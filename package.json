@@ -9,9 +9,9 @@
     "safe"
   ],
   "scripts": {
-    "build": "yarn rimraf dist && tsc",
-    "test": "jest",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "build": "yarn rimraf dist && tsc && hardhat compile",
+    "test": "hardhat deploy && hardhat test",
+    "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
   "repository": {
@@ -25,20 +25,31 @@
   },
   "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
   "devDependencies": {
-    "@types/jest": "^26.0.20",
+    "@gnosis.pm/safe-contracts": "^1.2.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.0",
+    "@typechain/ethers-v5": "^6.0.1",
+    "@types/chai": "^4.2.15",
+    "@types/mocha": "^8.2.1",
     "@types/node": "^14.14.28",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
+    "chai": "^4.3.1",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "ethereum-waffle": "^3.0.0",
+    "hardhat": "^2.0.11",
+    "hardhat-deploy": "^0.7.0-beta.46",
+    "hardhat-typechain": "^0.3.5",
     "husky": "^5.0.9",
-    "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
+    "mocha": "^8.3.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "ts-jest": "^26.5.1",
+    "ts-generator": "^0.1.1",
     "ts-node": "^9.1.1",
+    "typechain": "^4.0.2",
     "typescript": "^4.1.5"
   },
   "lint-staged": {

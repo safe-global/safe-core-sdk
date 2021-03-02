@@ -46,5 +46,13 @@ node_modules/
 .yarn/install-state.gz
 .pnp.*
 
-#macOS
+# macOS
 .DS_Store
+
+# Hardhat files
+cache
+artifacts
+deployments
+
+# Typechain
+typechain

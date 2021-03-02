@@ -4,9 +4,10 @@
   "description": "Safe Core SDK",
   "main": "index.ts",
   "keywords": [
+    "Ethereum",
     "Gnosis",
-    "sdk",
-    "safe"
+    "Safe",
+    "SDK"
   ],
   "scripts": {
     "build": "yarn rimraf dist && tsc && hardhat compile",

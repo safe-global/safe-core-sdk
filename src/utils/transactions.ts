@@ -27,10 +27,26 @@ interface SafeTransactionDataPartial {
   readonly nonce: string
 }
 
-export interface SafeTransaction {
+export class SafeTransaction {
   data: SafeTransactionData
-  signatures: Map<string, SafeSignature>
-  dataHash?: string
+  signatures: Map<string, SafeSignature> = new Map()
+
+  constructor(data: SafeTransactionData) {
+    this.data = data
+  }
+
+  encodedSignatures(): string {
+    const signers = Array.from(this.signatures.keys()).sort()
+    const baseOffset = signers.length * 130
+    let staticParts = ''
+    let dynamicParts = ''
+    signers.forEach((signerAddress) => {
+      const signer = this.signatures.get(signerAddress)!!
+      staticParts += signer.staticPart(/*baseOffset + dynamicParts.length / 2*/)
+      dynamicParts += signer.dynamicPart()
+    })
+    return '0x' + staticParts + dynamicParts
+  }
 }
 
 export function makeSafeTransaction({
@@ -57,8 +73,5 @@ export function makeSafeTransaction({
     refundReceiver,
     nonce
   }
-  return {
-    data: safeTransactionData,
-    signatures: new Map()
-  }
+  return new SafeTransaction(safeTransactionData)
 }

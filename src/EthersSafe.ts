@@ -1,24 +1,43 @@
-import SafeAbi from './abis/SafeAbiV1-1-1.json'
-import EthersSafeSigner from './EthersSafeSigner'
+import { BigNumber, Wallet } from 'ethers'
+import { GnosisSafe } from '../typechain'
+import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
-import { SafeTransaction, SafeTransactionData } from './utils/transactions'
+import { EthSignSignature, SafeSignature } from './utils/signatures'
+import { SafeTransaction } from './utils/transactions'
 
 class EthersSafe implements Safe {
-  contract: any
-  signer?: EthersSafeSigner
+  #contract: GnosisSafe
+  #ethers: any
+  #signer: Wallet
 
-  constructor(ethers: any, provider: any, address: string, signer?: EthersSafeSigner) {
-    this.contract = new ethers.Contract(address, SafeAbi, provider)
-    this.signer = signer
+  constructor(ethers: any, signer: Wallet, safeAddress: string) {
+    this.#ethers = ethers
+    this.#signer = signer
+    this.#contract = new ethers.Contract(safeAddress, SafeAbi, signer)
   }
 
   address(): string {
-    return this.contract.address
+    return this.#contract.address
+  }
+
+  async getOwners(): Promise<string[]> {
+    return this.#contract.getOwners()
+  }
+
+  async getThreshold(): Promise<BigNumber> {
+    return this.#contract.getThreshold()
+  }
+
+  async signMessage(hash: string): Promise<SafeSignature> {
+    const address = await this.#signer.address
+    const messageArray = this.#ethers.utils.arrayify(hash)
+    const signature = await this.#signer.signMessage(messageArray)
+    return new EthSignSignature(address, signature)
   }
 
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     const safeTransactionData = safeTransaction.data
-    const txHash = await this.contract.getTransactionHash(
+    const txHash = await this.#contract.getTransactionHash(
       safeTransactionData.to,
       safeTransactionData.value,
       safeTransactionData.data,
@@ -33,48 +52,59 @@ class EthersSafe implements Safe {
     return txHash
   }
 
-  async confirmTransaction(safeTransaction: SafeTransaction) {
-    // TODO: check owners
-    if (!this.signer) {
-      throw new Error('Signer not initialized')
+  async confirmTransaction(safeTransaction: SafeTransaction): Promise<void> {
+    const owners = await this.getOwners()
+    if (
+      owners.filter((owner: string) => owner.toLowerCase() === this.#signer.address.toLowerCase())
+        .length === 0
+    ) {
+      throw new Error('Transactions can only be confirmed by Safe owners')
     }
     const txHash = await this.getTransactionHash(safeTransaction)
-    const signature = await this.signer.sign(txHash)
+    const signature = await this.signMessage(txHash)
     safeTransaction.signatures.set(signature.signer, signature)
-    return safeTransaction
   }
 
-  async encodeTransaction(transaction: SafeTransactionData, signatures: string): Promise<string> {
-    const encodedTx = await this.contract.interface.functions.execTransaction.encode([
-      transaction.to,
-      transaction.value,
-      transaction.data,
-      transaction.operation,
-      transaction.safeTxGas,
-      transaction.baseGas,
-      transaction.gasPrice,
-      transaction.gasToken,
-      transaction.refundReceiver,
-      signatures
+  async encodeTransaction(transaction: SafeTransaction): Promise<string> {
+    const encodedTx = await this.#contract.interface.encodeFunctionData('execTransaction', [
+      transaction.data.to,
+      transaction.data.value,
+      transaction.data.data,
+      transaction.data.operation,
+      transaction.data.safeTxGas,
+      transaction.data.baseGas,
+      transaction.data.gasPrice,
+      transaction.data.gasToken,
+      transaction.data.refundReceiver,
+      transaction.encodedSignatures()
     ])
     return encodedTx
   }
 
-  async executeTransaction(transaction: SafeTransactionData, signatures: string): Promise<string> {
-    // TODO check nonce
-    const txHash = await this.contract.execTransaction(
-      transaction.to,
-      transaction.value,
-      transaction.data,
-      transaction.operation,
-      transaction.safeTxGas,
-      transaction.baseGas,
-      transaction.gasPrice,
-      transaction.gasToken,
-      transaction.refundReceiver,
-      signatures
+  async executeTransaction(transaction: SafeTransaction, options?: any): Promise<any> {
+    const threshold = await this.getThreshold()
+    if (threshold.gt(transaction.signatures.size)) {
+      const signaturesMissing = threshold.sub(transaction.signatures.size).toNumber()
+      throw new Error(
+        `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
+          signaturesMissing > 1 ? 's' : ''
+        } missing`
+      )
+    }
+    const txResponse = await this.#contract.execTransaction(
+      transaction.data.to,
+      transaction.data.value,
+      transaction.data.data,
+      transaction.data.operation,
+      transaction.data.safeTxGas,
+      transaction.data.baseGas,
+      transaction.data.gasPrice,
+      transaction.data.gasToken,
+      transaction.data.refundReceiver,
+      transaction.encodedSignatures(),
+      { ...options }
     )
-    return txHash
+    return txResponse
   }
 }
 

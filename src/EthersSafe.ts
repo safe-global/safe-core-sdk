@@ -16,8 +16,12 @@ class EthersSafe implements Safe {
     this.#contract = new ethers.Contract(safeAddress, SafeAbi, signer)
   }
 
-  address(): string {
+  getAddress(): string {
     return this.#contract.address
+  }
+
+  async getContractVersion(): Promise<string> {
+    return this.#contract.VERSION()
   }
 
   async getOwners(): Promise<string[]> {
@@ -28,11 +32,16 @@ class EthersSafe implements Safe {
     return this.#contract.getThreshold()
   }
 
-  async signMessage(hash: string): Promise<SafeSignature> {
-    const address = await this.#signer.address
-    const messageArray = this.#ethers.utils.arrayify(hash)
-    const signature = await this.#signer.signMessage(messageArray)
-    return new EthSignSignature(address, signature)
+  async getNetworkId(): Promise<number> {
+    return (await this.#signer.provider.getNetwork()).chainId
+  }
+
+  async getBalance(): Promise<BigNumber> {
+    return BigNumber.from(await this.#signer.provider.getBalance(this.getAddress()))
+  }
+
+  async getModules(): Promise<string[]> {
+    return this.#contract.getModules()
   }
 
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
@@ -50,6 +59,13 @@ class EthersSafe implements Safe {
       safeTransactionData.nonce
     )
     return txHash
+  }
+
+  async signMessage(hash: string): Promise<SafeSignature> {
+    const address = await this.#signer.address
+    const messageArray = this.#ethers.utils.arrayify(hash)
+    const signature = await this.#signer.signMessage(messageArray)
+    return new EthSignSignature(address, signature)
   }
 
   async confirmTransaction(safeTransaction: SafeTransaction): Promise<void> {
@@ -105,6 +121,10 @@ class EthersSafe implements Safe {
       { ...options }
     )
     return txResponse
+  }
+
+  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+    return this.#contract.isModuleEnabled(moduleAddress)
   }
 }
 

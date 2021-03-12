@@ -1,5 +1,5 @@
 import { zeroAddress } from './constants'
-import { SafeSignature } from './signatures'
+import { SafeSignature } from './signatures/SafeSignature'
 
 export enum OperationType {
   Call, // 0
@@ -61,9 +61,9 @@ export class SafeTransaction {
     let staticParts = ''
     let dynamicParts = ''
     signers.forEach((signerAddress) => {
-      const signer = this.signatures.get(signerAddress)!!
-      staticParts += signer.staticPart(/*baseOffset + dynamicParts.length / 2*/)
-      dynamicParts += signer.dynamicPart()
+      const signature = this.signatures.get(signerAddress)
+      staticParts += signature?.staticPart(/*baseOffset + dynamicParts.length / 2*/).slice(2)
+      dynamicParts += signature?.dynamicPart()
     })
     return '0x' + staticParts + dynamicParts
   }

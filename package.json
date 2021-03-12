@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "yarn rimraf dist && tsc && hardhat compile",
-    "test": "hardhat deploy && hardhat test",
+    "test": "hardhat deploy && nyc hardhat test",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
@@ -51,6 +51,7 @@
     "husky": "^5.0.9",
     "lint-staged": "^10.5.4",
     "mocha": "^8.3.0",
+    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "ts-generator": "^0.1.1",

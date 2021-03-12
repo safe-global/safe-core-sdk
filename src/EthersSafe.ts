@@ -89,6 +89,16 @@ class EthersSafe implements Safe {
   }
 
   /**
+   * Checks if a specific Safe module is enabled for the current Safe.
+   *
+   * @param moduleAddress - The desired module address
+   * @returns TRUE if the module is enabled
+   */
+  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+    return this.#contract.isModuleEnabled(moduleAddress)
+  }
+
+  /**
    * Returns the transaction hash to be signed by the owners.
    *
    * @param safeTransaction - The Safe transaction
@@ -129,7 +139,7 @@ class EthersSafe implements Safe {
    *
    * @param safeTransaction - The Safe transaction to be signed
    */
-  async confirmTransaction(safeTransaction: SafeTransaction): Promise<void> {
+  async signTransaction(safeTransaction: SafeTransaction): Promise<void> {
     const owners = await this.getOwners()
     if (!owners.find((owner: string) => areAddressesEqual(owner, this.#signer.address))) {
       throw new Error('Transactions can only be confirmed by Safe owners')
@@ -192,16 +202,6 @@ class EthersSafe implements Safe {
       { ...options }
     )
     return txResponse
-  }
-
-  /**
-   * Checks if a specific Safe module is enabled for the current Safe.
-   *
-   * @param moduleAddress - The desired module address
-   * @returns TRUE if the module is enabled
-   */
-  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.#contract.isModuleEnabled(moduleAddress)
   }
 }
 

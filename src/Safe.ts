@@ -10,12 +10,12 @@ interface Safe {
   getNetworkId(): Promise<number>
   getBalance(): Promise<BigNumber>
   getModules(): Promise<string[]>
+  isModuleEnabled(moduleAddress: string): Promise<boolean>
   getTransactionHash(transaction: SafeTransaction): Promise<string>
   signTransactionHash(hash: string): Promise<SafeSignature>
-  confirmTransaction(transaction: SafeTransaction): Promise<void>
+  signTransaction(transaction: SafeTransaction): Promise<void>
   encodeTransaction(transaction: SafeTransaction): Promise<string>
   executeTransaction(transaction: SafeTransaction, options?: any): Promise<any>
-  isModuleEnabled(moduleAddress: string): Promise<boolean>
 }
 
 export default Safe

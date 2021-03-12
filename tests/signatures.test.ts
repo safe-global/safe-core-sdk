@@ -16,7 +16,7 @@ describe('Safe Core SDK', () => {
     }
   })
 
-  describe('confirmTransaction', async () => {
+  describe('signTransaction', async () => {
     it('should fail if signature is not added by an owner', async () => {
       const { safe } = await setupTests()
       const tx = new SafeTransaction({
@@ -27,7 +27,7 @@ describe('Safe Core SDK', () => {
       })
       const safeSdk = new EthersSafe(ethers, user3, safe.address)
       chai
-        .expect(safeSdk.confirmTransaction(tx))
+        .expect(safeSdk.signTransaction(tx))
         .to.be.rejectedWith('Transactions can only be confirmed by Safe owners')
     })
 
@@ -41,9 +41,9 @@ describe('Safe Core SDK', () => {
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const safeSdk = new EthersSafe(ethers, user1, safe.address)
-      await safeSdk.confirmTransaction(tx)
+      await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
-      await safeSdk.confirmTransaction(tx)
+      await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
     })
 
@@ -57,7 +57,7 @@ describe('Safe Core SDK', () => {
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const safeSdk = new EthersSafe(ethers, user1, safe.address)
-      await safeSdk.confirmTransaction(tx)
+      await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
     })
   })
@@ -72,7 +72,7 @@ describe('Safe Core SDK', () => {
         nonce: (await safe.nonce()).toString()
       })
       const safeSdk = new EthersSafe(ethers, user1, safe.address)
-      await safeSdk.confirmTransaction(tx)
+      await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
       chai
         .expect(
@@ -107,10 +107,10 @@ describe('Safe Core SDK', () => {
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
       let safeSdk = new EthersSafe(ethers, user1, safe.address)
-      await safeSdk.confirmTransaction(tx)
+      await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
       safeSdk = new EthersSafe(ethers, user2, safe.address)
-      await safeSdk.confirmTransaction(tx)
+      await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(2)
       const txResponse = await safeSdk.executeTransaction(tx)
       chai.expect(txResponse.hash).not.to.be.null

@@ -53,10 +53,10 @@ const tx = new SafeTransaction({
 3. Generate the signatures with both owners:
 ```js
 let safeSdk = new EthersSafe(ethers, wallet1, safeAddress)
-await safeSdk.confirmTransaction(tx)
+await safeSdk.signTransaction(tx)
 
 safeSdk = new EthersSafe(ethers, wallet2, safeAddress)
-await safeSdk.confirmTransaction(tx)
+await safeSdk.signTransaction(tx)
 ```
 
 4. Execute the transaction with the two signatures added:

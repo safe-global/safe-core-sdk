@@ -1,28 +1,48 @@
-import { BigNumber, Wallet } from 'ethers'
+import { Provider } from '@ethersproject/providers'
+import { BigNumber, ContractTransaction, Wallet } from 'ethers'
 import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
 import { areAddressesEqual } from './utils'
-import { EthSignSignature, SafeSignature } from './utils/signatures'
+import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
 class EthersSafe implements Safe {
-  #contract: GnosisSafe
+  #contract!: GnosisSafe
   #ethers: any
-  #signer: Wallet
+  #provider!: Provider
+  #signer?: Wallet
 
   /**
    * Creates an instance of the Safe Core SDK.
    *
    * @param ethers - Ethers v5 library
-   * @param signer - Ethers signer
+   * @param providerOrSigner - Ethers provider or signer
    * @param safeAddress - The address of the Safe account to use
    * @returns The Safe Core SDK instance
    */
-  constructor(ethers: any, signer: Wallet, safeAddress: string) {
+  constructor(ethers: any, safeAddress: string, providerOrSigner: Provider | Wallet) {
     this.#ethers = ethers
-    this.#signer = signer
-    this.#contract = new ethers.Contract(safeAddress, SafeAbi, signer)
+    this.connect(safeAddress, providerOrSigner)
+  }
+
+  connect(safeAddress: string, providerOrSigner: Provider | Wallet): void {
+    this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, providerOrSigner)
+    if (Wallet.isSigner(providerOrSigner)) {
+      this.#signer = providerOrSigner
+      this.#provider = providerOrSigner.provider
+      return
+    }
+    this.#signer = undefined
+    this.#provider = providerOrSigner
+  }
+
+  getProvider(): Provider {
+    return this.#provider
+  }
+
+  getSigner(): Wallet | undefined {
+    return this.#signer
   }
 
   /**
@@ -67,7 +87,7 @@ class EthersSafe implements Safe {
    * @returns The chainId of the connected network
    */
   async getNetworkId(): Promise<number> {
-    return (await this.#signer.provider.getNetwork()).chainId
+    return (await this.#provider.getNetwork()).chainId
   }
 
   /**
@@ -76,7 +96,7 @@ class EthersSafe implements Safe {
    * @returns The ETH balance of the Safe
    */
   async getBalance(): Promise<BigNumber> {
-    return BigNumber.from(await this.#signer.provider.getBalance(this.getAddress()))
+    return BigNumber.from(await this.#provider.getBalance(this.getAddress()))
   }
 
   /**
@@ -122,16 +142,26 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Signs data using the current owner account.
+   * Signs a hash using the current owner account.
    *
-   * @param hash - The data to sign
+   * @param hash - The hash to sign
    * @returns The Safe signature
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
-    const address = await this.#signer.address
+    if (!this.#signer) {
+      throw new Error('No signer provided')
+    }
+    const owners = await this.getOwners()
+    if (
+      !owners.find(
+        (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+      )
+    ) {
+      throw new Error('Transactions can only be signed by Safe owners')
+    }
     const messageArray = this.#ethers.utils.arrayify(hash)
     const signature = await this.#signer.signMessage(messageArray)
-    return new EthSignSignature(address, signature)
+    return new EthSignSignature(this.#signer.address, signature)
   }
 
   /**
@@ -140,48 +170,26 @@ class EthersSafe implements Safe {
    * @param safeTransaction - The Safe transaction to be signed
    */
   async signTransaction(safeTransaction: SafeTransaction): Promise<void> {
-    const owners = await this.getOwners()
-    if (!owners.find((owner: string) => areAddressesEqual(owner, this.#signer.address))) {
-      throw new Error('Transactions can only be confirmed by Safe owners')
-    }
     const txHash = await this.getTransactionHash(safeTransaction)
     const signature = await this.signTransactionHash(txHash)
     safeTransaction.signatures.set(signature.signer, signature)
   }
 
-  /**
-   * Returns the encoding of a Safe transaction.
-   *
-   * @param transaction - The Safe transaction
-   * @returns The encoding of the Safe transaction
-   */
-  async encodeTransaction(transaction: SafeTransaction): Promise<string> {
-    const encodedTx = await this.#contract.interface.encodeFunctionData('execTransaction', [
-      transaction.data.to,
-      transaction.data.value,
-      transaction.data.data,
-      transaction.data.operation,
-      transaction.data.safeTxGas,
-      transaction.data.baseGas,
-      transaction.data.gasPrice,
-      transaction.data.gasToken,
-      transaction.data.refundReceiver,
-      transaction.encodedSignatures()
-    ])
-    return encodedTx
-  }
 
   /**
    * Executes a Safe transaction.
    *
-   * @param transaction - The Safe transaction to execute
+   * @param safeTransaction - The Safe transaction to execute
    * @param options - Execution configuration options
    * @returns The Safe transaction response
    */
-  async executeTransaction(transaction: SafeTransaction, options?: any): Promise<any> {
+  async executeTransaction(
+    safeTransaction: SafeTransaction,
+    options?: any
+  ): Promise<ContractTransaction> {
     const threshold = await this.getThreshold()
-    if (threshold.gt(transaction.signatures.size)) {
-      const signaturesMissing = threshold.sub(transaction.signatures.size).toNumber()
+    if (threshold.gt(safeTransaction.signatures.size)) {
+      const signaturesMissing = threshold.sub(safeTransaction.signatures.size).toNumber()
       throw new Error(
         `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
           signaturesMissing > 1 ? 's' : ''
@@ -189,16 +197,16 @@ class EthersSafe implements Safe {
       )
     }
     const txResponse = await this.#contract.execTransaction(
-      transaction.data.to,
-      transaction.data.value,
-      transaction.data.data,
-      transaction.data.operation,
-      transaction.data.safeTxGas,
-      transaction.data.baseGas,
-      transaction.data.gasPrice,
-      transaction.data.gasToken,
-      transaction.data.refundReceiver,
-      transaction.encodedSignatures(),
+      safeTransaction.data.to,
+      safeTransaction.data.value,
+      safeTransaction.data.data,
+      safeTransaction.data.operation,
+      safeTransaction.data.safeTxGas,
+      safeTransaction.data.baseGas,
+      safeTransaction.data.gasPrice,
+      safeTransaction.data.gasToken,
+      safeTransaction.data.refundReceiver,
+      safeTransaction.encodedSignatures(),
       { ...options }
     )
     return txResponse

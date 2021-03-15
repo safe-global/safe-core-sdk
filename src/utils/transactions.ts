@@ -49,6 +49,12 @@ export class SafeTransaction {
   }
 }
 
+/**
+ * Makes a standardized Safe transaction
+ * 
+ * @param transaction - The Safe transaction object
+ * @returns The standardized Safe transaction
+ */
 export function makeSafeTransaction({
   to,
   value,

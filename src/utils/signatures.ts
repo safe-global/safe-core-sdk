@@ -11,7 +11,7 @@ export class EthSignSignature implements SafeSignature {
 
   /**
    * Creates an instance of a Safe signature.
-   * 
+   *
    * @param signer - Ethers signer
    * @param signature - The Safe signature
    * @returns The Safe signature instance
@@ -28,7 +28,7 @@ export class EthSignSignature implements SafeSignature {
 
   /**
    * Returns the static part of the Safe signature.
-   * 
+   *
    * @Returns The static part of the Safe signature
    */
   staticPart(/* dynamicOffset: number */) {
@@ -37,7 +37,7 @@ export class EthSignSignature implements SafeSignature {
 
   /**
    * Returns the dynamic part of the Safe signature.
-   * 
+   *
    * @Returns The dynamic part of the Safe signature
    */
   dynamicPart() {

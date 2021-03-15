@@ -26,7 +26,7 @@ class EthersSafe implements Safe {
 
   /**
    * Returns the address of the current Safe Proxy contract.
-   * 
+   *
    * @returns The address of the Safe Proxy contract
    */
   getAddress(): string {
@@ -35,7 +35,7 @@ class EthersSafe implements Safe {
 
   /**
    * Returns the Safe Master Copy contract version.
-   * 
+   *
    * @returns The Safe Master Copy contract version
    */
   async getContractVersion(): Promise<string> {
@@ -44,7 +44,7 @@ class EthersSafe implements Safe {
 
   /**
    * Returns the list of Safe owner accounts.
-   * 
+   *
    * @returns The list of owners
    */
   async getOwners(): Promise<string[]> {
@@ -53,7 +53,7 @@ class EthersSafe implements Safe {
 
   /**
    * Returns the Safe threshold.
-   * 
+   *
    * @returns The Safe threshold
    */
   async getThreshold(): Promise<BigNumber> {
@@ -89,7 +89,7 @@ class EthersSafe implements Safe {
 
   /**
    * Returns the transaction hash to be signed by the owners.
-   * 
+   *
    * @param safeTransaction - The Safe transaction
    * @returns The transaction hash of the Safe transaction
    */
@@ -112,9 +112,9 @@ class EthersSafe implements Safe {
 
   /**
    * Signs data using the current owner account.
-   * 
+   *
    * @param hash - The data to sign
-   * @returns The Safe signature 
+   * @returns The Safe signature
    */
   async signMessage(hash: string): Promise<SafeSignature> {
     const address = await this.#signer.address
@@ -125,7 +125,7 @@ class EthersSafe implements Safe {
 
   /**
    * Adds the signature of the current owner to the Safe transaction object.
-   * 
+   *
    * @param safeTransaction - The Safe transaction to be signed
    */
   async confirmTransaction(safeTransaction: SafeTransaction): Promise<void> {

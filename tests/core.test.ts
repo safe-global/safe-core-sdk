@@ -7,12 +7,12 @@ import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 
 describe('Safe Core SDK', () => {
-  const [user1] = waffle.provider.getWallets()
+  const [user1, user2] = waffle.provider.getWallets()
 
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     return {
-      safe: await getSafeWithOwners([user1.address, user1.address]),
+      safe: await getSafeWithOwners([user1.address, user2.address]),
       chainId: (await waffle.provider.getNetwork()).chainId
     }
   })
@@ -31,6 +31,25 @@ describe('Safe Core SDK', () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, user1, safe.address)
       chai.expect(safeSdk.getAddress()).to.be.eq(safe.address)
+    })
+  })
+
+  describe('getOwners', async () => {
+    it('should return the list of Safe owners', async () => {
+      const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, user1, safe.address)
+      const owners = await safeSdk.getOwners()
+      chai.expect(owners.length).to.be.eq(2)
+      chai.expect(owners[0]).to.be.eq(user1.address)
+      chai.expect(owners[1]).to.be.eq(user2.address)
+    })
+  })
+
+  describe('getThreshold', async () => {
+    it('should return the Safe threshold', async () => {
+      const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, user1, safe.address)
+      chai.expect(await safeSdk.getThreshold()).to.be.eq(2)
     })
   })
 

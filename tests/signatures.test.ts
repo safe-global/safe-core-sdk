@@ -1,8 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe from '../src/index'
-import { makeSafeTransaction } from '../src/utils/transactions'
+import EthersSafe, { makeSafeTransaction } from '../src/index'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 

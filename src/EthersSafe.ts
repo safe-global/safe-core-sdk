@@ -4,6 +4,7 @@ import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
 import { areAddressesEqual } from './utils'
+import { generatePreValidatedSignature } from './utils/signatures'
 import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
@@ -175,6 +176,51 @@ class EthersSafe implements Safe {
     safeTransaction.signatures.set(signature.signer, signature)
   }
 
+  /**
+   * Approves a hash using the current owner account.
+   *
+   * @param hash - The hash to approve
+   * @param skipOnChainApproval - TRUE to avoid the Safe transaction to be approved on-chain
+   * @returns The pre-validated signature
+   */
+  async approveTransactionHash(
+    hash: string,
+    skipOnChainApproval?: boolean
+  ): Promise<SafeSignature> {
+    if (!this.#signer) {
+      throw new Error('No signer provided')
+    }
+    const owners = await this.getOwners()
+    if (
+      !owners.find(
+        (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+      )
+    ) {
+      throw new Error('Transaction hashes can only be approved by Safe owners')
+    }
+    if (!skipOnChainApproval) {
+      await this.#contract.approveHash(hash)
+    }
+    return generatePreValidatedSignature(this.#signer.address)
+  }
+
+  /**
+   * Returns a list of owners who have approved a specific Safe transaction
+   *
+   * @param txHash - The Safe transaction hash
+   * @returns The list of owners
+   */
+  async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
+    const owners = await this.getOwners()
+    let ownersWhoApproved: string[] = []
+    for (const owner of owners) {
+      const approved = await this.#contract.approvedHashes(owner, txHash)
+      if (approved.gt(0)) {
+        ownersWhoApproved.push(owner)
+      }
+    }
+    return ownersWhoApproved
+  }
 
   /**
    * Executes a Safe transaction.
@@ -196,6 +242,54 @@ class EthersSafe implements Safe {
         } missing`
       )
     }
+
+    const txResponse = await this.#contract.execTransaction(
+      safeTransaction.data.to,
+      safeTransaction.data.value,
+      safeTransaction.data.data,
+      safeTransaction.data.operation,
+      safeTransaction.data.safeTxGas,
+      safeTransaction.data.baseGas,
+      safeTransaction.data.gasPrice,
+      safeTransaction.data.gasToken,
+      safeTransaction.data.refundReceiver,
+      safeTransaction.encodedSignatures(),
+      { ...options }
+    )
+    return txResponse
+  }
+
+  async executeTransactionOnChain(
+    safeTransaction: SafeTransaction,
+    options?: any
+  ): Promise<ContractTransaction> {
+    if (!this.#signer) {
+      throw new Error('No signer provided')
+    }
+
+    const txHash = await this.getTransactionHash(safeTransaction)
+    const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
+    for (const owner of ownersWhoApprovedTx) {
+      safeTransaction.signatures.set(owner, generatePreValidatedSignature(owner))
+    }
+    const owners = await this.getOwners()
+    if (owners.includes(this.#signer.address)) {
+      safeTransaction.signatures.set(
+        this.#signer.address,
+        generatePreValidatedSignature(this.#signer.address)
+      )
+    }
+
+    const threshold = await this.getThreshold()
+    if (threshold.gt(safeTransaction.signatures.size)) {
+      const signaturesMissing = threshold.sub(safeTransaction.signatures.size).toNumber()
+      throw new Error(
+        `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
+          signaturesMissing > 1 ? 's' : ''
+        } missing`
+      )
+    }
+
     const txResponse = await this.#contract.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,

@@ -1,8 +1,10 @@
-import { BigNumber } from 'ethers'
-import { SafeSignature } from 'utils/signatures'
+import { Provider } from '@ethersproject/providers'
+import { BigNumber, ContractTransaction, Wallet } from 'ethers'
+import { SafeSignature } from 'utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
 interface Safe {
+  connect(safeAddress: string, providerOrSigner: Provider | Wallet): void
   getAddress(): string
   getContractVersion(): Promise<string>
   getOwners(): Promise<string[]>
@@ -11,11 +13,16 @@ interface Safe {
   getBalance(): Promise<BigNumber>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
-  getTransactionHash(transaction: SafeTransaction): Promise<string>
+  getTransactionHash(safeTransaction: SafeTransaction): Promise<string>
   signTransactionHash(hash: string): Promise<SafeSignature>
-  signTransaction(transaction: SafeTransaction): Promise<void>
-  encodeTransaction(transaction: SafeTransaction): Promise<string>
-  executeTransaction(transaction: SafeTransaction, options?: any): Promise<any>
+  signTransaction(safeTransaction: SafeTransaction): Promise<void>
+  approveTransactionHash(hash: string, skipOnChainApproval: boolean): Promise<SafeSignature>
+  getOwnersWhoApprovedTx(txHash: string): Promise<string[]>
+  executeTransaction(safeTransaction: SafeTransaction, options?: any): Promise<ContractTransaction>
+  executeTransactionOnChain(
+    safeTransaction: SafeTransaction,
+    options?: any
+  ): Promise<ContractTransaction>
 }
 
 export default Safe

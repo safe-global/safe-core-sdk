@@ -1,50 +1,48 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe, { SafeTransaction } from '../src/index'
+import EthersSafe, { SafeTransaction } from '../src'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 
-describe('Safe Core SDK', () => {
+describe('Off-chain signatures', () => {
   const [user1, user2, user3] = waffle.provider.getWallets()
 
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     return {
-      safe: await getSafeWithOwners([user1.address, user2.address]),
-      chainId: (await waffle.provider.getNetwork()).chainId
+      safe: await getSafeWithOwners([user1.address, user2.address])
     }
   })
 
-  describe('signTransaction', async () => {
-    it('should fail if signature is not added by an owner', async () => {
+  describe('signTransactionHash', async () => {
+    it('should fail if signer is not provided', async () => {
       const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, safe.address, user1.provider)
+      const tx = new SafeTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x',
+        nonce: (await safe.nonce()).toString()
+      })
+      const txHash = await safeSdk.getTransactionHash(tx)
+      chai.expect(safeSdk.signTransactionHash(txHash)).to.be.rejectedWith('No signer provided')
+    })
+  })
+
+  describe('signTransaction', async () => {
+    it('should fail if signature is added by an account that is not an owner', async () => {
+      const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, safe.address, user3)
       const tx = new SafeTransaction({
         to: user1.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      const safeSdk = new EthersSafe(ethers, user3, safe.address)
       chai
         .expect(safeSdk.signTransaction(tx))
-        .to.be.rejectedWith('Transactions can only be confirmed by Safe owners')
-    })
-
-    it('should ignore duplicated signatures', async () => {
-      const { safe } = await setupTests()
-      const tx = new SafeTransaction({
-        to: user1.address,
-        value: '0',
-        data: '0x',
-        nonce: await safe.nonce()
-      })
-      chai.expect(tx.signatures.size).to.be.eq(0)
-      const safeSdk = new EthersSafe(ethers, user1, safe.address)
-      await safeSdk.signTransaction(tx)
-      chai.expect(tx.signatures.size).to.be.eq(1)
-      await safeSdk.signTransaction(tx)
-      chai.expect(tx.signatures.size).to.be.eq(1)
+        .to.be.rejectedWith('Transactions can only be signed by Safe owners')
     })
 
     it('should add owner signature', async () => {
@@ -56,7 +54,23 @@ describe('Safe Core SDK', () => {
         nonce: (await safe.nonce()).toString()
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
-      const safeSdk = new EthersSafe(ethers, user1, safe.address)
+      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      await safeSdk.signTransaction(tx)
+      chai.expect(tx.signatures.size).to.be.eq(1)
+    })
+
+    it('should ignore duplicated signatures', async () => {
+      const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const tx = new SafeTransaction({
+        to: user1.address,
+        value: '0',
+        data: '0x',
+        nonce: await safe.nonce()
+      })
+      chai.expect(tx.signatures.size).to.be.eq(0)
+      await safeSdk.signTransaction(tx)
+      chai.expect(tx.signatures.size).to.be.eq(1)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
     })
@@ -65,13 +79,13 @@ describe('Safe Core SDK', () => {
   describe('execTransaction', async () => {
     it('should fail if there are not enough signatures (1 missing)', async () => {
       const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      const safeSdk = new EthersSafe(ethers, user1, safe.address)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
       chai
@@ -85,13 +99,13 @@ describe('Safe Core SDK', () => {
 
     it('should fail if there are not enough signatures (>1 missing)', async () => {
       const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      const safeSdk = new EthersSafe(ethers, user1, safe.address)
       chai
         .expect(safeSdk.executeTransaction(tx))
         .to.be.rejectedWith('There are 2 signatures missing')
@@ -99,6 +113,7 @@ describe('Safe Core SDK', () => {
 
     it('should execute transaction when there are enough signatures', async () => {
       const { safe } = await setupTests()
+      let safeSdk = new EthersSafe(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -106,10 +121,9 @@ describe('Safe Core SDK', () => {
         nonce: (await safe.nonce()).toString()
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
-      let safeSdk = new EthersSafe(ethers, user1, safe.address)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
-      safeSdk = new EthersSafe(ethers, user2, safe.address)
+      safeSdk.connect(safe.address, user2)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(2)
       const txResponse = await safeSdk.executeTransaction(tx)

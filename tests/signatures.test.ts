@@ -1,8 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe from '../src/index'
-import { makeSafeTransaction } from '../src/utils/transactions'
+import EthersSafe, { SafeTransaction } from '../src/index'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 
@@ -20,7 +19,7 @@ describe('Safe Core SDK', () => {
   describe('confirmTransaction', async () => {
     it('should fail if signature is not added by an owner', async () => {
       const { safe } = await setupTests()
-      const tx = makeSafeTransaction({
+      const tx = new SafeTransaction({
         to: user1.address,
         value: '0',
         data: '0x',
@@ -34,11 +33,11 @@ describe('Safe Core SDK', () => {
 
     it('should ignore duplicated signatures', async () => {
       const { safe } = await setupTests()
-      const tx = makeSafeTransaction({
+      const tx = new SafeTransaction({
         to: user1.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safe.nonce()
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const safeSdk = new EthersSafe(ethers, user1, safe.address)
@@ -50,7 +49,7 @@ describe('Safe Core SDK', () => {
 
     it('should add owner signature', async () => {
       const { safe } = await setupTests()
-      const tx = makeSafeTransaction({
+      const tx = new SafeTransaction({
         to: user1.address,
         value: '0',
         data: '0x',
@@ -66,7 +65,7 @@ describe('Safe Core SDK', () => {
   describe('execTransaction', async () => {
     it('should fail if there are not enough signatures (1 missing)', async () => {
       const { safe } = await setupTests()
-      const tx = makeSafeTransaction({
+      const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
@@ -86,7 +85,7 @@ describe('Safe Core SDK', () => {
 
     it('should fail if there are not enough signatures (>1 missing)', async () => {
       const { safe } = await setupTests()
-      const tx = makeSafeTransaction({
+      const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
@@ -100,7 +99,7 @@ describe('Safe Core SDK', () => {
 
     it('should execute transaction when there are enough signatures', async () => {
       const { safe } = await setupTests()
-      const tx = makeSafeTransaction({
+      const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',

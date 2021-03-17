@@ -2,6 +2,7 @@ import { BigNumber, Wallet } from 'ethers'
 import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
+import { areAddressesEqual } from './utils'
 import { EthSignSignature, SafeSignature } from './utils/signatures'
 import { SafeTransaction } from './utils/transactions'
 
@@ -54,10 +55,7 @@ class EthersSafe implements Safe {
 
   async confirmTransaction(safeTransaction: SafeTransaction): Promise<void> {
     const owners = await this.getOwners()
-    if (
-      owners.filter((owner: string) => owner.toLowerCase() === this.#signer.address.toLowerCase())
-        .length === 0
-    ) {
+    if (!owners.find((owner: string) => areAddressesEqual(owner, this.#signer.address))) {
       throw new Error('Transactions can only be confirmed by Safe owners')
     }
     const txHash = await this.getTransactionHash(safeTransaction)

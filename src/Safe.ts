@@ -11,7 +11,7 @@ interface Safe {
   getBalance(): Promise<BigNumber>
   getModules(): Promise<string[]>
   getTransactionHash(transaction: SafeTransaction): Promise<string>
-  signMessage(hash: string): Promise<SafeSignature>
+  signTransactionHash(hash: string): Promise<SafeSignature>
   confirmTransaction(transaction: SafeTransaction): Promise<void>
   encodeTransaction(transaction: SafeTransaction): Promise<string>
   executeTransaction(transaction: SafeTransaction, options?: any): Promise<any>

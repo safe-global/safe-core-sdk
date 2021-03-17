@@ -117,7 +117,7 @@ class EthersSafe implements Safe {
    * @param hash - The data to sign
    * @returns The Safe signature
    */
-  async signMessage(hash: string): Promise<SafeSignature> {
+  async signTransactionHash(hash: string): Promise<SafeSignature> {
     const address = await this.#signer.address
     const messageArray = this.#ethers.utils.arrayify(hash)
     const signature = await this.#signer.signMessage(messageArray)
@@ -135,7 +135,7 @@ class EthersSafe implements Safe {
       throw new Error('Transactions can only be confirmed by Safe owners')
     }
     const txHash = await this.getTransactionHash(safeTransaction)
-    const signature = await this.signMessage(txHash)
+    const signature = await this.signTransactionHash(txHash)
     safeTransaction.signatures.set(signature.signer, signature)
   }
 

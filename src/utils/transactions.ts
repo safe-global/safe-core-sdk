@@ -1,38 +1,58 @@
-import { zeroAddress, zeroNumber } from './constants'
+import { zeroAddress } from './constants'
 import { SafeSignature } from './signatures'
+
+export enum OperationType {
+  Call, // 0
+  DelegateCall // 1
+}
 
 export interface SafeTransactionData {
   readonly to: string
   readonly value: string
   readonly data: string
-  readonly operation: string
-  readonly safeTxGas: string
-  readonly baseGas: string
-  readonly gasPrice: string
+  readonly operation: OperationType
+  readonly safeTxGas: number
+  readonly baseGas: number
+  readonly gasPrice: number
   readonly gasToken: string
   readonly refundReceiver: string
-  readonly nonce: string
+  readonly nonce: number
 }
 
 interface SafeTransactionDataPartial {
   readonly to: string
   readonly value: string
   readonly data: string
-  readonly operation?: string
-  readonly safeTxGas?: string
-  readonly baseGas?: string
-  readonly gasPrice?: string
+  readonly operation?: OperationType
+  readonly safeTxGas?: number
+  readonly baseGas?: number
+  readonly gasPrice?: number
   readonly gasToken?: string
   readonly refundReceiver?: string
-  readonly nonce: string
+  readonly nonce: number
+}
+
+export function standardizeSafeTransaction(tx: SafeTransactionDataPartial): SafeTransactionData {
+  return {
+    to: tx.to,
+    value: tx.value,
+    data: tx.data,
+    operation: tx.operation || OperationType.Call,
+    safeTxGas: tx.safeTxGas || 0,
+    baseGas: tx.baseGas || 0,
+    gasPrice: tx.gasPrice || 0,
+    gasToken: tx.gasToken || zeroAddress,
+    refundReceiver: tx.refundReceiver || zeroAddress,
+    nonce: tx.nonce
+  }
 }
 
 export class SafeTransaction {
   data: SafeTransactionData
   signatures: Map<string, SafeSignature> = new Map()
 
-  constructor(data: SafeTransactionData) {
-    this.data = data
+  constructor(data: SafeTransactionDataPartial) {
+    this.data = standardizeSafeTransaction(data)
   }
 
   encodedSignatures(): string {
@@ -47,37 +67,4 @@ export class SafeTransaction {
     })
     return '0x' + staticParts + dynamicParts
   }
-}
-
-/**
- * Makes a standardized Safe transaction
- *
- * @param transaction - The Safe transaction object
- * @returns The standardized Safe transaction
- */
-export function makeSafeTransaction({
-  to,
-  value,
-  data,
-  operation = zeroNumber,
-  safeTxGas = zeroNumber,
-  baseGas = zeroNumber,
-  gasPrice = zeroNumber,
-  gasToken = zeroAddress,
-  refundReceiver = zeroAddress,
-  nonce
-}: SafeTransactionDataPartial): SafeTransaction {
-  const safeTransactionData: SafeTransactionData = {
-    to,
-    value,
-    data,
-    operation,
-    safeTxGas,
-    baseGas,
-    gasPrice,
-    gasToken,
-    refundReceiver,
-    nonce
-  }
-  return new SafeTransaction(safeTransactionData)
 }

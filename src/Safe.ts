@@ -19,10 +19,6 @@ interface Safe {
   approveTransactionHash(hash: string, skipOnChainApproval: boolean): Promise<SafeSignature>
   getOwnersWhoApprovedTx(txHash: string): Promise<string[]>
   executeTransaction(safeTransaction: SafeTransaction, options?: any): Promise<ContractTransaction>
-  executeTransactionOnChain(
-    safeTransaction: SafeTransaction,
-    options?: any
-  ): Promise<ContractTransaction>
 }
 
 export default Safe

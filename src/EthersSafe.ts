@@ -233,36 +233,6 @@ class EthersSafe implements Safe {
     safeTransaction: SafeTransaction,
     options?: any
   ): Promise<ContractTransaction> {
-    const threshold = await this.getThreshold()
-    if (threshold.gt(safeTransaction.signatures.size)) {
-      const signaturesMissing = threshold.sub(safeTransaction.signatures.size).toNumber()
-      throw new Error(
-        `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
-          signaturesMissing > 1 ? 's' : ''
-        } missing`
-      )
-    }
-
-    const txResponse = await this.#contract.execTransaction(
-      safeTransaction.data.to,
-      safeTransaction.data.value,
-      safeTransaction.data.data,
-      safeTransaction.data.operation,
-      safeTransaction.data.safeTxGas,
-      safeTransaction.data.baseGas,
-      safeTransaction.data.gasPrice,
-      safeTransaction.data.gasToken,
-      safeTransaction.data.refundReceiver,
-      safeTransaction.encodedSignatures(),
-      { ...options }
-    )
-    return txResponse
-  }
-
-  async executeTransactionOnChain(
-    safeTransaction: SafeTransaction,
-    options?: any
-  ): Promise<ContractTransaction> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }

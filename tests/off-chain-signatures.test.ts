@@ -26,20 +26,22 @@ describe('Off-chain signatures', () => {
         nonce: (await safe.nonce()).toString()
       })
       const txHash = await safeSdk.getTransactionHash(tx)
-      chai.expect(safeSdk.signTransactionHash(txHash)).to.be.rejectedWith('No signer provided')
+      await chai
+        .expect(safeSdk.signTransactionHash(txHash))
+        .to.be.rejectedWith('No signer provided')
     })
 
     it('should fail if signer is not an owner', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user3)
       const tx = new SafeTransaction({
-        to: user1.address,
+        to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
       const txHash = await safeSdk.getTransactionHash(tx)
-      chai
+      await chai
         .expect(safeSdk.signTransactionHash(txHash))
         .to.be.rejectedWith('Transactions can only be signed by Safe owners')
     })
@@ -48,7 +50,7 @@ describe('Off-chain signatures', () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
       const tx = new SafeTransaction({
-        to: user1.address,
+        to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
@@ -69,19 +71,19 @@ describe('Off-chain signatures', () => {
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      chai.expect(safeSdk.signTransaction(tx)).to.be.rejectedWith('No signer provided')
+      await chai.expect(safeSdk.signTransaction(tx)).to.be.rejectedWith('No signer provided')
     })
 
     it('should fail if signature is added by an account that is not an owner', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user3)
       const tx = new SafeTransaction({
-        to: user1.address,
+        to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      chai
+      await chai
         .expect(safeSdk.signTransaction(tx))
         .to.be.rejectedWith('Transactions can only be signed by Safe owners')
     })
@@ -89,7 +91,7 @@ describe('Off-chain signatures', () => {
     it('should add the signature of the current signer', async () => {
       const { safe } = await setupTests()
       const tx = new SafeTransaction({
-        to: user1.address,
+        to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
@@ -104,7 +106,7 @@ describe('Off-chain signatures', () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
       const tx = new SafeTransaction({
-        to: user1.address,
+        to: safe.address,
         value: '0',
         data: '0x',
         nonce: await safe.nonce()

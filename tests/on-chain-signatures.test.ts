@@ -26,7 +26,9 @@ describe('On-chain signatures', () => {
         nonce: (await safe.nonce()).toString()
       })
       const txHash = await safeSdk.getTransactionHash(tx)
-      chai.expect(safeSdk.approveTransactionHash(txHash)).to.be.rejectedWith('No signer provided')
+      await chai
+        .expect(safeSdk.approveTransactionHash(txHash))
+        .to.be.rejectedWith('No signer provided')
     })
 
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
@@ -39,7 +41,7 @@ describe('On-chain signatures', () => {
         nonce: (await safe.nonce()).toString()
       })
       const hash = await safeSdk.getTransactionHash(tx)
-      chai
+      await chai
         .expect(safeSdk.approveTransactionHash(hash))
         .to.be.rejectedWith('Transaction hashes can only be approved by Safe owners')
     })

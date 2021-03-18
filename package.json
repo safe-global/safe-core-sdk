@@ -12,6 +12,7 @@
   "scripts": {
     "build": "yarn rimraf dist && tsc && hardhat compile",
     "test": "hardhat deploy && nyc hardhat test",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
@@ -39,6 +40,7 @@
     "@typescript-eslint/parser": "^4.15.0",
     "chai": "^4.3.1",
     "chai-as-promised": "^7.1.1",
+    "coveralls": "^3.1.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^7.2.0",

@@ -5,6 +5,8 @@ import { SafeTransaction } from './utils/transactions'
 
 interface Safe {
   connect(safeAddress: string, providerOrSigner: Provider | Wallet): void
+  getProvider(): Provider
+  getSigner(): Wallet | undefined
   getAddress(): string
   getContractVersion(): Promise<string>
   getOwners(): Promise<string[]>

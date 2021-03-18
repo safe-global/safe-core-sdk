@@ -18,8 +18,8 @@ class EthersSafe implements Safe {
    * Creates an instance of the Safe Core SDK.
    *
    * @param ethers - Ethers v5 library
-   * @param providerOrSigner - Ethers provider or signer
    * @param safeAddress - The address of the Safe account to use
+   * @param providerOrSigner - Ethers provider or signer
    * @returns The Safe Core SDK instance
    */
   constructor(ethers: any, safeAddress: string, providerOrSigner: Provider | Wallet) {
@@ -27,6 +27,12 @@ class EthersSafe implements Safe {
     this.connect(safeAddress, providerOrSigner)
   }
 
+  /**
+   * Initializes the Safe Core SDK connecting the providerOrSigner to the safeAddress.
+   *
+   * @param safeAddress - The address of the Safe account to use
+   * @param providerOrSigner - Ethers provider or signer
+   */
   connect(safeAddress: string, providerOrSigner: Provider | Wallet): void {
     this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, providerOrSigner)
     if (Wallet.isSigner(providerOrSigner)) {
@@ -38,10 +44,20 @@ class EthersSafe implements Safe {
     this.#provider = providerOrSigner
   }
 
+  /**
+   * Returns the connected provider.
+   *
+   * @returns The connected provider
+   */
   getProvider(): Provider {
     return this.#provider
   }
 
+  /**
+   * Returns the connected signer.
+   *
+   * @returns The connected signer
+   */
   getSigner(): Wallet | undefined {
     return this.#signer
   }
@@ -120,7 +136,7 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Returns the transaction hash to be signed by the owners.
+   * Returns the transaction hash of a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction
    * @returns The transaction hash of the Safe transaction
@@ -143,7 +159,7 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Signs a hash using the current owner account.
+   * Signs a hash using the current signer account.
    *
    * @param hash - The hash to sign
    * @returns The Safe signature
@@ -166,7 +182,7 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Adds the signature of the current owner to the Safe transaction object.
+   * Adds the signature of the current signer to the Safe transaction object.
    *
    * @param safeTransaction - The Safe transaction to be signed
    */
@@ -177,7 +193,7 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Approves a hash using the current owner account.
+   * Approves on-chain a hash using the current signer account.
    *
    * @param hash - The hash to approve
    * @param skipOnChainApproval - TRUE to avoid the Safe transaction to be approved on-chain
@@ -205,7 +221,7 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Returns a list of owners who have approved a specific Safe transaction
+   * Returns a list of owners who have approved a specific Safe transaction.
    *
    * @param txHash - The Safe transaction hash
    * @returns The list of owners

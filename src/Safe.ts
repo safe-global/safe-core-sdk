@@ -1,6 +1,6 @@
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, ContractTransaction, Wallet } from 'ethers'
-import { SafeSignature } from 'utils/signatures/SafeSignature'
+import { SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
 interface Safe {

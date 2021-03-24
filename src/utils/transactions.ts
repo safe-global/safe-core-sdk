@@ -1,4 +1,4 @@
-import { zeroAddress } from './constants'
+import { ZERO_ADDRESS } from './constants'
 import { SafeSignature } from './signatures/SafeSignature'
 
 export enum OperationType {
@@ -41,8 +41,8 @@ export function standardizeSafeTransaction(tx: SafeTransactionDataPartial): Safe
     safeTxGas: tx.safeTxGas || 0,
     baseGas: tx.baseGas || 0,
     gasPrice: tx.gasPrice || 0,
-    gasToken: tx.gasToken || zeroAddress,
-    refundReceiver: tx.refundReceiver || zeroAddress,
+    gasToken: tx.gasToken || ZERO_ADDRESS,
+    refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
     nonce: tx.nonce
   }
 }

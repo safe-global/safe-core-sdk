@@ -25,9 +25,7 @@ describe('Transactions execution', () => {
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      await chai
-        .expect(safeSdk.executeTransaction(tx))
-        .rejectedWith('No signer provided')
+      await chai.expect(safeSdk.executeTransaction(tx)).rejectedWith('No signer provided')
     })
 
     it('should fail if there are not enough signatures (1 missing)', async () => {

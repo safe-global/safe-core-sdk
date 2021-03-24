@@ -3,7 +3,8 @@ import { BigNumber, ContractTransaction, Wallet } from 'ethers'
 import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
-import { areAddressesEqual } from './utils'
+import { sameString } from './utils'
+import { estimateGasForTransactionCreation } from './utils/gas'
 import { generatePreValidatedSignature } from './utils/signatures'
 import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
@@ -169,11 +170,7 @@ class EthersSafe implements Safe {
       throw new Error('No signer provided')
     }
     const owners = await this.getOwners()
-    if (
-      !owners.find(
-        (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
-      )
-    ) {
+    if (!owners.find((owner: string) => this.#signer && sameString(owner, this.#signer.address))) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
     const messageArray = this.#ethers.utils.arrayify(hash)
@@ -207,11 +204,7 @@ class EthersSafe implements Safe {
       throw new Error('No signer provided')
     }
     const owners = await this.getOwners()
-    if (
-      !owners.find(
-        (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
-      )
-    ) {
+    if (!owners.find((owner: string) => this.#signer && sameString(owner, this.#signer.address))) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
     if (!skipOnChainApproval) {
@@ -276,12 +269,29 @@ class EthersSafe implements Safe {
       )
     }
 
+    let safeTxGas = safeTransaction.data.safeTxGas
+    if (!safeTxGas) {
+      try {
+        safeTxGas = await estimateGasForTransactionCreation(
+          this.#provider,
+          this.#contract,
+          this.getAddress(),
+          safeTransaction.data.data,
+          safeTransaction.data.to,
+          safeTransaction.data.value,
+          safeTransaction.data.operation
+        )
+      } catch (error) {
+        safeTxGas = 0
+      }
+    }
+
     const txResponse = await this.#contract.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,
       safeTransaction.data.data,
       safeTransaction.data.operation,
-      safeTransaction.data.safeTxGas,
+      safeTxGas,
       safeTransaction.data.baseGas,
       safeTransaction.data.gasPrice,
       safeTransaction.data.gasToken,

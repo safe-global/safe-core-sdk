@@ -26,7 +26,7 @@ describe('Transactions execution', () => {
         nonce: (await safe.nonce()).toString()
       })
       await chai
-        .expect(safeSdk.executeTransaction(tx, { gasLimit: 10000000 }))
+        .expect(safeSdk.executeTransaction(tx))
         .rejectedWith('No signer provided')
     })
 
@@ -44,7 +44,7 @@ describe('Transactions execution', () => {
       const txHash = await safeSdk.getTransactionHash(tx)
       await safeSdk.approveTransactionHash(txHash)
       await chai
-        .expect(safeSdk.executeTransaction(tx, { gasLimit: 10000000 }))
+        .expect(safeSdk.executeTransaction(tx))
         .to.be.rejectedWith('There is 1 signature missing')
     })
 
@@ -71,7 +71,7 @@ describe('Transactions execution', () => {
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      const txResponse = await safeSdk.executeTransaction(tx, { gasLimit: 10000000 })
+      const txResponse = await safeSdk.executeTransaction(tx)
       chai.expect(txResponse.hash.length).to.be.eq(66)
     })
 
@@ -89,7 +89,7 @@ describe('Transactions execution', () => {
       const txHash = await safeSdk.getTransactionHash(tx)
       await safeSdk.approveTransactionHash(txHash)
       safeSdk.connect(safe.address, user3)
-      const txResponse = await safeSdk.executeTransaction(tx, { gasLimit: 10000000 })
+      const txResponse = await safeSdk.executeTransaction(tx)
       chai.expect(txResponse.hash.length).to.be.eq(66)
     })
 
@@ -107,7 +107,7 @@ describe('Transactions execution', () => {
       const txHash = await safeSdk.getTransactionHash(tx)
       await safeSdk.approveTransactionHash(txHash)
       safeSdk.connect(safe.address, user3)
-      const txResponse = await safeSdk.executeTransaction(tx, { gasLimit: 10000000 })
+      const txResponse = await safeSdk.executeTransaction(tx)
       chai.expect(txResponse.hash.length).to.be.eq(66)
     })
   })

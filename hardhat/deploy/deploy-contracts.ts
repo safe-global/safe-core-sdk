@@ -19,6 +19,20 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: true,
     deterministicDeployment: true
   })
+
+  await deploy('DailyLimitModule', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('SocialRecoveryModule', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
 }
 
 export default deploy

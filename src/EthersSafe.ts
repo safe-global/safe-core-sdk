@@ -4,6 +4,7 @@ import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
 import { areAddressesEqual } from './utils'
+import { SENTINEL_MODULES } from './utils/constants'
 import { generatePreValidatedSignature } from './utils/signatures'
 import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
@@ -286,6 +287,56 @@ class EthersSafe implements Safe {
       { ...options }
     )
     return txResponse
+  }
+
+  /**
+   * Returns the Safe transaction to enable a Safe module.
+   *
+   * @param moduleAddress - The desired module address
+   * @returns The Safe transaction ready to be signed
+   */
+  async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const modules = await this.getModules()
+    const moduleIndex = modules.findIndex((module: string) =>
+      areAddressesEqual(module, moduleAddress)
+    )
+    if (moduleIndex >= 0) {
+      throw new Error('Module provided is already enabled')
+    }
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: this.#contract.interface.encodeFunctionData('enableModule', [moduleAddress]),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to disable a Safe module.
+   *
+   * @param moduleAddress - The desired module address
+   * @returns The Safe transaction ready to be signed
+   */
+  async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const modules = await this.getModules()
+    const moduleIndex = modules.findIndex((module: string) =>
+      areAddressesEqual(module, moduleAddress)
+    )
+    if (moduleIndex < 0) {
+      throw new Error('Module provided is not enabled already')
+    }
+    const prevModuleAddress = moduleIndex === 0 ? SENTINEL_MODULES : modules[moduleIndex - 1]
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: this.#contract.interface.encodeFunctionData('disableModule', [
+        prevModuleAddress,
+        moduleAddress
+      ]),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
   }
 }
 

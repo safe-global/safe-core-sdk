@@ -15,6 +15,7 @@ interface Safe {
   getBalance(): Promise<BigNumber>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
+  isOwner(ownerAddress: string): Promise<boolean>
   getTransactionHash(safeTransaction: SafeTransaction): Promise<string>
   signTransactionHash(hash: string): Promise<SafeSignature>
   signTransaction(safeTransaction: SafeTransaction): Promise<void>
@@ -23,6 +24,9 @@ interface Safe {
   executeTransaction(safeTransaction: SafeTransaction, options?: any): Promise<ContractTransaction>
   getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction>
   getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction>
+  getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction>
+  getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction>
+  getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction>
 }
 
 export default Safe

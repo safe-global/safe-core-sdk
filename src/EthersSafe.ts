@@ -4,7 +4,7 @@ import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
 import { areAddressesEqual } from './utils'
-import { SENTINEL_MODULES } from './utils/constants'
+import { SENTINEL_MODULES, SENTINEL_OWNERS, zeroAddress } from './utils/constants'
 import { generatePreValidatedSignature } from './utils/signatures'
 import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
@@ -135,6 +135,17 @@ class EthersSafe implements Safe {
    */
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
     return this.#contract.isModuleEnabled(moduleAddress)
+  }
+
+  /**
+   * Checks if a specific address is an owner of the current Safe.
+   *
+   * @param ownerAddress - The account address
+   * @returns TRUE if the account is an owner
+   */
+  async isOwner(ownerAddress: string): Promise<boolean> {
+    const isOwner = await this.#contract.isOwner(ownerAddress)
+    return isOwner
   }
 
   /**
@@ -333,6 +344,133 @@ class EthersSafe implements Safe {
       data: this.#contract.interface.encodeFunctionData('disableModule', [
         prevModuleAddress,
         moduleAddress
+      ]),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to add an owner and optionally change the threshold.
+   *
+   * @param ownerAddress - The address of the new owner
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+    const isValidAddress = this.#ethers.utils.isAddress(ownerAddress)
+    if (!isValidAddress || ownerAddress === zeroAddress || ownerAddress === SENTINEL_OWNERS) {
+      throw new Error('Invalid owner address provided')
+    }
+    const owners = await this.getOwners()
+    const addressIsOwner = owners.find((owner: string) => areAddressesEqual(owner, ownerAddress))
+    if (addressIsOwner) {
+      throw new Error('Address provided is already an owner')
+    }
+    const newThreshold = threshold ?? (await this.getThreshold())
+    if (newThreshold <= 0) {
+      throw new Error('Threshold needs to be greater than 0')
+    }
+    if (newThreshold > owners.length + 1) {
+      throw new Error('Threshold cannot exceed owner count')
+    }
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: this.#contract.interface.encodeFunctionData('addOwnerWithThreshold', [
+        ownerAddress,
+        newThreshold
+      ]),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to remove an owner and optionally change the threshold.
+   *
+   * @param ownerAddress - The address of the owner that will be removed
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+    const isValidAddress = this.#ethers.utils.isAddress(ownerAddress)
+    if (!isValidAddress || ownerAddress === zeroAddress || ownerAddress === SENTINEL_OWNERS) {
+      throw new Error('Invalid owner address provided')
+    }
+    const owners = await this.getOwners()
+    const ownerIndex = owners.findIndex((owner: string) => areAddressesEqual(owner, ownerAddress))
+    const isOwner = ownerIndex >= 0
+    if (!isOwner) {
+      throw new Error('Address provided is not an owner')
+    }
+    const newThreshold = threshold ?? (await this.getThreshold()) - 1
+    if (newThreshold <= 0) {
+      throw new Error('Threshold needs to be greater than 0')
+    }
+    if (newThreshold > owners.length - 1) {
+      throw new Error('Threshold cannot exceed owner count')
+    }
+    const prevOwnerAddress = ownerIndex === 0 ? SENTINEL_OWNERS : owners[ownerIndex - 1]
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: this.#contract.interface.encodeFunctionData('removeOwner', [
+        prevOwnerAddress,
+        ownerAddress,
+        newThreshold
+      ]),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to replace an owner of the Safe with a new one.
+   *
+   * @param oldOwnerAddress - The old owner address
+   * @param newOwnerAddress - The new owner address
+   * @returns The Safe transaction ready to be signed
+   */
+  async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
+    const isValidOldAddress = this.#ethers.utils.isAddress(oldOwnerAddress)
+    const isValidNewAddress = this.#ethers.utils.isAddress(newOwnerAddress)
+    if (
+      !isValidOldAddress ||
+      oldOwnerAddress === zeroAddress ||
+      oldOwnerAddress === SENTINEL_OWNERS
+    ) {
+      throw new Error('Invalid old owner address provided')
+    }
+    if (
+      !isValidNewAddress ||
+      newOwnerAddress === zeroAddress ||
+      newOwnerAddress === SENTINEL_OWNERS
+    ) {
+      throw new Error('Invalid new owner address provided')
+    }
+    const owners = await this.getOwners()
+    const isOwnerNewAddress = owners.find((owner: string) =>
+      areAddressesEqual(owner, newOwnerAddress)
+    )
+    if (isOwnerNewAddress) {
+      throw new Error('New address provided is already an owner')
+    }
+    const ownerIndex = owners.findIndex((owner: string) =>
+      areAddressesEqual(owner, oldOwnerAddress)
+    )
+    const isOwner = ownerIndex >= 0
+    if (!isOwner) {
+      throw new Error('Old address provided is not an owner')
+    }
+    const prevOwnerAddress = ownerIndex === 0 ? SENTINEL_OWNERS : owners[ownerIndex - 1]
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: this.#contract.interface.encodeFunctionData('swapOwner', [
+        prevOwnerAddress,
+        oldOwnerAddress,
+        newOwnerAddress
       ]),
       nonce: (await this.#contract.nonce()).toNumber()
     })

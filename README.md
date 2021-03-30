@@ -270,6 +270,22 @@ const tx = new SafeTransaction({
 const txResponse = await safeSdk.executeTransaction(tx)
 ```
 
+### getEnableModuleTx
+
+Returns a Safe transaction ready to be signed that will enable a Safe module.
+
+```js
+const tx = await safeSdk.getEnableModuleTx(moduleAddress)
+```
+
+### getDisableModuleTx
+
+Returns a Safe transaction ready to be signed that will disable a Safe module.
+
+```js
+const tx = await safeSdk.getDisableModuleTx(moduleAddress)
+```
+
 ## License
 
 This library is released under MIT.

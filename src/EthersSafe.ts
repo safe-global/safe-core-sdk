@@ -96,8 +96,8 @@ class EthersSafe implements Safe {
    *
    * @returns The Safe threshold
    */
-  async getThreshold(): Promise<BigNumber> {
-    return this.#contract.getThreshold()
+  async getThreshold(): Promise<number> {
+    return (await this.#contract.getThreshold()).toNumber()
   }
 
   /**
@@ -275,8 +275,8 @@ class EthersSafe implements Safe {
     }
 
     const threshold = await this.getThreshold()
-    if (threshold.gt(safeTransaction.signatures.size)) {
-      const signaturesMissing = threshold.sub(safeTransaction.signatures.size).toNumber()
+    if (threshold > safeTransaction.signatures.size) {
+      const signaturesMissing = threshold - safeTransaction.signatures.size
       throw new Error(
         `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
           signaturesMissing > 1 ? 's' : ''

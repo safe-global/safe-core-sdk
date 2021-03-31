@@ -149,12 +149,12 @@ Returns the Safe threshold.
 const threshold = await safeSdk.getThreshold()
 ```
 
-### getNetworkId
+### getChainId
 
 Returns the chainId of the connected network.
 
 ```js
-const networkId = await safeSdk.getNetworkId()
+const chainId = await safeSdk.getChainId()
 ```
 
 ### getBalance
@@ -232,7 +232,11 @@ const signature = await safeSdk.approveTransactionHash(txHash)
 Returns a list of owners who have approved a specific Safe transaction.
 
 ```js
-const owners = await safeSdk.getOwnersWhoApproved()
+const tx = new SafeTransaction({
+  // ...
+})
+const txHash = await safeSdk.getTransactionHash(tx)
+const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
 
 ### executeTransaction

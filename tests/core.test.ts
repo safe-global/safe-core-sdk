@@ -69,11 +69,11 @@ describe('Safe Core SDK', () => {
     })
   })
 
-  describe('getNetworkId', async () => {
+  describe('getChainId', async () => {
     it('should return the chainId of the current network', async () => {
       const { safe, chainId } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      chai.expect(await safeSdk.getNetworkId()).to.be.eq(chainId)
+      chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
     })
   })
 

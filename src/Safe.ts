@@ -11,7 +11,7 @@ interface Safe {
   getContractVersion(): Promise<string>
   getOwners(): Promise<string[]>
   getThreshold(): Promise<BigNumber>
-  getNetworkId(): Promise<number>
+  getChainId(): Promise<number>
   getBalance(): Promise<BigNumber>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>

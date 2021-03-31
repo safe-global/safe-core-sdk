@@ -103,7 +103,7 @@ class EthersSafe implements Safe {
    *
    * @returns The chainId of the connected network
    */
-  async getNetworkId(): Promise<number> {
+  async getChainId(): Promise<number> {
     return (await this.#provider.getNetwork()).chainId
   }
 

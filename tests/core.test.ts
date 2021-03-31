@@ -31,6 +31,15 @@ describe('Safe Core SDK', () => {
       chai.expect(safeSdk.getProvider()).to.be.eq(user1.provider)
       chai.expect(safeSdk.getSigner()).to.be.undefined
     })
+
+    it('connect default provider', async () => {
+      const { safe } = await setupTests()
+      const safeSdk = new EthersSafe(ethers, safe.address)
+      const defaultProvider = safeSdk.getProvider()
+      chai.expect(ethers.providers.Provider.isProvider(defaultProvider)).to.be.true
+      chai.expect((await defaultProvider.getNetwork()).chainId).to.be.eq(1)
+      chai.expect(safeSdk.getSigner()).to.be.undefined
+    })
   })
 
   describe('getContractVersion', async () => {

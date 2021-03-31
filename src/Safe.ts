@@ -4,7 +4,7 @@ import { SafeSignature } from 'utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
 interface Safe {
-  connect(safeAddress: string, providerOrSigner: Provider | Wallet): void
+  connect(providerOrSigner: Provider | Wallet, safeAddress?: string): void
   getProvider(): Provider
   getSigner(): Wallet | undefined
   getAddress(): string

@@ -9,9 +9,9 @@ import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignatur
 import { SafeTransaction } from './utils/transactions'
 
 class EthersSafe implements Safe {
-  #contract!: GnosisSafe
+  #contract: GnosisSafe
   #ethers: any
-  #provider!: Provider
+  #provider: Provider
   #signer?: Wallet
 
   /**
@@ -19,29 +19,30 @@ class EthersSafe implements Safe {
    *
    * @param ethers - Ethers v5 library
    * @param safeAddress - The address of the Safe account to use
-   * @param providerOrSigner - Ethers provider or signer
+   * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
    * @returns The Safe Core SDK instance
    */
-  constructor(ethers: any, safeAddress: string, providerOrSigner: Provider | Wallet) {
+  constructor(ethers: any, safeAddress: string, providerOrSigner?: Provider | Wallet) {
+    const currentProviderOrSigner = providerOrSigner || (ethers.getDefaultProvider() as Provider)
     this.#ethers = ethers
-    this.connect(safeAddress, providerOrSigner)
+    this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
+    if (Wallet.isSigner(currentProviderOrSigner)) {
+      this.#signer = currentProviderOrSigner
+      this.#provider = currentProviderOrSigner.provider
+      return
+    }
+    this.#signer = undefined
+    this.#provider = currentProviderOrSigner
   }
 
   /**
    * Initializes the Safe Core SDK connecting the providerOrSigner to the safeAddress.
    *
-   * @param safeAddress - The address of the Safe account to use
    * @param providerOrSigner - Ethers provider or signer
+   * @param safeAddress - The address of the Safe account to use
    */
-  connect(safeAddress: string, providerOrSigner: Provider | Wallet): void {
-    this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, providerOrSigner)
-    if (Wallet.isSigner(providerOrSigner)) {
-      this.#signer = providerOrSigner
-      this.#provider = providerOrSigner.provider
-      return
-    }
-    this.#signer = undefined
-    this.#provider = providerOrSigner
+  connect(providerOrSigner: Provider | Wallet, safeAddress?: string): EthersSafe {
+    return new EthersSafe(this.#ethers, safeAddress || this.#contract.address, providerOrSigner)
   }
 
   /**
@@ -189,7 +190,7 @@ class EthersSafe implements Safe {
   async signTransaction(safeTransaction: SafeTransaction): Promise<void> {
     const txHash = await this.getTransactionHash(safeTransaction)
     const signature = await this.signTransactionHash(txHash)
-    safeTransaction.signatures.set(signature.signer, signature)
+    safeTransaction.addSignature(signature)
   }
 
   /**
@@ -256,14 +257,11 @@ class EthersSafe implements Safe {
     const txHash = await this.getTransactionHash(safeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
-      safeTransaction.signatures.set(owner, generatePreValidatedSignature(owner))
+      safeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
     if (owners.includes(this.#signer.address)) {
-      safeTransaction.signatures.set(
-        this.#signer.address,
-        generatePreValidatedSignature(this.#signer.address)
-      )
+      safeTransaction.addSignature(generatePreValidatedSignature(this.#signer.address))
     }
 
     const threshold = await this.getThreshold()

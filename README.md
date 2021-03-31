@@ -98,13 +98,13 @@ All the signatures used to execute the transaction are available at `tx.signatur
 Returns an instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
 
 ```js
-const safeSdk = safeSdk(ethers, safeAddress, providerOrSigner)
+const safeSdk = new EthersSafe(ethers, safeAddress, providerOrSigner)
 ```
 
 If `providerOrSigner` is not provided, `ethers` default provider will be used.
 
 ```js
-const safeSdk = safeSdk(ethers, safeAddress)
+const safeSdk = new EthersSafe(ethers, safeAddress)
 ```
 
 ### connect
@@ -112,13 +112,13 @@ const safeSdk = safeSdk(ethers, safeAddress)
 Returns a new instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
 
 ```js
-safeSdk.connect(providerOrSigner, safeAddress)
+const safeSdk2 = safeSdk.connect(providerOrSigner, safeAddress)
 ```
 
 If `safeAddress` is not provided, the `providerOrSigner` will be connected to the previous Safe.
 
 ```js
-safeSdk.connect(providerOrSigner)
+const safeSdk2 = safeSdk.connect(providerOrSigner)
 ```
 
 ### getProvider

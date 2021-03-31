@@ -44,7 +44,7 @@ const safeNonce = <safe_nonce>
 Create an instance of the Safe Core SDK with wallet1 connected as the signer.
 
 ```js
-const safeSdk = new EthersSafe(ethers, safeAddress, wallet1)
+const safeSdk1 = new EthersSafe(ethers, safeAddress, wallet1)
 ```
 
 ### 1. Create a Safe transaction
@@ -65,7 +65,7 @@ Before executing this transaction, it must be signed by the owners and this can 
 The owner `wallet1` signs the transaction off-chain.
 
 ```js
-const wallet1Signature = await safeSdk.signTransaction(tx)
+const wallet1Signature = await safeSdk1.signTransaction(tx)
 ```
 
 Because the signature is off-chain, there is no interaction with the contract and the signature is available at `tx.signatures`.
@@ -75,9 +75,9 @@ Because the signature is off-chain, there is no interaction with the contract an
 After `wallet2` account is connected to the SDK as the signer the transaction hash is approved on-chain.
 
 ```js
-safeSdk.connect(safeAddress, wallet2)
-const txHash = await safeSdk.getTransactionHash(tx)
-const wallet2Signature = await safeSdk.approveTransactionHash(txHash)
+const safeSdk2 = safeSdk1.connect(wallet2)
+const txHash = await safeSdk2.getTransactionHash(tx)
+const wallet2Signature = await safeSdk2.approveTransactionHash(txHash)
 ```
 
 ### 3. Transaction execution
@@ -85,20 +85,40 @@ const wallet2Signature = await safeSdk.approveTransactionHash(txHash)
 Lastly, `wallet3` account is connected to the SDK as the signer and executor of the Safe transaction to execute it.
 
 ```js
-safeSdk.connect(safeAddress, wallet3)
-const txResponse = await safeSdk.executeTransaction(tx)
+const safeSdk3 = safeSdk2.connect(wallet3)
+const txResponse = await safeSdk3.executeTransaction(tx)
 ```
 
 All the signatures used to execute the transaction are available at `tx.signatures`.
 
 ## API Reference
 
-### connect
+### constructor
 
-Initializes the Safe Core SDK connecting the providerOrSigner to the safeAddress.
+Returns an instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
 
 ```js
-safeSdk.connect(safeAddress, providerOrSigner)
+const safeSdk = safeSdk(ethers, safeAddress, providerOrSigner)
+```
+
+If `providerOrSigner` is not provided, `ethers` default provider will be used.
+
+```js
+const safeSdk = safeSdk(ethers, safeAddress)
+```
+
+### connect
+
+Returns a new instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
+
+```js
+safeSdk.connect(providerOrSigner, safeAddress)
+```
+
+If `safeAddress` is not provided, the `providerOrSigner` will be connected to the previous Safe.
+
+```js
+safeSdk.connect(providerOrSigner)
 ```
 
 ### getProvider

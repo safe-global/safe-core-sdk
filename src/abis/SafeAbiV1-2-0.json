@@ -424,5 +424,20 @@
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_threshold",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeThreshold",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]

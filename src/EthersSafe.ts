@@ -484,6 +484,29 @@ class EthersSafe implements Safe {
     })
     return tx
   }
+
+  /**
+   * Returns the Safe transaction to change the threshold.
+   *
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
+    if (threshold <= 0) {
+      throw new Error('Threshold needs to be greater than 0')
+    }
+    const owners = await this.getOwners()
+    if (threshold > owners.length) {
+      throw new Error('Threshold cannot exceed owner count')
+    }
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: this.#contract.interface.encodeFunctionData('changeThreshold', [threshold]),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
 }
 
 export default EthersSafe

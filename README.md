@@ -330,6 +330,14 @@ Returns the Safe transaction to replace an owner of the Safe with a new one.
 const tx = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
 ```
 
+### getChangeThresholdTx
+
+Returns the Safe transaction to change the threshold.
+
+```js
+const tx = await safeSdk.getChangeThresholdTx(threshold)
+```
+
 ## License
 
 This library is released under MIT.

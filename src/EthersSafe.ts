@@ -307,6 +307,10 @@ class EthersSafe implements Safe {
    * @returns The Safe transaction ready to be signed
    */
   async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
+    if (!isValidAddress || moduleAddress === zeroAddress || moduleAddress === SENTINEL_MODULES) {
+      throw new Error('Invalid module address provided')
+    }
     const modules = await this.getModules()
     const moduleIndex = modules.findIndex((module: string) =>
       areAddressesEqual(module, moduleAddress)
@@ -330,6 +334,10 @@ class EthersSafe implements Safe {
    * @returns The Safe transaction ready to be signed
    */
   async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
+    if (!isValidAddress || moduleAddress === zeroAddress || moduleAddress === SENTINEL_MODULES) {
+      throw new Error('Invalid module address provided')
+    }
     const modules = await this.getModules()
     const moduleIndex = modules.findIndex((module: string) =>
       areAddressesEqual(module, moduleAddress)

@@ -3,11 +3,12 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import EthersSafe from '../src'
+import { SENTINEL_MODULES, zeroAddress } from '../src/utils/constants'
 import { getDailyLimitModule, getSafeWithOwners, getSocialRecoveryModule } from './utils/setup'
 chai.use(chaiAsPromised)
 
 describe('Safe modules', () => {
-  const [user1, user2] = waffle.provider.getWallets()
+  const [user1] = waffle.provider.getWallets()
 
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
@@ -43,7 +44,31 @@ describe('Safe modules', () => {
   })
 
   describe('getEnableModuleTx', async () => {
-    it('should fail when enabling a module that is already enabled', async () => {
+    it('should fail if address is invalid', async () => {
+      const { safe } = await setupTests()
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      await chai
+        .expect(safeSdk1.getEnableModuleTx('0x123'))
+        .to.be.rejectedWith('Invalid module address provided')
+    })
+
+    it('should fail if address is equal to sentinel', async () => {
+      const { safe } = await setupTests()
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      await chai
+        .expect(safeSdk1.getEnableModuleTx(SENTINEL_MODULES))
+        .to.be.rejectedWith('Invalid module address provided')
+    })
+
+    it('should fail if address is equal to 0x address', async () => {
+      const { safe } = await setupTests()
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      await chai
+        .expect(safeSdk1.getEnableModuleTx(zeroAddress))
+        .to.be.rejectedWith('Invalid module address provided')
+    })
+
+    it('should fail if address is already enabled', async () => {
       const { safe, module1 } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
       const tx = await safeSdk.getEnableModuleTx(module1.address)
@@ -53,9 +78,7 @@ describe('Safe modules', () => {
         .expect(safeSdk.getEnableModuleTx(module1.address))
         .to.be.rejectedWith('Module provided is already enabled')
     })
-  })
 
-  describe('enableModule', async () => {
     it('should enable a Safe module', async () => {
       const { safe, module1 } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
@@ -70,16 +93,38 @@ describe('Safe modules', () => {
   })
 
   describe('getDisableModuleTx', async () => {
-    it('should fail when disabling a module that is not enabled', async () => {
+    it('should fail if address is invalid', async () => {
       const { safe } = await setupTests()
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      await chai
+        .expect(safeSdk1.getDisableModuleTx('0x123'))
+        .to.be.rejectedWith('Invalid module address provided')
+    })
+
+    it('should fail if address is equal to sentinel', async () => {
+      const { safe } = await setupTests()
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      await chai
+        .expect(safeSdk1.getDisableModuleTx(SENTINEL_MODULES))
+        .to.be.rejectedWith('Invalid module address provided')
+    })
+
+    it('should fail if address is equal to 0x address', async () => {
+      const { safe } = await setupTests()
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      await chai
+        .expect(safeSdk1.getDisableModuleTx(zeroAddress))
+        .to.be.rejectedWith('Invalid module address provided')
+    })
+
+    it('should fail if address is not enabled', async () => {
+      const { safe, module1 } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
       await chai
-        .expect(safeSdk.getDisableModuleTx('0x0000000000000000000000000000000000000001'))
+        .expect(safeSdk.getDisableModuleTx(module1.address))
         .to.be.rejectedWith('Module provided is not enabled already')
     })
-  })
 
-  describe('disableModule', async () => {
     it('should disable Safe modules', async () => {
       const { module1, module2 } = await setupTests()
       const safe = await getSafeWithOwners([user1.address])

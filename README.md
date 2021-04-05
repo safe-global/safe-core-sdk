@@ -201,6 +201,14 @@ Checks if a specific Safe module is enabled for the current Safe.
 const isEnabled = await safeSdk.isModuleEnabled(moduleAddress)
 ```
 
+### isOwner
+
+Checks if a specific address is an owner of the current Safe.
+
+```js
+const isOwner = await safeSdk.isOwner(address)
+```
+
 ### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.
@@ -284,6 +292,42 @@ Returns a Safe transaction ready to be signed that will disable a Safe module.
 
 ```js
 const tx = await safeSdk.getDisableModuleTx(moduleAddress)
+```
+
+### getAddOwnerTx
+
+Returns the Safe transaction to add an owner and update the threshold.
+
+```js
+const tx = await safeSdk.getAddOwnerTx(ownerAddress, threshold)
+```
+
+If `threshold` is not provided, the current threshold will not change.
+
+```js
+const tx = await safeSdk.getAddOwnerTx(ownerAddress)
+```
+
+### getRemoveOwnerTx
+
+Returns the Safe transaction to remove an owner and update the threshold.
+
+```js
+const tx = await safeSdk.getRemoveOwnerTx(ownerAddress, threshold)
+```
+
+If `threshold` is not provided, the current threshold will be decreased by one.
+
+```js
+const tx = await safeSdk.getRemoveOwnerTx(ownerAddress)
+```
+
+### getSwapOwnerTx
+
+Returns the Safe transaction to replace an owner of the Safe with a new one.
+
+```js
+const tx = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
 ```
 
 ## License

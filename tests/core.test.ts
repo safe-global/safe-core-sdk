@@ -18,21 +18,21 @@ describe('Safe Core SDK', () => {
   })
 
   describe('connect', async () => {
-    it('connect signer', async () => {
+    it('should connect with signer', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
       chai.expect(safeSdk.getProvider()).to.be.eq(user1.provider)
       chai.expect(safeSdk.getSigner()).to.be.eq(user1)
     })
 
-    it('connect provider', async () => {
+    it('should connect with provider', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1.provider)
       chai.expect(safeSdk.getProvider()).to.be.eq(user1.provider)
       chai.expect(safeSdk.getSigner()).to.be.undefined
     })
 
-    it('connect default provider', async () => {
+    it('should connect with default provider', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address)
       const defaultProvider = safeSdk.getProvider()

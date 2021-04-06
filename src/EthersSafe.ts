@@ -170,11 +170,10 @@ class EthersSafe implements Safe {
       throw new Error('No signer provided')
     }
     const owners = await this.getOwners()
-    if (
-      !owners.find(
-        (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
-      )
-    ) {
+    const addressIsOwner = owners.find(
+      (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+    )
+    if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
     const messageArray = this.#ethers.utils.arrayify(hash)
@@ -208,11 +207,10 @@ class EthersSafe implements Safe {
       throw new Error('No signer provided')
     }
     const owners = await this.getOwners()
-    if (
-      !owners.find(
-        (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
-      )
-    ) {
+    const addressIsOwner = owners.find(
+      (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+    )
+    if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
     if (!skipOnChainApproval) {

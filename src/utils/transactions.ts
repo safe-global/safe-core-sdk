@@ -49,19 +49,27 @@ export function standardizeSafeTransaction(tx: SafeTransactionDataPartial): Safe
 
 export class SafeTransaction {
   data: SafeTransactionData
-  signatures: Map<string, SafeSignature> = new Map()
+  #signatures: Map<string, SafeSignature> = new Map()
 
   constructor(data: SafeTransactionDataPartial) {
     this.data = standardizeSafeTransaction(data)
   }
 
+  get signatures(): Map<string, SafeSignature> {
+    return new Map(this.#signatures)
+  }
+
+  addSignature(signature: SafeSignature) {
+    this.#signatures.set(signature.signer, signature)
+  }
+
   encodedSignatures(): string {
-    const signers = Array.from(this.signatures.keys()).sort()
+    const signers = Array.from(this.#signatures.keys()).sort()
     const baseOffset = signers.length * 65
     let staticParts = ''
     let dynamicParts = ''
     signers.forEach((signerAddress) => {
-      const signature = this.signatures.get(signerAddress)
+      const signature = this.#signatures.get(signerAddress)
       staticParts += signature?.staticPart(/*baseOffset + dynamicParts.length / 2*/).slice(2)
       dynamicParts += signature?.dynamicPart()
     })

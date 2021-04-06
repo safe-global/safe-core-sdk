@@ -16,39 +16,51 @@ describe('Transactions execution', () => {
   })
 
   describe('execTransaction', async () => {
-    it('should fail if signer is not provided', async () => {
+    it('should fail if a provider is provided', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1.provider)
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1.provider)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      await chai.expect(safeSdk.executeTransaction(tx)).rejectedWith('No signer provided')
+      await chai.expect(safeSdk1.executeTransaction(tx)).rejectedWith('No signer provided')
+    })
+
+    it('should fail if no provider or signer is provided', async () => {
+      const { safe } = await setupTests()
+      const safeSdk1 = new EthersSafe(ethers, safe.address)
+      const tx = new SafeTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x',
+        nonce: (await safe.nonce()).toString()
+      })
+      await chai.expect(safeSdk1.executeTransaction(tx)).rejectedWith('No signer provided')
     })
 
     it('should fail if there are not enough signatures (1 missing)', async () => {
       const safe = await getSafeWithOwners([user1.address, user2.address, user3.address])
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk2 = safeSdk1.connect(user2)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      await safeSdk.signTransaction(tx)
-      safeSdk.connect(safe.address, user2)
-      const txHash = await safeSdk.getTransactionHash(tx)
-      await safeSdk.approveTransactionHash(txHash)
+      await safeSdk1.signTransaction(tx)
+      const txHash = await safeSdk2.getTransactionHash(tx)
+      await safeSdk2.approveTransactionHash(txHash)
       await chai
-        .expect(safeSdk.executeTransaction(tx))
+        .expect(safeSdk2.executeTransaction(tx))
         .to.be.rejectedWith('There is 1 signature missing')
     })
 
     it('should fail if there are not enough signatures (>1 missing)', async () => {
       const safe = await getSafeWithOwners([user1.address, user2.address, user3.address])
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -56,56 +68,56 @@ describe('Transactions execution', () => {
         nonce: (await safe.nonce()).toString()
       })
       await chai
-        .expect(safeSdk.executeTransaction(tx))
+        .expect(safeSdk1.executeTransaction(tx))
         .to.be.rejectedWith('There are 2 signatures missing')
     })
 
     it('should execute a transaction with threshold 1', async () => {
       const safe = await getSafeWithOwners([user1.address])
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      const txResponse = await safeSdk.executeTransaction(tx)
+      const txResponse = await safeSdk1.executeTransaction(tx)
       chai.expect(txResponse.hash.length).to.be.eq(66)
     })
 
     it('should execute a transaction with threshold >1', async () => {
       const safe = await getSafeWithOwners([user1.address, user2.address, user3.address])
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk2 = safeSdk1.connect(user2)
+      const safeSdk3 = safeSdk1.connect(user3)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      await safeSdk.signTransaction(tx)
-      safeSdk.connect(safe.address, user2)
-      const txHash = await safeSdk.getTransactionHash(tx)
-      await safeSdk.approveTransactionHash(txHash)
-      safeSdk.connect(safe.address, user3)
-      const txResponse = await safeSdk.executeTransaction(tx)
+      await safeSdk1.signTransaction(tx)
+      const txHash = await safeSdk2.getTransactionHash(tx)
+      await safeSdk2.approveTransactionHash(txHash)
+      const txResponse = await safeSdk3.executeTransaction(tx)
       chai.expect(txResponse.hash.length).to.be.eq(66)
     })
 
     it('should execute a transaction when is not submitted by an owner', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk2 = safeSdk1.connect(user2)
+      const safeSdk3 = safeSdk1.connect(user3)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
         nonce: (await safe.nonce()).toString()
       })
-      await safeSdk.signTransaction(tx)
-      safeSdk.connect(safe.address, user2)
-      const txHash = await safeSdk.getTransactionHash(tx)
-      await safeSdk.approveTransactionHash(txHash)
-      safeSdk.connect(safe.address, user3)
-      const txResponse = await safeSdk.executeTransaction(tx)
+      await safeSdk1.signTransaction(tx)
+      const txHash = await safeSdk2.getTransactionHash(tx)
+      await safeSdk2.approveTransactionHash(txHash)
+      const txResponse = await safeSdk3.executeTransaction(tx)
       chai.expect(txResponse.hash.length).to.be.eq(66)
     })
   })

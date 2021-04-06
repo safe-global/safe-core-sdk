@@ -18,18 +18,13 @@ export class EthSignSignature implements SafeSignature {
    */
   constructor(signer: string, signature: string) {
     this.signer = signer
-    this.data = signature
-      .replace('0x', '')
-      .replace(/00$/, '1f')
-      .replace(/1b$/, '1f')
-      .replace(/01$/, '20')
-      .replace(/1c$/, '20')
+    this.data = signature.replace(/1b$/, '1f').replace(/1c$/, '20')
   }
 
   /**
    * Returns the static part of the Safe signature.
    *
-   * @Returns The static part of the Safe signature
+   * @returns The static part of the Safe signature
    */
   staticPart(/* dynamicOffset: number */) {
     return this.data
@@ -38,7 +33,7 @@ export class EthSignSignature implements SafeSignature {
   /**
    * Returns the dynamic part of the Safe signature.
    *
-   * @Returns The dynamic part of the Safe signature
+   * @returns The dynamic part of the Safe signature
    */
   dynamicPart() {
     return ''

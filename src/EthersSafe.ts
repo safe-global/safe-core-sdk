@@ -1,28 +1,66 @@
-import { BigNumber, Wallet } from 'ethers'
+import { Provider } from '@ethersproject/providers'
+import { BigNumber, ContractTransaction, Wallet } from 'ethers'
 import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import Safe from './Safe'
 import { areAddressesEqual } from './utils'
-import { EthSignSignature, SafeSignature } from './utils/signatures'
+import { generatePreValidatedSignature } from './utils/signatures'
+import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
 class EthersSafe implements Safe {
   #contract: GnosisSafe
   #ethers: any
-  #signer: Wallet
+  #provider: Provider
+  #signer?: Wallet
 
   /**
    * Creates an instance of the Safe Core SDK.
    *
    * @param ethers - Ethers v5 library
-   * @param signer - Ethers signer
    * @param safeAddress - The address of the Safe account to use
+   * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
    * @returns The Safe Core SDK instance
    */
-  constructor(ethers: any, signer: Wallet, safeAddress: string) {
+  constructor(ethers: any, safeAddress: string, providerOrSigner?: Provider | Wallet) {
+    const currentProviderOrSigner = providerOrSigner || (ethers.getDefaultProvider() as Provider)
     this.#ethers = ethers
-    this.#signer = signer
-    this.#contract = new ethers.Contract(safeAddress, SafeAbi, signer)
+    this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
+    if (Wallet.isSigner(currentProviderOrSigner)) {
+      this.#signer = currentProviderOrSigner
+      this.#provider = currentProviderOrSigner.provider
+      return
+    }
+    this.#signer = undefined
+    this.#provider = currentProviderOrSigner
+  }
+
+  /**
+   * Initializes the Safe Core SDK connecting the providerOrSigner to the safeAddress.
+   *
+   * @param providerOrSigner - Ethers provider or signer
+   * @param safeAddress - The address of the Safe account to use
+   */
+  connect(providerOrSigner: Provider | Wallet, safeAddress?: string): EthersSafe {
+    return new EthersSafe(this.#ethers, safeAddress || this.#contract.address, providerOrSigner)
+  }
+
+  /**
+   * Returns the connected provider.
+   *
+   * @returns The connected provider
+   */
+  getProvider(): Provider {
+    return this.#provider
+  }
+
+  /**
+   * Returns the connected signer.
+   *
+   * @returns The connected signer
+   */
+  getSigner(): Wallet | undefined {
+    return this.#signer
   }
 
   /**
@@ -66,8 +104,8 @@ class EthersSafe implements Safe {
    *
    * @returns The chainId of the connected network
    */
-  async getNetworkId(): Promise<number> {
-    return (await this.#signer.provider.getNetwork()).chainId
+  async getChainId(): Promise<number> {
+    return (await this.#provider.getNetwork()).chainId
   }
 
   /**
@@ -76,7 +114,7 @@ class EthersSafe implements Safe {
    * @returns The ETH balance of the Safe
    */
   async getBalance(): Promise<BigNumber> {
-    return BigNumber.from(await this.#signer.provider.getBalance(this.getAddress()))
+    return BigNumber.from(await this.#provider.getBalance(this.getAddress()))
   }
 
   /**
@@ -89,7 +127,17 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Returns the transaction hash to be signed by the owners.
+   * Checks if a specific Safe module is enabled for the current Safe.
+   *
+   * @param moduleAddress - The desired module address
+   * @returns TRUE if the module is enabled
+   */
+  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+    return this.#contract.isModuleEnabled(moduleAddress)
+  }
+
+  /**
+   * Returns the transaction hash of a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction
    * @returns The transaction hash of the Safe transaction
@@ -112,96 +160,132 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Signs data using the current owner account.
+   * Signs a hash using the current signer account.
    *
-   * @param hash - The data to sign
+   * @param hash - The hash to sign
    * @returns The Safe signature
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
-    const address = await this.#signer.address
+    if (!this.#signer) {
+      throw new Error('No signer provided')
+    }
+    const owners = await this.getOwners()
+    const addressIsOwner = owners.find(
+      (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+    )
+    if (!addressIsOwner) {
+      throw new Error('Transactions can only be signed by Safe owners')
+    }
     const messageArray = this.#ethers.utils.arrayify(hash)
     const signature = await this.#signer.signMessage(messageArray)
-    return new EthSignSignature(address, signature)
+    return new EthSignSignature(this.#signer.address, signature)
   }
 
   /**
-   * Adds the signature of the current owner to the Safe transaction object.
+   * Adds the signature of the current signer to the Safe transaction object.
    *
    * @param safeTransaction - The Safe transaction to be signed
    */
-  async confirmTransaction(safeTransaction: SafeTransaction): Promise<void> {
-    const owners = await this.getOwners()
-    if (!owners.find((owner: string) => areAddressesEqual(owner, this.#signer.address))) {
-      throw new Error('Transactions can only be confirmed by Safe owners')
-    }
+  async signTransaction(safeTransaction: SafeTransaction): Promise<void> {
     const txHash = await this.getTransactionHash(safeTransaction)
     const signature = await this.signTransactionHash(txHash)
-    safeTransaction.signatures.set(signature.signer, signature)
+    safeTransaction.addSignature(signature)
   }
 
   /**
-   * Returns the encoding of a Safe transaction.
+   * Approves on-chain a hash using the current signer account.
    *
-   * @param transaction - The Safe transaction
-   * @returns The encoding of the Safe transaction
+   * @param hash - The hash to approve
+   * @param skipOnChainApproval - TRUE to avoid the Safe transaction to be approved on-chain
+   * @returns The pre-validated signature
    */
-  async encodeTransaction(transaction: SafeTransaction): Promise<string> {
-    const encodedTx = await this.#contract.interface.encodeFunctionData('execTransaction', [
-      transaction.data.to,
-      transaction.data.value,
-      transaction.data.data,
-      transaction.data.operation,
-      transaction.data.safeTxGas,
-      transaction.data.baseGas,
-      transaction.data.gasPrice,
-      transaction.data.gasToken,
-      transaction.data.refundReceiver,
-      transaction.encodedSignatures()
-    ])
-    return encodedTx
+  async approveTransactionHash(
+    hash: string,
+    skipOnChainApproval?: boolean
+  ): Promise<SafeSignature> {
+    if (!this.#signer) {
+      throw new Error('No signer provided')
+    }
+    const owners = await this.getOwners()
+    const addressIsOwner = owners.find(
+      (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+    )
+    if (!addressIsOwner) {
+      throw new Error('Transaction hashes can only be approved by Safe owners')
+    }
+    if (!skipOnChainApproval) {
+      await this.#contract.approveHash(hash)
+    }
+    return generatePreValidatedSignature(this.#signer.address)
+  }
+
+  /**
+   * Returns a list of owners who have approved a specific Safe transaction.
+   *
+   * @param txHash - The Safe transaction hash
+   * @returns The list of owners
+   */
+  async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
+    const owners = await this.getOwners()
+    let ownersWhoApproved: string[] = []
+    for (const owner of owners) {
+      const approved = await this.#contract.approvedHashes(owner, txHash)
+      if (approved.gt(0)) {
+        ownersWhoApproved.push(owner)
+      }
+    }
+    return ownersWhoApproved
   }
 
   /**
    * Executes a Safe transaction.
    *
-   * @param transaction - The Safe transaction to execute
+   * @param safeTransaction - The Safe transaction to execute
    * @param options - Execution configuration options
    * @returns The Safe transaction response
    */
-  async executeTransaction(transaction: SafeTransaction, options?: any): Promise<any> {
+  async executeTransaction(
+    safeTransaction: SafeTransaction,
+    options?: any
+  ): Promise<ContractTransaction> {
+    if (!this.#signer) {
+      throw new Error('No signer provided')
+    }
+
+    const txHash = await this.getTransactionHash(safeTransaction)
+    const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
+    for (const owner of ownersWhoApprovedTx) {
+      safeTransaction.addSignature(generatePreValidatedSignature(owner))
+    }
+    const owners = await this.getOwners()
+    if (owners.includes(this.#signer.address)) {
+      safeTransaction.addSignature(generatePreValidatedSignature(this.#signer.address))
+    }
+
     const threshold = await this.getThreshold()
-    if (threshold.gt(transaction.signatures.size)) {
-      const signaturesMissing = threshold.sub(transaction.signatures.size).toNumber()
+    if (threshold.gt(safeTransaction.signatures.size)) {
+      const signaturesMissing = threshold.sub(safeTransaction.signatures.size).toNumber()
       throw new Error(
         `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
           signaturesMissing > 1 ? 's' : ''
         } missing`
       )
     }
+
     const txResponse = await this.#contract.execTransaction(
-      transaction.data.to,
-      transaction.data.value,
-      transaction.data.data,
-      transaction.data.operation,
-      transaction.data.safeTxGas,
-      transaction.data.baseGas,
-      transaction.data.gasPrice,
-      transaction.data.gasToken,
-      transaction.data.refundReceiver,
-      transaction.encodedSignatures(),
+      safeTransaction.data.to,
+      safeTransaction.data.value,
+      safeTransaction.data.data,
+      safeTransaction.data.operation,
+      safeTransaction.data.safeTxGas,
+      safeTransaction.data.baseGas,
+      safeTransaction.data.gasPrice,
+      safeTransaction.data.gasToken,
+      safeTransaction.data.refundReceiver,
+      safeTransaction.encodedSignatures(),
       { ...options }
     )
     return txResponse
-  }
-
-  /**
-   * Checks if a specific Safe module is enabled for the current Safe.
-   *
-   * @param moduleAddress - The desired module address
-   * @returns TRUE if the module is enabled
-   */
-  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.#contract.isModuleEnabled(moduleAddress)
   }
 }
 

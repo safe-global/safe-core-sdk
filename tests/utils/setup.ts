@@ -22,11 +22,11 @@ export const getSafeTemplate = async () => {
   return Safe.attach(template)
 }
 
-export const getSafeWithOwners = async (owners: string[], threhsold?: number) => {
+export const getSafeWithOwners = async (owners: string[], threshold?: number) => {
   const template = await getSafeTemplate()
   await template.setup(
     owners,
-    threhsold || owners.length,
+    threshold || owners.length,
     AddressZero,
     '0x',
     AddressZero,

@@ -4,14 +4,14 @@ import { SafeSignature } from 'utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
 interface Safe {
-  connect(safeAddress: string, providerOrSigner: Provider | Wallet): void
+  connect(providerOrSigner: Provider | Wallet, safeAddress?: string): void
   getProvider(): Provider
   getSigner(): Wallet | undefined
   getAddress(): string
   getContractVersion(): Promise<string>
   getOwners(): Promise<string[]>
   getThreshold(): Promise<BigNumber>
-  getNetworkId(): Promise<number>
+  getChainId(): Promise<number>
   getBalance(): Promise<BigNumber>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>

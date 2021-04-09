@@ -276,6 +276,7 @@ const tx = new SafeTransaction({
   // ...
 })
 const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ### getEnableModuleTx
@@ -284,6 +285,8 @@ Returns a Safe transaction ready to be signed that will enable a Safe module.
 
 ```js
 const tx = await safeSdk.getEnableModuleTx(moduleAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ### getDisableModuleTx
@@ -292,6 +295,8 @@ Returns a Safe transaction ready to be signed that will disable a Safe module.
 
 ```js
 const tx = await safeSdk.getDisableModuleTx(moduleAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ### getAddOwnerTx
@@ -299,13 +304,17 @@ const tx = await safeSdk.getDisableModuleTx(moduleAddress)
 Returns the Safe transaction to add an owner and update the threshold.
 
 ```js
-const tx = await safeSdk.getAddOwnerTx(ownerAddress, threshold)
+const tx = await safeSdk.getAddOwnerTx(newOwnerAddress, newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 If `threshold` is not provided, the current threshold will not change.
 
 ```js
-const tx = await safeSdk.getAddOwnerTx(ownerAddress)
+const tx = await safeSdk.getAddOwnerTx(newOwnerAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ### getRemoveOwnerTx
@@ -313,13 +322,17 @@ const tx = await safeSdk.getAddOwnerTx(ownerAddress)
 Returns the Safe transaction to remove an owner and update the threshold.
 
 ```js
-const tx = await safeSdk.getRemoveOwnerTx(ownerAddress, threshold)
+const tx = await safeSdk.getRemoveOwnerTx(ownerAddress, newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 If `threshold` is not provided, the current threshold will be decreased by one.
 
 ```js
 const tx = await safeSdk.getRemoveOwnerTx(ownerAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ### getSwapOwnerTx
@@ -328,6 +341,8 @@ Returns the Safe transaction to replace an owner of the Safe with a new one.
 
 ```js
 const tx = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ### getChangeThresholdTx
@@ -335,7 +350,9 @@ const tx = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
 Returns the Safe transaction to change the threshold.
 
 ```js
-const tx = await safeSdk.getChangeThresholdTx(threshold)
+const tx = await safeSdk.getChangeThresholdTx(newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ## License

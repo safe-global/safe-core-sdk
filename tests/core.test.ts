@@ -59,25 +59,6 @@ describe('Safe Core SDK', () => {
     })
   })
 
-  describe('getOwners', async () => {
-    it('should return the list of Safe owners', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const owners = await safeSdk.getOwners()
-      chai.expect(owners.length).to.be.eq(2)
-      chai.expect(owners[0]).to.be.eq(user1.address)
-      chai.expect(owners[1]).to.be.eq(user2.address)
-    })
-  })
-
-  describe('getThreshold', async () => {
-    it('should return the Safe threshold', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      chai.expect(await safeSdk.getThreshold()).to.be.eq(2)
-    })
-  })
-
   describe('getChainId', async () => {
     it('should return the chainId of the current network', async () => {
       const { safe, chainId } = await setupTests()

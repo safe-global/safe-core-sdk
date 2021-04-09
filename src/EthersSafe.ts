@@ -2,9 +2,20 @@ import { Provider } from '@ethersproject/providers'
 import { BigNumber, ContractTransaction, Wallet } from 'ethers'
 import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
+import ModuleManager from './managers/moduleManager'
+import OwnerManager from './managers/ownerManager'
+import {
+  AddOwnerWithThreshold,
+  ChangeThreshold,
+  ContractCallParams,
+  DisableModule,
+  EnableModule,
+  RemoveOwner,
+  SafeSettings,
+  SwapOwner
+} from './managers/types'
 import Safe from './Safe'
 import { areAddressesEqual } from './utils'
-import { SENTINEL_MODULES, SENTINEL_OWNERS, zeroAddress } from './utils/constants'
 import { generatePreValidatedSignature } from './utils/signatures'
 import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
@@ -12,6 +23,8 @@ import { SafeTransaction } from './utils/transactions'
 class EthersSafe implements Safe {
   #contract: GnosisSafe
   #ethers: any
+  #ownerManager: OwnerManager
+  #moduleManager: ModuleManager
   #provider: Provider
   #signer?: Wallet
 
@@ -27,6 +40,8 @@ class EthersSafe implements Safe {
     const currentProviderOrSigner = providerOrSigner || (ethers.getDefaultProvider() as Provider)
     this.#ethers = ethers
     this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
+    this.#ownerManager = new OwnerManager(this.#ethers, this.#contract)
+    this.#moduleManager = new ModuleManager(this.#ethers, this.#contract)
     if (Wallet.isSigner(currentProviderOrSigner)) {
       this.#signer = currentProviderOrSigner
       this.#provider = currentProviderOrSigner.provider
@@ -88,7 +103,7 @@ class EthersSafe implements Safe {
    * @returns The list of owners
    */
   async getOwners(): Promise<string[]> {
-    return this.#contract.getOwners()
+    return this.#ownerManager.getOwners()
   }
 
   /**
@@ -97,7 +112,7 @@ class EthersSafe implements Safe {
    * @returns The Safe threshold
    */
   async getThreshold(): Promise<number> {
-    return (await this.#contract.getThreshold()).toNumber()
+    return this.#ownerManager.getThreshold()
   }
 
   /**
@@ -124,7 +139,7 @@ class EthersSafe implements Safe {
    * @returns The list of addresses of all the enabled Safe modules
    */
   async getModules(): Promise<string[]> {
-    return this.#contract.getModules()
+    return this.#moduleManager.getModules()
   }
 
   /**
@@ -134,7 +149,7 @@ class EthersSafe implements Safe {
    * @returns TRUE if the module is enabled
    */
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.#contract.isModuleEnabled(moduleAddress)
+    return this.#moduleManager.isModuleEnabled(moduleAddress)
   }
 
   /**
@@ -144,8 +159,7 @@ class EthersSafe implements Safe {
    * @returns TRUE if the account is an owner
    */
   async isOwner(ownerAddress: string): Promise<boolean> {
-    const isOwner = await this.#contract.isOwner(ownerAddress)
-    return isOwner
+    return this.#ownerManager.isOwner(ownerAddress)
   }
 
   /**
@@ -301,208 +315,50 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Returns the Safe transaction to enable a Safe module.
+   * Returns the Safe transaction to make a specific contract call.
    *
-   * @param moduleAddress - The desired module address
+   * @param params - Contract method name and specific parameters
    * @returns The Safe transaction ready to be signed
    */
-  async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
-    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
-    if (!isValidAddress || moduleAddress === zeroAddress || moduleAddress === SENTINEL_MODULES) {
-      throw new Error('Invalid module address provided')
-    }
-    const modules = await this.getModules()
-    const moduleIndex = modules.findIndex((module: string) =>
-      areAddressesEqual(module, moduleAddress)
-    )
-    if (moduleIndex >= 0) {
-      throw new Error('Module provided is already enabled')
+  async buildContractCall(params: ContractCallParams): Promise<SafeTransaction> {
+    const { method } = params
+    let data = ''
+    switch (method) {
+      case SafeSettings.ADD_OWNER_WITH_THRESHOLD: {
+        const { ownerAddress, threshold } = params as AddOwnerWithThreshold
+        data = await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
+        break
+      }
+      case SafeSettings.REMOVE_OWNER: {
+        const { ownerAddress, threshold } = params as RemoveOwner
+        data = await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
+        break
+      }
+      case SafeSettings.SWAP_OWNER: {
+        const { oldOwnerAddress, newOwnerAddress } = params as SwapOwner
+        data = await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
+        break
+      }
+      case SafeSettings.CHANGE_THRESHOLD: {
+        const { threshold } = params as ChangeThreshold
+        data = await this.#ownerManager.encodeChangeThresholdData(threshold)
+        break
+      }
+      case SafeSettings.ENABLE_MODULE: {
+        const { moduleAddress } = params as EnableModule
+        data = await this.#moduleManager.encodeEnableModuleData(moduleAddress)
+        break
+      }
+      case SafeSettings.DISABLE_MODULE: {
+        const { moduleAddress } = params as DisableModule
+        data = await this.#moduleManager.encodeDisableModuleData(moduleAddress)
+        break
+      }
     }
     const tx = new SafeTransaction({
       to: this.getAddress(),
       value: '0',
-      data: this.#contract.interface.encodeFunctionData('enableModule', [moduleAddress]),
-      nonce: (await this.#contract.nonce()).toNumber()
-    })
-    return tx
-  }
-
-  /**
-   * Returns the Safe transaction to disable a Safe module.
-   *
-   * @param moduleAddress - The desired module address
-   * @returns The Safe transaction ready to be signed
-   */
-  async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
-    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
-    if (!isValidAddress || moduleAddress === zeroAddress || moduleAddress === SENTINEL_MODULES) {
-      throw new Error('Invalid module address provided')
-    }
-    const modules = await this.getModules()
-    const moduleIndex = modules.findIndex((module: string) =>
-      areAddressesEqual(module, moduleAddress)
-    )
-    if (moduleIndex < 0) {
-      throw new Error('Module provided is not enabled already')
-    }
-    const prevModuleAddress = moduleIndex === 0 ? SENTINEL_MODULES : modules[moduleIndex - 1]
-    const tx = new SafeTransaction({
-      to: this.getAddress(),
-      value: '0',
-      data: this.#contract.interface.encodeFunctionData('disableModule', [
-        prevModuleAddress,
-        moduleAddress
-      ]),
-      nonce: (await this.#contract.nonce()).toNumber()
-    })
-    return tx
-  }
-
-  /**
-   * Returns the Safe transaction to add an owner and optionally change the threshold.
-   *
-   * @param ownerAddress - The address of the new owner
-   * @param threshold - The new threshold
-   * @returns The Safe transaction ready to be signed
-   */
-  async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
-    const isValidAddress = this.#ethers.utils.isAddress(ownerAddress)
-    if (!isValidAddress || ownerAddress === zeroAddress || ownerAddress === SENTINEL_OWNERS) {
-      throw new Error('Invalid owner address provided')
-    }
-    const owners = await this.getOwners()
-    const addressIsOwner = owners.find((owner: string) => areAddressesEqual(owner, ownerAddress))
-    if (addressIsOwner) {
-      throw new Error('Address provided is already an owner')
-    }
-    const newThreshold = threshold ?? (await this.getThreshold())
-    if (newThreshold <= 0) {
-      throw new Error('Threshold needs to be greater than 0')
-    }
-    if (newThreshold > owners.length + 1) {
-      throw new Error('Threshold cannot exceed owner count')
-    }
-    const tx = new SafeTransaction({
-      to: this.getAddress(),
-      value: '0',
-      data: this.#contract.interface.encodeFunctionData('addOwnerWithThreshold', [
-        ownerAddress,
-        newThreshold
-      ]),
-      nonce: (await this.#contract.nonce()).toNumber()
-    })
-    return tx
-  }
-
-  /**
-   * Returns the Safe transaction to remove an owner and optionally change the threshold.
-   *
-   * @param ownerAddress - The address of the owner that will be removed
-   * @param threshold - The new threshold
-   * @returns The Safe transaction ready to be signed
-   */
-  async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
-    const isValidAddress = this.#ethers.utils.isAddress(ownerAddress)
-    if (!isValidAddress || ownerAddress === zeroAddress || ownerAddress === SENTINEL_OWNERS) {
-      throw new Error('Invalid owner address provided')
-    }
-    const owners = await this.getOwners()
-    const ownerIndex = owners.findIndex((owner: string) => areAddressesEqual(owner, ownerAddress))
-    const isOwner = ownerIndex >= 0
-    if (!isOwner) {
-      throw new Error('Address provided is not an owner')
-    }
-    const newThreshold = threshold ?? (await this.getThreshold()) - 1
-    if (newThreshold <= 0) {
-      throw new Error('Threshold needs to be greater than 0')
-    }
-    if (newThreshold > owners.length - 1) {
-      throw new Error('Threshold cannot exceed owner count')
-    }
-    const prevOwnerAddress = ownerIndex === 0 ? SENTINEL_OWNERS : owners[ownerIndex - 1]
-    const tx = new SafeTransaction({
-      to: this.getAddress(),
-      value: '0',
-      data: this.#contract.interface.encodeFunctionData('removeOwner', [
-        prevOwnerAddress,
-        ownerAddress,
-        newThreshold
-      ]),
-      nonce: (await this.#contract.nonce()).toNumber()
-    })
-    return tx
-  }
-
-  /**
-   * Returns the Safe transaction to replace an owner of the Safe with a new one.
-   *
-   * @param oldOwnerAddress - The old owner address
-   * @param newOwnerAddress - The new owner address
-   * @returns The Safe transaction ready to be signed
-   */
-  async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
-    const isValidOldAddress = this.#ethers.utils.isAddress(oldOwnerAddress)
-    const isValidNewAddress = this.#ethers.utils.isAddress(newOwnerAddress)
-    if (
-      !isValidOldAddress ||
-      oldOwnerAddress === zeroAddress ||
-      oldOwnerAddress === SENTINEL_OWNERS
-    ) {
-      throw new Error('Invalid old owner address provided')
-    }
-    if (
-      !isValidNewAddress ||
-      newOwnerAddress === zeroAddress ||
-      newOwnerAddress === SENTINEL_OWNERS
-    ) {
-      throw new Error('Invalid new owner address provided')
-    }
-    const owners = await this.getOwners()
-    const isOwnerNewAddress = owners.find((owner: string) =>
-      areAddressesEqual(owner, newOwnerAddress)
-    )
-    if (isOwnerNewAddress) {
-      throw new Error('New address provided is already an owner')
-    }
-    const ownerIndex = owners.findIndex((owner: string) =>
-      areAddressesEqual(owner, oldOwnerAddress)
-    )
-    const isOwner = ownerIndex >= 0
-    if (!isOwner) {
-      throw new Error('Old address provided is not an owner')
-    }
-    const prevOwnerAddress = ownerIndex === 0 ? SENTINEL_OWNERS : owners[ownerIndex - 1]
-    const tx = new SafeTransaction({
-      to: this.getAddress(),
-      value: '0',
-      data: this.#contract.interface.encodeFunctionData('swapOwner', [
-        prevOwnerAddress,
-        oldOwnerAddress,
-        newOwnerAddress
-      ]),
-      nonce: (await this.#contract.nonce()).toNumber()
-    })
-    return tx
-  }
-
-  /**
-   * Returns the Safe transaction to change the threshold.
-   *
-   * @param threshold - The new threshold
-   * @returns The Safe transaction ready to be signed
-   */
-  async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
-    if (threshold <= 0) {
-      throw new Error('Threshold needs to be greater than 0')
-    }
-    const owners = await this.getOwners()
-    if (threshold > owners.length) {
-      throw new Error('Threshold cannot exceed owner count')
-    }
-    const tx = new SafeTransaction({
-      to: this.getAddress(),
-      value: '0',
-      data: this.#contract.interface.encodeFunctionData('changeThreshold', [threshold]),
+      data,
       nonce: (await this.#contract.nonce()).toNumber()
     })
     return tx

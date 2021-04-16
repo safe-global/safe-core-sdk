@@ -23,7 +23,7 @@ describe('Off-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk.getNonce()
       })
       const txHash = await safeSdk.getTransactionHash(tx)
       await chai
@@ -38,7 +38,7 @@ describe('Off-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk.getNonce()
       })
       const txHash = await safeSdk.getTransactionHash(tx)
       await chai
@@ -53,7 +53,7 @@ describe('Off-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk.getNonce()
       })
       const txHash = await safeSdk.getTransactionHash(tx)
       const signature = await safeSdk.signTransactionHash(txHash)
@@ -69,7 +69,7 @@ describe('Off-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk.getNonce()
       })
       await chai.expect(safeSdk.signTransaction(tx)).to.be.rejectedWith('No signer provided')
     })
@@ -81,7 +81,7 @@ describe('Off-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk.getNonce()
       })
       await chai
         .expect(safeSdk.signTransaction(tx))
@@ -90,14 +90,14 @@ describe('Off-chain signatures', () => {
 
     it('should add the signature of the current signer', async () => {
       const { safe } = await setupTests()
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk.getNonce()
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
     })
@@ -109,7 +109,7 @@ describe('Off-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: await safe.nonce()
+        nonce: await safeSdk.getNonce()
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
       await safeSdk.signTransaction(tx)

@@ -39,7 +39,6 @@ const signer3 = provider.getSigner(2)
 // Existing Safe address (e.g. Safe created via https://app.gnosis-safe.io)
 // Where signer1, signer2 and signer3 are the Safe owners
 const safeAddress = "0x<safe_address>"
-const safeNonce = <safe_nonce>
 ```
 
 Create an instance of the Safe Core SDK with `signer1` connected as the signer.
@@ -55,7 +54,7 @@ const tx = new SafeTransaction({
   to: safeAddress,
   value: '0',
   data: '0x',
-  nonce: safeNonce
+  nonce: await safeSdk1.getNonce()
 })
 ```
 
@@ -159,6 +158,14 @@ Returns the list of Safe owner accounts.
 
 ```js
 const owners = await safeSdk.getOwners()
+```
+
+### getNonce
+
+Returns the Safe nonce.
+
+```js
+const nonce = await safeSdk.getNonce()
 ```
 
 ### getThreshold

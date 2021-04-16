@@ -23,7 +23,7 @@ describe('On-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk1.getNonce()
       })
       const txHash = await safeSdk1.getTransactionHash(tx)
       await chai
@@ -38,7 +38,7 @@ describe('On-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk1.getNonce()
       })
       const hash = await safeSdk1.getTransactionHash(tx)
       await chai
@@ -53,7 +53,7 @@ describe('On-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk1.getNonce()
       })
       const txHash = await safeSdk1.getTransactionHash(tx)
       const signature = await safeSdk1.approveTransactionHash(txHash, true)
@@ -68,7 +68,7 @@ describe('On-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk1.getNonce()
       })
       const hash = await safeSdk1.getTransactionHash(tx)
       const signature = await safeSdk1.approveTransactionHash(hash)
@@ -83,7 +83,7 @@ describe('On-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk1.getNonce()
       })
       const hash = await safeSdk1.getTransactionHash(tx)
       chai.expect(await safe.approvedHashes(user1.address, hash)).to.be.equal(0)
@@ -103,7 +103,7 @@ describe('On-chain signatures', () => {
         to: safe.address,
         value: '0',
         data: '0x',
-        nonce: (await safe.nonce()).toString()
+        nonce: await safeSdk1.getNonce()
       })
       const txHash = await safeSdk1.getTransactionHash(tx)
       const ownersWhoApproved0 = await safeSdk1.getOwnersWhoApprovedTx(txHash)

@@ -10,6 +10,7 @@ interface Safe {
   getAddress(): string
   getContractVersion(): Promise<string>
   getOwners(): Promise<string[]>
+  getNonce(): Promise<number>
   getThreshold(): Promise<BigNumber>
   getChainId(): Promise<number>
   getBalance(): Promise<BigNumber>

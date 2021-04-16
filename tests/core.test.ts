@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { BigNumber } from 'ethers'
+import { BigNumber, VoidSigner } from 'ethers'
 import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe from '../src/index'
 import { getSafeWithOwners } from './utils/setup'
@@ -18,6 +18,21 @@ describe('Safe Core SDK', () => {
   })
 
   describe('connect', async () => {
+    it('should fail if Safe contract is not deployed', async () => {
+      const mainnetGnosisDAOSafe = '0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe'
+      await chai
+        .expect(EthersSafe.create(ethers, mainnetGnosisDAOSafe, user1.provider))
+        .to.be.rejectedWith('Safe contract is not deployed in the current network')
+    })
+
+    it('should fail if signer is not connected to a provider', async () => {
+      const { safe } = await setupTests()
+      const voidSigner = new VoidSigner(user1.address)
+      await chai
+        .expect(EthersSafe.create(ethers, safe.address, voidSigner))
+        .to.be.rejectedWith('Signer must be connected to a provider')
+    })
+
     it('should connect with signer', async () => {
       const { safe } = await setupTests()
       const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
@@ -32,15 +47,8 @@ describe('Safe Core SDK', () => {
       chai.expect(safeSdk.getSigner()).to.be.undefined
     })
 
-    it('should fail if Safe contract is not deployed', async () => {
-      const mainnetGnosisDAOSafe = '0x6810e776880c02933d47db1b9fc05908e5386b96'
-      await chai
-        .expect(EthersSafe.create(ethers, mainnetGnosisDAOSafe, user1.provider))
-        .to.be.rejectedWith('Safe contract is not deployed in the current network')
-    })
-
     it('should connect to Mainnet with default provider', async () => {
-      const mainnetGnosisDAOSafe = '0x6810e776880c02933d47db1b9fc05908e5386b96'
+      const mainnetGnosisDAOSafe = '0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe'
       const safeSdk = await EthersSafe.create(ethers, mainnetGnosisDAOSafe)
       const defaultProvider = safeSdk.getProvider()
       chai.expect(ethers.providers.Provider.isProvider(defaultProvider)).to.be.true

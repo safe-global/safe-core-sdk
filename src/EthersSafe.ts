@@ -36,7 +36,7 @@ class EthersSafe implements Safe {
 
   /**
    * Initializes the Safe Core SDK instance.
-   * 
+   *
    * @param ethers - Ethers v5 library
    * @param safeAddress - The address of the Safe account to use
    * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
@@ -126,7 +126,7 @@ class EthersSafe implements Safe {
 
   /**
    * Returns the Safe nonce.
-   * 
+   *
    * @returns The Safe nonce
    */
   async getNonce(): Promise<number> {

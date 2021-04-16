@@ -18,7 +18,7 @@ describe('Off-chain signatures', () => {
   describe('signTransactionHash', async () => {
     it('should fail if signer is not provided', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1.provider)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1.provider)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -33,7 +33,7 @@ describe('Off-chain signatures', () => {
 
     it('should fail if signer is not an owner', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user3)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user3)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -48,7 +48,7 @@ describe('Off-chain signatures', () => {
 
     it('should sign a transaction hash with the current signer', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -64,7 +64,7 @@ describe('Off-chain signatures', () => {
   describe('signTransaction', async () => {
     it('should fail if signer is not provided', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1.provider)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1.provider)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -76,7 +76,7 @@ describe('Off-chain signatures', () => {
 
     it('should fail if signature is added by an account that is not an owner', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user3)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user3)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -97,14 +97,14 @@ describe('Off-chain signatures', () => {
         nonce: (await safe.nonce()).toString()
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
     })
 
     it('should ignore duplicated signatures', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',

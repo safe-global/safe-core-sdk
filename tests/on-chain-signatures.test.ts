@@ -18,7 +18,7 @@ describe('On-chain signatures', () => {
   describe('approveTransactionHash', async () => {
     it('should fail if signer is not provided', async () => {
       const { safe } = await setupTests()
-      const safeSdk1 = new EthersSafe(ethers, safe.address, user1.provider)
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1.provider)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -33,7 +33,7 @@ describe('On-chain signatures', () => {
 
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
       const { safe } = await setupTests()
-      const safeSdk1 = new EthersSafe(ethers, safe.address, user3)
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user3)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -48,7 +48,7 @@ describe('On-chain signatures', () => {
 
     it('should return the pre-validated signature without approving the transaction hash on-chain if specified', async () => {
       const { safe } = await setupTests()
-      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -63,7 +63,7 @@ describe('On-chain signatures', () => {
 
     it('should return the pre-validated signature and approve the transaction hash', async () => {
       const { safe } = await setupTests()
-      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -78,7 +78,7 @@ describe('On-chain signatures', () => {
 
     it('should ignore a duplicated signatures', async () => {
       const { safe } = await setupTests()
-      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',
@@ -97,8 +97,8 @@ describe('On-chain signatures', () => {
   describe('getOwnersWhoApprovedTx', async () => {
     it('should return the list of owners who approved a transaction hash', async () => {
       const { safe } = await setupTests()
-      const safeSdk1 = new EthersSafe(ethers, safe.address, user1)
-      const safeSdk2 = safeSdk1.connect(user2)
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
+      const safeSdk2 = await safeSdk1.connect(user2)
       const tx = new SafeTransaction({
         to: safe.address,
         value: '0',

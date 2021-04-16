@@ -20,21 +20,28 @@ describe('Safe Core SDK', () => {
   describe('connect', async () => {
     it('should connect with signer', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect(safeSdk.getProvider()).to.be.eq(user1.provider)
       chai.expect(safeSdk.getSigner()).to.be.eq(user1)
     })
 
     it('should connect with provider', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1.provider)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1.provider)
       chai.expect(safeSdk.getProvider()).to.be.eq(user1.provider)
       chai.expect(safeSdk.getSigner()).to.be.undefined
     })
 
-    it('should connect with default provider', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address)
+    it('should fail if Safe contract is not deployed', async () => {
+      const mainnetGnosisDAOSafe = '0x6810e776880c02933d47db1b9fc05908e5386b96'
+      await chai
+        .expect(EthersSafe.create(ethers, mainnetGnosisDAOSafe, user1.provider))
+        .to.be.rejectedWith('Safe contract is not deployed in the current network')
+    })
+
+    it('should connect to Mainnet with default provider', async () => {
+      const mainnetGnosisDAOSafe = '0x6810e776880c02933d47db1b9fc05908e5386b96'
+      const safeSdk = await EthersSafe.create(ethers, mainnetGnosisDAOSafe)
       const defaultProvider = safeSdk.getProvider()
       chai.expect(ethers.providers.Provider.isProvider(defaultProvider)).to.be.true
       chai.expect((await defaultProvider.getNetwork()).chainId).to.be.eq(1)
@@ -45,7 +52,7 @@ describe('Safe Core SDK', () => {
   describe('getContractVersion', async () => {
     it('should return the Safe contract version', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const contractVersion = await safeSdk.getContractVersion()
       chai.expect(contractVersion).to.be.eq('1.2.0')
     })
@@ -54,7 +61,7 @@ describe('Safe Core SDK', () => {
   describe('getAddress', async () => {
     it('should return the Safe contract address', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect(safeSdk.getAddress()).to.be.eq(safe.address)
     })
   })
@@ -62,7 +69,7 @@ describe('Safe Core SDK', () => {
   describe('getOwners', async () => {
     it('should return the list of Safe owners', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const owners = await safeSdk.getOwners()
       chai.expect(owners.length).to.be.eq(2)
       chai.expect(owners[0]).to.be.eq(user1.address)
@@ -73,7 +80,7 @@ describe('Safe Core SDK', () => {
   describe('getThreshold', async () => {
     it('should return the Safe threshold', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect(await safeSdk.getThreshold()).to.be.eq(2)
     })
   })
@@ -81,7 +88,7 @@ describe('Safe Core SDK', () => {
   describe('getChainId', async () => {
     it('should return the chainId of the current network', async () => {
       const { safe, chainId } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
     })
   })
@@ -89,7 +96,7 @@ describe('Safe Core SDK', () => {
   describe('getBalance', async () => {
     it('should return the balance of the Safe contract', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect(await safeSdk.getBalance()).to.be.eq(0)
       await user1.sendTransaction({
         to: safe.address,
@@ -102,7 +109,7 @@ describe('Safe Core SDK', () => {
   describe('getModules', async () => {
     it('should return an empty array if there are no modules enabled', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
     })
 
@@ -114,7 +121,7 @@ describe('Safe Core SDK', () => {
   describe('isModuleEnabled', async () => {
     it('should return false if a module is not enabled', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect(await safeSdk.isModuleEnabled(user1.address)).to.be.false
     })
 

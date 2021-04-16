@@ -1,12 +1,12 @@
 import { Provider } from '@ethersproject/providers'
-import { BigNumber, ContractTransaction, Wallet } from 'ethers'
+import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import { SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
 interface Safe {
-  connect(providerOrSigner: Provider | Wallet, safeAddress?: string): void
+  connect(providerOrSigner: Provider | Signer, safeAddress?: string): void
   getProvider(): Provider
-  getSigner(): Wallet | undefined
+  getSigner(): Signer | undefined
   getAddress(): string
   getContractVersion(): Promise<string>
   getOwners(): Promise<string[]>

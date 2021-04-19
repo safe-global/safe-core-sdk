@@ -19,7 +19,7 @@ interface Safe {
   getTransactionHash(safeTransaction: SafeTransaction): Promise<string>
   signTransactionHash(hash: string): Promise<SafeSignature>
   signTransaction(safeTransaction: SafeTransaction): Promise<void>
-  approveTransactionHash(hash: string, skipOnChainApproval: boolean): Promise<SafeSignature>
+  approveTransactionHash(hash: string): Promise<ContractTransaction>
   getOwnersWhoApprovedTx(txHash: string): Promise<string[]>
   executeTransaction(safeTransaction: SafeTransaction, options?: any): Promise<ContractTransaction>
 }

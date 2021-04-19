@@ -244,9 +244,8 @@ class EthersSafe implements Safe {
    * @returns The pre-validated signature
    */
   async approveTransactionHash(
-    hash: string,
-    skipOnChainApproval?: boolean
-  ): Promise<SafeSignature> {
+    hash: string
+  ): Promise<ContractTransaction> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }
@@ -258,10 +257,7 @@ class EthersSafe implements Safe {
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
-    if (!skipOnChainApproval) {
-      await this.#contract.approveHash(hash)
-    }
-    return generatePreValidatedSignature(signerAddress)
+    return this.#contract.approveHash(hash)
   }
 
   /**

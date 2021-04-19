@@ -87,6 +87,7 @@ Lastly, `signer3` account is connected to the SDK as the signer and executor of 
 ```js
 const safeSdk3 = await safeSdk2.connect(signer3)
 const txResponse = await safeSdk3.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 All the signatures used to execute the transaction are available at `tx.signatures`.
@@ -251,7 +252,8 @@ const tx = new SafeTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
-const signature = await safeSdk.approveTransactionHash(txHash)
+const txResponse = await safeSdk.approveTransactionHash(txHash)
+await txResponse.wait()
 ```
 
 ### getOwnersWhoApprovedTx
@@ -275,6 +277,7 @@ const tx = new SafeTransaction({
   // ...
 })
 const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ## License

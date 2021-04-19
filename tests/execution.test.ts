@@ -53,7 +53,8 @@ describe('Transactions execution', () => {
       })
       await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
-      await safeSdk2.approveTransactionHash(txHash)
+      const txResponse = await safeSdk2.approveTransactionHash(txHash)
+      await txResponse.wait()
       await chai
         .expect(safeSdk2.executeTransaction(tx))
         .to.be.rejectedWith('There is 1 signature missing')
@@ -99,9 +100,10 @@ describe('Transactions execution', () => {
       })
       await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
-      await safeSdk2.approveTransactionHash(txHash)
-      const txResponse = await safeSdk3.executeTransaction(tx)
-      chai.expect(txResponse.hash.length).to.be.eq(66)
+      const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
+      await txResponse1.wait()
+      const txResponse2 = await safeSdk3.executeTransaction(tx)
+      chai.expect(txResponse2.hash.length).to.be.eq(66)
     })
 
     it('should execute a transaction when is not submitted by an owner', async () => {
@@ -123,9 +125,10 @@ describe('Transactions execution', () => {
       })
       await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
-      await safeSdk2.approveTransactionHash(txHash)
-      const txResponse = await safeSdk3.executeTransaction(tx)
-      chai.expect(txResponse.hash.length).to.be.eq(66)
+      const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
+      await txResponse1.wait()
+      const txResponse2 = await safeSdk3.executeTransaction(tx)
+      chai.expect(txResponse2.hash.length).to.be.eq(66)
 
       const safeFinalBalance = await safeSdk1.getBalance()
       chai.expect(safeFinalBalance.toString()).to.be.eq('500000000000000000')

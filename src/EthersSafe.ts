@@ -40,6 +40,8 @@ class EthersSafe implements Safe {
    * @param ethers - Ethers v5 library
    * @param safeAddress - The address of the Safe account to use
    * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
+   * @throws "Signer must be connected to a provider"
+   * @throws "Safe contract is not deployed in the current network"
    */
   private async init(
     ethers: any,
@@ -207,6 +209,8 @@ class EthersSafe implements Safe {
    *
    * @param hash - The hash to sign
    * @returns The Safe signature
+   * @throws "No signer provided"
+   * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
     if (!this.#signer) {
@@ -242,6 +246,8 @@ class EthersSafe implements Safe {
    * @param hash - The hash to approve
    * @param skipOnChainApproval - TRUE to avoid the Safe transaction to be approved on-chain
    * @returns The pre-validated signature
+   * @throws "No signer provided"
+   * @throws "Transaction hashes can only be approved by Safe owners"
    */
   async approveTransactionHash(
     hash: string
@@ -284,6 +290,8 @@ class EthersSafe implements Safe {
    * @param safeTransaction - The Safe transaction to execute
    * @param options - Execution configuration options
    * @returns The Safe transaction response
+   * @throws "No signer provided"
+   * @throws "There are X signatures missing"
    */
   async executeTransaction(
     safeTransaction: SafeTransaction,

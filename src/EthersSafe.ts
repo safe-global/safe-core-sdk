@@ -313,6 +313,8 @@ class EthersSafe implements Safe {
    *
    * @param moduleAddress - The desired module address
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid module address provided"
+   * @throws "Module provided is already enabled"
    */
   async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
     const tx = await this.createTransaction({
@@ -330,6 +332,8 @@ class EthersSafe implements Safe {
    * @param moduleAddress - The desired module address
    * @param params - Contract method name and specific parameters
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid module address provided"
+   * @throws "Module provided is not enabled already"
    */
   async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
     const tx = await this.createTransaction({
@@ -347,6 +351,10 @@ class EthersSafe implements Safe {
    * @param ownerAddress - The address of the new owner
    * @param threshold - The new threshold
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid owner address provided"
+   * @throws "Address provided is already an owner"
+   * @throws "Threshold needs to be greater than 0"
+   * @throws "Threshold cannot exceed owner count"
    */
   async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
     const tx = await this.createTransaction({
@@ -364,6 +372,10 @@ class EthersSafe implements Safe {
    * @param ownerAddress - The address of the owner that will be removed
    * @param threshold - The new threshold
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid owner address provided"
+   * @throws "Address provided is not an owner"
+   * @throws "Threshold needs to be greater than 0"
+   * @throws "Threshold cannot exceed owner count"
    */
   async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
     const tx = await this.createTransaction({
@@ -381,6 +393,10 @@ class EthersSafe implements Safe {
    * @param oldOwnerAddress - The old owner address
    * @param newOwnerAddress - The new owner address
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid new owner address provided"
+   * @throws "Invalid old owner address provided"
+   * @throws "New address provided is already an owner"
+   * @throws "Old address provided is not an owner"
    */
   async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
     const tx = await this.createTransaction({
@@ -397,6 +413,8 @@ class EthersSafe implements Safe {
    *
    * @param threshold - The new threshold
    * @returns The Safe transaction ready to be signed
+   * @throws "Threshold needs to be greater than 0"
+   * @throws "Threshold cannot exceed owner count"
    */
   async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
     const tx = await this.createTransaction({

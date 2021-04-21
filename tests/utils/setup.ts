@@ -1,5 +1,6 @@
 import { AddressZero } from '@ethersproject/constants'
 import { deployments, ethers } from 'hardhat'
+import { DailyLimitModule, GnosisSafe, MultiSend, SocialRecoveryModule } from '../../typechain'
 
 export const getSafeSingleton = async () => {
   const SafeDeployment = await deployments.get('GnosisSafe')
@@ -13,16 +14,19 @@ export const getFactory = async () => {
   return Factory.attach(FactoryDeployment.address)
 }
 
-export const getSafeTemplate = async () => {
+export const getSafeTemplate = async (): Promise<GnosisSafe> => {
   const singleton = await getSafeSingleton()
   const factory = await getFactory()
   const template = await factory.callStatic.createProxy(singleton.address, '0x')
   await factory.createProxy(singleton.address, '0x').then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory('GnosisSafe')
-  return Safe.attach(template)
+  return Safe.attach(template) as GnosisSafe
 }
 
-export const getSafeWithOwners = async (owners: string[], threshold?: number) => {
+export const getSafeWithOwners = async (
+  owners: string[],
+  threshold?: number
+): Promise<GnosisSafe> => {
   const template = await getSafeTemplate()
   await template.setup(
     owners,
@@ -37,14 +41,20 @@ export const getSafeWithOwners = async (owners: string[], threshold?: number) =>
   return template
 }
 
-export const getDailyLimitModule = async () => {
-  const DailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
-  const DailyLimitModule = await ethers.getContractFactory('DailyLimitModule')
-  return DailyLimitModule.attach(DailyLimitModuleDeployment.address)
+export const getMultiSend = async (): Promise<MultiSend> => {
+  const MultiSendDeployment = await deployments.get('MultiSend')
+  const MultiSend = await ethers.getContractFactory('MultiSend')
+  return MultiSend.attach(MultiSendDeployment.address) as MultiSend
 }
 
-export const getSocialRecoveryModule = async () => {
+export const getDailyLimitModule = async (): Promise<DailyLimitModule> => {
+  const DailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
+  const DailyLimitModule = await ethers.getContractFactory('DailyLimitModule')
+  return DailyLimitModule.attach(DailyLimitModuleDeployment.address) as DailyLimitModule
+}
+
+export const getSocialRecoveryModule = async (): Promise<SocialRecoveryModule> => {
   const SocialRecoveryModuleDeployment = await deployments.get('SocialRecoveryModule')
   const SocialRecoveryModule = await ethers.getContractFactory('SocialRecoveryModule')
-  return SocialRecoveryModule.attach(SocialRecoveryModuleDeployment.address)
+  return SocialRecoveryModule.attach(SocialRecoveryModuleDeployment.address) as SocialRecoveryModule
 }

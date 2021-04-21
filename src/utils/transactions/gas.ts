@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers'
-import SafeTransaction from './SafeTransaction'
+import SafeTransaction, { OperationType } from './SafeTransaction'
 
 const estimateDataGasCosts = (data: any): number => {
   const reducer = (accumulator: number, currentValue: string) => {
@@ -15,23 +15,23 @@ const estimateDataGasCosts = (data: any): number => {
 }
 
 export const estimateTxGas = async (
-  contract: any,
+  safeContract: any,
   to: string,
   valueInWei: string,
   data: string,
-  operation: number
+  operation: OperationType
 ): Promise<number> => {
   let txGasEstimation = 0
-  const safeAddress = contract.address
+  const safeAddress = safeContract.address
 
-  const estimateData: string = contract.interface.encodeFunctionData('requiredTxGas', [
+  const estimateData: string = safeContract.interface.encodeFunctionData('requiredTxGas', [
     to,
     valueInWei,
     data,
     operation
   ])
   try {
-    const estimateResponse = await contract.provider.call(
+    const estimateResponse = await safeContract.provider.call(
       {
         to: safeAddress,
         from: safeAddress,
@@ -47,7 +47,7 @@ export const estimateTxGas = async (
     let additionalGas = 10000
     for (let i = 0; i < 10; i++) {
       try {
-        const estimateResponse = await contract.provider.call({
+        const estimateResponse = await safeContract.provider.call({
           to: safeAddress,
           from: safeAddress,
           data: estimateData,
@@ -65,7 +65,7 @@ export const estimateTxGas = async (
   }
 
   try {
-    const estimateGas = await contract.provider.estimateGas({
+    const estimateGas = await safeContract.provider.estimateGas({
       to,
       from: safeAddress,
       value: valueInWei,
@@ -73,6 +73,9 @@ export const estimateTxGas = async (
     })
     return estimateGas.toNumber()
   } catch (error) {
+    if (operation === OperationType.DelegateCall) {
+      return 0
+    }
     return Promise.reject(error)
   }
 }

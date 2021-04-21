@@ -5,10 +5,14 @@ export enum OperationType {
   DelegateCall // 1
 }
 
-export interface SafeTransactionData {
+export interface SafeBasicTransactionData {
   readonly to: string
   readonly value: string
   readonly data: string
+  readonly operation?: OperationType
+}
+
+export interface SafeTransactionData extends SafeBasicTransactionData {
   readonly operation: OperationType
   readonly safeTxGas: number
   readonly baseGas: number
@@ -18,11 +22,7 @@ export interface SafeTransactionData {
   readonly nonce: number
 }
 
-export interface SafeTransactionDataPartial {
-  readonly to: string
-  readonly value: string
-  readonly data: string
-  readonly operation?: OperationType
+export interface SafeTransactionDataPartial extends SafeBasicTransactionData {
   readonly safeTxGas?: number
   readonly baseGas?: number
   readonly gasPrice?: number

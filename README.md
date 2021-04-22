@@ -31,7 +31,7 @@ A Safe account with three owners and threshold equal three will be used as the s
 
 ```js
 import { ethers } from 'ethers'
-import EthersSafe, { SafeTransaction } from 'safe-core-sdk'
+import EthersSafe from '@gnosis.pm/safe-core-sdk'
 
 const web3Provider = // ...
 const provider = new ethers.providers.Web3Provider(web3Provider)
@@ -41,23 +41,23 @@ const signer3 = provider.getSigner(2)
 
 // Existing Safe address (e.g. Safe created via https://app.gnosis-safe.io)
 // Where signer1, signer2 and signer3 are the Safe owners
-const safeAddress = "0x<safe_address>"
+const safeAddress = '0x<safe_address>'
 ```
 
 Create an instance of the Safe Core SDK with `signer1` connected as the signer.
 
 ```js
-const safeSdk = await EthersSafe.create(ethers, safeAddress, signer1)
+const safeSdk = await EthersSafe.create({ ethers, safeAddress, providerOrSigner: signer1 })
 ```
 
 ### 1. Create a Safe transaction
 
 ```js
-const tx = await safeSdk.createTransaction({
+const tx = await safeSdk.createTransaction([{
   to: safeAddress,
-  value: '0',
-  data: '0x',
-})
+  value: '<eth_value_in_wei>',
+  data: '0x<data>'
+}])
 ```
 
 Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain and the owner `signer3` would have to explicitly sign it too.
@@ -77,7 +77,7 @@ Because the signature is off-chain, there is no interaction with the contract an
 After `signer2` account is connected to the SDK as the signer the transaction hash is approved on-chain.
 
 ```js
-const safeSdk2 = await safeSdk.connect(signer2)
+const safeSdk2 = await safeSdk.connect({ providerOrSigner: signer2 })
 const txHash = await safeSdk2.getTransactionHash(tx)
 const signer2Signature = await safeSdk2.approveTransactionHash(txHash)
 ```
@@ -87,7 +87,7 @@ const signer2Signature = await safeSdk2.approveTransactionHash(txHash)
 Lastly, `signer3` account is connected to the SDK as the signer and executor of the Safe transaction to execute it.
 
 ```js
-const safeSdk3 = await safeSdk2.connect(signer3)
+const safeSdk3 = await safeSdk2.connect({ providerOrSigner: signer3 })
 const txResponse = await safeSdk3.executeTransaction(tx)
 await txResponse.wait()
 ```
@@ -100,13 +100,24 @@ All the signatures used to execute the transaction are available at `tx.signatur
 Returns an instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
 
 ```js
-const safeSdk = await EthersSafe.create(ethers, safeAddress, providerOrSigner)
+const safeSdk = await EthersSafe.create({ ethers, safeAddress, providerOrSigner })
 ```
 
 If `providerOrSigner` is not provided, `ethers` default provider will be used.
 
 ```js
-const safeSdk = await EthersSafe.create(ethers, safeAddress)
+const safeSdk = await EthersSafe.create({ ethers, safeAddress })
+```
+
+The property `contractNetworks` can be added to provide the Safe contract addresses in case the SDK is used in a network where the Safe contracts are not deployed.
+
+```js
+const contractNetworks: ContractNetworksConfig = {
+  [chainId]: {
+    multiSendAddress: '0x<multisend_address>'
+  }
+}
+const safeSdk = await EthersSafe.create({ ethers, safeAddress, providerOrSigner, contractNetworks })
 ```
 
 ### connect
@@ -114,13 +125,24 @@ const safeSdk = await EthersSafe.create(ethers, safeAddress)
 Returns a new instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
 
 ```js
-const safeSdk2 = await safeSdk.connect(providerOrSigner, safeAddress)
+const safeSdk2 = await safeSdk.connect({ providerOrSigner, safeAddress })
 ```
 
 If `safeAddress` is not provided, the `providerOrSigner` will be connected to the previous Safe.
 
 ```js
-const safeSdk2 = await safeSdk.connect(providerOrSigner)
+const safeSdk2 = await safeSdk.connect({ providerOrSigner })
+```
+
+The property `contractNetworks` can be added to provide the Safe contract addresses in case the SDK is used in a network where the Safe contracts are not deployed.
+
+```js
+const contractNetworks: ContractNetworksConfig = {
+  [chainId]: {
+    multiSendAddress: '0x<multisend_address>'
+  }
+}
+const safeSdk = await EthersSafe.create({ ethers, safeAddress, providerOrSigner, contractNetworks })
 ```
 
 ### getProvider
@@ -139,12 +161,12 @@ Returns the connected signer.
 const signer = safeSdk.getSigner()
 ```
 
-### getAddress
+### getSafeAddress
 
 Returns the address of the current Safe Proxy contract.
 
 ```js
-const address = safeSdk.getAddress()
+const address = safeSdk.getSafeAddress()
 ```
 
 ### getContractVersion
@@ -221,15 +243,20 @@ const isOwner = await safeSdk.isOwner(address)
 
 ### createTransaction
 
-Returns a Safe transaction ready to be signed by the owners and executed.
+Returns a Safe transaction ready to be signed by the owners and executed. Batched transactions are allowed if more than one transaction is added to the array of transactions.
 
 ```js
-const partialTx: SafeTransactionDataPartial = {
+const partialTx1: SafeTransactionDataPartial = {
   to: '0x<address>',
   data: '0x<data>',
   value: '<eth_value_in_wei>'
 }
-const safeTransaction = await safeSdk.createTransaction(partialTx)
+const partialTx2: SafeTransactionDataPartial = {
+  to: '0x<address>',
+  data: '0x<data>',
+  value: '<eth_value_in_wei>'
+}
+const safeTransaction = await safeSdk.createTransaction([partialTx1, partialTx2])
 ```
 
 ### getTransactionHash
@@ -237,9 +264,9 @@ const safeTransaction = await safeSdk.createTransaction(partialTx)
 Returns the transaction hash of a Safe transaction.
 
 ```js
-const tx = await safeSdk.createTransaction({
+const tx = await safeSdk.createTransaction([{
   // ...
-})
+}])
 const txHash = await safeSdk.getTransactionHash(tx)
 ```
 
@@ -248,9 +275,9 @@ const txHash = await safeSdk.getTransactionHash(tx)
 Signs a hash using the current signer account.
 
 ```js
-const tx = await safeSdk.createTransaction({
+const tx = await safeSdk.createTransaction([{
   // ...
-})
+}])
 const txHash = await safeSdk.getTransactionHash(tx)
 const signature = await safeSdk.signTransactionHash(txHash)
 ```
@@ -260,9 +287,9 @@ const signature = await safeSdk.signTransactionHash(txHash)
 Adds the signature of the current signer to the Safe transaction object.
 
 ```js
-const tx = await safeSdk.createTransaction({
+const tx = await safeSdk.createTransaction([{
   // ...
-})
+}])
 await safeSdk.signTransaction(tx)
 ```
 
@@ -271,9 +298,9 @@ await safeSdk.signTransaction(tx)
 Approves on-chain a hash using the current signer account.
 
 ```js
-const tx = await safeSdk.createTransaction({
+const tx = await safeSdk.createTransaction([{
   // ...
-})
+}])
 const txHash = await safeSdk.getTransactionHash(tx)
 const txResponse = await safeSdk.approveTransactionHash(txHash)
 await txResponse.wait()
@@ -284,9 +311,9 @@ await txResponse.wait()
 Returns a list of owners who have approved a specific Safe transaction.
 
 ```js
-const tx = await safeSdk.createTransaction({
+const tx = await safeSdk.createTransaction([{
   // ...
-})
+}])
 const txHash = await safeSdk.getTransactionHash(tx)
 const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```

@@ -267,6 +267,78 @@ const txHash = await safeSdk.getTransactionHash(tx)
 const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
 
+### getEnableModuleTx
+
+Returns a Safe transaction ready to be signed that will enable a Safe module.
+
+```js
+const tx = await safeSdk.getEnableModuleTx(moduleAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+### getDisableModuleTx
+
+Returns a Safe transaction ready to be signed that will disable a Safe module.
+
+```js
+const tx = await safeSdk.getDisableModuleTx(moduleAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+### getAddOwnerTx
+
+Returns the Safe transaction to add an owner and update the threshold.
+
+```js
+const tx = await safeSdk.getAddOwnerTx(newOwnerAddress, newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+If `threshold` is not provided, the current threshold will not change.
+
+```js
+const tx = await safeSdk.getAddOwnerTx(newOwnerAddress)
+```
+
+### getRemoveOwnerTx
+
+Returns the Safe transaction to remove an owner and update the threshold.
+
+```js
+const tx = await safeSdk.getRemoveOwnerTx(ownerAddress, newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+If `threshold` is not provided, the current threshold will be decreased by one.
+
+```js
+const tx = await safeSdk.getRemoveOwnerTx(ownerAddress)
+```
+
+### getSwapOwnerTx
+
+Returns the Safe transaction to replace an owner of the Safe with a new one.
+
+```js
+const tx = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+### getChangeThresholdTx
+
+Returns the Safe transaction to change the threshold.
+
+```js
+const tx = await safeSdk.getChangeThresholdTx(newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
 ### executeTransaction
 
 Executes a Safe transaction.
@@ -277,87 +349,6 @@ const tx = new SafeTransaction({
 })
 const txResponse = await safeSdk.executeTransaction(tx)
 await txResponse.wait()
-```
-
-### buildContractCall
-
-Returns a Safe transaction with the encoded data of a specific contract call ready to be signed and executed.
-
-#### Transaction to enable a module.
-
-```js
-import { SafeSettings } from 'safe-core-sdk'
-
-const tx = await safeSdk.buildContractCall({
-  method: SafeSettings.ENABLE_MODULE,
-  moduleAddress
-})
-```
-
-#### Transaction to disable a Safe module.
-
-```js
-const tx = await safeSdk.buildContractCall({
-  method: SafeSettings.DISABLE_MODULE,
-  moduleAddress
-})
-```
-
-#### Transaction to add an owner and update the threshold.
-
-If `threshold` is not provided, the current threshold will not change.
-
-```js
-const tx = await safeSdk.buildContractCall({
-  method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-  ownerAddress,
-  threshold
-})
-```
-
-```js
-const tx = await safeSdk.buildContractCall({
-  method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-  ownerAddress
-})
-```
-
-#### Transaction to remove an owner and update the threshold.
-
-If `threshold` is not provided, the current threshold will be decreased by one.
-
-```js
-const tx = await safeSdk1.buildContractCall({
-  method: SafeSettings.REMOVE_OWNER,
-  ownerAddress,
-  threshold
-})
-```
-
-```js
-const tx = await safeSdk.buildContractCall({
-  method: SafeSettings.REMOVE_OWNER,
-  ownerAddress
-})
-```
-
-#### Transaction to replace an owner of the Safe with a new one.
-
-```js
-const tx = await safeSdk.buildContractCall({
-  method: SafeSettings.SWAP_OWNER,
-  oldOwnerAddress,
-  newOwnerAddress
-})
-```
-
-#### Transaction to change the threshold.
-
-```js
-const tx = await safeSdk.buildContractCall({
-  method: SafeSettings.CHANGE_THRESHOLD,
-  threshold
-})
 ```
 
 ## License

@@ -1,6 +1,5 @@
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, ContractTransaction, Wallet } from 'ethers'
-import { ContractCallParams } from './managers/types'
 import { SafeSignature } from './utils/signatures/SafeSignature'
 import { SafeTransaction } from './utils/transactions'
 
@@ -22,8 +21,13 @@ interface Safe {
   signTransaction(safeTransaction: SafeTransaction): Promise<void>
   approveTransactionHash(hash: string, skipOnChainApproval: boolean): Promise<SafeSignature>
   getOwnersWhoApprovedTx(txHash: string): Promise<string[]>
+  getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction>
+  getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction>
+  getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction>
+  getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction>
+  getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction>
+  getChangeThresholdTx(threshold: number): Promise<SafeTransaction>
   executeTransaction(safeTransaction: SafeTransaction, options?: any): Promise<ContractTransaction>
-  buildContractCall(params: ContractCallParams): Promise<SafeTransaction>
 }
 
 export default Safe

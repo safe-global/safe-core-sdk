@@ -4,16 +4,6 @@ import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
-import {
-  AddOwnerWithThreshold,
-  ChangeThreshold,
-  ContractCallParams,
-  DisableModule,
-  EnableModule,
-  RemoveOwner,
-  SafeSettings,
-  SwapOwner
-} from './managers/types'
 import Safe from './Safe'
 import { areAddressesEqual } from './utils'
 import { generatePreValidatedSignature } from './utils/signatures'
@@ -264,6 +254,106 @@ class EthersSafe implements Safe {
   }
 
   /**
+   * Returns the Safe transaction to enable a Safe module.
+   *
+   * @param moduleAddress - The desired module address
+   * @returns The Safe transaction ready to be signed
+   */
+  async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to disable a Safe module.
+   *
+   * @param moduleAddress - The desired module address
+   * @param params - Contract method name and specific parameters
+   * @returns The Safe transaction ready to be signed
+   */
+  async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to add an owner and optionally change the threshold.
+   *
+   * @param ownerAddress - The address of the new owner
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to remove an owner and optionally change the threshold.
+   *
+   * @param ownerAddress - The address of the owner that will be removed
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to replace an owner of the Safe with a new one.
+   *
+   * @param oldOwnerAddress - The old owner address
+   * @param newOwnerAddress - The new owner address
+   * @returns The Safe transaction ready to be signed
+   */
+  async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to change the threshold.
+   *
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
+    const tx = new SafeTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeChangeThresholdData(threshold),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
@@ -312,56 +402,6 @@ class EthersSafe implements Safe {
       { ...options }
     )
     return txResponse
-  }
-
-  /**
-   * Returns the Safe transaction to make a specific contract call.
-   *
-   * @param params - Contract method name and specific parameters
-   * @returns The Safe transaction ready to be signed
-   */
-  async buildContractCall(params: ContractCallParams): Promise<SafeTransaction> {
-    const { method } = params
-    let data = ''
-    switch (method) {
-      case SafeSettings.ADD_OWNER_WITH_THRESHOLD: {
-        const { ownerAddress, threshold } = params as AddOwnerWithThreshold
-        data = await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
-        break
-      }
-      case SafeSettings.REMOVE_OWNER: {
-        const { ownerAddress, threshold } = params as RemoveOwner
-        data = await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
-        break
-      }
-      case SafeSettings.SWAP_OWNER: {
-        const { oldOwnerAddress, newOwnerAddress } = params as SwapOwner
-        data = await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
-        break
-      }
-      case SafeSettings.CHANGE_THRESHOLD: {
-        const { threshold } = params as ChangeThreshold
-        data = await this.#ownerManager.encodeChangeThresholdData(threshold)
-        break
-      }
-      case SafeSettings.ENABLE_MODULE: {
-        const { moduleAddress } = params as EnableModule
-        data = await this.#moduleManager.encodeEnableModuleData(moduleAddress)
-        break
-      }
-      case SafeSettings.DISABLE_MODULE: {
-        const { moduleAddress } = params as DisableModule
-        data = await this.#moduleManager.encodeDisableModuleData(moduleAddress)
-        break
-      }
-    }
-    const tx = new SafeTransaction({
-      to: this.getAddress(),
-      value: '0',
-      data,
-      nonce: (await this.#contract.nonce()).toNumber()
-    })
-    return tx
   }
 }
 

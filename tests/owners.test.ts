@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe, { SafeSettings } from '../src'
+import EthersSafe from '../src'
 import { SENTINEL_OWNERS, zeroAddress } from '../src/utils/constants'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
@@ -43,44 +43,32 @@ describe('Safe Owners', () => {
     })
   })
 
-  describe('buildContractCall ADD_OWNER_WITH_THRESHOLD', async () => {
+  describe('getAddOwnerTx', async () => {
     it('should fail if address is invalid', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: '0x123'
-      })
+      const tx = safeSdk.getAddOwnerTx('0x123')
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
     it('should fail if address is equal to sentinel', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: SENTINEL_OWNERS
-      })
+      const tx = safeSdk.getAddOwnerTx(SENTINEL_OWNERS)
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
     it('should fail if address is equal to 0x address', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: zeroAddress
-      })
+      const tx = safeSdk.getAddOwnerTx(zeroAddress)
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
     it('should fail if address is already an owner', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: user1.address
-      })
+      const tx = safeSdk.getAddOwnerTx(user1.address)
       await chai.expect(tx).to.be.rejectedWith('Address provided is already an owner')
     })
 
@@ -90,22 +78,14 @@ describe('Safe Owners', () => {
       const newThreshold = 3
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: user2.address,
-        threshold: newThreshold
-      })
+      const tx = safeSdk.getAddOwnerTx(user2.address, newThreshold)
       await chai.expect(tx).to.be.rejectedWith('Threshold cannot exceed owner count')
     })
 
     it('should fail if the threshold is not bigger than 0', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: user2.address,
-        threshold: 0
-      })
+      const tx = safeSdk.getAddOwnerTx(user2.address, 0)
       await chai.expect(tx).to.be.rejectedWith('Threshold needs to be greater than 0')
     })
 
@@ -116,10 +96,7 @@ describe('Safe Owners', () => {
       const initialOwners = await safeSdk.getOwners()
       chai.expect(initialOwners.length).to.be.eq(1)
       chai.expect(initialOwners[0]).to.be.eq(user1.address)
-      const tx = await safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: user2.address
-      })
+      const tx = await safeSdk.getAddOwnerTx(user2.address)
       const txResponse = await safeSdk.executeTransaction(tx, { gasLimit: 10000000 })
       await txResponse.wait()
       const finalThreshold = await safeSdk.getThreshold()
@@ -137,11 +114,7 @@ describe('Safe Owners', () => {
       const initialOwners = await safeSdk.getOwners()
       chai.expect(initialOwners.length).to.be.eq(1)
       chai.expect(initialOwners[0]).to.be.eq(user1.address)
-      const tx = await safeSdk.buildContractCall({
-        method: SafeSettings.ADD_OWNER_WITH_THRESHOLD,
-        ownerAddress: user2.address,
-        threshold: newThreshold
-      })
+      const tx = await safeSdk.getAddOwnerTx(user2.address, newThreshold)
       const txResponse = await safeSdk.executeTransaction(tx, { gasLimit: 10000000 })
       await txResponse.wait()
       chai.expect(await safeSdk.getThreshold()).to.be.eq(newThreshold)
@@ -152,44 +125,32 @@ describe('Safe Owners', () => {
     })
   })
 
-  describe('buildContractCall REMOVE_OWNER', async () => {
+  describe('getRemoveOwnerTx', async () => {
     it('should fail if address is invalid', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: '0x123'
-      })
+      const tx = safeSdk.getRemoveOwnerTx('0x123')
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
     it('should fail if address is equal to sentinel', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: SENTINEL_OWNERS
-      })
+      const tx = safeSdk.getRemoveOwnerTx(SENTINEL_OWNERS)
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
     it('should fail if address is equal to 0x address', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: zeroAddress
-      })
+      const tx = safeSdk.getRemoveOwnerTx(zeroAddress)
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
     it('should fail if address is not an owner', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: user4.address
-      })
+      const tx = safeSdk.getRemoveOwnerTx(user4.address)
       await chai.expect(tx).to.be.rejectedWith('Address provided is not an owner')
     })
 
@@ -199,22 +160,14 @@ describe('Safe Owners', () => {
       const newThreshold = 3
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners - 1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: user1.address,
-        threshold: newThreshold
-      })
+      const tx = safeSdk.getRemoveOwnerTx(user1.address, newThreshold)
       await chai.expect(tx).to.be.rejectedWith('Threshold cannot exceed owner count')
     })
 
     it('should fail if the threshold is not bigger than 0', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: user1.address,
-        threshold: 0
-      })
+      const tx = safeSdk.getRemoveOwnerTx(user1.address, 0)
       await chai.expect(tx).to.be.rejectedWith('Threshold needs to be greater than 0')
     })
 
@@ -229,10 +182,7 @@ describe('Safe Owners', () => {
       chai.expect(initialOwners[0]).to.be.eq(user1.address)
       chai.expect(initialOwners[1]).to.be.eq(user2.address)
       chai.expect(initialOwners[2]).to.be.eq(user3.address)
-      const tx = await safeSdk1.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: user1.address
-      })
+      const tx = await safeSdk1.getRemoveOwnerTx(user1.address)
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 10000000 })
@@ -256,10 +206,7 @@ describe('Safe Owners', () => {
       chai.expect(initialOwners[0]).to.be.eq(user1.address)
       chai.expect(initialOwners[1]).to.be.eq(user2.address)
       chai.expect(initialOwners[2]).to.be.eq(user3.address)
-      const tx = await safeSdk1.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: user2.address
-      })
+      const tx = await safeSdk1.getRemoveOwnerTx(user2.address)
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 10000000 })
@@ -283,11 +230,7 @@ describe('Safe Owners', () => {
       chai.expect(initialOwners[0]).to.be.eq(user1.address)
       chai.expect(initialOwners[1]).to.be.eq(user2.address)
       chai.expect(initialOwners[2]).to.be.eq(user3.address)
-      const tx = await safeSdk1.buildContractCall({
-        method: SafeSettings.REMOVE_OWNER,
-        ownerAddress: user1.address,
-        threshold: newThreshold
-      })
+      const tx = await safeSdk1.getRemoveOwnerTx(user1.address, newThreshold)
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 10000000 })
@@ -300,92 +243,60 @@ describe('Safe Owners', () => {
     })
   })
 
-  describe('buildContractCall SWAP_OWNER', async () => {
+  describe('getSwapOwnerTx', async () => {
     it('should fail if old address is invalid', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: '0x123',
-        newOwnerAddress: user2.address
-      })
+      const tx = safeSdk.getSwapOwnerTx('0x123', user2.address)
       await chai.expect(tx).to.be.rejectedWith('Invalid old owner address provided')
     })
 
     it('should fail if new address is invalid', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: user1.address,
-        newOwnerAddress: '0x123'
-      })
+      const tx = safeSdk.getSwapOwnerTx(user1.address, '0x123')
       await chai.expect(tx).to.be.rejectedWith('Invalid new owner address provided')
     })
 
     it('should fail if old address is equal to sentinel', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: SENTINEL_OWNERS,
-        newOwnerAddress: user2.address
-      })
+      const tx = safeSdk.getSwapOwnerTx(SENTINEL_OWNERS, user2.address)
       await chai.expect(tx).to.be.rejectedWith('Invalid old owner address provided')
     })
 
     it('should fail if new address is equal to sentinel', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: user1.address,
-        newOwnerAddress: SENTINEL_OWNERS
-      })
+      const tx = safeSdk.getSwapOwnerTx(user1.address, SENTINEL_OWNERS)
       await chai.expect(tx).to.be.rejectedWith('Invalid new owner address provided')
     })
 
     it('should fail if old address is equal to 0x address', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: zeroAddress,
-        newOwnerAddress: user2.address
-      })
+      const tx = safeSdk.getSwapOwnerTx(zeroAddress, user2.address)
       await chai.expect(tx).to.be.rejectedWith('Invalid old owner address provided')
     })
 
     it('should fail if new address is equal to 0x address', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: user1.address,
-        newOwnerAddress: zeroAddress
-      })
+      const tx = safeSdk.getSwapOwnerTx(user1.address, zeroAddress)
       await chai.expect(tx).to.be.rejectedWith('Invalid new owner address provided')
     })
 
     it('should fail if old address is not an owner', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: user4.address,
-        newOwnerAddress: user2.address
-      })
+      const tx = safeSdk.getSwapOwnerTx(user4.address, user2.address)
       await chai.expect(tx).to.be.rejectedWith('Old address provided is not an owner')
     })
 
     it('should fail if new address is already an owner', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: user1.address,
-        newOwnerAddress: user1.address
-      })
+      const tx = safeSdk.getSwapOwnerTx(user1.address, user1.address)
       await chai.expect(tx).to.be.rejectedWith('New address provided is already an owner')
     })
 
@@ -395,11 +306,7 @@ describe('Safe Owners', () => {
       const initialOwners = await safeSdk.getOwners()
       chai.expect(initialOwners.length).to.be.eq(1)
       chai.expect(initialOwners[0]).to.be.eq(user1.address)
-      const tx = await safeSdk.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: user1.address,
-        newOwnerAddress: user2.address
-      })
+      const tx = await safeSdk.getSwapOwnerTx(user1.address, user2.address)
       const txResponse = await safeSdk.executeTransaction(tx, { gasLimit: 10000000 })
       await txResponse.wait()
       const finalOwners = await safeSdk.getOwners()
@@ -417,11 +324,7 @@ describe('Safe Owners', () => {
       chai.expect(initialOwners[0]).to.be.eq(user1.address)
       chai.expect(initialOwners[1]).to.be.eq(user2.address)
       chai.expect(initialOwners[2]).to.be.eq(user3.address)
-      const tx = await safeSdk1.buildContractCall({
-        method: SafeSettings.SWAP_OWNER,
-        oldOwnerAddress: user2.address,
-        newOwnerAddress: user4.address
-      })
+      const tx = await safeSdk1.getSwapOwnerTx(user2.address, user4.address)
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 10000000 })

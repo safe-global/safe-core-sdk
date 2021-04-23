@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe from '../src'
-import { SENTINEL_OWNERS, zeroAddress } from '../src/utils/constants'
+import { SENTINEL_ADDRESS, zeroAddress } from '../src/utils/constants'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 
@@ -54,7 +54,7 @@ describe('Safe Owners', () => {
     it('should fail if address is equal to sentinel', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.getAddOwnerTx(SENTINEL_OWNERS)
+      const tx = safeSdk.getAddOwnerTx(SENTINEL_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -136,7 +136,7 @@ describe('Safe Owners', () => {
     it('should fail if address is equal to sentinel', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.getRemoveOwnerTx(SENTINEL_OWNERS)
+      const tx = safeSdk.getRemoveOwnerTx(SENTINEL_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -261,14 +261,14 @@ describe('Safe Owners', () => {
     it('should fail if old address is equal to sentinel', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.getSwapOwnerTx(SENTINEL_OWNERS, user2.address)
+      const tx = safeSdk.getSwapOwnerTx(SENTINEL_ADDRESS, user2.address)
       await chai.expect(tx).to.be.rejectedWith('Invalid old owner address provided')
     })
 
     it('should fail if new address is equal to sentinel', async () => {
       const safe = await getSafeWithOwners([user1.address])
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.getSwapOwnerTx(user1.address, SENTINEL_OWNERS)
+      const tx = safeSdk.getSwapOwnerTx(user1.address, SENTINEL_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid new owner address provided')
     })
 

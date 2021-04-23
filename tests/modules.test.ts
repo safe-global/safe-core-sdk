@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import EthersSafe from '../src'
-import { SENTINEL_MODULES, zeroAddress } from '../src/utils/constants'
+import { SENTINEL_ADDRESS, zeroAddress } from '../src/utils/constants'
 import { getDailyLimitModule, getSafeWithOwners, getSocialRecoveryModule } from './utils/setup'
 chai.use(chaiAsPromised)
 
@@ -54,7 +54,7 @@ describe('Safe modules', () => {
     it('should fail if address is equal to sentinel', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.getEnableModuleTx(SENTINEL_MODULES)
+      const tx = safeSdk.getEnableModuleTx(SENTINEL_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 
@@ -99,7 +99,7 @@ describe('Safe modules', () => {
     it('should fail if address is equal to sentinel', async () => {
       const { safe } = await setupTests()
       const safeSdk = new EthersSafe(ethers, safe.address, user1)
-      const tx = safeSdk.getDisableModuleTx(SENTINEL_MODULES)
+      const tx = safeSdk.getDisableModuleTx(SENTINEL_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 

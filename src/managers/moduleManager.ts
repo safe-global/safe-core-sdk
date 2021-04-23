@@ -1,6 +1,6 @@
 import { GnosisSafe } from '../../typechain'
-import { areAddressesEqual } from '../utils'
-import { SENTINEL_MODULES, zeroAddress } from '../utils/constants'
+import { areAddressesEqual, isRestrictedAddress } from '../utils'
+import { SENTINEL_ADDRESS } from '../utils/constants'
 
 class ModuleManager {
   #ethers: any
@@ -9,6 +9,34 @@ class ModuleManager {
   constructor(ethers: any, contract: GnosisSafe) {
     this.#ethers = ethers
     this.#contract = contract
+  }
+
+  private validateModuleAddress(moduleAddress: string): void {
+    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
+    if (!isValidAddress || isRestrictedAddress(moduleAddress)) {
+      throw new Error('Invalid module address provided')
+    }
+  }
+
+  private validateModuleIsNotEnabled(moduleAddress: string, modules: string[]): void {
+    const moduleIndex = modules.findIndex((module: string) =>
+      areAddressesEqual(module, moduleAddress)
+    )
+    const isEnabled = moduleIndex >= 0
+    if (isEnabled) {
+      throw new Error('Module provided is already enabled')
+    }
+  }
+
+  private validateModuleIsEnabled(moduleAddress: string, modules: string[]): number {
+    const moduleIndex = modules.findIndex((module: string) =>
+      areAddressesEqual(module, moduleAddress)
+    )
+    const isEnabled = moduleIndex >= 0
+    if (!isEnabled) {
+      throw new Error('Module provided is not enabled already')
+    }
+    return moduleIndex
   }
 
   async getModules(): Promise<string[]> {
@@ -20,33 +48,17 @@ class ModuleManager {
   }
 
   async encodeEnableModuleData(moduleAddress: string): Promise<string> {
-    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
-    if (!isValidAddress || moduleAddress === zeroAddress || moduleAddress === SENTINEL_MODULES) {
-      throw new Error('Invalid module address provided')
-    }
+    this.validateModuleAddress(moduleAddress)
     const modules = await this.getModules()
-    const moduleIndex = modules.findIndex((module: string) =>
-      areAddressesEqual(module, moduleAddress)
-    )
-    if (moduleIndex >= 0) {
-      throw new Error('Module provided is already enabled')
-    }
+    this.validateModuleIsNotEnabled(moduleAddress, modules)
     return this.#contract.interface.encodeFunctionData('enableModule', [moduleAddress])
   }
 
   async encodeDisableModuleData(moduleAddress: string): Promise<string> {
-    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
-    if (!isValidAddress || moduleAddress === zeroAddress || moduleAddress === SENTINEL_MODULES) {
-      throw new Error('Invalid module address provided')
-    }
+    this.validateModuleAddress(moduleAddress)
     const modules = await this.getModules()
-    const moduleIndex = modules.findIndex((module: string) =>
-      areAddressesEqual(module, moduleAddress)
-    )
-    if (moduleIndex < 0) {
-      throw new Error('Module provided is not enabled already')
-    }
-    const prevModuleAddress = moduleIndex === 0 ? SENTINEL_MODULES : modules[moduleIndex - 1]
+    const moduleIndex = this.validateModuleIsEnabled(moduleAddress, modules)
+    const prevModuleAddress = moduleIndex === 0 ? SENTINEL_ADDRESS : modules[moduleIndex - 1]
     return this.#contract.interface.encodeFunctionData('disableModule', [
       prevModuleAddress,
       moduleAddress

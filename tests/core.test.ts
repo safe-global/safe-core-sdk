@@ -1,8 +1,8 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { BigNumber, VoidSigner } from 'ethers'
-import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe from '../src/index'
+import { BigNumber, ethers, VoidSigner } from 'ethers'
+import { deployments, waffle } from 'hardhat'
+import EthersSafe from '../src'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 

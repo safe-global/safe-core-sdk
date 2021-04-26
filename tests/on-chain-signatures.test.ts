@@ -1,7 +1,8 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe, { SafeTransaction } from '../src'
+import { ethers } from 'ethers'
+import { deployments, waffle } from 'hardhat'
+import EthersSafe from '../src'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 
@@ -19,11 +20,10 @@ describe('On-chain signatures', () => {
     it('should fail if signer is not provided', async () => {
       const { safe } = await setupTests()
       const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1.provider)
-      const tx = new SafeTransaction({
+      const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
-        data: '0x',
-        nonce: await safeSdk1.getNonce()
+        data: '0x'
       })
       const txHash = await safeSdk1.getTransactionHash(tx)
       await chai
@@ -34,11 +34,10 @@ describe('On-chain signatures', () => {
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
       const { safe } = await setupTests()
       const safeSdk1 = await EthersSafe.create(ethers, safe.address, user3)
-      const tx = new SafeTransaction({
+      const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
-        data: '0x',
-        nonce: await safeSdk1.getNonce()
+        data: '0x'
       })
       const hash = await safeSdk1.getTransactionHash(tx)
       await chai
@@ -49,11 +48,10 @@ describe('On-chain signatures', () => {
     it('should approve the transaction hash', async () => {
       const { safe } = await setupTests()
       const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
-      const tx = new SafeTransaction({
+      const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
-        data: '0x',
-        nonce: await safeSdk1.getNonce()
+        data: '0x'
       })
       const txHash = await safeSdk1.getTransactionHash(tx)
       const txResponse = await safeSdk1.approveTransactionHash(txHash)
@@ -64,11 +62,10 @@ describe('On-chain signatures', () => {
     it('should ignore a duplicated signatures', async () => {
       const { safe } = await setupTests()
       const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
-      const tx = new SafeTransaction({
+      const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
-        data: '0x',
-        nonce: await safeSdk1.getNonce()
+        data: '0x'
       })
       const txHash = await safeSdk1.getTransactionHash(tx)
       chai.expect(await safe.approvedHashes(user1.address, txHash)).to.be.equal(0)
@@ -86,11 +83,10 @@ describe('On-chain signatures', () => {
       const { safe } = await setupTests()
       const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
       const safeSdk2 = await safeSdk1.connect(user2)
-      const tx = new SafeTransaction({
+      const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
-        data: '0x',
-        nonce: await safeSdk1.getNonce()
+        data: '0x'
       })
       const txHash = await safeSdk1.getTransactionHash(tx)
       const ownersWhoApproved0 = await safeSdk1.getOwnersWhoApprovedTx(txHash)

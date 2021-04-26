@@ -50,11 +50,10 @@ const safeSdk1 = await EthersSafe.create(ethers, safeAddress, signer1)
 ### 1. Create a Safe transaction
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   to: safeAddress,
   value: '0',
   data: '0x',
-  nonce: await safeSdk1.getNonce()
 })
 ```
 
@@ -209,12 +208,30 @@ Checks if a specific Safe module is enabled for the current Safe.
 const isEnabled = await safeSdk.isModuleEnabled(moduleAddress)
 ```
 
+
+
+
+
+### createTransaction
+
+Returns a Safe transaction ready to be signed by the owners and executed.
+
+```js
+const partialTx: SafeTransactionDataPartial = {
+  to: '0x<address>',
+  data: '0x<data>',
+  value: '<value_in_wei>',
+}
+const safeTransaction = await safeSdk.createTransaction(partialTx)
+```
+
+
 ### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
@@ -225,7 +242,7 @@ const txHash = await safeSdk.getTransactionHash(tx)
 Signs a hash using the current signer account.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
@@ -237,7 +254,7 @@ const signature = await safeSdk.signTransactionHash(txHash)
 Adds the signature of the current signer to the Safe transaction object.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 await safeSdk.signTransaction(tx)
@@ -248,7 +265,7 @@ await safeSdk.signTransaction(tx)
 Approves on-chain a hash using the current signer account.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
@@ -261,7 +278,7 @@ await txResponse.wait()
 Returns a list of owners who have approved a specific Safe transaction.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
@@ -273,7 +290,7 @@ const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
 Executes a Safe transaction.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txResponse = await safeSdk.executeTransaction(tx)

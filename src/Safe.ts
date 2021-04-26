@@ -1,7 +1,7 @@
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import { SafeSignature } from './utils/signatures/SafeSignature'
-import { SafeTransaction } from './utils/transactions'
+import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 
 interface Safe {
   connect(providerOrSigner: Provider | Signer, safeAddress?: string): void
@@ -16,6 +16,7 @@ interface Safe {
   getBalance(): Promise<BigNumber>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
+  createTransaction(safeTransaction: SafeTransactionDataPartial): Promise<SafeTransaction>
   getTransactionHash(safeTransaction: SafeTransaction): Promise<string>
   signTransactionHash(hash: string): Promise<SafeSignature>
   signTransaction(safeTransaction: SafeTransaction): Promise<void>

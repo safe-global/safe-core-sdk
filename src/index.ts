@@ -1,7 +1,7 @@
 import EthersSafe from './EthersSafe'
 import Safe from './Safe'
-import { SafeTransaction } from './utils/transactions'
+import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 
 export default EthersSafe
-export { SafeTransaction }
+export { SafeTransaction, SafeTransactionDataPartial }
 export type { Safe }

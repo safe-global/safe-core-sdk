@@ -5,6 +5,7 @@ import Safe from './Safe'
 import { sameString } from './utils'
 import { generatePreValidatedSignature } from './utils/signatures'
 import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
+import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 import { standardizeSafeTransaction } from './utils/transactions/utils'
 
@@ -302,10 +303,7 @@ class EthersSafe implements Safe {
    * @throws "No signer provided"
    * @throws "There are X signatures missing"
    */
-  async executeTransaction(
-    safeTransaction: SafeTransaction,
-    options?: any
-  ): Promise<ContractTransaction> {
+  async executeTransaction(safeTransaction: SafeTransaction): Promise<ContractTransaction> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }
@@ -331,6 +329,11 @@ class EthersSafe implements Safe {
       )
     }
 
+    const gasLimit = await estimateGasForTransactionExecution(
+      this.#contract,
+      await this.#signer.getAddress(),
+      safeTransaction
+    )
     const txResponse = await this.#contract.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,
@@ -342,7 +345,7 @@ class EthersSafe implements Safe {
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
       safeTransaction.encodedSignatures(),
-      { ...options }
+      { gasLimit }
     )
     return txResponse
   }

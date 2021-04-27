@@ -22,7 +22,7 @@ interface Safe {
   signTransaction(safeTransaction: SafeTransaction): Promise<void>
   approveTransactionHash(hash: string): Promise<ContractTransaction>
   getOwnersWhoApprovedTx(txHash: string): Promise<string[]>
-  executeTransaction(safeTransaction: SafeTransaction, options?: any): Promise<ContractTransaction>
+  executeTransaction(safeTransaction: SafeTransaction): Promise<ContractTransaction>
 }
 
 export default Safe

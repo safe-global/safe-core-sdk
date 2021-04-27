@@ -85,6 +85,22 @@ describe('Safe Core SDK', () => {
     })
   })
 
+  describe('getNonce', async () => {
+    it('should return the Safe nonce', async () => {
+      const safe = await getSafeWithOwners([user1.address])
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      chai.expect(await safeSdk.getNonce()).to.be.eq(0)
+      const tx = await safeSdk.createTransaction({
+        to: user2.address,
+        value: '0',
+        data: '0x'
+      })
+      const txResponse = await safeSdk.executeTransaction(tx)
+      await txResponse.wait()
+      chai.expect(await safeSdk.getNonce()).to.be.eq(1)
+    })
+  })
+
   describe('getThreshold', async () => {
     it('should return the Safe threshold', async () => {
       const { safe } = await setupTests()

@@ -44,7 +44,7 @@ class SafeTransaction {
   }
 
   addSignature(signature: SafeSignature) {
-    this.#signatures.set(signature.signer, signature)
+    this.#signatures.set(signature.signer.toLowerCase(), signature)
   }
 
   encodedSignatures(): string {

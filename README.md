@@ -208,10 +208,6 @@ Checks if a specific Safe module is enabled for the current Safe.
 const isEnabled = await safeSdk.isModuleEnabled(moduleAddress)
 ```
 
-
-
-
-
 ### createTransaction
 
 Returns a Safe transaction ready to be signed by the owners and executed.
@@ -220,11 +216,10 @@ Returns a Safe transaction ready to be signed by the owners and executed.
 const partialTx: SafeTransactionDataPartial = {
   to: '0x<address>',
   data: '0x<data>',
-  value: '<value_in_wei>',
+  value: '<eth_value_in_wei>',
 }
 const safeTransaction = await safeSdk.createTransaction(partialTx)
 ```
-
 
 ### getTransactionHash
 

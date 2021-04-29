@@ -43,9 +43,9 @@ class ContractManager {
       throw new Error('Safe contracts not found in the current network')
     }
 
-    const contractCode = await provider.getCode(safeAddress)
-    if (contractCode === '0x') {
-      throw new Error('Safe contract is not deployed in the current network')
+    const safeContractCode = await provider.getCode(safeAddress)
+    if (safeContractCode === '0x') {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
     }
     this.#safeContract = new ethers.Contract(safeAddress, SafeAbiV120, currentProviderOrSigner)
 

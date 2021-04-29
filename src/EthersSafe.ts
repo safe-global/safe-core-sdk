@@ -33,6 +33,9 @@ class EthersSafe implements Safe {
    * @param safeAddress - The address of the Safe account to use
    * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
    * @returns The Safe Core SDK instance
+   * @throws "Safe contracts not found in the current network"
+   * @throws "Safe Proxy contract is not deployed in the current network"
+   * @throws "MultiSend contract is not deployed in the current network"
    */
   static async create({
     ethers,
@@ -52,7 +55,9 @@ class EthersSafe implements Safe {
    * @param safeAddress - The address of the Safe account to use
    * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
    * @throws "Signer must be connected to a provider"
-   * @throws "Safe contract is not deployed in the current network"
+   * @throws "Safe contracts not found in the current network"
+   * @throws "Safe Proxy contract is not deployed in the current network"
+   * @throws "MultiSend contract is not deployed in the current network"
    */
   private async init({
     ethers,
@@ -90,6 +95,9 @@ class EthersSafe implements Safe {
    *
    * @param providerOrSigner - Ethers provider or signer
    * @param safeAddress - The address of the Safe account to use
+   * @throws "Safe contracts not found in the current network"
+   * @throws "Safe Proxy contract is not deployed in the current network"
+   * @throws "MultiSend contract is not deployed in the current network"
    */
   async connect({
     providerOrSigner,

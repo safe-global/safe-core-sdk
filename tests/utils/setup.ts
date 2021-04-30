@@ -36,3 +36,15 @@ export const getSafeWithOwners = async (owners: string[], threshold?: number) =>
   )
   return template
 }
+
+export const getDailyLimitModule = async () => {
+  const DailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
+  const DailyLimitModule = await ethers.getContractFactory('DailyLimitModule')
+  return DailyLimitModule.attach(DailyLimitModuleDeployment.address)
+}
+
+export const getSocialRecoveryModule = async () => {
+  const SocialRecoveryModuleDeployment = await deployments.get('SocialRecoveryModule')
+  const SocialRecoveryModule = await ethers.getContractFactory('SocialRecoveryModule')
+  return SocialRecoveryModule.attach(SocialRecoveryModuleDeployment.address)
+}

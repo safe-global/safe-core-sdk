@@ -44,7 +44,7 @@ const safeAddress = "0x<safe_address>"
 Create an instance of the Safe Core SDK with `signer1` connected as the signer.
 
 ```js
-const safeSdk1 = await EthersSafe.create(ethers, safeAddress, signer1)
+const safeSdk = await EthersSafe.create(ethers, safeAddress, signer1)
 ```
 
 ### 1. Create a Safe transaction
@@ -64,7 +64,7 @@ Before executing this transaction, it must be signed by the owners and this can 
 The owner `signer1` signs the transaction off-chain.
 
 ```js
-const signer1Signature = await safeSdk1.signTransaction(tx)
+const signer1Signature = await safeSdk.signTransaction(tx)
 ```
 
 Because the signature is off-chain, there is no interaction with the contract and the signature is available at `tx.signatures`.
@@ -74,7 +74,7 @@ Because the signature is off-chain, there is no interaction with the contract an
 After `signer2` account is connected to the SDK as the signer the transaction hash is approved on-chain.
 
 ```js
-const safeSdk2 = await safeSdk1.connect(signer2)
+const safeSdk2 = await safeSdk.connect(signer2)
 const txHash = await safeSdk2.getTransactionHash(tx)
 const signer2Signature = await safeSdk2.approveTransactionHash(txHash)
 ```
@@ -208,6 +208,14 @@ Checks if a specific Safe module is enabled for the current Safe.
 const isEnabled = await safeSdk.isModuleEnabled(moduleAddress)
 ```
 
+### isOwner
+
+Checks if a specific address is an owner of the current Safe.
+
+```js
+const isOwner = await safeSdk.isOwner(address)
+```
+
 ### createTransaction
 
 Returns a Safe transaction ready to be signed by the owners and executed.
@@ -216,7 +224,7 @@ Returns a Safe transaction ready to be signed by the owners and executed.
 const partialTx: SafeTransactionDataPartial = {
   to: '0x<address>',
   data: '0x<data>',
-  value: '<eth_value_in_wei>',
+  value: '<eth_value_in_wei>'
 }
 const safeTransaction = await safeSdk.createTransaction(partialTx)
 ```
@@ -278,6 +286,78 @@ const tx = await safeSdk.createTransaction({
 })
 const txHash = await safeSdk.getTransactionHash(tx)
 const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
+```
+
+### getEnableModuleTx
+
+Returns a Safe transaction ready to be signed that will enable a Safe module.
+
+```js
+const tx = await safeSdk.getEnableModuleTx(moduleAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+### getDisableModuleTx
+
+Returns a Safe transaction ready to be signed that will disable a Safe module.
+
+```js
+const tx = await safeSdk.getDisableModuleTx(moduleAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+### getAddOwnerTx
+
+Returns the Safe transaction to add an owner and update the threshold.
+
+```js
+const tx = await safeSdk.getAddOwnerTx(newOwnerAddress, newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+If `threshold` is not provided, the current threshold will not change.
+
+```js
+const tx = await safeSdk.getAddOwnerTx(newOwnerAddress)
+```
+
+### getRemoveOwnerTx
+
+Returns the Safe transaction to remove an owner and update the threshold.
+
+```js
+const tx = await safeSdk.getRemoveOwnerTx(ownerAddress, newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+If `threshold` is not provided, the current threshold will be decreased by one.
+
+```js
+const tx = await safeSdk.getRemoveOwnerTx(ownerAddress)
+```
+
+### getSwapOwnerTx
+
+Returns the Safe transaction to replace an owner of the Safe with a new one.
+
+```js
+const tx = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
+```
+
+### getChangeThresholdTx
+
+Returns the Safe transaction to change the threshold.
+
+```js
+const tx = await safeSdk.getChangeThresholdTx(newThreshold)
+const txResponse = await safeSdk.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 ### executeTransaction

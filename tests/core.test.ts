@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { BigNumber, ethers, VoidSigner } from 'ethers'
-import { deployments, waffle } from 'hardhat'
+import { BigNumber, VoidSigner } from 'ethers'
+import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe from '../src'
 import { getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
@@ -74,17 +74,6 @@ describe('Safe Core SDK', () => {
     })
   })
 
-  describe('getOwners', async () => {
-    it('should return the list of Safe owners', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
-      const owners = await safeSdk.getOwners()
-      chai.expect(owners.length).to.be.eq(2)
-      chai.expect(owners[0]).to.be.eq(user1.address)
-      chai.expect(owners[1]).to.be.eq(user2.address)
-    })
-  })
-
   describe('getNonce', async () => {
     it('should return the Safe nonce', async () => {
       const safe = await getSafeWithOwners([user1.address])
@@ -98,14 +87,6 @@ describe('Safe Core SDK', () => {
       const txResponse = await safeSdk.executeTransaction(tx)
       await txResponse.wait()
       chai.expect(await safeSdk.getNonce()).to.be.eq(1)
-    })
-  })
-
-  describe('getThreshold', async () => {
-    it('should return the Safe threshold', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
-      chai.expect(await safeSdk.getThreshold()).to.be.eq(2)
     })
   })
 
@@ -127,30 +108,6 @@ describe('Safe Core SDK', () => {
         value: BigNumber.from(`${1e18}`).toHexString()
       })
       chai.expect(await safeSdk.getBalance()).to.be.eq(BigNumber.from(`${1e18}`))
-    })
-  })
-
-  describe('getModules', async () => {
-    it('should return an empty array if there are no modules enabled', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
-      chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
-    })
-
-    it.skip('should return all the enabled modules', async () => {
-      // TO-DO when enableModule() is added
-    })
-  })
-
-  describe('isModuleEnabled', async () => {
-    it('should return false if a module is not enabled', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
-      chai.expect(await safeSdk.isModuleEnabled(user1.address)).to.be.false
-    })
-
-    it.skip('should return true if a module is enabled', async () => {
-      // TO-DO when enableModule() is added
     })
   })
 })

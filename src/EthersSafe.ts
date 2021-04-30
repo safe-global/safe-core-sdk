@@ -1,6 +1,8 @@
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
+import ModuleManager from './managers/moduleManager'
+import OwnerManager from './managers/ownerManager'
 import Safe from './Safe'
 import { sameString } from './utils'
 import { generatePreValidatedSignature } from './utils/signatures'
@@ -12,10 +14,10 @@ import { standardizeSafeTransaction } from './utils/transactions/utils'
 class EthersSafe implements Safe {
   #contract: any
   #ethers: any
+  #ownerManager!: OwnerManager
+  #moduleManager!: ModuleManager
   #provider!: Provider
   #signer?: Signer
-
-  private constructor() {}
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -66,6 +68,8 @@ class EthersSafe implements Safe {
     }
     this.#ethers = ethers
     this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
+    this.#ownerManager = new OwnerManager(this.#ethers, this.#contract)
+    this.#moduleManager = new ModuleManager(this.#ethers, this.#contract)
   }
 
   /**
@@ -124,7 +128,7 @@ class EthersSafe implements Safe {
    * @returns The list of owners
    */
   async getOwners(): Promise<string[]> {
-    return this.#contract.getOwners()
+    return this.#ownerManager.getOwners()
   }
 
   /**
@@ -141,8 +145,8 @@ class EthersSafe implements Safe {
    *
    * @returns The Safe threshold
    */
-  async getThreshold(): Promise<BigNumber> {
-    return this.#contract.getThreshold()
+  async getThreshold(): Promise<number> {
+    return this.#ownerManager.getThreshold()
   }
 
   /**
@@ -169,7 +173,7 @@ class EthersSafe implements Safe {
    * @returns The list of addresses of all the enabled Safe modules
    */
   async getModules(): Promise<string[]> {
-    return this.#contract.getModules()
+    return this.#moduleManager.getModules()
   }
 
   /**
@@ -179,7 +183,17 @@ class EthersSafe implements Safe {
    * @returns TRUE if the module is enabled
    */
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.#contract.isModuleEnabled(moduleAddress)
+    return this.#moduleManager.isModuleEnabled(moduleAddress)
+  }
+
+  /**
+   * Checks if a specific address is an owner of the current Safe.
+   *
+   * @param ownerAddress - The account address
+   * @returns TRUE if the account is an owner
+   */
+  async isOwner(ownerAddress: string): Promise<boolean> {
+    return this.#ownerManager.isOwner(ownerAddress)
   }
 
   /**
@@ -295,6 +309,106 @@ class EthersSafe implements Safe {
   }
 
   /**
+   * Returns the Safe transaction to enable a Safe module.
+   *
+   * @param moduleAddress - The desired module address
+   * @returns The Safe transaction ready to be signed
+   */
+  async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const tx = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to disable a Safe module.
+   *
+   * @param moduleAddress - The desired module address
+   * @param params - Contract method name and specific parameters
+   * @returns The Safe transaction ready to be signed
+   */
+  async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+    const tx = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to add an owner and optionally change the threshold.
+   *
+   * @param ownerAddress - The address of the new owner
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+    const tx = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to remove an owner and optionally change the threshold.
+   *
+   * @param ownerAddress - The address of the owner that will be removed
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+    const tx = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to replace an owner of the Safe with a new one.
+   *
+   * @param oldOwnerAddress - The old owner address
+   * @param newOwnerAddress - The new owner address
+   * @returns The Safe transaction ready to be signed
+   */
+  async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
+    const tx = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
+   * Returns the Safe transaction to change the threshold.
+   *
+   * @param threshold - The new threshold
+   * @returns The Safe transaction ready to be signed
+   */
+  async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
+    const tx = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeChangeThresholdData(threshold),
+      nonce: (await this.#contract.nonce()).toNumber()
+    })
+    return tx
+  }
+
+  /**
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
@@ -320,8 +434,8 @@ class EthersSafe implements Safe {
     }
 
     const threshold = await this.getThreshold()
-    if (threshold.gt(safeTransaction.signatures.size)) {
-      const signaturesMissing = threshold.sub(safeTransaction.signatures.size).toNumber()
+    if (threshold > safeTransaction.signatures.size) {
+      const signaturesMissing = threshold - safeTransaction.signatures.size
       throw new Error(
         `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
           signaturesMissing > 1 ? 's' : ''

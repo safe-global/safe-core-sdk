@@ -1,5 +1,6 @@
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
+import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
@@ -12,7 +13,7 @@ import SafeTransaction, { SafeTransactionDataPartial } from './utils/transaction
 import { standardizeSafeTransaction } from './utils/transactions/utils'
 
 class EthersSafe implements Safe {
-  #contract: any
+  #safeContract!: GnosisSafe
   #ethers: any
   #ownerManager!: OwnerManager
   #moduleManager!: ModuleManager
@@ -62,14 +63,14 @@ class EthersSafe implements Safe {
       this.#provider = currentProviderOrSigner
       this.#signer = undefined
     }
-    const contractCode = await this.#provider.getCode(safeAddress)
-    if (contractCode === '0x') {
+    const safeContractCode = await this.#provider.getCode(safeAddress)
+    if (safeContractCode === '0x') {
       throw new Error('Safe contract is not deployed in the current network')
     }
     this.#ethers = ethers
-    this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
-    this.#ownerManager = new OwnerManager(this.#ethers, this.#contract)
-    this.#moduleManager = new ModuleManager(this.#ethers, this.#contract)
+    this.#safeContract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
+    this.#ownerManager = new OwnerManager(this.#ethers, this.#safeContract)
+    this.#moduleManager = new ModuleManager(this.#ethers, this.#safeContract)
   }
 
   /**
@@ -81,7 +82,7 @@ class EthersSafe implements Safe {
   async connect(providerOrSigner: Provider | Signer, safeAddress?: string): Promise<EthersSafe> {
     return await EthersSafe.create(
       this.#ethers,
-      safeAddress || this.#contract.address,
+      safeAddress || this.#safeContract.address,
       providerOrSigner
     )
   }
@@ -110,7 +111,7 @@ class EthersSafe implements Safe {
    * @returns The address of the Safe Proxy contract
    */
   getAddress(): string {
-    return this.#contract.address
+    return this.#safeContract.address
   }
 
   /**
@@ -119,7 +120,7 @@ class EthersSafe implements Safe {
    * @returns The Safe Master Copy contract version
    */
   async getContractVersion(): Promise<string> {
-    return this.#contract.VERSION()
+    return this.#safeContract.VERSION()
   }
 
   /**
@@ -137,7 +138,7 @@ class EthersSafe implements Safe {
    * @returns The Safe nonce
    */
   async getNonce(): Promise<number> {
-    return (await this.#contract.nonce()).toNumber()
+    return (await this.#safeContract.nonce()).toNumber()
   }
 
   /**
@@ -203,7 +204,7 @@ class EthersSafe implements Safe {
    * @returns The Safe transaction
    */
   async createTransaction(tx: SafeTransactionDataPartial): Promise<SafeTransaction> {
-    const safeTransaction = await standardizeSafeTransaction(this.#contract, tx)
+    const safeTransaction = await standardizeSafeTransaction(this.#safeContract, tx)
     return new SafeTransaction(safeTransaction)
   }
 
@@ -215,7 +216,7 @@ class EthersSafe implements Safe {
    */
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     const safeTransactionData = safeTransaction.data
-    const txHash = await this.#contract.getTransactionHash(
+    const txHash = await this.#safeContract.getTransactionHash(
       safeTransactionData.to,
       safeTransactionData.value,
       safeTransactionData.data,
@@ -287,7 +288,7 @@ class EthersSafe implements Safe {
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
-    return this.#contract.approveHash(hash)
+    return this.#safeContract.approveHash(hash)
   }
 
   /**
@@ -300,7 +301,7 @@ class EthersSafe implements Safe {
     const owners = await this.getOwners()
     let ownersWhoApproved: string[] = []
     for (const owner of owners) {
-      const approved = await this.#contract.approvedHashes(owner, txHash)
+      const approved = await this.#safeContract.approvedHashes(owner, txHash)
       if (approved.gt(0)) {
         ownersWhoApproved.push(owner)
       }
@@ -321,7 +322,7 @@ class EthersSafe implements Safe {
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -340,7 +341,7 @@ class EthersSafe implements Safe {
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -361,7 +362,7 @@ class EthersSafe implements Safe {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -382,7 +383,7 @@ class EthersSafe implements Safe {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -403,7 +404,7 @@ class EthersSafe implements Safe {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -421,7 +422,7 @@ class EthersSafe implements Safe {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeChangeThresholdData(threshold),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -462,11 +463,11 @@ class EthersSafe implements Safe {
     }
 
     const gasLimit = await estimateGasForTransactionExecution(
-      this.#contract,
+      this.#safeContract,
       await this.#signer.getAddress(),
       safeTransaction
     )
-    const txResponse = await this.#contract.execTransaction(
+    const txResponse = await this.#safeContract.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,
       safeTransaction.data.data,

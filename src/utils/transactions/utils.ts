@@ -1,9 +1,10 @@
+import { GnosisSafe } from '../../../typechain'
 import { ZERO_ADDRESS } from '../constants'
 import { estimateTxGas } from './gas'
 import { OperationType, SafeTransactionData, SafeTransactionDataPartial } from './SafeTransaction'
 
 export async function standardizeSafeTransaction(
-  contract: any,
+  contract: GnosisSafe,
   tx: SafeTransactionDataPartial
 ): Promise<SafeTransactionData> {
   const standardizedTxs = {

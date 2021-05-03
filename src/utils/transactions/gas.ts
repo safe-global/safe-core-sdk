@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers'
+import { GnosisSafe } from '../../../typechain'
 import SafeTransaction from './SafeTransaction'
 
 function estimateDataGasCosts(data: any): number {
@@ -15,7 +16,7 @@ function estimateDataGasCosts(data: any): number {
 }
 
 export async function estimateTxGas(
-  contract: any,
+  contract: GnosisSafe,
   to: string,
   valueInWei: string,
   data: string,

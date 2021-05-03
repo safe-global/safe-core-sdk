@@ -220,6 +220,21 @@ const isOwner = await safeSdk.isOwner(address)
 
 Returns a Safe transaction ready to be signed by the owners and executed.
 
+Each of the transactions provided as input to this function must be an object with the following properties:
+
+* `to`: Required.
+* `data`: Required.
+* `value`: Required.
+* `operation`: Optional. `OperationType.Call` (0) is the default value.
+* `safeTxGas`: Optional. The right gas estimation is the default value.
+* `baseGas`: Optional. 0 is the default value.
+* `gasPrice`: Optional. 0 is the default value.
+* `gasToken`: Optional. 0x address is the default value.
+* `refundReceiver`: Optional. 0x address is the default value.
+* `nonce`: Optional. The current Safe nonce is the default value.
+
+Read more about the [Safe transaction properties](https://docs.gnosis.io/safe/docs/contracts_tx_execution/).
+
 ```js
 const partialTx: SafeTransactionDataPartial = {
   to: '0x<address>',

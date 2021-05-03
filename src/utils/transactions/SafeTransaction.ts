@@ -1,5 +1,4 @@
-import { zeroAddress } from './constants'
-import { SafeSignature } from './signatures/SafeSignature'
+import { SafeSignature } from '../signatures/SafeSignature'
 
 export enum OperationType {
   Call, // 0
@@ -19,7 +18,7 @@ export interface SafeTransactionData {
   readonly nonce: number
 }
 
-interface SafeTransactionDataPartial {
+export interface SafeTransactionDataPartial {
   readonly to: string
   readonly value: string
   readonly data: string
@@ -29,30 +28,15 @@ interface SafeTransactionDataPartial {
   readonly gasPrice?: number
   readonly gasToken?: string
   readonly refundReceiver?: string
-  readonly nonce: number
+  readonly nonce?: number
 }
 
-export function standardizeSafeTransaction(tx: SafeTransactionDataPartial): SafeTransactionData {
-  return {
-    to: tx.to,
-    value: tx.value,
-    data: tx.data,
-    operation: tx.operation || OperationType.Call,
-    safeTxGas: tx.safeTxGas || 0,
-    baseGas: tx.baseGas || 0,
-    gasPrice: tx.gasPrice || 0,
-    gasToken: tx.gasToken || zeroAddress,
-    refundReceiver: tx.refundReceiver || zeroAddress,
-    nonce: tx.nonce
-  }
-}
-
-export class SafeTransaction {
+class SafeTransaction {
   data: SafeTransactionData
   #signatures: Map<string, SafeSignature> = new Map()
 
-  constructor(data: SafeTransactionDataPartial) {
-    this.data = standardizeSafeTransaction(data)
+  constructor(data: SafeTransactionData) {
+    this.data = data
   }
 
   get signatures(): Map<string, SafeSignature> {
@@ -60,7 +44,7 @@ export class SafeTransaction {
   }
 
   addSignature(signature: SafeSignature) {
-    this.#signatures.set(signature.signer, signature)
+    this.#signatures.set(signature.signer.toLowerCase(), signature)
   }
 
   encodedSignatures(): string {
@@ -76,3 +60,5 @@ export class SafeTransaction {
     return '0x' + staticParts + dynamicParts
   }
 }
+
+export default SafeTransaction

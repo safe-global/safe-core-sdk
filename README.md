@@ -30,81 +30,80 @@ A Safe account with three owners and threshold equal three will be used as the s
 import { ethers } from 'ethers'
 import EthersSafe, { SafeTransaction } from 'safe-core-sdk'
 
-const provider = ethers.getDefaultProvider('homestead')
-const wallet1 = ethers.Wallet.createRandom().connect(provider)
-const wallet2 = ethers.Wallet.createRandom().connect(provider)
-const wallet3 = ethers.Wallet.createRandom().connect(provider)
+const web3Provider = // ...
+const provider = new ethers.providers.Web3Provider(web3Provider)
+const signer1 = provider.getSigner(0)
+const signer2 = provider.getSigner(1)
+const signer3 = provider.getSigner(2)
 
 // Existing Safe address (e.g. Safe created via https://app.gnosis-safe.io)
-// Where wallet1.address, wallet2.address and wallet3.address are the Safe owners
+// Where signer1, signer2 and signer3 are the Safe owners
 const safeAddress = "0x<safe_address>"
-const safeNonce = <safe_nonce>
 ```
 
-Create an instance of the Safe Core SDK with wallet1 connected as the signer.
+Create an instance of the Safe Core SDK with `signer1` connected as the signer.
 
 ```js
-const safeSdk = new EthersSafe(ethers, safeAddress, wallet1)
+const safeSdk = await EthersSafe.create(ethers, safeAddress, signer1)
 ```
 
 ### 1. Create a Safe transaction
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   to: safeAddress,
   value: '0',
   data: '0x',
-  nonce: safeNonce
 })
 ```
 
-Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `wallet1` will sign it off-chain and the owner `wallet2` will sign it on-chain. It is not needed that `wallet3` signs the transaction explicitly because it will be the one executing the transaction. If an account that is not an owner executes the transaction, `wallet3` would have to explicitly sign it too.
+Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain and the owner `signer3` would have to explicitly sign it too.
 
 ### 2.a. Off-chain signatures
 
-The owner `wallet1` signs the transaction off-chain.
+The owner `signer1` signs the transaction off-chain.
 
 ```js
-const wallet1Signature = await safeSdk.signTransaction(tx)
+const signer1Signature = await safeSdk.signTransaction(tx)
 ```
 
 Because the signature is off-chain, there is no interaction with the contract and the signature is available at `tx.signatures`.
 
 ### 2.b. On-chain signatures
 
-After `wallet2` account is connected to the SDK as the signer the transaction hash is approved on-chain.
+After `signer2` account is connected to the SDK as the signer the transaction hash is approved on-chain.
 
 ```js
-const safeSdk2 = safeSdk.connect(wallet2)
+const safeSdk2 = await safeSdk.connect(signer2)
 const txHash = await safeSdk2.getTransactionHash(tx)
-const wallet2Signature = await safeSdk2.approveTransactionHash(txHash)
+const signer2Signature = await safeSdk2.approveTransactionHash(txHash)
 ```
 
 ### 3. Transaction execution
 
-Lastly, `wallet3` account is connected to the SDK as the signer and executor of the Safe transaction to execute it.
+Lastly, `signer3` account is connected to the SDK as the signer and executor of the Safe transaction to execute it.
 
 ```js
-const safeSdk3 = safeSdk.connect(wallet3)
+const safeSdk3 = await safeSdk2.connect(signer3)
 const txResponse = await safeSdk3.executeTransaction(tx)
+await txResponse.wait()
 ```
 
 All the signatures used to execute the transaction are available at `tx.signatures`.
 
 ## API Reference
 
-### constructor
-
+### create
 Returns an instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
 
 ```js
-const safeSdk = new EthersSafe(ethers, safeAddress, providerOrSigner)
+const safeSdk = await EthersSafe.create(ethers, safeAddress, providerOrSigner)
 ```
 
 If `providerOrSigner` is not provided, `ethers` default provider will be used.
 
 ```js
-const safeSdk = new EthersSafe(ethers, safeAddress)
+const safeSdk = await EthersSafe.create(ethers, safeAddress)
 ```
 
 ### connect
@@ -112,13 +111,13 @@ const safeSdk = new EthersSafe(ethers, safeAddress)
 Returns a new instance of the Safe Core SDK with the `providerOrSigner` connected to the `safeAddress`.
 
 ```js
-const safeSdk2 = safeSdk.connect(providerOrSigner, safeAddress)
+const safeSdk2 = await safeSdk.connect(providerOrSigner, safeAddress)
 ```
 
 If `safeAddress` is not provided, the `providerOrSigner` will be connected to the previous Safe.
 
 ```js
-const safeSdk2 = safeSdk.connect(providerOrSigner)
+const safeSdk2 = await safeSdk.connect(providerOrSigner)
 ```
 
 ### getProvider
@@ -159,6 +158,14 @@ Returns the list of Safe owner accounts.
 
 ```js
 const owners = await safeSdk.getOwners()
+```
+
+### getNonce
+
+Returns the Safe nonce.
+
+```js
+const nonce = await safeSdk.getNonce()
 ```
 
 ### getThreshold
@@ -209,12 +216,40 @@ Checks if a specific address is an owner of the current Safe.
 const isOwner = await safeSdk.isOwner(address)
 ```
 
+### createTransaction
+
+Returns a Safe transaction ready to be signed by the owners and executed.
+
+Each of the transactions provided as input to this function must be an object with the following properties:
+
+* `to`: Required.
+* `data`: Required.
+* `value`: Required.
+* `operation`: Optional. `OperationType.Call` (0) is the default value.
+* `safeTxGas`: Optional. The right gas estimation is the default value.
+* `baseGas`: Optional. 0 is the default value.
+* `gasPrice`: Optional. 0 is the default value.
+* `gasToken`: Optional. 0x address is the default value.
+* `refundReceiver`: Optional. 0x address is the default value.
+* `nonce`: Optional. The current Safe nonce is the default value.
+
+Read more about the [Safe transaction properties](https://docs.gnosis.io/safe/docs/contracts_tx_execution/).
+
+```js
+const partialTx: SafeTransactionDataPartial = {
+  to: '0x<address>',
+  data: '0x<data>',
+  value: '<eth_value_in_wei>'
+}
+const safeTransaction = await safeSdk.createTransaction(partialTx)
+```
+
 ### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
@@ -225,7 +260,7 @@ const txHash = await safeSdk.getTransactionHash(tx)
 Signs a hash using the current signer account.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
@@ -237,7 +272,7 @@ const signature = await safeSdk.signTransactionHash(txHash)
 Adds the signature of the current signer to the Safe transaction object.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 await safeSdk.signTransaction(tx)
@@ -248,11 +283,12 @@ await safeSdk.signTransaction(tx)
 Approves on-chain a hash using the current signer account.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
-const signature = await safeSdk.approveTransactionHash(txHash)
+const txResponse = await safeSdk.approveTransactionHash(txHash)
+await txResponse.wait()
 ```
 
 ### getOwnersWhoApprovedTx
@@ -260,7 +296,7 @@ const signature = await safeSdk.approveTransactionHash(txHash)
 Returns a list of owners who have approved a specific Safe transaction.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txHash = await safeSdk.getTransactionHash(tx)
@@ -344,7 +380,7 @@ await txResponse.wait()
 Executes a Safe transaction.
 
 ```js
-const tx = new SafeTransaction({
+const tx = await safeSdk.createTransaction({
   // ...
 })
 const txResponse = await safeSdk.executeTransaction(tx)

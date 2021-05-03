@@ -1,14 +1,14 @@
 import { GnosisSafe } from '../../typechain'
-import { areAddressesEqual, isRestrictedAddress } from '../utils'
+import { isRestrictedAddress, sameString } from '../utils'
 import { SENTINEL_ADDRESS } from '../utils/constants'
 
 class OwnerManager {
   #ethers: any
-  #contract: GnosisSafe
+  #safeContract: GnosisSafe
 
-  constructor(ethers: any, contract: GnosisSafe) {
+  constructor(ethers: any, safeContract: GnosisSafe) {
     this.#ethers = ethers
-    this.#contract = contract
+    this.#safeContract = safeContract
   }
 
   private validateOwnerAddress(ownerAddress: string, errorMessage?: string): void {
@@ -32,7 +32,7 @@ class OwnerManager {
     owners: string[],
     errorMessage?: string
   ): void {
-    const ownerIndex = owners.findIndex((owner: string) => areAddressesEqual(owner, ownerAddress))
+    const ownerIndex = owners.findIndex((owner: string) => sameString(owner, ownerAddress))
     const isOwner = ownerIndex >= 0
     if (isOwner) {
       throw new Error(errorMessage || 'Address provided is already an owner')
@@ -44,7 +44,7 @@ class OwnerManager {
     owners: string[],
     errorMessage?: string
   ): number {
-    const ownerIndex = owners.findIndex((owner: string) => areAddressesEqual(owner, ownerAddress))
+    const ownerIndex = owners.findIndex((owner: string) => sameString(owner, ownerAddress))
     const isOwner = ownerIndex >= 0
     if (!isOwner) {
       throw new Error(errorMessage || 'Address provided is not an owner')
@@ -53,15 +53,15 @@ class OwnerManager {
   }
 
   async getOwners(): Promise<string[]> {
-    return this.#contract.getOwners()
+    return this.#safeContract.getOwners()
   }
 
   async getThreshold(): Promise<number> {
-    return (await this.#contract.getThreshold()).toNumber()
+    return (await this.#safeContract.getThreshold()).toNumber()
   }
 
   async isOwner(ownerAddress: string): Promise<boolean> {
-    return this.#contract.isOwner(ownerAddress)
+    return this.#safeContract.isOwner(ownerAddress)
   }
 
   async encodeAddOwnerWithThresholdData(ownerAddress: string, threshold?: number): Promise<string> {
@@ -70,7 +70,7 @@ class OwnerManager {
     this.validateAddressIsNotOwner(ownerAddress, owners)
     const newThreshold = threshold ?? (await this.getThreshold())
     this.validateThreshold(newThreshold, owners.length)
-    return this.#contract.interface.encodeFunctionData('addOwnerWithThreshold', [
+    return this.#safeContract.interface.encodeFunctionData('addOwnerWithThreshold', [
       ownerAddress,
       newThreshold
     ])
@@ -83,7 +83,7 @@ class OwnerManager {
     const newThreshold = threshold ?? (await this.getThreshold()) - 1
     this.validateThreshold(newThreshold, owners.length - 1)
     const prevOwnerAddress = ownerIndex === 0 ? SENTINEL_ADDRESS : owners[ownerIndex - 1]
-    return this.#contract.interface.encodeFunctionData('removeOwner', [
+    return this.#safeContract.interface.encodeFunctionData('removeOwner', [
       prevOwnerAddress,
       ownerAddress,
       newThreshold
@@ -105,7 +105,7 @@ class OwnerManager {
       'Old address provided is not an owner'
     )
     const prevOwnerAddress = oldOwnerIndex === 0 ? SENTINEL_ADDRESS : owners[oldOwnerIndex - 1]
-    return this.#contract.interface.encodeFunctionData('swapOwner', [
+    return this.#safeContract.interface.encodeFunctionData('swapOwner', [
       prevOwnerAddress,
       oldOwnerAddress,
       newOwnerAddress
@@ -115,7 +115,7 @@ class OwnerManager {
   async encodeChangeThresholdData(threshold: number): Promise<string> {
     const owners = await this.getOwners()
     this.validateThreshold(threshold, owners.length)
-    return this.#contract.interface.encodeFunctionData('changeThreshold', [threshold])
+    return this.#safeContract.interface.encodeFunctionData('changeThreshold', [threshold])
   }
 }
 

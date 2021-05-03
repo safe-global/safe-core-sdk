@@ -1,22 +1,24 @@
 import { Provider } from '@ethersproject/providers'
-import { BigNumber, ContractTransaction, Wallet } from 'ethers'
+import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import { GnosisSafe } from '../typechain'
 import SafeAbi from './abis/SafeAbiV1-2-0.json'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import Safe from './Safe'
-import { areAddressesEqual } from './utils'
+import { sameString } from './utils'
 import { generatePreValidatedSignature } from './utils/signatures'
 import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
-import { SafeTransaction } from './utils/transactions'
+import { estimateGasForTransactionExecution } from './utils/transactions/gas'
+import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
+import { standardizeSafeTransaction } from './utils/transactions/utils'
 
 class EthersSafe implements Safe {
-  #contract: GnosisSafe
+  #safeContract!: GnosisSafe
   #ethers: any
-  #ownerManager: OwnerManager
-  #moduleManager: ModuleManager
-  #provider: Provider
-  #signer?: Wallet
+  #ownerManager!: OwnerManager
+  #moduleManager!: ModuleManager
+  #provider!: Provider
+  #signer?: Signer
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -26,29 +28,63 @@ class EthersSafe implements Safe {
    * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
    * @returns The Safe Core SDK instance
    */
-  constructor(ethers: any, safeAddress: string, providerOrSigner?: Provider | Wallet) {
-    const currentProviderOrSigner = providerOrSigner || (ethers.getDefaultProvider() as Provider)
-    this.#ethers = ethers
-    this.#contract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
-    this.#ownerManager = new OwnerManager(this.#ethers, this.#contract)
-    this.#moduleManager = new ModuleManager(this.#ethers, this.#contract)
-    if (Wallet.isSigner(currentProviderOrSigner)) {
-      this.#signer = currentProviderOrSigner
-      this.#provider = currentProviderOrSigner.provider
-      return
-    }
-    this.#signer = undefined
-    this.#provider = currentProviderOrSigner
+  static async create(
+    ethers: any,
+    safeAddress: string,
+    providerOrSigner?: Provider | Signer
+  ): Promise<EthersSafe> {
+    const safeSdk = new EthersSafe()
+    await safeSdk.init(ethers, safeAddress, providerOrSigner)
+    return safeSdk
   }
 
   /**
-   * Initializes the Safe Core SDK connecting the providerOrSigner to the safeAddress.
+   * Initializes the Safe Core SDK instance.
+   *
+   * @param ethers - Ethers v5 library
+   * @param safeAddress - The address of the Safe account to use
+   * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
+   * @throws "Signer must be connected to a provider"
+   * @throws "Safe contract is not deployed in the current network"
+   */
+  private async init(
+    ethers: any,
+    safeAddress: string,
+    providerOrSigner?: Provider | Signer
+  ): Promise<void> {
+    const currentProviderOrSigner = providerOrSigner || (ethers.getDefaultProvider() as Provider)
+    if (Signer.isSigner(currentProviderOrSigner)) {
+      if (!currentProviderOrSigner.provider) {
+        throw new Error('Signer must be connected to a provider')
+      }
+      this.#provider = currentProviderOrSigner.provider
+      this.#signer = currentProviderOrSigner
+    } else {
+      this.#provider = currentProviderOrSigner
+      this.#signer = undefined
+    }
+    const safeContractCode = await this.#provider.getCode(safeAddress)
+    if (safeContractCode === '0x') {
+      throw new Error('Safe contract is not deployed in the current network')
+    }
+    this.#ethers = ethers
+    this.#safeContract = new this.#ethers.Contract(safeAddress, SafeAbi, currentProviderOrSigner)
+    this.#ownerManager = new OwnerManager(this.#ethers, this.#safeContract)
+    this.#moduleManager = new ModuleManager(this.#ethers, this.#safeContract)
+  }
+
+  /**
+   * Returns a new instance of the Safe Core SDK connecting the providerOrSigner and the safeAddress.
    *
    * @param providerOrSigner - Ethers provider or signer
    * @param safeAddress - The address of the Safe account to use
    */
-  connect(providerOrSigner: Provider | Wallet, safeAddress?: string): EthersSafe {
-    return new EthersSafe(this.#ethers, safeAddress || this.#contract.address, providerOrSigner)
+  async connect(providerOrSigner: Provider | Signer, safeAddress?: string): Promise<EthersSafe> {
+    return await EthersSafe.create(
+      this.#ethers,
+      safeAddress || this.#safeContract.address,
+      providerOrSigner
+    )
   }
 
   /**
@@ -65,7 +101,7 @@ class EthersSafe implements Safe {
    *
    * @returns The connected signer
    */
-  getSigner(): Wallet | undefined {
+  getSigner(): Signer | undefined {
     return this.#signer
   }
 
@@ -75,7 +111,7 @@ class EthersSafe implements Safe {
    * @returns The address of the Safe Proxy contract
    */
   getAddress(): string {
-    return this.#contract.address
+    return this.#safeContract.address
   }
 
   /**
@@ -84,7 +120,7 @@ class EthersSafe implements Safe {
    * @returns The Safe Master Copy contract version
    */
   async getContractVersion(): Promise<string> {
-    return this.#contract.VERSION()
+    return this.#safeContract.VERSION()
   }
 
   /**
@@ -94,6 +130,15 @@ class EthersSafe implements Safe {
    */
   async getOwners(): Promise<string[]> {
     return this.#ownerManager.getOwners()
+  }
+
+  /**
+   * Returns the Safe nonce.
+   *
+   * @returns The Safe nonce
+   */
+  async getNonce(): Promise<number> {
+    return (await this.#safeContract.nonce()).toNumber()
   }
 
   /**
@@ -153,6 +198,17 @@ class EthersSafe implements Safe {
   }
 
   /**
+   * Returns a Safe transaction ready to be signed by the owners.
+   *
+   * @param safeTransaction - The minimum required data to create the transaction
+   * @returns The Safe transaction
+   */
+  async createTransaction(tx: SafeTransactionDataPartial): Promise<SafeTransaction> {
+    const safeTransaction = await standardizeSafeTransaction(this.#safeContract, tx)
+    return new SafeTransaction(safeTransaction)
+  }
+
+  /**
    * Returns the transaction hash of a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction
@@ -160,7 +216,7 @@ class EthersSafe implements Safe {
    */
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     const safeTransactionData = safeTransaction.data
-    const txHash = await this.#contract.getTransactionHash(
+    const txHash = await this.#safeContract.getTransactionHash(
       safeTransactionData.to,
       safeTransactionData.value,
       safeTransactionData.data,
@@ -180,21 +236,24 @@ class EthersSafe implements Safe {
    *
    * @param hash - The hash to sign
    * @returns The Safe signature
+   * @throws "No signer provided"
+   * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }
     const owners = await this.getOwners()
+    const signerAddress = await this.#signer.getAddress()
     const addressIsOwner = owners.find(
-      (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+      (owner: string) => this.#signer && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
     const messageArray = this.#ethers.utils.arrayify(hash)
     const signature = await this.#signer.signMessage(messageArray)
-    return new EthSignSignature(this.#signer.address, signature)
+    return new EthSignSignature(signerAddress, signature)
   }
 
   /**
@@ -214,25 +273,22 @@ class EthersSafe implements Safe {
    * @param hash - The hash to approve
    * @param skipOnChainApproval - TRUE to avoid the Safe transaction to be approved on-chain
    * @returns The pre-validated signature
+   * @throws "No signer provided"
+   * @throws "Transaction hashes can only be approved by Safe owners"
    */
-  async approveTransactionHash(
-    hash: string,
-    skipOnChainApproval?: boolean
-  ): Promise<SafeSignature> {
+  async approveTransactionHash(hash: string): Promise<ContractTransaction> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }
     const owners = await this.getOwners()
+    const signerAddress = await this.#signer.getAddress()
     const addressIsOwner = owners.find(
-      (owner: string) => this.#signer && areAddressesEqual(owner, this.#signer.address)
+      (owner: string) => this.#signer && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
-    if (!skipOnChainApproval) {
-      await this.#contract.approveHash(hash)
-    }
-    return generatePreValidatedSignature(this.#signer.address)
+    return this.#safeContract.approveHash(hash)
   }
 
   /**
@@ -245,7 +301,7 @@ class EthersSafe implements Safe {
     const owners = await this.getOwners()
     let ownersWhoApproved: string[] = []
     for (const owner of owners) {
-      const approved = await this.#contract.approvedHashes(owner, txHash)
+      const approved = await this.#safeContract.approvedHashes(owner, txHash)
       if (approved.gt(0)) {
         ownersWhoApproved.push(owner)
       }
@@ -258,13 +314,15 @@ class EthersSafe implements Safe {
    *
    * @param moduleAddress - The desired module address
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid module address provided"
+   * @throws "Module provided is already enabled"
    */
   async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
-    const tx = new SafeTransaction({
+    const tx = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -275,13 +333,15 @@ class EthersSafe implements Safe {
    * @param moduleAddress - The desired module address
    * @param params - Contract method name and specific parameters
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid module address provided"
+   * @throws "Module provided is not enabled already"
    */
   async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
-    const tx = new SafeTransaction({
+    const tx = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -292,13 +352,17 @@ class EthersSafe implements Safe {
    * @param ownerAddress - The address of the new owner
    * @param threshold - The new threshold
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid owner address provided"
+   * @throws "Address provided is already an owner"
+   * @throws "Threshold needs to be greater than 0"
+   * @throws "Threshold cannot exceed owner count"
    */
   async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
-    const tx = new SafeTransaction({
+    const tx = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -309,13 +373,17 @@ class EthersSafe implements Safe {
    * @param ownerAddress - The address of the owner that will be removed
    * @param threshold - The new threshold
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid owner address provided"
+   * @throws "Address provided is not an owner"
+   * @throws "Threshold needs to be greater than 0"
+   * @throws "Threshold cannot exceed owner count"
    */
   async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
-    const tx = new SafeTransaction({
+    const tx = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -326,13 +394,17 @@ class EthersSafe implements Safe {
    * @param oldOwnerAddress - The old owner address
    * @param newOwnerAddress - The new owner address
    * @returns The Safe transaction ready to be signed
+   * @throws "Invalid new owner address provided"
+   * @throws "Invalid old owner address provided"
+   * @throws "New address provided is already an owner"
+   * @throws "Old address provided is not an owner"
    */
   async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
-    const tx = new SafeTransaction({
+    const tx = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -342,13 +414,15 @@ class EthersSafe implements Safe {
    *
    * @param threshold - The new threshold
    * @returns The Safe transaction ready to be signed
+   * @throws "Threshold needs to be greater than 0"
+   * @throws "Threshold cannot exceed owner count"
    */
   async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
-    const tx = new SafeTransaction({
+    const tx = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeChangeThresholdData(threshold),
-      nonce: (await this.#contract.nonce()).toNumber()
+      nonce: (await this.#safeContract.nonce()).toNumber()
     })
     return tx
   }
@@ -359,11 +433,10 @@ class EthersSafe implements Safe {
    * @param safeTransaction - The Safe transaction to execute
    * @param options - Execution configuration options
    * @returns The Safe transaction response
+   * @throws "No signer provided"
+   * @throws "There are X signatures missing"
    */
-  async executeTransaction(
-    safeTransaction: SafeTransaction,
-    options?: any
-  ): Promise<ContractTransaction> {
+  async executeTransaction(safeTransaction: SafeTransaction): Promise<ContractTransaction> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }
@@ -374,8 +447,9 @@ class EthersSafe implements Safe {
       safeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
-    if (owners.includes(this.#signer.address)) {
-      safeTransaction.addSignature(generatePreValidatedSignature(this.#signer.address))
+    const signerAddress = await this.#signer.getAddress()
+    if (owners.includes(signerAddress)) {
+      safeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
     const threshold = await this.getThreshold()
@@ -388,7 +462,12 @@ class EthersSafe implements Safe {
       )
     }
 
-    const txResponse = await this.#contract.execTransaction(
+    const gasLimit = await estimateGasForTransactionExecution(
+      this.#safeContract,
+      await this.#signer.getAddress(),
+      safeTransaction
+    )
+    const txResponse = await this.#safeContract.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,
       safeTransaction.data.data,
@@ -399,7 +478,7 @@ class EthersSafe implements Safe {
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
       safeTransaction.encodedSignatures(),
-      { ...options }
+      { gasLimit }
     )
     return txResponse
   }

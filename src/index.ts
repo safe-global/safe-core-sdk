@@ -1,6 +1,7 @@
+import { SafeSignature } from 'utils/signatures/SafeSignature'
 import EthersSafe from './EthersSafe'
 import Safe from './Safe'
-import { SafeTransaction } from './utils/transactions'
+import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 
 export default EthersSafe
-export { SafeTransaction, Safe }
+export { Safe, SafeSignature, SafeTransactionDataPartial, SafeTransaction }

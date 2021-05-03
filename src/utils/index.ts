@@ -1,11 +1,11 @@
-import { SENTINEL_ADDRESS, zeroAddress } from './constants'
+import { SENTINEL_ADDRESS, ZERO_ADDRESS } from './constants'
 
-export function areAddressesEqual(address1: string, address2: string): boolean {
-  return address1.toLowerCase() === address2.toLowerCase()
+export function sameString(str1: string, str2: string): boolean {
+  return str1.toLowerCase() === str2.toLowerCase()
 }
 
 function isZeroAddress(address: string): boolean {
-  return address === zeroAddress
+  return address === ZERO_ADDRESS
 }
 
 function isSentinelAddress(address: string): boolean {

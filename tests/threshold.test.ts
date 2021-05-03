@@ -18,7 +18,7 @@ describe('Safe Threshold', () => {
   describe('getThreshold', async () => {
     it('should return the Safe threshold', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       chai.expect(await safeSdk.getThreshold()).to.be.eq(1)
     })
   })
@@ -26,7 +26,7 @@ describe('Safe Threshold', () => {
   describe('getChangeThresholdTx', async () => {
     it('should fail if the threshold is bigger than the number of owners', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const newThreshold = 2
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners)
@@ -37,7 +37,7 @@ describe('Safe Threshold', () => {
 
     it('should fail if the threshold is not bigger than 0', async () => {
       const { safe } = await setupTests()
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const newThreshold = 0
       await chai
         .expect(safeSdk.getChangeThresholdTx(newThreshold))
@@ -46,11 +46,11 @@ describe('Safe Threshold', () => {
 
     it('should change the threshold', async () => {
       const safe = await getSafeWithOwners([user1.address, user2.address], 1)
-      const safeSdk = new EthersSafe(ethers, safe.address, user1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
       const newThreshold = 2
       chai.expect(await safeSdk.getThreshold()).to.be.not.eq(newThreshold)
       const tx = await safeSdk.getChangeThresholdTx(newThreshold)
-      const txResponse = await safeSdk.executeTransaction(tx, { gasLimit: 10000000 })
+      const txResponse = await safeSdk.executeTransaction(tx)
       await txResponse.wait()
       chai.expect(await safeSdk.getThreshold()).to.be.eq(newThreshold)
     })

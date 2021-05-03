@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers'
 import SafeTransaction from './SafeTransaction'
 
-const estimateDataGasCosts = (data: any): number => {
+function estimateDataGasCosts(data: any): number {
   const reducer = (accumulator: number, currentValue: string) => {
     if (currentValue === '0x') {
       return accumulator + 0
@@ -14,13 +14,13 @@ const estimateDataGasCosts = (data: any): number => {
   return data.match(/.{2}/g).reduce(reducer, 0)
 }
 
-export const estimateTxGas = async (
+export async function estimateTxGas(
   contract: any,
   to: string,
   valueInWei: string,
   data: string,
   operation: number
-): Promise<number> => {
+): Promise<number> {
   let txGasEstimation = 0
   const safeAddress = contract.address
 
@@ -77,11 +77,11 @@ export const estimateTxGas = async (
   }
 }
 
-export const estimateGasForTransactionExecution = async (
+export async function estimateGasForTransactionExecution(
   contract: any,
   from: string,
   tx: SafeTransaction
-): Promise<number> => {
+): Promise<number> {
   try {
     const gas = await contract.estimateGas.execTransaction(
       tx.data.to,

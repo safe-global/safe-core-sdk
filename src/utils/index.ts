@@ -1,6 +1,6 @@
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from './constants'
 
-export const sameString = (str1: string, str2: string): boolean => {
+export function sameString(str1: string, str2: string): boolean {
   return str1.toLowerCase() === str2.toLowerCase()
 }
 

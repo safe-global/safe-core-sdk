@@ -25,6 +25,11 @@
   "bugs": {
     "url": "https://github.com/gnosis/safe-core-sdk/issues"
   },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE.md"
+  ],
   "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
   "devDependencies": {
     "@gnosis.pm/safe-contracts": "^1.2.0",

@@ -2,7 +2,7 @@
   "name": "@gnosis.pm/safe-core-sdk",
   "version": "0.1.0",
   "description": "Safe Core SDK",
-  "main": "index.ts",
+  "main": "dist/src/index.ts",
   "keywords": [
     "Ethereum",
     "Gnosis",

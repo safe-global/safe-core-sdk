@@ -28,7 +28,7 @@ A Safe account with three owners and threshold equal three will be used as the s
 
 ```js
 import { ethers } from 'ethers'
-import EthersSafe, { SafeTransaction } from 'safe-core-sdk'
+import EthersSafe, { SafeTransaction } from '@gnosis.pm/safe-core-sdk'
 
 const web3Provider = // ...
 const provider = new ethers.providers.Web3Provider(web3Provider)

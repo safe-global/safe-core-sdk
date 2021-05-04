@@ -1,8 +1,8 @@
 {
-  "name": "safe-core-sdk",
+  "name": "@gnosis.pm/safe-core-sdk",
   "version": "0.1.0",
   "description": "Safe Core SDK",
-  "main": "index.ts",
+  "main": "dist/src/index.ts",
   "keywords": [
     "Ethereum",
     "Gnosis",
@@ -10,7 +10,7 @@
     "SDK"
   ],
   "scripts": {
-    "build": "yarn rimraf dist && tsc && hardhat compile",
+    "build": "yarn rimraf dist && hardhat compile && tsc",
     "test": "hardhat deploy && nyc hardhat test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",

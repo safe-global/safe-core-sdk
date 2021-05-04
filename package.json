@@ -10,7 +10,7 @@
     "SDK"
   ],
   "scripts": {
-    "build": "yarn rimraf dist && tsc && hardhat compile",
+    "build": "yarn rimraf dist && hardhat compile && tsc",
     "test": "hardhat deploy && nyc hardhat test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",

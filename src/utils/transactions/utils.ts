@@ -1,4 +1,5 @@
 import { utils } from 'ethers'
+import { GnosisSafe } from '../../../typechain'
 import { ZERO_ADDRESS } from '../constants'
 import { estimateTxGas } from './gas'
 import {
@@ -21,7 +22,7 @@ export function standardizeBasicSafeTransaction(
 }
 
 export async function standardizeSafeTransaction(
-  safeContract: any,
+  safeContract: GnosisSafe,
   tx: SafeTransactionDataPartial
 ): Promise<SafeTransactionData> {
   const standardizedTxs = {

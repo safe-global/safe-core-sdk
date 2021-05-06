@@ -6,9 +6,9 @@ class ModuleManager {
   #ethers: any
   #safeContract: GnosisSafe
 
-  constructor(ethers: any, contract: GnosisSafe) {
+  constructor(ethers: any, safeContract: GnosisSafe) {
     this.#ethers = ethers
-    this.#safeContract = contract
+    this.#safeContract = safeContract
   }
 
   private validateModuleAddress(moduleAddress: string): void {

@@ -1,7 +1,8 @@
 import { BigNumber } from 'ethers'
+import { GnosisSafe } from '../../../typechain'
 import SafeTransaction, { OperationType } from './SafeTransaction'
 
-const estimateDataGasCosts = (data: any): number => {
+function estimateDataGasCosts(data: any): number {
   const reducer = (accumulator: number, currentValue: string) => {
     if (currentValue === '0x') {
       return accumulator + 0
@@ -15,7 +16,7 @@ const estimateDataGasCosts = (data: any): number => {
 }
 
 export const estimateTxGas = async (
-  safeContract: any,
+  safeContract: GnosisSafe,
   to: string,
   valueInWei: string,
   data: string,
@@ -80,13 +81,13 @@ export const estimateTxGas = async (
   }
 }
 
-export const estimateGasForTransactionExecution = async (
-  contract: any,
+export async function estimateGasForTransactionExecution(
+  safeContract: GnosisSafe,
   from: string,
   tx: SafeTransaction
-): Promise<number> => {
+): Promise<number> {
   try {
-    const gas = await contract.estimateGas.execTransaction(
+    const gas = await safeContract.estimateGas.execTransaction(
       tx.data.to,
       tx.data.value,
       tx.data.data,

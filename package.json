@@ -1,8 +1,8 @@
 {
-  "name": "safe-core-sdk",
-  "version": "0.1.0",
+  "name": "@gnosis.pm/safe-core-sdk",
+  "version": "0.1.1",
   "description": "Safe Core SDK",
-  "main": "index.ts",
+  "main": "dist/src/index.js",
   "keywords": [
     "Ethereum",
     "Gnosis",
@@ -25,6 +25,11 @@
   "bugs": {
     "url": "https://github.com/gnosis/safe-core-sdk/issues"
   },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE.md"
+  ],
   "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
   "devDependencies": {
     "@gnosis.pm/safe-contracts": "^1.2.0",

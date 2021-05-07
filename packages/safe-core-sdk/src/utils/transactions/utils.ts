@@ -3,16 +3,16 @@ import { GnosisSafe } from '../../../typechain'
 import { ZERO_ADDRESS } from '../constants'
 import { estimateTxGas } from './gas'
 import {
-  OperationType,
-  SafeBasicTransactionData,
+  MetaTransactionData, OperationType,
+
   SafeTransactionData,
   SafeTransactionDataPartial
 } from './SafeTransaction'
 
-export function standardizeBasicSafeTransaction(
+export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
-): SafeBasicTransactionData {
-  const standardizedTxs: SafeBasicTransactionData = {
+): MetaTransactionData {
+  const standardizedTxs: MetaTransactionData = {
     to: tx.to,
     value: tx.value,
     data: tx.data,
@@ -21,7 +21,7 @@ export function standardizeBasicSafeTransaction(
   return standardizedTxs
 }
 
-export async function standardizeSafeTransaction(
+export async function standardizeSafeTransactionData(
   safeContract: GnosisSafe,
   tx: SafeTransactionDataPartial
 ): Promise<SafeTransactionData> {
@@ -51,7 +51,7 @@ export async function standardizeSafeTransaction(
   }
 }
 
-const encodeMetaTransaction = (tx: SafeBasicTransactionData): string => {
+const encodeMetaTransaction = (tx: MetaTransactionData): string => {
   const data = utils.arrayify(tx.data)
   const encoded = utils.solidityPack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
@@ -60,6 +60,6 @@ const encodeMetaTransaction = (tx: SafeBasicTransactionData): string => {
   return encoded.slice(2)
 }
 
-export const encodeMultiSendData = (txs: SafeBasicTransactionData[]): string => {
+export const encodeMultiSendData = (txs: MetaTransactionData[]): string => {
   return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
 }

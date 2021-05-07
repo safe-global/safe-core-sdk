@@ -14,8 +14,8 @@ import SafeTransaction, {
 } from './utils/transactions/SafeTransaction'
 import {
   encodeMultiSendData,
-  standardizeBasicSafeTransaction,
-  standardizeSafeTransaction
+  standardizeMetaTransactionData,
+  standardizeSafeTransactionData
 } from './utils/transactions/utils'
 
 class EthersSafe implements Safe {
@@ -241,13 +241,13 @@ class EthersSafe implements Safe {
     safeTransactions: SafeTransactionDataPartial[]
   ): Promise<SafeTransaction> {
     if (safeTransactions.length === 1) {
-      const standardizedTransaction = await standardizeSafeTransaction(
+      const standardizedTransaction = await standardizeSafeTransactionData(
         this.#contractManager.safeContract,
         safeTransactions[0]
       )
       return new SafeTransaction(standardizedTransaction)
     }
-    const multiSendData = encodeMultiSendData(safeTransactions.map(standardizeBasicSafeTransaction))
+    const multiSendData = encodeMultiSendData(safeTransactions.map(standardizeMetaTransactionData))
     const multiSendTransaction = {
       to: this.#contractManager.multiSendContract.address,
       value: '0',
@@ -256,7 +256,7 @@ class EthersSafe implements Safe {
       ]),
       operation: OperationType.DelegateCall
     }
-    const standardizedTransaction = await standardizeSafeTransaction(
+    const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
       multiSendTransaction
     )

@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "description": "Safe Core SDK",
   "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Gnosis",
@@ -27,8 +28,7 @@
   },
   "files": [
     "dist/**/*",
-    "README.md",
-    "LICENSE.md"
+    "README.md"
   ],
   "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
   "devDependencies": {

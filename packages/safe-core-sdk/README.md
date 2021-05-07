@@ -161,12 +161,12 @@ Returns the connected signer.
 const signer = safeSdk.getSigner()
 ```
 
-### getSafeAddress
+### getAddress
 
 Returns the address of the current Safe Proxy contract.
 
 ```js
-const address = safeSdk.getSafeAddress()
+const address = safeSdk.getAddress()
 ```
 
 ### getContractVersion

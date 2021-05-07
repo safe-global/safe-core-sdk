@@ -21,7 +21,7 @@ interface Safe {
   connect({ providerOrSigner, safeAddress, contractNetworks }: ConnectEthersSafeConfig): void
   getProvider(): Provider
   getSigner(): Signer | undefined
-  getSafeAddress(): string
+  getAddress(): string
   getMultiSendAddress(): string
   getContractVersion(): Promise<string>
   getNonce(): Promise<number>

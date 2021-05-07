@@ -98,7 +98,7 @@ describe('Safe Core SDK', () => {
     })
   })
 
-  describe('getSafeAddress', async () => {
+  describe('getAddress', async () => {
     it('should return the Safe contract address', async () => {
       const { safe, contractNetworks } = await setupTests()
       const safeSdk = await EthersSafe.create({
@@ -107,7 +107,7 @@ describe('Safe Core SDK', () => {
         providerOrSigner: user1,
         contractNetworks
       })
-      chai.expect(safeSdk.getSafeAddress()).to.be.eq(safe.address)
+      chai.expect(safeSdk.getAddress()).to.be.eq(safe.address)
     })
   })
 

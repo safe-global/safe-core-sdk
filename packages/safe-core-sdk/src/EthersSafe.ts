@@ -106,7 +106,7 @@ class EthersSafe implements Safe {
   }: ConnectEthersSafeConfig): Promise<EthersSafe> {
     return await EthersSafe.create({
       ethers: this.#ethers,
-      safeAddress: safeAddress || this.getSafeAddress(),
+      safeAddress: safeAddress || this.getAddress(),
       providerOrSigner,
       contractNetworks
     })
@@ -135,7 +135,7 @@ class EthersSafe implements Safe {
    *
    * @returns The address of the Safe Proxy contract
    */
-  getSafeAddress(): string {
+  getAddress(): string {
     return this.#contractManager.safeContract.address
   }
 
@@ -199,7 +199,7 @@ class EthersSafe implements Safe {
    * @returns The ETH balance of the Safe
    */
   async getBalance(): Promise<BigNumber> {
-    return BigNumber.from(await this.#provider.getBalance(this.getSafeAddress()))
+    return BigNumber.from(await this.#provider.getBalance(this.getAddress()))
   }
 
   /**
@@ -375,7 +375,7 @@ class EthersSafe implements Safe {
   async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction([
       {
-        to: this.getSafeAddress(),
+        to: this.getAddress(),
         value: '0',
         data: await this.#moduleManager.encodeEnableModuleData(moduleAddress)
       }
@@ -395,7 +395,7 @@ class EthersSafe implements Safe {
   async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction([
       {
-        to: this.getSafeAddress(),
+        to: this.getAddress(),
         value: '0',
         data: await this.#moduleManager.encodeDisableModuleData(moduleAddress)
       }
@@ -417,7 +417,7 @@ class EthersSafe implements Safe {
   async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction([
       {
-        to: this.getSafeAddress(),
+        to: this.getAddress(),
         value: '0',
         data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
       }
@@ -439,7 +439,7 @@ class EthersSafe implements Safe {
   async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction([
       {
-        to: this.getSafeAddress(),
+        to: this.getAddress(),
         value: '0',
         data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
       }
@@ -461,7 +461,7 @@ class EthersSafe implements Safe {
   async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction([
       {
-        to: this.getSafeAddress(),
+        to: this.getAddress(),
         value: '0',
         data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
       }
@@ -480,7 +480,7 @@ class EthersSafe implements Safe {
   async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction([
       {
-        to: this.getSafeAddress(),
+        to: this.getAddress(),
         value: '0',
         data: await this.#ownerManager.encodeChangeThresholdData(threshold)
       }

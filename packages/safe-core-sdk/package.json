@@ -1,0 +1,82 @@
+{
+  "name": "@gnosis.pm/safe-core-sdk",
+  "version": "0.1.1",
+  "description": "Safe Core SDK",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "keywords": [
+    "Ethereum",
+    "Gnosis",
+    "Safe",
+    "SDK"
+  ],
+  "scripts": {
+    "build": "yarn rimraf dist && hardhat compile && tsc",
+    "test": "hardhat deploy && nyc hardhat test",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnosis/safe-core-sdk.git"
+  },
+  "author": "Gnosis (https://gnosis.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gnosis/safe-core-sdk/issues"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
+  "devDependencies": {
+    "@gnosis.pm/safe-contracts": "^1.2.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@typechain/ethers-v5": "^6.0.5",
+    "@types/chai": "^4.2.17",
+    "@types/chai-as-promised": "^7.1.3",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.0.2",
+    "@types/yargs": "^16.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "coveralls": "^3.1.0",
+    "dotenv": "^9.0.0",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.1.4",
+    "hardhat": "^2.2.1",
+    "hardhat-deploy": "^0.7.5",
+    "hardhat-typechain": "^0.3.5",
+    "husky": "^6.0.0",
+    "lerna": "^4.0.0",
+    "lint-staged": "^10.5.4",
+    "mocha": "^8.4.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "ts-generator": "^0.1.1",
+    "ts-node": "^9.1.1",
+    "typechain": "^4.0.3",
+    "typescript": "^4.2.4",
+    "yargs": "^17.0.1"
+  },
+  "lint-staged": {
+    "src/**/!(*test).ts": [
+      "yarn lint",
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
+}

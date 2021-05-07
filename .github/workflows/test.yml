@@ -1,4 +1,4 @@
-name: Test
+name: 'Safe Core SDK Tests'
 on: [push, pull_request]
 jobs:
   test:
@@ -13,4 +13,4 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn install
-      - run: yarn test
+      - run: yarn sdk:test

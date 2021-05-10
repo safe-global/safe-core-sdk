@@ -32,7 +32,7 @@ interface Safe {
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
   isOwner(ownerAddress: string): Promise<boolean>
-  createTransaction(safeTransactions: SafeTransactionDataPartial[]): Promise<SafeTransaction>
+  createTransaction(...safeTransactions: SafeTransactionDataPartial[]): Promise<SafeTransaction>
   getTransactionHash(safeTransaction: SafeTransaction): Promise<string>
   signTransactionHash(hash: string): Promise<SafeSignature>
   signTransaction(safeTransaction: SafeTransaction): Promise<void>

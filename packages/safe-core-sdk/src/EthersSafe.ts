@@ -238,7 +238,7 @@ class EthersSafe implements Safe {
    * @returns The Safe transaction
    */
   async createTransaction(
-    safeTransactions: SafeTransactionDataPartial[]
+    ...safeTransactions: SafeTransactionDataPartial[]
   ): Promise<SafeTransaction> {
     if (safeTransactions.length === 1) {
       const standardizedTransaction = await standardizeSafeTransactionData(
@@ -373,13 +373,11 @@ class EthersSafe implements Safe {
    * @throws "Module provided is already enabled"
    */
   async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction([
-      {
-        to: this.getAddress(),
-        value: '0',
-        data: await this.#moduleManager.encodeEnableModuleData(moduleAddress)
-      }
-    ])
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeEnableModuleData(moduleAddress)
+    })
     return safeTransaction
   }
 
@@ -393,13 +391,11 @@ class EthersSafe implements Safe {
    * @throws "Module provided is not enabled already"
    */
   async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction([
-      {
-        to: this.getAddress(),
-        value: '0',
-        data: await this.#moduleManager.encodeDisableModuleData(moduleAddress)
-      }
-    ])
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeDisableModuleData(moduleAddress)
+    })
     return safeTransaction
   }
 
@@ -415,13 +411,11 @@ class EthersSafe implements Safe {
    * @throws "Threshold cannot exceed owner count"
    */
   async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction([
-      {
-        to: this.getAddress(),
-        value: '0',
-        data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
-      }
-    ])
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
+    })
     return safeTransaction
   }
 
@@ -437,13 +431,11 @@ class EthersSafe implements Safe {
    * @throws "Threshold cannot exceed owner count"
    */
   async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction([
-      {
-        to: this.getAddress(),
-        value: '0',
-        data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
-      }
-    ])
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
+    })
     return safeTransaction
   }
 
@@ -459,13 +451,11 @@ class EthersSafe implements Safe {
    * @throws "Old address provided is not an owner"
    */
   async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction([
-      {
-        to: this.getAddress(),
-        value: '0',
-        data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
-      }
-    ])
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
+    })
     return safeTransaction
   }
 
@@ -478,13 +468,11 @@ class EthersSafe implements Safe {
    * @throws "Threshold cannot exceed owner count"
    */
   async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction([
-      {
-        to: this.getAddress(),
-        value: '0',
-        data: await this.#ownerManager.encodeChangeThresholdData(threshold)
-      }
-    ])
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeChangeThresholdData(threshold)
+    })
     return safeTransaction
   }
 

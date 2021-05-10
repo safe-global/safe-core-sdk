@@ -37,13 +37,11 @@ describe('Off-chain signatures', () => {
         providerOrSigner: user1.provider,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       const txHash = await safeSdk.getTransactionHash(tx)
       await chai
         .expect(safeSdk.signTransactionHash(txHash))
@@ -58,13 +56,11 @@ describe('Off-chain signatures', () => {
         providerOrSigner: user3,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       const txHash = await safeSdk.getTransactionHash(tx)
       await chai
         .expect(safeSdk.signTransactionHash(txHash))
@@ -79,13 +75,11 @@ describe('Off-chain signatures', () => {
         providerOrSigner: user1,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       const txHash = await safeSdk.getTransactionHash(tx)
       const signature = await safeSdk.signTransactionHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
@@ -101,13 +95,11 @@ describe('Off-chain signatures', () => {
         providerOrSigner: user1.provider,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       await chai.expect(safeSdk.signTransaction(tx)).to.be.rejectedWith('No signer provided')
     })
 
@@ -119,13 +111,11 @@ describe('Off-chain signatures', () => {
         providerOrSigner: user3,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       await chai
         .expect(safeSdk.signTransaction(tx))
         .to.be.rejectedWith('Transactions can only be signed by Safe owners')
@@ -139,13 +129,11 @@ describe('Off-chain signatures', () => {
         providerOrSigner: user1,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       chai.expect(tx.signatures.size).to.be.eq(0)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)
@@ -159,13 +147,11 @@ describe('Off-chain signatures', () => {
         providerOrSigner: user1,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       chai.expect(tx.signatures.size).to.be.eq(0)
       await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(1)

@@ -3,8 +3,8 @@ import { GnosisSafe } from '../../../typechain'
 import { ZERO_ADDRESS } from '../constants'
 import { estimateTxGas } from './gas'
 import {
-  MetaTransactionData, OperationType,
-
+  MetaTransactionData,
+  OperationType,
   SafeTransactionData,
   SafeTransactionDataPartial
 } from './SafeTransaction'

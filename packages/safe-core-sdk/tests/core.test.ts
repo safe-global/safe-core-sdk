@@ -122,13 +122,11 @@ describe('Safe Core SDK', () => {
         contractNetworks
       })
       chai.expect(await safeSdk.getNonce()).to.be.eq(0)
-      const tx = await safeSdk.createTransaction([
-        {
-          to: user2.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk.createTransaction({
+        to: user2.address,
+        value: '0',
+        data: '0x'
+      })
       const txResponse = await safeSdk.executeTransaction(tx)
       await txResponse.wait()
       chai.expect(await safeSdk.getNonce()).to.be.eq(1)

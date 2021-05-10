@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe from '../src'
+import EthersSafe, { SafeTransactionDataPartial } from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
 import { GnosisSafe } from '../typechain'
 import { getMultiSend, getSafeWithOwners } from './utils/setup'
@@ -37,13 +37,11 @@ describe('Transactions execution', () => {
         providerOrSigner: user1.provider,
         contractNetworks
       })
-      const tx = await safeSdk1.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk1.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       await chai.expect(safeSdk1.executeTransaction(tx)).rejectedWith('No signer provided')
     })
 
@@ -55,13 +53,11 @@ describe('Transactions execution', () => {
         safeAddress: mainnetGnosisDAOSafe,
         contractNetworks
       })
-      const tx = await safeSdk1.createTransaction([
-        {
-          to: mainnetGnosisDAOSafe,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk1.createTransaction({
+        to: mainnetGnosisDAOSafe,
+        value: '0',
+        data: '0x'
+      })
       await chai.expect(safeSdk1.executeTransaction(tx)).rejectedWith('No signer provided')
     })
 
@@ -75,13 +71,11 @@ describe('Transactions execution', () => {
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({ providerOrSigner: user2, contractNetworks })
-      const tx = await safeSdk1.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk1.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
       const txResponse = await safeSdk2.approveTransactionHash(txHash)
@@ -100,13 +94,11 @@ describe('Transactions execution', () => {
         providerOrSigner: user1,
         contractNetworks
       })
-      const tx = await safeSdk1.createTransaction([
-        {
-          to: safe.address,
-          value: '0',
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk1.createTransaction({
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      })
       await chai
         .expect(safeSdk1.executeTransaction(tx))
         .to.be.rejectedWith('There are 2 signatures missing')
@@ -126,13 +118,11 @@ describe('Transactions execution', () => {
         value: BigNumber.from('1000000000000000000') // 1 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
-      const tx = await safeSdk1.createTransaction([
-        {
-          to: user2.address,
-          value: '500000000000000000', // 0.5 ETH
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk1.createTransaction({
+        to: user2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
       const txResponse = await safeSdk1.executeTransaction(tx)
       await txResponse.wait()
       const safeFinalBalance = await safeSdk1.getBalance()
@@ -157,13 +147,11 @@ describe('Transactions execution', () => {
         value: BigNumber.from('1000000000000000000') // 1 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
-      const tx = await safeSdk1.createTransaction([
-        {
-          to: user2.address,
-          value: '500000000000000000', // 0.5 ETH
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk1.createTransaction({
+        to: user2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
       await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
@@ -191,13 +179,11 @@ describe('Transactions execution', () => {
         value: BigNumber.from('1000000000000000000') // 1 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
-      const tx = await safeSdk1.createTransaction([
-        {
-          to: user2.address,
-          value: '500000000000000000', // 0.5 ETH
-          data: '0x'
-        }
-      ])
+      const tx = await safeSdk1.createTransaction({
+        to: user2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
       await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
@@ -228,7 +214,7 @@ describe('Transactions execution', () => {
         value: BigNumber.from('2000000000000000000') // 2 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
-      const txs = [
+      const txs: SafeTransactionDataPartial[] = [
         {
           to: user2.address,
           value: '1100000000000000000', // 1.1 ETH
@@ -240,7 +226,7 @@ describe('Transactions execution', () => {
           data: '0x'
         }
       ]
-      const multiSendTx = await safeSdk1.createTransaction(txs)
+      const multiSendTx = await safeSdk1.createTransaction(...txs)
       await safeSdk1.signTransaction(multiSendTx)
       const txHash = await safeSdk2.getTransactionHash(multiSendTx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)

@@ -57,6 +57,7 @@ class SafeTransaction {
       staticParts += signature?.staticPart(/*baseOffset + dynamicParts.length / 2*/).slice(2)
       dynamicParts += signature?.dynamicPart()
     })
+    console.log('encoded signature', '0x' + staticParts + dynamicParts)
     return '0x' + staticParts + dynamicParts
   }
 }

@@ -443,6 +443,7 @@ class EthersSafe implements Safe {
 
     const txHash = await this.getTransactionHash(safeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
+    console.log({ownersWhoApprovedTx})
     for (const owner of ownersWhoApprovedTx) {
       safeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
@@ -461,7 +462,7 @@ class EthersSafe implements Safe {
         } missing`
       )
     }
-
+    console.log('tx signatures', safeTransaction.signatures)
     const gasLimit = await estimateGasForTransactionExecution(
       this.#safeContract,
       await this.#signer.getAddress(),

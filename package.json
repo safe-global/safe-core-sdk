@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "yarn rimraf dist && hardhat compile && tsc",
-    "test": "hardhat deploy && nyc hardhat test",
+    "test": "hardhat --network localhost deploy && hardhat --network localhost test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
@@ -35,6 +35,7 @@
     "@gnosis.pm/safe-contracts": "^1.2.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
     "@typechain/ethers-v5": "^6.0.5",
     "@types/chai": "^4.2.17",
     "@types/chai-as-promised": "^7.1.3",

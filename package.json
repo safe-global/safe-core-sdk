@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "build": "yarn rimraf dist && hardhat compile && tsc",
+    "test:ganache": "export TEST_NETWORK=ganache && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test": "hardhat deploy && nyc hardhat test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",

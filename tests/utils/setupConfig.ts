@@ -23,7 +23,6 @@ function getHardhatAccounts(): Account[] {
   const accounts: Account[] = []
   for (let i = 0; i < 10; i++) {
     const wallet: Wallet = wallets[i]
-    console.log(wallet.address)
     const account: Account = { signer: wallet as Signer, address: wallet.address }
     accounts.push(account)
   }
@@ -31,6 +30,7 @@ function getHardhatAccounts(): Account[] {
 }
 
 export async function getAccounts(): Promise<Account[]> {
-  console.log(process.env.TEST_ENV)
-  return process.env.TEST_ENV === 'ganache' ? await getGanacheAccounts() : getHardhatAccounts()
+  const accounts =
+    process.env.TEST_NETWORK === 'ganache' ? await getGanacheAccounts() : getHardhatAccounts()
+  return accounts
 }

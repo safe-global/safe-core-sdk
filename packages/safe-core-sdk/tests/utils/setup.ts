@@ -1,6 +1,6 @@
 import { AddressZero } from '@ethersproject/constants'
 import { deployments, ethers } from 'hardhat'
-import { DailyLimitModule, GnosisSafe, MultiSend, SocialRecoveryModule } from '../../typechain'
+import { DailyLimitModule, ERC20Mintable, GnosisSafe, MultiSend, SocialRecoveryModule } from '../../typechain'
 
 export const getSafeSingleton = async () => {
   const SafeDeployment = await deployments.get('GnosisSafe')
@@ -57,4 +57,10 @@ export const getSocialRecoveryModule = async (): Promise<SocialRecoveryModule> =
   const SocialRecoveryModuleDeployment = await deployments.get('SocialRecoveryModule')
   const SocialRecoveryModule = await ethers.getContractFactory('SocialRecoveryModule')
   return SocialRecoveryModule.attach(SocialRecoveryModuleDeployment.address) as SocialRecoveryModule
+}
+
+export const getERC20Mintable = async (): Promise<ERC20Mintable> => {
+  const ERC20MintableDeployment = await deployments.get('ERC20Mintable')
+  const ERC20Mintable = await ethers.getContractFactory('ERC20Mintable')
+  return ERC20Mintable.attach(ERC20MintableDeployment.address) as ERC20Mintable
 }

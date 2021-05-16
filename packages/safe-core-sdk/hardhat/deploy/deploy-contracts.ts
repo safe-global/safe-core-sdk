@@ -40,6 +40,12 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: true,
     deterministicDeployment: true
   })
+
+  await deploy('ERC20Mintable', {
+    from: deployer,
+    args: [],
+    log: true
+  })
 }
 
 export default deploy

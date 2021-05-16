@@ -4,13 +4,14 @@ import { BigNumber } from 'ethers'
 import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe, { SafeTransactionDataPartial } from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
-import { GnosisSafe } from '../typechain'
-import { getMultiSend, getSafeWithOwners } from './utils/setup'
+import { ERC20Mintable, GnosisSafe } from '../typechain'
+import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setup'
 chai.use(chaiAsPromised)
 
 interface SetupTestsResult {
   safe: GnosisSafe
   contractNetworks: ContractNetworksConfig
+  erc20Mintable: ERC20Mintable
 }
 
 describe('Transactions execution', () => {
@@ -24,7 +25,8 @@ describe('Transactions execution', () => {
       const contractNetworks: ContractNetworksConfig = {
         [chainId]: { multiSendAddress: (await getMultiSend()).address }
       }
-      return { safe, contractNetworks }
+      const erc20Mintable = await getERC20Mintable()
+      return { safe, contractNetworks, erc20Mintable }
     }
   )
 
@@ -242,6 +244,50 @@ describe('Transactions execution', () => {
             .add(BigNumber.from(txs[1].value))
             .toString()
         )
+    })
+
+    it('should execute a batch transaction with contract calls and threshold >1', async () => {
+      const { contractNetworks, erc20Mintable } = await setupTests()
+      const safe = await getSafeWithOwners([user1.address, user2.address, user3.address])
+      const safeSdk1 = await EthersSafe.create({
+        ethers,
+        safeAddress: safe.address,
+        providerOrSigner: user1,
+        contractNetworks
+      })
+      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: user2, contractNetworks })
+      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: user3, contractNetworks })
+
+      erc20Mintable.mint(safe.address, '1200000000000000000') // 1.2 ETH
+      const safeInitialERC20Balance = await erc20Mintable.balanceOf(safe.address)
+      chai.expect(safeInitialERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ETH
+      const accountInitialERC20Balance = await erc20Mintable.balanceOf(user2.address)
+      chai.expect(accountInitialERC20Balance.toString()).to.be.eq('0') // 0 ETH
+
+      const txs: SafeTransactionDataPartial[] = [
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: erc20Mintable.interface.encodeFunctionData('transfer', [user2.address, '1100000000000000000']) // 1.1 ETH
+        },
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: erc20Mintable.interface.encodeFunctionData('transfer', [user2.address, '100000000000000000']) // 0.1 ETH
+        }
+      ]
+      const multiSendTx = await safeSdk1.createTransaction(...txs)
+      await safeSdk1.signTransaction(multiSendTx)
+      const txHash = await safeSdk2.getTransactionHash(multiSendTx)
+      const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
+      await txResponse1.wait()
+      const txResponse2 = await safeSdk3.executeTransaction(multiSendTx)
+      await txResponse2.wait()
+
+      const safeFinalERC20Balance = await erc20Mintable.balanceOf(safe.address)
+      chai.expect(safeFinalERC20Balance.toString()).to.be.eq('0') // 0 ETH
+      const accountFinalERC20Balance = await erc20Mintable.balanceOf(user2.address)
+      chai.expect(accountFinalERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ETH
     })
   })
 })

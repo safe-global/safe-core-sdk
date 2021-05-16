@@ -53,7 +53,8 @@ class OwnerManager {
   }
 
   async getOwners(): Promise<string[]> {
-    return this.#safeContract.getOwners()
+    const owners = await this.#safeContract.getOwners()
+    return [...owners]
   }
 
   async getThreshold(): Promise<number> {

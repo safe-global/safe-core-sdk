@@ -48,6 +48,9 @@ const config: HardhatUserConfig = {
     tests: 'tests'
   },
   networks: {
+    localhost: {
+      url: "http://127.0.0.1:8545"
+    },
     hardhat: {
       allowUnlimitedContractSize: true,
       blockGasLimit: 100000000,

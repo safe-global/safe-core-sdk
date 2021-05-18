@@ -11,7 +11,7 @@ async function getGanacheAccounts(): Promise<Account[]> {
   const provider = new ethers.providers.Web3Provider(web3.currentProvider as any)
   const accounts: Account[] = []
   for (let i = 0; i < 10; i++) {
-    const signer: Signer = provider.getSigner(i)
+    const signer = provider.getSigner(i)
     const account: Account = { signer, address: await signer.getAddress() }
     accounts.push(account)
   }

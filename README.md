@@ -28,7 +28,7 @@ A Safe account with three owners and threshold equal three will be used as the s
 
 ```js
 import { ethers } from 'ethers'
-import EthersSafe, { SafeTransaction } from '@gnosis.pm/safe-core-sdk'
+import EthersSafe, { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk'
 
 const web3Provider = // ...
 const provider = new ethers.providers.Web3Provider(web3Provider)
@@ -50,33 +50,35 @@ const safeSdk = await EthersSafe.create(ethers, safeAddress, signer1)
 ### 1. Create a Safe transaction
 
 ```js
-const tx = await safeSdk.createTransaction({
-  to: safeAddress,
-  value: '0',
-  data: '0x',
-})
+const partialTx: SafeTransactionDataPartial = {
+  to: '0x<address>',
+  data: '0x<data>',
+  value: '<eth_value_in_wei>'
+}
+const safeTransaction = await safeSdk.createTransaction(partialTx)
 ```
 
-Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain and the owner `signer3` would have to explicitly sign it too.
+Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain, the owner `signer2` will sign it on-chain and the owner `signer3` will execute it (the executor also signs the transaction transparently).
 
 ### 2.a. Off-chain signatures
 
 The owner `signer1` signs the transaction off-chain.
 
 ```js
-const signer1Signature = await safeSdk.signTransaction(tx)
+const signer1Signature = await safeSdk.signTransaction(safeTransaction)
 ```
 
-Because the signature is off-chain, there is no interaction with the contract and the signature is available at `tx.signatures`.
+Because the signature is off-chain, there is no interaction with the contract and the signature becomes available at `safeTransaction.signatures`.
 
 ### 2.b. On-chain signatures
 
-After `signer2` account is connected to the SDK as the signer the transaction hash is approved on-chain.
+After `signer2` account is connected to the SDK as the signer the transaction hash will be approved on-chain.
 
 ```js
 const safeSdk2 = await safeSdk.connect(signer2)
-const txHash = await safeSdk2.getTransactionHash(tx)
-const signer2Signature = await safeSdk2.approveTransactionHash(txHash)
+const txHash = await safeSdk2.getTransactionHash(safeTransaction)
+const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
+await approveTxResponse.wait()
 ```
 
 ### 3. Transaction execution
@@ -85,11 +87,11 @@ Lastly, `signer3` account is connected to the SDK as the signer and executor of 
 
 ```js
 const safeSdk3 = await safeSdk2.connect(signer3)
-const txResponse = await safeSdk3.executeTransaction(tx)
-await txResponse.wait()
+const executeTxResponse = await safeSdk3.executeTransaction(safeTransaction)
+await executeTxResponse.wait()
 ```
 
-All the signatures used to execute the transaction are available at `tx.signatures`.
+All the signatures used to execute the transaction are now available at `safeTransaction.signatures`.
 
 ## API Reference
 

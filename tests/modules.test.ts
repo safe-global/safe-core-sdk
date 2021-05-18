@@ -1,19 +1,24 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import EthersSafe from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
-import { getDailyLimitModule, getSafeWithOwners, getSocialRecoveryModule } from './utils/setup'
+import { getAccounts } from './utils/setupConfig'
+import {
+  getDailyLimitModule,
+  getSafeWithOwners,
+  getSocialRecoveryModule
+} from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 describe('Safe modules', () => {
-  const [user1] = waffle.provider.getWallets()
-
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
+    const accounts = await getAccounts()
     return {
-      safe: await getSafeWithOwners([user1.address]),
+      safe: await getSafeWithOwners([accounts[0].address]),
+      accounts,
       module1: await getDailyLimitModule(),
       module2: await getSocialRecoveryModule()
     }
@@ -21,8 +26,9 @@ describe('Safe modules', () => {
 
   describe('getModules', async () => {
     it('should return all the enabled modules', async () => {
-      const { safe, module1 } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts, module1 } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
       const tx = await safeSdk.getEnableModuleTx(module1.address)
       const txResponse = await safeSdk.executeTransaction(tx)
@@ -33,8 +39,9 @@ describe('Safe modules', () => {
 
   describe('isModuleEnabled', async () => {
     it('should return true if a module is enabled', async () => {
-      const { safe, module1 } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts, module1 } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       chai.expect(await safeSdk.isModuleEnabled(module1.address)).to.be.false
       const tx = await safeSdk.getEnableModuleTx(module1.address)
       const txResponse = await safeSdk.executeTransaction(tx)
@@ -45,29 +52,33 @@ describe('Safe modules', () => {
 
   describe('getEnableModuleTx', async () => {
     it('should fail if address is invalid', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = safeSdk.getEnableModuleTx('0x123')
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = safeSdk.getEnableModuleTx(SENTINEL_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = safeSdk.getEnableModuleTx(ZERO_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 
     it('should fail if address is already enabled', async () => {
-      const { safe, module1 } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts, module1 } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx1 = await safeSdk.getEnableModuleTx(module1.address)
       const txResponse = await safeSdk.executeTransaction(tx1)
       await txResponse.wait()
@@ -76,8 +87,9 @@ describe('Safe modules', () => {
     })
 
     it('should enable a Safe module', async () => {
-      const { safe, module1 } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts, module1 } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
       chai.expect(await safeSdk.isModuleEnabled(module1.address)).to.be.false
       const tx = await safeSdk.getEnableModuleTx(module1.address)
@@ -90,37 +102,42 @@ describe('Safe modules', () => {
 
   describe('getDisableModuleTx', async () => {
     it('should fail if address is invalid', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = safeSdk.getDisableModuleTx('0x123')
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = safeSdk.getDisableModuleTx(SENTINEL_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = safeSdk.getDisableModuleTx(ZERO_ADDRESS)
       await chai.expect(tx).to.be.rejectedWith('Invalid module address provided')
     })
 
     it('should fail if address is not enabled', async () => {
-      const { safe, module1 } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts, module1 } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = safeSdk.getDisableModuleTx(module1.address)
       await chai.expect(tx).to.be.rejectedWith('Module provided is not enabled already')
     })
 
     it('should disable Safe modules', async () => {
-      const { module1, module2 } = await setupTests()
-      const safe = await getSafeWithOwners([user1.address])
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { accounts, module1, module2 } = await setupTests()
+      const [account1] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
 
       const tx1 = await safeSdk.getEnableModuleTx(module1.address)
       const txResponse1 = await safeSdk.executeTransaction(tx1)

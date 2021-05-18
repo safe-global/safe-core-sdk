@@ -1,32 +1,35 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, ethers, waffle } from 'hardhat'
+import { deployments, ethers } from 'hardhat'
 import EthersSafe from '../src'
-import { getSafeWithOwners } from './utils/setup'
+import { getAccounts } from './utils/setupConfig'
+import { getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 describe('Safe Threshold', () => {
-  const [user1, user2] = waffle.provider.getWallets()
-
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
+    const accounts = await getAccounts()
     return {
-      safe: await getSafeWithOwners([user1.address])
+      safe: await getSafeWithOwners([accounts[0].address]),
+      accounts
     }
   })
 
   describe('getThreshold', async () => {
     it('should return the Safe threshold', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       chai.expect(await safeSdk.getThreshold()).to.be.eq(1)
     })
   })
 
   describe('getChangeThresholdTx', async () => {
     it('should fail if the threshold is bigger than the number of owners', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const newThreshold = 2
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners)
@@ -36,8 +39,9 @@ describe('Safe Threshold', () => {
     })
 
     it('should fail if the threshold is not bigger than 0', async () => {
-      const { safe } = await setupTests()
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const newThreshold = 0
       await chai
         .expect(safeSdk.getChangeThresholdTx(newThreshold))
@@ -45,8 +49,10 @@ describe('Safe Threshold', () => {
     })
 
     it('should change the threshold', async () => {
-      const safe = await getSafeWithOwners([user1.address, user2.address], 1)
-      const safeSdk = await EthersSafe.create(ethers, safe.address, user1)
+      const { accounts } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address, account2.address], 1)
+      const safeSdk = await EthersSafe.create(ethers, safe.address, account1.signer)
       const newThreshold = 2
       chai.expect(await safeSdk.getThreshold()).to.be.not.eq(newThreshold)
       const tx = await safeSdk.getChangeThresholdTx(newThreshold)

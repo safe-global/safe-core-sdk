@@ -1,25 +1,26 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
-import { deployments, ethers, waffle } from 'hardhat'
+import { deployments, ethers } from 'hardhat'
 import EthersSafe from '../src'
-import { getSafeWithOwners } from './utils/setup'
+import { getAccounts } from './utils/setupConfig'
+import { getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 describe('Transactions execution', () => {
-  const [user1, user2, user3] = waffle.provider.getWallets()
-
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
+    const accounts = await getAccounts()
     return {
-      safe: await getSafeWithOwners([user1.address, user2.address])
+      safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
+      accounts
     }
   })
 
   describe('execTransaction', async () => {
     it('should fail if a provider is provided', async () => {
-      const { safe } = await setupTests()
-      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1.provider)
+      const { safe, accounts } = await setupTests()
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, accounts[0].signer.provider)
       const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
@@ -40,9 +41,11 @@ describe('Transactions execution', () => {
     })
 
     it('should fail if there are not enough signatures (1 missing)', async () => {
-      const safe = await getSafeWithOwners([user1.address, user2.address, user3.address])
-      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
-      const safeSdk2 = await safeSdk1.connect(user2)
+      const { accounts } = await setupTests()
+      const [account1, account2, account3] = accounts
+      const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, account1.signer)
+      const safeSdk2 = await safeSdk1.connect(account2.signer)
       const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
@@ -58,8 +61,10 @@ describe('Transactions execution', () => {
     })
 
     it('should fail if there are not enough signatures (>1 missing)', async () => {
-      const safe = await getSafeWithOwners([user1.address, user2.address, user3.address])
-      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
+      const { accounts } = await setupTests()
+      const [account1, account2, account3] = accounts
+      const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, account1.signer)
       const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
@@ -71,15 +76,17 @@ describe('Transactions execution', () => {
     })
 
     it('should execute a transaction with threshold 1', async () => {
-      const safe = await getSafeWithOwners([user1.address])
-      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
-      await user1.sendTransaction({
+      const { accounts } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, account1.signer)
+      await account1.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('1000000000000000000')
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const tx = await safeSdk1.createTransaction({
-        to: user2.address,
+        to: account2.address,
         value: '500000000000000000',
         data: '0x'
       })
@@ -92,17 +99,19 @@ describe('Transactions execution', () => {
     })
 
     it('should execute a transaction with threshold >1', async () => {
-      const safe = await getSafeWithOwners([user1.address, user2.address, user3.address])
-      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
-      const safeSdk2 = await safeSdk1.connect(user2)
-      const safeSdk3 = await safeSdk1.connect(user3)
-      await user1.sendTransaction({
+      const { accounts } = await setupTests()
+      const [account1, account2, account3] = accounts
+      const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, account1.signer)
+      const safeSdk2 = await safeSdk1.connect(account2.signer)
+      const safeSdk3 = await safeSdk1.connect(account3.signer)
+      await account1.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('1000000000000000000')
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const tx = await safeSdk1.createTransaction({
-        to: user2.address,
+        to: account2.address,
         value: '500000000000000000',
         data: '0x'
       })
@@ -119,17 +128,18 @@ describe('Transactions execution', () => {
     })
 
     it('should execute a transaction when is not submitted by an owner', async () => {
-      const { safe } = await setupTests()
-      const safeSdk1 = await EthersSafe.create(ethers, safe.address, user1)
-      const safeSdk2 = await safeSdk1.connect(user2)
-      const safeSdk3 = await safeSdk1.connect(user3)
-      await user1.sendTransaction({
+      const { safe, accounts } = await setupTests()
+      const [account1, account2, account3] = accounts
+      const safeSdk1 = await EthersSafe.create(ethers, safe.address, account1.signer)
+      const safeSdk2 = await safeSdk1.connect(account2.signer)
+      const safeSdk3 = await safeSdk1.connect(account3.signer)
+      await account1.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('1000000000000000000')
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const tx = await safeSdk1.createTransaction({
-        to: user2.address,
+        to: account2.address,
         value: '500000000000000000',
         data: '0x'
       })

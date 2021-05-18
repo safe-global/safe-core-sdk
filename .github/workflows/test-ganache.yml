@@ -1,4 +1,4 @@
-name: Hardhat Test
+name: Ganache Test
 on: [push, pull_request]
 jobs:
   test:
@@ -12,5 +12,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - run: yarn global add ganache-cli@6.12.2
       - run: yarn install
-      - run: yarn test
+      - run: ganache-cli -d > /dev/null &
+      - run: yarn test:ganache

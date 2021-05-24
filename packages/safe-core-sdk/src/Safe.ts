@@ -1,19 +1,26 @@
 import { Provider } from '@ethersproject/providers'
-import { ContractNetworksConfig } from 'configuration/contracts'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
+import { ContractNetworksConfig } from './configuration/contracts'
 import { SafeSignature } from './utils/signatures/SafeSignature'
 import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 
 export interface EthersSafeConfig {
+  /** ethers - Ethers v5 library */
   ethers: any
+  /** safeAddress - The address of the Safe account to use */
   safeAddress: string
+  /** providerOrSigner - Ethers provider or signer */
   providerOrSigner?: Provider | Signer
+  /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
 
 export interface ConnectEthersSafeConfig {
+  /** providerOrSigner - Ethers provider or signer */
   providerOrSigner: Provider | Signer
+  /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
+  /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
 

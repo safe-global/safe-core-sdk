@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers'
 import { GnosisSafe } from '../../../typechain'
 import SafeTransaction, { OperationType } from './SafeTransaction'
 
-function estimateDataGasCosts(data: any): number {
+function estimateDataGasCosts(data: string): number {
   const reducer = (accumulator: number, currentValue: string) => {
     if (currentValue === '0x') {
       return accumulator + 0
@@ -12,7 +12,7 @@ function estimateDataGasCosts(data: any): number {
     }
     return accumulator + 16
   }
-  return data.match(/.{2}/g).reduce(reducer, 0)
+  return (data.match(/.{2}/g) as string[]).reduce(reducer, 0)
 }
 
 export async function estimateTxGas(

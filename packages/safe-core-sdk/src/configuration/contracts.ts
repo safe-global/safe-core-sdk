@@ -1,8 +1,10 @@
 interface ContractNetworkConfig {
+  /** multiSendAddress - Address of the MultiSend contract deployed in a specific network id */
   multiSendAddress: string
 }
 
 export interface ContractNetworksConfig {
+  /** id - Network id */
   [id: string]: ContractNetworkConfig
 }
 

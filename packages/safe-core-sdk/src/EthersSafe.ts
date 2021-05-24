@@ -28,10 +28,7 @@ class EthersSafe implements Safe {
 
   /**
    * Creates an instance of the Safe Core SDK.
-   *
-   * @param ethers - Ethers v5 library
-   * @param safeAddress - The address of the Safe account to use
-   * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
+   * @param config - Ethers Safe configuration
    * @returns The Safe Core SDK instance
    * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
@@ -50,10 +47,7 @@ class EthersSafe implements Safe {
 
   /**
    * Initializes the Safe Core SDK instance.
-   *
-   * @param ethers - Ethers v5 library
-   * @param safeAddress - The address of the Safe account to use
-   * @param providerOrSigner - Ethers provider or signer. If this parameter is not passed, Ethers defaultProvider will be used.
+   * @param config - Ethers Safe configuration
    * @throws "Signer must be connected to a provider"
    * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
@@ -92,9 +86,7 @@ class EthersSafe implements Safe {
 
   /**
    * Returns a new instance of the Safe Core SDK connecting the providerOrSigner and the safeAddress.
-   *
-   * @param providerOrSigner - Ethers provider or signer
-   * @param safeAddress - The address of the Safe account to use
+   * @param config - Connect Ethers Safe configuration
    * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
@@ -324,8 +316,7 @@ class EthersSafe implements Safe {
    * Approves on-chain a hash using the current signer account.
    *
    * @param hash - The hash to approve
-   * @param skipOnChainApproval - TRUE to avoid the Safe transaction to be approved on-chain
-   * @returns The pre-validated signature
+   * @returns The Safe transaction response
    * @throws "No signer provided"
    * @throws "Transaction hashes can only be approved by Safe owners"
    */
@@ -383,7 +374,6 @@ class EthersSafe implements Safe {
    * Returns the Safe transaction to disable a Safe module.
    *
    * @param moduleAddress - The desired module address
-   * @param params - Contract method name and specific parameters
    * @returns The Safe transaction ready to be signed
    * @throws "Invalid module address provided"
    * @throws "Module provided is not enabled already"
@@ -478,7 +468,6 @@ class EthersSafe implements Safe {
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
-   * @param options - Execution configuration options
    * @returns The Safe transaction response
    * @throws "No signer provided"
    * @throws "There are X signatures missing"

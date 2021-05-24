@@ -6,13 +6,13 @@ import EthersSafe from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import { DailyLimitModule, GnosisSafe, SocialRecoveryModule } from '../typechain'
+import { getAccounts } from './utils/setupConfig'
 import {
   getDailyLimitModule,
   getMultiSend,
   getSafeWithOwners,
   getSocialRecoveryModule
-} from './utils/setup'
-import { getAccounts } from './utils/setupConfig'
+} from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 interface SetupTestsResult {

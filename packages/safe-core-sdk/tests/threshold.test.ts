@@ -4,8 +4,8 @@ import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
 import { GnosisSafe } from '../typechain'
-import { getMultiSend, getSafeWithOwners } from './utils/setup'
 import { getAccounts } from './utils/setupConfig'
+import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 interface SetupTestsResult {

@@ -5,8 +5,8 @@ import EthersSafe from '../src'
 import { ContractNetworksConfig, defaultContractNetworks } from '../src/configuration/contracts'
 import { ZERO_ADDRESS } from '../src/utils/constants'
 import { GnosisSafe } from '../typechain'
-import { getMultiSend, getSafeWithOwners } from './utils/setup'
 import { getAccounts } from './utils/setupConfig'
+import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 interface SetupTestsResult {

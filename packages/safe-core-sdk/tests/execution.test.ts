@@ -5,8 +5,8 @@ import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe, { SafeTransactionDataPartial } from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
 import { ERC20Mintable, GnosisSafe } from '../typechain'
-import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setup'
 import { getAccounts } from './utils/setupConfig'
+import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 interface SetupTestsResult {

@@ -1,0 +1,51 @@
+import { DeployFunction } from 'hardhat-deploy/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
+
+const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
+  const { deployments, getNamedAccounts } = hre
+  const { deployer } = await getNamedAccounts()
+  const { deploy } = deployments
+
+  await deploy('GnosisSafe', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('GnosisSafeProxyFactory', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('MultiSend', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('DailyLimitModule', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('SocialRecoveryModule', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('ERC20Mintable', {
+    from: deployer,
+    args: [],
+    log: true
+  })
+}
+
+export default deploy

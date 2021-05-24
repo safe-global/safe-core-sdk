@@ -51,7 +51,7 @@ export async function standardizeSafeTransactionData(
   }
 }
 
-const encodeMetaTransaction = (tx: MetaTransactionData): string => {
+function encodeMetaTransaction(tx: MetaTransactionData): string {
   const data = utils.arrayify(tx.data)
   const encoded = utils.solidityPack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
@@ -60,6 +60,6 @@ const encodeMetaTransaction = (tx: MetaTransactionData): string => {
   return encoded.slice(2)
 }
 
-export const encodeMultiSendData = (txs: MetaTransactionData[]): string => {
+export function encodeMultiSendData(txs: MetaTransactionData[]): string {
   return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
 }

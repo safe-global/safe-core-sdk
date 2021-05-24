@@ -15,13 +15,13 @@ function estimateDataGasCosts(data: any): number {
   return data.match(/.{2}/g).reduce(reducer, 0)
 }
 
-export const estimateTxGas = async (
+export async function estimateTxGas(
   safeContract: GnosisSafe,
   to: string,
   valueInWei: string,
   data: string,
   operation: OperationType
-): Promise<number> => {
+): Promise<number> {
   let txGasEstimation = 0
   const safeAddress = safeContract.address
 

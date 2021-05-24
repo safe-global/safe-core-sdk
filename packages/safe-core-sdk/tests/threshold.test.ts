@@ -3,15 +3,9 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
-import { GnosisSafe } from '../typechain'
 import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
-
-interface SetupTestsResult {
-  safe: GnosisSafe
-  contractNetworks: ContractNetworksConfig
-}
 
 describe('Safe Threshold', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {

@@ -5,7 +5,6 @@ import { deployments, waffle } from 'hardhat'
 import EthersSafe from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
-import { DailyLimitModule, GnosisSafe, SocialRecoveryModule } from '../typechain'
 import { getAccounts } from './utils/setupConfig'
 import {
   getDailyLimitModule,
@@ -14,13 +13,6 @@ import {
   getSocialRecoveryModule
 } from './utils/setupContracts'
 chai.use(chaiAsPromised)
-
-interface SetupTestsResult {
-  safe: GnosisSafe
-  contractNetworks: ContractNetworksConfig
-  dailyLimitModule: DailyLimitModule
-  socialRecoveryModule: SocialRecoveryModule
-}
 
 describe('Safe modules manager', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {

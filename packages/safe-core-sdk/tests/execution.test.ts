@@ -4,16 +4,9 @@ import { BigNumber } from 'ethers'
 import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe, { SafeTransactionDataPartial } from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
-import { ERC20Mintable, GnosisSafe } from '../typechain'
 import { getAccounts } from './utils/setupConfig'
 import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
-
-interface SetupTestsResult {
-  safe: GnosisSafe
-  contractNetworks: ContractNetworksConfig
-  erc20Mintable: ERC20Mintable
-}
 
 describe('Transactions execution', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {

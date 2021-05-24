@@ -4,16 +4,9 @@ import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe from '../src'
 import { ContractNetworksConfig, defaultContractNetworks } from '../src/configuration/contracts'
 import { ZERO_ADDRESS } from '../src/utils/constants'
-import { GnosisSafe } from '../typechain'
 import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
-
-interface SetupTestsResult {
-  safe: GnosisSafe
-  chainId: number
-  contractNetworks: ContractNetworksConfig
-}
 
 describe('Safe contracts manager', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {

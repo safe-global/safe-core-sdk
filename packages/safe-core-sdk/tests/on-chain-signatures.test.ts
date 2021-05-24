@@ -4,15 +4,9 @@ import { ethers } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import EthersSafe from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
-import { GnosisSafe } from '../typechain'
 import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
-
-interface SetupTestsResult {
-  safe: GnosisSafe
-  contractNetworks: ContractNetworksConfig
-}
 
 describe('On-chain signatures', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {

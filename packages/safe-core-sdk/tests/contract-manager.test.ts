@@ -6,6 +6,7 @@ import { ContractNetworksConfig, defaultContractNetworks } from '../src/configur
 import { ZERO_ADDRESS } from '../src/utils/constants'
 import { GnosisSafe } from '../typechain'
 import { getMultiSend, getSafeWithOwners } from './utils/setup'
+import { getAccounts } from './utils/setupConfig'
 chai.use(chaiAsPromised)
 
 interface SetupTestsResult {
@@ -14,43 +15,46 @@ interface SetupTestsResult {
   contractNetworks: ContractNetworksConfig
 }
 
-describe('Safe Contracts Manager', () => {
-  const [user1] = waffle.provider.getWallets()
-
-  const setupTests = deployments.createFixture(
-    async ({ deployments }): Promise<SetupTestsResult> => {
-      await deployments.fixture()
-      const safe: GnosisSafe = await getSafeWithOwners([user1.address])
-      const chainId: number = (await waffle.provider.getNetwork()).chainId
-      const contractNetworks: ContractNetworksConfig = {
-        [chainId]: { multiSendAddress: (await getMultiSend()).address }
-      }
-      return { safe, chainId, contractNetworks }
+describe('Safe contracts manager', () => {
+  const setupTests = deployments.createFixture(async ({ deployments }) => {
+    await deployments.fixture()
+    const accounts = await getAccounts()
+    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const contractNetworks: ContractNetworksConfig = {
+      [chainId]: { multiSendAddress: (await getMultiSend()).address }
     }
-  )
+    return {
+      safe: await getSafeWithOwners([accounts[0].address]),
+      accounts,
+      contractNetworks,
+      chainId
+    }
+  })
 
-  describe('init', async () => {
+  describe('create', async () => {
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
-      const { safe } = await setupTests()
+      const { safe, accounts } = await setupTests()
+      const [account1] = accounts
       await chai
         .expect(
           EthersSafe.create({
             ethers,
             safeAddress: safe.address,
-            providerOrSigner: user1.provider
+            providerOrSigner: account1.signer.provider
           })
         )
         .to.be.rejectedWith('Safe contracts not found in the current network')
     })
 
     it('should fail if Safe Proxy contract is not deployed in the current network', async () => {
-      const { contractNetworks } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
       await chai
         .expect(
           EthersSafe.create({
             ethers,
             safeAddress: ZERO_ADDRESS,
-            providerOrSigner: user1.provider,
+            providerOrSigner: account1.signer.provider,
             contractNetworks
           })
         )
@@ -58,23 +62,24 @@ describe('Safe Contracts Manager', () => {
     })
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
-      const { safe, chainId } = await setupTests()
+      const { safe, accounts, chainId } = await setupTests()
       const contractNetworks: ContractNetworksConfig = {
         [chainId]: { multiSendAddress: ZERO_ADDRESS }
       }
+      const [account1] = accounts
       await chai
         .expect(
           EthersSafe.create({
             ethers,
             safeAddress: safe.address,
-            providerOrSigner: user1.provider,
+            providerOrSigner: account1.signer.provider,
             contractNetworks
           })
         )
         .to.be.rejectedWith('MultiSend contract is not deployed in the current network')
     })
 
-    it('should use default MultiSend contract', async () => {
+    it('should set default MultiSend contract', async () => {
       const mainnetGnosisDAOSafe = '0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe'
       const safeSdk = await EthersSafe.create({ ethers, safeAddress: mainnetGnosisDAOSafe })
       chai
@@ -82,12 +87,13 @@ describe('Safe Contracts Manager', () => {
         .to.be.eq(defaultContractNetworks[1].multiSendAddress)
     })
 
-    it('should use specified MultiSend contract', async () => {
-      const { safe, chainId, contractNetworks } = await setupTests()
+    it('should set the MultiSend contract available in the current network', async () => {
+      const { safe, accounts, chainId, contractNetworks } = await setupTests()
+      const [account1] = accounts
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user1.provider,
+        providerOrSigner: account1.signer.provider,
         contractNetworks
       })
       chai

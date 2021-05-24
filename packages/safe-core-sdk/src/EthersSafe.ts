@@ -5,8 +5,8 @@ import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import Safe, { ConnectEthersSafeConfig, EthersSafeConfig } from './Safe'
 import { sameString } from './utils'
-import { generatePreValidatedSignature } from './utils/signatures'
-import { EthSignSignature, SafeSignature } from './utils/signatures/SafeSignature'
+import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
+import { SafeSignature } from './utils/signatures/SafeSignature'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import SafeTransaction, {
   OperationType,
@@ -306,9 +306,7 @@ class EthersSafe implements Safe {
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-    const messageArray = this.#ethers.utils.arrayify(hash)
-    const signature = await this.#signer.signMessage(messageArray)
-    return new EthSignSignature(signerAddress, signature)
+    return generateSignature(this.#ethers, this.#signer, hash)
   }
 
   /**

@@ -1,4 +1,4 @@
-name: 'Safe Core SDK Tests'
+name: Hardhat Test
 on: [push, pull_request]
 jobs:
   test:

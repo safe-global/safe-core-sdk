@@ -5,36 +5,39 @@ import { deployments, waffle } from 'hardhat'
 import EthersSafe from '../src'
 import { ContractNetworksConfig } from '../src/configuration/contracts'
 import { GnosisSafe } from '../typechain'
-import { getMultiSend, getSafeWithOwners } from './utils/setup'
+import { getAccounts } from './utils/setupConfig'
+import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
 
 interface SetupTestsResult {
   safe: GnosisSafe
+  accounts: Account[]
   contractNetworks: ContractNetworksConfig
 }
 
 describe('Off-chain signatures', () => {
-  const [user1, user2, user3] = waffle.provider.getWallets()
-
-  const setupTests = deployments.createFixture(
-    async ({ deployments }): Promise<SetupTestsResult> => {
-      await deployments.fixture()
-      const safe: GnosisSafe = await getSafeWithOwners([user1.address, user2.address])
-      const chainId: number = (await waffle.provider.getNetwork()).chainId
-      const contractNetworks: ContractNetworksConfig = {
-        [chainId]: { multiSendAddress: (await getMultiSend()).address }
-      }
-      return { safe, contractNetworks }
+  const setupTests = deployments.createFixture(async ({ deployments }) => {
+    await deployments.fixture()
+    const accounts = await getAccounts()
+    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const contractNetworks: ContractNetworksConfig = {
+      [chainId]: { multiSendAddress: (await getMultiSend()).address }
     }
-  )
+    return {
+      safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
+      accounts,
+      contractNetworks
+    }
+  })
 
   describe('signTransactionHash', async () => {
     it('should fail if signer is not provided', async () => {
-      const { safe, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user1.provider,
+        providerOrSigner: account1.signer.provider,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -49,11 +52,12 @@ describe('Off-chain signatures', () => {
     })
 
     it('should fail if signer is not an owner', async () => {
-      const { safe, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const account3 = accounts[2]
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user3,
+        providerOrSigner: account3.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -68,11 +72,12 @@ describe('Off-chain signatures', () => {
     })
 
     it('should sign a transaction hash with the current signer', async () => {
-      const { safe, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user1,
+        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -88,11 +93,12 @@ describe('Off-chain signatures', () => {
 
   describe('signTransaction', async () => {
     it('should fail if signer is not provided', async () => {
-      const { safe, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user1.provider,
+        providerOrSigner: account1.signer.provider,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -104,11 +110,12 @@ describe('Off-chain signatures', () => {
     })
 
     it('should fail if signature is added by an account that is not an owner', async () => {
-      const { safe, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const account3 = accounts[2]
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user3,
+        providerOrSigner: account3.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -122,11 +129,12 @@ describe('Off-chain signatures', () => {
     })
 
     it('should add the signature of the current signer', async () => {
-      const { safe, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user1,
+        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -140,11 +148,12 @@ describe('Off-chain signatures', () => {
     })
 
     it('should ignore duplicated signatures', async () => {
-      const { safe, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
       const safeSdk = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
-        providerOrSigner: user1,
+        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({

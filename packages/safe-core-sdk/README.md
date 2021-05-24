@@ -61,7 +61,7 @@ const transactions: SafeTransactionDataPartial[] = [{
 const safeTransaction = await safeSdk.createTransaction(...transactions)
 ```
 
-Before executing this/these transaction/s, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain and the owner `signer3` would have to explicitly sign it too.
+Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain, the owner `signer2` will sign it on-chain and the owner `signer3` will execute it (the executor also signs the transaction transparently).
 
 ### 2.a. Off-chain signatures
 
@@ -71,16 +71,17 @@ The owner `signer1` signs the transaction off-chain.
 const signer1Signature = await safeSdk.signTransaction(safeTransaction)
 ```
 
-Because the signature is off-chain, there is no interaction with the contract and the signature is available at `tx.signatures`.
+Because the signature is off-chain, there is no interaction with the contract and the signature becomes available at `safeTransaction.signatures`.
 
 ### 2.b. On-chain signatures
 
-After `signer2` account is connected to the SDK as the signer the transaction hash is approved on-chain.
+After `signer2` account is connected to the SDK as the signer the transaction hash will be approved on-chain.
 
 ```js
 const safeSdk2 = await safeSdk.connect({ providerOrSigner: signer2 })
 const txHash = await safeSdk2.getTransactionHash(safeTransaction)
-const signer2Signature = await safeSdk2.approveTransactionHash(txHash)
+const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
+await approveTxResponse.wait()
 ```
 
 ### 3. Transaction execution
@@ -89,11 +90,11 @@ Lastly, `signer3` account is connected to the SDK as the signer and executor of 
 
 ```js
 const safeSdk3 = await safeSdk2.connect({ providerOrSigner: signer3 })
-const txResponse = await safeSdk3.executeTransaction(safeTransaction)
-await txResponse.wait()
+const executeTxResponse = await safeSdk3.executeTransaction(safeTransaction)
+await executeTxResponse.wait()
 ```
 
-All the signatures used to execute the transaction are available at `tx.signatures`.
+All the signatures used to execute the transaction are now available at `safeTransaction.signatures`.
 
 ## API Reference
 

@@ -7,7 +7,6 @@ import { getCreateCallDeployment } from "@gnosis.pm/safe-deployments";
 import EthersSafe, { Safe, SafeSignature, SafeTransaction, SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk";
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction";
-import { poll } from "@ethersproject/web";
 
 const sleep = (duration: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, duration))
 

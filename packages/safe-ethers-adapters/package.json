@@ -1,14 +1,14 @@
 {
-  "name": "@gnosis.pm/safe-ethers-adapter",
+  "name": "@gnosis.pm/safe-ethers-adapters",
   "version": "0.1.0",
-  "description": "Safe Ethers Adapter",
+  "description": "Safe Ethers Adapters",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Gnosis",
     "Safe",
-    "Ethers",
+    "Ethers"
   ],
   "scripts": {
     "build": "yarn rimraf dist && hardhat compile && tsc",
@@ -62,6 +62,8 @@
     }
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk": "^0.1.1"
+    "@gnosis.pm/safe-core-sdk": "^0.1.1",
+    "@gnosis.pm/safe-deployments": "^1.0.0",
+    "axios": "^0.21.1"
   }
 }

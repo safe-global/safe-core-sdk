@@ -1,6 +1,6 @@
-# Safe Core SDK
+# Safe Ethers Adapters
 
-[![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapter.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapter)
+[![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters)
 [![GitHub](https://img.shields.io/github/license/gnosis/safe-core-sdk)](https://github.com/gnosis/safe-core-sdk/blob/main/LICENSE.md)
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/safe-core-sdk/badge.svg?branch=main)](https://coveralls.io/github/gnosis/safe-core-sdk?branch=main)
 

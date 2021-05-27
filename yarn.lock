@@ -1120,6 +1120,11 @@
     solc "0.5.17"
     truffle "^5.1.21"
 
+"@gnosis.pm/safe-deployments@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-deployments/-/safe-deployments-1.0.0.tgz#ba7ab027d8f0563e6f1e472c4073cbcc15db3e90"
+  integrity sha512-ShZMGy4LaP27HqDKDguCGC+6CfS86ceq8gBrnbJvIUNzijSAjeLyJTvjKxTkOl3hAxmyk/DjtO3/DQGE4LVE6g==
+
 "@graphql-tools/batch-delegate@^6.2.4", "@graphql-tools/batch-delegate@^6.2.6":
   version "6.2.6"
   resolved "https://registry.yarnpkg.com/@graphql-tools/batch-delegate/-/batch-delegate-6.2.6.tgz#fbea98dc825f87ef29ea5f3f371912c2a2aa2f2c"

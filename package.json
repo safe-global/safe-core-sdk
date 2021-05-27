@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "sdk:build": "lerna run --scope @gnosis.pm/safe-core-sdk build --stream",
+    "sea:build": "lerna run --scope @gnosis.pm/safe-ethers-adapter build --stream",
     "test": "FORCE_COLOR=1 lerna run test --stream"
   },
   "workspaces": {

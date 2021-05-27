@@ -1,0 +1,67 @@
+{
+  "name": "@gnosis.pm/safe-ethers-adapter",
+  "version": "0.1.0",
+  "description": "Safe Ethers Adapter",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "keywords": [
+    "Ethereum",
+    "Gnosis",
+    "Safe",
+    "Ethers",
+  ],
+  "scripts": {
+    "build": "yarn rimraf dist && hardhat compile && tsc",
+    "test": "hardhat deploy && nyc hardhat test",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnosis/safe-core-sdk.git"
+  },
+  "author": "Gnosis (https://gnosis.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gnosis/safe-core-sdk/issues"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
+  "devDependencies": {
+    "@types/node": "^15.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "dotenv": "^9.0.2",
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "ethers": "^5.1.4",
+    "husky": "^6.0.0",
+    "lerna": "^4.0.0",
+    "lint-staged": "^10.5.4",
+    "nyc": "^15.1.0",
+    "prettier": "^2.3.0",
+    "rimraf": "^3.0.2",
+    "ts-generator": "^0.1.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  },
+  "lint-staged": {
+    "src/**/!(*test).ts": [
+      "yarn lint",
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "dependencies": {
+    "@gnosis.pm/safe-core-sdk": "^0.1.1"
+  }
+}

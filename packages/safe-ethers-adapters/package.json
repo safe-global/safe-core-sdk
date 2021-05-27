@@ -11,8 +11,9 @@
     "Ethers"
   ],
   "scripts": {
-    "build": "yarn rimraf dist && hardhat compile && tsc",
+    "build": "yarn rimraf dist && tsc",
     "test": "hardhat deploy && nyc hardhat test",
+    "example": "ts-node example/index.ts",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"

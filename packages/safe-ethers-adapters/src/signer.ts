@@ -15,10 +15,10 @@ export interface SafeTransactionResponse extends TransactionResponse {
 
 export class SafeEthersSigner extends VoidSigner {
 
-    createLibAddress: string
-    createLibInterface: utils.Interface
-    service: SafeService
-    safe: Safe
+    readonly createLibAddress: string
+    readonly createLibInterface: utils.Interface
+    readonly service: SafeService
+    readonly safe: Safe
 
     static async create(address: string, signer: Signer, service: SafeService, provider?: Provider): Promise<SafeEthersSigner> { 
         const safe = await EthersSafe.create({ethers, safeAddress: address, providerOrSigner: signer})

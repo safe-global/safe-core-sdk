@@ -14,14 +14,8 @@ export class SafeService {
 
     async estimateSafeTx(safe: string, safeTx: SafeTransactionDataPartial): Promise<BigNumber> {
         const url = `${this.serviceUrl}/api/v1/safes/${safe}/multisig-transactions/estimations/`
-        try {
-            console.log({safeTx})
-            const resp = await this.network.post(url, safeTx)
-            return BigNumber.from(resp.data.safeTxGas)
-        } catch (e) {
-            console.log((e as AxiosError).response)
-            throw e
-        }
+        const resp = await this.network.post(url, safeTx)
+        return BigNumber.from(resp.data.safeTxGas)
     }
 
     async getSafeTxDetails(safeTxHash: string): Promise<any> {
@@ -38,13 +32,7 @@ export class SafeService {
             sender: signature.signer,
             signature: signature.data
         }
-        try {
-            console.log({data})
-            const resp = await this.network.post(url, data)
-            return resp.data
-        } catch (e) {
-            console.log((e as AxiosError).response)
-            throw e
-        }
+        const resp = await this.network.post(url, data)
+        return resp.data
     }
 }

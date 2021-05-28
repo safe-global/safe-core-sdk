@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinonChai from 'sinon-chai'
-import { SafeService } from '../src/signer'
+import { SafeService } from '../src/'
 import sinon from 'sinon'
 import { BigNumber } from '@ethersproject/bignumber'
 import { SafeTransaction } from '@gnosis.pm/safe-core-sdk'

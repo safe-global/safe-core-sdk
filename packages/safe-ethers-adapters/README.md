@@ -32,7 +32,7 @@ npm build
 
 ## Getting Started
 
-TBD
+See [examples](./examples) to get started.
 
 ## License
 

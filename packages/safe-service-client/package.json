@@ -64,6 +64,7 @@
     }
   },
   "dependencies": {
+    "@gnosis.pm/safe-core-sdk-types": "^0.1.0",
     "axios": "^0.21.1"
   }
 }

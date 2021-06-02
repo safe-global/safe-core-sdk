@@ -3,14 +3,14 @@ import { VoidSigner, Signer } from "@ethersproject/abstract-signer";
 import { Provider, TransactionResponse, TransactionRequest, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { Deferrable } from "@ethersproject/properties";
 import EthersSafe, { Safe } from "@gnosis.pm/safe-core-sdk";
-import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction";
+import { SafeTransactionData, OperationType } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction";
 import { SafeService } from "service";
 import { createLibAddress, createLibInterface, mapReceipt } from "./utils";
 
 const sleep = (duration: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, duration))
 
 export interface SafeTransactionResponse extends TransactionResponse {
-    operation: number
+    operation: OperationType
 }
 
 export interface SafeEthersSignerOptions {
@@ -84,7 +84,7 @@ export class SafeEthersSigner extends VoidSigner {
      */
     async sendTransaction(transaction: Deferrable<TransactionRequest>): Promise<SafeTransactionResponse> {
         const tx = await transaction
-        let operation = 0
+        let operation = OperationType.Call
         let to = await tx.to
         let data = (await tx.data)?.toString() ?? "0x"
         let value = BigNumber.from(await tx.value ?? 0)
@@ -92,7 +92,7 @@ export class SafeEthersSigner extends VoidSigner {
             to = createLibAddress
             data = createLibInterface.encodeFunctionData("performCreate", [value, data])
             value = BigNumber.from(0)
-            operation = 1
+            operation = OperationType.DelegateCall
         }
         const baseTx = {
             to: to!!,

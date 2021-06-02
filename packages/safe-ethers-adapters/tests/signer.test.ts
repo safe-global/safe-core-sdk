@@ -193,6 +193,7 @@ describe('SafeEthersSigner', () => {
       const service: any = { 
         getSafeTxDetails : sinon.fake.returns(safeTxDetails)
       }
+      // ExecutionSuccess event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
       const logs = [
         {
           topics: [
@@ -238,6 +239,7 @@ describe('SafeEthersSigner', () => {
       const service: any = { 
         getSafeTxDetails : sinon.fake.returns(safeTxDetails)
       }
+      // ExecutionFailure event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L48)
       const logs = [
         {
           topics: [
@@ -284,6 +286,7 @@ describe('SafeEthersSigner', () => {
       const service: any = { 
         getSafeTxDetails : sinon.fake.returns(safeTxDetails)
       }
+      // ExecutionSuccess event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
       const logs = [
         {
           topics: [
@@ -330,6 +333,9 @@ describe('SafeEthersSigner', () => {
       const service: any = { 
         getSafeTxDetails : sinon.fake.returns(safeTxDetails)
       }
+      // ExecutionSuccess event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
+      // and
+      // ContractCreation event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/libraries/CreateCall.sol#L7)
       const logs = [
         {
           topics: [

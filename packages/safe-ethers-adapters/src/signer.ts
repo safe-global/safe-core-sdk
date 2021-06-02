@@ -30,7 +30,7 @@ export class SafeEthersSigner extends VoidSigner {
      * @param service - Services to which the transactions should be proposed to
      * @param provider - (Optional) Provider that should be used for blockchain interactions. By default the provider from the signer is used.
      * @param options - (Optional) Additional options (e.g. polling delay when waiting for a transaction to be mined)
-     * @returns The Safe Core SDK instance
+     * @returns The SafeEthersSigner instance
      */
     static async create(address: string, signer: Signer, service: SafeService, provider?: Provider, options?: SafeEthersSignerOptions): Promise<SafeEthersSigner> {
         const safe = await EthersSafe.create({ ethers, safeAddress: address, providerOrSigner: signer })

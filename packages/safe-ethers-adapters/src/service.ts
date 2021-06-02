@@ -44,7 +44,7 @@ export class SafeService {
     /**
      * Propose a new Safe transaction to the service
      *
-     * @param safe - Address of the Safe for which this transaction should be proposed
+     * @param safeAddress - Address of the Safe for which this transaction should be proposed
      * @param safeTxHash - Hash of the Safe transaction
      * @param safeTx - Safe transaction that should be proposed
      * @param signature - Signature of an owner or a delegate of an owner of the specified Safe to authorize the proposal

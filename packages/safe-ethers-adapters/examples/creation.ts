@@ -1,4 +1,4 @@
-import { SafeEthersSigner, SafeService } from '../src/signer'
+import { SafeEthersSigner, SafeService } from '../src'
 import dotenv from 'dotenv'
 import { Wallet } from '@ethersproject/wallet'
 import { JsonRpcProvider } from '@ethersproject/providers'

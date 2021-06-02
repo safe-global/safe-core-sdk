@@ -62,7 +62,7 @@ export class SafeEthersSigner extends VoidSigner {
                         if (txDetails.transactionHash) {
                             this._checkProvider("sendTransaction")
                             const receipt = await this.provider!!.waitForTransaction(txDetails.transactionHash, confirmations)
-                            // update status with Safe tx status and extract created contract
+                            // Update status with Safe tx status and extract created contract
                             // TODO load topic strings from abi
                             const success = receipt.logs.find((log: any) => log.topics[0] === "0x442e715f626346e8c54381002da614f62bee8d27386535b2521ec8540898556e")
                             receipt.status = !!success ? 1 : 0

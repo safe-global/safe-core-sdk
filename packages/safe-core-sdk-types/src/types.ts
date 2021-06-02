@@ -38,7 +38,7 @@ export interface SafeSignature {
 
 export interface SafeTransaction {
   readonly data: SafeTransactionData
-  signatures: Map<string, SafeSignature>
+  readonly signatures: Map<string, SafeSignature>
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
 }

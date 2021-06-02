@@ -166,7 +166,7 @@ describe('SafeEthersSigner', () => {
       const receipt = await response.wait()
       chai.expect(receipt.transactionHash).to.be.equals("some_eth_tx_hash")
       chai.expect(receipt.status).to.be.equals(0)
-      chai.expect(receipt.contractAddress).to.be.null
+      chai.expect(receipt.contractAddress).to.be.undefined
       chai.expect(service.getSafeTxDetails).to.have.been.calledWith(
         "some_safe_tx_hash"
       )
@@ -211,7 +211,7 @@ describe('SafeEthersSigner', () => {
       const receipt = await response.wait()
       chai.expect(receipt.transactionHash).to.be.equals("some_eth_tx_hash")
       chai.expect(receipt.status).to.be.equals(1)
-      chai.expect(receipt.contractAddress).to.be.null
+      chai.expect(receipt.contractAddress).to.be.undefined
       chai.expect(service.getSafeTxDetails).to.have.been.calledWith(
         "some_safe_tx_hash"
       )
@@ -256,7 +256,7 @@ describe('SafeEthersSigner', () => {
       const receipt = await response.wait()
       chai.expect(receipt.transactionHash).to.be.equals("some_eth_tx_hash")
       chai.expect(receipt.status).to.be.equals(0)
-      chai.expect(receipt.contractAddress).to.be.null
+      chai.expect(receipt.contractAddress).to.be.undefined
       chai.expect(service.getSafeTxDetails).to.have.been.calledWith(
         "some_safe_tx_hash"
       )
@@ -301,8 +301,8 @@ describe('SafeEthersSigner', () => {
       chai.expect(response.operation).to.be.equals(1)
       const receipt = await response.wait()
       chai.expect(receipt.transactionHash).to.be.equals("some_eth_tx_hash")
-      chai.expect(receipt.status).to.be.equals(0)
-      chai.expect(receipt.contractAddress).to.be.null
+      chai.expect(receipt.status).to.be.equals(1)
+      chai.expect(receipt.contractAddress).to.be.undefined
       chai.expect(service.getSafeTxDetails).to.have.been.calledWith(
         "some_safe_tx_hash"
       )

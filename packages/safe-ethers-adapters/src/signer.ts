@@ -25,17 +25,26 @@ export class SafeEthersSigner extends VoidSigner {
     readonly safe: Safe
     readonly options?: SafeEthersSignerOptions
 
-    static async create(address: string, signer: Signer, service: SafeService, provider?: Provider, options?: SafeEthersSignerOptions): Promise<SafeEthersSigner> { 
-        const safe = await EthersSafe.create({ethers, safeAddress: address, providerOrSigner: signer})
+    /**
+     * Creates an instance of the SafeEthersSigner.
+     * @param address - Address of the Safe that should be used
+     * @param signer - Owner or delegate of an owner for the specified Safe
+     * @param service - Services to which the transactions should be proposed to
+     * @param provider - (Optional) Provider that should be used for blockchain interactions. By default the provider from the signer is used.
+     * @param options - (Optional) Additional options (e.g. polling delay when waiting for a transaction to be mined)
+     * @returns The Safe Core SDK instance
+     */
+    static async create(address: string, signer: Signer, service: SafeService, provider?: Provider, options?: SafeEthersSignerOptions): Promise<SafeEthersSigner> {
+        const safe = await EthersSafe.create({ ethers, safeAddress: address, providerOrSigner: signer })
         return new SafeEthersSigner(safe, service, provider, options)
     }
-    
+
     constructor(safe: Safe, service: SafeService, provider?: Provider, options?: SafeEthersSignerOptions) {
         super(safe.getAddress(), provider)
         const createLibDeployment = getCreateCallDeployment()
         this.service = service
-        this.createLibAddress = createLibDeployment!!.defaultAddress 
-        this.createLibInterface = new utils.Interface(createLibDeployment!!.abi) 
+        this.createLibAddress = createLibDeployment!!.defaultAddress
+        this.createLibInterface = new utils.Interface(createLibDeployment!!.abi)
         this.safe = safe
         this.options = options
     }
@@ -45,7 +54,7 @@ export class SafeEthersSigner extends VoidSigner {
         const connectedService = this.service;
         return {
             to: safeTx.to,
-            value: BigNumber.from(safeTx.value), 
+            value: BigNumber.from(safeTx.value),
             data: safeTx.data,
             operation: safeTx.operation,
             gasLimit: BigNumber.from(safeTx.safeTxGas),
@@ -68,7 +77,7 @@ export class SafeEthersSigner extends VoidSigner {
                             receipt.status = !!success ? 1 : 0
                             if (safeTx.to.toLowerCase() === this.createLibAddress.toLowerCase()) {
                                 const creationLog = receipt.logs.find((log: any) => log.topics[0] === "0x4db17dd5e4732fb6da34a148104a592783ca119a1e7bb8829eba6cbadef0b511")
-                                if(creationLog)
+                                if (creationLog)
                                     receipt.contractAddress = utils.getAddress("0x" + creationLog.data.slice(creationLog.data.length - 40))
                             }
                             return receipt
@@ -81,7 +90,12 @@ export class SafeEthersSigner extends VoidSigner {
         }
     }
 
-    // Populates all fields in a transaction, signs it and sends it to the network
+    /**
+     * Populates all fields in a transaction, signs it and sends it to the Safe transaction service
+     *
+     * @param transaction - The transaction what should be send
+     * @returns A promise that resolves to a SafeTransactionReponse, that contains all the information of the transaction.
+     */
     async sendTransaction(transaction: Deferrable<TransactionRequest>): Promise<SafeTransactionResponse> {
         const tx = await transaction
         let operation = 0

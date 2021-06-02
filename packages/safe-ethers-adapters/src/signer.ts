@@ -13,25 +13,31 @@ export interface SafeTransactionResponse extends TransactionResponse {
     operation: number
 }
 
+export interface SafeEthersSignerOptions {
+    pollingDelay?: number
+}
+
 export class SafeEthersSigner extends VoidSigner {
 
     readonly createLibAddress: string
     readonly createLibInterface: utils.Interface
     readonly service: SafeService
     readonly safe: Safe
+    readonly options?: SafeEthersSignerOptions
 
-    static async create(address: string, signer: Signer, service: SafeService, provider?: Provider): Promise<SafeEthersSigner> { 
+    static async create(address: string, signer: Signer, service: SafeService, provider?: Provider, options?: SafeEthersSignerOptions): Promise<SafeEthersSigner> { 
         const safe = await EthersSafe.create({ethers, safeAddress: address, providerOrSigner: signer})
-        return new SafeEthersSigner(safe, service, provider)
+        return new SafeEthersSigner(safe, service, provider, options)
     }
     
-    constructor(safe: Safe, service: SafeService, provider?: Provider) {
+    constructor(safe: Safe, service: SafeService, provider?: Provider, options?: SafeEthersSignerOptions) {
         super(safe.getAddress(), provider)
         const createLibDeployment = getCreateCallDeployment()
         this.service = service
         this.createLibAddress = createLibDeployment!!.defaultAddress 
         this.createLibInterface = new utils.Interface(createLibDeployment!!.abi) 
         this.safe = safe
+        this.options = options
     }
 
     async buildTransactionResponse(safeTxHash: string, safeTx: SafeTransactionData): Promise<SafeTransactionResponse> {
@@ -69,7 +75,7 @@ export class SafeEthersSigner extends VoidSigner {
                         }
                     } catch (e) {
                     }
-                    await sleep(5000)
+                    await sleep(this.options?.pollingDelay ?? 5000)
                 }
             }
         }

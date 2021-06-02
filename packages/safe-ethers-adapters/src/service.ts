@@ -2,6 +2,10 @@ import { BigNumber } from "ethers";
 import { SafeSignature, SafeTransaction, SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk";
 import axios, { AxiosError, AxiosInstance } from "axios";
 
+export interface SafeTxDetails {
+    transactionHash?: string
+}
+
 export class SafeService {
 
     serviceUrl: string
@@ -18,9 +22,9 @@ export class SafeService {
         return BigNumber.from(resp.data.safeTxGas)
     }
 
-    async getSafeTxDetails(safeTxHash: string): Promise<any> {
+    async getSafeTxDetails(safeTxHash: string): Promise<SafeTxDetails> {
         const url = `${this.serviceUrl}/api/v1/multisig-transactions/${safeTxHash}`
-        const resp = await this.network.get(url)
+        const resp = await this.network.get<SafeTxDetails>(url)
         return resp.data
     }
 

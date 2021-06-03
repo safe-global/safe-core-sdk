@@ -6,6 +6,7 @@
     "build:sdk-types": "lerna run --scope @gnosis.pm/safe-core-sdk-types build --stream",
     "build:sdk": "lerna run --scope @gnosis.pm/safe-core-sdk build --stream",
     "build:service": "lerna run --scope @gnosis.pm/safe-service-client build --stream",
+    "build:sea:": "lerna run --scope @gnosis.pm/safe-ethers-adapters build --stream",
     "test": "FORCE_COLOR=1 lerna run test --stream"
   },
   "workspaces": {

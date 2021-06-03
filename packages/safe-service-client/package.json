@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-service-client",
-  "version": "0.1.0",
+  "version": "v0.1.0-alpha.0",
   "description": "Safe Service Client",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

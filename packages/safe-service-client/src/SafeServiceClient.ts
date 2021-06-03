@@ -2,6 +2,7 @@ import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-typ
 import SafeTransactionService from './SafeTransactionService'
 import {
   MasterCopyResponse,
+  OwnerResponse,
   SafeBalanceResponse,
   SafeBalanceUsdResponse,
   SafeCollectibleResponse,
@@ -17,6 +18,7 @@ import {
   SafeMultisigTransactionListResponse,
   SafeMultisigTransactionResponse,
   SafeServiceInfoResponse,
+  SignatureResponse,
   TokenInfoListResponse,
   TokenInfoResponse,
   TransferListResponse
@@ -44,7 +46,7 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
-   * Returns the list of Safe master copies
+   * Returns the list of Safe master copies.
    *
    * @returns The list of Safe master copies
    */
@@ -56,7 +58,7 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
-   * Decodes the specified Safe transaction data
+   * Decodes the specified Safe transaction data.
    *
    * @param data - The Safe transaction data
    * @returns The transaction data decoded
@@ -78,7 +80,7 @@ class SafeServiceClient implements SafeTransactionService {
    * @returns The list of Safes where the address provided is an owner
    * @throws "422 Owner address checksum not valid"
    */
-  async getSafesByOwner(ownerAddress: string): Promise<string[]> {
+  async getSafesByOwner(ownerAddress: string): Promise<OwnerResponse> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/owners/${ownerAddress}/`,
       method: HttpMethod.Get
@@ -123,7 +125,7 @@ class SafeServiceClient implements SafeTransactionService {
    * @throws "400 Malformed data"
    * @throws "422 Error processing data"
    */
-  async confirmTransaction(safeTxHash: string, signature: string): Promise<any> {
+  async confirmTransaction(safeTxHash: string, signature: string): Promise<SignatureResponse> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/multisig-transactions/${safeTxHash}/confirmations/`,
       method: HttpMethod.Post,
@@ -250,18 +252,15 @@ class SafeServiceClient implements SafeTransactionService {
     transaction: SafeTransactionData,
     transactionHash: string,
     signature: SafeSignature
-  ): Promise<string> {
+  ): Promise<void> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/multisig-transactions/`,
       method: HttpMethod.Post,
       body: {
-        data: {
-          ...transaction,
-          contractTransactionHash: transactionHash,
-          sender: signature.signer,
-          signature: signature.data
-        },
-        safe: safeAddress
+        ...transaction,
+        contractTransactionHash: transactionHash,
+        sender: signature.signer,
+        signature: signature.data
       }
     })
   }

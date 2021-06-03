@@ -35,6 +35,10 @@ export type SafeInfoResponse = {
   readonly version: string
 }
 
+export type OwnerResponse = {
+  safes: string[]
+}
+
 export type SafeCreationInfoResponse = {
   readonly created: string
   readonly creator: string
@@ -80,6 +84,10 @@ export type SafeMultisigTransactionEstimate = {
 
 export type SafeMultisigTransactionEstimateResponse = {
   readonly safeTxGas: string
+}
+
+export type SignatureResponse = {
+  readonly signature: string
 }
 
 type SafeMultisigConfirmationResponse = {

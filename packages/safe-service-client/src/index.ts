@@ -1,5 +1,7 @@
 import SafeServiceClient from './SafeServiceClient'
 import {
+  MasterCopyResponse,
+  OwnerResponse,
   SafeBalanceResponse,
   SafeBalanceUsdResponse,
   SafeCollectibleResponse,
@@ -15,6 +17,7 @@ import {
   SafeMultisigTransactionListResponse,
   SafeMultisigTransactionResponse,
   SafeServiceInfoResponse,
+  SignatureResponse,
   TokenInfoListResponse,
   TokenInfoResponse,
   TransferListResponse
@@ -22,6 +25,8 @@ import {
 
 export default SafeServiceClient
 export {
+  MasterCopyResponse,
+  OwnerResponse,
   SafeBalanceResponse,
   SafeBalanceUsdResponse,
   SafeCollectibleResponse,
@@ -37,6 +42,7 @@ export {
   SafeMultisigTransactionListResponse,
   SafeMultisigTransactionResponse,
   SafeServiceInfoResponse,
+  SignatureResponse,
   TokenInfoListResponse,
   TokenInfoResponse,
   TransferListResponse

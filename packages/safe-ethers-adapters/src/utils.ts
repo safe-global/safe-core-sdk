@@ -1,4 +1,4 @@
-import { SafeTransactionData } from '@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction'
+import { SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { getCreateCallDeployment } from '@gnosis.pm/safe-deployments'
 import { providers, utils } from 'ethers'
 

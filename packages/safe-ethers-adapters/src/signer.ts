@@ -1,17 +1,14 @@
-import { ethers, BigNumber } from 'ethers'
-import { VoidSigner, Signer } from '@ethersproject/abstract-signer'
 import {
   Provider,
-  TransactionResponse,
+  TransactionReceipt,
   TransactionRequest,
-  TransactionReceipt
+  TransactionResponse
 } from '@ethersproject/abstract-provider'
+import { Signer, VoidSigner } from '@ethersproject/abstract-signer'
 import { Deferrable } from '@ethersproject/properties'
 import EthersSafe, { Safe } from '@gnosis.pm/safe-core-sdk'
-import {
-  SafeTransactionData,
-  OperationType
-} from '@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction'
+import { OperationType, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import { BigNumber, ethers } from 'ethers'
 import { SafeService } from 'service'
 import { createLibAddress, createLibInterface, mapReceipt } from './utils'
 

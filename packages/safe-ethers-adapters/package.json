@@ -73,7 +73,7 @@
     }
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk": "^0.1.1",
+    "@gnosis.pm/safe-core-sdk": "^0.1.2",
     "@gnosis.pm/safe-core-sdk-types": "^0.1.0",
     "@gnosis.pm/safe-deployments": "^1.0.0",
     "axios": "^0.21.1"

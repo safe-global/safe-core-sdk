@@ -44,7 +44,7 @@ export class SafeEthersSigner extends VoidSigner {
     provider?: Provider,
     options?: SafeEthersSignerOptions
   ): Promise<SafeEthersSigner> {
-    const safe = await EthersSafe.create({ ethers, safeAddress: address, providerOrSigner: signer })
+    const safe = await EthersSafe.create(ethers, address, signer)
     return new SafeEthersSigner(safe, service, provider, options)
   }
 

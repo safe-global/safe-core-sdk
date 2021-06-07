@@ -1,9 +1,9 @@
 {
-  "extends": "../tsconfig.settings.json",
+  "extends": "../../tsconfig.settings.json",
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
     "baseUrl": "src"
   },
-  "include": ["src"]
+  "include": ["src", "src/**/*.json", "typechain"]
 }

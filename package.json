@@ -1,10 +1,9 @@
-
 {
   "name": "safe-core-sdk",
   "private": true,
   "scripts": {
-    "sdk:build": "lerna run --scope @gnosis.pm/safe-core-sdk build --stream",
-    "sea:build": "lerna run --scope @gnosis.pm/safe-ethers-adapters build --stream",
+    "clean": "lerna clean",
+    "unbuild": "lerna run unbuild",
     "build": "lerna run build --stream",
     "test": "FORCE_COLOR=1 lerna run test --stream"
   },
@@ -13,7 +12,8 @@
       "packages/*"
     ]
   },
-  "dependencies": {
-    "lerna": "^4.0.0"
+  "devDependencies": {
+    "lerna": "^4.0.0",
+    "rimraf": "^3.0.2"
   }
 }

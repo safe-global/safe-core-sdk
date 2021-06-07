@@ -1,8 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.settings.json",
   "compilerOptions": {
-    "outDir": "./dist", /* Redirect output structure to the directory. */
-    "baseUrl": "./src", /* Base directory to resolve non-absolute module names. */
+    "composite": true,
+    "outDir": "dist",
+    "baseUrl": "src"
   },
-  "include": ["./src"]
+  "include": ["src", "src/**/*.json", "typechain"]
 }

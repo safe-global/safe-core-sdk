@@ -13,32 +13,17 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
   return new EthSignSignature(ownerAddress, signature)
 }
 
-export async function generateSignature(
-  ethers: any,
-  signer: Signer,
-  hash: string
-): Promise<EthSignSignature> {
-  const signerAddress = await signer.getAddress()
-  const messageArray = ethers.utils.arrayify(hash)
-  let signature = await signer.signMessage(messageArray)
-  const hasPrefix = isTxHashSignedWithPrefix(hash, signature, signerAddress)
-  let signatureV = parseInt(signature.slice(-2), 16)
-  switch (signatureV) {
-    case 0:
-    case 1:
-      signatureV += 31
-      break
-    case 27:
-    case 28:
-      if (hasPrefix) {
-        signatureV += 4
-      }
-      break
-    default:
-      throw new Error('Invalid signature')
-  }
-  signature = signature.slice(0, -2) + signatureV.toString(16)
-  return new EthSignSignature(signerAddress, signature)
+function isWalletConnectProvider(signer: Signer) {
+  return !!((signer?.provider as any)?.provider?.wc)
+}
+
+async function generateWalletConnectSignature(ethers: any, hash: any, signer: Signer): Promise<string> {
+  const prefix = ethers.utils.toUtf8Bytes(`\x19Ethereum Signed Message:\n${hash.length}`)
+  const message = ethers.utils.concat([prefix, hash])
+  const keccakMessage = ethers.utils.keccak256(message)
+  const wc = (signer?.provider as any)?.provider
+  const signature = await wc.connector.signMessage([await signer.getAddress(), keccakMessage])
+  return signature
 }
 
 function isTxHashSignedWithPrefix(
@@ -65,4 +50,39 @@ function isTxHashSignedWithPrefix(
     hasPrefix = true
   }
   return hasPrefix
+}
+
+function adjustVInSignature(signature: string, hasPrefix: boolean) {
+  let signatureV = parseInt(signature.slice(-2), 16)
+  switch (signatureV) {
+    case 0:
+    case 1:
+      signatureV += 31
+      break
+    case 27:
+    case 28:
+      if (hasPrefix) {
+        signatureV += 4
+      }
+      break
+    default:
+      throw new Error('Invalid signature')
+  }
+  signature = signature.slice(0, -2) + signatureV.toString(16)
+  return signature
+}
+
+export async function generateSignature(
+  ethers: any,
+  signer: Signer,
+  hash: string
+): Promise<EthSignSignature> {
+  const signerAddress = await signer.getAddress()
+  const messageArray = ethers.utils.arrayify(hash)
+  let signature = isWalletConnectProvider(signer)
+    ? await generateWalletConnectSignature(ethers, messageArray, signer)
+    : await signer.signMessage(messageArray)
+  const hasPrefix = isTxHashSignedWithPrefix(hash, signature, signerAddress)
+  signature = adjustVInSignature(signature, hasPrefix)
+  return new EthSignSignature(signerAddress, signature)
 }

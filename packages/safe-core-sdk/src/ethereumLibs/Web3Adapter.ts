@@ -37,7 +37,7 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getCode(address)
   }
 
-  async getAccount(): Promise<string> {
+  async getSignerAddress(): Promise<string> {
     return this.#web3.eth.defaultAccount || (await this.#web3.eth.getAccounts())[0]
   }
 

@@ -7,7 +7,7 @@ interface EthAdapter {
   getChainId(): Promise<number>
   getContract(address: string, abi: Abi): any
   getContractCode(address: string): Promise<string>
-  getAccount(): Promise<string>
+  getSignerAddress(): Promise<string>
   signMessage(message: string, signerAddress: string): Promise<string>
 }
 

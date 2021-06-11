@@ -250,7 +250,7 @@ class EthersSafe implements Safe {
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
     const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getAccount()
+    const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
@@ -281,7 +281,7 @@ class EthersSafe implements Safe {
    */
   async approveTransactionHash(hash: string): Promise<ContractTransaction> {
     const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getAccount()
+    const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
@@ -435,7 +435,7 @@ class EthersSafe implements Safe {
       safeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getAccount()
+    const signerAddress = await this.#ethAdapter.getSignerAddress()
     if (owners.includes(signerAddress)) {
       safeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }

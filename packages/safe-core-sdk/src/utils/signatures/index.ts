@@ -17,7 +17,7 @@ export async function generateSignature(
   ethAdapter: EthAdapter,
   hash: string
 ): Promise<EthSignSignature> {
-  const signerAddress = await ethAdapter.getAccount()
+  const signerAddress = await ethAdapter.getSignerAddress()
   let signature = await ethAdapter.signMessage(hash, signerAddress)
   const hasPrefix = isTxHashSignedWithPrefix(hash, signature, signerAddress)
   let signatureV = parseInt(signature.slice(-2), 16)

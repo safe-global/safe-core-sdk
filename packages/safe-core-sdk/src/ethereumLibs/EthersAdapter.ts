@@ -61,7 +61,7 @@ class EthersAdapter implements EthAdapter {
     return this.#provider.getCode(address)
   }
 
-  async getAccount(): Promise<string> {
+  async getSignerAddress(): Promise<string> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }

@@ -1,23 +1,21 @@
-import { Provider } from '@ethersproject/providers'
-import { BigNumber, ContractTransaction, Signer } from 'ethers'
+import { BigNumber, ContractTransaction } from 'ethers'
 import { ContractNetworksConfig } from './configuration/contracts'
+import EthAdapter from './ethereumLibs/EthAdapter'
 import { SafeSignature } from './utils/signatures/SafeSignature'
 import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 
 export interface EthersSafeConfig {
-  /** ethers - Ethers v5 library */
-  ethers: any
+  /** ethAdapter - Ethereum adapter */
+  ethAdapter: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress: string
-  /** providerOrSigner - Ethers provider or signer */
-  providerOrSigner?: Provider | Signer
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
 
 export interface ConnectEthersSafeConfig {
-  /** providerOrSigner - Ethers provider or signer */
-  providerOrSigner: Provider | Signer
+  /** ethAdapter - Ethereum adapter */
+  ethAdapter: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
   /** contractNetworks - Contract network configuration */
@@ -25,9 +23,7 @@ export interface ConnectEthersSafeConfig {
 }
 
 interface Safe {
-  connect({ providerOrSigner, safeAddress, contractNetworks }: ConnectEthersSafeConfig): void
-  getProvider(): Provider
-  getSigner(): Signer | undefined
+  connect({ ethAdapter, safeAddress, contractNetworks }: ConnectEthersSafeConfig): void
   getAddress(): string
   getMultiSendAddress(): string
   getContractVersion(): Promise<string>

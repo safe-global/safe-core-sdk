@@ -1,5 +1,5 @@
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
-import { Signer } from 'ethers'
+import EthAdapter from 'ethereumLibs/EthAdapter'
 import { sameString } from '../../utils'
 import { EthSignSignature, SafeSignature } from './SafeSignature'
 
@@ -14,13 +14,11 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
 }
 
 export async function generateSignature(
-  ethers: any,
-  signer: Signer,
+  ethAdapter: EthAdapter,
   hash: string
 ): Promise<EthSignSignature> {
-  const signerAddress = await signer.getAddress()
-  const messageArray = ethers.utils.arrayify(hash)
-  let signature = await signer.signMessage(messageArray)
+  const signerAddress = await ethAdapter.getAccount()
+  let signature = await ethAdapter.signMessage(hash, signerAddress)
   const hasPrefix = isTxHashSignedWithPrefix(hash, signature, signerAddress)
   let signatureV = parseInt(signature.slice(-2), 16)
   switch (signatureV) {

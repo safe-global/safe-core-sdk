@@ -1,5 +1,5 @@
-import { Provider } from '@ethersproject/providers'
-import { BigNumber, ContractTransaction, Signer } from 'ethers'
+import EthAdapter from 'ethereumLibs/EthAdapter'
+import { BigNumber, ContractTransaction } from 'ethers'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
@@ -19,12 +19,10 @@ import {
 } from './utils/transactions/utils'
 
 class EthersSafe implements Safe {
-  #ethers: any
+  #ethAdapter!: EthAdapter
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
   #moduleManager!: ModuleManager
-  #provider!: Provider
-  #signer?: Signer
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -35,13 +33,12 @@ class EthersSafe implements Safe {
    * @throws "MultiSend contract is not deployed in the current network"
    */
   static async create({
-    ethers,
+    ethAdapter,
     safeAddress,
-    providerOrSigner,
     contractNetworks
   }: EthersSafeConfig): Promise<EthersSafe> {
     const safeSdk = new EthersSafe()
-    await safeSdk.init({ ethers, safeAddress, providerOrSigner, contractNetworks })
+    await safeSdk.init({ ethAdapter, safeAddress, contractNetworks })
     return safeSdk
   }
 
@@ -54,34 +51,18 @@ class EthersSafe implements Safe {
    * @throws "MultiSend contract is not deployed in the current network"
    */
   private async init({
-    ethers,
+    ethAdapter,
     safeAddress,
-    providerOrSigner,
     contractNetworks
   }: EthersSafeConfig): Promise<void> {
-    const currentProviderOrSigner = providerOrSigner || (ethers.getDefaultProvider() as Provider)
-    if (Signer.isSigner(currentProviderOrSigner)) {
-      if (!currentProviderOrSigner.provider) {
-        throw new Error('Signer must be connected to a provider')
-      }
-      this.#provider = currentProviderOrSigner.provider
-      this.#signer = currentProviderOrSigner
-    } else {
-      this.#provider = currentProviderOrSigner
-      this.#signer = undefined
-    }
-    this.#ethers = ethers
-    const chainId = await this.getChainId()
+    this.#ethAdapter = ethAdapter
     this.#contractManager = await ContractManager.create(
-      this.#ethers,
+      this.#ethAdapter,
       safeAddress,
-      chainId,
-      currentProviderOrSigner,
-      this.#provider,
       contractNetworks
     )
-    this.#ownerManager = new OwnerManager(this.#ethers, this.#contractManager.safeContract)
-    this.#moduleManager = new ModuleManager(this.#ethers, this.#contractManager.safeContract)
+    this.#ownerManager = new OwnerManager(this.#ethAdapter, this.#contractManager.safeContract)
+    this.#moduleManager = new ModuleManager(this.#ethAdapter, this.#contractManager.safeContract)
   }
 
   /**
@@ -92,34 +73,15 @@ class EthersSafe implements Safe {
    * @throws "MultiSend contract is not deployed in the current network"
    */
   async connect({
-    providerOrSigner,
+    ethAdapter,
     safeAddress,
     contractNetworks
   }: ConnectEthersSafeConfig): Promise<EthersSafe> {
     return await EthersSafe.create({
-      ethers: this.#ethers,
+      ethAdapter: ethAdapter || this.#ethAdapter,
       safeAddress: safeAddress || this.getAddress(),
-      providerOrSigner,
-      contractNetworks
+      contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     })
-  }
-
-  /**
-   * Returns the connected provider.
-   *
-   * @returns The connected provider
-   */
-  getProvider(): Provider {
-    return this.#provider
-  }
-
-  /**
-   * Returns the connected signer.
-   *
-   * @returns The connected signer
-   */
-  getSigner(): Signer | undefined {
-    return this.#signer
   }
 
   /**
@@ -182,7 +144,7 @@ class EthersSafe implements Safe {
    * @returns The chainId of the connected network
    */
   async getChainId(): Promise<number> {
-    return (await this.#provider.getNetwork()).chainId
+    return this.#ethAdapter.getChainId()
   }
 
   /**
@@ -191,7 +153,7 @@ class EthersSafe implements Safe {
    * @returns The ETH balance of the Safe
    */
   async getBalance(): Promise<BigNumber> {
-    return BigNumber.from(await this.#provider.getBalance(this.getAddress()))
+    return this.#ethAdapter.getBalance(this.getAddress())
   }
 
   /**
@@ -287,18 +249,15 @@ class EthersSafe implements Safe {
    * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
-    if (!this.#signer) {
-      throw new Error('No signer provided')
-    }
     const owners = await this.getOwners()
-    const signerAddress = await this.#signer.getAddress()
+    const signerAddress = await this.#ethAdapter.getAccount()
     const addressIsOwner = owners.find(
-      (owner: string) => this.#signer && sameString(owner, signerAddress)
+      (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-    return generateSignature(this.#ethers, this.#signer, hash)
+    return generateSignature(this.#ethAdapter, hash)
   }
 
   /**
@@ -321,13 +280,10 @@ class EthersSafe implements Safe {
    * @throws "Transaction hashes can only be approved by Safe owners"
    */
   async approveTransactionHash(hash: string): Promise<ContractTransaction> {
-    if (!this.#signer) {
-      throw new Error('No signer provided')
-    }
     const owners = await this.getOwners()
-    const signerAddress = await this.#signer.getAddress()
+    const signerAddress = await this.#ethAdapter.getAccount()
     const addressIsOwner = owners.find(
-      (owner: string) => this.#signer && sameString(owner, signerAddress)
+      (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
@@ -473,17 +429,13 @@ class EthersSafe implements Safe {
    * @throws "There are X signatures missing"
    */
   async executeTransaction(safeTransaction: SafeTransaction): Promise<ContractTransaction> {
-    if (!this.#signer) {
-      throw new Error('No signer provided')
-    }
-
     const txHash = await this.getTransactionHash(safeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
       safeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
-    const signerAddress = await this.#signer.getAddress()
+    const signerAddress = await this.#ethAdapter.getAccount()
     if (owners.includes(signerAddress)) {
       safeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
@@ -500,7 +452,7 @@ class EthersSafe implements Safe {
 
     const gasLimit = await estimateGasForTransactionExecution(
       this.#contractManager.safeContract,
-      await this.#signer.getAddress(),
+      signerAddress,
       safeTransaction
     )
     const txResponse = await this.#contractManager.safeContract.execTransaction(

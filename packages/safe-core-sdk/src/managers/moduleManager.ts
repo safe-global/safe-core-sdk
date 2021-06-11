@@ -1,18 +1,19 @@
 import { GnosisSafe } from '../../typechain'
+import EthAdapter from '../ethereumLibs/EthAdapter'
 import { isRestrictedAddress, sameString } from '../utils'
 import { SENTINEL_ADDRESS } from '../utils/constants'
 
 class ModuleManager {
-  #ethers: any
+  #ethAdapter: EthAdapter
   #safeContract: GnosisSafe
 
-  constructor(ethers: any, safeContract: GnosisSafe) {
-    this.#ethers = ethers
+  constructor(ethAdapter: EthAdapter, safeContract: GnosisSafe) {
+    this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }
 
   private validateModuleAddress(moduleAddress: string): void {
-    const isValidAddress = this.#ethers.utils.isAddress(moduleAddress)
+    const isValidAddress = this.#ethAdapter.isAddress(moduleAddress)
     if (!isValidAddress || isRestrictedAddress(moduleAddress)) {
       throw new Error('Invalid module address provided')
     }

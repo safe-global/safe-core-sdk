@@ -2,8 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import EthersSafe from '../src'
-import { ContractNetworksConfig } from '../src/configuration/contracts'
+import EthersSafe, { ContractNetworksConfig, EthersAdapter } from '../src'
 import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
@@ -27,10 +26,13 @@ describe('Off-chain signatures', () => {
     it('should fail if signer is not provided', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeSdk = await EthersSafe.create({
+      const ethAdapter = new EthersAdapter({
         ethers,
+        providerOrSigner: account1.signer.provider
+      })
+      const safeSdk = await EthersSafe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer.provider,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -47,10 +49,10 @@ describe('Off-chain signatures', () => {
     it('should fail if signer is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account3.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account3.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -67,10 +69,10 @@ describe('Off-chain signatures', () => {
     it('should sign a transaction hash with the current signer', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -88,10 +90,13 @@ describe('Off-chain signatures', () => {
     it('should fail if signer is not provided', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeSdk = await EthersSafe.create({
+      const ethAdapter = new EthersAdapter({
         ethers,
+        providerOrSigner: account1.signer.provider
+      })
+      const safeSdk = await EthersSafe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer.provider,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -105,10 +110,10 @@ describe('Off-chain signatures', () => {
     it('should fail if signature is added by an account that is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account3.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account3.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -124,10 +129,10 @@ describe('Off-chain signatures', () => {
     it('should add the signature of the current signer', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({
@@ -143,10 +148,10 @@ describe('Off-chain signatures', () => {
     it('should ignore duplicated signatures', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = await safeSdk.createTransaction({

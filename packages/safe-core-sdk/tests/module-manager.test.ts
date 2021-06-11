@@ -2,8 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import EthersSafe from '../src'
-import { ContractNetworksConfig } from '../src/configuration/contracts'
+import EthersSafe, { ContractNetworksConfig, EthersAdapter } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import { getAccounts } from './utils/setupConfig'
 import {
@@ -35,10 +34,10 @@ describe('Safe modules manager', () => {
     it('should return all the enabled modules', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
@@ -53,10 +52,10 @@ describe('Safe modules manager', () => {
     it('should return true if a module is enabled', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.false
@@ -71,10 +70,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getEnableModuleTx('0x123')
@@ -84,10 +83,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is equal to sentinel', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getEnableModuleTx(SENTINEL_ADDRESS)
@@ -97,10 +96,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is equal to 0x address', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getEnableModuleTx(ZERO_ADDRESS)
@@ -110,10 +109,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is already enabled', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx1 = await safeSdk.getEnableModuleTx(dailyLimitModule.address)
@@ -126,10 +125,10 @@ describe('Safe modules manager', () => {
     it('should enable a Safe module', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
@@ -146,10 +145,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getDisableModuleTx('0x123')
@@ -159,10 +158,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is equal to sentinel', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getDisableModuleTx(SENTINEL_ADDRESS)
@@ -172,10 +171,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is equal to 0x address', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getDisableModuleTx(ZERO_ADDRESS)
@@ -185,10 +184,10 @@ describe('Safe modules manager', () => {
     it('should fail if address is not enabled', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getDisableModuleTx(dailyLimitModule.address)
@@ -196,13 +195,14 @@ describe('Safe modules manager', () => {
     })
 
     it('should disable Safe modules', async () => {
-      const { dailyLimitModule, accounts, socialRecoveryModule, contractNetworks } = await setupTests()
+      const { dailyLimitModule, accounts, socialRecoveryModule, contractNetworks } =
+        await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
 

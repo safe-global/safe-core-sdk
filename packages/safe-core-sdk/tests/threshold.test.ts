@@ -1,8 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe from '../src'
-import { ContractNetworksConfig } from '../src/configuration/contracts'
+import EthersSafe, { ContractNetworksConfig, EthersAdapter } from '../src'
 import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
@@ -26,10 +25,10 @@ describe('Safe Threshold', () => {
     it('should return the Safe threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       chai.expect(await safeSdk.getThreshold()).to.be.eq(1)
@@ -40,10 +39,10 @@ describe('Safe Threshold', () => {
     it('should fail if the threshold is bigger than the number of owners', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const newThreshold = 2
@@ -57,10 +56,10 @@ describe('Safe Threshold', () => {
     it('should fail if the threshold is not bigger than 0', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const newThreshold = 0
@@ -73,10 +72,10 @@ describe('Safe Threshold', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const newThreshold = 2

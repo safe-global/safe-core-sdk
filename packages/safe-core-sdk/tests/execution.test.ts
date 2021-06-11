@@ -2,8 +2,11 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe, { SafeTransactionDataPartial } from '../src'
-import { ContractNetworksConfig } from '../src/configuration/contracts'
+import EthersSafe, {
+  ContractNetworksConfig,
+  EthersAdapter,
+  SafeTransactionDataPartial
+} from '../src'
 import { getAccounts } from './utils/setupConfig'
 import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)
@@ -28,10 +31,10 @@ describe('Transactions execution', () => {
     it('should fail if a provider is provided', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer.provider })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer.provider,
         contractNetworks
       })
       const tx = await safeSdk1.createTransaction({
@@ -45,8 +48,9 @@ describe('Transactions execution', () => {
     it('should fail if no provider or signer is provided', async () => {
       const { contractNetworks } = await setupTests()
       const mainnetGnosisDAOSafe = '0x0da0c3e52c977ed3cbc641ff02dd271c3ed55afe'
+      const ethAdapter = new EthersAdapter({ ethers })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: mainnetGnosisDAOSafe,
         contractNetworks
       })
@@ -60,15 +64,16 @@ describe('Transactions execution', () => {
 
     it('should fail if there are not enough signatures (1 missing)', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
+      const ethAdapter2 = new EthersAdapter({ ethers, providerOrSigner: account2.signer })
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
       const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
@@ -85,12 +90,12 @@ describe('Transactions execution', () => {
 
     it('should fail if there are not enough signatures (>1 missing)', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = await safeSdk1.createTransaction({
@@ -105,12 +110,12 @@ describe('Transactions execution', () => {
 
     it('should execute a transaction with threshold 1', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       await account1.signer.sendTransaction({
@@ -133,16 +138,18 @@ describe('Transactions execution', () => {
 
     it('should execute a transaction with threshold >1', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const ethAdapter1 = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const ethAdapter2 = new EthersAdapter({ ethers, providerOrSigner: account2.signer })
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = new EthersAdapter({ ethers, providerOrSigner: account3.signer })
+      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       await account1.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('1000000000000000000') // 1 ETH
@@ -167,15 +174,17 @@ describe('Transactions execution', () => {
 
     it('should execute a transaction when is not submitted by an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
+      const ethAdapter1 = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const ethAdapter2 = new EthersAdapter({ ethers, providerOrSigner: account2.signer })
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = new EthersAdapter({ ethers, providerOrSigner: account3.signer })
+      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       await account2.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('1000000000000000000') // 1 ETH
@@ -202,16 +211,18 @@ describe('Transactions execution', () => {
   describe('executeTransaction (MultiSend)', async () => {
     it('should execute a batch transaction with threshold >1', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const ethAdapter1 = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const ethAdapter2 = new EthersAdapter({ ethers, providerOrSigner: account2.signer })
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = new EthersAdapter({ ethers, providerOrSigner: account3.signer })
+      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       await account1.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('2000000000000000000') // 2 ETH
@@ -249,22 +260,24 @@ describe('Transactions execution', () => {
 
     it('should execute a batch transaction with contract calls and threshold >1', async () => {
       const { accounts, contractNetworks, erc20Mintable } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const ethAdapter1 = new EthersAdapter({ ethers, providerOrSigner: account1.signer })
       const safeSdk1 = await EthersSafe.create({
-        ethers,
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const ethAdapter2 = new EthersAdapter({ ethers, providerOrSigner: account2.signer })
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = new EthersAdapter({ ethers, providerOrSigner: account3.signer })
+      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
 
-      await erc20Mintable.mint(safe.address, '1200000000000000000') // 1.2 ETH
+      await erc20Mintable.mint(safe.address, '1200000000000000000') // 1.2 ERC20
       const safeInitialERC20Balance = await erc20Mintable.balanceOf(safe.address)
-      chai.expect(safeInitialERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ETH
+      chai.expect(safeInitialERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ERC20
       const accountInitialERC20Balance = await erc20Mintable.balanceOf(account2.address)
-      chai.expect(accountInitialERC20Balance.toString()).to.be.eq('0') // 0 ETH
+      chai.expect(accountInitialERC20Balance.toString()).to.be.eq('0') // 0 ERC20
 
       const txs: SafeTransactionDataPartial[] = [
         {
@@ -272,7 +285,7 @@ describe('Transactions execution', () => {
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
-            '1100000000000000000' // 1.1 ETH
+            '1100000000000000000' // 1.1 ERC20
           ])
         },
         {
@@ -280,7 +293,7 @@ describe('Transactions execution', () => {
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
-            '100000000000000000' // 0.1 ETH
+            '100000000000000000' // 0.1 ERC20
           ])
         }
       ]
@@ -293,9 +306,9 @@ describe('Transactions execution', () => {
       await txResponse2.wait()
 
       const safeFinalERC20Balance = await erc20Mintable.balanceOf(safe.address)
-      chai.expect(safeFinalERC20Balance.toString()).to.be.eq('0') // 0 ETH
+      chai.expect(safeFinalERC20Balance.toString()).to.be.eq('0') // 0 ERC20
       const accountFinalERC20Balance = await erc20Mintable.balanceOf(account2.address)
-      chai.expect(accountFinalERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ETH
+      chai.expect(accountFinalERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ERC20
     })
   })
 })

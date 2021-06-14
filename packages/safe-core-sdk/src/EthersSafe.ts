@@ -256,6 +256,21 @@ class EthersSafe implements Safe {
   }
 
   /**
+   * Returns a Safe transaction ready to be signed by the owners that rejects an existing Safe transaction.
+   *
+   * @param safeTransaction - The existing Safe transaction to be rejected
+   * @returns The Safe transaction that rejects the existing Safe transaction
+   */
+  async rejectTransaction(safeTransaction: SafeTransaction): Promise<SafeTransaction> {
+    return this.createTransaction({
+      to: this.getAddress(),
+      nonce: safeTransaction.data.nonce,
+      value: '0',
+      data: '0x'
+    })
+  }
+
+  /**
    * Returns the transaction hash of a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction

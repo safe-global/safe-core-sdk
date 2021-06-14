@@ -274,6 +274,18 @@ const transactions: SafeTransactionDataPartial[] = [
 const safeTransaction = await safeSdk.createTransaction(...transactions)
 ```
 
+### rejectTransaction
+
+Returns a Safe transaction ready to be signed by the owners that invalidates a pending Safe transaction.
+
+```js
+const transactions: SafeTransactionDataPartial[] = [{
+  // ...
+}]
+const safeTransaction =  await safeSdk.createTransaction(...transactions)
+const rejectionTransaction = await safeSdk.rejectTransaction(safeTransaction)
+```
+
 ### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.

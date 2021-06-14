@@ -266,7 +266,8 @@ class EthersSafe implements Safe {
       to: this.getAddress(),
       nonce: safeTransaction.data.nonce,
       value: '0',
-      data: '0x'
+      data: '0x',
+      safeTxGas: 0
     })
   }
 

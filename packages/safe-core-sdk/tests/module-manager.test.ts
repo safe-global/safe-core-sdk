@@ -196,7 +196,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should disable Safe modules', async () => {
-      const { dailyLimitModule, accounts, socialRecoveryModule, contractNetworks } = await setupTests()
+      const { dailyLimitModule, accounts, socialRecoveryModule, contractNetworks } =
+        await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await EthersSafe.create({

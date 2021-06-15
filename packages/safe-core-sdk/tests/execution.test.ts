@@ -60,7 +60,7 @@ describe('Transactions execution', () => {
 
     it('should fail if there are not enough signatures (1 missing)', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeSdk1 = await EthersSafe.create({
         ethers,
@@ -68,7 +68,10 @@ describe('Transactions execution', () => {
         providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
       const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',
@@ -85,7 +88,7 @@ describe('Transactions execution', () => {
 
     it('should fail if there are not enough signatures (>1 missing)', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeSdk1 = await EthersSafe.create({
         ethers,
@@ -103,9 +106,42 @@ describe('Transactions execution', () => {
         .to.be.rejectedWith('There are 2 signatures missing')
     })
 
+    it('should fail if the user tries to execute a transaction that was rejected', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const safeSdk1 = await EthersSafe.create({
+        ethers,
+        safeAddress: safe.address,
+        providerOrSigner: account1.signer,
+        contractNetworks
+      })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+      const tx = await safeSdk1.createTransaction({
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
+      const rejectTx = await safeSdk1.createRejectionTransaction(tx.data.nonce)
+      await safeSdk1.signTransaction(rejectTx)
+      const txRejectResponse = await safeSdk2.executeTransaction(rejectTx)
+      await txRejectResponse.wait()
+      await safeSdk1.signTransaction(tx)
+      await chai
+        .expect(safeSdk2.executeTransaction(tx))
+        .to.be.rejectedWith('Invalid owner provided')
+    })
+
     it('should execute a transaction with threshold 1', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk1 = await EthersSafe.create({
         ethers,
@@ -133,7 +169,7 @@ describe('Transactions execution', () => {
 
     it('should execute a transaction with threshold >1', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeSdk1 = await EthersSafe.create({
         ethers,
@@ -141,8 +177,14 @@ describe('Transactions execution', () => {
         providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
+      const safeSdk3 = await safeSdk1.connect({
+        providerOrSigner: account3.signer,
+        contractNetworks
+      })
       await account1.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('1000000000000000000') // 1 ETH
@@ -167,15 +209,21 @@ describe('Transactions execution', () => {
 
     it('should execute a transaction when is not submitted by an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safeSdk1 = await EthersSafe.create({
         ethers,
         safeAddress: safe.address,
         providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
+      const safeSdk3 = await safeSdk1.connect({
+        providerOrSigner: account3.signer,
+        contractNetworks
+      })
       await account2.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('1000000000000000000') // 1 ETH
@@ -202,7 +250,7 @@ describe('Transactions execution', () => {
   describe('executeTransaction (MultiSend)', async () => {
     it('should execute a batch transaction with threshold >1', async () => {
       const { accounts, contractNetworks } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeSdk1 = await EthersSafe.create({
         ethers,
@@ -210,8 +258,14 @@ describe('Transactions execution', () => {
         providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
+      const safeSdk3 = await safeSdk1.connect({
+        providerOrSigner: account3.signer,
+        contractNetworks
+      })
       await account1.signer.sendTransaction({
         to: safe.address,
         value: BigNumber.from('2000000000000000000') // 2 ETH
@@ -249,7 +303,7 @@ describe('Transactions execution', () => {
 
     it('should execute a batch transaction with contract calls and threshold >1', async () => {
       const { accounts, contractNetworks, erc20Mintable } = await setupTests()
-      const [account1 ,account2, account3] = accounts
+      const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeSdk1 = await EthersSafe.create({
         ethers,
@@ -257,8 +311,14 @@ describe('Transactions execution', () => {
         providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
-      const safeSdk3 = await safeSdk1.connect({ providerOrSigner: account3.signer, contractNetworks })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
+      const safeSdk3 = await safeSdk1.connect({
+        providerOrSigner: account3.signer,
+        contractNetworks
+      })
 
       await erc20Mintable.mint(safe.address, '1200000000000000000') // 1.2 ETH
       const safeInitialERC20Balance = await erc20Mintable.balanceOf(safe.address)

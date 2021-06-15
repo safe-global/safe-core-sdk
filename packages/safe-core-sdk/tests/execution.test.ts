@@ -106,6 +106,39 @@ describe('Transactions execution', () => {
         .to.be.rejectedWith('There are 2 signatures missing')
     })
 
+    it('should fail if the user tries to execute a transaction that was rejected', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const safeSdk1 = await EthersSafe.create({
+        ethers,
+        safeAddress: safe.address,
+        providerOrSigner: account1.signer,
+        contractNetworks
+      })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+      const tx = await safeSdk1.createTransaction({
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
+      const rejectTx = await safeSdk1.createRejectionTransaction(tx.data.nonce)
+      await safeSdk1.signTransaction(rejectTx)
+      const txRejectResponse = await safeSdk2.executeTransaction(rejectTx)
+      await txRejectResponse.wait()
+      await safeSdk1.signTransaction(tx)
+      await chai
+        .expect(safeSdk2.executeTransaction(tx))
+        .to.be.rejectedWith('Invalid owner provided')
+    })
+
     it('should execute a transaction with threshold 1', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
@@ -211,39 +244,6 @@ describe('Transactions execution', () => {
       chai
         .expect(safeInitialBalance.toString())
         .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
-    })
-  
-    it('should fail if a transaction that was rejected is executed', async () => {
-      const { accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
-      const safeSdk1 = await EthersSafe.create({
-        ethers,
-        safeAddress: safe.address,
-        providerOrSigner: account1.signer,
-        contractNetworks
-      })
-      const safeSdk2 = await safeSdk1.connect({
-        providerOrSigner: account2.signer,
-        contractNetworks
-      })
-      await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
-      })
-      const tx = await safeSdk1.createTransaction({
-        to: account2.address,
-        value: '500000000000000000', // 0.5 ETH
-        data: '0x'
-      })
-      const rejectTx = await safeSdk1.rejectTransaction(tx)
-      await safeSdk1.signTransaction(rejectTx)
-      const txRejectResponse = await safeSdk2.executeTransaction(rejectTx)
-      await txRejectResponse.wait()
-      await safeSdk1.signTransaction(tx)
-      await chai
-        .expect(safeSdk2.executeTransaction(tx))
-        .to.be.rejectedWith('Invalid owner provided')
     })
   })
 

@@ -256,15 +256,15 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Returns a Safe transaction ready to be signed by the owners that invalidates a pending Safe transaction.
+   * Returns a Safe transaction ready to be signed by the owners that invalidates the pending Safe transaction/s with a specific nonce.
    *
-   * @param safeTransaction - The pending Safe transaction to be invalidated
-   * @returns The Safe transaction that invalidates the pending Safe transaction
+   * @param nonce - The nonce of the transaction/s that are going to be rejected
+   * @returns The Safe transaction that invalidates the pending Safe transaction/s
    */
-  async rejectTransaction(safeTransaction: SafeTransaction): Promise<SafeTransaction> {
+  async createRejectionTransaction(nonce: number): Promise<SafeTransaction> {
     return this.createTransaction({
       to: this.getAddress(),
-      nonce: safeTransaction.data.nonce,
+      nonce,
       value: '0',
       data: '0x',
       safeTxGas: 0

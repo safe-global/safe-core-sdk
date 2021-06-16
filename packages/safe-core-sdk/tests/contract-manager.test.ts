@@ -4,8 +4,9 @@ import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe, { ContractNetworksConfig, EthersAdapter } from '../src'
 import { defaultContractNetworks } from '../src/configuration/contracts'
 import { ZERO_ADDRESS } from '../src/utils/constants'
-import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import { getAccounts } from './utils/setupTestNetwork'
+
 chai.use(chaiAsPromised)
 
 describe('Safe contracts manager', () => {

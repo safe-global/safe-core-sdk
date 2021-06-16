@@ -3,8 +3,9 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import EthersSafe, { ContractNetworksConfig, EthersAdapter } from '../src'
-import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import { getAccounts } from './utils/setupTestNetwork'
+
 chai.use(chaiAsPromised)
 
 describe('Off-chain signatures', () => {

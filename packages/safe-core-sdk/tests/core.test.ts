@@ -3,8 +3,9 @@ import chaiAsPromised from 'chai-as-promised'
 import { BigNumber, VoidSigner } from 'ethers'
 import { deployments, ethers, waffle } from 'hardhat'
 import EthersSafe, { ContractNetworksConfig, EthersAdapter } from '../src'
-import { getAccounts } from './utils/setupConfig'
 import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import { getAccounts } from './utils/setupTestNetwork'
+
 chai.use(chaiAsPromised)
 
 describe('Safe Core SDK', () => {

@@ -4,13 +4,14 @@ import { ethers } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import EthersSafe, { ContractNetworksConfig, EthersAdapter } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
-import { getAccounts } from './utils/setupConfig'
 import {
   getDailyLimitModule,
   getMultiSend,
   getSafeWithOwners,
   getSocialRecoveryModule
 } from './utils/setupContracts'
+import { getAccounts } from './utils/setupTestNetwork'
+
 chai.use(chaiAsPromised)
 
 describe('Safe modules manager', () => {

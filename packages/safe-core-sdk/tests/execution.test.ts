@@ -7,8 +7,9 @@ import EthersSafe, {
   EthersAdapter,
   SafeTransactionDataPartial
 } from '../src'
-import { getAccounts } from './utils/setupConfig'
 import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import { getAccounts } from './utils/setupTestNetwork'
+
 chai.use(chaiAsPromised)
 
 describe('Transactions execution', () => {

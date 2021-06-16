@@ -75,6 +75,14 @@ class EthersAdapter implements EthAdapter {
     const messageArray = this.#ethers.utils.arrayify(message)
     return this.#signer.signMessage(messageArray)
   }
+
+  async estimateGas(transaction: any): Promise<number> {
+    return (await this.#provider.estimateGas(transaction)).toNumber()
+  }
+
+  call(transaction: any): Promise<string> {
+    return this.#provider.call(transaction)
+  }
 }
 
 export default EthersAdapter

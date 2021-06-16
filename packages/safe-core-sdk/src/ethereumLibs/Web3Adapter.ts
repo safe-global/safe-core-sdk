@@ -1,20 +1,24 @@
 import { BigNumber } from 'ethers'
-import { Abi } from '../utils/types'
+import { Abi } from 'utils/types'
 import EthAdapter from './EthAdapter'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
   web3: any
+  /** signerAddress - Address of the signer */
+  signerAddress: string
 }
 
 class Web3Adapter implements EthAdapter {
   #web3: any
+  #signerAddress: string
 
-  constructor({ web3 }: Web3AdapterConfig) {
+  constructor({ web3, signerAddress }: Web3AdapterConfig) {
     if (!web3) {
       throw new Error('web3 property missing from options')
     }
     this.#web3 = web3
+    this.#signerAddress = signerAddress
   }
 
   isAddress(address: string): boolean {
@@ -38,11 +42,19 @@ class Web3Adapter implements EthAdapter {
   }
 
   async getSignerAddress(): Promise<string> {
-    return this.#web3.eth.defaultAccount || (await this.#web3.eth.getAccounts())[0]
+    return this.#signerAddress
   }
 
-  signMessage(message: string, signerAddress: string): Promise<string> {
-    return this.#web3.eth.sign(message, signerAddress)
+  signMessage(message: string): Promise<string> {
+    return this.#web3.eth.sign(message, this.#signerAddress)
+  }
+
+  estimateGas(transaction: any, options?: any): Promise<number> {
+    return this.#web3.eth.estimateGas(transaction, options)
+  }
+
+  call(transaction: any): Promise<string> {
+    return this.#web3.eth.call(transaction)
   }
 }
 

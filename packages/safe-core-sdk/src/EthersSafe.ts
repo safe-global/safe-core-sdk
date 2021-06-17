@@ -1,5 +1,5 @@
 import EthAdapter from 'ethereumLibs/EthAdapter'
-import { BigNumber, ContractTransaction } from 'ethers'
+import { BigNumber } from 'ethers'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
@@ -12,6 +12,7 @@ import SafeTransaction, {
   OperationType,
   SafeTransactionDataPartial
 } from './utils/transactions/SafeTransaction'
+import { TransactionResult } from './utils/transactions/types'
 import {
   encodeMultiSendData,
   standardizeMetaTransactionData,
@@ -90,7 +91,7 @@ class EthersSafe implements Safe {
    * @returns The address of the Safe Proxy contract
    */
   getAddress(): string {
-    return this.#contractManager.safeContract.address
+    return this.#contractManager.safeContract.getAddress()
   }
 
   /**
@@ -99,7 +100,7 @@ class EthersSafe implements Safe {
    * @returns The address of the MultiSend contract
    */
   getMultiSendAddress(): string {
-    return this.#contractManager.multiSendContract.address
+    return this.#contractManager.multiSendContract.getAddress()
   }
 
   /**
@@ -108,7 +109,7 @@ class EthersSafe implements Safe {
    * @returns The Safe Master Copy contract version
    */
   async getContractVersion(): Promise<string> {
-    return this.#contractManager.safeContract.VERSION()
+    return this.#contractManager.safeContract.getVersion()
   }
 
   /**
@@ -126,7 +127,7 @@ class EthersSafe implements Safe {
    * @returns The Safe nonce
    */
   async getNonce(): Promise<number> {
-    return (await this.#contractManager.safeContract.nonce()).toNumber()
+    return this.#contractManager.safeContract.getNonce()
   }
 
   /**
@@ -197,21 +198,21 @@ class EthersSafe implements Safe {
     if (safeTransactions.length === 1) {
       const standardizedTransaction = await standardizeSafeTransactionData(
         this.#contractManager.safeContract,
+        this.#ethAdapter,
         safeTransactions[0]
       )
       return new SafeTransaction(standardizedTransaction)
     }
     const multiSendData = encodeMultiSendData(safeTransactions.map(standardizeMetaTransactionData))
     const multiSendTransaction = {
-      to: this.#contractManager.multiSendContract.address,
+      to: this.#contractManager.multiSendContract.getAddress(),
       value: '0',
-      data: this.#contractManager.multiSendContract.interface.encodeFunctionData('multiSend', [
-        multiSendData
-      ]),
+      data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
       operation: OperationType.DelegateCall
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
+      this.#ethAdapter,
       multiSendTransaction
     )
     return new SafeTransaction(standardizedTransaction)
@@ -225,18 +226,7 @@ class EthersSafe implements Safe {
    */
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     const safeTransactionData = safeTransaction.data
-    const txHash = await this.#contractManager.safeContract.getTransactionHash(
-      safeTransactionData.to,
-      safeTransactionData.value,
-      safeTransactionData.data,
-      safeTransactionData.operation,
-      safeTransactionData.safeTxGas,
-      safeTransactionData.baseGas,
-      safeTransactionData.gasPrice,
-      safeTransactionData.gasToken,
-      safeTransactionData.refundReceiver,
-      safeTransactionData.nonce
-    )
+    const txHash = await this.#contractManager.safeContract.getTransactionHash(safeTransactionData)
     return txHash
   }
 
@@ -251,6 +241,7 @@ class EthersSafe implements Safe {
   async signTransactionHash(hash: string): Promise<SafeSignature> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
+    console.log(owners, signerAddress)
     const addressIsOwner = owners.find(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
@@ -279,7 +270,7 @@ class EthersSafe implements Safe {
    * @throws "No signer provided"
    * @throws "Transaction hashes can only be approved by Safe owners"
    */
-  async approveTransactionHash(hash: string): Promise<ContractTransaction> {
+  async approveTransactionHash(hash: string): Promise<TransactionResult> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
@@ -428,7 +419,7 @@ class EthersSafe implements Safe {
    * @throws "No signer provided"
    * @throws "There are X signatures missing"
    */
-  async executeTransaction(safeTransaction: SafeTransaction): Promise<ContractTransaction> {
+  async executeTransaction(safeTransaction: SafeTransaction): Promise<TransactionResult> {
     const txHash = await this.getTransactionHash(safeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
@@ -449,25 +440,15 @@ class EthersSafe implements Safe {
         } missing`
       )
     }
-
     const gasLimit = await estimateGasForTransactionExecution(
       this.#contractManager.safeContract,
       signerAddress,
       safeTransaction
     )
-    const txResponse = await this.#contractManager.safeContract.execTransaction(
-      safeTransaction.data.to,
-      safeTransaction.data.value,
-      safeTransaction.data.data,
-      safeTransaction.data.operation,
-      safeTransaction.data.safeTxGas,
-      safeTransaction.data.baseGas,
-      safeTransaction.data.gasPrice,
-      safeTransaction.data.gasToken,
-      safeTransaction.data.refundReceiver,
-      safeTransaction.encodedSignatures(),
-      { gasLimit }
-    )
+    const txResponse = await this.#contractManager.safeContract.execTransaction(safeTransaction, {
+      from: await this.#ethAdapter.getSignerAddress(),
+      gasLimit
+    })
     return txResponse
   }
 }

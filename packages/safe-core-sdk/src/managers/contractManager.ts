@@ -54,13 +54,10 @@ class ContractManager {
     }
 
     if (ethAdapter instanceof EthersAdapter) {
-      const providerOrSigner = ethAdapter.getSigner() || ethAdapter.getProvider()
-      const safeContract = GnosisSafe__factory.connect(safeAddress, providerOrSigner)
+      const signer = ethAdapter.getSigner()
+      const safeContract = GnosisSafe__factory.connect(safeAddress, signer)
       this.#safeContract = new GnosisSafeEthersV5Contract(safeContract)
-      const multiSendContract = MultiSend__factory.connect(
-        contracts.multiSendAddress,
-        providerOrSigner
-      )
+      const multiSendContract = MultiSend__factory.connect(contracts.multiSendAddress, signer)
       this.#multiSendContract = new MultiSendEthersV5Contract(multiSendContract)
     } else if (ethAdapter instanceof Web3Adapter) {
       const safeContract = ethAdapter.getContract(safeAddress, SafeAbiV120) as any as GnosisSafeWeb3

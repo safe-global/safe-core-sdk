@@ -6,30 +6,24 @@ import EthAdapter from './EthAdapter'
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
   ethers: any
-  /** providerOrSigner - Ethers provider or signer */
-  providerOrSigner?: Provider | Signer
+  /** signer - Ethers signer */
+  signer: Signer
 }
 
 class EthersAdapter implements EthAdapter {
   #ethers: any
+  #signer: Signer
   #provider: Provider
-  #signer?: Signer
 
-  constructor({ ethers, providerOrSigner }: EthersAdapterConfig) {
+  constructor({ ethers, signer }: EthersAdapterConfig) {
     if (!ethers) {
       throw new Error('ethers property missing from options')
     }
-    const currentProviderOrSigner = providerOrSigner || (ethers.getDefaultProvider() as Provider)
-    if (Signer.isSigner(currentProviderOrSigner)) {
-      if (!currentProviderOrSigner.provider) {
-        throw new Error('Signer must be connected to a provider')
-      }
-      this.#provider = currentProviderOrSigner.provider
-      this.#signer = currentProviderOrSigner
-    } else {
-      this.#provider = currentProviderOrSigner
-      this.#signer = undefined
+    if (!signer.provider) {
+      throw new Error('Signer must be connected to a provider')
     }
+    this.#signer = signer
+    this.#provider = signer.provider
     this.#ethers = ethers
   }
 
@@ -37,7 +31,7 @@ class EthersAdapter implements EthAdapter {
     return this.#provider
   }
 
-  getSigner(): Signer | undefined {
+  getSigner(): Signer {
     return this.#signer
   }
 
@@ -54,7 +48,7 @@ class EthersAdapter implements EthAdapter {
   }
 
   getContract(address: string, abi: Abi): any {
-    return new this.#ethers.Contract(address, abi, this.#signer || this.#provider)
+    return new this.#ethers.Contract(address, abi, this.#signer)
   }
 
   async getContractCode(address: string): Promise<string> {

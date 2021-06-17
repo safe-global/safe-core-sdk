@@ -67,7 +67,7 @@ class EthersSafe implements Safe {
   }
 
   /**
-   * Returns a new instance of the Safe Core SDK connecting the providerOrSigner and the safeAddress.
+   * Returns a new instance of the Safe Core SDK.
    * @param config - Connect Ethers Safe configuration
    * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"

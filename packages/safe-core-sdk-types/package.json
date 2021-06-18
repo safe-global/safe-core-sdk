@@ -2,8 +2,8 @@
   "name": "@gnosis.pm/safe-core-sdk-types",
   "version": "0.1.0",
   "description": "Safe Core SDK types",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Gnosis",

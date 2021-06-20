@@ -11,7 +11,8 @@
     "SDK"
   ],
   "scripts": {
-    "build": "yarn rimraf dist && tsc"
+    "unbuild": "rimraf dist *.tsbuildinfo",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

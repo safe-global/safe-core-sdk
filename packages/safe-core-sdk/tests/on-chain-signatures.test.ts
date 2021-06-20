@@ -119,7 +119,10 @@ describe('On-chain signatures', () => {
         providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({ providerOrSigner: account2.signer, contractNetworks })
+      const safeSdk2 = await safeSdk1.connect({
+        providerOrSigner: account2.signer,
+        contractNetworks
+      })
       const tx = await safeSdk1.createTransaction({
         to: safe.address,
         value: '0',

@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-core-sdk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Safe Core SDK",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -11,7 +11,7 @@
     "SDK"
   ],
   "scripts": {
-    "unbuild": "rimraf dist artifacts cache typechain",
+    "unbuild": "rimraf dist artifacts cache typechain .nyc_output",
     "build": "hardhat compile && tsc",
     "test:ganache": "export TEST_NETWORK=ganache && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test": "hardhat deploy && nyc hardhat test",
@@ -81,6 +81,7 @@
     }
   },
   "dependencies": {
+    "@gnosis.pm/safe-core-sdk-types": "^0.1.1",
     "ethereumjs-util": "^7.0.10"
   }
 }

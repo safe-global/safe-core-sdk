@@ -1,7 +1,8 @@
+import { SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { Signer } from 'ethers'
 import { sameString } from '../../utils'
-import { EthSignSignature, SafeSignature } from './SafeSignature'
+import { EthSafeSignature } from './SafeSignature'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -10,14 +11,14 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
     '0000000000000000000000000000000000000000000000000000000000000000' +
     '01'
 
-  return new EthSignSignature(ownerAddress, signature)
+  return new EthSafeSignature(ownerAddress, signature)
 }
 
 export async function generateSignature(
   ethers: any,
   signer: Signer,
   hash: string
-): Promise<EthSignSignature> {
+): Promise<SafeSignature> {
   const signerAddress = await signer.getAddress()
   const messageArray = ethers.utils.arrayify(hash)
   let signature = await signer.signMessage(messageArray)
@@ -38,7 +39,7 @@ export async function generateSignature(
       throw new Error('Invalid signature')
   }
   signature = signature.slice(0, -2) + signatureV.toString(16)
-  return new EthSignSignature(signerAddress, signature)
+  return new EthSafeSignature(signerAddress, signature)
 }
 
 function isTxHashSignedWithPrefix(

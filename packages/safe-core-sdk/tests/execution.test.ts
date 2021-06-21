@@ -1,9 +1,9 @@
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe, { SafeTransactionDataPartial } from '../src'
-import { ContractNetworksConfig } from '../src/configuration/contracts'
+import EthersSafe, { ContractNetworksConfig } from '../src'
 import { getAccounts } from './utils/setupConfig'
 import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 chai.use(chaiAsPromised)

@@ -1,8 +1,7 @@
 import { Provider } from '@ethersproject/providers'
+import { SafeSignature, SafeTransaction, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import { ContractNetworksConfig } from './configuration/contracts'
-import { SafeSignature } from './utils/signatures/SafeSignature'
-import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 
 export interface EthersSafeConfig {
   /** ethers - Ethers v5 library */

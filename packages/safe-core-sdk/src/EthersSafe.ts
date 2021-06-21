@@ -1,4 +1,5 @@
 import { Provider } from '@ethersproject/providers'
+import { OperationType, SafeSignature, SafeTransaction, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
@@ -6,12 +7,8 @@ import OwnerManager from './managers/ownerManager'
 import Safe, { ConnectEthersSafeConfig, EthersSafeConfig } from './Safe'
 import { sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
-import { SafeSignature } from './utils/signatures/SafeSignature'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
-import SafeTransaction, {
-  OperationType,
-  SafeTransactionDataPartial
-} from './utils/transactions/SafeTransaction'
+import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import {
   encodeMultiSendData,
   standardizeMetaTransactionData,
@@ -237,7 +234,7 @@ class EthersSafe implements Safe {
         this.#contractManager.safeContract,
         safeTransactions[0]
       )
-      return new SafeTransaction(standardizedTransaction)
+      return new EthSafeTransaction(standardizedTransaction)
     }
     const multiSendData = encodeMultiSendData(safeTransactions.map(standardizeMetaTransactionData))
     const multiSendTransaction = {
@@ -252,7 +249,7 @@ class EthersSafe implements Safe {
       this.#contractManager.safeContract,
       multiSendTransaction
     )
-    return new SafeTransaction(standardizedTransaction)
+    return new EthSafeTransaction(standardizedTransaction)
   }
 
   /**

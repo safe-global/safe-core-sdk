@@ -1,13 +1,13 @@
-import { utils } from 'ethers'
-import { GnosisSafe } from '../../../typechain'
-import { ZERO_ADDRESS } from '../constants'
-import { estimateTxGas } from './gas'
 import {
   MetaTransactionData,
   OperationType,
   SafeTransactionData,
   SafeTransactionDataPartial
-} from './SafeTransaction'
+} from '@gnosis.pm/safe-core-sdk-types'
+import { utils } from 'ethers'
+import { GnosisSafe } from '../../../typechain'
+import { ZERO_ADDRESS } from '../constants'
+import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial

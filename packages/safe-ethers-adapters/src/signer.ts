@@ -30,7 +30,7 @@ export class SafeEthersSigner extends VoidSigner {
 
   /**
    * Creates an instance of the SafeEthersSigner.
-   * @param address - Address of the Safe that should be used
+   * @param safeAddress - Address of the Safe that should be used
    * @param signer - Owner or delegate of an owner for the specified Safe
    * @param service - Services to which the transactions should be proposed to
    * @param provider - (Optional) Provider that should be used for blockchain interactions. By default the provider from the signer is used.
@@ -38,13 +38,13 @@ export class SafeEthersSigner extends VoidSigner {
    * @returns The SafeEthersSigner instance
    */
   static async create(
-    address: string,
+    safeAddress: string,
     signer: Signer,
     service: SafeService,
     provider?: Provider,
     options?: SafeEthersSignerOptions
   ): Promise<SafeEthersSigner> {
-    const safe = await EthersSafe.create(ethers, address, signer)
+    const safe = await EthersSafe.create({ ethers, safeAddress, providerOrSigner: signer })
     return new SafeEthersSigner(safe, service, provider, options)
   }
 

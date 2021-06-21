@@ -1127,10 +1127,12 @@
     solc "0.5.17"
     truffle "^5.1.21"
 
-"@gnosis.pm/safe-core-sdk-types@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-core-sdk-types/-/safe-core-sdk-types-0.1.1.tgz#908c394cb4660493b4e9c8e01b5a7aa36efafd30"
-  integrity sha512-PghXGDaI5Foq37nZGmI90U2OKMeGtxh5KqkDqou9aFHwGVa/nf9HRQPxG9/XUzcyfe9OlKttDlJnR3XnC3dSDw==
+"@gnosis.pm/safe-core-sdk@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-core-sdk/-/safe-core-sdk-0.1.2.tgz#118037442b8cf766e5a2ddfbffeb90cd6dc87d91"
+  integrity sha512-tvInAfwENVG7QXWRMbXqCnZkTqPPIWzFnonU/fDRQmA5S5pKI9qIDYCjqOAwPzqRgvuItG3NxmSPynZD09771w==
+  dependencies:
+    ethereumjs-util "^7.0.10"
 
 "@gnosis.pm/safe-deployments@^1.0.0":
   version "1.1.0"

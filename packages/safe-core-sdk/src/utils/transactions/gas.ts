@@ -1,7 +1,6 @@
-import { OperationType } from '@gnosis.pm/safe-core-sdk-types'
+import { OperationType, SafeTransaction } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber } from 'ethers'
 import { GnosisSafe } from '../../../typechain'
-import SafeTransaction from './SafeTransaction'
 
 function estimateDataGasCosts(data: string): number {
   const reducer = (accumulator: number, currentValue: string) => {

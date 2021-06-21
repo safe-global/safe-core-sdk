@@ -1,6 +1,6 @@
 import { SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
 
-export class EthSignSignature implements SafeSignature {
+export class EthSafeSignature implements SafeSignature {
   signer: string
   data: string
 

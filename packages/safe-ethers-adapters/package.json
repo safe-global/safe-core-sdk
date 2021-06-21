@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-ethers-adapters",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.2",
   "description": "Safe Ethers Adapters",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

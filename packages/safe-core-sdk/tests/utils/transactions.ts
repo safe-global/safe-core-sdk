@@ -4,14 +4,14 @@ import { TransactionResult } from '../../src/utils/transactions/types'
 
 export async function waitSafeTxReceipt(
   txResult: TransactionResult
-): Promise<ContractReceipt | TransactionReceipt> {
-  let receipt: ContractReceipt | TransactionReceipt
+): Promise<ContractReceipt | TransactionReceipt | undefined> {
+  let receipt: ContractReceipt | TransactionReceipt | undefined
   if (txResult.promiEvent) {
     receipt = await new Promise(
       (resolve, reject) =>
         txResult.promiEvent &&
         txResult.promiEvent
-          .on('confirmation', (_confirmationNumber: any, receipt: TransactionReceipt) =>
+          .on('confirmation', (_confirmationNumber: number, receipt: TransactionReceipt) =>
             resolve(receipt)
           )
           .catch(reject)

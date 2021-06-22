@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers'
-import { Abi } from 'utils/types'
-import EthAdapter from './EthAdapter'
+import { Abi } from '../utils/types'
+import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -49,11 +49,11 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
 
-  estimateGas(transaction: any, options?: any): Promise<number> {
+  estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number> {
     return this.#web3.eth.estimateGas(transaction, options)
   }
 
-  call(transaction: any): Promise<string> {
+  call(transaction: EthAdapterTransaction): Promise<string> {
     return this.#web3.eth.call(transaction)
   }
 }

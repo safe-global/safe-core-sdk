@@ -16,7 +16,7 @@ interface GnosisSafeContract {
   isModuleEnabled(moduleAddress: string): Promise<boolean>
   execTransaction(safeTransaction: SafeTransaction, options?: TxOptions): Promise<TransactionResult>
   encode(methodName: string, params: any[]): string
-  estimateGas(methodName: string, params: any[], options: any): Promise<number>
+  estimateGas(methodName: string, params: any[], options: TxOptions): Promise<number>
 }
 
 export default GnosisSafeContract

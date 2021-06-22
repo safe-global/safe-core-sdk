@@ -1,7 +1,7 @@
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, Signer } from 'ethers'
 import { Abi } from '../utils/types'
-import EthAdapter from './EthAdapter'
+import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
 
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
@@ -64,11 +64,11 @@ class EthersAdapter implements EthAdapter {
     return this.#signer.signMessage(messageArray)
   }
 
-  async estimateGas(transaction: any): Promise<number> {
+  async estimateGas(transaction: EthAdapterTransaction): Promise<number> {
     return (await this.#provider.estimateGas(transaction)).toNumber()
   }
 
-  call(transaction: any): Promise<string> {
+  call(transaction: EthAdapterTransaction): Promise<string> {
     return this.#provider.call(transaction)
   }
 }

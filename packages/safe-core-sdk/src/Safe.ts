@@ -16,7 +16,7 @@ export interface EthersSafeConfig {
 
 export interface ConnectEthersSafeConfig {
   /** ethAdapter - Ethereum adapter */
-  ethAdapter: EthAdapter
+  ethAdapter?: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
   /** contractNetworks - Contract network configuration */

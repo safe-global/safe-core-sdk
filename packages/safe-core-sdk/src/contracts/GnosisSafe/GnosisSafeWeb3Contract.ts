@@ -44,7 +44,6 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
   }
 
   async getTransactionHash(safeTransactionData: SafeTransactionData): Promise<string> {
-    console.log('getTransactionHash')
     return this.contract.methods
       .getTransactionHash(
         safeTransactionData.to,

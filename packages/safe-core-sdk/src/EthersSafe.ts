@@ -249,7 +249,6 @@ class EthersSafe implements Safe {
   async signTransactionHash(hash: string): Promise<SafeSignature> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
-    console.log(owners, signerAddress)
     const addressIsOwner = owners.find(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
@@ -286,7 +285,9 @@ class EthersSafe implements Safe {
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
-    return this.#contractManager.safeContract.approveHash(hash)
+    return this.#contractManager.safeContract.approveHash(hash, {
+      from: await this.#ethAdapter.getSignerAddress()
+    })
   }
 
   /**

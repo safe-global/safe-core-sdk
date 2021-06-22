@@ -95,6 +95,15 @@ class EthersSafe implements Safe {
   }
 
   /**
+   * Returns the current EthAdapter.
+   *
+   * @returns The current EthAdapter
+   */
+  getEthAdapter(): EthAdapter {
+    return this.#ethAdapter
+  }
+
+  /**
    * Returns the address of the MultiSend contract.
    *
    * @returns The address of the MultiSend contract

@@ -26,6 +26,7 @@ export interface ConnectEthersSafeConfig {
 interface Safe {
   connect({ ethAdapter, safeAddress, contractNetworks }: ConnectEthersSafeConfig): void
   getAddress(): string
+  getEthAdapter(): EthAdapter
   getMultiSendAddress(): string
   getContractVersion(): Promise<string>
   getNonce(): Promise<number>

@@ -235,7 +235,6 @@ class EthersSafe implements Safe {
    *
    * @param hash - The hash to sign
    * @returns The Safe signature
-   * @throws "No signer provided"
    * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
@@ -267,7 +266,6 @@ class EthersSafe implements Safe {
    *
    * @param hash - The hash to approve
    * @returns The Safe transaction response
-   * @throws "No signer provided"
    * @throws "Transaction hashes can only be approved by Safe owners"
    */
   async approveTransactionHash(hash: string): Promise<TransactionResult> {
@@ -416,7 +414,6 @@ class EthersSafe implements Safe {
    *
    * @param safeTransaction - The Safe transaction to execute
    * @returns The Safe transaction response
-   * @throws "No signer provided"
    * @throws "There are X signatures missing"
    */
   async executeTransaction(safeTransaction: SafeTransaction): Promise<TransactionResult> {

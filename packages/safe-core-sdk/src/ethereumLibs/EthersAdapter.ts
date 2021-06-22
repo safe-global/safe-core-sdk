@@ -56,16 +56,10 @@ class EthersAdapter implements EthAdapter {
   }
 
   async getSignerAddress(): Promise<string> {
-    if (!this.#signer) {
-      throw new Error('No signer provided')
-    }
     return this.#signer.getAddress()
   }
 
   signMessage(message: string): Promise<string> {
-    if (!this.#signer) {
-      throw new Error('No signer provided')
-    }
     const messageArray = this.#ethers.utils.arrayify(message)
     return this.#signer.signMessage(messageArray)
   }

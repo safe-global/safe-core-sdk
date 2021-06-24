@@ -72,9 +72,9 @@ const ethAdapter = new Web3Adapter({
 Create an instance of the Safe Core SDK.
 
 ```js
-import EthersSafe from '@gnosis.pm/safe-core-sdk'
+import Safe from '@gnosis.pm/safe-core-sdk'
 
-const safeSdk = await EthersSafe.create({ ethAdapter, safeAddress })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
 
 ### 2. Create a Safe transaction
@@ -131,13 +131,13 @@ All the signatures used to execute the transaction are now available at `safeTra
 Returns an instance of the Safe Core SDK with the `signer` connected to the `safeAddress`.
 
 ```js
-const safeSdk = await EthersSafe.create({ ethAdapter, safeAddress, signer })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress, signer })
 ```
 
 If `signer` is not provided, `ethAdapter` default provider will be used.
 
 ```js
-const safeSdk = await EthersSafe.create({ ethAdapter, safeAddress })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
 
 The property `contractNetworks` can be added to provide the Safe contract addresses in case the SDK is used in a network where the Safe contracts are not deployed.
@@ -148,7 +148,7 @@ const contractNetworks: ContractNetworksConfig = {
     multiSendAddress: '0x<multisend_address>'
   }
 }
-const safeSdk = await EthersSafe.create({ ethAdapter, safeAddress, signer, contractNetworks })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress, signer, contractNetworks })
 ```
 
 ### connect
@@ -173,7 +173,7 @@ const contractNetworks: ContractNetworksConfig = {
     multiSendAddress: '0x<multisend_address>'
   }
 }
-const safeSdk = await EthersSafe.create({ ethAdapter, safeAddress, signer, contractNetworks })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress, signer, contractNetworks })
 ```
 
 ### getAddress

@@ -1,9 +1,9 @@
 import EthAdapter from 'ethereumLibs/EthAdapter'
 import { BigNumber } from 'ethers'
+import { ContractNetworksConfig } from './configuration/contracts'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
-import Safe, { ConnectEthersSafeConfig, EthersSafeConfig } from './Safe'
 import { sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
 import { SafeSignature } from './utils/signatures/SafeSignature'
@@ -19,7 +19,25 @@ import {
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
 
-class EthersSafe implements Safe {
+export interface EthersSafeConfig {
+  /** ethAdapter - Ethereum adapter */
+  ethAdapter: EthAdapter
+  /** safeAddress - The address of the Safe account to use */
+  safeAddress: string
+  /** contractNetworks - Contract network configuration */
+  contractNetworks?: ContractNetworksConfig
+}
+
+export interface ConnectEthersSafeConfig {
+  /** ethAdapter - Ethereum adapter */
+  ethAdapter?: EthAdapter
+  /** safeAddress - The address of the Safe account to use */
+  safeAddress?: string
+  /** contractNetworks - Contract network configuration */
+  contractNetworks?: ContractNetworksConfig
+}
+
+class EthersSafe {
   #ethAdapter!: EthAdapter
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager

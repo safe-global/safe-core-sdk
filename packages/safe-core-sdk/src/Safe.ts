@@ -19,7 +19,7 @@ import {
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
 
-export interface EthersSafeConfig {
+export interface SafeConfig {
   /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
   /** safeAddress - The address of the Safe account to use */
@@ -28,7 +28,7 @@ export interface EthersSafeConfig {
   contractNetworks?: ContractNetworksConfig
 }
 
-export interface ConnectEthersSafeConfig {
+export interface ConnectSafeConfig {
   /** ethAdapter - Ethereum adapter */
   ethAdapter?: EthAdapter
   /** safeAddress - The address of the Safe account to use */
@@ -37,7 +37,7 @@ export interface ConnectEthersSafeConfig {
   contractNetworks?: ContractNetworksConfig
 }
 
-class EthersSafe {
+class Safe {
   #ethAdapter!: EthAdapter
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
@@ -51,29 +51,21 @@ class EthersSafe {
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
-  static async create({
-    ethAdapter,
-    safeAddress,
-    contractNetworks
-  }: EthersSafeConfig): Promise<EthersSafe> {
-    const safeSdk = new EthersSafe()
+  static async create({ ethAdapter, safeAddress, contractNetworks }: SafeConfig): Promise<Safe> {
+    const safeSdk = new Safe()
     await safeSdk.init({ ethAdapter, safeAddress, contractNetworks })
     return safeSdk
   }
 
   /**
    * Initializes the Safe Core SDK instance.
-   * @param config - Ethers Safe configuration
+   * @param config - Safe configuration
    * @throws "Signer must be connected to a provider"
    * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
-  private async init({
-    ethAdapter,
-    safeAddress,
-    contractNetworks
-  }: EthersSafeConfig): Promise<void> {
+  private async init({ ethAdapter, safeAddress, contractNetworks }: SafeConfig): Promise<void> {
     this.#ethAdapter = ethAdapter
     this.#contractManager = await ContractManager.create(
       this.#ethAdapter,
@@ -86,17 +78,13 @@ class EthersSafe {
 
   /**
    * Returns a new instance of the Safe Core SDK.
-   * @param config - Connect Ethers Safe configuration
+   * @param config - Connect Safe configuration
    * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
-  async connect({
-    ethAdapter,
-    safeAddress,
-    contractNetworks
-  }: ConnectEthersSafeConfig): Promise<EthersSafe> {
-    return await EthersSafe.create({
+  async connect({ ethAdapter, safeAddress, contractNetworks }: ConnectSafeConfig): Promise<Safe> {
+    return await Safe.create({
       ethAdapter: ethAdapter || this.#ethAdapter,
       safeAddress: safeAddress || this.getAddress(),
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
@@ -478,4 +466,4 @@ class EthersSafe {
   }
 }
 
-export default EthersSafe
+export default Safe

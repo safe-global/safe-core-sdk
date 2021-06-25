@@ -13,13 +13,12 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
   return new EthSignSignature(ownerAddress, signature)
 }
 
-function isTxHashSignedWithPrefix(
+export function isTxHashSignedWithPrefix(
   txHash: string,
   signature: string,
   ownerAddress: string
 ): boolean {
   let hasPrefix
-  console.log({ownerAddress})
   try {
     const rsvSig = {
       r: Buffer.from(signature.slice(2, 66), 'hex'),
@@ -33,36 +32,27 @@ function isTxHashSignedWithPrefix(
       rsvSig.s
     )
     const recoveredAddress = bufferToHex(pubToAddress(recoveredData))
-    console.log({recoveredAddress})
     hasPrefix = !sameString(recoveredAddress, ownerAddress)
   } catch (e) {
-    console.log(e)
     hasPrefix = true
   }
   return hasPrefix
 }
 
-function adjustVInSignature(signature: string, hasPrefix: boolean) {
-  console.log({hasPrefix})
+export function adjustVInSignature(signature: string, hasPrefix: boolean) {
+  const V_VALUES = [0, 1, 27, 28]
+  const MIN_VALID_V_VALUE = 27
   let signatureV = parseInt(signature.slice(-2), 16)
-  console.log({signatureV})
-  switch (signatureV) {
-    case 0:
-    case 1:
-      signatureV += 31
-      break
-    case 27:
-    case 28:
-      if (hasPrefix) {
-        signatureV += 4
-      }
-      break
-    default:
-      throw new Error('Invalid signature')
+  if (!V_VALUES.includes(signatureV)) {
+    throw new Error('Invalid signature')
   }
-  console.log({signatureV})
+  if (signatureV < MIN_VALID_V_VALUE) {
+    signatureV += MIN_VALID_V_VALUE
+  }
+  if (hasPrefix) {
+    signatureV += 4
+  }
   signature = signature.slice(0, -2) + signatureV.toString(16)
-  console.log({signature})
   return signature
 }
 

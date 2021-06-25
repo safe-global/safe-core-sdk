@@ -245,7 +245,7 @@ describe('Transactions execution', () => {
         .expect(safeInitialBalance.toString())
         .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
     })
-  
+
     it('should execute a transaction with options: { gasLimit }', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
@@ -270,7 +270,7 @@ describe('Transactions execution', () => {
       await txResponse.wait()
       chai.expect(execOptions.gasLimit).to.be.eq(txResponse.gasLimit.toNumber())
     })
-  
+
     it('should execute a transaction with options: { gasLimit, gasPrice }', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts

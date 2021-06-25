@@ -1,5 +1,9 @@
 import { Provider } from '@ethersproject/providers'
-import { SafeSignature, SafeTransaction, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  SafeSignature,
+  SafeTransaction,
+  SafeTransactionDataPartial
+} from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import { ContractNetworksConfig } from './configuration/contracts'
 
@@ -58,7 +62,10 @@ interface Safe {
   getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction>
   getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction>
   getChangeThresholdTx(threshold: number): Promise<SafeTransaction>
-  executeTransaction(safeTransaction: SafeTransaction, options?: ExecuteTransactionOptions): Promise<ContractTransaction>
+  executeTransaction(
+    safeTransaction: SafeTransaction,
+    options?: ExecuteTransactionOptions
+  ): Promise<ContractTransaction>
 }
 
 export default Safe

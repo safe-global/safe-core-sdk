@@ -1,5 +1,10 @@
 import { Provider } from '@ethersproject/providers'
-import { OperationType, SafeSignature, SafeTransaction, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  OperationType,
+  SafeSignature,
+  SafeTransaction,
+  SafeTransactionDataPartial
+} from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
@@ -486,7 +491,10 @@ class EthersSafe implements Safe {
    * @throws "No signer provided"
    * @throws "There are X signatures missing"
    */
-  async executeTransaction(safeTransaction: SafeTransaction, options?: ExecuteTransactionOptions): Promise<ContractTransaction> {
+  async executeTransaction(
+    safeTransaction: SafeTransaction,
+    options?: ExecuteTransactionOptions
+  ): Promise<ContractTransaction> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }
@@ -512,11 +520,13 @@ class EthersSafe implements Safe {
       )
     }
 
-    const gasLimit = options?.gasLimit || await estimateGasForTransactionExecution(
-      this.#contractManager.safeContract,
-      await this.#signer.getAddress(),
-      safeTransaction
-    )
+    const gasLimit =
+      options?.gasLimit ||
+      (await estimateGasForTransactionExecution(
+        this.#contractManager.safeContract,
+        await this.#signer.getAddress(),
+        safeTransaction
+      ))
     const executionOptions: ExecuteTransactionOptions = {
       gasLimit,
       gasPrice: options?.gasPrice

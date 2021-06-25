@@ -1,8 +1,7 @@
 import { Provider } from '@ethersproject/providers'
+import { SafeSignature, SafeTransaction, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import { ContractNetworksConfig } from './configuration/contracts'
-import { SafeSignature } from './utils/signatures/SafeSignature'
-import SafeTransaction, { SafeTransactionDataPartial } from './utils/transactions/SafeTransaction'
 
 export interface EthersSafeConfig {
   /** ethers - Ethers v5 library */
@@ -40,6 +39,7 @@ interface Safe {
   isModuleEnabled(moduleAddress: string): Promise<boolean>
   isOwner(ownerAddress: string): Promise<boolean>
   createTransaction(...safeTransactions: SafeTransactionDataPartial[]): Promise<SafeTransaction>
+  createRejectionTransaction(nonce: number): Promise<SafeTransaction>
   getTransactionHash(safeTransaction: SafeTransaction): Promise<string>
   signTransactionHash(hash: string): Promise<SafeSignature>
   signTransaction(safeTransaction: SafeTransaction): Promise<void>

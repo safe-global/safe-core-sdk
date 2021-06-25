@@ -1,9 +1,4 @@
-export interface SafeSignature {
-  signer: string
-  data: string
-  staticPart(/* dynamicOffset: number */): string
-  dynamicPart(): string
-}
+import { SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
 
 export class EthSignSignature implements SafeSignature {
   signer: string

@@ -31,7 +31,8 @@ A Safe account with three owners and threshold equal three will be used as the s
 
 ```js
 import { ethers } from 'ethers'
-import EthersSafe, { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk'
+import EthersSafe from '@gnosis.pm/safe-core-sdk'
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 
 const web3Provider = // ...
 const provider = new ethers.providers.Web3Provider(web3Provider)
@@ -272,6 +273,18 @@ const transactions: SafeTransactionDataPartial[] = [
   // ...
 ]
 const safeTransaction = await safeSdk.createTransaction(...transactions)
+```
+
+### createRejectionTransaction
+
+Returns a Safe transaction ready to be signed by the owners that invalidates the pending Safe transaction/s with a specific nonce.
+
+```js
+const transactions: SafeTransactionDataPartial[] = [{
+  // ...
+}]
+const safeTransaction =  await safeSdk.createTransaction(...transactions)
+const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransaction.data.nonce)
 ```
 
 ### getTransactionHash

@@ -13,20 +13,6 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
   return new EthSignSignature(ownerAddress, signature)
 }
 
-function isWalletConnectProvider(signer: Signer) {
-  return !!((signer?.provider as any)?.provider?.wc)
-}
-
-async function generateWalletConnectSignature(ethers: any, hash: string, signer: Signer): Promise<string> {
-  console.log("wc", hash, hash.length)
-  const prefix = ethers.utils.toUtf8Bytes(`\x19Ethereum Signed Message:\n${hash.length}`)
-  //const message = ethers.utils.concat([prefix, hash])
-  const keccakMessage = ethers.utils.keccak256(/*prefix +*/ hash)
-  const wc = (signer?.provider as any)?.provider
-  const signature = await wc.connector.signMessage([await signer.getAddress(), keccakMessage])
-  return signature
-}
-
 function isTxHashSignedWithPrefix(
   txHash: string,
   signature: string,
@@ -87,12 +73,7 @@ export async function generateSignature(
 ): Promise<EthSignSignature> {
   const signerAddress = await signer.getAddress()
   const messageArray = ethers.utils.arrayify(hash)
-  let signature: string
-  if (isWalletConnectProvider(signer)) {
-    signature = await generateWalletConnectSignature(ethers, messageArray, signer)
-  } else {
-    signature = await signer.signMessage(messageArray)
-  }
+  let signature = await signer.signMessage(messageArray)
   const hasPrefix = isTxHashSignedWithPrefix(hash, signature, signerAddress)
   signature = adjustVInSignature(signature, hasPrefix)
   return new EthSignSignature(signerAddress, signature)

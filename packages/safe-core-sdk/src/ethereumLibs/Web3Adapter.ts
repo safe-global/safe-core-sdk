@@ -1,6 +1,13 @@
 import { BigNumber } from 'ethers'
+import { GnosisSafe } from '../../typechain/web3-v1/GnosisSafe'
+import { MultiSend } from '../../typechain/web3-v1/MultiSend'
+import { ContractNetworkConfig } from '../configuration/contracts'
+import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contract'
+import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
+import MultiSendAbi from '../contracts/MultiSend/MultiSendAbi.json'
+import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
 import { Abi } from '../utils/types'
-import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
+import EthAdapter, { EthAdapterTransaction, GnosisSafeContracts } from './EthAdapter'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -31,6 +38,31 @@ class Web3Adapter implements EthAdapter {
 
   async getChainId(): Promise<number> {
     return this.#web3.eth.getChainId()
+  }
+
+  async getSafeContracts(
+    safeAddress: string,
+    contracts: ContractNetworkConfig
+  ): Promise<GnosisSafeContracts> {
+    const safeContractCode = await this.getContractCode(safeAddress)
+    if (safeContractCode === '0x') {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
+    const multiSendContractCode = await this.getContractCode(contracts.multiSendAddress)
+    if (multiSendContractCode === '0x') {
+      throw new Error('MultiSend contract is not deployed in the current network')
+    }
+    const safeContract = this.getContract(safeAddress, SafeAbiV120) as any as GnosisSafe
+    const wrapperSafeContract = new GnosisSafeWeb3Contract(safeContract)
+    const multiSendContract = this.getContract(
+      contracts.multiSendAddress,
+      MultiSendAbi
+    ) as any as MultiSend
+    const wrappedMultiSendContract = new MultiSendWeb3Contract(multiSendContract)
+    return {
+      gnosisSafeContract: wrapperSafeContract,
+      multiSendContract: wrappedMultiSendContract
+    }
   }
 
   getContract(address: string, abi: Abi): any {

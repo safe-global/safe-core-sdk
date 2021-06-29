@@ -1,7 +1,12 @@
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, Signer } from 'ethers'
+import { GnosisSafe__factory } from '../../typechain/ethers-v5/factories/GnosisSafe__factory'
+import { MultiSend__factory } from '../../typechain/ethers-v5/factories/MultiSend__factory'
+import { ContractNetworkConfig } from '../configuration/contracts'
+import GnosisSafeEthersV5Contract from '../contracts/GnosisSafe/GnosisSafeEthersV5Contract'
+import MultiSendEthersV5Contract from '../contracts/MultiSend/MultiSendEthersV5Contract'
 import { Abi } from '../utils/types'
-import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
+import EthAdapter, { EthAdapterTransaction, GnosisSafeContracts } from './EthAdapter'
 
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
@@ -45,6 +50,28 @@ class EthersAdapter implements EthAdapter {
 
   async getChainId(): Promise<number> {
     return (await this.#provider.getNetwork()).chainId
+  }
+
+  async getSafeContracts(
+    safeAddress: string,
+    contracts: ContractNetworkConfig
+  ): Promise<GnosisSafeContracts> {
+    const safeContractCode = await this.getContractCode(safeAddress)
+    if (safeContractCode === '0x') {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
+    const multiSendContractCode = await this.getContractCode(contracts.multiSendAddress)
+    if (multiSendContractCode === '0x') {
+      throw new Error('MultiSend contract is not deployed in the current network')
+    }
+    const safeContract = GnosisSafe__factory.connect(safeAddress, this.#signer)
+    const wrapperSafeContract = new GnosisSafeEthersV5Contract(safeContract)
+    const multiSendContract = MultiSend__factory.connect(contracts.multiSendAddress, this.#signer)
+    const wrappedMultiSendContract = new MultiSendEthersV5Contract(multiSendContract)
+    return {
+      gnosisSafeContract: wrapperSafeContract,
+      multiSendContract: wrappedMultiSendContract
+    }
   }
 
   getContract(address: string, abi: Abi): any {

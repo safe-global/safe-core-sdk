@@ -1,10 +1,15 @@
 import { Provider } from '@ethersproject/providers'
-import { OperationType, SafeSignature, SafeTransaction, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  OperationType,
+  SafeSignature,
+  SafeTransaction,
+  SafeTransactionDataPartial
+} from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction, Signer } from 'ethers'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
-import Safe, { ConnectEthersSafeConfig, EthersSafeConfig } from './Safe'
+import Safe, { ConnectEthersSafeConfig, EthersSafeConfig, ExecuteTransactionOptions } from './Safe'
 import { sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
@@ -481,11 +486,15 @@ class EthersSafe implements Safe {
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
+   * @param options - The Safe transaction execution options (gasLimit, gasPrice)
    * @returns The Safe transaction response
    * @throws "No signer provided"
    * @throws "There are X signatures missing"
    */
-  async executeTransaction(safeTransaction: SafeTransaction): Promise<ContractTransaction> {
+  async executeTransaction(
+    safeTransaction: SafeTransaction,
+    options?: ExecuteTransactionOptions
+  ): Promise<ContractTransaction> {
     if (!this.#signer) {
       throw new Error('No signer provided')
     }
@@ -511,11 +520,18 @@ class EthersSafe implements Safe {
       )
     }
 
-    const gasLimit = await estimateGasForTransactionExecution(
-      this.#contractManager.safeContract,
-      await this.#signer.getAddress(),
-      safeTransaction
-    )
+    const gasLimit =
+      options?.gasLimit ||
+      (await estimateGasForTransactionExecution(
+        this.#contractManager.safeContract,
+        await this.#signer.getAddress(),
+        safeTransaction
+      ))
+    const executionOptions: ExecuteTransactionOptions = {
+      gasLimit,
+      gasPrice: options?.gasPrice
+    }
+
     const txResponse = await this.#contractManager.safeContract.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,
@@ -527,7 +543,7 @@ class EthersSafe implements Safe {
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
       safeTransaction.encodedSignatures(),
-      { gasLimit }
+      executionOptions
     )
     return txResponse
   }

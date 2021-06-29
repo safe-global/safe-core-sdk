@@ -436,6 +436,16 @@ const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.wait()
 ```
 
+Optionally, `gasLimit` and `gasPrice` values can be passed as execution options, avoiding the gas estimation.
+
+```
+const options: ExecuteTransactionOptions = {
+  gasLimit: 123456,
+  gasPrice: 123 // Optional parameter.
+}
+const txResponse = await safeSdk.executeTransaction(safeTransaction, options)
+```
+
 ## License
 
 This library is released under MIT.

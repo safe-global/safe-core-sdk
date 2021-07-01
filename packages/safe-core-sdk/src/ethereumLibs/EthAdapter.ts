@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers'
-import { ContractNetworkConfig } from '../configuration/contracts'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
+import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
 import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
 import { Abi } from '../utils/types'
 
@@ -22,11 +22,10 @@ interface EthAdapter {
   isAddress(address: string): boolean
   getBalance(address: string): Promise<BigNumber>
   getChainId(): Promise<number>
-  getSafeContracts(
-    safeAddress: string,
-    contracts: ContractNetworkConfig
-  ): Promise<GnosisSafeContracts>
   getContract(address: string, abi: Abi): any
+  getSafeContract(safeAddress: string): Promise<GnosisSafeContract>
+  getMultiSendContract(multiSendAddress: string): Promise<MultiSendContract>
+  getGnosisSafeProxyFactoryContract(proxyFactoryAddress: string): Promise<GnosisSafeProxyFactoryContract>
   getContractCode(address: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>

@@ -2,7 +2,12 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import Safe, { ContractNetworksConfig } from '../src'
-import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getSafeSingleton,
+  getSafeWithOwners
+} from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
@@ -15,7 +20,11 @@ describe('Safe Threshold', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks: ContractNetworksConfig = {
-      [chainId]: { multiSendAddress: (await getMultiSend()).address }
+      [chainId]: {
+        multiSendAddress: (await getMultiSend()).address,
+        safeMasterCopyAddress: (await getSafeSingleton()).address,
+        safeProxyFactoryAddress: (await getFactory()).address
+      }
     }
     return {
       safe: await getSafeWithOwners([accounts[0].address]),

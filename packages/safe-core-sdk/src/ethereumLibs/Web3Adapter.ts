@@ -50,7 +50,7 @@ class Web3Adapter implements EthAdapter {
     if (safeContractCode === '0x') {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
-    const safeContract = this.getContract(safeAddress, SafeAbiV120) as any as GnosisSafe
+    const safeContract = (await this.getContract(safeAddress, SafeAbiV120)) as GnosisSafe
     const wrapperSafeContract = new GnosisSafeWeb3Contract(safeContract)
     return wrapperSafeContract
   }
@@ -60,7 +60,7 @@ class Web3Adapter implements EthAdapter {
     if (multiSendContractCode === '0x') {
       throw new Error('MultiSend contract is not deployed in the current network')
     }
-    const multiSendContract = this.getContract(multiSendAddress, MultiSendAbi) as any as MultiSend
+    const multiSendContract = (await this.getContract(multiSendAddress, MultiSendAbi)) as MultiSend
     const wrappedMultiSendContract = new MultiSendWeb3Contract(multiSendContract)
     return wrappedMultiSendContract
   }
@@ -72,10 +72,10 @@ class Web3Adapter implements EthAdapter {
     if (proxyFactoryContractCode === '0x') {
       throw new Error('Safe Proxy Factory contract is not deployed in the current network')
     }
-    const proxyFactoryContract = this.getContract(
+    const proxyFactoryContract = (await this.getContract(
       proxyFactoryAddress,
       MultiSendAbi
-    ) as any as GnosisSafeProxyFactory
+    )) as GnosisSafeProxyFactory
     const wrappedProxyFactoryContract = new GnosisSafeProxyFactoryWeb3Contract(proxyFactoryContract)
     return wrappedProxyFactoryContract
   }

@@ -74,13 +74,20 @@ class EthersAdapter implements EthAdapter {
     return wrappedMultiSendContract
   }
 
-  async getGnosisSafeProxyFactoryContract(proxyFactoryAddress: string): Promise<GnosisSafeProxyFactoryEthersV5Contract> {
+  async getGnosisSafeProxyFactoryContract(
+    proxyFactoryAddress: string
+  ): Promise<GnosisSafeProxyFactoryEthersV5Contract> {
     const proxyFactoryContractCode = await this.getContractCode(proxyFactoryAddress)
     if (proxyFactoryContractCode === '0x') {
       throw new Error('Safe Proxy Factory contract is not deployed in the current network')
     }
-    const proxyFactoryContract = GnosisSafeProxyFactory__factory.connect(proxyFactoryAddress, this.#signer)
-    const wrappedProxyFactoryContract = new GnosisSafeProxyFactoryEthersV5Contract(proxyFactoryContract)
+    const proxyFactoryContract = GnosisSafeProxyFactory__factory.connect(
+      proxyFactoryAddress,
+      this.#signer
+    )
+    const wrappedProxyFactoryContract = new GnosisSafeProxyFactoryEthersV5Contract(
+      proxyFactoryContract
+    )
     return wrappedProxyFactoryContract
   }
 

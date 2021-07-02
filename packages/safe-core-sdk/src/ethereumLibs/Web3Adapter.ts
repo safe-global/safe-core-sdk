@@ -65,12 +65,17 @@ class Web3Adapter implements EthAdapter {
     return wrappedMultiSendContract
   }
 
-  async getGnosisSafeProxyFactoryContract(proxyFactoryAddress: string): Promise<GnosisSafeProxyFactoryWeb3Contract> {
+  async getGnosisSafeProxyFactoryContract(
+    proxyFactoryAddress: string
+  ): Promise<GnosisSafeProxyFactoryWeb3Contract> {
     const proxyFactoryContractCode = await this.getContractCode(proxyFactoryAddress)
     if (proxyFactoryContractCode === '0x') {
       throw new Error('Safe Proxy Factory contract is not deployed in the current network')
     }
-    const proxyFactoryContract = this.getContract(proxyFactoryAddress, MultiSendAbi) as any as GnosisSafeProxyFactory
+    const proxyFactoryContract = this.getContract(
+      proxyFactoryAddress,
+      MultiSendAbi
+    ) as any as GnosisSafeProxyFactory
     const wrappedProxyFactoryContract = new GnosisSafeProxyFactoryWeb3Contract(proxyFactoryContract)
     return wrappedProxyFactoryContract
   }

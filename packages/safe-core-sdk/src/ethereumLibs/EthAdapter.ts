@@ -25,7 +25,9 @@ interface EthAdapter {
   getContract(address: string, abi: Abi): any
   getSafeContract(safeAddress: string): Promise<GnosisSafeContract>
   getMultiSendContract(multiSendAddress: string): Promise<MultiSendContract>
-  getGnosisSafeProxyFactoryContract(proxyFactoryAddress: string): Promise<GnosisSafeProxyFactoryContract>
+  getGnosisSafeProxyFactoryContract(
+    proxyFactoryAddress: string
+  ): Promise<GnosisSafeProxyFactoryContract>
   getContractCode(address: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>

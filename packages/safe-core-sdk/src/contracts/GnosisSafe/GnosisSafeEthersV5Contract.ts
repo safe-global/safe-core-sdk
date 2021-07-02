@@ -98,7 +98,11 @@ class GnosisSafeEthersV5Contract implements GnosisSafeContract {
     return (this.contract.interface as any).encodeFunctionData(methodName, params)
   }
 
-  async estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number> {
+  async estimateGas(
+    methodName: string,
+    params: any[],
+    options: TransactionOptions
+  ): Promise<number> {
     return (await (this.contract.estimateGas as any)[methodName](...params, options)).toNumber()
   }
 }

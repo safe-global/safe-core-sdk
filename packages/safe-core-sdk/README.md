@@ -287,6 +287,18 @@ const transactions: SafeTransactionDataPartial[] = [
 const safeTransaction = await safeSdk.createTransaction(...transactions)
 ```
 
+### createRejectionTransaction
+
+Returns a Safe transaction ready to be signed by the owners that invalidates the pending Safe transaction/s with a specific nonce.
+
+```js
+const transactions: SafeTransactionDataPartial[] = [{
+  // ...
+}]
+const safeTransaction =  await safeSdk.createTransaction(...transactions)
+const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransaction.data.nonce)
+```
+
 ### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.
@@ -434,6 +446,16 @@ const transactions: SafeTransactionDataPartial[] = [{
 const safeTransaction = await safeSdk.createTransaction(...transactions)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.wait()
+```
+
+Optionally, `gasLimit` and `gasPrice` values can be passed as execution options, avoiding the gas estimation.
+
+```
+const options: TransactionOptions = {
+  gasLimit: 123456,
+  gasPrice: 123 // Optional parameter.
+}
+const txResponse = await safeSdk.executeTransaction(safeTransaction, options)
 ```
 
 ## License

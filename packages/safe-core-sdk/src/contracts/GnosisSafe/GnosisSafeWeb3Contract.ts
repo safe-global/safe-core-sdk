@@ -1,13 +1,13 @@
+import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber } from 'ethers'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 import { GnosisSafe } from '../../../typechain/web3-v1/GnosisSafe'
-import SafeTransaction, { SafeTransactionData } from '../../utils/transactions/SafeTransaction'
-import { TxOptions, Web3TransactionResult } from '../../utils/transactions/types'
+import { TransactionOptions, Web3TransactionResult } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 
 function toTxResult(
   promiEvent: PromiEvent<TransactionReceipt>,
-  options?: TxOptions
+  options?: TransactionOptions
 ): Promise<Web3TransactionResult> {
   return new Promise((resolve, reject) =>
     promiEvent
@@ -64,7 +64,7 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
     return BigNumber.from(await this.contract.methods.approvedHashes(ownerAddress, hash).call())
   }
 
-  async approveHash(hash: string, options?: TxOptions): Promise<Web3TransactionResult> {
+  async approveHash(hash: string, options?: TransactionOptions): Promise<Web3TransactionResult> {
     const txResponse = this.contract.methods.approveHash(hash).send(options)
     return toTxResult(txResponse, options)
   }
@@ -79,7 +79,7 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
 
   async execTransaction(
     safeTransaction: SafeTransaction,
-    options?: TxOptions
+    options?: TransactionOptions
   ): Promise<Web3TransactionResult> {
     const txResponse = this.contract.methods
       .execTransaction(
@@ -102,7 +102,7 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
     return (this.contract.methods as any)[methodName](...params).encodeABI()
   }
 
-  async estimateGas(methodName: string, params: any[], options: TxOptions): Promise<number> {
+  async estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number> {
     return Number(await (this.contract.methods as any)[methodName](...params).estimateGas(options))
   }
 }

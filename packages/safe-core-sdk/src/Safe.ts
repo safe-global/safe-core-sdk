@@ -1,18 +1,20 @@
-import EthAdapter from 'ethereumLibs/EthAdapter'
+import {
+  OperationType,
+  SafeSignature,
+  SafeTransaction,
+  SafeTransactionDataPartial
+} from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber } from 'ethers'
 import { ContractNetworksConfig } from './configuration/contracts'
+import EthAdapter from './ethereumLibs/EthAdapter'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
-import { SafeSignature } from './utils/signatures/SafeSignature'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
-import SafeTransaction, {
-  OperationType,
-  SafeTransactionDataPartial
-} from './utils/transactions/SafeTransaction'
-import { TransactionResult } from './utils/transactions/types'
+import EthSafeTransaction from './utils/transactions/SafeTransaction'
+import { TransactionOptions, TransactionResult } from './utils/transactions/types'
 import {
   encodeMultiSendData,
   standardizeMetaTransactionData,
@@ -216,7 +218,7 @@ class Safe {
         this.#ethAdapter,
         safeTransactions[0]
       )
-      return new SafeTransaction(standardizedTransaction)
+      return new EthSafeTransaction(standardizedTransaction)
     }
     const multiSendData = encodeMultiSendData(safeTransactions.map(standardizeMetaTransactionData))
     const multiSendTransaction = {
@@ -230,7 +232,23 @@ class Safe {
       this.#ethAdapter,
       multiSendTransaction
     )
-    return new SafeTransaction(standardizedTransaction)
+    return new EthSafeTransaction(standardizedTransaction)
+  }
+
+  /**
+   * Returns a Safe transaction ready to be signed by the owners that invalidates the pending Safe transaction/s with a specific nonce.
+   *
+   * @param nonce - The nonce of the transaction/s that are going to be rejected
+   * @returns The Safe transaction that invalidates the pending Safe transaction/s
+   */
+  async createRejectionTransaction(nonce: number): Promise<SafeTransaction> {
+    return this.createTransaction({
+      to: this.getAddress(),
+      nonce,
+      value: '0',
+      data: '0x',
+      safeTxGas: 0
+    })
   }
 
   /**
@@ -292,7 +310,7 @@ class Safe {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
     return this.#contractManager.safeContract.approveHash(hash, {
-      from: await this.#ethAdapter.getSignerAddress()
+      from: signerAddress
     })
   }
 
@@ -429,10 +447,15 @@ class Safe {
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
+   * @param options - The Safe transaction execution options (gasLimit, gasPrice)
    * @returns The Safe transaction response
+   * @throws "No signer provided"
    * @throws "There are X signatures missing"
    */
-  async executeTransaction(safeTransaction: SafeTransaction): Promise<TransactionResult> {
+  async executeTransaction(
+    safeTransaction: SafeTransaction,
+    options?: TransactionOptions
+  ): Promise<TransactionResult> {
     const txHash = await this.getTransactionHash(safeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
@@ -453,15 +476,24 @@ class Safe {
         } missing`
       )
     }
-    const gasLimit = await estimateGasForTransactionExecution(
-      this.#contractManager.safeContract,
-      signerAddress,
-      safeTransaction
+
+    const gasLimit =
+      options?.gasLimit ||
+      (await estimateGasForTransactionExecution(
+        this.#contractManager.safeContract,
+        signerAddress,
+        safeTransaction
+      ))
+    const executionOptions: TransactionOptions = {
+      gasLimit,
+      gasPrice: options?.gasPrice,
+      from: signerAddress
+    }
+
+    const txResponse = await this.#contractManager.safeContract.execTransaction(
+      safeTransaction,
+      executionOptions
     )
-    const txResponse = await this.#contractManager.safeContract.execTransaction(safeTransaction, {
-      from: await this.#ethAdapter.getSignerAddress(),
-      gasLimit
-    })
     return txResponse
   }
 }

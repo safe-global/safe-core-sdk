@@ -1,12 +1,12 @@
+import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction } from 'ethers'
 import { GnosisSafe } from '../../../typechain/ethers-v5/GnosisSafe'
-import SafeTransaction, { SafeTransactionData } from '../../utils/transactions/SafeTransaction'
-import { EthersTransactionResult, TxOptions } from '../../utils/transactions/types'
+import { EthersTransactionResult, TransactionOptions } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 
 function toTxResult(
   transactionResponse: ContractTransaction,
-  options?: TxOptions
+  options?: TransactionOptions
 ): EthersTransactionResult {
   return {
     hash: transactionResponse.hash,
@@ -61,7 +61,7 @@ class GnosisSafeEthersV5Contract implements GnosisSafeContract {
     return this.contract.approvedHashes(ownerAddress, hash)
   }
 
-  async approveHash(hash: string, options?: TxOptions): Promise<EthersTransactionResult> {
+  async approveHash(hash: string, options?: TransactionOptions): Promise<EthersTransactionResult> {
     const txResponse = await this.contract.approveHash(hash, options)
     return toTxResult(txResponse, options)
   }
@@ -76,7 +76,7 @@ class GnosisSafeEthersV5Contract implements GnosisSafeContract {
 
   async execTransaction(
     safeTransaction: SafeTransaction,
-    options?: TxOptions
+    options?: TransactionOptions
   ): Promise<EthersTransactionResult> {
     const txResponse = await this.contract.execTransaction(
       safeTransaction.data.to,
@@ -98,7 +98,7 @@ class GnosisSafeEthersV5Contract implements GnosisSafeContract {
     return (this.contract.interface as any).encodeFunctionData(methodName, params)
   }
 
-  async estimateGas(methodName: string, params: any[], options: TxOptions): Promise<number> {
+  async estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number> {
     return (await (this.contract.estimateGas as any)[methodName](...params, options)).toNumber()
   }
 }

@@ -1,8 +1,9 @@
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig, SafeTransactionDataPartial } from '../src'
+import Safe, { ContractNetworksConfig, TransactionOptions } from '../src'
 import { getERC20Mintable, getMultiSend, getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -71,6 +72,40 @@ describe('Transactions execution', () => {
       await chai
         .expect(safeSdk1.executeTransaction(tx))
         .to.be.rejectedWith('There are 2 signatures missing')
+    })
+
+    it('should fail if the user tries to execute a transaction that was rejected', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const safeSdk2 = await safeSdk1.connect({
+        ethAdapter: ethAdapter2,
+        contractNetworks
+      })
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+      const tx = await safeSdk1.createTransaction({
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
+      const rejectTx = await safeSdk1.createRejectionTransaction(tx.data.nonce)
+      await safeSdk1.signTransaction(rejectTx)
+      const txRejectResponse = await safeSdk2.executeTransaction(rejectTx)
+      await waitSafeTxReceipt(txRejectResponse)
+      await safeSdk1.signTransaction(tx)
+      await chai
+        .expect(safeSdk2.executeTransaction(tx))
+        .to.be.rejectedWith('Invalid owner provided')
     })
 
     it('should execute a transaction with threshold 1', async () => {
@@ -170,6 +205,64 @@ describe('Transactions execution', () => {
       chai
         .expect(safeInitialBalance.toString())
         .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+    })
+
+    it('should execute a transaction with options: { gasLimit }', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+      const tx = await safeSdk1.createTransaction({
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
+      const execOptions: TransactionOptions = { gasLimit: 123456 }
+      const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
+      await waitSafeTxReceipt(txResponse)
+      const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
+      const gasLimit = txConfirmed.gas || Number(txConfirmed.gasLimit)
+      chai.expect(execOptions.gasLimit).to.be.eq(gasLimit)
+    })
+
+    it('should execute a transaction with options: { gasLimit, gasPrice }', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+      const tx = await safeSdk1.createTransaction({
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
+      const execOptions: TransactionOptions = {
+        gasLimit: 123456,
+        gasPrice: 123
+      }
+      const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
+      await waitSafeTxReceipt(txResponse)
+      const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
+      const gasLimit = txConfirmed.gas || Number(txConfirmed.gasLimit)
+      chai.expect(execOptions.gasPrice).to.be.eq(Number(txConfirmed.gasPrice))
+      chai.expect(execOptions.gasLimit).to.be.eq(gasLimit)
     })
   })
 

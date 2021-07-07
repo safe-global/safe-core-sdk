@@ -73,6 +73,10 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getCode(address)
   }
 
+  async getTransaction(transactionHash: string): Promise<any> {
+    return this.#web3.eth.getTransaction(transactionHash)
+  }
+
   async getSignerAddress(): Promise<string> {
     return this.#signerAddress
   }

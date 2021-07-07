@@ -28,6 +28,7 @@ interface EthAdapter {
   ): Promise<GnosisSafeContracts>
   getContract(address: string, abi: Abi): any
   getContractCode(address: string): Promise<string>
+  getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
   signMessage(message: string, signerAddress: string): Promise<string>
   estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number>

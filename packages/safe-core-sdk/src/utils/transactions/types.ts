@@ -1,7 +1,7 @@
 import { ContractTransaction } from 'ethers'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
-export interface TxOptions {
+export interface TransactionOptions {
   from?: string
   gas?: number | string
   gasLimit?: number | string
@@ -15,16 +15,16 @@ export interface BaseTransactionResult {
 
 export interface Web3TransactionResult extends BaseTransactionResult {
   promiEvent: PromiEvent<TransactionReceipt>
-  options?: TxOptions
+  options?: TransactionOptions
 }
 
 export interface EthersTransactionResult extends BaseTransactionResult {
   transactionResponse: ContractTransaction
-  options?: TxOptions
+  options?: TransactionOptions
 }
 
 export interface TransactionResult extends BaseTransactionResult {
   promiEvent?: PromiEvent<TransactionReceipt>
   transactionResponse?: ContractTransaction
-  options?: TxOptions
+  options?: TransactionOptions
 }

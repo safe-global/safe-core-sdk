@@ -1,6 +1,6 @@
+import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber } from 'ethers'
-import SafeTransaction, { SafeTransactionData } from '../../utils/transactions/SafeTransaction'
-import { TransactionResult, TxOptions } from '../../utils/transactions/types'
+import { TransactionOptions, TransactionResult } from '../../utils/transactions/types'
 
 interface GnosisSafeContract {
   getVersion(): Promise<string>
@@ -11,12 +11,12 @@ interface GnosisSafeContract {
   isOwner(address: string): Promise<boolean>
   getTransactionHash(safeTransactionData: SafeTransactionData): Promise<string>
   approvedHashes(ownerAddress: string, hash: string): Promise<BigNumber>
-  approveHash(hash: string, options?: TxOptions): Promise<TransactionResult>
+  approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
-  execTransaction(safeTransaction: SafeTransaction, options?: TxOptions): Promise<TransactionResult>
+  execTransaction(safeTransaction: SafeTransaction, options?: TransactionOptions): Promise<TransactionResult>
   encode(methodName: string, params: any[]): string
-  estimateGas(methodName: string, params: any[], options: TxOptions): Promise<number>
+  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>
 }
 
 export default GnosisSafeContract

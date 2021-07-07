@@ -1,7 +1,7 @@
+import { OperationType, SafeTransaction } from '@gnosis.pm/safe-core-sdk-types'
 import EthAdapter from 'ethereumLibs/EthAdapter'
 import { BigNumber } from 'ethers'
 import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
-import SafeTransaction, { OperationType } from './SafeTransaction'
 
 function estimateDataGasCosts(data: string): number {
   const reducer = (accumulator: number, currentValue: string) => {

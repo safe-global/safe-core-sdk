@@ -1,3 +1,4 @@
+import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Provider } from '@ethersproject/providers'
 import { BigNumber, Signer } from 'ethers'
 import { GnosisSafe__factory } from '../../typechain/ethers-v5/factories/GnosisSafe__factory'
@@ -80,6 +81,10 @@ class EthersAdapter implements EthAdapter {
 
   async getContractCode(address: string): Promise<string> {
     return this.#provider.getCode(address)
+  }
+
+  async getTransaction(transactionHash: string): Promise<TransactionResponse> {
+    return this.#provider.getTransaction(transactionHash)
   }
 
   async getSignerAddress(): Promise<string> {

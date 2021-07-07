@@ -1,0 +1,33 @@
+{
+  "name": "@gnosis.pm/safe-core-sdk-types",
+  "version": "0.1.1",
+  "description": "Safe Core SDK types",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "keywords": [
+    "Ethereum",
+    "Gnosis",
+    "Safe",
+    "SDK"
+  ],
+  "scripts": {
+    "unbuild": "rimraf dist *.tsbuildinfo",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnosis/safe-core-sdk.git"
+  },
+  "author": "Gnosis (https://gnosis.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gnosis/safe-core-sdk/issues"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
+  "devDependencies": {
+    "typescript": "^4.2.4"
+  }
+}

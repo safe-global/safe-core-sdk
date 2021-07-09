@@ -4,6 +4,7 @@ import { GnosisSafeProxyFactory } from '../../typechain/web3-v1/GnosisSafeProxyF
 import { MultiSend } from '../../typechain/web3-v1/MultiSend'
 import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contract'
 import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
+import GnosisSafeProxyFactoryAbiV120 from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryAbiV1-2-0.json'
 import GnosisSafeProxyFactoryWeb3Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendAbi from '../contracts/MultiSend/MultiSendAbi.json'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
@@ -74,7 +75,7 @@ class Web3Adapter implements EthAdapter {
     }
     const proxyFactoryContract = (await this.getContract(
       proxyFactoryAddress,
-      MultiSendAbi
+      GnosisSafeProxyFactoryAbiV120
     )) as GnosisSafeProxyFactory
     const wrappedProxyFactoryContract = new GnosisSafeProxyFactoryWeb3Contract(proxyFactoryContract)
     return wrappedProxyFactoryContract

@@ -27,29 +27,17 @@ npm build
 
 ## Getting Started
 
-A Safe account with three owners and threshold equal three will be used as the starting point for this example but any Safe configuration is valid. Let's start defining the three signers and the Safe address.
-
-```js
-import { ethers } from 'ethers'
-
-const web3Provider = // ...
-const provider = new ethers.providers.Web3Provider(web3Provider)
-const signer1 = provider.getSigner(0)
-const signer2 = provider.getSigner(1)
-const signer3 = provider.getSigner(2)
-
-// Existing Safe address (e.g. Safe created via https://app.gnosis-safe.io)
-// Where signer1, signer2 and signer3 are the Safe owners
-const safeAddress = '0x<safe_address>'
-```
-
 ### 1. Set up the SDK using `Ethers` or `Web3`
 
-If the app integrating the SDK is using `Ethers` `v5`, create an instance of the `EthersAdapter`.
+If the app integrating the SDK is using `Ethers` `v5`, create an instance of the `EthersAdapter`. The `signer` or `signerAddress` is the Ethereum account we are connecting and the one who will sign the transactions.
 
 ```js
 import { ethers } from 'ethers'
 import { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+
+const web3Provider = // ...
+const provider = new ethers.providers.Web3Provider(web3Provider)
+const signer1 = provider.getSigner(0)
 
 const ethAdapter = new EthersAdapter({
   ethers,
@@ -69,15 +57,40 @@ const ethAdapter = new Web3Adapter({
 })
 ```
 
-Create an instance of the Safe Core SDK.
+### 2. Deploy a new Safe
+
+To deploy a new Safe account instantiate the `SafeFactory` class and call the method `deploySafe` with the right params to configure the new Safe. This includes defining the list of owners and the threshold of the Safe. A Safe account with three owners and threshold equal three will be used as the starting point for this example but any Safe configuration is valid.
+
+```js
+import { Safe, SafeFactory, SafeAccountConfig } from '@gnosis.pm/safe-code-sdk'
+
+const safeFactory = await SafeFactory.create({ ethAdapter })
+
+const owners = ['0x<address>', '0x<address>', '0x<address>']
+const threshold = 3
+const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+
+const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
+```
+
+The method `deploySafe` executes a transaction from the `signer` account connected, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe.
+
+
+Call the method `getAddress`, for example, to check the address of the newly deployed Safe.
+
+```js
+const newSafeAddress = safeSdk.getAddress()
+```
+
+To instantiate the Safe Core SDK from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address. 
 
 ```js
 import Safe from '@gnosis.pm/safe-core-sdk'
 
-const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+const safeSdk: Safe = await Safe.create({ ethAdapter, safeAddress })
 ```
 
-### 2. Create a Safe transaction
+### 3. Create a Safe transaction
 
 ```js
 import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk'
@@ -92,7 +105,7 @@ const safeTransaction = await safeSdk.createTransaction(...transactions)
 
 Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain, the owner `signer2` will sign it on-chain and the owner `signer3` will execute it (the executor also signs the transaction transparently).
 
-### 2.a. Off-chain signatures
+### 3.a. Off-chain signatures
 
 The owner `signer1` signs the transaction off-chain.
 
@@ -102,7 +115,7 @@ const signer1Signature = await safeSdk.signTransaction(safeTransaction)
 
 Because the signature is off-chain, there is no interaction with the contract and the signature becomes available at `safeTransaction.signatures`.
 
-### 2.b. On-chain signatures
+### 3.b. On-chain signatures
 
 After `signer2` account is connected to the SDK as the signer the transaction hash will be approved on-chain.
 
@@ -113,7 +126,7 @@ const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
 await approveTxResponse.wait()
 ```
 
-### 3. Transaction execution
+### 4. Transaction execution
 
 Lastly, `signer3` account is connected to the SDK as the signer and executor of the Safe transaction to execute it.
 
@@ -450,7 +463,7 @@ await txResponse.wait()
 
 Optionally, `gasLimit` and `gasPrice` values can be passed as execution options, avoiding the gas estimation.
 
-```
+```js
 const options: TransactionOptions = {
   gasLimit: 123456,
   gasPrice: 123 // Optional parameter.

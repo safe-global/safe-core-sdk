@@ -102,7 +102,11 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
     return (this.contract.methods as any)[methodName](...params).encodeABI()
   }
 
-  async estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number> {
+  async estimateGas(
+    methodName: string,
+    params: any[],
+    options: TransactionOptions
+  ): Promise<number> {
     return Number(await (this.contract.methods as any)[methodName](...params).estimateGas(options))
   }
 }

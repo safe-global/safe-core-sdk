@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers'
+import Contract from 'web3/eth/contract'
 import { GnosisSafe } from '../../typechain/web3-v1/GnosisSafe'
 import { MultiSend } from '../../typechain/web3-v1/MultiSend'
 import { ContractNetworkConfig } from '../configuration/contracts'
@@ -6,7 +7,7 @@ import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contra
 import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
 import MultiSendAbi from '../contracts/MultiSend/MultiSendAbi.json'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
-import { Abi } from '../utils/types'
+import { AbiItem } from '../utils/types'
 import EthAdapter, { EthAdapterTransaction, GnosisSafeContracts } from './EthAdapter'
 
 export interface Web3AdapterConfig {
@@ -65,7 +66,7 @@ class Web3Adapter implements EthAdapter {
     }
   }
 
-  getContract(address: string, abi: Abi): any {
+  getContract(address: string, abi: AbiItem[]): Contract {
     return new this.#web3.eth.Contract(abi, address)
   }
 

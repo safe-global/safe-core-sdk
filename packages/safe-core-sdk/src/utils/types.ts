@@ -1,5 +1,26 @@
-type Json = string | number | boolean | null | JsonObject | Json[]
+interface AbiInput {
+  name: string
+  type: string
+  indexed?: boolean
+  components?: AbiInput[]
+  internalType?: string
+}
 
-type JsonObject = { [property: string]: Json }
+interface AbiOutput {
+  name: string
+  type: string
+  components?: AbiOutput[]
+  internalType?: string
+}
 
-export type Abi = JsonObject[]
+export interface AbiItem {
+  anonymous?: boolean
+  constant?: boolean
+  inputs?: AbiInput[]
+  name?: string
+  outputs?: AbiOutput[]
+  payable?: boolean
+  stateMutability: string
+  type: string
+  gas?: number
+}

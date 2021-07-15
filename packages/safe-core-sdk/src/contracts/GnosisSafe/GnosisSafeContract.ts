@@ -14,7 +14,10 @@ interface GnosisSafeContract {
   approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
-  execTransaction(safeTransaction: SafeTransaction, options?: TransactionOptions): Promise<TransactionResult>
+  execTransaction(
+    safeTransaction: SafeTransaction,
+    options?: TransactionOptions
+  ): Promise<TransactionResult>
   encode(methodName: string, params: any[]): string
   estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>
 }

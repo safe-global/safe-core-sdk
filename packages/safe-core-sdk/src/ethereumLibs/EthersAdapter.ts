@@ -1,12 +1,12 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Provider } from '@ethersproject/providers'
-import { BigNumber, Signer } from 'ethers'
+import { BigNumber, Contract, Signer } from 'ethers'
 import { GnosisSafe__factory } from '../../typechain/ethers-v5/factories/GnosisSafe__factory'
 import { MultiSend__factory } from '../../typechain/ethers-v5/factories/MultiSend__factory'
 import { ContractNetworkConfig } from '../configuration/contracts'
 import GnosisSafeEthersV5Contract from '../contracts/GnosisSafe/GnosisSafeEthersV5Contract'
 import MultiSendEthersV5Contract from '../contracts/MultiSend/MultiSendEthersV5Contract'
-import { Abi } from '../utils/types'
+import { AbiItem } from '../utils/types'
 import EthAdapter, { EthAdapterTransaction, GnosisSafeContracts } from './EthAdapter'
 
 export interface EthersAdapterConfig {
@@ -75,7 +75,7 @@ class EthersAdapter implements EthAdapter {
     }
   }
 
-  getContract(address: string, abi: Abi): any {
+  getContract(address: string, abi: AbiItem[]): Contract {
     return new this.#ethers.Contract(address, abi, this.#signer)
   }
 

@@ -23,6 +23,9 @@ export async function waitSafeTxReceipt(
   return receipt
 }
 
-export async function getTransaction(ethAdapter: EthAdapter, transactionHash: string): Promise<any> {
+export async function getTransaction(
+  ethAdapter: EthAdapter,
+  transactionHash: string
+): Promise<any> {
   return ethAdapter.getTransaction(transactionHash)
 }

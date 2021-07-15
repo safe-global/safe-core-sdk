@@ -18,4 +18,3 @@ export {
   TransactionOptions,
   TransactionResult
 }
-

@@ -1,6 +1,6 @@
 import { SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
-import { Signer } from 'ethers'
+import EthAdapter from 'ethereumLibs/EthAdapter'
 import { sameString } from '../../utils'
 import { EthSignSignature } from './SafeSignature'
 
@@ -58,13 +58,11 @@ export function adjustVInSignature(signature: string, hasPrefix: boolean) {
 }
 
 export async function generateSignature(
-  ethers: any,
-  signer: Signer,
+  ethAdapter: EthAdapter,
   hash: string
 ): Promise<EthSignSignature> {
-  const signerAddress = await signer.getAddress()
-  const messageArray = ethers.utils.arrayify(hash)
-  let signature = await signer.signMessage(messageArray)
+  const signerAddress = await ethAdapter.getSignerAddress()
+  let signature = await ethAdapter.signMessage(hash, signerAddress)
   const hasPrefix = isTxHashSignedWithPrefix(hash, signature, signerAddress)
   signature = adjustVInSignature(signature, hasPrefix)
   return new EthSignSignature(signerAddress, signature)

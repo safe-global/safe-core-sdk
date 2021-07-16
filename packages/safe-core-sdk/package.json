@@ -90,7 +90,6 @@
   },
   "dependencies": {
     "@gnosis.pm/safe-core-sdk-types": "^0.1.1",
-    "bignumber.js": "^9.0.1",
     "ethereumjs-util": "^7.0.10"
   }
 }

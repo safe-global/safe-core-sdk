@@ -1,6 +1,6 @@
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction } from 'ethers'
-import { GnosisSafe } from '../../types/typechain/ethers-v5/GnosisSafe'
+import { GnosisSafe, GnosisSafeInterface } from '../../types/typechain/ethers-v5/GnosisSafe'
 import { EthersTransactionResult, TransactionOptions } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 
@@ -94,8 +94,8 @@ class GnosisSafeEthersV5Contract implements GnosisSafeContract {
     return toTxResult(txResponse, options)
   }
 
-  encode(methodName: string, params: any[]): string {
-    return (this.contract.interface as any).encodeFunctionData(methodName, params)
+  encode: GnosisSafeInterface['encodeFunctionData'] = (methodName: any, params: any): string => {
+    return this.contract.interface.encodeFunctionData(methodName, params)
   }
 
   async estimateGas(

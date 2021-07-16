@@ -1,6 +1,6 @@
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber, ContractTransaction } from 'ethers'
-import { GnosisSafe } from '../../../typechain/ethers-v5/GnosisSafe'
+import { GnosisSafe } from '../../types/typechain/ethers-v5/GnosisSafe'
 import { EthersTransactionResult, TransactionOptions } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 

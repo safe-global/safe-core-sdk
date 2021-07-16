@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers'
 import { ContractNetworkConfig } from '../configuration/contracts'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
-import { AbiItem } from '../utils/types'
+import { AbiItem } from '../types'
 
 export interface EthAdapterTransaction {
   to: string

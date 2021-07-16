@@ -1,13 +1,13 @@
 import { BigNumber } from 'ethers'
 import Contract from 'web3/eth/contract'
-import { GnosisSafe } from '../../typechain/web3-v1/GnosisSafe'
-import { MultiSend } from '../../typechain/web3-v1/MultiSend'
 import { ContractNetworkConfig } from '../configuration/contracts'
 import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contract'
 import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
 import MultiSendAbi from '../contracts/MultiSend/MultiSendAbi.json'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
-import { AbiItem } from '../utils/types'
+import { AbiItem } from '../types'
+import { GnosisSafe } from '../types/typechain/web3-v1/GnosisSafe'
+import { MultiSend } from '../types/typechain/web3-v1/MultiSend'
 import EthAdapter, { EthAdapterTransaction, GnosisSafeContracts } from './EthAdapter'
 
 export interface Web3AdapterConfig {

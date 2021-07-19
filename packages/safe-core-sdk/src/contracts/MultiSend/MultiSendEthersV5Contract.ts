@@ -1,4 +1,4 @@
-import { MultiSend } from '../../../typechain/ethers-v5/MultiSend'
+import { MultiSend, MultiSendInterface } from '../../types/typechain/ethers-v5/MultiSend'
 import MultiSendContract from './MultiSendContract'
 
 class MultiSendEthersV5Contract implements MultiSendContract {
@@ -8,8 +8,8 @@ class MultiSendEthersV5Contract implements MultiSendContract {
     return this.contract.address
   }
 
-  encode(methodName: string, params: any[]): string {
-    return (this.contract as any).interface.encodeFunctionData(methodName, params)
+  encode: MultiSendInterface['encodeFunctionData'] = (methodName: any, params: any): string => {
+    return this.contract.interface.encodeFunctionData(methodName, params)
   }
 }
 

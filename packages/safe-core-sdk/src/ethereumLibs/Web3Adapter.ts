@@ -1,14 +1,14 @@
 import { BigNumber } from 'ethers'
-import { GnosisSafe } from '../../typechain/web3-v1/GnosisSafe'
-import { GnosisSafeProxyFactory } from '../../typechain/web3-v1/GnosisSafeProxyFactory'
-import { MultiSend } from '../../typechain/web3-v1/MultiSend'
 import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contract'
 import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
 import GnosisSafeProxyFactoryAbiV120 from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryAbiV1-2-0.json'
 import GnosisSafeProxyFactoryWeb3Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendAbi from '../contracts/MultiSend/MultiSendAbi.json'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
-import { Abi } from '../utils/types'
+import { AbiItem } from '../types'
+import { GnosisSafe } from '../types/typechain/web3-v1/GnosisSafe'
+import { GnosisSafeProxyFactory } from '../types/typechain/web3-v1/GnosisSafeProxyFactory'
+import { MultiSend } from '../types/typechain/web3-v1/MultiSend'
 import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
 
 export interface Web3AdapterConfig {
@@ -42,7 +42,7 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getChainId()
   }
 
-  async getContract(address: string, abi: Abi): Promise<any> {
+  async getContract(address: string, abi: AbiItem[]): Promise<any> {
     return new this.#web3.eth.Contract(abi, address)
   }
 

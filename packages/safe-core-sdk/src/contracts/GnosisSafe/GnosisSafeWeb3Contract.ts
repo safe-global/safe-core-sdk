@@ -1,7 +1,7 @@
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { BigNumber } from 'ethers'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
-import { GnosisSafe } from '../../../typechain/web3-v1/GnosisSafe'
+import { GnosisSafe } from '../../types/typechain/web3-v1/GnosisSafe'
 import { TransactionOptions, Web3TransactionResult } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 

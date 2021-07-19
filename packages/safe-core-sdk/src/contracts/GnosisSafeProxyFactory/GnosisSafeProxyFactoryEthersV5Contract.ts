@@ -1,5 +1,5 @@
 import { ContractTransaction } from 'ethers'
-import { GnosisSafeProxyFactory } from '../../../typechain/ethers-v5/GnosisSafeProxyFactory'
+import { GnosisSafeProxyFactory } from '../../types/typechain/ethers-v5/GnosisSafeProxyFactory'
 import GnosisSafeProxyFactoryContract, { CreateProxyProps } from './GnosisSafeProxyFactoryContract'
 
 class GnosisSafeProxyFactoryEthersV5Contract implements GnosisSafeProxyFactoryContract {

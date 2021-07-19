@@ -1,13 +1,13 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Provider } from '@ethersproject/providers'
-import { BigNumber, Signer } from 'ethers'
-import { GnosisSafeProxyFactory__factory } from '../../typechain/ethers-v5/factories/GnosisSafeProxyFactory__factory'
-import { GnosisSafe__factory } from '../../typechain/ethers-v5/factories/GnosisSafe__factory'
-import { MultiSend__factory } from '../../typechain/ethers-v5/factories/MultiSend__factory'
+import { BigNumber, Contract, Signer } from 'ethers'
 import GnosisSafeEthersV5Contract from '../contracts/GnosisSafe/GnosisSafeEthersV5Contract'
 import GnosisSafeProxyFactoryEthersV5Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersV5Contract'
 import MultiSendEthersV5Contract from '../contracts/MultiSend/MultiSendEthersV5Contract'
-import { Abi } from '../utils/types'
+import { AbiItem } from '../types'
+import { GnosisSafeProxyFactory__factory } from '../types/typechain/ethers-v5/factories/GnosisSafeProxyFactory__factory'
+import { GnosisSafe__factory } from '../types/typechain/ethers-v5/factories/GnosisSafe__factory'
+import { MultiSend__factory } from '../types/typechain/ethers-v5/factories/MultiSend__factory'
 import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
 
 export interface EthersAdapterConfig {
@@ -91,7 +91,7 @@ class EthersAdapter implements EthAdapter {
     return wrappedProxyFactoryContract
   }
 
-  getContract(address: string, abi: Abi): any {
+  getContract(address: string, abi: AbiItem[]): Contract {
     return new this.#ethers.Contract(address, abi, this.#signer)
   }
 

@@ -18,7 +18,7 @@ interface GnosisSafeContract {
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
   ): Promise<TransactionResult>
-  encode(methodName: string, params: any[]): string
+  encode(methodName: any, params: any): string
   estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>
 }
 

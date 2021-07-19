@@ -29,7 +29,7 @@ npm build
 
 ### 1. Set up the SDK using `Ethers` or `Web3`
 
-If the app integrating the SDK is using `Ethers` `v5`, create an instance of the `EthersAdapter`. The `signer` or `signerAddress` is the Ethereum account we are connecting and the one who will sign the transactions.
+If the app integrating the SDK is using `Ethers` `v5`, create an instance of the `EthersAdapter`. `owner1` is the Ethereum account we are connecting and the one who will sign the transactions.
 
 ```js
 import { ethers } from 'ethers'
@@ -37,11 +37,11 @@ import { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
 
 const web3Provider = // ...
 const provider = new ethers.providers.Web3Provider(web3Provider)
-const signer1 = provider.getSigner(0)
+const owner1 = provider.getSigner(0)
 
-const ethAdapter = new EthersAdapter({
+const ethAdapterOwner1 = new EthersAdapter({
   ethers,
-  signer: signer1
+  signer: owner1
 })
 ```
 
@@ -51,9 +51,9 @@ If the app integrating the SDK is using `Web3` `v1`, create an instance of the `
 import Web3 from 'web3'
 import { Web3Adapter } from '@gnosis.pm/safe-core-sdk'
 
-const ethAdapter = new Web3Adapter({
+const ethAdapterOwner1 = new Web3Adapter({
   web3,
-  signerAddress: await signer1.getAddress()
+  signerAddress: await owner1.getAddress()
 })
 ```
 
@@ -73,8 +73,7 @@ const safeAccountConfig: SafeAccountConfig = { owners, threshold }
 const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
 ```
 
-The method `deploySafe` executes a transaction from the `signer` account connected, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe.
-
+The method `deploySafe` executes a transaction from `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe.
 
 Call the method `getAddress`, for example, to check the address of the newly deployed Safe.
 
@@ -87,7 +86,7 @@ To instantiate the Safe Core SDK from an existing Safe just pass to it an instan
 ```js
 import Safe from '@gnosis.pm/safe-core-sdk'
 
-const safeSdk: Safe = await Safe.create({ ethAdapter, safeAddress })
+const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterOwner1, safeAddress })
 ```
 
 ### 3. Create a Safe transaction
@@ -103,24 +102,25 @@ const transactions: SafeTransactionDataPartial[] = [{
 const safeTransaction = await safeSdk.createTransaction(...transactions)
 ```
 
-Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example the owner `signer1` will sign it off-chain, the owner `signer2` will sign it on-chain and the owner `signer3` will execute it (the executor also signs the transaction transparently).
+Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example `owner1` will sign it off-chain, `owner2` will sign it on-chain and `owner3` will execute it (the executor also signs the transaction transparently).
 
 ### 3.a. Off-chain signatures
 
-The owner `signer1` signs the transaction off-chain.
+The `owner1` account signs the transaction off-chain.
 
 ```js
-const signer1Signature = await safeSdk.signTransaction(safeTransaction)
+const owner1Signature = await safeSdk.signTransaction(safeTransaction)
 ```
 
 Because the signature is off-chain, there is no interaction with the contract and the signature becomes available at `safeTransaction.signatures`.
 
 ### 3.b. On-chain signatures
 
-After `signer2` account is connected to the SDK as the signer the transaction hash will be approved on-chain.
+To connect `owner2` to the Safe we need to create a new instance of the class `EthAdapter` passing to its constructor the owner we would like to connect. After `owner2` account is connected to the SDK as a signer the transaction hash will be approved on-chain.
 
 ```js
-const safeSdk2 = await safeSdk.connect({ signer: signer2 })
+const ethAdapterOwner2 = new EthersAdapter({ ethers, signer: owner2 })
+const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapterOwner2, safeAddress })
 const txHash = await safeSdk2.getTransactionHash(safeTransaction)
 const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
 await approveTxResponse.wait()
@@ -128,10 +128,11 @@ await approveTxResponse.wait()
 
 ### 4. Transaction execution
 
-Lastly, `signer3` account is connected to the SDK as the signer and executor of the Safe transaction to execute it.
+Lastly, `owner3` account is connected to the SDK as a signer and executor of the Safe transaction to execute it.
 
 ```js
-const safeSdk3 = await safeSdk2.connect({ signer: signer3 })
+const ethAdapterOwner3 = new EthersAdapter({ ethers, signer: owner3 })
+const safeSdk3 = await safeSdk2.connect({ ethAdapter: ethAdapterOwner3, safeAddress })
 const executeTxResponse = await safeSdk3.executeTransaction(safeTransaction)
 await executeTxResponse.wait()
 ```
@@ -141,13 +142,7 @@ All the signatures used to execute the transaction are now available at `safeTra
 ## API Reference
 
 ### create
-Returns an instance of the Safe Core SDK with the `signer` connected to the `safeAddress`.
-
-```js
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, signer })
-```
-
-If `signer` is not provided, `ethAdapter` default provider will be used.
+Returns an instance of the Safe Core SDK connected to the `safeAddress`.
 
 ```js
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
@@ -161,21 +156,15 @@ const contractNetworks: ContractNetworksConfig = {
     multiSendAddress: '0x<multisend_address>'
   }
 }
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, signer, contractNetworks })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
 ```
 
 ### connect
 
-Returns a new instance of the Safe Core SDK with the `signer` connected to the `safeAddress`.
+Returns a new instance of the Safe Core SDK connected to the `safeAddress`.
 
 ```js
-const safeSdk2 = await safeSdk.connect({ signer, safeAddress })
-```
-
-If `safeAddress` is not provided, the `signer` will be connected to the previous Safe.
-
-```js
-const safeSdk2 = await safeSdk.connect({ signer })
+const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 ```
 
 The property `contractNetworks` can be added to provide the Safe contract addresses in case the SDK is used in a network where the Safe contracts are not deployed.
@@ -186,7 +175,7 @@ const contractNetworks: ContractNetworksConfig = {
     multiSendAddress: '0x<multisend_address>'
   }
 }
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, signer, contractNetworks })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
 ```
 
 ### getAddress
@@ -326,7 +315,7 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 
 ### signTransactionHash
 
-Signs a hash using the current signer account.
+Signs a hash using the current owner account.
 
 ```js
 const transactions: SafeTransactionDataPartial[] = [{
@@ -339,7 +328,7 @@ const signature = await safeSdk.signTransactionHash(txHash)
 
 ### signTransaction
 
-Adds the signature of the current signer to the Safe transaction object.
+Adds the signature of the current owner to the Safe transaction object.
 
 ```js
 const transactions: SafeTransactionDataPartial[] = [{
@@ -351,7 +340,7 @@ await safeSdk.signTransaction(safeTransaction)
 
 ### approveTransactionHash
 
-Approves on-chain a hash using the current signer account.
+Approves a hash on-chain using the current owner account.
 
 ```js
 const transactions: SafeTransactionDataPartial[] = [{

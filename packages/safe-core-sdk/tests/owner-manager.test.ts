@@ -1,10 +1,18 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, ethers, waffle } from 'hardhat'
-import EthersSafe, { ContractNetworksConfig } from '../src'
+import { deployments, waffle } from 'hardhat'
+import Safe, { ContractNetworksConfig } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
-import { getAccounts } from './utils/setupConfig'
-import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getSafeSingleton,
+  getSafeWithOwners
+} from './utils/setupContracts'
+import { getEthAdapter } from './utils/setupEthAdapter'
+import { getAccounts } from './utils/setupTestNetwork'
+import { waitSafeTxReceipt } from './utils/transactions'
+
 chai.use(chaiAsPromised)
 
 describe('Safe owners manager', () => {
@@ -13,7 +21,11 @@ describe('Safe owners manager', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks: ContractNetworksConfig = {
-      [chainId]: { multiSendAddress: (await getMultiSend()).address }
+      [chainId]: {
+        multiSendAddress: (await getMultiSend()).address,
+        safeMasterCopyAddress: (await getSafeSingleton()).address,
+        safeProxyFactoryAddress: (await getFactory()).address
+      }
     }
     return {
       safe: await getSafeWithOwners([
@@ -31,10 +43,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const owners = await safeSdk.getOwners()
@@ -49,10 +61,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const isOwner = await safeSdk.isOwner(account1.address)
@@ -63,10 +75,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const isOwner = await safeSdk.isOwner(account2.address)
@@ -79,10 +91,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getAddOwnerTx('0x123')
@@ -93,10 +105,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getAddOwnerTx(SENTINEL_ADDRESS)
@@ -107,10 +119,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getAddOwnerTx(ZERO_ADDRESS)
@@ -121,10 +133,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getAddOwnerTx(account1.address)
@@ -135,10 +147,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const newThreshold = 3
@@ -152,10 +164,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getAddOwnerTx(account2.address, 0)
@@ -166,10 +178,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const initialThreshold = await safeSdk.getThreshold()
@@ -178,7 +190,7 @@ describe('Safe owners manager', () => {
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
       const tx = await safeSdk.getAddOwnerTx(account2.address)
       const txResponse = await safeSdk.executeTransaction(tx)
-      await txResponse.wait()
+      await waitSafeTxReceipt(txResponse)
       const finalThreshold = await safeSdk.getThreshold()
       chai.expect(initialThreshold).to.be.eq(finalThreshold)
       const owners = await safeSdk.getOwners()
@@ -191,10 +203,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const newThreshold = 1
@@ -203,7 +215,7 @@ describe('Safe owners manager', () => {
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
       const tx = await safeSdk.getAddOwnerTx(account2.address, newThreshold)
       const txResponse = await safeSdk.executeTransaction(tx)
-      await txResponse.wait()
+      await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getThreshold()).to.be.eq(newThreshold)
       const owners = await safeSdk.getOwners()
       chai.expect(owners.length).to.be.eq(2)
@@ -216,10 +228,10 @@ describe('Safe owners manager', () => {
     it('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getRemoveOwnerTx('0x123')
@@ -229,10 +241,10 @@ describe('Safe owners manager', () => {
     it('should fail if address is equal to sentinel', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getRemoveOwnerTx(SENTINEL_ADDRESS)
@@ -242,10 +254,10 @@ describe('Safe owners manager', () => {
     it('should fail if address is equal to 0x address', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getRemoveOwnerTx(ZERO_ADDRESS)
@@ -255,10 +267,10 @@ describe('Safe owners manager', () => {
     it('should fail if address is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3, account4] = accounts
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getRemoveOwnerTx(account4.address)
@@ -268,10 +280,10 @@ describe('Safe owners manager', () => {
     it('should fail if the threshold is bigger than the number of owners', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const newThreshold = 3
@@ -284,10 +296,10 @@ describe('Safe owners manager', () => {
     it('should fail if the threshold is not bigger than 0', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getRemoveOwnerTx(account1.address, 0)
@@ -297,20 +309,16 @@ describe('Safe owners manager', () => {
     it('should remove the first owner of a Safe and decrease the threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const safeSdk1 = await EthersSafe.create({
-        ethers,
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({
-        providerOrSigner: account2.signer,
-        contractNetworks
-      })
-      const safeSdk3 = await safeSdk1.connect({
-        providerOrSigner: account3.signer,
-        contractNetworks
-      })
+      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = await getEthAdapter(account3.signer)
+      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       const initialThreshold = await safeSdk1.getThreshold()
       const initialOwners = await safeSdk1.getOwners()
       chai.expect(initialOwners.length).to.be.eq(3)
@@ -321,7 +329,7 @@ describe('Safe owners manager', () => {
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)
-      await txResponse.wait()
+      await waitSafeTxReceipt(txResponse)
       const finalThreshold = await safeSdk1.getThreshold()
       chai.expect(initialThreshold - 1).to.be.eq(finalThreshold)
       const finalOwners = await safeSdk1.getOwners()
@@ -333,18 +341,17 @@ describe('Safe owners manager', () => {
     it('should remove any owner of a Safe and decrease the threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const safeSdk1 = await EthersSafe.create({
-        ethers,
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({
-        providerOrSigner: account2.signer,
-        contractNetworks
-      })
+      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = await getEthAdapter(account3.signer)
       const safeSdk3 = await safeSdk1.connect({
-        providerOrSigner: account3.signer,
+        ethAdapter: ethAdapter3,
         contractNetworks
       })
       const initialThreshold = await safeSdk1.getThreshold()
@@ -357,7 +364,7 @@ describe('Safe owners manager', () => {
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)
-      await txResponse.wait()
+      await waitSafeTxReceipt(txResponse)
       const finalThreshold = await safeSdk1.getThreshold()
       chai.expect(initialThreshold - 1).to.be.eq(finalThreshold)
       const finalOwners = await safeSdk1.getOwners()
@@ -369,20 +376,16 @@ describe('Safe owners manager', () => {
     it('should remove an owner and update the threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const safeSdk1 = await EthersSafe.create({
-        ethers,
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({
-        providerOrSigner: account2.signer,
-        contractNetworks
-      })
-      const safeSdk3 = await safeSdk1.connect({
-        providerOrSigner: account3.signer,
-        contractNetworks
-      })
+      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = await getEthAdapter(account3.signer)
+      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       const newThreshold = 1
       const initialOwners = await safeSdk1.getOwners()
       chai.expect(initialOwners.length).to.be.eq(3)
@@ -393,7 +396,7 @@ describe('Safe owners manager', () => {
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)
-      await txResponse.wait()
+      await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk1.getThreshold()).to.be.eq(newThreshold)
       const finalOwners = await safeSdk1.getOwners()
       chai.expect(finalOwners.length).to.be.eq(initialOwners.length - 1)
@@ -407,10 +410,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx('0x123', account2.address)
@@ -421,10 +424,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx(account1.address, '0x123')
@@ -435,10 +438,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx(SENTINEL_ADDRESS, account2.address)
@@ -449,10 +452,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx(account1.address, SENTINEL_ADDRESS)
@@ -463,10 +466,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx(ZERO_ADDRESS, account2.address)
@@ -477,10 +480,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx(account1.address, ZERO_ADDRESS)
@@ -491,10 +494,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3, account4] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx(account4.address, account2.address)
@@ -505,10 +508,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const tx = safeSdk.getSwapOwnerTx(account1.address, account1.address)
@@ -519,10 +522,10 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await EthersSafe.create({
-        ethers,
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
       const initialOwners = await safeSdk.getOwners()
@@ -530,7 +533,7 @@ describe('Safe owners manager', () => {
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
       const tx = await safeSdk.getSwapOwnerTx(account1.address, account2.address)
       const txResponse = await safeSdk.executeTransaction(tx)
-      await txResponse.wait()
+      await waitSafeTxReceipt(txResponse)
       const finalOwners = await safeSdk.getOwners()
       chai.expect(finalOwners.length).to.be.eq(1)
       chai.expect(finalOwners[0]).to.be.eq(account2.address)
@@ -539,20 +542,16 @@ describe('Safe owners manager', () => {
     it('should replace any owner of a Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3, account4] = accounts
-      const safeSdk1 = await EthersSafe.create({
-        ethers,
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
-        providerOrSigner: account1.signer,
         contractNetworks
       })
-      const safeSdk2 = await safeSdk1.connect({
-        providerOrSigner: account2.signer,
-        contractNetworks
-      })
-      const safeSdk3 = await safeSdk1.connect({
-        providerOrSigner: account3.signer,
-        contractNetworks
-      })
+      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+      const ethAdapter3 = await getEthAdapter(account3.signer)
+      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       const initialOwners = await safeSdk1.getOwners()
       chai.expect(initialOwners.length).to.be.eq(3)
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
@@ -562,7 +561,7 @@ describe('Safe owners manager', () => {
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)
-      await txResponse.wait()
+      await waitSafeTxReceipt(txResponse)
       const finalOwners = await safeSdk1.getOwners()
       chai.expect(finalOwners.length).to.be.eq(3)
       chai.expect(finalOwners[0]).to.be.eq(account1.address)

@@ -100,7 +100,7 @@ describe('Safe Proxy Factory', () => {
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       chai
         .expect(safeFactory.deploySafe(safeAccountConfig))
-        .rejectedWith('Threshold must be greater than or equal to 0')
+        .rejectedWith('Threshold must be greater than or equal to 1')
     })
 
     it('should fail if the threshold is higher than the threshold', async () => {

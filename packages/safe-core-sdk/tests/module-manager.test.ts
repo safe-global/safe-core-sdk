@@ -5,7 +5,9 @@ import Safe, { ContractNetworksConfig } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import {
   getDailyLimitModule,
+  getFactory,
   getMultiSend,
+  getSafeSingleton,
   getSafeWithOwners,
   getSocialRecoveryModule
 } from './utils/setupContracts'
@@ -21,7 +23,11 @@ describe('Safe modules manager', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks: ContractNetworksConfig = {
-      [chainId]: { multiSendAddress: (await getMultiSend()).address }
+      [chainId]: {
+        multiSendAddress: (await getMultiSend()).address,
+        safeMasterCopyAddress: (await getSafeSingleton()).address,
+        safeProxyFactoryAddress: (await getFactory()).address
+      }
     }
     return {
       dailyLimitModule: await getDailyLimitModule(),

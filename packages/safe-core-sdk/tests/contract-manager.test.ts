@@ -3,7 +3,12 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import Safe, { ContractNetworksConfig } from '../src'
 import { ZERO_ADDRESS } from '../src/utils/constants'
-import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getSafeSingleton,
+  getSafeWithOwners
+} from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
@@ -15,7 +20,11 @@ describe('Safe contracts manager', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks: ContractNetworksConfig = {
-      [chainId]: { multiSendAddress: (await getMultiSend()).address }
+      [chainId]: {
+        multiSendAddress: (await getMultiSend()).address,
+        safeMasterCopyAddress: (await getSafeSingleton()).address,
+        safeProxyFactoryAddress: (await getFactory()).address
+      }
     }
     return {
       safe: await getSafeWithOwners([accounts[0].address]),
@@ -56,9 +65,13 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
-      const { safe, accounts, chainId } = await setupTests()
-      const contractNetworks: ContractNetworksConfig = {
-        [chainId]: { multiSendAddress: ZERO_ADDRESS }
+      const { safe, accounts, chainId, contractNetworks } = await setupTests()
+      const customContractNetworks: ContractNetworksConfig = {
+        [chainId]: {
+          multiSendAddress: ZERO_ADDRESS,
+          safeMasterCopyAddress: ZERO_ADDRESS,
+          safeProxyFactoryAddress: ZERO_ADDRESS
+        }
       }
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -67,7 +80,7 @@ describe('Safe contracts manager', () => {
           Safe.create({
             ethAdapter,
             safeAddress: safe.address,
-            contractNetworks
+            contractNetworks: customContractNetworks
           })
         )
         .to.be.rejectedWith('MultiSend contract is not deployed in the current network')

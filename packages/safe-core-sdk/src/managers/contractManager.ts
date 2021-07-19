@@ -30,12 +30,8 @@ class ContractManager {
       throw new Error('Safe contracts not found in the current network')
     }
     this.#contractNetworks = contractNetworksConfig
-    const { gnosisSafeContract, multiSendContract } = await ethAdapter.getSafeContracts(
-      safeAddress,
-      contracts
-    )
-    this.#safeContract = gnosisSafeContract
-    this.#multiSendContract = multiSendContract
+    this.#safeContract = await ethAdapter.getSafeContract(safeAddress)
+    this.#multiSendContract = await ethAdapter.getMultiSendContract(contracts.multiSendAddress)
   }
 
   get contractNetworks(): ContractNetworksConfig {

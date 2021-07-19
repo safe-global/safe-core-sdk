@@ -3,7 +3,12 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import Safe, { ContractNetworksConfig } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
-import { getMultiSend, getSafeWithOwners } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getSafeSingleton,
+  getSafeWithOwners
+} from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
@@ -16,7 +21,11 @@ describe('Safe owners manager', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks: ContractNetworksConfig = {
-      [chainId]: { multiSendAddress: (await getMultiSend()).address }
+      [chainId]: {
+        multiSendAddress: (await getMultiSend()).address,
+        safeMasterCopyAddress: (await getSafeSingleton()).address,
+        safeProxyFactoryAddress: (await getFactory()).address
+      }
     }
     return {
       safe: await getSafeWithOwners([

@@ -11,9 +11,7 @@
     "SDK"
   ],
   "scripts": {
-    "typechain-ethers": "typechain --target ethers-v5 --out-dir 'src/types/typechain/ethers-v5' '../../node_modules/@gnosis.pm/safe-contracts/build/contracts/**/*.json' '../../node_modules/openzeppelin-solidity/build/contracts/ERC20Mintable.json'",
-    "typechain-web3": "typechain --target web3-v1 --out-dir 'src/types/typechain/web3-v1' '../../node_modules/@gnosis.pm/safe-contracts/build/contracts/**/*.json' '../../node_modules/openzeppelin-solidity/build/contracts/ERC20Mintable.json'",
-    "typechain": "yarn typechain-ethers && yarn typechain-web3",
+    "typechain": "node ./scripts/generateTypechainFiles.ts",
     "postinstall": "yarn typechain",
     "unbuild": "rimraf dist artifacts cache .nyc_output",
     "build": "hardhat compile && tsc",

@@ -5,10 +5,11 @@ import {
   TransactionResponse
 } from '@ethersproject/abstract-provider'
 import { Signer, VoidSigner } from '@ethersproject/abstract-signer'
+import { BigNumber } from '@ethersproject/bignumber'
 import { Deferrable } from '@ethersproject/properties'
 import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
 import { OperationType, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
 import { SafeService } from 'service'
 import { createLibAddress, createLibInterface, mapReceipt } from './utils'
 

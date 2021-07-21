@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers'
+import { BigNumber } from '@ethersproject/bignumber'
 import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contract'
 import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
 import GnosisSafeProxyFactoryAbiV120 from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryAbiV1-2-0.json'

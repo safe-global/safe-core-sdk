@@ -1,4 +1,4 @@
-import { Signer } from 'ethers'
+import { Signer } from '@ethersproject/abstract-signer'
 import { ethers, web3 } from 'hardhat'
 import { EthAdapter, EthersAdapter, Web3Adapter } from '../../src'
 

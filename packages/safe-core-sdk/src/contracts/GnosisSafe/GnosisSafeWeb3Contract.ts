@@ -1,5 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
-import { BigNumber } from 'ethers'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 import { GnosisSafe } from '../../types/typechain/web3-v1/GnosisSafe'
 import { TransactionOptions, Web3TransactionResult } from '../../utils/transactions/types'

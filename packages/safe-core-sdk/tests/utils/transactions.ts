@@ -1,4 +1,4 @@
-import { ContractReceipt } from 'ethers/lib/ethers'
+import { ContractReceipt } from '@ethersproject/contracts'
 import { TransactionReceipt } from 'web3-core/types'
 import { EthAdapter, TransactionResult } from '../../src'
 

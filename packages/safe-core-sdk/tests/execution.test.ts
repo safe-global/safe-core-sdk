@@ -1,7 +1,7 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import Safe, { ContractNetworksConfig, TransactionOptions } from '../src'
 import {

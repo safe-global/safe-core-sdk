@@ -1,5 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
-import { BigNumber } from 'ethers'
 import { TransactionOptions, TransactionResult } from '../../utils/transactions/types'
 
 interface GnosisSafeContract {

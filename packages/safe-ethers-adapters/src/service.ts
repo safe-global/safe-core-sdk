@@ -1,10 +1,10 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import {
   SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
 import axios, { AxiosInstance } from 'axios'
-import { BigNumber } from 'ethers'
 
 export interface SafeTxDetails {
   transactionHash?: string

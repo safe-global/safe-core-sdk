@@ -1,10 +1,10 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import {
   OperationType,
   SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import { BigNumber } from 'ethers'
 import { ContractNetworksConfig } from './configuration/contracts'
 import EthAdapter from './ethereumLibs/EthAdapter'
 import ContractManager from './managers/contractManager'

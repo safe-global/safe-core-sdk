@@ -1,6 +1,6 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import Safe, { ContractNetworksConfig } from '../src'
 import {

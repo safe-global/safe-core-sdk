@@ -1,10 +1,11 @@
+import { arrayify } from '@ethersproject/bytes'
+import { pack } from '@ethersproject/solidity'
 import {
   MetaTransactionData,
   OperationType,
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import { utils } from 'ethers'
 import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
 import EthAdapter from '../../ethereumLibs/EthAdapter'
 import { ZERO_ADDRESS } from '../constants'
@@ -55,8 +56,8 @@ export async function standardizeSafeTransactionData(
 }
 
 function encodeMetaTransaction(tx: MetaTransactionData): string {
-  const data = utils.arrayify(tx.data)
-  const encoded = utils.solidityPack(
+  const data = arrayify(tx.data)
+  const encoded = pack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
     [tx.operation, tx.to, tx.value, data.length, data]
   )

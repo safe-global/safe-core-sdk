@@ -1,4 +1,4 @@
-import { ContractTransaction } from 'ethers'
+import { ContractTransaction } from '@ethersproject/contracts'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
 export interface TransactionOptions {

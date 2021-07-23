@@ -1,5 +1,5 @@
-import { ContractTransaction, Event } from 'ethers'
-import { GnosisSafeProxyFactory } from '../../types/typechain/ethers-v5/GnosisSafeProxyFactory'
+import { ContractTransaction, Event } from '@ethersproject/contracts'
+import { GnosisSafeProxyFactory } from '../../../typechain/src/ethers-v5/GnosisSafeProxyFactory'
 import GnosisSafeProxyFactoryContract, { CreateProxyProps } from './GnosisSafeProxyFactoryContract'
 
 class GnosisSafeProxyFactoryEthersV5Contract implements GnosisSafeProxyFactoryContract {
@@ -27,7 +27,9 @@ class GnosisSafeProxyFactoryEthersV5Contract implements GnosisSafeProxyFactoryCo
       txResponse = await this.contract.createProxy(safeMasterCopyAddress, initializer, options)
     }
     const txReceipt = await txResponse.wait()
-    const proxyCreationEvent = txReceipt.events?.find(({ event }: Event) => event === 'ProxyCreation')
+    const proxyCreationEvent = txReceipt.events?.find(
+      ({ event }: Event) => event === 'ProxyCreation'
+    )
     if (!proxyCreationEvent || !proxyCreationEvent.args) {
       throw new Error('Safe Proxy was not deployed correctly')
     }

@@ -1,4 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { GnosisSafe } from '../../typechain/src/web3-v1/GnosisSafe'
+import { GnosisSafeProxyFactory } from '../../typechain/src/web3-v1/GnosisSafeProxyFactory'
+import { MultiSend } from '../../typechain/src/web3-v1/MultiSend'
 import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contract'
 import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
 import GnosisSafeProxyFactoryAbiV120 from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryAbiV1-2-0.json'
@@ -6,9 +9,6 @@ import GnosisSafeProxyFactoryWeb3Contract from '../contracts/GnosisSafeProxyFact
 import MultiSendAbi from '../contracts/MultiSend/MultiSendAbi.json'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
 import { AbiItem } from '../types'
-import { GnosisSafe } from '../types/typechain/web3-v1/GnosisSafe'
-import { GnosisSafeProxyFactory } from '../types/typechain/web3-v1/GnosisSafeProxyFactory'
-import { MultiSend } from '../types/typechain/web3-v1/MultiSend'
 import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
 
 export interface Web3AdapterConfig {

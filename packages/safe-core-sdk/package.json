@@ -11,10 +11,9 @@
     "SDK"
   ],
   "scripts": {
-    "typechain": "node ./scripts/generateTypechainFiles.ts",
-    "postinstall": "yarn typechain",
-    "unbuild": "rimraf dist artifacts cache .nyc_output",
-    "build": "hardhat compile && tsc",
+    "typechain": "node scripts/generateTypechainFiles.ts",
+    "unbuild": "rimraf dist artifacts cache .nyc_output typechain",
+    "build": "hardhat compile && yarn typechain && tsc",
     "test:ganache:web3": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:ethers": "export TEST_NETWORK=ganache && export ETH_LIB=ethers && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:hardhat:web3": "export TEST_NETWORK=hardhat && export ETH_LIB=web3 && hardhat deploy && nyc hardhat test",

@@ -74,6 +74,7 @@ moveTypechainFiles(web3V1, typeChainDirectorySrcPath, typeChainDirectoryBuildPat
 
 // Src: Ethers V5 types
 generateTypechainFiles(ethersV5, outDirSrc, safeContracts)
+moveTypechainFiles(ethersV5, typeChainDirectorySrcPath, typeChainDirectoryBuildPath)
 
 // Tests: Ethers V5 types
 generateTypechainFiles(ethersV5, outDirTests, testContracts)

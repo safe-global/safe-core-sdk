@@ -1,48 +1,79 @@
-const { exec } = require('child_process')
+const { execSync } = require('child_process')
+const { readdir, mkdirSync, existsSync } = require('fs')
+const path = require('path')
 
-// Directory where the Typechain files will be generated
-const outDir = 'src/types/typechain/'
+// Directories where the Typechain files will be generated
+const outDirSrc = 'typechain/src/'
+const typeChainDirectorySrcPath = path.join(__dirname, `../${outDirSrc}`)
+
+const outDirTests = 'typechain/tests/'
+const typeChainDirectoryTestsPath = path.join(__dirname, `../${outDirTests}`)
+
+const outDirBuild = 'dist/typechain/src/'
+const typeChainDirectoryBuildPath = path.join(__dirname, `../${outDirBuild}`)
 
 // Contract list for which the Typechain files will be generated
+// Will be included in dist/ folder
 const safeContractsPath = '../../node_modules/@gnosis.pm/safe-contracts/build/contracts'
+const openZeppelinContractsPath = '../../node_modules/openzeppelin-solidity/build/contracts'
 const safeContracts = [
   `${safeContractsPath}/GnosisSafe.json`,
   `${safeContractsPath}/GnosisSafeProxyFactory.json`,
   `${safeContractsPath}/MultiSend.json`,
+].join(' ')
+// Won't be included in dist/ folder
+const testContracts = [
   `${safeContractsPath}/DailyLimitModule.json`,
-  `${safeContractsPath}/SocialRecoveryModule.json`
-]
-const openZeppelinContractsPath = '../../node_modules/openzeppelin-solidity/build/contracts'
-const openZeppelinContracts = [
+  `${safeContractsPath}/SocialRecoveryModule.json`,
   `${openZeppelinContractsPath}/ERC20Mintable.json`
-]
-const contractList = [...safeContracts, ...openZeppelinContracts].join(' ')
+].join(' ')
 
 // Remove existing Typechain files
-exec('rimraf src/types/typechain', (error, stdout) => {
+execSync(`rimraf ${outDirSrc} ${outDirTests}`, (error) => {
   if (error) {
     console.log(error.message)
     return
   }
-  console.log(stdout)
 })
 
-// Generate Web3 types
+// Generate Typechain files
+function generateTypechainFiles(typechainVersion, outDir, contractList) {
+  execSync(`typechain --target ${typechainVersion} --out-dir ${outDir}${typechainVersion} ${contractList}`, (error) => {
+    if (error) {
+      console.log(error.message)
+    }
+  })
+  console.log(`Generated typechain ${typechainVersion} at ${outDir}`)
+}
+
+// Copy Typechain files with the right extension (.d.ts -> .ts) allows them to be included in the build folder
+function moveTypechainFiles(typechainVersion, inDir, outDir) {
+  readdir(`${inDir}${typechainVersion}`, (error, files) => {
+    if (error) {
+      console.log(error)
+    }
+    if (!existsSync(`${outDir}${typechainVersion}`)) {
+      mkdirSync(`${outDir}${typechainVersion}`, { recursive: true })
+    }
+    files.forEach(file => {
+      const pattern = /.d.ts/
+      if (!file.match(pattern)) {
+        return
+      }
+      execSync(`cp ${inDir}${typechainVersion}/${file} ${outDir}${typechainVersion}/${file}`)
+    })
+  })
+}
+
 const web3V1 = 'web3-v1'
-exec(`typechain --target ${web3V1} --out-dir ${outDir}${web3V1} ${contractList}`, (error, stdout) => {
-  if (error) {
-    console.log(error.message)
-    return
-  }
-  console.log(stdout)
-})
-
-// Generate Ethers types
 const ethersV5 = 'ethers-v5'
-exec(`typechain --target ${ethersV5} --out-dir ${outDir}${ethersV5} ${contractList}`, (error, stdout) => {
-  if (error) {
-    console.log(error.message)
-    return
-  }
-  console.log(stdout)
-})
+
+// Src: Web3 V1 types
+generateTypechainFiles(web3V1, outDirSrc, safeContracts)
+moveTypechainFiles(web3V1, typeChainDirectorySrcPath, typeChainDirectoryBuildPath)
+
+// Src: Ethers V5 types
+generateTypechainFiles(ethersV5, outDirSrc, safeContracts)
+
+// Tests: Ethers V5 types
+generateTypechainFiles(ethersV5, outDirTests, testContracts)

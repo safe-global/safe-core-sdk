@@ -3,6 +3,7 @@
   "references": [
     { "path": "safe-core-sdk" },
     { "path": "safe-core-sdk-types" },
-    { "path": "safe-ethers-adapters" }
+    { "path": "safe-ethers-adapters" },
+    { "path": "safe-service-client" }
   ]
 }

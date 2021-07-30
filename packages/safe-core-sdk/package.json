@@ -11,7 +11,7 @@
     "SDK"
   ],
   "scripts": {
-    "unbuild": "rimraf dist artifacts cache typechain",
+    "unbuild": "rimraf dist artifacts cache typechain .nyc_output",
     "build": "hardhat compile && tsc",
     "test:ganache": "export TEST_NETWORK=ganache && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test": "hardhat deploy && nyc hardhat test",

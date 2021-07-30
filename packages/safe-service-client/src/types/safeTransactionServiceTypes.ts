@@ -90,7 +90,7 @@ export type SignatureResponse = {
   readonly signature: string
 }
 
-type SafeMultisigConfirmationResponse = {
+export type SafeMultisigConfirmationResponse = {
   readonly owner: string
   readonly submissionDate: string
   readonly transactionHash?: string

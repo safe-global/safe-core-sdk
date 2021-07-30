@@ -14,7 +14,7 @@
     "unbuild": "rimraf dist",
     "build": "yarn rimraf dist && tsc",
     "test": "mocha --require ts-node/register tests/**/*.test.ts",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write \"{src,tests}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
   "repository": {

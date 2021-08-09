@@ -1,3 +1,12 @@
 {
-  "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "auryn-macmillan",
+      "id": 8453294,
+      "comment_id": 895407099,
+      "created_at": "2021-08-09T17:32:13Z",
+      "repoId": 337806885,
+      "pullRequestNo": 54
+    }
+  ]
 }

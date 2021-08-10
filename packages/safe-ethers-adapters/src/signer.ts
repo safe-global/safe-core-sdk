@@ -1,17 +1,13 @@
-import { ethers, BigNumber } from 'ethers'
-import { VoidSigner, Signer } from '@ethersproject/abstract-signer'
+
 import {
-  Provider,
-  TransactionResponse,
-  TransactionRequest,
-  TransactionReceipt
+  Provider, TransactionReceipt, TransactionRequest, TransactionResponse
 } from '@ethersproject/abstract-provider'
+import { Signer, VoidSigner } from '@ethersproject/abstract-signer'
+import { BigNumber } from '@ethersproject/bignumber'
 import { Deferrable } from '@ethersproject/properties'
-import EthersSafe, { Safe } from '@gnosis.pm/safe-core-sdk'
-import {
-  SafeTransactionData,
-  OperationType
-} from '@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction'
+import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+import { OperationType, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import { ethers } from 'ethers'
 import { SafeService } from 'service'
 import { createLibAddress, createLibInterface, mapReceipt } from './utils'
 
@@ -33,7 +29,7 @@ export class SafeEthersSigner extends VoidSigner {
 
   /**
    * Creates an instance of the SafeEthersSigner.
-   * @param address - Address of the Safe that should be used
+   * @param safeAddress - Address of the Safe that should be used
    * @param signer - Owner or delegate of an owner for the specified Safe
    * @param service - Services to which the transactions should be proposed to
    * @param provider - (Optional) Provider that should be used for blockchain interactions. By default the provider from the signer is used.
@@ -41,13 +37,14 @@ export class SafeEthersSigner extends VoidSigner {
    * @returns The SafeEthersSigner instance
    */
   static async create(
-    address: string,
+    safeAddress: string,
     signer: Signer,
     service: SafeService,
     provider?: Provider,
     options?: SafeEthersSignerOptions
   ): Promise<SafeEthersSigner> {
-    const safe = await EthersSafe.create({ ethers, safeAddress: address, providerOrSigner: signer })
+    const ethAdapter = new EthersAdapter({ ethers, signer })
+    const safe = await Safe.create({ ethAdapter, safeAddress })
     return new SafeEthersSigner(safe, service, provider, options)
   }
 

@@ -54,7 +54,7 @@ interface SafeTransactionService {
   proposeTransaction(
     safeAddress: string,
     transaction: SafeTransactionData,
-    transactionHash: string,
+    safeTxHash: string,
     signature: SafeSignature
   ): Promise<void>
   getIncomingTransactions(safeAddress: string): Promise<TransferListResponse>
@@ -71,7 +71,7 @@ interface SafeTransactionService {
   getCollectibles(safeAddress: string): Promise<SafeCollectibleResponse[]>
 
   // Tokens
-  getTokens(): Promise<TokenInfoListResponse>
+  getTokenList(): Promise<TokenInfoListResponse>
   getToken(tokenAddress: string): Promise<TokenInfoResponse>
 }
 

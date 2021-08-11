@@ -27,12 +27,11 @@ npm build
 
 ## Getting Started
 
-TBD
-
 ```js
-const await safeService = new await safeServiceClient('https://safe-transaction.gnosis.io')
-```
+import SafeServiceClient from '@gnosis.pm/safe-service-client'
 
+const safeService = new SafeServiceClient('https://safe-transaction.gnosis.io')
+```
 
 ## API Reference
 
@@ -145,7 +144,7 @@ const estimateTx: SafeMultisigTransactionEstimateResponse = await safeService.es
 Creates a new multi-signature transaction and stores it in the Safe Transaction Service.
 
 ```js
-await safeService.proposeTransaction(safeAddress, transaction, transactionHash, signature)
+await safeService.proposeTransaction(safeAddress, transaction, safeTxHash, signature)
 ```
 
 ### getIncomingTransactions
@@ -208,12 +207,12 @@ Returns the collectives (ERC721 tokens) owned by the given Safe and information 
 const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress)
 ```
 
-### getTokens
+### getTokenList
 
 Returns the list of all the ERC20 tokens handled by the Safe.
 
 ```js
-const tokens: TokenInfoListResponse = await safeService.getTokens()
+const tokens: TokenInfoListResponse = await safeService.getTokenList()
 ```
 
 ### getToken

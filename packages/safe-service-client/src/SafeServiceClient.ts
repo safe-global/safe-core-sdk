@@ -241,7 +241,7 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The address of the Safe proposing the transaction
    * @param transaction - The transaction that is proposed
-   * @param transactionHash - The hash of the Safe transaction
+   * @param safeTxHash - The hash of the Safe transaction
    * @param signature - The signature of an owner or delegate of the specified Safe
    * @returns The hash of the Safe transaction proposed
    * @throws "400 Invalid data"
@@ -250,7 +250,7 @@ class SafeServiceClient implements SafeTransactionService {
   async proposeTransaction(
     safeAddress: string,
     transaction: SafeTransactionData,
-    transactionHash: string,
+    safeTxHash: string,
     signature: SafeSignature
   ): Promise<void> {
     return sendRequest({
@@ -258,7 +258,7 @@ class SafeServiceClient implements SafeTransactionService {
       method: HttpMethod.Post,
       body: {
         ...transaction,
-        contractTransactionHash: transactionHash,
+        contractTransactionHash: safeTxHash,
         sender: signature.signer,
         signature: signature.data
       }
@@ -381,7 +381,7 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @returns The list of all the ERC20 tokens
    */
-  async getTokens(): Promise<TokenInfoListResponse> {
+  async getTokenList(): Promise<TokenInfoListResponse> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/tokens/`,
       method: HttpMethod.Get

@@ -13,7 +13,7 @@ interface HttpRequest {
 }
 
 export async function sendRequest<T>({ url, method, body }: HttpRequest): Promise<T> {
-  let response: AxiosResponse<any>
+  let response: AxiosResponse<T>
   try {
     response = await axios[method](url, body)
   } catch (error) {

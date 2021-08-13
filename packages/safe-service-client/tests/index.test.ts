@@ -288,7 +288,7 @@ describe('Safe Service Client', () => {
     })
 
     it('getTokens', async () => {
-      chai.expect(serviceSdk.getTokens()).to.be.eventually.deep.equals({ success: true })
+      chai.expect(serviceSdk.getTokenList()).to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(

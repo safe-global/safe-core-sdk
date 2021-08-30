@@ -4,13 +4,12 @@ import {
   TransactionRequest,
   TransactionResponse
 } from '@ethersproject/abstract-provider'
-import { Signer, VoidSigner } from '@ethersproject/abstract-signer'
+import { VoidSigner } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Deferrable } from '@ethersproject/properties'
-import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+import Safe from '@gnosis.pm/safe-core-sdk'
 import { OperationType, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
-import { ethers } from 'ethers'
-import { SafeService } from 'service'
+import { SafeService } from './service'
 import { createLibAddress, createLibInterface, mapReceipt } from './utils'
 
 const sleep = (duration: number): Promise<void> =>
@@ -24,34 +23,25 @@ export interface SafeEthersSignerOptions {
   pollingDelay?: number
 }
 
+export interface SafeFactory extends Promise<Safe> {
+  getAddress: () => string
+}
+
 export class SafeEthersSigner extends VoidSigner {
   readonly service: SafeService
-  readonly safe: Safe
+  readonly safe: Safe | SafeFactory
   readonly options?: SafeEthersSignerOptions
 
   /**
    * Creates an instance of the SafeEthersSigner.
-   * @param safeAddress - Address of the Safe that should be used
-   * @param signer - Owner or delegate of an owner for the specified Safe
+   * @param safe - Safe that should be used
    * @param service - Services to which the transactions should be proposed to
    * @param provider - (Optional) Provider that should be used for blockchain interactions. By default the provider from the signer is used.
    * @param options - (Optional) Additional options (e.g. polling delay when waiting for a transaction to be mined)
    * @returns The SafeEthersSigner instance
    */
-  static async create(
-    safeAddress: string,
-    signer: Signer,
-    service: SafeService,
-    provider?: Provider,
-    options?: SafeEthersSignerOptions
-  ): Promise<SafeEthersSigner> {
-    const ethAdapter = new EthersAdapter({ ethers, signer })
-    const safe = await Safe.create({ ethAdapter, safeAddress })
-    return new SafeEthersSigner(safe, service, provider, options)
-  }
-
   constructor(
-    safe: Safe,
+    safe: Safe | SafeFactory,
     service: SafeService,
     provider?: Provider,
     options?: SafeEthersSignerOptions
@@ -66,7 +56,7 @@ export class SafeEthersSigner extends VoidSigner {
     safeTxHash: string,
     safeTx: SafeTransactionData
   ): Promise<SafeTransactionResponse> {
-    const connectedSafe = this.safe
+    const connectedSafe = await this.safe
     const connectedService = this.service
     return {
       to: safeTx.to,
@@ -126,12 +116,13 @@ export class SafeEthersSigner extends VoidSigner {
       operation
     }
     const safeTxGas = await this.service.estimateSafeTx(this.address, baseTx)
-    const safeTx = await this.safe.createTransaction({
+    const connectedSafe = await this.safe
+    const safeTx = await connectedSafe.createTransaction({
       ...baseTx,
       safeTxGas: safeTxGas.toNumber()
     })
-    const safeTxHash = await this.safe.getTransactionHash(safeTx)
-    const signature = await this.safe.signTransactionHash(safeTxHash)
+    const safeTxHash = await connectedSafe.getTransactionHash(safeTx)
+    const signature = await connectedSafe.signTransactionHash(safeTxHash)
     await this.service.proposeTx(this.address, safeTxHash, safeTx, signature)
     // TODO: maybe use original tx information
     return this.buildTransactionResponse(safeTxHash, safeTx.data)

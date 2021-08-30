@@ -123,7 +123,7 @@ const ethAdapterOwner2 = new EthersAdapter({ ethers, signer: owner2 })
 const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapterOwner2, safeAddress })
 const txHash = await safeSdk2.getTransactionHash(safeTransaction)
 const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
-await approveTxResponse.wait()
+await approveTxResponse.transactionResponse?.wait()
 ```
 
 ### 4. Transaction execution
@@ -134,7 +134,7 @@ Lastly, `owner3` account is connected to the SDK as a signer and executor of the
 const ethAdapterOwner3 = new EthersAdapter({ ethers, signer: owner3 })
 const safeSdk3 = await safeSdk2.connect({ ethAdapter: ethAdapterOwner3, safeAddress })
 const executeTxResponse = await safeSdk3.executeTransaction(safeTransaction)
-await executeTxResponse.wait()
+await executeTxResponse.transactionResponse?.wait()
 ```
 
 All the signatures used to execute the transaction are now available at `safeTransaction.signatures`.
@@ -349,7 +349,7 @@ const transactions: SafeTransactionDataPartial[] = [{
 const safeTransaction = await safeSdk.createTransaction(...transactions)
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const txResponse = await safeSdk.approveTransactionHash(txHash)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 ### getOwnersWhoApprovedTx
@@ -372,7 +372,7 @@ Returns a Safe transaction ready to be signed that will enable a Safe module.
 ```js
 const safeTransaction = await safeSdk.getEnableModuleTx(moduleAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 ### getDisableModuleTx
@@ -382,7 +382,7 @@ Returns a Safe transaction ready to be signed that will disable a Safe module.
 ```js
 const safeTransaction = await safeSdk.getDisableModuleTx(moduleAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 ### getAddOwnerTx
@@ -392,7 +392,7 @@ Returns the Safe transaction to add an owner and update the threshold.
 ```js
 const safeTransaction = await safeSdk.getAddOwnerTx(newOwnerAddress, newThreshold)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 If `threshold` is not provided, the current threshold will not change.
@@ -408,7 +408,7 @@ Returns the Safe transaction to remove an owner and update the threshold.
 ```js
 const safeTransaction = await safeSdk.getRemoveOwnerTx(ownerAddress, newThreshold)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 If `threshold` is not provided, the current threshold will be decreased by one.
@@ -424,7 +424,7 @@ Returns the Safe transaction to replace an owner of the Safe with a new one.
 ```js
 const safeTransaction = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 ### getChangeThresholdTx
@@ -434,7 +434,7 @@ Returns the Safe transaction to change the threshold.
 ```js
 const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 ### executeTransaction
@@ -447,7 +447,7 @@ const transactions: SafeTransactionDataPartial[] = [{
 }]
 const safeTransaction = await safeSdk.createTransaction(...transactions)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
-await txResponse.wait()
+await txResponse.transactionResponse?.wait()
 ```
 
 Optionally, `gasLimit` and `gasPrice` values can be passed as execution options, avoiding the gas estimation.
@@ -458,6 +458,7 @@ const options: TransactionOptions = {
   gasPrice: 123 // Optional parameter.
 }
 const txResponse = await safeSdk.executeTransaction(safeTransaction, options)
+await txResponse.transactionResponse?.wait()
 ```
 
 ## License

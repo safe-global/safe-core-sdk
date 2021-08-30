@@ -265,7 +265,7 @@ describe('Transactions execution', () => {
       })
       const execOptions: TransactionOptions = {
         gasLimit: 123456,
-        gasPrice: 123
+        gasPrice: 170000000
       }
       const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
       await waitSafeTxReceipt(txResponse)

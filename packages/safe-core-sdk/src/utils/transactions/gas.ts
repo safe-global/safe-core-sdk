@@ -105,7 +105,7 @@ export async function estimateGasForTransactionExecution(
         tx.data.refundReceiver,
         tx.encodedSignatures()
       ],
-      { from, gasPrice: tx.data.gasPrice }
+      { from }
     )
     return gas
   } catch (error) {

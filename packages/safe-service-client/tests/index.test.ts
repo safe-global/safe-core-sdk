@@ -51,7 +51,7 @@ describe('Safe Service Client', () => {
         .to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
-        .to.have.been.calledWith(`${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${ownerAddress}/`)
+        .to.have.been.calledWith(`${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${ownerAddress}/safes/`)
     })
 
     it('getTransaction', async () => {

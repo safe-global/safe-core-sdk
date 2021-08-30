@@ -82,7 +82,7 @@ class SafeServiceClient implements SafeTransactionService {
    */
   async getSafesByOwner(ownerAddress: string): Promise<OwnerResponse> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/owners/${ownerAddress}/`,
+      url: `${this.#txServiceBaseUrl}/owners/${ownerAddress}/safes/`,
       method: HttpMethod.Get
     })
   }

@@ -1,11 +1,11 @@
+import { BigNumber } from '@ethersproject/bignumber'
+import { OperationType } from '@gnosis.pm/safe-core-sdk-types'
+import EthSafeTransaction from '@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import { SafeService } from '../src/'
-import sinon from 'sinon'
-import { BigNumber } from '@ethersproject/bignumber'
-import { SafeTransaction } from '@gnosis.pm/safe-core-sdk'
-import { OperationType } from '@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -93,7 +93,7 @@ describe('SafeServices', () => {
         post: sinon.fake.throws(new Error('Test error'))
       }
       const service = new SafeService('some_base_url', mockNetwork)
-      const safeTx = new SafeTransaction({
+      const safeTx = new EthSafeTransaction({
         to: 'to_address',
         value: 'some_value',
         data: 'some_data',
@@ -131,7 +131,7 @@ describe('SafeServices', () => {
         post: sinon.fake.returns({ data: 'some_tx_hash' })
       }
       const service = new SafeService('some_base_url', mockNetwork)
-      const safeTx = new SafeTransaction({
+      const safeTx = new EthSafeTransaction({
         to: 'to_address',
         value: 'some_value',
         data: 'some_data',

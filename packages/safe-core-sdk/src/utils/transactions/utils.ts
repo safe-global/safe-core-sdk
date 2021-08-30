@@ -1,14 +1,15 @@
-import { pack as solidityPack } from '@ethersproject/solidity'
 import { arrayify } from '@ethersproject/bytes'
-import { GnosisSafe } from '../../../typechain'
-import { ZERO_ADDRESS } from '../constants'
-import { estimateTxGas } from './gas'
+import { pack as solidityPack } from '@ethersproject/solidity'
 import {
   MetaTransactionData,
   OperationType,
   SafeTransactionData,
   SafeTransactionDataPartial
-} from './SafeTransaction'
+} from '@gnosis.pm/safe-core-sdk-types'
+import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
+import EthAdapter from '../../ethereumLibs/EthAdapter'
+import { ZERO_ADDRESS } from '../constants'
+import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
@@ -23,7 +24,8 @@ export function standardizeMetaTransactionData(
 }
 
 export async function standardizeSafeTransactionData(
-  safeContract: GnosisSafe,
+  safeContract: GnosisSafeContract,
+  ethAdapter: EthAdapter,
   tx: SafeTransactionDataPartial
 ): Promise<SafeTransactionData> {
   const standardizedTxs = {
@@ -35,12 +37,13 @@ export async function standardizeSafeTransactionData(
     gasPrice: tx.gasPrice ?? 0,
     gasToken: tx.gasToken || ZERO_ADDRESS,
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
-    nonce: tx.nonce ?? (await safeContract.nonce()).toNumber()
+    nonce: tx.nonce ?? (await safeContract.getNonce())
   }
   const safeTxGas =
     tx.safeTxGas ??
     (await estimateTxGas(
       safeContract,
+      ethAdapter,
       standardizedTxs.to,
       standardizedTxs.value,
       standardizedTxs.data,

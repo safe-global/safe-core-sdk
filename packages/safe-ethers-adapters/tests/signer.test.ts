@@ -1,11 +1,10 @@
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import sinonChai from 'sinon-chai'
-import { SafeEthersSigner, SafeTxDetails } from '../src/'
-import sinon from 'sinon'
 import { BigNumber } from '@ethersproject/bignumber'
 import { getCreateCallDeployment } from '@gnosis.pm/safe-deployments'
-import { VoidSigner } from '@ethersproject/abstract-signer'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
+import { SafeEthersSigner, SafeTxDetails } from '../src/'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)

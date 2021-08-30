@@ -1,12 +1,11 @@
 import { AddressZero } from '@ethersproject/constants'
 import { deployments, ethers } from 'hardhat'
+import { GnosisSafe, MultiSend } from '../../typechain/src/ethers-v5'
 import {
   DailyLimitModule,
   ERC20Mintable,
-  GnosisSafe,
-  MultiSend,
   SocialRecoveryModule
-} from '../../typechain'
+} from '../../typechain/tests/ethers-v5'
 
 export const getSafeSingleton = async () => {
   const SafeDeployment = await deployments.get('GnosisSafe')

@@ -336,15 +336,17 @@ class Safe {
    * Returns the Safe transaction to enable a Safe module.
    *
    * @param moduleAddress - The desired module address
+   * @param nonce - The transaction nonce 
    * @returns The Safe transaction ready to be signed
    * @throws "Invalid module address provided"
    * @throws "Module provided is already enabled"
    */
-  async getEnableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+  async getEnableModuleTx(moduleAddress: string, nonce?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
-      data: await this.#moduleManager.encodeEnableModuleData(moduleAddress)
+      data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
+      nonce
     })
     return safeTransaction
   }
@@ -353,15 +355,17 @@ class Safe {
    * Returns the Safe transaction to disable a Safe module.
    *
    * @param moduleAddress - The desired module address
+   * @param nonce - The transaction nonce
    * @returns The Safe transaction ready to be signed
    * @throws "Invalid module address provided"
    * @throws "Module provided is not enabled already"
    */
-  async getDisableModuleTx(moduleAddress: string): Promise<SafeTransaction> {
+  async getDisableModuleTx(moduleAddress: string, nonce?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
-      data: await this.#moduleManager.encodeDisableModuleData(moduleAddress)
+      data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
+      nonce
     })
     return safeTransaction
   }
@@ -371,17 +375,19 @@ class Safe {
    *
    * @param ownerAddress - The address of the new owner
    * @param threshold - The new threshold
+   * @param nonce - The transaction nonce
    * @returns The Safe transaction ready to be signed
    * @throws "Invalid owner address provided"
    * @throws "Address provided is already an owner"
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getAddOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+  async getAddOwnerTx(ownerAddress: string, threshold?: number, nonce?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
+      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
+      nonce
     })
     return safeTransaction
   }
@@ -391,17 +397,19 @@ class Safe {
    *
    * @param ownerAddress - The address of the owner that will be removed
    * @param threshold - The new threshold
+   * @param nonce - The transaction nonce
    * @returns The Safe transaction ready to be signed
    * @throws "Invalid owner address provided"
    * @throws "Address provided is not an owner"
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getRemoveOwnerTx(ownerAddress: string, threshold?: number): Promise<SafeTransaction> {
+  async getRemoveOwnerTx(ownerAddress: string, threshold?: number, nonce?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
+      data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
+      nonce
     })
     return safeTransaction
   }
@@ -411,17 +419,19 @@ class Safe {
    *
    * @param oldOwnerAddress - The old owner address
    * @param newOwnerAddress - The new owner address
+   * @param nonce - The transaction nonce
    * @returns The Safe transaction ready to be signed
    * @throws "Invalid new owner address provided"
    * @throws "Invalid old owner address provided"
    * @throws "New address provided is already an owner"
    * @throws "Old address provided is not an owner"
    */
-  async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string): Promise<SafeTransaction> {
+  async getSwapOwnerTx(oldOwnerAddress: string, newOwnerAddress: string, nonce?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
+      data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
+      nonce
     })
     return safeTransaction
   }
@@ -430,15 +440,17 @@ class Safe {
    * Returns the Safe transaction to change the threshold.
    *
    * @param threshold - The new threshold
+   * @param nonce - The transaction nonce
    * @returns The Safe transaction ready to be signed
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getChangeThresholdTx(threshold: number): Promise<SafeTransaction> {
+  async getChangeThresholdTx(threshold: number, nonce?: number): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeChangeThresholdData(threshold)
+      data: await this.#ownerManager.encodeChangeThresholdData(threshold),
+      nonce
     })
     return safeTransaction
   }

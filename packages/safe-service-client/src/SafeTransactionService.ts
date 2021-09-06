@@ -66,9 +66,9 @@ interface SafeTransactionService {
   ): Promise<SafeMultisigTransactionListResponse>
 
   // Balances
-  getBalances(safeAddress: string): Promise<SafeBalanceResponse[]>
-  getUsdBalances(safeAddress: string): Promise<SafeBalanceUsdResponse[]>
-  getCollectibles(safeAddress: string): Promise<SafeCollectibleResponse[]>
+  getBalances(safeAddress: string, excludeSpamTokens?: boolean): Promise<SafeBalanceResponse[]>
+  getUsdBalances(safeAddress: string, excludeSpamTokens?: boolean): Promise<SafeBalanceUsdResponse[]>
+  getCollectibles(safeAddress: string, excludeSpamTokens?: boolean): Promise<SafeCollectibleResponse[]>
 
   // Tokens
   getTokenList(): Promise<TokenInfoListResponse>

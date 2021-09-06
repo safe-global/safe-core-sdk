@@ -339,9 +339,9 @@ class SafeServiceClient implements SafeTransactionService {
    * @throws "404 Safe not found"
    * @throws "422 Safe address checksum not valid"
    */
-  async getBalances(safeAddress: string): Promise<SafeBalanceResponse[]> {
+  async getBalances(safeAddress: string, excludeSpamTokens = true): Promise<SafeBalanceResponse[]> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/`,
+      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/?exclude_spam=${excludeSpamTokens}`,
       method: HttpMethod.Get
     })
   }
@@ -354,9 +354,9 @@ class SafeServiceClient implements SafeTransactionService {
    * @throws "404 Safe not found"
    * @throws "422 Safe address checksum not valid"
    */
-  async getUsdBalances(safeAddress: string): Promise<SafeBalanceUsdResponse[]> {
+  async getUsdBalances(safeAddress: string, excludeSpamTokens = true): Promise<SafeBalanceUsdResponse[]> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/`,
+      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/?exclude_spam=${excludeSpamTokens}`,
       method: HttpMethod.Get
     })
   }
@@ -369,9 +369,9 @@ class SafeServiceClient implements SafeTransactionService {
    * @throws "404 Safe not found"
    * @throws "422 Safe address checksum not valid"
    */
-  async getCollectibles(safeAddress: string): Promise<SafeCollectibleResponse[]> {
+  async getCollectibles(safeAddress: string, excludeSpamTokens = true): Promise<SafeCollectibleResponse[]> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/`,
+      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/?exclude_spam=${excludeSpamTokens}`,
       method: HttpMethod.Get
     })
   }

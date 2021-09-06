@@ -261,7 +261,18 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/`
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/?exclude_spam=true`
+        )
+    })
+
+    it('getBalances (not excluding spam tokens)', async () => {
+      chai
+        .expect(serviceSdk.getBalances(safeAddress, false))
+        .to.be.eventually.deep.equals({ success: true })
+      chai
+        .expect(axiosGet)
+        .to.have.been.calledWith(
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/?exclude_spam=false`
         )
     })
 
@@ -272,7 +283,18 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/usd/`
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/usd/?exclude_spam=true`
+        )
+    })
+
+    it('getUsdBalances (not excluding spam tokens)', async () => {
+      chai
+        .expect(serviceSdk.getUsdBalances(safeAddress, false))
+        .to.be.eventually.deep.equals({ success: true })
+      chai
+        .expect(axiosGet)
+        .to.have.been.calledWith(
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/usd/?exclude_spam=false`
         )
     })
 
@@ -283,7 +305,18 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/collectibles/`
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/collectibles/?exclude_spam=true`
+        )
+    })
+
+    it('getCollectibles (not excluding spam tokens)', async () => {
+      chai
+        .expect(serviceSdk.getCollectibles(safeAddress, false))
+        .to.be.eventually.deep.equals({ success: true })
+      chai
+        .expect(axiosGet)
+        .to.have.been.calledWith(
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/collectibles/?exclude_spam=false`
         )
     })
 

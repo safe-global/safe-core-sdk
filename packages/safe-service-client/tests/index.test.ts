@@ -325,7 +325,7 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/usd/`
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/`
         )
     })
 
@@ -335,7 +335,7 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/collectibles/`
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/${tokenAddress}/`
         )
     })
   })

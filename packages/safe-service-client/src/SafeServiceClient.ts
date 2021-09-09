@@ -78,7 +78,7 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param ownerAddress - The owner address
    * @returns The list of Safes where the address provided is an owner
-   * @throws "422 Owner address checksum not valid"
+   * @throws "422 Checksum address validation failed"
    */
   async getSafesByOwner(ownerAddress: string): Promise<OwnerResponse> {
     return sendRequest({

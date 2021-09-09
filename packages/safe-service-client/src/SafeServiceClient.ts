@@ -62,8 +62,8 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param data - The Safe transaction data
    * @returns The transaction data decoded
-   * @throws "404 Cannot find function selector to decode data"
-   * @throws "422 Invalid data"
+   * @throws "404 Not Found"
+   * @throws "422 Ensure this field has at least 1 hexadecimal chars (not counting 0x)."
    */
   async decodeData(data: string): Promise<any> {
     return sendRequest({

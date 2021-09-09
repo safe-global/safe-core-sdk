@@ -15,7 +15,7 @@
     "build": "yarn rimraf dist && tsc",
     "test": "mocha --require ts-node/register tests/**/*.test.ts",
     "test:ci": "mocha --require ts-node/register e2e/**/*.test.ts",
-    "format": "prettier --write \"{src,tests}/**/*.ts\"",
+    "format": "prettier --write \"{src,tests,e2e}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
   "repository": {

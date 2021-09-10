@@ -50,7 +50,7 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @returns The list of Safe master copies
    */
-  async getServiceMasterCopiesInfo(): Promise<MasterCopyResponse> {
+  async getServiceMasterCopiesInfo(): Promise<MasterCopyResponse[]> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/about/master-copies`,
       method: HttpMethod.Get

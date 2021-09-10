@@ -26,7 +26,7 @@ import {
 interface SafeTransactionService {
   // About
   getServiceInfo(): Promise<SafeServiceInfoResponse>
-  getServiceMasterCopiesInfo(): Promise<MasterCopyResponse>
+  getServiceMasterCopiesInfo(): Promise<MasterCopyResponse[]>
 
   // Data decoder
   decodeData(data: string): Promise<any>

@@ -25,7 +25,12 @@ export async function sendRequest<T>({ url, method, body }: HttpRequest): Promis
         if (data.data) {
           throw new Error(data.data)
         }
-        throw new Error(data.message)
+        if (data.detail) {
+          throw new Error(data.detail)
+        }
+        if (data.message) {
+          throw new Error(data.message)
+        }
       }
       throw new Error(error.response.statusText)
     } else if (error.request) {

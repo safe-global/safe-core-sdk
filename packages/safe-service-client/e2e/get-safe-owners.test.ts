@@ -8,6 +8,13 @@ chai.use(chaiAsPromised)
 describe('getSafesByOwner', () => {
   const serviceSdk = new SafeServiceClient(config.baseUrl)
 
+  it('should fail if owner address is empty', async () => {
+    const ownerAddress = ''
+    await chai
+      .expect(serviceSdk.getSafesByOwner(ownerAddress))
+      .to.be.rejectedWith('Invalid owner address')
+  })
+
   it('should fail if owner address is not checksummed', async () => {
     const ownerAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'.toLowerCase()
     await chai

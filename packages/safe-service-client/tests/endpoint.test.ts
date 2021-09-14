@@ -9,7 +9,7 @@ import { getTxServiceBaseUrl } from '../src/utils'
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
-describe('Safe Service Client', () => {
+describe('Endpoint tests', () => {
   const safeAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
   const ownerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
   const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
@@ -38,7 +38,7 @@ describe('Safe Service Client', () => {
     })
 
     it('decodeData', async () => {
-      const data = '0x610b592500000000000000000000000033a458e072b182152bb30243f29585a82c45a22b'
+      const data = '0x610b592500000000000000000000000090F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       chai.expect(serviceSdk.decodeData(data)).to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosPost)
@@ -51,7 +51,9 @@ describe('Safe Service Client', () => {
         .to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
-        .to.have.been.calledWith(`${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${ownerAddress}/safes/`)
+        .to.have.been.calledWith(
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${ownerAddress}/safes/`
+        )
     })
 
     it('getTransaction', async () => {

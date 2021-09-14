@@ -50,7 +50,7 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @returns The list of Safe master copies
    */
-  async getServiceMasterCopiesInfo(): Promise<MasterCopyResponse> {
+  async getServiceMasterCopiesInfo(): Promise<MasterCopyResponse[]> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/about/master-copies`,
       method: HttpMethod.Get
@@ -62,10 +62,14 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param data - The Safe transaction data
    * @returns The transaction data decoded
-   * @throws "404 Cannot find function selector to decode data"
-   * @throws "422 Invalid data"
+   * @throws "Invalid data"
+   * @throws "Not Found"
+   * @throws "Ensure this field has at least 1 hexadecimal chars (not counting 0x)."
    */
   async decodeData(data: string): Promise<any> {
+    if (data === '') {
+      throw new Error('Invalid data')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/data-decoder/`,
       method: HttpMethod.Post,
@@ -78,9 +82,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param ownerAddress - The owner address
    * @returns The list of Safes where the address provided is an owner
-   * @throws "422 Owner address checksum not valid"
+   * @throws "Invalid owner address"
+   * @throws "Checksum address validation failed"
    */
   async getSafesByOwner(ownerAddress: string): Promise<OwnerResponse> {
+    if (ownerAddress === '') {
+      throw new Error('Invalid owner address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/owners/${ownerAddress}/safes/`,
       method: HttpMethod.Get
@@ -92,8 +100,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeTxHash - Hash of the Safe transaction
    * @returns The information of a Safe transaction
+   * @throws "Invalid safeTxHash"
+   * @throws "Not found."
    */
   async getTransaction(safeTxHash: string): Promise<SafeMultisigTransactionResponse> {
+    if (safeTxHash === '') {
+      throw new Error('Invalid safeTxHash')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/multisig-transactions/${safeTxHash}/`,
       method: HttpMethod.Get
@@ -105,11 +118,14 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeTxHash - The hash of the Safe transaction
    * @returns The list of confirmations
-   * @throws "400 Invalid data"
+   * @throws "Invalid safeTxHash"
    */
   async getTransactionConfirmations(
     safeTxHash: string
   ): Promise<SafeMultisigConfirmationListResponse> {
+    if (safeTxHash === '') {
+      throw new Error('Invalid safeTxHash')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/multisig-transactions/${safeTxHash}/confirmations/`,
       method: HttpMethod.Get
@@ -122,10 +138,18 @@ class SafeServiceClient implements SafeTransactionService {
    * @param safeTxHash - Hash of the Safe transaction that will be confirmed
    * @param signature - Signature of the transaction
    * @returns
-   * @throws "400 Malformed data"
-   * @throws "422 Error processing data"
+   * @throws "Invalid safeTxHash"
+   * @throws "Invalid signature"
+   * @throws "Malformed data"
+   * @throws "Error processing data"
    */
   async confirmTransaction(safeTxHash: string, signature: string): Promise<SignatureResponse> {
+    if (safeTxHash === '') {
+      throw new Error('Invalid safeTxHash')
+    }
+    if (signature === '') {
+      throw new Error('Invalid signature')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/multisig-transactions/${safeTxHash}/confirmations/`,
       method: HttpMethod.Post,
@@ -140,10 +164,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The information and configuration of the provided Safe address
-   * @throws "404	Safe not found"
-   * @throws "422 Checksum address validation failed/Cannot get Safe info"
+   * @throws "Invalid Safe address"
+   * @throws "Checksum address validation failed"
    */
   async getSafeInfo(safeAddress: string): Promise<SafeInfoResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/`,
       method: HttpMethod.Get
@@ -155,10 +182,14 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The list of delegates
-   * @throws "400 Invalid data"
-   * @throws "422 Invalid ethereum address"
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
    */
   async getSafeDelegates(safeAddress: string): Promise<SafeDelegateListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/`,
       method: HttpMethod.Get
@@ -171,10 +202,14 @@ class SafeServiceClient implements SafeTransactionService {
    * @param safeAddress - The Safe address
    * @param delegate - The new delegate
    * @returns
-   * @throws "400 Malformed data"
-   * @throws "422 Invalid Ethereum address/Error processing data"
+   * @throws "Invalid Safe address"
+   * @throws "Malformed data"
+   * @throws "Invalid Ethereum address/Error processing data"
    */
   async addSafeDelegate(safeAddress: string, delegate: SafeDelegate): Promise<any> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/`,
       method: HttpMethod.Post,
@@ -188,10 +223,14 @@ class SafeServiceClient implements SafeTransactionService {
    * @param safeAddress - The Safe address
    * @param delegate - The delegate that will be removed
    * @returns
-   * @throws "400 Malformed data"
-   * @throws "422 Invalid Ethereum address/Error processing data"
+   * @throws "Invalid Safe address"
+   * @throws "Malformed data"
+   * @throws "Invalid Ethereum address/Error processing data"
    */
   async removeSafeDelegate(safeAddress: string, delegate: SafeDelegateDelete): Promise<any> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/${delegate.delegate}`,
       method: HttpMethod.Delete,
@@ -204,11 +243,15 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The creation information of a Safe
-   * @throws "404 Safe creation not found"
-   * @throws "422	Owner address checksum not valid"
-   * @throws "503 Problem connecting to Ethereum network"
+   * @throws "Invalid Safe address"
+   * @throws "Safe creation not found"
+   * @throws "Checksum address validation failed"
+   * @throws "Problem connecting to Ethereum network"
    */
   async getSafeCreationInfo(safeAddress: string): Promise<SafeCreationInfoResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/creation/`,
       method: HttpMethod.Get
@@ -221,14 +264,18 @@ class SafeServiceClient implements SafeTransactionService {
    * @param safeAddress - The Safe address
    * @param safeTransaction - The Safe transaction to estimate
    * @returns The safeTxGas for the given Safe transaction
-   * @throws "400 Data not valid"
-   * @throws "404 Safe not found"
-   * @throws "422 Tx not valid"
+   * @throws "Invalid Safe address"
+   * @throws "Data not valid"
+   * @throws "Safe not found"
+   * @throws "Tx not valid"
    */
   async estimateSafeTransaction(
     safeAddress: string,
     safeTransaction: SafeMultisigTransactionEstimate
   ): Promise<SafeMultisigTransactionEstimateResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/multisig-transactions/estimations/`,
       method: HttpMethod.Post,
@@ -244,8 +291,10 @@ class SafeServiceClient implements SafeTransactionService {
    * @param safeTxHash - The hash of the Safe transaction
    * @param signature - The signature of an owner or delegate of the specified Safe
    * @returns The hash of the Safe transaction proposed
-   * @throws "400 Invalid data"
-   * @throws "422 Invalid ethereum address/User is not an owner/Invalid safeTxHash/Invalid signature/Nonce already executed/Sender is not an owner"
+   * @throws "Invalid Safe address"
+   * @throws "Invalid Safe safeTxHash"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address/User is not an owner/Invalid safeTxHash/Invalid signature/Nonce already executed/Sender is not an owner"
    */
   async proposeTransaction(
     safeAddress: string,
@@ -253,6 +302,12 @@ class SafeServiceClient implements SafeTransactionService {
     safeTxHash: string,
     signature: SafeSignature
   ): Promise<void> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
+    if (safeTxHash === '') {
+      throw new Error('Invalid safeTxHash')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/multisig-transactions/`,
       method: HttpMethod.Post,
@@ -270,9 +325,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The history of incoming transactions
-   * @throws "422 Safe address checksum not valid"
+   * @throws "Invalid Safe address"
+   * @throws "Checksum address validation failed"
    */
   async getIncomingTransactions(safeAddress: string): Promise<TransferListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/incoming-transfers/`,
       method: HttpMethod.Get
@@ -284,10 +343,14 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The history of module transactions
-   * @throws "400 Invalid data"
-   * @throws "422	Invalid ethereum address"
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
    */
   async getModuleTransactions(safeAddress: string): Promise<SafeModuleTransactionListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/module-transfers/`,
       method: HttpMethod.Get
@@ -299,10 +362,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The history of multi-signature transactions
-   * @throws "400 Invalid data"
-   * @throws "422 Invalid ethereum address"
+   * @throws "Invalid Safe address"
+   * @throws "Checksum address validation failed"
    */
   async getMultisigTransactions(safeAddress: string): Promise<SafeMultisigTransactionListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/multisig-transactions/`,
       method: HttpMethod.Get
@@ -315,13 +381,17 @@ class SafeServiceClient implements SafeTransactionService {
    * @param safeAddress - The Safe address
    * @param currentNonce - Current nonce of the Safe
    * @returns The list of transactions waiting for the confirmation of the Safe owners
-   * @throws "400 Invalid data"
-   * @throws "422 Invalid ethereum address"
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
    */
   async getPendingTransactions(
     safeAddress: string,
     currentNonce?: number
   ): Promise<SafeMultisigTransactionListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     let nonce = currentNonce ? currentNonce : (await this.getSafeInfo(safeAddress)).nonce
     return sendRequest({
       url: `${
@@ -336,10 +406,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The balances for Ether and ERC20 tokens
-   * @throws "404 Safe not found"
-   * @throws "422 Safe address checksum not valid"
+   * @throws "Invalid Safe address"
+   * @throws "Checksum address validation failed"
    */
   async getBalances(safeAddress: string): Promise<SafeBalanceResponse[]> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/`,
       method: HttpMethod.Get
@@ -351,10 +424,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The balances for Ether and ERC20 tokens with USD fiat conversion
-   * @throws "404 Safe not found"
-   * @throws "422 Safe address checksum not valid"
+   * @throws "Invalid Safe address"
+   * @throws "Checksum address validation failed"
    */
   async getUsdBalances(safeAddress: string): Promise<SafeBalanceUsdResponse[]> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/`,
       method: HttpMethod.Get
@@ -366,10 +442,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param safeAddress - The Safe address
    * @returns The collectives owned by the given Safe
-   * @throws "404 Safe not found"
-   * @throws "422 Safe address checksum not valid"
+   * @throws "Invalid Safe address"
+   * @throws "Checksum address validation failed"
    */
   async getCollectibles(safeAddress: string): Promise<SafeCollectibleResponse[]> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/`,
       method: HttpMethod.Get
@@ -393,8 +472,13 @@ class SafeServiceClient implements SafeTransactionService {
    *
    * @param tokenAddress - The token address
    * @returns The information of the given ERC20 token
+   * @throws "Invalid token address"
+   * @throws "Checksum address validation failed"
    */
   async getToken(tokenAddress: string): Promise<TokenInfoResponse> {
+    if (tokenAddress === '') {
+      throw new Error('Invalid token address')
+    }
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/tokens/${tokenAddress}/`,
       method: HttpMethod.Get

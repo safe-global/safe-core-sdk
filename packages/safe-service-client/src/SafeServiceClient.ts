@@ -421,7 +421,8 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/`)
-    url.searchParams.set('exclude_spam', options?.excludeSpamTokens?.toString() || 'true')
+    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
+    url.searchParams.set('exclude_spam', excludeSpam)
 
     return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
@@ -443,7 +444,8 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/`)
-    url.searchParams.set('exclude_spam', options?.excludeSpamTokens?.toString() || 'true')
+    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
+    url.searchParams.set('exclude_spam', excludeSpam)
 
     return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
@@ -465,7 +467,8 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/`)
-    url.searchParams.set('exclude_spam', options?.excludeSpamTokens?.toString() || 'true')
+    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
+    url.searchParams.set('exclude_spam', excludeSpam)
 
     return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }

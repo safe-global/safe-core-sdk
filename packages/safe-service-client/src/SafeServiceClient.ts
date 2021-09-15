@@ -4,8 +4,11 @@ import {
   MasterCopyResponse,
   OwnerResponse,
   SafeBalanceResponse,
+  SafeBalancesOptions,
+  SafeBalancesUsdOptions,
   SafeBalanceUsdResponse,
   SafeCollectibleResponse,
+  SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
   SafeDelegateDelete,
@@ -335,45 +338,66 @@ class SafeServiceClient implements SafeTransactionService {
    * Returns the balances for Ether and ERC20 tokens of a Safe.
    *
    * @param safeAddress - The Safe address
+   * @param options - API params
    * @returns The balances for Ether and ERC20 tokens
    * @throws "404 Safe not found"
    * @throws "422 Safe address checksum not valid"
    */
-  async getBalances(safeAddress: string, excludeSpamTokens = true): Promise<SafeBalanceResponse[]> {
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/?exclude_spam=${excludeSpamTokens}`,
-      method: HttpMethod.Get
-    })
+  async getBalances(
+    safeAddress: string,
+    options?: SafeBalancesOptions
+  ): Promise<SafeBalanceResponse[]> {
+    let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/`)
+    url.searchParams.set('exclude_spam', 'true')
+
+    if (options?.excludeSpamTokens !== undefined) {
+      url.searchParams.set('exclude_spam', options?.excludeSpamTokens.toString())
+    }
+    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
   /**
    * Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversion.
    *
    * @param safeAddress - The Safe address
+   * @param options - API params
    * @returns The balances for Ether and ERC20 tokens with USD fiat conversion
    * @throws "404 Safe not found"
    * @throws "422 Safe address checksum not valid"
    */
-  async getUsdBalances(safeAddress: string, excludeSpamTokens = true): Promise<SafeBalanceUsdResponse[]> {
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/?exclude_spam=${excludeSpamTokens}`,
-      method: HttpMethod.Get
-    })
+  async getUsdBalances(
+    safeAddress: string,
+    options?: SafeBalancesUsdOptions
+  ): Promise<SafeBalanceUsdResponse[]> {
+    let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/`)
+    url.searchParams.set('exclude_spam', 'true')
+
+    if (options?.excludeSpamTokens !== undefined) {
+      url.searchParams.set('exclude_spam', options?.excludeSpamTokens.toString())
+    }
+    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
   /**
    * Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
    *
    * @param safeAddress - The Safe address
+   * @param options - API params
    * @returns The collectives owned by the given Safe
    * @throws "404 Safe not found"
    * @throws "422 Safe address checksum not valid"
    */
-  async getCollectibles(safeAddress: string, excludeSpamTokens = true): Promise<SafeCollectibleResponse[]> {
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/?exclude_spam=${excludeSpamTokens}`,
-      method: HttpMethod.Get
-    })
+  async getCollectibles(
+    safeAddress: string,
+    options?: SafeCollectiblesOptions
+  ): Promise<SafeCollectibleResponse[]> {
+    let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/`)
+    url.searchParams.set('exclude_spam', 'true')
+
+    if (options?.excludeSpamTokens !== undefined) {
+      url.searchParams.set('exclude_spam', options?.excludeSpamTokens.toString())
+    }
+    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
   /**

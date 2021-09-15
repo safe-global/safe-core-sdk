@@ -4,7 +4,13 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import SafeServiceClient, { SafeDelegate, SafeMultisigTransactionEstimate } from '../src'
+import SafeServiceClient, {
+  SafeBalancesOptions,
+  SafeBalancesUsdOptions,
+  SafeCollectiblesOptions,
+  SafeDelegate,
+  SafeMultisigTransactionEstimate
+} from '../src'
 import { getTxServiceBaseUrl } from '../src/utils'
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -51,7 +57,9 @@ describe('Safe Service Client', () => {
         .to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
-        .to.have.been.calledWith(`${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${ownerAddress}/safes/`)
+        .to.have.been.calledWith(
+          `${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${ownerAddress}/safes/`
+        )
     })
 
     it('getTransaction', async () => {
@@ -261,18 +269,25 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/?exclude_spam=true`
+          `${getTxServiceBaseUrl(
+            txServiceBaseUrl
+          )}/safes/${safeAddress}/balances/?exclude_spam=true`
         )
     })
 
-    it('getBalances (not excluding spam tokens)', async () => {
+    it('getBalances (with options)', async () => {
+      const options: SafeBalancesOptions = {
+        excludeSpamTokens: false
+      }
       chai
-        .expect(serviceSdk.getBalances(safeAddress, false))
+        .expect(serviceSdk.getBalances(safeAddress, options))
         .to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/?exclude_spam=false`
+          `${getTxServiceBaseUrl(
+            txServiceBaseUrl
+          )}/safes/${safeAddress}/balances/?exclude_spam=false`
         )
     })
 
@@ -283,18 +298,25 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/usd/?exclude_spam=true`
+          `${getTxServiceBaseUrl(
+            txServiceBaseUrl
+          )}/safes/${safeAddress}/balances/usd/?exclude_spam=true`
         )
     })
 
-    it('getUsdBalances (not excluding spam tokens)', async () => {
+    it('getUsdBalances (with options)', async () => {
+      const options: SafeBalancesUsdOptions = {
+        excludeSpamTokens: false
+      }
       chai
-        .expect(serviceSdk.getUsdBalances(safeAddress, false))
+        .expect(serviceSdk.getUsdBalances(safeAddress, options))
         .to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/balances/usd/?exclude_spam=false`
+          `${getTxServiceBaseUrl(
+            txServiceBaseUrl
+          )}/safes/${safeAddress}/balances/usd/?exclude_spam=false`
         )
     })
 
@@ -305,18 +327,25 @@ describe('Safe Service Client', () => {
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/collectibles/?exclude_spam=true`
+          `${getTxServiceBaseUrl(
+            txServiceBaseUrl
+          )}/safes/${safeAddress}/collectibles/?exclude_spam=true`
         )
     })
 
-    it('getCollectibles (not excluding spam tokens)', async () => {
+    it('getCollectibles (with options)', async () => {
+      const options: SafeCollectiblesOptions = {
+        excludeSpamTokens: false
+      }
       chai
-        .expect(serviceSdk.getCollectibles(safeAddress, false))
+        .expect(serviceSdk.getCollectibles(safeAddress, options))
         .to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
         .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/collectibles/?exclude_spam=false`
+          `${getTxServiceBaseUrl(
+            txServiceBaseUrl
+          )}/safes/${safeAddress}/collectibles/?exclude_spam=false`
         )
     })
 
@@ -324,9 +353,7 @@ describe('Safe Service Client', () => {
       chai.expect(serviceSdk.getTokenList()).to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
-        .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/`
-        )
+        .to.have.been.calledWith(`${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/`)
     })
 
     it('getToken', async () => {
@@ -334,9 +361,7 @@ describe('Safe Service Client', () => {
       chai.expect(serviceSdk.getToken(tokenAddress)).to.be.eventually.deep.equals({ success: true })
       chai
         .expect(axiosGet)
-        .to.have.been.calledWith(
-          `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/${tokenAddress}/`
-        )
+        .to.have.been.calledWith(`${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/${tokenAddress}/`)
     })
   })
 })

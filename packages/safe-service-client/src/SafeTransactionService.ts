@@ -3,8 +3,11 @@ import {
   MasterCopyResponse,
   OwnerResponse,
   SafeBalanceResponse,
+  SafeBalancesOptions,
+  SafeBalancesUsdOptions,
   SafeBalanceUsdResponse,
   SafeCollectibleResponse,
+  SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
   SafeDelegateDelete,
@@ -66,9 +69,15 @@ interface SafeTransactionService {
   ): Promise<SafeMultisigTransactionListResponse>
 
   // Balances
-  getBalances(safeAddress: string): Promise<SafeBalanceResponse[]>
-  getUsdBalances(safeAddress: string): Promise<SafeBalanceUsdResponse[]>
-  getCollectibles(safeAddress: string): Promise<SafeCollectibleResponse[]>
+  getBalances(safeAddress: string, options?: SafeBalancesOptions): Promise<SafeBalanceResponse[]>
+  getUsdBalances(
+    safeAddress: string,
+    options?: SafeBalancesUsdOptions
+  ): Promise<SafeBalanceUsdResponse[]>
+  getCollectibles(
+    safeAddress: string,
+    options?: SafeCollectiblesOptions
+  ): Promise<SafeCollectibleResponse[]>
 
   // Tokens
   getTokenList(): Promise<TokenInfoListResponse>

@@ -192,10 +192,18 @@ export type Erc20Info = {
   readonly logoUri: string
 }
 
+export type SafeBalancesOptions = {
+  excludeSpamTokens?: boolean
+}
+
 export type SafeBalanceResponse = {
   readonly tokenAddress: string
   readonly token: Erc20Info
   readonly balance: string
+}
+
+export type SafeBalancesUsdOptions = {
+  excludeSpamTokens?: boolean
 }
 
 export type SafeBalanceUsdResponse = {
@@ -207,6 +215,10 @@ export type SafeBalanceUsdResponse = {
   readonly fiatBalance: string
   readonly fiatConversion: string
   readonly fiatCode: string
+}
+
+export type SafeCollectiblesOptions = {
+  excludeSpamTokens?: boolean
 }
 
 export type SafeCollectibleResponse = {

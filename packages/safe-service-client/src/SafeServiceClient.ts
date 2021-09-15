@@ -4,8 +4,11 @@ import {
   MasterCopyResponse,
   OwnerResponse,
   SafeBalanceResponse,
+  SafeBalancesOptions,
+  SafeBalancesUsdOptions,
   SafeBalanceUsdResponse,
   SafeCollectibleResponse,
+  SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
   SafeDelegateDelete,
@@ -405,54 +408,69 @@ class SafeServiceClient implements SafeTransactionService {
    * Returns the balances for Ether and ERC20 tokens of a Safe.
    *
    * @param safeAddress - The Safe address
+   * @param options - API params
    * @returns The balances for Ether and ERC20 tokens
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
-  async getBalances(safeAddress: string): Promise<SafeBalanceResponse[]> {
+  async getBalances(
+    safeAddress: string,
+    options?: SafeBalancesOptions
+  ): Promise<SafeBalanceResponse[]> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/`,
-      method: HttpMethod.Get
-    })
+    let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/`)
+    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
+    url.searchParams.set('exclude_spam', excludeSpam)
+
+    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
   /**
    * Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversion.
    *
    * @param safeAddress - The Safe address
+   * @param options - API params
    * @returns The balances for Ether and ERC20 tokens with USD fiat conversion
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
-  async getUsdBalances(safeAddress: string): Promise<SafeBalanceUsdResponse[]> {
+  async getUsdBalances(
+    safeAddress: string,
+    options?: SafeBalancesUsdOptions
+  ): Promise<SafeBalanceUsdResponse[]> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/`,
-      method: HttpMethod.Get
-    })
+    let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/`)
+    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
+    url.searchParams.set('exclude_spam', excludeSpam)
+
+    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
   /**
    * Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
    *
    * @param safeAddress - The Safe address
+   * @param options - API params
    * @returns The collectives owned by the given Safe
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
-  async getCollectibles(safeAddress: string): Promise<SafeCollectibleResponse[]> {
+  async getCollectibles(
+    safeAddress: string,
+    options?: SafeCollectiblesOptions
+  ): Promise<SafeCollectibleResponse[]> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/`,
-      method: HttpMethod.Get
-    })
+    let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/`)
+    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
+    url.searchParams.set('exclude_spam', excludeSpam)
+
+    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
   /**

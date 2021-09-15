@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
+import Safe, { CallTransactionOptionalProps, ContractNetworksConfig } from '../src'
 import {
   getFactory,
   getMultiSend,
@@ -92,7 +92,7 @@ describe('Safe Threshold', () => {
       })
       const newThreshold = 2
       chai.expect(await safeSdk.getThreshold()).to.be.not.eq(newThreshold)
-      const options: SafeTransactionOptionalProps = {
+      const options: CallTransactionOptionalProps = {
         baseGas: 111,
         gasPrice: 222,
         gasToken: '0x333',

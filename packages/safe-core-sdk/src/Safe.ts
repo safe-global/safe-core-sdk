@@ -15,7 +15,7 @@ import { generatePreValidatedSignature, generateSignature } from './utils/signat
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import {
-  SafeTransactionOptionalProps,
+  CallTransactionOptionalProps,
   TransactionOptions,
   TransactionResult
 } from './utils/transactions/types'
@@ -368,7 +368,7 @@ class Safe {
    */
   async getEnableModuleTx(
     moduleAddress: string,
-    options?: SafeTransactionOptionalProps
+    options?: CallTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -390,7 +390,7 @@ class Safe {
    */
   async getDisableModuleTx(
     moduleAddress: string,
-    options?: SafeTransactionOptionalProps
+    options?: CallTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -414,7 +414,7 @@ class Safe {
    */
   async getAddOwnerTx(
     { ownerAddress, threshold }: AddOwnerTxParams,
-    options?: SafeTransactionOptionalProps
+    options?: CallTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -438,7 +438,7 @@ class Safe {
    */
   async getRemoveOwnerTx(
     { ownerAddress, threshold }: RemoveOwnerTxParams,
-    options?: SafeTransactionOptionalProps
+    options?: CallTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -462,7 +462,7 @@ class Safe {
    */
   async getSwapOwnerTx(
     { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
-    options?: SafeTransactionOptionalProps
+    options?: CallTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -484,7 +484,7 @@ class Safe {
    */
   async getChangeThresholdTx(
     threshold: number,
-    options?: SafeTransactionOptionalProps
+    options?: CallTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),

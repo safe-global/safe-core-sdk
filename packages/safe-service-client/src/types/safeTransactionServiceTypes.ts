@@ -231,7 +231,7 @@ export type SafeCollectibleResponse = {
   readonly name: string
   readonly description: string
   readonly imageUri: string
-  readonly medatada: any
+  readonly metadata: any
 }
 
 export type TokenInfoResponse = {

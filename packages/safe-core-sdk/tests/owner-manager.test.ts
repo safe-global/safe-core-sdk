@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig } from '../src'
+import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import {
   getFactory,
@@ -97,7 +97,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getAddOwnerTx('0x123')
+      const tx = safeSdk.getAddOwnerTx({ ownerAddress: '0x123' })
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -111,7 +111,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getAddOwnerTx(SENTINEL_ADDRESS)
+      const tx = safeSdk.getAddOwnerTx({ ownerAddress: SENTINEL_ADDRESS })
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -125,7 +125,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getAddOwnerTx(ZERO_ADDRESS)
+      const tx = safeSdk.getAddOwnerTx({ ownerAddress: ZERO_ADDRESS })
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -139,7 +139,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getAddOwnerTx(account1.address)
+      const tx = safeSdk.getAddOwnerTx({ ownerAddress: account1.address })
       await chai.expect(tx).to.be.rejectedWith('Address provided is already an owner')
     })
 
@@ -156,7 +156,7 @@ describe('Safe owners manager', () => {
       const newThreshold = 3
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners)
-      const tx = safeSdk.getAddOwnerTx(account2.address, newThreshold)
+      const tx = safeSdk.getAddOwnerTx({ ownerAddress: account2.address, threshold: newThreshold })
       await chai.expect(tx).to.be.rejectedWith('Threshold cannot exceed owner count')
     })
 
@@ -170,8 +170,35 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getAddOwnerTx(account2.address, 0)
+      const tx = safeSdk.getAddOwnerTx({ ownerAddress: account2.address, threshold: 0 })
       await chai.expect(tx).to.be.rejectedWith('Threshold needs to be greater than 0')
+    })
+
+    it('should build the transaction with the optional props', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const options: SafeTransactionOptionalProps = {
+        baseGas: 111,
+        gasPrice: 222,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx = await safeSdk.getAddOwnerTx({ ownerAddress: account2.address }, options)
+      chai.expect(tx.data.baseGas).to.be.eq(111)
+      chai.expect(tx.data.gasPrice).to.be.eq(222)
+      chai.expect(tx.data.gasToken).to.be.eq('0x333')
+      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
+      chai.expect(tx.data.nonce).to.be.eq(555)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should add an owner and keep the same threshold', async () => {
@@ -188,7 +215,7 @@ describe('Safe owners manager', () => {
       const initialOwners = await safeSdk.getOwners()
       chai.expect(initialOwners.length).to.be.eq(1)
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
-      const tx = await safeSdk.getAddOwnerTx(account2.address)
+      const tx = await safeSdk.getAddOwnerTx({ ownerAddress: account2.address })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       const finalThreshold = await safeSdk.getThreshold()
@@ -213,7 +240,10 @@ describe('Safe owners manager', () => {
       const initialOwners = await safeSdk.getOwners()
       chai.expect(initialOwners.length).to.be.eq(1)
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
-      const tx = await safeSdk.getAddOwnerTx(account2.address, newThreshold)
+      const tx = await safeSdk.getAddOwnerTx({
+        ownerAddress: account2.address,
+        threshold: newThreshold
+      })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getThreshold()).to.be.eq(newThreshold)
@@ -234,7 +264,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getRemoveOwnerTx('0x123')
+      const tx = safeSdk.getRemoveOwnerTx({ ownerAddress: '0x123' })
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -247,7 +277,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getRemoveOwnerTx(SENTINEL_ADDRESS)
+      const tx = safeSdk.getRemoveOwnerTx({ ownerAddress: SENTINEL_ADDRESS })
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -260,7 +290,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getRemoveOwnerTx(ZERO_ADDRESS)
+      const tx = safeSdk.getRemoveOwnerTx({ ownerAddress: ZERO_ADDRESS })
       await chai.expect(tx).to.be.rejectedWith('Invalid owner address provided')
     })
 
@@ -273,7 +303,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getRemoveOwnerTx(account4.address)
+      const tx = safeSdk.getRemoveOwnerTx({ ownerAddress: account4.address })
       await chai.expect(tx).to.be.rejectedWith('Address provided is not an owner')
     })
 
@@ -289,7 +319,10 @@ describe('Safe owners manager', () => {
       const newThreshold = 3
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners - 1)
-      const tx = safeSdk.getRemoveOwnerTx(account1.address, newThreshold)
+      const tx = safeSdk.getRemoveOwnerTx({
+        ownerAddress: account1.address,
+        threshold: newThreshold
+      })
       await chai.expect(tx).to.be.rejectedWith('Threshold cannot exceed owner count')
     })
 
@@ -302,8 +335,34 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getRemoveOwnerTx(account1.address, 0)
+      const tx = safeSdk.getRemoveOwnerTx({ ownerAddress: account1.address, threshold: 0 })
       await chai.expect(tx).to.be.rejectedWith('Threshold needs to be greater than 0')
+    })
+
+    it('should build the transaction with the optional props', async () => {
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const options: SafeTransactionOptionalProps = {
+        baseGas: 111,
+        gasPrice: 222,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx = await safeSdk1.getRemoveOwnerTx({ ownerAddress: account1.address }, options)
+      chai.expect(tx.data.baseGas).to.be.eq(111)
+      chai.expect(tx.data.gasPrice).to.be.eq(222)
+      chai.expect(tx.data.gasToken).to.be.eq('0x333')
+      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
+      chai.expect(tx.data.nonce).to.be.eq(555)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should remove the first owner of a Safe and decrease the threshold', async () => {
@@ -325,7 +384,7 @@ describe('Safe owners manager', () => {
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
       chai.expect(initialOwners[1]).to.be.eq(account2.address)
       chai.expect(initialOwners[2]).to.be.eq(account3.address)
-      const tx = await safeSdk1.getRemoveOwnerTx(account1.address)
+      const tx = await safeSdk1.getRemoveOwnerTx({ ownerAddress: account1.address })
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)
@@ -360,7 +419,7 @@ describe('Safe owners manager', () => {
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
       chai.expect(initialOwners[1]).to.be.eq(account2.address)
       chai.expect(initialOwners[2]).to.be.eq(account3.address)
-      const tx = await safeSdk1.getRemoveOwnerTx(account2.address)
+      const tx = await safeSdk1.getRemoveOwnerTx({ ownerAddress: account2.address })
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)
@@ -392,7 +451,10 @@ describe('Safe owners manager', () => {
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
       chai.expect(initialOwners[1]).to.be.eq(account2.address)
       chai.expect(initialOwners[2]).to.be.eq(account3.address)
-      const tx = await safeSdk1.getRemoveOwnerTx(account1.address, newThreshold)
+      const tx = await safeSdk1.getRemoveOwnerTx({
+        ownerAddress: account1.address,
+        threshold: newThreshold
+      })
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)
@@ -416,7 +478,10 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx('0x123', account2.address)
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: '0x123',
+        newOwnerAddress: account2.address
+      })
       await chai.expect(tx).to.be.rejectedWith('Invalid old owner address provided')
     })
 
@@ -430,7 +495,10 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx(account1.address, '0x123')
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: account1.address,
+        newOwnerAddress: '0x123'
+      })
       await chai.expect(tx).to.be.rejectedWith('Invalid new owner address provided')
     })
 
@@ -444,7 +512,10 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx(SENTINEL_ADDRESS, account2.address)
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: SENTINEL_ADDRESS,
+        newOwnerAddress: account2.address
+      })
       await chai.expect(tx).to.be.rejectedWith('Invalid old owner address provided')
     })
 
@@ -458,7 +529,10 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx(account1.address, SENTINEL_ADDRESS)
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: account1.address,
+        newOwnerAddress: SENTINEL_ADDRESS
+      })
       await chai.expect(tx).to.be.rejectedWith('Invalid new owner address provided')
     })
 
@@ -472,7 +546,10 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx(ZERO_ADDRESS, account2.address)
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: ZERO_ADDRESS,
+        newOwnerAddress: account2.address
+      })
       await chai.expect(tx).to.be.rejectedWith('Invalid old owner address provided')
     })
 
@@ -486,7 +563,10 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx(account1.address, ZERO_ADDRESS)
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: account1.address,
+        newOwnerAddress: ZERO_ADDRESS
+      })
       await chai.expect(tx).to.be.rejectedWith('Invalid new owner address provided')
     })
 
@@ -500,7 +580,10 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx(account4.address, account2.address)
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: account4.address,
+        newOwnerAddress: account2.address
+      })
       await chai.expect(tx).to.be.rejectedWith('Old address provided is not an owner')
     })
 
@@ -514,8 +597,41 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = safeSdk.getSwapOwnerTx(account1.address, account1.address)
+      const tx = safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: account1.address,
+        newOwnerAddress: account1.address
+      })
       await chai.expect(tx).to.be.rejectedWith('New address provided is already an owner')
+    })
+
+    it('should build the transaction with the optional props', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const options: SafeTransactionOptionalProps = {
+        baseGas: 111,
+        gasPrice: 222,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx = await safeSdk.getSwapOwnerTx(
+        { oldOwnerAddress: account1.address, newOwnerAddress: account2.address },
+        options
+      )
+      chai.expect(tx.data.baseGas).to.be.eq(111)
+      chai.expect(tx.data.gasPrice).to.be.eq(222)
+      chai.expect(tx.data.gasToken).to.be.eq('0x333')
+      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
+      chai.expect(tx.data.nonce).to.be.eq(555)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should replace the first owner of a Safe', async () => {
@@ -531,7 +647,10 @@ describe('Safe owners manager', () => {
       const initialOwners = await safeSdk.getOwners()
       chai.expect(initialOwners.length).to.be.eq(1)
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
-      const tx = await safeSdk.getSwapOwnerTx(account1.address, account2.address)
+      const tx = await safeSdk.getSwapOwnerTx({
+        oldOwnerAddress: account1.address,
+        newOwnerAddress: account2.address
+      })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       const finalOwners = await safeSdk.getOwners()
@@ -557,7 +676,10 @@ describe('Safe owners manager', () => {
       chai.expect(initialOwners[0]).to.be.eq(account1.address)
       chai.expect(initialOwners[1]).to.be.eq(account2.address)
       chai.expect(initialOwners[2]).to.be.eq(account3.address)
-      const tx = await safeSdk1.getSwapOwnerTx(account2.address, account4.address)
+      const tx = await safeSdk1.getSwapOwnerTx({
+        oldOwnerAddress: account2.address,
+        newOwnerAddress: account4.address
+      })
       await safeSdk2.signTransaction(tx)
       await safeSdk3.signTransaction(tx)
       const txResponse = await safeSdk1.executeTransaction(tx)

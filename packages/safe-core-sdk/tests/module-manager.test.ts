@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig } from '../src'
+import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import {
   getDailyLimitModule,
@@ -130,6 +130,32 @@ describe('Safe modules manager', () => {
       await chai.expect(tx2).to.be.rejectedWith('Module provided is already enabled')
     })
 
+    it('should build the transaction with the optional props', async () => {
+      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const options: SafeTransactionOptionalProps = {
+        baseGas: 111,
+        gasPrice: 222,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx = await safeSdk.getEnableModuleTx(dailyLimitModule.address, options)
+      chai.expect(tx.data.baseGas).to.be.eq(111)
+      chai.expect(tx.data.gasPrice).to.be.eq(222)
+      chai.expect(tx.data.gasToken).to.be.eq('0x333')
+      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
+      chai.expect(tx.data.nonce).to.be.eq(555)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+    })
+
     it('should enable a Safe module', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -200,6 +226,40 @@ describe('Safe modules manager', () => {
       })
       const tx = safeSdk.getDisableModuleTx(dailyLimitModule.address)
       await chai.expect(tx).to.be.rejectedWith('Module provided is not enabled already')
+    })
+
+    it('should build the transaction with the optional props', async () => {
+      const { dailyLimitModule, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+
+      const tx1 = await safeSdk.getEnableModuleTx(dailyLimitModule.address)
+      const txResponse1 = await safeSdk.executeTransaction(tx1)
+      await waitSafeTxReceipt(txResponse1)
+      chai.expect((await safeSdk.getModules()).length).to.be.eq(1)
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.true
+
+      const options: SafeTransactionOptionalProps = {
+        baseGas: 111,
+        gasPrice: 222,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx2 = await safeSdk.getDisableModuleTx(dailyLimitModule.address, options)
+      chai.expect(tx2.data.baseGas).to.be.eq(111)
+      chai.expect(tx2.data.gasPrice).to.be.eq(222)
+      chai.expect(tx2.data.gasToken).to.be.eq('0x333')
+      chai.expect(tx2.data.refundReceiver).to.be.eq('0x444')
+      chai.expect(tx2.data.nonce).to.be.eq(555)
+      chai.expect(tx2.data.safeTxGas).to.be.eq(666)
     })
 
     it('should disable Safe modules', async () => {

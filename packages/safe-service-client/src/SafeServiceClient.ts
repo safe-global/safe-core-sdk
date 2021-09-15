@@ -348,11 +348,8 @@ class SafeServiceClient implements SafeTransactionService {
     options?: SafeBalancesOptions
   ): Promise<SafeBalanceResponse[]> {
     let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/`)
-    url.searchParams.set('exclude_spam', 'true')
+    url.searchParams.set('exclude_spam', options?.excludeSpamTokens?.toString() || 'true')
 
-    if (options?.excludeSpamTokens !== undefined) {
-      url.searchParams.set('exclude_spam', options?.excludeSpamTokens.toString())
-    }
     return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
@@ -370,11 +367,8 @@ class SafeServiceClient implements SafeTransactionService {
     options?: SafeBalancesUsdOptions
   ): Promise<SafeBalanceUsdResponse[]> {
     let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/balances/usd/`)
-    url.searchParams.set('exclude_spam', 'true')
+    url.searchParams.set('exclude_spam', options?.excludeSpamTokens?.toString() || 'true')
 
-    if (options?.excludeSpamTokens !== undefined) {
-      url.searchParams.set('exclude_spam', options?.excludeSpamTokens.toString())
-    }
     return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
@@ -392,11 +386,8 @@ class SafeServiceClient implements SafeTransactionService {
     options?: SafeCollectiblesOptions
   ): Promise<SafeCollectibleResponse[]> {
     let url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/collectibles/`)
-    url.searchParams.set('exclude_spam', 'true')
+    url.searchParams.set('exclude_spam', options?.excludeSpamTokens?.toString() || 'true')
 
-    if (options?.excludeSpamTokens !== undefined) {
-      url.searchParams.set('exclude_spam', options?.excludeSpamTokens.toString())
-    }
     return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 

@@ -529,6 +529,14 @@ class Safe {
       )
     }
 
+    const value = BigNumber.from(safeTransaction.data.value)
+    if (!value.isZero()) {
+      const balance = await this.getBalance()
+      if (value.gt(BigNumber.from(balance))) {
+        throw new Error('Not enough Ether funds')
+      }
+    }
+
     const gasLimit =
       options?.gasLimit ||
       (await estimateGasForTransactionExecution(

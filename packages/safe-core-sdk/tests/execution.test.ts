@@ -38,6 +38,28 @@ describe('Transactions execution', () => {
   })
 
   describe('executeTransaction', async () => {
+    it('should fail if there are not enough Ether funds', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const safeInitialBalance = await safeSdk1.getBalance()
+      chai.expect(safeInitialBalance.toString()).to.be.eq('0')
+      const tx = await safeSdk1.createTransaction({
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      })
+      await chai
+        .expect(safeSdk1.executeTransaction(tx))
+        .to.be.rejectedWith('Not enough Ether funds')
+    })
+
     it('should fail if there are not enough signatures (1 missing)', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts

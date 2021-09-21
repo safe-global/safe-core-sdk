@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-service-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Safe Service Client",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -14,7 +14,8 @@
     "unbuild": "rimraf dist",
     "build": "yarn rimraf dist && tsc",
     "test": "mocha --require ts-node/register tests/**/*.test.ts",
-    "format": "prettier --write \"{src,tests}/**/*.ts\"",
+    "test:ci": "mocha --require ts-node/register e2e/**/*.test.ts",
+    "format": "prettier --write \"{src,tests,e2e}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
   "repository": {

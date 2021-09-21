@@ -1,5 +1,13 @@
-name: Hardhat Test
-on: [push, pull_request]
+name: e2e Test
+on:
+  push:
+    branches:
+      - development
+      - main
+  pull_request:
+    branches:
+      - development
+      - main
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,4 +23,4 @@ jobs:
       - run: |
           yarn install
           yarn build
-          yarn test
+          yarn test:ci

@@ -1,5 +1,5 @@
 import { arrayify } from '@ethersproject/bytes'
-import { pack } from '@ethersproject/solidity'
+import { pack as solidityPack } from '@ethersproject/solidity'
 import {
   MetaTransactionData,
   OperationType,
@@ -57,7 +57,7 @@ export async function standardizeSafeTransactionData(
 
 function encodeMetaTransaction(tx: MetaTransactionData): string {
   const data = arrayify(tx.data)
-  const encoded = pack(
+  const encoded = solidityPack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
     [tx.operation, tx.to, tx.value, data.length, data]
   )

@@ -5,7 +5,8 @@
     "clean": "lerna clean",
     "unbuild": "lerna run unbuild",
     "build": "lerna run build --stream",
-    "test": "FORCE_COLOR=1 lerna run test --stream"
+    "test": "FORCE_COLOR=1 lerna run test --stream",
+    "test:ci": "FORCE_COLOR=1 lerna run test:ci --stream"
   },
   "workspaces": {
     "packages": [

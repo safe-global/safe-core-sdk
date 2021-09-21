@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig } from '../src'
+import Safe, { CallTransactionOptionalProps, ContractNetworksConfig } from '../src'
 import {
   getFactory,
   getMultiSend,
@@ -78,6 +78,35 @@ describe('Safe Threshold', () => {
       await chai
         .expect(safeSdk.getChangeThresholdTx(newThreshold))
         .to.be.rejectedWith('Threshold needs to be greater than 0')
+    })
+
+    it('should build the transaction with the optional props', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address, account2.address], 1)
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const newThreshold = 2
+      chai.expect(await safeSdk.getThreshold()).to.be.not.eq(newThreshold)
+      const options: CallTransactionOptionalProps = {
+        baseGas: 111,
+        gasPrice: 222,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx = await safeSdk.getChangeThresholdTx(newThreshold, options)
+      chai.expect(tx.data.baseGas).to.be.eq(111)
+      chai.expect(tx.data.gasPrice).to.be.eq(222)
+      chai.expect(tx.data.gasToken).to.be.eq('0x333')
+      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
+      chai.expect(tx.data.nonce).to.be.eq(555)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should change the threshold', async () => {

@@ -1,5 +1,5 @@
 import { ContractNetworksConfig } from './configuration/contracts'
-import EthAdapter from './ethereumLibs/EthAdapter'
+import EthAdapter, { EthAdapterTransaction } from './ethereumLibs/EthAdapter'
 import EthersAdapter, { EthersAdapterConfig } from './ethereumLibs/EthersAdapter'
 import Web3Adapter, { Web3AdapterConfig } from './ethereumLibs/Web3Adapter'
 import Safe, {
@@ -27,6 +27,7 @@ export {
   SafeAccountConfig,
   SafeDeploymentConfig,
   EthAdapter,
+  EthAdapterTransaction,
   Web3AdapterConfig,
   Web3Adapter,
   EthersAdapterConfig,

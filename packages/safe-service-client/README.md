@@ -212,7 +212,7 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeBalancesUsdOptions = {
-  excludeSpamTokens: false  // Optional parameter. Default value is true.
+  excludeSpamTokens: false // Optional parameter. Default value is true.
 }
 const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress, options)
 ```
@@ -229,7 +229,7 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeCollectiblesOptions = {
-  excludeSpamTokens: false  // Optional parameter. Default value is true.
+  excludeSpamTokens: false // Optional parameter. Default value is true.
 }
 const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress, options)
 ```

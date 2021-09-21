@@ -191,6 +191,15 @@ Returns the balances for Ether and ERC20 tokens of a Safe.
 const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress)
 ```
 
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeBalancesOptions = {
+  excludeSpamTokens: false  // Optional parameter. Default value is true.
+}
+const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress, options)
+```
+
 ### getUsdBalances
 
 Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversion.
@@ -199,12 +208,30 @@ Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversi
 const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress)
 ```
 
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeBalancesUsdOptions = {
+  excludeSpamTokens: false  // Optional parameter. Default value is true.
+}
+const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress, options)
+```
+
 ### getCollectibles
 
 Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
 
 ```js
 const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress)
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeCollectiblesOptions = {
+  excludeSpamTokens: false  // Optional parameter. Default value is true.
+}
+const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress, options)
 ```
 
 ### getTokenList

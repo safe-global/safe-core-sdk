@@ -109,7 +109,7 @@ const delegates: SafeDelegateListResponse = await safeService.getSafeDelegates(s
 
 ### addSafeDelegate
 
-Adds a new delegate for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
+Adds a new delegate for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
 
 ```js
 await safeService.addSafeDelegate(safeAddress, delegate)
@@ -117,7 +117,7 @@ await safeService.addSafeDelegate(safeAddress, delegate)
 
 ### removeSafeDelegate
 
-Removes a delegate for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
+Removes a delegate for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
 
 ```js
 await safeService.removeSafeDelegate(safeAddress, delegate)
@@ -191,6 +191,15 @@ Returns the balances for Ether and ERC20 tokens of a Safe.
 const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress)
 ```
 
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeBalancesOptions = {
+  excludeSpamTokens  // Optional. Default value is `true`.
+}
+const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress, options)
+```
+
 ### getUsdBalances
 
 Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversion.
@@ -199,12 +208,30 @@ Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversi
 const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress)
 ```
 
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeBalancesUsdOptions = {
+  excludeSpamTokens // Optional. Default value is `true`.
+}
+const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress, options)
+```
+
 ### getCollectibles
 
 Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
 
 ```js
 const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress)
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeCollectiblesOptions = {
+  excludeSpamTokens // Optional. Default value is `true`.
+}
+const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress, options)
 ```
 
 ### getTokenList

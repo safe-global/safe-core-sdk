@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import fetch from 'node-fetch'
 
 export enum HttpMethod {
   Get = 'get',
@@ -13,34 +13,31 @@ interface HttpRequest {
 }
 
 export async function sendRequest<T>({ url, method, body }: HttpRequest): Promise<T> {
-  let response: AxiosResponse<T>
+  const response = await fetch(url, {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
+  let jsonResponse
   try {
-    response = await axios[method](url, body)
+    jsonResponse = await response.json()
   } catch (error) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      const data = error.response.data
-      if (data) {
-        if (data.data) {
-          throw new Error(data.data)
-        }
-        if (data.detail) {
-          throw new Error(data.detail)
-        }
-        if (data.message) {
-          throw new Error(data.message)
-        }
-      }
-      throw new Error(error.response.statusText)
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-      throw new Error('Connection error')
-    }
-    // Something happened in setting up the request that triggered an Error
-    throw new Error(error.message)
+    throw new Error(response.statusText)
   }
-  return response.data as T
+  if (response.ok) {
+    return jsonResponse as T
+  }
+  if (jsonResponse.data) {
+    throw new Error(jsonResponse.data)
+  }
+  if (jsonResponse.detail) {
+    throw new Error(jsonResponse.detail)
+  }
+  if (jsonResponse.message) {
+    throw new Error(jsonResponse.message)
+  }
+  throw new Error(response.statusText)
 }

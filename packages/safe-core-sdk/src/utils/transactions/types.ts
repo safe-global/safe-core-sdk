@@ -1,9 +1,7 @@
 import { ContractTransaction } from '@ethersproject/contracts'
-import { OperationType } from '@gnosis.pm/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
-interface SafeTransactionOptionalProps {
-  operation?: OperationType
+export interface SafeTransactionOptionalProps {
   safeTxGas?: number
   baseGas?: number
   gasPrice?: number
@@ -11,8 +9,6 @@ interface SafeTransactionOptionalProps {
   refundReceiver?: string
   nonce?: number
 }
-
-export type CallTransactionOptionalProps = Omit<SafeTransactionOptionalProps, 'operation'>
 
 export interface TransactionOptions {
   from?: string

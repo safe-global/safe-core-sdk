@@ -378,7 +378,7 @@ await txResponse.transactionResponse?.wait()
 This method can optionally receive the `options` parameter:
 
 ```js
-const options: CallTransactionOptionalProps = {
+const options: SafeTransactionOptionalProps = {
   safeTxGas, // Optional
   baseGas, // Optional
   gasPrice, // Optional
@@ -402,7 +402,7 @@ await txResponse.transactionResponse?.wait()
 This method can optionally receive the `options` parameter:
 
 ```js
-const options: CallTransactionOptionalProps = { ... }
+const options: SafeTransactionOptionalProps = { ... }
 const safeTransaction = await safeSdk.getDisableModuleTx(moduleAddress, options)
 ```
 
@@ -423,7 +423,7 @@ await txResponse.transactionResponse?.wait()
 This method can optionally receive the `options` parameter:
 
 ```js
-const options: CallTransactionOptionalProps = { ... }
+const options: SafeTransactionOptionalProps = { ... }
 const safeTransaction = await safeSdk.getAddOwnerTx(params, options)
 ```
 
@@ -444,7 +444,7 @@ await txResponse.transactionResponse?.wait()
 This method can optionally receive the `options` parameter:
 
 ```js
-const options: CallTransactionOptionalProps = { ... }
+const options: SafeTransactionOptionalProps = { ... }
 const safeTransaction = await safeSdk.getRemoveOwnerTx(params, options)
 ```
 
@@ -465,7 +465,7 @@ await txResponse.transactionResponse?.wait()
 This method can optionally receive the `options` parameter:
 
 ```js
-const options: CallTransactionOptionalProps = { ... }
+const options: SafeTransactionOptionalProps = { ... }
 const safeTransaction = await safeSdk.getSwapOwnerTx(params, options)
 ```
 
@@ -482,7 +482,7 @@ await txResponse.transactionResponse?.wait()
 This method can optionally receive the `options` parameter:
 
 ```js
-const options: CallTransactionOptionalProps = { ... }
+const options: SafeTransactionOptionalProps = { ... }
 const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold, options)
 ```
 

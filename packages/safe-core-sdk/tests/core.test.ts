@@ -1,4 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
@@ -123,11 +124,12 @@ describe('Safe Core SDK', () => {
         contractNetworks
       })
       chai.expect(await safeSdk.getNonce()).to.be.eq(0)
-      const tx = await safeSdk.createTransaction({
+      const txDataPartial: SafeTransactionDataPartial = {
         to: account2.address,
         value: '0',
         data: '0x'
-      })
+      }
+      const tx = await safeSdk.createTransaction(txDataPartial)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getNonce()).to.be.eq(1)

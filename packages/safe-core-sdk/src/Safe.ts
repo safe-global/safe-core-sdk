@@ -1,5 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
+  MetaTransactionData,
   OperationType,
   SafeSignature,
   SafeTransaction,
@@ -234,28 +235,37 @@ class Safe {
    * @param safeTransactions - The list of transactions to process
    * @returns The Safe transaction
    */
+  async createTransaction(safeTransactions: SafeTransactionDataPartial): Promise<SafeTransaction>
   async createTransaction(
-    ...safeTransactions: SafeTransactionDataPartial[]
+    safeTransactions: MetaTransactionData[],
+    options?: CallTransactionOptionalProps
+  ): Promise<SafeTransaction>
+  async createTransaction(
+    safeTransactions: SafeTransactionDataPartial | MetaTransactionData[],
+    options?: SafeTransactionDataPartial
   ): Promise<SafeTransaction> {
-    if (safeTransactions.length === 1) {
+    if (safeTransactions instanceof Array) {
+      const multiSendData = encodeMultiSendData(
+        safeTransactions.map(standardizeMetaTransactionData)
+      )
+      const multiSendTransaction = {
+        ...options,
+        to: this.#contractManager.multiSendContract.getAddress(),
+        value: '0',
+        data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
+        operation: OperationType.DelegateCall
+      }
       const standardizedTransaction = await standardizeSafeTransactionData(
         this.#contractManager.safeContract,
         this.#ethAdapter,
-        safeTransactions[0]
+        multiSendTransaction
       )
       return new EthSafeTransaction(standardizedTransaction)
-    }
-    const multiSendData = encodeMultiSendData(safeTransactions.map(standardizeMetaTransactionData))
-    const multiSendTransaction = {
-      to: this.#contractManager.multiSendContract.getAddress(),
-      value: '0',
-      data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
-      operation: OperationType.DelegateCall
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
       this.#ethAdapter,
-      multiSendTransaction
+      safeTransactions
     )
     return new EthSafeTransaction(standardizedTransaction)
   }

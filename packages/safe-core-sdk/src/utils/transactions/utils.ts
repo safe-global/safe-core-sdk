@@ -15,9 +15,7 @@ export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
 ): MetaTransactionData {
   const standardizedTxs: MetaTransactionData = {
-    to: tx.to,
-    value: tx.value,
-    data: tx.data,
+    ...tx,
     operation: tx.operation ?? OperationType.Call
   }
   return standardizedTxs

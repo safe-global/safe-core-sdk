@@ -137,6 +137,16 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('removeAllSafeDelegates', async () => {
+      chai
+        .expect(serviceSdk.removeAllSafeDelegates(safeAddress))
+        .to.be.eventually.deep.equals({ success: true })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        method: 'delete'
+      })
+    })
+
     it('removeSafeDelegate', async () => {
       const delegate: SafeDelegateDelete = {
         safe: safeAddress,

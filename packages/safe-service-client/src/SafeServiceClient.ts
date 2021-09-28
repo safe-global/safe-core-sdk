@@ -221,6 +221,25 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
+   * Removes all delegates for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
+   *
+   * @param safeAddress - The Safe address
+   * @returns
+   * @throws "Invalid Safe address"
+   * @throws "Malformed data"
+   * @throws "Invalid Ethereum address/Error processing data"
+   */
+  async removeAllSafeDelegates(safeAddress: string): Promise<any> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/`,
+      method: HttpMethod.Delete
+    })
+  }
+
+  /**
    * Removes a delegate for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
    *
    * @param safeAddress - The Safe address

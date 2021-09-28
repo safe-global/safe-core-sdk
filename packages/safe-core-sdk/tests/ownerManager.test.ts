@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { CallTransactionOptionalProps, ContractNetworksConfig } from '../src'
+import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import {
   getFactory,
@@ -184,7 +184,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const options: CallTransactionOptionalProps = {
+      const options: SafeTransactionOptionalProps = {
         baseGas: 111,
         gasPrice: 222,
         gasToken: '0x333',
@@ -348,7 +348,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const options: CallTransactionOptionalProps = {
+      const options: SafeTransactionOptionalProps = {
         baseGas: 111,
         gasPrice: 222,
         gasToken: '0x333',
@@ -614,7 +614,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const options: CallTransactionOptionalProps = {
+      const options: SafeTransactionOptionalProps = {
         baseGas: 111,
         gasPrice: 222,
         gasToken: '0x333',

@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { CallTransactionOptionalProps, ContractNetworksConfig } from '../src'
+import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import {
   getDailyLimitModule,
@@ -139,7 +139,7 @@ describe('Safe modules manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const options: CallTransactionOptionalProps = {
+      const options: SafeTransactionOptionalProps = {
         baseGas: 111,
         gasPrice: 222,
         gasToken: '0x333',
@@ -245,7 +245,7 @@ describe('Safe modules manager', () => {
       chai.expect((await safeSdk.getModules()).length).to.be.eq(1)
       chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.true
 
-      const options: CallTransactionOptionalProps = {
+      const options: SafeTransactionOptionalProps = {
         baseGas: 111,
         gasPrice: 222,
         gasToken: '0x333',

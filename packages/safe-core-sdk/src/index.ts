@@ -15,7 +15,7 @@ import SafeFactory, {
   SafeFactoryConfig
 } from './safeFactory'
 import {
-  CallTransactionOptionalProps,
+  SafeTransactionOptionalProps,
   TransactionOptions,
   TransactionResult
 } from './utils/transactions/types'
@@ -37,7 +37,7 @@ export {
   ContractNetworksConfig,
   TransactionOptions,
   TransactionResult,
-  CallTransactionOptionalProps,
+  SafeTransactionOptionalProps,
   AddOwnerTxParams,
   RemoveOwnerTxParams,
   SwapOwnerTxParams

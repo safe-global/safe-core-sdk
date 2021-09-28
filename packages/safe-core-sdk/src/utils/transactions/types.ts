@@ -1,14 +1,11 @@
 import { ContractTransaction } from '@ethersproject/contracts'
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types/dist/src'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
-export interface SafeTransactionOptionalProps {
-  safeTxGas?: number
-  baseGas?: number
-  gasPrice?: number
-  gasToken?: string
-  refundReceiver?: string
-  nonce?: number
-}
+export type SafeTransactionOptionalProps = Pick<
+  SafeTransactionDataPartial,
+  'safeTxGas' | 'baseGas' | 'gasPrice' | 'gasToken' | 'refundReceiver' | 'nonce'
+>
 
 export interface TransactionOptions {
   from?: string

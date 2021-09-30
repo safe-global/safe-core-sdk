@@ -56,3 +56,5 @@ deployments
 
 # Typechain
 typechain
+
+openapi/

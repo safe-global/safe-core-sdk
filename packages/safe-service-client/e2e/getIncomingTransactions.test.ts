@@ -27,8 +27,8 @@ describe('getIncomingTransactions', () => {
     const transferListResponse: TransferListResponse = await serviceSdk.getIncomingTransactions(
       safeAddress
     )
-    chai.expect(transferListResponse.count).to.be.equal(5)
-    chai.expect(transferListResponse.results.length).to.be.equal(5)
+    chai.expect(transferListResponse.count).to.be.equal(6)
+    chai.expect(transferListResponse.results.length).to.be.equal(6)
     transferListResponse.results.map((transaction: TransferResponse) => {
       chai.expect(transaction.to).to.be.equal(safeAddress)
     })

@@ -1,6 +1,5 @@
 name: typedoc
 
-
 on:
   push:
     branches:
@@ -12,17 +11,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: |
+          yarn install
+          yarn build
 
-      - run: npm install
-
-      - run: npm run build
-
-      - run: npm install typescript typedoc
+      - run: yarn add -W -D typescript typedoc
 
       - name: Create the docs directory locally in CI
-        run: ./node_modules/.bin/typedoc --tsconfig packages/safe-core-sdk/tsconfig.json packages/safe-core-sdk/src
+        run: ./node_modules/.bin/typedoc --tsconfig packages/safe-core-sdk/tsconfig.json --readme packages/safe-core-sdk/README.md packages/safe-core-sdk/src
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4

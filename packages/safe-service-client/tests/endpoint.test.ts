@@ -1,14 +1,17 @@
+import { getDefaultProvider } from '@ethersproject/providers'
+import { Wallet } from '@ethersproject/wallet'
 import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
+import config from '../e2e/config'
 import SafeServiceClient, {
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
   SafeCollectiblesOptions,
-  SafeDelegate,
-  SafeDelegateDelete,
+  SafeDelegateConfig,
+  SafeDelegateDeleteConfig,
   SafeMultisigTransactionEstimate
 } from '../src'
 import { getTxServiceBaseUrl } from '../src/utils'
@@ -122,14 +125,19 @@ describe('Endpoint tests', () => {
     })
 
     it('addSafeDelegate', async () => {
-      const delegate: SafeDelegate = {
+      const provider = getDefaultProvider(config.JSON_RPC)
+      const signer = new Wallet(
+        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
+        provider
+      )
+      const delegateConfig: SafeDelegateConfig = {
         safe: safeAddress,
         delegate: '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b',
-        signature: '0x',
+        signer,
         label: ''
       }
       chai
-        .expect(serviceSdk.addSafeDelegate(safeAddress, delegate))
+        .expect(serviceSdk.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ success: true })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
@@ -138,30 +146,52 @@ describe('Endpoint tests', () => {
     })
 
     it('removeAllSafeDelegates', async () => {
+      const provider = getDefaultProvider(config.JSON_RPC)
+      const signer = new Wallet(
+        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
+        provider
+      )
+      const totp = Math.floor(Date.now() / 1000 / 3600)
+      const data = safeAddress + totp
+      const signature = await signer.signMessage(data)
       chai
-        .expect(serviceSdk.removeAllSafeDelegates(safeAddress))
+        .expect(serviceSdk.removeAllSafeDelegates(safeAddress, signer))
         .to.be.eventually.deep.equals({ success: true })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
-        method: 'delete'
+        method: 'delete',
+        body: { signature }
       })
     })
 
     it('removeSafeDelegate', async () => {
-      const delegate: SafeDelegateDelete = {
+      const provider = getDefaultProvider(config.JSON_RPC)
+      const signer = new Wallet(
+        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
+        provider
+      )
+      const delegate = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
+      const delegateConfig: SafeDelegateDeleteConfig = {
         safe: safeAddress,
-        delegate: '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b',
-        signature: '0x'
+        delegate,
+        signer
       }
+      const totp = Math.floor(Date.now() / 1000 / 3600)
+      const data = delegate + totp
+      const signature = await signer.signMessage(data)
       chai
-        .expect(serviceSdk.removeSafeDelegate(safeAddress, delegate))
+        .expect(serviceSdk.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ success: true })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/${
-          delegate.delegate
+          delegateConfig.delegate
         }`,
         method: 'delete',
-        body: delegate
+        body: {
+          safe: delegateConfig.safe,
+          delegate: delegateConfig.delegate,
+          signature
+        }
       })
     })
 

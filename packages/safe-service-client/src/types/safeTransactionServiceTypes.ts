@@ -1,3 +1,5 @@
+import { Signer } from '@ethersproject/abstract-signer'
+
 export type SafeServiceInfoResponse = {
   readonly name: string
   readonly version: string
@@ -49,17 +51,21 @@ export type SafeCreationInfoResponse = {
   readonly dataDecoded?: string
 }
 
+export type SafeDelegateDeleteConfig = {
+  readonly safe: string
+  readonly delegate: string
+  readonly signer: Signer
+}
+
+export type SafeDelegateConfig = SafeDelegateDeleteConfig & {
+  readonly label: string
+}
+
 export type SafeDelegate = {
   readonly safe: string
   readonly delegate: string
   readonly signature: string
   readonly label: string
-}
-
-export type SafeDelegateDelete = {
-  readonly safe: string
-  readonly delegate: string
-  readonly signature: string
 }
 
 export type SafeDelegateResponse = {

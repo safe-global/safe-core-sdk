@@ -6,7 +6,7 @@ import config from './config'
 chai.use(chaiAsPromised)
 
 describe('getToken', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if token address is empty', async () => {
     const tokenAddress = ''

@@ -9,7 +9,7 @@ import config from './config'
 chai.use(chaiAsPromised)
 
 describe('getMultisigTransactions', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if Safe address is empty', async () => {
     const safeAddress = ''

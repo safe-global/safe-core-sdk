@@ -6,7 +6,7 @@ import config from './config'
 chai.use(chaiAsPromised)
 
 describe('getPendingTransactions', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if safeAddress is empty', async () => {
     const safeAddress = ''

@@ -6,7 +6,7 @@ import config from './config'
 chai.use(chaiAsPromised)
 
 describe('getTransactionConfirmations', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if safeTxHash is empty', async () => {
     const safeTxHash = ''

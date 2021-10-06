@@ -3,7 +3,7 @@ import SafeServiceClient, { MasterCopyResponse } from '../src'
 import config from './config'
 
 describe('getServiceMasterCopiesInfo', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should call getServiceMasterCopiesInfo', async () => {
     const masterCopiesResponse: MasterCopyResponse[] = await serviceSdk.getServiceMasterCopiesInfo()

@@ -3,7 +3,7 @@ import SafeServiceClient, { SafeServiceInfoResponse } from '../src'
 import config from './config'
 
 describe('getServiceInfo', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should return the Safe info', async () => {
     const safeInfo: SafeServiceInfoResponse = await serviceSdk.getServiceInfo()

@@ -6,7 +6,7 @@ import config from './config'
 chai.use(chaiAsPromised)
 
 describe('getSafesByOwner', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if owner address is empty', async () => {
     const ownerAddress = ''

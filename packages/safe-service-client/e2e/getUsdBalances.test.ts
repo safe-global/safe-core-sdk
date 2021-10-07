@@ -1,12 +1,12 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient, { SafeBalanceUsdResponse } from '../src'
+import SafeServiceClient from '../src'
 import config from './config'
 
 chai.use(chaiAsPromised)
 
 describe('getUsdBalances', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if Safe address is empty', async () => {
     const safeAddress = ''
@@ -24,7 +24,7 @@ describe('getUsdBalances', () => {
 
   it('should return the list of USD balances', async () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
-    const balances: SafeBalanceUsdResponse[] = await serviceSdk.getUsdBalances(safeAddress)
+    const balances = await serviceSdk.getUsdBalances(safeAddress)
     chai.expect(balances.length).to.be.equal(2)
     const ethBalance = balances.filter((safeBalance) => !safeBalance.tokenAddress)[0]
     chai.expect(ethBalance.token).to.be.equal(null)

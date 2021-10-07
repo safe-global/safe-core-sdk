@@ -115,6 +115,14 @@ Adds a new delegate for a given Safe address. The signature is calculated by sig
 await safeService.addSafeDelegate(safeAddress, delegate)
 ```
 
+### removeAllSafeDelegates
+
+Removes all delegates for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
+
+```js
+await safeService.removeAllSafeDelegates(safeAddress)
+```
+
 ### removeSafeDelegate
 
 Removes a delegate for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.

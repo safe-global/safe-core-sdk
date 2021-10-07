@@ -1,12 +1,12 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient, { TokenInfoResponse } from '../src'
+import SafeServiceClient from '../src'
 import config from './config'
 
 chai.use(chaiAsPromised)
 
 describe('getToken', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if token address is empty', async () => {
     const tokenAddress = ''
@@ -22,7 +22,7 @@ describe('getToken', () => {
 
   it('should return the token info', async () => {
     const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
-    const tokenInfoResponse: TokenInfoResponse = await serviceSdk.getToken(tokenAddress)
+    const tokenInfoResponse = await serviceSdk.getToken(tokenAddress)
     chai.expect(tokenInfoResponse.address).to.be.equal('0xc778417E063141139Fce010982780140Aa0cD5Ab')
   })
 })

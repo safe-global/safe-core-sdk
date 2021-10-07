@@ -21,12 +21,16 @@ export async function sendRequest<T>({ url, method, body }: HttpRequest): Promis
     },
     body: JSON.stringify(body)
   })
+
   let jsonResponse
   try {
     jsonResponse = await response.json()
   } catch (error) {
-    throw new Error(response.statusText)
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
   }
+
   if (response.ok) {
     return jsonResponse as T
   }
@@ -38,6 +42,12 @@ export async function sendRequest<T>({ url, method, body }: HttpRequest): Promis
   }
   if (jsonResponse.message) {
     throw new Error(jsonResponse.message)
+  }
+  if (jsonResponse.nonFieldErrors) {
+    throw new Error(jsonResponse.nonFieldErrors)
+  }
+  if (jsonResponse.delegate) {
+    throw new Error(jsonResponse.delegate)
   }
   throw new Error(response.statusText)
 }

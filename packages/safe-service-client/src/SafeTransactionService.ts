@@ -1,3 +1,4 @@
+import { Signer } from '@ethersproject/abstract-signer'
 import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import {
   MasterCopyResponse,
@@ -10,7 +11,8 @@ import {
   SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
-  SafeDelegateDelete,
+  SafeDelegateConfig,
+  SafeDelegateDeleteConfig,
   SafeDelegateListResponse,
   SafeInfoResponse,
   SafeModuleTransactionListResponse,
@@ -45,8 +47,9 @@ interface SafeTransactionService {
   // Safes
   getSafeInfo(safeAddress: string): Promise<SafeInfoResponse>
   getSafeDelegates(safeAddress: string): Promise<SafeDelegateListResponse>
-  addSafeDelegate(safeAddress: string, delegate: SafeDelegate): Promise<any>
-  removeSafeDelegate(safeAddress: string, delegate: SafeDelegateDelete): Promise<any>
+  addSafeDelegate(config: SafeDelegateConfig): Promise<SafeDelegate>
+  removeSafeDelegate(config: SafeDelegateDeleteConfig): Promise<void>
+  removeAllSafeDelegates(safeAddress: string, signer: Signer): Promise<void>
 
   // Transactions
   getSafeCreationInfo(safeAddress: string): Promise<SafeCreationInfoResponse>

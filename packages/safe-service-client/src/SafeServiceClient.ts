@@ -1,3 +1,4 @@
+import { Signer } from '@ethersproject/abstract-signer'
 import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import SafeTransactionService from './SafeTransactionService'
 import {
@@ -11,7 +12,8 @@ import {
   SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
-  SafeDelegateDelete,
+  SafeDelegateConfig,
+  SafeDelegateDeleteConfig,
   SafeDelegateListResponse,
   SafeInfoResponse,
   SafeModuleTransactionListResponse,
@@ -186,8 +188,7 @@ class SafeServiceClient implements SafeTransactionService {
    * @param safeAddress - The Safe address
    * @returns The list of delegates
    * @throws "Invalid Safe address"
-   * @throws "Invalid data"
-   * @throws "Invalid ethereum address"
+   * @throws "Checksum address validation failed"
    */
   async getSafeDelegates(safeAddress: string): Promise<SafeDelegateListResponse> {
     if (safeAddress === '') {
@@ -200,44 +201,97 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
-   * Adds a new delegate for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
+   * Adds a new delegate for a given Safe address.
    *
    * @param safeAddress - The Safe address
-   * @param delegate - The new delegate
+   * @param delegateConfig - The configuration of the new delegate
    * @returns
    * @throws "Invalid Safe address"
-   * @throws "Malformed data"
-   * @throws "Invalid Ethereum address/Error processing data"
+   * @throws "Invalid Safe delegate address"
+   * @throws "Checksum address validation failed"
+   * @throws "Address <delegate_address> is not checksumed"
+   * @throws "Safe=<safe_address> does not exist or it's still not indexed"
+   * @throws "Signing owner is not an owner of the Safe"
    */
-  async addSafeDelegate(safeAddress: string, delegate: SafeDelegate): Promise<any> {
-    if (safeAddress === '') {
+  async addSafeDelegate(delegateConfig: SafeDelegateConfig): Promise<SafeDelegate> {
+    const { safe, delegate, label, signer } = delegateConfig
+    if (safe === '') {
       throw new Error('Invalid Safe address')
     }
+    if (delegate === '') {
+      throw new Error('Invalid Safe delegate address')
+    }
+    const totp = Math.floor(Date.now() / 1000 / 3600)
+    const data = delegate + totp
+    const signature = await signer.signMessage(data)
+    const body: SafeDelegate = {
+      safe,
+      delegate,
+      label,
+      signature
+    }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/`,
+      url: `${this.#txServiceBaseUrl}/safes/${safe}/delegates/`,
       method: HttpMethod.Post,
-      body: delegate
+      body
     })
   }
 
   /**
-   * Removes a delegate for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
+   * Removes all delegates for a given Safe address.
    *
    * @param safeAddress - The Safe address
-   * @param delegate - The delegate that will be removed
    * @returns
    * @throws "Invalid Safe address"
-   * @throws "Malformed data"
-   * @throws "Invalid Ethereum address/Error processing data"
+   * @throws "Checksum address validation failed"
+   * @throws "Safe=<safe_address> does not exist or it's still not indexed"
+   * @throws "Signing owner is not an owner of the Safe"
    */
-  async removeSafeDelegate(safeAddress: string, delegate: SafeDelegateDelete): Promise<any> {
+  async removeAllSafeDelegates(safeAddress: string, signer: Signer): Promise<void> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
+    const totp = Math.floor(Date.now() / 1000 / 3600)
+    const data = safeAddress + totp
+    const signature = await signer.signMessage(data)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/${delegate.delegate}`,
+      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/`,
       method: HttpMethod.Delete,
-      body: delegate
+      body: { signature }
+    })
+  }
+
+  /**
+   * Removes a delegate for a given Safe address.
+   *
+   * @param safeAddress - The Safe address
+   * @param delegateConfig - The configuration for the delegate that will be removed
+   * @returns
+   * @throws "Invalid Safe address"
+   * @throws "Invalid Safe delegate address"
+   * @throws "Checksum address validation failed"
+   * @throws "Signing owner is not an owner of the Safe"
+   * @throws "Not found"
+   */
+  async removeSafeDelegate(delegateConfig: SafeDelegateDeleteConfig): Promise<void> {
+    const { safe, delegate, signer } = delegateConfig
+    if (safe === '') {
+      throw new Error('Invalid Safe address')
+    }
+    if (delegate === '') {
+      throw new Error('Invalid Safe delegate address')
+    }
+    const totp = Math.floor(Date.now() / 1000 / 3600)
+    const data = delegate + totp
+    const signature = await signer.signMessage(data)
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/safes/${safe}/delegates/${delegate}`,
+      method: HttpMethod.Delete,
+      body: {
+        safe,
+        delegate,
+        signature
+      }
     })
   }
 

@@ -25,12 +25,20 @@ describe('getMultisigTransactions', () => {
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
-  it('should return the list of multisig transactions', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+  it('should return an empty list if there are no multisig transactions', async () => {
+    const safeAddress = '0x3e04a375aC5847C690A7f2fF54b45c59f7eeD6f0' // Safe without multisig transactions
     const safeMultisigTransactionListResponse: SafeMultisigTransactionListResponse =
       await serviceSdk.getMultisigTransactions(safeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(3)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(3)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(0)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(0)
+  })
+
+  it('should return the list of multisig transactions', async () => {
+    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD' // Safe with multisig transactions
+    const safeMultisigTransactionListResponse: SafeMultisigTransactionListResponse =
+      await serviceSdk.getMultisigTransactions(safeAddress)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(11)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(11)
     safeMultisigTransactionListResponse.results.map(
       (transaction: SafeMultisigTransactionResponse) => {
         chai.expect(transaction.safe).to.be.equal(safeAddress)

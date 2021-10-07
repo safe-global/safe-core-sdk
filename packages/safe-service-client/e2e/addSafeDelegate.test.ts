@@ -2,7 +2,7 @@ import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient, { SafeDelegate, SafeDelegateConfig } from '../src'
+import SafeServiceClient, { SafeDelegateConfig } from '../src'
 import config from './config'
 chai.use(chaiAsPromised)
 
@@ -141,7 +141,7 @@ describe('addSafeDelegate', () => {
     const { results: initialDelegates } = await serviceSdk.getSafeDelegates(safeAddress)
     chai.expect(initialDelegates.length).to.be.eq(0)
 
-    const delegateResponse: SafeDelegate = await serviceSdk.addSafeDelegate(delegateConfig)
+    const delegateResponse = await serviceSdk.addSafeDelegate(delegateConfig)
     chai.expect(delegateResponse.safe).to.be.equal(delegateConfig.safe)
     chai.expect(delegateResponse.delegate).to.be.equal(delegateConfig.delegate)
     chai.expect(delegateResponse.signature).to.be.a('string')

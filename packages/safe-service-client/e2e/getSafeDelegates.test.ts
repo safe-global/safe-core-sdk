@@ -2,11 +2,7 @@ import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient, {
-  SafeDelegateConfig,
-  SafeDelegateListResponse,
-  SafeDelegateResponse
-} from '../src'
+import SafeServiceClient, { SafeDelegateConfig } from '../src'
 import config from './config'
 
 chai.use(chaiAsPromised)
@@ -30,10 +26,8 @@ describe('getSafeDelegates', () => {
 
   it('should return an empty array if the Safe address is not found', async () => {
     const safeAddress = '0x11dBF28A2B46bdD4E284e79e28B2E8b94Cfa39Bc'
-    const safeDelegateListResponse: SafeDelegateListResponse = await serviceSdk.getSafeDelegates(
-      safeAddress
-    )
-    const results: SafeDelegateResponse[] = safeDelegateListResponse.results
+    const safeDelegateListResponse = await serviceSdk.getSafeDelegates(safeAddress)
+    const results = safeDelegateListResponse.results
     chai.expect(results).to.be.empty
   })
 
@@ -60,9 +54,7 @@ describe('getSafeDelegates', () => {
     await serviceSdk.addSafeDelegate(delegateConfig1)
     await serviceSdk.addSafeDelegate(delegateConfig2)
 
-    const safeDelegateListResponse: SafeDelegateListResponse = await serviceSdk.getSafeDelegates(
-      safeAddress
-    )
+    const safeDelegateListResponse = await serviceSdk.getSafeDelegates(safeAddress)
     const { results } = safeDelegateListResponse
     chai.expect(results.length).to.be.eq(2)
     chai.expect(results[0].delegate).to.be.eq(delegateConfig1.delegate)

@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient, { SafeCollectibleResponse } from '../src'
+import SafeServiceClient from '../src'
 import config from './config'
 
 chai.use(chaiAsPromised)
@@ -24,11 +24,9 @@ describe('getCollectibles', () => {
 
   it('should return the list of collectibles', async () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
-    const safeCollectibleResponse: SafeCollectibleResponse[] = await serviceSdk.getCollectibles(
-      safeAddress
-    )
+    const safeCollectibleResponse = await serviceSdk.getCollectibles(safeAddress)
     chai.expect(safeCollectibleResponse.length).to.be.equal(2)
-    safeCollectibleResponse.map((safeCollectible: SafeCollectibleResponse) => {
+    safeCollectibleResponse.map((safeCollectible) => {
       chai.expect(safeCollectible.address).to.be.equal('0x9cf1A34D70261f0594823EFCCeed53C8c639c464')
       chai.expect(safeCollectible.tokenName).to.be.equal('Safe NFTs')
       chai.expect(safeCollectible.metadata.type).to.be.equal('ERC721')

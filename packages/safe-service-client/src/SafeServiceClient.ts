@@ -1,9 +1,9 @@
 import { Signer } from '@ethersproject/abstract-signer'
-import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import SafeTransactionService from './SafeTransactionService'
 import {
   MasterCopyResponse,
   OwnerResponse,
+  ProposeTransactionProps,
   SafeBalanceResponse,
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
@@ -349,16 +349,16 @@ class SafeServiceClient implements SafeTransactionService {
    * @param signature - The signature of an owner or delegate of the specified Safe
    * @returns The hash of the Safe transaction proposed
    * @throws "Invalid Safe address"
-   * @throws "Invalid Safe safeTxHash"
+   * @throws "Invalid safeTxHash"
    * @throws "Invalid data"
-   * @throws "Invalid ethereum address/User is not an owner/Invalid safeTxHash/Invalid signature/Nonce already executed/Sender is not an owner"
+   * @throws "Invalid ethereum address/User is not an owner/Invalid signature/Nonce already executed/Sender is not an owner"
    */
-  async proposeTransaction(
-    safeAddress: string,
-    transaction: SafeTransactionData,
-    safeTxHash: string,
-    signature: SafeSignature
-  ): Promise<void> {
+  async proposeTransaction({
+    safeAddress,
+    senderAddress,
+    safeTransaction,
+    safeTxHash
+  }: ProposeTransactionProps): Promise<void> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
@@ -369,10 +369,10 @@ class SafeServiceClient implements SafeTransactionService {
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/multisig-transactions/`,
       method: HttpMethod.Post,
       body: {
-        ...transaction,
+        ...safeTransaction.data,
         contractTransactionHash: safeTxHash,
-        sender: signature.signer,
-        signature: signature.data
+        sender: senderAddress,
+        signature: safeTransaction.signatures.get(senderAddress.toLowerCase())?.data
       }
     })
   }

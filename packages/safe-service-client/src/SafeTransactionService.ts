@@ -1,8 +1,8 @@
 import { Signer } from '@ethersproject/abstract-signer'
-import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import {
   MasterCopyResponse,
   OwnerResponse,
+  ProposeTransactionProps,
   SafeBalanceResponse,
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
@@ -57,12 +57,12 @@ interface SafeTransactionService {
     safeAddress: string,
     safeTransaction: SafeMultisigTransactionEstimate
   ): Promise<SafeMultisigTransactionEstimateResponse>
-  proposeTransaction(
-    safeAddress: string,
-    transaction: SafeTransactionData,
-    safeTxHash: string,
-    signature: SafeSignature
-  ): Promise<void>
+  proposeTransaction({
+    safeAddress,
+    senderAddress,
+    safeTransaction,
+    safeTxHash
+  }: ProposeTransactionProps): Promise<void>
   getIncomingTransactions(safeAddress: string): Promise<TransferListResponse>
   getModuleTransactions(safeAddress: string): Promise<SafeModuleTransactionListResponse>
   getMultisigTransactions(safeAddress: string): Promise<SafeMultisigTransactionListResponse>

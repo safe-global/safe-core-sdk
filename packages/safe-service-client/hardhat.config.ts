@@ -13,7 +13,7 @@ const argv = yargs
   .version(false).argv
 
 dotenv.config()
-const { INFURA_KEY, MNEMONIC, PK } = process.env
+const { INFURA_KEY, MNEMONIC, PK, TESTS_PATH } = process.env
 const DEFAULT_MNEMONIC = 'myth like bonus scare over problem client lizard pioneer submit female collect'
 
 const sharedNetworkConfig: HttpNetworkUserConfig = {}
@@ -34,7 +34,7 @@ if (['rinkeby'].includes(argv.network) && INFURA_KEY === undefined) {
 const config: HardhatUserConfig = {
   defaultNetwork: "rinkeby",
   paths: {
-    tests: 'e2e'
+    tests: TESTS_PATH
   },
   networks: {
     hardhat: {

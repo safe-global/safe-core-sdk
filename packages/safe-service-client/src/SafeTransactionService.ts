@@ -70,6 +70,7 @@ interface SafeTransactionService {
     safeAddress: string,
     currentNonce?: number
   ): Promise<SafeMultisigTransactionListResponse>
+  getNextNonce(safeAddress: string): Promise<number>
 
   // Balances
   getBalances(safeAddress: string, options?: SafeBalancesOptions): Promise<SafeBalanceResponse[]>

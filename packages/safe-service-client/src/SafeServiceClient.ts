@@ -459,6 +459,29 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
+   * Returns the right nonce to propose a new transaction after the last pending transaction.
+   *
+   * @param safeAddress - The Safe address
+   * @returns The right nonce to propose a new transaction after the last pending transaction
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
+   */
+  async getNextNonce(safeAddress: string): Promise<number> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
+    const pendingTransactions = await this.getPendingTransactions(safeAddress)
+    if (pendingTransactions.results.length > 0) {
+      const nonces = pendingTransactions.results.map((tx) => tx.nonce)
+      const lastNonce = Math.max(...nonces)
+      return lastNonce + 1
+    }
+    const safeInfo = await this.getSafeInfo(safeAddress)
+    return safeInfo.nonce
+  }
+
+  /**
    * Returns the balances for Ether and ERC20 tokens of a Safe.
    *
    * @param safeAddress - The Safe address

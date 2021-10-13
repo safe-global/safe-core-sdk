@@ -92,7 +92,7 @@ const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterOwner1, safeAddr
 ### 3. Create a Safe transaction
 
 ```js
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk'
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 
 const transactions: SafeTransactionDataPartial[] = [{
   to: '0x<address>',

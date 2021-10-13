@@ -148,7 +148,7 @@ export type SafeMultisigTransactionResponse = {
   readonly dataDecoded?: string
   readonly confirmationsRequired: number
   readonly confirmations?: SafeMultisigConfirmationResponse[]
-  readonly signatures: string
+  readonly signatures?: string
 }
 
 export type SafeMultisigTransactionListResponse = {

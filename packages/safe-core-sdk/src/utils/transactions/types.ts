@@ -1,5 +1,5 @@
 import { ContractTransaction } from '@ethersproject/contracts'
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types/dist/src'
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
 export type SafeTransactionOptionalProps = Pick<

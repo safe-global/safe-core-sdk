@@ -23,10 +23,11 @@ interface EthAdapter {
   getBalance(address: string): Promise<BigNumber>
   getChainId(): Promise<number>
   getContract(address: string, abi: AbiItem[]): any
-  getSafeContract(safeAddress: string): Promise<GnosisSafeContract>
-  getMultiSendContract(multiSendAddress: string): Promise<MultiSendContract>
+  getSafeContract(chainId: number, customContractAddress?: string): Promise<GnosisSafeContract>
+  getMultiSendContract(chainId: number, customContractAddress?: string): Promise<MultiSendContract>
   getGnosisSafeProxyFactoryContract(
-    proxyFactoryAddress: string
+    chainId: number,
+    customContractAddress?: string
   ): Promise<GnosisSafeProxyFactoryContract>
   getContractCode(address: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>

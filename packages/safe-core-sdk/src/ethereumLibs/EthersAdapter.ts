@@ -3,9 +3,14 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { Provider } from '@ethersproject/providers'
-import { GnosisSafeProxyFactory__factory } from '../../typechain/src/ethers-v5/factories/GnosisSafeProxyFactory__factory'
-import { GnosisSafe__factory } from '../../typechain/src/ethers-v5/factories/GnosisSafe__factory'
-import { MultiSend__factory } from '../../typechain/src/ethers-v5/factories/MultiSend__factory'
+import {
+  getMultiSendDeployment,
+  getProxyFactoryDeployment,
+  getSafeSingletonDeployment
+} from '@gnosis.pm/safe-deployments'
+import { MultiSend__factory } from '../../typechain/src/ethers-v5/v1.1.1/factories/MultiSend__factory'
+import { ProxyFactory__factory } from '../../typechain/src/ethers-v5/v1.1.1/factories/ProxyFactory__factory'
+import { GnosisSafe__factory } from '../../typechain/src/ethers-v5/v1.2.0/factories/GnosisSafe__factory'
 import GnosisSafeEthersV5Contract from '../contracts/GnosisSafe/GnosisSafeEthersV5Contract'
 import GnosisSafeProxyFactoryEthersV5Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersV5Contract'
 import MultiSendEthersV5Contract from '../contracts/MultiSend/MultiSendEthersV5Contract'
@@ -56,41 +61,67 @@ class EthersAdapter implements EthAdapter {
     return (await this.#provider.getNetwork()).chainId
   }
 
-  async getSafeContract(safeAddress: string): Promise<GnosisSafeEthersV5Contract> {
-    const safeContractCode = await this.getContractCode(safeAddress)
-    if (safeContractCode === '0x') {
+  async getSafeContract(chainId: number, customContractAddress?: string): Promise<GnosisSafeEthersV5Contract> {
+    let contractAddress: string | undefined
+    if (customContractAddress) {
+      contractAddress = customContractAddress
+    } else {
+      const safeSingletonDeployment = getSafeSingletonDeployment({
+        network: chainId.toString(),
+        released: true
+      })
+      contractAddress =
+        safeSingletonDeployment?.networkAddresses[chainId] ??
+        safeSingletonDeployment?.defaultAddress
+    }
+    if (!contractAddress || (await this.getContractCode(contractAddress) === '0x')) {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
-    const safeContract = GnosisSafe__factory.connect(safeAddress, this.#signer)
-    const wrapperSafeContract = new GnosisSafeEthersV5Contract(safeContract)
-    return wrapperSafeContract
+    const safeContract = GnosisSafe__factory.connect(contractAddress, this.#signer)
+    return new GnosisSafeEthersV5Contract(safeContract)
   }
 
-  async getMultiSendContract(multiSendAddress: string): Promise<MultiSendEthersV5Contract> {
-    const multiSendContractCode = await this.getContractCode(multiSendAddress)
-    if (multiSendContractCode === '0x') {
-      throw new Error('MultiSend contract is not deployed in the current network')
+  async getMultiSendContract(chainId: number, customContractAddress?: string): Promise<MultiSendEthersV5Contract> {
+    let contractAddress: string | undefined
+    if (customContractAddress) {
+      contractAddress = customContractAddress
+    } else {
+      const multiSendDeployment = getMultiSendDeployment({
+        network: chainId.toString(),
+        released: true
+      })
+      contractAddress =
+        multiSendDeployment?.networkAddresses[chainId] ??
+        multiSendDeployment?.defaultAddress
     }
-    const multiSendContract = MultiSend__factory.connect(multiSendAddress, this.#signer)
-    const wrappedMultiSendContract = new MultiSendEthersV5Contract(multiSendContract)
-    return wrappedMultiSendContract
+    if (!contractAddress || (await this.getContractCode(contractAddress) === '0x')) {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
+    const multiSendContract = MultiSend__factory.connect(contractAddress, this.#signer)
+    return new MultiSendEthersV5Contract(multiSendContract)
   }
 
   async getGnosisSafeProxyFactoryContract(
-    proxyFactoryAddress: string
+    chainId: number,
+    customContractAddress?: string
   ): Promise<GnosisSafeProxyFactoryEthersV5Contract> {
-    const proxyFactoryContractCode = await this.getContractCode(proxyFactoryAddress)
-    if (proxyFactoryContractCode === '0x') {
-      throw new Error('Safe Proxy Factory contract is not deployed in the current network')
+    let contractAddress: string | undefined
+    if (customContractAddress) {
+      contractAddress = customContractAddress
+    } else {
+      const proxyFactoryDeployment = getProxyFactoryDeployment({
+        network: chainId.toString(),
+        released: true
+      })
+      contractAddress =
+        proxyFactoryDeployment?.networkAddresses[chainId] ??
+        proxyFactoryDeployment?.defaultAddress
     }
-    const proxyFactoryContract = GnosisSafeProxyFactory__factory.connect(
-      proxyFactoryAddress,
-      this.#signer
-    )
-    const wrappedProxyFactoryContract = new GnosisSafeProxyFactoryEthersV5Contract(
-      proxyFactoryContract
-    )
-    return wrappedProxyFactoryContract
+    if (!contractAddress || (await this.getContractCode(contractAddress) === '0x')) {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
+    const proxyFactoryContract = ProxyFactory__factory.connect(contractAddress, this.#signer)
+    return new GnosisSafeProxyFactoryEthersV5Contract(proxyFactoryContract)
   }
 
   getContract(address: string, abi: AbiItem[]): Contract {

@@ -1,10 +1,10 @@
-import { ContractNetworksConfig, defaultContractNetworks } from '../configuration/contracts'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
 import EthAdapter from '../ethereumLibs/EthAdapter'
+import { ContractNetworksConfig } from '../types'
 
 class ContractManager {
-  #contractNetworks!: ContractNetworksConfig
+  #contractNetworks?: ContractNetworksConfig
   #safeContract!: GnosisSafeContract
   #multiSendContract!: MultiSendContract
 
@@ -24,17 +24,16 @@ class ContractManager {
     contractNetworks?: ContractNetworksConfig
   ): Promise<void> {
     const chainId = await ethAdapter.getChainId()
-    const contractNetworksConfig = { ...defaultContractNetworks, ...contractNetworks }
-    const contracts = contractNetworksConfig[chainId]
-    if (!contracts) {
-      throw new Error('Safe contracts not found in the current network')
-    }
-    this.#contractNetworks = contractNetworksConfig
-    this.#safeContract = await ethAdapter.getSafeContract(safeAddress)
-    this.#multiSendContract = await ethAdapter.getMultiSendContract(contracts.multiSendAddress)
+    const customContracts = contractNetworks?.[chainId]
+    this.#contractNetworks = contractNetworks
+    this.#safeContract = await ethAdapter.getSafeContract(chainId, safeAddress)
+    this.#multiSendContract = await ethAdapter.getMultiSendContract(
+      chainId,
+      customContracts?.multiSendAddress
+    )
   }
 
-  get contractNetworks(): ContractNetworksConfig {
+  get contractNetworks(): ContractNetworksConfig | undefined {
     return this.#contractNetworks
   }
 

@@ -6,11 +6,11 @@ import {
   SafeTransaction,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import { ContractNetworksConfig } from './configuration/contracts'
 import EthAdapter from './ethereumLibs/EthAdapter'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
+import { ContractNetworksConfig } from './types'
 import { sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
@@ -75,7 +75,6 @@ class Safe {
    * Creates an instance of the Safe Core SDK.
    * @param config - Ethers Safe configuration
    * @returns The Safe Core SDK instance
-   * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
@@ -89,7 +88,6 @@ class Safe {
    * Initializes the Safe Core SDK instance.
    * @param config - Safe configuration
    * @throws "Signer must be connected to a provider"
-   * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
@@ -107,7 +105,6 @@ class Safe {
   /**
    * Returns a new instance of the Safe Core SDK.
    * @param config - Connect Safe configuration
-   * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */

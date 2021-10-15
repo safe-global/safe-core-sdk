@@ -1,12 +1,14 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { GnosisSafe } from '../../typechain/src/web3-v1/GnosisSafe'
-import { GnosisSafeProxyFactory } from '../../typechain/src/web3-v1/GnosisSafeProxyFactory'
-import { MultiSend } from '../../typechain/src/web3-v1/MultiSend'
+import {
+  getMultiSendDeployment,
+  getProxyFactoryDeployment,
+  getSafeSingletonDeployment
+} from '@gnosis.pm/safe-deployments'
+import { MultiSend } from '../../typechain/src/web3-v1/v1.1.1/multi_send'
+import { ProxyFactory } from '../../typechain/src/web3-v1/v1.1.1/proxy_factory'
+import { GnosisSafe } from '../../typechain/src/web3-v1/v1.2.0/gnosis_safe'
 import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeWeb3Contract'
-import SafeAbiV120 from '../contracts/GnosisSafe/SafeAbiV1-2-0.json'
-import GnosisSafeProxyFactoryAbiV120 from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryAbiV1-2-0.json'
 import GnosisSafeProxyFactoryWeb3Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
-import MultiSendAbi from '../contracts/MultiSend/MultiSendAbi.json'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
 import { AbiItem } from '../types'
 import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
@@ -42,43 +44,68 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getChainId()
   }
 
-  async getContract(address: string, abi: AbiItem[]): Promise<any> {
-    return new this.#web3.eth.Contract(abi, address)
-  }
-
-  async getSafeContract(safeAddress: string): Promise<GnosisSafeWeb3Contract> {
-    const safeContractCode = await this.getContractCode(safeAddress)
-    if (safeContractCode === '0x') {
+  async getSafeContract(chainId: number, customContractAddress?: string): Promise<GnosisSafeWeb3Contract> {
+    const safeSingletonDeployment = getSafeSingletonDeployment({
+      network: chainId.toString(),
+      released: true
+    })
+    const contractAddress =
+      customContractAddress ??
+      safeSingletonDeployment?.networkAddresses[chainId] ??
+      safeSingletonDeployment?.defaultAddress
+    if (!contractAddress || (await this.getContractCode(contractAddress) === '0x')) {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
-    const safeContract = (await this.getContract(safeAddress, SafeAbiV120)) as GnosisSafe
-    const wrapperSafeContract = new GnosisSafeWeb3Contract(safeContract)
-    return wrapperSafeContract
+    const safeContract = this.getContract(
+      contractAddress,
+      safeSingletonDeployment?.abi as AbiItem[]
+    ) as GnosisSafe
+    return new GnosisSafeWeb3Contract(safeContract)
   }
 
-  async getMultiSendContract(multiSendAddress: string): Promise<MultiSendWeb3Contract> {
-    const multiSendContractCode = await this.getContractCode(multiSendAddress)
-    if (multiSendContractCode === '0x') {
-      throw new Error('MultiSend contract is not deployed in the current network')
+  async getMultiSendContract(chainId: number, customContractAddress?: string): Promise<MultiSendWeb3Contract> {
+    const multiSendDeployment = getMultiSendDeployment({
+      network: chainId.toString(),
+      released: true
+    })
+    const contractAddress =
+      customContractAddress ??
+      multiSendDeployment?.networkAddresses[chainId] ??
+      multiSendDeployment?.defaultAddress
+    if (!contractAddress || (await this.getContractCode(contractAddress) === '0x')) {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
     }
-    const multiSendContract = (await this.getContract(multiSendAddress, MultiSendAbi)) as MultiSend
-    const wrappedMultiSendContract = new MultiSendWeb3Contract(multiSendContract)
-    return wrappedMultiSendContract
+    const multiSendContract = this.getContract(
+      contractAddress,
+      multiSendDeployment?.abi as AbiItem[]
+    ) as MultiSend
+    return new MultiSendWeb3Contract(multiSendContract)
   }
 
   async getGnosisSafeProxyFactoryContract(
-    proxyFactoryAddress: string
+    chainId: number,
+    customContractAddress?: string
   ): Promise<GnosisSafeProxyFactoryWeb3Contract> {
-    const proxyFactoryContractCode = await this.getContractCode(proxyFactoryAddress)
-    if (proxyFactoryContractCode === '0x') {
-      throw new Error('Safe Proxy Factory contract is not deployed in the current network')
+    const proxyFactoryDeployment = getProxyFactoryDeployment({
+      network: chainId.toString(),
+      released: true
+    })
+    const contractAddress =
+      customContractAddress ??
+      proxyFactoryDeployment?.networkAddresses[chainId] ??
+      proxyFactoryDeployment?.defaultAddress
+    if (!contractAddress || (await this.getContractCode(contractAddress) === '0x')) {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
     }
-    const proxyFactoryContract = (await this.getContract(
-      proxyFactoryAddress,
-      GnosisSafeProxyFactoryAbiV120
-    )) as GnosisSafeProxyFactory
-    const wrappedProxyFactoryContract = new GnosisSafeProxyFactoryWeb3Contract(proxyFactoryContract)
-    return wrappedProxyFactoryContract
+    const proxyFactoryContract = this.getContract(
+      contractAddress,
+      proxyFactoryDeployment?.abi as AbiItem[]
+    ) as ProxyFactory
+    return new GnosisSafeProxyFactoryWeb3Contract(proxyFactoryContract)
+  }
+
+  getContract(address: string, abi: AbiItem[]): any {
+    return new this.#web3.eth.Contract(abi, address)
   }
 
   async getContractCode(address: string): Promise<string> {

@@ -16,11 +16,6 @@ const typeChainDirectoryBuildPath = path.join(__dirname, `../${outDirBuild}`)
 // Will be included in dist/ folder
 const safeContractsPath = '../../node_modules/@gnosis.pm/safe-contracts/build/contracts'
 const openZeppelinContractsPath = '../../node_modules/openzeppelin-solidity/build/contracts'
-const safeContracts = [
-  `${safeContractsPath}/GnosisSafe.json`,
-  `${safeContractsPath}/GnosisSafeProxyFactory.json`,
-  `${safeContractsPath}/MultiSend.json`,
-].join(' ')
 // Won't be included in dist/ folder
 const testContracts = [
   `${safeContractsPath}/DailyLimitModule.json`,
@@ -38,7 +33,7 @@ execSync(`rimraf ${outDirSrc} ${outDirTests}`, (error) => {
 
 // Generate Typechain files
 function generateTypechainFiles(typechainVersion, outDir, contractList) {
-  execSync(`typechain --target ${typechainVersion} --out-dir ${outDir}${typechainVersion} ${contractList}`, (error) => {
+  execSync(`typechain --target ${typechainVersion} --out-dir ${outDir} ${contractList}`, (error) => {
     if (error) {
       console.log(error.message)
     }
@@ -65,16 +60,26 @@ function moveTypechainFiles(typechainVersion, inDir, outDir) {
   })
 }
 
+function getSafeDeploymentsContracts(contractVersion) {
+  return `../../node_modules/@gnosis.pm/safe-deployments/dist/assets/${contractVersion}/*.json`
+}
+
 const web3V1 = 'web3-v1'
 const ethersV5 = 'ethers-v5'
 
 // Src: Web3 V1 types
-generateTypechainFiles(web3V1, outDirSrc, safeContracts)
+generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.0.0'`, getSafeDeploymentsContracts('v1.0.0'))
+generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.1.1'`, getSafeDeploymentsContracts('v1.1.1'))
+generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.2.0'`, getSafeDeploymentsContracts('v1.2.0'))
+generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.3.0'`, getSafeDeploymentsContracts('v1.3.0'))
 moveTypechainFiles(web3V1, typeChainDirectorySrcPath, typeChainDirectoryBuildPath)
 
 // Src: Ethers V5 types
-generateTypechainFiles(ethersV5, outDirSrc, safeContracts)
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.0.0'`, getSafeDeploymentsContracts('v1.0.0'))
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.1.1'`, getSafeDeploymentsContracts('v1.1.1'))
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.2.0'`, getSafeDeploymentsContracts('v1.2.0'))
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.3.0'`, getSafeDeploymentsContracts('v1.3.0'))
 moveTypechainFiles(ethersV5, typeChainDirectorySrcPath, typeChainDirectoryBuildPath)
 
 // Tests: Ethers V5 types
-generateTypechainFiles(ethersV5, outDirTests, testContracts)
+generateTypechainFiles(ethersV5, `${outDirTests}${ethersV5}`, testContracts)

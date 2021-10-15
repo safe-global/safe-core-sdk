@@ -24,3 +24,17 @@ export interface AbiItem {
   type: string
   gas?: number
 }
+
+export interface ContractNetworkConfig {
+  /** multiSendAddress - Address of the MultiSend contract deployed on a specific network */
+  multiSendAddress: string
+  /** safeMasterCopyAddress - Address of the Gnosis Safe Master Copy contract deployed on a specific network */
+  safeMasterCopyAddress: string
+  /** safeProxyFactoryAddress - Address of the Gnosis Safe Proxy Factory contract deployed on a specific network */
+  safeProxyFactoryAddress: string
+}
+
+export interface ContractNetworksConfig {
+  /** id - Network id */
+  [id: string]: ContractNetworkConfig
+}

@@ -153,7 +153,9 @@ The property `contractNetworks` can be added to provide the Safe contract addres
 ```js
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
-    multiSendAddress: '0x<multisend_address>'
+    multiSendAddress: '0x<multisend_address>',
+    safeMasterCopyAddress: '0x<master_copy_address>',
+    safeProxyFactoryAddress: '0x<proxy_factory_address>'
   }
 }
 const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
@@ -172,7 +174,9 @@ The property `contractNetworks` can be added to provide the Safe contract addres
 ```js
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
-    multiSendAddress: '0x<multisend_address>'
+    multiSendAddress: '0x<multisend_address>',
+    safeMasterCopyAddress: '0x<master_copy_address>',
+    safeProxyFactoryAddress: '0x<proxy_factory_address>'
   }
 }
 const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })

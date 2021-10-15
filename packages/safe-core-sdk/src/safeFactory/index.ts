@@ -1,8 +1,8 @@
-import { ContractNetworksConfig, defaultContractNetworks } from '../configuration/contracts'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
 import EthAdapter from '../ethereumLibs/EthAdapter'
 import Safe from '../Safe'
+import { ContractNetworksConfig } from '../types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
 import { validateSafeAccountConfig } from './utils'
 
@@ -29,7 +29,7 @@ export interface SafeFactoryConfig {
 }
 
 class SafeFactory {
-  #contractNetworks!: ContractNetworksConfig
+  #contractNetworks?: ContractNetworksConfig
   #ethAdapter!: EthAdapter
   #safeProxyFactoryContract!: GnosisSafeProxyFactoryContract
   #gnosisSafeContract!: GnosisSafeContract
@@ -42,17 +42,16 @@ class SafeFactory {
 
   private async init({ ethAdapter, contractNetworks }: SafeFactoryConfig): Promise<void> {
     this.#ethAdapter = ethAdapter
-    this.#contractNetworks = { ...defaultContractNetworks, ...contractNetworks }
+    this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
-    const contractNetworksConfig = this.#contractNetworks[chainId]
-    if (!contractNetworksConfig) {
-      throw new Error('Safe contracts not found in the current network')
-    }
+    const customContracts = contractNetworks?.[chainId]
     this.#safeProxyFactoryContract = await ethAdapter.getGnosisSafeProxyFactoryContract(
-      this.#contractNetworks[chainId].safeProxyFactoryAddress
+      chainId,
+      customContracts?.safeProxyFactoryAddress
     )
     this.#gnosisSafeContract = await ethAdapter.getSafeContract(
-      contractNetworksConfig.safeMasterCopyAddress
+      chainId,
+      customContracts?.safeMasterCopyAddress
     )
   }
 
@@ -95,6 +94,7 @@ class SafeFactory {
     safeDeploymentConfig?: SafeDeploymentConfig
   ): Promise<Safe> {
     validateSafeAccountConfig(safeAccountConfig)
+    const chainId = await this.#ethAdapter.getChainId()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
@@ -103,7 +103,7 @@ class SafeFactory {
       saltNonce: safeDeploymentConfig?.saltNonce,
       options: { from: signerAddress }
     })
-    const safeContract = await this.#ethAdapter.getSafeContract(safeAddress)
+    const safeContract = await this.#ethAdapter.getSafeContract(chainId, safeAddress)
     const safe = Safe.create({
       ethAdapter: this.#ethAdapter,
       safeAddress: safeContract.getAddress(),

@@ -18,7 +18,7 @@
     "test:ganache:ethers": "export TEST_NETWORK=ganache && export ETH_LIB=ethers && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:hardhat:web3": "export TEST_NETWORK=hardhat && export ETH_LIB=web3 && hardhat deploy && nyc hardhat test",
     "test:hardhat:ethers": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && hardhat deploy && nyc hardhat test",
-    "test": "yarn test:hardhat:web3 && yarn test:hardhat:ethers",
+    "test": "yarn test:hardhat:ethers",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
@@ -87,6 +87,7 @@
   },
   "dependencies": {
     "@gnosis.pm/safe-core-sdk-types": "^0.1.1",
+    "@gnosis.pm/safe-deployments": "^1.4.0",
     "ethereumjs-util": "^7.0.10"
   }
 }

@@ -39,7 +39,7 @@ describe('Safe Proxy Factory', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       chai
         .expect(SafeFactory.create({ ethAdapter }))
-        .rejectedWith('Safe contracts not found in the current network')
+        .rejectedWith('Safe Proxy contract is not deployed in the current network')
     })
 
     it('should instantiate the Safe Proxy Factory', async () => {

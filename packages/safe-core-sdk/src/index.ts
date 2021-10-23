@@ -14,6 +14,7 @@ import SafeFactory, {
   SafeDeploymentConfig,
   SafeFactoryConfig
 } from './safeFactory'
+import EthSignSignature from './utils/signatures/SafeSignature'
 import {
   SafeTransactionOptionalProps,
   TransactionOptions,
@@ -40,5 +41,6 @@ export {
   SafeTransactionOptionalProps,
   AddOwnerTxParams,
   RemoveOwnerTxParams,
-  SwapOwnerTxParams
+  SwapOwnerTxParams,
+  EthSignSignature
 }

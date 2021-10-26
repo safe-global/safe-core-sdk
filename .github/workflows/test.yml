@@ -1,5 +1,7 @@
 name: Hardhat Test
 on: [push, pull_request]
+env:
+  INFURA_KEY: ${{ secrets.INFURA_KEY }}
 jobs:
   test:
     runs-on: ubuntu-latest

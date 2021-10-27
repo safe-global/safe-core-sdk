@@ -1,5 +1,5 @@
 import { ContractTransaction, Event } from '@ethersproject/contracts'
-import { ProxyFactory } from '../../../typechain/src/ethers-v5/v1.1.1/ProxyFactory'
+import { ProxyFactory } from '../../../typechain/src/ethers-v5/v1.3.0/ProxyFactory'
 import GnosisSafeProxyFactoryContract, { CreateProxyProps } from './GnosisSafeProxyFactoryContract'
 
 class GnosisSafeProxyFactoryEthersV5Contract implements GnosisSafeProxyFactoryContract {

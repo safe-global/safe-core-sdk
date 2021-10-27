@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
-import { GnosisSafe } from '../../../typechain/src/web3-v1/v1.2.0/gnosis_safe'
+import { GnosisSafe } from '../../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
 import { TransactionOptions, Web3TransactionResult } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 
@@ -16,7 +16,7 @@ function toTxResult(
   )
 }
 
-class GnosisSafeWeb3Contract implements GnosisSafeContract {
+class GnosisSafeContractWeb3 implements GnosisSafeContract {
   constructor(public contract: GnosisSafe) {}
 
   async getVersion(): Promise<string> {
@@ -111,4 +111,4 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
   }
 }
 
-export default GnosisSafeWeb3Contract
+export default GnosisSafeContractWeb3

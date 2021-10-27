@@ -2,7 +2,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { GnosisSafe } from '../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
 import { MultiSend } from '../../typechain/src/web3-v1/v1.3.0/multi_send'
 import { ProxyFactory } from '../../typechain/src/web3-v1/v1.3.0/proxy_factory'
-import GnosisSafeWeb3Contract from '../contracts/GnosisSafe/GnosisSafeContractWeb3'
+import GnosisSafeContractWeb3 from '../contracts/GnosisSafe/GnosisSafeContractWeb3'
 import GnosisSafeProxyFactoryWeb3Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
 import {
@@ -49,7 +49,7 @@ class Web3Adapter implements EthAdapter {
     safeVersion: SafeVersion,
     chainId: number,
     customContractAddress?: string
-  ): Promise<GnosisSafeWeb3Contract> {
+  ): Promise<GnosisSafeContractWeb3> {
     const safeSingletonDeployment = getSafeContractDeployment(safeVersion, chainId)
     const contractAddress =
       customContractAddress ??
@@ -62,7 +62,7 @@ class Web3Adapter implements EthAdapter {
       contractAddress,
       safeSingletonDeployment?.abi as AbiItem[]
     ) as GnosisSafe
-    return new GnosisSafeWeb3Contract(safeContract)
+    return new GnosisSafeContractWeb3(safeContract)
   }
 
   async getMultiSendContract(

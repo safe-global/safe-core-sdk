@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
-import { GnosisSafe, GnosisSafeInterface } from '../../../typechain/src/ethers-v5/v1.2.0/GnosisSafe'
+import { GnosisSafe, GnosisSafeInterface } from '../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
 import { EthersTransactionResult, TransactionOptions } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 
@@ -16,7 +16,7 @@ function toTxResult(
   }
 }
 
-class GnosisSafeEthersV5Contract implements GnosisSafeContract {
+class GnosisSafeContractEthersV5 implements GnosisSafeContract {
   constructor(public contract: GnosisSafe) {}
 
   async getVersion(): Promise<string> {
@@ -108,4 +108,4 @@ class GnosisSafeEthersV5Contract implements GnosisSafeContract {
   }
 }
 
-export default GnosisSafeEthersV5Contract
+export default GnosisSafeContractEthersV5

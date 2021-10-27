@@ -1,9 +1,9 @@
 import { Signer } from '@ethersproject/abstract-signer'
-import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import SafeTransactionService from './SafeTransactionService'
 import {
   MasterCopyResponse,
   OwnerResponse,
+  ProposeTransactionProps,
   SafeBalanceResponse,
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
@@ -349,16 +349,16 @@ class SafeServiceClient implements SafeTransactionService {
    * @param signature - The signature of an owner or delegate of the specified Safe
    * @returns The hash of the Safe transaction proposed
    * @throws "Invalid Safe address"
-   * @throws "Invalid Safe safeTxHash"
+   * @throws "Invalid safeTxHash"
    * @throws "Invalid data"
-   * @throws "Invalid ethereum address/User is not an owner/Invalid safeTxHash/Invalid signature/Nonce already executed/Sender is not an owner"
+   * @throws "Invalid ethereum address/User is not an owner/Invalid signature/Nonce already executed/Sender is not an owner"
    */
-  async proposeTransaction(
-    safeAddress: string,
-    transaction: SafeTransactionData,
-    safeTxHash: string,
-    signature: SafeSignature
-  ): Promise<void> {
+  async proposeTransaction({
+    safeAddress,
+    senderAddress,
+    safeTransaction,
+    safeTxHash
+  }: ProposeTransactionProps): Promise<void> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
@@ -369,10 +369,10 @@ class SafeServiceClient implements SafeTransactionService {
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/multisig-transactions/`,
       method: HttpMethod.Post,
       body: {
-        ...transaction,
+        ...safeTransaction.data,
         contractTransactionHash: safeTxHash,
-        sender: signature.signer,
-        signature: signature.data
+        sender: senderAddress,
+        signature: safeTransaction.signatures.get(senderAddress.toLowerCase())?.data
       }
     })
   }
@@ -456,6 +456,29 @@ class SafeServiceClient implements SafeTransactionService {
       }/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
       method: HttpMethod.Get
     })
+  }
+
+  /**
+   * Returns the right nonce to propose a new transaction after the last pending transaction.
+   *
+   * @param safeAddress - The Safe address
+   * @returns The right nonce to propose a new transaction after the last pending transaction
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
+   */
+  async getNextNonce(safeAddress: string): Promise<number> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
+    const pendingTransactions = await this.getPendingTransactions(safeAddress)
+    if (pendingTransactions.results.length > 0) {
+      const nonces = pendingTransactions.results.map((tx) => tx.nonce)
+      const lastNonce = Math.max(...nonces)
+      return lastNonce + 1
+    }
+    const safeInfo = await this.getSafeInfo(safeAddress)
+    return safeInfo.nonce
   }
 
   /**

@@ -1,4 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer'
+import { SafeTransaction } from '@gnosis.pm/safe-core-sdk-types'
 
 export type SafeServiceInfoResponse = {
   readonly name: string
@@ -110,6 +111,13 @@ export type SafeMultisigConfirmationListResponse = {
   readonly next?: string
   readonly previous?: string
   readonly results: SafeMultisigConfirmationResponse[]
+}
+
+export type ProposeTransactionProps = {
+  safeAddress: string
+  senderAddress: string
+  safeTransaction: SafeTransaction
+  safeTxHash: string
 }
 
 export type SafeMultisigTransactionResponse = {

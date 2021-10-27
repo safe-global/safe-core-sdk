@@ -13,8 +13,8 @@
   "scripts": {
     "unbuild": "rimraf dist",
     "build": "yarn rimraf dist && tsc",
-    "test": "mocha --require ts-node/register tests/**/*.test.ts",
-    "test:ci": "nyc hardhat test",
+    "test": "export TESTS_PATH=tests && nyc hardhat test",
+    "test:ci": "export TESTS_PATH=e2e && nyc hardhat test",
     "format": "prettier --write \"{src,tests,e2e}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },

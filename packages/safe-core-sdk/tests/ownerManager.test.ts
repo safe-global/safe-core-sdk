@@ -236,7 +236,7 @@ describe('Safe owners manager', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const newThreshold = 1
+      const newThreshold = 2
       const initialOwners = await safeSdk.getOwners()
       chai.expect(initialOwners.length).to.be.eq(1)
       chai.expect(initialOwners[0]).to.be.eq(account1.address)

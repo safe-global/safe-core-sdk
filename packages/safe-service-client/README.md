@@ -152,7 +152,7 @@ const estimateTx: SafeMultisigTransactionEstimateResponse = await safeService.es
 Creates a new multi-signature transaction and stores it in the Safe Transaction Service.
 
 ```js
-await safeService.proposeTransaction(safeAddress, transaction, safeTxHash, signature)
+await safeService.proposeTransaction({ safeAddress, safeTransaction, safeTxHash, senderAddress })
 ```
 
 ### getIncomingTransactions
@@ -189,6 +189,14 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 
 ```js
 const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(safeAddress, currentNonce)
+```
+
+### getNextNonce
+
+Returns the right nonce to propose a new transaction right after the last pending transaction.
+
+```js
+const nextNonce = await getNextNonce(safeAddress)
 ```
 
 ### getBalances

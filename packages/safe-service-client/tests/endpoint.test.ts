@@ -1,8 +1,10 @@
 import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import { ethers } from 'hardhat'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import config from '../e2e/config'
@@ -20,7 +22,7 @@ chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
 describe('Endpoint tests', () => {
-  const safeAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+  const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
   const ownerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
   const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
   const txServiceBaseUrl = 'https://safe-transaction.rinkeby.gnosis.io'
@@ -229,7 +231,7 @@ describe('Endpoint tests', () => {
     })
 
     it('proposeTransaction', async () => {
-      const safeTxData: SafeTransactionData = {
+      const safeTxData: SafeTransactionDataPartial = {
         to: '0xa33d2495760462018275994d85117600bd58221e',
         data: '0x',
         value: '123456789',
@@ -241,14 +243,25 @@ describe('Endpoint tests', () => {
         refundReceiver: '0x0000000000000000000000000000000000000000',
         nonce: 1
       }
-      const signature: SafeSignature = {
-        signer: 'signer',
-        data: 'signature',
-        staticPart: () => '',
-        dynamicPart: () => ''
-      }
+      const provider = getDefaultProvider(config.JSON_RPC)
+      const signer = new Wallet(
+        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
+        provider
+      )
+      const signerAddress = await signer.getAddress()
+      const ethAdapter = new EthersAdapter({ ethers, signer })
+      const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+      const safeTransaction = await safeSdk.createTransaction(safeTxData)
+      await safeSdk.signTransaction(safeTransaction)
       await chai
-        .expect(serviceSdk.proposeTransaction(safeAddress, safeTxData, safeTxHash, signature))
+        .expect(
+          serviceSdk.proposeTransaction({
+            safeAddress,
+            senderAddress: signerAddress,
+            safeTransaction,
+            safeTxHash
+          })
+        )
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
@@ -256,8 +269,8 @@ describe('Endpoint tests', () => {
         body: {
           ...safeTxData,
           contractTransactionHash: safeTxHash,
-          sender: signature.signer,
-          signature: signature.data
+          sender: safeTransaction.signatures.get(signerAddress.toLowerCase())?.signer,
+          signature: safeTransaction.signatures.get(signerAddress.toLowerCase())?.data
         }
       })
     })

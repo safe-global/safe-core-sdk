@@ -75,6 +75,25 @@ const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
 
 The method `deploySafe` executes a transaction from `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe.
 
+The `SafeFactory` will deploy by default the last version of the Safe contracts available (currently `v1.3.0`). To deploy an older version of the Safe contracts instantiate the `SafeFactory` adding the property `safeVersion` with the desired version number.
+
+```js
+const safeFactoryV1_1_1 = await SafeFactory.create({ ethAdapter, safeVersion: '1.1.1' })
+```
+
+The property `contractNetworks` can also be used to provide the Safe contract addresses in case the SDK is used in a network where the Safe contracts are not deployed.
+
+```js
+const contractNetworks: ContractNetworksConfig = {
+  [chainId]: {
+    multiSendAddress: '0x<multisend_address>',
+    safeMasterCopyAddress: '0x<master_copy_address>',
+    safeProxyFactoryAddress: '0x<proxy_factory_address>'
+  }
+}
+const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
+```
+
 Call the method `getAddress`, for example, to check the address of the newly deployed Safe.
 
 ```js

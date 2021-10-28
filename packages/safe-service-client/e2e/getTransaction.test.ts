@@ -1,12 +1,12 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient, { SafeMultisigTransactionResponse } from '../src'
+import SafeServiceClient from '../src'
 import config from './config'
 
 chai.use(chaiAsPromised)
 
 describe('getTransaction', () => {
-  const serviceSdk = new SafeServiceClient(config.baseUrl)
+  const serviceSdk = new SafeServiceClient(config.BASE_URL)
 
   it('should fail if safeTxHash is empty', async () => {
     const safeTxHash = ''
@@ -22,7 +22,7 @@ describe('getTransaction', () => {
 
   it('should return the transaction with the given safeTxHash', async () => {
     const safeTxHash = '0xb22be4e57718560c89de96acd1acefe55c2673b31a7019a374ebb1d8a2842f5d'
-    const transaction: SafeMultisigTransactionResponse = await serviceSdk.getTransaction(safeTxHash)
+    const transaction = await serviceSdk.getTransaction(safeTxHash)
     chai.expect(transaction.safeTxHash).to.be.equal(safeTxHash)
   })
 })

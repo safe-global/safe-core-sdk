@@ -71,7 +71,7 @@ class OwnerManager {
     const owners = await this.getOwners()
     this.validateAddressIsNotOwner(ownerAddress, owners)
     const newThreshold = threshold ?? (await this.getThreshold())
-    this.validateThreshold(newThreshold, owners.length)
+    this.validateThreshold(newThreshold, owners.length + 1)
     return this.#safeContract.encode('addOwnerWithThreshold', [ownerAddress, newThreshold])
   }
 

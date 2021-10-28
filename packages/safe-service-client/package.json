@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-service-client",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Safe Service Client",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -13,8 +13,8 @@
   "scripts": {
     "unbuild": "rimraf dist",
     "build": "yarn rimraf dist && tsc",
-    "test": "mocha --require ts-node/register tests/**/*.test.ts",
-    "test:ci": "mocha --require ts-node/register e2e/**/*.test.ts",
+    "test": "export TESTS_PATH=tests && nyc hardhat test",
+    "test:ci": "export TESTS_PATH=e2e && nyc hardhat test",
     "format": "prettier --write \"{src,tests,e2e}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
@@ -33,26 +33,28 @@
   ],
   "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
   "devDependencies": {
-    "@gnosis.pm/safe-core-sdk": "^0.1.2",
-    "@types/chai": "^4.2.19",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@types/chai": "^4.2.22",
     "@types/chai-as-promised": "^7.1.4",
-    "@types/mocha": "^8.2.2",
-    "@types/node": "^15.12.4",
-    "@typescript-eslint/eslint-plugin": "^4.27.0",
-    "@typescript-eslint/parser": "^4.27.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.9.6",
+    "@typescript-eslint/eslint-plugin": "^4.31.2",
+    "@typescript-eslint/parser": "^4.31.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
-    "eslint": "^7.29.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "husky": "^6.0.0",
-    "lint-staged": "^11.0.0",
-    "mocha": "^8.4.0",
-    "prettier": "^2.3.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "hardhat": "^2.3.3",
+    "husky": "^7.0.2",
+    "lint-staged": "^11.1.2",
+    "mocha": "^9.1.1",
+    "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
     "ts-generator": "^0.1.1",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.3.4"
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
   },
   "lint-staged": {
     "src/**/!(*test).ts": [
@@ -66,7 +68,6 @@
     }
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk-types": "^0.1.0",
-    "axios": "^0.21.1"
+    "@gnosis.pm/safe-core-sdk-types": "^0.1.1"
   }
 }

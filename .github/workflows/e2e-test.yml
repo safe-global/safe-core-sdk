@@ -8,6 +8,8 @@ on:
     branches:
       - development
       - main
+env:
+  INFURA_KEY: ${{ secrets.INFURA_KEY }}
 jobs:
   test:
     runs-on: ubuntu-latest

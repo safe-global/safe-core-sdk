@@ -92,7 +92,7 @@ const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterOwner1, safeAddr
 ### 3. Create a Safe transaction
 
 ```js
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk'
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 
 const transactions: SafeTransactionDataPartial[] = [{
   to: '0x<address>',
@@ -260,34 +260,73 @@ const isOwner = await safeSdk.isOwner(address)
 
 ### createTransaction
 
-Returns a Safe transaction ready to be signed by the owners and executed. Batched transactions are allowed if more than one transaction is added to the array of transactions.
-
-Each of the transactions provided as input to this function must be an object with the following properties:
-
-* `to`: Required.
-* `data`: Required.
-* `value`: Required.
-* `operation`: Optional. `OperationType.Call` (0) is the default value.
-* `safeTxGas`: Optional. The right gas estimation is the default value.
-* `baseGas`: Optional. 0 is the default value.
-* `gasPrice`: Optional. 0 is the default value.
-* `gasToken`: Optional. 0x address is the default value.
-* `refundReceiver`: Optional. 0x address is the default value.
-* `nonce`: Optional. The current Safe nonce is the default value.
-
-Read more about the [Safe transaction properties](https://docs.gnosis.io/safe/docs/contracts_tx_execution/).
+Returns a Safe transaction ready to be signed by the owners and executed.
 
 ```js
-const transactions: SafeTransactionDataPartial[] = [
+const transaction: SafeTransactionDataPartial = {
+  to,
+  data,
+  value,
+  operation, // Optional
+  safeTxGas, // Optional
+  baseGas, // Optional
+  gasPrice, // Optional
+  gasToken, // Optional
+  refundReceiver, // Optional
+  nonce // Optional
+}
+const safeTransaction = await safeSdk.createTransaction(transaction)
+```
+
+Batched transactions are allowed if more than one transaction are passed as an array of transactions.
+
+```js
+const transactions: MetaTransactionData[] = [
   {
-    to: '0x<address>',
-    data: '0x<data>',
-    value: '<eth_value_in_wei>'
+    to,
+    data,
+    value,
+    operation // Optional
   },
   // ...
 ]
-const safeTransaction = await safeSdk.createTransaction(...transactions)
+const safeTransaction = await safeSdk.createTransaction(transactions)
 ```
+
+This method can also receive the `options` parameter to set the optional properties in the MultiSend transaction:
+
+```js
+const transactions: MetaTransactionData[] = [
+  {
+    to,
+    data,
+    value,
+    operation
+  },
+  // ...
+]
+const options: SafeTransactionOptionalProps = {
+  safeTxGas, // Optional
+  baseGas, // Optional
+  gasPrice, // Optional
+  gasToken, // Optional
+  refundReceiver, // Optional
+  nonce // Optional
+}
+const safeTransaction = await safeSdk.createTransaction(transactions, options)
+```
+
+If the optional properties are not manually set, the Safe transaction returned will have the default value for each one:
+
+* `operation`: `OperationType.Call` (0) is the default value.
+* `safeTxGas`: The right gas estimation is the default value.
+* `baseGas`: 0 is the default value.
+* `gasPrice`: 0 is the default value.
+* `gasToken`: 0x address is the default value.
+* `refundReceiver`: 0x address is the default value.
+* `nonce`: The current Safe nonce is the default value.
+
+Read more about the [Safe transaction properties](https://docs.gnosis.io/safe/docs/contracts_tx_execution/).
 
 ### createRejectionTransaction
 
@@ -375,6 +414,20 @@ const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
 
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = {
+  safeTxGas, // Optional
+  baseGas, // Optional
+  gasPrice, // Optional
+  gasToken, // Optional
+  refundReceiver, // Optional
+  nonce // Optional
+}
+const safeTransaction = await safeSdk.getEnableModuleTx(moduleAddress, options)
+```
+
 ### getDisableModuleTx
 
 Returns a Safe transaction ready to be signed that will disable a Safe module.
@@ -385,36 +438,53 @@ const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
 
-### getAddOwnerTx
-
-Returns the Safe transaction to add an owner and update the threshold.
+This method can optionally receive the `options` parameter:
 
 ```js
-const safeTransaction = await safeSdk.getAddOwnerTx(newOwnerAddress, newThreshold)
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.getDisableModuleTx(moduleAddress, options)
+```
+
+### getAddOwnerTx
+
+Returns the Safe transaction to add an owner and optionally change the threshold.
+
+```js
+const params: AddOwnerTxParams = {
+  ownerAddress,
+  threshold // Optional. If `threshold` is not provided the current threshold will not change.
+}
+const safeTransaction = await safeSdk.getAddOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
 
-If `threshold` is not provided, the current threshold will not change.
+This method can optionally receive the `options` parameter:
 
 ```js
-const safeTransaction = await safeSdk.getAddOwnerTx(newOwnerAddress)
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.getAddOwnerTx(params, options)
 ```
 
 ### getRemoveOwnerTx
 
-Returns the Safe transaction to remove an owner and update the threshold.
+Returns the Safe transaction to remove an owner and optionally change the threshold.
 
 ```js
-const safeTransaction = await safeSdk.getRemoveOwnerTx(ownerAddress, newThreshold)
+const params: RemoveOwnerTxParams = {
+  ownerAddress,
+  newThreshold // Optional. If `newThreshold` is not provided, the current threshold will be decreased by one.
+}
+const safeTransaction = await safeSdk.getRemoveOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
 
-If `threshold` is not provided, the current threshold will be decreased by one.
+This method can optionally receive the `options` parameter:
 
 ```js
-const safeTransaction = await safeSdk.getRemoveOwnerTx(ownerAddress)
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.getRemoveOwnerTx(params, options)
 ```
 
 ### getSwapOwnerTx
@@ -422,9 +492,20 @@ const safeTransaction = await safeSdk.getRemoveOwnerTx(ownerAddress)
 Returns the Safe transaction to replace an owner of the Safe with a new one.
 
 ```js
-const safeTransaction = await safeSdk.getSwapOwnerTx(oldOwnerAddress, newOwnerAddress)
+const params: SwapOwnerTxParams = {
+  oldOwnerAddress,
+  newOwnerAddress
+}
+const safeTransaction = await safeSdk.getSwapOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.getSwapOwnerTx(params, options)
 ```
 
 ### getChangeThresholdTx
@@ -435,6 +516,13 @@ Returns the Safe transaction to change the threshold.
 const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold, options)
 ```
 
 ### executeTransaction
@@ -454,11 +542,10 @@ Optionally, `gasLimit` and `gasPrice` values can be passed as execution options,
 
 ```js
 const options: TransactionOptions = {
-  gasLimit: 123456,
-  gasPrice: 123 // Optional parameter.
+  gasLimit,
+  gasPrice // Optional
 }
 const txResponse = await safeSdk.executeTransaction(safeTransaction, options)
-await txResponse.transactionResponse?.wait()
 ```
 
 ## License

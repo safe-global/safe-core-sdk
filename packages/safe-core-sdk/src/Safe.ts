@@ -1,5 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
+  MetaTransactionData,
   OperationType,
   SafeSignature,
   SafeTransaction,
@@ -15,7 +16,7 @@ import { generatePreValidatedSignature, generateSignature } from './utils/signat
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import {
-  CallTransactionOptionalProps,
+  SafeTransactionOptionalProps,
   TransactionOptions,
   TransactionResult
 } from './utils/transactions/types'
@@ -234,28 +235,37 @@ class Safe {
    * @param safeTransactions - The list of transactions to process
    * @returns The Safe transaction
    */
+  async createTransaction(safeTransactions: SafeTransactionDataPartial): Promise<SafeTransaction>
   async createTransaction(
-    ...safeTransactions: SafeTransactionDataPartial[]
+    safeTransactions: MetaTransactionData[],
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction>
+  async createTransaction(
+    safeTransactions: SafeTransactionDataPartial | MetaTransactionData[],
+    options?: SafeTransactionDataPartial
   ): Promise<SafeTransaction> {
-    if (safeTransactions.length === 1) {
+    if (safeTransactions instanceof Array) {
+      const multiSendData = encodeMultiSendData(
+        safeTransactions.map(standardizeMetaTransactionData)
+      )
+      const multiSendTransaction = {
+        ...options,
+        to: this.#contractManager.multiSendContract.getAddress(),
+        value: '0',
+        data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
+        operation: OperationType.DelegateCall
+      }
       const standardizedTransaction = await standardizeSafeTransactionData(
         this.#contractManager.safeContract,
         this.#ethAdapter,
-        safeTransactions[0]
+        multiSendTransaction
       )
       return new EthSafeTransaction(standardizedTransaction)
-    }
-    const multiSendData = encodeMultiSendData(safeTransactions.map(standardizeMetaTransactionData))
-    const multiSendTransaction = {
-      to: this.#contractManager.multiSendContract.getAddress(),
-      value: '0',
-      data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
-      operation: OperationType.DelegateCall
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
       this.#ethAdapter,
-      multiSendTransaction
+      safeTransactions
     )
     return new EthSafeTransaction(standardizedTransaction)
   }
@@ -368,7 +378,7 @@ class Safe {
    */
   async getEnableModuleTx(
     moduleAddress: string,
-    options?: CallTransactionOptionalProps
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -390,7 +400,7 @@ class Safe {
    */
   async getDisableModuleTx(
     moduleAddress: string,
-    options?: CallTransactionOptionalProps
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -414,7 +424,7 @@ class Safe {
    */
   async getAddOwnerTx(
     { ownerAddress, threshold }: AddOwnerTxParams,
-    options?: CallTransactionOptionalProps
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -438,7 +448,7 @@ class Safe {
    */
   async getRemoveOwnerTx(
     { ownerAddress, threshold }: RemoveOwnerTxParams,
-    options?: CallTransactionOptionalProps
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -462,7 +472,7 @@ class Safe {
    */
   async getSwapOwnerTx(
     { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
-    options?: CallTransactionOptionalProps
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),
@@ -484,7 +494,7 @@ class Safe {
    */
   async getChangeThresholdTx(
     threshold: number,
-    options?: CallTransactionOptionalProps
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransaction = await this.createTransaction({
       to: this.getAddress(),

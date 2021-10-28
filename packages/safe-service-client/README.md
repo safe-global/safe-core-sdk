@@ -109,15 +109,23 @@ const delegates: SafeDelegateListResponse = await safeService.getSafeDelegates(s
 
 ### addSafeDelegate
 
-Adds a new delegate for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
+Adds a new delegate for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
 
 ```js
 await safeService.addSafeDelegate(safeAddress, delegate)
 ```
 
+### removeAllSafeDelegates
+
+Removes all delegates for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
+
+```js
+await safeService.removeAllSafeDelegates(safeAddress)
+```
+
 ### removeSafeDelegate
 
-Removes a delegate for a given Safe address. The signature is calculated by signing this hash: keccak(address + str(int(current_epoch / 3600))).
+Removes a delegate for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
 
 ```js
 await safeService.removeSafeDelegate(safeAddress, delegate)
@@ -144,7 +152,7 @@ const estimateTx: SafeMultisigTransactionEstimateResponse = await safeService.es
 Creates a new multi-signature transaction and stores it in the Safe Transaction Service.
 
 ```js
-await safeService.proposeTransaction(safeAddress, transaction, safeTxHash, signature)
+await safeService.proposeTransaction({ safeAddress, safeTransaction, safeTxHash, senderAddress })
 ```
 
 ### getIncomingTransactions
@@ -183,12 +191,29 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(safeAddress, currentNonce)
 ```
 
+### getNextNonce
+
+Returns the right nonce to propose a new transaction right after the last pending transaction.
+
+```js
+const nextNonce = await getNextNonce(safeAddress)
+```
+
 ### getBalances
 
 Returns the balances for Ether and ERC20 tokens of a Safe.
 
 ```js
 const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress)
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeBalancesOptions = {
+  excludeSpamTokens  // Optional. Default value is `true`.
+}
+const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress, options)
 ```
 
 ### getUsdBalances
@@ -199,12 +224,30 @@ Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversi
 const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress)
 ```
 
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeBalancesUsdOptions = {
+  excludeSpamTokens // Optional. Default value is `true`.
+}
+const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress, options)
+```
+
 ### getCollectibles
 
 Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
 
 ```js
 const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress)
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeCollectiblesOptions = {
+  excludeSpamTokens // Optional. Default value is `true`.
+}
+const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress, options)
 ```
 
 ### getTokenList

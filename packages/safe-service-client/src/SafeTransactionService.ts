@@ -1,7 +1,8 @@
-import { SafeSignature, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import { Signer } from '@ethersproject/abstract-signer'
 import {
   MasterCopyResponse,
   OwnerResponse,
+  ProposeTransactionProps,
   SafeBalanceResponse,
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
@@ -10,7 +11,8 @@ import {
   SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
-  SafeDelegateDelete,
+  SafeDelegateConfig,
+  SafeDelegateDeleteConfig,
   SafeDelegateListResponse,
   SafeInfoResponse,
   SafeModuleTransactionListResponse,
@@ -45,8 +47,9 @@ interface SafeTransactionService {
   // Safes
   getSafeInfo(safeAddress: string): Promise<SafeInfoResponse>
   getSafeDelegates(safeAddress: string): Promise<SafeDelegateListResponse>
-  addSafeDelegate(safeAddress: string, delegate: SafeDelegate): Promise<any>
-  removeSafeDelegate(safeAddress: string, delegate: SafeDelegateDelete): Promise<any>
+  addSafeDelegate(config: SafeDelegateConfig): Promise<SafeDelegate>
+  removeSafeDelegate(config: SafeDelegateDeleteConfig): Promise<void>
+  removeAllSafeDelegates(safeAddress: string, signer: Signer): Promise<void>
 
   // Transactions
   getSafeCreationInfo(safeAddress: string): Promise<SafeCreationInfoResponse>
@@ -54,12 +57,12 @@ interface SafeTransactionService {
     safeAddress: string,
     safeTransaction: SafeMultisigTransactionEstimate
   ): Promise<SafeMultisigTransactionEstimateResponse>
-  proposeTransaction(
-    safeAddress: string,
-    transaction: SafeTransactionData,
-    safeTxHash: string,
-    signature: SafeSignature
-  ): Promise<void>
+  proposeTransaction({
+    safeAddress,
+    senderAddress,
+    safeTransaction,
+    safeTxHash
+  }: ProposeTransactionProps): Promise<void>
   getIncomingTransactions(safeAddress: string): Promise<TransferListResponse>
   getModuleTransactions(safeAddress: string): Promise<SafeModuleTransactionListResponse>
   getMultisigTransactions(safeAddress: string): Promise<SafeMultisigTransactionListResponse>
@@ -67,6 +70,7 @@ interface SafeTransactionService {
     safeAddress: string,
     currentNonce?: number
   ): Promise<SafeMultisigTransactionListResponse>
+  getNextNonce(safeAddress: string): Promise<number>
 
   // Balances
   getBalances(safeAddress: string, options?: SafeBalancesOptions): Promise<SafeBalanceResponse[]>

@@ -56,13 +56,14 @@ describe('getSafeDelegates', () => {
 
     const safeDelegateListResponse = await serviceSdk.getSafeDelegates(safeAddress)
     const { results } = safeDelegateListResponse
-    chai.expect(results.length).to.be.eq(2)
-    chai.expect(results[0].delegate).to.be.eq(delegateConfig1.delegate)
-    chai.expect(results[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
-    chai.expect(results[0].label).to.be.eq(delegateConfig1.label)
-    chai.expect(results[1].delegate).to.be.eq(delegateConfig2.delegate)
-    chai.expect(results[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
-    chai.expect(results[1].label).to.be.eq(delegateConfig2.label)
+    const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
+    chai.expect(sortedResults.length).to.be.eq(2)
+    chai.expect(sortedResults[0].delegate).to.be.eq(delegateConfig1.delegate)
+    chai.expect(sortedResults[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
+    chai.expect(sortedResults[0].label).to.be.eq(delegateConfig1.label)
+    chai.expect(sortedResults[1].delegate).to.be.eq(delegateConfig2.delegate)
+    chai.expect(sortedResults[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
+    chai.expect(sortedResults[1].label).to.be.eq(delegateConfig2.label)
 
     await serviceSdk.removeAllSafeDelegates(safeAddress, signer)
   })

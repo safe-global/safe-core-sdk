@@ -1,7 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { GnosisSafe } from '../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
-import { MultiSend } from '../../typechain/src/web3-v1/v1.3.0/multi_send'
-import { ProxyFactory } from '../../typechain/src/web3-v1/v1.3.0/proxy_factory'
+import {
+  getGnosisSafeProxyFactoryContractInstance,
+  getMultiSendContractInstance,
+  getSafeContractInstance
+} from '../contracts/contractInstancesWeb3'
 import GnosisSafeContractWeb3 from '../contracts/GnosisSafe/GnosisSafeContractWeb3'
 import GnosisSafeProxyFactoryWeb3Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
@@ -61,8 +63,8 @@ class Web3Adapter implements EthAdapter {
     const safeContract = this.getContract(
       contractAddress,
       safeSingletonDeployment?.abi as AbiItem[]
-    ) as GnosisSafe
-    return new GnosisSafeContractWeb3(safeContract)
+    )
+    return getSafeContractInstance(safeVersion, safeContract)
   }
 
   async getMultiSendContract(
@@ -81,8 +83,8 @@ class Web3Adapter implements EthAdapter {
     const multiSendContract = this.getContract(
       contractAddress,
       multiSendDeployment?.abi as AbiItem[]
-    ) as MultiSend
-    return new MultiSendWeb3Contract(multiSendContract)
+    )
+    return getMultiSendContractInstance(safeVersion, multiSendContract)
   }
 
   async getSafeProxyFactoryContract(
@@ -101,8 +103,8 @@ class Web3Adapter implements EthAdapter {
     const proxyFactoryContract = this.getContract(
       contractAddress,
       proxyFactoryDeployment?.abi as AbiItem[]
-    ) as ProxyFactory
-    return new GnosisSafeProxyFactoryWeb3Contract(proxyFactoryContract)
+    )
+    return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
   getContract(address: string, abi: AbiItem[]): any {

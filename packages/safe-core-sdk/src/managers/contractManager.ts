@@ -26,7 +26,11 @@ class ContractManager {
   ): Promise<void> {
     const chainId = await ethAdapter.getChainId()
     const baseSafeVersion: SafeVersion = '1.1.1'
-    const temporarySafeContract = await ethAdapter.getSafeContract(baseSafeVersion, chainId, safeAddress)
+    const temporarySafeContract = await ethAdapter.getSafeContract(
+      baseSafeVersion,
+      chainId,
+      safeAddress
+    )
     const safeVersion = (await temporarySafeContract.getVersion()) as SafeVersion
 
     const customContracts = contractNetworks?.[chainId]

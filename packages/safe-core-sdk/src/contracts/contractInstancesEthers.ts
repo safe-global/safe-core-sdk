@@ -1,0 +1,69 @@
+import { Signer } from '@ethersproject/abstract-signer'
+import { GnosisSafe__factory as SafeMasterCopy_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/GnosisSafe__factory'
+import { MultiSend__factory as MultiSend_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/MultiSend__factory'
+import { ProxyFactory__factory as SafeProxyFactory_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/ProxyFactory__factory'
+import { GnosisSafe__factory as SafeMasterCopy_V1_2_0 } from '../../typechain/src/ethers-v5/v1.2.0/factories/GnosisSafe__factory'
+import { GnosisSafe__factory as SafeMasterCopy_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/GnosisSafe__factory'
+import { MultiSend__factory as MultiSend_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/MultiSend__factory'
+import { ProxyFactory__factory as SafeProxyFactory_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/ProxyFactory__factory'
+import GnosisSafeContract_V1_1_1_Ethers from './GnosisSafe/v1.1.1/GnosisSafeContract_V1_1_1_Ethers'
+import GnosisSafeContract_V1_2_0_Ethers from './GnosisSafe/v1.2.0/GnosisSafeContract_V1_2_0_Ethers'
+import GnosisSafeContract_V1_3_0_Ethers from './GnosisSafe/v1.3.0/GnosisSafeContract_V1_3_0_Ethers'
+import GnosisSafeProxyFactoryContract_V1_1_1_Ethers from './GnosisSafeProxyFactory/v1.1.1/GnosisSafeProxyFactoryContract_V1_1_1_Ethers'
+import GnosisSafeProxyFactoryContract_V1_3_0_Ethers from './GnosisSafeProxyFactory/v1.3.0/GnosisSafeProxyFactoryContract_V1_3_0_Ethers'
+import MultiSendContract_V1_1_1_Ethers from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
+import MultiSendContract_V1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
+import { SafeVersion } from './safeDeploymentContracts'
+
+export function getSafeContractInstance(
+  safeVersion: SafeVersion,
+  contractAddress: string,
+  signer: Signer
+) {
+  let safeContract
+  switch (safeVersion) {
+    case '1.3.0':
+      safeContract = SafeMasterCopy_V1_3_0.connect(contractAddress, signer)
+      return new GnosisSafeContract_V1_3_0_Ethers(safeContract)
+    case '1.2.0':
+      safeContract = SafeMasterCopy_V1_2_0.connect(contractAddress, signer)
+      return new GnosisSafeContract_V1_2_0_Ethers(safeContract)
+    case '1.1.1':
+      safeContract = SafeMasterCopy_V1_1_1.connect(contractAddress, signer)
+      return new GnosisSafeContract_V1_1_1_Ethers(safeContract)
+  }
+}
+
+export function getMultiSendContractInstance(
+  safeVersion: SafeVersion,
+  contractAddress: string,
+  signer: Signer
+) {
+  let multiSendContract
+  switch (safeVersion) {
+    case '1.3.0':
+      multiSendContract = MultiSend_V1_3_0.connect(contractAddress, signer)
+      return new MultiSendContract_V1_3_0_Ethers(multiSendContract)
+    case '1.2.0':
+    case '1.1.1':
+      multiSendContract = MultiSend_V1_1_1.connect(contractAddress, signer)
+      return new MultiSendContract_V1_1_1_Ethers(multiSendContract)
+  }
+}
+
+export function getSafeProxyFactoryContractInstance(
+  safeVersion: SafeVersion,
+  contractAddress: string,
+  signer: Signer
+) {
+  let gnosisSafeProxyFactoryContract
+  switch (safeVersion) {
+    case '1.3.0':
+      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_3_0.connect(contractAddress, signer)
+      return new GnosisSafeProxyFactoryContract_V1_3_0_Ethers(gnosisSafeProxyFactoryContract)
+    case '1.2.0':
+    case '1.1.1':
+      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_1_1.connect(contractAddress, signer)
+      return new GnosisSafeProxyFactoryContract_V1_1_1_Ethers(gnosisSafeProxyFactoryContract)
+  }
+}

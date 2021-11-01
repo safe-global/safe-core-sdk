@@ -7,7 +7,7 @@ import {
 
 export type SafeVersion = '1.3.0' | '1.2.0' | '1.1.1'
 
-export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
+export const SAFE_LAST_VERSION: SafeVersion = '1.3.0'
 
 const safeDeploymentsVersions = {
   '1.3.0': {

@@ -1,6 +1,6 @@
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
-import { DEFAULT_SAFE_VERSION, SafeVersion } from '../contracts/safeDeploymentContracts'
+import { SafeVersion, SAFE_LAST_VERSION } from '../contracts/safeDeploymentContracts'
 import EthAdapter from '../ethereumLibs/EthAdapter'
 import Safe from '../Safe'
 import { ContractNetworksConfig } from '../types'
@@ -49,7 +49,7 @@ class SafeFactory {
 
   static async create({
     ethAdapter,
-    safeVersion = DEFAULT_SAFE_VERSION,
+    safeVersion = SAFE_LAST_VERSION,
     contractNetworks
   }: SafeFactoryConfig): Promise<SafeFactory> {
     const safeFactorySdk = new SafeFactory()
@@ -136,7 +136,7 @@ class SafeFactory {
       chainId,
       safeAddress
     )
-    const safe = Safe.create({
+    const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,
       safeAddress: safeContract.getAddress(),
       contractNetworks: this.#contractNetworks

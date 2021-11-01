@@ -68,7 +68,11 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 const owners = ['0x<address>', '0x<address>', '0x<address>']
 const threshold = 3
-const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+const safeAccountConfig: SafeAccountConfig = {
+  owners,
+  threshold,
+  // ...
+}
 
 const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
 ```

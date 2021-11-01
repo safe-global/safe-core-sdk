@@ -1,7 +1,12 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
-import { GnosisSafe, GnosisSafeInterface } from '../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
+import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/GnosisSafe'
+import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/GnosisSafe'
+import {
+  GnosisSafe as GnosisSafe_V1_3_0,
+  GnosisSafeInterface
+} from '../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
 import { EthersTransactionResult, TransactionOptions } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 
@@ -16,8 +21,8 @@ function toTxResult(
   }
 }
 
-class GnosisSafeContractEthersV5 implements GnosisSafeContract {
-  constructor(public contract: GnosisSafe) {}
+abstract class GnosisSafeContractEthers implements GnosisSafeContract {
+  constructor(public contract: GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0) {}
 
   async getVersion(): Promise<string> {
     return this.contract.VERSION()
@@ -67,13 +72,9 @@ class GnosisSafeContractEthersV5 implements GnosisSafeContract {
     return toTxResult(txResponse, options)
   }
 
-  async getModules(): Promise<string[]> {
-    return this.contract.getModules()
-  }
+  abstract getModules(): Promise<string[]>
 
-  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.contract.isModuleEnabled(moduleAddress)
-  }
+  abstract isModuleEnabled(moduleAddress: string): Promise<boolean>
 
   async execTransaction(
     safeTransaction: SafeTransaction,
@@ -108,4 +109,4 @@ class GnosisSafeContractEthersV5 implements GnosisSafeContract {
   }
 }
 
-export default GnosisSafeContractEthersV5
+export default GnosisSafeContractEthers

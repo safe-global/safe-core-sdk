@@ -74,9 +74,7 @@ class EthersAdapter implements EthAdapter {
       contractAddress = customContractAddress
     } else {
       const safeSingletonDeployment = getSafeContractDeployment(safeVersion, chainId)
-      contractAddress =
-        safeSingletonDeployment?.networkAddresses[chainId] ??
-        safeSingletonDeployment?.defaultAddress
+      contractAddress = safeSingletonDeployment?.networkAddresses[chainId]
     }
     if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
       throw new Error('Safe Proxy contract is not deployed in the current network')
@@ -94,8 +92,7 @@ class EthersAdapter implements EthAdapter {
       contractAddress = customContractAddress
     } else {
       const multiSendDeployment = getMultiSendContractDeployment(safeVersion, chainId)
-      contractAddress =
-        multiSendDeployment?.networkAddresses[chainId] ?? multiSendDeployment?.defaultAddress
+      contractAddress = multiSendDeployment?.networkAddresses[chainId]
     }
     if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
       throw new Error('Multi Send contract is not deployed in the current network')
@@ -113,8 +110,7 @@ class EthersAdapter implements EthAdapter {
       contractAddress = customContractAddress
     } else {
       const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
-      contractAddress =
-        proxyFactoryDeployment?.networkAddresses[chainId] ?? proxyFactoryDeployment?.defaultAddress
+      contractAddress = proxyFactoryDeployment?.networkAddresses[chainId]
     }
     if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
       throw new Error('Safe Proxy Factory contract is not deployed in the current network')

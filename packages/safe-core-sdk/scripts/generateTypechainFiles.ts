@@ -68,14 +68,12 @@ const web3V1 = 'web3-v1'
 const ethersV5 = 'ethers-v5'
 
 // Src: Web3 V1 types
-generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.0.0'`, getSafeDeploymentsContracts('v1.0.0'))
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.1.1'`, getSafeDeploymentsContracts('v1.1.1'))
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.2.0'`, getSafeDeploymentsContracts('v1.2.0'))
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/'v1.3.0'`, getSafeDeploymentsContracts('v1.3.0'))
 moveTypechainFiles(web3V1, typeChainDirectorySrcPath, typeChainDirectoryBuildPath)
 
 // Src: Ethers V5 types
-generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.0.0'`, getSafeDeploymentsContracts('v1.0.0'))
 generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.1.1'`, getSafeDeploymentsContracts('v1.1.1'))
 generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.2.0'`, getSafeDeploymentsContracts('v1.2.0'))
 generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/'v1.3.0'`, getSafeDeploymentsContracts('v1.3.0'))

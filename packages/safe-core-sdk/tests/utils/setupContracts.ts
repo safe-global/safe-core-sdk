@@ -1,38 +1,38 @@
 import { AddressZero } from '@ethersproject/constants'
 import { deployments, ethers } from 'hardhat'
-import { GnosisSafe } from '../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
-import { MultiSend } from '../../typechain/src/ethers-v5/v1.3.0/MultiSend'
+import {
+  gnosisSafeDeployed,
+  multiSendDeployed,
+  proxyFactoryDeployed
+} from '../../hardhat/deploy/deploy-contracts'
 import {
   DailyLimitModule,
   ERC20Mintable,
   SocialRecoveryModule
 } from '../../typechain/tests/ethers-v5'
 
-export const getSafeSingleton = async () => {
-  const SafeDeployment = await deployments.get('GnosisSafe')
-  const Safe = await ethers.getContractFactory('GnosisSafe')
+export const getSafeSingleton = async (): Promise<any> => {
+  const SafeDeployment = await deployments.get(gnosisSafeDeployed.name)
+  const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
   return Safe.attach(SafeDeployment.address)
 }
 
-export const getFactory = async () => {
-  const FactoryDeployment = await deployments.get('GnosisSafeProxyFactory')
-  const Factory = await ethers.getContractFactory('GnosisSafeProxyFactory')
+export const getFactory = async (): Promise<any> => {
+  const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
+  const Factory = await ethers.getContractFactory(proxyFactoryDeployed.name)
   return Factory.attach(FactoryDeployment.address)
 }
 
-export const getSafeTemplate = async (): Promise<GnosisSafe> => {
+export const getSafeTemplate = async (): Promise<any> => {
   const singleton = await getSafeSingleton()
   const factory = await getFactory()
   const template = await factory.callStatic.createProxy(singleton.address, '0x')
   await factory.createProxy(singleton.address, '0x').then((tx: any) => tx.wait())
-  const Safe = await ethers.getContractFactory('GnosisSafe')
-  return Safe.attach(template) as GnosisSafe
+  const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
+  return Safe.attach(template)
 }
 
-export const getSafeWithOwners = async (
-  owners: string[],
-  threshold?: number
-): Promise<GnosisSafe> => {
+export const getSafeWithOwners = async (owners: string[], threshold?: number): Promise<any> => {
   const template = await getSafeTemplate()
   await template.setup(
     owners,
@@ -47,10 +47,10 @@ export const getSafeWithOwners = async (
   return template
 }
 
-export const getMultiSend = async (): Promise<MultiSend> => {
-  const MultiSendDeployment = await deployments.get('MultiSend')
-  const MultiSend = await ethers.getContractFactory('MultiSend')
-  return MultiSend.attach(MultiSendDeployment.address) as MultiSend
+export const getMultiSend = async (): Promise<any> => {
+  const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
+  const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)
+  return MultiSend.attach(MultiSendDeployment.address)
 }
 
 export const getDailyLimitModule = async (): Promise<DailyLimitModule> => {

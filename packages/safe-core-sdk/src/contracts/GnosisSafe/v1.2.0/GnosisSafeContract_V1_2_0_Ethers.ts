@@ -7,11 +7,11 @@ class GnosisSafeContract_V1_2_0_Ethers extends GnosisSafeContractEthers {
   }
 
   async getModules(): Promise<string[]> {
-    return (super.contract as GnosisSafe).getModules()
+    return this.contract.getModules()
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return (super.contract as GnosisSafe).isModuleEnabled(moduleAddress)
+    return this.contract.isModuleEnabled(moduleAddress)
   }
 }
 

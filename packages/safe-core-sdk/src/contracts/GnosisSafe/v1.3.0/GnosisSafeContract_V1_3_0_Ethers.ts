@@ -8,13 +8,12 @@ class GnosisSafeContract_V1_3_0_Ethers extends GnosisSafeContractEthers {
   }
 
   async getModules(): Promise<string[]> {
-    const asdf = (super.contract as GnosisSafe).getModulesPaginated(SENTINEL_ADDRESS, 10)
-    console.log({ asdf })
-    return ['']
+    const { array } = await this.contract.getModulesPaginated(SENTINEL_ADDRESS, 10)
+    return array
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return (super.contract as GnosisSafe).isModuleEnabled(moduleAddress)
+    return this.contract.isModuleEnabled(moduleAddress)
   }
 }
 

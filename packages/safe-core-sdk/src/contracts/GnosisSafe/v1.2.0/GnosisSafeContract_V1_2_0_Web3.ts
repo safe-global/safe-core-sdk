@@ -7,11 +7,11 @@ class GnosisSafeContract_V1_2_0_Web3 extends GnosisSafeContractWeb3 {
   }
 
   async getModules(): Promise<string[]> {
-    return (super.contract as GnosisSafe).methods.getModules().call()
+    return this.contract.methods.getModules().call()
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return (super.contract as GnosisSafe).methods.isModuleEnabled(moduleAddress).call()
+    return this.contract.methods.isModuleEnabled(moduleAddress).call()
   }
 }
 

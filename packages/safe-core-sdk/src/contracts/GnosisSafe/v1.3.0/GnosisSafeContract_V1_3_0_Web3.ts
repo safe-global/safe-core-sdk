@@ -8,15 +8,12 @@ class GnosisSafeContract_V1_3_0_Web3 extends GnosisSafeContractWeb3 {
   }
 
   async getModules(): Promise<string[]> {
-    const asdf = (super.contract as GnosisSafe).methods
-      .getModulesPaginated(SENTINEL_ADDRESS, 10)
-      .call()
-    console.log({ asdf })
-    return ['']
+    const { array } = await this.contract.methods.getModulesPaginated(SENTINEL_ADDRESS, 10).call()
+    return array
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return (super.contract as GnosisSafe).methods.isModuleEnabled(moduleAddress).call()
+    return this.contract.methods.isModuleEnabled(moduleAddress).call()
   }
 }
 

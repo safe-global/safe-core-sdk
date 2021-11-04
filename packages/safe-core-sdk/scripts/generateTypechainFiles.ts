@@ -31,7 +31,7 @@ const safeContracts_V1_1_1 = [
 ].join(' ')
 
 // Won't be included in dist/ folder
-const safeContractsTestPath = '../../node_modules/@gnosis.pm/safe-contracts-v1.2.0/contracts'
+const safeContractsTestPath = '../../node_modules/@gnosis.pm/safe-contracts-v1.2.0/build/contracts'
 const openZeppelinContractsPath = '../../node_modules/openzeppelin-solidity/build/contracts'
 const testContracts = [
   `${safeContractsTestPath}/DailyLimitModule.json`,
@@ -96,4 +96,4 @@ moveTypechainFiles(`${typeChainDirectorySrcPath}${ethersV5}/v1.2.0`, `${typeChai
 moveTypechainFiles(`${typeChainDirectorySrcPath}${ethersV5}/v1.1.1`, `${typeChainDirectoryBuildPath}${ethersV5}/v1.1.1`)
 
 // Tests: Ethers V5 types
-generateTypechainFiles(ethersV5, outDirTests, testContracts)
+generateTypechainFiles(ethersV5, `${outDirTests}${ethersV5}`, testContracts)

@@ -87,6 +87,10 @@ class SafeFactory {
     return this.#safeVersion
   }
 
+  getAddress() {
+    return this.#safeProxyFactoryContract.getAddress()
+  }
+
   async getChainId(): Promise<number> {
     return this.#ethAdapter.getChainId()
   }
@@ -111,10 +115,6 @@ class SafeFactory {
       payment,
       paymentReceiver
     ])
-  }
-
-  getAddress() {
-    return this.#safeProxyFactoryContract.getAddress()
   }
 
   async deploySafe(

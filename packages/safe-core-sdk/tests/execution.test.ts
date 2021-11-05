@@ -3,6 +3,7 @@ import { MetaTransactionData, SafeTransactionDataPartial } from '@gnosis.pm/safe
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
+import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
 import Safe, { ContractNetworksConfig, TransactionOptions } from '../src'
 import {
   getERC20Mintable,
@@ -141,7 +142,7 @@ describe('Transactions execution', () => {
       await safeSdk1.signTransaction(tx)
       await chai
         .expect(safeSdk2.executeTransaction(tx))
-        .to.be.rejectedWith('Invalid owner provided')
+        .to.be.rejectedWith(safeVersionDeployed === '1.3.0' ? 'GS026' : 'Invalid owner provided')
     })
 
     it('should execute a transaction with threshold 1', async () => {

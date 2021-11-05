@@ -53,7 +53,8 @@ class Web3Adapter implements EthAdapter {
     customContractAddress?: string
   ): Promise<GnosisSafeContractWeb3> {
     const safeSingletonDeployment = getSafeContractDeployment(safeVersion, chainId)
-    const contractAddress = customContractAddress ?? safeSingletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? safeSingletonDeployment?.networkAddresses[chainId]
     if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
@@ -87,7 +88,8 @@ class Web3Adapter implements EthAdapter {
     customContractAddress?: string
   ): Promise<GnosisSafeProxyFactoryWeb3Contract> {
     const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
-    const contractAddress = customContractAddress ?? proxyFactoryDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? proxyFactoryDeployment?.networkAddresses[chainId]
     if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
       throw new Error('Safe Proxy Factory contract is not deployed in the current network')
     }

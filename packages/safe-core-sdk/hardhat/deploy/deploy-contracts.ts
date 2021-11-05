@@ -1,38 +1,36 @@
 import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
-type SafeVersion = 'v1.3.0' | 'v1.2.0' | 'v1.1.1'
+type SafeVersion = '1.3.0' | '1.2.0' | '1.1.1'
 
-export const safeVersion = process.env.SAFE_VERSION as SafeVersion
+export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 
 const gnosisSafeContracts = {
-  'v1.3.0': { name: 'GnosisSafe_SV1_3_0' },
-  'v1.2.0': { name: 'GnosisSafe_SV1_2_0' },
-  'v1.1.1': { name: 'GnosisSafe_SV1_1_1' }
+  '1.3.0': { name: 'GnosisSafe_SV1_3_0' },
+  '1.2.0': { name: 'GnosisSafe_SV1_2_0' },
+  '1.1.1': { name: 'GnosisSafe_SV1_1_1' }
 }
 
 const proxyFactoryContracts = {
-  'v1.3.0': { name: 'ProxyFactory_SV1_3_0' },
-  'v1.2.0': { name: 'ProxyFactory_SV1_2_0' },
-  'v1.1.1': { name: 'ProxyFactory_SV1_1_1' }
+  '1.3.0': { name: 'ProxyFactory_SV1_3_0' },
+  '1.2.0': { name: 'ProxyFactory_SV1_2_0' },
+  '1.1.1': { name: 'ProxyFactory_SV1_1_1' }
 }
 
 const multiSendContracts = {
-  'v1.3.0': { name: 'MultiSend_SV1_3_0' },
-  'v1.2.0': { name: 'MultiSend_SV1_2_0' },
-  'v1.1.1': { name: 'MultiSend_SV1_1_1' }
+  '1.3.0': { name: 'MultiSend_SV1_3_0' },
+  '1.2.0': { name: 'MultiSend_SV1_2_0' },
+  '1.1.1': { name: 'MultiSend_SV1_1_1' }
 }
 
-export const gnosisSafeDeployed = gnosisSafeContracts[safeVersion]
-export const proxyFactoryDeployed = proxyFactoryContracts[safeVersion]
-export const multiSendDeployed = multiSendContracts[safeVersion]
+export const gnosisSafeDeployed = gnosisSafeContracts[safeVersionDeployed]
+export const proxyFactoryDeployed = proxyFactoryContracts[safeVersionDeployed]
+export const multiSendDeployed = multiSendContracts[safeVersionDeployed]
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts } = hre
   const { deployer } = await getNamedAccounts()
   const { deploy } = deployments
-
-  console.log(`Deploying Safe contracts ${safeVersion}`)
 
   await deploy(gnosisSafeDeployed.name, {
     from: deployer,

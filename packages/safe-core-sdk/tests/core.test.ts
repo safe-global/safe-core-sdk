@@ -3,6 +3,7 @@ import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
+import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
 import Safe, { ContractNetworksConfig } from '../src'
 import {
   getFactory,
@@ -16,7 +17,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
-describe('Safe Core SDK', () => {
+describe('Safe Info', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
@@ -78,7 +79,7 @@ describe('Safe Core SDK', () => {
         contractNetworks
       })
       const contractVersion = await safeSdk.getContractVersion()
-      chai.expect(contractVersion).to.be.eq('1.2.0')
+      chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
     })
   })
 

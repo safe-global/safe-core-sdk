@@ -175,7 +175,7 @@ const contractNetworks: ContractNetworksConfig = {
     multiSendAddress: '0x<multisend_address>'
   }
 }
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
+const safeSdk = await Safe.connect({ ethAdapter, safeAddress, contractNetworks })
 ```
 
 ### getAddress

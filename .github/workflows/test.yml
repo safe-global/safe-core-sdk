@@ -1,4 +1,4 @@
-name: Safe Core SDK Test (Safe v1.2.0)
+name: Monorepo Test
 on: [push, pull_request]
 env:
   INFURA_KEY: ${{ secrets.INFURA_KEY }}
@@ -17,5 +17,4 @@ jobs:
       - run: |
           yarn install
           yarn build
-          cd packages/safe-core-sdk
-          yarn test:hardhat:ethers:v1.2.0
+          yarn test

@@ -1,4 +1,4 @@
-name: Hardhat Test
+name: Safe Core SDK Test (Safe v1.3.0)
 on: [push, pull_request]
 env:
   INFURA_KEY: ${{ secrets.INFURA_KEY }}
@@ -17,4 +17,5 @@ jobs:
       - run: |
           yarn install
           yarn build
+          cd packages/safe-core-sdk
           yarn test:hardhat:ethers:v1.3.0

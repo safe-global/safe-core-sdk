@@ -27,7 +27,7 @@ export const gnosisSafeDeployed = gnosisSafeContracts[safeVersionDeployed]
 export const proxyFactoryDeployed = proxyFactoryContracts[safeVersionDeployed]
 export const multiSendDeployed = multiSendContracts[safeVersionDeployed]
 
-const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
+const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   const { deployments, getNamedAccounts } = hre
   const { deployer } = await getNamedAccounts()
   const { deploy } = deployments

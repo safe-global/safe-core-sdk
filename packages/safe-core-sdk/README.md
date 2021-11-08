@@ -79,7 +79,7 @@ const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
 
 The method `deploySafe` executes a transaction from `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe.
 
-The `SafeFactory` will deploy by default the last version of the Safe contracts available (currently `v1.3.0`). To deploy an older version of the Safe contracts instantiate the `SafeFactory` adding the property `safeVersion` with the desired version number.
+The `SafeFactory` will deploy the last version of the Safe contracts available by default (currently `v1.3.0`). To deploy an older version of the Safe contracts instantiate the `SafeFactory` adding the property `safeVersion` with the desired version number.
 
 ```js
 const safeFactoryV1_1_1 = await SafeFactory.create({ ethAdapter, safeVersion: '1.1.1' })

@@ -19,7 +19,10 @@ export function getSafeContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   signer: Signer
-) {
+):
+  | GnosisSafeContract_V1_3_0_Ethers
+  | GnosisSafeContract_V1_2_0_Ethers
+  | GnosisSafeContract_V1_1_1_Ethers {
   let safeContract
   switch (safeVersion) {
     case '1.3.0':
@@ -31,6 +34,8 @@ export function getSafeContractInstance(
     case '1.1.1':
       safeContract = SafeMasterCopy_V1_1_1.connect(contractAddress, signer)
       return new GnosisSafeContract_V1_1_1_Ethers(safeContract)
+    default:
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -38,7 +43,7 @@ export function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   signer: Signer
-) {
+): MultiSendContract_V1_3_0_Ethers | MultiSendContract_V1_1_1_Ethers {
   let multiSendContract
   switch (safeVersion) {
     case '1.3.0':
@@ -48,6 +53,8 @@ export function getMultiSendContractInstance(
     case '1.1.1':
       multiSendContract = MultiSend_V1_1_1.connect(contractAddress, signer)
       return new MultiSendContract_V1_1_1_Ethers(multiSendContract)
+    default:
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -55,7 +62,7 @@ export function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   signer: Signer
-) {
+): GnosisSafeProxyFactoryContract_V1_3_0_Ethers | GnosisSafeProxyFactoryContract_V1_1_1_Ethers {
   let gnosisSafeProxyFactoryContract
   switch (safeVersion) {
     case '1.3.0':
@@ -65,5 +72,7 @@ export function getSafeProxyFactoryContractInstance(
     case '1.1.1':
       gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_1_1.connect(contractAddress, signer)
       return new GnosisSafeProxyFactoryContract_V1_1_1_Ethers(gnosisSafeProxyFactoryContract)
+    default:
+      throw new Error('Invalid Safe version')
   }
 }

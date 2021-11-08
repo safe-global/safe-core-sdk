@@ -1,6 +1,6 @@
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
-import { SafeVersion } from '../contracts/safeDeploymentContracts'
+import { SafeVersion, SAFE_BASE_VERSION } from '../contracts/safeDeploymentContracts'
 import EthAdapter from '../ethereumLibs/EthAdapter'
 import { ContractNetworksConfig } from '../types'
 
@@ -25,9 +25,8 @@ class ContractManager {
     contractNetworks?: ContractNetworksConfig
   ): Promise<void> {
     const chainId = await ethAdapter.getChainId()
-    const baseSafeVersion: SafeVersion = '1.1.1'
     const temporarySafeContract = await ethAdapter.getSafeContract(
-      baseSafeVersion,
+      SAFE_BASE_VERSION,
       chainId,
       safeAddress
     )

@@ -48,7 +48,7 @@ execSync(`rimraf ${outDirSrc} ${outDirTests}`, (error) => {
 })
 
 // Generate Typechain files
-function generateTypechainFiles(typechainVersion, outDir, contractList) {
+function generateTypechainFiles(typechainVersion, outDir, contractList): void {
   execSync(`typechain --target ${typechainVersion} --out-dir ${outDir} ${contractList}`, (error) => {
     if (error) {
       console.log(error.message)
@@ -58,7 +58,7 @@ function generateTypechainFiles(typechainVersion, outDir, contractList) {
 }
 
 // Copy Typechain files with the right extension (.d.ts -> .ts) allows them to be included in the build folder
-function moveTypechainFiles(inDir, outDir) {
+function moveTypechainFiles(inDir, outDir): void {
   readdir(`${inDir}`, (error, files) => {
     if (error) {
       console.log(error)

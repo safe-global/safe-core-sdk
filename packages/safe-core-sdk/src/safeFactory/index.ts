@@ -87,7 +87,7 @@ class SafeFactory {
     return this.#safeVersion
   }
 
-  getAddress() {
+  getAddress(): string {
     return this.#safeProxyFactoryContract.getAddress()
   }
 

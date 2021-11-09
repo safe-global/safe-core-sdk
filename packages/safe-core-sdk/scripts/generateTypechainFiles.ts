@@ -1,16 +1,15 @@
-const { execSync } = require('child_process')
-const { readdir, mkdirSync, existsSync } = require('fs')
-const path = require('path')
+import { execSync } from 'child_process'
+import { existsSync, mkdirSync, readdir } from 'fs'
+import path from 'path'
 
 // Directories where the Typechain files will be generated
 const outDirSrc = 'typechain/src/'
 const typeChainDirectorySrcPath = path.join(__dirname, `../${outDirSrc}`)
 
-const outDirTests = 'typechain/tests/'
-const typeChainDirectoryTestsPath = path.join(__dirname, `../${outDirTests}`)
-
 const outDirBuild = 'dist/typechain/src/'
 const typeChainDirectoryBuildPath = path.join(__dirname, `../${outDirBuild}`)
+
+const outDirTests = 'typechain/tests/'
 
 // Contract list for which the Typechain files will be generated
 // Will be included in dist/ folder
@@ -40,25 +39,16 @@ const testContracts = [
 ].join(' ')
 
 // Remove existing Typechain files
-execSync(`rimraf ${outDirSrc} ${outDirTests}`, (error) => {
-  if (error) {
-    console.log(error.message)
-    return
-  }
-})
+execSync(`rimraf ${outDirSrc} ${outDirTests}`)
 
 // Generate Typechain files
-function generateTypechainFiles(typechainVersion, outDir, contractList): void {
-  execSync(`typechain --target ${typechainVersion} --out-dir ${outDir} ${contractList}`, (error) => {
-    if (error) {
-      console.log(error.message)
-    }
-  })
+function generateTypechainFiles(typechainVersion: string, outDir: string, contractList: string): void {
+  execSync(`typechain --target ${typechainVersion} --out-dir ${outDir} ${contractList}`)
   console.log(`Generated typechain ${typechainVersion} at ${outDir}`)
 }
 
 // Copy Typechain files with the right extension (.d.ts -> .ts) allows them to be included in the build folder
-function moveTypechainFiles(inDir, outDir): void {
+function moveTypechainFiles(inDir: string, outDir: string): void {
   readdir(`${inDir}`, (error, files) => {
     if (error) {
       console.log(error)

@@ -11,7 +11,7 @@
     "SDK"
   ],
   "scripts": {
-    "typechain": "node scripts/generateTypechainFiles.ts",
+    "typechain": "ts-node scripts/generateTypechainFiles.ts",
     "unbuild": "rimraf dist artifacts cache .nyc_output typechain",
     "build": "hardhat compile && yarn typechain && tsc",
     "test:ganache:web3:v1.2.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.2.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
@@ -23,7 +23,7 @@
     "test:hardhat:ethers:v1.2.0": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.2.0 && hardhat deploy && nyc hardhat test",
     "test:hardhat:ethers:v1.3.0": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.3.0 && hardhat deploy && nyc hardhat test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "format": "prettier --write \"{src,tests,hardhat}/**/*.ts\"",
+    "format": "prettier --write \"{src,tests,hardhat,scripts}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
   "repository": {

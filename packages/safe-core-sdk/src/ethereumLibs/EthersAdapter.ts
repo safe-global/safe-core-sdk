@@ -3,6 +3,7 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { Provider } from '@ethersproject/providers'
+import { SafeVersion } from '../contracts/config'
 import {
   getMultiSendContractInstance,
   getSafeContractInstance,
@@ -14,11 +15,10 @@ import MultiSendEthersContract from '../contracts/MultiSend/MultiSendEthersContr
 import {
   getMultiSendContractDeployment,
   getSafeContractDeployment,
-  getSafeProxyFactoryContractDeployment,
-  SafeVersion
+  getSafeProxyFactoryContractDeployment
 } from '../contracts/safeDeploymentContracts'
 import { AbiItem } from '../types'
-import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
+import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
 
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
@@ -64,16 +64,21 @@ class EthersAdapter implements EthAdapter {
     return (await this.#provider.getNetwork()).chainId
   }
 
-  async getSafeContract(
-    safeVersion: SafeVersion,
-    chainId: number,
-    customContractAddress?: string
-  ): Promise<GnosisSafeContractEthers> {
+  async getSafeContract({
+    safeVersion,
+    chainId,
+    isL1SafeMasterCopy,
+    customContractAddress
+  }: GetSafeContractProps): Promise<GnosisSafeContractEthers> {
     let contractAddress: string | undefined
     if (customContractAddress) {
       contractAddress = customContractAddress
     } else {
-      const safeSingletonDeployment = getSafeContractDeployment(safeVersion, chainId)
+      const safeSingletonDeployment = getSafeContractDeployment(
+        safeVersion,
+        chainId,
+        isL1SafeMasterCopy
+      )
       contractAddress = safeSingletonDeployment?.networkAddresses[chainId]
     }
     if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {

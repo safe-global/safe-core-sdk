@@ -8,7 +8,7 @@ import {
   SafeDeploymentConfig,
   SafeFactory
 } from '../src'
-import { SAFE_LAST_VERSION } from '../src/contracts/safeDeploymentContracts'
+import { SAFE_LAST_VERSION } from '../src/contracts/config'
 import { itif } from './utils/helpers'
 import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'

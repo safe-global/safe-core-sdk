@@ -1,6 +1,6 @@
+import { SafeVersion, SAFE_LAST_VERSION } from '../contracts/config'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
-import { SafeVersion, SAFE_LAST_VERSION } from '../contracts/safeDeploymentContracts'
 import EthAdapter from '../ethereumLibs/EthAdapter'
 import Safe from '../Safe'
 import { ContractNetworksConfig } from '../types'
@@ -27,6 +27,8 @@ export interface SafeFactoryConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
+  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
@@ -36,12 +38,15 @@ interface SafeFactoryInitConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion
+  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
 
 class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
+  #isL1SafeMasterCopy?: boolean
   #safeVersion!: SafeVersion
   #ethAdapter!: EthAdapter
   #safeProxyFactoryContract!: GnosisSafeProxyFactoryContract
@@ -50,20 +55,23 @@ class SafeFactory {
   static async create({
     ethAdapter,
     safeVersion = SAFE_LAST_VERSION,
+    isL1SafeMasterCopy = false,
     contractNetworks
   }: SafeFactoryConfig): Promise<SafeFactory> {
     const safeFactorySdk = new SafeFactory()
-    await safeFactorySdk.init({ ethAdapter, safeVersion, contractNetworks })
+    await safeFactorySdk.init({ ethAdapter, safeVersion, isL1SafeMasterCopy, contractNetworks })
     return safeFactorySdk
   }
 
   private async init({
     ethAdapter,
     safeVersion,
+    isL1SafeMasterCopy,
     contractNetworks
   }: SafeFactoryInitConfig): Promise<void> {
     this.#ethAdapter = ethAdapter
     this.#safeVersion = safeVersion
+    this.#isL1SafeMasterCopy = isL1SafeMasterCopy
     this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
@@ -72,11 +80,12 @@ class SafeFactory {
       chainId,
       customContracts?.safeProxyFactoryAddress
     )
-    this.#gnosisSafeContract = await ethAdapter.getSafeContract(
-      this.#safeVersion,
+    this.#gnosisSafeContract = await ethAdapter.getSafeContract({
+      safeVersion: this.#safeVersion,
       chainId,
-      customContracts?.safeMasterCopyAddress
-    )
+      isL1SafeMasterCopy,
+      customContractAddress: customContracts?.safeMasterCopyAddress
+    })
   }
 
   getEthAdapter(): EthAdapter {
@@ -131,14 +140,16 @@ class SafeFactory {
       saltNonce: safeDeploymentConfig?.saltNonce,
       options: { from: signerAddress }
     })
-    const safeContract = await this.#ethAdapter.getSafeContract(
-      this.#safeVersion,
+    const safeContract = await this.#ethAdapter.getSafeContract({
+      safeVersion: this.#safeVersion,
       chainId,
-      safeAddress
-    )
+      isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
+      customContractAddress: safeAddress
+    })
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,
       safeAddress: safeContract.getAddress(),
+      isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
       contractNetworks: this.#contractNetworks
     })
     return safe

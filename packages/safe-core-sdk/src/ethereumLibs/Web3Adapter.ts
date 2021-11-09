@@ -1,4 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { SafeVersion } from '../contracts/config'
 import {
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendContractInstance,
@@ -10,11 +11,10 @@ import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
 import {
   getMultiSendContractDeployment,
   getSafeContractDeployment,
-  getSafeProxyFactoryContractDeployment,
-  SafeVersion
+  getSafeProxyFactoryContractDeployment
 } from '../contracts/safeDeploymentContracts'
 import { AbiItem } from '../types'
-import EthAdapter, { EthAdapterTransaction } from './EthAdapter'
+import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -47,12 +47,17 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getChainId()
   }
 
-  async getSafeContract(
-    safeVersion: SafeVersion,
-    chainId: number,
-    customContractAddress?: string
-  ): Promise<GnosisSafeContractWeb3> {
-    const safeSingletonDeployment = getSafeContractDeployment(safeVersion, chainId)
+  async getSafeContract({
+    safeVersion,
+    chainId,
+    isL1SafeMasterCopy,
+    customContractAddress
+  }: GetSafeContractProps): Promise<GnosisSafeContractWeb3> {
+    const safeSingletonDeployment = getSafeContractDeployment(
+      safeVersion,
+      chainId,
+      isL1SafeMasterCopy
+    )
     const contractAddress =
       customContractAddress ?? safeSingletonDeployment?.networkAddresses[chainId]
     if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {

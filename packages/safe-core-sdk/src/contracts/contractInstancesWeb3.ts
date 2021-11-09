@@ -5,6 +5,7 @@ import { GnosisSafe as SafeMasterCopy_V1_2_0 } from '../../typechain/src/web3-v1
 import { GnosisSafe as SafeMasterCopy_V1_3_0 } from '../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
 import { MultiSend as MultiSend_V1_3_0 } from '../../typechain/src/web3-v1/v1.3.0/multi_send'
 import { ProxyFactory as GnosisSafeProxyFactory_V1_3_0 } from '../../typechain/src/web3-v1/v1.3.0/proxy_factory'
+import { SafeVersion } from './config'
 import GnosisSafeContract_V1_1_1_Web3 from './GnosisSafe/v1.1.1/GnosisSafeContract_V1_1_1_Web3'
 import GnosisSafeContract_V1_2_0_Web3 from './GnosisSafe/v1.2.0/GnosisSafeContract_V1_2_0_Web3'
 import GnosisSafeContract_V1_3_0_Web3 from './GnosisSafe/v1.3.0/GnosisSafeContract_V1_3_0_Web3'
@@ -12,7 +13,6 @@ import GnosisSafeProxyFactoryContract_V1_1_1_Web3 from './GnosisSafeProxyFactory
 import GnosisSafeProxyFactoryContract_V1_3_0_Web3 from './GnosisSafeProxyFactory/v1.3.0/GnosisSafeProxyFactoryContract_V1_3_0_Web3'
 import MultiSendContract_V1_1_1_Web3 from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
 import MultiSendContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
-import { SafeVersion } from './safeDeploymentContracts'
 
 export function getSafeContractInstance(
   safeVersion: SafeVersion,

@@ -1,8 +1,8 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { SafeVersion } from '../contracts/config'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
 import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
-import { SafeVersion } from '../contracts/safeDeploymentContracts'
 import { AbiItem } from '../types'
 
 export interface EthAdapterTransaction {
@@ -14,9 +14,11 @@ export interface EthAdapterTransaction {
   gasLimit?: number
 }
 
-export interface GnosisSafeContracts {
-  gnosisSafeContract: GnosisSafeContract
-  multiSendContract: MultiSendContract
+export interface GetSafeContractProps {
+  safeVersion: SafeVersion
+  chainId: number
+  isL1SafeMasterCopy?: boolean
+  customContractAddress?: string
 }
 
 interface EthAdapter {
@@ -24,11 +26,12 @@ interface EthAdapter {
   getBalance(address: string): Promise<BigNumber>
   getChainId(): Promise<number>
   getContract(address: string, abi: AbiItem[]): any
-  getSafeContract(
-    safeVersion: SafeVersion,
-    chainId: number,
-    customContractAddress?: string
-  ): Promise<GnosisSafeContract>
+  getSafeContract({
+    safeVersion,
+    chainId,
+    isL1SafeMasterCopy,
+    customContractAddress
+  }: GetSafeContractProps): Promise<GnosisSafeContract>
   getMultiSendContract(
     safeVersion: SafeVersion,
     chainId: number,

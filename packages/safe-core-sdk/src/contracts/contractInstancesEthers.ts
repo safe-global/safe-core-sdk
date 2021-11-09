@@ -6,6 +6,7 @@ import { GnosisSafe__factory as SafeMasterCopy_V1_2_0 } from '../../typechain/sr
 import { GnosisSafe__factory as SafeMasterCopy_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/GnosisSafe__factory'
 import { MultiSend__factory as MultiSend_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/MultiSend__factory'
 import { ProxyFactory__factory as SafeProxyFactory_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/ProxyFactory__factory'
+import { SafeVersion } from './config'
 import GnosisSafeContract_V1_1_1_Ethers from './GnosisSafe/v1.1.1/GnosisSafeContract_V1_1_1_Ethers'
 import GnosisSafeContract_V1_2_0_Ethers from './GnosisSafe/v1.2.0/GnosisSafeContract_V1_2_0_Ethers'
 import GnosisSafeContract_V1_3_0_Ethers from './GnosisSafe/v1.3.0/GnosisSafeContract_V1_3_0_Ethers'
@@ -13,7 +14,6 @@ import GnosisSafeProxyFactoryContract_V1_1_1_Ethers from './GnosisSafeProxyFacto
 import GnosisSafeProxyFactoryContract_V1_3_0_Ethers from './GnosisSafeProxyFactory/v1.3.0/GnosisSafeProxyFactoryContract_V1_3_0_Ethers'
 import MultiSendContract_V1_1_1_Ethers from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
 import MultiSendContract_V1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
-import { SafeVersion } from './safeDeploymentContracts'
 
 export function getSafeContractInstance(
   safeVersion: SafeVersion,

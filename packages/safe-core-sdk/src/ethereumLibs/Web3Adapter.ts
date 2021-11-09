@@ -47,12 +47,12 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getChainId()
   }
 
-  async getSafeContract({
+  getSafeContract({
     safeVersion,
     chainId,
     isL1SafeMasterCopy,
     customContractAddress
-  }: GetSafeContractProps): Promise<GnosisSafeContractWeb3> {
+  }: GetSafeContractProps): GnosisSafeContractWeb3 {
     const safeSingletonDeployment = getSafeContractDeployment(
       safeVersion,
       chainId,
@@ -60,8 +60,8 @@ class Web3Adapter implements EthAdapter {
     )
     const contractAddress =
       customContractAddress ?? safeSingletonDeployment?.networkAddresses[chainId]
-    if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
-      throw new Error('Safe Proxy contract is not deployed in the current network')
+    if (!contractAddress) {
+      throw new Error('Invalid Safe Proxy contract address')
     }
     const safeContract = this.getContract(
       contractAddress,
@@ -70,15 +70,15 @@ class Web3Adapter implements EthAdapter {
     return getSafeContractInstance(safeVersion, safeContract)
   }
 
-  async getMultiSendContract(
+  getMultiSendContract(
     safeVersion: SafeVersion,
     chainId: number,
     customContractAddress?: string
-  ): Promise<MultiSendWeb3Contract> {
+  ): MultiSendWeb3Contract {
     const multiSendDeployment = getMultiSendContractDeployment(safeVersion, chainId)
     const contractAddress = customContractAddress ?? multiSendDeployment?.networkAddresses[chainId]
-    if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
-      throw new Error('Multi Send contract is not deployed in the current network')
+    if (!contractAddress) {
+      throw new Error('Invalid Multi Send contract addresss')
     }
     const multiSendContract = this.getContract(
       contractAddress,
@@ -87,16 +87,16 @@ class Web3Adapter implements EthAdapter {
     return getMultiSendContractInstance(safeVersion, multiSendContract)
   }
 
-  async getSafeProxyFactoryContract(
+  getSafeProxyFactoryContract(
     safeVersion: SafeVersion,
     chainId: number,
     customContractAddress?: string
-  ): Promise<GnosisSafeProxyFactoryWeb3Contract> {
+  ): GnosisSafeProxyFactoryWeb3Contract {
     const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
     const contractAddress =
       customContractAddress ?? proxyFactoryDeployment?.networkAddresses[chainId]
-    if (!contractAddress || (await this.getContractCode(contractAddress)) === '0x') {
-      throw new Error('Safe Proxy Factory contract is not deployed in the current network')
+    if (!contractAddress) {
+      throw new Error('Invalid Safe Proxy Factory contract address')
     }
     const proxyFactoryContract = this.getContract(
       contractAddress,

@@ -46,7 +46,7 @@ describe('Safe contracts manager', () => {
             safeAddress: safe.address
           })
         )
-        .to.be.rejectedWith('Multi Send contract is not deployed in the current network')
+        .to.be.rejectedWith('Invalid Multi Send contract')
     })
 
     it('should fail if Safe Proxy contract is not deployed in the current network', async () => {

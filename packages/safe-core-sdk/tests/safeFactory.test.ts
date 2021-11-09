@@ -9,6 +9,7 @@ import {
   SafeFactory
 } from '../src'
 import { SAFE_LAST_VERSION } from '../src/contracts/config'
+import { ZERO_ADDRESS } from '../src/utils/constants'
 import { itif } from './utils/helpers'
 import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -42,6 +43,22 @@ describe('Safe Proxy Factory', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       chai
         .expect(SafeFactory.create({ ethAdapter }))
+        .rejectedWith('Invalid Safe Proxy Factory contract')
+    })
+
+    it('should fail if the contractNetworks provided are not deployed', async () => {
+      const { accounts, chainId } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const contractNetworks: ContractNetworksConfig = {
+        [chainId]: {
+          multiSendAddress: ZERO_ADDRESS,
+          safeMasterCopyAddress: ZERO_ADDRESS,
+          safeProxyFactoryAddress: ZERO_ADDRESS
+        }
+      }
+      chai
+        .expect(SafeFactory.create({ ethAdapter, contractNetworks }))
         .rejectedWith('Safe Proxy Factory contract is not deployed in the current network')
     })
 

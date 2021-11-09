@@ -31,17 +31,17 @@ interface EthAdapter {
     chainId,
     isL1SafeMasterCopy,
     customContractAddress
-  }: GetSafeContractProps): Promise<GnosisSafeContract>
+  }: GetSafeContractProps): GnosisSafeContract
   getMultiSendContract(
     safeVersion: SafeVersion,
     chainId: number,
     customContractAddress?: string
-  ): Promise<MultiSendContract>
+  ): MultiSendContract
   getSafeProxyFactoryContract(
     safeVersion: SafeVersion,
     chainId: number,
     customContractAddress?: string
-  ): Promise<GnosisSafeProxyFactoryContract>
+  ): GnosisSafeProxyFactoryContract
   getContractCode(address: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>

@@ -1,3 +1,4 @@
+import { SafeVersion } from './contracts/config'
 import EthAdapter, { EthAdapterTransaction } from './ethereumLibs/EthAdapter'
 import EthersAdapter, { EthersAdapterConfig } from './ethereumLibs/EthersAdapter'
 import Web3Adapter, { Web3AdapterConfig } from './ethereumLibs/Web3Adapter'
@@ -23,6 +24,7 @@ import {
 
 export default Safe
 export {
+  SafeVersion,
   SafeFactory,
   SafeFactoryConfig,
   SafeAccountConfig,

@@ -28,28 +28,40 @@ class ContractManager {
     contractNetworks
   }: SafeConfig): Promise<void> {
     const chainId = await ethAdapter.getChainId()
-    const temporarySafeContract = await ethAdapter.getSafeContract({
+    const temporarySafeContract = ethAdapter.getSafeContract({
       safeVersion: SAFE_BASE_VERSION,
       chainId,
       isL1SafeMasterCopy,
       customContractAddress: safeAddress
     })
+    if ((await ethAdapter.getContractCode(temporarySafeContract.getAddress())) === '0x') {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
     const safeVersion = (await temporarySafeContract.getVersion()) as SafeVersion
 
     const customContracts = contractNetworks?.[chainId]
     this.#contractNetworks = contractNetworks
     this.#isL1SafeMasterCopy = isL1SafeMasterCopy
-    this.#safeContract = await ethAdapter.getSafeContract({
+    const safeContract = ethAdapter.getSafeContract({
       safeVersion,
       chainId,
       isL1SafeMasterCopy,
       customContractAddress: safeAddress
     })
-    this.#multiSendContract = await ethAdapter.getMultiSendContract(
+    if ((await ethAdapter.getContractCode(safeContract.getAddress())) === '0x') {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
+    this.#safeContract = safeContract
+
+    const multiSendContract = await ethAdapter.getMultiSendContract(
       safeVersion,
       chainId,
       customContracts?.multiSendAddress
     )
+    if ((await ethAdapter.getContractCode(multiSendContract.getAddress())) === '0x') {
+      throw new Error('Multi Send contract is not deployed in the current network')
+    }
+    this.#multiSendContract = multiSendContract
   }
 
   get contractNetworks(): ContractNetworksConfig | undefined {

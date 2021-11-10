@@ -1,13 +1,13 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
-import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/GnosisSafe'
-import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/GnosisSafe'
+import { EthersTransactionResult, TransactionOptions } from 'src/utils/transactions/types'
+import { GnosisSafe as GnosisSafe_V1_1_1 } from 'typechain/src/ethers-v5/v1.1.1/GnosisSafe'
+import { GnosisSafe as GnosisSafe_V1_2_0 } from 'typechain/src/ethers-v5/v1.2.0/GnosisSafe'
 import {
   GnosisSafe as GnosisSafe_V1_3_0,
   GnosisSafeInterface
-} from '../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
-import { EthersTransactionResult, TransactionOptions } from '../../utils/transactions/types'
+} from 'typechain/src/ethers-v5/v1.3.0/GnosisSafe'
 import GnosisSafeContract from './GnosisSafeContract'
 
 function toTxResult(

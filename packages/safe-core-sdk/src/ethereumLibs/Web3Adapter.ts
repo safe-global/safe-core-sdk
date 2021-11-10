@@ -1,19 +1,19 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { SafeVersion } from '../contracts/config'
+import { SafeVersion } from 'src/contracts/config'
 import {
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance
-} from '../contracts/contractInstancesWeb3'
-import GnosisSafeContractWeb3 from '../contracts/GnosisSafe/GnosisSafeContractWeb3'
-import GnosisSafeProxyFactoryWeb3Contract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
-import MultiSendWeb3Contract from '../contracts/MultiSend/MultiSendWeb3Contract'
+} from 'src/contracts/contractInstancesWeb3'
+import GnosisSafeContractWeb3 from 'src/contracts/GnosisSafe/GnosisSafeContractWeb3'
+import GnosisSafeProxyFactoryWeb3Contract from 'src/contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
+import MultiSendWeb3Contract from 'src/contracts/MultiSend/MultiSendWeb3Contract'
 import {
   getMultiSendContractDeployment,
   getSafeContractDeployment,
   getSafeProxyFactoryContractDeployment
-} from '../contracts/safeDeploymentContracts'
-import { AbiItem } from '../types'
+} from 'src/contracts/safeDeploymentContracts'
+import { AbiItem } from 'src/types'
 import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
 
 export interface Web3AdapterConfig {

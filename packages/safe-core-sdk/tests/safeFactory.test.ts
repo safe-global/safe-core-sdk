@@ -1,19 +1,19 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from 'hardhat/deploy/deploy-contracts'
 import {
   ContractNetworksConfig,
   SafeAccountConfig,
   SafeDeploymentConfig,
   SafeFactory
-} from '../src'
-import { SAFE_LAST_VERSION } from '../src/contracts/config'
-import { ZERO_ADDRESS } from '../src/utils/constants'
-import { itif } from './utils/helpers'
-import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
-import { getAccounts } from './utils/setupTestNetwork'
+} from 'src'
+import { SAFE_LAST_VERSION } from 'src/contracts/config'
+import { ZERO_ADDRESS } from 'src/utils/constants'
+import { itif } from 'tests/utils/helpers'
+import { getFactory, getMultiSend, getSafeSingleton } from 'tests/utils/setupContracts'
+import { getEthAdapter } from 'tests/utils/setupEthAdapter'
+import { getAccounts } from 'tests/utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 

@@ -1,6 +1,6 @@
 import { ContractReceipt } from '@ethersproject/contracts'
+import { EthAdapter, TransactionResult } from 'src'
 import { TransactionReceipt } from 'web3-core/types'
-import { EthAdapter, TransactionResult } from '../../src'
 
 export async function waitSafeTxReceipt(
   txResult: TransactionResult

@@ -3,18 +3,18 @@ import { MetaTransactionData, SafeTransactionDataPartial } from '@gnosis.pm/safe
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
-import Safe, { ContractNetworksConfig, TransactionOptions } from '../src'
+import { safeVersionDeployed } from 'hardhat/deploy/deploy-contracts'
+import Safe, { ContractNetworksConfig, TransactionOptions } from 'src'
 import {
   getERC20Mintable,
   getFactory,
   getMultiSend,
   getSafeSingleton,
   getSafeWithOwners
-} from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
-import { getAccounts } from './utils/setupTestNetwork'
-import { waitSafeTxReceipt } from './utils/transactions'
+} from 'tests/utils/setupContracts'
+import { getEthAdapter } from 'tests/utils/setupEthAdapter'
+import { getAccounts } from 'tests/utils/setupTestNetwork'
+import { waitSafeTxReceipt } from 'tests/utils/transactions'
 
 chai.use(chaiAsPromised)
 

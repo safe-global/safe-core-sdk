@@ -1,7 +1,19 @@
-import { SafeVersion } from './contracts/config'
-import EthAdapter, { EthAdapterTransaction } from './ethereumLibs/EthAdapter'
-import EthersAdapter, { EthersAdapterConfig } from './ethereumLibs/EthersAdapter'
-import Web3Adapter, { Web3AdapterConfig } from './ethereumLibs/Web3Adapter'
+import { SafeVersion } from 'src/contracts/config'
+import EthAdapter, { EthAdapterTransaction } from 'src/ethereumLibs/EthAdapter'
+import EthersAdapter, { EthersAdapterConfig } from 'src/ethereumLibs/EthersAdapter'
+import Web3Adapter, { Web3AdapterConfig } from 'src/ethereumLibs/Web3Adapter'
+import SafeFactory, {
+  SafeAccountConfig,
+  SafeDeploymentConfig,
+  SafeFactoryConfig
+} from 'src/safeFactory'
+import { ContractNetworksConfig } from 'src/types'
+import EthSignSignature from 'src/utils/signatures/SafeSignature'
+import {
+  SafeTransactionOptionalProps,
+  TransactionOptions,
+  TransactionResult
+} from 'src/utils/transactions/types'
 import Safe, {
   AddOwnerTxParams,
   ConnectSafeConfig,
@@ -9,18 +21,6 @@ import Safe, {
   SafeConfig,
   SwapOwnerTxParams
 } from './Safe'
-import SafeFactory, {
-  SafeAccountConfig,
-  SafeDeploymentConfig,
-  SafeFactoryConfig
-} from './safeFactory'
-import { ContractNetworksConfig } from './types'
-import EthSignSignature from './utils/signatures/SafeSignature'
-import {
-  SafeTransactionOptionalProps,
-  TransactionOptions,
-  TransactionResult
-} from './utils/transactions/types'
 
 export default Safe
 export {

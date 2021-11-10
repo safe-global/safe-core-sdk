@@ -1,16 +1,16 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig } from '../src'
-import { ZERO_ADDRESS } from '../src/utils/constants'
+import Safe, { ContractNetworksConfig } from 'src'
+import { ZERO_ADDRESS } from 'src/utils/constants'
 import {
   getFactory,
   getMultiSend,
   getSafeSingleton,
   getSafeWithOwners
-} from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
-import { getAccounts } from './utils/setupTestNetwork'
+} from 'tests/utils/setupContracts'
+import { getEthAdapter } from 'tests/utils/setupEthAdapter'
+import { getAccounts } from 'tests/utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 

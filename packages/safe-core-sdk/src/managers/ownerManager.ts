@@ -1,7 +1,7 @@
-import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
-import EthAdapter from '../ethereumLibs/EthAdapter'
-import { isRestrictedAddress, sameString } from '../utils'
-import { SENTINEL_ADDRESS } from '../utils/constants'
+import GnosisSafeContract from 'src/contracts/GnosisSafe/GnosisSafeContract'
+import EthAdapter from 'src/ethereumLibs/EthAdapter'
+import { isRestrictedAddress, sameString } from 'src/utils'
+import { SENTINEL_ADDRESS } from 'src/utils/constants'
 
 class OwnerManager {
   #ethAdapter: EthAdapter

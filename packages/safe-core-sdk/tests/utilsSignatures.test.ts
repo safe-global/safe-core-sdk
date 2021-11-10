@@ -1,5 +1,5 @@
 import chai from 'chai'
-import { adjustVInSignature, isTxHashSignedWithPrefix } from '../src/utils/signatures'
+import { adjustVInSignature, isTxHashSignedWithPrefix } from 'src/utils/signatures'
 
 describe('Signature utils', () => {
   describe('isTxHashSignedWithPrefix', () => {

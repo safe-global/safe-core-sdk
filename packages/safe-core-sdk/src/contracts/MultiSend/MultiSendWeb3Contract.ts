@@ -1,5 +1,5 @@
-import { MultiSend as MultiSend_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/multi_send'
-import { MultiSend as MultiSend_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/multi_send'
+import { MultiSend as MultiSend_V1_1_1 } from 'typechain/src/web3-v1/v1.1.1/multi_send'
+import { MultiSend as MultiSend_V1_3_0 } from 'typechain/src/web3-v1/v1.3.0/multi_send'
 import MultiSendContract from './MultiSendContract'
 
 abstract class MultiSendWeb3Contract implements MultiSendContract {

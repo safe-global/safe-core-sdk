@@ -1,7 +1,7 @@
 import { SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
-import EthAdapter from 'ethereumLibs/EthAdapter'
-import { sameString } from '../../utils'
+import EthAdapter from 'src/ethereumLibs/EthAdapter'
+import { sameString } from 'src/utils'
 import EthSignSignature from './SafeSignature'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {

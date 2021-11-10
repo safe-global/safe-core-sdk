@@ -6,9 +6,9 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
-import EthAdapter from '../../ethereumLibs/EthAdapter'
-import { ZERO_ADDRESS } from '../constants'
+import GnosisSafeContract from 'src/contracts/GnosisSafe/GnosisSafeContract'
+import EthAdapter from 'src/ethereumLibs/EthAdapter'
+import { ZERO_ADDRESS } from 'src/utils/constants'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(

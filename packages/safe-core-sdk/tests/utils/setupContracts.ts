@@ -4,23 +4,23 @@ import {
   gnosisSafeDeployed,
   multiSendDeployed,
   proxyFactoryDeployed
-} from '../../hardhat/deploy/deploy-contracts'
+} from 'hardhat/deploy/deploy-contracts'
 import {
   GnosisSafe as GnosisSafe_V1_1_1,
   MultiSend as MultiSend_V1_1_1,
   ProxyFactory as ProxyFactory_V1_1_1
-} from '../../typechain/src/ethers-v5/v1.1.1'
-import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../typechain/src/ethers-v5/v1.2.0/'
+} from 'typechain/src/ethers-v5/v1.1.1'
+import { GnosisSafe as GnosisSafe_V1_2_0 } from 'typechain/src/ethers-v5/v1.2.0/'
 import {
   GnosisSafe as GnosisSafe_V1_3_0,
   MultiSend as MultiSend_V1_3_0,
   ProxyFactory as ProxyFactory_V1_3_0
-} from '../../typechain/src/ethers-v5/v1.3.0/'
+} from 'typechain/src/ethers-v5/v1.3.0/'
 import {
   DailyLimitModule,
   ERC20Mintable,
   SocialRecoveryModule
-} from '../../typechain/tests/ethers-v5'
+} from 'typechain/tests/ethers-v5'
 
 export const getSafeSingleton = async (): Promise<
   GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1

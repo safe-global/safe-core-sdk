@@ -1,4 +1,4 @@
-import { TransactionOptions } from '../../utils/transactions/types'
+import { TransactionOptions } from 'src/utils/transactions/types'
 
 export interface CreateProxyProps {
   safeMasterCopyAddress: string

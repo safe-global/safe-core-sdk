@@ -3,21 +3,21 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { Provider } from '@ethersproject/providers'
-import { SafeVersion } from '../contracts/config'
+import { SafeVersion } from 'src/contracts/config'
 import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance
-} from '../contracts/contractInstancesEthers'
-import GnosisSafeContractEthers from '../contracts/GnosisSafe/GnosisSafeContractEthers'
-import GnosisSafeProxyFactoryEthersContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
-import MultiSendEthersContract from '../contracts/MultiSend/MultiSendEthersContract'
+} from 'src/contracts/contractInstancesEthers'
+import GnosisSafeContractEthers from 'src/contracts/GnosisSafe/GnosisSafeContractEthers'
+import GnosisSafeProxyFactoryEthersContract from 'src/contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
+import MultiSendEthersContract from 'src/contracts/MultiSend/MultiSendEthersContract'
 import {
   getMultiSendContractDeployment,
   getSafeContractDeployment,
   getSafeProxyFactoryContractDeployment
-} from '../contracts/safeDeploymentContracts'
-import { AbiItem } from '../types'
+} from 'src/contracts/safeDeploymentContracts'
+import { AbiItem } from 'src/types'
 import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
 
 export interface EthersAdapterConfig {

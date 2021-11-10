@@ -1,5 +1,5 @@
-import { GnosisSafe } from '../../../../typechain/src/ethers-v5/v1.1.1/GnosisSafe'
-import { sameString } from '../../../utils'
+import { sameString } from 'src/utils'
+import { GnosisSafe } from 'typechain/src/ethers-v5/v1.1.1/GnosisSafe'
 import GnosisSafeContractEthers from '../GnosisSafeContractEthers'
 
 class GnosisSafeContract_V1_1_1_Ethers extends GnosisSafeContractEthers {

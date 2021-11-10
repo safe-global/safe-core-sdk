@@ -1,10 +1,10 @@
-import { SafeVersion, SAFE_LAST_VERSION } from '../contracts/config'
-import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
-import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
-import EthAdapter from '../ethereumLibs/EthAdapter'
-import Safe from '../Safe'
-import { ContractNetworksConfig } from '../types'
-import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
+import { SafeVersion, SAFE_LAST_VERSION } from 'src/contracts/config'
+import GnosisSafeContract from 'src/contracts/GnosisSafe/GnosisSafeContract'
+import GnosisSafeProxyFactoryContract from 'src/contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
+import EthAdapter from 'src/ethereumLibs/EthAdapter'
+import Safe from 'src/Safe'
+import { ContractNetworksConfig } from 'src/types'
+import { EMPTY_DATA, ZERO_ADDRESS } from 'src/utils/constants'
 import { validateSafeAccountConfig } from './utils'
 
 export interface SafeAccountConfig {

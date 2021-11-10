@@ -1,9 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { SafeVersion } from '../contracts/config'
-import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
-import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
-import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
-import { AbiItem } from '../types'
+import { SafeVersion } from 'src/contracts/config'
+import GnosisSafeContract from 'src/contracts/GnosisSafe/GnosisSafeContract'
+import GnosisSafeProxyFactoryContract from 'src/contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
+import MultiSendContract from 'src/contracts/MultiSend/MultiSendContract'
+import { AbiItem } from 'src/types'
 
 export interface EthAdapterTransaction {
   to: string

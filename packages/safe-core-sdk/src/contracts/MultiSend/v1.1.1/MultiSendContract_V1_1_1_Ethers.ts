@@ -1,4 +1,4 @@
-import { MultiSend } from '../../../../typechain/src/ethers-v5/v1.1.1/MultiSend'
+import { MultiSend } from 'typechain/src/ethers-v5/v1.1.1/MultiSend'
 import MultiSendEthersContract from '../MultiSendEthersContract'
 
 class MultiSendContract_V1_1_1_Ethers extends MultiSendEthersContract {

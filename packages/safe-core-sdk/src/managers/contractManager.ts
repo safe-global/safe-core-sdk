@@ -1,8 +1,8 @@
-import { SafeVersion, SAFE_BASE_VERSION } from '../contracts/config'
-import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
-import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
-import { SafeConfig } from '../Safe'
-import { ContractNetworksConfig } from '../types'
+import { SafeVersion, SAFE_BASE_VERSION } from 'src/contracts/config'
+import GnosisSafeContract from 'src/contracts/GnosisSafe/GnosisSafeContract'
+import MultiSendContract from 'src/contracts/MultiSend/MultiSendContract'
+import { SafeConfig } from 'src/Safe'
+import { ContractNetworksConfig } from 'src/types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig

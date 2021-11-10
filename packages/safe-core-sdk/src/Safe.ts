@@ -6,25 +6,25 @@ import {
   SafeTransaction,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import EthAdapter from './ethereumLibs/EthAdapter'
-import ContractManager from './managers/contractManager'
-import ModuleManager from './managers/moduleManager'
-import OwnerManager from './managers/ownerManager'
-import { ContractNetworksConfig } from './types'
-import { sameString } from './utils'
-import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
-import { estimateGasForTransactionExecution } from './utils/transactions/gas'
-import EthSafeTransaction from './utils/transactions/SafeTransaction'
+import EthAdapter from 'src/ethereumLibs/EthAdapter'
+import ContractManager from 'src/managers/contractManager'
+import ModuleManager from 'src/managers/moduleManager'
+import OwnerManager from 'src/managers/ownerManager'
+import { ContractNetworksConfig } from 'src/types'
+import { sameString } from 'src/utils'
+import { generatePreValidatedSignature, generateSignature } from 'src/utils/signatures'
+import { estimateGasForTransactionExecution } from 'src/utils/transactions/gas'
+import EthSafeTransaction from 'src/utils/transactions/SafeTransaction'
 import {
   SafeTransactionOptionalProps,
   TransactionOptions,
   TransactionResult
-} from './utils/transactions/types'
+} from 'src/utils/transactions/types'
 import {
   encodeMultiSendData,
   standardizeMetaTransactionData,
   standardizeSafeTransactionData
-} from './utils/transactions/utils'
+} from 'src/utils/transactions/utils'
 
 export interface SafeConfig {
   /** ethAdapter - Ethereum adapter */

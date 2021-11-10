@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { ethers, web3 } from 'hardhat'
-import { EthAdapter, EthersAdapter, Web3Adapter } from '../../src'
+import { EthAdapter, EthersAdapter, Web3Adapter } from 'src'
 
 export async function getEthAdapter(signer: Signer): Promise<EthAdapter> {
   let ethAdapter: EthAdapter

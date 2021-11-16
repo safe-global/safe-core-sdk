@@ -68,6 +68,7 @@
     }
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk-types": "^0.1.1"
+    "@gnosis.pm/safe-core-sdk-types": "^0.1.1",
+    "node-fetch": "^2.6.6"
   }
 }

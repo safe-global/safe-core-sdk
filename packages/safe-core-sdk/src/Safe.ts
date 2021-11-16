@@ -6,11 +6,11 @@ import {
   SafeTransaction,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import { ContractNetworksConfig } from './configuration/contracts'
 import EthAdapter from './ethereumLibs/EthAdapter'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
+import { ContractNetworksConfig } from './types'
 import { sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
@@ -31,6 +31,8 @@ export interface SafeConfig {
   ethAdapter: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress: string
+  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
@@ -40,6 +42,8 @@ export interface ConnectSafeConfig {
   ethAdapter?: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
+  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
@@ -75,13 +79,17 @@ class Safe {
    * Creates an instance of the Safe Core SDK.
    * @param config - Ethers Safe configuration
    * @returns The Safe Core SDK instance
-   * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
-  static async create({ ethAdapter, safeAddress, contractNetworks }: SafeConfig): Promise<Safe> {
+  static async create({
+    ethAdapter,
+    safeAddress,
+    isL1SafeMasterCopy,
+    contractNetworks
+  }: SafeConfig): Promise<Safe> {
     const safeSdk = new Safe()
-    await safeSdk.init({ ethAdapter, safeAddress, contractNetworks })
+    await safeSdk.init({ ethAdapter, safeAddress, isL1SafeMasterCopy, contractNetworks })
     return safeSdk
   }
 
@@ -89,17 +97,22 @@ class Safe {
    * Initializes the Safe Core SDK instance.
    * @param config - Safe configuration
    * @throws "Signer must be connected to a provider"
-   * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
-  private async init({ ethAdapter, safeAddress, contractNetworks }: SafeConfig): Promise<void> {
+  private async init({
+    ethAdapter,
+    safeAddress,
+    isL1SafeMasterCopy,
+    contractNetworks
+  }: SafeConfig): Promise<void> {
     this.#ethAdapter = ethAdapter
-    this.#contractManager = await ContractManager.create(
-      this.#ethAdapter,
+    this.#contractManager = await ContractManager.create({
+      ethAdapter: this.#ethAdapter,
       safeAddress,
+      isL1SafeMasterCopy,
       contractNetworks
-    )
+    })
     this.#ownerManager = new OwnerManager(this.#ethAdapter, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#ethAdapter, this.#contractManager.safeContract)
   }
@@ -107,14 +120,19 @@ class Safe {
   /**
    * Returns a new instance of the Safe Core SDK.
    * @param config - Connect Safe configuration
-   * @throws "Safe contracts not found in the current network"
    * @throws "Safe Proxy contract is not deployed in the current network"
    * @throws "MultiSend contract is not deployed in the current network"
    */
-  async connect({ ethAdapter, safeAddress, contractNetworks }: ConnectSafeConfig): Promise<Safe> {
+  async connect({
+    ethAdapter,
+    safeAddress,
+    isL1SafeMasterCopy,
+    contractNetworks
+  }: ConnectSafeConfig): Promise<Safe> {
     return await Safe.create({
       ethAdapter: ethAdapter || this.#ethAdapter,
       safeAddress: safeAddress || this.getAddress(),
+      isL1SafeMasterCopy: isL1SafeMasterCopy || this.#contractManager.isL1SafeMasterCopy,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     })
   }

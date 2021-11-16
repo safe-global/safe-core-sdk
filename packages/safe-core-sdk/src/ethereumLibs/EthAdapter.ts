@@ -1,4 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { SafeVersion } from '../contracts/config'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
 import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
@@ -13,9 +14,11 @@ export interface EthAdapterTransaction {
   gasLimit?: number
 }
 
-export interface GnosisSafeContracts {
-  gnosisSafeContract: GnosisSafeContract
-  multiSendContract: MultiSendContract
+export interface GetSafeContractProps {
+  safeVersion: SafeVersion
+  chainId: number
+  isL1SafeMasterCopy?: boolean
+  customContractAddress?: string
 }
 
 interface EthAdapter {
@@ -23,11 +26,22 @@ interface EthAdapter {
   getBalance(address: string): Promise<BigNumber>
   getChainId(): Promise<number>
   getContract(address: string, abi: AbiItem[]): any
-  getSafeContract(safeAddress: string): Promise<GnosisSafeContract>
-  getMultiSendContract(multiSendAddress: string): Promise<MultiSendContract>
-  getGnosisSafeProxyFactoryContract(
-    proxyFactoryAddress: string
-  ): Promise<GnosisSafeProxyFactoryContract>
+  getSafeContract({
+    safeVersion,
+    chainId,
+    isL1SafeMasterCopy,
+    customContractAddress
+  }: GetSafeContractProps): GnosisSafeContract
+  getMultiSendContract(
+    safeVersion: SafeVersion,
+    chainId: number,
+    customContractAddress?: string
+  ): MultiSendContract
+  getSafeProxyFactoryContract(
+    safeVersion: SafeVersion,
+    chainId: number,
+    customContractAddress?: string
+  ): GnosisSafeProxyFactoryContract
   getContractCode(address: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>

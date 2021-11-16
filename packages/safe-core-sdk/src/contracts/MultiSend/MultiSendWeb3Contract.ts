@@ -1,8 +1,9 @@
-import { MultiSend } from '../../../typechain/src/web3-v1/MultiSend'
+import { MultiSend as MultiSend_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/multi_send'
+import { MultiSend as MultiSend_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/multi_send'
 import MultiSendContract from './MultiSendContract'
 
-class MultiSendWeb3Contract implements MultiSendContract {
-  constructor(public contract: MultiSend) {}
+abstract class MultiSendWeb3Contract implements MultiSendContract {
+  constructor(public contract: MultiSend_V1_3_0 | MultiSend_V1_1_1) {}
 
   getAddress(): string {
     return this.contract.options.address

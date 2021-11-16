@@ -68,12 +68,35 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 const owners = ['0x<address>', '0x<address>', '0x<address>']
 const threshold = 3
-const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+const safeAccountConfig: SafeAccountConfig = {
+  owners,
+  threshold,
+  // ...
+}
 
 const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
 ```
 
 The method `deploySafe` executes a transaction from `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe.
+
+The `SafeFactory` will deploy the last version of the Safe contracts available by default (currently `v1.3.0`). To deploy an older version of the Safe contracts instantiate the `SafeFactory` adding the property `safeVersion` with the desired version number.
+
+```js
+const safeFactoryV1_1_1 = await SafeFactory.create({ ethAdapter, safeVersion: '1.1.1' })
+```
+
+The property `contractNetworks` can also be used to provide the Safe contract addresses in case the SDK is used in a network where the Safe contracts are not deployed.
+
+```js
+const contractNetworks: ContractNetworksConfig = {
+  [chainId]: {
+    multiSendAddress: '0x<multisend_address>',
+    safeMasterCopyAddress: '0x<master_copy_address>',
+    safeProxyFactoryAddress: '0x<proxy_factory_address>'
+  }
+}
+const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
+```
 
 Call the method `getAddress`, for example, to check the address of the newly deployed Safe.
 
@@ -153,7 +176,9 @@ The property `contractNetworks` can be added to provide the Safe contract addres
 ```js
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
-    multiSendAddress: '0x<multisend_address>'
+    multiSendAddress: '0x<multisend_address>',
+    safeMasterCopyAddress: '0x<master_copy_address>',
+    safeProxyFactoryAddress: '0x<proxy_factory_address>'
   }
 }
 const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
@@ -172,7 +197,9 @@ The property `contractNetworks` can be added to provide the Safe contract addres
 ```js
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
-    multiSendAddress: '0x<multisend_address>'
+    multiSendAddress: '0x<multisend_address>',
+    safeMasterCopyAddress: '0x<master_copy_address>',
+    safeProxyFactoryAddress: '0x<proxy_factory_address>'
   }
 }
 const safeSdk = await Safe.connect({ ethAdapter, safeAddress, contractNetworks })

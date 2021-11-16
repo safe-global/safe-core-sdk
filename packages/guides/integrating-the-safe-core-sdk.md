@@ -14,7 +14,7 @@
 
 ## 1. Install the dependencies <a name="install-dependencies"></a>
 
-To integrate the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) into your Dapp or script you would need to install these dependencies:
+To integrate the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) into your Dapp or script you will need to install these dependencies:
 
 ```
 @gnosis.pm/safe-core-sdk-types
@@ -26,7 +26,7 @@ To integrate the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) into y
 
 ### Initialize the Safe Service Client
 
-As stated in the introduction, the [Safe Service Client](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service). To start using this library create a new instance of the class `SafeServiceClient` imported from `@gnosis.pm/safe-service-client` and pass to its constructor the URL of the Safe Transaction Service you want to use depending on the network.
+As stated in the introduction, the [Safe Service Client](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service). To start using this library, create a new instance of the class `SafeServiceClient` imported from `@gnosis.pm/safe-service-client` and pass the URL to its constructor of the Safe Transaction Service you want to use depending on the network.
 
 ```js
 import SafeServiceClient from '@gnosis.pm/safe-service-client'
@@ -37,11 +37,11 @@ const safeService = new SafeServiceClient(transactionServiceUrl)
 
 ### Initialize the Safe Core SDK
 
-The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-core-sdk) library only interacts with the [Safe contracts](https://github.com/gnosis/safe-contracts). Because of that, we need to select one Ethereum library between [web3.js](https://web3js.readthedocs.io/) and [ethers.js](https://docs.ethers.io/v5/) to interact with the blockchain.
+The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-core-sdk) library only interacts with the [Safe contracts](https://github.com/gnosis/safe-contracts). Because of this, we need to select one Ethereum library: [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/).
 
 * **Using ethers.js**
 
-  We can use the class `EthersAdapter` from `@gnosis.pm/safe-core-sdk` as a wrapper of `ethers.js`.
+  We can use the class `EthersAdapter` from `@gnosis.pm/safe-core-sdk` as the wrapper for `ethers.js`.
 
   ```js
   import { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
@@ -59,7 +59,7 @@ The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/s
 
 * **Using web3.js**
 
-  We can use the class `Web3Adapter` from `@gnosis.pm/safe-core-sdk` as a wrapper of `web3.js`.
+  We can use the class `Web3Adapter` from `@gnosis.pm/safe-core-sdk` as the wrapper for `web3.js`.
 
   ```js
   import { Web3Adapter } from '@gnosis.pm/safe-core-sdk'
@@ -81,7 +81,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
 
-There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to afford some gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does it and it is more appropriate for L2 networks.
+There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
 By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `GnosisSafe.sol` contract.
 
@@ -91,7 +91,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: t
 const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
 ```
 
-If the Safe contracts are not deployed in your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
+If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
 
 ```js
 import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
@@ -110,7 +110,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
 const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
 ```
 
-The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will deploy. This string can take the values `1.1.1`, `1.2.0` or `1.3.0` and if not specified the last version will be used by default.
+The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will deploy. This string can take the values `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
 
 ```js
 const safeVersion = 'X.Y.Z'
@@ -119,7 +119,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter, safeVersion })
 
 ## 3. Deploy a new Safe <a name="deploy-safe"></a>
 
-The Safe Core SDK library allows to deploy new Safes using the `safeFactory` instance we just created.
+The Safe Core SDK library allows the deployment of new Safes using the `safeFactory` instance we just created.
 
 Here, for example, we can create a new Safe account with 3 owners and 2 required signatures.
 
@@ -134,7 +134,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk = await safeFactory.deploySafe(safeAccountConfig)
 ```
 
-Calling the method `deploySafe` will deploy de desired Safe and return a Safe Core SDK initialized instance ready to be used.
+Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used.
 
 ## 4. Create a transaction <a name="create-transaction"></a>
 
@@ -142,7 +142,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
 
 * **Create a single transaction**
 
-  This method can receive an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). There are some optional properties in case we want to specify them.
+  This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
 
   ```js
   import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
@@ -165,7 +165,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
 
 * **Create a MultiSend transaction**
 
-  This method can receive an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
+  This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
   ```js
   import { SafeTransactionOptionalProps } from '@gnosis.pm/safe-core-sdk'
@@ -200,7 +200,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   ```
 
 
-We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, making valid the first transaction that gets executed and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe Service Client instance. This method will take into account all the transactions that are queued and pending to be executed and calculate the next nonce, making it different for all the transactions.
+We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe Service Client instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.
 
 ```js
 const nonce = await safeService.getNextNonce(safeAddress)
@@ -208,9 +208,9 @@ const nonce = await safeService.getNextNonce(safeAddress)
 
 ## 5. Propose the transaction to the service <a name="propose-transaction"></a>
 
-Once we have the Safe transaction object we need to share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe Service Client instance and pass an object with the properties:
+Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe Service Client instance and pass an object with the properties:
 - `safeAddress`: The Safe address.
-- `safeTransaction`: The Safe transaction object returned from the method `createTransaction`. Make sure that this object includes the signature of the owner who is proposing it.
+- `safeTransaction`: The Safe transaction object returned from the method `createTransaction`. Make sure that this object includes the signature of the owner which is proposing it.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.
 - `senderAddress`: The Safe owner proposing the transaction.
 
@@ -227,9 +227,9 @@ await safeService.proposeTransaction({
 
 ## 6. Get the transaction from the service <a name="get-transaction"></a>
 
-Now the Safe transaction is available on the Safe Transaction Service and the owners need to retrieve it by finding it in the list of pending transactions or getting if by its Safe transaction hash.
+The transaction is then available on the Safe Transaction Service and the owners can retrieve it by finding it in the pending transaction list, or by getting its Safe transaction hash.
 
-Get the list of pending transactions:
+Get a list of pending transactions:
 
 ```js
 const pendingTxs = await safeService.getPendingTransactions(safeAddress)
@@ -302,7 +302,7 @@ await safeService.confirmTransaction(hash, signature.data)
 
 Once there are enough confirmations in the service the transaction is ready to be executed. The account that will execute the transaction needs to retrieve it from the service with all the required signatures and call the method `executeTransaction` from the Safe Core SDK.
 
-The method `executeTransaction` expects an instance of the class `SafeTransaction` so the transaction needs to be transformed from the type `SafeMultisigTransactionResponse`.
+The method `executeTransaction` accepts an instance of the class `SafeTransaction` so the transaction needs to be transformed from the type `SafeMultisigTransactionResponse`.
 
 ```js
 import { EthSignSignature } from '@gnosis.pm/safe-core-sdk'
@@ -333,9 +333,9 @@ const receipt = executeTxResponse.transactionResponse && (await executeTxRespons
 
 ## 9. Interface checks <a name="interface-checks"></a>
 
-During the process of collecting the signatures and executing the transaction some useful checks can be used in the interface to display or hide a button to confirm or execute the transaction depending on the current number of confirmations, the address of the accounts who confirmed the transaction and the Safe threshold:
+During the process of collecting the signatures/executing transactions, some useful checks can be made in the interface to display or hide a button to confirm or execute the transaction depending on the current number of confirmations, the address of accounts that confirmed the transaction and the Safe threshold:
 
-Check if a Safe transaction is already sign by an owner:
+Check if a Safe transaction is already signed by an owner:
 
 ```js
 const isTransactionSignedByAddress = (signerAddress: string, transaction: SafeMultisigTransactionResponse) => {

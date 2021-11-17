@@ -252,6 +252,7 @@ class Safe {
    *
    * @param safeTransactions - The list of transactions to process
    * @returns The Safe transaction
+   * @throws "Invalid empty array of transactions"
    */
   async createTransaction(safeTransactions: SafeTransactionDataPartial): Promise<SafeTransaction>
   async createTransaction(
@@ -260,11 +261,17 @@ class Safe {
   ): Promise<SafeTransaction>
   async createTransaction(
     safeTransactions: SafeTransactionDataPartial | MetaTransactionData[],
-    options?: SafeTransactionDataPartial
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    if (safeTransactions instanceof Array) {
+    const isTxArray = Array.isArray(safeTransactions)
+    if (isTxArray && (safeTransactions as MetaTransactionData[]).length === 0) {
+      throw new Error('Invalid empty array of transactions')
+    }
+    const isMultisend = isTxArray && (safeTransactions as MetaTransactionData[]).length > 1
+    let newTransaction: SafeTransactionDataPartial
+    if (isMultisend) {
       const multiSendData = encodeMultiSendData(
-        safeTransactions.map(standardizeMetaTransactionData)
+        (safeTransactions as MetaTransactionData[]).map(standardizeMetaTransactionData)
       )
       const multiSendTransaction = {
         ...options,
@@ -273,17 +280,16 @@ class Safe {
         data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
         operation: OperationType.DelegateCall
       }
-      const standardizedTransaction = await standardizeSafeTransactionData(
-        this.#contractManager.safeContract,
-        this.#ethAdapter,
-        multiSendTransaction
-      )
-      return new EthSafeTransaction(standardizedTransaction)
+      newTransaction = multiSendTransaction
+    } else {
+      newTransaction = isTxArray
+        ? { ...options, ...(safeTransactions as MetaTransactionData[])[0] }
+        : (safeTransactions as SafeTransactionDataPartial)
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
       this.#ethAdapter,
-      safeTransactions
+      newTransaction
     )
     return new EthSafeTransaction(standardizedTransaction)
   }

@@ -3,7 +3,6 @@
 [![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-service-client.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-service-client)
 [![GitHub Release](https://img.shields.io/github/release/gnosis/safe-service-client.svg?style=flat)](https://github.com/gnosis/safe-service-client/releases)
 [![GitHub](https://img.shields.io/github/license/gnosis/safe-core-sdk)](https://github.com/gnosis/safe-core-sdk/blob/main/LICENSE.md)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/safe-core-sdk/badge.svg?branch=main)](https://coveralls.io/github/gnosis/safe-core-sdk?branch=main)
 
 Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service).
 
@@ -109,26 +108,37 @@ const delegates: SafeDelegateListResponse = await safeService.getSafeDelegates(s
 
 ### addSafeDelegate
 
-Adds a new delegate for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
+Adds a new delegate for a given Safe address.
 
 ```js
-await safeService.addSafeDelegate(safeAddress, delegate)
+const delegateConfig: SafeDelegateConfig = {
+  safe,
+  delegate,
+  label,
+  signer
+}
+await safeService.addSafeDelegate(delegateConfig)
 ```
 
 ### removeAllSafeDelegates
 
-Removes all delegates for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
+Removes all delegates for a given Safe address.
 
 ```js
-await safeService.removeAllSafeDelegates(safeAddress)
+await safeService.removeAllSafeDelegates(safeAddress, signer)
 ```
 
 ### removeSafeDelegate
 
-Removes a delegate for a given Safe address. The signature is calculated by signing this hash: `keccak(address + str(int(current_epoch / 3600)))`.
+Removes a delegate for a given Safe address.
 
 ```js
-await safeService.removeSafeDelegate(safeAddress, delegate)
+const delegateConfig: SafeDelegateDeleteConfig = {
+  safe,
+  delegate,
+  signer
+}
+await safeService.removeSafeDelegate(delegateConfig)
 ```
 
 ### getSafeCreationInfo
@@ -144,7 +154,10 @@ const safeCreationInfo: SafeCreationInfoResponse = await safeService.getSafeCrea
 Estimates the safeTxGas for a given Safe multi-signature transaction.
 
 ```js
-const estimateTx: SafeMultisigTransactionEstimateResponse = await safeService.estimateSafeTransaction(safeAddress, safeTransaction)
+const estimateTx: SafeMultisigTransactionEstimateResponse = await safeService.estimateSafeTransaction(
+  safeAddress,
+  safeTransaction
+)
 ```
 
 ### proposeTransaction
@@ -152,7 +165,13 @@ const estimateTx: SafeMultisigTransactionEstimateResponse = await safeService.es
 Creates a new multi-signature transaction and stores it in the Safe Transaction Service.
 
 ```js
-await safeService.proposeTransaction({ safeAddress, safeTransaction, safeTxHash, senderAddress })
+const transactionConfig: ProposeTransactionProps = {
+  safeAddress,
+  safeTransaction,
+  safeTxHash,
+  senderAddress
+}
+await safeService.proposeTransaction(transactionConfig)
 ```
 
 ### getIncomingTransactions
@@ -188,7 +207,10 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 ```
 
 ```js
-const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(safeAddress, currentNonce)
+const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(
+  safeAddress,
+  currentNonce
+)
 ```
 
 ### getNextNonce
@@ -196,7 +218,7 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 Returns the right nonce to propose a new transaction right after the last pending transaction.
 
 ```js
-const nextNonce = await getNextNonce(safeAddress)
+const nextNonce = await safeService.getNextNonce(safeAddress)
 ```
 
 ### getBalances

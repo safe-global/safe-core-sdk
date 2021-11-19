@@ -1,9 +1,9 @@
 {
   "name": "@gnosis.pm/safe-ethers-adapters",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "description": "Safe Ethers Adapters",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Gnosis",
@@ -73,9 +73,9 @@
     }
   },
   "peerDependencies": {
-    "@ethersproject/bignumber": "^5.0.0",
-    "@ethersproject/abstract-signer": "^5.0.0",
     "@ethersproject/abstract-providers": "^5.0.0",
+    "@ethersproject/abstract-signer": "^5.0.0",
+    "@ethersproject/bignumber": "^5.0.0",
     "@ethersproject/properties": "^5.0.0"
   },
   "dependencies": {

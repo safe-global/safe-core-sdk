@@ -239,7 +239,7 @@ class SafeServiceClient implements SafeTransactionService {
    * Removes all delegates for a given Safe address.
    *
    * @param safeAddress - The Safe address
-   * @param signer - A Signer who is an owner of the Safe
+   * @param signer - A Signer that owns the Safe
    * @returns
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"

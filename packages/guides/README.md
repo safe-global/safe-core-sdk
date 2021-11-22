@@ -8,8 +8,7 @@ Read about the basics of Gnosis Safe and how it compares to other solutions [her
 
 The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) is a monorepo that contains software developer tools that allows interaction with the [Safe contracts](https://github.com/gnosis/safe-contracts) and the [Safe Transaction Service](https://github.com/gnosis/safe-transaction-service).
 
-In this guide we will be using the following packages to deploy new Safes, create transactions, collect the signatures off-chain and execute those transactions:
-
+In this guide we will use the following packages to deploy new Safes, create transactions, collect off-chain signatures and execute transactions:
 * **safe-core-sdk-types**
   
   Contains the types that are shared among the different packages inside the monorepo.

@@ -13,7 +13,7 @@ Software development kit that facilitates the interaction with the [Gnosis Safe 
 * [Safe Factory API Reference](#factory-api)
 * [Safe Core SDK API Reference](#sdk-api)
 
-## Installation <a name="installation"></a>
+## <a name="installation">Installation</a>
 
 Install the package with yarn or npm:
 
@@ -22,7 +22,7 @@ yarn install
 npm install
 ```
 
-## Build <a name="build"></a>
+## <a name="build">Build</a>
 
 Build the package with yarn or npm:
 
@@ -31,9 +31,9 @@ yarn build
 npm build
 ```
 
-## Getting Started <a name="getting-started"></a>
+## <a name="getting-started">Getting Started</a>
 
-The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from its owners and execute the transaction. However, using the Safe Core SDK alone will not allow to collect the signatures of the owners off-chain. To do this and be able to see and confirm the pending transactions showed in the [Gnosis Safe Web App](https://gnosis-safe.io/app/), it is recommended that you follow this other [guide](/packages/guides/integrating-the-safe-core-sdk.md) that covers the use of the Safe Core SDK combined with the Safe Service Client.
+The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Gnosis Safe Web App](https://gnosis-safe.io/app/), it is recommended that you follow this other [guide](/packages/guides/integrating-the-safe-core-sdk.md) that covers the use of the Safe Core SDK, combined with the Safe Service Client.
 
 ### 1. Set up the SDK using `Ethers` or `Web3`
 
@@ -71,7 +71,7 @@ The following steps show how to set up the Safe Core SDK, deploy a new Safe, cre
 
 ### 2. Deploy a new Safe
 
-To deploy a new Safe account instantiate the `SafeFactory` class and call the method `deploySafe` with the right params to configure the new Safe. This includes defining the list of owners and the threshold of the Safe. A Safe account with three owners and threshold equal three will be used as the starting point for this example but any Safe configuration is valid.
+To deploy a new Safe account instantiate the `SafeFactory` class and call the `deploySafe` method with the right params to configure the new Safe. This includes defining the list of owners and the threshold of the Safe. A Safe account with three owners and threshold equal three will be used as the starting point for this example but any Safe configuration is valid.
 
 ```js
 import { Safe, SafeFactory, SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
@@ -89,9 +89,9 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
 ```
 
-The method `deploySafe` executes a transaction from `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe. Check the method `deploySafe` in the [API Reference](#factory-api) for more details on additional configuration parameters.
+The `deploySafe` method executes a transaction from the `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe. Check the `deploySafe` method in the [API Reference](#factory-api) for more details on additional configuration parameters.
 
-Call the method `getAddress`, for example, to check the address of the newly deployed Safe.
+Call the `getAddress` method, for example, to check the address of the newly deployed Safe.
 
 ```js
 const newSafeAddress = safeSdk.getAddress()
@@ -105,7 +105,7 @@ import Safe from '@gnosis.pm/safe-core-sdk'
 const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterOwner1, safeAddress })
 ```
 
-Check the method `create` in the [API Reference](#sdk-api) for more details on additional configuration parameters.
+Check the `create` method in the [API Reference](#sdk-api) for more details on additional configuration parameters.
 
 ### 3. Create a Safe transaction
 
@@ -120,7 +120,7 @@ const transaction: SafeTransactionDataPartial = {
 const safeTransaction = await safeSdk.createTransaction(transaction)
 ```
 
-Check the method `createTransaction` in the [API Reference](#sdk-api) for additional details on creating MultiSend transactions.
+Check the `createTransaction` method in the [API Reference](#sdk-api) for additional details on creating MultiSend transactions.
 
 Before executing this transaction, it must be signed by the owners and this can be done off-chain or on-chain. In this example `owner1` will sign it off-chain, `owner2` will sign it on-chain and `owner3` will execute it (the executor also signs the transaction transparently).
 
@@ -159,7 +159,7 @@ await executeTxResponse.transactionResponse?.wait()
 
 All the signatures used to execute the transaction are now available at `safeTransaction.signatures`.
 
-## Safe Factory API Reference <a name="factory-api"></a>
+## <a name="factory-api">Safe Factory API Reference</a>
 
 ### create
 
@@ -171,19 +171,19 @@ import { SafeFactory } from '@gnosis.pm/safe-core-sdk'
 const safeFactory = await SafeFactory.create({ ethAdapter })
 ```
 
-* The property `isL1SafeMasterCopy`
+* The `isL1SafeMasterCopy` flag
 
   There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `GnosisSafe.sol` contract.
+  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
 
   ```js
   const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: true })
   ```
 
-* The property `contractNetworks`
+* The `contractNetworks` property
 
-  If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
+  If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
   import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
@@ -200,9 +200,9 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
   ```
 
-* The property `safeVersion`
+* The `safeVersion` property
 
-  The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will deploy. This string can take the values `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
+  The `SafeFactory` constructor also accepts the `safeVersion` property to specify the Safe contract version that will be deployed. This string can take the values `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
 
   ```js
   const safeVersion = 'X.Y.Z'
@@ -246,7 +246,7 @@ const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce }
 const safeSdk = await safeFactory.deploySafe(safeAccountConfig, safeDeploymentConfig)
 ```
 
-## Safe Core SDK API Reference <a name="sdk-api"></a>
+## <a name="sdk-api">Safe Core SDK API Reference</a>
 
 ### create
 
@@ -258,19 +258,19 @@ import Safe from '@gnosis.pm/safe-core-sdk'
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
 
-* The property `isL1SafeMasterCopy`
+* The `isL1SafeMasterCopy` flag
 
   There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `GnosisSafe.sol` contract.
+  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
 
   ```js
   const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
   ```
 
-* The property `contractNetworks`
+* The `contractNetworks` property
 
-  If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
+  If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
   import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
@@ -295,19 +295,19 @@ Returns a new instance of the Safe Core SDK connected to the `safeAddress`.
 const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 ```
 
-* The property `isL1SafeMasterCopy`
+* The `isL1SafeMasterCopy` flag
 
   There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `GnosisSafe.sol` contract.
+  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
 
   ```js
   const safeSdk = await Safe.connect({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
   ```
 
-* The property `contractNetworks`
+* The `contractNetworks` property
 
-  If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
+  If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
   const contractNetworks: ContractNetworksConfig = {
@@ -447,7 +447,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
 
 * **MultiSend transactions**
 
-  This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
+  This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the `createTransaction` method with the `SafeTransactionOptionalProps` object.
 
   ```js
   const transactions: MetaTransactionData[] = [

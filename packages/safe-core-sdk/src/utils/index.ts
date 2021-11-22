@@ -1,3 +1,4 @@
+import { MetaTransactionData, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from './constants'
 
 export function sameString(str1: string, str2: string): boolean {
@@ -14,4 +15,10 @@ function isSentinelAddress(address: string): boolean {
 
 export function isRestrictedAddress(address: string): boolean {
   return isZeroAddress(address) || isSentinelAddress(address)
+}
+
+export function isMetaTransactionArray(
+  safeTransactions: SafeTransactionDataPartial | MetaTransactionData[]
+): safeTransactions is MetaTransactionData[] {
+  return (safeTransactions as MetaTransactionData[])?.length !== undefined
 }

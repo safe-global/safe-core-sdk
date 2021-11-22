@@ -11,7 +11,7 @@ import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
-import { sameString } from './utils'
+import { isMetaTransactionArray, sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
@@ -263,15 +263,13 @@ class Safe {
     safeTransactions: SafeTransactionDataPartial | MetaTransactionData[],
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const isTxArray = Array.isArray(safeTransactions)
-    if (isTxArray && (safeTransactions as MetaTransactionData[]).length === 0) {
+    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length === 0) {
       throw new Error('Invalid empty array of transactions')
     }
-    const isMultisend = isTxArray && (safeTransactions as MetaTransactionData[]).length > 1
     let newTransaction: SafeTransactionDataPartial
-    if (isMultisend) {
+    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length > 1) {
       const multiSendData = encodeMultiSendData(
-        (safeTransactions as MetaTransactionData[]).map(standardizeMetaTransactionData)
+        safeTransactions.map(standardizeMetaTransactionData)
       )
       const multiSendTransaction = {
         ...options,
@@ -282,9 +280,9 @@ class Safe {
       }
       newTransaction = multiSendTransaction
     } else {
-      newTransaction = isTxArray
-        ? { ...options, ...(safeTransactions as MetaTransactionData[])[0] }
-        : (safeTransactions as SafeTransactionDataPartial)
+      newTransaction = isMetaTransactionArray(safeTransactions)
+        ? { ...options, ...safeTransactions[0] }
+        : safeTransactions
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,

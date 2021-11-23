@@ -1,7 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
-import { GnosisSafe } from '../../../typechain/src/web3-v1/GnosisSafe'
+import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/gnosis_safe'
+import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/web3-v1/v1.2.0/gnosis_safe'
+import { GnosisSafe as GnosisSafe_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
 import { TransactionOptions, Web3TransactionResult } from '../../utils/transactions/types'
 import GnosisSafeContract from './GnosisSafeContract'
 
@@ -16,8 +18,8 @@ function toTxResult(
   )
 }
 
-class GnosisSafeWeb3Contract implements GnosisSafeContract {
-  constructor(public contract: GnosisSafe) {}
+abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
+  constructor(public contract: GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0) {}
 
   async getVersion(): Promise<string> {
     return this.contract.methods.VERSION().call()
@@ -69,13 +71,9 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
     return toTxResult(txResponse, options)
   }
 
-  async getModules(): Promise<string[]> {
-    return this.contract.methods.getModules().call()
-  }
+  abstract getModules(): Promise<string[]>
 
-  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.contract.methods.isModuleEnabled(moduleAddress).call()
-  }
+  abstract isModuleEnabled(moduleAddress: string): Promise<boolean>
 
   async execTransaction(
     safeTransaction: SafeTransaction,
@@ -111,4 +109,4 @@ class GnosisSafeWeb3Contract implements GnosisSafeContract {
   }
 }
 
-export default GnosisSafeWeb3Contract
+export default GnosisSafeContractWeb3

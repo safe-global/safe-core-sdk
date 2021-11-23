@@ -37,7 +37,7 @@ describe('Transactions creation', () => {
   })
 
   describe('createTransaction', async () => {
-    it('should create a transaction', async () => {
+    it('should create a single transaction', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
@@ -68,6 +68,113 @@ describe('Transactions creation', () => {
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
       chai.expect(tx.data.safeTxGas).to.be.eq(666)
+    })
+
+    it('should create a single transaction when passing a transaction array with length=1', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const metaTransactions: MetaTransactionData[] = [
+        {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+      ]
+      const tx = await safeSdk.createTransaction(metaTransactions)
+      chai.expect(tx.data.to).to.be.eq(account2.address)
+      chai.expect(tx.data.value).to.be.eq('500000000000000000')
+      chai.expect(tx.data.data).to.be.eq('0x')
+    })
+
+    it('should create a single transaction when passing a transaction array with length=1 and options', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const metaTransactions: MetaTransactionData[] = [
+        {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+      ]
+      const options: SafeTransactionOptionalProps = {
+        baseGas: 111,
+        gasPrice: 222,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx = await safeSdk.createTransaction(metaTransactions, options)
+      chai.expect(tx.data.to).to.be.eq(account2.address)
+      chai.expect(tx.data.value).to.be.eq('500000000000000000')
+      chai.expect(tx.data.data).to.be.eq('0x')
+      chai.expect(tx.data.baseGas).to.be.eq(111)
+      chai.expect(tx.data.gasPrice).to.be.eq(222)
+      chai.expect(tx.data.gasToken).to.be.eq('0x333')
+      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
+      chai.expect(tx.data.nonce).to.be.eq(555)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+    })
+
+    it('should fail when creating a MultiSend transaction passing a transaction array with length=0', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const txs: MetaTransactionData[] = []
+      const tx = safeSdk.createTransaction(txs)
+      await chai.expect(tx).to.be.rejectedWith('Invalid empty array of transactions')
+    })
+
+    it('should create a MultiSend transaction', async () => {
+      const { accounts, contractNetworks, erc20Mintable, chainId } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const txs: MetaTransactionData[] = [
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: erc20Mintable.interface.encodeFunctionData('transfer', [
+            account2.address,
+            '1100000000000000000' // 1.1 ERC20
+          ])
+        },
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: erc20Mintable.interface.encodeFunctionData('transfer', [
+            account2.address,
+            '100000000000000000' // 0.1 ERC20
+          ])
+        }
+      ]
+      const multiSendTx = await safeSdk.createTransaction(txs)
+      chai.expect(multiSendTx.data.to).to.be.eq(contractNetworks[chainId].multiSendAddress)
     })
 
     it('should create a MultiSend transaction with options', async () => {

@@ -1,9 +1,10 @@
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
-import { GnosisSafeProxyFactory } from '../../../typechain/src/web3-v1/GnosisSafeProxyFactory'
+import { ProxyFactory as ProxyFactory_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/proxy_factory'
+import { ProxyFactory as ProxyFactory_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/proxy_factory'
 import GnosisSafeProxyFactoryContract, { CreateProxyProps } from './GnosisSafeProxyFactoryContract'
 
 class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContract {
-  constructor(public contract: GnosisSafeProxyFactory) {}
+  constructor(public contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1) {}
 
   getAddress(): string {
     return this.contract.options.address

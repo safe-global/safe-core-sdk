@@ -2,7 +2,6 @@
 
 [![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters)
 [![GitHub](https://img.shields.io/github/license/gnosis/safe-core-sdk)](https://github.com/gnosis/safe-core-sdk/blob/main/LICENSE.md)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/safe-core-sdk/badge.svg?branch=main)](https://coveralls.io/github/gnosis/safe-core-sdk?branch=main)
 
 [Ethers](https://docs.ethers.io/v5/single-page/) adapter that facilitates the interaction with the [Gnosis Safe Services](https://github.com/gnosis/safe-transaction-service)
 

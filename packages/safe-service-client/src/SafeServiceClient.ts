@@ -203,7 +203,6 @@ class SafeServiceClient implements SafeTransactionService {
   /**
    * Adds a new delegate for a given Safe address.
    *
-   * @param safeAddress - The Safe address
    * @param delegateConfig - The configuration of the new delegate
    * @returns
    * @throws "Invalid Safe address"
@@ -213,8 +212,7 @@ class SafeServiceClient implements SafeTransactionService {
    * @throws "Safe=<safe_address> does not exist or it's still not indexed"
    * @throws "Signing owner is not an owner of the Safe"
    */
-  async addSafeDelegate(delegateConfig: SafeDelegateConfig): Promise<SafeDelegate> {
-    const { safe, delegate, label, signer } = delegateConfig
+  async addSafeDelegate({ safe, delegate, label, signer }: SafeDelegateConfig): Promise<SafeDelegate> {
     if (safe === '') {
       throw new Error('Invalid Safe address')
     }
@@ -241,6 +239,7 @@ class SafeServiceClient implements SafeTransactionService {
    * Removes all delegates for a given Safe address.
    *
    * @param safeAddress - The Safe address
+   * @param signer - A Signer that owns the Safe
    * @returns
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
@@ -264,7 +263,6 @@ class SafeServiceClient implements SafeTransactionService {
   /**
    * Removes a delegate for a given Safe address.
    *
-   * @param safeAddress - The Safe address
    * @param delegateConfig - The configuration for the delegate that will be removed
    * @returns
    * @throws "Invalid Safe address"
@@ -273,8 +271,7 @@ class SafeServiceClient implements SafeTransactionService {
    * @throws "Signing owner is not an owner of the Safe"
    * @throws "Not found"
    */
-  async removeSafeDelegate(delegateConfig: SafeDelegateDeleteConfig): Promise<void> {
-    const { safe, delegate, signer } = delegateConfig
+  async removeSafeDelegate({ safe, delegate, signer }: SafeDelegateDeleteConfig): Promise<void> {
     if (safe === '') {
       throw new Error('Invalid Safe address')
     }
@@ -343,10 +340,7 @@ class SafeServiceClient implements SafeTransactionService {
   /**
    * Creates a new multi-signature transaction with its confirmations and stores it in the Safe Transaction Service.
    *
-   * @param safeAddress - The address of the Safe proposing the transaction
-   * @param transaction - The transaction that is proposed
-   * @param safeTxHash - The hash of the Safe transaction
-   * @param signature - The signature of an owner or delegate of the specified Safe
+   * @param proposeTransactionConfig - The configuration of the proposed transaction
    * @returns The hash of the Safe transaction proposed
    * @throws "Invalid Safe address"
    * @throws "Invalid safeTxHash"

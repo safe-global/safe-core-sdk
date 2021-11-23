@@ -1,4 +1,4 @@
-import { ContractNetworksConfig } from './configuration/contracts'
+import { SafeVersion } from './contracts/config'
 import EthAdapter, { EthAdapterTransaction } from './ethereumLibs/EthAdapter'
 import EthersAdapter, { EthersAdapterConfig } from './ethereumLibs/EthersAdapter'
 import Web3Adapter, { Web3AdapterConfig } from './ethereumLibs/Web3Adapter'
@@ -14,6 +14,7 @@ import SafeFactory, {
   SafeDeploymentConfig,
   SafeFactoryConfig
 } from './safeFactory'
+import { ContractNetworksConfig } from './types'
 import EthSignSignature from './utils/signatures/SafeSignature'
 import {
   SafeTransactionOptionalProps,
@@ -23,6 +24,7 @@ import {
 
 export default Safe
 export {
+  SafeVersion,
   SafeFactory,
   SafeFactoryConfig,
   SafeAccountConfig,

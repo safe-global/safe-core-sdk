@@ -46,7 +46,7 @@ describe('Safe contracts manager', () => {
             safeAddress: safe.address
           })
         )
-        .to.be.rejectedWith('Safe contracts not found in the current network')
+        .to.be.rejectedWith('Invalid Multi Send contract')
     })
 
     it('should fail if Safe Proxy contract is not deployed in the current network', async () => {
@@ -65,7 +65,7 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
-      const { safe, accounts, chainId, contractNetworks } = await setupTests()
+      const { safe, accounts, chainId } = await setupTests()
       const customContractNetworks: ContractNetworksConfig = {
         [chainId]: {
           multiSendAddress: ZERO_ADDRESS,
@@ -83,7 +83,7 @@ describe('Safe contracts manager', () => {
             contractNetworks: customContractNetworks
           })
         )
-        .to.be.rejectedWith('MultiSend contract is not deployed in the current network')
+        .to.be.rejectedWith('Multi Send contract is not deployed in the current network')
     })
 
     it('should set the MultiSend contract available in the current network', async () => {

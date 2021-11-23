@@ -11,7 +11,7 @@ import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
-import { sameString } from './utils'
+import { isMetaTransactionArray, sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
@@ -252,6 +252,7 @@ class Safe {
    *
    * @param safeTransactions - The list of transactions to process
    * @returns The Safe transaction
+   * @throws "Invalid empty array of transactions"
    */
   async createTransaction(safeTransactions: SafeTransactionDataPartial): Promise<SafeTransaction>
   async createTransaction(
@@ -260,9 +261,13 @@ class Safe {
   ): Promise<SafeTransaction>
   async createTransaction(
     safeTransactions: SafeTransactionDataPartial | MetaTransactionData[],
-    options?: SafeTransactionDataPartial
+    options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    if (safeTransactions instanceof Array) {
+    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length === 0) {
+      throw new Error('Invalid empty array of transactions')
+    }
+    let newTransaction: SafeTransactionDataPartial
+    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length > 1) {
       const multiSendData = encodeMultiSendData(
         safeTransactions.map(standardizeMetaTransactionData)
       )
@@ -273,17 +278,16 @@ class Safe {
         data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
         operation: OperationType.DelegateCall
       }
-      const standardizedTransaction = await standardizeSafeTransactionData(
-        this.#contractManager.safeContract,
-        this.#ethAdapter,
-        multiSendTransaction
-      )
-      return new EthSafeTransaction(standardizedTransaction)
+      newTransaction = multiSendTransaction
+    } else {
+      newTransaction = isMetaTransactionArray(safeTransactions)
+        ? { ...options, ...safeTransactions[0] }
+        : safeTransactions
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
       this.#ethAdapter,
-      safeTransactions
+      newTransaction
     )
     return new EthSafeTransaction(standardizedTransaction)
   }

@@ -12,7 +12,7 @@
   8. [Execute the transaction](#execute-transaction)
   9. [Interface checks](#interface-checks)
 
-## 1. Install the dependencies <a name="install-dependencies"></a>
+## <a name="install-dependencies">1. Install the dependencies</a>
 
 To integrate the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) into your Dapp or script you will need to install these dependencies:
 
@@ -22,7 +22,7 @@ To integrate the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) into y
 @gnosis.pm/safe-service-client
 ```
 
-## 2. Initialize the SDK’s <a name="initialize-sdks"></a>
+## <a name="initialize-sdks">2. Initialize the SDK’s</a>
 
 ### Initialize the Safe Service Client
 
@@ -117,7 +117,7 @@ const safeVersion = 'X.Y.Z'
 const safeFactory = await SafeFactory.create({ ethAdapter, safeVersion })
 ```
 
-## 3. Deploy a new Safe <a name="deploy-safe"></a>
+## <a name="deploy-safe">3. Deploy a new Safe</a>
 
 The Safe Core SDK library allows the deployment of new Safes using the `safeFactory` instance we just created.
 
@@ -136,7 +136,7 @@ const safeSdk = await safeFactory.deploySafe(safeAccountConfig)
 
 Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used.
 
-## 4. Create a transaction <a name="create-transaction"></a>
+## <a name="create-transaction">4. Create a transaction</a>
 
 The Safe Core SDK supports the execution of single Safe transactions but also MultiSend transactions. We can create a transaction object by calling the method `createTransaction` in our `Safe` instance.
 
@@ -206,7 +206,7 @@ We can specify the `nonce` of our Safe transaction as long as it is not lower th
 const nonce = await safeService.getNextNonce(safeAddress)
 ```
 
-## 5. Propose the transaction to the service <a name="propose-transaction"></a>
+## <a name="propose-transaction">5. Propose the transaction to the service</a>
 
 Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe Service Client instance and pass an object with the properties:
 - `safeAddress`: The Safe address.
@@ -225,7 +225,7 @@ await safeService.proposeTransaction({
 })
 ```
 
-## 6. Get the transaction from the service <a name="get-transaction"></a>
+## <a name="get-transaction">6. Get the transaction from the service</a>
 
 The transaction is then available on the Safe Transaction Service and the owners can retrieve it by finding it in the pending transaction list, or by getting its Safe transaction hash.
 
@@ -286,7 +286,7 @@ type SafeMultisigTransactionResponse = {
 }
 ```
 
-## 7. Confirm/reject the transaction <a name="confirm-transaction"></a>
+## <a name="confirm-transaction">7. Confirm/reject the transaction</a>
 
 The owners of the Safe can now sign the transaction obtained from the Safe Transaction Service by calling the method `signTransactionHash` from the Safe Core SDK to generate the signature and by calling the method `confirmTransaction` from the Safe Service Client to add the signature to the service.
 
@@ -298,7 +298,7 @@ let signature = await safeSdk.signTransactionHash(hash)
 await safeService.confirmTransaction(hash, signature.data)
 ```
 
-## 8. Execute the transaction <a name="execute-transaction"></a>
+## <a name="execute-transaction">8. Execute the transaction</a>
 
 Once there are enough confirmations in the service the transaction is ready to be executed. The account that will execute the transaction needs to retrieve it from the service with all the required signatures and call the method `executeTransaction` from the Safe Core SDK.
 
@@ -331,7 +331,7 @@ const executeTxResponse = await safeSdk.executeTransaction(safeTransaction)
 const receipt = executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
 ```
 
-## 9. Interface checks <a name="interface-checks"></a>
+## <a name="interface-checks">9. Interface checks</a>
 
 During the process of collecting the signatures/executing transactions, some useful checks can be made in the interface to display or hide a button to confirm or execute the transaction depending on the current number of confirmations, the address of accounts that confirmed the transaction and the Safe threshold:
 

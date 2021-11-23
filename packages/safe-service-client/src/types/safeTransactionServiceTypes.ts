@@ -287,7 +287,7 @@ export type EthereumTxResponse = {
   readonly from: string
 }
 
-export type EthereumTxWithTransfersResponse = {
+export type EthereumTxWithTransfersResponse = EthereumTxResponse & {
   readonly txType?: 'ETHEREUM_TRANSACTION'
   readonly transfers: string
 }

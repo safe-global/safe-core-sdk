@@ -3501,10 +3501,10 @@
     lodash "^4.17.15"
     ts-essentials "^7.0.1"
 
-"@typechain/web3-v1@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@typechain/web3-v1/-/web3-v1-4.0.0.tgz#938f745579c4c4d3991f806437259308d08498f1"
-  integrity sha512-UpUV+BB9Gcmmhw3P5lCawSOai8ivbRHglOqPnSCLau/w5lbw6mA5nAR2eI2tLfaC6vJoN5YDUYh+pvX5aXrt8A==
+"@typechain/web3-v1@^3.0.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@typechain/web3-v1/-/web3-v1-3.1.0.tgz#3124cd25589dad93c5115acb87c65ea708d89ab3"
+  integrity sha512-pZG8Kd+sm5DzxZsBn/4SVBb1tu3k6Kh5K6iUiqKffuTJoMHGkDpJLLC+UTGPMs3+8q+0tAGwgGFDFdaCjAkqFQ==
   dependencies:
     lodash "^4.17.15"
     ts-essentials "^7.0.1"

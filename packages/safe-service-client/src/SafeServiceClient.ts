@@ -1,6 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import SafeTransactionService from './SafeTransactionService'
 import {
+  AllTransactionsListResponse,
   MasterCopyResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -454,6 +455,25 @@ class SafeServiceClient implements SafeTransactionService {
       url: `${
         this.#txServiceBaseUrl
       }/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Returns a paginated list of transactions for a Safe. The list has different structures depending on the transaction type
+   *
+   * @param safeAddress - The Safe address
+   * @returns The list of transactions waiting for the confirmation of the Safe owners
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
+   */
+  async getAllTransactions(safeAddress: string): Promise<AllTransactionsListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/all-transactions/`,
       method: HttpMethod.Get
     })
   }

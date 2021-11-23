@@ -18,15 +18,13 @@ const safeContractsPath = '../../node_modules/@gnosis.pm/safe-deployments/dist/a
 const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/gnosis_safe.json`,
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
-  `${safeContractsPath}/v1.3.0/multi_send.json`,
+  `${safeContractsPath}/v1.3.0/multi_send.json`
 ].join(' ')
-const safeContracts_V1_2_0 = [
-  `${safeContractsPath}/v1.2.0/gnosis_safe.json`,
-].join(' ')
+const safeContracts_V1_2_0 = [`${safeContractsPath}/v1.2.0/gnosis_safe.json`].join(' ')
 const safeContracts_V1_1_1 = [
   `${safeContractsPath}/v1.1.1/gnosis_safe.json`,
   `${safeContractsPath}/v1.1.1/proxy_factory.json`,
-  `${safeContractsPath}/v1.1.1/multi_send.json`,
+  `${safeContractsPath}/v1.1.1/multi_send.json`
 ].join(' ')
 
 // Won't be included in dist/ folder
@@ -42,7 +40,11 @@ const testContracts = [
 execSync(`rimraf ${outDirSrc} ${outDirTests}`)
 
 // Generate Typechain files
-function generateTypechainFiles(typechainVersion: string, outDir: string, contractList: string): void {
+function generateTypechainFiles(
+  typechainVersion: string,
+  outDir: string,
+  contractList: string
+): void {
   execSync(`typechain --target ${typechainVersion} --out-dir ${outDir} ${contractList}`)
   console.log(`Generated typechain ${typechainVersion} at ${outDir}`)
 }
@@ -56,7 +58,7 @@ function moveTypechainFiles(inDir: string, outDir: string): void {
     if (!existsSync(`${outDir}`)) {
       mkdirSync(`${outDir}`, { recursive: true })
     }
-    files.forEach(file => {
+    files.forEach((file) => {
       const pattern = /.d.ts/
       if (!file.match(pattern)) {
         return
@@ -73,17 +75,35 @@ const ethersV5 = 'ethers-v5'
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/v1.3.0`, safeContracts_V1_3_0)
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/v1.2.0`, safeContracts_V1_2_0)
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/v1.1.1`, safeContracts_V1_1_1)
-moveTypechainFiles(`${typeChainDirectorySrcPath}${web3V1}/v1.3.0`, `${typeChainDirectoryBuildPath}${web3V1}/v1.3.0`)
-moveTypechainFiles(`${typeChainDirectorySrcPath}${web3V1}/v1.2.0`, `${typeChainDirectoryBuildPath}${web3V1}/v1.2.0`)
-moveTypechainFiles(`${typeChainDirectorySrcPath}${web3V1}/v1.1.1`, `${typeChainDirectoryBuildPath}${web3V1}/v1.1.1`)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${web3V1}/v1.3.0`,
+  `${typeChainDirectoryBuildPath}${web3V1}/v1.3.0`
+)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${web3V1}/v1.2.0`,
+  `${typeChainDirectoryBuildPath}${web3V1}/v1.2.0`
+)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${web3V1}/v1.1.1`,
+  `${typeChainDirectoryBuildPath}${web3V1}/v1.1.1`
+)
 
 // Src: Ethers V5 types
 generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/v1.3.0`, safeContracts_V1_3_0)
 generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/v1.2.0`, safeContracts_V1_2_0)
 generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/v1.1.1`, safeContracts_V1_1_1)
-moveTypechainFiles(`${typeChainDirectorySrcPath}${ethersV5}/v1.3.0`, `${typeChainDirectoryBuildPath}${ethersV5}/v1.3.0`)
-moveTypechainFiles(`${typeChainDirectorySrcPath}${ethersV5}/v1.2.0`, `${typeChainDirectoryBuildPath}${ethersV5}/v1.2.0`)
-moveTypechainFiles(`${typeChainDirectorySrcPath}${ethersV5}/v1.1.1`, `${typeChainDirectoryBuildPath}${ethersV5}/v1.1.1`)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${ethersV5}/v1.3.0`,
+  `${typeChainDirectoryBuildPath}${ethersV5}/v1.3.0`
+)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${ethersV5}/v1.2.0`,
+  `${typeChainDirectoryBuildPath}${ethersV5}/v1.2.0`
+)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${ethersV5}/v1.1.1`,
+  `${typeChainDirectoryBuildPath}${ethersV5}/v1.1.1`
+)
 
 // Tests: Ethers V5 types
 generateTypechainFiles(ethersV5, `${outDirTests}${ethersV5}`, testContracts)

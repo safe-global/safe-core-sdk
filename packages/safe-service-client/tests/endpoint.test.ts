@@ -318,6 +318,18 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getAllTransactions', async () => {
+      await chai
+        .expect(serviceSdk.getAllTransactions(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        method: 'get'
+      })
+    })
+
     it('getBalances', async () => {
       await chai
         .expect(serviceSdk.getBalances(safeAddress))

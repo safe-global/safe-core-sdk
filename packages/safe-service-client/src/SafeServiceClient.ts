@@ -1,6 +1,8 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import SafeTransactionService from './SafeTransactionService'
 import {
+  AllTransactionsListResponse,
+  AllTransactionsOptions,
   MasterCopyResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -212,7 +214,12 @@ class SafeServiceClient implements SafeTransactionService {
    * @throws "Safe=<safe_address> does not exist or it's still not indexed"
    * @throws "Signing owner is not an owner of the Safe"
    */
-  async addSafeDelegate({ safe, delegate, label, signer }: SafeDelegateConfig): Promise<SafeDelegate> {
+  async addSafeDelegate({
+    safe,
+    delegate,
+    label,
+    signer
+  }: SafeDelegateConfig): Promise<SafeDelegate> {
     if (safe === '') {
       throw new Error('Invalid Safe address')
     }
@@ -448,6 +455,39 @@ class SafeServiceClient implements SafeTransactionService {
       url: `${
         this.#txServiceBaseUrl
       }/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Returns a paginated list of transactions for a Safe. The list has different structures depending on the transaction type
+   *
+   * @param safeAddress - The Safe address
+   * @returns The list of transactions waiting for the confirmation of the Safe owners
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
+   */
+  async getAllTransactions(
+    safeAddress: string,
+    options?: AllTransactionsOptions
+  ): Promise<AllTransactionsListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
+    const url = new URL(`${this.#txServiceBaseUrl}/safes/${safeAddress}/all-transactions/`)
+
+    const trusted = options?.trusted?.toString() || 'true'
+    url.searchParams.set('trusted', trusted)
+
+    const queued = options?.queued?.toString() || 'true'
+    url.searchParams.set('queued', queued)
+
+    const executed = options?.executed?.toString() || 'false'
+    url.searchParams.set('executed', executed)
+
+    return sendRequest({
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }

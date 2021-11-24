@@ -1,4 +1,4 @@
-import { SafeVersion, SAFE_BASE_VERSION } from '../contracts/config'
+import { SafeVersion, SAFE_LAST_VERSION } from '../contracts/config'
 import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
 import MultiSendContract from '../contracts/MultiSend/MultiSendContract'
 import { SafeConfig } from '../Safe'
@@ -29,7 +29,7 @@ class ContractManager {
   }: SafeConfig): Promise<void> {
     const chainId = await ethAdapter.getChainId()
     const temporarySafeContract = ethAdapter.getSafeContract({
-      safeVersion: SAFE_BASE_VERSION,
+      safeVersion: SAFE_LAST_VERSION,
       chainId,
       isL1SafeMasterCopy,
       customContractAddress: safeAddress

@@ -6,6 +6,7 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
+import semverSatisfies from 'semver/functions/satisfies'
 import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
 import EthAdapter from '../../ethereumLibs/EthAdapter'
 import { ZERO_ADDRESS } from '../constants'
@@ -37,9 +38,12 @@ export async function standardizeSafeTransactionData(
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
     nonce: tx.nonce ?? (await safeContract.getNonce())
   }
-  const safeTxGas =
-    tx.safeTxGas ??
-    (await estimateTxGas(
+  let safeTxGas: number
+  const safeVersion = await safeContract.getVersion()
+  if (semverSatisfies(safeVersion, '>=1.3.0')) {
+    safeTxGas = 0
+  } else {
+    safeTxGas = (tx.safeTxGas) ?? (await estimateTxGas(
       safeContract,
       ethAdapter,
       standardizedTxs.to,
@@ -47,6 +51,7 @@ export async function standardizeSafeTransactionData(
       standardizedTxs.data,
       standardizedTxs.operation
     ))
+  }
   return {
     ...standardizedTxs,
     safeTxGas

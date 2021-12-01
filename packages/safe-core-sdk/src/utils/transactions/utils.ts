@@ -43,14 +43,16 @@ export async function standardizeSafeTransactionData(
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     safeTxGas = 0
   } else {
-    safeTxGas = (tx.safeTxGas) ?? (await estimateTxGas(
-      safeContract,
-      ethAdapter,
-      standardizedTxs.to,
-      standardizedTxs.value,
-      standardizedTxs.data,
-      standardizedTxs.operation
-    ))
+    safeTxGas =
+      tx.safeTxGas ??
+      (await estimateTxGas(
+        safeContract,
+        ethAdapter,
+        standardizedTxs.to,
+        standardizedTxs.value,
+        standardizedTxs.data,
+        standardizedTxs.operation
+      ))
   }
   return {
     ...standardizedTxs,

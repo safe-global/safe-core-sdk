@@ -2,6 +2,7 @@ import { SafeVersion } from './contracts/config'
 import EthAdapter, { EthAdapterTransaction } from './ethereumLibs/EthAdapter'
 import EthersAdapter, { EthersAdapterConfig } from './ethereumLibs/EthersAdapter'
 import Web3Adapter, { Web3AdapterConfig } from './ethereumLibs/Web3Adapter'
+import ContractManager from './managers/contractManager'
 import Safe, {
   AddOwnerTxParams,
   ConnectSafeConfig,
@@ -25,6 +26,7 @@ import { standardizeSafeTransactionData } from './utils/transactions/utils'
 
 export default Safe
 export {
+  ContractManager,
   SafeVersion,
   SafeFactory,
   SafeFactoryConfig,

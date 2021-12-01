@@ -21,6 +21,7 @@ import {
   TransactionOptions,
   TransactionResult
 } from './utils/transactions/types'
+import { standardizeSafeTransactionData } from './utils/transactions/utils'
 
 export default Safe
 export {
@@ -44,5 +45,6 @@ export {
   AddOwnerTxParams,
   RemoveOwnerTxParams,
   SwapOwnerTxParams,
-  EthSignSignature
+  EthSignSignature,
+  standardizeSafeTransactionData
 }

@@ -6,10 +6,10 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import semverSatisfies from 'semver/functions/satisfies'
 import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
 import EthAdapter from '../../ethereumLibs/EthAdapter'
 import { ZERO_ADDRESS } from '../constants'
+import { FEATURES, hasFeature } from '../safeVersions'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
@@ -40,7 +40,7 @@ export async function standardizeSafeTransactionData(
   }
   let safeTxGas: number
   const safeVersion = await safeContract.getVersion()
-  if (semverSatisfies(safeVersion, '>=1.3.0')) {
+  if (hasFeature(FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)) {
     safeTxGas = 0
   } else {
     safeTxGas =

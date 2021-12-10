@@ -236,7 +236,7 @@ describe('Endpoint tests', () => {
         data: '0x',
         value: '123456789',
         operation: 1,
-        safeTxGas: 123,
+        safeTxGas: 0,
         baseGas: 0,
         gasPrice: 0,
         gasToken: '0x0000000000000000000000000000000000000000',

@@ -147,6 +147,15 @@ class Safe {
   }
 
   /**
+   * Returns the ContractManager
+   *
+   * @returns The current ContractManager
+   * */
+  getContractManager(): ContractManager {
+    return this.#contractManager
+  }
+
+  /**
    * Returns the current EthAdapter.
    *
    * @returns The current EthAdapter

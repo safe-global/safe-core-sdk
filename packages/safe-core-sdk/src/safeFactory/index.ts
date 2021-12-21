@@ -143,10 +143,12 @@ class SafeFactory {
     const chainId = await this.#ethAdapter.getChainId()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
+    const saltNonce =
+      safeDeploymentConfig?.saltNonce ?? Date.now() * 1000 + Math.floor(Math.random() * 1000)
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
       safeMasterCopyAddress: this.#gnosisSafeContract.getAddress(),
       initializer,
-      saltNonce: safeDeploymentConfig?.saltNonce,
+      saltNonce,
       options: { from: signerAddress }
     })
     const safeContract = await this.#ethAdapter.getSafeContract({

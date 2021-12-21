@@ -25,4 +25,4 @@ describe('getNextNonce', () => {
     const nextNonce = await serviceSdk.getNextNonce(safeAddress)
     chai.expect(nextNonce).to.be.equal(0)
   })
-})  
+})

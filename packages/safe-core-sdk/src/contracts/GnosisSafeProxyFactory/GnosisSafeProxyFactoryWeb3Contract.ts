@@ -16,16 +16,10 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     saltNonce,
     options
   }: CreateProxyProps): Promise<string> {
-    let txResponse: PromiEvent<TransactionReceipt>
-    if (saltNonce) {
-      txResponse = this.contract.methods
-        .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce)
-        .send(options)
-    } else {
-      txResponse = this.contract.methods
-        .createProxy(safeMasterCopyAddress, initializer)
-        .send(options)
-    }
+    const txResponse = this.contract.methods
+      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce)
+      .send(options)
+
     const txResult: TransactionReceipt = await new Promise((resolve, reject) =>
       txResponse.once('receipt', (receipt: TransactionReceipt) => resolve(receipt)).catch(reject)
     )

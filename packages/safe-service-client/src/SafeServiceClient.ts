@@ -460,13 +460,12 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
-   * Returns a paginated list of transactions for a Safe. The list has different structures depending on the transaction type
+   * Returns a list of transactions for a Safe. The list has different structures depending on the transaction type
    *
    * @param safeAddress - The Safe address
    * @returns The list of transactions waiting for the confirmation of the Safe owners
    * @throws "Invalid Safe address"
-   * @throws "Invalid data"
-   * @throws "Invalid ethereum address"
+   * @throws "Checksum address validation failed"
    */
   async getAllTransactions(
     safeAddress: string,

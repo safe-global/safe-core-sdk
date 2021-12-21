@@ -213,6 +213,26 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 )
 ```
 
+### getAllTransactions
+
+Returns a list of transactions for a Safe. The list has different structures depending on the transaction type.
+
+```js
+const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(safeAddress)
+```
+
+```js
+const allTxsOptions: AllTransactionsOptions = {
+  executed,
+  queued,
+  trusted
+}
+const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(
+  safeAddress,
+  allTxsOptions
+)
+```
+
 ### getNextNonce
 
 Returns the right nonce to propose a new transaction right after the last pending transaction.

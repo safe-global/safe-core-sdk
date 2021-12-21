@@ -9,6 +9,7 @@ import {
 import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
 import EthAdapter from '../../ethereumLibs/EthAdapter'
 import { ZERO_ADDRESS } from '../constants'
+import { FEATURES, hasFeature } from '../safeVersions'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
@@ -37,16 +38,22 @@ export async function standardizeSafeTransactionData(
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
     nonce: tx.nonce ?? (await safeContract.getNonce())
   }
-  const safeTxGas =
-    tx.safeTxGas ??
-    (await estimateTxGas(
-      safeContract,
-      ethAdapter,
-      standardizedTxs.to,
-      standardizedTxs.value,
-      standardizedTxs.data,
-      standardizedTxs.operation
-    ))
+  let safeTxGas: number
+  const safeVersion = await safeContract.getVersion()
+  if (hasFeature(FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)) {
+    safeTxGas = 0
+  } else {
+    safeTxGas =
+      tx.safeTxGas ??
+      (await estimateTxGas(
+        safeContract,
+        ethAdapter,
+        standardizedTxs.to,
+        standardizedTxs.value,
+        standardizedTxs.data,
+        standardizedTxs.operation
+      ))
+  }
   return {
     ...standardizedTxs,
     safeTxGas

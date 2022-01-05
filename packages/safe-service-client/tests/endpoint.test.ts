@@ -236,7 +236,7 @@ describe('Endpoint tests', () => {
         data: '0x',
         value: '123456789',
         operation: 1,
-        safeTxGas: 123,
+        safeTxGas: 0,
         baseGas: 0,
         gasPrice: 0,
         gasToken: '0x0000000000000000000000000000000000000000',
@@ -314,6 +314,18 @@ describe('Endpoint tests', () => {
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
         )}/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,
+        method: 'get'
+      })
+    })
+
+    it('getAllTransactions', async () => {
+      await chai
+        .expect(serviceSdk.getAllTransactions(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
         method: 'get'
       })
     })

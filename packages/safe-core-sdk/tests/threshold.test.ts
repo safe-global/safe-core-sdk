@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
+import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
 import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
 import {
   getFactory,
@@ -106,7 +107,7 @@ describe('Safe Threshold', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
     })
 
     it('should change the threshold', async () => {

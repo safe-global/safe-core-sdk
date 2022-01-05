@@ -3,7 +3,7 @@ import { TransactionOptions } from '../../utils/transactions/types'
 export interface CreateProxyProps {
   safeMasterCopyAddress: string
   initializer: string
-  saltNonce?: number
+  saltNonce: number
   options?: TransactionOptions
 }
 

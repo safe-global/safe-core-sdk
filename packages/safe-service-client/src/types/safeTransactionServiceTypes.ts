@@ -263,3 +263,48 @@ export type TokenInfoListResponse = {
   readonly previous?: string
   readonly results: TokenInfoListResponse[]
 }
+
+export type TransferWithTokenInfoResponse = TransferResponse & {
+  readonly tokenInfo: TokenInfoResponse
+}
+
+export type SafeModuleTransactionWithTransfersResponse = SafeModuleTransaction & {
+  readonly txType?: 'MODULE_TRANSACTION'
+  readonly transfers: TransferWithTokenInfoResponse[]
+}
+
+export type SafeMultisigTransactionWithTransfersResponse = SafeMultisigTransactionResponse & {
+  readonly txType?: 'MULTISIG_TRANSACTION'
+  readonly transfers: TransferWithTokenInfoResponse[]
+}
+
+export type EthereumTxResponse = {
+  readonly executionDate: string
+  readonly to: string
+  readonly data: string
+  readonly txHash: string
+  readonly blockNumber?: number
+  readonly from: string
+}
+
+export type EthereumTxWithTransfersResponse = EthereumTxResponse & {
+  readonly txType?: 'ETHEREUM_TRANSACTION'
+  readonly transfers: TransferWithTokenInfoResponse[]
+}
+
+export type AllTransactionsOptions = {
+  executed?: boolean
+  queued?: boolean
+  trusted?: boolean
+}
+
+export type AllTransactionsListResponse = {
+  readonly count: number
+  readonly next?: string
+  readonly previous?: string
+  readonly results: Array<
+    | SafeModuleTransactionWithTransfersResponse
+    | SafeMultisigTransactionWithTransfersResponse
+    | EthereumTxWithTransfersResponse
+  >
+}

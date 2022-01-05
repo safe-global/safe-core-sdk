@@ -2,7 +2,13 @@ import { MetaTransactionData, SafeTransactionDataPartial } from '@gnosis.pm/safe
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
+import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
+import Safe, {
+  ContractNetworksConfig,
+  SafeTransactionOptionalProps,
+  standardizeSafeTransactionData
+} from '../src'
+import { itif } from './utils/helpers'
 import {
   getERC20Mintable,
   getFactory,
@@ -36,6 +42,88 @@ describe('Transactions creation', () => {
     }
   })
 
+  describe('standardizeSafeTransactionData', async () => {
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should return a transaction with safeTxGas=0 if safeVersion>=1.3.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const safe = await getSafeWithOwners([account1.address])
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const txDataPartial: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '0',
+          data: '0x'
+        }
+        const safeTxData = await standardizeSafeTransactionData(
+          safeSdk.getContractManager().safeContract,
+          ethAdapter,
+          txDataPartial
+        )
+        chai.expect(safeTxData.safeTxGas).to.be.eq(0)
+      }
+    )
+
+    itif(safeVersionDeployed < '1.3.0')(
+      'should return a transaction with estimated safeTxGas if safeVersion<1.3.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const safe = await getSafeWithOwners([account1.address])
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const txDataPartial: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '0',
+          data: '0x'
+        }
+        const safeTxData = await standardizeSafeTransactionData(
+          safeSdk.getContractManager().safeContract,
+          ethAdapter,
+          txDataPartial
+        )
+        chai.expect(safeTxData.safeTxGas).to.be.gt(0)
+      }
+    )
+
+    itif(safeVersionDeployed < '1.3.0')(
+      'should return a transaction with defined safeTxGas if safeVersion<1.3.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const safe = await getSafeWithOwners([account1.address])
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeTxGas = 111
+        const txDataPartial: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '0',
+          data: '0x',
+          safeTxGas
+        }
+        const safeTxData = await standardizeSafeTransactionData(
+          safeSdk.getContractManager().safeContract,
+          ethAdapter,
+          txDataPartial
+        )
+        chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
+      }
+    )
+  })
+
   describe('createTransaction', async () => {
     it('should create a single transaction', async () => {
       const { accounts, contractNetworks } = await setupTests()
@@ -67,7 +155,7 @@ describe('Transactions creation', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
     })
 
     it('should create a single transaction when passing a transaction array with length=1', async () => {
@@ -127,7 +215,7 @@ describe('Transactions creation', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
     })
 
     it('should fail when creating a MultiSend transaction passing a transaction array with length=0', async () => {
@@ -221,7 +309,7 @@ describe('Transactions creation', () => {
       chai.expect(multiSendTx.data.gasToken).to.be.eq('0x333')
       chai.expect(multiSendTx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(multiSendTx.data.nonce).to.be.eq(555)
-      chai.expect(multiSendTx.data.safeTxGas).to.be.eq(666)
+      chai.expect(multiSendTx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
     })
   })
 })

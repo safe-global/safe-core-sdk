@@ -16,17 +16,12 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
     saltNonce,
     options
   }: CreateProxyProps): Promise<string> {
-    let txResponse: ContractTransaction
-    if (saltNonce) {
-      txResponse = await this.contract.createProxyWithNonce(
-        safeMasterCopyAddress,
-        initializer,
-        saltNonce,
-        options
-      )
-    } else {
-      txResponse = await this.contract.createProxy(safeMasterCopyAddress, initializer, options)
-    }
+    const txResponse = await this.contract.createProxyWithNonce(
+      safeMasterCopyAddress,
+      initializer,
+      saltNonce,
+      options
+    )
     const txReceipt = await txResponse.wait()
     const proxyCreationEvent = txReceipt.events?.find(
       ({ event }: Event) => event === 'ProxyCreation'

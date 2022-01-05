@@ -1251,7 +1251,7 @@
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-deployments/-/safe-deployments-1.4.0.tgz#d49d3d36cc014ef62306d09c0f4761895a17d7a6"
   integrity sha512-q4salJNQ/Gx0DnZJytAFO/U4OwGI6xTGtTJSOZK+C9Fh2NW8sep+YfSunHQvCLcu4b7WgWEBhxnCV6rpyveLHg==
 
-"@gnosis.pm/safe-deployments@^1.5.0":
+"@gnosis.pm/safe-deployments@^1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-deployments/-/safe-deployments-1.7.0.tgz#dd5fde901595545131d447888e327cc72e41d370"
   integrity sha512-OWc73XDBOJzoDk7GAQsasOxHnXKdJdOb28Jkv+JNie2LlRwZe1SMCu0iTozhwpLFp4BC+iDtuVWN7EVpe142ag==

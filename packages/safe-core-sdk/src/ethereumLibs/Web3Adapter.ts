@@ -1,3 +1,5 @@
+import Web3 from 'web3'
+import { ethers } from 'ethers'
 import { BigNumber } from '@ethersproject/bignumber'
 import { SafeVersion } from '../contracts/config'
 import {
@@ -24,7 +26,7 @@ export interface Web3AdapterConfig {
 }
 
 class Web3Adapter implements EthAdapter {
-  #web3: any
+  #web3: Web3
   #signerAddress: string
 
   constructor({ web3, signerAddress }: Web3AdapterConfig) {
@@ -105,7 +107,7 @@ class Web3Adapter implements EthAdapter {
     return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
-  getContract(address: string, abi: AbiItem[]): any {
+  getContract(address: string, abi: any): any {
     return new this.#web3.eth.Contract(abi, address)
   }
 
@@ -125,12 +127,23 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
 
-  estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number> {
+  estimateGas(transaction: EthAdapterTransaction, options?: any): Promise<number> {
     return this.#web3.eth.estimateGas(transaction, options)
   }
 
   call(transaction: EthAdapterTransaction): Promise<string> {
     return this.#web3.eth.call(transaction)
+  }
+
+  ensLookup(name: string): Promise<string> {
+    return this.#web3.eth.ens.getAddress(name)
+  }
+
+  async ensReverseLookup(address: string): Promise<string> {
+    const lookup = address.toLowerCase().substr(2) + '.addr.reverse'
+    const node = ethers.utils.namehash(lookup)
+    const ResolverContract = await this.#web3.eth.ens.getResolver(lookup);
+    return await ResolverContract.methods.name(node).call()
   }
 }
 

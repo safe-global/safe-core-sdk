@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import { ethers } from 'ethers'
+const namehash = require('@ensdomains/eth-ens-namehash')
 import { BigNumber } from '@ethersproject/bignumber'
 import { SafeVersion } from '../contracts/config'
 import {
@@ -141,7 +141,7 @@ class Web3Adapter implements EthAdapter {
 
   async ensReverseLookup(address: string): Promise<string> {
     const lookup = address.toLowerCase().substr(2) + '.addr.reverse'
-    const node = ethers.utils.namehash(lookup)
+    const node = namehash.hash(lookup)
     const ResolverContract = await this.#web3.eth.ens.getResolver(lookup);
     return await ResolverContract.methods.name(node).call()
   }

@@ -43,7 +43,7 @@ describe("Web3Adapter", () => {
   })
 })
 
-describe.only("EthersAdapter", () => {
+describe("EthersAdapter", () => {
   const provider = getDefaultProvider(`https://rinkeby.infura.io/v3/${process.env.INFURA_KEY}`)
   const signer = new Wallet(
     '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner

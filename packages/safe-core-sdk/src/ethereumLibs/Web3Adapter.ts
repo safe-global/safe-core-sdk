@@ -20,7 +20,7 @@ import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAd
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
-  web3: any
+  web3: Web3
   /** signerAddress - Address of the signer */
   signerAddress: string
 }

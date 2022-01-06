@@ -48,6 +48,8 @@ interface EthAdapter {
   signMessage(message: string, signerAddress: string): Promise<string>
   estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number>
   call(transaction: EthAdapterTransaction): Promise<string>
+  ensLookup(name: string): Promise<string | null>
+  ensReverseLookup(address: string): Promise<string | null>
 }
 
 export default EthAdapter

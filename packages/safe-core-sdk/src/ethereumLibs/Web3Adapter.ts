@@ -1,6 +1,5 @@
-import Web3 from 'web3'
-const namehash = require('@ensdomains/eth-ens-namehash')
 import { BigNumber } from '@ethersproject/bignumber'
+import { namehash } from '@ethersproject/hash'
 import { SafeVersion } from '../contracts/config'
 import {
   getGnosisSafeProxyFactoryContractInstance,
@@ -20,13 +19,13 @@ import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAd
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
-  web3: Web3
+  web3: any
   /** signerAddress - Address of the signer */
   signerAddress: string
 }
 
 class Web3Adapter implements EthAdapter {
-  #web3: Web3
+  #web3: any
   #signerAddress: string
 
   constructor({ web3, signerAddress }: Web3AdapterConfig) {
@@ -141,7 +140,7 @@ class Web3Adapter implements EthAdapter {
 
   async ensReverseLookup(address: string): Promise<string> {
     const lookup = address.slice(-40) + '.addr.reverse'
-    const node = namehash.hash(lookup)
+    const node = namehash(lookup)
     const ResolverContract = await this.#web3.eth.ens.getResolver(lookup);
     return await ResolverContract.methods.name(node).call()
   }

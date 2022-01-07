@@ -90,7 +90,6 @@
     }
   },
   "dependencies": {
-    "@ensdomains/eth-ens-namehash": "^2.0.15",
     "@gnosis.pm/safe-core-sdk-types": "^0.1.1",
     "@gnosis.pm/safe-deployments": "^1.4.0",
     "ethereumjs-util": "^7.1.3"

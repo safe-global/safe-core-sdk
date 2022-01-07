@@ -35,7 +35,7 @@ describe('Web3Adapter', () => {
 
     it('throws an error if no name exists for address', async () => {
       try {
-        await web3Adapter.ensReverseLookup('0x16B110D5b7583266B29159d89eF0d001adf6f6FD')
+        await web3Adapter.ensReverseLookup(ZERO_ADDRESS)
       } catch(error: any) {
         chai.expect(error.message).to.exist
       }

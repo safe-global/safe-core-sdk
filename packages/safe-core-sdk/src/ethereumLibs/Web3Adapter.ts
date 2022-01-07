@@ -140,7 +140,7 @@ class Web3Adapter implements EthAdapter {
   }
 
   async ensReverseLookup(address: string): Promise<string> {
-    const lookup = address.toLowerCase().substr(2) + '.addr.reverse'
+    const lookup = address.slice(-40) + '.addr.reverse'
     const node = namehash.hash(lookup)
     const ResolverContract = await this.#web3.eth.ens.getResolver(lookup);
     return await ResolverContract.methods.name(node).call()

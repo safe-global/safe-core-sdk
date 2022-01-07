@@ -156,8 +156,8 @@ class EthersAdapter implements EthAdapter {
     return this.#provider.resolveName(name)
   }
 
-  async ensReverseLookup(address: string): Promise<string | null> {
-    return await this.#provider.lookupAddress(address);
+  ensReverseLookup(address: string): Promise<string | null> {
+    return this.#provider.lookupAddress(address);
   }
 }
 

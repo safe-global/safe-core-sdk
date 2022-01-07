@@ -29,8 +29,8 @@ describe('Web3Adapter', () => {
 
   describe('ENS reverse lookup', () => {
     it('returns a name for existing address', async () => {
-      const name = await web3Adapter.ensReverseLookup('0x203aBBf9F190009606C317439360c9f3c0874452')
-      chai.expect(name).to.equal("marco.eth")
+      const name = await web3Adapter.ensReverseLookup('0xd8bbcb76bc9aea78972ed4773a5eb67b413f26a5')
+      chai.expect(name).to.equal("loremipsum.eth")
     })
 
     it('throws an error if no name exists for address', async () => {
@@ -65,8 +65,8 @@ describe('EthersAdapter', () => {
 
   describe('ENS reverse lookup', () => {
     it('returns a name for existing address', async () => {
-      const name = await ethersAdapter.ensReverseLookup('0x203aBBf9F190009606C317439360c9f3c0874452')
-      chai.expect(name).to.equal('marco.eth')
+      const name = await ethersAdapter.ensReverseLookup('0xd8bbcb76bc9aea78972ed4773a5eb67b413f26a5')
+      chai.expect(name).to.equal('loremipsum.eth')
     })
 
     it('returns null if no name exists for address', async () => {

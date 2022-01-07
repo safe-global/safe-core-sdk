@@ -67,7 +67,11 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
   }
 
   async approveHash(hash: string, options?: TransactionOptions): Promise<Web3TransactionResult> {
-    const txResponse = this.contract.methods.approveHash(hash).send(options)
+    const tx = this.contract.methods.approveHash(hash)
+    if (options && !options.gas && !options.gasLimit) {
+      options.gas = await tx.estimateGas(options)
+    }
+    const txResponse = tx.send(options)
     return toTxResult(txResponse, options)
   }
 
@@ -79,7 +83,7 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
   ): Promise<Web3TransactionResult> {
-    const txResponse = this.contract.methods
+    const tx = this.contract.methods
       .execTransaction(
         safeTransaction.data.to,
         safeTransaction.data.value,
@@ -92,7 +96,12 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
         safeTransaction.data.refundReceiver,
         safeTransaction.encodedSignatures()
       )
-      .send(options)
+
+    if (options && !options.gas && !options.gasLimit) {
+      options.gas = await tx.estimateGas(options)
+    }
+
+    const txResponse = tx.send(options)
     return toTxResult(txResponse, options)
   }
 

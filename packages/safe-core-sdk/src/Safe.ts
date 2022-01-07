@@ -375,12 +375,8 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
-    const estimate = await this.#contractManager.safeContract.estimateGas('approveHash', [hash], {
-      from: signerAddress
-    })
     return this.#contractManager.safeContract.approveHash(hash, {
-      from: signerAddress,
-      gas: estimate
+      from: signerAddress
     })
   }
 

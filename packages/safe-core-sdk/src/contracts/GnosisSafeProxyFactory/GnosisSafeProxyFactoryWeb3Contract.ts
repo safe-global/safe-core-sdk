@@ -22,7 +22,7 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
       saltNonce
     )
 
-    if (options && !options.gas) {
+    if (options && !options.gasLimit && !options.gas) {
       options.gas = await tx.estimateGas(options)
     }
 

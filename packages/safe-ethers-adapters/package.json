@@ -73,7 +73,7 @@
     }
   },
   "peerDependencies": {
-    "@ethersproject/abstract-providers": "^5.0.0",
+    "@ethersproject/abstract-provider": "^5.0.0",
     "@ethersproject/abstract-signer": "^5.0.0",
     "@ethersproject/bignumber": "^5.0.0",
     "@ethersproject/properties": "^5.0.0"

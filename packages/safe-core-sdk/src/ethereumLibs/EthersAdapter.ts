@@ -19,6 +19,7 @@ import {
 } from '../contracts/safeDeploymentContracts'
 import { AbiItem } from '../types'
 import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
+import ErrorCodes from './exceptions'
 
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
@@ -152,12 +153,24 @@ class EthersAdapter implements EthAdapter {
     return this.#provider.call(transaction)
   }
 
-  ensLookup(name: string): Promise<string | null> {
-    return this.#provider.resolveName(name)
+  async ensLookup(name: string): Promise<string> {
+    const address = await this.#provider.resolveName(name)
+
+    if (!address) {
+      throw new Error(ErrorCodes._100)
+    }
+
+    return address
   }
 
-  ensReverseLookup(address: string): Promise<string | null> {
-    return this.#provider.lookupAddress(address);
+  async ensReverseLookup(address: string): Promise<string> {
+    const name = await this.#provider.lookupAddress(address);
+
+    if (!name) {
+      throw new Error(ErrorCodes._101)
+    }
+
+    return name
   }
 }
 

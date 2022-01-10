@@ -16,6 +16,7 @@ import {
 } from '../contracts/safeDeploymentContracts'
 import { AbiItem } from '../types'
 import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
+import ErrorCodes from './exceptions'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -134,15 +135,24 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.call(transaction)
   }
 
-  ensLookup(name: string): Promise<string> {
-    return this.#web3.eth.ens.getAddress(name)
+  async ensLookup(name: string): Promise<string> {
+    try {
+      return await this.#web3.eth.ens.getAddress(name)
+    } catch (error) {
+      throw new Error(ErrorCodes._100)
+    }
   }
 
   async ensReverseLookup(address: string): Promise<string> {
     const lookup = address.slice(2) + '.addr.reverse'
     const node = namehash(lookup)
-    const ResolverContract = await this.#web3.eth.ens.getResolver(lookup);
-    return await ResolverContract.methods.name(node).call()
+
+    try {
+      const ResolverContract = await this.#web3.eth.ens.getResolver(lookup);
+      return await ResolverContract.methods.name(node).call()
+    } catch (error) {
+      throw new Error(ErrorCodes._101)
+    }
   }
 }
 

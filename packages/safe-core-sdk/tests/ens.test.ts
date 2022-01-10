@@ -6,6 +6,7 @@ import { ZERO_ADDRESS } from '../src/utils/constants'
 import chai from 'chai'
 import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
+import ErrorCodes from '../src/ethereumLibs/exceptions'
 
 describe('Web3Adapter', () => {
   const web3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby-light.eth.linkpool.io/', {}))
@@ -13,16 +14,16 @@ describe('Web3Adapter', () => {
 
   describe('ENS direct lookup', () => {
     it('returns an address for ens name', async () => {
-      const address = await web3Adapter.ensLookup('safe.eth')
-
+      const address = await web3Adapter.ensLookup('loremipsum.eth')
       chai.expect(address).match(/0x[0-9a-z]{40}/i)
     })
 
     it('throws an error for a non existing name', async () => {
       try {
         await web3Adapter.ensLookup('nonexistingname')
+        chai.expect(true).to.be.false
       } catch(error) {
-        chai.expect((error as Error).message).to.equal('The resolver at 0x0000000000000000000000000000000000000000does not implement requested method: \"addr\".')
+        chai.expect((error as Error).message).to.equal(ErrorCodes._100)
       }
     })
   })
@@ -36,8 +37,9 @@ describe('Web3Adapter', () => {
     it('throws an error if no name exists for address', async () => {
       try {
         await web3Adapter.ensReverseLookup(ZERO_ADDRESS)
-      } catch(error: any) {
-        chai.expect(error.message).to.exist
+        chai.expect(true).to.be.false
+      } catch(error) {
+        chai.expect((error as Error).message).to.equal(ErrorCodes._101)
       }
     })
   })
@@ -58,8 +60,12 @@ describe('EthersAdapter', () => {
     })
 
     it('throws an error for a non existing name', async () => {
-      const address = await ethersAdapter.ensLookup('nonexistingname')
-      chai.expect(address).to.be.null
+      try {
+        await ethersAdapter.ensLookup('nonexistingname')
+        chai.expect(true).to.be.false
+      } catch (error) {
+        chai.expect((error as Error).message).to.equal(ErrorCodes._100)
+      }
     })
   })
 
@@ -70,8 +76,12 @@ describe('EthersAdapter', () => {
     })
 
     it('returns null if no name exists for address', async () => {
-      const name = await ethersAdapter.ensReverseLookup('0x16B110D5b7583266B29159d89eF0d001adf6f6FD')
-      chai.expect(name).to.be.null
+      try {
+        await ethersAdapter.ensReverseLookup(ZERO_ADDRESS)
+        chai.expect(true).to.be.false
+      } catch (error) {
+        chai.expect((error as Error).message).to.equal(ErrorCodes._101)
+      }
     })
   })
 })

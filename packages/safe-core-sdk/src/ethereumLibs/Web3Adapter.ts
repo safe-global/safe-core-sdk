@@ -1,4 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { namehash } from '@ethersproject/hash'
 import { SafeVersion } from '../contracts/config'
 import {
   getGnosisSafeProxyFactoryContractInstance,
@@ -15,6 +16,7 @@ import {
 } from '../contracts/safeDeploymentContracts'
 import { AbiItem } from '../types'
 import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
+import ErrorCodes from './exceptions'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -105,7 +107,7 @@ class Web3Adapter implements EthAdapter {
     return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
-  getContract(address: string, abi: AbiItem[]): any {
+  getContract(address: string, abi: any): any {
     return new this.#web3.eth.Contract(abi, address)
   }
 
@@ -125,12 +127,32 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
 
-  estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number> {
+  estimateGas(transaction: EthAdapterTransaction, options?: any): Promise<number> {
     return this.#web3.eth.estimateGas(transaction, options)
   }
 
   call(transaction: EthAdapterTransaction): Promise<string> {
     return this.#web3.eth.call(transaction)
+  }
+
+  async ensLookup(name: string): Promise<string> {
+    try {
+      return await this.#web3.eth.ens.getAddress(name)
+    } catch (error) {
+      throw new Error(ErrorCodes._100)
+    }
+  }
+
+  async ensReverseLookup(address: string): Promise<string> {
+    const lookup = address.slice(2) + '.addr.reverse'
+    const node = namehash(lookup)
+
+    try {
+      const ResolverContract = await this.#web3.eth.ens.getResolver(lookup);
+      return await ResolverContract.methods.name(node).call()
+    } catch (error) {
+      throw new Error(ErrorCodes._101)
+    }
   }
 }
 

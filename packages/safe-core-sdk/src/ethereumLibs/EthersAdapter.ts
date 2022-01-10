@@ -154,23 +154,32 @@ class EthersAdapter implements EthAdapter {
   }
 
   async ensLookup(name: string): Promise<string> {
-    const address = await this.#provider.resolveName(name)
+    try {
+      const address = await this.#provider.resolveName(name)
 
-    if (!address) {
+      if (!address) {
+        throw new Error(ErrorCodes._100)
+      }
+
+      return address
+    } catch (error) {
       throw new Error(ErrorCodes._100)
     }
 
-    return address
   }
 
   async ensReverseLookup(address: string): Promise<string> {
-    const name = await this.#provider.lookupAddress(address);
+    try {
+      const name = await this.#provider.lookupAddress(address);
 
-    if (!name) {
+      if (!name) {
+        throw new Error(ErrorCodes._101)
+      }
+
+      return name
+    } catch (error) {
       throw new Error(ErrorCodes._101)
     }
-
-    return name
   }
 }
 

@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import Safe, { ContractNetworksConfig } from '../src'
 import { ZERO_ADDRESS } from '../src/utils/constants'
+import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getFactory,
   getMultiSend,
@@ -19,13 +20,7 @@ describe('Safe contracts manager', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       safe: await getSafeWithOwners([accounts[0].address]),
       accounts,
@@ -46,7 +41,9 @@ describe('Safe contracts manager', () => {
             safeAddress: safe.address
           })
         )
-        .to.be.rejectedWith('Invalid Multi Send contract')
+        .to.be.rejectedWith(
+          'You must provide the json interface of the contract when instantiating a contract object'
+        )
     })
 
     it('should fail if Safe Proxy contract is not deployed in the current network', async () => {
@@ -69,8 +66,11 @@ describe('Safe contracts manager', () => {
       const customContractNetworks: ContractNetworksConfig = {
         [chainId]: {
           multiSendAddress: ZERO_ADDRESS,
+          multiSendAbi: (await getMultiSend()).abi,
           safeMasterCopyAddress: ZERO_ADDRESS,
-          safeProxyFactoryAddress: ZERO_ADDRESS
+          safeMasterCopyAbi: (await getSafeSingleton()).abi,
+          safeProxyFactoryAddress: ZERO_ADDRESS,
+          safeProxyFactoryAbi: (await getFactory()).abi
         }
       }
       const [account1] = accounts

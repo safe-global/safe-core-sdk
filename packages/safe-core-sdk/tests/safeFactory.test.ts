@@ -11,6 +11,7 @@ import {
 import { SAFE_LAST_VERSION } from '../src/contracts/config'
 import { ZERO_ADDRESS } from '../src/utils/constants'
 import { itif } from './utils/helpers'
+import { getContractNetworks } from './utils/setupContractNetworks'
 import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -22,13 +23,7 @@ describe('Safe Proxy Factory', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       chainId: (await waffle.provider.getNetwork()).chainId,
       accounts,
@@ -53,8 +48,11 @@ describe('Safe Proxy Factory', () => {
       const contractNetworks: ContractNetworksConfig = {
         [chainId]: {
           multiSendAddress: ZERO_ADDRESS,
+          multiSendAbi: (await getMultiSend()).abi,
           safeMasterCopyAddress: ZERO_ADDRESS,
-          safeProxyFactoryAddress: ZERO_ADDRESS
+          safeMasterCopyAbi: (await getSafeSingleton()).abi,
+          safeProxyFactoryAddress: ZERO_ADDRESS,
+          safeProxyFactoryAbi: (await getFactory()).abi
         }
       }
       chai

@@ -1,7 +1,8 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { ContractNetworksConfig, SafeVersion } from '../src'
+import { SafeVersion } from '../src'
+import { getContractNetworks } from './utils/setupContractNetworks'
 import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -13,13 +14,7 @@ describe('Safe contracts', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       accounts,
       contractNetworks,
@@ -74,13 +69,16 @@ describe('Safe contracts', () => {
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
-      const customContractAddress = contractNetworks[chainId].safeMasterCopyAddress
+      const customContract = contractNetworks[chainId]
       const safeContract = await ethAdapter.getSafeContract({
         safeVersion,
         chainId,
-        customContractAddress
+        customContractAddress: customContract?.safeMasterCopyAddress,
+        customContractAbi: customContract?.safeMasterCopyAbi
       })
-      chai.expect(await safeContract.getAddress()).to.be.eq((await getSafeSingleton()).address)
+      chai
+        .expect(await safeContract.getAddress())
+        .to.be.eq((await getSafeSingleton()).contract.address)
     })
   })
 
@@ -91,7 +89,7 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1
-      const multiSendContract = await ethAdapter.getMultiSendContract(safeVersion, chainId)
+      const multiSendContract = await ethAdapter.getMultiSendContract({ safeVersion, chainId })
       chai
         .expect(await multiSendContract.getAddress())
         .to.be.eq('0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761')
@@ -102,13 +100,16 @@ describe('Safe contracts', () => {
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
-      const customContractAddress = contractNetworks[chainId].multiSendAddress
-      const multiSendContract = await ethAdapter.getMultiSendContract(
+      const customContract = contractNetworks[chainId]
+      const multiSendContract = await ethAdapter.getMultiSendContract({
         safeVersion,
         chainId,
-        customContractAddress
-      )
-      chai.expect(await multiSendContract.getAddress()).to.be.eq((await getMultiSend()).address)
+        customContractAddress: customContract.multiSendAddress,
+        customContractAbi: customContract.multiSendAbi
+      })
+      chai
+        .expect(await multiSendContract.getAddress())
+        .to.be.eq((await getMultiSend()).contract.address)
     })
   })
 
@@ -119,7 +120,7 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1
-      const factoryContract = await ethAdapter.getSafeProxyFactoryContract(safeVersion, chainId)
+      const factoryContract = await ethAdapter.getSafeProxyFactoryContract({ safeVersion, chainId })
       chai
         .expect(await factoryContract.getAddress())
         .to.be.eq('0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2')
@@ -130,13 +131,16 @@ describe('Safe contracts', () => {
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
-      const customContractAddress = contractNetworks[chainId].safeProxyFactoryAddress
-      const factoryContract = await ethAdapter.getSafeProxyFactoryContract(
+      const customContract = contractNetworks[chainId]
+      const factoryContract = await ethAdapter.getSafeProxyFactoryContract({
         safeVersion,
         chainId,
-        customContractAddress
-      )
-      chai.expect(await factoryContract.getAddress()).to.be.eq((await getFactory()).address)
+        customContractAddress: customContract.safeProxyFactoryAddress,
+        customContractAbi: customContract.safeProxyFactoryAbi
+      })
+      chai
+        .expect(await factoryContract.getAddress())
+        .to.be.eq((await getFactory()).contract.address)
     })
   })
 })

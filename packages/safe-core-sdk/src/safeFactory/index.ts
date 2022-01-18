@@ -75,11 +75,12 @@ class SafeFactory {
     this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
-    const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract(
-      this.#safeVersion,
+    const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
+      safeVersion: this.#safeVersion,
       chainId,
-      customContracts?.safeProxyFactoryAddress
-    )
+      customContractAddress: customContracts?.safeProxyFactoryAddress,
+      customContractAbi: customContracts?.safeProxyFactoryAbi
+    })
     if ((await this.#ethAdapter.getContractCode(safeProxyFactoryContract.getAddress())) === '0x') {
       throw new Error('Safe Proxy Factory contract is not deployed in the current network')
     }
@@ -89,7 +90,8 @@ class SafeFactory {
       safeVersion: this.#safeVersion,
       chainId,
       isL1SafeMasterCopy,
-      customContractAddress: customContracts?.safeMasterCopyAddress
+      customContractAddress: customContracts?.safeMasterCopyAddress,
+      customContractAbi: customContracts?.safeMasterCopyAbi
     })
     if ((await this.#ethAdapter.getContractCode(gnosisSafeContract.getAddress())) === '0x') {
       throw new Error('Safe Proxy contract is not deployed in the current network')

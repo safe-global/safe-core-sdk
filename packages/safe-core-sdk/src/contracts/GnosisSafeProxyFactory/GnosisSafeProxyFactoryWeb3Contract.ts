@@ -1,4 +1,4 @@
-import { PromiEvent, TransactionReceipt } from 'web3-core/types'
+import { TransactionReceipt } from 'web3-core/types'
 import { ProxyFactory as ProxyFactory_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/proxy_factory'
 import { ProxyFactory as ProxyFactory_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/proxy_factory'
 import GnosisSafeProxyFactoryContract, { CreateProxyProps } from './GnosisSafeProxyFactoryContract'

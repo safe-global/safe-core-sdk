@@ -142,7 +142,6 @@ class SafeFactory {
     safeDeploymentConfig?: SafeDeploymentConfig
   ): Promise<Safe> {
     validateSafeAccountConfig(safeAccountConfig)
-    const chainId = await this.#ethAdapter.getChainId()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const saltNonce =
@@ -153,18 +152,12 @@ class SafeFactory {
       saltNonce,
       options: { from: signerAddress }
     })
-    const safeContract = await this.#ethAdapter.getSafeContract({
-      safeVersion: this.#safeVersion,
-      chainId,
-      isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
-      customContractAddress: safeAddress
-    })
-    if ((await this.#ethAdapter.getContractCode(safeContract.getAddress())) === '0x') {
+    if ((await this.#ethAdapter.getContractCode(safeAddress)) === '0x') {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,
-      safeAddress: safeContract.getAddress(),
+      safeAddress,
       isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
       contractNetworks: this.#contractNetworks
     })

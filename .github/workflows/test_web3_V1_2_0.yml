@@ -1,4 +1,4 @@
-name: Safe Core SDK Test (Safe v1.2.0)
+name: Safe Core SDK Test - Web3 - Safe v1.2.0
 on: [push, pull_request]
 env:
   INFURA_KEY: ${{ secrets.INFURA_KEY }}
@@ -18,4 +18,4 @@ jobs:
           yarn install
           yarn build
           cd packages/safe-core-sdk
-          yarn test:hardhat:ethers:v1.2.0
+          yarn test:hardhat:web3:v1.2.0

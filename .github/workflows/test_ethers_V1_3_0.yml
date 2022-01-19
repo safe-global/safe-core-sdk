@@ -1,4 +1,4 @@
-name: Safe Core SDK Test (Safe v1.3.0)
+name: Safe Core SDK Test - Ethers - Safe v1.3.0
 on: [push, pull_request]
 env:
   INFURA_KEY: ${{ secrets.INFURA_KEY }}

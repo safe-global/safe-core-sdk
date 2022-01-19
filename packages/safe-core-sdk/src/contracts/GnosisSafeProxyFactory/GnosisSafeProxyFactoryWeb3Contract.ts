@@ -23,11 +23,11 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     const txResult: TransactionReceipt = await new Promise((resolve, reject) =>
       txResponse.once('receipt', (receipt: TransactionReceipt) => resolve(receipt)).catch(reject)
     )
-    const proxyAddress = txResult.events?.['0'].raw?.data.substr(-40)
+    const proxyAddress = txResult.events?.ProxyCreation?.returnValues?.proxy
     if (!proxyAddress) {
       throw new Error('Safe Proxy was not deployed correctly')
     }
-    return '0x' + proxyAddress
+    return proxyAddress
   }
 
   encode(methodName: string, params: any[]): string {

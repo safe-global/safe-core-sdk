@@ -11,7 +11,6 @@ export interface TransactionOptions {
   from?: string
   gas?: number | string
   gasLimit?: number | string
-  safeTxGas?: number | string
   gasPrice?: number | string
 }
 

@@ -2,13 +2,11 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
-import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
+import Safe, { SafeTransactionOptionalProps } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
+import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getDailyLimitModule,
-  getFactory,
-  getMultiSend,
-  getSafeSingleton,
   getSafeWithOwners,
   getSocialRecoveryModule
 } from './utils/setupContracts'
@@ -23,13 +21,7 @@ describe('Safe modules manager', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       dailyLimitModule: await getDailyLimitModule(),
       socialRecoveryModule: await getSocialRecoveryModule(),

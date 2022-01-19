@@ -19,6 +19,14 @@ export interface GetSafeContractProps {
   chainId: number
   isL1SafeMasterCopy?: boolean
   customContractAddress?: string
+  customContractAbi?: AbiItem[]
+}
+
+export interface GetContractProps {
+  safeVersion: SafeVersion
+  chainId: number
+  customContractAddress?: string
+  customContractAbi?: AbiItem[]
 }
 
 interface EthAdapter {
@@ -30,18 +38,21 @@ interface EthAdapter {
     safeVersion,
     chainId,
     isL1SafeMasterCopy,
-    customContractAddress
+    customContractAddress,
+    customContractAbi
   }: GetSafeContractProps): GnosisSafeContract
-  getMultiSendContract(
-    safeVersion: SafeVersion,
-    chainId: number,
-    customContractAddress?: string
-  ): MultiSendContract
-  getSafeProxyFactoryContract(
-    safeVersion: SafeVersion,
-    chainId: number,
-    customContractAddress?: string
-  ): GnosisSafeProxyFactoryContract
+  getMultiSendContract({
+    safeVersion,
+    chainId,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): MultiSendContract
+  getSafeProxyFactoryContract({
+    safeVersion,
+    chainId,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): GnosisSafeProxyFactoryContract
   getContractCode(address: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>

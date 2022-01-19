@@ -4,14 +4,9 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
-import Safe, { ContractNetworksConfig, TransactionOptions } from '../src'
-import {
-  getERC20Mintable,
-  getFactory,
-  getMultiSend,
-  getSafeSingleton,
-  getSafeWithOwners
-} from './utils/setupContracts'
+import Safe, { TransactionOptions } from '../src'
+import { getContractNetworks } from './utils/setupContractNetworks'
+import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
@@ -23,13 +18,7 @@ describe('Transactions execution', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       erc20Mintable: await getERC20Mintable(),
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),

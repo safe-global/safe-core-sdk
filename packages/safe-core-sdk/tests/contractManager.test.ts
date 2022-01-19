@@ -42,7 +42,9 @@ describe('Safe contracts manager', () => {
           })
         )
         .to.be.rejectedWith(
-          'You must provide the json interface of the contract when instantiating a contract object'
+          process.env.ETH_LIB === 'web3'
+            ? 'You must provide the json interface of the contract when instantiating a contract object'
+            : 'Invalid Multi Send contract address'
         )
     })
 

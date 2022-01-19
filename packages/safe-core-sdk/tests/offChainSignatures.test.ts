@@ -1,13 +1,9 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig } from '../src'
-import {
-  getFactory,
-  getMultiSend,
-  getSafeSingleton,
-  getSafeWithOwners
-} from './utils/setupContracts'
+import Safe from '../src'
+import { getContractNetworks } from './utils/setupContractNetworks'
+import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
@@ -18,13 +14,7 @@ describe('Off-chain signatures', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       accounts,

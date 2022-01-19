@@ -18,7 +18,11 @@ import {
   getSafeProxyFactoryContractDeployment
 } from '../contracts/safeDeploymentContracts'
 import { AbiItem } from '../types'
-import EthAdapter, { EthAdapterTransaction, GetSafeContractProps } from './EthAdapter'
+import EthAdapter, {
+  EthAdapterTransaction,
+  GetContractProps,
+  GetSafeContractProps
+} from './EthAdapter'
 
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
@@ -87,11 +91,11 @@ class EthersAdapter implements EthAdapter {
     return getSafeContractInstance(safeVersion, contractAddress, this.#signer)
   }
 
-  getMultiSendContract(
-    safeVersion: SafeVersion,
-    chainId: number,
-    customContractAddress?: string
-  ): MultiSendEthersContract {
+  getMultiSendContract({
+    safeVersion,
+    chainId,
+    customContractAddress
+  }: GetContractProps): MultiSendEthersContract {
     let contractAddress: string | undefined
     if (customContractAddress) {
       contractAddress = customContractAddress
@@ -105,11 +109,11 @@ class EthersAdapter implements EthAdapter {
     return getMultiSendContractInstance(safeVersion, contractAddress, this.#signer)
   }
 
-  getSafeProxyFactoryContract(
-    safeVersion: SafeVersion,
-    chainId: number,
-    customContractAddress?: string
-  ): GnosisSafeProxyFactoryEthersContract {
+  getSafeProxyFactoryContract({
+    safeVersion,
+    chainId,
+    customContractAddress
+  }: GetContractProps): GnosisSafeProxyFactoryEthersContract {
     let contractAddress: string | undefined
     if (customContractAddress) {
       contractAddress = customContractAddress

@@ -5,6 +5,7 @@ import {
   multiSendDeployed,
   proxyFactoryDeployed
 } from '../../hardhat/deploy/deploy-contracts'
+import { AbiItem } from '../../src/types'
 import {
   GnosisSafe as GnosisSafe_V1_1_1,
   MultiSend as MultiSend_V1_1_1,
@@ -22,28 +23,40 @@ import {
   SocialRecoveryModule
 } from '../../typechain/tests/ethers-v5'
 
-export const getSafeSingleton = async (): Promise<
-  GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
-> => {
+export const getSafeSingleton = async (): Promise<{
+  contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
+  abi: AbiItem[]
+}> => {
   const SafeDeployment = await deployments.get(gnosisSafeDeployed.name)
   const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
-  return Safe.attach(SafeDeployment.address) as
-    | GnosisSafe_V1_3_0
-    | GnosisSafe_V1_2_0
-    | GnosisSafe_V1_1_1
+  return {
+    contract: Safe.attach(SafeDeployment.address) as
+      | GnosisSafe_V1_3_0
+      | GnosisSafe_V1_2_0
+      | GnosisSafe_V1_1_1,
+    abi: SafeDeployment.abi
+  }
 }
 
-export const getFactory = async (): Promise<ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1> => {
+export const getFactory = async (): Promise<{
+  contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1
+  abi: AbiItem[]
+}> => {
   const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const Factory = await ethers.getContractFactory(proxyFactoryDeployed.name)
-  return Factory.attach(FactoryDeployment.address) as ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1
+  return {
+    contract: Factory.attach(FactoryDeployment.address) as
+      | ProxyFactory_V1_3_0
+      | ProxyFactory_V1_1_1,
+    abi: FactoryDeployment.abi
+  }
 }
 
 export const getSafeTemplate = async (): Promise<
   GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
 > => {
-  const singleton = await getSafeSingleton()
-  const factory = await getFactory()
+  const singleton = (await getSafeSingleton()).contract
+  const factory = (await getFactory()).contract
   const template = await factory.callStatic.createProxy(singleton.address, '0x')
   await factory.createProxy(singleton.address, '0x').then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
@@ -68,10 +81,16 @@ export const getSafeWithOwners = async (
   return template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
 }
 
-export const getMultiSend = async (): Promise<MultiSend_V1_3_0 | MultiSend_V1_1_1> => {
+export const getMultiSend = async (): Promise<{
+  contract: MultiSend_V1_3_0 | MultiSend_V1_1_1
+  abi: AbiItem[]
+}> => {
   const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
   const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)
-  return MultiSend.attach(MultiSendDeployment.address) as MultiSend_V1_3_0 | MultiSend_V1_1_1
+  return {
+    contract: MultiSend.attach(MultiSendDeployment.address) as MultiSend_V1_3_0 | MultiSend_V1_1_1,
+    abi: MultiSendDeployment.abi
+  }
 }
 
 export const getDailyLimitModule = async (): Promise<DailyLimitModule> => {

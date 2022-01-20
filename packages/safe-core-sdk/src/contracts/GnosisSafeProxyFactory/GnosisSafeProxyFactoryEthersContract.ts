@@ -16,6 +16,9 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
     saltNonce,
     options
   }: CreateProxyProps): Promise<string> {
+    if (saltNonce < 0) {
+      throw new Error('saltNonce must be greater than 0')
+    }
     const txResponse = await this.contract.createProxyWithNonce(
       safeMasterCopyAddress,
       initializer,

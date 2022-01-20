@@ -134,6 +134,24 @@ describe('Safe Proxy Factory', () => {
         .rejectedWith('Threshold must be lower than or equal to owners length')
     })
 
+    it('should fail if the saltNonce is lower than 0', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: -1 }
+      chai
+        .expect(safeFactory.deploySafe(safeAccountConfig, safeDeploymentConfig))
+        .rejectedWith('saltNonce must be greater than 0')
+    })
+
     it('should deploy a new Safe without saltNonce', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts

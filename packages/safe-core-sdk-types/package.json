@@ -24,7 +24,7 @@
     "url": "https://github.com/gnosis/safe-core-sdk/issues"
   },
   "files": [
-    "dist/**/*"
+    "dist"
   ],
   "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
   "devDependencies": {

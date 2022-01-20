@@ -16,6 +16,9 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     saltNonce,
     options
   }: CreateProxyProps): Promise<string> {
+    if (saltNonce < 0) {
+      throw new Error('saltNonce must be greater than 0')
+    }
     const txResponse = this.contract.methods
       .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce)
       .send(options)

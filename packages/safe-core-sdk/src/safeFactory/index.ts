@@ -1,7 +1,14 @@
-import { SafeVersion, SAFE_LAST_VERSION } from '../contracts/config'
-import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
-import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
-import EthAdapter from '../ethereumLibs/EthAdapter'
+import {
+  EthAdapter,
+  GnosisSafeContract,
+  GnosisSafeProxyFactoryContract,
+  SafeVersion
+} from '@gnosis.pm/safe-core-sdk-types'
+import { SAFE_LAST_VERSION } from '../contracts/config'
+import {
+  getSafeContractDeployment,
+  getSafeProxyFactoryContractDeployment
+} from '../contracts/safeDeploymentContracts'
 import Safe from '../Safe'
 import { ContractNetworksConfig } from '../types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
@@ -75,9 +82,12 @@ class SafeFactory {
     this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
+
+    const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
     const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
-      safeVersion: this.#safeVersion,
+      safeVersion: safeVersion,
       chainId,
+      singletonDeployment: proxyFactoryDeployment,
       customContractAddress: customContracts?.safeProxyFactoryAddress,
       customContractAbi: customContracts?.safeProxyFactoryAbi
     })
@@ -86,10 +96,15 @@ class SafeFactory {
     }
     this.#safeProxyFactoryContract = safeProxyFactoryContract
 
-    const gnosisSafeContract = ethAdapter.getSafeContract({
-      safeVersion: this.#safeVersion,
+    const safeSingletonDeployment = getSafeContractDeployment(
+      SAFE_LAST_VERSION,
       chainId,
-      isL1SafeMasterCopy,
+      isL1SafeMasterCopy
+    )
+    const gnosisSafeContract = ethAdapter.getSafeContract({
+      safeVersion: safeVersion,
+      chainId,
+      singletonDeployment: safeSingletonDeployment,
       customContractAddress: customContracts?.safeMasterCopyAddress,
       customContractAbi: customContracts?.safeMasterCopyAbi
     })

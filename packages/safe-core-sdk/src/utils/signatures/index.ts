@@ -1,6 +1,5 @@
-import { SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
+import { EthAdapter, SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
-import EthAdapter from 'ethereumLibs/EthAdapter'
 import { sameString } from '../../utils'
 import EthSignSignature from './SafeSignature'
 

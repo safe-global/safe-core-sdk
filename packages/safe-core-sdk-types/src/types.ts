@@ -1,3 +1,35 @@
+import { ContractTransaction } from '@ethersproject/contracts'
+import { PromiEvent, TransactionReceipt } from 'web3-core/types'
+
+export type SafeVersion = '1.3.0' | '1.2.0' | '1.1.1'
+
+interface AbiInput {
+  name: string
+  type: string
+  indexed?: boolean
+  components?: AbiInput[]
+  internalType?: string
+}
+
+interface AbiOutput {
+  name: string
+  type: string
+  components?: AbiOutput[]
+  internalType?: string
+}
+
+export interface AbiItem {
+  anonymous?: boolean
+  constant?: boolean
+  inputs?: AbiInput[]
+  name?: string
+  outputs?: AbiOutput[]
+  payable?: boolean
+  stateMutability: string
+  type: string
+  gas?: number
+}
+
 export enum OperationType {
   Call, // 0
   DelegateCall // 1
@@ -41,4 +73,22 @@ export interface SafeTransaction {
   readonly signatures: Map<string, SafeSignature>
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
+}
+
+export interface TransactionOptions {
+  from?: string
+  gas?: number | string
+  gasLimit?: number | string
+  safeTxGas?: number | string
+  gasPrice?: number | string
+}
+
+export interface BaseTransactionResult {
+  hash: string
+}
+
+export interface TransactionResult extends BaseTransactionResult {
+  promiEvent?: PromiEvent<TransactionReceipt>
+  transactionResponse?: ContractTransaction
+  options?: TransactionOptions
 }

@@ -1,10 +1,14 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { MetaTransactionData, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  SafeTransactionDataPartial,
+  TransactionOptions
+} from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
-import Safe, { TransactionOptions } from '../src'
+import Safe from '../src'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'

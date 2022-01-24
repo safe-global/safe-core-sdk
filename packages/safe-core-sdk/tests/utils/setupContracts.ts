@@ -1,11 +1,11 @@
 import { AddressZero } from '@ethersproject/constants'
+import { AbiItem } from '@gnosis.pm/safe-core-sdk-types'
 import { deployments, ethers } from 'hardhat'
 import {
   gnosisSafeDeployed,
   multiSendDeployed,
   proxyFactoryDeployed
 } from '../../hardhat/deploy/deploy-contracts'
-import { AbiItem } from '../../src/types'
 import {
   GnosisSafe as GnosisSafe_V1_1_1,
   MultiSend as MultiSend_V1_1_1,

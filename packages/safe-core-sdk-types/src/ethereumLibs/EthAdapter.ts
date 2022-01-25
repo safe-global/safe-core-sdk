@@ -17,9 +17,9 @@ export interface EthAdapterTransaction {
 export interface GetContractProps {
   safeVersion: SafeVersion
   chainId: number
+  singletonDeployment?: SingletonDeployment
   customContractAddress?: string
   customContractAbi?: AbiItem[]
-  singletonDeployment?: SingletonDeployment
 }
 
 export interface EthAdapter {
@@ -30,19 +30,21 @@ export interface EthAdapter {
   getSafeContract({
     safeVersion,
     chainId,
+    singletonDeployment,
     customContractAddress,
-    customContractAbi,
-    singletonDeployment
+    customContractAbi
   }: GetContractProps): GnosisSafeContract
   getMultiSendContract({
     safeVersion,
     chainId,
+    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps): MultiSendContract
   getSafeProxyFactoryContract({
     safeVersion,
     chainId,
+    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps): GnosisSafeProxyFactoryContract

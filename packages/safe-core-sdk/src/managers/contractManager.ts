@@ -1,11 +1,32 @@
-import { GnosisSafeContract, MultiSendContract, SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  EthAdapter,
+  GnosisSafeContract,
+  MultiSendContract,
+  SafeVersion
+} from '@gnosis.pm/safe-core-sdk-types'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import {
   getMultiSendContractDeployment,
   getSafeContractDeployment
 } from '../contracts/safeDeploymentContracts'
 import { SafeConfig } from '../Safe'
-import { ContractNetworksConfig } from '../types'
+import { ContractNetworkConfig, ContractNetworksConfig } from '../types'
+
+interface GetSafeContractInstanceProps {
+  ethAdapter: EthAdapter
+  safeVersion: SafeVersion
+  chainId: number
+  safeAddress: string
+  isL1SafeMasterCopy?: boolean
+  customContracts?: ContractNetworkConfig
+}
+
+interface GetMultiSendContractInstanceProps {
+  ethAdapter: EthAdapter
+  safeVersion: SafeVersion
+  chainId: number
+  customContracts?: ContractNetworkConfig
+}
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
@@ -35,48 +56,29 @@ class ContractManager {
     this.#contractNetworks = contractNetworks
     this.#isL1SafeMasterCopy = isL1SafeMasterCopy
 
-    let safeSingletonDeployment = getSafeContractDeployment(
-      SAFE_LAST_VERSION,
-      chainId,
-      isL1SafeMasterCopy
-    )
-    const temporarySafeContract = ethAdapter.getSafeContract({
+    const temporarySafeContract = await this.getSafeContract({
+      ethAdapter,
       safeVersion: SAFE_LAST_VERSION,
       chainId,
-      singletonDeployment: safeSingletonDeployment,
-      customContractAddress: safeAddress,
-      customContractAbi: customContracts?.safeMasterCopyAbi
+      safeAddress,
+      isL1SafeMasterCopy,
+      customContracts
     })
-    if ((await ethAdapter.getContractCode(temporarySafeContract.getAddress())) === '0x') {
-      throw new Error('Safe Proxy contract is not deployed in the current network')
-    }
-
     const safeVersion = (await temporarySafeContract.getVersion()) as SafeVersion
-    safeSingletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeMasterCopy)
-    const safeContract = ethAdapter.getSafeContract({
+    this.#safeContract = await this.getSafeContract({
+      ethAdapter,
       safeVersion,
       chainId,
-      singletonDeployment: safeSingletonDeployment,
-      customContractAddress: safeAddress,
-      customContractAbi: customContracts?.safeMasterCopyAbi
+      safeAddress,
+      isL1SafeMasterCopy,
+      customContracts
     })
-    if ((await ethAdapter.getContractCode(safeContract.getAddress())) === '0x') {
-      throw new Error('Safe Proxy contract is not deployed in the current network')
-    }
-    this.#safeContract = safeContract
-
-    const multiSendDeployment = getMultiSendContractDeployment(safeVersion, chainId)
-    const multiSendContract = await ethAdapter.getMultiSendContract({
+    this.#multiSendContract = await this.getMultiSendContract({
+      ethAdapter,
       safeVersion,
       chainId,
-      singletonDeployment: multiSendDeployment,
-      customContractAddress: customContracts?.multiSendAddress,
-      customContractAbi: customContracts?.multiSendAbi
+      customContracts
     })
-    if ((await ethAdapter.getContractCode(multiSendContract.getAddress())) === '0x') {
-      throw new Error('Multi Send contract is not deployed in the current network')
-    }
-    this.#multiSendContract = multiSendContract
   }
 
   get contractNetworks(): ContractNetworksConfig | undefined {
@@ -93,6 +95,52 @@ class ContractManager {
 
   get multiSendContract(): MultiSendContract {
     return this.#multiSendContract
+  }
+
+  private async getSafeContract({
+    ethAdapter,
+    safeVersion,
+    chainId,
+    safeAddress,
+    isL1SafeMasterCopy,
+    customContracts
+  }: GetSafeContractInstanceProps): Promise<GnosisSafeContract> {
+    const safeSingletonDeployment = getSafeContractDeployment(
+      safeVersion,
+      chainId,
+      isL1SafeMasterCopy
+    )
+    const temporarySafeContract = ethAdapter.getSafeContract({
+      safeVersion: SAFE_LAST_VERSION,
+      chainId,
+      singletonDeployment: safeSingletonDeployment,
+      customContractAddress: safeAddress,
+      customContractAbi: customContracts?.safeMasterCopyAbi
+    })
+    if ((await ethAdapter.getContractCode(temporarySafeContract.getAddress())) === '0x') {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
+    return temporarySafeContract
+  }
+
+  private async getMultiSendContract({
+    ethAdapter,
+    safeVersion,
+    chainId,
+    customContracts
+  }: GetMultiSendContractInstanceProps): Promise<MultiSendContract> {
+    const multiSendDeployment = getMultiSendContractDeployment(safeVersion, chainId)
+    const multiSendContract = await ethAdapter.getMultiSendContract({
+      safeVersion,
+      chainId,
+      singletonDeployment: multiSendDeployment,
+      customContractAddress: customContracts?.multiSendAddress,
+      customContractAbi: customContracts?.multiSendAbi
+    })
+    if ((await ethAdapter.getContractCode(multiSendContract.getAddress())) === '0x') {
+      throw new Error('Multi Send contract is not deployed in the current network')
+    }
+    return multiSendContract
   }
 }
 

@@ -1,5 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { SafeTransaction, SafeTransactionData, TransactionOptions, TransactionResult } from '../types'
+import {
+  SafeTransaction,
+  SafeTransactionData,
+  TransactionOptions,
+  TransactionResult
+} from '../types'
 
 export interface GnosisSafeContract {
   getVersion(): Promise<string>

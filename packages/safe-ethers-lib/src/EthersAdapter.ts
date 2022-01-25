@@ -1,18 +1,22 @@
-import { TransactionResponse } from '@ethersproject/abstract-provider';
-import { Signer } from '@ethersproject/abstract-signer';
-import { BigNumber } from '@ethersproject/bignumber';
-import { Contract } from '@ethersproject/contracts';
-import { Provider } from '@ethersproject/providers';
-import { AbiItem, EthAdapter, EthAdapterTransaction, GetContractProps } from '@gnosis.pm/safe-core-sdk-types';
+import { TransactionResponse } from '@ethersproject/abstract-provider'
+import { Signer } from '@ethersproject/abstract-signer'
+import { BigNumber } from '@ethersproject/bignumber'
+import { Contract } from '@ethersproject/contracts'
+import { Provider } from '@ethersproject/providers'
+import {
+  AbiItem,
+  EthAdapter,
+  EthAdapterTransaction,
+  GetContractProps
+} from '@gnosis.pm/safe-core-sdk-types'
 import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance
-} from './contracts/contractInstancesEthers';
-import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers';
-import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract';
-import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract';
-
+} from './contracts/contractInstancesEthers'
+import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
+import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
+import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
 
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */

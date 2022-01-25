@@ -1,9 +1,18 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { AbiItem, EthAdapter, EthAdapterTransaction, GetContractProps } from "@gnosis.pm/safe-core-sdk-types";
-import { getGnosisSafeProxyFactoryContractInstance, getMultiSendContractInstance, getSafeContractInstance } from "./contracts/contractInstancesWeb3";
-import GnosisSafeContractWeb3 from "./contracts/GnosisSafe/GnosisSafeContractWeb3";
-import GnosisSafeProxyFactoryWeb3Contract from "./contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract";
-import MultiSendWeb3Contract from "./contracts/MultiSend/MultiSendWeb3Contract";
+import { BigNumber } from '@ethersproject/bignumber'
+import {
+  AbiItem,
+  EthAdapter,
+  EthAdapterTransaction,
+  GetContractProps
+} from '@gnosis.pm/safe-core-sdk-types'
+import {
+  getGnosisSafeProxyFactoryContractInstance,
+  getMultiSendContractInstance,
+  getSafeContractInstance
+} from './contracts/contractInstancesWeb3'
+import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
+import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
+import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -43,9 +52,7 @@ class Web3Adapter implements EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): GnosisSafeContractWeb3 {
-    
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid Safe Proxy contract address')
     }
@@ -81,8 +88,7 @@ class Web3Adapter implements EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid Safe Proxy Factory contract address')
     }

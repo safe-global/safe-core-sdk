@@ -1,6 +1,12 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
-import { BaseTransactionResult, GnosisSafeContract, SafeTransaction, SafeTransactionData, TransactionOptions } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  BaseTransactionResult,
+  GnosisSafeContract,
+  SafeTransaction,
+  SafeTransactionData,
+  TransactionOptions
+} from '@gnosis.pm/safe-core-sdk-types'
 import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/GnosisSafe'
 import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/GnosisSafe'
 import {

@@ -1,9 +1,9 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { SingletonDeployment } from '@gnosis.pm/safe-deployments';
-import { GnosisSafeContract } from '../contracts/GnosisSafeContract';
-import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract';
-import { MultiSendContract } from '../contracts/MultiSendContract';
-import { AbiItem, SafeVersion } from '../types';
+import { BigNumber } from '@ethersproject/bignumber'
+import { SingletonDeployment } from '@gnosis.pm/safe-deployments'
+import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
+import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
+import { MultiSendContract } from '../contracts/MultiSendContract'
+import { AbiItem, SafeVersion } from '../types'
 
 export interface EthAdapterTransaction {
   to: string

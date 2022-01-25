@@ -2,7 +2,11 @@ import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { getMultiSendContractDeployment, getSafeContractDeployment, getSafeProxyFactoryContractDeployment } from '../src/contracts/safeDeploymentContracts'
+import {
+  getMultiSendContractDeployment,
+  getSafeContractDeployment,
+  getSafeProxyFactoryContractDeployment
+} from '../src/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'

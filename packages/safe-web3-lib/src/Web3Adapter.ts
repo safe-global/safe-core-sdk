@@ -58,7 +58,7 @@ class Web3Adapter implements EthAdapter {
     const safeContract = this.getContract(
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    ) as any
+    )
     return getSafeContractInstance(safeVersion, safeContract)
   }
 

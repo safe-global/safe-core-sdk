@@ -70,7 +70,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     from: deployer,
     args: [],
     log: true,
-    deterministicDeployment: true
   })
 }
 

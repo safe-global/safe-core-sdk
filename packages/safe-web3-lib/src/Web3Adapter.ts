@@ -1,10 +1,13 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
-  AbiItem,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps
 } from '@gnosis.pm/safe-core-sdk-types'
+import Web3 from 'web3'
+import { Transaction } from 'web3-core'
+import { ContractOptions } from 'web3-eth-contract'
+import { AbiItem } from 'web3-utils'
 import {
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendContractInstance,
@@ -16,13 +19,13 @@ import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
-  web3: any
+  web3: Web3
   /** signerAddress - Address of the signer */
   signerAddress: string
 }
 
 class Web3Adapter implements EthAdapter {
-  #web3: any
+  #web3: Web3
   #signerAddress: string
 
   constructor({ web3, signerAddress }: Web3AdapterConfig) {
@@ -59,7 +62,7 @@ class Web3Adapter implements EthAdapter {
     const safeContract = this.getContract(
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
+    ) as any
     return getSafeContractInstance(safeVersion, safeContract)
   }
 
@@ -99,15 +102,15 @@ class Web3Adapter implements EthAdapter {
     return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
-  getContract(address: string, abi: AbiItem[]): any {
-    return new this.#web3.eth.Contract(abi, address)
+  getContract(address: string, abi: AbiItem | AbiItem[], options?: ContractOptions): any {
+    return new this.#web3.eth.Contract(abi, address, options)
   }
 
   async getContractCode(address: string): Promise<string> {
     return this.#web3.eth.getCode(address)
   }
 
-  async getTransaction(transactionHash: string): Promise<any> {
+  async getTransaction(transactionHash: string): Promise<Transaction> {
     return this.#web3.eth.getTransaction(transactionHash)
   }
 
@@ -119,7 +122,7 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
 
-  estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number> {
+  estimateGas(transaction: EthAdapterTransaction, options?: any): Promise<number> {
     return this.#web3.eth.estimateGas(transaction, options)
   }
 

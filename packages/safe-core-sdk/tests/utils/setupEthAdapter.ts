@@ -9,7 +9,7 @@ export async function getEthAdapter(signer: Signer): Promise<EthAdapter> {
   switch (process.env.ETH_LIB) {
     case 'web3':
       const signerAddress = await signer.getAddress()
-      const web3AdapterConfig: Web3AdapterConfig = { web3, signerAddress }
+      const web3AdapterConfig: Web3AdapterConfig = { web3: web3 as any, signerAddress }
       ethAdapter = new Web3Adapter(web3AdapterConfig)
       break
     case 'ethers':

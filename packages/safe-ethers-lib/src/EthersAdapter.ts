@@ -1,14 +1,13 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
-import { Contract } from '@ethersproject/contracts'
 import { Provider } from '@ethersproject/providers'
 import {
-  AbiItem,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps
 } from '@gnosis.pm/safe-core-sdk-types'
+import { ethers } from 'ethers'
 import {
   getMultiSendContractInstance,
   getSafeContractInstance,
@@ -18,15 +17,17 @@ import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractE
 import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
 
+type Ethers = typeof ethers
+
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
-  ethers: any
+  ethers: Ethers
   /** signer - Ethers signer */
   signer: Signer
 }
 
 class EthersAdapter implements EthAdapter {
-  #ethers: any
+  #ethers: Ethers
   #signer: Signer
   #provider: Provider
 
@@ -114,10 +115,6 @@ class EthersAdapter implements EthAdapter {
       throw new Error('Invalid Safe Proxy Factory contract address')
     }
     return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, this.#signer)
-  }
-
-  getContract(address: string, abi: AbiItem[]): Contract {
-    return new this.#ethers.Contract(address, abi, this.#signer)
   }
 
   async getContractCode(address: string): Promise<string> {

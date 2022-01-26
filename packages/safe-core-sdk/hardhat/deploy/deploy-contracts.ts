@@ -69,7 +69,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
   await deploy('ERC20Mintable', {
     from: deployer,
     args: [],
-    log: true,
+    log: true
   })
 }
 

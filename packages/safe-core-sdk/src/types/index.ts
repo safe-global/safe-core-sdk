@@ -1,4 +1,4 @@
-import { AbiItem } from 'web3-utils';
+import { AbiItem } from 'web3-utils'
 
 export interface ContractNetworkConfig {
   /** multiSendAddress - Address of the MultiSend contract deployed on a specific network */

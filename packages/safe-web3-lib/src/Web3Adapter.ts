@@ -1,9 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import {
-  EthAdapter,
-  EthAdapterTransaction,
-  GetContractProps
-} from '@gnosis.pm/safe-core-sdk-types'
+import { EthAdapter, EthAdapterTransaction, GetContractProps } from '@gnosis.pm/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'

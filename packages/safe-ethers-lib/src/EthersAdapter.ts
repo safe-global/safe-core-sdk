@@ -2,11 +2,7 @@ import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Provider } from '@ethersproject/providers'
-import {
-  EthAdapter,
-  EthAdapterTransaction,
-  GetContractProps
-} from '@gnosis.pm/safe-core-sdk-types'
+import { EthAdapter, EthAdapterTransaction, GetContractProps } from '@gnosis.pm/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import {
   getMultiSendContractInstance,

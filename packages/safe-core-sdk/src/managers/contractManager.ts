@@ -64,7 +64,7 @@ class ContractManager {
       isL1SafeMasterCopy,
       customContracts
     })
-    const safeVersion = (await temporarySafeContract.getVersion()) as SafeVersion
+    const safeVersion = await temporarySafeContract.getVersion()
     this.#safeContract = await this.getSafeContract({
       ethAdapter,
       safeVersion,
@@ -117,7 +117,10 @@ class ContractManager {
       customContractAddress: safeAddress,
       customContractAbi: customContracts?.safeMasterCopyAbi
     })
-    if ((await ethAdapter.getContractCode(temporarySafeContract.getAddress())) === '0x') {
+    const isContractDeployed = await ethAdapter.isContractDeployed(
+      temporarySafeContract.getAddress()
+    )
+    if (!isContractDeployed) {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
     return temporarySafeContract
@@ -137,7 +140,8 @@ class ContractManager {
       customContractAddress: customContracts?.multiSendAddress,
       customContractAbi: customContracts?.multiSendAbi
     })
-    if ((await ethAdapter.getContractCode(multiSendContract.getAddress())) === '0x') {
+    const isContractDeployed = await ethAdapter.isContractDeployed(multiSendContract.getAddress())
+    if (!isContractDeployed) {
       throw new Error('Multi Send contract is not deployed in the current network')
     }
     return multiSendContract

@@ -106,6 +106,11 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getCode(address)
   }
 
+  async isContractDeployed(address: string): Promise<boolean> {
+    const contractCode = await this.#web3.eth.getCode(address)
+    return contractCode !== '0x'
+  }
+
   async getTransaction(transactionHash: string): Promise<Transaction> {
     return this.#web3.eth.getTransaction(transactionHash)
   }
@@ -118,8 +123,11 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
 
-  estimateGas(transaction: EthAdapterTransaction, options?: any): Promise<number> {
-    return this.#web3.eth.estimateGas(transaction, options)
+  estimateGas(
+    transaction: EthAdapterTransaction,
+    callback?: (error: Error, gas: number) => void
+  ): Promise<number> {
+    return this.#web3.eth.estimateGas(transaction, callback)
   }
 
   call(transaction: EthAdapterTransaction): Promise<string> {

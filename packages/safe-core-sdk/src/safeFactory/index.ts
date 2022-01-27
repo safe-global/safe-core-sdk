@@ -165,7 +165,8 @@ class SafeFactory {
       saltNonce,
       options: { from: signerAddress }
     })
-    if ((await this.#ethAdapter.getContractCode(safeAddress)) === '0x') {
+    const isContractDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
+    if (!isContractDeployed) {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
     const safe = await Safe.create({
@@ -196,7 +197,10 @@ class SafeFactory {
       customContractAddress: customContracts?.safeMasterCopyAddress,
       customContractAbi: customContracts?.safeMasterCopyAbi
     })
-    if ((await this.#ethAdapter.getContractCode(gnosisSafeContract.getAddress())) === '0x') {
+    const isContractDeployed = await this.#ethAdapter.isContractDeployed(
+      gnosisSafeContract.getAddress()
+    )
+    if (!isContractDeployed) {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
     return gnosisSafeContract
@@ -216,7 +220,10 @@ class SafeFactory {
       customContractAddress: customContracts?.safeProxyFactoryAddress,
       customContractAbi: customContracts?.safeProxyFactoryAbi
     })
-    if ((await this.#ethAdapter.getContractCode(safeProxyFactoryContract.getAddress())) === '0x') {
+    const isContractDeployed = await this.#ethAdapter.isContractDeployed(
+      safeProxyFactoryContract.getAddress()
+    )
+    if (!isContractDeployed) {
       throw new Error('Safe Proxy Factory contract is not deployed in the current network')
     }
     return safeProxyFactoryContract

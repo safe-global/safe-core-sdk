@@ -6,6 +6,7 @@ import {
   SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial,
+  SafeVersion,
   TransactionOptions,
   TransactionResult
 } from '@gnosis.pm/safe-core-sdk-types'
@@ -176,7 +177,7 @@ class Safe {
    *
    * @returns The Safe Master Copy contract version
    */
-  async getContractVersion(): Promise<string> {
+  async getContractVersion(): Promise<SafeVersion> {
     return this.#contractManager.safeContract.getVersion()
   }
 

@@ -49,9 +49,13 @@ export interface EthAdapter {
     customContractAbi
   }: GetContractProps): GnosisSafeProxyFactoryContract
   getContractCode(address: string): Promise<string>
+  isContractDeployed(address: string): Promise<boolean>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
   signMessage(message: string, signerAddress: string): Promise<string>
-  estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number>
+  estimateGas(
+    transaction: EthAdapterTransaction,
+    callback?: (error: Error, gas: number) => void
+  ): Promise<number>
   call(transaction: EthAdapterTransaction): Promise<string>
 }

@@ -65,12 +65,9 @@ class EthersAdapter implements EthAdapter {
     singletonDeployment,
     customContractAddress
   }: GetContractProps): GnosisSafeContractEthers {
-    let contractAddress: string | undefined
-    if (customContractAddress) {
-      contractAddress = customContractAddress
-    } else {
-      contractAddress = singletonDeployment?.networkAddresses[chainId]
-    }
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid Safe Proxy contract address')
     }
@@ -83,12 +80,9 @@ class EthersAdapter implements EthAdapter {
     singletonDeployment,
     customContractAddress
   }: GetContractProps): MultiSendEthersContract {
-    let contractAddress: string | undefined
-    if (customContractAddress) {
-      contractAddress = customContractAddress
-    } else {
-      contractAddress = singletonDeployment?.networkAddresses[chainId]
-    }
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid Multi Send contract address')
     }
@@ -101,12 +95,9 @@ class EthersAdapter implements EthAdapter {
     singletonDeployment,
     customContractAddress
   }: GetContractProps): GnosisSafeProxyFactoryEthersContract {
-    let contractAddress: string | undefined
-    if (customContractAddress) {
-      contractAddress = customContractAddress
-    } else {
-      contractAddress = singletonDeployment?.networkAddresses[chainId]
-    }
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid Safe Proxy Factory contract address')
     }
@@ -115,6 +106,11 @@ class EthersAdapter implements EthAdapter {
 
   async getContractCode(address: string): Promise<string> {
     return this.#provider.getCode(address)
+  }
+
+  async isContractDeployed(address: string): Promise<boolean> {
+    const contractCode = await this.#provider.getCode(address)
+    return contractCode !== '0x'
   }
 
   async getTransaction(transactionHash: string): Promise<TransactionResponse> {

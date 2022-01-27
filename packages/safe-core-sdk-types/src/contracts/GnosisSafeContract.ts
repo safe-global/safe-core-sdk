@@ -2,12 +2,13 @@ import { BigNumber } from '@ethersproject/bignumber'
 import {
   SafeTransaction,
   SafeTransactionData,
+  SafeVersion,
   TransactionOptions,
   TransactionResult
 } from '../types'
 
 export interface GnosisSafeContract {
-  getVersion(): Promise<string>
+  getVersion(): Promise<SafeVersion>
   getAddress(): string
   getNonce(): Promise<number>
   getThreshold(): Promise<number>

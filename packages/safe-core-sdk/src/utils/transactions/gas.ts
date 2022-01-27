@@ -38,14 +38,11 @@ export async function estimateTxGas(
   ])
   try {
     const estimateResponse = (
-      await ethAdapter.estimateGas(
-        {
-          to: safeAddress,
-          from: safeAddress,
-          data: estimateData
-        },
-        'latest'
-      )
+      await ethAdapter.estimateGas({
+        to: safeAddress,
+        from: safeAddress,
+        data: estimateData
+      })
     ).toString()
     txGasEstimation = BigNumber.from('0x' + estimateResponse.substring(138)).toNumber() + 10000
   } catch (error) {}

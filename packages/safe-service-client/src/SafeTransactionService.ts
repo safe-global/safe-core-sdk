@@ -61,7 +61,8 @@ interface SafeTransactionService {
     safeAddress,
     senderAddress,
     safeTransaction,
-    safeTxHash
+    safeTxHash,
+    origin
   }: ProposeTransactionProps): Promise<void>
   getIncomingTransactions(safeAddress: string): Promise<TransferListResponse>
   getModuleTransactions(safeAddress: string): Promise<SafeModuleTransactionListResponse>

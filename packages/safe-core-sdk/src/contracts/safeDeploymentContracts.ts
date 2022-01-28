@@ -1,3 +1,4 @@
+import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 import {
   DeploymentFilter,
   getMultiSendDeployment,
@@ -6,7 +7,7 @@ import {
   getSafeSingletonDeployment,
   SingletonDeployment
 } from '@gnosis.pm/safe-deployments'
-import { safeDeploymentsL1ChainIds, safeDeploymentsVersions, SafeVersion } from './config'
+import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
 export function getSafeContractDeployment(
   safeVersion: SafeVersion,

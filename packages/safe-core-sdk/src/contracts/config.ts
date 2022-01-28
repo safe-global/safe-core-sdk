@@ -1,4 +1,4 @@
-export type SafeVersion = '1.3.0' | '1.2.0' | '1.1.1'
+import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 
 export const SAFE_LAST_VERSION: SafeVersion = '1.3.0'
 export const SAFE_BASE_VERSION: SafeVersion = '1.1.1'

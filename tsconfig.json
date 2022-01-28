@@ -4,6 +4,8 @@
     { "path": "safe-core-sdk" },
     { "path": "safe-core-sdk-types" },
     { "path": "safe-ethers-adapters" },
-    { "path": "safe-service-client" }
+    { "path": "safe-ethers-lib" },
+    { "path": "safe-service-client" },
+    { "path": "safe-web3-lib" }
   ]
 }

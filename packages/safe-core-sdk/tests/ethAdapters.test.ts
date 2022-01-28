@@ -1,7 +1,12 @@
+import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { SafeVersion } from '../src'
+import {
+  getMultiSendContractDeployment,
+  getSafeContractDeployment,
+  getSafeProxyFactoryContractDeployment
+} from '../src/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -29,7 +34,12 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1
-      const safeContract = await ethAdapter.getSafeContract({ safeVersion, chainId })
+      const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
+      const safeContract = await ethAdapter.getSafeContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
+      })
       chai
         .expect(await safeContract.getAddress())
         .to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
@@ -41,7 +51,12 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100
-      const safeContract = await ethAdapter.getSafeContract({ safeVersion, chainId })
+      const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
+      const safeContract = await ethAdapter.getSafeContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
+      })
       chai
         .expect(await safeContract.getAddress())
         .to.be.eq('0x3E5c63644E683549055b9Be8653de26E0B4CD36E')
@@ -54,10 +69,15 @@ describe('Safe contracts', () => {
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100
       const isL1SafeMasterCopy = true
-      const safeContract = await ethAdapter.getSafeContract({
+      const singletonDeployment = getSafeContractDeployment(
         safeVersion,
         chainId,
         isL1SafeMasterCopy
+      )
+      const safeContract = await ethAdapter.getSafeContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
       })
       chai
         .expect(await safeContract.getAddress())
@@ -89,7 +109,12 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1
-      const multiSendContract = await ethAdapter.getMultiSendContract({ safeVersion, chainId })
+      const singletonDeployment = getMultiSendContractDeployment(safeVersion, chainId)
+      const multiSendContract = await ethAdapter.getMultiSendContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
+      })
       chai
         .expect(await multiSendContract.getAddress())
         .to.be.eq('0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761')
@@ -120,7 +145,12 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1
-      const factoryContract = await ethAdapter.getSafeProxyFactoryContract({ safeVersion, chainId })
+      const singletonDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
+      const factoryContract = await ethAdapter.getSafeProxyFactoryContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
+      })
       chai
         .expect(await factoryContract.getAddress())
         .to.be.eq('0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2')

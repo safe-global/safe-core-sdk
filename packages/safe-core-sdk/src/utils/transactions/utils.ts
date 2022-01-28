@@ -1,13 +1,13 @@
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
 import {
+  EthAdapter,
+  GnosisSafeContract,
   MetaTransactionData,
   OperationType,
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@gnosis.pm/safe-core-sdk-types'
-import GnosisSafeContract from '../../contracts/GnosisSafe/GnosisSafeContract'
-import EthAdapter from '../../ethereumLibs/EthAdapter'
 import { ZERO_ADDRESS } from '../constants'
 import { FEATURES, hasFeature } from '../safeVersions'
 import { estimateTxGas } from './gas'

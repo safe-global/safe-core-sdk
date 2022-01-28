@@ -213,6 +213,7 @@ Once we have the Safe transaction object we can share it with the other owners o
 - `safeTransaction`: The Safe transaction object returned from the method `createTransaction`. Make sure that this object includes the signature of the owner which is proposing it.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.
 - `senderAddress`: The Safe owner proposing the transaction.
+- `origin`: Optional string that allows to provide more information about the app proposing the transaction.
 
 ```js
 await safeSdk.signTransaction(safeTransaction)
@@ -221,7 +222,8 @@ await safeService.proposeTransaction({
   safeAddress,
   safeTransaction,
   safeTxHash,
-  senderAddress
+  senderAddress,
+  origin
 })
 ```
 

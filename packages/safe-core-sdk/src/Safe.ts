@@ -1,12 +1,15 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
+  EthAdapter,
   MetaTransactionData,
   OperationType,
   SafeSignature,
   SafeTransaction,
-  SafeTransactionDataPartial
+  SafeTransactionDataPartial,
+  SafeVersion,
+  TransactionOptions,
+  TransactionResult
 } from '@gnosis.pm/safe-core-sdk-types'
-import EthAdapter from './ethereumLibs/EthAdapter'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
@@ -15,11 +18,7 @@ import { isMetaTransactionArray, sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
 import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
-import {
-  SafeTransactionOptionalProps,
-  TransactionOptions,
-  TransactionResult
-} from './utils/transactions/types'
+import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
   encodeMultiSendData,
   standardizeMetaTransactionData,
@@ -178,7 +177,7 @@ class Safe {
    *
    * @returns The Safe Master Copy contract version
    */
-  async getContractVersion(): Promise<string> {
+  async getContractVersion(): Promise<SafeVersion> {
     return this.#contractManager.safeContract.getVersion()
   }
 

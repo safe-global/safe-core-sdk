@@ -1,9 +1,16 @@
-import { SafeVersion, SAFE_LAST_VERSION } from '../contracts/config'
-import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
-import GnosisSafeProxyFactoryContract from '../contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryContract'
-import EthAdapter from '../ethereumLibs/EthAdapter'
+import {
+  EthAdapter,
+  GnosisSafeContract,
+  GnosisSafeProxyFactoryContract,
+  SafeVersion
+} from '@gnosis.pm/safe-core-sdk-types'
+import { SAFE_LAST_VERSION } from '../contracts/config'
+import {
+  getSafeContractDeployment,
+  getSafeProxyFactoryContractDeployment
+} from '../contracts/safeDeploymentContracts'
 import Safe from '../Safe'
-import { ContractNetworksConfig } from '../types'
+import { ContractNetworkConfig, ContractNetworksConfig } from '../types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
 import { validateSafeAccountConfig } from './utils'
 
@@ -44,6 +51,21 @@ interface SafeFactoryInitConfig {
   contractNetworks?: ContractNetworksConfig
 }
 
+interface GetSafeContractInstanceProps {
+  ethAdapter: EthAdapter
+  safeVersion: SafeVersion
+  chainId: number
+  isL1SafeMasterCopy?: boolean
+  customContracts?: ContractNetworkConfig
+}
+
+interface GetProxyFactoryContractInstanceProps {
+  ethAdapter: EthAdapter
+  safeVersion: SafeVersion
+  chainId: number
+  customContracts?: ContractNetworkConfig
+}
+
 class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeMasterCopy?: boolean
@@ -75,28 +97,19 @@ class SafeFactory {
     this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
-    const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
-      safeVersion: this.#safeVersion,
+    this.#safeProxyFactoryContract = await this.getProxyFactoryContract({
+      ethAdapter,
+      safeVersion,
       chainId,
-      customContractAddress: customContracts?.safeProxyFactoryAddress,
-      customContractAbi: customContracts?.safeProxyFactoryAbi
+      customContracts
     })
-    if ((await this.#ethAdapter.getContractCode(safeProxyFactoryContract.getAddress())) === '0x') {
-      throw new Error('Safe Proxy Factory contract is not deployed in the current network')
-    }
-    this.#safeProxyFactoryContract = safeProxyFactoryContract
-
-    const gnosisSafeContract = ethAdapter.getSafeContract({
-      safeVersion: this.#safeVersion,
+    this.#gnosisSafeContract = await this.getSafeContract({
+      ethAdapter,
+      safeVersion,
       chainId,
       isL1SafeMasterCopy,
-      customContractAddress: customContracts?.safeMasterCopyAddress,
-      customContractAbi: customContracts?.safeMasterCopyAbi
+      customContracts
     })
-    if ((await this.#ethAdapter.getContractCode(gnosisSafeContract.getAddress())) === '0x') {
-      throw new Error('Safe Proxy contract is not deployed in the current network')
-    }
-    this.#gnosisSafeContract = gnosisSafeContract
   }
 
   getEthAdapter(): EthAdapter {
@@ -152,7 +165,8 @@ class SafeFactory {
       saltNonce,
       options: { from: signerAddress }
     })
-    if ((await this.#ethAdapter.getContractCode(safeAddress)) === '0x') {
+    const isContractDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
+    if (!isContractDeployed) {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
     const safe = await Safe.create({
@@ -162,6 +176,57 @@ class SafeFactory {
       contractNetworks: this.#contractNetworks
     })
     return safe
+  }
+
+  private async getSafeContract({
+    ethAdapter,
+    safeVersion,
+    chainId,
+    isL1SafeMasterCopy,
+    customContracts
+  }: GetSafeContractInstanceProps): Promise<GnosisSafeContract> {
+    const safeSingletonDeployment = getSafeContractDeployment(
+      SAFE_LAST_VERSION,
+      chainId,
+      isL1SafeMasterCopy
+    )
+    const gnosisSafeContract = ethAdapter.getSafeContract({
+      safeVersion: safeVersion,
+      chainId,
+      singletonDeployment: safeSingletonDeployment,
+      customContractAddress: customContracts?.safeMasterCopyAddress,
+      customContractAbi: customContracts?.safeMasterCopyAbi
+    })
+    const isContractDeployed = await this.#ethAdapter.isContractDeployed(
+      gnosisSafeContract.getAddress()
+    )
+    if (!isContractDeployed) {
+      throw new Error('Safe Proxy contract is not deployed in the current network')
+    }
+    return gnosisSafeContract
+  }
+
+  private async getProxyFactoryContract({
+    ethAdapter,
+    safeVersion,
+    chainId,
+    customContracts
+  }: GetProxyFactoryContractInstanceProps): Promise<GnosisSafeProxyFactoryContract> {
+    const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
+    const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
+      safeVersion: safeVersion,
+      chainId,
+      singletonDeployment: proxyFactoryDeployment,
+      customContractAddress: customContracts?.safeProxyFactoryAddress,
+      customContractAbi: customContracts?.safeProxyFactoryAbi
+    })
+    const isContractDeployed = await this.#ethAdapter.isContractDeployed(
+      safeProxyFactoryContract.getAddress()
+    )
+    if (!isContractDeployed) {
+      throw new Error('Safe Proxy Factory contract is not deployed in the current network')
+    }
+    return safeProxyFactoryContract
   }
 }
 

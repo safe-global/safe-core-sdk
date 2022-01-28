@@ -1,7 +1,6 @@
+import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
-
-type SafeVersion = '1.3.0' | '1.2.0' | '1.1.1'
 
 export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 

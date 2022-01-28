@@ -1,3 +1,8 @@
+import { ContractTransaction } from '@ethersproject/contracts'
+import { PromiEvent, TransactionReceipt } from 'web3-core/types'
+
+export type SafeVersion = '1.3.0' | '1.2.0' | '1.1.1'
+
 export enum OperationType {
   Call, // 0
   DelegateCall // 1
@@ -41,4 +46,22 @@ export interface SafeTransaction {
   readonly signatures: Map<string, SafeSignature>
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
+}
+
+export interface TransactionOptions {
+  from?: string
+  gas?: number | string
+  gasLimit?: number | string
+  safeTxGas?: number | string
+  gasPrice?: number | string
+}
+
+export interface BaseTransactionResult {
+  hash: string
+}
+
+export interface TransactionResult extends BaseTransactionResult {
+  promiEvent?: PromiEvent<TransactionReceipt>
+  transactionResponse?: ContractTransaction
+  options?: TransactionOptions
 }

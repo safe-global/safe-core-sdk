@@ -1,7 +1,7 @@
 # Safe Service Client
 
 [![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-service-client.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-service-client)
-[![GitHub Release](https://img.shields.io/github/release/gnosis/safe-service-client.svg?style=flat)](https://github.com/gnosis/safe-service-client/releases)
+[![GitHub Release](https://img.shields.io/github/release/gnosis/safe-core-sdk.svg?style=flat)](https://github.com/gnosis/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/gnosis/safe-core-sdk)](https://github.com/gnosis/safe-core-sdk/blob/main/LICENSE.md)
 
 Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service).

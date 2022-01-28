@@ -1,9 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { SingletonDeployment } from '@gnosis.pm/safe-deployments'
+import { AbiItem } from 'web3-utils'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
 import { MultiSendContract } from '../contracts/MultiSendContract'
-import { AbiItem, SafeVersion } from '../types'
+import { SafeVersion } from '../types'
 
 export interface EthAdapterTransaction {
   to: string
@@ -19,14 +20,13 @@ export interface GetContractProps {
   chainId: number
   singletonDeployment?: SingletonDeployment
   customContractAddress?: string
-  customContractAbi?: AbiItem[]
+  customContractAbi?: AbiItem | AbiItem[]
 }
 
 export interface EthAdapter {
   isAddress(address: string): boolean
   getBalance(address: string): Promise<BigNumber>
   getChainId(): Promise<number>
-  getContract(address: string, abi: AbiItem[]): any
   getSafeContract({
     safeVersion,
     chainId,
@@ -49,9 +49,13 @@ export interface EthAdapter {
     customContractAbi
   }: GetContractProps): GnosisSafeProxyFactoryContract
   getContractCode(address: string): Promise<string>
+  isContractDeployed(address: string): Promise<boolean>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
   signMessage(message: string, signerAddress: string): Promise<string>
-  estimateGas(transaction: EthAdapterTransaction, options?: string): Promise<number>
+  estimateGas(
+    transaction: EthAdapterTransaction,
+    callback?: (error: Error, gas: number) => void
+  ): Promise<number>
   call(transaction: EthAdapterTransaction): Promise<string>
 }

@@ -1,5 +1,4 @@
 import { AddressZero } from '@ethersproject/constants'
-import { AbiItem } from '@gnosis.pm/safe-core-sdk-types'
 import {
   GnosisSafe as GnosisSafe_V1_1_1,
   MultiSend as MultiSend_V1_1_1,
@@ -17,6 +16,7 @@ import {
   SocialRecoveryModule
 } from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5'
 import { deployments, ethers } from 'hardhat'
+import { AbiItem } from 'web3-utils'
 import {
   gnosisSafeDeployed,
   multiSendDeployed,
@@ -25,7 +25,7 @@ import {
 
 export const getSafeSingleton = async (): Promise<{
   contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
-  abi: AbiItem[]
+  abi: AbiItem | AbiItem[]
 }> => {
   const SafeDeployment = await deployments.get(gnosisSafeDeployed.name)
   const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
@@ -40,7 +40,7 @@ export const getSafeSingleton = async (): Promise<{
 
 export const getFactory = async (): Promise<{
   contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1
-  abi: AbiItem[]
+  abi: AbiItem | AbiItem[]
 }> => {
   const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const Factory = await ethers.getContractFactory(proxyFactoryDeployed.name)
@@ -83,7 +83,7 @@ export const getSafeWithOwners = async (
 
 export const getMultiSend = async (): Promise<{
   contract: MultiSend_V1_3_0 | MultiSend_V1_1_1
-  abi: AbiItem[]
+  abi: AbiItem | AbiItem[]
 }> => {
   const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
   const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)

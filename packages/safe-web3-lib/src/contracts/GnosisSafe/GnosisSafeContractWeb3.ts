@@ -4,6 +4,7 @@ import {
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
+  SafeVersion,
   TransactionOptions
 } from '@gnosis.pm/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
@@ -30,8 +31,8 @@ function toTxResult(
 abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
   constructor(public contract: GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0) {}
 
-  async getVersion(): Promise<string> {
-    return this.contract.methods.VERSION().call()
+  async getVersion(): Promise<SafeVersion> {
+    return (await this.contract.methods.VERSION().call()) as SafeVersion
   }
 
   getAddress(): string {

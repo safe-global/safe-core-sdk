@@ -5,6 +5,7 @@ import {
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
+  SafeVersion,
   TransactionOptions
 } from '@gnosis.pm/safe-core-sdk-types'
 import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/GnosisSafe'
@@ -33,8 +34,8 @@ function toTxResult(
 abstract class GnosisSafeContractEthers implements GnosisSafeContract {
   constructor(public contract: GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0) {}
 
-  async getVersion(): Promise<string> {
-    return this.contract.VERSION()
+  async getVersion(): Promise<SafeVersion> {
+    return (await this.contract.VERSION()) as SafeVersion
   }
 
   getAddress(): string {

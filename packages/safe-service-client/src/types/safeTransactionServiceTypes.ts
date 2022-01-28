@@ -118,6 +118,7 @@ export type ProposeTransactionProps = {
   senderAddress: string
   safeTransaction: SafeTransaction
   safeTxHash: string
+  origin?: string
 }
 
 export type SafeMultisigTransactionResponse = {

@@ -358,7 +358,8 @@ class SafeServiceClient implements SafeTransactionService {
     safeAddress,
     senderAddress,
     safeTransaction,
-    safeTxHash
+    safeTxHash,
+    origin
   }: ProposeTransactionProps): Promise<void> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
@@ -373,7 +374,8 @@ class SafeServiceClient implements SafeTransactionService {
         ...safeTransaction.data,
         contractTransactionHash: safeTxHash,
         sender: senderAddress,
-        signature: safeTransaction.signatures.get(senderAddress.toLowerCase())?.data
+        signature: safeTransaction.signatures.get(senderAddress.toLowerCase())?.data,
+        origin
       }
     })
   }

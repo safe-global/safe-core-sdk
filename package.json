@@ -4,10 +4,10 @@
   "scripts": {
     "clean": "lerna clean",
     "unbuild": "lerna run unbuild",
-    "build": "lerna run build --stream",
-    "test": "FORCE_COLOR=1 lerna run test --stream",
-    "test:ci": "FORCE_COLOR=1 lerna run test:ci --stream",
-    "format": "lerna run format"
+    "build": "lerna run build --stream --npm-client=yarn",
+    "test": "FORCE_COLOR=1 lerna run test --stream --npm-client=yarn",
+    "format": "lerna run format --npm-client=yarn",
+    "postinstall": "cd packages/safe-ethers-lib; hardhat compile"
   },
   "workspaces": {
     "packages": [

@@ -74,7 +74,7 @@ The following steps show how to set up the Safe Core SDK, deploy a new Safe, cre
 To deploy a new Safe account instantiate the `SafeFactory` class and call the `deploySafe` method with the right params to configure the new Safe. This includes defining the list of owners and the threshold of the Safe. A Safe account with three owners and threshold equal three will be used as the starting point for this example but any Safe configuration is valid.
 
 ```js
-import { Safe, SafeFactory, SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
+import Safe, { SafeFactory, SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 

@@ -1,7 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { EthAdapter } from '@gnosis.pm/safe-core-sdk-types'
-import { EthersAdapter, EthersAdapterConfig } from '@gnosis.pm/safe-ethers-lib'
-import { Web3Adapter, Web3AdapterConfig } from '@gnosis.pm/safe-web3-lib'
+import EthersAdapter, { EthersAdapterConfig } from '@gnosis.pm/safe-ethers-lib'
+import Web3Adapter, { Web3AdapterConfig } from '@gnosis.pm/safe-web3-lib'
 import { ethers, web3 } from 'hardhat'
 
 export async function getEthAdapter(signer: Signer): Promise<EthAdapter> {

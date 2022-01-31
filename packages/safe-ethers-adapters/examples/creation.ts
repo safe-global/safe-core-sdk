@@ -1,6 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+import Safe from '@gnosis.pm/safe-core-sdk'
+import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
 import dotenv from 'dotenv'
 import { ethers } from 'ethers'
 import { SafeEthersSigner, SafeService } from '../src'

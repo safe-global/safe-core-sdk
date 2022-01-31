@@ -41,10 +41,10 @@ The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/s
 
 * **Using ethers.js**
 
-  We can use the class `EthersAdapter` from `@gnosis.pm/safe-core-sdk` as the wrapper for `ethers.js`.
+  We can use the class `EthersAdapter` from `@gnosis.pm/safe-ethers-lib` as the wrapper for `ethers.js`.
 
   ```js
-  import { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+  import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
   import { ethers } from 'ethers'
 
   const web3Provider = // ...
@@ -59,10 +59,10 @@ The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/s
 
 * **Using web3.js**
 
-  We can use the class `Web3Adapter` from `@gnosis.pm/safe-core-sdk` as the wrapper for `web3.js`.
+  We can use the class `Web3Adapter` from `@gnosis.pm/safe-web3-lib` as the wrapper for `web3.js`.
 
   ```js
-  import { Web3Adapter } from '@gnosis.pm/safe-core-sdk'
+  import Web3Adapter from '@gnosis.pm/safe-web3-lib'
   import Web3 from 'web3'
 
   const ethAdapter = new Web3Adapter({

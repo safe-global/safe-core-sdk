@@ -43,7 +43,7 @@ The following steps show how to set up the Safe Core SDK, deploy a new Safe, cre
 
   ```js
   import { ethers } from 'ethers'
-  import { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+  import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
 
   const web3Provider = // ...
   const provider = new ethers.providers.Web3Provider(web3Provider)
@@ -61,7 +61,7 @@ The following steps show how to set up the Safe Core SDK, deploy a new Safe, cre
 
   ```js
   import Web3 from 'web3'
-  import { Web3Adapter } from '@gnosis.pm/safe-core-sdk'
+  import Web3Adapter from '@gnosis.pm/safe-web3-lib'
 
   const ethAdapterOwner1 = new Web3Adapter({
     web3,

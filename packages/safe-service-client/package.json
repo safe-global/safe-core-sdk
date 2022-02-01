@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-service-client",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Safe Service Client",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -68,7 +68,7 @@
     }
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk-types": "^0.1.1",
+    "@gnosis.pm/safe-core-sdk-types": "^1.0.0",
     "node-fetch": "^2.6.6"
   }
 }

@@ -70,7 +70,7 @@ describe('Transactions creation', () => {
           to: account2.address,
           value: '0',
           data: '0x',
-          gasPrice: 123,
+          gasPrice: 123
         }
         const safeTxData = await standardizeSafeTransactionData(
           safeSdk.getContractManager().safeContract,
@@ -99,7 +99,7 @@ describe('Transactions creation', () => {
           value: '0',
           data: '0x',
           safeTxGas,
-          gasPrice: 123,
+          gasPrice: 123
         }
         const safeTxData = await standardizeSafeTransactionData(
           safeSdk.getContractManager().safeContract,

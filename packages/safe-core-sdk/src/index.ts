@@ -7,6 +7,7 @@ import Safe, {
   SwapOwnerTxParams
 } from './Safe'
 import SafeFactory, {
+  DeploySafeProps,
   SafeAccountConfig,
   SafeDeploymentConfig,
   SafeFactoryConfig
@@ -23,6 +24,7 @@ export {
   SafeFactoryConfig,
   SafeAccountConfig,
   SafeDeploymentConfig,
+  DeploySafeProps,
   SafeConfig,
   ConnectSafeConfig,
   ContractNetworksConfig,

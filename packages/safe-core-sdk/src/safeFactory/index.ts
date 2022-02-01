@@ -2,7 +2,8 @@ import {
   EthAdapter,
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
-  SafeVersion
+  SafeVersion,
+  TransactionOptions
 } from '@gnosis.pm/safe-core-sdk-types'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import {
@@ -27,6 +28,12 @@ export interface SafeAccountConfig {
 
 export interface SafeDeploymentConfig {
   saltNonce: number
+}
+
+export interface DeploySafeProps {
+  safeAccountConfig: SafeAccountConfig
+  safeDeploymentConfig?: SafeDeploymentConfig
+  options?: TransactionOptions
 }
 
 export interface SafeFactoryConfig {
@@ -150,20 +157,28 @@ class SafeFactory {
     ])
   }
 
-  async deploySafe(
-    safeAccountConfig: SafeAccountConfig,
-    safeDeploymentConfig?: SafeDeploymentConfig
-  ): Promise<Safe> {
+  async deploySafe({
+    safeAccountConfig,
+    safeDeploymentConfig,
+    options
+  }: DeploySafeProps): Promise<Safe> {
     validateSafeAccountConfig(safeAccountConfig)
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const saltNonce =
       safeDeploymentConfig?.saltNonce ?? Date.now() * 1000 + Math.floor(Math.random() * 1000)
+
+    if (options?.gas && options?.gasLimit) {
+      throw new Error('Cannot specify gas and gasLimit together in transaction options')
+    }
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
       safeMasterCopyAddress: this.#gnosisSafeContract.getAddress(),
       initializer,
       saltNonce,
-      options: { from: signerAddress }
+      options: {
+        from: signerAddress,
+        ...options
+      }
     })
     const isContractDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
     if (!isContractDeployed) {

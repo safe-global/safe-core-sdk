@@ -4,6 +4,7 @@ import { deployments, waffle } from 'hardhat'
 import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
 import {
   ContractNetworksConfig,
+  DeploySafeProps,
   SafeAccountConfig,
   SafeDeploymentConfig,
   SafeFactory
@@ -103,8 +104,9 @@ describe('Safe Proxy Factory', () => {
       const owners: string[] = []
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeployProps: DeploySafeProps = { safeAccountConfig }
       chai
-        .expect(safeFactory.deploySafe(safeAccountConfig))
+        .expect(safeFactory.deploySafe(safeDeployProps))
         .rejectedWith('Owner list must have at least one owner')
     })
 
@@ -116,8 +118,9 @@ describe('Safe Proxy Factory', () => {
       const owners = [account1.address, account2.address]
       const threshold = 0
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeployProps: DeploySafeProps = { safeAccountConfig }
       chai
-        .expect(safeFactory.deploySafe(safeAccountConfig))
+        .expect(safeFactory.deploySafe(safeDeployProps))
         .rejectedWith('Threshold must be greater than or equal to 1')
     })
 
@@ -129,8 +132,9 @@ describe('Safe Proxy Factory', () => {
       const owners = [account1.address, account2.address]
       const threshold = 3
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig }
       chai
-        .expect(safeFactory.deploySafe(safeAccountConfig))
+        .expect(safeFactory.deploySafe(deploySafeProps))
         .rejectedWith('Threshold must be lower than or equal to owners length')
     })
 
@@ -147,8 +151,9 @@ describe('Safe Proxy Factory', () => {
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: -1 }
+      const safeDeployProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
       chai
-        .expect(safeFactory.deploySafe(safeAccountConfig, safeDeploymentConfig))
+        .expect(safeFactory.deploySafe(safeDeployProps))
         .rejectedWith('saltNonce must be greater than 0')
     })
 
@@ -164,7 +169,8 @@ describe('Safe Proxy Factory', () => {
       const owners = [account1.address, account2.address]
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
-      const safe = await safeFactory.deploySafe(safeAccountConfig)
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
       const deployedSafeOwners = await safe.getOwners()
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
       const deployedSafeThreshold = await safe.getThreshold()
@@ -184,7 +190,8 @@ describe('Safe Proxy Factory', () => {
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: 1 }
-      const safe = await safeFactory.deploySafe(safeAccountConfig, safeDeploymentConfig)
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
       const deployedSafeOwners = await safe.getOwners()
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
       const deployedSafeThreshold = await safe.getThreshold()
@@ -201,7 +208,8 @@ describe('Safe Proxy Factory', () => {
         const owners = [account1.address, account2.address]
         const threshold = 2
         const safeAccountConfig: SafeAccountConfig = { owners, threshold }
-        const safe = await safeFactory.deploySafe(safeAccountConfig)
+        const deploySafeProps: DeploySafeProps = { safeAccountConfig }
+        const safe = await safeFactory.deploySafe(deploySafeProps)
         const safeInstanceVersion = await safe.getContractVersion()
         chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
       }
@@ -219,7 +227,8 @@ describe('Safe Proxy Factory', () => {
       const owners = [account1.address, account2.address]
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
-      const safe = await safeFactory.deploySafe(safeAccountConfig)
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
       const safeInstanceVersion = await safe.getContractVersion()
       chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
     })

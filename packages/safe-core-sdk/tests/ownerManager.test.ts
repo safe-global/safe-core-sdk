@@ -1,7 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
 import Safe, { SafeTransactionOptionalProps } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
 import { getContractNetworks } from './utils/setupContractNetworks'
@@ -189,7 +188,7 @@ describe('Safe owners manager', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should add an owner and keep the same threshold', async () => {
@@ -353,7 +352,7 @@ describe('Safe owners manager', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should remove the first owner of a Safe and decrease the threshold', async () => {
@@ -622,7 +621,7 @@ describe('Safe owners manager', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should replace the first owner of a Safe', async () => {

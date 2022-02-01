@@ -5,8 +5,7 @@ import {
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
-  SafeVersion,
-  TransactionOptions
+  SafeVersion
 } from '@gnosis.pm/safe-core-sdk-types'
 import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/GnosisSafe'
 import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/GnosisSafe'
@@ -14,15 +13,16 @@ import {
   GnosisSafe as GnosisSafe_V1_3_0,
   GnosisSafeInterface
 } from '../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
+import { EthersTransactionOptions } from '../../types'
 
 export interface EthersTransactionResult extends BaseTransactionResult {
   transactionResponse: ContractTransaction
-  options?: TransactionOptions
+  options?: EthersTransactionOptions
 }
 
 function toTxResult(
   transactionResponse: ContractTransaction,
-  options?: TransactionOptions
+  options?: EthersTransactionOptions
 ): EthersTransactionResult {
   return {
     hash: transactionResponse.hash,
@@ -77,7 +77,13 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
     return this.contract.approvedHashes(ownerAddress, hash)
   }
 
-  async approveHash(hash: string, options?: TransactionOptions): Promise<EthersTransactionResult> {
+  async approveHash(
+    hash: string,
+    options?: EthersTransactionOptions
+  ): Promise<EthersTransactionResult> {
+    if (options && !options.gasLimit) {
+      options.gasLimit = await this.estimateGas('approveHash', [hash], { ...options })
+    }
     const txResponse = await this.contract.approveHash(hash, options)
     return toTxResult(txResponse, options)
   }
@@ -88,8 +94,28 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
 
   async execTransaction(
     safeTransaction: SafeTransaction,
-    options?: TransactionOptions
+    options?: EthersTransactionOptions
   ): Promise<EthersTransactionResult> {
+    if (options && !options.gasLimit) {
+      options.gasLimit = await this.estimateGas(
+        'execTransaction',
+        [
+          safeTransaction.data.to,
+          safeTransaction.data.value,
+          safeTransaction.data.data,
+          safeTransaction.data.operation,
+          safeTransaction.data.safeTxGas,
+          safeTransaction.data.baseGas,
+          safeTransaction.data.gasPrice,
+          safeTransaction.data.gasToken,
+          safeTransaction.data.refundReceiver,
+          safeTransaction.encodedSignatures()
+        ],
+        {
+          ...options
+        }
+      )
+    }
     const txResponse = await this.contract.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,
@@ -113,7 +139,7 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
   async estimateGas(
     methodName: string,
     params: any[],
-    options: TransactionOptions
+    options: EthersTransactionOptions
   ): Promise<number> {
     return (await (this.contract.estimateGas as any)[methodName](...params, options)).toNumber()
   }

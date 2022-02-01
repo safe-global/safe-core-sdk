@@ -40,7 +40,7 @@ export async function standardizeSafeTransactionData(
   }
   let safeTxGas: number
   const safeVersion = await safeContract.getVersion()
-  if (hasFeature(FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)) {
+  if (hasFeature(FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) && standardizedTxs.gasPrice === 0) {
     safeTxGas = 0
   } else {
     safeTxGas =

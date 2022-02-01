@@ -131,7 +131,7 @@ const safeAccountConfig: SafeAccountConfig = {
   threshold: 2,
   // ... (optional params)
 }
-const safeSdk = await safeFactory.deploySafe(safeAccountConfig)
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
 Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used.

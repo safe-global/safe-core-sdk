@@ -4,22 +4,22 @@ import {
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
-  SafeVersion,
-  TransactionOptions
+  SafeVersion
 } from '@gnosis.pm/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/gnosis_safe'
 import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/web3-v1/v1.2.0/gnosis_safe'
 import { GnosisSafe as GnosisSafe_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
+import { Web3TransactionOptions } from '../../types'
 
 export interface Web3TransactionResult extends BaseTransactionResult {
   promiEvent: PromiEvent<TransactionReceipt>
-  options?: TransactionOptions
+  options?: Web3TransactionOptions
 }
 
 function toTxResult(
   promiEvent: PromiEvent<TransactionReceipt>,
-  options?: TransactionOptions
+  options?: Web3TransactionOptions
 ): Promise<Web3TransactionResult> {
   return new Promise((resolve, reject) =>
     promiEvent
@@ -76,7 +76,13 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
     return BigNumber.from(await this.contract.methods.approvedHashes(ownerAddress, hash).call())
   }
 
-  async approveHash(hash: string, options?: TransactionOptions): Promise<Web3TransactionResult> {
+  async approveHash(
+    hash: string,
+    options?: Web3TransactionOptions
+  ): Promise<Web3TransactionResult> {
+    if (options && !options.gas) {
+      options.gas = await this.estimateGas('approveHash', [hash], { ...options })
+    }
     const txResponse = this.contract.methods.approveHash(hash).send(options)
     return toTxResult(txResponse, options)
   }
@@ -87,8 +93,28 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
 
   async execTransaction(
     safeTransaction: SafeTransaction,
-    options?: TransactionOptions
+    options?: Web3TransactionOptions
   ): Promise<Web3TransactionResult> {
+    if (options && !options.gas) {
+      options.gas = await this.estimateGas(
+        'execTransaction',
+        [
+          safeTransaction.data.to,
+          safeTransaction.data.value,
+          safeTransaction.data.data,
+          safeTransaction.data.operation,
+          safeTransaction.data.safeTxGas,
+          safeTransaction.data.baseGas,
+          safeTransaction.data.gasPrice,
+          safeTransaction.data.gasToken,
+          safeTransaction.data.refundReceiver,
+          safeTransaction.encodedSignatures()
+        ],
+        {
+          ...options
+        }
+      )
+    }
     const txResponse = this.contract.methods
       .execTransaction(
         safeTransaction.data.to,
@@ -103,6 +129,7 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
         safeTransaction.encodedSignatures()
       )
       .send(options)
+
     return toTxResult(txResponse, options)
   }
 
@@ -113,9 +140,15 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
   async estimateGas(
     methodName: string,
     params: any[],
-    options: TransactionOptions
+    options: Web3TransactionOptions
   ): Promise<number> {
-    return Number(await (this.contract.methods as any)[methodName](...params).estimateGas(options))
+    try {
+      return Number(
+        await (this.contract.methods as any)[methodName](...params).estimateGas(options)
+      )
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 

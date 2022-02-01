@@ -1,10 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import {
-  EthAdapter,
-  GnosisSafeContract,
-  OperationType,
-  SafeTransaction
-} from '@gnosis.pm/safe-core-sdk-types'
+import { EthAdapter, GnosisSafeContract, OperationType } from '@gnosis.pm/safe-core-sdk-types'
 
 function estimateDataGasCosts(data: string): number {
   const reducer = (accumulator: number, currentValue: string) => {
@@ -81,34 +76,6 @@ export async function estimateTxGas(
     if (operation === OperationType.DelegateCall) {
       return 0
     }
-    return Promise.reject(error)
-  }
-}
-
-export async function estimateGasForTransactionExecution(
-  safeContract: GnosisSafeContract,
-  from: string,
-  tx: SafeTransaction
-): Promise<number> {
-  try {
-    const gas = await safeContract.estimateGas(
-      'execTransaction',
-      [
-        tx.data.to,
-        tx.data.value,
-        tx.data.data,
-        tx.data.operation,
-        tx.data.safeTxGas,
-        tx.data.baseGas,
-        tx.data.gasPrice,
-        tx.data.gasToken,
-        tx.data.refundReceiver,
-        tx.encodedSignatures()
-      ],
-      { from }
-    )
-    return gas
-  } catch (error) {
     return Promise.reject(error)
   }
 }

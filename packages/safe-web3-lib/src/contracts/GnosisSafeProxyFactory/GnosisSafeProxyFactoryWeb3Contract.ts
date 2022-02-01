@@ -1,7 +1,15 @@
-import { CreateProxyProps, GnosisSafeProxyFactoryContract } from '@gnosis.pm/safe-core-sdk-types'
+import { GnosisSafeProxyFactoryContract } from '@gnosis.pm/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 import { ProxyFactory as ProxyFactory_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/proxy_factory'
 import { ProxyFactory as ProxyFactory_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/proxy_factory'
+import { Web3TransactionOptions } from '../../types'
+
+export interface CreateProxyProps {
+  safeMasterCopyAddress: string
+  initializer: string
+  saltNonce: number
+  options?: Web3TransactionOptions
+}
 
 class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContract {
   constructor(public contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1) {}
@@ -19,15 +27,18 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     if (saltNonce < 0) {
       throw new Error('saltNonce must be greater than 0')
     }
-    const tx = this.contract.methods.createProxyWithNonce(
-      safeMasterCopyAddress,
-      initializer,
-      saltNonce
-    )
-    if (options && !options.gasLimit && !options.gas) {
-      options.gas = await tx.estimateGas(options)
+    if (options && !options.gas) {
+      options.gas = await this.estimateGas(
+        'createProxyWithNonce',
+        [safeMasterCopyAddress, initializer, saltNonce],
+        {
+          ...options
+        }
+      )
     }
-    const txResponse = tx.send(options)
+    const txResponse = this.contract.methods
+      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce)
+      .send(options)
     const txResult: TransactionReceipt = await new Promise((resolve, reject) =>
       txResponse.once('receipt', (receipt: TransactionReceipt) => resolve(receipt)).catch(reject)
     )
@@ -40,6 +51,20 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
 
   encode(methodName: string, params: any[]): string {
     return (this.contract as any).methods[methodName](...params).encodeABI()
+  }
+
+  async estimateGas(
+    methodName: string,
+    params: any[],
+    options: Web3TransactionOptions
+  ): Promise<number> {
+    try {
+      return Number(
+        await (this.contract.methods as any)[methodName](...params).estimateGas(options)
+      )
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
 

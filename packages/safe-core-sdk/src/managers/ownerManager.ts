@@ -1,5 +1,4 @@
-import GnosisSafeContract from '../contracts/GnosisSafe/GnosisSafeContract'
-import EthAdapter from '../ethereumLibs/EthAdapter'
+import { EthAdapter, GnosisSafeContract } from '@gnosis.pm/safe-core-sdk-types'
 import { isRestrictedAddress, sameString } from '../utils'
 import { SENTINEL_ADDRESS } from '../utils/constants'
 

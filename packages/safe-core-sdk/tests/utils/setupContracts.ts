@@ -1,49 +1,62 @@
 import { AddressZero } from '@ethersproject/constants'
+import {
+  GnosisSafe as GnosisSafe_V1_1_1,
+  MultiSend as MultiSend_V1_1_1,
+  ProxyFactory as ProxyFactory_V1_1_1
+} from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.1.1'
+import { GnosisSafe as GnosisSafe_V1_2_0 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.2.0/'
+import {
+  GnosisSafe as GnosisSafe_V1_3_0,
+  MultiSend as MultiSend_V1_3_0,
+  ProxyFactory as ProxyFactory_V1_3_0
+} from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/'
+import {
+  DailyLimitModule,
+  ERC20Mintable,
+  SocialRecoveryModule
+} from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5'
 import { deployments, ethers } from 'hardhat'
+import { AbiItem } from 'web3-utils'
 import {
   gnosisSafeDeployed,
   multiSendDeployed,
   proxyFactoryDeployed
 } from '../../hardhat/deploy/deploy-contracts'
-import {
-  GnosisSafe as GnosisSafe_V1_1_1,
-  MultiSend as MultiSend_V1_1_1,
-  ProxyFactory as ProxyFactory_V1_1_1
-} from '../../typechain/src/ethers-v5/v1.1.1'
-import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../typechain/src/ethers-v5/v1.2.0/'
-import {
-  GnosisSafe as GnosisSafe_V1_3_0,
-  MultiSend as MultiSend_V1_3_0,
-  ProxyFactory as ProxyFactory_V1_3_0
-} from '../../typechain/src/ethers-v5/v1.3.0/'
-import {
-  DailyLimitModule,
-  ERC20Mintable,
-  SocialRecoveryModule
-} from '../../typechain/tests/ethers-v5'
 
-export const getSafeSingleton = async (): Promise<
-  GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
-> => {
+export const getSafeSingleton = async (): Promise<{
+  contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
+  abi: AbiItem | AbiItem[]
+}> => {
   const SafeDeployment = await deployments.get(gnosisSafeDeployed.name)
   const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
-  return Safe.attach(SafeDeployment.address) as
-    | GnosisSafe_V1_3_0
-    | GnosisSafe_V1_2_0
-    | GnosisSafe_V1_1_1
+  return {
+    contract: Safe.attach(SafeDeployment.address) as
+      | GnosisSafe_V1_3_0
+      | GnosisSafe_V1_2_0
+      | GnosisSafe_V1_1_1,
+    abi: SafeDeployment.abi
+  }
 }
 
-export const getFactory = async (): Promise<ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1> => {
+export const getFactory = async (): Promise<{
+  contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1
+  abi: AbiItem | AbiItem[]
+}> => {
   const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const Factory = await ethers.getContractFactory(proxyFactoryDeployed.name)
-  return Factory.attach(FactoryDeployment.address) as ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1
+  return {
+    contract: Factory.attach(FactoryDeployment.address) as
+      | ProxyFactory_V1_3_0
+      | ProxyFactory_V1_1_1,
+    abi: FactoryDeployment.abi
+  }
 }
 
 export const getSafeTemplate = async (): Promise<
   GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
 > => {
-  const singleton = await getSafeSingleton()
-  const factory = await getFactory()
+  const singleton = (await getSafeSingleton()).contract
+  const factory = (await getFactory()).contract
   const template = await factory.callStatic.createProxy(singleton.address, '0x')
   await factory.createProxy(singleton.address, '0x').then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
@@ -68,10 +81,16 @@ export const getSafeWithOwners = async (
   return template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
 }
 
-export const getMultiSend = async (): Promise<MultiSend_V1_3_0 | MultiSend_V1_1_1> => {
+export const getMultiSend = async (): Promise<{
+  contract: MultiSend_V1_3_0 | MultiSend_V1_1_1
+  abi: AbiItem | AbiItem[]
+}> => {
   const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
   const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)
-  return MultiSend.attach(MultiSendDeployment.address) as MultiSend_V1_3_0 | MultiSend_V1_1_1
+  return {
+    contract: MultiSend.attach(MultiSendDeployment.address) as MultiSend_V1_3_0 | MultiSend_V1_1_1,
+    abi: MultiSendDeployment.abi
+  }
 }
 
 export const getDailyLimitModule = async (): Promise<DailyLimitModule> => {

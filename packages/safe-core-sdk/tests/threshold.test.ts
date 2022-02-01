@@ -1,14 +1,9 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
-import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
-import {
-  getFactory,
-  getMultiSend,
-  getSafeSingleton,
-  getSafeWithOwners
-} from './utils/setupContracts'
+import Safe, { SafeTransactionOptionalProps } from '../src'
+import { getContractNetworks } from './utils/setupContractNetworks'
+import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
@@ -20,13 +15,7 @@ describe('Safe Threshold', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       safe: await getSafeWithOwners([accounts[0].address]),
       accounts,
@@ -107,7 +96,7 @@ describe('Safe Threshold', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should change the threshold', async () => {

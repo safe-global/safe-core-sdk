@@ -1,14 +1,11 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
-import Safe, { ContractNetworksConfig, SafeTransactionOptionalProps } from '../src'
+import Safe, { SafeTransactionOptionalProps } from '../src'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../src/utils/constants'
+import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getDailyLimitModule,
-  getFactory,
-  getMultiSend,
-  getSafeSingleton,
   getSafeWithOwners,
   getSocialRecoveryModule
 } from './utils/setupContracts'
@@ -23,13 +20,7 @@ describe('Safe modules manager', () => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
-    const contractNetworks: ContractNetworksConfig = {
-      [chainId]: {
-        multiSendAddress: (await getMultiSend()).address,
-        safeMasterCopyAddress: (await getSafeSingleton()).address,
-        safeProxyFactoryAddress: (await getFactory()).address
-      }
-    }
+    const contractNetworks = await getContractNetworks(chainId)
     return {
       dailyLimitModule: await getDailyLimitModule(),
       socialRecoveryModule: await getSocialRecoveryModule(),
@@ -154,7 +145,7 @@ describe('Safe modules manager', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should enable a Safe module', async () => {
@@ -260,7 +251,7 @@ describe('Safe modules manager', () => {
       chai.expect(tx2.data.gasToken).to.be.eq('0x333')
       chai.expect(tx2.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx2.data.nonce).to.be.eq(555)
-      chai.expect(tx2.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
+      chai.expect(tx2.data.safeTxGas).to.be.eq(666)
     })
 
     it('should disable Safe modules', async () => {

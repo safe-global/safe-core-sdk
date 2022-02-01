@@ -1,16 +1,20 @@
 import { Signer } from '@ethersproject/abstract-signer'
+import { EthAdapter } from '@gnosis.pm/safe-core-sdk-types'
+import EthersAdapter, { EthersAdapterConfig } from '@gnosis.pm/safe-ethers-lib'
+import Web3Adapter, { Web3AdapterConfig } from '@gnosis.pm/safe-web3-lib'
 import { ethers, web3 } from 'hardhat'
-import { EthAdapter, EthersAdapter, Web3Adapter } from '../../src'
 
 export async function getEthAdapter(signer: Signer): Promise<EthAdapter> {
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
     case 'web3':
       const signerAddress = await signer.getAddress()
-      ethAdapter = new Web3Adapter({ web3, signerAddress })
+      const web3AdapterConfig: Web3AdapterConfig = { web3: web3 as any, signerAddress }
+      ethAdapter = new Web3Adapter(web3AdapterConfig)
       break
     case 'ethers':
-      ethAdapter = new EthersAdapter({ ethers, signer })
+      const ethersAdapterConfig: EthersAdapterConfig = { ethers, signer }
+      ethAdapter = new EthersAdapter(ethersAdapterConfig)
       break
     default:
       throw new Error('Ethereum library not supported')

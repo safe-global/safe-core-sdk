@@ -1,7 +1,8 @@
 import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import Safe, { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+import Safe from '@gnosis.pm/safe-core-sdk'
 import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
@@ -243,6 +244,7 @@ describe('Endpoint tests', () => {
         refundReceiver: '0x0000000000000000000000000000000000000000',
         nonce: 1
       }
+      const origin = 'Safe Core SDK: Safe Service Client'
       const provider = getDefaultProvider(config.JSON_RPC)
       const signer = new Wallet(
         '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
@@ -259,7 +261,8 @@ describe('Endpoint tests', () => {
             safeAddress,
             senderAddress: signerAddress,
             safeTransaction,
-            safeTxHash
+            safeTxHash,
+            origin
           })
         )
         .to.be.eventually.deep.equals({ data: { success: true } })
@@ -270,7 +273,8 @@ describe('Endpoint tests', () => {
           ...safeTxData,
           contractTransactionHash: safeTxHash,
           sender: safeTransaction.signatures.get(signerAddress.toLowerCase())?.signer,
-          signature: safeTransaction.signatures.get(signerAddress.toLowerCase())?.data
+          signature: safeTransaction.signatures.get(signerAddress.toLowerCase())?.data,
+          origin
         }
       })
     })

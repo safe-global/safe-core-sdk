@@ -1,25 +1,23 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
+  EthAdapter,
   MetaTransactionData,
   OperationType,
   SafeSignature,
   SafeTransaction,
-  SafeTransactionDataPartial
+  SafeTransactionDataPartial,
+  SafeVersion,
+  TransactionOptions,
+  TransactionResult
 } from '@gnosis.pm/safe-core-sdk-types'
-import EthAdapter from './ethereumLibs/EthAdapter'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
 import { isMetaTransactionArray, sameString } from './utils'
 import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
-import { estimateGasForTransactionExecution } from './utils/transactions/gas'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
-import {
-  SafeTransactionOptionalProps,
-  TransactionOptions,
-  TransactionResult
-} from './utils/transactions/types'
+import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
   encodeMultiSendData,
   standardizeMetaTransactionData,
@@ -178,7 +176,7 @@ class Safe {
    *
    * @returns The Safe Master Copy contract version
    */
-  async getContractVersion(): Promise<string> {
+  async getContractVersion(): Promise<SafeVersion> {
     return this.#contractManager.safeContract.getVersion()
   }
 
@@ -365,8 +363,12 @@ class Safe {
    * @param hash - The hash to approve
    * @returns The Safe transaction response
    * @throws "Transaction hashes can only be approved by Safe owners"
+   * @throws "Cannot specify gas and gasLimit together in transaction options"
    */
-  async approveTransactionHash(hash: string): Promise<TransactionResult> {
+  async approveTransactionHash(
+    hash: string,
+    options?: TransactionOptions
+  ): Promise<TransactionResult> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
@@ -375,8 +377,12 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
+    if (options?.gas && options?.gasLimit) {
+      throw new Error('Cannot specify gas and gasLimit together in transaction options')
+    }
     return this.#contractManager.safeContract.approveHash(hash, {
-      from: signerAddress
+      from: signerAddress,
+      ...options
     })
   }
 
@@ -544,6 +550,7 @@ class Safe {
    * @returns The Safe transaction response
    * @throws "No signer provided"
    * @throws "There are X signatures missing"
+   * @throws "Cannot specify gas and gasLimit together in transaction options"
    */
   async executeTransaction(
     safeTransaction: SafeTransaction,
@@ -578,23 +585,13 @@ class Safe {
       }
     }
 
-    const gasLimit =
-      options?.gasLimit ||
-      (await estimateGasForTransactionExecution(
-        this.#contractManager.safeContract,
-        signerAddress,
-        safeTransaction
-      ))
-    const executionOptions: TransactionOptions = {
-      gasLimit,
-      gasPrice: options?.gasPrice,
-      from: signerAddress
+    if (options?.gas && options?.gasLimit) {
+      throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
-
-    const txResponse = await this.#contractManager.safeContract.execTransaction(
-      safeTransaction,
-      executionOptions
-    )
+    const txResponse = await this.#contractManager.safeContract.execTransaction(safeTransaction, {
+      from: signerAddress,
+      ...options
+    })
     return txResponse
   }
 }

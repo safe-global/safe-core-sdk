@@ -41,10 +41,10 @@ The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/s
 
 * **Using ethers.js**
 
-  We can use the class `EthersAdapter` from `@gnosis.pm/safe-core-sdk` as the wrapper for `ethers.js`.
+  We can use the class `EthersAdapter` from `@gnosis.pm/safe-ethers-lib` as the wrapper for `ethers.js`.
 
   ```js
-  import { EthersAdapter } from '@gnosis.pm/safe-core-sdk'
+  import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
   import { ethers } from 'ethers'
 
   const web3Provider = // ...
@@ -59,10 +59,10 @@ The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/s
 
 * **Using web3.js**
 
-  We can use the class `Web3Adapter` from `@gnosis.pm/safe-core-sdk` as the wrapper for `web3.js`.
+  We can use the class `Web3Adapter` from `@gnosis.pm/safe-web3-lib` as the wrapper for `web3.js`.
 
   ```js
-  import { Web3Adapter } from '@gnosis.pm/safe-core-sdk'
+  import Web3Adapter from '@gnosis.pm/safe-web3-lib'
   import Web3 from 'web3'
 
   const ethAdapter = new Web3Adapter({
@@ -131,7 +131,7 @@ const safeAccountConfig: SafeAccountConfig = {
   threshold: 2,
   // ... (optional params)
 }
-const safeSdk = await safeFactory.deploySafe(safeAccountConfig)
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
 Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used.
@@ -213,6 +213,7 @@ Once we have the Safe transaction object we can share it with the other owners o
 - `safeTransaction`: The Safe transaction object returned from the method `createTransaction`. Make sure that this object includes the signature of the owner which is proposing it.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.
 - `senderAddress`: The Safe owner proposing the transaction.
+- `origin`: Optional string that allows to provide more information about the app proposing the transaction.
 
 ```js
 await safeSdk.signTransaction(safeTransaction)
@@ -221,7 +222,8 @@ await safeService.proposeTransaction({
   safeAddress,
   safeTransaction,
   safeTxHash,
-  senderAddress
+  senderAddress,
+  origin
 })
 ```
 

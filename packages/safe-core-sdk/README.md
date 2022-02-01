@@ -86,7 +86,7 @@ const safeAccountConfig: SafeAccountConfig = {
   // ...
 }
 
-const safeSdk: Safe = await safeFactory.deploySafe(safeAccountConfig)
+const safeSdk: Safe = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
 The `deploySafe` method executes a transaction from the `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe. Check the `deploySafe` method in the [API Reference](#factory-api) for more details on additional configuration parameters.
@@ -225,7 +225,7 @@ const safeAccountConfig: SafeAccountConfig = {
   paymentReceiver // Optional
 }
 
-const safeSdk = await safeFactory.deploySafe(safeAccountConfig)
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
 This method can optionally receive the `safeDeploymentConfig` parameter to define the `saltNonce`.
@@ -243,7 +243,27 @@ const safeAccountConfig: SafeAccountConfig = {
 }
 const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce }
 
-const safeSdk = await safeFactory.deploySafe(safeAccountConfig, safeDeploymentConfig)
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, safeDeploymentConfig })
+```
+
+Optionally, some properties can be passed as execution options:
+
+```js
+const options: Web3TransactionOptions = {
+  from, // Optional
+  gas, // Optional
+  gasPrice // Optional
+}
+```
+```js
+const options: EthersTransactionOptions = {
+  from, // Optional
+  gasLimit, // Optional
+  gasPrice // Optional
+}
+```
+```js
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, safeDeploymentConfig, options })
 ```
 
 ## <a name="sdk-api">Safe Core SDK API Reference</a>
@@ -319,25 +339,6 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
   }
   const safeSdk = await Safe.connect({ ethAdapter, safeAddress, contractNetworks })
   ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### getAddress
 
@@ -572,6 +573,26 @@ const txResponse = await safeSdk.approveTransactionHash(txHash)
 await txResponse.transactionResponse?.wait()
 ```
 
+Optionally, some properties can be passed as execution options:
+
+```js
+const options: Web3TransactionOptions = {
+  from, // Optional
+  gas, // Optional
+  gasPrice // Optional
+}
+```
+```js
+const options: EthersTransactionOptions = {
+  from, // Optional
+  gasLimit, // Optional
+  gasPrice // Optional
+}
+```
+```js
+const txResponse = await safeSdk.approveTransactionHash(txHash, options)
+```
+
 ### getOwnersWhoApprovedTx
 
 Returns a list of owners who have approved a specific Safe transaction.
@@ -719,13 +740,23 @@ const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
 
-Optionally, `gasLimit` and `gasPrice` values can be passed as execution options, avoiding the gas estimation.
+Optionally, some properties can be passed as execution options:
 
 ```js
-const options: TransactionOptions = {
-  gasLimit,
+const options: Web3TransactionOptions = {
+  from, // Optional
+  gas, // Optional
   gasPrice // Optional
 }
+```
+```js
+const options: EthersTransactionOptions = {
+  from, // Optional
+  gasLimit, // Optional
+  gasPrice // Optional
+}
+```
+```js
 const txResponse = await safeSdk.executeTransaction(safeTransaction, options)
 ```
 

@@ -86,7 +86,7 @@ export async function getSafeContract({
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(gnosisSafeContract.getAddress())
   if (!isContractDeployed) {
-    throw new Error('Safe Proxy contract is not deployed in the current network')
+    throw new Error('Safe Proxy contract is not deployed on the current network')
   }
   return gnosisSafeContract
 }
@@ -109,7 +109,7 @@ export async function getProxyFactoryContract({
     safeProxyFactoryContract.getAddress()
   )
   if (!isContractDeployed) {
-    throw new Error('Safe Proxy Factory contract is not deployed in the current network')
+    throw new Error('Safe Proxy Factory contract is not deployed on the current network')
   }
   return safeProxyFactoryContract
 }
@@ -130,7 +130,7 @@ export async function getMultiSendContract({
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(multiSendContract.getAddress())
   if (!isContractDeployed) {
-    throw new Error('Multi Send contract is not deployed in the current network')
+    throw new Error('Multi Send contract is not deployed on the current network')
   }
   return multiSendContract
 }

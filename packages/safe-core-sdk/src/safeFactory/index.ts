@@ -164,7 +164,7 @@ class SafeFactory {
     })
     const isContractDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
     if (!isContractDeployed) {
-      throw new Error('Safe Proxy contract is not deployed in the current network')
+      throw new Error('Safe Proxy contract is not deployed on the current network')
     }
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,

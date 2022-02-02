@@ -16,27 +16,16 @@ import {
 import { ContractNetworkConfig } from '../types'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
-interface GetSafeContractInstanceProps {
+interface GetContractInstanceProps {
   ethAdapter: EthAdapter
   safeVersion: SafeVersion
   chainId: number
+  customContracts?: ContractNetworkConfig
+}
+
+interface GetSafeContractInstanceProps extends GetContractInstanceProps {
   isL1SafeMasterCopy?: boolean
   customSafeAddress?: string
-  customContracts?: ContractNetworkConfig
-}
-
-interface GetProxyFactoryContractInstanceProps {
-  ethAdapter: EthAdapter
-  safeVersion: SafeVersion
-  chainId: number
-  customContracts?: ContractNetworkConfig
-}
-
-interface GetMultiSendContractInstanceProps {
-  ethAdapter: EthAdapter
-  safeVersion: SafeVersion
-  chainId: number
-  customContracts?: ContractNetworkConfig
 }
 
 export function getSafeContractDeployment(
@@ -96,7 +85,7 @@ export async function getProxyFactoryContract({
   safeVersion,
   chainId,
   customContracts
-}: GetProxyFactoryContractInstanceProps): Promise<GnosisSafeProxyFactoryContract> {
+}: GetContractInstanceProps): Promise<GnosisSafeProxyFactoryContract> {
   const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
   const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
     safeVersion,
@@ -119,7 +108,7 @@ export async function getMultiSendContract({
   safeVersion,
   chainId,
   customContracts
-}: GetMultiSendContractInstanceProps): Promise<MultiSendContract> {
+}: GetContractInstanceProps): Promise<MultiSendContract> {
   const multiSendDeployment = getMultiSendContractDeployment(safeVersion, chainId)
   const multiSendContract = await ethAdapter.getMultiSendContract({
     safeVersion,

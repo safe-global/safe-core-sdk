@@ -58,7 +58,7 @@ describe('Safe Proxy Factory', () => {
       }
       chai
         .expect(SafeFactory.create({ ethAdapter, contractNetworks }))
-        .rejectedWith('Safe Proxy Factory contract is not deployed in the current network')
+        .rejectedWith('Safe Proxy Factory contract is not deployed on the current network')
     })
 
     it('should instantiate the Safe Proxy Factory', async () => {

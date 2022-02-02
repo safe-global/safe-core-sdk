@@ -105,25 +105,25 @@ class ContractManager {
     isL1SafeMasterCopy,
     customContracts
   }: GetSafeContractInstanceProps): Promise<GnosisSafeContract> {
-    const safeSingletonDeployment = getSafeContractDeployment(
+    const singletonDeployment = getSafeContractDeployment(
       safeVersion,
       chainId,
       isL1SafeMasterCopy
     )
-    const temporarySafeContract = ethAdapter.getSafeContract({
-      safeVersion: SAFE_LAST_VERSION,
+    const gnosisSafeContract = ethAdapter.getSafeContract({
+      safeVersion,
       chainId,
-      singletonDeployment: safeSingletonDeployment,
+      singletonDeployment,
       customContractAddress: safeAddress,
       customContractAbi: customContracts?.safeMasterCopyAbi
     })
     const isContractDeployed = await ethAdapter.isContractDeployed(
-      temporarySafeContract.getAddress()
+      gnosisSafeContract.getAddress()
     )
     if (!isContractDeployed) {
       throw new Error('Safe Proxy contract is not deployed in the current network')
     }
-    return temporarySafeContract
+    return gnosisSafeContract
   }
 
   private async getMultiSendContract({

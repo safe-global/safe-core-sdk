@@ -200,15 +200,15 @@ class SafeFactory {
     isL1SafeMasterCopy,
     customContracts
   }: GetSafeContractInstanceProps): Promise<GnosisSafeContract> {
-    const safeSingletonDeployment = getSafeContractDeployment(
-      SAFE_LAST_VERSION,
+    const singletonDeployment = getSafeContractDeployment(
+      safeVersion,
       chainId,
       isL1SafeMasterCopy
     )
     const gnosisSafeContract = ethAdapter.getSafeContract({
-      safeVersion: safeVersion,
+      safeVersion,
       chainId,
-      singletonDeployment: safeSingletonDeployment,
+      singletonDeployment,
       customContractAddress: customContracts?.safeMasterCopyAddress,
       customContractAbi: customContracts?.safeMasterCopyAbi
     })
@@ -229,7 +229,7 @@ class SafeFactory {
   }: GetProxyFactoryContractInstanceProps): Promise<GnosisSafeProxyFactoryContract> {
     const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
     const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
-      safeVersion: safeVersion,
+      safeVersion,
       chainId,
       singletonDeployment: proxyFactoryDeployment,
       customContractAddress: customContracts?.safeProxyFactoryAddress,

@@ -48,7 +48,7 @@ describe('Safe contracts manager', () => {
         )
     })
 
-    it('should fail if Safe Proxy contract is not deployed in the current network', async () => {
+    it('should fail if Safe Proxy contract is not deployed on the current network', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -60,7 +60,7 @@ describe('Safe contracts manager', () => {
             contractNetworks
           })
         )
-        .to.be.rejectedWith('Safe Proxy contract is not deployed in the current network')
+        .to.be.rejectedWith('Safe Proxy contract is not deployed on the current network')
     })
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
@@ -85,10 +85,10 @@ describe('Safe contracts manager', () => {
             contractNetworks: customContractNetworks
           })
         )
-        .to.be.rejectedWith('Multi Send contract is not deployed in the current network')
+        .to.be.rejectedWith('Multi Send contract is not deployed on the current network')
     })
 
-    it('should set the MultiSend contract available in the current network', async () => {
+    it('should set the MultiSend contract available on the current network', async () => {
       const { safe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)

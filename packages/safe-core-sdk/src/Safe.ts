@@ -77,8 +77,8 @@ class Safe {
    * Creates an instance of the Safe Core SDK.
    * @param config - Ethers Safe configuration
    * @returns The Safe Core SDK instance
-   * @throws "Safe Proxy contract is not deployed in the current network"
-   * @throws "MultiSend contract is not deployed in the current network"
+   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "MultiSend contract is not deployed on the current network"
    */
   static async create({
     ethAdapter,
@@ -95,8 +95,8 @@ class Safe {
    * Initializes the Safe Core SDK instance.
    * @param config - Safe configuration
    * @throws "Signer must be connected to a provider"
-   * @throws "Safe Proxy contract is not deployed in the current network"
-   * @throws "MultiSend contract is not deployed in the current network"
+   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "MultiSend contract is not deployed on the current network"
    */
   private async init({
     ethAdapter,
@@ -118,8 +118,8 @@ class Safe {
   /**
    * Returns a new instance of the Safe Core SDK.
    * @param config - Connect Safe configuration
-   * @throws "Safe Proxy contract is not deployed in the current network"
-   * @throws "MultiSend contract is not deployed in the current network"
+   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "MultiSend contract is not deployed on the current network"
    */
   async connect({
     ethAdapter,

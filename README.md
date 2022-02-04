@@ -2,6 +2,12 @@
 
 Software developer tools that facilitate the interaction with the Gnosis Safe [contracts](https://github.com/gnosis/safe-contracts) and [services](https://github.com/gnosis/safe-transaction-service).
 
+## Guides
+
+| Title | Description |
+| ------- | ----------- |
+| [Integrating the Safe Core SDK](https://github.com/gnosis/safe-core-sdk/blob/main/packages/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-core-sdk) and [Safe Service Client](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-service-client). |
+
 ## Packages
 
 | Package | Release | Description |

@@ -64,3 +64,8 @@ export interface TransactionResult extends BaseTransactionResult {
   transactionResponse?: ContractTransaction
   options?: TransactionOptions
 }
+
+export interface Eip3770Address {
+  prefix: string
+  address: string
+}

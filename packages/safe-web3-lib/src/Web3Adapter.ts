@@ -1,5 +1,11 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { EthAdapter, EthAdapterTransaction, GetContractProps } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  Eip3770Address,
+  EthAdapter,
+  EthAdapterTransaction,
+  GetContractProps
+} from '@gnosis.pm/safe-core-sdk-types'
+import { validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
@@ -34,6 +40,11 @@ class Web3Adapter implements EthAdapter {
 
   isAddress(address: string): boolean {
     return this.#web3.utils.isAddress(address)
+  }
+
+  async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
+    const chainId = await this.getChainId()
+    return validateEip3770Address(fullAddress, chainId)
   }
 
   async getBalance(address: string): Promise<BigNumber> {

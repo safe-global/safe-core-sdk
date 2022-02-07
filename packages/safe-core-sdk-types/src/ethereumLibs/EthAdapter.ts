@@ -4,7 +4,7 @@ import { AbiItem } from 'web3-utils'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
 import { MultiSendContract } from '../contracts/MultiSendContract'
-import { SafeVersion } from '../types'
+import { Eip3770Address, SafeVersion } from '../types'
 
 export interface EthAdapterTransaction {
   to: string
@@ -25,6 +25,7 @@ export interface GetContractProps {
 
 export interface EthAdapter {
   isAddress(address: string): boolean
+  getEip3770Address(fullAddress: string): Promise<Eip3770Address>
   getBalance(address: string): Promise<BigNumber>
   getChainId(): Promise<number>
   getSafeContract({

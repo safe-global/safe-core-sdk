@@ -412,7 +412,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/module-transfers/`,
+      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/module-transactions/`,
       method: HttpMethod.Get
     })
   }

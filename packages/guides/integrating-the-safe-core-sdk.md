@@ -22,22 +22,19 @@ To integrate the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) into y
 @gnosis.pm/safe-service-client
 ```
 
-## <a name="initialize-sdks">2. Initialize the SDK’s</a>
-
-### Initialize the Safe Service Client
-
-As stated in the introduction, the [Safe Service Client](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service). To start using this library, create a new instance of the class `SafeServiceClient` imported from `@gnosis.pm/safe-service-client` and pass the URL to its constructor of the Safe Transaction Service you want to use depending on the network.
-
-```js
-import SafeServiceClient from '@gnosis.pm/safe-service-client'
-
-const transactionServiceUrl = 'https://safe-transaction.gnosis.io'
-const safeService = new SafeServiceClient(transactionServiceUrl)
+And one of these two:
+```
+@gnosis.pm/safe-web3-lib
+@gnosis.pm/safe-ethers-lib
 ```
 
-### Initialize the Safe Core SDK
+## <a name="initialize-sdks">2. Initialize the SDK’s</a>
 
-The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-core-sdk) library only interacts with the [Safe contracts](https://github.com/gnosis/safe-contracts). Because of this, we need to select one Ethereum library: [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/).
+### Initialize an EthAdapter
+
+First of all, we need to create an `EthAdapter`, which contains all the required utilities that allow the SDKs to interact with the blockchain, acting as a wrapper of [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/) Ethereum libraries.
+
+Depending on the library used by the Dapp, there are two options:
 
 * **Using ethers.js**
 
@@ -71,7 +68,20 @@ The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk/tree/main/packages/s
   })
   ```
 
-Once we have an instance of `EthersAdapter` or `Web3Adapter` we are ready to instantiate the `SafeFactory` and `Safe` classes from `@gnosis.pm/safe-core-sdk`.
+Once we have an instance of `EthersAdapter` or `Web3Adapter` we are ready to pass it to the constructors of the SDKs.
+
+### Initialize the Safe Service Client
+
+As stated in the introduction, the [Safe Service Client](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service). To start using this library, create a new instance of the class `SafeServiceClient` imported from `@gnosis.pm/safe-service-client` and pass the URL to its constructor of the Safe Transaction Service you want to use depending on the network.
+
+```js
+import SafeServiceClient from '@gnosis.pm/safe-service-client'
+
+const txServiceUrl = 'https://safe-transaction.gnosis.io'
+const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
+```
+
+### Initialize the Safe Core SDK
 
 ```js
 import Safe, { SafeFactory } from '@gnosis.pm/safe-core-sdk'

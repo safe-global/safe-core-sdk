@@ -30,45 +30,16 @@ And one of these two:
 
 ## <a name="initialize-sdks">2. Initialize the SDK’s</a>
 
-### Initialize an EthAdapter
+### Instantiate an EthAdapter
 
 First of all, we need to create an `EthAdapter`, which contains all the required utilities that allow the SDKs to interact with the blockchain, acting as a wrapper of [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/) Ethereum libraries.
 
 Depending on the library used by the Dapp, there are two options:
 
-* **Using ethers.js**
+- [Create an `EthersAdapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
+- [Create a `Web3Adapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
 
-  We can use the class `EthersAdapter` from `@gnosis.pm/safe-ethers-lib` as the wrapper for `ethers.js`.
-
-  ```js
-  import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
-  import { ethers } from 'ethers'
-
-  const web3Provider = // ...
-  const provider = new ethers.providers.Web3Provider(web3Provider)
-  const safeOwner = provider.getSigner(0)
-
-  const ethAdapter = new EthersAdapter({
-    ethers,
-    signer: safeOwner
-  })
-  ```
-
-* **Using web3.js**
-
-  We can use the class `Web3Adapter` from `@gnosis.pm/safe-web3-lib` as the wrapper for `web3.js`.
-
-  ```js
-  import Web3Adapter from '@gnosis.pm/safe-web3-lib'
-  import Web3 from 'web3'
-
-  const ethAdapter = new Web3Adapter({
-    web3,
-    signerAddress: safeOwnerAddress
-  })
-  ```
-
-Once we have an instance of `EthersAdapter` or `Web3Adapter` we are ready to pass it to the constructors of the SDKs.
+Once the instance of `EthersAdapter` or `Web3Adapter` was created, it can be used in the SDK initialization.
 
 ### Initialize the Safe Service Client
 

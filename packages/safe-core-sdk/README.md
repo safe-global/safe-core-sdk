@@ -12,6 +12,8 @@ Software development kit that facilitates the interaction with the [Gnosis Safe 
 * [Getting Started](#getting-started)
 * [Safe Factory API Reference](#factory-api)
 * [Safe Core SDK API Reference](#sdk-api)
+* [License](#license)
+* [Contributors](#contributors)
 
 ## <a name="installation">Installation</a>
 
@@ -35,39 +37,16 @@ npm build
 
 The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Gnosis Safe Web App](https://gnosis-safe.io/app/), it is recommended that you follow this other [guide](/packages/guides/integrating-the-safe-core-sdk.md) that covers the use of the Safe Core SDK, combined with the Safe Service Client.
 
-### 1. Set up the SDK using `Ethers` or `Web3`
+### 1. Instantiate an EthAdapter
 
-* **Using ethers.js**
+First of all, we need to create an `EthAdapter`, which contains all the required utilities that allow the SDKs to interact with the blockchain, acting as a wrapper of [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/) Ethereum libraries.
 
-  If the app integrating the SDK is using `Ethers` `v5`, create an instance of the `EthersAdapter`. `owner1` is the Ethereum account we are connecting and the one who will sign the transactions.
+Depending on the library used by the Dapp, there are two options:
 
-  ```js
-  import { ethers } from 'ethers'
-  import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
+- [Create an `EthersAdapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
+- [Create a `Web3Adapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
 
-  const web3Provider = // ...
-  const provider = new ethers.providers.Web3Provider(web3Provider)
-  const owner1 = provider.getSigner(0)
-
-  const ethAdapterOwner1 = new EthersAdapter({
-    ethers,
-    signer: owner1
-  })
-  ```
-
-* **Using web3.js**
-
-  If the app integrating the SDK is using `Web3` `v1`, create an instance of the `Web3Adapter`.
-
-  ```js
-  import Web3 from 'web3'
-  import Web3Adapter from '@gnosis.pm/safe-web3-lib'
-
-  const ethAdapterOwner1 = new Web3Adapter({
-    web3,
-    signerAddress: await owner1.getAddress()
-  })
-  ```
+Once the instance of `EthersAdapter` or `Web3Adapter` was created, it can be used in the SDK initialization.
 
 ### 2. Deploy a new Safe
 
@@ -760,10 +739,10 @@ const options: EthersTransactionOptions = {
 const txResponse = await safeSdk.executeTransaction(safeTransaction, options)
 ```
 
-## License
+## <a name="license">License</a>
 
 This library is released under MIT.
 
-## Contributors
+## <a name="contributors">Contributors</a>
 
 - Germán Martínez ([germartinez](https://github.com/germartinez))

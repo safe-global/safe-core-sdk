@@ -10,6 +10,8 @@ Web3.js wrapper that contains some utilities and the Safe contracts types (gener
 * [Installation](#installation)
 * [Build](#build)
 * [Initialization](#initialization)
+* [License](#license)
+* [Contributors](#contributors)
 
 ## <a name="installation">Installation</a>
 
@@ -31,6 +33,8 @@ npm build
 
 ## <a name="initialization">Initialization</a>
 
+If the app integrating the SDK is using `Web3`, create an instance of the `Web3Adapter`, where `signerAddress` is the Ethereum account we are connecting and the one who will sign the transactions.
+
 ```js
 import Web3 from 'web3'
 import Web3Adapter from '@gnosis.pm/safe-web3-lib'
@@ -43,3 +47,11 @@ const ethAdapter = new Web3Adapter({
   signerAddress: safeOwner
 })
 ```
+
+## <a name="license">License</a>
+
+This library is released under MIT.
+
+## <a name="contributors">Contributors</a>
+
+- Germán Martínez ([germartinez](https://github.com/germartinez))

@@ -6,7 +6,15 @@
 
 Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service).
 
-## Installation
+## Table of contents
+* [Installation](#installation)
+* [Build](#build)
+* [Initialization](#initialization)
+* [API Reference](#api-reference)
+* [License](#license)
+* [Contributors](#contributors)
+
+## <a name="installation">Installation</a>
 
 Install the package with yarn or npm:
 
@@ -15,7 +23,7 @@ yarn install
 npm install
 ```
 
-## Build
+## <a name="build">Build</a>
 
 Build the package with yarn or npm:
 
@@ -24,15 +32,31 @@ yarn build
 npm build
 ```
 
-## Getting Started
+## <a name="initialization">Initialization</a>
+
+### Instantiate an EthAdapter
+
+First of all, we need to create an `EthAdapter`, which contains all the required utilities that allow the SDKs to interact with the blockchain, acting as a wrapper of [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/) Ethereum libraries.
+
+Depending on the library used by the Dapp, there are two options:
+
+- [Create an `EthersAdapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
+- [Create a `Web3Adapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
+
+Once the instance of `EthersAdapter` or `Web3Adapter` was created, it can be used in the SDK initialization.
+
+### Initialize the SafeServiceClient
 
 ```js
 import SafeServiceClient from '@gnosis.pm/safe-service-client'
 
-const safeService = new SafeServiceClient('https://safe-transaction.gnosis.io')
+const safeService = new SafeServiceClient({
+  txServiceUrl: 'https://safe-transaction.gnosis.io',
+  ethAdapter
+})
 ```
 
-## API Reference
+## <a name="api-reference">API Reference</a>
 
 ### getServiceInfo
 
@@ -308,10 +332,10 @@ Returns the information of a given ERC20 token.
 const token: TokenInfoResponse = await safeService.getToken(tokenAddress)
 ```
 
-## License
+## <a name="license">License</a>
 
 This library is released under MIT.
 
-## Contributors
+## <a name="contributors">Contributors</a>
 
 - Germán Martínez ([germartinez](https://github.com/germartinez))

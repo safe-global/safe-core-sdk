@@ -1,14 +1,13 @@
 import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
 import Safe from '@gnosis.pm/safe-core-sdk'
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
+import { EthAdapter, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { ethers } from 'hardhat'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import config from '../e2e/config'
+import { getServiceClient } from '../e2e/utils'
+import config from '../e2e/utils/config'
 import SafeServiceClient, {
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
@@ -22,12 +21,24 @@ import * as httpRequests from '../src/utils/httpRequests'
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
+const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+const randomAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
+const txServiceBaseUrl = 'https://safe-transaction.rinkeby.gnosis.io'
+const provider = getDefaultProvider(config.JSON_RPC)
+const signer = new Wallet(
+  '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
+  provider
+)
+let ethAdapter: EthAdapter
+let serviceSdk: SafeServiceClient
+
 describe('Endpoint tests', () => {
-  const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
-  const ownerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-  const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
-  const txServiceBaseUrl = 'https://safe-transaction.rinkeby.gnosis.io'
-  const serviceSdk = new SafeServiceClient(txServiceBaseUrl)
+  before(async () => {
+    ;({ serviceSdk, ethAdapter } = await getServiceClient(
+      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+    ))
+  })
 
   const fetchData = sinon
     .stub(httpRequests, 'sendRequest')
@@ -68,10 +79,10 @@ describe('Endpoint tests', () => {
 
     it('getSafesByOwner', async () => {
       await chai
-        .expect(serviceSdk.getSafesByOwner(ownerAddress))
+        .expect(serviceSdk.getSafesByOwner(randomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${ownerAddress}/safes/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${randomAddress}/safes/`,
         method: 'get'
       })
     })
@@ -132,11 +143,6 @@ describe('Endpoint tests', () => {
     })
 
     it('addSafeDelegate', async () => {
-      const provider = getDefaultProvider(config.JSON_RPC)
-      const signer = new Wallet(
-        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
-        provider
-      )
       const delegateConfig: SafeDelegateConfig = {
         safe: safeAddress,
         delegate: '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b',
@@ -153,11 +159,6 @@ describe('Endpoint tests', () => {
     })
 
     it('removeAllSafeDelegates', async () => {
-      const provider = getDefaultProvider(config.JSON_RPC)
-      const signer = new Wallet(
-        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
-        provider
-      )
       const totp = Math.floor(Date.now() / 1000 / 3600)
       const data = safeAddress + totp
       const signature = await signer.signMessage(data)
@@ -172,11 +173,6 @@ describe('Endpoint tests', () => {
     })
 
     it('removeSafeDelegate', async () => {
-      const provider = getDefaultProvider(config.JSON_RPC)
-      const signer = new Wallet(
-        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
-        provider
-      )
       const delegate = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
       const delegateConfig: SafeDelegateDeleteConfig = {
         safe: safeAddress,
@@ -214,7 +210,7 @@ describe('Endpoint tests', () => {
 
     it('estimateSafeTransaction', async () => {
       const safeTransaction: SafeMultisigTransactionEstimate = {
-        to: ownerAddress,
+        to: randomAddress,
         value: '0',
         data: '0x',
         operation: 0
@@ -233,7 +229,7 @@ describe('Endpoint tests', () => {
 
     it('proposeTransaction', async () => {
       const safeTxData: SafeTransactionDataPartial = {
-        to: '0xa33d2495760462018275994d85117600bd58221e',
+        to: safeAddress,
         data: '0x',
         value: '123456789',
         operation: 1,
@@ -245,13 +241,7 @@ describe('Endpoint tests', () => {
         nonce: 1
       }
       const origin = 'Safe Core SDK: Safe Service Client'
-      const provider = getDefaultProvider(config.JSON_RPC)
-      const signer = new Wallet(
-        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
-        provider
-      )
       const signerAddress = await signer.getAddress()
-      const ethAdapter = new EthersAdapter({ ethers, signer })
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       const safeTransaction = await safeSdk.createTransaction(safeTxData)
       await safeSdk.signTransaction(safeTransaction)
@@ -426,7 +416,7 @@ describe('Endpoint tests', () => {
     })
 
     it('getToken', async () => {
-      const tokenAddress = '0x'
+      const tokenAddress = '0xcb0591ba2d74edd4211d5200d5d3b19cf598c548'
       await chai
         .expect(serviceSdk.getToken(tokenAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })

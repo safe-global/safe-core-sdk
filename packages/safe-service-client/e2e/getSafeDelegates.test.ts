@@ -1,14 +1,20 @@
-import { getDefaultProvider } from '@ethersproject/providers'
-import { Wallet } from '@ethersproject/wallet'
+import { Signer } from '@ethersproject/abstract-signer'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient, { SafeDelegateConfig } from '../src'
-import config from './config'
+import { getServiceClient } from './utils'
 
 chai.use(chaiAsPromised)
 
+let serviceSdk: SafeServiceClient
+let signer: Signer
+
 describe('getSafeDelegates', () => {
-  const serviceSdk = new SafeServiceClient(config.BASE_URL)
+  before(async () => {
+    ;({ serviceSdk, signer } = await getServiceClient(
+      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+    ))
+  })
 
   it('should fail if Safe address is empty', async () => {
     const safeAddress = ''
@@ -33,11 +39,6 @@ describe('getSafeDelegates', () => {
 
   it('should return an array of delegates', async () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
-    const provider = getDefaultProvider(config.JSON_RPC)
-    const signer = new Wallet(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // A Safe owner
-      provider
-    )
 
     const delegateConfig1: SafeDelegateConfig = {
       safe: safeAddress,

@@ -6,8 +6,6 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import { getServiceClient } from '../e2e/utils'
-import config from '../e2e/utils/config'
 import SafeServiceClient, {
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
@@ -15,9 +13,11 @@ import SafeServiceClient, {
   SafeDelegateConfig,
   SafeDelegateDeleteConfig,
   SafeMultisigTransactionEstimate
-} from '../src'
-import { getTxServiceBaseUrl } from '../src/utils'
-import * as httpRequests from '../src/utils/httpRequests'
+} from '../../src'
+import { getTxServiceBaseUrl } from '../../src/utils'
+import * as httpRequests from '../../src/utils/httpRequests'
+import config from '../utils/config'
+import { getServiceClient } from '../utils/setupServiceClient'
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 

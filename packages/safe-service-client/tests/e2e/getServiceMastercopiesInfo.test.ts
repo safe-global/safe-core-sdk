@@ -1,6 +1,6 @@
 import chai from 'chai'
-import SafeServiceClient from '../src'
-import { getServiceClient } from './utils'
+import SafeServiceClient from '../../src'
+import { getServiceClient } from '../utils/setupServiceClient'
 
 let serviceSdk: SafeServiceClient
 

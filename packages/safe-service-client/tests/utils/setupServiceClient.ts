@@ -2,8 +2,8 @@ import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
 import { EthAdapter } from '@gnosis.pm/safe-core-sdk-types'
 import SafeServiceClient from '../../src'
-import { getEthAdapter } from '../../tests/utils/setupEthAdapter'
 import config from './config'
+import { getEthAdapter } from './setupEthAdapter'
 
 interface ServiceClientConfig {
   serviceSdk: SafeServiceClient

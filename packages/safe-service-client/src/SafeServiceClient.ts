@@ -242,7 +242,7 @@ class SafeServiceClient implements SafeTransactionService {
     const { address: safeAddress } = await this.#ethAdapter.getEip3770Address(safe)
     const { address: delegateAddress } = await this.#ethAdapter.getEip3770Address(delegate)
     const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegate + totp
+    const data = delegateAddress + totp
     const signature = await signer.signMessage(data)
     const body: SafeDelegate = {
       safe: safeAddress,
@@ -274,7 +274,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = safeAddress + totp
+    const data = address + totp
     const signature = await signer.signMessage(data)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${address}/delegates/`,
@@ -304,7 +304,7 @@ class SafeServiceClient implements SafeTransactionService {
     const { address: safeAddress } = await this.#ethAdapter.getEip3770Address(safe)
     const { address: delegateAddress } = await this.#ethAdapter.getEip3770Address(delegate)
     const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegate + totp
+    const data = delegateAddress + totp
     const signature = await signer.signMessage(data)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/${delegateAddress}`,

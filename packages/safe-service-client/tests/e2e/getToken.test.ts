@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient from '../../src'
+import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
@@ -29,6 +30,13 @@ describe('getToken', () => {
   it('should return the token info', async () => {
     const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
     const tokenInfoResponse = await serviceSdk.getToken(tokenAddress)
+    chai.expect(tokenInfoResponse.address).to.be.equal('0xc778417E063141139Fce010982780140Aa0cD5Ab')
+  })
+
+  it('should return the token info EIP-3770', async () => {
+    const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+    const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
+    const tokenInfoResponse = await serviceSdk.getToken(eip3770TokenAddress)
     chai.expect(tokenInfoResponse.address).to.be.equal('0xc778417E063141139Fce010982780140Aa0cD5Ab')
   })
 })

@@ -2,6 +2,7 @@ import { Signer } from '@ethersproject/abstract-signer'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient, { SafeDelegateConfig } from '../../src'
+import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
@@ -39,7 +40,9 @@ describe('removeAllSafeDelegates', () => {
 
   it('should fail if the signer is not an owner of the Safe', async () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
-    const { serviceSdk, signer } = await getServiceClient('0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773')
+    const { serviceSdk, signer } = await getServiceClient(
+      '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
+    )
     await chai
       .expect(serviceSdk.removeAllSafeDelegates(safeAddress, signer))
       .to.be.rejectedWith('Signing owner is not an owner of the Safe')
@@ -47,7 +50,6 @@ describe('removeAllSafeDelegates', () => {
 
   it('should remove all delegates', async () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
-
     const delegateConfig1: SafeDelegateConfig = {
       safe: safeAddress,
       delegate: '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0',
@@ -64,10 +66,32 @@ describe('removeAllSafeDelegates', () => {
     await serviceSdk.addSafeDelegate(delegateConfig2)
     const { results: initialDelegates } = await serviceSdk.getSafeDelegates(safeAddress)
     chai.expect(initialDelegates.length).to.be.eq(2)
-
     await serviceSdk.removeAllSafeDelegates(safeAddress, signer)
-
     const { results: finalDelegates } = await serviceSdk.getSafeDelegates(safeAddress)
+    chai.expect(finalDelegates.length).to.be.eq(0)
+  })
+
+  it('should remove all delegates EIP-3770', async () => {
+    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const delegateConfig1: SafeDelegateConfig = {
+      safe: eip3770SafeAddress,
+      delegate: `${config.EIP_3770_PREFIX}:0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0`,
+      signer,
+      label: 'Label1'
+    }
+    const delegateConfig2: SafeDelegateConfig = {
+      safe: eip3770SafeAddress,
+      delegate: `${config.EIP_3770_PREFIX}:0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b`,
+      signer,
+      label: 'Label2'
+    }
+    await serviceSdk.addSafeDelegate(delegateConfig1)
+    await serviceSdk.addSafeDelegate(delegateConfig2)
+    const { results: initialDelegates } = await serviceSdk.getSafeDelegates(eip3770SafeAddress)
+    chai.expect(initialDelegates.length).to.be.eq(2)
+    await serviceSdk.removeAllSafeDelegates(eip3770SafeAddress, signer)
+    const { results: finalDelegates } = await serviceSdk.getSafeDelegates(eip3770SafeAddress)
     chai.expect(finalDelegates.length).to.be.eq(0)
   })
 })

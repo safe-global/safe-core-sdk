@@ -2,6 +2,7 @@ import { Signer } from '@ethersproject/abstract-signer'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient, { SafeDelegateConfig } from '../../src'
+import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
@@ -54,7 +55,6 @@ describe('getSafeDelegates', () => {
     }
     await serviceSdk.addSafeDelegate(delegateConfig1)
     await serviceSdk.addSafeDelegate(delegateConfig2)
-
     const safeDelegateListResponse = await serviceSdk.getSafeDelegates(safeAddress)
     const { results } = safeDelegateListResponse
     const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
@@ -65,7 +65,36 @@ describe('getSafeDelegates', () => {
     chai.expect(sortedResults[1].delegate).to.be.eq(delegateConfig2.delegate)
     chai.expect(sortedResults[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
     chai.expect(sortedResults[1].label).to.be.eq(delegateConfig2.label)
-
     await serviceSdk.removeAllSafeDelegates(safeAddress, signer)
+  })
+
+  it('should return an array of delegates EIP-3770', async () => {
+    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const delegateConfig1: SafeDelegateConfig = {
+      safe: eip3770SafeAddress,
+      delegate: `${config.EIP_3770_PREFIX}:0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0`,
+      signer,
+      label: 'Label1'
+    }
+    const delegateConfig2: SafeDelegateConfig = {
+      safe: eip3770SafeAddress,
+      delegate: `${config.EIP_3770_PREFIX}:0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b`,
+      signer,
+      label: 'Label2'
+    }
+    await serviceSdk.addSafeDelegate(delegateConfig1)
+    await serviceSdk.addSafeDelegate(delegateConfig2)
+    const safeDelegateListResponse = await serviceSdk.getSafeDelegates(eip3770SafeAddress)
+    const { results } = safeDelegateListResponse
+    const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
+    chai.expect(sortedResults.length).to.be.eq(2)
+    chai.expect(sortedResults[0].delegate).to.be.eq('0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0')
+    chai.expect(sortedResults[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
+    chai.expect(sortedResults[0].label).to.be.eq(delegateConfig1.label)
+    chai.expect(sortedResults[1].delegate).to.be.eq('0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b')
+    chai.expect(sortedResults[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
+    chai.expect(sortedResults[1].label).to.be.eq(delegateConfig2.label)
+    await serviceSdk.removeAllSafeDelegates(eip3770SafeAddress, signer)
   })
 })

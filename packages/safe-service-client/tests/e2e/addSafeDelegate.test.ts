@@ -2,6 +2,7 @@ import { Signer } from '@ethersproject/abstract-signer'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient, { SafeDelegateConfig } from '../../src'
+import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
@@ -112,17 +113,37 @@ describe('addSafeDelegate', () => {
       signer,
       label: 'Label'
     }
-
     const { results: initialDelegates } = await serviceSdk.getSafeDelegates(safeAddress)
     chai.expect(initialDelegates.length).to.be.eq(0)
-
     const delegateResponse = await serviceSdk.addSafeDelegate(delegateConfig)
     chai.expect(delegateResponse.safe).to.be.equal(delegateConfig.safe)
     chai.expect(delegateResponse.delegate).to.be.equal(delegateConfig.delegate)
     chai.expect(delegateResponse.signature).to.be.a('string')
     chai.expect(delegateResponse.label).to.be.equal(delegateConfig.label)
-
     const { results: finalDelegates } = await serviceSdk.getSafeDelegates(safeAddress)
+    chai.expect(finalDelegates.length).to.be.eq(1)
+    await serviceSdk.removeSafeDelegate(delegateConfig)
+  })
+
+  it('should add a new delegate EIP-3770', async () => {
+    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
+    const delegateConfig: SafeDelegateConfig = {
+      safe: eip3770SafeAddress,
+      delegate: eip3770DelegateAddress,
+      signer,
+      label: 'Label'
+    }
+    const { results: initialDelegates } = await serviceSdk.getSafeDelegates(eip3770SafeAddress)
+    chai.expect(initialDelegates.length).to.be.eq(0)
+    const delegateResponse = await serviceSdk.addSafeDelegate(delegateConfig)
+    chai.expect(delegateResponse.safe).to.be.equal(safeAddress)
+    chai.expect(delegateResponse.delegate).to.be.equal(delegateAddress)
+    chai.expect(delegateResponse.signature).to.be.a('string')
+    chai.expect(delegateResponse.label).to.be.equal(delegateConfig.label)
+    const { results: finalDelegates } = await serviceSdk.getSafeDelegates(eip3770SafeAddress)
     chai.expect(finalDelegates.length).to.be.eq(1)
     await serviceSdk.removeSafeDelegate(delegateConfig)
   })

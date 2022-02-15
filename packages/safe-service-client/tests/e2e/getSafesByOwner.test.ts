@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient from '../../src'
+import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
@@ -38,6 +39,14 @@ describe('getSafesByOwner', () => {
   it('should return the array of owned Safes', async () => {
     const ownerAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
     const ownerResponse = await serviceSdk.getSafesByOwner(ownerAddress)
+    const { safes } = ownerResponse
+    chai.expect(safes.length).to.be.greaterThan(1)
+  })
+
+  it('should return the array of owned Safes EIP-3770', async () => {
+    const ownerAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+    const eip3770OwnerAddress = `${config.EIP_3770_PREFIX}:${ownerAddress}`
+    const ownerResponse = await serviceSdk.getSafesByOwner(eip3770OwnerAddress)
     const { safes } = ownerResponse
     chai.expect(safes.length).to.be.greaterThan(1)
   })

@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient from '../../src'
+import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
@@ -31,6 +32,13 @@ describe('getSafeInfo', () => {
   it('should return an empty array if the safeTxHash is not found', async () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
     const safeInfoResponse = await serviceSdk.getSafeInfo(safeAddress)
+    chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
+  })
+
+  it('should return an empty array if the safeTxHash is not found EIP-3770', async () => {
+    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const safeInfoResponse = await serviceSdk.getSafeInfo(eip3770SafeAddress)
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
   })
 })

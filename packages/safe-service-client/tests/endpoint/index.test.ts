@@ -22,7 +22,13 @@ chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
 const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
 const randomAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+const eip3770RandomAddress = `${config.EIP_3770_PREFIX}:${randomAddress}`
+const delegateAddress = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
+const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
+const tokenAddress = '0xcb0591ba2d74edd4211d5200d5d3b19cf598c548'
+const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
 const txServiceBaseUrl = 'https://safe-transaction.rinkeby.gnosis.io'
 const provider = getDefaultProvider(config.JSON_RPC)
@@ -87,6 +93,16 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getSafesByOwner EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getSafesByOwner(eip3770RandomAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${randomAddress}/safes/`,
+        method: 'get'
+      })
+    })
+
     it('getTransaction', async () => {
       await chai
         .expect(serviceSdk.getTransaction(safeTxHash))
@@ -132,6 +148,16 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getSafeInfo EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getSafeInfo(eip3770SafeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/`,
+        method: 'get'
+      })
+    })
+
     it('getSafeDelegates', async () => {
       await chai
         .expect(serviceSdk.getSafeDelegates(safeAddress))
@@ -142,10 +168,36 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getSafeDelegates EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getSafeDelegates(eip3770SafeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        method: 'get'
+      })
+    })
+
     it('addSafeDelegate', async () => {
       const delegateConfig: SafeDelegateConfig = {
         safe: safeAddress,
-        delegate: '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b',
+        delegate: delegateAddress,
+        signer,
+        label: ''
+      }
+      await chai
+        .expect(serviceSdk.addSafeDelegate(delegateConfig))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        method: 'get'
+      })
+    })
+
+    it('addSafeDelegate EIP-3770', async () => {
+      const delegateConfig: SafeDelegateConfig = {
+        safe: eip3770SafeAddress,
+        delegate: eip3770DelegateAddress,
         signer,
         label: ''
       }
@@ -172,8 +224,22 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('removeAllSafeDelegates EIP-3770', async () => {
+      const totp = Math.floor(Date.now() / 1000 / 3600)
+      const data = safeAddress + totp
+      const signature = await signer.signMessage(data)
+      await chai
+        .expect(serviceSdk.removeAllSafeDelegates(eip3770SafeAddress, signer))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        method: 'delete',
+        body: { signature }
+      })
+    })
+
     it('removeSafeDelegate', async () => {
-      const delegate = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
+      const delegate = delegateAddress
       const delegateConfig: SafeDelegateDeleteConfig = {
         safe: safeAddress,
         delegate,
@@ -198,9 +264,45 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('removeSafeDelegate', async () => {
+      const delegate = delegateAddress
+      const delegateConfig: SafeDelegateDeleteConfig = {
+        safe: eip3770SafeAddress,
+        delegate: eip3770DelegateAddress,
+        signer
+      }
+      const totp = Math.floor(Date.now() / 1000 / 3600)
+      const data = delegate + totp
+      const signature = await signer.signMessage(data)
+      await chai
+        .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/delegates/${delegateAddress}`,
+        method: 'delete',
+        body: {
+          safe: safeAddress,
+          delegate: delegateAddress,
+          signature
+        }
+      })
+    })
+
     it('getSafeCreationInfo', async () => {
       await chai
         .expect(serviceSdk.getSafeCreationInfo(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/creation/`,
+        method: 'get'
+      })
+    })
+
+    it('getSafeCreationInfo EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getSafeCreationInfo(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/creation/`,
@@ -217,6 +319,25 @@ describe('Endpoint tests', () => {
       }
       await chai
         .expect(serviceSdk.estimateSafeTransaction(safeAddress, safeTransaction))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/multisig-transactions/estimations/`,
+        method: 'post',
+        body: safeTransaction
+      })
+    })
+
+    it('estimateSafeTransaction EIP-3770', async () => {
+      const safeTransaction: SafeMultisigTransactionEstimate = {
+        to: randomAddress,
+        value: '0',
+        data: '0x',
+        operation: 0
+      }
+      await chai
+        .expect(serviceSdk.estimateSafeTransaction(eip3770SafeAddress, safeTransaction))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -269,9 +390,61 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('proposeTransaction EIP-3770', async () => {
+      const safeTxData: SafeTransactionDataPartial = {
+        to: safeAddress,
+        data: '0x',
+        value: '123456789',
+        operation: 1,
+        safeTxGas: 0,
+        baseGas: 0,
+        gasPrice: 0,
+        gasToken: '0x0000000000000000000000000000000000000000',
+        refundReceiver: '0x0000000000000000000000000000000000000000',
+        nonce: 1
+      }
+      const origin = 'Safe Core SDK: Safe Service Client'
+      const signerAddress = await signer.getAddress()
+      const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+      const safeTransaction = await safeSdk.createTransaction(safeTxData)
+      await safeSdk.signTransaction(safeTransaction)
+      await chai
+        .expect(
+          serviceSdk.proposeTransaction({
+            safeAddress: eip3770SafeAddress,
+            senderAddress: `${config.EIP_3770_PREFIX}:${signerAddress}`,
+            safeTransaction,
+            safeTxHash,
+            origin
+          })
+        )
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
+        method: 'post',
+        body: {
+          ...safeTxData,
+          contractTransactionHash: safeTxHash,
+          sender: safeTransaction.signatures.get(signerAddress.toLowerCase())?.signer,
+          signature: safeTransaction.signatures.get(signerAddress.toLowerCase())?.data,
+          origin
+        }
+      })
+    })
+
     it('getIncomingTransactions', async () => {
       await chai
         .expect(serviceSdk.getIncomingTransactions(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/incoming-transfers/`,
+        method: 'get'
+      })
+    })
+
+    it('getIncomingTransactions EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getIncomingTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/incoming-transfers/`,
@@ -289,9 +462,29 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getModuleTransactions EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getModuleTransactions(eip3770SafeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/module-transfers/`,
+        method: 'get'
+      })
+    })
+
     it('getMultisigTransactions', async () => {
       await chai
         .expect(serviceSdk.getMultisigTransactions(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
+        method: 'get'
+      })
+    })
+
+    it('getMultisigTransactions EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getMultisigTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
@@ -303,6 +496,19 @@ describe('Endpoint tests', () => {
       const currentNonce = 1
       await chai
         .expect(serviceSdk.getPendingTransactions(safeAddress, currentNonce))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,
+        method: 'get'
+      })
+    })
+
+    it('getPendingTransactions EIP-3770', async () => {
+      const currentNonce = 1
+      await chai
+        .expect(serviceSdk.getPendingTransactions(eip3770SafeAddress, currentNonce))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -324,9 +530,33 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getAllTransactions EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getAllTransactions(eip3770SafeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        method: 'get'
+      })
+    })
+
     it('getBalances', async () => {
       await chai
         .expect(serviceSdk.getBalances(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/balances/?exclude_spam=true`,
+        method: 'get'
+      })
+    })
+
+    it('getBalances EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getBalances(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -363,6 +593,18 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getUsdBalances EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getUsdBalances(eip3770SafeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/balances/usd/?exclude_spam=true`,
+        method: 'get'
+      })
+    })
+
     it('getUsdBalances (with options)', async () => {
       const options: SafeBalancesUsdOptions = {
         excludeSpamTokens: false
@@ -381,6 +623,18 @@ describe('Endpoint tests', () => {
     it('getCollectibles', async () => {
       await chai
         .expect(serviceSdk.getCollectibles(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/safes/${safeAddress}/collectibles/?exclude_spam=true`,
+        method: 'get'
+      })
+    })
+
+    it('getCollectibles EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getCollectibles(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -416,9 +670,18 @@ describe('Endpoint tests', () => {
     })
 
     it('getToken', async () => {
-      const tokenAddress = '0xcb0591ba2d74edd4211d5200d5d3b19cf598c548'
       await chai
         .expect(serviceSdk.getToken(tokenAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/${tokenAddress}/`,
+        method: 'get'
+      })
+    })
+
+    it('getToken EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getToken(eip3770TokenAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/${tokenAddress}/`,

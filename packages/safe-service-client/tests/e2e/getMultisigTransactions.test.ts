@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeServiceClient from '../../src'
+import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
@@ -41,6 +42,19 @@ describe('getMultisigTransactions', () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD' // Safe with multisig transactions
     const safeMultisigTransactionListResponse = await serviceSdk.getMultisigTransactions(
       safeAddress
+    )
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(11)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(11)
+    safeMultisigTransactionListResponse.results.map((transaction) => {
+      chai.expect(transaction.safe).to.be.equal(safeAddress)
+    })
+  })
+
+  it('should return the list of multisig transactions EIP-3770', async () => {
+    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD' // Safe with multisig transactions
+    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const safeMultisigTransactionListResponse = await serviceSdk.getMultisigTransactions(
+      eip3770SafeAddress
     )
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(11)
     chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(11)

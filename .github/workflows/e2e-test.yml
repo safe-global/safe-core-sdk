@@ -1,13 +1,10 @@
 name: e2e Test
 on:
+  pull_request:
   push:
     branches:
-      - development
       - main
-  pull_request:
-    branches:
       - development
-      - main
 env:
   INFURA_KEY: ${{ secrets.INFURA_KEY }}
 jobs:

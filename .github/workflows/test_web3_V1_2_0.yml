@@ -1,5 +1,10 @@
 name: Safe Core SDK Test - Web3 - Safe v1.2.0
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - development
 env:
   INFURA_KEY: ${{ secrets.INFURA_KEY }}
 jobs:

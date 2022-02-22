@@ -1,12 +1,19 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient from '../src'
-import config from './config'
+import SafeServiceClient from '../../src'
+import config from '../utils/config'
+import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
 
+let serviceSdk: SafeServiceClient
+
 describe('getToken', () => {
-  const serviceSdk = new SafeServiceClient(config.BASE_URL)
+  before(async () => {
+    ;({ serviceSdk } = await getServiceClient(
+      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+    ))
+  })
 
   it('should fail if token address is empty', async () => {
     const tokenAddress = ''
@@ -23,6 +30,13 @@ describe('getToken', () => {
   it('should return the token info', async () => {
     const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
     const tokenInfoResponse = await serviceSdk.getToken(tokenAddress)
+    chai.expect(tokenInfoResponse.address).to.be.equal('0xc778417E063141139Fce010982780140Aa0cD5Ab')
+  })
+
+  it('should return the token info EIP-3770', async () => {
+    const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+    const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
+    const tokenInfoResponse = await serviceSdk.getToken(eip3770TokenAddress)
     chai.expect(tokenInfoResponse.address).to.be.equal('0xc778417E063141139Fce010982780140Aa0cD5Ab')
   })
 })

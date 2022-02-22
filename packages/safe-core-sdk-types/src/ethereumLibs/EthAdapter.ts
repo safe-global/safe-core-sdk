@@ -53,7 +53,7 @@ export interface EthAdapter {
   isContractDeployed(address: string): Promise<boolean>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
-  signMessage(message: string, signerAddress: string): Promise<string>
+  signMessage(message: string): Promise<string>
   estimateGas(
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void

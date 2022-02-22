@@ -23,7 +23,7 @@ export function isValidEip3770NetworkPrefix(prefix: string): boolean {
 
 export function validateEip3770NetworkPrefix(prefix: string, currentChainId: number): void {
   const isCurrentNetworkPrefix = prefix === getEip3770NetworkPrefixFromChainId(currentChainId)
-  if (prefix && (!isValidEip3770NetworkPrefix(prefix) || !isCurrentNetworkPrefix)) {
+  if (!isValidEip3770NetworkPrefix(prefix) || !isCurrentNetworkPrefix) {
     throw new Error('The network prefix must match the current network')
   }
 }
@@ -41,6 +41,8 @@ export function validateEip3770Address(
 ): Eip3770Address {
   const { address, prefix } = parseEip3770Address(fullAddress)
   validateEthereumAddress(address)
-  validateEip3770NetworkPrefix(prefix, currentChainId)
+  if (prefix) {
+    validateEip3770NetworkPrefix(prefix, currentChainId)
+  }
   return { address, prefix }
 }

@@ -11,8 +11,9 @@
     "SDK"
   ],
   "scripts": {
+    "safe-deployments": "ts-node scripts/checkSafeDeployments.ts",
     "unbuild": "rimraf dist *.tsbuildinfo",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && yarn safe-deployments && tsc",
     "test": "nyc mocha -r ts-node/register tests/**/*.test.ts",
     "format": "prettier --write \"{src,tests}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
@@ -31,6 +32,7 @@
   ],
   "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
   "devDependencies": {
+    "@gnosis.pm/safe-deployments": "^1.10.0",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.4",
     "@types/mocha": "^9.1.0",

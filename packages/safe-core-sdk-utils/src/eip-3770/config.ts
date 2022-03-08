@@ -1,3 +1,4 @@
+
 interface NetworkShortName {
   shortName: string
   chainId: number
@@ -36,3 +37,9 @@ export const networks: NetworkShortName[] = [
   { shortName: 'aurora', chainId: 1313161554 },
   { shortName: 'aurora-testnet', chainId: 1313161555 }
 ]
+
+if (process.env.TEST_NETWORK === 'hardhat') {
+  networks.push({ shortName: 'local', chainId: 31337 })
+} else if (process.env.TEST_NETWORK === 'ganache') {
+  networks.push({ shortName: 'local', chainId: 1337 })
+}

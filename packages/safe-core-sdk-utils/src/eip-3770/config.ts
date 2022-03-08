@@ -1,4 +1,3 @@
-
 interface NetworkShortName {
   shortName: string
   chainId: number
@@ -28,14 +27,18 @@ export const networks: NetworkShortName[] = [
   { shortName: 'mriver', chainId: 1285 },
   { shortName: 'mbase', chainId: 1287 },
   { shortName: 'tftm', chainId: 4002 },
+  { shortName: 'evmos', chainId: 9000 },
   { shortName: 'arb1', chainId: 42161 },
+  { shortName: 'arb-rinkeby', chainId: 421611 },
   { shortName: 'celo', chainId: 42220 },
   { shortName: 'avax', chainId: 43114 },
   { shortName: 'vt', chainId: 73799 },
   { shortName: 'maticmum', chainId: 80001 },
   { shortName: 'olympus', chainId: 333999 },
   { shortName: 'aurora', chainId: 1313161554 },
-  { shortName: 'aurora-testnet', chainId: 1313161555 }
+  { shortName: 'aurora-testnet', chainId: 1313161555 },
+  { shortName: 'hmy-s0', chainId: 1666600000 },
+  { shortName: 'hmy-b-s0', chainId: 1666700000 }
 ]
 
 if (process.env.TEST_NETWORK === 'hardhat') {

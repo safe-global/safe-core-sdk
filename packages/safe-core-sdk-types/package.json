@@ -42,7 +42,7 @@
   "dependencies": {
     "@ethersproject/bignumber": "^5.5.0",
     "@ethersproject/contracts": "^5.5.0",
-    "@gnosis.pm/safe-deployments": "^1.9.0",
+    "@gnosis.pm/safe-deployments": "^1.10.0",
     "web3-core": "^1.7.0"
   }
 }

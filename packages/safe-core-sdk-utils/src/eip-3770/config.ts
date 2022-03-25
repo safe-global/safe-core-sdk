@@ -3,6 +3,7 @@ interface NetworkShortName {
   chainId: number
 }
 
+// https://github.com/ethereum-lists/chains/tree/master/_data/chains
 export const networks: NetworkShortName[] = [
   { chainId: 1, shortName: 'eth' },
   { chainId: 3, shortName: 'rop' },
@@ -16,6 +17,8 @@ export const networks: NetworkShortName[] = [
   { chainId: 56, shortName: 'bnb' },
   { chainId: 69, shortName: 'okov' },
   { chainId: 100, shortName: 'gno' },
+  { chainId: 106, shortName: 'vlx' },
+  { chainId: 111, shortName: 'etl' },
   { chainId: 122, shortName: 'fuse' },
   { chainId: 123, shortName: 'spark' },
   { chainId: 137, shortName: 'matic' },
@@ -27,14 +30,18 @@ export const networks: NetworkShortName[] = [
   { chainId: 1285, shortName: 'mriver' },
   { chainId: 1287, shortName: 'mbase' },
   { chainId: 4002, shortName: 'tftm' },
+  { chainId: 7341, shortName: 'shyft' },
   { chainId: 9000, shortName: 'evmos' },
+  { chainId: 11437, shortName: 'shyftt' },
+  { chainId: 12357, shortName: 'rei-testnet' },
   { chainId: 42161, shortName: 'arb1' },
-  { chainId: 421611, shortName: 'arb-rinkeby' },
   { chainId: 42220, shortName: 'celo' },
   { chainId: 43114, shortName: 'avax' },
+  { chainId: 47805, shortName: 'rei' },
   { chainId: 73799, shortName: 'vt' },
   { chainId: 80001, shortName: 'maticmum' },
   { chainId: 333999, shortName: 'olympus' },
+  { chainId: 421611, shortName: 'arb-rinkeby' },
   { chainId: 1313161554, shortName: 'aurora' },
   { chainId: 1313161555, shortName: 'aurora-testnet' },
   { chainId: 1666600000, shortName: 'hmy-s0' },

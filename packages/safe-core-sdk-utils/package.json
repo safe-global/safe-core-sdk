@@ -1,25 +1,21 @@
 {
-  "name": "@gnosis.pm/safe-ethers-adapters",
-  "version": "0.1.0-alpha.8",
-  "description": "Safe Ethers Adapters",
+  "name": "@gnosis.pm/safe-core-sdk-utils",
+  "version": "1.0.0",
+  "description": "Safe Core SDK Utilities",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Gnosis",
     "Safe",
-    "Ethers"
+    "SDK"
   ],
   "scripts": {
     "unbuild": "rimraf dist *.tsbuildinfo",
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "test": "nyc mocha -r ts-node/register tests/**/*.test.ts",
-    "example:creation": "ts-node examples/creation.ts",
-    "example:interaction": "ts-node examples/interaction.ts",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepublish": "yarn build"
+    "lint": "tslint -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -43,44 +39,17 @@
     "@typescript-eslint/parser": "^5.10.1",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.1.1",
-    "dotenv": "^14.3.2",
     "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "ethers": "^5.5.3",
-    "husky": "^7.0.4",
-    "lint-staged": "^12.3.2",
     "mocha": "^9.2.0",
     "nyc": "^15.1.0",
     "prettier": "^2.5.1",
-    "sinon": "^12.0.1",
-    "sinon-chai": "^3.7.0",
-    "ts-generator": "^0.1.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.5"
   },
-  "lint-staged": {
-    "src/**/!(*test).ts": [
-      "yarn lint",
-      "prettier --write"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "peerDependencies": {
-    "@ethersproject/abstract-provider": "^5.5.1",
-    "@ethersproject/abstract-signer": "^5.5.0",
-    "@ethersproject/bignumber": "^5.5.0",
-    "@ethersproject/properties": "^5.5.0"
-  },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk": "^2.0.0",
     "@gnosis.pm/safe-core-sdk-types": "^1.0.0",
-    "@gnosis.pm/safe-deployments": "^1.9.0",
-    "axios": "^0.25.0"
+    "web3-utils": "^1.7.0"
   }
 }

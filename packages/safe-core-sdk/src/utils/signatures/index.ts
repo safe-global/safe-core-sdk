@@ -61,7 +61,7 @@ export async function generateSignature(
   hash: string
 ): Promise<EthSignSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
-  let signature = await ethAdapter.signMessage(hash, signerAddress)
+  let signature = await ethAdapter.signMessage(hash)
   const hasPrefix = isTxHashSignedWithPrefix(hash, signature, signerAddress)
   signature = adjustVInSignature(signature, hasPrefix)
   return new EthSignSignature(signerAddress, signature)

@@ -436,7 +436,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/module-transfers/`,
+      url: `${this.#txServiceBaseUrl}/safes/${address}/module-transactions/`,
       method: HttpMethod.Get
     })
   }

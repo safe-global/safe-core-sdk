@@ -1,7 +1,8 @@
+import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 import { DeploymentFilter, getSafeSingletonDeployment } from '@gnosis.pm/safe-deployments'
 import { networks } from '../src/eip-3770/config'
 
-const safeVersion = '1.3.0'
+const safeVersion: SafeVersion = '1.3.0'
 
 function getSafeDeploymentNetworks(): string[] {
   const filters: DeploymentFilter = { version: safeVersion, released: true }

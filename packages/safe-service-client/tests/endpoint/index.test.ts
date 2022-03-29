@@ -457,7 +457,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getModuleTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/module-transfers/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/module-transactions/`,
         method: 'get'
       })
     })
@@ -467,7 +467,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getModuleTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/module-transfers/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/module-transactions/`,
         method: 'get'
       })
     })

@@ -9,6 +9,7 @@ export interface CreateProxyProps {
   initializer: string
   saltNonce: number
   options?: EthersTransactionOptions
+  callback?: (txHash: string) => void
 }
 
 class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryContract {
@@ -22,7 +23,8 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
     safeMasterCopyAddress,
     initializer,
     saltNonce,
-    options
+    options,
+    callback
   }: CreateProxyProps): Promise<string> {
     if (saltNonce < 0) {
       throw new Error('saltNonce must be greater than 0')
@@ -36,20 +38,22 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
         }
       )
     }
-    const txResponse = await this.contract.createProxyWithNonce(
-      safeMasterCopyAddress,
-      initializer,
-      saltNonce,
-      options
-    )
-    const txReceipt = await txResponse.wait()
-    const proxyCreationEvent = txReceipt.events?.find(
-      ({ event }: Event) => event === 'ProxyCreation'
-    )
-    if (!proxyCreationEvent || !proxyCreationEvent.args) {
-      throw new Error('Safe Proxy was not deployed correctly')
-    }
-    const proxyAddress: string = proxyCreationEvent.args[0]
+    const proxyAddress = this.contract
+      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce, options)
+      .then(async (txResponse) => {
+        if (callback) {
+          callback(txResponse.hash)
+        }
+        const txReceipt = await txResponse.wait()
+        const proxyCreationEvent = txReceipt?.events?.find(
+          ({ event }: Event) => event === 'ProxyCreation'
+        )
+        if (!proxyCreationEvent || !proxyCreationEvent.args) {
+          throw new Error('Safe Proxy was not deployed correctly')
+        }
+        const proxyAddress: string = proxyCreationEvent.args[0]
+        return proxyAddress
+      })
     return proxyAddress
   }
 

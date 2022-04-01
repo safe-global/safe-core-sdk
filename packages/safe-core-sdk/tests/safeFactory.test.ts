@@ -198,6 +198,30 @@ describe('Safe Proxy Factory', () => {
       chai.expect(deployedSafeThreshold).to.be.eq(threshold)
     })
 
+    it('should deploy a new Safe with callback', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      let callbackResult = ''
+      const callback = (txHash: string) => {
+        callbackResult = txHash
+      }
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig, callback }
+      chai.expect(callbackResult).to.be.empty
+      const safe = await safeFactory.deploySafe(deploySafeProps)
+      chai.expect(callbackResult).to.be.not.empty
+      const safeInstanceVersion = await safe.getContractVersion()
+      chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
+    })
+
     itif(safeVersionDeployed === SAFE_LAST_VERSION)(
       'should deploy last Safe version by default',
       async () => {

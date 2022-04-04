@@ -5,6 +5,7 @@ export interface CreateProxyProps {
   initializer: string
   saltNonce: number
   options?: TransactionOptions
+  callback?: (txHash: string) => void
 }
 
 export interface GnosisSafeProxyFactoryContract {

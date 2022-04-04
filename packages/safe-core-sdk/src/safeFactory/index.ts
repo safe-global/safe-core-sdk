@@ -31,6 +31,7 @@ export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig?: SafeDeploymentConfig
   options?: TransactionOptions
+  callback?: (txHash: string) => void
 }
 
 export interface SafeFactoryConfig {
@@ -142,7 +143,8 @@ class SafeFactory {
   async deploySafe({
     safeAccountConfig,
     safeDeploymentConfig,
-    options
+    options,
+    callback
   }: DeploySafeProps): Promise<Safe> {
     validateSafeAccountConfig(safeAccountConfig)
     const signerAddress = await this.#ethAdapter.getSignerAddress()
@@ -160,7 +162,8 @@ class SafeFactory {
       options: {
         from: signerAddress,
         ...options
-      }
+      },
+      callback
     })
     const isContractDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
     if (!isContractDeployed) {

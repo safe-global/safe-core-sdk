@@ -68,7 +68,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk: Safe = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
-The `deploySafe` method executes a transaction from the `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe. Check the `deploySafe` method in the [API Reference](#factory-api) for more details on additional configuration parameters.
+The `deploySafe` method executes a transaction from the `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe. Check the `deploySafe` method in the [API Reference](#factory-api) for more details on additional configuration parameters and callbacks.
 
 Call the `getAddress` method, for example, to check the address of the newly deployed Safe.
 
@@ -243,6 +243,16 @@ const options: EthersTransactionOptions = {
 ```
 ```js
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, safeDeploymentConfig, options })
+```
+
+It can also take an optional callback which receives the `txHash` of the Safe deployment transaction prior to returning a new instance of the Safe Core SDK:
+
+```js
+const callback = (txHash: string): void => {
+  console.log({ txHash })
+}
+
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, callback })
 ```
 
 ## <a name="sdk-api">Safe Core SDK API Reference</a>

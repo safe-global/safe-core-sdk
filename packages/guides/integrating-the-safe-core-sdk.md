@@ -115,7 +115,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
-Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used.
+Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used. Check the [API Reference](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-core-sdk#deploysafe) for more details on additional configuration parameters and callbacks.
 
 ## <a name="create-transaction">4. Create a transaction</a>
 

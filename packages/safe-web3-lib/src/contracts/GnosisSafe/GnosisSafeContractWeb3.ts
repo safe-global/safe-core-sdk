@@ -1,32 +1,15 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
-  BaseTransactionResult,
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
   SafeVersion
 } from '@gnosis.pm/safe-core-sdk-types'
-import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/gnosis_safe'
 import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/web3-v1/v1.2.0/gnosis_safe'
 import { GnosisSafe as GnosisSafe_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
-import { Web3TransactionOptions } from '../../types'
-
-export interface Web3TransactionResult extends BaseTransactionResult {
-  promiEvent: PromiEvent<TransactionReceipt>
-  options?: Web3TransactionOptions
-}
-
-function toTxResult(
-  promiEvent: PromiEvent<TransactionReceipt>,
-  options?: Web3TransactionOptions
-): Promise<Web3TransactionResult> {
-  return new Promise((resolve, reject) =>
-    promiEvent
-      .once('transactionHash', (hash: string) => resolve({ hash, promiEvent, options }))
-      .catch(reject)
-  )
-}
+import { Web3TransactionOptions, Web3TransactionResult } from '../../types'
+import { toTxResult } from '../../utils'
 
 abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
   constructor(public contract: GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0) {}

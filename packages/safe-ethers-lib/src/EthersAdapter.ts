@@ -2,7 +2,13 @@ import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Provider } from '@ethersproject/providers'
-import { EthAdapter, EthAdapterTransaction, GetContractProps } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  Eip3770Address,
+  EthAdapter,
+  EthAdapterTransaction,
+  GetContractProps
+} from '@gnosis.pm/safe-core-sdk-types'
+import { validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import {
   getMultiSendContractInstance,
@@ -49,6 +55,11 @@ class EthersAdapter implements EthAdapter {
 
   isAddress(address: string): boolean {
     return this.#ethers.utils.isAddress(address)
+  }
+
+  async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
+    const chainId = await this.getChainId()
+    return validateEip3770Address(fullAddress, chainId)
   }
 
   async getBalance(address: string): Promise<BigNumber> {

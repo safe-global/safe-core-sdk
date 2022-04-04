@@ -1,7 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { ContractTransaction } from '@ethersproject/contracts'
 import {
-  BaseTransactionResult,
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
@@ -13,23 +11,8 @@ import {
   GnosisSafe as GnosisSafe_V1_3_0,
   GnosisSafeInterface
 } from '../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
-import { EthersTransactionOptions } from '../../types'
-
-export interface EthersTransactionResult extends BaseTransactionResult {
-  transactionResponse: ContractTransaction
-  options?: EthersTransactionOptions
-}
-
-function toTxResult(
-  transactionResponse: ContractTransaction,
-  options?: EthersTransactionOptions
-): EthersTransactionResult {
-  return {
-    hash: transactionResponse.hash,
-    options,
-    transactionResponse
-  }
-}
+import { EthersTransactionOptions, EthersTransactionResult } from '../../types'
+import { toTxResult } from '../../utils'
 
 abstract class GnosisSafeContractEthers implements GnosisSafeContract {
   constructor(public contract: GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0) {}

@@ -1,12 +1,19 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient from '../src'
-import config from './config'
+import SafeServiceClient from '../../src'
+import config from '../utils/config'
+import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
 
+let serviceSdk: SafeServiceClient
+
 describe('getPendingTransactions', () => {
-  const serviceSdk = new SafeServiceClient(config.BASE_URL)
+  before(async () => {
+    ;({ serviceSdk } = await getServiceClient(
+      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+    ))
+  })
 
   it('should fail if safeAddress is empty', async () => {
     const safeAddress = ''
@@ -32,6 +39,14 @@ describe('getPendingTransactions', () => {
   it('should return the the transaction list', async () => {
     const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD' // Safe with pending transaction
     const transactionList = await serviceSdk.getPendingTransactions(safeAddress)
+    chai.expect(transactionList.count).to.be.equal(2)
+    chai.expect(transactionList.results.length).to.be.equal(2)
+  })
+
+  it('should return the the transaction list EIP-3770', async () => {
+    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD' // Safe with pending transaction
+    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const transactionList = await serviceSdk.getPendingTransactions(eip3770SafeAddress)
     chai.expect(transactionList.count).to.be.equal(2)
     chai.expect(transactionList.results.length).to.be.equal(2)
   })

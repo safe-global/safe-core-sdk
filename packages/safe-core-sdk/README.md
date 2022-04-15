@@ -497,7 +497,7 @@ If the optional properties are not manually set, the Safe transaction returned w
 * `refundReceiver`: 0x address is the default value.
 * `nonce`: The current Safe nonce is the default value.
 
-Read more about the [Safe transaction properties](https://docs.gnosis.io/safe/docs/contracts_tx_execution/).
+Read more about the [Safe transaction properties](https://docs.gnosis-safe.io/tutorials/tutorial_tx_service_initiate_sign).
 
 ### createRejectionTransaction
 

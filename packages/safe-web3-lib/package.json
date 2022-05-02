@@ -22,7 +22,7 @@
     "type": "git",
     "url": "git+https://github.com/gnosis/safe-core-sdk.git"
   },
-  "author": "Gnosis (https://gnosis.io)",
+  "author": "Gnosis Safe (https://gnosis-safe.io)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/gnosis/safe-core-sdk/issues"

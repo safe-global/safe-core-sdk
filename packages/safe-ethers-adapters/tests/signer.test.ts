@@ -151,7 +151,7 @@ describe('SafeEthersSigner', () => {
       const service: any = {
         getSafeTxDetails: sinon.fake.returns(safeTxDetails)
       }
-      // ExecutionSuccess event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
+      // ExecutionSuccess event (see https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
       const logs = [
         {
           topics: ['0x442e715f626346e8c54381002da614f62bee8d27386535b2521ec8540898556e'],
@@ -193,7 +193,7 @@ describe('SafeEthersSigner', () => {
       const service: any = {
         getSafeTxDetails: sinon.fake.returns(safeTxDetails)
       }
-      // ExecutionFailure event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L48)
+      // ExecutionFailure event (see https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L48)
       const logs = [
         {
           topics: ['0x23428b18acfb3ea64b08dc0c1d296ea9c09702c09083ca5272e64d115b687d23'],
@@ -236,7 +236,7 @@ describe('SafeEthersSigner', () => {
       const service: any = {
         getSafeTxDetails: sinon.fake.returns(safeTxDetails)
       }
-      // ExecutionSuccess event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
+      // ExecutionSuccess event (see https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
       const logs = [
         {
           topics: ['0x442e715f626346e8c54381002da614f62bee8d27386535b2521ec8540898556e'],
@@ -279,9 +279,9 @@ describe('SafeEthersSigner', () => {
       const service: any = {
         getSafeTxDetails: sinon.fake.returns(safeTxDetails)
       }
-      // ExecutionSuccess event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
+      // ExecutionSuccess event (see https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)
       // and
-      // ContractCreation event (see https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/libraries/CreateCall.sol#L7)
+      // ContractCreation event (see https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/libraries/CreateCall.sol#L7)
       const logs = [
         {
           topics: ['0x442e715f626346e8c54381002da614f62bee8d27386535b2521ec8540898556e'],

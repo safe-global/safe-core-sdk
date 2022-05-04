@@ -23,17 +23,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gnosis/safe-core-sdk.git"
+    "url": "git+https://github.com/safe-global/safe-core-sdk.git"
   },
   "author": "Gnosis Safe (https://gnosis-safe.io)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gnosis/safe-core-sdk/issues"
+    "url": "https://github.com/safe-global/safe-core-sdk/issues"
   },
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/gnosis/safe-core-sdk#readme",
+  "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",

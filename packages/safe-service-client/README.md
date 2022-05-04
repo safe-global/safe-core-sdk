@@ -1,10 +1,10 @@
 # Safe Service Client
 
 [![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-service-client.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-service-client)
-[![GitHub Release](https://img.shields.io/github/release/gnosis/safe-core-sdk.svg?style=flat)](https://github.com/gnosis/safe-core-sdk/releases)
-[![GitHub](https://img.shields.io/github/license/gnosis/safe-core-sdk)](https://github.com/gnosis/safe-core-sdk/blob/main/LICENSE.md)
+[![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
+[![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service).
+Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service).
 
 ## Table of contents
 * [Installation](#installation)
@@ -40,8 +40,8 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
-- [Create a `Web3Adapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 

@@ -6,7 +6,7 @@ Read about the basics of Gnosis Safe and how it compares to other solutions [her
 
 ## Safe Core SDK
 
-The [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) is a monorepo that contains software developer tools that allows interaction with the [Safe contracts](https://github.com/gnosis/safe-contracts) and the [Safe Transaction Service](https://github.com/gnosis/safe-transaction-service).
+The [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) is a monorepo that contains software developer tools that allows interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts) and the [Safe Transaction Service](https://github.com/safe-global/safe-transaction-service).
 
 In this guide we will use the following packages to deploy new Safes, create transactions, collect off-chain signatures and execute transactions:
 * **safe-core-sdk-types**
@@ -41,6 +41,6 @@ We'll assume that you are familiar with TypeScript (JavaScript), Ethereum and ha
 
 ## Help
 
-If you need help, you can reach Gnosis Safe developers in the #safe-developers channel at https://chat.gnosis.io/ or create a discussion at https://github.com/gnosis/safe-core-sdk/discussions.
+If you need help, you can reach Gnosis Safe developers in the #safe-developers channel at https://chat.gnosis.io/ or create a discussion at https://github.com/safe-global/safe-core-sdk/discussions.
 
 Let's jump into the guide: [Integrating the Safe Core SDK](/packages/guides/integrating-the-safe-core-sdk.md)

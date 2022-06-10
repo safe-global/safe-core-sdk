@@ -3,11 +3,12 @@ import {
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
-  GetContractProps
+  GetContractProps,
+  SafeTransactionEIP712Args
 } from '@gnosis.pm/safe-core-sdk-types'
-import { validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import Web3 from 'web3'
-import { Transaction } from 'web3-core'
+import { AbstractProvider, Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 import {
@@ -132,6 +133,44 @@ class Web3Adapter implements EthAdapter {
 
   signMessage(message: string): Promise<string> {
     return this.#web3.eth.sign(message, this.#signerAddress)
+  }
+
+  async signTypedData(
+    safeTransactionEIP712Args: SafeTransactionEIP712Args,
+    methodVersion?: 'v3' | 'v4'
+  ): Promise<string> {
+    const typedData = generateTypedData(safeTransactionEIP712Args)
+    let method = 'eth_signTypedData_v3'
+    if (methodVersion === 'v4') {
+      method = 'eth_signTypedData_v4'
+    } else if (!methodVersion) {
+      method = 'eth_signTypedData'
+    }
+    const jsonTypedData = JSON.stringify(typedData)
+    const signedTypedData = {
+      jsonrpc: '2.0',
+      method,
+      params:
+        methodVersion === 'v3' || methodVersion === 'v4'
+          ? [this.#signerAddress, jsonTypedData]
+          : [jsonTypedData, this.#signerAddress],
+      from: this.#signerAddress,
+      id: new Date().getTime()
+    }
+    return new Promise((resolve, reject) => {
+      const provider = this.#web3.currentProvider as AbstractProvider
+      provider.sendAsync(signedTypedData, (err, signature) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        if (signature?.result == null) {
+          reject(new Error("EIP712 is not supported by user's wallet"))
+          return
+        }
+        resolve(signature.result)
+      })
+    })
   }
 
   estimateGas(

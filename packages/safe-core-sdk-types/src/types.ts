@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
@@ -68,4 +69,43 @@ export interface TransactionResult extends BaseTransactionResult {
 export interface Eip3770Address {
   prefix: string
   address: string
+}
+
+export interface SafeTransactionEIP712Args {
+  safeAddress: string
+  safeVersion: string
+  chainId: number
+  safeTransactionData: SafeTransactionData
+}
+
+export interface Eip712MessageTypes {
+  EIP712Domain: {
+    type: string
+    name: string
+  }[]
+  SafeTx: {
+    type: string
+    name: string
+  }[]
+}
+
+export interface GenerateTypedData {
+  types: Eip712MessageTypes
+  domain: {
+    chainId: number | undefined
+    verifyingContract: string
+  }
+  primaryType: string
+  message: {
+    to: string
+    value: BigNumber
+    data: string
+    operation: OperationType
+    safeTxGas: BigNumber
+    baseGas: BigNumber
+    gasPrice: BigNumber
+    gasToken: string
+    refundReceiver: string
+    nonce: BigNumber
+  }
 }

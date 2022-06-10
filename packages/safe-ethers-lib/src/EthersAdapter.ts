@@ -1,14 +1,15 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
-import { Provider } from '@ethersproject/providers'
+import { JsonRpcSigner, Provider } from '@ethersproject/providers'
 import {
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
-  GetContractProps
+  GetContractProps,
+  SafeTransactionEIP712Args
 } from '@gnosis.pm/safe-core-sdk-types'
-import { validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import {
   getMultiSendContractInstance,
@@ -135,6 +136,16 @@ class EthersAdapter implements EthAdapter {
   signMessage(message: string): Promise<string> {
     const messageArray = this.#ethers.utils.arrayify(message)
     return this.#signer.signMessage(messageArray)
+  }
+
+  async signTypedData(safeTransactionEIP712Args: SafeTransactionEIP712Args): Promise<string> {
+    const typedData = generateTypedData(safeTransactionEIP712Args)
+    const signature = await (this.#signer as JsonRpcSigner)._signTypedData(
+      typedData.domain,
+      { SafeTx: typedData.types.SafeTx },
+      typedData.message
+    )
+    return signature
   }
 
   async estimateGas(transaction: EthAdapterTransaction): Promise<number> {

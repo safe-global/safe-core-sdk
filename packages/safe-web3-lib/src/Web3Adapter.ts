@@ -1,24 +1,25 @@
-import { BigNumber } from '@ethersproject/bignumber'
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
   SafeTransactionEIP712Args
-} from '@gnosis.pm/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
-import Web3 from 'web3'
-import { AbstractProvider, Transaction } from 'web3-core'
-import { ContractOptions } from 'web3-eth-contract'
-import { AbiItem } from 'web3-utils'
+} from '@gnosis.pm/safe-core-sdk-types';
+import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils';
+import Web3 from 'web3';
+import { Transaction } from 'web3-core';
+import { ContractOptions } from 'web3-eth-contract';
+import { AbiItem } from 'web3-utils';
+import type { Callback, JsonRPCResponse, Provider } from "web3/providers";
 import {
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance
-} from './contracts/contractInstancesWeb3'
-import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
-import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
-import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
+} from './contracts/contractInstancesWeb3';
+import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3';
+import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract';
+import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract';
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -158,18 +159,19 @@ class Web3Adapter implements EthAdapter {
       id: new Date().getTime()
     }
     return new Promise((resolve, reject) => {
-      const provider = this.#web3.currentProvider as AbstractProvider
-      provider.sendAsync(signedTypedData, (err, signature) => {
+      const provider = this.#web3.currentProvider as Provider
+      const callback: Callback<JsonRPCResponse> = (err: null, val: JsonRPCResponse): void => {
         if (err) {
           reject(err)
           return
         }
-        if (signature?.result == null) {
+        if (val?.result == null) {
           reject(new Error("EIP712 is not supported by user's wallet"))
           return
         }
-        resolve(signature.result)
-      })
+        resolve(val.result)
+      }
+      provider.send(signedTypedData, callback)
     })
   }
 

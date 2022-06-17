@@ -376,9 +376,10 @@ class SafeServiceClient implements SafeTransactionService {
    */
   async proposeTransaction({
     safeAddress,
-    senderAddress,
-    safeTransaction,
+    safeTransactionData,
     safeTxHash,
+    senderAddress,
+    senderSignature,
     origin
   }: ProposeTransactionProps): Promise<void> {
     if (safeAddress === '') {
@@ -393,10 +394,10 @@ class SafeServiceClient implements SafeTransactionService {
       url: `${this.#txServiceBaseUrl}/safes/${safe}/multisig-transactions/`,
       method: HttpMethod.Post,
       body: {
-        ...safeTransaction.data,
+        ...safeTransactionData,
         contractTransactionHash: safeTxHash,
         sender,
-        signature: safeTransaction.signatures.get(sender.toLowerCase())?.data,
+        signature: senderSignature,
         origin
       }
     })

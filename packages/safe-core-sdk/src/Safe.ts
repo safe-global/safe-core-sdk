@@ -6,6 +6,7 @@ import {
   SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial,
+  SafeTransactionEIP712Args,
   SafeVersion,
   TransactionOptions,
   TransactionResult
@@ -15,7 +16,11 @@ import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
 import { isMetaTransactionArray, sameString } from './utils'
-import { generatePreValidatedSignature, generateSignature } from './utils/signatures'
+import {
+  generateEIP712Signature,
+  generatePreValidatedSignature,
+  generateSignature
+} from './utils/signatures'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
@@ -338,12 +343,36 @@ class Safe {
   }
 
   /**
+   * Signs a transaction according to the EIP-712 using the current signer account.
+   *
+   * @param safeTransaction - The Safe transaction to be signed
+   * @param methodVersion - EIP-712 version. Optional
+   * @returns The Safe signature
+   */
+  async signTypedData(
+    safeTransaction: SafeTransaction,
+    methodVersion?: 'v3' | 'v4'
+  ): Promise<SafeSignature> {
+    const safeTransactionEIP712Args: SafeTransactionEIP712Args = {
+      safeAddress: this.getAddress(),
+      safeVersion: await this.getContractVersion(),
+      chainId: await this.getEthAdapter().getChainId(),
+      safeTransactionData: safeTransaction.data
+    }
+    return generateEIP712Signature(this.#ethAdapter, safeTransactionEIP712Args, methodVersion)
+  }
+
+  /**
    * Adds the signature of the current signer to the Safe transaction object.
    *
    * @param safeTransaction - The Safe transaction to be signed
+   * @param signingMethod - Method followed to sign a transaction. Optional. Default value is eth_sign
    * @throws "Transactions can only be signed by Safe owners"
    */
-  async signTransaction(safeTransaction: SafeTransaction): Promise<void> {
+  async signTransaction(
+    safeTransaction: SafeTransaction,
+    signingMethod: 'eth_sign' | 'eth_signTypedData' = 'eth_sign'
+  ): Promise<void> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
@@ -352,8 +381,13 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-    const txHash = await this.getTransactionHash(safeTransaction)
-    const signature = await this.signTransactionHash(txHash)
+    let signature: SafeSignature
+    if (signingMethod === 'eth_signTypedData') {
+      signature = await this.signTypedData(safeTransaction)
+    } else {
+      const txHash = await this.getTransactionHash(safeTransaction)
+      signature = await this.signTransactionHash(txHash)
+    }
     safeTransaction.addSignature(signature)
   }
 

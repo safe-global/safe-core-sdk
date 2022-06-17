@@ -536,9 +536,21 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const signature = await safeSdk.signTransactionHash(txHash)
 ```
 
+### signTypedData
+
+Signs a transaction according to the EIP-712 using the current signer account.
+
+```js
+const transaction: SafeTransactionDataPartial = {
+  // ...
+}
+const safeTransaction = await safeSdk.createTransaction(transaction)
+const signature = await safeSdk.signTypedData(safeTransaction)
+```
+
 ### signTransaction
 
-Adds the signature of the current owner to the Safe transaction object.
+Adds the signature of the current owner to the Safe transaction object. `eth_sign` will be used by default to generate the signature.
 
 ```js
 const transaction: SafeTransactionDataPartial = {
@@ -546,6 +558,16 @@ const transaction: SafeTransactionDataPartial = {
 }
 const safeTransaction =  await safeSdk.createTransaction(transaction)
 await safeSdk.signTransaction(safeTransaction)
+```
+
+Optionally, an additional parameter can be passed to specify a different way of signing:
+
+```js
+await safeSdk.signTransaction(safeTransaction, 'eth_signTypedData')
+```
+
+```js
+await safeSdk.signTransaction(safeTransaction, 'eth_sign') // default option.
 ```
 
 ### approveTransactionHash

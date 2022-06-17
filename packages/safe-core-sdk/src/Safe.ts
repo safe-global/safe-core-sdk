@@ -337,17 +337,8 @@ class Safe {
    *
    * @param hash - The hash to sign
    * @returns The Safe signature
-   * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
-    const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
-    const addressIsOwner = owners.find(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
-    if (!addressIsOwner) {
-      throw new Error('Transactions can only be signed by Safe owners')
-    }
     return generateSignature(this.#ethAdapter, hash)
   }
 
@@ -357,20 +348,11 @@ class Safe {
    * @param safeTransaction - The Safe transaction to be signed
    * @param methodVersion - EIP-712 version. Optional
    * @returns The Safe signature
-   * @throws "Transactions can only be signed by Safe owners"
    */
   async signTypedData(
     safeTransaction: SafeTransaction,
     methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
-    const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
-    const addressIsOwner = owners.find(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
-    if (!addressIsOwner) {
-      throw new Error('Transactions can only be signed by Safe owners')
-    }
     const safeTransactionEIP712Args: SafeTransactionEIP712Args = {
       safeAddress: this.getAddress(),
       safeVersion: await this.getContractVersion(),
@@ -385,11 +367,20 @@ class Safe {
    *
    * @param safeTransaction - The Safe transaction to be signed
    * @param signingMethod - Method followed to sign a transaction. Optional. Default value is eth_sign
+   * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransaction(
     safeTransaction: SafeTransaction,
     signingMethod: 'eth_sign' | 'eth_signTypedData' = 'eth_sign'
   ): Promise<void> {
+    const owners = await this.getOwners()
+    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    const addressIsOwner = owners.find(
+      (owner: string) => signerAddress && sameString(owner, signerAddress)
+    )
+    if (!addressIsOwner) {
+      throw new Error('Transactions can only be signed by Safe owners')
+    }
     let signature: SafeSignature
     if (signingMethod === 'eth_signTypedData') {
       signature = await this.signTypedData(safeTransaction)

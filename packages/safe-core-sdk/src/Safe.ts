@@ -332,9 +332,18 @@ class Safe {
    *
    * @param hash - The hash to sign
    * @returns The Safe signature
-   * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
+    return generateSignature(this.#ethAdapter, hash)
+  }
+
+  /**
+   * Adds the signature of the current signer to the Safe transaction object.
+   *
+   * @param safeTransaction - The Safe transaction to be signed
+   * @throws "Transactions can only be signed by Safe owners"
+   */
+  async signTransaction(safeTransaction: SafeTransaction): Promise<void> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
@@ -343,15 +352,6 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-    return generateSignature(this.#ethAdapter, hash)
-  }
-
-  /**
-   * Adds the signature of the current signer to the Safe transaction object.
-   *
-   * @param safeTransaction - The Safe transaction to be signed
-   */
-  async signTransaction(safeTransaction: SafeTransaction): Promise<void> {
     const txHash = await this.getTransactionHash(safeTransaction)
     const signature = await this.signTransactionHash(txHash)
     safeTransaction.addSignature(signature)

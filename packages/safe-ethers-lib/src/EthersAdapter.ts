@@ -1,7 +1,7 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
-import { JsonRpcSigner, Provider } from '@ethersproject/providers'
+import { Provider } from '@ethersproject/providers'
 import {
   Eip3770Address,
   EthAdapter,
@@ -19,6 +19,7 @@ import {
 import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
 import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
+import { isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
 
@@ -139,13 +140,16 @@ class EthersAdapter implements EthAdapter {
   }
 
   async signTypedData(safeTransactionEIP712Args: SafeTransactionEIP712Args): Promise<string> {
-    const typedData = generateTypedData(safeTransactionEIP712Args)
-    const signature = await (this.#signer as JsonRpcSigner)._signTypedData(
-      typedData.domain,
-      { SafeTx: typedData.types.SafeTx },
-      typedData.message
-    )
-    return signature
+    if (isTypedDataSigner(this.#signer)) {
+      const typedData = generateTypedData(safeTransactionEIP712Args)
+      const signature = this.#signer._signTypedData(
+        typedData.domain,
+        { SafeTx: typedData.types.SafeTx },
+        typedData.message
+      )
+      return signature
+    }
+    throw new Error('The current signer does not implement EIP-712 to sign typed data')
   }
 
   async estimateGas(transaction: EthAdapterTransaction): Promise<number> {

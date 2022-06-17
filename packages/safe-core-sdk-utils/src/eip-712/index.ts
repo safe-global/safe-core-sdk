@@ -2,6 +2,8 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { GenerateTypedData, SafeTransactionEIP712Args } from '@gnosis.pm/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 
+const EQ_OR_GT_1_3_0 = '>=1.3.0'
+
 const EIP712_DOMAIN_BEFORE_V130 = [
   {
     type: 'address',
@@ -25,7 +27,7 @@ function getEip712MessageTypes(safeVersion: string): {
   EIP712Domain: typeof EIP712_DOMAIN | typeof EIP712_DOMAIN_BEFORE_V130
   SafeTx: Array<{ type: string; name: string }>
 } {
-  const eip712WithChainId = semverSatisfies(safeVersion, '>=1.3.0')
+  const eip712WithChainId = semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)
   return {
     EIP712Domain: eip712WithChainId ? EIP712_DOMAIN : EIP712_DOMAIN_BEFORE_V130,
     SafeTx: [
@@ -49,7 +51,7 @@ export function generateTypedData({
   chainId,
   safeTransactionData
 }: SafeTransactionEIP712Args): GenerateTypedData {
-  const eip712WithChainId = semverSatisfies(safeVersion, '>=1.3.0')
+  const eip712WithChainId = semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)
   const typedData: GenerateTypedData = {
     types: getEip712MessageTypes(safeVersion),
     domain: {

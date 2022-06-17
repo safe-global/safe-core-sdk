@@ -205,7 +205,7 @@ await safeService.proposeTransaction({
   safeTransactionData: safeTransaction.data,
   safeTxHash,
   senderAddress,
-  senderSignature,
+  senderSignature: senderSignature.data,
   origin
 })
 ```

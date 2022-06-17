@@ -191,9 +191,11 @@ Creates a new multi-signature transaction and stores it in the Safe Transaction 
 ```js
 const transactionConfig: ProposeTransactionProps = {
   safeAddress,
-  safeTransaction,
   safeTxHash,
-  senderAddress
+  safeTransactionData,
+  senderAddress,
+  senderSignature,
+  origin
 }
 await safeService.proposeTransaction(transactionConfig)
 ```

@@ -310,3 +310,7 @@ export type AllTransactionsListResponse = {
     | EthereumTxWithTransfersResponse
   >
 }
+
+export type ModulesResponse = {
+  safes: string[]
+}

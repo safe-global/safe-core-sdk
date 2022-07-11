@@ -5,6 +5,7 @@ import {
   AllTransactionsListResponse,
   AllTransactionsOptions,
   MasterCopyResponse,
+  ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
   SafeBalanceResponse,
@@ -109,6 +110,25 @@ class SafeServiceClient implements SafeTransactionService {
     const { address } = await this.#ethAdapter.getEip3770Address(ownerAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/owners/${address}/safes/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Returns the list of Safes where the module address provided is enabled.
+   * 
+   * @param moduleAddress - The Safe module address
+   * @returns The list of Safe addresses where the module provided is enabled
+   * @throws "Invalid module address"
+   * @throws "Module address checksum not valid"
+   */
+  async getSafesByModule(moduleAddress: string): Promise<ModulesResponse> {
+    if (moduleAddress === '') {
+      throw new Error('Invalid module address')
+    }
+    const { address } = await this.#ethAdapter.getEip3770Address(moduleAddress)
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/modules/${address}/safes/`,
       method: HttpMethod.Get
     })
   }

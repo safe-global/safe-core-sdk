@@ -4,7 +4,7 @@ import { AbiItem } from 'web3-utils'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
 import { MultiSendContract } from '../contracts/MultiSendContract'
-import { Eip3770Address, SafeVersion } from '../types'
+import { Eip3770Address, SafeTransactionEIP712Args, SafeVersion } from '../types'
 
 export interface EthAdapterTransaction {
   to: string
@@ -54,6 +54,10 @@ export interface EthAdapter {
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
   signMessage(message: string): Promise<string>
+  signTypedData(
+    safeTransactionEIP712Args: SafeTransactionEIP712Args,
+    signTypedDataVersion?: string
+  ): Promise<string>
   estimateGas(
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void

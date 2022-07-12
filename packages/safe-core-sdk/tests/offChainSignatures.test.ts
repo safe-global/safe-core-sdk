@@ -23,26 +23,6 @@ describe('Off-chain signatures', () => {
   })
 
   describe('signTransactionHash', async () => {
-    it('should fail if signer is not an owner', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const account3 = accounts[2]
-      const ethAdapter = await getEthAdapter(account3.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
-        safeAddress: safe.address,
-        contractNetworks
-      })
-      const tx = await safeSdk.createTransaction({
-        to: safe.address,
-        value: '0',
-        data: '0x'
-      })
-      const txHash = await safeSdk.getTransactionHash(tx)
-      await chai
-        .expect(safeSdk.signTransactionHash(txHash))
-        .to.be.rejectedWith('Transactions can only be signed by Safe owners')
-    })
-
     it('should sign a transaction hash with the current signer', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts

@@ -365,14 +365,15 @@ describe('Endpoint tests', () => {
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       const safeTransaction = await safeSdk.createTransaction(safeTxData)
-      await safeSdk.signTransaction(safeTransaction)
+      const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
       await chai
         .expect(
           serviceSdk.proposeTransaction({
             safeAddress,
-            senderAddress: signerAddress,
-            safeTransaction,
+            safeTransactionData: safeTransaction.data,
             safeTxHash,
+            senderAddress: signerAddress,
+            senderSignature: senderSignature.data,
             origin
           })
         )
@@ -383,8 +384,8 @@ describe('Endpoint tests', () => {
         body: {
           ...safeTxData,
           contractTransactionHash: safeTxHash,
-          sender: safeTransaction.signatures.get(signerAddress.toLowerCase())?.signer,
-          signature: safeTransaction.signatures.get(signerAddress.toLowerCase())?.data,
+          sender: signerAddress,
+          signature: senderSignature.data,
           origin
         }
       })
@@ -407,14 +408,15 @@ describe('Endpoint tests', () => {
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       const safeTransaction = await safeSdk.createTransaction(safeTxData)
-      await safeSdk.signTransaction(safeTransaction)
+      const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
       await chai
         .expect(
           serviceSdk.proposeTransaction({
             safeAddress: eip3770SafeAddress,
-            senderAddress: `${config.EIP_3770_PREFIX}:${signerAddress}`,
-            safeTransaction,
+            safeTransactionData: safeTransaction.data,
             safeTxHash,
+            senderAddress: `${config.EIP_3770_PREFIX}:${signerAddress}`,
+            senderSignature: senderSignature.data,
             origin
           })
         )
@@ -425,8 +427,8 @@ describe('Endpoint tests', () => {
         body: {
           ...safeTxData,
           contractTransactionHash: safeTxHash,
-          sender: safeTransaction.signatures.get(signerAddress.toLowerCase())?.signer,
-          signature: safeTransaction.signatures.get(signerAddress.toLowerCase())?.data,
+          sender: signerAddress,
+          signature: senderSignature.data,
           origin
         }
       })

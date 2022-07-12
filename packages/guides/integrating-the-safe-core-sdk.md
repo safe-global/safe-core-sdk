@@ -14,7 +14,7 @@
 
 ## <a name="install-dependencies">1. Install the dependencies</a>
 
-To integrate the [Safe Core SDK](https://github.com/gnosis/safe-core-sdk) into your Dapp or script you will need to install these dependencies:
+To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) into your Dapp or script you will need to install these dependencies:
 
 ```
 @gnosis.pm/safe-core-sdk-types
@@ -36,14 +36,14 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
-- [Create a `Web3Adapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
 ### Initialize the Safe Service Client
 
-As stated in the introduction, the [Safe Service Client](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/gnosis/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@gnosis.pm/safe-service-client` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
+As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@gnosis.pm/safe-service-client` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
 
 ```js
 import SafeServiceClient from '@gnosis.pm/safe-service-client'
@@ -62,7 +62,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
 
-There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
 By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `GnosisSafe.sol` contract.
 
@@ -115,7 +115,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
-Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used. Check the [API Reference](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-core-sdk#deploysafe) for more details on additional configuration parameters and callbacks.
+Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#deploysafe) for more details on additional configuration parameters and callbacks.
 
 ## <a name="create-transaction">4. Create a transaction</a>
 
@@ -191,19 +191,21 @@ const nonce = await safeService.getNextNonce(safeAddress)
 
 Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe Service Client instance and pass an object with the properties:
 - `safeAddress`: The Safe address.
-- `safeTransaction`: The Safe transaction object returned from the method `createTransaction`. Make sure that this object includes the signature of the owner which is proposing it.
+- `safeTransactionData`: The `data` object inside the Safe transaction object returned from the method `createTransaction`.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.
-- `senderAddress`: The Safe owner proposing the transaction.
+- `senderAddress`: The Safe owner or delegate proposing the transaction.
+- `senderSignature`: The signature generated by signing the `safeTxHash` with the `senderAddress`.
 - `origin`: Optional string that allows to provide more information about the app proposing the transaction.
 
 ```js
-await safeSdk.signTransaction(safeTransaction)
 const safeTxHash = await safeSdk.getTransactionHash(safeTransaction)
+const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
 await safeService.proposeTransaction({
   safeAddress,
-  safeTransaction,
+  safeTransactionData: safeTransaction.data,
   safeTxHash,
   senderAddress,
+  senderSignature: senderSignature.data,
   origin
 })
 ```

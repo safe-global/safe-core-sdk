@@ -1,3 +1,4 @@
+import { TypedDataSigner } from '@ethersproject/abstract-signer'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { EthersTransactionOptions, EthersTransactionResult } from '../types'
 
@@ -14,4 +15,8 @@ export function toTxResult(
     options,
     transactionResponse
   }
+}
+
+export function isTypedDataSigner(signer: any): signer is TypedDataSigner {
+  return (signer as unknown as TypedDataSigner)._signTypedData !== undefined
 }

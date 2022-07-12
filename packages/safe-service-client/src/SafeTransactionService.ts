@@ -60,7 +60,8 @@ interface SafeTransactionService {
   proposeTransaction({
     safeAddress,
     senderAddress,
-    safeTransaction,
+    safeTransactionData,
+    senderSignature,
     safeTxHash,
     origin
   }: ProposeTransactionProps): Promise<void>

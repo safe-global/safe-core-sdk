@@ -1,10 +1,10 @@
 # Safe Core SDK
 
 [![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-core-sdk.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-core-sdk)
-[![GitHub Release](https://img.shields.io/github/release/gnosis/safe-core-sdk.svg?style=flat)](https://github.com/gnosis/safe-core-sdk/releases)
-[![GitHub](https://img.shields.io/github/license/gnosis/safe-core-sdk)](https://github.com/gnosis/safe-core-sdk/blob/main/LICENSE.md)
+[![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
+[![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with the [Gnosis Safe contracts](https://github.com/gnosis/safe-contracts).
+Software development kit that facilitates the interaction with the [Gnosis Safe contracts](https://github.com/safe-global/safe-contracts).
 
 ## Table of contents
 * [Installation](#installation)
@@ -43,8 +43,8 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
-- [Create a `Web3Adapter` instance](https://github.com/gnosis/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
@@ -152,7 +152,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 * The `isL1SafeMasterCopy` flag
 
-  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
   By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
 
@@ -269,7 +269,7 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 
 * The `isL1SafeMasterCopy` flag
 
-  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
   By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
 
@@ -306,7 +306,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 
 * The `isL1SafeMasterCopy` flag
 
-  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/gnosis/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
   By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
 
@@ -497,7 +497,7 @@ If the optional properties are not manually set, the Safe transaction returned w
 * `refundReceiver`: 0x address is the default value.
 * `nonce`: The current Safe nonce is the default value.
 
-Read more about the [Safe transaction properties](https://docs.gnosis.io/safe/docs/contracts_tx_execution/).
+Read more about the [Safe transaction properties](https://docs.gnosis-safe.io/tutorials/tutorial_tx_service_initiate_sign).
 
 ### createRejectionTransaction
 
@@ -536,9 +536,21 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const signature = await safeSdk.signTransactionHash(txHash)
 ```
 
+### signTypedData
+
+Signs a transaction according to the EIP-712 using the current signer account.
+
+```js
+const transaction: SafeTransactionDataPartial = {
+  // ...
+}
+const safeTransaction = await safeSdk.createTransaction(transaction)
+const signature = await safeSdk.signTypedData(safeTransaction)
+```
+
 ### signTransaction
 
-Adds the signature of the current owner to the Safe transaction object.
+Adds the signature of the current owner to the Safe transaction object. `eth_sign` will be used by default to generate the signature.
 
 ```js
 const transaction: SafeTransactionDataPartial = {
@@ -546,6 +558,16 @@ const transaction: SafeTransactionDataPartial = {
 }
 const safeTransaction =  await safeSdk.createTransaction(transaction)
 await safeSdk.signTransaction(safeTransaction)
+```
+
+Optionally, an additional parameter can be passed to specify a different way of signing:
+
+```js
+await safeSdk.signTransaction(safeTransaction, 'eth_signTypedData')
+```
+
+```js
+await safeSdk.signTransaction(safeTransaction, 'eth_sign') // default option.
 ```
 
 ### approveTransactionHash

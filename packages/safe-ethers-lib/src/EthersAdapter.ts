@@ -6,9 +6,10 @@ import {
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
-  GetContractProps
+  GetContractProps,
+  SafeTransactionEIP712Args
 } from '@gnosis.pm/safe-core-sdk-types'
-import { validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import {
   getMultiSendContractInstance,
@@ -18,6 +19,7 @@ import {
 import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
 import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
+import { isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
 
@@ -135,6 +137,19 @@ class EthersAdapter implements EthAdapter {
   signMessage(message: string): Promise<string> {
     const messageArray = this.#ethers.utils.arrayify(message)
     return this.#signer.signMessage(messageArray)
+  }
+
+  async signTypedData(safeTransactionEIP712Args: SafeTransactionEIP712Args): Promise<string> {
+    if (isTypedDataSigner(this.#signer)) {
+      const typedData = generateTypedData(safeTransactionEIP712Args)
+      const signature = this.#signer._signTypedData(
+        typedData.domain,
+        { SafeTx: typedData.types.SafeTx },
+        typedData.message
+      )
+      return signature
+    }
+    throw new Error('The current signer does not implement EIP-712 to sign typed data')
   }
 
   async estimateGas(transaction: EthAdapterTransaction): Promise<number> {

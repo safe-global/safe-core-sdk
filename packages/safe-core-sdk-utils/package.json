@@ -32,7 +32,7 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@gnosis.pm/safe-deployments": "1.12.0",
+    "@gnosis.pm/safe-deployments": "1.15.0",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.0",

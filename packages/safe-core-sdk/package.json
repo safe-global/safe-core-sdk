@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-core-sdk",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Safe Core SDK",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -41,8 +41,8 @@
   "devDependencies": {
     "@gnosis.pm/safe-contracts-v1.2.0": "npm:@gnosis.pm/safe-contracts@1.2.0",
     "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
-    "@gnosis.pm/safe-ethers-lib": "^1.2.0",
-    "@gnosis.pm/safe-web3-lib": "^1.2.0",
+    "@gnosis.pm/safe-ethers-lib": "^1.2.1",
+    "@gnosis.pm/safe-web3-lib": "^1.2.1",
     "@nomiclabs/hardhat-ethers": "^2.0.5",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
@@ -89,7 +89,7 @@
   },
   "dependencies": {
     "@ethersproject/solidity": "^5.6.0",
-    "@gnosis.pm/safe-core-sdk-types": "^1.2.0",
+    "@gnosis.pm/safe-core-sdk-types": "^1.2.1",
     "@gnosis.pm/safe-deployments": "1.15.0",
     "ethereumjs-util": "^7.1.4",
     "semver": "^7.3.5",

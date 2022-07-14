@@ -109,6 +109,6 @@ export async function generateEIP712Signature(
 ): Promise<EthSignSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
   let signature = await ethAdapter.signTypedData(safeTransactionEIP712Args, methodVersion)
-  signature = adjustVInSignature('eth_signTypedData', signature.replace('0x', ''))
+  signature = adjustVInSignature('eth_signTypedData', signature)
   return new EthSignSignature(signerAddress, signature)
 }

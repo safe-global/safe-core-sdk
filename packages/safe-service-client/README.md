@@ -90,6 +90,14 @@ Returns the list of Safes where the address provided is an owner.
 const safes: OwnerResponse = await safeService.getSafesByOwner(ownerAddress)
 ```
 
+### getSafesByModule
+
+Returns the list of Safes where the module address provided is enabled.
+
+```js
+const safes: ModulesResponse = await getSafesByModule(moduleAddress)
+```
+
 ### getTransaction
 
 Returns all the information of a Safe transaction.

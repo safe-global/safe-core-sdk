@@ -103,6 +103,26 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getSafesByModule', async () => {
+      await chai
+        .expect(serviceSdk.getSafesByModule(randomAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/modules/${randomAddress}/safes/`,
+        method: 'get'
+      })
+    })
+
+    it('getSafesByModule EIP-3770', async () => {
+      await chai
+        .expect(serviceSdk.getSafesByModule(eip3770RandomAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/modules/${randomAddress}/safes/`,
+        method: 'get'
+      })
+    })
+
     it('getTransaction', async () => {
       await chai
         .expect(serviceSdk.getTransaction(safeTxHash))

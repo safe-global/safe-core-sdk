@@ -142,7 +142,7 @@ class EthersAdapter implements EthAdapter {
   async signTypedData(safeTransactionEIP712Args: SafeTransactionEIP712Args): Promise<string> {
     if (isTypedDataSigner(this.#signer)) {
       const typedData = generateTypedData(safeTransactionEIP712Args)
-      const signature = this.#signer._signTypedData(
+      const signature = await this.#signer._signTypedData(
         typedData.domain,
         { SafeTx: typedData.types.SafeTx },
         typedData.message

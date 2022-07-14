@@ -4,14 +4,14 @@ import semverSatisfies from 'semver/functions/satisfies'
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
-const EIP712_DOMAIN_BEFORE_V130 = [
+export const EIP712_DOMAIN_BEFORE_V130 = [
   {
     type: 'address',
     name: 'verifyingContract'
   }
 ]
 
-const EIP712_DOMAIN = [
+export const EIP712_DOMAIN = [
   {
     type: 'uint256',
     name: 'chainId'
@@ -23,7 +23,7 @@ const EIP712_DOMAIN = [
 ]
 
 // This function returns the types structure for signing off-chain messages according to EIP-712
-function getEip712MessageTypes(safeVersion: string): {
+export function getEip712MessageTypes(safeVersion: string): {
   EIP712Domain: typeof EIP712_DOMAIN | typeof EIP712_DOMAIN_BEFORE_V130
   SafeTx: Array<{ type: string; name: string }>
 } {
@@ -55,7 +55,6 @@ export function generateTypedData({
   const typedData: GenerateTypedData = {
     types: getEip712MessageTypes(safeVersion),
     domain: {
-      chainId: eip712WithChainId ? chainId : undefined,
       verifyingContract: safeAddress
     },
     primaryType: 'SafeTx',
@@ -67,6 +66,9 @@ export function generateTypedData({
       gasPrice: BigNumber.from(safeTransactionData.gasPrice),
       nonce: BigNumber.from(safeTransactionData.nonce)
     }
+  }
+  if (eip712WithChainId) {
+    typedData.domain.chainId = chainId
   }
   return typedData
 }

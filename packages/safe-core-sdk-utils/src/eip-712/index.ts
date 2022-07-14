@@ -55,7 +55,6 @@ export function generateTypedData({
   const typedData: GenerateTypedData = {
     types: getEip712MessageTypes(safeVersion),
     domain: {
-      chainId: eip712WithChainId ? chainId : undefined,
       verifyingContract: safeAddress
     },
     primaryType: 'SafeTx',
@@ -67,6 +66,9 @@ export function generateTypedData({
       gasPrice: BigNumber.from(safeTransactionData.gasPrice),
       nonce: BigNumber.from(safeTransactionData.nonce)
     }
+  }
+  if (eip712WithChainId) {
+    typedData.domain.chainId = chainId
   }
   return typedData
 }

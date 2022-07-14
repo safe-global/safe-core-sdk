@@ -92,7 +92,7 @@ export interface Eip712MessageTypes {
 export interface GenerateTypedData {
   types: Eip712MessageTypes
   domain: {
-    chainId: number | undefined
+    chainId?: number
     verifyingContract: string
   }
   primaryType: string

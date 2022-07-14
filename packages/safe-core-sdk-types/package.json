@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-core-sdk-types",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Safe Core SDK types",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -42,7 +42,7 @@
   "dependencies": {
     "@ethersproject/bignumber": "^5.6.0",
     "@ethersproject/contracts": "^5.6.0",
-    "@gnosis.pm/safe-deployments": "1.12.0",
+    "@gnosis.pm/safe-deployments": "1.15.0",
     "web3-core": "^1.7.1"
   }
 }

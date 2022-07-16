@@ -5,6 +5,8 @@ export interface Web3TransactionOptions {
   from?: string
   gas?: number | string
   gasPrice?: number | string
+  maxFeePerGas?: number | string
+  maxPriorityFeePerGas?: number | string
 }
 
 export interface Web3TransactionResult extends BaseTransactionResult {

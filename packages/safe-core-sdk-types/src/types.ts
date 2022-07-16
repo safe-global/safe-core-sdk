@@ -54,6 +54,8 @@ export interface TransactionOptions {
   gas?: number | string
   gasLimit?: number | string
   gasPrice?: number | string
+  maxFeePerGas?: number | string
+  maxPriorityFeePerGas?: number | string
 }
 
 export interface BaseTransactionResult {

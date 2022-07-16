@@ -231,14 +231,18 @@ Optionally, some properties can be passed as execution options:
 const options: Web3TransactionOptions = {
   from, // Optional
   gas, // Optional
-  gasPrice // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
 }
 ```
 ```js
 const options: EthersTransactionOptions = {
   from, // Optional
   gasLimit, // Optional
-  gasPrice // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
 }
 ```
 ```js
@@ -590,14 +594,18 @@ Optionally, some properties can be passed as execution options:
 const options: Web3TransactionOptions = {
   from, // Optional
   gas, // Optional
-  gasPrice // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
 }
 ```
 ```js
 const options: EthersTransactionOptions = {
   from, // Optional
   gasLimit, // Optional
-  gasPrice // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
 }
 ```
 ```js
@@ -757,14 +765,18 @@ Optionally, some properties can be passed as execution options:
 const options: Web3TransactionOptions = {
   from, // Optional
   gas, // Optional
-  gasPrice // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
 }
 ```
 ```js
 const options: EthersTransactionOptions = {
   from, // Optional
   gasLimit, // Optional
-  gasPrice // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
 }
 ```
 ```js

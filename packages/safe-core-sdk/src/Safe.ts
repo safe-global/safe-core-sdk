@@ -580,7 +580,7 @@ class Safe {
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
-   * @param options - The Safe transaction execution options (gasLimit, gasPrice)
+   * @param options - The Safe transaction execution options (gasLimit, gasPrice, maxFeePerGas, maxPriorityFeePerGas)
    * @returns The Safe transaction response
    * @throws "No signer provided"
    * @throws "There are X signatures missing"

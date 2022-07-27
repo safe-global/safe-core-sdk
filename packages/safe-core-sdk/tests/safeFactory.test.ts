@@ -5,6 +5,7 @@ import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
 import {
   ContractNetworksConfig,
   DeploySafeProps,
+  PredictSafeProps,
   SafeAccountConfig,
   SafeDeploymentConfig,
   SafeFactory
@@ -92,6 +93,93 @@ describe('Safe Proxy Factory', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
       chai.expect(await safeFactory.getChainId()).to.be.eq(chainId)
+    })
+  })
+
+  describe('predictSafeAddress', async () => {
+    it('should fail if there are no owners', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
+      const owners: string[] = []
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: 1 }
+      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      chai
+        .expect(safeFactory.predictSafeAddress(predictSafeProps))
+        .rejectedWith('Owner list must have at least one owner')
+    })
+
+    it('should fail if the threshold is lower than 0', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
+      const owners = [account1.address, account2.address]
+      const threshold = 0
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: 1 }
+      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      chai
+        .expect(safeFactory.predictSafeAddress(predictSafeProps))
+        .rejectedWith('Threshold must be greater than or equal to 1')
+    })
+
+    it('should fail if the threshold is higher than the threshold', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
+      const owners = [account1.address, account2.address]
+      const threshold = 3
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: 1 }
+      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      chai
+        .expect(safeFactory.predictSafeAddress(predictSafeProps))
+        .rejectedWith('Threshold must be lower than or equal to owners length')
+    })
+
+    it('should fail if the saltNonce is lower than 0', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: -1 }
+      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      chai
+        .expect(safeFactory.predictSafeAddress(predictSafeProps))
+        .rejectedWith('saltNonce must be greater than 0')
+    })
+
+    it('should predict a new Safe with saltNonce', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: 12345 }
+      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
+      const safeAddress = await safe.getAddress()
+      chai.expect(counterfactualSafeAddress).to.be.eq(safeAddress)
     })
   })
 

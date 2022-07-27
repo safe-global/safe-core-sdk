@@ -8,6 +8,7 @@ import Safe, {
 } from './Safe'
 import SafeFactory, {
   DeploySafeProps,
+  PredictSafeProps,
   SafeAccountConfig,
   SafeDeploymentConfig,
   SafeFactoryConfig
@@ -24,6 +25,7 @@ export {
   SafeFactoryConfig,
   SafeAccountConfig,
   SafeDeploymentConfig,
+  PredictSafeProps,
   DeploySafeProps,
   SafeConfig,
   ConnectSafeConfig,

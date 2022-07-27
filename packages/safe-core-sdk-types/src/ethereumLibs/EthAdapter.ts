@@ -28,6 +28,7 @@ export interface EthAdapter {
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
   getBalance(address: string): Promise<BigNumber>
   getChainId(): Promise<number>
+  getChecksummedAddress(address: string): string
   getSafeContract({
     safeVersion,
     chainId,

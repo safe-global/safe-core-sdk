@@ -72,6 +72,10 @@ class EthersAdapter implements EthAdapter {
     return (await this.#provider.getNetwork()).chainId
   }
 
+  getChecksummedAddress(address: string): string {
+    return this.#ethers.utils.getAddress(address)
+  }
+
   getSafeContract({
     safeVersion,
     chainId,

@@ -57,6 +57,10 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getChainId()
   }
 
+  getChecksummedAddress(address: string): string {
+    return this.#web3.utils.toChecksumAddress(address)
+  }
+
   getSafeContract({
     safeVersion,
     chainId,

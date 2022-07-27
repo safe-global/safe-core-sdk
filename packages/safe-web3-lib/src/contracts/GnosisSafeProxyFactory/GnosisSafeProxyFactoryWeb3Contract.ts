@@ -20,6 +20,10 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     return this.contract.options.address
   }
 
+  async proxyCreationCode(): Promise<string> {
+    return this.contract.methods.proxyCreationCode().call()
+  }
+
   async createProxy({
     safeMasterCopyAddress,
     initializer,

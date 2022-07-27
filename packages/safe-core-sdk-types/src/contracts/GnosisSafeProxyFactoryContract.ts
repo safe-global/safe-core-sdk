@@ -1,4 +1,4 @@
-import { TransactionOptions } from '../types'
+import { TransactionOptions } from '../types';
 
 export interface CreateProxyProps {
   safeMasterCopyAddress: string
@@ -10,6 +10,7 @@ export interface CreateProxyProps {
 
 export interface GnosisSafeProxyFactoryContract {
   getAddress(): string
+  proxyCreationCode(): Promise<string>
   createProxy(options: CreateProxyProps): Promise<string>
   encode(methodName: string, params: any[]): string
   estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>

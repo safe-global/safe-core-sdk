@@ -19,6 +19,10 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
     return this.contract.address
   }
 
+  async proxyCreationCode(): Promise<string> {
+    return this.contract.proxyCreationCode()
+  }
+
   async createProxy({
     safeMasterCopyAddress,
     initializer,

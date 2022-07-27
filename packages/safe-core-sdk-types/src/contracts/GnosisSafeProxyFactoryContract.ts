@@ -1,9 +1,9 @@
-import { TransactionOptions } from '../types';
+import { TransactionOptions } from '../types'
 
 export interface CreateProxyProps {
   safeMasterCopyAddress: string
   initializer: string
-  saltNonce: number
+  saltNonce: string
   options?: TransactionOptions
   callback?: (txHash: string) => void
 }

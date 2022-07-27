@@ -8,7 +8,7 @@ import { toTxResult } from '../../utils'
 export interface CreateProxyProps {
   safeMasterCopyAddress: string
   initializer: string
-  saltNonce: number
+  saltNonce: string
   options?: Web3TransactionOptions
   callback?: (txHash: string) => void
 }
@@ -31,9 +31,9 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     options,
     callback
   }: CreateProxyProps): Promise<string> {
-    if (saltNonce < 0) {
-      throw new Error('saltNonce must be greater than 0')
-    }
+    //if (saltNonce < 0) {
+    //  throw new Error('saltNonce must be greater than or equal to 0')
+    //}
     if (options && !options.gas) {
       options.gas = await this.estimateGas(
         'createProxyWithNonce',

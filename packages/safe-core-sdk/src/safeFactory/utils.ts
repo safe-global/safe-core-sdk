@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { SafeAccountConfig, SafeDeploymentConfig } from './'
 
 export const validateSafeAccountConfig = ({ owners, threshold }: SafeAccountConfig): void => {
@@ -8,5 +9,6 @@ export const validateSafeAccountConfig = ({ owners, threshold }: SafeAccountConf
 }
 
 export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig): void => {
-  if (saltNonce < 0) throw new Error('saltNonce must be greater than 0')
+  if (BigNumber.from(saltNonce).lt(0))
+    throw new Error('saltNonce must be greater than or equal to 0')
 }

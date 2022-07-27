@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { Event } from '@ethersproject/contracts'
 import { GnosisSafeProxyFactoryContract } from '@gnosis.pm/safe-core-sdk-types'
 import { ProxyFactory as ProxyFactory_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/ProxyFactory'
@@ -7,7 +8,7 @@ import { EthersTransactionOptions } from '../../types'
 export interface CreateProxyProps {
   safeMasterCopyAddress: string
   initializer: string
-  saltNonce: number
+  saltNonce: string
   options?: EthersTransactionOptions
   callback?: (txHash: string) => void
 }
@@ -30,9 +31,8 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
     options,
     callback
   }: CreateProxyProps): Promise<string> {
-    if (saltNonce < 0) {
-      throw new Error('saltNonce must be greater than 0')
-    }
+    if (BigNumber.from(saltNonce).lt(0))
+      throw new Error('saltNonce must be greater than or equal to 0')
     if (options && !options.gasLimit) {
       options.gasLimit = await this.estimateGas(
         'createProxyWithNonce',

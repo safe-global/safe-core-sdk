@@ -5,12 +5,13 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@gnosis.pm/safe-core-sdk-types'
+import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import { getProxyFactoryContract, getSafeContract } from '../contracts/safeDeploymentContracts'
 import Safe from '../Safe'
 import { ContractNetworksConfig } from '../types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
-import { validateSafeAccountConfig } from './utils'
+import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -24,7 +25,12 @@ export interface SafeAccountConfig {
 }
 
 export interface SafeDeploymentConfig {
-  saltNonce: number
+  saltNonce: string
+}
+
+export interface PredictSafeProps {
+  safeAccountConfig: SafeAccountConfig
+  safeDeploymentConfig: SafeDeploymentConfig
 }
 
 export interface DeploySafeProps {
@@ -140,6 +146,36 @@ class SafeFactory {
     ])
   }
 
+  async predictSafeAddress({
+    safeAccountConfig,
+    safeDeploymentConfig
+  }: PredictSafeProps): Promise<string> {
+    validateSafeAccountConfig(safeAccountConfig)
+    validateSafeDeploymentConfig(safeDeploymentConfig)
+
+    const from = this.#safeProxyFactoryContract.getAddress()
+
+    const initializer = await this.encodeSetupCallData(safeAccountConfig)
+    const saltNonce = safeDeploymentConfig.saltNonce
+    const encodedNonce = toBuffer(this.#ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(
+      'hex'
+    )
+
+    const salt = keccak256(
+      toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
+    )
+
+    const proxyCreationCode = await this.#safeProxyFactoryContract.proxyCreationCode()
+    const constructorData = toBuffer(
+      this.#ethAdapter.encodeParameters(['address'], [this.#gnosisSafeContract.getAddress()])
+    ).toString('hex')
+    const initCode = proxyCreationCode + constructorData
+
+    const proxyAddress =
+      '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
+    return this.#ethAdapter.getChecksummedAddress(proxyAddress)
+  }
+
   async deploySafe({
     safeAccountConfig,
     safeDeploymentConfig,
@@ -147,10 +183,14 @@ class SafeFactory {
     callback
   }: DeploySafeProps): Promise<Safe> {
     validateSafeAccountConfig(safeAccountConfig)
+    if (safeDeploymentConfig) {
+      validateSafeDeploymentConfig(safeDeploymentConfig)
+    }
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const saltNonce =
-      safeDeploymentConfig?.saltNonce ?? Date.now() * 1000 + Math.floor(Math.random() * 1000)
+      safeDeploymentConfig?.saltNonce ??
+      (Date.now() * 1000 + Math.floor(Math.random() * 1000)).toString()
 
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')

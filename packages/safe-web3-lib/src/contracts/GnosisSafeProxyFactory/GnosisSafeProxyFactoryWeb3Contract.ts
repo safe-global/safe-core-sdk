@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { GnosisSafeProxyFactoryContract } from '@gnosis.pm/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 import { ProxyFactory as ProxyFactory_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/proxy_factory'
@@ -8,7 +9,7 @@ import { toTxResult } from '../../utils'
 export interface CreateProxyProps {
   safeMasterCopyAddress: string
   initializer: string
-  saltNonce: number
+  saltNonce: string
   options?: Web3TransactionOptions
   callback?: (txHash: string) => void
 }
@@ -20,6 +21,10 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     return this.contract.options.address
   }
 
+  async proxyCreationCode(): Promise<string> {
+    return this.contract.methods.proxyCreationCode().call()
+  }
+
   async createProxy({
     safeMasterCopyAddress,
     initializer,
@@ -27,9 +32,8 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     options,
     callback
   }: CreateProxyProps): Promise<string> {
-    if (saltNonce < 0) {
-      throw new Error('saltNonce must be greater than 0')
-    }
+    if (BigNumber.from(saltNonce).lt(0))
+      throw new Error('saltNonce must be greater than or equal to 0')
     if (options && !options.gas) {
       options.gas = await this.estimateGas(
         'createProxyWithNonce',

@@ -72,6 +72,10 @@ class EthersAdapter implements EthAdapter {
     return (await this.#provider.getNetwork()).chainId
   }
 
+  getChecksummedAddress(address: string): string {
+    return this.#ethers.utils.getAddress(address)
+  }
+
   getSafeContract({
     safeVersion,
     chainId,
@@ -158,6 +162,10 @@ class EthersAdapter implements EthAdapter {
 
   call(transaction: EthAdapterTransaction): Promise<string> {
     return this.#provider.call(transaction)
+  }
+
+  encodeParameters(types: string[], values: any[]) {
+    return new this.#ethers.utils.AbiCoder().encode(types, values)
   }
 }
 

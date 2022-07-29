@@ -164,8 +164,8 @@ class EthersAdapter implements EthAdapter {
     return this.#provider.call(transaction)
   }
 
-  encodeParameter(type: string, value: any) {
-    return new this.#ethers.utils.AbiCoder().encode([type], [value])
+  encodeParameters(types: string[], values: any[]) {
+    return new this.#ethers.utils.AbiCoder().encode(types, values)
   }
 }
 

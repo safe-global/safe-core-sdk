@@ -157,7 +157,7 @@ class SafeFactory {
 
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const saltNonce = safeDeploymentConfig.saltNonce
-    const encodedNonce = toBuffer(this.#ethAdapter.encodeParameter('uint256', saltNonce)).toString(
+    const encodedNonce = toBuffer(this.#ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(
       'hex'
     )
 
@@ -167,7 +167,7 @@ class SafeFactory {
 
     const proxyCreationCode = await this.#safeProxyFactoryContract.proxyCreationCode()
     const constructorData = toBuffer(
-      this.#ethAdapter.encodeParameter('address', this.#gnosisSafeContract.getAddress())
+      this.#ethAdapter.encodeParameters(['address'], [this.#gnosisSafeContract.getAddress()])
     ).toString('hex')
     const initCode = proxyCreationCode + constructorData
 

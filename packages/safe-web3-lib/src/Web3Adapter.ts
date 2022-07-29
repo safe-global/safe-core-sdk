@@ -192,8 +192,8 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.call(transaction)
   }
 
-  encodeParameter(type: string, value: any): string {
-    return this.#web3.eth.abi.encodeParameter(type, value)
+  encodeParameters(types: string[], values: any[]): string {
+    return this.#web3.eth.abi.encodeParameters(types, values)
   }
 }
 

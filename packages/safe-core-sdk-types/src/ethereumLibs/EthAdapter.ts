@@ -64,5 +64,5 @@ export interface EthAdapter {
     callback?: (error: Error, gas: number) => void
   ): Promise<number>
   call(transaction: EthAdapterTransaction): Promise<string>
-  encodeParameter(type: string, value: any): string
+  encodeParameters(types: string[], values: any[]): string
 }

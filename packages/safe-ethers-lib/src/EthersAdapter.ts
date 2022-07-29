@@ -163,6 +163,10 @@ class EthersAdapter implements EthAdapter {
   call(transaction: EthAdapterTransaction): Promise<string> {
     return this.#provider.call(transaction)
   }
+
+  encodeParameter(type: string, value: any) {
+    return new this.#ethers.utils.AbiCoder().encode([type], [value])
+  }
 }
 
 export default EthersAdapter

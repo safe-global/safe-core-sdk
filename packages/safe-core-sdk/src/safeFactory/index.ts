@@ -5,7 +5,6 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@gnosis.pm/safe-core-sdk-types'
-import abi from 'ethereumjs-abi'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import { getProxyFactoryContract, getSafeContract } from '../contracts/safeDeploymentContracts'
@@ -26,7 +25,7 @@ export interface SafeAccountConfig {
 }
 
 export interface SafeDeploymentConfig {
-  saltNonce: number
+  saltNonce: string
 }
 
 export interface PredictSafeProps {
@@ -152,23 +151,24 @@ class SafeFactory {
     safeDeploymentConfig
   }: PredictSafeProps): Promise<string> {
     validateSafeAccountConfig(safeAccountConfig)
-    if (safeDeploymentConfig) {
-      validateSafeDeploymentConfig(safeDeploymentConfig)
-    }
+    validateSafeDeploymentConfig(safeDeploymentConfig)
 
     const from = this.#safeProxyFactoryContract.getAddress()
 
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
-    const saltNonce = safeDeploymentConfig.saltNonce.toString()
-    const encodedNonce = abi.rawEncode(['uint256'], [saltNonce]).toString('hex')
+    const saltNonce = safeDeploymentConfig.saltNonce
+    const encodedNonce = toBuffer(this.#ethAdapter.encodeParameter('uint256', saltNonce)).toString(
+      'hex'
+    )
+
     const salt = keccak256(
       toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
     )
 
     const proxyCreationCode = await this.#safeProxyFactoryContract.proxyCreationCode()
-    const constructorData = abi
-      .rawEncode(['address'], [this.#gnosisSafeContract.getAddress()])
-      .toString('hex')
+    const constructorData = toBuffer(
+      this.#ethAdapter.encodeParameter('address', this.#gnosisSafeContract.getAddress())
+    ).toString('hex')
     const initCode = proxyCreationCode + constructorData
 
     const proxyAddress =
@@ -189,7 +189,8 @@ class SafeFactory {
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const saltNonce =
-      safeDeploymentConfig?.saltNonce ?? Date.now() * 1000 + Math.floor(Math.random() * 1000)
+      safeDeploymentConfig?.saltNonce ??
+      (Date.now() * 1000 + Math.floor(Math.random() * 1000)).toString()
 
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')

@@ -25,7 +25,7 @@ describe('removeAllSafeDelegates', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'.toLowerCase()
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
     await chai
       .expect(serviceSdk.removeAllSafeDelegates(safeAddress, signer))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -39,7 +39,7 @@ describe('removeAllSafeDelegates', () => {
   })
 
   it('should fail if the signer is not an owner of the Safe', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const { serviceSdk, signer } = await getServiceClient(
       '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
     )
@@ -49,7 +49,7 @@ describe('removeAllSafeDelegates', () => {
   })
 
   it('should remove all delegates', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateConfig1: SafeDelegateConfig = {
       safe: safeAddress,
       delegate: '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0',
@@ -72,7 +72,7 @@ describe('removeAllSafeDelegates', () => {
   })
 
   it('should remove all delegates EIP-3770', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateConfig1: SafeDelegateConfig = {
       safe: eip3770SafeAddress,

@@ -31,7 +31,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if Safe delegate address is empty', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = ''
     const delegateConfig: SafeDelegateDeleteConfig = {
       safe: safeAddress,
@@ -44,7 +44,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'.toLowerCase()
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
     const delegateConfig: SafeDelegateDeleteConfig = {
       safe: safeAddress,
       delegate: '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0',
@@ -56,7 +56,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if Safe delegate address is not checksummed', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'.toLowerCase()
     const delegateConfig: SafeDelegateDeleteConfig = {
       safe: safeAddress,
@@ -82,7 +82,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if the signer is not an owner of the Safe', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
     const { serviceSdk, signer } = await getServiceClient(
       '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
@@ -98,7 +98,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if the delegate to remove is not a delegate', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
     const delegateConfig: SafeDelegateDeleteConfig = {
       safe: safeAddress,
@@ -109,7 +109,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should remove a delegate', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
     const delegateConfig: SafeDelegateDeleteConfig = {
       safe: safeAddress,
@@ -125,7 +125,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should remove a delegate EIP-3770', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`

@@ -21,16 +21,16 @@ import { getServiceClient } from '../utils/setupServiceClient'
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
-const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
 const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
 const randomAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
 const eip3770RandomAddress = `${config.EIP_3770_PREFIX}:${randomAddress}`
 const delegateAddress = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
 const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-const tokenAddress = '0xcb0591ba2d74edd4211d5200d5d3b19cf598c548'
+const tokenAddress = '0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D'
 const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
-const txServiceBaseUrl = 'https://safe-transaction.rinkeby.gnosis.io'
+const txServiceBaseUrl = 'https://safe-transaction.goerli.gnosis.io'
 const provider = getDefaultProvider(config.JSON_RPC)
 const signer = new Wallet(
   '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',

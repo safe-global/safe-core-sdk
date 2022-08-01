@@ -22,21 +22,21 @@ describe('getNextNonce', () => {
   })
 
   it('should return the next Safe nonce when there are pending transactions', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const nextNonce = await serviceSdk.getNextNonce(safeAddress)
-    chai.expect(nextNonce).to.be.equal(10)
+    chai.expect(nextNonce).to.be.equal(8)
+  })
+
+  it('should return the next Safe nonce when there are pending transactions EIP-3770', async () => {
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const nextNonce = await serviceSdk.getNextNonce(eip3770SafeAddress)
+    chai.expect(nextNonce).to.be.equal(8)
   })
 
   it('should return the next Safe nonce when there are no pending transactions', async () => {
-    const safeAddress = '0x3e1ee196231490c8483df2D57403c7B814f91803'
+    const safeAddress = '0x72c346260a4887F0231af41178C1c818Ce34543f'
     const nextNonce = await serviceSdk.getNextNonce(safeAddress)
-    chai.expect(nextNonce).to.be.equal(0)
-  })
-
-  it('should return the next Safe nonce when there are no pending transactions EIP-3770', async () => {
-    const safeAddress = '0x3e1ee196231490c8483df2D57403c7B814f91803'
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const nextNonce = await serviceSdk.getNextNonce(eip3770SafeAddress)
-    chai.expect(nextNonce).to.be.equal(0)
+    chai.expect(nextNonce).to.be.equal(3)
   })
 })

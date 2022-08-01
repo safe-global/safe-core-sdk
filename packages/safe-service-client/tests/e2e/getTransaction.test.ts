@@ -27,7 +27,7 @@ describe('getTransaction', () => {
   })
 
   it('should return the transaction with the given safeTxHash', async () => {
-    const safeTxHash = '0xb22be4e57718560c89de96acd1acefe55c2673b31a7019a374ebb1d8a2842f5d'
+    const safeTxHash = '0xc58b604550610302477087256063d1ba195fbec20b2fd27648fec55242074592'
     const transaction = await serviceSdk.getTransaction(safeTxHash)
     chai.expect(transaction.safeTxHash).to.be.equal(safeTxHash)
   })

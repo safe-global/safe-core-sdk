@@ -7,7 +7,7 @@ import { getServiceClient } from '../utils/setupServiceClient'
 chai.use(chaiAsPromised)
 
 let serviceSdk: SafeServiceClient
-const rinkebySpendingLimitModule = '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
+const goerliSpendingLimitModule = '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
 
 describe('getSafesByModule', () => {
   before(async () => {
@@ -38,14 +38,14 @@ describe('getSafesByModule', () => {
   })
 
   it('should return the array Safes with the module enabled', async () => {
-    const moduleAddress = rinkebySpendingLimitModule
+    const moduleAddress = goerliSpendingLimitModule
     const moduleResponse = await serviceSdk.getSafesByModule(moduleAddress)
     const { safes } = moduleResponse
     chai.expect(safes.length).to.be.greaterThan(10)
   })
 
   it('should return the array of Safes EIP-3770', async () => {
-    const moduleAddress = rinkebySpendingLimitModule
+    const moduleAddress = goerliSpendingLimitModule
     const eip3770ModuleAddress = `${config.EIP_3770_PREFIX}:${moduleAddress}`
     const moduleResponse = await serviceSdk.getSafesByModule(eip3770ModuleAddress)
     const { safes } = moduleResponse

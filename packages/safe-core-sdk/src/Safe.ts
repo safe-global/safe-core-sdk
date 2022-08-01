@@ -4,13 +4,13 @@ import {
   MetaTransactionData,
   OperationType,
   SafeSignature,
-  SafeTransaction,
   SafeTransactionDataPartial,
   SafeTransactionEIP712Args,
   SafeVersion,
   TransactionOptions,
   TransactionResult
 } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeTransaction } from './../../safe-core-sdk-types/src/types'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
@@ -372,7 +372,7 @@ class Safe {
   async signTransaction(
     safeTransaction: SafeTransaction,
     signingMethod: 'eth_sign' | 'eth_signTypedData' = 'eth_sign'
-  ): Promise<void> {
+  ): Promise<SafeTransaction> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
@@ -388,7 +388,12 @@ class Safe {
       const txHash = await this.getTransactionHash(safeTransaction)
       signature = await this.signTransactionHash(txHash)
     }
-    safeTransaction.addSignature(signature)
+    const signedSafeTransaction = await this.createTransaction(safeTransaction.data)
+    safeTransaction.signatures.forEach((signature) => {
+      signedSafeTransaction.addSignature(signature)
+    })
+    signedSafeTransaction.addSignature(signature)
+    return signedSafeTransaction
   }
 
   /**

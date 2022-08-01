@@ -111,7 +111,7 @@ The `owner1` account signs the transaction off-chain.
 const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction)
 ```
 
-Because the signature is off-chain, there is no interaction with the contract and the signature becomes available at `safeTransaction.signatures`.
+Because the signature is off-chain, there is no interaction with the contract and the signature becomes available at `signedSafeTransaction.signatures`.
 
 ### 3.b. On-chain signatures
 

@@ -364,7 +364,8 @@ class Safe {
    * Adds the signature of the current signer to the Safe transaction object.
    *
    * @param safeTransaction - The Safe transaction to be signed
-   * @param signingMethod - Method followed to sign a transaction. Optional. Default value is eth_sign
+   * @param signingMethod - Method followed to sign a transaction. Optional. Default value is "eth_sign"
+   * @returns The signed Safe transaction
    * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransaction(

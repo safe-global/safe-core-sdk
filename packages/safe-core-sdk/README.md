@@ -108,7 +108,7 @@ Before executing this transaction, it must be signed by the owners and this can 
 The `owner1` account signs the transaction off-chain.
 
 ```js
-const owner1Signature = await safeSdk.signTransaction(safeTransaction)
+const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction)
 ```
 
 Because the signature is off-chain, there is no interaction with the contract and the signature becomes available at `safeTransaction.signatures`.
@@ -556,18 +556,18 @@ Adds the signature of the current owner to the Safe transaction object. `eth_sig
 const transaction: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction(transaction)
-await safeSdk.signTransaction(safeTransaction)
+const safeTransaction = await safeSdk.createTransaction(transaction)
+const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction)
 ```
 
 Optionally, an additional parameter can be passed to specify a different way of signing:
 
 ```js
-await safeSdk.signTransaction(safeTransaction, 'eth_signTypedData')
+const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction, 'eth_signTypedData')
 ```
 
 ```js
-await safeSdk.signTransaction(safeTransaction, 'eth_sign') // default option.
+const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction, 'eth_sign') // default option.
 ```
 
 ### approveTransactionHash

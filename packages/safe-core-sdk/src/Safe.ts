@@ -3,14 +3,12 @@ import {
   EthAdapter,
   MetaTransactionData,
   OperationType,
-  SafeSignature,
-  SafeTransactionDataPartial,
+  SafeSignature, SafeTransaction, SafeTransactionDataPartial,
   SafeTransactionEIP712Args,
   SafeVersion,
   TransactionOptions,
   TransactionResult
 } from '@gnosis.pm/safe-core-sdk-types'
-import { SafeTransaction } from './../../safe-core-sdk-types/src/types'
 import ContractManager from './managers/contractManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'

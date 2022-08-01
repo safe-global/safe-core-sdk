@@ -23,7 +23,7 @@ describe('getIncomingTransactions', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'.toLowerCase()
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
     await chai
       .expect(serviceSdk.getIncomingTransactions(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -37,21 +37,21 @@ describe('getIncomingTransactions', () => {
   })
 
   it('should return the list of incoming transactions', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD' // Safe with incoming transactions
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with incoming transactions
     const transferListResponse = await serviceSdk.getIncomingTransactions(safeAddress)
-    chai.expect(transferListResponse.count).to.be.equal(10)
-    chai.expect(transferListResponse.results.length).to.be.equal(10)
+    chai.expect(transferListResponse.count).to.be.equal(3)
+    chai.expect(transferListResponse.results.length).to.be.equal(3)
     transferListResponse.results.map((transaction) => {
       chai.expect(transaction.to).to.be.equal(safeAddress)
     })
   })
 
   it('should return the list of incoming transactions EIP-3770', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD' // Safe with incoming transactions
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with incoming transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transferListResponse = await serviceSdk.getIncomingTransactions(eip3770SafeAddress)
-    chai.expect(transferListResponse.count).to.be.equal(10)
-    chai.expect(transferListResponse.results.length).to.be.equal(10)
+    chai.expect(transferListResponse.count).to.be.equal(3)
+    chai.expect(transferListResponse.results.length).to.be.equal(3)
     transferListResponse.results.map((transaction) => {
       chai.expect(transaction.to).to.be.equal(safeAddress)
     })

@@ -21,22 +21,22 @@ describe('getToken', () => {
   })
 
   it('should fail if token address is not checksummed', async () => {
-    const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'.toLowerCase()
+    const tokenAddress = '0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D'.toLowerCase()
     await chai
       .expect(serviceSdk.getToken(tokenAddress))
       .to.be.rejectedWith('Invalid ethereum address')
   })
 
   it('should return the token info', async () => {
-    const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+    const tokenAddress = '0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D'
     const tokenInfoResponse = await serviceSdk.getToken(tokenAddress)
-    chai.expect(tokenInfoResponse.address).to.be.equal('0xc778417E063141139Fce010982780140Aa0cD5Ab')
+    chai.expect(tokenInfoResponse.address).to.be.equal('0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D')
   })
 
   it('should return the token info EIP-3770', async () => {
-    const tokenAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+    const tokenAddress = '0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D'
     const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
     const tokenInfoResponse = await serviceSdk.getToken(eip3770TokenAddress)
-    chai.expect(tokenInfoResponse.address).to.be.equal('0xc778417E063141139Fce010982780140Aa0cD5Ab')
+    chai.expect(tokenInfoResponse.address).to.be.equal('0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D')
   })
 })

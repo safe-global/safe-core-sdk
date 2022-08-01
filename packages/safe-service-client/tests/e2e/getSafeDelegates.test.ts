@@ -25,7 +25,7 @@ describe('getSafeDelegates', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'.toLowerCase()
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
     await chai
       .expect(serviceSdk.getSafeDelegates(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -39,7 +39,7 @@ describe('getSafeDelegates', () => {
   })
 
   it('should return an array of delegates', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
 
     const delegateConfig1: SafeDelegateConfig = {
       safe: safeAddress,
@@ -69,7 +69,7 @@ describe('getSafeDelegates', () => {
   })
 
   it('should return an array of delegates EIP-3770', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateConfig1: SafeDelegateConfig = {
       safe: eip3770SafeAddress,

@@ -26,14 +26,14 @@ if (PK) {
   }
 }
 
-if (['rinkeby'].includes(argv.network) && INFURA_KEY === undefined) {
+if (['goerli'].includes(argv.network) && INFURA_KEY === undefined) {
   throw new Error(
     `Could not find Infura key in env, unable to connect to network ${argv.network}`,
   )
 }
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "goerli",
   paths: {
     tests: TESTS_PATH
   },
@@ -43,9 +43,9 @@ const config: HardhatUserConfig = {
       blockGasLimit: 100000000,
       gas: 100000000
     },
-    rinkeby: {
+    goerli: {
       ...sharedNetworkConfig,
-      url: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
+      url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
     }
   }
 }

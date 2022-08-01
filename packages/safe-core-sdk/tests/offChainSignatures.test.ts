@@ -78,8 +78,9 @@ describe('Off-chain signatures', () => {
         data: '0x'
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
-      await safeSdk.signTransaction(tx)
-      chai.expect(tx.signatures.size).to.be.eq(1)
+      const signedTx = await safeSdk.signTransaction(tx)
+      chai.expect(tx.signatures.size).to.be.eq(0)
+      chai.expect(signedTx.signatures.size).to.be.eq(1)
     })
 
     it('should ignore duplicated signatures', async () => {
@@ -97,10 +98,11 @@ describe('Off-chain signatures', () => {
         data: '0x'
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
-      await safeSdk.signTransaction(tx)
-      chai.expect(tx.signatures.size).to.be.eq(1)
-      await safeSdk.signTransaction(tx)
-      chai.expect(tx.signatures.size).to.be.eq(1)
+      const signedTx1 = await safeSdk.signTransaction(tx)
+      chai.expect(signedTx1.signatures.size).to.be.eq(1)
+      const signedTx2 = await safeSdk.signTransaction(signedTx1)
+      chai.expect(signedTx2.signatures.size).to.be.eq(1)
+      chai.expect(tx.signatures.size).to.be.eq(0)
     })
   })
 })

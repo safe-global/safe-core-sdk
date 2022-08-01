@@ -395,6 +395,7 @@ class Safe {
    * Approves on-chain a hash using the current signer account.
    *
    * @param hash - The hash to approve
+   * @param options - The Safe transaction execution options. Optional
    * @returns The Safe transaction response
    * @throws "Transaction hashes can only be approved by Safe owners"
    * @throws "Cannot specify gas and gasLimit together in transaction options"
@@ -580,7 +581,7 @@ class Safe {
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
-   * @param options - The Safe transaction execution options (gasLimit, gasPrice, maxFeePerGas, maxPriorityFeePerGas)
+   * @param options - The Safe transaction execution options. Optional
    * @returns The Safe transaction response
    * @throws "No signer provided"
    * @throws "There are X signatures missing"

@@ -333,6 +333,44 @@ describe('Transactions execution', () => {
       }
     )
 
+    itif(process.env.ETH_LIB === 'ethers')(
+      'should execute a transaction with options: { maxFeePerGas, maxPriorityFeePerGas }',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const safe = await getSafeWithOwners([account1.address])
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk1 = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        await account1.signer.sendTransaction({
+          to: safe.address,
+          value: BigNumber.from('1000000000000000000') // 1 ETH
+        })
+        const txDataPartial: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+        const tx = await safeSdk1.createTransaction(txDataPartial)
+        const execOptions: EthersTransactionOptions = {
+          maxFeePerGas: 200000000, //higher than hardhat's block baseFeePerGas
+          maxPriorityFeePerGas: 1
+        }
+        const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
+        await waitSafeTxReceipt(txResponse)
+        const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
+        chai
+          .expect(BigNumber.from(execOptions.maxFeePerGas))
+          .to.be.eq(BigNumber.from(txConfirmed.maxFeePerGas))
+        chai
+          .expect(BigNumber.from(execOptions.maxPriorityFeePerGas))
+          .to.be.eq(BigNumber.from(txConfirmed.maxPriorityFeePerGas))
+      }
+    )
+
     itif(process.env.ETH_LIB === 'web3')(
       'should execute a transaction with options: { gas }',
       async () => {
@@ -394,6 +432,44 @@ describe('Transactions execution', () => {
         const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
         chai.expect(execOptions.gasPrice).to.be.eq(Number(txConfirmed.gasPrice))
         chai.expect(execOptions.gas).to.be.eq(txConfirmed.gas)
+      }
+    )
+
+    itif(process.env.ETH_LIB === 'web3')(
+      'should execute a transaction with options: { maxFeePerGas, maxPriorityFeePerGas }',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const safe = await getSafeWithOwners([account1.address])
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk1 = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        await account1.signer.sendTransaction({
+          to: safe.address,
+          value: BigNumber.from('1000000000000000000') // 1 ETH
+        })
+        const txDataPartial: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+        const tx = await safeSdk1.createTransaction(txDataPartial)
+        const execOptions: Web3TransactionOptions = {
+          maxFeePerGas: 200000000, //higher than hardhat's block baseFeePerGas
+          maxPriorityFeePerGas: 1
+        }
+        const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
+        await waitSafeTxReceipt(txResponse)
+        const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
+        chai
+          .expect(BigNumber.from(execOptions.maxFeePerGas))
+          .to.be.eq(BigNumber.from(txConfirmed.maxFeePerGas))
+        chai
+          .expect(BigNumber.from(execOptions.maxPriorityFeePerGas))
+          .to.be.eq(BigNumber.from(txConfirmed.maxPriorityFeePerGas))
       }
     )
   })

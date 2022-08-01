@@ -13,6 +13,8 @@ export interface EthAdapterTransaction {
   value?: string
   gasPrice?: number
   gasLimit?: number
+  maxFeePerGas?: number | string
+  maxPriorityFeePerGas?: number | string
 }
 
 export interface GetContractProps {

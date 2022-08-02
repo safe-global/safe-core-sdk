@@ -79,7 +79,9 @@ describe('Off-chain signatures', () => {
       })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx = await safeSdk.signTransaction(tx)
-      chai.expect(tx.signatures.size).to.be.eq(0)
+      // TO-DO: Uncomment in v3.0.0 {
+      // chai.expect(tx.signatures.size).to.be.eq(0)
+      // }
       chai.expect(signedTx.signatures.size).to.be.eq(1)
     })
 
@@ -102,7 +104,9 @@ describe('Off-chain signatures', () => {
       chai.expect(signedTx1.signatures.size).to.be.eq(1)
       const signedTx2 = await safeSdk.signTransaction(signedTx1)
       chai.expect(signedTx2.signatures.size).to.be.eq(1)
-      chai.expect(tx.signatures.size).to.be.eq(0)
+      // TO-DO: Remove in v3.0.0 {
+      // chai.expect(tx.signatures.size).to.be.eq(0)
+      // }
     })
   })
 })

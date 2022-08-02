@@ -401,7 +401,7 @@ class Safe {
     )
     safeTransaction.addSignature(signature)
     // }
-    
+
     return signedSafeTransaction
   }
 

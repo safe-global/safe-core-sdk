@@ -397,7 +397,7 @@ class Safe {
 
     // TO-DO: Remove in v3.0.0 {
     console.warn(
-      'WARNING! "signTransaction" method now *returns* the signed Safe transaction. Update your code according to the new documentation: https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#signtransaction. In >=v3.0.0 the signature will only be added to the returned object, not the one that is passed as params.'
+      `⚠️ the "signTransaction" method now returns a signed Safe transaction. Please update your code according to the new documentation: https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#signtransaction. In >=v3.0.0, the signature will be added only to the return transaction object, and not to the one passed as an argument.`
     )
     safeTransaction.addSignature(signature)
     // }

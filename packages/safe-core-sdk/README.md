@@ -550,7 +550,7 @@ const signature = await safeSdk.signTypedData(safeTransaction)
 
 ### signTransaction
 
-Adds the signature of the current owner to the Safe transaction object. `eth_sign` will be used by default to generate the signature.
+Returns a new `SafeTransaction` object that includes the signature of the current owner. `eth_sign` will be used by default to generate the signature.
 
 ```js
 const transaction: SafeTransactionDataPartial = {

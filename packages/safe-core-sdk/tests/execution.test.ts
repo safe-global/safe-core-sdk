@@ -76,12 +76,12 @@ describe('Transactions execution', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction(txDataPartial)
-      await safeSdk1.signTransaction(tx)
+      const signedTx = await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
       const txResponse = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse)
       await chai
-        .expect(safeSdk2.executeTransaction(tx))
+        .expect(safeSdk2.executeTransaction(signedTx))
         .to.be.rejectedWith('There is 1 signature missing')
     })
 
@@ -132,12 +132,12 @@ describe('Transactions execution', () => {
       }
       const tx = await safeSdk1.createTransaction(txDataPartial)
       const rejectTx = await safeSdk1.createRejectionTransaction(tx.data.nonce)
-      await safeSdk1.signTransaction(rejectTx)
-      const txRejectResponse = await safeSdk2.executeTransaction(rejectTx)
+      const signedRejectTx = await safeSdk1.signTransaction(rejectTx)
+      const txRejectResponse = await safeSdk2.executeTransaction(signedRejectTx)
       await waitSafeTxReceipt(txRejectResponse)
-      await safeSdk1.signTransaction(tx)
+      const signedTx = await safeSdk1.signTransaction(tx)
       await chai
-        .expect(safeSdk2.executeTransaction(tx))
+        .expect(safeSdk2.executeTransaction(signedTx))
         .to.be.rejectedWith(safeVersionDeployed === '1.3.0' ? 'GS026' : 'Invalid owner provided')
     })
 
@@ -221,11 +221,11 @@ describe('Transactions execution', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction(txDataPartial)
-      await safeSdk1.signTransaction(tx)
+      const signedTx = await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
-      const txResponse2 = await safeSdk3.executeTransaction(tx)
+      const txResponse2 = await safeSdk3.executeTransaction(signedTx)
       await waitSafeTxReceipt(txResponse2)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai
@@ -257,11 +257,11 @@ describe('Transactions execution', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction(txDataPartial)
-      await safeSdk1.signTransaction(tx)
+      const signedTx = await safeSdk1.signTransaction(tx)
       const txHash = await safeSdk2.getTransactionHash(tx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
-      const txResponse2 = await safeSdk3.executeTransaction(tx)
+      const txResponse2 = await safeSdk3.executeTransaction(signedTx)
       await waitSafeTxReceipt(txResponse2)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai
@@ -507,11 +507,11 @@ describe('Transactions execution', () => {
         }
       ]
       const multiSendTx = await safeSdk1.createTransaction(txs)
-      await safeSdk1.signTransaction(multiSendTx)
+      const signedMultiSendTx = await safeSdk1.signTransaction(multiSendTx)
       const txHash = await safeSdk2.getTransactionHash(multiSendTx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
-      const txResponse2 = await safeSdk3.executeTransaction(multiSendTx)
+      const txResponse2 = await safeSdk3.executeTransaction(signedMultiSendTx)
       await waitSafeTxReceipt(txResponse2)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai
@@ -564,11 +564,11 @@ describe('Transactions execution', () => {
         }
       ]
       const multiSendTx = await safeSdk1.createTransaction(txs)
-      await safeSdk1.signTransaction(multiSendTx)
+      const signedMultiSendTx = await safeSdk1.signTransaction(multiSendTx)
       const txHash = await safeSdk2.getTransactionHash(multiSendTx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
-      const txResponse2 = await safeSdk3.executeTransaction(multiSendTx)
+      const txResponse2 = await safeSdk3.executeTransaction(signedMultiSendTx)
       await waitSafeTxReceipt(txResponse2)
 
       const safeFinalERC20Balance = await erc20Mintable.balanceOf(safe.address)

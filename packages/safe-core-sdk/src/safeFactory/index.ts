@@ -157,9 +157,9 @@ class SafeFactory {
 
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const saltNonce = safeDeploymentConfig.saltNonce
-    const encodedNonce = toBuffer(this.#ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(
-      'hex'
-    )
+    const encodedNonce = toBuffer(
+      this.#ethAdapter.encodeParameters(['uint256'], [saltNonce])
+    ).toString('hex')
 
     const salt = keccak256(
       toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)

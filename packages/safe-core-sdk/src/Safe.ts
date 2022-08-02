@@ -3,7 +3,9 @@ import {
   EthAdapter,
   MetaTransactionData,
   OperationType,
-  SafeSignature, SafeTransaction, SafeTransactionDataPartial,
+  SafeSignature,
+  SafeTransaction,
+  SafeTransactionDataPartial,
   SafeTransactionEIP712Args,
   SafeVersion,
   TransactionOptions,
@@ -392,6 +394,14 @@ class Safe {
       signedSafeTransaction.addSignature(signature)
     })
     signedSafeTransaction.addSignature(signature)
+
+    // TO-DO: Remove in v3.0.0 {
+    console.warn(
+      'WARNING! "signTransaction" method now *returns* the signed Safe transaction. Update your code according to the new documentation: https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#signtransaction'
+    )
+    safeTransaction.addSignature(signature)
+    // }
+    
     return signedSafeTransaction
   }
 

@@ -59,12 +59,12 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should return false if prefix is invalid', async () => {
-      const prefix = 'RIN'
+      const prefix = 'GOR'
       chai.expect(isValidEip3770NetworkPrefix(prefix)).to.be.false
     })
 
     it('should return true if prefix is valid', async () => {
-      const prefix = 'rin'
+      const prefix = 'gor'
       chai.expect(isValidEip3770NetworkPrefix(prefix)).to.be.true
     })
   })
@@ -183,7 +183,7 @@ describe('EIP-3770 chain-specific addresses', () => {
 
     it('should fail validating a full address with address and prefix of different chainId', async () => {
       const testChainId = 100
-      const testPrefix = 'rin'
+      const testPrefix = 'gor'
       const testAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       chai
         .expect(() => validateEip3770Address(`${testPrefix}:${testAddress}`, testChainId))

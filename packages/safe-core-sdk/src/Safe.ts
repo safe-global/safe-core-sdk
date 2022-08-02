@@ -366,13 +366,14 @@ class Safe {
    * Adds the signature of the current signer to the Safe transaction object.
    *
    * @param safeTransaction - The Safe transaction to be signed
-   * @param signingMethod - Method followed to sign a transaction. Optional. Default value is eth_sign
+   * @param signingMethod - Method followed to sign a transaction. Optional. Default value is "eth_sign"
+   * @returns The signed Safe transaction
    * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransaction(
     safeTransaction: SafeTransaction,
     signingMethod: 'eth_sign' | 'eth_signTypedData' = 'eth_sign'
-  ): Promise<void> {
+  ): Promise<SafeTransaction> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     const addressIsOwner = owners.find(
@@ -388,13 +389,27 @@ class Safe {
       const txHash = await this.getTransactionHash(safeTransaction)
       signature = await this.signTransactionHash(txHash)
     }
+    const signedSafeTransaction = await this.createTransaction(safeTransaction.data)
+    safeTransaction.signatures.forEach((signature) => {
+      signedSafeTransaction.addSignature(signature)
+    })
+    signedSafeTransaction.addSignature(signature)
+
+    // TO-DO: Remove in v3.0.0 {
+    console.warn(
+      `⚠️ the "signTransaction" method now returns a signed Safe transaction. Please update your code according to the new documentation: https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#signtransaction. In >=v3.0.0, the signature will be added only to the return transaction object, and not to the one passed as an argument.`
+    )
     safeTransaction.addSignature(signature)
+    // }
+
+    return signedSafeTransaction
   }
 
   /**
    * Approves on-chain a hash using the current signer account.
    *
    * @param hash - The hash to approve
+   * @param options - The Safe transaction execution options. Optional
    * @returns The Safe transaction response
    * @throws "Transaction hashes can only be approved by Safe owners"
    * @throws "Cannot specify gas and gasLimit together in transaction options"
@@ -580,7 +595,7 @@ class Safe {
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute
-   * @param options - The Safe transaction execution options (gasLimit, gasPrice)
+   * @param options - The Safe transaction execution options. Optional
    * @returns The Safe transaction response
    * @throws "No signer provided"
    * @throws "There are X signatures missing"

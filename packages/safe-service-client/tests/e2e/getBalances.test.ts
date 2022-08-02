@@ -23,38 +23,38 @@ describe('getBalances', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'.toLowerCase()
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
     await chai
       .expect(serviceSdk.getBalances(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
   it('should return the list of balances', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const balances = await serviceSdk.getBalances(safeAddress)
     chai.expect(balances.length).to.be.equal(2)
     const ethBalance = balances.filter((safeBalance) => !safeBalance.tokenAddress)[0]
     chai.expect(ethBalance.token).to.be.equal(null)
-    chai.expect(ethBalance.balance).to.be.equal('4000000000000000000')
-    const wethBalance = balances.filter(
-      (safeBalance) => safeBalance.tokenAddress === '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+    chai.expect(ethBalance.balance).to.be.equal('100000000000000000')
+    const usdcBalance = balances.filter(
+      (safeBalance) => safeBalance.tokenAddress === '0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C'
     )[0]
-    chai.expect(wethBalance.token.symbol).to.be.equal('WETH')
-    chai.expect(wethBalance.balance).to.be.equal('10000000000000000')
+    chai.expect(usdcBalance.token.symbol).to.be.equal('USDC')
+    chai.expect(usdcBalance.balance).to.be.equal('1000000000')
   })
 
   it('should return the list of balances EIP-3770', async () => {
-    const safeAddress = '0xf9A2FAa4E3b140ad42AAE8Cac4958cFf38Ab08fD'
+    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const balances = await serviceSdk.getBalances(eip3770SafeAddress)
     chai.expect(balances.length).to.be.equal(2)
     const ethBalance = balances.filter((safeBalance) => !safeBalance.tokenAddress)[0]
     chai.expect(ethBalance.token).to.be.equal(null)
-    chai.expect(ethBalance.balance).to.be.equal('4000000000000000000')
-    const wethBalance = balances.filter(
-      (safeBalance) => safeBalance.tokenAddress === '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+    chai.expect(ethBalance.balance).to.be.equal('100000000000000000')
+    const usdcBalance = balances.filter(
+      (safeBalance) => safeBalance.tokenAddress === '0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C'
     )[0]
-    chai.expect(wethBalance.token.symbol).to.be.equal('WETH')
-    chai.expect(wethBalance.balance).to.be.equal('10000000000000000')
+    chai.expect(usdcBalance.token.symbol).to.be.equal('USDC')
+    chai.expect(usdcBalance.balance).to.be.equal('1000000000')
   })
 })

@@ -13,7 +13,7 @@
   "scripts": {
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output",
     "build": "hardhat compile && tsc",
-    "postinstall": "ts-node scripts/postinstall.ts",
+    "postinstall": "node scripts/postinstall.js",
     "test:ganache:web3:v1.2.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.2.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.3.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.3.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:ethers:v1.2.0": "export TEST_NETWORK=ganache && export ETH_LIB=ethers && export SAFE_VERSION=1.2.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",

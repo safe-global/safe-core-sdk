@@ -12,6 +12,7 @@ import {
   TransactionResult
 } from '@gnosis.pm/safe-core-sdk-types'
 import ContractManager from './managers/contractManager'
+import GuardManager from './managers/guardManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
@@ -77,6 +78,7 @@ class Safe {
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
   #moduleManager!: ModuleManager
+  #guardManager!: GuardManager
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -118,6 +120,7 @@ class Safe {
     })
     this.#ownerManager = new OwnerManager(this.#ethAdapter, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#ethAdapter, this.#contractManager.safeContract)
+    this.#guardManager = new GuardManager(this.#ethAdapter, this.#contractManager.safeContract)
   }
 
   /**
@@ -228,6 +231,16 @@ class Safe {
    */
   async getBalance(): Promise<BigNumber> {
     return this.#ethAdapter.getBalance(this.getAddress())
+  }
+
+  /**
+   * Returns the enabled Safe guard.
+   *
+   * @returns The address of the enabled Safe guard
+   * @throws "Current version of the Safe does not support Safe transaction guards functionality"
+   */
+  async getGuard(): Promise<string> {
+    return this.#guardManager.getGuard()
   }
 
   /**
@@ -454,6 +467,49 @@ class Safe {
   }
 
   /**
+   * Returns the Safe transaction to enable a Safe guard.
+   *
+   * @param guardAddress - The desired guard address
+   * @param options - The transaction optional properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "Invalid guard address provided"
+   * @throws "Guard provided is already enabled"
+   * @throws "Current version of the Safe does not support Safe transaction guards functionality"
+   */
+  async getEnableGuardTx(
+    guardAddress: string,
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#guardManager.encodeEnableGuardData(guardAddress),
+      ...options
+    })
+    return safeTransaction
+  }
+
+  /**
+   * Returns the Safe transaction to disable a Safe guard.
+   *
+   * @param guardAddress - The desired guard address
+   * @param options - The transaction optional properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "Invalid guard address provided"
+   * @throws "There are no guards enabled already"
+   * @throws "Current version of the Safe does not support Safe transaction guards functionality"
+   */
+  async getDisableGuardTx(options?: SafeTransactionOptionalProps): Promise<SafeTransaction> {
+    const safeTransaction = await this.createTransaction({
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#guardManager.encodeDisableGuardData(),
+      ...options
+    })
+    return safeTransaction
+  }
+
+  /**
    * Returns the Safe transaction to enable a Safe module.
    *
    * @param moduleAddress - The desired module address
@@ -642,10 +698,13 @@ class Safe {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
-    const txResponse = await this.#contractManager.safeContract.execTransaction(signedSafeTransaction, {
-      from: signerAddress,
-      ...options
-    })
+    const txResponse = await this.#contractManager.safeContract.execTransaction(
+      signedSafeTransaction,
+      {
+        from: signerAddress,
+        ...options
+      }
+    )
     return txResponse
   }
 }

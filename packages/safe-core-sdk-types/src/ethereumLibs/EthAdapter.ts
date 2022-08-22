@@ -54,6 +54,7 @@ export interface EthAdapter {
   }: GetContractProps): GnosisSafeProxyFactoryContract
   getContractCode(address: string): Promise<string>
   isContractDeployed(address: string): Promise<boolean>
+  getStorageAt(address: string, position: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
   signMessage(message: string): Promise<string>
@@ -67,4 +68,5 @@ export interface EthAdapter {
   ): Promise<number>
   call(transaction: EthAdapterTransaction): Promise<string>
   encodeParameters(types: string[], values: any[]): string
+  decodeParameters(types: any[], values: string): { [key: string]: any }
 }

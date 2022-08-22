@@ -5,12 +5,12 @@ export function sameString(str1: string, str2: string): boolean {
   return str1.toLowerCase() === str2.toLowerCase()
 }
 
-function isZeroAddress(address: string): boolean {
-  return address === ZERO_ADDRESS
+export function isZeroAddress(address: string): boolean {
+  return sameString(address, ZERO_ADDRESS)
 }
 
 function isSentinelAddress(address: string): boolean {
-  return address === SENTINEL_ADDRESS
+  return sameString(address, SENTINEL_ADDRESS)
 }
 
 export function isRestrictedAddress(address: string): boolean {

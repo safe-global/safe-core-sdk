@@ -128,6 +128,12 @@ class Web3Adapter implements EthAdapter {
     return contractCode !== '0x'
   }
 
+  async getStorageAt(address: string, position: string): Promise<string> {
+    const content = await this.#web3.eth.getStorageAt(address, position)
+    const decodedContent = this.decodeParameters(['address'], content)
+    return decodedContent[0]
+  }
+
   async getTransaction(transactionHash: string): Promise<Transaction> {
     return this.#web3.eth.getTransaction(transactionHash)
   }
@@ -194,6 +200,10 @@ class Web3Adapter implements EthAdapter {
 
   encodeParameters(types: string[], values: any[]): string {
     return this.#web3.eth.abi.encodeParameters(types, values)
+  }
+
+  decodeParameters(types: any[], values: string): { [key: string]: any } {
+    return this.#web3.eth.abi.decodeParameters(types, values)
   }
 }
 

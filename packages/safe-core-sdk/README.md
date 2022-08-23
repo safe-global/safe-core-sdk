@@ -234,6 +234,7 @@ const options: Web3TransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -243,6 +244,7 @@ const options: EthersTransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -597,6 +599,7 @@ const options: Web3TransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -606,6 +609,7 @@ const options: EthersTransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -768,6 +772,7 @@ const options: Web3TransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -777,6 +782,7 @@ const options: EthersTransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js

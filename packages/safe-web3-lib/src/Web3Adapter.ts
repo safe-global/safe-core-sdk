@@ -53,6 +53,10 @@ class Web3Adapter implements EthAdapter {
     return BigNumber.from(await this.#web3.eth.getBalance(address))
   }
 
+  async getNonce(address: string): Promise<number> {
+    return this.#web3.eth.getTransactionCount(address)
+  }
+
   async getChainId(): Promise<number> {
     return this.#web3.eth.getChainId()
   }

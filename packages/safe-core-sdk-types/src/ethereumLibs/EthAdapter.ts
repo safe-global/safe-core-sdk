@@ -29,6 +29,7 @@ export interface EthAdapter {
   isAddress(address: string): boolean
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
   getBalance(address: string): Promise<BigNumber>
+  getNonce(address: string): Promise<number>
   getChainId(): Promise<number>
   getChecksummedAddress(address: string): string
   getSafeContract({

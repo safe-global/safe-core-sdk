@@ -68,6 +68,10 @@ class EthersAdapter implements EthAdapter {
     return BigNumber.from(await this.#provider.getBalance(address))
   }
 
+  async getNonce(address: string): Promise<number> {
+    return this.#provider.getTransactionCount(address)
+  }
+
   async getChainId(): Promise<number> {
     return (await this.#provider.getNetwork()).chainId
   }

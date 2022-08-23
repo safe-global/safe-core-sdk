@@ -56,6 +56,7 @@ export interface TransactionOptions {
   gasPrice?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
+  nonce?: number
 }
 
 export interface BaseTransactionResult {

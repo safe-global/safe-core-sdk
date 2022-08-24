@@ -188,7 +188,10 @@ describe('Transactions execution', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction(txDataPartial)
+      const initNumSignatures = tx.signatures.size
       const txResponse = await safeSdk1.executeTransaction(tx)
+      const finalNumSignatures = tx.signatures.size
+      chai.expect(initNumSignatures).to.be.eq(finalNumSignatures)
       await waitSafeTxReceipt(txResponse)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai

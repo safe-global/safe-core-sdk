@@ -605,20 +605,25 @@ class Safe {
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
   ): Promise<TransactionResult> {
-    const txHash = await this.getTransactionHash(safeTransaction)
+    const signedSafeTransaction = await this.createTransaction(safeTransaction.data)
+    safeTransaction.signatures.forEach((signature) => {
+      signedSafeTransaction.addSignature(signature)
+    })
+
+    const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
-      safeTransaction.addSignature(generatePreValidatedSignature(owner))
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     if (owners.includes(signerAddress)) {
-      safeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
     const threshold = await this.getThreshold()
-    if (threshold > safeTransaction.signatures.size) {
-      const signaturesMissing = threshold - safeTransaction.signatures.size
+    if (threshold > signedSafeTransaction.signatures.size) {
+      const signaturesMissing = threshold - signedSafeTransaction.signatures.size
       throw new Error(
         `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
           signaturesMissing > 1 ? 's' : ''
@@ -626,7 +631,7 @@ class Safe {
       )
     }
 
-    const value = BigNumber.from(safeTransaction.data.value)
+    const value = BigNumber.from(signedSafeTransaction.data.value)
     if (!value.isZero()) {
       const balance = await this.getBalance()
       if (value.gt(BigNumber.from(balance))) {
@@ -637,7 +642,7 @@ class Safe {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
-    const txResponse = await this.#contractManager.safeContract.execTransaction(safeTransaction, {
+    const txResponse = await this.#contractManager.safeContract.execTransaction(signedSafeTransaction, {
       from: signerAddress,
       ...options
     })

@@ -49,12 +49,18 @@ class Web3Adapter implements EthAdapter {
     return validateEip3770Address(fullAddress, chainId)
   }
 
-  async getBalance(address: string): Promise<BigNumber> {
-    return BigNumber.from(await this.#web3.eth.getBalance(address))
+  async getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber> {
+    const balance = (defaultBlock)
+      ? await this.#web3.eth.getBalance(address, defaultBlock)
+      : await this.#web3.eth.getBalance(address)
+    return BigNumber.from(balance)
   }
 
-  async getNonce(address: string): Promise<number> {
-    return this.#web3.eth.getTransactionCount(address)
+  async getNonce(address: string, defaultBlock?: string | number): Promise<number> {
+    const nonce = (defaultBlock)
+      ? await this.#web3.eth.getTransactionCount(address, defaultBlock)
+      : await this.#web3.eth.getTransactionCount(address)
+    return nonce
   }
 
   async getChainId(): Promise<number> {
@@ -123,12 +129,15 @@ class Web3Adapter implements EthAdapter {
     return new this.#web3.eth.Contract(abi, address, options)
   }
 
-  async getContractCode(address: string): Promise<string> {
-    return this.#web3.eth.getCode(address)
+  async getContractCode(address: string, defaultBlock?: string | number): Promise<string> {
+    const code = (defaultBlock)
+      ? await this.#web3.eth.getCode(address, defaultBlock)
+      : await this.#web3.eth.getCode(address)
+    return code
   }
 
-  async isContractDeployed(address: string): Promise<boolean> {
-    const contractCode = await this.#web3.eth.getCode(address)
+  async isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean> {
+    const contractCode = await this.getContractCode(address, defaultBlock)
     return contractCode !== '0x'
   }
 
@@ -192,8 +201,8 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.estimateGas(transaction, callback)
   }
 
-  call(transaction: EthAdapterTransaction): Promise<string> {
-    return this.#web3.eth.call(transaction)
+  call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string> {
+    return this.#web3.eth.call(transaction, defaultBlock)
   }
 
   encodeParameters(types: string[], values: any[]): string {

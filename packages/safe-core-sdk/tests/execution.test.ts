@@ -518,7 +518,7 @@ describe('Transactions execution', () => {
         value: '500000000000000000', // 0.5 ETH
         data: '0x'
       }
-      const currentNonce = await ethAdapter.getNonce(account1.address)
+      const currentNonce = await ethAdapter.getNonce(account1.address, 'pending')
       const tx = await safeSdk1.createTransaction(txDataPartial)
       const execOptions: EthersTransactionOptions = { nonce: currentNonce }
       const txResponse = await safeSdk1.executeTransaction(tx, execOptions)

@@ -28,8 +28,8 @@ export interface GetContractProps {
 export interface EthAdapter {
   isAddress(address: string): boolean
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
-  getBalance(address: string): Promise<BigNumber>
-  getNonce(address: string): Promise<number>
+  getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber>
+  getNonce(address: string, defaultBlock?: string | number): Promise<number>
   getChainId(): Promise<number>
   getChecksummedAddress(address: string): string
   getSafeContract({
@@ -53,8 +53,8 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): GnosisSafeProxyFactoryContract
-  getContractCode(address: string): Promise<string>
-  isContractDeployed(address: string): Promise<boolean>
+  getContractCode(address: string, defaultBlock?: string | number): Promise<string>
+  isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
   signMessage(message: string): Promise<string>
@@ -66,6 +66,6 @@ export interface EthAdapter {
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void
   ): Promise<number>
-  call(transaction: EthAdapterTransaction): Promise<string>
+  call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string>
   encodeParameters(types: string[], values: any[]): string
 }

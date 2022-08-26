@@ -172,7 +172,10 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
     [id]: {
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
-      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>'
+      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>' // Optional. Only needed with web3.js
     }
   }
 
@@ -295,7 +298,10 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
     [id]: {
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
-      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>'
+      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>' // Optional. Only needed with web3.js
     }
   }
 

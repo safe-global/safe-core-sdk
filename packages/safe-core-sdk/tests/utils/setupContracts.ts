@@ -8,6 +8,7 @@ import { GnosisSafe as GnosisSafe_V1_2_0 } from '@gnosis.pm/safe-ethers-lib/type
 import {
   GnosisSafe as GnosisSafe_V1_3_0,
   MultiSend as MultiSend_V1_3_0,
+  MultiSendCallOnly as MultiSendCallOnly_V1_3_0,
   ProxyFactory as ProxyFactory_V1_3_0
 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/'
 import {
@@ -19,6 +20,7 @@ import { deployments, ethers } from 'hardhat'
 import { AbiItem } from 'web3-utils'
 import {
   gnosisSafeDeployed,
+  multiSendCallOnlyDeployed,
   multiSendDeployed,
   proxyFactoryDeployed
 } from '../../hardhat/deploy/deploy-contracts'
@@ -90,6 +92,20 @@ export const getMultiSend = async (): Promise<{
   return {
     contract: MultiSend.attach(MultiSendDeployment.address) as MultiSend_V1_3_0 | MultiSend_V1_1_1,
     abi: MultiSendDeployment.abi
+  }
+}
+
+export const getMultiSendCallOnly = async (): Promise<{
+  contract: MultiSendCallOnly_V1_3_0
+  abi: AbiItem | AbiItem[]
+}> => {
+  const MultiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
+  const MultiSendCallOnly = await ethers.getContractFactory(multiSendCallOnlyDeployed.name)
+  return {
+    contract: MultiSendCallOnly.attach(
+      MultiSendCallOnlyDeployment.address
+    ) as MultiSendCallOnly_V1_3_0,
+    abi: MultiSendCallOnlyDeployment.abi
   }
 }
 

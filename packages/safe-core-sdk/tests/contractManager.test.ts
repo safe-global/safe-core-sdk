@@ -7,6 +7,7 @@ import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getFactory,
   getMultiSend,
+  getMultiSendCallOnly,
   getSafeSingleton,
   getSafeWithOwners
 } from './utils/setupContracts'
@@ -69,6 +70,8 @@ describe('Safe contracts manager', () => {
         [chainId]: {
           multiSendAddress: ZERO_ADDRESS,
           multiSendAbi: (await getMultiSend()).abi,
+          multiSendCallOnlyAddress: ZERO_ADDRESS,
+          multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
           safeMasterCopyAddress: ZERO_ADDRESS,
           safeMasterCopyAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,

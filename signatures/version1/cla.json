@@ -111,6 +111,14 @@
       "created_at": "2022-03-29T12:02:41Z",
       "repoId": 337806885,
       "pullRequestNo": 173
+    },
+    {
+      "name": "kyosyun",
+      "id": 5374394,
+      "comment_id": 1230784604,
+      "created_at": "2022-08-29T19:43:42Z",
+      "repoId": 337806885,
+      "pullRequestNo": 249
     }
   ]
 }

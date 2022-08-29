@@ -1,3 +1,4 @@
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
@@ -32,11 +33,12 @@ describe('Off-chain signatures', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
         data: '0x'
-      })
+      }
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       const txHash = await safeSdk.getTransactionHash(tx)
       const signature = await safeSdk.signTransactionHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
@@ -53,11 +55,12 @@ describe('Off-chain signatures', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
-        data: '0x'
-      })
+        data: '0x'  
+      }
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       await chai
         .expect(safeSdk.signTransaction(tx))
         .to.be.rejectedWith('Transactions can only be signed by Safe owners')
@@ -72,11 +75,12 @@ describe('Off-chain signatures', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
-        data: '0x'
-      })
+        data: '0x'  
+      }
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx = await safeSdk.signTransaction(tx)
       // TO-DO: Uncomment in v3.0.0 {
@@ -94,11 +98,12 @@ describe('Off-chain signatures', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = await safeSdk.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
-        data: '0x'
-      })
+        data: '0x'  
+      }
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx1 = await safeSdk.signTransaction(tx)
       chai.expect(signedTx1.signatures.size).to.be.eq(1)

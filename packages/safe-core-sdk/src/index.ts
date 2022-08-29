@@ -2,6 +2,7 @@ import ContractManager from './managers/contractManager'
 import Safe, {
   AddOwnerTxParams,
   ConnectSafeConfig,
+  CreateTransactionProps,
   RemoveOwnerTxParams,
   SafeConfig,
   SwapOwnerTxParams
@@ -31,6 +32,7 @@ export {
   ConnectSafeConfig,
   ContractNetworksConfig,
   SafeTransactionOptionalProps,
+  CreateTransactionProps,
   AddOwnerTxParams,
   RemoveOwnerTxParams,
   SwapOwnerTxParams,

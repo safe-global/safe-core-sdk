@@ -3,6 +3,7 @@ import { SingletonDeployment } from '@gnosis.pm/safe-deployments'
 import { AbiItem } from 'web3-utils'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
+import { MultiSendCallOnlyContract } from '../contracts/MultiSendCallOnlyContract'
 import { MultiSendContract } from '../contracts/MultiSendContract'
 import { Eip3770Address, SafeTransactionEIP712Args, SafeVersion } from '../types'
 
@@ -46,6 +47,13 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): MultiSendContract
+  getMultiSendCallOnlyContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): MultiSendCallOnlyContract
   getSafeProxyFactoryContract({
     safeVersion,
     chainId,

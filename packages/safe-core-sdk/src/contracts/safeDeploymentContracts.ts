@@ -148,7 +148,9 @@ export async function getMultiSendCallOnlyContract({
     customContractAddress: customContracts?.multiSendAddress,
     customContractAbi: customContracts?.multiSendAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(multiSendCallOnlyContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(
+    multiSendCallOnlyContract.getAddress()
+  )
   if (!isContractDeployed) {
     throw new Error('MultiSendCallOnly contract is not deployed on the current network')
   }

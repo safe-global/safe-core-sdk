@@ -11,7 +11,10 @@ abstract class MultiSendCallOnlyEthersContract implements MultiSendCallOnlyContr
     return this.contract.address
   }
 
-  encode: MultiSendCallOnlyInterface['encodeFunctionData'] = (methodName: any, params: any): string => {
+  encode: MultiSendCallOnlyInterface['encodeFunctionData'] = (
+    methodName: any,
+    params: any
+  ): string => {
     return this.contract.interface.encodeFunctionData(methodName, params)
   }
 }

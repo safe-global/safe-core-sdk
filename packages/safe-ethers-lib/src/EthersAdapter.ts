@@ -12,7 +12,9 @@ import {
 import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import {
-  getMultiSendCallOnlyContractInstance, getMultiSendContractInstance, getSafeContractInstance,
+  getMultiSendCallOnlyContractInstance,
+  getMultiSendContractInstance,
+  getSafeContractInstance,
   getSafeProxyFactoryContractInstance
 } from './contracts/contractInstancesEthers'
 import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'

@@ -52,14 +52,14 @@ class Web3Adapter implements EthAdapter {
   }
 
   async getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber> {
-    const balance = (defaultBlock)
+    const balance = defaultBlock
       ? await this.#web3.eth.getBalance(address, defaultBlock)
       : await this.#web3.eth.getBalance(address)
     return BigNumber.from(balance)
   }
 
   async getNonce(address: string, defaultBlock?: string | number): Promise<number> {
-    const nonce = (defaultBlock)
+    const nonce = defaultBlock
       ? await this.#web3.eth.getTransactionCount(address, defaultBlock)
       : await this.#web3.eth.getTransactionCount(address)
     return nonce
@@ -150,7 +150,7 @@ class Web3Adapter implements EthAdapter {
   }
 
   async getContractCode(address: string, defaultBlock?: string | number): Promise<string> {
-    const code = (defaultBlock)
+    const code = defaultBlock
       ? await this.#web3.eth.getCode(address, defaultBlock)
       : await this.#web3.eth.getCode(address)
     return code

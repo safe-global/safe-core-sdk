@@ -52,8 +52,11 @@ export interface ConnectSafeConfig {
 }
 
 export interface CreateTransactionProps {
+  /** safeTransactionData - The transaction or transaction array to process */
   safeTransactionData: SafeTransactionDataPartial | MetaTransactionData[]
+  /** options - The transaction array optional properties */
   options?: SafeTransactionOptionalProps
+  /** onlyCalls - Forces the execution of the transaction array with MultiSendCallOnly contract */
   onlyCalls?: boolean
 }
 
@@ -278,7 +281,7 @@ class Safe {
   /**
    * Returns a Safe transaction ready to be signed by the owners.
    *
-   * @param safeTransactions - The list of transactions to process
+   * @param createTransactionProps - The createTransaction props
    * @returns The Safe transaction
    * @throws "Invalid empty array of transactions"
    */

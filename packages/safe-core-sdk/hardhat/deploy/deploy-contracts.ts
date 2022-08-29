@@ -24,8 +24,8 @@ const multiSendContracts = {
 
 const multiSendCallOnlyContracts = {
   '1.3.0': { name: 'MultiSendCallOnly_SV1_3_0' },
-  '1.2.0': { name: 'MultiSendCallOnly_SV1_2_0' },
-  '1.1.1': { name: 'MultiSendCallOnly_SV1_1_1' }
+  '1.2.0': { name: 'MultiSendCallOnly_SV1_3_0' },
+  '1.1.1': { name: 'MultiSendCallOnly_SV1_3_0' }
 }
 
 export const gnosisSafeDeployed = gnosisSafeContracts[safeVersionDeployed]

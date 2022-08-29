@@ -68,10 +68,10 @@ export function getMultiSendCallOnlyContractInstance(
   let multiSendCallOnlyContract
   switch (safeVersion) {
     case '1.3.0':
-      multiSendCallOnlyContract = MultiSendCallOnly_V1_3_0.connect(contractAddress, signer)
-      return new MultiSendCallOnlyContract_V1_3_0_Ethers(multiSendCallOnlyContract)
     case '1.2.0':
     case '1.1.1':
+      multiSendCallOnlyContract = MultiSendCallOnly_V1_3_0.connect(contractAddress, signer)
+      return new MultiSendCallOnlyContract_V1_3_0_Ethers(multiSendCallOnlyContract)
     default:
       throw new Error('Invalid Safe version')
   }

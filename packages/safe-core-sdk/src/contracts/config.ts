@@ -9,7 +9,7 @@ type SafeDeploymentsVersions = {
     safeMasterCopyL2Version: string | undefined
     safeProxyFactoryVersion: string
     multiSendVersion: string
-    multiSendCallOnlyVersion: string | undefined
+    multiSendCallOnlyVersion: string
   }
 }
 
@@ -26,14 +26,14 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeMasterCopyL2Version: undefined,
     safeProxyFactoryVersion: '1.1.1',
     multiSendVersion: '1.1.1',
-    multiSendCallOnlyVersion: undefined
+    multiSendCallOnlyVersion: '1.3.0'
   },
   '1.1.1': {
     safeMasterCopyVersion: '1.1.1',
     safeMasterCopyL2Version: undefined,
     safeProxyFactoryVersion: '1.1.1',
     multiSendVersion: '1.1.1',
-    multiSendCallOnlyVersion: undefined
+    multiSendCallOnlyVersion: '1.3.0'
   }
 }
 

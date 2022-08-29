@@ -56,11 +56,11 @@ export function getMultiSendCallOnlyContractInstance(
 ): MultiSendCallOnlyContract_V1_3_0_Web3 {
   switch (safeVersion) {
     case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
       return new MultiSendCallOnlyContract_V1_3_0_Web3(
         multiSendCallOnlyContract as MultiSendCallOnly_V1_3_0
       )
-    case '1.2.0':
-    case '1.1.1':
     default:
       throw new Error('Invalid Safe version')
   }

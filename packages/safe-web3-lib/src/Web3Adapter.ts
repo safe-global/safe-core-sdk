@@ -14,12 +14,14 @@ import { AbiItem } from 'web3-utils'
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import {
   getGnosisSafeProxyFactoryContractInstance,
+  getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance
 } from './contracts/contractInstancesWeb3'
 import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
 import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
+import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -105,6 +107,24 @@ class Web3Adapter implements EthAdapter {
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
     return getMultiSendContractInstance(safeVersion, multiSendContract)
+  }
+
+  getMultiSendCallOnlyContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): MultiSendCallOnlyWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid MultiSendCallOnly contract address')
+    }
+    const multiSendContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getMultiSendCallOnlyContractInstance(safeVersion, multiSendContract)
   }
 
   getSafeProxyFactoryContract({

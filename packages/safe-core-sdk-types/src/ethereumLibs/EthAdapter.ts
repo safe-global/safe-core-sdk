@@ -3,6 +3,7 @@ import { SingletonDeployment } from '@gnosis.pm/safe-deployments'
 import { AbiItem } from 'web3-utils'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
+import { MultiSendCallOnlyContract } from '../contracts/MultiSendCallOnlyContract'
 import { MultiSendContract } from '../contracts/MultiSendContract'
 import { Eip3770Address, SafeTransactionEIP712Args, SafeVersion } from '../types'
 
@@ -28,7 +29,8 @@ export interface GetContractProps {
 export interface EthAdapter {
   isAddress(address: string): boolean
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
-  getBalance(address: string): Promise<BigNumber>
+  getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber>
+  getNonce(address: string, defaultBlock?: string | number): Promise<number>
   getChainId(): Promise<number>
   getChecksummedAddress(address: string): string
   getSafeContract({
@@ -45,6 +47,13 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): MultiSendContract
+  getMultiSendCallOnlyContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): MultiSendCallOnlyContract
   getSafeProxyFactoryContract({
     safeVersion,
     chainId,
@@ -52,8 +61,8 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): GnosisSafeProxyFactoryContract
-  getContractCode(address: string): Promise<string>
-  isContractDeployed(address: string): Promise<boolean>
+  getContractCode(address: string, defaultBlock?: string | number): Promise<string>
+  isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean>
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string>
   signMessage(message: string): Promise<string>
@@ -65,6 +74,6 @@ export interface EthAdapter {
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void
   ): Promise<number>
-  call(transaction: EthAdapterTransaction): Promise<string>
+  call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string>
   encodeParameters(types: string[], values: any[]): string
 }

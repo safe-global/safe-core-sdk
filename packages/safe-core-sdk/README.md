@@ -91,12 +91,12 @@ Check the `create` method in the [API Reference](#sdk-api) for more details on a
 ```js
 import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   to: '0x<address>',
   value: '<eth_value_in_wei>',
   data: '0x<data>'
 }
-const safeTransaction = await safeSdk.createTransaction(transaction)
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 ```
 
 Check the `createTransaction` method in the [API Reference](#sdk-api) for additional details on creating MultiSend transactions.
@@ -171,8 +171,13 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   const contractNetworks: ContractNetworksConfig = {
     [id]: {
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
-      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>'
+      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>' // Optional. Only needed with web3.js
     }
   }
 
@@ -234,6 +239,7 @@ const options: Web3TransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -243,6 +249,7 @@ const options: EthersTransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -292,8 +299,13 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
   const contractNetworks: ContractNetworksConfig = {
     [id]: {
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
-      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>'
+      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>' // Optional. Only needed with web3.js
     }
   }
 
@@ -326,8 +338,13 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
   const contractNetworks: ContractNetworksConfig = {
     [chainId]: {
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
-      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>'
+      safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>' // Optional. Only needed with web3.js
     }
   }
   const safeSdk = await Safe.connect({ ethAdapter, safeAddress, contractNetworks })
@@ -335,7 +352,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 
 ### getAddress
 
-Returns the address of the current Safe Proxy contract.
+Returns the address of the current SafeProxy contract.
 
 ```js
 const address = safeSdk.getAddress()
@@ -424,7 +441,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
   ```js
   import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 
-  const transaction: SafeTransactionDataPartial = {
+  const safeTransactionData: SafeTransactionDataPartial = {
     to,
     data,
     value,
@@ -436,7 +453,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
     refundReceiver, // Optional
     nonce // Optional
   }
-  const safeTransaction = await safeSdk.createTransaction(transaction)
+  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
   ```
 
 * **MultiSend transactions**
@@ -444,7 +461,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
   This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the `createTransaction` method with the `SafeTransactionOptionalProps` object.
 
   ```js
-  const transactions: MetaTransactionData[] = [
+  const safeTransactionData: MetaTransactionData[] = [
     {
       to,
       data,
@@ -459,13 +476,13 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
     },
     // ...
   ]
-  const safeTransaction = await safeSdk.createTransaction(transactions)
+  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
   ```
 
   This method can also receive the `options` parameter to set the optional properties in the MultiSend transaction:
 
   ```js
-  const transactions: MetaTransactionData[] = [
+  const safeTransactionData: MetaTransactionData[] = [
     {
       to,
       data,
@@ -488,7 +505,14 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
     refundReceiver, // Optional
     nonce // Optional
   }
-  const safeTransaction = await safeSdk.createTransaction(transactions, options)
+  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
+  ```
+
+  In addition, the optional `callsOnly` parameter, which is `false` by default, allows to force the use of the `MultiSendCallOnly` instead of the `MultiSend` contract when sending a batch transaction:
+
+  ```js
+  const callsOnly = true
+  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options, callsOnly })
   ```
 
 If the optional properties are not manually set, the Safe transaction returned will have the default value for each one:
@@ -508,10 +532,10 @@ Read more about the [Safe transaction properties](https://docs.gnosis-safe.io/tu
 Returns a Safe transaction ready to be signed by the owners that invalidates the pending Safe transaction/s with a specific nonce.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction(transaction)
+const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
 const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransaction.data.nonce)
 ```
 
@@ -520,10 +544,10 @@ const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransa
 Returns the transaction hash of a Safe transaction.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction(transaction)
+const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 ```
 
@@ -532,10 +556,10 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 Signs a hash using the current owner account.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction(transaction)
+const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const signature = await safeSdk.signTransactionHash(txHash)
 ```
@@ -545,10 +569,10 @@ const signature = await safeSdk.signTransactionHash(txHash)
 Signs a transaction according to the EIP-712 using the current signer account.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction = await safeSdk.createTransaction(transaction)
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const signature = await safeSdk.signTypedData(safeTransaction)
 ```
 
@@ -557,10 +581,10 @@ const signature = await safeSdk.signTypedData(safeTransaction)
 Returns a new `SafeTransaction` object that includes the signature of the current owner. `eth_sign` will be used by default to generate the signature.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction = await safeSdk.createTransaction(transaction)
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction)
 ```
 
@@ -579,10 +603,10 @@ const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction, 'et
 Approves a hash on-chain using the current owner account.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction(transaction)
+const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const txResponse = await safeSdk.approveTransactionHash(txHash)
 await txResponse.transactionResponse?.wait()
@@ -597,6 +621,7 @@ const options: Web3TransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -606,6 +631,7 @@ const options: EthersTransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -617,20 +643,20 @@ const txResponse = await safeSdk.approveTransactionHash(txHash, options)
 Returns a list of owners who have approved a specific Safe transaction.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction(transaction)
+const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
 
-### getEnableModuleTx
+### createEnableModuleTx
 
 Returns a Safe transaction ready to be signed that will enable a Safe module.
 
 ```js
-const safeTransaction = await safeSdk.getEnableModuleTx(moduleAddress)
+const safeTransaction = await safeSdk.createEnableModuleTx(moduleAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -646,15 +672,15 @@ const options: SafeTransactionOptionalProps = {
   refundReceiver, // Optional
   nonce // Optional
 }
-const safeTransaction = await safeSdk.getEnableModuleTx(moduleAddress, options)
+const safeTransaction = await safeSdk.createEnableModuleTx(moduleAddress, options)
 ```
 
-### getDisableModuleTx
+### createDisableModuleTx
 
 Returns a Safe transaction ready to be signed that will disable a Safe module.
 
 ```js
-const safeTransaction = await safeSdk.getDisableModuleTx(moduleAddress)
+const safeTransaction = await safeSdk.createDisableModuleTx(moduleAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -663,10 +689,10 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getDisableModuleTx(moduleAddress, options)
+const safeTransaction = await safeSdk.createDisableModuleTx(moduleAddress, options)
 ```
 
-### getAddOwnerTx
+### createAddOwnerTx
 
 Returns the Safe transaction to add an owner and optionally change the threshold.
 
@@ -675,7 +701,7 @@ const params: AddOwnerTxParams = {
   ownerAddress,
   threshold // Optional. If `threshold` is not provided the current threshold will not change.
 }
-const safeTransaction = await safeSdk.getAddOwnerTx(params)
+const safeTransaction = await safeSdk.createAddOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -684,10 +710,10 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getAddOwnerTx(params, options)
+const safeTransaction = await safeSdk.createAddOwnerTx(params, options)
 ```
 
-### getRemoveOwnerTx
+### createRemoveOwnerTx
 
 Returns the Safe transaction to remove an owner and optionally change the threshold.
 
@@ -696,7 +722,7 @@ const params: RemoveOwnerTxParams = {
   ownerAddress,
   newThreshold // Optional. If `newThreshold` is not provided, the current threshold will be decreased by one.
 }
-const safeTransaction = await safeSdk.getRemoveOwnerTx(params)
+const safeTransaction = await safeSdk.createRemoveOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -705,10 +731,10 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getRemoveOwnerTx(params, options)
+const safeTransaction = await safeSdk.createRemoveOwnerTx(params, options)
 ```
 
-### getSwapOwnerTx
+### createSwapOwnerTx
 
 Returns the Safe transaction to replace an owner of the Safe with a new one.
 
@@ -717,7 +743,7 @@ const params: SwapOwnerTxParams = {
   oldOwnerAddress,
   newOwnerAddress
 }
-const safeTransaction = await safeSdk.getSwapOwnerTx(params)
+const safeTransaction = await safeSdk.createSwapOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -726,15 +752,15 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getSwapOwnerTx(params, options)
+const safeTransaction = await safeSdk.createSwapOwnerTx(params, options)
 ```
 
-### getChangeThresholdTx
+### createChangeThresholdTx
 
 Returns the Safe transaction to change the threshold.
 
 ```js
-const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold)
+const safeTransaction = await safeSdk.createChangeThresholdTx(newThreshold)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -743,7 +769,7 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold, options)
+const safeTransaction = await safeSdk.createChangeThresholdTx(newThreshold, options)
 ```
 
 ### executeTransaction
@@ -751,10 +777,10 @@ const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold, options
 Executes a Safe transaction.
 
 ```js
-const transaction: SafeTransactionDataPartial = {
+const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction(transaction)
+const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -768,6 +794,7 @@ const options: Web3TransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js
@@ -777,6 +804,7 @@ const options: EthersTransactionOptions = {
   gasPrice, // Optional
   maxFeePerGas, // Optional
   maxPriorityFeePerGas // Optional
+  nonce // Optional
 }
 ```
 ```js

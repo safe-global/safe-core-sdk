@@ -2,11 +2,13 @@ import {
   EthAdapter,
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
+  MultiSendCallOnlyContract,
   MultiSendContract,
   SafeVersion
 } from '@gnosis.pm/safe-core-sdk-types'
 import {
   DeploymentFilter,
+  getMultiSendCallOnlyDeployment,
   getMultiSendDeployment,
   getProxyFactoryDeployment,
   getSafeL2SingletonDeployment,
@@ -39,6 +41,14 @@ export function getSafeContractDeployment(
     return getSafeSingletonDeployment(filters)
   }
   return getSafeL2SingletonDeployment(filters)
+}
+
+export function getMultiSendCallOnlyContractDeployment(
+  safeVersion: SafeVersion,
+  chainId: number
+): SingletonDeployment | undefined {
+  const version = safeDeploymentsVersions[safeVersion].multiSendCallOnlyVersion
+  return getMultiSendCallOnlyDeployment({ version, network: chainId.toString(), released: true })
 }
 
 export function getMultiSendContractDeployment(
@@ -75,7 +85,7 @@ export async function getSafeContract({
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(gnosisSafeContract.getAddress())
   if (!isContractDeployed) {
-    throw new Error('Safe Proxy contract is not deployed on the current network')
+    throw new Error('SafeProxy contract is not deployed on the current network')
   }
   return gnosisSafeContract
 }
@@ -98,7 +108,7 @@ export async function getProxyFactoryContract({
     safeProxyFactoryContract.getAddress()
   )
   if (!isContractDeployed) {
-    throw new Error('Safe Proxy Factory contract is not deployed on the current network')
+    throw new Error('SafeProxyFactory contract is not deployed on the current network')
   }
   return safeProxyFactoryContract
 }
@@ -119,7 +129,30 @@ export async function getMultiSendContract({
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(multiSendContract.getAddress())
   if (!isContractDeployed) {
-    throw new Error('Multi Send contract is not deployed on the current network')
+    throw new Error('MultiSend contract is not deployed on the current network')
   }
   return multiSendContract
+}
+
+export async function getMultiSendCallOnlyContract({
+  ethAdapter,
+  safeVersion,
+  chainId,
+  customContracts
+}: GetContractInstanceProps): Promise<MultiSendCallOnlyContract> {
+  const multiSendCallOnlyDeployment = getMultiSendCallOnlyContractDeployment(safeVersion, chainId)
+  const multiSendCallOnlyContract = await ethAdapter.getMultiSendCallOnlyContract({
+    safeVersion,
+    chainId,
+    singletonDeployment: multiSendCallOnlyDeployment,
+    customContractAddress: customContracts?.multiSendAddress,
+    customContractAbi: customContracts?.multiSendAbi
+  })
+  const isContractDeployed = await ethAdapter.isContractDeployed(
+    multiSendCallOnlyContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('MultiSendCallOnly contract is not deployed on the current network')
+  }
+  return multiSendCallOnlyContract
 }

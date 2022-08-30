@@ -51,6 +51,15 @@ export interface ConnectSafeConfig {
   contractNetworks?: ContractNetworksConfig
 }
 
+export interface CreateTransactionProps {
+  /** safeTransactionData - The transaction or transaction array to process */
+  safeTransactionData: SafeTransactionDataPartial | MetaTransactionData[]
+  /** options - The transaction array optional properties */
+  options?: SafeTransactionOptionalProps
+  /** onlyCalls - Forces the execution of the transaction array with MultiSendCallOnly contract */
+  onlyCalls?: boolean
+}
+
 export interface AddOwnerTxParams {
   /** ownerAddress - The address of the new owner */
   ownerAddress: string
@@ -82,8 +91,9 @@ class Safe {
    * Creates an instance of the Safe Core SDK.
    * @param config - Ethers Safe configuration
    * @returns The Safe Core SDK instance
-   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
+   * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   static async create({
     ethAdapter,
@@ -100,8 +110,9 @@ class Safe {
    * Initializes the Safe Core SDK instance.
    * @param config - Safe configuration
    * @throws "Signer must be connected to a provider"
-   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
+   * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init({
     ethAdapter,
@@ -123,8 +134,9 @@ class Safe {
   /**
    * Returns a new instance of the Safe Core SDK.
    * @param config - Connect Safe configuration
-   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
+   * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect({
     ethAdapter,
@@ -141,9 +153,9 @@ class Safe {
   }
 
   /**
-   * Returns the address of the current Safe Proxy contract.
+   * Returns the address of the current SafeProxy contract.
    *
-   * @returns The address of the Safe Proxy contract
+   * @returns The address of the SafeProxy contract
    */
   getAddress(): string {
     return this.#contractManager.safeContract.getAddress()
@@ -174,6 +186,15 @@ class Safe {
    */
   getMultiSendAddress(): string {
     return this.#contractManager.multiSendContract.getAddress()
+  }
+
+  /**
+   * Returns the address of the MultiSendCallOnly contract.
+   *
+   * @returns The address of the MultiSendCallOnly contract
+   */
+  getMultiSendCallOnlyAddress(): string {
+    return this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
   /**
@@ -262,39 +283,38 @@ class Safe {
   /**
    * Returns a Safe transaction ready to be signed by the owners.
    *
-   * @param safeTransactions - The list of transactions to process
+   * @param createTransactionProps - The createTransaction props
    * @returns The Safe transaction
    * @throws "Invalid empty array of transactions"
    */
-  async createTransaction(safeTransactions: SafeTransactionDataPartial): Promise<SafeTransaction>
-  async createTransaction(
-    safeTransactions: MetaTransactionData[],
-    options?: SafeTransactionOptionalProps
-  ): Promise<SafeTransaction>
-  async createTransaction(
-    safeTransactions: SafeTransactionDataPartial | MetaTransactionData[],
-    options?: SafeTransactionOptionalProps
-  ): Promise<SafeTransaction> {
-    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length === 0) {
+  async createTransaction({
+    safeTransactionData,
+    onlyCalls = false,
+    options
+  }: CreateTransactionProps): Promise<SafeTransaction> {
+    if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length === 0) {
       throw new Error('Invalid empty array of transactions')
     }
     let newTransaction: SafeTransactionDataPartial
-    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length > 1) {
+    if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length > 1) {
+      const multiSendContract = onlyCalls
+        ? this.#contractManager.multiSendCallOnlyContract
+        : this.#contractManager.multiSendContract
       const multiSendData = encodeMultiSendData(
-        safeTransactions.map(standardizeMetaTransactionData)
+        safeTransactionData.map(standardizeMetaTransactionData)
       )
       const multiSendTransaction = {
         ...options,
-        to: this.#contractManager.multiSendContract.getAddress(),
+        to: multiSendContract.getAddress(),
         value: '0',
-        data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
+        data: multiSendContract.encode('multiSend', [multiSendData]),
         operation: OperationType.DelegateCall
       }
       newTransaction = multiSendTransaction
     } else {
-      newTransaction = isMetaTransactionArray(safeTransactions)
-        ? { ...options, ...safeTransactions[0] }
-        : safeTransactions
+      newTransaction = isMetaTransactionArray(safeTransactionData)
+        ? { ...options, ...safeTransactionData[0] }
+        : safeTransactionData
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
@@ -311,13 +331,14 @@ class Safe {
    * @returns The Safe transaction that invalidates the pending Safe transaction/s
    */
   async createRejectionTransaction(nonce: number): Promise<SafeTransaction> {
-    return this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       nonce,
       value: '0',
       data: '0x',
       safeTxGas: 0
-    })
+    }
+    return this.createTransaction({ safeTransactionData })
   }
 
   /**
@@ -389,17 +410,18 @@ class Safe {
       const txHash = await this.getTransactionHash(safeTransaction)
       signature = await this.signTransactionHash(txHash)
     }
-    const signedSafeTransaction = await this.createTransaction(safeTransaction.data)
+    const signedSafeTransaction = await this.createTransaction({
+      safeTransactionData: safeTransaction.data
+    })
     safeTransaction.signatures.forEach((signature) => {
       signedSafeTransaction.addSignature(signature)
     })
     signedSafeTransaction.addSignature(signature)
 
-    // TO-DO: Remove in v3.0.0 {
+    // TO-DO: Remove in v4.0.0 {
     console.warn(
-      `⚠️ the "signTransaction" method now returns a signed Safe transaction. Please update your code according to the new documentation: https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#signtransaction. In >=v3.0.0, the signature will be added only to the return transaction object, and not to the one passed as an argument.`
+      `⚠️ the "signTransaction" method now returns a signed Safe transaction without modifying the passed safeTransaction argument. Please check the new documentation: https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#signtransaction.`
     )
-    safeTransaction.addSignature(signature)
     // }
 
     return signedSafeTransaction
@@ -462,16 +484,17 @@ class Safe {
    * @throws "Invalid module address provided"
    * @throws "Module provided is already enabled"
    */
-  async getEnableModuleTx(
+  async createEnableModuleTx(
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -484,16 +507,17 @@ class Safe {
    * @throws "Invalid module address provided"
    * @throws "Module provided is not enabled already"
    */
-  async getDisableModuleTx(
+  async createDisableModuleTx(
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -508,16 +532,17 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getAddOwnerTx(
+  async createAddOwnerTx(
     { ownerAddress, threshold }: AddOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -532,16 +557,17 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getRemoveOwnerTx(
+  async createRemoveOwnerTx(
     { ownerAddress, threshold }: RemoveOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -556,16 +582,17 @@ class Safe {
    * @throws "New address provided is already an owner"
    * @throws "Old address provided is not an owner"
    */
-  async getSwapOwnerTx(
+  async createSwapOwnerTx(
     { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -578,16 +605,17 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getChangeThresholdTx(
+  async createChangeThresholdTx(
     threshold: number,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeChangeThresholdData(threshold),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -605,20 +633,27 @@ class Safe {
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
   ): Promise<TransactionResult> {
-    const txHash = await this.getTransactionHash(safeTransaction)
+    const signedSafeTransaction = await this.createTransaction({
+      safeTransactionData: safeTransaction.data
+    })
+    safeTransaction.signatures.forEach((signature) => {
+      signedSafeTransaction.addSignature(signature)
+    })
+
+    const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
-      safeTransaction.addSignature(generatePreValidatedSignature(owner))
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     if (owners.includes(signerAddress)) {
-      safeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
     const threshold = await this.getThreshold()
-    if (threshold > safeTransaction.signatures.size) {
-      const signaturesMissing = threshold - safeTransaction.signatures.size
+    if (threshold > signedSafeTransaction.signatures.size) {
+      const signaturesMissing = threshold - signedSafeTransaction.signatures.size
       throw new Error(
         `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
           signaturesMissing > 1 ? 's' : ''
@@ -626,7 +661,7 @@ class Safe {
       )
     }
 
-    const value = BigNumber.from(safeTransaction.data.value)
+    const value = BigNumber.from(signedSafeTransaction.data.value)
     if (!value.isZero()) {
       const balance = await this.getBalance()
       if (value.gt(BigNumber.from(balance))) {
@@ -637,10 +672,13 @@ class Safe {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
-    const txResponse = await this.#contractManager.safeContract.execTransaction(safeTransaction, {
-      from: signerAddress,
-      ...options
-    })
+    const txResponse = await this.#contractManager.safeContract.execTransaction(
+      signedSafeTransaction,
+      {
+        from: signerAddress,
+        ...options
+      }
+    )
     return txResponse
   }
 }

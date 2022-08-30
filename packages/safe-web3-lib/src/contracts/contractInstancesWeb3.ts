@@ -5,6 +5,7 @@ import { ProxyFactory as GnosisSafeProxyFactory_V1_1_1 } from '../../typechain/s
 import { GnosisSafe as SafeMasterCopy_V1_2_0 } from '../../typechain/src/web3-v1/v1.2.0/gnosis_safe'
 import { GnosisSafe as SafeMasterCopy_V1_3_0 } from '../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
 import { MultiSend as MultiSend_V1_3_0 } from '../../typechain/src/web3-v1/v1.3.0/multi_send'
+import { MultiSendCallOnly as MultiSendCallOnly_V1_3_0 } from '../../typechain/src/web3-v1/v1.3.0/multi_send_call_only'
 import { ProxyFactory as GnosisSafeProxyFactory_V1_3_0 } from '../../typechain/src/web3-v1/v1.3.0/proxy_factory'
 import GnosisSafeContract_V1_1_1_Web3 from './GnosisSafe/v1.1.1/GnosisSafeContract_V1_1_1_Web3'
 import GnosisSafeContract_V1_2_0_Web3 from './GnosisSafe/v1.2.0/GnosisSafeContract_V1_2_0_Web3'
@@ -13,6 +14,7 @@ import GnosisSafeProxyFactoryContract_V1_1_1_Web3 from './GnosisSafeProxyFactory
 import GnosisSafeProxyFactoryContract_V1_3_0_Web3 from './GnosisSafeProxyFactory/v1.3.0/GnosisSafeProxyFactoryContract_V1_3_0_Web3'
 import MultiSendContract_V1_1_1_Web3 from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
 import MultiSendContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
+import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSendCallOnly/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
 
 export function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -43,6 +45,22 @@ export function getMultiSendContractInstance(
     case '1.2.0':
     case '1.1.1':
       return new MultiSendContract_V1_1_1_Web3(multiSendContract as MultiSend_V1_1_1)
+    default:
+      throw new Error('Invalid Safe version')
+  }
+}
+
+export function getMultiSendCallOnlyContractInstance(
+  safeVersion: SafeVersion,
+  multiSendCallOnlyContract: MultiSendCallOnly_V1_3_0
+): MultiSendCallOnlyContract_V1_3_0_Web3 {
+  switch (safeVersion) {
+    case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
+      return new MultiSendCallOnlyContract_V1_3_0_Web3(
+        multiSendCallOnlyContract as MultiSendCallOnly_V1_3_0
+      )
     default:
       throw new Error('Invalid Safe version')
   }

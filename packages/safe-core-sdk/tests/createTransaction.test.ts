@@ -176,7 +176,7 @@ describe('Transactions creation', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const txDataPartial: SafeTransactionDataPartial = {
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x',
@@ -187,7 +187,7 @@ describe('Transactions creation', () => {
         nonce: 555,
         safeTxGas: 666
       }
-      const tx = await safeSdk.createTransaction(txDataPartial)
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)
       chai.expect(tx.data.value).to.be.eq('500000000000000000')
       chai.expect(tx.data.data).to.be.eq('0x')
@@ -209,7 +209,7 @@ describe('Transactions creation', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const txDataPartial: SafeTransactionDataPartial = {
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x',
@@ -220,7 +220,7 @@ describe('Transactions creation', () => {
         nonce: 555,
         safeTxGas: 666
       }
-      const tx = await safeSdk.createTransaction(txDataPartial)
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)
       chai.expect(tx.data.value).to.be.eq('500000000000000000')
       chai.expect(tx.data.data).to.be.eq('0x')
@@ -242,14 +242,14 @@ describe('Transactions creation', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const metaTransactions: MetaTransactionData[] = [
+      const safeTransactionData: MetaTransactionData[] = [
         {
           to: account2.address,
           value: '500000000000000000', // 0.5 ETH
           data: '0x'
         }
       ]
-      const tx = await safeSdk.createTransaction(metaTransactions)
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)
       chai.expect(tx.data.value).to.be.eq('500000000000000000')
       chai.expect(tx.data.data).to.be.eq('0x')
@@ -265,7 +265,7 @@ describe('Transactions creation', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const metaTransactions: MetaTransactionData[] = [
+      const safeTransactionData: MetaTransactionData[] = [
         {
           to: account2.address,
           value: '500000000000000000', // 0.5 ETH
@@ -280,7 +280,7 @@ describe('Transactions creation', () => {
         nonce: 555,
         safeTxGas: 666
       }
-      const tx = await safeSdk.createTransaction(metaTransactions, options)
+      const tx = await safeSdk.createTransaction({ safeTransactionData, options })
       chai.expect(tx.data.to).to.be.eq(account2.address)
       chai.expect(tx.data.value).to.be.eq('500000000000000000')
       chai.expect(tx.data.data).to.be.eq('0x')
@@ -302,8 +302,8 @@ describe('Transactions creation', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const txs: MetaTransactionData[] = []
-      const tx = safeSdk.createTransaction(txs)
+      const safeTransactionData: MetaTransactionData[] = []
+      const tx = safeSdk.createTransaction({ safeTransactionData })
       await chai.expect(tx).to.be.rejectedWith('Invalid empty array of transactions')
     })
 
@@ -317,7 +317,7 @@ describe('Transactions creation', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const txs: MetaTransactionData[] = [
+      const safeTransactionData: MetaTransactionData[] = [
         {
           to: erc20Mintable.address,
           value: '0',
@@ -335,7 +335,7 @@ describe('Transactions creation', () => {
           ])
         }
       ]
-      const multiSendTx = await safeSdk.createTransaction(txs)
+      const multiSendTx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(multiSendTx.data.to).to.be.eq(contractNetworks[chainId].multiSendAddress)
     })
 
@@ -357,7 +357,7 @@ describe('Transactions creation', () => {
         nonce: 555,
         safeTxGas: 666
       }
-      const txs: MetaTransactionData[] = [
+      const safeTransactionData: MetaTransactionData[] = [
         {
           to: erc20Mintable.address,
           value: '0',
@@ -375,7 +375,7 @@ describe('Transactions creation', () => {
           ])
         }
       ]
-      const multiSendTx = await safeSdk.createTransaction(txs, options)
+      const multiSendTx = await safeSdk.createTransaction({ safeTransactionData, options })
       chai.expect(multiSendTx.data.to).to.be.eq(contractNetworks[chainId].multiSendAddress)
       chai.expect(multiSendTx.data.value).to.be.eq('0')
       chai.expect(multiSendTx.data.baseGas).to.be.eq(111)

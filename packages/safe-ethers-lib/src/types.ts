@@ -7,6 +7,7 @@ export interface EthersTransactionOptions {
   gasPrice?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
+  nonce?: number
 }
 
 export interface EthersTransactionResult extends BaseTransactionResult {

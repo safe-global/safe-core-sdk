@@ -115,12 +115,12 @@ describe('Safe Info', () => {
         contractNetworks
       })
       chai.expect(await safeSdk.getNonce()).to.be.eq(0)
-      const txDataPartial: SafeTransactionDataPartial = {
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction(txDataPartial)
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getNonce()).to.be.eq(1)

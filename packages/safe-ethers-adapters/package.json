@@ -78,8 +78,8 @@
     "@ethersproject/properties": "^5.5.0"
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk": "^2.3.2",
-    "@gnosis.pm/safe-core-sdk-types": "^1.4.0",
+    "@gnosis.pm/safe-core-sdk": "^3.0.0",
+    "@gnosis.pm/safe-core-sdk-types": "^1.5.0",
     "@gnosis.pm/safe-deployments": "1.16.0",
     "axios": "^0.27.2"
   }

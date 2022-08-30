@@ -1,4 +1,4 @@
-import { ProxyFactory } from '../../../../typechain/src/web3-v1/v1.1.1/proxy_factory'
+import { Proxy_factory as ProxyFactory } from '../../../../typechain/src/web3-v1/v1.1.1/Proxy_factory'
 import GnosisSafeProxyFactoryWeb3Contract from '../GnosisSafeProxyFactoryWeb3Contract'
 
 class GnosisSafeProxyFactoryContract_V1_1_1_Web3 extends GnosisSafeProxyFactoryWeb3Contract {

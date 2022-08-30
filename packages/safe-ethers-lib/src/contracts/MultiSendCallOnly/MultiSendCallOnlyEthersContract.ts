@@ -1,8 +1,8 @@
 import { MultiSendCallOnlyContract } from '@gnosis.pm/safe-core-sdk-types'
 import {
-  MultiSendCallOnly as MultiSendCallOnly_V1_3_0,
-  MultiSendCallOnlyInterface
-} from '../../../typechain/src/ethers-v5/v1.3.0/MultiSendCallOnly'
+  Multi_send_call_only as MultiSendCallOnly_V1_3_0,
+  Multi_send_call_onlyInterface as MultiSendCallOnlyInterface
+} from '../../../typechain/src/ethers-v5/v1.3.0/Multi_send_call_only'
 
 abstract class MultiSendCallOnlyEthersContract implements MultiSendCallOnlyContract {
   constructor(public contract: MultiSendCallOnly_V1_3_0) {}

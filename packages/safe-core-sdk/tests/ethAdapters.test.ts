@@ -9,7 +9,12 @@ import {
   getSafeProxyFactoryContractDeployment
 } from '../src/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
-import { getFactory, getMultiSend, getMultiSendCallOnly, getSafeSingleton } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getMultiSendCallOnly,
+  getSafeSingleton
+} from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 

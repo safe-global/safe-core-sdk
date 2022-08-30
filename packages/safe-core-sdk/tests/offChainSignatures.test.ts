@@ -58,7 +58,7 @@ describe('Off-chain signatures', () => {
       const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
-        data: '0x'  
+        data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       await chai
@@ -78,7 +78,7 @@ describe('Off-chain signatures', () => {
       const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
-        data: '0x'  
+        data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.signatures.size).to.be.eq(0)
@@ -99,7 +99,7 @@ describe('Off-chain signatures', () => {
       const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
-        data: '0x'  
+        data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.signatures.size).to.be.eq(0)

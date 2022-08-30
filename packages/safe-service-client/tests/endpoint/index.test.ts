@@ -402,7 +402,7 @@ describe('Endpoint tests', () => {
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
-          ...safeTxData,
+          ...safeTransactionData,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,
@@ -445,7 +445,7 @@ describe('Endpoint tests', () => {
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
-          ...safeTxData,
+          ...safeTransactionData,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,

@@ -5,12 +5,12 @@ import {
   SafeTransactionData,
   SafeVersion
 } from '@gnosis.pm/safe-core-sdk-types'
-import { GnosisSafe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/GnosisSafe'
-import { GnosisSafe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/GnosisSafe'
+import { Gnosis_safe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/Gnosis_safe'
 import {
-  GnosisSafe as GnosisSafe_V1_3_0,
-  GnosisSafeInterface
-} from '../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
+  Gnosis_safe as GnosisSafe_V1_3_0,
+  Gnosis_safeInterface as GnosisSafeInterface
+} from '../../../typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
 import { EthersTransactionOptions, EthersTransactionResult } from '../../types'
 import { toTxResult } from '../../utils'
 

@@ -14,7 +14,12 @@ import { SAFE_LAST_VERSION } from '../src/contracts/config'
 import { ZERO_ADDRESS } from '../src/utils/constants'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
-import { getFactory, getMultiSend, getMultiSendCallOnly, getSafeSingleton } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getMultiSendCallOnly,
+  getSafeSingleton
+} from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 

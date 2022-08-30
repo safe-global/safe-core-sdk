@@ -508,7 +508,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
   ```
 
-  In addition, the optional `callsOnly` parameter, that is false by default, allows to force the use of the `MultiSendCallOnly` instead of the `MultiSend` contract when sending a batch transaction:
+  In addition, the optional `callsOnly` parameter, which is `false` by default, allows to force the use of the `MultiSendCallOnly` instead of the `MultiSend` contract when sending a batch transaction:
 
   ```js
   const callsOnly = true

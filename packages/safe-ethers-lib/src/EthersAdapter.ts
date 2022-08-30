@@ -12,6 +12,7 @@ import {
 import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import {
+  getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance
@@ -19,6 +20,7 @@ import {
 import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
 import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
+import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
 import { isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
@@ -108,6 +110,21 @@ class EthersAdapter implements EthAdapter {
       throw new Error('Invalid Multi Send contract address')
     }
     return getMultiSendContractInstance(safeVersion, contractAddress, this.#signer)
+  }
+
+  getMultiSendCallOnlyContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress
+  }: GetContractProps): MultiSendCallOnlyEthersContract {
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid MultiSendCallOnly contract address')
+    }
+    return getMultiSendCallOnlyContractInstance(safeVersion, contractAddress, this.#signer)
   }
 
   getSafeProxyFactoryContract({

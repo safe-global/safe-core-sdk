@@ -5,6 +5,10 @@ export interface ContractNetworkConfig {
   multiSendAddress: string
   /** multiSendAbi - Abi of the MultiSend contract deployed on a specific network */
   multiSendAbi?: AbiItem | AbiItem[]
+  /** multiSendCallOnlyAddress - Address of the MultiSendCallOnly contract deployed on a specific network */
+  multiSendCallOnlyAddress: string
+  /** multiSendCallOnlyAbi - Abi of the MultiSendCallOnly contract deployed on a specific network */
+  multiSendCallOnlyAbi?: AbiItem | AbiItem[]
   /** safeMasterCopyAddress - Address of the Gnosis Safe Master Copy contract deployed on a specific network */
   safeMasterCopyAddress: string
   /** safeMasterCopyAbi - Abi of the Gnosis Safe Master Copy contract deployed on a specific network */

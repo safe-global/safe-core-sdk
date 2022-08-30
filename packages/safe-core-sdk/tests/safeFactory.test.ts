@@ -14,7 +14,7 @@ import { SAFE_LAST_VERSION } from '../src/contracts/config'
 import { ZERO_ADDRESS } from '../src/utils/constants'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
-import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
+import { getFactory, getMultiSend, getMultiSendCallOnly, getSafeSingleton } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
@@ -51,6 +51,8 @@ describe('Safe Proxy Factory', () => {
         [chainId]: {
           multiSendAddress: ZERO_ADDRESS,
           multiSendAbi: (await getMultiSend()).abi,
+          multiSendCallOnlyAddress: ZERO_ADDRESS,
+          multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
           safeMasterCopyAddress: ZERO_ADDRESS,
           safeMasterCopyAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,

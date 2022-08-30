@@ -8,7 +8,7 @@ import { VoidSigner } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Deferrable } from '@ethersproject/properties'
 import Safe from '@gnosis.pm/safe-core-sdk'
-import { OperationType, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import { OperationType, SafeTransactionData, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import { SafeService } from './service'
 import { createLibAddress, createLibInterface, mapReceipt } from './utils'
 
@@ -117,10 +117,11 @@ export class SafeEthersSigner extends VoidSigner {
     }
     const safeTxGas = await this.service.estimateSafeTx(this.address, baseTx)
     const connectedSafe = await this.safe
-    const safeTx = await connectedSafe.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       ...baseTx,
       safeTxGas: safeTxGas.toNumber()
-    })
+    }
+    const safeTx = await connectedSafe.createTransaction({ safeTransactionData })
     const safeTxHash = await connectedSafe.getTransactionHash(safeTx)
     const signature = await connectedSafe.signTransactionHash(safeTxHash)
     await this.service.proposeTx(this.address, safeTxHash, safeTx, signature)

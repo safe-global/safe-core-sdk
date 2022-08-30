@@ -51,6 +51,15 @@ export interface ConnectSafeConfig {
   contractNetworks?: ContractNetworksConfig
 }
 
+export interface CreateTransactionProps {
+  /** safeTransactionData - The transaction or transaction array to process */
+  safeTransactionData: SafeTransactionDataPartial | MetaTransactionData[]
+  /** options - The transaction array optional properties */
+  options?: SafeTransactionOptionalProps
+  /** onlyCalls - Forces the execution of the transaction array with MultiSendCallOnly contract */
+  onlyCalls?: boolean
+}
+
 export interface AddOwnerTxParams {
   /** ownerAddress - The address of the new owner */
   ownerAddress: string
@@ -84,6 +93,7 @@ class Safe {
    * @returns The Safe Core SDK instance
    * @throws "Safe Proxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
+   * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   static async create({
     ethAdapter,
@@ -177,6 +187,15 @@ class Safe {
   }
 
   /**
+   * Returns the address of the MultiSendCallOnly contract.
+   *
+   * @returns The address of the MultiSendCallOnly contract
+   */
+  getMultiSendCallOnlyAddress(): string {
+    return this.#contractManager.multiSendCallOnlyContract.getAddress()
+  }
+
+  /**
    * Returns the Safe Master Copy contract version.
    *
    * @returns The Safe Master Copy contract version
@@ -262,39 +281,38 @@ class Safe {
   /**
    * Returns a Safe transaction ready to be signed by the owners.
    *
-   * @param safeTransactions - The list of transactions to process
+   * @param createTransactionProps - The createTransaction props
    * @returns The Safe transaction
    * @throws "Invalid empty array of transactions"
    */
-  async createTransaction(safeTransactions: SafeTransactionDataPartial): Promise<SafeTransaction>
-  async createTransaction(
-    safeTransactions: MetaTransactionData[],
-    options?: SafeTransactionOptionalProps
-  ): Promise<SafeTransaction>
-  async createTransaction(
-    safeTransactions: SafeTransactionDataPartial | MetaTransactionData[],
-    options?: SafeTransactionOptionalProps
-  ): Promise<SafeTransaction> {
-    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length === 0) {
+  async createTransaction({
+    safeTransactionData,
+    onlyCalls = false,
+    options
+  }: CreateTransactionProps): Promise<SafeTransaction> {
+    if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length === 0) {
       throw new Error('Invalid empty array of transactions')
     }
     let newTransaction: SafeTransactionDataPartial
-    if (isMetaTransactionArray(safeTransactions) && safeTransactions.length > 1) {
+    if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length > 1) {
+      const multiSendContract = onlyCalls
+        ? this.#contractManager.multiSendCallOnlyContract
+        : this.#contractManager.multiSendContract
       const multiSendData = encodeMultiSendData(
-        safeTransactions.map(standardizeMetaTransactionData)
+        safeTransactionData.map(standardizeMetaTransactionData)
       )
       const multiSendTransaction = {
         ...options,
-        to: this.#contractManager.multiSendContract.getAddress(),
+        to: multiSendContract.getAddress(),
         value: '0',
-        data: this.#contractManager.multiSendContract.encode('multiSend', [multiSendData]),
+        data: multiSendContract.encode('multiSend', [multiSendData]),
         operation: OperationType.DelegateCall
       }
       newTransaction = multiSendTransaction
     } else {
-      newTransaction = isMetaTransactionArray(safeTransactions)
-        ? { ...options, ...safeTransactions[0] }
-        : safeTransactions
+      newTransaction = isMetaTransactionArray(safeTransactionData)
+        ? { ...options, ...safeTransactionData[0] }
+        : safeTransactionData
     }
     const standardizedTransaction = await standardizeSafeTransactionData(
       this.#contractManager.safeContract,
@@ -311,13 +329,14 @@ class Safe {
    * @returns The Safe transaction that invalidates the pending Safe transaction/s
    */
   async createRejectionTransaction(nonce: number): Promise<SafeTransaction> {
-    return this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       nonce,
       value: '0',
       data: '0x',
       safeTxGas: 0
-    })
+    }
+    return this.createTransaction({ safeTransactionData })
   }
 
   /**
@@ -389,7 +408,9 @@ class Safe {
       const txHash = await this.getTransactionHash(safeTransaction)
       signature = await this.signTransactionHash(txHash)
     }
-    const signedSafeTransaction = await this.createTransaction(safeTransaction.data)
+    const signedSafeTransaction = await this.createTransaction({
+      safeTransactionData: safeTransaction.data
+    })
     safeTransaction.signatures.forEach((signature) => {
       signedSafeTransaction.addSignature(signature)
     })
@@ -465,12 +486,13 @@ class Safe {
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -487,12 +509,13 @@ class Safe {
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -511,12 +534,13 @@ class Safe {
     { ownerAddress, threshold }: AddOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -535,12 +559,13 @@ class Safe {
     { ownerAddress, threshold }: RemoveOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -559,12 +584,13 @@ class Safe {
     { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -581,12 +607,13 @@ class Safe {
     threshold: number,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeChangeThresholdData(threshold),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -604,7 +631,9 @@ class Safe {
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
   ): Promise<TransactionResult> {
-    const signedSafeTransaction = await this.createTransaction(safeTransaction.data)
+    const signedSafeTransaction = await this.createTransaction({
+      safeTransactionData: safeTransaction.data
+    })
     safeTransaction.signatures.forEach((signature) => {
       signedSafeTransaction.addSignature(signature)
     })
@@ -641,10 +670,13 @@ class Safe {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
-    const txResponse = await this.#contractManager.safeContract.execTransaction(signedSafeTransaction, {
-      from: signerAddress,
-      ...options
-    })
+    const txResponse = await this.#contractManager.safeContract.execTransaction(
+      signedSafeTransaction,
+      {
+        from: signerAddress,
+        ...options
+      }
+    )
     return txResponse
   }
 }

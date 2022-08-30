@@ -484,7 +484,7 @@ class Safe {
    * @throws "Invalid module address provided"
    * @throws "Module provided is already enabled"
    */
-  async getEnableModuleTx(
+  async createEnableModuleTx(
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -507,7 +507,7 @@ class Safe {
    * @throws "Invalid module address provided"
    * @throws "Module provided is not enabled already"
    */
-  async getDisableModuleTx(
+  async createDisableModuleTx(
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -532,7 +532,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getAddOwnerTx(
+  async createAddOwnerTx(
     { ownerAddress, threshold }: AddOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -557,7 +557,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getRemoveOwnerTx(
+  async createRemoveOwnerTx(
     { ownerAddress, threshold }: RemoveOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -582,7 +582,7 @@ class Safe {
    * @throws "New address provided is already an owner"
    * @throws "Old address provided is not an owner"
    */
-  async getSwapOwnerTx(
+  async createSwapOwnerTx(
     { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -605,7 +605,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getChangeThresholdTx(
+  async createChangeThresholdTx(
     threshold: number,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {

@@ -651,12 +651,12 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
 
-### getEnableModuleTx
+### createEnableModuleTx
 
 Returns a Safe transaction ready to be signed that will enable a Safe module.
 
 ```js
-const safeTransaction = await safeSdk.getEnableModuleTx(moduleAddress)
+const safeTransaction = await safeSdk.createEnableModuleTx(moduleAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -672,15 +672,15 @@ const options: SafeTransactionOptionalProps = {
   refundReceiver, // Optional
   nonce // Optional
 }
-const safeTransaction = await safeSdk.getEnableModuleTx(moduleAddress, options)
+const safeTransaction = await safeSdk.createEnableModuleTx(moduleAddress, options)
 ```
 
-### getDisableModuleTx
+### createDisableModuleTx
 
 Returns a Safe transaction ready to be signed that will disable a Safe module.
 
 ```js
-const safeTransaction = await safeSdk.getDisableModuleTx(moduleAddress)
+const safeTransaction = await safeSdk.createDisableModuleTx(moduleAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -689,10 +689,10 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getDisableModuleTx(moduleAddress, options)
+const safeTransaction = await safeSdk.createDisableModuleTx(moduleAddress, options)
 ```
 
-### getAddOwnerTx
+### createAddOwnerTx
 
 Returns the Safe transaction to add an owner and optionally change the threshold.
 
@@ -701,7 +701,7 @@ const params: AddOwnerTxParams = {
   ownerAddress,
   threshold // Optional. If `threshold` is not provided the current threshold will not change.
 }
-const safeTransaction = await safeSdk.getAddOwnerTx(params)
+const safeTransaction = await safeSdk.createAddOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -710,10 +710,10 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getAddOwnerTx(params, options)
+const safeTransaction = await safeSdk.createAddOwnerTx(params, options)
 ```
 
-### getRemoveOwnerTx
+### createRemoveOwnerTx
 
 Returns the Safe transaction to remove an owner and optionally change the threshold.
 
@@ -722,7 +722,7 @@ const params: RemoveOwnerTxParams = {
   ownerAddress,
   newThreshold // Optional. If `newThreshold` is not provided, the current threshold will be decreased by one.
 }
-const safeTransaction = await safeSdk.getRemoveOwnerTx(params)
+const safeTransaction = await safeSdk.createRemoveOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -731,10 +731,10 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getRemoveOwnerTx(params, options)
+const safeTransaction = await safeSdk.createRemoveOwnerTx(params, options)
 ```
 
-### getSwapOwnerTx
+### createSwapOwnerTx
 
 Returns the Safe transaction to replace an owner of the Safe with a new one.
 
@@ -743,7 +743,7 @@ const params: SwapOwnerTxParams = {
   oldOwnerAddress,
   newOwnerAddress
 }
-const safeTransaction = await safeSdk.getSwapOwnerTx(params)
+const safeTransaction = await safeSdk.createSwapOwnerTx(params)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -752,15 +752,15 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getSwapOwnerTx(params, options)
+const safeTransaction = await safeSdk.createSwapOwnerTx(params, options)
 ```
 
-### getChangeThresholdTx
+### createChangeThresholdTx
 
 Returns the Safe transaction to change the threshold.
 
 ```js
-const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold)
+const safeTransaction = await safeSdk.createChangeThresholdTx(newThreshold)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -769,7 +769,7 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeTransactionOptionalProps = { ... }
-const safeTransaction = await safeSdk.getChangeThresholdTx(newThreshold, options)
+const safeTransaction = await safeSdk.createChangeThresholdTx(newThreshold, options)
 ```
 
 ### executeTransaction

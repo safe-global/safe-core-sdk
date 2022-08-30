@@ -57,7 +57,7 @@ class GnosisSafeProxyFactoryWeb3Contract implements GnosisSafeProxyFactoryContra
     )
     const proxyAddress = txResult.events?.ProxyCreation?.returnValues?.proxy
     if (!proxyAddress) {
-      throw new Error('Safe Proxy was not deployed correctly')
+      throw new Error('SafeProxy was not deployed correctly')
     }
     return proxyAddress
   }

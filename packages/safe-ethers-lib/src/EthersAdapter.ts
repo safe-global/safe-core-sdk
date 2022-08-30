@@ -92,7 +92,7 @@ class EthersAdapter implements EthAdapter {
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy contract address')
+      throw new Error('Invalid SafeProxy contract address')
     }
     return getSafeContractInstance(safeVersion, contractAddress, this.#signer)
   }
@@ -107,7 +107,7 @@ class EthersAdapter implements EthAdapter {
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Multi Send contract address')
+      throw new Error('Invalid MultiSend contract address')
     }
     return getMultiSendContractInstance(safeVersion, contractAddress, this.#signer)
   }
@@ -137,7 +137,7 @@ class EthersAdapter implements EthAdapter {
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy Factory contract address')
+      throw new Error('Invalid SafeProxyFactory contract address')
     }
     return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, this.#signer)
   }

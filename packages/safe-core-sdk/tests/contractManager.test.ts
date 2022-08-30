@@ -45,11 +45,11 @@ describe('Safe contracts manager', () => {
         .to.be.rejectedWith(
           process.env.ETH_LIB === 'web3'
             ? 'You must provide the json interface of the contract when instantiating a contract object'
-            : 'Invalid Multi Send contract address'
+            : 'Invalid MultiSend contract address'
         )
     })
 
-    it('should fail if Safe Proxy contract is not deployed on the current network', async () => {
+    it('should fail if SafeProxy contract is not deployed on the current network', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -61,7 +61,7 @@ describe('Safe contracts manager', () => {
             contractNetworks
           })
         )
-        .to.be.rejectedWith('Safe Proxy contract is not deployed on the current network')
+        .to.be.rejectedWith('SafeProxy contract is not deployed on the current network')
     })
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
@@ -88,7 +88,7 @@ describe('Safe contracts manager', () => {
             contractNetworks: customContractNetworks
           })
         )
-        .to.be.rejectedWith('Multi Send contract is not deployed on the current network')
+        .to.be.rejectedWith('MultiSend contract is not deployed on the current network')
     })
 
     it('should set the MultiSend contract available on the current network', async () => {

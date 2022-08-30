@@ -20,7 +20,7 @@ import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 
-describe('Safe Proxy Factory', () => {
+describe('SafeProxyFactory', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
@@ -40,7 +40,7 @@ describe('Safe Proxy Factory', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       chai
         .expect(SafeFactory.create({ ethAdapter }))
-        .rejectedWith('Invalid Safe Proxy Factory contract')
+        .rejectedWith('Invalid SafeProxyFactory contract')
     })
 
     it('should fail if the contractNetworks provided are not deployed', async () => {
@@ -61,10 +61,10 @@ describe('Safe Proxy Factory', () => {
       }
       chai
         .expect(SafeFactory.create({ ethAdapter, contractNetworks }))
-        .rejectedWith('Safe Proxy Factory contract is not deployed on the current network')
+        .rejectedWith('SafeProxyFactory contract is not deployed on the current network')
     })
 
-    it('should instantiate the Safe Proxy Factory', async () => {
+    it('should instantiate the SafeProxyFactory', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)

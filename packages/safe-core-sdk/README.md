@@ -352,7 +352,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 
 ### getAddress
 
-Returns the address of the current Safe Proxy contract.
+Returns the address of the current SafeProxy contract.
 
 ```js
 const address = safeSdk.getAddress()

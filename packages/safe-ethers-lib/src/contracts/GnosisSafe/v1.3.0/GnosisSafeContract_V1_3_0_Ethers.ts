@@ -1,4 +1,4 @@
-import { GnosisSafe } from '../../../../typechain/src/ethers-v5/v1.3.0/GnosisSafe'
+import { Gnosis_safe as GnosisSafe } from '../../../../typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
 import { SENTINEL_ADDRESS } from '../../../utils/constants'
 import GnosisSafeContractEthers from '../GnosisSafeContractEthers'
 

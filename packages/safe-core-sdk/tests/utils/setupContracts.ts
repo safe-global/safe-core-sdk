@@ -1,15 +1,15 @@
 import { AddressZero } from '@ethersproject/constants'
 import {
-  GnosisSafe as GnosisSafe_V1_1_1,
-  MultiSend as MultiSend_V1_1_1,
-  ProxyFactory as ProxyFactory_V1_1_1
+  Gnosis_safe as GnosisSafe_V1_1_1,
+  Multi_send as MultiSend_V1_1_1,
+  Proxy_factory as ProxyFactory_V1_1_1
 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.1.1'
-import { GnosisSafe as GnosisSafe_V1_2_0 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.2.0/'
+import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.2.0/'
 import {
-  GnosisSafe as GnosisSafe_V1_3_0,
-  MultiSend as MultiSend_V1_3_0,
-  MultiSendCallOnly as MultiSendCallOnly_V1_3_0,
-  ProxyFactory as ProxyFactory_V1_3_0
+  Gnosis_safe as GnosisSafe_V1_3_0,
+  Multi_send as MultiSend_V1_3_0,
+  Multi_send_call_only as MultiSendCallOnly_V1_3_0,
+  Proxy_factory as ProxyFactory_V1_3_0
 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/'
 import {
   DailyLimitModule,

@@ -146,7 +146,10 @@ describe('Safe owners manager', () => {
       const newThreshold = 3
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners)
-      const tx = safeSdk.createAddOwnerTx({ ownerAddress: account2.address, threshold: newThreshold })
+      const tx = safeSdk.createAddOwnerTx({
+        ownerAddress: account2.address,
+        threshold: newThreshold
+      })
       await chai.expect(tx).to.be.rejectedWith('Threshold cannot exceed owner count')
     })
 

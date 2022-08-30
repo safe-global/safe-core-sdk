@@ -116,7 +116,7 @@ class SafeServiceClient implements SafeTransactionService {
 
   /**
    * Returns the list of Safes where the module address provided is enabled.
-   * 
+   *
    * @param moduleAddress - The Safe module address
    * @returns The list of Safe addresses where the module provided is enabled
    * @throws "Invalid module address"

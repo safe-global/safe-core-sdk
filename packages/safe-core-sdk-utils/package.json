@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "safe-deployments": "ts-node scripts/checkSafeDeployments.ts",
-    "unbuild": "rimraf dist *.tsbuildinfo",
+    "unbuild": "rimraf dist *.tsbuildinfo .nyc_output",
     "build": "rimraf dist && yarn safe-deployments && tsc",
     "test": "nyc mocha -r ts-node/register tests/**/*.test.ts",
     "format": "prettier --write \"{src,tests}/**/*.ts\"",
@@ -32,28 +32,28 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@gnosis.pm/safe-deployments": "1.15.0",
-    "@types/chai": "^4.3.0",
+    "@gnosis.pm/safe-deployments": "1.16.0",
+    "@types/chai": "^4.3.3",
     "@types/chai-as-promised": "^7.1.5",
-    "@types/mocha": "^9.1.0",
-    "@types/node": "^17.0.23",
-    "@types/semver": "^7.3.9",
-    "@typescript-eslint/eslint-plugin": "^5.17.0",
-    "@typescript-eslint/parser": "^5.17.0",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.7.14",
+    "@types/semver": "^7.3.12",
+    "@typescript-eslint/eslint-plugin": "^5.36.0",
+    "@typescript-eslint/parser": "^5.36.0",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
-    "eslint": "^8.12.0",
+    "eslint": "^8.23.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "mocha": "^9.2.2",
+    "eslint-plugin-prettier": "^4.2.1",
+    "mocha": "^10.0.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.6.1",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.3"
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.2"
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk-types": "^1.2.1",
+    "@gnosis.pm/safe-core-sdk-types": "^1.4.0",
     "semver": "^7.3.7",
-    "web3-utils": "^1.7.1"
+    "web3-utils": "^1.7.5"
   }
 }

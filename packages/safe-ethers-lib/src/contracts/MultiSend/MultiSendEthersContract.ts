@@ -1,9 +1,9 @@
 import { MultiSendContract } from '@gnosis.pm/safe-core-sdk-types'
-import { MultiSend as MultiSend_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/MultiSend'
+import { Multi_send as MultiSend_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/Multi_send'
 import {
-  MultiSend as MultiSend_V1_3_0,
-  MultiSendInterface
-} from '../../../typechain/src/ethers-v5/v1.3.0/MultiSend'
+  Multi_send as MultiSend_V1_3_0,
+  Multi_sendInterface as MultiSendInterface
+} from '../../../typechain/src/ethers-v5/v1.3.0/Multi_send'
 
 abstract class MultiSendEthersContract implements MultiSendContract {
   constructor(public contract: MultiSend_V1_1_1 | MultiSend_V1_3_0) {}

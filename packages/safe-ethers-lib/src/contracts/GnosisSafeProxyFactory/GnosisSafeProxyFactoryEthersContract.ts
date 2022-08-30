@@ -53,7 +53,7 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
           ({ event }: Event) => event === 'ProxyCreation'
         )
         if (!proxyCreationEvent || !proxyCreationEvent.args) {
-          throw new Error('Safe Proxy was not deployed correctly')
+          throw new Error('SafeProxy was not deployed correctly')
         }
         const proxyAddress: string = proxyCreationEvent.args[0]
         return proxyAddress

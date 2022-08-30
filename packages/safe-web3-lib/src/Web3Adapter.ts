@@ -82,7 +82,7 @@ class Web3Adapter implements EthAdapter {
   }: GetContractProps): GnosisSafeContractWeb3 {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy contract address')
+      throw new Error('Invalid SafeProxy contract address')
     }
     const safeContract = this.getContract(
       contractAddress,
@@ -100,7 +100,7 @@ class Web3Adapter implements EthAdapter {
   }: GetContractProps): MultiSendWeb3Contract {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Multi Send contract addresss')
+      throw new Error('Invalid MultiSend contract address')
     }
     const multiSendContract = this.getContract(
       contractAddress,
@@ -136,7 +136,7 @@ class Web3Adapter implements EthAdapter {
   }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy Factory contract address')
+      throw new Error('Invalid SafeProxyFactory contract address')
     }
     const proxyFactoryContract = this.getContract(
       contractAddress,

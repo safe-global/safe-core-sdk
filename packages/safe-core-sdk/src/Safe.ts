@@ -91,7 +91,7 @@ class Safe {
    * Creates an instance of the Safe Core SDK.
    * @param config - Ethers Safe configuration
    * @returns The Safe Core SDK instance
-   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
@@ -110,8 +110,9 @@ class Safe {
    * Initializes the Safe Core SDK instance.
    * @param config - Safe configuration
    * @throws "Signer must be connected to a provider"
-   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
+   * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init({
     ethAdapter,
@@ -133,8 +134,9 @@ class Safe {
   /**
    * Returns a new instance of the Safe Core SDK.
    * @param config - Connect Safe configuration
-   * @throws "Safe Proxy contract is not deployed on the current network"
+   * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
+   * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect({
     ethAdapter,
@@ -151,9 +153,9 @@ class Safe {
   }
 
   /**
-   * Returns the address of the current Safe Proxy contract.
+   * Returns the address of the current SafeProxy contract.
    *
-   * @returns The address of the Safe Proxy contract
+   * @returns The address of the SafeProxy contract
    */
   getAddress(): string {
     return this.#contractManager.safeContract.getAddress()
@@ -482,7 +484,7 @@ class Safe {
    * @throws "Invalid module address provided"
    * @throws "Module provided is already enabled"
    */
-  async getEnableModuleTx(
+  async createEnableModuleTx(
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -505,7 +507,7 @@ class Safe {
    * @throws "Invalid module address provided"
    * @throws "Module provided is not enabled already"
    */
-  async getDisableModuleTx(
+  async createDisableModuleTx(
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -530,7 +532,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getAddOwnerTx(
+  async createAddOwnerTx(
     { ownerAddress, threshold }: AddOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -555,7 +557,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getRemoveOwnerTx(
+  async createRemoveOwnerTx(
     { ownerAddress, threshold }: RemoveOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -580,7 +582,7 @@ class Safe {
    * @throws "New address provided is already an owner"
    * @throws "Old address provided is not an owner"
    */
-  async getSwapOwnerTx(
+  async createSwapOwnerTx(
     { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -603,7 +605,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async getChangeThresholdTx(
+  async createChangeThresholdTx(
     threshold: number,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {

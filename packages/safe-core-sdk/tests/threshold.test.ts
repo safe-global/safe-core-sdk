@@ -37,7 +37,7 @@ describe('Safe Threshold', () => {
     })
   })
 
-  describe('getChangeThresholdTx', async () => {
+  describe('createChangeThresholdTx', async () => {
     it('should fail if the threshold is bigger than the number of owners', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -51,7 +51,7 @@ describe('Safe Threshold', () => {
       const numOwners = (await safeSdk.getOwners()).length
       chai.expect(newThreshold).to.be.gt(numOwners)
       await chai
-        .expect(safeSdk.getChangeThresholdTx(newThreshold))
+        .expect(safeSdk.createChangeThresholdTx(newThreshold))
         .to.be.rejectedWith('Threshold cannot exceed owner count')
     })
 
@@ -66,7 +66,7 @@ describe('Safe Threshold', () => {
       })
       const newThreshold = 0
       await chai
-        .expect(safeSdk.getChangeThresholdTx(newThreshold))
+        .expect(safeSdk.createChangeThresholdTx(newThreshold))
         .to.be.rejectedWith('Threshold needs to be greater than 0')
     })
 
@@ -90,7 +90,7 @@ describe('Safe Threshold', () => {
         nonce: 555,
         safeTxGas: 666
       }
-      const tx = await safeSdk.getChangeThresholdTx(newThreshold, options)
+      const tx = await safeSdk.createChangeThresholdTx(newThreshold, options)
       chai.expect(tx.data.baseGas).to.be.eq(111)
       chai.expect(tx.data.gasPrice).to.be.eq(222)
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
@@ -111,7 +111,7 @@ describe('Safe Threshold', () => {
       })
       const newThreshold = 2
       chai.expect(await safeSdk.getThreshold()).to.be.not.eq(newThreshold)
-      const tx = await safeSdk.getChangeThresholdTx(newThreshold)
+      const tx = await safeSdk.createChangeThresholdTx(newThreshold)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getThreshold()).to.be.eq(newThreshold)

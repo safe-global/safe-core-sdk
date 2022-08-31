@@ -81,8 +81,13 @@ const id = await ethAdapter.getChainId()
 const contractNetworks: ContractNetworksConfig = {
   [id]: {
     multiSendAddress: '<MULTI_SEND_ADDRESS>',
+    multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
     safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
-    safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>'
+    safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+    multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+    multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+    safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+    safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>' // Optional. Only needed with web3.js
   }
 }
 
@@ -128,7 +133,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   ```js
   import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 
-  const transaction: SafeTransactionDataPartial = {
+  const safeTransactionData: SafeTransactionDataPartial = {
     to,
     data,
     value,
@@ -141,7 +146,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
     nonce // Optional
   }
 
-  const safeTransaction = await safeSdk.createTransaction(transaction)
+  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
   ```
 
 * **Create a MultiSend transaction**
@@ -152,7 +157,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   import { SafeTransactionOptionalProps } from '@gnosis.pm/safe-core-sdk'
   import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types'
 
-  const transactions: MetaTransactionData[] = [
+  const safeTransactionData: MetaTransactionData[] = [
     {
       to,
       data,
@@ -177,7 +182,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
     nonce // Optional
   }
 
-  const safeTransaction = await safeSdk.createTransaction(transactions, options)
+  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
   ```
 
 
@@ -306,7 +311,7 @@ const safeTransactionData: SafeTransactionData = {
   refundReceiver: transaction.refundReceiver,
   nonce: transaction.nonce
 }
-const safeTransaction = await safeSdk.createTransaction(safeTransactionData)
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 transaction.confirmations.forEach(confirmation => {
   const signature = new EthSignSignature(confirmation.owner, confirmation.signature)
   safeTransaction.addSignature(signature)

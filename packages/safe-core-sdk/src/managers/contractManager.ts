@@ -1,6 +1,14 @@
-import { GnosisSafeContract, MultiSendContract } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  GnosisSafeContract,
+  MultiSendCallOnlyContract,
+  MultiSendContract
+} from '@gnosis.pm/safe-core-sdk-types'
 import { SAFE_LAST_VERSION } from '../contracts/config'
-import { getMultiSendContract, getSafeContract } from '../contracts/safeDeploymentContracts'
+import {
+  getMultiSendCallOnlyContract,
+  getMultiSendContract,
+  getSafeContract
+} from '../contracts/safeDeploymentContracts'
 import { SafeConfig } from '../Safe'
 import { ContractNetworksConfig } from '../types'
 
@@ -9,6 +17,7 @@ class ContractManager {
   #isL1SafeMasterCopy?: boolean
   #safeContract!: GnosisSafeContract
   #multiSendContract!: MultiSendContract
+  #multiSendCallOnlyContract!: MultiSendCallOnlyContract
 
   static async create({
     ethAdapter,
@@ -55,6 +64,12 @@ class ContractManager {
       chainId,
       customContracts
     })
+    this.#multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
+      ethAdapter,
+      safeVersion,
+      chainId,
+      customContracts
+    })
   }
 
   get contractNetworks(): ContractNetworksConfig | undefined {
@@ -71,6 +86,10 @@ class ContractManager {
 
   get multiSendContract(): MultiSendContract {
     return this.#multiSendContract
+  }
+
+  get multiSendCallOnlyContract(): MultiSendCallOnlyContract {
+    return this.#multiSendCallOnlyContract
   }
 }
 

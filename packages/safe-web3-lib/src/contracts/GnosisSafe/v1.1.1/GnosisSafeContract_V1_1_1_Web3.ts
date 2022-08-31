@@ -1,4 +1,4 @@
-import { GnosisSafe } from '../../../../typechain/src/web3-v1/v1.1.1/gnosis_safe'
+import { Gnosis_safe as GnosisSafe } from '../../../../typechain/src/web3-v1/v1.1.1/Gnosis_safe'
 import { sameString } from '../../../utils'
 import GnosisSafeContractWeb3 from '../GnosisSafeContractWeb3'
 

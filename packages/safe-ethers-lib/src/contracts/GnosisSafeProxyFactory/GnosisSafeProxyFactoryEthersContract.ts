@@ -1,8 +1,8 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { Event } from '@ethersproject/contracts'
 import { GnosisSafeProxyFactoryContract } from '@gnosis.pm/safe-core-sdk-types'
-import { ProxyFactory as ProxyFactory_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/ProxyFactory'
-import { ProxyFactory as ProxyFactory_V1_3_0 } from '../../../typechain/src/ethers-v5/v1.3.0/ProxyFactory'
+import { Proxy_factory as ProxyFactory_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/Proxy_factory'
+import { Proxy_factory as ProxyFactory_V1_3_0 } from '../../../typechain/src/ethers-v5/v1.3.0/Proxy_factory'
 import { EthersTransactionOptions } from '../../types'
 
 export interface CreateProxyProps {
@@ -53,7 +53,7 @@ class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryCont
           ({ event }: Event) => event === 'ProxyCreation'
         )
         if (!proxyCreationEvent || !proxyCreationEvent.args) {
-          throw new Error('Safe Proxy was not deployed correctly')
+          throw new Error('SafeProxy was not deployed correctly')
         }
         const proxyAddress: string = proxyCreationEvent.args[0]
         return proxyAddress

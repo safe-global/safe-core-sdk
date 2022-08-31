@@ -14,13 +14,18 @@ import { SAFE_LAST_VERSION } from '../src/contracts/config'
 import { ZERO_ADDRESS } from '../src/utils/constants'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
-import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getMultiSendCallOnly,
+  getSafeSingleton
+} from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 
-describe('Safe Proxy Factory', () => {
+describe('SafeProxyFactory', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
@@ -40,7 +45,7 @@ describe('Safe Proxy Factory', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       chai
         .expect(SafeFactory.create({ ethAdapter }))
-        .rejectedWith('Invalid Safe Proxy Factory contract')
+        .rejectedWith('Invalid SafeProxyFactory contract')
     })
 
     it('should fail if the contractNetworks provided are not deployed', async () => {
@@ -51,6 +56,8 @@ describe('Safe Proxy Factory', () => {
         [chainId]: {
           multiSendAddress: ZERO_ADDRESS,
           multiSendAbi: (await getMultiSend()).abi,
+          multiSendCallOnlyAddress: ZERO_ADDRESS,
+          multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
           safeMasterCopyAddress: ZERO_ADDRESS,
           safeMasterCopyAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,
@@ -59,10 +66,10 @@ describe('Safe Proxy Factory', () => {
       }
       chai
         .expect(SafeFactory.create({ ethAdapter, contractNetworks }))
-        .rejectedWith('Safe Proxy Factory contract is not deployed on the current network')
+        .rejectedWith('SafeProxyFactory contract is not deployed on the current network')
     })
 
-    it('should instantiate the Safe Proxy Factory', async () => {
+    it('should instantiate the SafeProxyFactory', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)

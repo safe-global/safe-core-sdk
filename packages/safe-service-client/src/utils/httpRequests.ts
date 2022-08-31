@@ -22,7 +22,7 @@ export async function sendRequest<T>({ url, method, body }: HttpRequest): Promis
     body: JSON.stringify(body)
   })
 
-  let jsonResponse
+  let jsonResponse: any
   try {
     jsonResponse = await response.json()
   } catch (error) {

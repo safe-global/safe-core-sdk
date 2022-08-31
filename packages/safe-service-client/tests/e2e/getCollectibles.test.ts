@@ -35,7 +35,7 @@ describe('getCollectibles', () => {
     chai.expect(safeCollectibleResponse.length).to.be.equal(1)
     safeCollectibleResponse.map((safeCollectible) => {
       chai.expect(safeCollectible.address).to.be.equal('0x39Ec448b891c476e166b3C3242A90830DB556661')
-      chai.expect(safeCollectible.tokenName).to.be.equal('Frank\'s Art Sale')
+      chai.expect(safeCollectible.tokenName).to.be.equal("Frank's Art Sale")
     })
   })
 
@@ -46,7 +46,7 @@ describe('getCollectibles', () => {
     chai.expect(safeCollectibleResponse.length).to.be.equal(1)
     safeCollectibleResponse.map((safeCollectible) => {
       chai.expect(safeCollectible.address).to.be.equal('0x39Ec448b891c476e166b3C3242A90830DB556661')
-      chai.expect(safeCollectible.tokenName).to.be.equal('Frank\'s Art Sale')
+      chai.expect(safeCollectible.tokenName).to.be.equal("Frank's Art Sale")
     })
   })
 })

@@ -34,7 +34,7 @@ export interface SafeConfig {
   ethAdapter: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress: string
-  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
@@ -45,7 +45,7 @@ export interface ConnectSafeConfig {
   ethAdapter?: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
-  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig

@@ -9,13 +9,13 @@ export interface ContractNetworkConfig {
   multiSendCallOnlyAddress: string
   /** multiSendCallOnlyAbi - Abi of the MultiSendCallOnly contract deployed on a specific network */
   multiSendCallOnlyAbi?: AbiItem | AbiItem[]
-  /** safeMasterCopyAddress - Address of the Gnosis Safe Master Copy contract deployed on a specific network */
+  /** safeMasterCopyAddress - Address of the GnosisSafe Master Copy contract deployed on a specific network */
   safeMasterCopyAddress: string
-  /** safeMasterCopyAbi - Abi of the Gnosis Safe Master Copy contract deployed on a specific network */
+  /** safeMasterCopyAbi - Abi of the GnosisSafe Master Copy contract deployed on a specific network */
   safeMasterCopyAbi?: AbiItem | AbiItem[]
-  /** safeProxyFactoryAddress - Address of the Gnosis SafeProxyFactory contract deployed on a specific network */
+  /** safeProxyFactoryAddress - Address of the GnosisSafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAddress: string
-  /** safeProxyFactoryAbi - Abi of the Gnosis SafeProxyFactory contract deployed on a specific network */
+  /** safeProxyFactoryAbi - Abi of the GnosisSafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAbi?: AbiItem | AbiItem[]
 }
 

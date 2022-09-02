@@ -6,7 +6,7 @@ Software developer tools that facilitate the interaction with the Gnosis Safe [c
 
 | Title | Description |
 | ------- | ----------- |
-| [Integrating the Safe Core SDK](https://github.com/safe-global/safe-core-sdk/blob/main/packages/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk) and [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client). |
+| [Integrating the Safe Core SDK](https://github.com/safe-global/safe-core-sdk/blob/main/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk) and [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client). |
 
 ## Packages
 

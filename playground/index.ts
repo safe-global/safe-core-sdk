@@ -6,7 +6,7 @@ import { ethers } from 'ethers'
 // This file can be used to play around with the Safe Core SDK
 
 const config = {
-  RPC_URL: 'https://rinkeby.infura.io/v3/<INFURA_TOKEN>',
+  RPC_URL: 'https://goerli.infura.io/v3/<INFURA_TOKEN>',
   SAFE_ADDRESS: '<SAFE_ADDRESS>',
   SAFE_OWNERS_PRIVATE_KEYS: [
     '<OWNER_1_PRIVATE_KEY>',

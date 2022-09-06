@@ -7,6 +7,7 @@
     "build": "lerna run build --stream --npm-client=yarn",
     "test": "FORCE_COLOR=1 lerna run test --stream --npm-client=yarn",
     "test:ci": "FORCE_COLOR=1 lerna run test:ci --stream --npm-client=yarn",
+    "play": "ts-node ./playground",
     "format": "lerna run format --npm-client=yarn",
     "postinstall": "cd packages/safe-ethers-lib; hardhat compile"
   },

@@ -43,4 +43,4 @@ We'll assume that you are familiar with TypeScript (JavaScript), Ethereum and ha
 
 If you need help, you can reach Safe developers in the #safe-developers channel at https://chat.gnosis-safe.io/ or create a discussion at https://github.com/safe-global/safe-core-sdk/discussions.
 
-Let's jump into the guide: [Integrating the Safe Core SDK](/packages/guides/integrating-the-safe-core-sdk.md)
+Let's jump into the guide: [Integrating the Safe Core SDK](/guides/integrating-the-safe-core-sdk.md)

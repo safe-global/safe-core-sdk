@@ -498,16 +498,17 @@ class Safe {
    * @throws "Guard provided is already enabled"
    * @throws "Current version of the Safe does not support Safe transaction guards functionality"
    */
-  async getEnableGuardTx(
+  async createEnableGuardTx(
     guardAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#guardManager.encodeEnableGuardData(guardAddress),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 
@@ -521,13 +522,14 @@ class Safe {
    * @throws "There are no guards enabled already"
    * @throws "Current version of the Safe does not support Safe transaction guards functionality"
    */
-  async getDisableGuardTx(options?: SafeTransactionOptionalProps): Promise<SafeTransaction> {
-    const safeTransaction = await this.createTransaction({
+  async createDisableGuardTx(options?: SafeTransactionOptionalProps): Promise<SafeTransaction> {
+    const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       value: '0',
       data: await this.#guardManager.encodeDisableGuardData(),
       ...options
-    })
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
     return safeTransaction
   }
 

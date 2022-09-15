@@ -27,7 +27,7 @@ class GuardManager {
 
   private validateGuardIsEnabled(guardAddress: string): void {
     if (isZeroAddress(guardAddress)) {
-      throw new Error('There are no guards enabled already')
+      throw new Error('There are no guards enabled yet')
     }
   }
 

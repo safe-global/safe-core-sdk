@@ -30,7 +30,7 @@ class ModuleManager {
     const moduleIndex = modules.findIndex((module: string) => sameString(module, moduleAddress))
     const isEnabled = moduleIndex >= 0
     if (!isEnabled) {
-      throw new Error('Module provided is not enabled already')
+      throw new Error('Module provided is not enabled yet')
     }
     return moduleIndex
   }

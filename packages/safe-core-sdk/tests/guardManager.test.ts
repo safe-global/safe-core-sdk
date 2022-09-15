@@ -210,7 +210,7 @@ describe('Safe guards manager', () => {
         contractNetworks
       })
       const tx = safeSdk.getDisableGuardTx()
-      await chai.expect(tx).to.be.rejectedWith('There are no guards enabled already')
+      await chai.expect(tx).to.be.rejectedWith('There are no guards enabled yet')
     })
 
     itif(safeVersionDeployed >= '1.3.0')(

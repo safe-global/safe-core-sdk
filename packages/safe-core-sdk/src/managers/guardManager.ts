@@ -38,7 +38,9 @@ class GuardManager {
     if (hasFeature(FEATURES.SAFE_TX_GUARDS, safeVersion)) {
       return this.#ethAdapter.getStorageAt(this.#safeContract.getAddress(), slot)
     } else {
-      throw new Error('Current version of the Safe does not support Safe transaction guards functionality')
+      throw new Error(
+        'Current version of the Safe does not support Safe transaction guards functionality'
+      )
     }
   }
 

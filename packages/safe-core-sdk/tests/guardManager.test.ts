@@ -41,7 +41,11 @@ describe('Safe guards manager', () => {
           contractNetworks
         })
         const tx = safeSdk.getGuard()
-        await chai.expect(tx).to.be.rejectedWith('Current version of the Safe does not support Safe transaction guards functionality')
+        await chai
+          .expect(tx)
+          .to.be.rejectedWith(
+            'Current version of the Safe does not support Safe transaction guards functionality'
+          )
       }
     )
 
@@ -87,7 +91,11 @@ describe('Safe guards manager', () => {
           contractNetworks
         })
         const tx = safeSdk.createEnableGuardTx(guardAddress)
-        await chai.expect(tx).to.be.rejectedWith('Current version of the Safe does not support Safe transaction guards functionality')
+        await chai
+          .expect(tx)
+          .to.be.rejectedWith(
+            'Current version of the Safe does not support Safe transaction guards functionality'
+          )
       }
     )
 
@@ -196,7 +204,11 @@ describe('Safe guards manager', () => {
           contractNetworks
         })
         const tx = safeSdk.createDisableGuardTx()
-        await chai.expect(tx).to.be.rejectedWith('Current version of the Safe does not support Safe transaction guards functionality')
+        await chai
+          .expect(tx)
+          .to.be.rejectedWith(
+            'Current version of the Safe does not support Safe transaction guards functionality'
+          )
       }
     )
 

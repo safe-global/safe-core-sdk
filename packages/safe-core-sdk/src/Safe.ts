@@ -515,11 +515,10 @@ class Safe {
   /**
    * Returns the Safe transaction to disable a Safe guard.
    *
-   * @param guardAddress - The desired guard address
    * @param options - The transaction optional properties
    * @returns The Safe transaction ready to be signed
    * @throws "Invalid guard address provided"
-   * @throws "There are no guards enabled already"
+   * @throws "There are no guards enabled yet"
    * @throws "Current version of the Safe does not support Safe transaction guards functionality"
    */
   async createDisableGuardTx(options?: SafeTransactionOptionalProps): Promise<SafeTransaction> {

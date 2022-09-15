@@ -6,6 +6,8 @@ import { FEATURES, hasFeature } from '../utils/safeVersions'
 class GuardManager {
   #ethAdapter: EthAdapter
   #safeContract: GnosisSafeContract
+  // keccak256("guard_manager.guard.address")
+  #slot = '0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8'
 
   constructor(ethAdapter: EthAdapter, safeContract: GnosisSafeContract) {
     this.#ethAdapter = ethAdapter
@@ -32,11 +34,9 @@ class GuardManager {
   }
 
   async getGuard(): Promise<string> {
-    // keccak256("guard_manager.guard.address")
-    const slot = '0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8'
     const safeVersion = await this.#safeContract.getVersion()
     if (hasFeature(FEATURES.SAFE_TX_GUARDS, safeVersion)) {
-      return this.#ethAdapter.getStorageAt(this.#safeContract.getAddress(), slot)
+      return this.#ethAdapter.getStorageAt(this.#safeContract.getAddress(), this.#slot)
     } else {
       throw new Error(
         'Current version of the Safe does not support Safe transaction guards functionality'

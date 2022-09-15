@@ -3,7 +3,7 @@
 [![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-[Ethers](https://docs.ethers.io/v5/single-page/) adapter that facilitates the interaction with the [Gnosis Safe Services](https://github.com/safe-global/safe-transaction-service)
+[Ethers](https://docs.ethers.io/v5/single-page/) adapter that facilitates the interaction with the [Safe Services](https://github.com/safe-global/safe-transaction-service)
 
 ## Getting Started
 
@@ -19,7 +19,7 @@ An example for such an account would be the private key of one of the owners tha
 const signer = new Wallet("some_private_key", ethereumProvider)
 ```
 
-It is also necessary to specify a service instance that should be used to publish the Safe transactions. An example for this would be the Mainnet instance of the [Gnosis Safe Transaction Service](https://safe-transaction.gnosis.io/): `https://safe-transaction.gnosis.io/`
+It is also necessary to specify a service instance that should be used to publish the Safe transactions. An example for this would be the Mainnet instance of the [Safe Transaction Service](https://safe-transaction.gnosis.io/): `https://safe-transaction.gnosis.io/`
 
 ```js
 const service = new SafeService("some_service_url")

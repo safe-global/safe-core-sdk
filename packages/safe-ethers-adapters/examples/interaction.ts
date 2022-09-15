@@ -23,7 +23,7 @@ const sample = async () => {
     const contract = new Contract("0xe50c6391a6cb10f9B9Ef599aa1C68C82dD88Bd91", ["function pin(string newMessage)"], safeSigner)
     const proposedTx = await contract.functions.pin(`Local time: ${new Date().toLocaleString()}`)
     console.log("USER ACTION REQUIRED")
-    console.log("Go to the Gnosis Safe Web App to confirm the transaction")
+    console.log("Go to the Safe Web App to confirm the transaction")
     console.log(await proposedTx.wait())
     console.log("Transaction has been executed")
 }

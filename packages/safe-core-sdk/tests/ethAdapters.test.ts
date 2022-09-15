@@ -3,12 +3,18 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import {
+  getMultiSendCallOnlyContractDeployment,
   getMultiSendContractDeployment,
   getSafeContractDeployment,
   getSafeProxyFactoryContractDeployment
 } from '../src/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
-import { getFactory, getMultiSend, getSafeSingleton } from './utils/setupContracts'
+import {
+  getFactory,
+  getMultiSend,
+  getMultiSendCallOnly,
+  getSafeSingleton
+} from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
@@ -103,7 +109,7 @@ describe('Safe contracts', () => {
   })
 
   describe('getMultiSendContract', async () => {
-    it('should return a Multi Send contract from safe-deployments', async () => {
+    it('should return a MultiSend contract from safe-deployments', async () => {
       const { accounts } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -120,7 +126,7 @@ describe('Safe contracts', () => {
         .to.be.eq('0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761')
     })
 
-    it('should return a Multi Send contract from the custom addresses', async () => {
+    it('should return a MultiSend contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -138,8 +144,44 @@ describe('Safe contracts', () => {
     })
   })
 
+  describe('getMultiSendCallOnlyContract', async () => {
+    it('should return a MultiSendCallOnly contract from safe-deployments', async () => {
+      const { accounts } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const chainId = 1
+      const singletonDeployment = getMultiSendCallOnlyContractDeployment(safeVersion, chainId)
+      const multiSendCallOnlyContract = await ethAdapter.getMultiSendCallOnlyContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
+      })
+      chai
+        .expect(await multiSendCallOnlyContract.getAddress())
+        .to.be.eq('0x40A2aCCbd92BCA938b02010E17A5b8929b49130D')
+    })
+
+    it('should return a MultiSendCallOnly contract from the custom addresses', async () => {
+      const { accounts, contractNetworks, chainId } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const customContract = contractNetworks[chainId]
+      const multiSendCallOnlyContract = await ethAdapter.getMultiSendCallOnlyContract({
+        safeVersion,
+        chainId,
+        customContractAddress: customContract.multiSendCallOnlyAddress,
+        customContractAbi: customContract.multiSendCallOnlyAbi
+      })
+      chai
+        .expect(await multiSendCallOnlyContract.getAddress())
+        .to.be.eq((await getMultiSendCallOnly()).contract.address)
+    })
+  })
+
   describe('getSafeProxyFactoryContract', async () => {
-    it('should return a Safe Proxy Factory contract from safe-deployments', async () => {
+    it('should return a SafeProxyFactory contract from safe-deployments', async () => {
       const { accounts } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -156,7 +198,7 @@ describe('Safe contracts', () => {
         .to.be.eq('0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2')
     })
 
-    it('should return a Safe Proxy Factory contract from the custom addresses', async () => {
+    it('should return a SafeProxyFactory contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)

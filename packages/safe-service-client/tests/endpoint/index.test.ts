@@ -369,7 +369,7 @@ describe('Endpoint tests', () => {
     })
 
     it('proposeTransaction', async () => {
-      const safeTxData: SafeTransactionDataPartial = {
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safeAddress,
         data: '0x',
         value: '123456789',
@@ -384,7 +384,7 @@ describe('Endpoint tests', () => {
       const origin = 'Safe Core SDK: Safe Service Client'
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
-      const safeTransaction = await safeSdk.createTransaction(safeTxData)
+      const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
       const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
       await chai
         .expect(
@@ -402,7 +402,7 @@ describe('Endpoint tests', () => {
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
-          ...safeTxData,
+          ...safeTransactionData,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,
@@ -412,7 +412,7 @@ describe('Endpoint tests', () => {
     })
 
     it('proposeTransaction EIP-3770', async () => {
-      const safeTxData: SafeTransactionDataPartial = {
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safeAddress,
         data: '0x',
         value: '123456789',
@@ -427,7 +427,7 @@ describe('Endpoint tests', () => {
       const origin = 'Safe Core SDK: Safe Service Client'
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
-      const safeTransaction = await safeSdk.createTransaction(safeTxData)
+      const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
       const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
       await chai
         .expect(
@@ -445,7 +445,7 @@ describe('Endpoint tests', () => {
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
-          ...safeTxData,
+          ...safeTransactionData,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,

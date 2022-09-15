@@ -14,12 +14,14 @@ import { AbiItem } from 'web3-utils'
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import {
   getGnosisSafeProxyFactoryContractInstance,
+  getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance
 } from './contracts/contractInstancesWeb3'
 import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
 import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
+import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -49,8 +51,18 @@ class Web3Adapter implements EthAdapter {
     return validateEip3770Address(fullAddress, chainId)
   }
 
-  async getBalance(address: string): Promise<BigNumber> {
-    return BigNumber.from(await this.#web3.eth.getBalance(address))
+  async getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber> {
+    const balance = defaultBlock
+      ? await this.#web3.eth.getBalance(address, defaultBlock)
+      : await this.#web3.eth.getBalance(address)
+    return BigNumber.from(balance)
+  }
+
+  async getNonce(address: string, defaultBlock?: string | number): Promise<number> {
+    const nonce = defaultBlock
+      ? await this.#web3.eth.getTransactionCount(address, defaultBlock)
+      : await this.#web3.eth.getTransactionCount(address)
+    return nonce
   }
 
   async getChainId(): Promise<number> {
@@ -70,7 +82,7 @@ class Web3Adapter implements EthAdapter {
   }: GetContractProps): GnosisSafeContractWeb3 {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy contract address')
+      throw new Error('Invalid SafeProxy contract address')
     }
     const safeContract = this.getContract(
       contractAddress,
@@ -88,13 +100,31 @@ class Web3Adapter implements EthAdapter {
   }: GetContractProps): MultiSendWeb3Contract {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Multi Send contract addresss')
+      throw new Error('Invalid MultiSend contract address')
     }
     const multiSendContract = this.getContract(
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
     return getMultiSendContractInstance(safeVersion, multiSendContract)
+  }
+
+  getMultiSendCallOnlyContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): MultiSendCallOnlyWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid MultiSendCallOnly contract address')
+    }
+    const multiSendContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getMultiSendCallOnlyContractInstance(safeVersion, multiSendContract)
   }
 
   getSafeProxyFactoryContract({
@@ -106,7 +136,7 @@ class Web3Adapter implements EthAdapter {
   }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy Factory contract address')
+      throw new Error('Invalid SafeProxyFactory contract address')
     }
     const proxyFactoryContract = this.getContract(
       contractAddress,
@@ -119,12 +149,15 @@ class Web3Adapter implements EthAdapter {
     return new this.#web3.eth.Contract(abi, address, options)
   }
 
-  async getContractCode(address: string): Promise<string> {
-    return this.#web3.eth.getCode(address)
+  async getContractCode(address: string, defaultBlock?: string | number): Promise<string> {
+    const code = defaultBlock
+      ? await this.#web3.eth.getCode(address, defaultBlock)
+      : await this.#web3.eth.getCode(address)
+    return code
   }
 
-  async isContractDeployed(address: string): Promise<boolean> {
-    const contractCode = await this.#web3.eth.getCode(address)
+  async isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean> {
+    const contractCode = await this.getContractCode(address, defaultBlock)
     return contractCode !== '0x'
   }
 
@@ -194,8 +227,8 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.estimateGas(transaction, callback)
   }
 
-  call(transaction: EthAdapterTransaction): Promise<string> {
-    return this.#web3.eth.call(transaction)
+  call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string> {
+    return this.#web3.eth.call(transaction, defaultBlock)
   }
 
   encodeParameters(types: string[], values: any[]): string {

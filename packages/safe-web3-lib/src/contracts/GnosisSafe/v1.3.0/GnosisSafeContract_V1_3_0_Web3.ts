@@ -1,4 +1,4 @@
-import { GnosisSafe } from '../../../../typechain/src/web3-v1/v1.3.0/gnosis_safe'
+import { Gnosis_safe as GnosisSafe } from '../../../../typechain/src/web3-v1/v1.3.0/Gnosis_safe'
 import { SENTINEL_ADDRESS } from '../../../utils/constants'
 import GnosisSafeContractWeb3 from '../GnosisSafeContractWeb3'
 

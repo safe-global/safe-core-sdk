@@ -45,7 +45,7 @@ export interface SafeFactoryConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
-  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
@@ -56,7 +56,7 @@ interface SafeFactoryInitConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion
-  /** isL1SafeMasterCopy - Forces to use the Gnosis Safe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
@@ -207,7 +207,7 @@ class SafeFactory {
     })
     const isContractDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
     if (!isContractDeployed) {
-      throw new Error('Safe Proxy contract is not deployed on the current network')
+      throw new Error('SafeProxy contract is not deployed on the current network')
     }
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,

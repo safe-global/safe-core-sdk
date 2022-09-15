@@ -12,6 +12,7 @@ import {
 import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import {
+  getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance
@@ -19,6 +20,7 @@ import {
 import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
 import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
+import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
 import { isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
@@ -64,8 +66,12 @@ class EthersAdapter implements EthAdapter {
     return validateEip3770Address(fullAddress, chainId)
   }
 
-  async getBalance(address: string): Promise<BigNumber> {
-    return BigNumber.from(await this.#provider.getBalance(address))
+  async getBalance(address: string, blockTag?: string | number): Promise<BigNumber> {
+    return BigNumber.from(await this.#provider.getBalance(address, blockTag))
+  }
+
+  async getNonce(address: string, blockTag?: string | number): Promise<number> {
+    return this.#provider.getTransactionCount(address, blockTag)
   }
 
   async getChainId(): Promise<number> {
@@ -86,7 +92,7 @@ class EthersAdapter implements EthAdapter {
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy contract address')
+      throw new Error('Invalid SafeProxy contract address')
     }
     return getSafeContractInstance(safeVersion, contractAddress, this.#signer)
   }
@@ -101,9 +107,24 @@ class EthersAdapter implements EthAdapter {
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Multi Send contract address')
+      throw new Error('Invalid MultiSend contract address')
     }
     return getMultiSendContractInstance(safeVersion, contractAddress, this.#signer)
+  }
+
+  getMultiSendCallOnlyContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress
+  }: GetContractProps): MultiSendCallOnlyEthersContract {
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid MultiSendCallOnly contract address')
+    }
+    return getMultiSendCallOnlyContractInstance(safeVersion, contractAddress, this.#signer)
   }
 
   getSafeProxyFactoryContract({
@@ -116,17 +137,17 @@ class EthersAdapter implements EthAdapter {
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid Safe Proxy Factory contract address')
+      throw new Error('Invalid SafeProxyFactory contract address')
     }
     return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, this.#signer)
   }
 
-  async getContractCode(address: string): Promise<string> {
-    return this.#provider.getCode(address)
+  async getContractCode(address: string, blockTag?: string | number): Promise<string> {
+    return this.#provider.getCode(address, blockTag)
   }
 
-  async isContractDeployed(address: string): Promise<boolean> {
-    const contractCode = await this.#provider.getCode(address)
+  async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
+    const contractCode = await this.#provider.getCode(address, blockTag)
     return contractCode !== '0x'
   }
 
@@ -166,8 +187,8 @@ class EthersAdapter implements EthAdapter {
     return (await this.#provider.estimateGas(transaction)).toNumber()
   }
 
-  call(transaction: EthAdapterTransaction): Promise<string> {
-    return this.#provider.call(transaction)
+  call(transaction: EthAdapterTransaction, blockTag?: string | number): Promise<string> {
+    return this.#provider.call(transaction, blockTag)
   }
 
   encodeParameters(types: string[], values: any[]): string {

@@ -1,3 +1,4 @@
+import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
@@ -33,11 +34,12 @@ describe('On-chain signatures', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = await safeSdk1.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
         data: '0x'
-      })
+      }
+      const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const hash = await safeSdk1.getTransactionHash(tx)
       await chai
         .expect(safeSdk1.approveTransactionHash(hash))
@@ -53,11 +55,12 @@ describe('On-chain signatures', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = await safeSdk1.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
         data: '0x'
-      })
+      }
+      const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const txHash = await safeSdk1.getTransactionHash(tx)
       const txResponse = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse)
@@ -73,11 +76,12 @@ describe('On-chain signatures', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const tx = await safeSdk1.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
         data: '0x'
-      })
+      }
+      const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const txHash = await safeSdk1.getTransactionHash(tx)
       chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(0)
       const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
@@ -101,11 +105,12 @@ describe('On-chain signatures', () => {
       })
       const ethAdapter2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
-      const tx = await safeSdk1.createTransaction({
+      const safeTransactionData: SafeTransactionDataPartial = {
         to: safe.address,
         value: '0',
         data: '0x'
-      })
+      }
+      const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const txHash = await safeSdk1.getTransactionHash(tx)
       const ownersWhoApproved0 = await safeSdk1.getOwnersWhoApprovedTx(txHash)
       chai.expect(ownersWhoApproved0.length).to.be.eq(0)

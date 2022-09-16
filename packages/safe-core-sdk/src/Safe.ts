@@ -255,7 +255,7 @@ class Safe {
   }
 
   /**
-   * Returns the enabled Safe guard.
+   * Returns the enabled Safe guard or 0x address if no guards are enabled.
    *
    * @returns The address of the enabled Safe guard
    * @throws "Current version of the Safe does not support Safe transaction guards functionality"

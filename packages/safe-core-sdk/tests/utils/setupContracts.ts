@@ -15,7 +15,8 @@ import {
   DailyLimitModule,
   ERC20Mintable,
   SocialRecoveryModule
-} from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5'
+} from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5/v1.2.0'
+import { DebugTransactionGuard } from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import { AbiItem } from 'web3-utils'
 import {
@@ -125,4 +126,10 @@ export const getERC20Mintable = async (): Promise<ERC20Mintable> => {
   const ERC20MintableDeployment = await deployments.get('ERC20Mintable')
   const ERC20Mintable = await ethers.getContractFactory('ERC20Mintable')
   return ERC20Mintable.attach(ERC20MintableDeployment.address) as ERC20Mintable
+}
+
+export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard> => {
+  const DebugTransactionGuardDeployment = await deployments.get('DebugTransactionGuard')
+  const DebugTransactionGuard = await ethers.getContractFactory('DebugTransactionGuard')
+  return DebugTransactionGuard.attach(DebugTransactionGuardDeployment.address) as DebugTransactionGuard
 }

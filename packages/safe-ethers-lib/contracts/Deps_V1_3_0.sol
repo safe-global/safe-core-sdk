@@ -5,6 +5,7 @@ import { GnosisSafeProxyFactory } from "@gnosis.pm/safe-contracts-v1.3.0/contrac
 import { GnosisSafe } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/GnosisSafe.sol";
 import { MultiSend } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/libraries/MultiSend.sol";
 import { MultiSendCallOnly } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/libraries/MultiSendCallOnly.sol";
+import { DebugTransactionGuard } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/examples/guards/DebugTransactionGuard.sol";
 
 contract ProxyFactory_SV1_3_0 is GnosisSafeProxyFactory {}
 contract GnosisSafe_SV1_3_0 is GnosisSafe {}

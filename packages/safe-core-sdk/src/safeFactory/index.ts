@@ -187,6 +187,9 @@ class SafeFactory {
       validateSafeDeploymentConfig(safeDeploymentConfig)
     }
     const signerAddress = await this.#ethAdapter.getSignerAddress()
+    if (!signerAddress) {
+      throw new Error('EthAdapter must be initialized with a signer to use this method')
+    }
     const initializer = await this.encodeSetupCallData(safeAccountConfig)
     const saltNonce =
       safeDeploymentConfig?.saltNonce ??

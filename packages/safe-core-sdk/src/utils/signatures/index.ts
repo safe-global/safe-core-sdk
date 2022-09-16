@@ -100,6 +100,9 @@ export async function generateSignature(
   hash: string
 ): Promise<EthSignSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
+  if (!signerAddress) {
+    throw new Error('EthAdapter must be initialized with a signer to use this method')
+  }
   let signature = await ethAdapter.signMessage(hash)
   signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
   return new EthSignSignature(signerAddress, signature)
@@ -111,6 +114,9 @@ export async function generateEIP712Signature(
   methodVersion?: 'v3' | 'v4'
 ): Promise<EthSignSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
+  if (!signerAddress) {
+    throw new Error('EthAdapter must be initialized with a signer to use this method')
+  }
   let signature = await ethAdapter.signTypedData(safeTransactionEIP712Args, methodVersion)
   signature = adjustVInSignature('eth_signTypedData', signature)
   return new EthSignSignature(signerAddress, signature)

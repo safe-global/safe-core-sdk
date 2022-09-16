@@ -32,32 +32,37 @@ type Ethers = typeof ethers
 export interface EthersAdapterConfig {
   /** ethers - Ethers v5 library */
   ethers: Ethers
-  /** signer - Ethers signer */
-  signer: Signer
+  /** signerOrProvider - Ethers signer or provider */
+  signerOrProvider: Signer | Provider
 }
 
 class EthersAdapter implements EthAdapter {
   #ethers: Ethers
-  #signer: Signer
+  #signer?: Signer
   #provider: Provider
 
-  constructor({ ethers, signer }: EthersAdapterConfig) {
+  constructor({ ethers, signerOrProvider }: EthersAdapterConfig) {
     if (!ethers) {
       throw new Error('ethers property missing from options')
     }
-    if (!signer.provider) {
-      throw new Error('Signer must be connected to a provider')
-    }
-    this.#signer = signer
-    this.#provider = signer.provider
     this.#ethers = ethers
+    const isSigner = signerOrProvider instanceof Signer
+    if (isSigner) {
+      if (!signerOrProvider.provider) {
+        throw new Error('Signer must be connected to a provider')
+      }
+      this.#provider = signerOrProvider.provider
+      this.#signer = signerOrProvider
+    } else {
+      this.#provider = signerOrProvider
+    }
   }
 
   getProvider(): Provider {
     return this.#provider
   }
 
-  getSigner(): Signer {
+  getSigner(): Signer | undefined {
     return this.#signer
   }
 
@@ -98,7 +103,8 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
     }
-    return getSafeContractInstance(safeVersion, contractAddress, this.#signer)
+    const signerOrProvider = this.#signer || this.#provider
+    return getSafeContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   getMultiSendContract({
@@ -113,7 +119,8 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
     }
-    return getMultiSendContractInstance(safeVersion, contractAddress, this.#signer)
+    const signerOrProvider = this.#signer || this.#provider
+    return getMultiSendContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   getMultiSendCallOnlyContract({
@@ -128,7 +135,8 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid MultiSendCallOnly contract address')
     }
-    return getMultiSendCallOnlyContractInstance(safeVersion, contractAddress, this.#signer)
+    const signerOrProvider = this.#signer || this.#provider
+    return getMultiSendCallOnlyContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   getSafeProxyFactoryContract({
@@ -143,7 +151,8 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
-    return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, this.#signer)
+    const signerOrProvider = this.#signer || this.#provider
+    return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   getSignMessageLibContract({
@@ -195,16 +204,22 @@ class EthersAdapter implements EthAdapter {
     return this.#provider.getTransaction(transactionHash)
   }
 
-  async getSignerAddress(): Promise<string> {
-    return this.#signer.getAddress()
+  async getSignerAddress(): Promise<string | undefined> {
+    return this.#signer?.getAddress()
   }
 
   signMessage(message: string): Promise<string> {
+    if (!this.#signer) {
+      throw new Error('EthAdapter must be initialized with a signer to use this method')
+    }
     const messageArray = this.#ethers.utils.arrayify(message)
     return this.#signer.signMessage(messageArray)
   }
 
   async signTypedData(safeTransactionEIP712Args: SafeTransactionEIP712Args): Promise<string> {
+    if (!this.#signer) {
+      throw new Error('EthAdapter must be initialized with a signer to use this method')
+    }
     if (isTypedDataSigner(this.#signer)) {
       const typedData = generateTypedData(safeTransactionEIP712Args)
       const signature = await this.#signer._signTypedData(

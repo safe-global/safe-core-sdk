@@ -1,4 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer'
+import { Provider } from '@ethersproject/providers'
 import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 import { Gnosis_safe__factory as SafeMasterCopy_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/Gnosis_safe__factory'
 import { Multi_send__factory as MultiSend_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/Multi_send__factory'
@@ -24,7 +25,7 @@ import SignMessageLibContract_V1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMe
 export function getSafeContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signer: Signer
+  signerOrProvider: Signer | Provider
 ):
   | GnosisSafeContract_V1_3_0_Ethers
   | GnosisSafeContract_V1_2_0_Ethers
@@ -32,13 +33,13 @@ export function getSafeContractInstance(
   let safeContract
   switch (safeVersion) {
     case '1.3.0':
-      safeContract = SafeMasterCopy_V1_3_0.connect(contractAddress, signer)
+      safeContract = SafeMasterCopy_V1_3_0.connect(contractAddress, signerOrProvider)
       return new GnosisSafeContract_V1_3_0_Ethers(safeContract)
     case '1.2.0':
-      safeContract = SafeMasterCopy_V1_2_0.connect(contractAddress, signer)
+      safeContract = SafeMasterCopy_V1_2_0.connect(contractAddress, signerOrProvider)
       return new GnosisSafeContract_V1_2_0_Ethers(safeContract)
     case '1.1.1':
-      safeContract = SafeMasterCopy_V1_1_1.connect(contractAddress, signer)
+      safeContract = SafeMasterCopy_V1_1_1.connect(contractAddress, signerOrProvider)
       return new GnosisSafeContract_V1_1_1_Ethers(safeContract)
     default:
       throw new Error('Invalid Safe version')
@@ -48,16 +49,16 @@ export function getSafeContractInstance(
 export function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signer: Signer
+  signerOrProvider: Signer | Provider
 ): MultiSendContract_V1_3_0_Ethers | MultiSendContract_V1_1_1_Ethers {
   let multiSendContract
   switch (safeVersion) {
     case '1.3.0':
-      multiSendContract = MultiSend_V1_3_0.connect(contractAddress, signer)
+      multiSendContract = MultiSend_V1_3_0.connect(contractAddress, signerOrProvider)
       return new MultiSendContract_V1_3_0_Ethers(multiSendContract)
     case '1.2.0':
     case '1.1.1':
-      multiSendContract = MultiSend_V1_1_1.connect(contractAddress, signer)
+      multiSendContract = MultiSend_V1_1_1.connect(contractAddress, signerOrProvider)
       return new MultiSendContract_V1_1_1_Ethers(multiSendContract)
     default:
       throw new Error('Invalid Safe version')
@@ -67,14 +68,14 @@ export function getMultiSendContractInstance(
 export function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signer: Signer
+  signerOrProvider: Signer | Provider
 ): MultiSendCallOnlyContract_V1_3_0_Ethers {
   let multiSendCallOnlyContract
   switch (safeVersion) {
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
-      multiSendCallOnlyContract = MultiSendCallOnly_V1_3_0.connect(contractAddress, signer)
+      multiSendCallOnlyContract = MultiSendCallOnly_V1_3_0.connect(contractAddress, signerOrProvider)
       return new MultiSendCallOnlyContract_V1_3_0_Ethers(multiSendCallOnlyContract)
     default:
       throw new Error('Invalid Safe version')
@@ -84,16 +85,16 @@ export function getMultiSendCallOnlyContractInstance(
 export function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signer: Signer
+  signerOrProvider: Signer | Provider
 ): GnosisSafeProxyFactoryContract_V1_3_0_Ethers | GnosisSafeProxyFactoryContract_V1_1_1_Ethers {
   let gnosisSafeProxyFactoryContract
   switch (safeVersion) {
     case '1.3.0':
-      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_3_0.connect(contractAddress, signer)
+      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_3_0.connect(contractAddress, signerOrProvider)
       return new GnosisSafeProxyFactoryContract_V1_3_0_Ethers(gnosisSafeProxyFactoryContract)
     case '1.2.0':
     case '1.1.1':
-      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_1_1.connect(contractAddress, signer)
+      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_1_1.connect(contractAddress, signerOrProvider)
       return new GnosisSafeProxyFactoryContract_V1_1_1_Ethers(gnosisSafeProxyFactoryContract)
     default:
       throw new Error('Invalid Safe version')

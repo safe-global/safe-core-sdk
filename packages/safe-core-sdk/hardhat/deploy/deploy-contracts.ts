@@ -85,6 +85,12 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     args: [],
     log: true
   })
+
+  await deploy('DebugTransactionGuard', {
+    from: deployer,
+    args: [],
+    log: true
+  })
 }
 
 export default deploy

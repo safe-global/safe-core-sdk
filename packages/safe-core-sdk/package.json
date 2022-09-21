@@ -88,6 +88,7 @@
     }
   },
   "dependencies": {
+    "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/solidity": "^5.7.0",
     "@gnosis.pm/safe-core-sdk-types": "^1.5.0",
     "@gnosis.pm/safe-deployments": "1.16.0",

@@ -217,7 +217,7 @@ describe('Safe modules manager', () => {
         contractNetworks
       })
       const tx = safeSdk.createDisableModuleTx(dailyLimitModule.address)
-      await chai.expect(tx).to.be.rejectedWith('Module provided is not enabled already')
+      await chai.expect(tx).to.be.rejectedWith('Module provided is not enabled yet')
     })
 
     it('should build the transaction with the optional props', async () => {

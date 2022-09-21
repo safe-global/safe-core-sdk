@@ -6,7 +6,7 @@ about: Suggest an idea or feature request for the Safe Core SDK
 ## Prerequisites
 
 - First, many thanks for taking part in the community and helping us improve. We appreciate that a lot.
-- Support questions are better asked in our Discord chat: https://discord.com/channels/477106835862716416/477391201708802058
+- Support questions are better asked in our Discord chat: https://chat.gnosis-safe.io/
 - Please ensure the issue isn't already reported.
 
 *Please delete the above section and the instructions in the sections below before submitting*

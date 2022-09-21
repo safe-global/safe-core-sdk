@@ -16,7 +16,7 @@
       "packages/*"
     ]
   },
-  "author": "Gnosis Safe (https://gnosis-safe.io)",
+  "author": "Safe (https://safe.global)",
   "license": "MIT",
   "devDependencies": {
     "lerna": "^4.0.0",

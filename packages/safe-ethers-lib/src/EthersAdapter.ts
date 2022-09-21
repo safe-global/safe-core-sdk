@@ -151,6 +151,12 @@ class EthersAdapter implements EthAdapter {
     return contractCode !== '0x'
   }
 
+  async getStorageAt(address: string, position: string): Promise<string> {
+    const content = await this.#provider.getStorageAt(address, position)
+    const decodedContent = this.decodeParameters(['address'], content)
+    return decodedContent[0]
+  }
+
   async getTransaction(transactionHash: string): Promise<TransactionResponse> {
     return this.#provider.getTransaction(transactionHash)
   }
@@ -185,8 +191,12 @@ class EthersAdapter implements EthAdapter {
     return this.#provider.call(transaction, blockTag)
   }
 
-  encodeParameters(types: string[], values: any[]) {
+  encodeParameters(types: string[], values: any[]): string {
     return new this.#ethers.utils.AbiCoder().encode(types, values)
+  }
+
+  decodeParameters(types: string[], values: string): { [key: string]: any } {
+    return new this.#ethers.utils.AbiCoder().decode(types, values)
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-core-sdk-types",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Safe Core SDK types",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -20,7 +20,7 @@
     "type": "git",
     "url": "git+https://github.com/safe-global/safe-core-sdk.git"
   },
-  "author": "Gnosis Safe (https://gnosis-safe.io)",
+  "author": "Safe (https://safe.global)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/safe-global/safe-core-sdk/issues"

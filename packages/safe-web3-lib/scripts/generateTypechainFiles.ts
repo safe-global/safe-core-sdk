@@ -29,12 +29,16 @@ const safeContracts_V1_1_1 = [
 ].join(' ')
 
 // Won't be included in dist/ folder
-const safeContractsTestPath = '../../node_modules/@gnosis.pm/safe-contracts-v1.2.0/build/contracts'
+const safeContractsTestV1_2_0Path = '../../node_modules/@gnosis.pm/safe-contracts-v1.2.0/build/contracts'
 const openZeppelinContractsPath = '../../node_modules/openzeppelin-solidity/build/contracts'
-const testContracts = [
-  `${safeContractsTestPath}/DailyLimitModule.json`,
-  `${safeContractsTestPath}/SocialRecoveryModule.json`,
+const testContracts_V1_2_0 = [
+  `${safeContractsTestV1_2_0Path}/DailyLimitModule.json`,
+  `${safeContractsTestV1_2_0Path}/SocialRecoveryModule.json`,
   `${openZeppelinContractsPath}/ERC20Mintable.json`
+].join(' ')
+const safeContractsTestV1_3_0Path = '../../node_modules/@gnosis.pm/safe-contracts-v1.3.0/build/artifacts/contracts'
+const testContracts_V1_3_0 = [
+  `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`,
 ].join(' ')
 
 // Remove existing Typechain files
@@ -89,4 +93,5 @@ moveTypechainFiles(
 )
 
 // Tests: Web3 V1 types
-generateTypechainFiles(web3V1, `${outDirTests}${web3V1}`, testContracts)
+generateTypechainFiles(web3V1, `${outDirTests}${web3V1}/v1.2.0`, testContracts_V1_2_0)
+generateTypechainFiles(web3V1, `${outDirTests}${web3V1}/v1.3.0`, testContracts_V1_3_0)

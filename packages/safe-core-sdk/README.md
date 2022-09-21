@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with the [Gnosis Safe contracts](https://github.com/safe-global/safe-contracts).
+Software development kit that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts).
 
 ## Table of contents
 * [Installation](#installation)
@@ -35,7 +35,7 @@ npm build
 
 ## <a name="getting-started">Getting Started</a>
 
-The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Gnosis Safe Web App](https://gnosis-safe.io/app/), it is recommended that you follow this other [guide](/guides/integrating-the-safe-core-sdk.md) that covers the use of the Safe Core SDK, combined with the Safe Service Client.
+The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Safe Web App](https://gnosis-safe.io/app/), it is recommended that you follow this other [guide](/packages/guides/integrating-the-safe-core-sdk.md) that covers the use of the Safe Core SDK, combined with the Safe Service Client.
 
 ### 1. Instantiate an EthAdapter
 
@@ -355,7 +355,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 Returns the address of the current SafeProxy contract.
 
 ```js
-const address = safeSdk.getAddress()
+const safeAddress = safeSdk.getAddress()
 ```
 
 ### getContractVersion
@@ -371,7 +371,7 @@ const contractVersion = await safeSdk.getContractVersion()
 Returns the list of Safe owner accounts.
 
 ```js
-const owners = await safeSdk.getOwners()
+const ownerAddresses = await safeSdk.getOwners()
 ```
 
 ### getNonce
@@ -406,12 +406,20 @@ Returns the ETH balance of the Safe.
 const balance = await safeSdk.getBalance()
 ```
 
+### getGuard
+
+Returns the enabled Safe guard or 0x address if no guards are enabled.
+
+```js
+const guardAddress = await safeSdk.getGuard()
+```
+
 ### getModules
 
 Returns the list of addresses of all the enabled Safe modules.
 
 ```js
-const modules = await safeSdk.getModules()
+const moduleAddresses = await safeSdk.getModules()
 ```
 
 ### isModuleEnabled
@@ -648,15 +656,15 @@ const safeTransactionData: SafeTransactionDataPartial = {
 }
 const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
-const owners = await safeSdk.getOwnersWhoApprovedTx(txHash)
+const ownerAddresses = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
 
-### createEnableModuleTx
+### createEnableGuardTx
 
-Returns a Safe transaction ready to be signed that will enable a Safe module.
+Returns the Safe transaction to enable a Safe guard.
 
 ```js
-const safeTransaction = await safeSdk.createEnableModuleTx(moduleAddress)
+const safeTransaction = await safeSdk.createEnableGuardTx(guardAddress)
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```
@@ -672,6 +680,40 @@ const options: SafeTransactionOptionalProps = {
   refundReceiver, // Optional
   nonce // Optional
 }
+const safeTransaction = await safeSdk.createEnableGuardTx(guardAddress, options)
+```
+
+### createDisableGuardTx
+
+Returns the Safe transaction to disable a Safe guard.
+
+```js
+const safeTransaction = await safeSdk.createDisableGuardTx()
+const txResponse = await safeSdk.executeTransaction(safeTransaction)
+await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.createDisableGuardTx(options)
+```
+
+### createEnableModuleTx
+
+Returns a Safe transaction ready to be signed that will enable a Safe module.
+
+```js
+const safeTransaction = await safeSdk.createEnableModuleTx(moduleAddress)
+const txResponse = await safeSdk.executeTransaction(safeTransaction)
+await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = { ... }
 const safeTransaction = await safeSdk.createEnableModuleTx(moduleAddress, options)
 ```
 

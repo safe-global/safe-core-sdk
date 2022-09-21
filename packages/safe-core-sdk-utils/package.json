@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-core-sdk-utils",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Safe Core SDK Utilities",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -22,7 +22,7 @@
     "type": "git",
     "url": "git+https://github.com/safe-global/safe-core-sdk.git"
   },
-  "author": "Gnosis Safe (https://gnosis-safe.io)",
+  "author": "Safe (https://safe.global)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/safe-global/safe-core-sdk/issues"
@@ -52,7 +52,7 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk-types": "^1.5.0",
+    "@gnosis.pm/safe-core-sdk-types": "^1.6.0",
     "semver": "^7.3.7",
     "web3-utils": "^1.7.5"
   }

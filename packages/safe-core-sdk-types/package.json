@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/safe-core-sdk-types",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Safe Core SDK types",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

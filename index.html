@@ -17,7 +17,7 @@
 <p><a href="https://badge.fury.io/js/%40gnosis.pm%2Fsafe-core-sdk"><img src="https://badge.fury.io/js/%40gnosis.pm%2Fsafe-core-sdk.svg" alt="NPM Version"></a>
 <a href="https://github.com/safe-global/safe-core-sdk/releases"><img src="https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat" alt="GitHub Release"></a>
 <a href="https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/safe-global/safe-core-sdk" alt="GitHub"></a></p>
-<p>Software development kit that facilitates the interaction with the <a href="https://github.com/safe-global/safe-contracts">Gnosis Safe contracts</a>.</p>
+<p>Software development kit that facilitates the interaction with the <a href="https://github.com/safe-global/safe-contracts">Safe contracts</a>.</p>
 
 <a href="#table-of-contents" id="table-of-contents" style="color: inherit; text-decoration: none;">
   <h2>Table of contents</h2>
@@ -49,7 +49,7 @@
 <a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
   <h2><a name="getting-started">Getting Started</a></h2>
 </a>
-<p>The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the <a href="https://gnosis-safe.io/app/">Gnosis Safe Web App</a>, it is recommended that you follow this other <a href="/guides/integrating-the-safe-core-sdk.md">guide</a> that covers the use of the Safe Core SDK, combined with the Safe Service Client.</p>
+<p>The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the <a href="https://gnosis-safe.io/app/">Safe Web App</a>, it is recommended that you follow this other <a href="/packages/guides/integrating-the-safe-core-sdk.md">guide</a> that covers the use of the Safe Core SDK, combined with the Safe Service Client.</p>
 
 <a href="#1-instantiate-an-ethadapter" id="1-instantiate-an-ethadapter" style="color: inherit; text-decoration: none;">
   <h3>1. Instantiate an EthAdapter</h3>
@@ -205,7 +205,7 @@
   <h3>getAddress</h3>
 </a>
 <p>Returns the address of the current SafeProxy contract.</p>
-<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">address</span><span class="hl-0"> = </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getAddress</span><span class="hl-0">()</span>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeAddress</span><span class="hl-0"> = </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getAddress</span><span class="hl-0">()</span>
 </code></pre>
 
 <a href="#getcontractversion" id="getcontractversion" style="color: inherit; text-decoration: none;">
@@ -219,7 +219,7 @@
   <h3>getOwners</h3>
 </a>
 <p>Returns the list of Safe owner accounts.</p>
-<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">owners</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getOwners</span><span class="hl-0">()</span>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">ownerAddresses</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getOwners</span><span class="hl-0">()</span>
 </code></pre>
 
 <a href="#getnonce" id="getnonce" style="color: inherit; text-decoration: none;">
@@ -250,11 +250,18 @@
 <pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">balance</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getBalance</span><span class="hl-0">()</span>
 </code></pre>
 
+<a href="#getguard" id="getguard" style="color: inherit; text-decoration: none;">
+  <h3>getGuard</h3>
+</a>
+<p>Returns the enabled Safe guard or 0x address if no guards are enabled.</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">guardAddress</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getGuard</span><span class="hl-0">()</span>
+</code></pre>
+
 <a href="#getmodules" id="getmodules" style="color: inherit; text-decoration: none;">
   <h3>getModules</h3>
 </a>
 <p>Returns the list of addresses of all the enabled Safe modules.</p>
-<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">modules</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getModules</span><span class="hl-0">()</span>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">moduleAddresses</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getModules</span><span class="hl-0">()</span>
 </code></pre>
 
 <a href="#ismoduleenabled" id="ismoduleenabled" style="color: inherit; text-decoration: none;">
@@ -363,7 +370,27 @@
   <h3>getOwnersWhoApprovedTx</h3>
 </a>
 <p>Returns a list of owners who have approved a specific Safe transaction.</p>
-<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransactionData</span><span class="hl-0">: </span><span class="hl-8">SafeTransactionDataPartial</span><span class="hl-0"> = {</span><br/><span class="hl-0">  </span><span class="hl-9">// ...</span><br/><span class="hl-0">}</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> =  </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createTransaction</span><span class="hl-0">({ </span><span class="hl-2">safeTransactionData</span><span class="hl-0"> })</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">txHash</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getTransactionHash</span><span class="hl-0">(</span><span class="hl-2">safeTransaction</span><span class="hl-0">)</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">owners</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getOwnersWhoApprovedTx</span><span class="hl-0">(</span><span class="hl-2">txHash</span><span class="hl-0">)</span>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransactionData</span><span class="hl-0">: </span><span class="hl-8">SafeTransactionDataPartial</span><span class="hl-0"> = {</span><br/><span class="hl-0">  </span><span class="hl-9">// ...</span><br/><span class="hl-0">}</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> =  </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createTransaction</span><span class="hl-0">({ </span><span class="hl-2">safeTransactionData</span><span class="hl-0"> })</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">txHash</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getTransactionHash</span><span class="hl-0">(</span><span class="hl-2">safeTransaction</span><span class="hl-0">)</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">ownerAddresses</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">getOwnersWhoApprovedTx</span><span class="hl-0">(</span><span class="hl-2">txHash</span><span class="hl-0">)</span>
+</code></pre>
+
+<a href="#createenableguardtx" id="createenableguardtx" style="color: inherit; text-decoration: none;">
+  <h3>createEnableGuardTx</h3>
+</a>
+<p>Returns the Safe transaction to enable a Safe guard.</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createEnableGuardTx</span><span class="hl-0">(</span><span class="hl-2">guardAddress</span><span class="hl-0">)</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">txResponse</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">executeTransaction</span><span class="hl-0">(</span><span class="hl-2">safeTransaction</span><span class="hl-0">)</span><br/><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">txResponse</span><span class="hl-0">.</span><span class="hl-2">transactionResponse</span><span class="hl-0">?.</span><span class="hl-6">wait</span><span class="hl-0">()</span>
+</code></pre>
+<p>This method can optionally receive the <code>options</code> parameter:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">options</span><span class="hl-0">: </span><span class="hl-8">SafeTransactionOptionalProps</span><span class="hl-0"> = {</span><br/><span class="hl-0">  </span><span class="hl-2">safeTxGas</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">baseGas</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">gasPrice</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">gasToken</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">refundReceiver</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">nonce</span><span class="hl-0"> </span><span class="hl-9">// Optional</span><br/><span class="hl-0">}</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createEnableGuardTx</span><span class="hl-0">(</span><span class="hl-2">guardAddress</span><span class="hl-0">, </span><span class="hl-2">options</span><span class="hl-0">)</span>
+</code></pre>
+
+<a href="#createdisableguardtx" id="createdisableguardtx" style="color: inherit; text-decoration: none;">
+  <h3>createDisableGuardTx</h3>
+</a>
+<p>Returns the Safe transaction to disable a Safe guard.</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createDisableGuardTx</span><span class="hl-0">()</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">txResponse</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">executeTransaction</span><span class="hl-0">(</span><span class="hl-2">safeTransaction</span><span class="hl-0">)</span><br/><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">txResponse</span><span class="hl-0">.</span><span class="hl-2">transactionResponse</span><span class="hl-0">?.</span><span class="hl-6">wait</span><span class="hl-0">()</span>
+</code></pre>
+<p>This method can optionally receive the <code>options</code> parameter:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">options</span><span class="hl-0">: </span><span class="hl-8">SafeTransactionOptionalProps</span><span class="hl-0"> = { ... }</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createDisableGuardTx</span><span class="hl-0">(</span><span class="hl-2">options</span><span class="hl-0">)</span>
 </code></pre>
 
 <a href="#createenablemoduletx" id="createenablemoduletx" style="color: inherit; text-decoration: none;">
@@ -373,7 +400,7 @@
 <pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createEnableModuleTx</span><span class="hl-0">(</span><span class="hl-2">moduleAddress</span><span class="hl-0">)</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">txResponse</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">executeTransaction</span><span class="hl-0">(</span><span class="hl-2">safeTransaction</span><span class="hl-0">)</span><br/><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">txResponse</span><span class="hl-0">.</span><span class="hl-2">transactionResponse</span><span class="hl-0">?.</span><span class="hl-6">wait</span><span class="hl-0">()</span>
 </code></pre>
 <p>This method can optionally receive the <code>options</code> parameter:</p>
-<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">options</span><span class="hl-0">: </span><span class="hl-8">SafeTransactionOptionalProps</span><span class="hl-0"> = {</span><br/><span class="hl-0">  </span><span class="hl-2">safeTxGas</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">baseGas</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">gasPrice</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">gasToken</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">refundReceiver</span><span class="hl-0">, </span><span class="hl-9">// Optional</span><br/><span class="hl-0">  </span><span class="hl-2">nonce</span><span class="hl-0"> </span><span class="hl-9">// Optional</span><br/><span class="hl-0">}</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createEnableModuleTx</span><span class="hl-0">(</span><span class="hl-2">moduleAddress</span><span class="hl-0">, </span><span class="hl-2">options</span><span class="hl-0">)</span>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">options</span><span class="hl-0">: </span><span class="hl-8">SafeTransactionOptionalProps</span><span class="hl-0"> = { ... }</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">safeTransaction</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">safeSdk</span><span class="hl-0">.</span><span class="hl-6">createEnableModuleTx</span><span class="hl-0">(</span><span class="hl-2">moduleAddress</span><span class="hl-0">, </span><span class="hl-2">options</span><span class="hl-0">)</span>
 </code></pre>
 
 <a href="#createdisablemoduletx" id="createdisablemoduletx" style="color: inherit; text-decoration: none;">

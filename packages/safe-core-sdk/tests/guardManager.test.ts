@@ -48,17 +48,20 @@ describe('Safe guards manager', () => {
       }
     )
 
-    itif(safeVersionDeployed >= '1.3.0')('should return 0x address when no Safe guard is enabled', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
-        safeAddress: safe.address,
-        contractNetworks
-      })
-      chai.expect(await safeSdk.getGuard()).to.be.eq(ZERO_ADDRESS)
-    })
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should return 0x address when no Safe guard is enabled',
+      async () => {
+        const { safe, accounts, contractNetworks } = await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        chai.expect(await safeSdk.getGuard()).to.be.eq(ZERO_ADDRESS)
+      }
+    )
 
     itif(safeVersionDeployed >= '1.3.0')('should return the enabled Safe guard', async () => {
       const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()

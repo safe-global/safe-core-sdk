@@ -131,5 +131,7 @@ export const getERC20Mintable = async (): Promise<ERC20Mintable> => {
 export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard> => {
   const DebugTransactionGuardDeployment = await deployments.get('DebugTransactionGuard')
   const DebugTransactionGuard = await ethers.getContractFactory('DebugTransactionGuard')
-  return DebugTransactionGuard.attach(DebugTransactionGuardDeployment.address) as DebugTransactionGuard
+  return DebugTransactionGuard.attach(
+    DebugTransactionGuardDeployment.address
+  ) as DebugTransactionGuard
 }

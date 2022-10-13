@@ -43,8 +43,8 @@ describe('getMultisigTransactions', () => {
     const safeMultisigTransactionListResponse = await serviceSdk.getMultisigTransactions(
       safeAddress
     )
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(9)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(9)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(10)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(10)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })
@@ -56,8 +56,8 @@ describe('getMultisigTransactions', () => {
     const safeMultisigTransactionListResponse = await serviceSdk.getMultisigTransactions(
       eip3770SafeAddress
     )
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(9)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(9)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(10)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(10)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })

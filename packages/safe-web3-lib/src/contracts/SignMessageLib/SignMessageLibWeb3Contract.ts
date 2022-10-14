@@ -44,4 +44,4 @@ abstract class SignMessageLibWeb3Contract implements SignMessageLibContract {
   }
 }
 
-export default SignMessageLibWebContract
+export default SignMessageLibWeb3Contract

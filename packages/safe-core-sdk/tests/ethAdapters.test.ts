@@ -3,6 +3,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import {
+  getCreateCallContractDeployment,
   getMultiSendCallOnlyContractDeployment,
   getMultiSendContractDeployment,
   getSafeContractDeployment,
@@ -10,6 +11,7 @@ import {
 } from '../src/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
+  getCreateCall,
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
@@ -213,6 +215,42 @@ describe('Safe contracts', () => {
       chai
         .expect(await factoryContract.getAddress())
         .to.be.eq((await getFactory()).contract.address)
+    })
+  })
+
+  describe('getCreateCallContract', async () => {
+    it('should return a CreateCall contract from safe-deployments', async () => {
+      const { accounts } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const chainId = 1
+      const singletonDeployment = getCreateCallContractDeployment(safeVersion, chainId)
+      const createCallContract = await ethAdapter.getCreateCallContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
+      })
+      chai
+        .expect(await createCallContract.getAddress())
+        .to.be.eq('0x7cbB62EaA69F79e6873cD1ecB2392971036cFAa4')
+    })
+
+    it('should return a SafeProxyFactory contract from the custom addresses', async () => {
+      const { accounts, contractNetworks, chainId } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const customContract = contractNetworks[chainId]
+      const createCallContract = await ethAdapter.getCreateCallContract({
+        safeVersion,
+        chainId,
+        customContractAddress: customContract.createCallAddress,
+        customContractAbi: customContract.createCallAbi
+      })
+      chai
+        .expect(await createCallContract.getAddress())
+        .to.be.eq((await getCreateCall()).contract.address)
     })
   })
 })

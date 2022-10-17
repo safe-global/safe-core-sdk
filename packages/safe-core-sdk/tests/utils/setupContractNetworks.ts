@@ -1,5 +1,11 @@
 import { ContractNetworksConfig } from '../../src'
-import { getFactory, getMultiSend, getMultiSendCallOnly, getSafeSingleton } from './setupContracts'
+import {
+  getCreateCall,
+  getFactory,
+  getMultiSend,
+  getMultiSendCallOnly,
+  getSafeSingleton
+} from './setupContracts'
 
 export async function getContractNetworks(chainId: number): Promise<ContractNetworksConfig> {
   return {
@@ -11,7 +17,9 @@ export async function getContractNetworks(chainId: number): Promise<ContractNetw
       safeMasterCopyAddress: (await getSafeSingleton()).contract.address,
       safeMasterCopyAbi: (await getSafeSingleton()).abi,
       safeProxyFactoryAddress: (await getFactory()).contract.address,
-      safeProxyFactoryAbi: (await getFactory()).abi
+      safeProxyFactoryAbi: (await getFactory()).abi,
+      createCallAddress: (await getCreateCall()).contract.address,
+      createCallAbi: (await getCreateCall()).abi
     }
   }
 }

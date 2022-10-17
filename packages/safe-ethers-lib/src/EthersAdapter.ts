@@ -10,8 +10,10 @@ import {
   SafeTransactionEIP712Args
 } from '@gnosis.pm/safe-core-sdk-types'
 import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+import CreateCallEthersContract from 'contracts/CreateCall/CreateCallEthersContract'
 import { ethers } from 'ethers'
 import {
+  getCreateCallContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance,
@@ -140,6 +142,21 @@ class EthersAdapter implements EthAdapter {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
     return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, this.#signer)
+  }
+
+  getCreateCallContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress
+  }: GetContractProps): CreateCallEthersContract {
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid CreateCall contract address')
+    }
+    return getCreateCallContractInstance(safeVersion, contractAddress, this.#signer)
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {

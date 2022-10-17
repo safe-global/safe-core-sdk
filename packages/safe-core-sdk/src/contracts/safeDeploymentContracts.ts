@@ -1,4 +1,5 @@
 import {
+  CreateCallContract,
   EthAdapter,
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
@@ -8,6 +9,7 @@ import {
 } from '@gnosis.pm/safe-core-sdk-types'
 import {
   DeploymentFilter,
+  getCreateCallDeployment,
   getMultiSendCallOnlyDeployment,
   getMultiSendDeployment,
   getProxyFactoryDeployment,
@@ -65,6 +67,14 @@ export function getSafeProxyFactoryContractDeployment(
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeProxyFactoryVersion
   return getProxyFactoryDeployment({ version, network: chainId.toString(), released: true })
+}
+
+export function getCreateCallContractDeployment(
+  safeVersion: SafeVersion,
+  chainId: number
+): SingletonDeployment | undefined {
+  const version = safeDeploymentsVersions[safeVersion].createCallVersion
+  return getCreateCallDeployment({ version, network: chainId.toString(), released: true })
 }
 
 export async function getSafeContract({
@@ -155,4 +165,25 @@ export async function getMultiSendCallOnlyContract({
     throw new Error('MultiSendCallOnly contract is not deployed on the current network')
   }
   return multiSendCallOnlyContract
+}
+
+export async function getCreateCallContract({
+  ethAdapter,
+  safeVersion,
+  chainId,
+  customContracts
+}: GetContractInstanceProps): Promise<CreateCallContract> {
+  const createCallDeployment = getCreateCallContractDeployment(safeVersion, chainId)
+  const createCallContract = await ethAdapter.getCreateCallContract({
+    safeVersion,
+    chainId,
+    singletonDeployment: createCallDeployment,
+    customContractAddress: customContracts?.multiSendAddress,
+    customContractAbi: customContracts?.multiSendAbi
+  })
+  const isContractDeployed = await ethAdapter.isContractDeployed(createCallContract.getAddress())
+  if (!isContractDeployed) {
+    throw new Error('CreateCall contract is not deployed on the current network')
+  }
+  return createCallContract
 }

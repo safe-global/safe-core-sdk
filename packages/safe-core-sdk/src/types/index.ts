@@ -17,6 +17,10 @@ export interface ContractNetworkConfig {
   safeProxyFactoryAddress: string
   /** safeProxyFactoryAbi - Abi of the GnosisSafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAbi?: AbiItem | AbiItem[]
+  /** createCallAddress - Address of the CreateCall contract deployed on a specific network */
+  createCallAddress: string
+  /** createCallAbi - Abi of the CreateCall contract deployed on a specific network */
+  createCallAbi?: AbiItem | AbiItem[]
 }
 
 export interface ContractNetworksConfig {

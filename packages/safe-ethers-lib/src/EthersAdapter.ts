@@ -10,19 +10,21 @@ import {
   SafeTransactionEIP712Args
 } from '@gnosis.pm/safe-core-sdk-types'
 import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
-import CreateCallEthersContract from 'contracts/CreateCall/CreateCallEthersContract'
 import { ethers } from 'ethers'
 import {
   getCreateCallContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance,
-  getSafeProxyFactoryContractInstance
+  getSafeProxyFactoryContractInstance,
+  getSignMessageLibContractInstance
 } from './contracts/contractInstancesEthers'
+import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
 import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
 import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
+import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
 import { isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
@@ -142,6 +144,21 @@ class EthersAdapter implements EthAdapter {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
     return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, this.#signer)
+  }
+
+  getSignMessageLibContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress
+  }: GetContractProps): SignMessageLibEthersContract {
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SignMessageLib contract address')
+    }
+    return getSignMessageLibContractInstance(safeVersion, contractAddress, this.#signer)
   }
 
   getCreateCallContract({

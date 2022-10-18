@@ -7,7 +7,6 @@ import {
   SafeTransactionEIP712Args
 } from '@gnosis.pm/safe-core-sdk-types'
 import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
-import CreateCallWeb3Contract from 'contracts/CreateCall/CreateCallWeb3Contract'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
@@ -18,12 +17,15 @@ import {
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
-  getSafeContractInstance
+  getSafeContractInstance,
+  getSignMessageLibContractInstance
 } from './contracts/contractInstancesWeb3'
+import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
 import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
 import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
 import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
+import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -145,6 +147,24 @@ class Web3Adapter implements EthAdapter {
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
     return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+  }
+
+  getSignMessageLibContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): SignMessageLibWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SignMessageLib contract address')
+    }
+    const signMessageLibContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getSignMessageLibContractInstance(safeVersion, signMessageLibContract)
   }
 
   getCreateCallContract({

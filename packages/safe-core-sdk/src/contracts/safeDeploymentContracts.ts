@@ -15,6 +15,7 @@ import {
   getProxyFactoryDeployment,
   getSafeL2SingletonDeployment,
   getSafeSingletonDeployment,
+  getSignMessageLibDeployment,
   SingletonDeployment
 } from '@gnosis.pm/safe-deployments'
 import { ContractNetworkConfig } from '../types'
@@ -67,6 +68,14 @@ export function getSafeProxyFactoryContractDeployment(
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeProxyFactoryVersion
   return getProxyFactoryDeployment({ version, network: chainId.toString(), released: true })
+}
+
+export function getSignMessageLibContractDeployment(
+  safeVersion: SafeVersion,
+  chainId: number
+): SingletonDeployment | undefined {
+  const version = safeDeploymentsVersions[safeVersion].signMessageLibVersion
+  return getSignMessageLibDeployment({ version, network: chainId.toString(), released: true })
 }
 
 export function getCreateCallContractDeployment(
@@ -165,6 +174,29 @@ export async function getMultiSendCallOnlyContract({
     throw new Error('MultiSendCallOnly contract is not deployed on the current network')
   }
   return multiSendCallOnlyContract
+}
+
+export async function getSignMessageLibContract({
+  ethAdapter,
+  safeVersion,
+  chainId,
+  customContracts
+}: GetContractInstanceProps): Promise<CreateCallContract> {
+  const signMessageLibDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
+  const signMessageLibContract = await ethAdapter.getSignMessageLibContract({
+    safeVersion,
+    chainId,
+    singletonDeployment: signMessageLibDeployment,
+    customContractAddress: customContracts?.multiSendAddress,
+    customContractAbi: customContracts?.multiSendAbi
+  })
+  const isContractDeployed = await ethAdapter.isContractDeployed(
+    signMessageLibContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('SignMessageLib contract is not deployed on the current network')
+  }
+  return signMessageLibContract
 }
 
 export async function getCreateCallContract({

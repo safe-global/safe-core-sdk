@@ -10,7 +10,8 @@ import {
   Gnosis_safe as GnosisSafe_V1_3_0,
   Multi_send as MultiSend_V1_3_0,
   Multi_send_call_only as MultiSendCallOnly_V1_3_0,
-  Proxy_factory as ProxyFactory_V1_3_0
+  Proxy_factory as ProxyFactory_V1_3_0,
+  Sign_message_lib as SignMessageLib_V1_3_0
 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/'
 import {
   DailyLimitModule,
@@ -25,7 +26,8 @@ import {
   gnosisSafeDeployed,
   multiSendCallOnlyDeployed,
   multiSendDeployed,
-  proxyFactoryDeployed
+  proxyFactoryDeployed,
+  signMessageLibDeployed
 } from '../../hardhat/deploy/deploy-contracts'
 
 export const getSafeSingleton = async (): Promise<{
@@ -109,6 +111,18 @@ export const getMultiSendCallOnly = async (): Promise<{
       MultiSendCallOnlyDeployment.address
     ) as MultiSendCallOnly_V1_3_0,
     abi: MultiSendCallOnlyDeployment.abi
+  }
+}
+
+export const getSignMessageLib = async (): Promise<{
+  contract: SignMessageLib_V1_3_0
+  abi: AbiItem | AbiItem[]
+}> => {
+  const SignMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
+  const SignMessageLib = await ethers.getContractFactory(signMessageLibDeployed.name)
+  return {
+    contract: SignMessageLib.attach(SignMessageLibDeployment.address) as SignMessageLib_V1_3_0,
+    abi: SignMessageLibDeployment.abi
   }
 }
 

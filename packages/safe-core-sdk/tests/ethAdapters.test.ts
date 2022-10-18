@@ -7,7 +7,8 @@ import {
   getMultiSendCallOnlyContractDeployment,
   getMultiSendContractDeployment,
   getSafeContractDeployment,
-  getSafeProxyFactoryContractDeployment
+  getSafeProxyFactoryContractDeployment,
+  getSignMessageLibContractDeployment
 } from '../src/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
@@ -15,7 +16,8 @@ import {
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
-  getSafeSingleton
+  getSafeSingleton,
+  getSignMessageLib
 } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -215,6 +217,42 @@ describe('Safe contracts', () => {
       chai
         .expect(await factoryContract.getAddress())
         .to.be.eq((await getFactory()).contract.address)
+    })
+  })
+
+  describe('getSignMessageLibContract', async () => {
+    it('should return a SignMessageLib contract from safe-deployments', async () => {
+      const { accounts } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const chainId = 1
+      const singletonDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
+      const signMessageLibContract = await ethAdapter.getSignMessageLibContract({
+        safeVersion,
+        chainId,
+        singletonDeployment
+      })
+      chai
+        .expect(await signMessageLibContract.getAddress())
+        .to.be.eq('0xA65387F16B013cf2Af4605Ad8aA5ec25a2cbA3a2')
+    })
+
+    it('should return a SignMessageLib contract from the custom addresses', async () => {
+      const { accounts, contractNetworks, chainId } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const customContract = contractNetworks[chainId]
+      const signMessageLibContract = await ethAdapter.getSignMessageLibContract({
+        safeVersion,
+        chainId,
+        customContractAddress: customContract.signMessageLibAddress,
+        customContractAbi: customContract.signMessageLibAbi
+      })
+      chai
+        .expect(await signMessageLibContract.getAddress())
+        .to.be.eq((await getSignMessageLib()).contract.address)
     })
   })
 

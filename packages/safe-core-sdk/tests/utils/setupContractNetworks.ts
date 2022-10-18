@@ -4,7 +4,8 @@ import {
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
-  getSafeSingleton
+  getSafeSingleton,
+  getSignMessageLib
 } from './setupContracts'
 
 export async function getContractNetworks(chainId: number): Promise<ContractNetworksConfig> {
@@ -18,6 +19,8 @@ export async function getContractNetworks(chainId: number): Promise<ContractNetw
       safeMasterCopyAbi: (await getSafeSingleton()).abi,
       safeProxyFactoryAddress: (await getFactory()).contract.address,
       safeProxyFactoryAbi: (await getFactory()).abi,
+      signMessageLibAddress: (await getSignMessageLib()).contract.address,
+      signMessageLibAbi: (await getSignMessageLib()).abi,
       createCallAddress: (await getCreateCall()).contract.address,
       createCallAbi: (await getCreateCall()).abi
     }

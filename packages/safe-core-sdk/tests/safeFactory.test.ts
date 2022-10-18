@@ -15,10 +15,12 @@ import { ZERO_ADDRESS } from '../src/utils/constants'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
+  getCreateCall,
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
-  getSafeSingleton
+  getSafeSingleton,
+  getSignMessageLib
 } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -61,7 +63,11 @@ describe('SafeProxyFactory', () => {
           safeMasterCopyAddress: ZERO_ADDRESS,
           safeMasterCopyAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,
-          safeProxyFactoryAbi: (await getFactory()).abi
+          safeProxyFactoryAbi: (await getFactory()).abi,
+          signMessageLibAddress: ZERO_ADDRESS,
+          signMessageLibAbi: (await getSignMessageLib()).abi,
+          createCallAddress: ZERO_ADDRESS,
+          createCallAbi: (await getCreateCall()).abi
         }
       }
       chai

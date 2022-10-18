@@ -84,10 +84,14 @@ const contractNetworks: ContractNetworksConfig = {
     multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
     safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
     safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+    signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
+    createCallAddress: '<CREATE_CALL_ADDRESS>',
     multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
     multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
     safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
-    safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>' // Optional. Only needed with web3.js
+    safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+    signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
+    createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
   }
 }
 

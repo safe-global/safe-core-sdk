@@ -39,15 +39,15 @@ describe('getPendingTransactions', () => {
   it('should return the the transaction list', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with pending transaction
     const transactionList = await serviceSdk.getPendingTransactions(safeAddress)
-    chai.expect(transactionList.count).to.be.equal(2)
-    chai.expect(transactionList.results.length).to.be.equal(2)
+    chai.expect(transactionList.count).to.be.equal(3)
+    chai.expect(transactionList.results.length).to.be.equal(3)
   })
 
   it('should return the the transaction list EIP-3770', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with pending transaction
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transactionList = await serviceSdk.getPendingTransactions(eip3770SafeAddress)
-    chai.expect(transactionList.count).to.be.equal(2)
-    chai.expect(transactionList.results.length).to.be.equal(2)
+    chai.expect(transactionList.count).to.be.equal(3)
+    chai.expect(transactionList.results.length).to.be.equal(3)
   })
 })

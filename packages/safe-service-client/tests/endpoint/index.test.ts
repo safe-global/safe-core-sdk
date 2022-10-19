@@ -30,7 +30,7 @@ const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
 const tokenAddress = '0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D'
 const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
-const txServiceBaseUrl = 'https://safe-transaction.goerli.gnosis.io'
+const txServiceBaseUrl = 'https://safe-transaction-goerli.safe.global'
 const provider = getDefaultProvider(config.JSON_RPC)
 const signer = new Wallet(
   '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',

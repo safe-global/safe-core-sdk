@@ -19,7 +19,8 @@ const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/gnosis_safe.json`,
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
   `${safeContractsPath}/v1.3.0/multi_send.json`,
-  `${safeContractsPath}/v1.3.0/multi_send_call_only.json`
+  `${safeContractsPath}/v1.3.0/multi_send_call_only.json`,
+  `${safeContractsPath}/v1.3.0/sign_message_lib.json`
 ].join(' ')
 const safeContracts_V1_2_0 = [`${safeContractsPath}/v1.2.0/gnosis_safe.json`].join(' ')
 const safeContracts_V1_1_1 = [

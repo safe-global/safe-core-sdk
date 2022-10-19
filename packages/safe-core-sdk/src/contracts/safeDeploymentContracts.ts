@@ -5,7 +5,8 @@ import {
   GnosisSafeProxyFactoryContract,
   MultiSendCallOnlyContract,
   MultiSendContract,
-  SafeVersion
+  SafeVersion,
+  SignMessageLibContract
 } from '@gnosis.pm/safe-core-sdk-types'
 import {
   DeploymentFilter,
@@ -164,8 +165,8 @@ export async function getMultiSendCallOnlyContract({
     safeVersion,
     chainId,
     singletonDeployment: multiSendCallOnlyDeployment,
-    customContractAddress: customContracts?.multiSendAddress,
-    customContractAbi: customContracts?.multiSendAbi
+    customContractAddress: customContracts?.multiSendCallOnlyAddress,
+    customContractAbi: customContracts?.multiSendCallOnlyAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
     multiSendCallOnlyContract.getAddress()
@@ -181,14 +182,14 @@ export async function getSignMessageLibContract({
   safeVersion,
   chainId,
   customContracts
-}: GetContractInstanceProps): Promise<CreateCallContract> {
+}: GetContractInstanceProps): Promise<SignMessageLibContract> {
   const signMessageLibDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
   const signMessageLibContract = await ethAdapter.getSignMessageLibContract({
     safeVersion,
     chainId,
     singletonDeployment: signMessageLibDeployment,
-    customContractAddress: customContracts?.multiSendAddress,
-    customContractAbi: customContracts?.multiSendAbi
+    customContractAddress: customContracts?.signMessageLibAddress,
+    customContractAbi: customContracts?.signMessageLibAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
     signMessageLibContract.getAddress()
@@ -210,8 +211,8 @@ export async function getCreateCallContract({
     safeVersion,
     chainId,
     singletonDeployment: createCallDeployment,
-    customContractAddress: customContracts?.multiSendAddress,
-    customContractAbi: customContracts?.multiSendAbi
+    customContractAddress: customContracts?.createCallAddress,
+    customContractAbi: customContracts?.createCallAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(createCallContract.getAddress())
   if (!isContractDeployed) {

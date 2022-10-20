@@ -13,15 +13,19 @@ import { ContractOptions } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import {
+  getCreateCallContractInstance,
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
-  getSafeContractInstance
+  getSafeContractInstance,
+  getSignMessageLibContractInstance
 } from './contracts/contractInstancesWeb3'
+import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
 import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
 import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
 import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
+import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -143,6 +147,42 @@ class Web3Adapter implements EthAdapter {
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
     return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+  }
+
+  getSignMessageLibContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): SignMessageLibWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SignMessageLib contract address')
+    }
+    const signMessageLibContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getSignMessageLibContractInstance(safeVersion, signMessageLibContract)
+  }
+
+  getCreateCallContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): CreateCallWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid CreateCall contract address')
+    }
+    const createCallContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getCreateCallContractInstance(safeVersion, createCallContract)
   }
 
   getContract(address: string, abi: AbiItem | AbiItem[], options?: ContractOptions): any {

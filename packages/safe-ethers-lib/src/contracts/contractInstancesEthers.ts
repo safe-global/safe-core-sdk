@@ -9,6 +9,8 @@ import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '../..
 import { Multi_send__factory as MultiSend_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/Multi_send__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/Proxy_factory__factory'
 import { Sign_message_lib__factory as SignMessageLib_V1_3_0 } from '../../typechain/src/ethers-v5/v1.3.0/factories/Sign_message_lib__factory'
+import { Create_call__factory as CreateCall_V1_3_0 } from './../../typechain/src/ethers-v5/v1.3.0/factories/Create_call__factory'
+import CreateCallContract_V1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Ethers'
 import GnosisSafeContract_V1_1_1_Ethers from './GnosisSafe/v1.1.1/GnosisSafeContract_V1_1_1_Ethers'
 import GnosisSafeContract_V1_2_0_Ethers from './GnosisSafe/v1.2.0/GnosisSafeContract_V1_2_0_Ethers'
 import GnosisSafeContract_V1_3_0_Ethers from './GnosisSafe/v1.3.0/GnosisSafeContract_V1_3_0_Ethers'
@@ -108,6 +110,23 @@ export function getSignMessageLibContractInstance(
     case '1.3.0':
       signMessageLibContract = SignMessageLib_V1_3_0.connect(contractAddress, signer)
       return new SignMessageLibContract_V1_3_0_Ethers(signMessageLibContract)
+    default:
+      throw new Error('Invalid Safe version')
+  }
+}
+
+export function getCreateCallContractInstance(
+  safeVersion: SafeVersion,
+  contractAddress: string,
+  signer: Signer
+): CreateCallContract_V1_3_0_Ethers {
+  let createCallContract
+  switch (safeVersion) {
+    case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
+      createCallContract = CreateCall_V1_3_0.connect(contractAddress, signer)
+      return new CreateCallContract_V1_3_0_Ethers(createCallContract)
     default:
       throw new Error('Invalid Safe version')
   }

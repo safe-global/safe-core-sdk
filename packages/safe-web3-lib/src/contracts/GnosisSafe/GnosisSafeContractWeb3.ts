@@ -74,6 +74,50 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
 
   abstract isModuleEnabled(moduleAddress: string): Promise<boolean>
 
+  async isValidTransaction(
+    safeTransaction: SafeTransaction,
+    options?: Web3TransactionOptions
+  ): Promise<boolean> {
+    let isTxValid = false
+    try {
+      if (options && !options.gas) {
+        options.gas = await this.estimateGas(
+          'execTransaction',
+          [
+            safeTransaction.data.to,
+            safeTransaction.data.value,
+            safeTransaction.data.data,
+            safeTransaction.data.operation,
+            safeTransaction.data.safeTxGas,
+            safeTransaction.data.baseGas,
+            safeTransaction.data.gasPrice,
+            safeTransaction.data.gasToken,
+            safeTransaction.data.refundReceiver,
+            safeTransaction.encodedSignatures()
+          ],
+          {
+            ...options
+          }
+        )
+      }
+      isTxValid = await this.contract.methods
+        .execTransaction(
+          safeTransaction.data.to,
+          safeTransaction.data.value,
+          safeTransaction.data.data,
+          safeTransaction.data.operation,
+          safeTransaction.data.safeTxGas,
+          safeTransaction.data.baseGas,
+          safeTransaction.data.gasPrice,
+          safeTransaction.data.gasToken,
+          safeTransaction.data.refundReceiver,
+          safeTransaction.encodedSignatures()
+        )
+        .call(options)
+    } catch {}
+    return isTxValid
+  }
+
   async execTransaction(
     safeTransaction: SafeTransaction,
     options?: Web3TransactionOptions

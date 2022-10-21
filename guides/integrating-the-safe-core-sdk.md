@@ -325,6 +325,12 @@ const executeTxResponse = await safeSdk.executeTransaction(safeTransaction)
 const receipt = executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
 ```
 
+Optionally, the `isValidTransaction` method, that returns a boolean value, could be called right before the `executeTransaction` method to check if the transaction will be executed successfully or not.
+
+```js
+const isValidTx = await safeSdk.isValidTransaction(safeTransaction)
+```
+
 ## <a name="interface-checks">9. Interface checks</a>
 
 During the process of collecting the signatures/executing transactions, some useful checks can be made in the interface to display or hide a button to confirm or execute the transaction depending on the current number of confirmations, the address of accounts that confirmed the transaction and the Safe threshold:

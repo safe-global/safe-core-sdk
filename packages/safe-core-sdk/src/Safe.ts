@@ -677,6 +677,45 @@ class Safe {
   }
 
   /**
+   * Checks if a Safe transaction can be executed successfully with no errors.
+   *
+   * @param safeTransaction - The Safe transaction to check
+   * @param options - The Safe transaction execution options. Optional
+   * @returns TRUE if the Safe transaction can be executed successfully with no errors
+   */
+  async isValidTransaction(
+    safeTransaction: SafeTransaction,
+    options?: TransactionOptions
+  ): Promise<boolean> {
+    const signedSafeTransaction = await this.createTransaction({
+      safeTransactionData: safeTransaction.data
+    })
+    safeTransaction.signatures.forEach((signature) => {
+      signedSafeTransaction.addSignature(signature)
+    })
+
+    const txHash = await this.getTransactionHash(signedSafeTransaction)
+    const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
+    for (const owner of ownersWhoApprovedTx) {
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
+    }
+    const owners = await this.getOwners()
+    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    if (owners.includes(signerAddress)) {
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
+    }
+
+    const isTxValid = await this.#contractManager.safeContract.isValidTransaction(
+      signedSafeTransaction,
+      {
+        from: signerAddress,
+        ...options
+      }
+    )
+    return isTxValid
+  }
+
+  /**
    * Executes a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction to execute

@@ -19,7 +19,7 @@ An example for such an account would be the private key of one of the owners tha
 const signer = new Wallet("some_private_key", ethereumProvider)
 ```
 
-It is also necessary to specify a service instance that should be used to publish the Safe transactions. An example for this would be the Mainnet instance of the [Safe Transaction Service](https://safe-transaction.gnosis.io/): `https://safe-transaction.gnosis.io/`
+It is also necessary to specify a service instance that should be used to publish the Safe transactions. An example for this would be the Mainnet instance of the [Safe Transaction Service](https://safe-transaction-mainnet.safe.global/): `https://safe-transaction-mainnet.safe.global/`
 
 ```js
 const service = new SafeService("some_service_url")

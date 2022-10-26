@@ -559,6 +559,15 @@ const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData }
 const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransaction.data.nonce)
 ```
 
+### copyTransaction
+
+Copies a Safe transaction.
+
+```js
+const safeTransaction1 = await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction2 = await copyTransaction(safeTransaction1)
+```
+
 ### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.
@@ -824,6 +833,44 @@ This method can optionally receive the `options` parameter:
 ```js
 const options: SafeTransactionOptionalProps = { ... }
 const safeTransaction = await safeSdk.createChangeThresholdTx(newThreshold, options)
+```
+
+### isValidTransaction
+
+Checks if a Safe transaction can be executed successfully with no errors.
+
+```js
+const safeTransactionData: SafeTransactionDataPartial = {
+  // ...
+}
+const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const isValidTx = await safeSdk.isValidTransaction(safeTransaction)
+```
+
+Optionally, some properties can be passed as execution options:
+
+```js
+const options: Web3TransactionOptions = {
+  from, // Optional
+  gas, // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
+  nonce // Optional
+}
+```
+```js
+const options: EthersTransactionOptions = {
+  from, // Optional
+  gasLimit, // Optional
+  gasPrice, // Optional
+  maxFeePerGas, // Optional
+  maxPriorityFeePerGas // Optional
+  nonce // Optional
+}
+```
+```js
+const isValidTx = await safeSdk.isValidTransaction(safeTransaction, options)
 ```
 
 ### executeTransaction

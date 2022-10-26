@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   MetaTransactionData,
   SafeTransactionDataPartial,
@@ -8,6 +7,7 @@ import { EthersTransactionOptions } from '@gnosis.pm/safe-ethers-lib'
 import { Web3TransactionOptions } from '@gnosis.pm/safe-web3-lib'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
 import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
 import Safe from '../src'
@@ -32,6 +32,72 @@ describe('Transactions execution', () => {
       accounts,
       contractNetworks
     }
+  })
+
+  describe('isValidTransaction', async () => {
+    it('should return false if a transaction will not be executed successfully', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const safeSdk2 = await safeSdk1.connect({
+        ethAdapter: ethAdapter2,
+        contractNetworks
+      })
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+      const safeInitialBalance = await safeSdk1.getBalance()
+      const safeTransactionData: SafeTransactionDataPartial = {
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      }
+      const tx = await safeSdk1.createTransaction({ safeTransactionData })
+      const rejectTx = await safeSdk1.createRejectionTransaction(tx.data.nonce)
+      const signedRejectTx = await safeSdk1.signTransaction(rejectTx)
+      const txRejectResponse = await safeSdk2.executeTransaction(signedRejectTx)
+      await waitSafeTxReceipt(txRejectResponse)
+      const signedTx = await safeSdk1.signTransaction(tx)
+      const isTxExecutable = await safeSdk2.isValidTransaction(signedTx)
+      await chai.expect(isTxExecutable).to.be.eq(false)
+      const safeFinalBalance = await safeSdk1.getBalance()
+      chai.expect(safeInitialBalance.toString()).to.be.eq(safeFinalBalance.toString())
+    })
+
+    it('should return true if a transaction will execute successfully', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safe = await getSafeWithOwners([account1.address])
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+      const safeInitialBalance = await safeSdk1.getBalance()
+      const safeTransactionData: SafeTransactionDataPartial = {
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x'
+      }
+      const tx = await safeSdk1.createTransaction({ safeTransactionData })
+      const isTxExecutable = await safeSdk1.isValidTransaction(tx)
+      await chai.expect(isTxExecutable).to.be.eq(true)
+      const safeFinalBalance = await safeSdk1.getBalance()
+      chai.expect(safeInitialBalance.toString()).to.be.eq(safeFinalBalance.toString())
+    })
   })
 
   describe('executeTransaction', async () => {

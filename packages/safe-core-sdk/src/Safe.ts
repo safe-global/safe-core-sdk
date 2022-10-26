@@ -758,7 +758,7 @@ class Safe {
     }
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
-    if (owners.includes(signerAddress)) {
+    if (signerAddress && owners.includes(signerAddress)) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 

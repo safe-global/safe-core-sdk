@@ -559,6 +559,15 @@ const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData }
 const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransaction.data.nonce)
 ```
 
+### copyTransaction
+
+Copies a Safe transaction.
+
+```js
+const safeTransaction1 = await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction2 = await copyTransaction(safeTransaction1)
+```
+
 ### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.

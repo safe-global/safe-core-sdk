@@ -355,6 +355,22 @@ class Safe {
   }
 
   /**
+   * Copies a Safe transaction
+   *
+   * @param safeTransaction - The Safe transaction
+   * @returns The new Safe transaction
+   */
+  async copyTransaction(safeTransaction: SafeTransaction): Promise<SafeTransaction> {
+    const signedSafeTransaction = await this.createTransaction({
+      safeTransactionData: safeTransaction.data
+    })
+    safeTransaction.signatures.forEach((signature) => {
+      signedSafeTransaction.addSignature(signature)
+    })
+    return safeTransaction
+  }
+
+  /**
    * Returns the transaction hash of a Safe transaction.
    *
    * @param safeTransaction - The Safe transaction
@@ -687,12 +703,7 @@ class Safe {
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
   ): Promise<boolean> {
-    const signedSafeTransaction = await this.createTransaction({
-      safeTransactionData: safeTransaction.data
-    })
-    safeTransaction.signatures.forEach((signature) => {
-      signedSafeTransaction.addSignature(signature)
-    })
+    const signedSafeTransaction = await this.copyTransaction(safeTransaction)
 
     const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
@@ -729,12 +740,7 @@ class Safe {
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
   ): Promise<TransactionResult> {
-    const signedSafeTransaction = await this.createTransaction({
-      safeTransactionData: safeTransaction.data
-    })
-    safeTransaction.signatures.forEach((signature) => {
-      signedSafeTransaction.addSignature(signature)
-    })
+    const signedSafeTransaction = await this.copyTransaction(safeTransaction)
 
     const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)

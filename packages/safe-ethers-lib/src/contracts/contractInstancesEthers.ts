@@ -104,12 +104,12 @@ export function getSafeProxyFactoryContractInstance(
 export function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signer: Signer
+  signerOrProvider: Signer | Provider
 ): SignMessageLibContract_V1_3_0_Ethers {
   let signMessageLibContract
   switch (safeVersion) {
     case '1.3.0':
-      signMessageLibContract = SignMessageLib_V1_3_0.connect(contractAddress, signer)
+      signMessageLibContract = SignMessageLib_V1_3_0.connect(contractAddress, signerOrProvider)
       return new SignMessageLibContract_V1_3_0_Ethers(signMessageLibContract)
     default:
       throw new Error('Invalid Safe version')
@@ -119,14 +119,14 @@ export function getSignMessageLibContractInstance(
 export function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signer: Signer
+  signerOrProvider: Signer | Provider
 ): CreateCallContract_V1_3_0_Ethers {
   let createCallContract
   switch (safeVersion) {
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
-      createCallContract = CreateCall_V1_3_0.connect(contractAddress, signer)
+      createCallContract = CreateCall_V1_3_0.connect(contractAddress, signerOrProvider)
       return new CreateCallContract_V1_3_0_Ethers(createCallContract)
     default:
       throw new Error('Invalid Safe version')

@@ -48,13 +48,14 @@ class EthersAdapter implements EthAdapter {
     this.#ethers = ethers
     const isSigner = signerOrProvider instanceof Signer
     if (isSigner) {
-      if (!signerOrProvider.provider) {
+      const signer = signerOrProvider as Signer
+      if (!signer.provider) {
         throw new Error('Signer must be connected to a provider')
       }
-      this.#provider = signerOrProvider.provider
-      this.#signer = signerOrProvider
+      this.#provider = signer.provider
+      this.#signer = signer
     } else {
-      this.#provider = signerOrProvider
+      this.#provider = signerOrProvider as Provider
     }
   }
 
@@ -167,7 +168,8 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
-    return getSignMessageLibContractInstance(safeVersion, contractAddress, this.#signer)
+    const signerOrProvider = this.#signer || this.#provider
+    return getSignMessageLibContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   getCreateCallContract({
@@ -182,7 +184,8 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
     }
-    return getCreateCallContractInstance(safeVersion, contractAddress, this.#signer)
+    const signerOrProvider = this.#signer || this.#provider
+    return getCreateCallContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {

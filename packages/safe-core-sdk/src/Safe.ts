@@ -367,7 +367,7 @@ class Safe {
     safeTransaction.signatures.forEach((signature) => {
       signedSafeTransaction.addSignature(signature)
     })
-    return safeTransaction
+    return signedSafeTransaction
   }
 
   /**

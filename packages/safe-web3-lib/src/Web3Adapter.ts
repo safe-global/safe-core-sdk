@@ -31,12 +31,12 @@ export interface Web3AdapterConfig {
   /** web3 - Web3 library */
   web3: Web3
   /** signerAddress - Address of the signer */
-  signerAddress: string
+  signerAddress?: string
 }
 
 class Web3Adapter implements EthAdapter {
   #web3: Web3
-  #signerAddress: string
+  #signerAddress?: string
 
   constructor({ web3, signerAddress }: Web3AdapterConfig) {
     if (!web3) {
@@ -211,11 +211,14 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getTransaction(transactionHash)
   }
 
-  async getSignerAddress(): Promise<string> {
+  async getSignerAddress(): Promise<string | undefined> {
     return this.#signerAddress
   }
 
   signMessage(message: string): Promise<string> {
+    if (!this.#signerAddress) {
+      throw new Error('EthAdapter must be initialized with a signer to use this method')
+    }
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
 
@@ -223,6 +226,9 @@ class Web3Adapter implements EthAdapter {
     safeTransactionEIP712Args: SafeTransactionEIP712Args,
     methodVersion?: 'v3' | 'v4'
   ): Promise<string> {
+    if (!this.#signerAddress) {
+      throw new Error('This method requires a signer')
+    }
     const typedData = generateTypedData(safeTransactionEIP712Args)
     let method = 'eth_signTypedData_v3'
     if (methodVersion === 'v4') {

@@ -1,4 +1,4 @@
-import { SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeTransactionData } from '@weichain/safe-core-sdk-types'
 import chai from 'chai'
 import {
   EIP712_DOMAIN,

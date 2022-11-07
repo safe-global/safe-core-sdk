@@ -7,12 +7,13 @@
 Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service).
 
 ## Table of contents
-* [Installation](#installation)
-* [Build](#build)
-* [Initialization](#initialization)
-* [API Reference](#api-reference)
-* [License](#license)
-* [Contributors](#contributors)
+
+- [Installation](#installation)
+- [Build](#build)
+- [Initialization](#initialization)
+- [API Reference](#api-reference)
+- [License](#license)
+- [Contributors](#contributors)
 
 ## <a name="installation">Installation</a>
 
@@ -48,7 +49,7 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 ### Initialize the SafeServiceClient
 
 ```js
-import SafeServiceClient from '@gnosis.pm/safe-service-client'
+import SafeServiceClient from '@weichain/safe-service-client'
 
 const safeService = new SafeServiceClient({
   txServiceUrl: 'https://safe-transaction-mainnet.safe.global',
@@ -111,7 +112,9 @@ const tx: SafeMultisigTransactionResponse = await safeService.getTransaction(saf
 Returns the list of confirmations for a given a Safe transaction.
 
 ```js
-const confirmations: SafeMultisigConfirmationListResponse = await safeService.getTransactionConfirmations(safeTxHash)
+const confirmations: SafeMultisigConfirmationListResponse = await safeService.getTransactionConfirmations(
+  safeTxHash
+)
 ```
 
 ### confirmTransaction
@@ -178,7 +181,9 @@ await safeService.removeSafeDelegate(delegateConfig)
 Returns the creation information of a Safe.
 
 ```js
-const safeCreationInfo: SafeCreationInfoResponse = await safeService.getSafeCreationInfo(safeAddress)
+const safeCreationInfo: SafeCreationInfoResponse = await safeService.getSafeCreationInfo(
+  safeAddress
+)
 ```
 
 ### estimateSafeTransaction
@@ -221,7 +226,9 @@ const incomingTxs: TransferListResponse = await safeService.getIncomingTransacti
 Returns the history of module transactions of a Safe account.
 
 ```js
-const moduleTxs: SafeModuleTransactionListResponse = await safeService.getModuleTransactions(safeAddress)
+const moduleTxs: SafeModuleTransactionListResponse = await safeService.getModuleTransactions(
+  safeAddress
+)
 ```
 
 ### getMultisigTransactions
@@ -229,7 +236,9 @@ const moduleTxs: SafeModuleTransactionListResponse = await safeService.getModule
 Returns the history of multi-signature transactions of a Safe account.
 
 ```js
-const multisigTxs: SafeMultisigTransactionListResponse = await safeService.getMultisigTransactions(safeAddress)
+const multisigTxs: SafeMultisigTransactionListResponse = await safeService.getMultisigTransactions(
+  safeAddress
+)
 ```
 
 ### getPendingTransactions
@@ -237,7 +246,9 @@ const multisigTxs: SafeMultisigTransactionListResponse = await safeService.getMu
 Returns the list of multi-signature transactions that are waiting for the confirmation of the Safe owners.
 
 ```js
-const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(safeAddress)
+const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(
+  safeAddress
+)
 ```
 
 ```js
@@ -252,7 +263,9 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 Returns a list of transactions for a Safe. The list has different structures depending on the transaction type.
 
 ```js
-const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(safeAddress)
+const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(
+  safeAddress
+)
 ```
 
 ```js
@@ -287,7 +300,7 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeBalancesOptions = {
-  excludeSpamTokens  // Optional. Default value is `true`.
+  excludeSpamTokens // Optional. Default value is `true`.
 }
 const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress, options)
 ```
@@ -323,7 +336,10 @@ This method can optionally receive the `options` parameter:
 const options: SafeCollectiblesOptions = {
   excludeSpamTokens // Optional. Default value is `true`.
 }
-const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress, options)
+const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(
+  safeAddress,
+  options
+)
 ```
 
 ### getTokenList

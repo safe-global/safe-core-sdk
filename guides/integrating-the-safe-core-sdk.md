@@ -2,30 +2,31 @@
 
 ## Table of contents:
 
-  1. [Install the dependencies](#install-dependencies)
-  2. [Initialize the SDK’s](#initialize-sdks)
-  3. [Deploy a new Safe](#deploy-safe)
-  4. [Create a transaction](#create-transaction)
-  5. [Propose the transaction to the service](#propose-transaction)
-  6. [Get the transaction from the service](#get-transaction)
-  7. [Confirm/reject the transaction](#confirm-transaction)
-  8. [Execute the transaction](#execute-transaction)
-  9. [Interface checks](#interface-checks)
+1. [Install the dependencies](#install-dependencies)
+2. [Initialize the SDK’s](#initialize-sdks)
+3. [Deploy a new Safe](#deploy-safe)
+4. [Create a transaction](#create-transaction)
+5. [Propose the transaction to the service](#propose-transaction)
+6. [Get the transaction from the service](#get-transaction)
+7. [Confirm/reject the transaction](#confirm-transaction)
+8. [Execute the transaction](#execute-transaction)
+9. [Interface checks](#interface-checks)
 
 ## <a name="install-dependencies">1. Install the dependencies</a>
 
 To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) into your Dapp or script you will need to install these dependencies:
 
 ```
-@gnosis.pm/safe-core-sdk-types
-@gnosis.pm/safe-core-sdk
-@gnosis.pm/safe-service-client
+@weichain/safe-core-sdk-types
+@weichain/safe-core-sdk
+@weichain/safe-service-client
 ```
 
 And one of these two:
+
 ```
-@gnosis.pm/safe-web3-lib
-@gnosis.pm/safe-ethers-lib
+@weichain/safe-web3-lib
+@weichain/safe-ethers-lib
 ```
 
 ## <a name="initialize-sdks">2. Initialize the SDK’s</a>
@@ -43,10 +44,10 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 
 ### Initialize the Safe Service Client
 
-As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@gnosis.pm/safe-service-client` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
+As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@weichain/safe-service-client` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
 
 ```js
-import SafeServiceClient from '@gnosis.pm/safe-service-client'
+import SafeServiceClient from '@weichain/safe-service-client'
 
 const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
 const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
@@ -55,7 +56,7 @@ const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
 ### Initialize the Safe Core SDK
 
 ```js
-import Safe, { SafeFactory } from '@gnosis.pm/safe-core-sdk'
+import Safe, { SafeFactory } from 'weichain/safe-core-sdk'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 
@@ -75,7 +76,7 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy:
 If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
 
 ```js
-import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
+import { ContractNetworksConfig } from '@weichain/safe-core-sdk'
 
 const id = await ethAdapter.getChainId()
 const contractNetworks: ContractNetworksConfig = {
@@ -110,7 +111,7 @@ The Safe Core SDK library allows the deployment of new Safes using the `safeFact
 Here, for example, we can create a new Safe account with 3 owners and 2 required signatures.
 
 ```js
-import { SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
+import { SafeAccountConfig } from 'weichain/safe-core-sdk'
 
 const safeAccountConfig: SafeAccountConfig = {
   owners: ['0x...', '0x...', '0x...']
@@ -126,12 +127,12 @@ Calling the method `deploySafe` will deploy the desired Safe and return a Safe C
 
 The Safe Core SDK supports the execution of single Safe transactions but also MultiSend transactions. We can create a transaction object by calling the method `createTransaction` in our `Safe` instance.
 
-* **Create a single transaction**
+- **Create a single transaction**
 
   This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
 
   ```js
-  import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+  import { SafeTransactionDataPartial } from '@weichain/safe-core-sdk-types'
 
   const safeTransactionData: SafeTransactionDataPartial = {
     to,
@@ -149,13 +150,13 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
   ```
 
-* **Create a MultiSend transaction**
+- **Create a MultiSend transaction**
 
   This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
   ```js
-  import { SafeTransactionOptionalProps } from '@gnosis.pm/safe-core-sdk'
-  import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+  import { SafeTransactionOptionalProps } from '@weichain/safe-core-sdk'
+  import { MetaTransactionData } from '@weichain/safe-core-sdk-types'
 
   const safeTransactionData: MetaTransactionData[] = [
     {
@@ -169,7 +170,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
       data,
       value,
       operation
-    },
+    }
     // ...
   ]
 
@@ -185,7 +186,6 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
   ```
 
-
 We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe Service Client instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.
 
 ```js
@@ -195,6 +195,7 @@ const nonce = await safeService.getNextNonce(safeAddress)
 ## <a name="propose-transaction">5. Propose the transaction to the service</a>
 
 Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe Service Client instance and pass an object with the properties:
+
 - `safeAddress`: The Safe address.
 - `safeTransactionData`: The `data` object inside the Safe transaction object returned from the method `createTransaction`.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.
@@ -295,7 +296,7 @@ Once there are enough confirmations in the service the transaction is ready to b
 The method `executeTransaction` accepts an instance of the class `SafeTransaction` so the transaction needs to be transformed from the type `SafeMultisigTransactionResponse`.
 
 ```js
-import { EthSignSignature } from '@gnosis.pm/safe-core-sdk'
+import { EthSignSignature } from '@weichain/safe-core-sdk'
 
 // transaction: SafeMultisigTransactionResponse
 
@@ -312,13 +313,14 @@ const safeTransactionData: SafeTransactionData = {
   nonce: transaction.nonce
 }
 const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-transaction.confirmations.forEach(confirmation => {
+transaction.confirmations.forEach((confirmation) => {
   const signature = new EthSignSignature(confirmation.owner, confirmation.signature)
   safeTransaction.addSignature(signature)
 })
 
 const executeTxResponse = await safeSdk.executeTransaction(safeTransaction)
-const receipt = executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
+const receipt =
+  executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
 ```
 
 ## <a name="interface-checks">9. Interface checks</a>
@@ -328,8 +330,13 @@ During the process of collecting the signatures/executing transactions, some use
 Check if a Safe transaction is already signed by an owner:
 
 ```js
-const isTransactionSignedByAddress = (signerAddress: string, transaction: SafeMultisigTransactionResponse) => {
-  const confirmation = transaction.confirmations.find(confirmation => confirmation.owner === signerAddress)
+const isTransactionSignedByAddress = (
+  signerAddress: string,
+  transaction: SafeMultisigTransactionResponse
+) => {
+  const confirmation = transaction.confirmations.find(
+    (confirmation) => confirmation.owner === signerAddress
+  )
   return !!confirmation
 }
 ```
@@ -337,7 +344,10 @@ const isTransactionSignedByAddress = (signerAddress: string, transaction: SafeMu
 Check if a Safe transaction is ready to be executed:
 
 ```js
-const isTransactionExecutable = (safeThreshold: number, transaction: SafeMultisigTransactionResponse) => {
+const isTransactionExecutable = (
+  safeThreshold: number,
+  transaction: SafeMultisigTransactionResponse
+) => {
   return transaction.confirmations.length >= safeThreshold
 }
 ```

@@ -1,5 +1,5 @@
 {
-  "name": "@gnosis.pm/safe-ethers-lib",
+  "name": "@weichain/safe-ethers-lib",
   "version": "1.6.1",
   "description": "Ethers library adapter to be used by Safe Core SDK",
   "main": "dist/src/index.js",
@@ -50,8 +50,8 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk-types": "^1.6.1",
-    "@gnosis.pm/safe-core-sdk-utils": "^1.4.1",
+    "@weichain/safe-core-sdk-types": "^1.6.1",
+    "@weichain/safe-core-sdk-utils": "^1.4.1",
     "ethers": "^5.7.1"
   }
 }

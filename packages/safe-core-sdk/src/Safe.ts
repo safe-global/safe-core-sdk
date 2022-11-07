@@ -10,7 +10,7 @@ import {
   SafeVersion,
   TransactionOptions,
   TransactionResult
-} from '@gnosis.pm/safe-core-sdk-types'
+} from '@weichain/safe-core-sdk-types'
 import ContractManager from './managers/contractManager'
 import GuardManager from './managers/guardManager'
 import ModuleManager from './managers/moduleManager'

@@ -1,4 +1,4 @@
-import { SafeSignature, SafeTransaction, SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeSignature, SafeTransaction, SafeTransactionData } from '@weichain/safe-core-sdk-types'
 
 class EthSafeTransaction implements SafeTransaction {
   data: SafeTransactionData

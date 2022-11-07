@@ -1,5 +1,5 @@
 {
-  "name": "@gnosis.pm/safe-ethers-adapters",
+  "name": "@weichain/safe-ethers-adapters",
   "version": "0.1.0-alpha.11",
   "description": "Safe Ethers Adapters",
   "main": "dist/src/index.js",
@@ -78,9 +78,9 @@
     "@ethersproject/properties": "^5.5.0"
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk": "^3.1.1",
-    "@gnosis.pm/safe-core-sdk-types": "^1.6.1",
-    "@gnosis.pm/safe-deployments": "1.16.0",
+    "@weichain/safe-core-sdk": "^3.1.1",
+    "@weichain/safe-core-sdk-types": "^1.6.1",
+    "@weichain/safe-deployments": "1.16.0",
     "axios": "^0.27.2"
   }
 }

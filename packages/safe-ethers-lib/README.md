@@ -7,11 +7,12 @@
 Ethers.js wrapper that contains some utilities and the Safe contracts types (generated with typechain ethers-v5). It is used to initialize the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk).
 
 ## Table of contents
-* [Installation](#installation)
-* [Build](#build)
-* [Initialization](#initialization)
-* [License](#license)
-* [Contributors](#contributors)
+
+- [Installation](#installation)
+- [Build](#build)
+- [Initialization](#initialization)
+- [License](#license)
+- [Contributors](#contributors)
 
 ## <a name="installation">Installation</a>
 
@@ -37,7 +38,7 @@ If the app integrating the SDK is using `Ethers` `v5`, create an instance of the
 
 ```js
 import { ethers } from 'ethers'
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
+import EthersAdapter from '@weichain/safe-ethers-lib'
 
 const web3Provider = // ...
 const provider = new ethers.providers.Web3Provider(web3Provider)

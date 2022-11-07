@@ -1,5 +1,5 @@
 {
-  "name": "@gnosis.pm/safe-core-sdk",
+  "name": "@weichain/safe-core-sdk",
   "version": "3.1.1",
   "description": "Safe Core SDK",
   "main": "dist/src/index.js",
@@ -89,8 +89,8 @@
   },
   "dependencies": {
     "@ethersproject/solidity": "^5.7.0",
-    "@gnosis.pm/safe-core-sdk-types": "^1.6.1",
-    "@gnosis.pm/safe-deployments": "1.16.0",
+    "@weichain/safe-core-sdk-types": "^1.6.1",
+    "@weichain/safe-deployments": "1.16.0",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.7",
     "web3-utils": "^1.8.0"

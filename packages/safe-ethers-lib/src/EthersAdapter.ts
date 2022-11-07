@@ -8,8 +8,8 @@ import {
   EthAdapterTransaction,
   GetContractProps,
   SafeTransactionEIP712Args
-} from '@gnosis.pm/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+} from '@weichain/safe-core-sdk-types'
+import { generateTypedData, validateEip3770Address } from '@weichain/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import {
   getMultiSendCallOnlyContractInstance,

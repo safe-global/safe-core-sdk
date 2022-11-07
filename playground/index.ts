@@ -1,6 +1,6 @@
-import Safe, { SafeFactory } from '@gnosis.pm/safe-core-sdk'
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
-import SafeServiceClient from '@gnosis.pm/safe-service-client'
+import Safe, { SafeFactory } from '@weichain/safe-core-sdk'
+import EthersAdapter from '@weichain/safe-ethers-lib'
+import SafeServiceClient from '@weichain/safe-service-client'
 import { ethers } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK
@@ -10,7 +10,7 @@ const config = {
   SAFE_ADDRESS: '<SAFE_ADDRESS>',
   SAFE_OWNERS_PRIVATE_KEYS: [
     '<OWNER_1_PRIVATE_KEY>',
-    '<OWNER_2_PRIVATE_KEY>',
+    '<OWNER_2_PRIVATE_KEY>'
     // ...
   ],
   SAFE_TRANSACTION_SERVICE_URL: '<SAFE_TRANSACTION_SERVICE_URL>'

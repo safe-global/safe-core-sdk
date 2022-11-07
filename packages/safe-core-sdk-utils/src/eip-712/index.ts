@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { GenerateTypedData, SafeTransactionEIP712Args } from '@gnosis.pm/safe-core-sdk-types'
+import { GenerateTypedData, SafeTransactionEIP712Args } from '@weichain/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -23,7 +23,9 @@ export const EIP712_DOMAIN = [
 ]
 
 // This function returns the types structure for signing off-chain messages according to EIP-712
-export function getEip712MessageTypes(safeVersion: string): {
+export function getEip712MessageTypes(
+  safeVersion: string
+): {
   EIP712Domain: typeof EIP712_DOMAIN | typeof EIP712_DOMAIN_BEFORE_V130
   SafeTx: Array<{ type: string; name: string }>
 } {

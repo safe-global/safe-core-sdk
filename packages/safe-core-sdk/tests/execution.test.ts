@@ -3,9 +3,9 @@ import {
   MetaTransactionData,
   SafeTransactionDataPartial,
   TransactionOptions
-} from '@gnosis.pm/safe-core-sdk-types'
-import { EthersTransactionOptions } from '@gnosis.pm/safe-ethers-lib'
-import { Web3TransactionOptions } from '@gnosis.pm/safe-web3-lib'
+} from '@weichain/safe-core-sdk-types'
+import { EthersTransactionOptions } from '@weichain/safe-ethers-lib'
+import { Web3TransactionOptions } from '@weichain/safe-web3-lib'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'

@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { SingletonDeployment } from '@gnosis.pm/safe-deployments'
+import { SingletonDeployment } from '@weichain/safe-deployments'
 import { AbiItem } from 'web3-utils'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'

@@ -1,17 +1,17 @@
 import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 
 export const SAFE_LAST_VERSION: SafeVersion = '1.3.0'
-export const SAFE_BASE_VERSION: SafeVersion = '1.1.1'
+export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
 
 type SafeDeploymentsVersions = {
   [version: string]: {
     safeMasterCopyVersion: string
-    safeMasterCopyL2Version: string | undefined
+    safeMasterCopyL2Version?: string
     safeProxyFactoryVersion: string
     multiSendVersion: string
-    multiSendCallOnlyVersion: string
-    signMessageLibVersion: string
-    createCallVersion: string
+    multiSendCallOnlyVersion?: string
+    signMessageLibVersion?: string
+    createCallVersion?: string
   }
 }
 
@@ -42,6 +42,15 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0'
+  },
+  '1.0.0': {
+    safeMasterCopyVersion: '1.0.0',
+    safeMasterCopyL2Version: undefined,
+    safeProxyFactoryVersion: '1.0.0',
+    multiSendVersion: '1.0.0',
+    multiSendCallOnlyVersion: undefined,
+    signMessageLibVersion: undefined,
+    createCallVersion: undefined
   }
 }
 

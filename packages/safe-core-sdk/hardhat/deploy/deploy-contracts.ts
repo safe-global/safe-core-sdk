@@ -7,19 +7,22 @@ export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 const gnosisSafeContracts = {
   '1.3.0': { name: 'GnosisSafe_SV1_3_0' },
   '1.2.0': { name: 'GnosisSafe_SV1_2_0' },
-  '1.1.1': { name: 'GnosisSafe_SV1_1_1' }
+  '1.1.1': { name: 'GnosisSafe_SV1_1_1' },
+  '1.0.0': { name: 'GnosisSafe_SV1_0_0' }
 }
 
 const proxyFactoryContracts = {
   '1.3.0': { name: 'ProxyFactory_SV1_3_0' },
   '1.2.0': { name: 'ProxyFactory_SV1_2_0' },
-  '1.1.1': { name: 'ProxyFactory_SV1_1_1' }
+  '1.1.1': { name: 'ProxyFactory_SV1_1_1' },
+  '1.0.0': { name: 'ProxyFactory_SV1_0_0' }
 }
 
 const multiSendContracts = {
   '1.3.0': { name: 'MultiSend_SV1_3_0' },
   '1.2.0': { name: 'MultiSend_SV1_2_0' },
-  '1.1.1': { name: 'MultiSend_SV1_1_1' }
+  '1.1.1': { name: 'MultiSend_SV1_1_1' },
+  '1.0.0': { name: 'MultiSend_SV1_0_0' }
 }
 
 const multiSendCallOnlyContracts = {

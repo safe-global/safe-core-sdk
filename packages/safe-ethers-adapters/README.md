@@ -30,7 +30,8 @@ It may be obtained with:
 
 ```js
 import { ethers } from "ethers"
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
+import Safe from "@gnosis.pm/safe-core-sdk"
+import EthersAdapter from "@gnosis.pm/safe-ethers-lib"
 
 const safe = await Safe.create({
   ethAdapter: new EthersAdapter({ ethers, signer }),

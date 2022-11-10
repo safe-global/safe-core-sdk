@@ -51,7 +51,7 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 import SafeServiceClient from '@gnosis.pm/safe-service-client'
 
 const safeService = new SafeServiceClient({
-  txServiceUrl: 'https://safe-transaction.gnosis.io',
+  txServiceUrl: 'https://safe-transaction-mainnet.safe.global',
   ethAdapter
 })
 ```

@@ -48,7 +48,7 @@ As stated in the introduction, the [Safe Service Client](https://github.com/safe
 ```js
 import SafeServiceClient from '@gnosis.pm/safe-service-client'
 
-const txServiceUrl = 'https://safe-transaction.gnosis.io'
+const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
 const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
 ```
 

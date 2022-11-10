@@ -19,19 +19,33 @@ An example for such an account would be the private key of one of the owners tha
 const signer = new Wallet("some_private_key", ethereumProvider)
 ```
 
-It is also necessary to specify a service instance that should be used to publish the Safe transactions. An example for this would be the Mainnet instance of the [Safe Transaction Service](https://safe-transaction.gnosis.io/): `https://safe-transaction.gnosis.io/`
+It is also necessary to specify a service instance that should be used to publish the Safe transactions. An example for this would be the Mainnet instance of the [Safe Transaction Service](https://safe-transaction-mainnet.safe.global/): `https://safe-transaction-mainnet.safe.global/`
 
 ```js
 const service = new SafeService("some_service_url")
 ```
 
+A Safe instance must also be created before obtaining the signer.
+It may be obtained with:
+
+```js
+import { ethers } from "ethers"
+import Safe from "@gnosis.pm/safe-core-sdk"
+import EthersAdapter from "@gnosis.pm/safe-ethers-lib"
+
+const safe = await Safe.create({
+  ethAdapter: new EthersAdapter({ ethers, signer }),
+  safeAddress: "some_safe_address"
+})
+```
+
 Using these components it is possible to create an instance of the `SafeEthersSigner`
 
 ```js
-const safeSigner = await SafeEthersSigner.create("some_safe_address", signer, service)
+const safeSigner = new SafeEthersSigner(safe, service, provider)
 ```
 
-See [examples](./examples) for more information.
+See [examples](/packages/safe-ethers-adapters/examples) for more information.
 
 ## Installation
 

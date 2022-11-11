@@ -47,7 +47,7 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeMasterCopyVersion: '1.0.0',
     safeMasterCopyL2Version: undefined,
     safeProxyFactoryVersion: '1.0.0',
-    multiSendVersion: '1.0.0',
+    multiSendVersion: '1.3.0',
     multiSendCallOnlyVersion: undefined,
     signMessageLibVersion: undefined,
     createCallVersion: undefined

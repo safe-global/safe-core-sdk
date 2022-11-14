@@ -1,5 +1,7 @@
 # Safe Core SDK Monorepo
 
+[![Logo](https://raw.githubusercontent.com/gnosis/safe-core-sdk/main/assets/logo.png)](https://gnosis-safe.io/)
+
 Software developer tools that facilitate the interaction with the Safe [contracts](https://github.com/safe-global/safe-contracts) and [services](https://github.com/safe-global/safe-transaction-service).
 
 ## Guides

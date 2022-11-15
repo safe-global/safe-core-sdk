@@ -37,6 +37,6 @@ describe('getNextNonce', () => {
   it('should return the next Safe nonce when there are no pending transactions', async () => {
     const safeAddress = '0x72c346260a4887F0231af41178C1c818Ce34543f'
     const nextNonce = await serviceSdk.getNextNonce(safeAddress)
-    chai.expect(nextNonce).to.be.equal(3)
+    chai.expect(nextNonce).to.be.equal(5)
   })
 })

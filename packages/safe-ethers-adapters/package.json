@@ -80,7 +80,7 @@
   "dependencies": {
     "@gnosis.pm/safe-core-sdk": "^3.1.1",
     "@gnosis.pm/safe-core-sdk-types": "^1.6.1",
-    "@gnosis.pm/safe-deployments": "1.16.0",
+    "@gnosis.pm/safe-deployments": "1.17.0",
     "axios": "^0.27.2"
   }
 }

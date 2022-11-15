@@ -90,7 +90,7 @@
   "dependencies": {
     "@ethersproject/solidity": "^5.7.0",
     "@gnosis.pm/safe-core-sdk-types": "^1.6.1",
-    "@gnosis.pm/safe-deployments": "1.16.0",
+    "@gnosis.pm/safe-deployments": "1.17.0",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.7",
     "web3-utils": "^1.8.0"

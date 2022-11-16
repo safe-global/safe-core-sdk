@@ -31,8 +31,7 @@ const safeContracts_V1_1_1 = [
 ].join(' ')
 const safeContracts_V1_0_0 = [
   `${safeContractsPath}/v1.0.0/gnosis_safe.json`,
-  `${safeContractsPath}/v1.0.0/proxy_factory.json`,
-  `${safeContractsPath}/v1.0.0/multi_send.json`
+  `${safeContractsPath}/v1.0.0/proxy_factory.json`
 ].join(' ')
 
 // Won't be included in dist/ folder

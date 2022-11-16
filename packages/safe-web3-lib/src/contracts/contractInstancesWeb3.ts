@@ -1,6 +1,5 @@
 import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
 import { Gnosis_safe as SafeMasterCopy_V1_0_0 } from '../../typechain/src/web3-v1/v1.0.0/Gnosis_safe'
-import { Multi_send as MultiSend_V1_0_0 } from '../../typechain/src/web3-v1/v1.0.0/Multi_send'
 import { Proxy_factory as GnosisSafeProxyFactory_V1_0_0 } from '../../typechain/src/web3-v1/v1.0.0/Proxy_factory'
 import { Gnosis_safe as SafeMasterCopy_V1_1_1 } from '../../typechain/src/web3-v1/v1.1.1/Gnosis_safe'
 import { Multi_send as MultiSend_V1_1_1 } from '../../typechain/src/web3-v1/v1.1.1/Multi_send'
@@ -20,7 +19,6 @@ import GnosisSafeContract_V1_3_0_Web3 from './GnosisSafe/v1.3.0/GnosisSafeContra
 import GnosisSafeProxyFactoryContract_V1_0_0_Web3 from './GnosisSafeProxyFactory/v1.0.0/GnosisSafeProxyFactoryContract_V1_0_0_Web3'
 import GnosisSafeProxyFactoryContract_V1_1_1_Web3 from './GnosisSafeProxyFactory/v1.1.1/GnosisSafeProxyFactoryContract_V1_1_1_Web3'
 import GnosisSafeProxyFactoryContract_V1_3_0_Web3 from './GnosisSafeProxyFactory/v1.3.0/GnosisSafeProxyFactoryContract_V1_3_0_Web3'
-import MultiSendContract_V1_0_0_Web3 from './MultiSend/v1.0.0/MultiSendContract_V1_0_0_Web3'
 import MultiSendContract_V1_1_1_Web3 from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
 import MultiSendContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
 import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSendCallOnly/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
@@ -61,9 +59,8 @@ export function getMultiSendContractInstance(
       return new MultiSendContract_V1_3_0_Web3(multiSendContract as MultiSend_V1_3_0)
     case '1.2.0':
     case '1.1.1':
-      return new MultiSendContract_V1_1_1_Web3(multiSendContract as MultiSend_V1_1_1)
     case '1.0.0':
-      return new MultiSendContract_V1_0_0_Web3(multiSendContract as MultiSend_V1_0_0)
+      return new MultiSendContract_V1_1_1_Web3(multiSendContract as MultiSend_V1_1_1)
     default:
       throw new Error('Invalid Safe version')
   }
@@ -77,6 +74,7 @@ export function getMultiSendCallOnlyContractInstance(
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
+    case '1.0.0':
       return new MultiSendCallOnlyContract_V1_3_0_Web3(
         multiSendCallOnlyContract as MultiSendCallOnly_V1_3_0
       )
@@ -134,6 +132,7 @@ export function getCreateCallContractInstance(
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
+    case '1.0.0':
       return new CreateCallContract_V1_3_0_Web3(createCallContract as CreateCall_V1_3_0)
     default:
       throw new Error('Invalid Safe version')

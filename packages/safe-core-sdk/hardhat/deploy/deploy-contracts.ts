@@ -22,25 +22,28 @@ const multiSendContracts = {
   '1.3.0': { name: 'MultiSend_SV1_3_0' },
   '1.2.0': { name: 'MultiSend_SV1_2_0' },
   '1.1.1': { name: 'MultiSend_SV1_1_1' },
-  '1.0.0': { name: 'MultiSend_SV1_0_0' }
+  '1.0.0': { name: 'MultiSend_SV1_1_1' }
 }
 
 const multiSendCallOnlyContracts = {
   '1.3.0': { name: 'MultiSendCallOnly_SV1_3_0' },
   '1.2.0': { name: 'MultiSendCallOnly_SV1_3_0' },
-  '1.1.1': { name: 'MultiSendCallOnly_SV1_3_0' }
+  '1.1.1': { name: 'MultiSendCallOnly_SV1_3_0' },
+  '1.0.0': { name: 'MultiSendCallOnly_SV1_3_0' }
 }
 
 const signMessageLibContracts = {
   '1.3.0': { name: 'SignMessageLib_SV1_3_0' },
   '1.2.0': { name: 'SignMessageLib_SV1_3_0' },
-  '1.1.1': { name: 'SignMessageLib_SV1_3_0' }
+  '1.1.1': { name: 'SignMessageLib_SV1_3_0' },
+  '1.0.0': { name: 'SignMessageLib_SV1_3_0' }
 }
 
 const createCallContracts = {
   '1.3.0': { name: 'CreateCall_SV1_3_0' },
   '1.2.0': { name: 'CreateCall_SV1_3_0' },
-  '1.1.1': { name: 'CreateCall_SV1_3_0' }
+  '1.1.1': { name: 'CreateCall_SV1_3_0' },
+  '1.0.0': { name: 'CreateCall_SV1_3_0' }
 }
 
 export const gnosisSafeDeployed = gnosisSafeContracts[safeVersionDeployed]

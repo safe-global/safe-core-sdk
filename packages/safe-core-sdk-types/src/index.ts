@@ -1,3 +1,4 @@
+export * from './contracts/CompatibilityFallbackHandlerContract'
 export * from './contracts/CreateCallContract'
 export * from './contracts/GnosisSafeContract'
 export * from './contracts/GnosisSafeProxyFactoryContract'

@@ -1,4 +1,5 @@
 import {
+  CompatibilityFallbackHandlerContract,
   CreateCallContract,
   EthAdapter,
   GnosisSafeContract,
@@ -10,6 +11,7 @@ import {
 } from '@gnosis.pm/safe-core-sdk-types'
 import {
   DeploymentFilter,
+  getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
   getMultiSendCallOnlyDeployment,
   getMultiSendDeployment,
@@ -45,6 +47,18 @@ export function getSafeContractDeployment(
     return getSafeSingletonDeployment(filters)
   }
   return getSafeL2SingletonDeployment(filters)
+}
+
+export function getCompatibilityFallbackHandlerContractDeployment(
+  safeVersion: SafeVersion,
+  chainId: number
+): SingletonDeployment | undefined {
+  const version = safeDeploymentsVersions[safeVersion].compatibilityFallbackHandler
+  return getCompatibilityFallbackHandlerDeployment({
+    version,
+    network: chainId.toString(),
+    released: true
+  })
 }
 
 export function getMultiSendCallOnlyContractDeployment(
@@ -131,6 +145,32 @@ export async function getProxyFactoryContract({
     throw new Error('SafeProxyFactory contract is not deployed on the current network')
   }
   return safeProxyFactoryContract
+}
+
+export async function getCompatibilityFallbackHandlerContract({
+  ethAdapter,
+  safeVersion,
+  chainId,
+  customContracts
+}: GetContractInstanceProps): Promise<CompatibilityFallbackHandlerContract> {
+  const fallbackHandlerDeployment = getCompatibilityFallbackHandlerContractDeployment(
+    safeVersion,
+    chainId
+  )
+  const fallbackHandlerContract = await ethAdapter.getCompatibilityFallbackHandlerContract({
+    safeVersion,
+    chainId,
+    singletonDeployment: fallbackHandlerDeployment,
+    customContractAddress: customContracts?.fallbackHandlerAddress,
+    customContractAbi: customContracts?.fallbackHandlerAbi
+  })
+  const isContractDeployed = await ethAdapter.isContractDeployed(
+    fallbackHandlerContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('CompatibilityFallbackHandler contract is not deployed on the current network')
+  }
+  return fallbackHandlerContract
 }
 
 export async function getMultiSendContract({

@@ -82,7 +82,7 @@ describe('Transactions creation', () => {
     )
 
     itif(safeVersionDeployed >= '1.3.0')(
-      'should return a transaction with defined safeTxGas if safeVersion>=1.3.0 and gasPrice>0',
+      'should return a transaction with defined safeTxGas if safeVersion>=1.3.0',
       async () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
@@ -98,8 +98,7 @@ describe('Transactions creation', () => {
           to: account2.address,
           value: '0',
           data: '0x',
-          safeTxGas,
-          gasPrice: 123
+          safeTxGas
         }
         const safeTxData = await standardizeSafeTransactionData(
           safeSdk.getContractManager().safeContract,
@@ -196,7 +195,7 @@ describe('Transactions creation', () => {
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
       chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
       chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(safeVersionDeployed >= '1.3.0' ? 0 : 666)
+      chai.expect(tx.data.safeTxGas).to.be.eq(666)
     })
 
     it('should create a single transaction with gasPrice>0', async () => {
@@ -385,30 +384,5 @@ describe('Transactions creation', () => {
       chai.expect(multiSendTx.data.nonce).to.be.eq(555)
       chai.expect(multiSendTx.data.safeTxGas).to.be.eq(666)
     })
-  })
-
-  it('should respect passed safeTxGas option', async () => {
-    const { accounts, contractNetworks, chainId } = await setupTests()
-    const [account1] = accounts
-    const safe = await getSafeWithOwners([account1.address])
-    const ethAdapter = await getEthAdapter(account1.signer)
-    const safeSdk = await Safe.create({
-      ethAdapter,
-      safeAddress: safe.address,
-      contractNetworks
-    })
-    const options: SafeTransactionOptionalProps = {
-      safeTxGas: 666
-    }
-    const safeTransactionData: MetaTransactionData[] = [
-      {
-        to: `0xbeef${'0'.repeat(38)}`,
-        value: '0',
-        data: '0x'
-      }
-    ]
-    const multiSendTx = await safeSdk.createTransaction({ safeTransactionData, options })
-
-    chai.expect(multiSendTx.data.safeTxGas).to.be.eq(options.safeTxGas)
   })
 })

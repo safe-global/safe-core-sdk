@@ -59,7 +59,6 @@ export async function standardizeSafeTransactionData(
       standardizedTxs.operation
     )
   }
-  console.log({safeTxGas})
   return {
     ...standardizedTxs,
     safeTxGas

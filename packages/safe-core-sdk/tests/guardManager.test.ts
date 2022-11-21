@@ -13,7 +13,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
-describe('Safe guards manager', () => {
+describe('Safe guard manager', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
@@ -224,7 +224,7 @@ describe('Safe guards manager', () => {
         contractNetworks
       })
       const tx = safeSdk.createDisableGuardTx()
-      await chai.expect(tx).to.be.rejectedWith('There are no guards enabled yet')
+      await chai.expect(tx).to.be.rejectedWith('There is no guard enabled yet')
     })
 
     itif(safeVersionDeployed >= '1.3.0')(

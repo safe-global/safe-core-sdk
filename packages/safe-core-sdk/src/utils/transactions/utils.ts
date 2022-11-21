@@ -34,32 +34,32 @@ export async function standardizeSafeTransactionData(
     operation: tx.operation ?? OperationType.Call,
     baseGas: tx.baseGas ?? 0,
     gasPrice: tx.gasPrice ?? 0,
-    safeTxGas: tx.safeTxGas ?? 0,
     gasToken: tx.gasToken || ZERO_ADDRESS,
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
     nonce: tx.nonce ?? (await safeContract.getNonce())
   }
   let safeTxGas: number
-  const safeVersion = await safeContract.getVersion()
 
-  if (
-    hasFeature(FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) &&
-    standardizedTxs.gasPrice === 0 &&
-    standardizedTxs.safeTxGas === 0
-  ) {
+  if (tx.safeTxGas) {
+    return {
+      ...standardizedTxs,
+      safeTxGas: tx.safeTxGas
+    }
+  }
+  const safeVersion = await safeContract.getVersion()
+  if (hasFeature(FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) && standardizedTxs.gasPrice === 0) {
     safeTxGas = 0
   } else {
-    safeTxGas =
-      tx.safeTxGas ??
-      (await estimateTxGas(
-        safeContract,
-        ethAdapter,
-        standardizedTxs.to,
-        standardizedTxs.value,
-        standardizedTxs.data,
-        standardizedTxs.operation
-      ))
+    safeTxGas = await estimateTxGas(
+      safeContract,
+      ethAdapter,
+      standardizedTxs.to,
+      standardizedTxs.value,
+      standardizedTxs.data,
+      standardizedTxs.operation
+    )
   }
+  console.log({safeTxGas})
   return {
     ...standardizedTxs,
     safeTxGas

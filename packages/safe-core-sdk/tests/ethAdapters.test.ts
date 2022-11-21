@@ -3,6 +3,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
 import {
+  getCompatibilityFallbackHandlerContractDeployment,
   getCreateCallContractDeployment,
   getMultiSendCallOnlyContractDeployment,
   getMultiSendContractDeployment,
@@ -12,6 +13,7 @@ import {
 } from '../src/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
+  getCompatibilityFallbackHandler,
   getCreateCall,
   getFactory,
   getMultiSend,
@@ -181,6 +183,47 @@ describe('Safe contracts', () => {
       chai
         .expect(await multiSendCallOnlyContract.getAddress())
         .to.be.eq((await getMultiSendCallOnly()).contract.address)
+    })
+  })
+
+  describe('getCompatibilityFallbackHandlerContract', async () => {
+    it('should return a CompatibilityFallbackHandler contract from safe-deployments', async () => {
+      const { accounts } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const chainId = 1
+      const singletonDeployment = getCompatibilityFallbackHandlerContractDeployment(
+        safeVersion,
+        chainId
+      )
+      const compatibilityFallbackHandlerContract =
+        await ethAdapter.getCompatibilityFallbackHandlerContract({
+          safeVersion,
+          chainId,
+          singletonDeployment
+        })
+      chai
+        .expect(await compatibilityFallbackHandlerContract.getAddress())
+        .to.be.eq('0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4')
+    })
+
+    it('should return a CompatibilityFallbackHandler contract from the custom addresses', async () => {
+      const { accounts, contractNetworks, chainId } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeVersion: SafeVersion = '1.3.0'
+      const customContract = contractNetworks[chainId]
+      const compatibilityFallbackHandlerContract =
+        await ethAdapter.getCompatibilityFallbackHandlerContract({
+          safeVersion,
+          chainId,
+          customContractAddress: customContract.fallbackHandlerAddress,
+          customContractAbi: customContract.fallbackHandlerAbi
+        })
+      chai
+        .expect(await compatibilityFallbackHandlerContract.getAddress())
+        .to.be.eq((await getCompatibilityFallbackHandler()).contract.address)
     })
   })
 

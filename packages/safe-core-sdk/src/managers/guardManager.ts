@@ -29,7 +29,7 @@ class GuardManager {
 
   private validateGuardIsEnabled(guardAddress: string): void {
     if (isZeroAddress(guardAddress)) {
-      throw new Error('There are no guards enabled yet')
+      throw new Error('There is no guard enabled yet')
     }
   }
 

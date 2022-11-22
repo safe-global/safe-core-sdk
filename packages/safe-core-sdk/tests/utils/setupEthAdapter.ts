@@ -9,9 +9,8 @@ export async function getEthAdapter(signerOrProvider: Signer | Provider): Promis
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
     case 'web3':
-      const signerAddress = (signerOrProvider instanceof Signer)
-        ? await signerOrProvider.getAddress()
-        : undefined
+      const signerAddress =
+        signerOrProvider instanceof Signer ? await signerOrProvider.getAddress() : undefined
       const web3AdapterConfig: Web3AdapterConfig = { web3: web3 as any, signerAddress }
       ethAdapter = new Web3Adapter(web3AdapterConfig)
       break

@@ -8,6 +8,7 @@ type SafeDeploymentsVersions = {
     safeMasterCopyVersion: string
     safeMasterCopyL2Version: string | undefined
     safeProxyFactoryVersion: string
+    compatibilityFallbackHandler: string
     multiSendVersion: string
     multiSendCallOnlyVersion: string
     signMessageLibVersion: string
@@ -22,6 +23,7 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeProxyFactoryVersion: '1.3.0',
     multiSendVersion: '1.3.0',
     multiSendCallOnlyVersion: '1.3.0',
+    compatibilityFallbackHandler: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0'
   },
@@ -31,6 +33,7 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeProxyFactoryVersion: '1.1.1',
     multiSendVersion: '1.1.1',
     multiSendCallOnlyVersion: '1.3.0',
+    compatibilityFallbackHandler: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0'
   },
@@ -40,6 +43,7 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeProxyFactoryVersion: '1.1.1',
     multiSendVersion: '1.1.1',
     multiSendCallOnlyVersion: '1.3.0',
+    compatibilityFallbackHandler: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0'
   }

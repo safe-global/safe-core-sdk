@@ -12,6 +12,7 @@ import {
   TransactionResult
 } from '@gnosis.pm/safe-core-sdk-types'
 import ContractManager from './managers/contractManager'
+import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
@@ -88,6 +89,7 @@ class Safe {
   #ownerManager!: OwnerManager
   #moduleManager!: ModuleManager
   #guardManager!: GuardManager
+  #fallbackHandlerManager!: FallbackHandlerManager
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -132,6 +134,10 @@ class Safe {
     this.#ownerManager = new OwnerManager(this.#ethAdapter, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#ethAdapter, this.#contractManager.safeContract)
     this.#guardManager = new GuardManager(this.#ethAdapter, this.#contractManager.safeContract)
+    this.#fallbackHandlerManager = new FallbackHandlerManager(
+      this.#ethAdapter,
+      this.#contractManager.safeContract
+    )
   }
 
   /**
@@ -252,6 +258,15 @@ class Safe {
    */
   async getBalance(): Promise<BigNumber> {
     return this.#ethAdapter.getBalance(this.getAddress())
+  }
+
+  /**
+   * Returns the address of the FallbackHandler contract.
+   *
+   * @returns The address of the FallbackHandler contract
+   */
+  getFallbackHandler(): Promise<string> {
+    return this.#fallbackHandlerManager.getFallbackHandler()
   }
 
   /**
@@ -511,6 +526,53 @@ class Safe {
   }
 
   /**
+   * Returns the Safe transaction to enable the fallback handler.
+   *
+   * @param address - The new fallback handler address
+   * @param options - The transaction optional properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "Invalid fallback handler address provided"
+   * @throws "Fallback handler provided is already enabled"
+   * @throws "Current version of the Safe does not support the fallback handler functionality"
+   */
+  async createEnableFallbackHandlerTx(
+    fallbackHandlerAddress: string,
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const safeTransactionData: SafeTransactionDataPartial = {
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#fallbackHandlerManager.encodeEnableFallbackHandlerData(
+        fallbackHandlerAddress
+      ),
+      ...options
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    return safeTransaction
+  }
+
+  /**
+   * Returns the Safe transaction to disable the fallback handler.
+   *
+   * @param options - The transaction optional properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "There is no fallback handler enabled yet"
+   * @throws "Current version of the Safe does not support the fallback handler functionality"
+   */
+  async createDisableFallbackHandlerTx(
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const safeTransactionData: SafeTransactionDataPartial = {
+      to: this.getAddress(),
+      value: '0',
+      data: await this.#fallbackHandlerManager.encodeDisableFallbackHandlerData(),
+      ...options
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    return safeTransaction
+  }
+
+  /**
    * Returns the Safe transaction to enable a Safe guard.
    *
    * @param guardAddress - The desired guard address
@@ -539,8 +601,7 @@ class Safe {
    *
    * @param options - The transaction optional properties
    * @returns The Safe transaction ready to be signed
-   * @throws "Invalid guard address provided"
-   * @throws "There are no guards enabled yet"
+   * @throws "There is no guard enabled yet"
    * @throws "Current version of the Safe does not support Safe transaction guards functionality"
    */
   async createDisableGuardTx(options?: SafeTransactionOptionalProps): Promise<SafeTransaction> {

@@ -28,6 +28,12 @@ const multiSendCallOnlyContracts = {
   '1.1.1': { name: 'MultiSendCallOnly_SV1_3_0' }
 }
 
+const compatibilityFallbackHandlerContracts = {
+  '1.3.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
+  '1.2.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
+  '1.1.1': { name: 'CompatibilityFallbackHandler_SV1_3_0' }
+}
+
 const signMessageLibContracts = {
   '1.3.0': { name: 'SignMessageLib_SV1_3_0' },
   '1.2.0': { name: 'SignMessageLib_SV1_3_0' },
@@ -44,6 +50,8 @@ export const gnosisSafeDeployed = gnosisSafeContracts[safeVersionDeployed]
 export const proxyFactoryDeployed = proxyFactoryContracts[safeVersionDeployed]
 export const multiSendDeployed = multiSendContracts[safeVersionDeployed]
 export const multiSendCallOnlyDeployed = multiSendCallOnlyContracts[safeVersionDeployed]
+export const compatibilityFallbackHandlerDeployed =
+  compatibilityFallbackHandlerContracts[safeVersionDeployed]
 export const signMessageLibDeployed = signMessageLibContracts[safeVersionDeployed]
 export const createCallDeployed = createCallContracts[safeVersionDeployed]
 
@@ -94,6 +102,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     deterministicDeployment: true
   })
 
+  await deploy(compatibilityFallbackHandlerDeployed.name, {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
   await deploy('DailyLimitModule', {
     from: deployer,
     args: [],
@@ -118,6 +133,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     from: deployer,
     args: [],
     log: true
+  })
+
+  await deploy('DefaultCallbackHandler', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
   })
 }
 

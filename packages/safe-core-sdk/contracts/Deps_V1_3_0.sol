@@ -7,7 +7,9 @@ import { MultiSend } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/libraries/
 import { MultiSendCallOnly } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/libraries/MultiSendCallOnly.sol";
 import { SignMessageLib } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/examples/libraries/SignMessage.sol";
 import { CreateCall } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/libraries/CreateCall.sol";
+import { CompatibilityFallbackHandler } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/handler/CompatibilityFallbackHandler.sol";
 import { DebugTransactionGuard } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/examples/guards/DebugTransactionGuard.sol";
+import { DefaultCallbackHandler } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/handler/DefaultCallbackHandler.sol";
 
 contract ProxyFactory_SV1_3_0 is GnosisSafeProxyFactory {}
 contract GnosisSafe_SV1_3_0 is GnosisSafe {}
@@ -15,3 +17,4 @@ contract MultiSend_SV1_3_0 is MultiSend {}
 contract MultiSendCallOnly_SV1_3_0 is MultiSendCallOnly {}
 contract SignMessageLib_SV1_3_0 is SignMessageLib {}
 contract CreateCall_SV1_3_0 is CreateCall {}
+contract CompatibilityFallbackHandler_SV1_3_0 is CompatibilityFallbackHandler {}

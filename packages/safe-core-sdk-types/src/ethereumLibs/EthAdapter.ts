@@ -1,6 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { SingletonDeployment } from '@gnosis.pm/safe-deployments'
 import { AbiItem } from 'web3-utils'
+import { CompatibilityFallbackHandlerContract } from '../contracts/CompatibilityFallbackHandlerContract'
 import { CreateCallContract } from '../contracts/CreateCallContract'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
@@ -56,6 +57,13 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): MultiSendCallOnlyContract
+  getCompatibilityFallbackHandlerContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): CompatibilityFallbackHandlerContract
   getSafeProxyFactoryContract({
     safeVersion,
     chainId,

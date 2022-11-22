@@ -7,7 +7,11 @@ import {
 } from '@gnosis.pm/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import { SAFE_LAST_VERSION } from '../contracts/config'
-import { getProxyFactoryContract, getSafeContract } from '../contracts/safeDeploymentContracts'
+import {
+  getCompatibilityFallbackHandlerContract,
+  getProxyFactoryContract,
+  getSafeContract
+} from '../contracts/safeDeploymentContracts'
 import Safe from '../Safe'
 import { ContractNetworksConfig } from '../types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
@@ -129,17 +133,31 @@ class SafeFactory {
     threshold,
     to = ZERO_ADDRESS,
     data = EMPTY_DATA,
-    fallbackHandler = ZERO_ADDRESS,
+    fallbackHandler,
     paymentToken = ZERO_ADDRESS,
     payment = 0,
     paymentReceiver = ZERO_ADDRESS
   }: SafeAccountConfig): Promise<string> {
+    let fallbackHandlerAddress: string
+    if (fallbackHandler) {
+      fallbackHandlerAddress = fallbackHandler
+    } else {
+      const chainId = await this.#ethAdapter.getChainId()
+      const customContracts = this.#contractNetworks?.[chainId]
+      const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
+        ethAdapter: this.#ethAdapter,
+        safeVersion: this.#safeVersion,
+        chainId,
+        customContracts
+      })
+      fallbackHandlerAddress = fallbackHandlerContract.getAddress()
+    }
     return this.#gnosisSafeContract.encode('setup', [
       owners,
       threshold,
       to,
       data,
-      fallbackHandler,
+      fallbackHandlerAddress,
       paymentToken,
       payment,
       paymentReceiver

@@ -167,19 +167,21 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   ```js
   import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
 
-  const id = await ethAdapter.getChainId()
+  const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
-    [id]: {
-      multiSendAddress: '<MULTI_SEND_ADDRESS>',
-      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+    [chainId]: {
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+      fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
-      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
-      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -299,19 +301,21 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
   ```js
   import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
 
-  const id = await ethAdapter.getChainId()
+  const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
-    [id]: {
-      multiSendAddress: '<MULTI_SEND_ADDRESS>',
-      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+    [chainId]: {
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+      fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
-      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
-      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -343,18 +347,23 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
+  import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
+
+  const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
     [chainId]: {
-      multiSendAddress: '<MULTI_SEND_ADDRESS>',
-      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+      fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
-      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
-      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }

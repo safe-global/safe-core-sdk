@@ -15,10 +15,14 @@ import { ZERO_ADDRESS } from '../src/utils/constants'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
+  getCompatibilityFallbackHandler,
+  getCreateCall,
+  getDefaultCallbackHandler,
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
-  getSafeSingleton
+  getSafeSingleton,
+  getSignMessageLib
 } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -32,6 +36,7 @@ describe('SafeProxyFactory', () => {
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
     return {
+      defaultCallbackHandler: await getDefaultCallbackHandler(),
       chainId: (await waffle.provider.getNetwork()).chainId,
       accounts,
       contractNetworks
@@ -54,14 +59,20 @@ describe('SafeProxyFactory', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const contractNetworks: ContractNetworksConfig = {
         [chainId]: {
+          safeMasterCopyAddress: ZERO_ADDRESS,
+          safeMasterCopyAbi: (await getSafeSingleton()).abi,
+          safeProxyFactoryAddress: ZERO_ADDRESS,
+          safeProxyFactoryAbi: (await getFactory()).abi,
           multiSendAddress: ZERO_ADDRESS,
           multiSendAbi: (await getMultiSend()).abi,
           multiSendCallOnlyAddress: ZERO_ADDRESS,
           multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
-          safeMasterCopyAddress: ZERO_ADDRESS,
-          safeMasterCopyAbi: (await getSafeSingleton()).abi,
-          safeProxyFactoryAddress: ZERO_ADDRESS,
-          safeProxyFactoryAbi: (await getFactory()).abi
+          fallbackHandlerAddress: ZERO_ADDRESS,
+          fallbackHandlerAbi: (await getCompatibilityFallbackHandler()).abi,
+          signMessageLibAddress: ZERO_ADDRESS,
+          signMessageLibAbi: (await getSignMessageLib()).abi,
+          createCallAddress: ZERO_ADDRESS,
+          createCallAbi: (await getCreateCall()).abi
         }
       }
       chai
@@ -185,8 +196,58 @@ describe('SafeProxyFactory', () => {
       const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
       const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
       const safe = await safeFactory.deploySafe(deploySafeProps)
-      const safeAddress = await safe.getAddress()
-      chai.expect(counterfactualSafeAddress).to.be.eq(safeAddress)
+      chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+      chai.expect(threshold).to.be.eq(await safe.getThreshold())
+      const deployedSafeOwners = await safe.getOwners()
+      chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
+    })
+
+    it('should predict a new Safe with the default CompatibilityFallbackHandler', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
+      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
+      chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
+        .address
+      chai.expect(compatibilityFallbackHandler).to.be.eq(await safe.getFallbackHandler())
+    })
+
+    it('should predict a new Safe with a custom fallback handler', async () => {
+      const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = {
+        owners,
+        threshold,
+        fallbackHandler: defaultCallbackHandler.address
+      }
+      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
+      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
+      chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+      chai.expect(defaultCallbackHandler.address).to.be.eq(await safe.getFallbackHandler())
     })
   })
 
@@ -250,6 +311,52 @@ describe('SafeProxyFactory', () => {
       await chai
         .expect(safeFactory.deploySafe(safeDeployProps))
         .rejectedWith('saltNonce must be greater than or equal to 0')
+    })
+
+    it('should deploy a new Safe with custom fallback handler', async () => {
+      const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = {
+        owners,
+        threshold,
+        fallbackHandler: defaultCallbackHandler.address
+      }
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
+      const deployedSafeOwners = await safe.getOwners()
+      chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
+      const deployedSafeThreshold = await safe.getThreshold()
+      chai.expect(deployedSafeThreshold).to.be.eq(threshold)
+      const fallbackHandler = await safe.getFallbackHandler()
+      chai.expect(defaultCallbackHandler.address).to.be.eq(fallbackHandler)
+    })
+
+    it('should deploy a new Safe with the default CompatibilityFallbackHandler', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeFactory = await SafeFactory.create({
+        ethAdapter,
+        safeVersion: safeVersionDeployed,
+        contractNetworks
+      })
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const deploySafeProps: DeploySafeProps = { safeAccountConfig }
+      const safe = await safeFactory.deploySafe(deploySafeProps)
+      const fallbackHandler = await safe.getFallbackHandler()
+      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
+        .address
+      chai.expect(compatibilityFallbackHandler).to.be.eq(fallbackHandler)
     })
 
     it('should deploy a new Safe without saltNonce', async () => {

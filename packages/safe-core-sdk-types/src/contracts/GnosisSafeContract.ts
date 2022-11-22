@@ -19,6 +19,10 @@ export interface GnosisSafeContract {
   approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
+  isValidTransaction(
+    safeTransaction: SafeTransaction,
+    options?: TransactionOptions
+  ): Promise<boolean>
   execTransaction(
     safeTransaction: SafeTransaction,
     options?: TransactionOptions

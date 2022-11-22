@@ -12,27 +12,33 @@ import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 import type { JsonRPCResponse, Provider } from 'web3/providers'
+import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
 import {
+  getCompatibilityFallbackHandlerContractInstance,
+  getCreateCallContractInstance,
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
-  getSafeContractInstance
+  getSafeContractInstance,
+  getSignMessageLibContractInstance
 } from './contracts/contractInstancesWeb3'
+import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
 import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
 import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
 import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
 import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
+import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
   web3: Web3
   /** signerAddress - Address of the signer */
-  signerAddress: string
+  signerAddress?: string
 }
 
 class Web3Adapter implements EthAdapter {
   #web3: Web3
-  #signerAddress: string
+  #signerAddress?: string
 
   constructor({ web3, signerAddress }: Web3AdapterConfig) {
     if (!web3) {
@@ -91,6 +97,24 @@ class Web3Adapter implements EthAdapter {
     return getSafeContractInstance(safeVersion, safeContract)
   }
 
+  getSafeProxyFactoryContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SafeProxyFactory contract address')
+    }
+    const proxyFactoryContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+  }
+
   getMultiSendContract({
     safeVersion,
     chainId,
@@ -127,22 +151,58 @@ class Web3Adapter implements EthAdapter {
     return getMultiSendCallOnlyContractInstance(safeVersion, multiSendContract)
   }
 
-  getSafeProxyFactoryContract({
+  getCompatibilityFallbackHandlerContract({
     safeVersion,
     chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
+  }: GetContractProps): CompatibilityFallbackHandlerWeb3Contract {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid SafeProxyFactory contract address')
+      throw new Error('Invalid Compatibility Fallback Handler contract address')
     }
-    const proxyFactoryContract = this.getContract(
+    const multiSendContract = this.getContract(
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
-    return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+    return getCompatibilityFallbackHandlerContractInstance(safeVersion, multiSendContract)
+  }
+
+  getSignMessageLibContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): SignMessageLibWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SignMessageLib contract address')
+    }
+    const signMessageLibContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getSignMessageLibContractInstance(safeVersion, signMessageLibContract)
+  }
+
+  getCreateCallContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): CreateCallWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid CreateCall contract address')
+    }
+    const createCallContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getCreateCallContractInstance(safeVersion, createCallContract)
   }
 
   getContract(address: string, abi: AbiItem | AbiItem[], options?: ContractOptions): any {
@@ -171,11 +231,14 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.eth.getTransaction(transactionHash)
   }
 
-  async getSignerAddress(): Promise<string> {
+  async getSignerAddress(): Promise<string | undefined> {
     return this.#signerAddress
   }
 
   signMessage(message: string): Promise<string> {
+    if (!this.#signerAddress) {
+      throw new Error('EthAdapter must be initialized with a signer to use this method')
+    }
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
 
@@ -183,6 +246,9 @@ class Web3Adapter implements EthAdapter {
     safeTransactionEIP712Args: SafeTransactionEIP712Args,
     methodVersion?: 'v3' | 'v4'
   ): Promise<string> {
+    if (!this.#signerAddress) {
+      throw new Error('This method requires a signer')
+    }
     const typedData = generateTypedData(safeTransactionEIP712Args)
     let method = 'eth_signTypedData_v3'
     if (methodVersion === 'v4') {

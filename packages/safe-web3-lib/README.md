@@ -49,6 +49,12 @@ const ethAdapter = new Web3Adapter({
 })
 ```
 
+In case the `ethAdapter` instance is only used to execute read-only methods the `signerAddress` property can be omitted.
+
+```js
+const readOnlyEthAdapter = new Web3Adapter({ web3 })
+```
+
 ## <a name="license">License</a>
 
 This library is released under MIT.

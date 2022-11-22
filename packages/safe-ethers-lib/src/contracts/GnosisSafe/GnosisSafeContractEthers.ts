@@ -75,6 +75,49 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
 
   abstract isModuleEnabled(moduleAddress: string): Promise<boolean>
 
+  async isValidTransaction(
+    safeTransaction: SafeTransaction,
+    options?: EthersTransactionOptions
+  ): Promise<boolean> {
+    let isTxValid = false
+    try {
+      if (options && !options.gasLimit) {
+        options.gasLimit = await this.estimateGas(
+          'execTransaction',
+          [
+            safeTransaction.data.to,
+            safeTransaction.data.value,
+            safeTransaction.data.data,
+            safeTransaction.data.operation,
+            safeTransaction.data.safeTxGas,
+            safeTransaction.data.baseGas,
+            safeTransaction.data.gasPrice,
+            safeTransaction.data.gasToken,
+            safeTransaction.data.refundReceiver,
+            safeTransaction.encodedSignatures()
+          ],
+          {
+            ...options
+          }
+        )
+      }
+      isTxValid = await this.contract.callStatic.execTransaction(
+        safeTransaction.data.to,
+        safeTransaction.data.value,
+        safeTransaction.data.data,
+        safeTransaction.data.operation,
+        safeTransaction.data.safeTxGas,
+        safeTransaction.data.baseGas,
+        safeTransaction.data.gasPrice,
+        safeTransaction.data.gasToken,
+        safeTransaction.data.refundReceiver,
+        safeTransaction.encodedSignatures(),
+        options
+      )
+    } catch {}
+    return isTxValid
+  }
+
   async execTransaction(
     safeTransaction: SafeTransaction,
     options?: EthersTransactionOptions

@@ -18,8 +18,11 @@ const safeContractsPath = '../../node_modules/@gnosis.pm/safe-deployments/dist/a
 const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/gnosis_safe.json`,
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
+  `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`,
   `${safeContractsPath}/v1.3.0/multi_send.json`,
-  `${safeContractsPath}/v1.3.0/multi_send_call_only.json`
+  `${safeContractsPath}/v1.3.0/multi_send_call_only.json`,
+  `${safeContractsPath}/v1.3.0/sign_message_lib.json`,
+  `${safeContractsPath}/v1.3.0/create_call.json`
 ].join(' ')
 const safeContracts_V1_2_0 = [`${safeContractsPath}/v1.2.0/gnosis_safe.json`].join(' ')
 const safeContracts_V1_1_1 = [
@@ -40,7 +43,8 @@ const testContracts_V1_2_0 = [
 const safeContractsTestV1_3_0Path =
   '../../node_modules/@gnosis.pm/safe-contracts-v1.3.0/build/artifacts/contracts'
 const testContracts_V1_3_0 = [
-  `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`
+  `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`,
+  `${safeContractsTestV1_3_0Path}/examples/guards/DefaultCallbackHandler.sol/DefaultCallbackHandler.json`
 ].join(' ')
 
 // Remove existing Typechain files

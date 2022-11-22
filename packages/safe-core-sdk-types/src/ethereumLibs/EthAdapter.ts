@@ -1,10 +1,13 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { SingletonDeployment } from '@gnosis.pm/safe-deployments'
 import { AbiItem } from 'web3-utils'
+import { CompatibilityFallbackHandlerContract } from '../contracts/CompatibilityFallbackHandlerContract'
+import { CreateCallContract } from '../contracts/CreateCallContract'
 import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
 import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
 import { MultiSendCallOnlyContract } from '../contracts/MultiSendCallOnlyContract'
 import { MultiSendContract } from '../contracts/MultiSendContract'
+import { SignMessageLibContract } from '../contracts/SignMessageLibContract'
 import { Eip3770Address, SafeTransactionEIP712Args, SafeVersion } from '../types'
 
 export interface EthAdapterTransaction {
@@ -54,6 +57,13 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): MultiSendCallOnlyContract
+  getCompatibilityFallbackHandlerContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): CompatibilityFallbackHandlerContract
   getSafeProxyFactoryContract({
     safeVersion,
     chainId,
@@ -61,11 +71,25 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): GnosisSafeProxyFactoryContract
+  getSignMessageLibContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): SignMessageLibContract
+  getCreateCallContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): CreateCallContract
   getContractCode(address: string, defaultBlock?: string | number): Promise<string>
   isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean>
   getStorageAt(address: string, position: string): Promise<string>
   getTransaction(transactionHash: string): Promise<any>
-  getSignerAddress(): Promise<string>
+  getSignerAddress(): Promise<string | undefined>
   signMessage(message: string): Promise<string>
   signTypedData(
     safeTransactionEIP712Args: SafeTransactionEIP712Args,

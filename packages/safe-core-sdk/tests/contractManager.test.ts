@@ -5,11 +5,14 @@ import Safe, { ContractNetworksConfig } from '../src'
 import { ZERO_ADDRESS } from '../src/utils/constants'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
+  getCompatibilityFallbackHandler,
+  getCreateCall,
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
   getSafeSingleton,
-  getSafeWithOwners
+  getSafeWithOwners,
+  getSignMessageLib
 } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -68,14 +71,20 @@ describe('Safe contracts manager', () => {
       const { safe, accounts, chainId } = await setupTests()
       const customContractNetworks: ContractNetworksConfig = {
         [chainId]: {
+          safeMasterCopyAddress: ZERO_ADDRESS,
+          safeMasterCopyAbi: (await getSafeSingleton()).abi,
+          safeProxyFactoryAddress: ZERO_ADDRESS,
+          safeProxyFactoryAbi: (await getFactory()).abi,
           multiSendAddress: ZERO_ADDRESS,
           multiSendAbi: (await getMultiSend()).abi,
           multiSendCallOnlyAddress: ZERO_ADDRESS,
           multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
-          safeMasterCopyAddress: ZERO_ADDRESS,
-          safeMasterCopyAbi: (await getSafeSingleton()).abi,
-          safeProxyFactoryAddress: ZERO_ADDRESS,
-          safeProxyFactoryAbi: (await getFactory()).abi
+          fallbackHandlerAddress: ZERO_ADDRESS,
+          fallbackHandlerAbi: (await getCompatibilityFallbackHandler()).abi,
+          signMessageLibAddress: ZERO_ADDRESS,
+          signMessageLibAbi: (await getSignMessageLib()).abi,
+          createCallAddress: ZERO_ADDRESS,
+          createCallAbi: (await getCreateCall()).abi
         }
       }
       const [account1] = accounts

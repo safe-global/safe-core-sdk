@@ -49,6 +49,12 @@ const ethAdapter = new EthersAdapter({
 })
 ```
 
+In case the `ethAdapter` instance is only used to execute read-only methods the `signerAddress` property can be omitted.
+
+```js
+const readOnlyEthAdapter = new EthersAdapter({ ethers })
+```
+
 ## <a name="license">License</a>
 
 This library is released under MIT.

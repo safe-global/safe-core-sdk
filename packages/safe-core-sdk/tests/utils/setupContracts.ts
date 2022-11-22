@@ -6,24 +6,33 @@ import {
 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.1.1'
 import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.2.0/'
 import {
+  Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
+  Create_call as CreateCall_V1_3_0,
   Gnosis_safe as GnosisSafe_V1_3_0,
   Multi_send as MultiSend_V1_3_0,
   Multi_send_call_only as MultiSendCallOnly_V1_3_0,
-  Proxy_factory as ProxyFactory_V1_3_0
+  Proxy_factory as ProxyFactory_V1_3_0,
+  Sign_message_lib as SignMessageLib_V1_3_0
 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/'
 import {
   DailyLimitModule,
   ERC20Mintable,
   SocialRecoveryModule
 } from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5/v1.2.0'
-import { DebugTransactionGuard } from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5/v1.3.0'
+import {
+  DebugTransactionGuard,
+  DefaultCallbackHandler
+} from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import { AbiItem } from 'web3-utils'
 import {
+  compatibilityFallbackHandlerDeployed,
+  createCallDeployed,
   gnosisSafeDeployed,
   multiSendCallOnlyDeployed,
   multiSendDeployed,
-  proxyFactoryDeployed
+  proxyFactoryDeployed,
+  signMessageLibDeployed
 } from '../../hardhat/deploy/deploy-contracts'
 
 export const getSafeSingleton = async (): Promise<{
@@ -68,7 +77,8 @@ export const getSafeTemplate = async (): Promise<
 
 export const getSafeWithOwners = async (
   owners: string[],
-  threshold?: number
+  threshold?: number,
+  fallbackHandler?: string
 ): Promise<GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1> => {
   const template = await getSafeTemplate()
   await template.setup(
@@ -76,12 +86,30 @@ export const getSafeWithOwners = async (
     threshold || owners.length,
     AddressZero,
     '0x',
-    AddressZero,
+    fallbackHandler || (await getCompatibilityFallbackHandler()).contract.address,
     AddressZero,
     0,
     AddressZero
   )
   return template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
+}
+
+export const getCompatibilityFallbackHandler = async (): Promise<{
+  contract: CompatibilityFallbackHandler_V1_3_0
+  abi: AbiItem | AbiItem[]
+}> => {
+  const CompatibilityFallbackHandlerDeployment = await deployments.get(
+    compatibilityFallbackHandlerDeployed.name
+  )
+  const CompatibilityFallbackHandler = await ethers.getContractFactory(
+    compatibilityFallbackHandlerDeployed.name
+  )
+  return {
+    contract: CompatibilityFallbackHandler.attach(
+      CompatibilityFallbackHandlerDeployment.address
+    ) as CompatibilityFallbackHandler_V1_3_0,
+    abi: CompatibilityFallbackHandlerDeployment.abi
+  }
 }
 
 export const getMultiSend = async (): Promise<{
@@ -110,6 +138,30 @@ export const getMultiSendCallOnly = async (): Promise<{
   }
 }
 
+export const getSignMessageLib = async (): Promise<{
+  contract: SignMessageLib_V1_3_0
+  abi: AbiItem | AbiItem[]
+}> => {
+  const SignMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
+  const SignMessageLib = await ethers.getContractFactory(signMessageLibDeployed.name)
+  return {
+    contract: SignMessageLib.attach(SignMessageLibDeployment.address) as SignMessageLib_V1_3_0,
+    abi: SignMessageLibDeployment.abi
+  }
+}
+
+export const getCreateCall = async (): Promise<{
+  contract: CreateCall_V1_3_0
+  abi: AbiItem | AbiItem[]
+}> => {
+  const CreateCallDeployment = await deployments.get(createCallDeployed.name)
+  const CreateCall = await ethers.getContractFactory(createCallDeployed.name)
+  return {
+    contract: CreateCall.attach(CreateCallDeployment.address) as CreateCall_V1_3_0,
+    abi: CreateCallDeployment.abi
+  }
+}
+
 export const getDailyLimitModule = async (): Promise<DailyLimitModule> => {
   const DailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
   const DailyLimitModule = await ethers.getContractFactory('DailyLimitModule')
@@ -134,4 +186,12 @@ export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard>
   return DebugTransactionGuard.attach(
     DebugTransactionGuardDeployment.address
   ) as DebugTransactionGuard
+}
+
+export const getDefaultCallbackHandler = async (): Promise<DefaultCallbackHandler> => {
+  const DefaultCallbackHandlerDeployment = await deployments.get('DefaultCallbackHandler')
+  const DefaultCallbackHandler = await ethers.getContractFactory('DefaultCallbackHandler')
+  return DefaultCallbackHandler.attach(
+    DefaultCallbackHandlerDeployment.address
+  ) as DefaultCallbackHandler
 }

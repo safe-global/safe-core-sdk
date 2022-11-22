@@ -689,6 +689,47 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const ownerAddresses = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
 
+### createEnableFallbackHandlerTx
+
+Returns the Safe transaction to enable the fallback handler.
+
+```js
+const safeTransaction = await safeSdk.createEnableFallbackHandlerTx(fallbackHandlerAddress)
+const txResponse = await safeSdk.executeTransaction(safeTransaction)
+await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = {
+  safeTxGas, // Optional
+  baseGas, // Optional
+  gasPrice, // Optional
+  gasToken, // Optional
+  refundReceiver, // Optional
+  nonce // Optional
+}
+const safeTransaction = await safeSdk.createEnableFallbackHandlerTx(fallbackHandlerAddress, options)
+```
+
+### createDisableFallbackHandlerTx
+
+Returns the Safe transaction to disable the fallback handler.
+
+```js
+const safeTransaction = await safeSdk.createDisableFallbackHandlerTx()
+const txResponse = await safeSdk.executeTransaction(safeTransaction)
+await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.createDisableFallbackHandlerTx(options)
+```
+
 ### createEnableGuardTx
 
 Returns the Safe transaction to enable a Safe guard.

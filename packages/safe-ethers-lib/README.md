@@ -1,6 +1,6 @@
 # Safe Ethers Lib
 
-[![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-lib.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-lib)
+[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-lib.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-lib)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
@@ -37,7 +37,7 @@ If the app integrating the SDK is using `Ethers` `v5`, create an instance of the
 
 ```js
 import { ethers } from 'ethers'
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
+import EthersAdapter from '@safe-global/safe-ethers-lib'
 
 const web3Provider = // ...
 const provider = new ethers.providers.Web3Provider(web3Provider)

@@ -20,7 +20,7 @@ export interface ContractNetworkConfig {
   /** fallbackHandlerAddress - Address of the Fallback Handler contract deployed on a specific network */
   fallbackHandlerAddress: string
   /** fallbackHandlerAbi - Abi of the Fallback Handler contract deployed on a specific network */
-  fallbackHandlerAbi: AbiItem | AbiItem[]
+  fallbackHandlerAbi?: AbiItem | AbiItem[]
   /** signMessageLibAddress - Address of the SignMessageLib contract deployed on a specific network */
   signMessageLibAddress: string
   /** signMessageLibAbi - Abi of the SignMessageLib contract deployed on a specific network */

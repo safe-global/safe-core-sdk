@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { GnosisSafeProxyFactoryContract } from '@gnosis.pm/safe-core-sdk-types'
+import { GnosisSafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 import { Proxy_factory as ProxyFactory_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/Proxy_factory'
 import { Proxy_factory as ProxyFactory_V1_3_0 } from '../../../typechain/src/web3-v1/v1.3.0/Proxy_factory'

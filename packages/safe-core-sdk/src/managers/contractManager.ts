@@ -2,7 +2,7 @@ import {
   GnosisSafeContract,
   MultiSendCallOnlyContract,
   MultiSendContract
-} from '@gnosis.pm/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import {
   getMultiSendCallOnlyContract,

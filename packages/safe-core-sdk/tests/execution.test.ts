@@ -2,9 +2,9 @@ import {
   MetaTransactionData,
   SafeTransactionDataPartial,
   TransactionOptions
-} from '@gnosis.pm/safe-core-sdk-types'
-import { EthersTransactionOptions } from '@gnosis.pm/safe-ethers-lib'
-import { Web3TransactionOptions } from '@gnosis.pm/safe-web3-lib'
+} from '@safe-global/safe-core-sdk-types'
+import { EthersTransactionOptions } from '@safe-global/safe-ethers-lib'
+import { Web3TransactionOptions } from '@safe-global/safe-web3-lib'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'

@@ -1,4 +1,4 @@
-import { MetaTransactionData, SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import { MetaTransactionData, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from './constants'
 
 export function sameString(str1: string, str2: string): boolean {

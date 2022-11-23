@@ -1,5 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer'
-import { EthAdapter } from '@gnosis.pm/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import SafeTransactionService from './SafeTransactionService'
 import {
   AllTransactionsListResponse,

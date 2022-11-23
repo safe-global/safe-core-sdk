@@ -1,5 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer'
-import { SafeTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeTransactionData } from '@safe-global/safe-core-sdk-types'
 
 export type SafeServiceInfoResponse = {
   readonly name: string

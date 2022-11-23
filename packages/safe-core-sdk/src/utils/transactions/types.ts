@@ -1,4 +1,4 @@
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 
 export type SafeTransactionOptionalProps = Pick<
   SafeTransactionDataPartial,

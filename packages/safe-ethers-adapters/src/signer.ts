@@ -7,12 +7,12 @@ import {
 import { VoidSigner } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Deferrable } from '@ethersproject/properties'
-import Safe from '@gnosis.pm/safe-core-sdk'
+import Safe from '@safe-global/safe-core-sdk'
 import {
   OperationType,
   SafeTransactionData,
   SafeTransactionDataPartial
-} from '@gnosis.pm/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 import { SafeService } from './service'
 import { createLibAddress, createLibInterface, mapReceipt } from './utils'
 

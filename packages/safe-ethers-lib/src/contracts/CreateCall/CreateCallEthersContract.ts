@@ -1,4 +1,4 @@
-import { CreateCallContract } from '@gnosis.pm/safe-core-sdk-types'
+import { CreateCallContract } from '@safe-global/safe-core-sdk-types'
 import {
   Create_call as CreateCall_V1_3_0,
   Create_callInterface as CreateCallContractInterface

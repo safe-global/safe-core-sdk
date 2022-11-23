@@ -1,5 +1,5 @@
 import { ContractReceipt } from '@ethersproject/contracts'
-import { EthAdapter, TransactionResult } from '@gnosis.pm/safe-core-sdk-types'
+import { EthAdapter, TransactionResult } from '@safe-global/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 
 export async function waitSafeTxReceipt(

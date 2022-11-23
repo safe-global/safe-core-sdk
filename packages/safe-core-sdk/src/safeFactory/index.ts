@@ -4,7 +4,7 @@ import {
   GnosisSafeProxyFactoryContract,
   SafeVersion,
   TransactionOptions
-} from '@gnosis.pm/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import {

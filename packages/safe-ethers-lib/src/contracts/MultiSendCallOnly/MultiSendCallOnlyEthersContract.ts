@@ -1,4 +1,4 @@
-import { MultiSendCallOnlyContract } from '@gnosis.pm/safe-core-sdk-types'
+import { MultiSendCallOnlyContract } from '@safe-global/safe-core-sdk-types'
 import {
   Multi_send_call_only as MultiSendCallOnly_V1_3_0,
   Multi_send_call_onlyInterface as MultiSendCallOnlyInterface

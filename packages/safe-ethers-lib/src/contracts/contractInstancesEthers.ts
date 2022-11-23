@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { Provider } from '@ethersproject/providers'
-import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { Gnosis_safe__factory as SafeMasterCopy_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/Gnosis_safe__factory'
 import { Multi_send__factory as MultiSend_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/Multi_send__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_1_1 } from '../../typechain/src/ethers-v5/v1.1.1/factories/Proxy_factory__factory'

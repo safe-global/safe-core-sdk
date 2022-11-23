@@ -1,4 +1,4 @@
-import { SafeSignature } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 
 class EthSignSignature implements SafeSignature {
   signer: string

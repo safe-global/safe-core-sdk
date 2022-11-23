@@ -8,8 +8,8 @@ import {
   EthAdapterTransaction,
   GetContractProps,
   SafeTransactionEIP712Args
-} from '@gnosis.pm/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+} from '@safe-global/safe-core-sdk-types'
+import { generateTypedData, validateEip3770Address } from '@safe-global/safe-core-sdk-utils'
 import { ethers } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import {

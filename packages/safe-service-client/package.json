@@ -36,8 +36,8 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@gnosis.pm/safe-ethers-lib": "^1.6.1",
-    "@gnosis.pm/safe-web3-lib": "^1.6.1",
+    "@gnosis.pm/safe-ethers-lib": "^1.7.0",
+    "@gnosis.pm/safe-web3-lib": "^1.7.1",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
-    "@gnosis.pm/safe-core-sdk-types": "^1.6.1",
+    "@gnosis.pm/safe-core-sdk-types": "^1.7.0",
     "node-fetch": "^2.6.6"
   }
 }

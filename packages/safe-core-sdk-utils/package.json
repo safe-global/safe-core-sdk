@@ -1,5 +1,5 @@
 {
-  "name": "@gnosis.pm/safe-core-sdk-utils",
+  "name": "@safe-global/safe-core-sdk-utils",
   "version": "1.5.0",
   "description": "Safe Core SDK Utilities",
   "main": "dist/src/index.js",
@@ -52,7 +52,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk-types": "^1.7.0",
+    "@safe-global/safe-core-sdk-types": "^1.7.0",
     "semver": "^7.3.8",
     "web3-utils": "^1.8.1"
   }

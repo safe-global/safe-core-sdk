@@ -3,8 +3,8 @@ import {
   Gnosis_safe as GnosisSafe_V1_1_1,
   Multi_send as MultiSend_V1_1_1,
   Proxy_factory as ProxyFactory_V1_1_1
-} from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.1.1'
-import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.2.0/'
+} from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.1.1'
+import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.2.0/'
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
   Create_call as CreateCall_V1_3_0,
@@ -13,16 +13,16 @@ import {
   Multi_send_call_only as MultiSendCallOnly_V1_3_0,
   Proxy_factory as ProxyFactory_V1_3_0,
   Sign_message_lib as SignMessageLib_V1_3_0
-} from '@gnosis.pm/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/'
+} from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/'
 import {
   DailyLimitModule,
   ERC20Mintable,
   SocialRecoveryModule
-} from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5/v1.2.0'
+} from '@safe-global/safe-ethers-lib/typechain/tests/ethers-v5/v1.2.0'
 import {
   DebugTransactionGuard,
   DefaultCallbackHandler
-} from '@gnosis.pm/safe-ethers-lib/typechain/tests/ethers-v5/v1.3.0'
+} from '@safe-global/safe-ethers-lib/typechain/tests/ethers-v5/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import { AbiItem } from 'web3-utils'
 import {

@@ -1,4 +1,4 @@
-import { SafeVersion } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { Gnosis_safe as SafeMasterCopy_V1_1_1 } from '../../typechain/src/web3-v1/v1.1.1/Gnosis_safe'
 import { Multi_send as MultiSend_V1_1_1 } from '../../typechain/src/web3-v1/v1.1.1/Multi_send'
 import { Proxy_factory as GnosisSafeProxyFactory_V1_1_1 } from '../../typechain/src/web3-v1/v1.1.1/Proxy_factory'

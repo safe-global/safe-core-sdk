@@ -1,4 +1,4 @@
-import { CompatibilityFallbackHandlerContract } from '@gnosis.pm/safe-core-sdk-types'
+import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types'
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
   Compatibility_fallback_handlerInterface as CompatibilityFallbackHandlerInterface

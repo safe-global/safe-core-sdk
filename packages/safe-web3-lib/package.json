@@ -1,5 +1,5 @@
 {
-  "name": "@gnosis.pm/safe-web3-lib",
+  "name": "@safe-global/safe-web3-lib",
   "version": "1.7.1",
   "description": "Web3 library adapter to be used by Safe Core SDK",
   "main": "dist/src/index.js",
@@ -51,8 +51,8 @@
   },
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
-    "@gnosis.pm/safe-core-sdk-types": "^1.7.0",
-    "@gnosis.pm/safe-core-sdk-utils": "^1.5.0",
+    "@safe-global/safe-core-sdk-types": "^1.7.0",
+    "@safe-global/safe-core-sdk-utils": "^1.5.0",
     "web3": "^1.8.1",
     "web3-core": "^1.8.1",
     "web3-utils": "^1.8.1"

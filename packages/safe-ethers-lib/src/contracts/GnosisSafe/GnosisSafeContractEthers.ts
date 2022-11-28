@@ -4,7 +4,7 @@ import {
   SafeTransaction,
   SafeTransactionData,
   SafeVersion
-} from '@gnosis.pm/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 import { Gnosis_safe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/Gnosis_safe'
 import { Gnosis_safe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/Gnosis_safe'
 import {

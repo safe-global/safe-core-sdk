@@ -1,4 +1,4 @@
-import { EthAdapter, GnosisSafeContract } from '@gnosis.pm/safe-core-sdk-types'
+import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
 import { isZeroAddress, sameString } from '../utils'
 import { ZERO_ADDRESS } from '../utils/constants'
 import { FEATURES, hasFeature } from '../utils/safeVersions'

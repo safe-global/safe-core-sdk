@@ -45,15 +45,11 @@ const safeOwner = provider.getSigner(0)
 
 const ethAdapter = new EthersAdapter({
   ethers,
-  signer: safeOwner
+  signerOrProvider: safeOwner
 })
 ```
 
-In case the `ethAdapter` instance is only used to execute read-only methods the `signerAddress` property can be omitted.
-
-```js
-const readOnlyEthAdapter = new EthersAdapter({ ethers })
-```
+Depending on if the `ethAdapter` instance is used to execute or read-only methods the `signerOrProvider` property can be a `Signer` or a `Provider`.
 
 ## <a name="license">License</a>
 

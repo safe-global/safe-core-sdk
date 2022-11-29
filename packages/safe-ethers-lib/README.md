@@ -49,7 +49,7 @@ const ethAdapter = new EthersAdapter({
 })
 ```
 
-Depending on if the `ethAdapter` instance is used to execute or read-only methods the `signerOrProvider` property can be a `Signer` or a `Provider`.
+Depending on whether the `ethAdapter` instance is used to sign/execute transactions or just call read-only methods, the `signerOrProvider` property can be a `Signer` or a `Provider`.
 
 ## <a name="license">License</a>
 

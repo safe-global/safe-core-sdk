@@ -118,7 +118,7 @@ Because the signature is off-chain, there is no interaction with the contract an
 To connect `owner2` to the Safe we need to create a new instance of the class `EthAdapter` passing to its constructor the owner we would like to connect. After `owner2` account is connected to the SDK as a signer the transaction hash will be approved on-chain.
 
 ```js
-const ethAdapterOwner2 = new EthersAdapter({ ethers, signer: owner2 })
+const ethAdapterOwner2 = new EthersAdapter({ ethers, signerOrProvider: owner2 })
 const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapterOwner2, safeAddress })
 const txHash = await safeSdk2.getTransactionHash(safeTransaction)
 const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
@@ -130,7 +130,7 @@ await approveTxResponse.transactionResponse?.wait()
 Lastly, `owner3` account is connected to the SDK as a signer and executor of the Safe transaction to execute it.
 
 ```js
-const ethAdapterOwner3 = new EthersAdapter({ ethers, signer: owner3 })
+const ethAdapterOwner3 = new EthersAdapter({ ethers, signerOrProvider: owner3 })
 const safeSdk3 = await safeSdk2.connect({ ethAdapter: ethAdapterOwner3, safeAddress })
 const executeTxResponse = await safeSdk3.executeTransaction(safeTransaction)
 await executeTxResponse.transactionResponse?.wait()

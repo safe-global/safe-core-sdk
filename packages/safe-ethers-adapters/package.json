@@ -35,30 +35,30 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@types/chai": "^4.3.3",
+    "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^18.7.18",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
-    "chai": "^4.3.6",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.1",
-    "dotenv": "^16.0.2",
-    "eslint": "^8.23.1",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "ethers": "^5.7.1",
-    "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
-    "mocha": "^10.0.0",
+    "ethers": "5.7.2",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.0.4",
+    "mocha": "^10.1.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.7.1",
+    "prettier": "^2.8.0",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "ts-generator": "^0.1.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.3"
+    "typescript": "^4.9.3"
   },
   "lint-staged": {
     "src/**/!(*test).ts": [
@@ -72,15 +72,15 @@
     }
   },
   "peerDependencies": {
-    "@ethersproject/abstract-provider": "^5.5.1",
-    "@ethersproject/abstract-signer": "^5.5.0",
-    "@ethersproject/bignumber": "^5.5.0",
-    "@ethersproject/properties": "^5.5.0"
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/properties": "^5.7.0"
   },
   "dependencies": {
+    "@gnosis.pm/safe-deployments": "1.17.0",
     "@safe-global/safe-core-sdk": "^3.2.0",
     "@safe-global/safe-core-sdk-types": "^1.7.0",
-    "@gnosis.pm/safe-deployments": "1.17.0",
     "axios": "^0.27.2"
   }
 }

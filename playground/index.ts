@@ -35,7 +35,7 @@ async function main() {
   // EthAdapter instance
   const ethAdapter = new EthersAdapter({
     ethers,
-    signer: currentSigner
+    signerOrProvider: currentSigner
   })
 
   // Safe Core SDK instance

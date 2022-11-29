@@ -34,7 +34,7 @@ import Safe from "@safe-global/safe-core-sdk"
 import EthersAdapter from "@safe-global/safe-ethers-lib"
 
 const safe = await Safe.create({
-  ethAdapter: new EthersAdapter({ ethers, signer }),
+  ethAdapter: new EthersAdapter({ ethers, signerOrProvider }),
   safeAddress: "some_safe_address"
 })
 ```

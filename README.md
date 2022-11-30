@@ -24,10 +24,26 @@ Software developer tools that facilitate the interaction with the Safe [contract
 
 ## Playground
 
-There is a [playground script](https://github.com/safe-global/safe-core-sdk/tree/main/playground/index.ts) that can be used to play around with the Safe Core SDK.
+This project includes a [playground](https://github.com/safe-global/safe-core-sdk/tree/main/playground) with a few scripts that can be used as a starting point to play around with the Safe Core SDK. These scripts does not cover all the functionality exposed by the SDK, but each of them present one of the steps involved in the Safe transaction flow.
 
-Update the config inside the script and execute the following command to run the script:
+Update the config inside the scripts and execute the following commands to run each step:
 
+#### Step 1: Deploy a Safe
 ```bash
-yarn play
+yarn play deploy-safe
+```
+
+#### Step 2: Propose the transaction
+```bash
+yarn play propose-transaction
+```
+
+#### Step 3: Confirm the transaction
+```bash
+yarn play confirm-transaction
+```
+
+#### Step 4: Execute the transaction
+```bash
+yarn play execute-transaction
 ```

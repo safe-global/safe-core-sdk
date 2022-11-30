@@ -3,7 +3,7 @@ import {
   EthAdapter,
   MetaTransactionData,
   OperationType,
-  SafeSignature,
+  SafeMultisigTransactionResponse,
   SafeTransaction,
   SafeTransactionDataPartial,
   SafeTransactionEIP712Args,
@@ -17,12 +17,13 @@ import GuardManager from './managers/guardManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
-import { isMetaTransactionArray, sameString } from './utils'
+import { isMetaTransactionArray, isSafeMultisigTransactionResponse, sameString } from './utils'
 import {
   generateEIP712Signature,
   generatePreValidatedSignature,
   generateSignature
 } from './utils/signatures'
+import SafeSignature from './utils/signatures/SafeSignature'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
@@ -753,6 +754,35 @@ class Safe {
   }
 
   /**
+   * Converts a transaction from type SafeMultisigTransactionResponse to type SafeTransaction
+   *
+   * @param serviceTransactionResponse - The transaction to convert
+   * @returns The converted transaction with type SafeTransaction
+   */
+  async toSafeTransactionType(
+    serviceTransactionResponse: SafeMultisigTransactionResponse
+  ): Promise<SafeTransaction> {
+    const safeTransactionData: SafeTransactionDataPartial = {
+      to: serviceTransactionResponse.to,
+      value: serviceTransactionResponse.value,
+      data: serviceTransactionResponse.data || '0x',
+      operation: serviceTransactionResponse.operation,
+      safeTxGas: serviceTransactionResponse.safeTxGas,
+      baseGas: serviceTransactionResponse.baseGas,
+      gasPrice: Number(serviceTransactionResponse.gasPrice),
+      gasToken: serviceTransactionResponse.gasToken,
+      refundReceiver: serviceTransactionResponse.refundReceiver,
+      nonce: serviceTransactionResponse.nonce
+    }
+    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    serviceTransactionResponse.confirmations?.map((confirmation) => {
+      const signature = new SafeSignature(confirmation.owner, confirmation.signature)
+      safeTransaction.addSignature(signature)
+    })
+    return safeTransaction
+  }
+
+  /**
    * Checks if a Safe transaction can be executed successfully with no errors.
    *
    * @param safeTransaction - The Safe transaction to check
@@ -760,10 +790,14 @@ class Safe {
    * @returns TRUE if the Safe transaction can be executed successfully with no errors
    */
   async isValidTransaction(
-    safeTransaction: SafeTransaction,
+    safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
     options?: TransactionOptions
   ): Promise<boolean> {
-    const signedSafeTransaction = await this.copyTransaction(safeTransaction)
+    let transaction = isSafeMultisigTransactionResponse(safeTransaction)
+      ? await this.toSafeTransactionType(safeTransaction)
+      : safeTransaction
+
+    const signedSafeTransaction = await this.copyTransaction(transaction)
 
     const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
@@ -800,10 +834,14 @@ class Safe {
    * @throws "Cannot specify gas and gasLimit together in transaction options"
    */
   async executeTransaction(
-    safeTransaction: SafeTransaction,
+    safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
     options?: TransactionOptions
   ): Promise<TransactionResult> {
-    const signedSafeTransaction = await this.copyTransaction(safeTransaction)
+    let transaction = isSafeMultisigTransactionResponse(safeTransaction)
+      ? await this.toSafeTransactionType(safeTransaction)
+      : safeTransaction
+
+    const signedSafeTransaction = await this.copyTransaction(transaction)
 
     const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)

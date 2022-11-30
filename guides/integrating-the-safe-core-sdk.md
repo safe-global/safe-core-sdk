@@ -301,28 +301,7 @@ Once there are enough confirmations in the service the transaction is ready to b
 The method `executeTransaction` accepts an instance of the class `SafeTransaction` so the transaction needs to be transformed from the type `SafeMultisigTransactionResponse`.
 
 ```js
-import { EthSignSignature } from '@safe-global/safe-core-sdk'
-
-// transaction: SafeMultisigTransactionResponse
-
-const safeTransactionData: SafeTransactionData = {
-  to: transaction.to,
-  value: transaction.value,
-  data: transaction.data,
-  operation: transaction.operation,
-  safeTxGas: transaction.safeTxGas,
-  baseGas: transaction.baseGas,
-  gasPrice: transaction.gasPrice,
-  gasToken: transaction.gasToken,
-  refundReceiver: transaction.refundReceiver,
-  nonce: transaction.nonce
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-transaction.confirmations.forEach(confirmation => {
-  const signature = new EthSignSignature(confirmation.owner, confirmation.signature)
-  safeTransaction.addSignature(signature)
-})
-
+const safeTransaction = await safeService.getTransaction(...)
 const executeTxResponse = await safeSdk.executeTransaction(safeTransaction)
 const receipt = executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
 ```

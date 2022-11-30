@@ -1,6 +1,4 @@
 import Safe from '@safe-global/safe-core-sdk'
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
-import SafeSignature from '@safe-global/safe-core-sdk/dist/src/utils/signatures/SafeSignature'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
 import SafeServiceClient from '@safe-global/safe-service-client'
 import { ethers } from 'ethers'
@@ -46,19 +44,7 @@ async function main() {
   })
 
   // Get the transaction
-  const transaction = await service.getTransaction(config.SAFE_TX_HASH)
-  const safeTransactionData: SafeTransactionDataPartial = {
-    to: transaction.to,
-    value: transaction.value,
-    data: transaction.data,
-    operation: transaction.operation
-    // ...
-  }
-  const safeTransaction = await safe.createTransaction({ safeTransactionData })
-  transaction.confirmations?.map((confirmation) => {
-    const signature = new SafeSignature(confirmation.owner, confirmation.signature)
-    safeTransaction.addSignature(signature)
-  })
+  const safeTransaction = await service.getTransaction(config.SAFE_TX_HASH)
 
   const isTxExecutable = await safe.isValidTransaction(safeTransaction)
 

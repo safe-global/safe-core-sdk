@@ -15,7 +15,6 @@ import SafeFactory, {
   SafeFactoryConfig
 } from './safeFactory'
 import { ContractNetworksConfig } from './types'
-import EthSignSignature from './utils/signatures/SafeSignature'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { standardizeSafeTransactionData } from './utils/transactions/utils'
 
@@ -36,6 +35,5 @@ export {
   AddOwnerTxParams,
   RemoveOwnerTxParams,
   SwapOwnerTxParams,
-  EthSignSignature,
   standardizeSafeTransactionData
 }

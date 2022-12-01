@@ -8,7 +8,7 @@ interface Config {
   RPC_URL: string
   DEPLOYER_ADDRESS_PRIVATE_KEY: string
   DEPLOY_SAFE: {
-    OWNERS: string[],
+    OWNERS: string[]
     THRESHOLD: number
     SALT_NONCE: string
   }
@@ -18,10 +18,7 @@ const config: Config = {
   RPC_URL: 'https://goerli.infura.io/v3/<INFURA_KEY>',
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_PRIVATE_KEY>',
   DEPLOY_SAFE: {
-    OWNERS: [
-      '<OWNER_ADDRESS_1>',
-      '<OWNER_ADDRESS_2>'
-    ],
+    OWNERS: ['<OWNER_ADDRESS_1>', '<OWNER_ADDRESS_2>'],
     THRESHOLD: 1, // <SAFE_THRESHOLD>
     SALT_NONCE: '<SALT_NONCE_NUMBER>'
   }

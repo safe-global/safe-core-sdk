@@ -437,9 +437,13 @@ class Safe {
    * @throws "Transactions can only be signed by Safe owners"
    */
   async signTransaction(
-    safeTransaction: SafeTransaction,
+    safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
     signingMethod: 'eth_sign' | 'eth_signTypedData' = 'eth_sign'
   ): Promise<SafeTransaction> {
+    let transaction = isSafeMultisigTransactionResponse(safeTransaction)
+      ? await this.toSafeTransactionType(safeTransaction)
+      : safeTransaction
+
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     if (!signerAddress) {
@@ -453,15 +457,15 @@ class Safe {
     }
     let signature: SafeSignature
     if (signingMethod === 'eth_signTypedData') {
-      signature = await this.signTypedData(safeTransaction)
+      signature = await this.signTypedData(transaction)
     } else {
-      const txHash = await this.getTransactionHash(safeTransaction)
+      const txHash = await this.getTransactionHash(transaction)
       signature = await this.signTransactionHash(txHash)
     }
     const signedSafeTransaction = await this.createTransaction({
-      safeTransactionData: safeTransaction.data
+      safeTransactionData: transaction.data
     })
-    safeTransaction.signatures.forEach((signature) => {
+    transaction.signatures.forEach((signature) => {
       signedSafeTransaction.addSignature(signature)
     })
     signedSafeTransaction.addSignature(signature)

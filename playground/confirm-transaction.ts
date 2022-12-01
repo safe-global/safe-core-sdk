@@ -17,7 +17,7 @@ const config: Config = {
   RPC_URL: 'https://goerli.infura.io/v3/<INFURA_KEY>',
   SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
   SAFE_ADDRESS: '<SAFE_ADDRESS>',
-  TX_SERVICE_URL: 'https://safe-transaction-goerli.safe.global/', // Check https://docs.gnosis-safe.io/backend/available-services
+  TX_SERVICE_URL: 'https://safe-transaction-goerli.safe.global/', // Check https://docs.safe.global/backend/available-services
   SAFE_TX_HASH: '<SAFE_TX_HASH>'
 }
 

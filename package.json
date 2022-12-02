@@ -7,8 +7,8 @@
     "build": "lerna run build --stream",
     "test": "FORCE_COLOR=1 lerna run test --stream",
     "test:ci": "FORCE_COLOR=1 lerna run test:ci --stream",
-    "play": "ts-node ./playground",
-    "format": "lerna run format",
+    "play": "ts-node ./playground/config/run.ts",
+    "format": "lerna run format && prettier --write \"playground/**/*.ts\"",
     "postinstall": "cd packages/safe-ethers-lib; hardhat compile"
   },
   "workspaces": {
@@ -20,6 +20,7 @@
   "license": "MIT",
   "devDependencies": {
     "lerna": "^6.0.3",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1"
   }
 }

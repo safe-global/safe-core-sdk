@@ -1,5 +1,9 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import {
+  SafeMultisigConfirmationListResponse,
+  SafeMultisigTransactionResponse
+} from '@safe-global/safe-core-sdk-types'
+import {
   MasterCopyResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -16,11 +20,9 @@ import {
   SafeDelegateListResponse,
   SafeInfoResponse,
   SafeModuleTransactionListResponse,
-  SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionEstimate,
   SafeMultisigTransactionEstimateResponse,
   SafeMultisigTransactionListResponse,
-  SafeMultisigTransactionResponse,
   SafeServiceInfoResponse,
   SignatureResponse,
   TokenInfoListResponse,

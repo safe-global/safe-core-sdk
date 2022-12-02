@@ -37,3 +37,13 @@ yarn play deploy-safe
 ```bash
 yarn play propose-transaction
 ```
+
+#### Step 3: Confirm a transaction
+```bash
+yarn play confirm-transaction
+```
+
+#### Step 4: Execute a transaction
+```bash
+yarn play execute-transaction
+```

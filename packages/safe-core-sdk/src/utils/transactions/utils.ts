@@ -40,7 +40,7 @@ export async function standardizeSafeTransactionData(
   }
   let safeTxGas: number
 
-  if (tx.safeTxGas) {
+  if (typeof tx.safeTxGas !== 'undefined') {
     return {
       ...standardizedTxs,
       safeTxGas: tx.safeTxGas

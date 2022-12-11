@@ -147,7 +147,7 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = 111
+        const safeTxGas = 0
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',

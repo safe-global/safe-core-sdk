@@ -136,6 +136,34 @@ describe('Transactions creation', () => {
     )
 
     itif(safeVersionDeployed < '1.3.0')(
+      'should return a transaction with defined safeTxGas of 0 if safeVersion<1.3.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const safe = await getSafeWithOwners([account1.address])
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeTxGas = 0
+        const txDataPartial: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '0',
+          data: '0x',
+          safeTxGas
+        }
+        const safeTxData = await standardizeSafeTransactionData(
+          safeSdk.getContractManager().safeContract,
+          ethAdapter,
+          txDataPartial
+        )
+        chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
+      }
+    )
+
+    itif(safeVersionDeployed < '1.3.0')(
       'should return a transaction with defined safeTxGas if safeVersion<1.3.0',
       async () => {
         const { accounts, contractNetworks } = await setupTests()

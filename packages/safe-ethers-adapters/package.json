@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-ethers-adapters",
-  "version": "0.1.0-alpha.14",
+  "version": "0.1.0-alpha.15",
   "description": "Safe Ethers Adapters",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -78,8 +78,8 @@
   },
   "dependencies": {
     "@gnosis.pm/safe-deployments": "1.17.0",
-    "@safe-global/safe-core-sdk": "^3.2.1",
-    "@safe-global/safe-core-sdk-types": "^1.7.0",
+    "@safe-global/safe-core-sdk": "^3.2.2",
+    "@safe-global/safe-core-sdk-types": "^1.8.0",
     "axios": "^0.27.2"
   }
 }

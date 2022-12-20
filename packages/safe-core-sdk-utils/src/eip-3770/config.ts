@@ -65,6 +65,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 421611, shortName: 'arb-rinkeby' },
   { chainId: 421613, shortName: 'arb-goerli' },
   { chainId: 43214913, shortName: 'mai' },
+  { chainId: 13812, shortName: 'susono' },
   { chainId: 1313161554, shortName: 'aurora' },
   { chainId: 1313161555, shortName: 'aurora-testnet' },
   { chainId: 1666600000, shortName: 'hmy-s0' },

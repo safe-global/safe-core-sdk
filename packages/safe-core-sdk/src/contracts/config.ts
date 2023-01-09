@@ -31,7 +31,7 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeProxyFactoryVersion: '1.1.1',
     multiSendVersion: '1.1.1',
     multiSendCallOnlyVersion: '1.3.0',
-    signMessageLibVersion: '1.3.0',
+    signMessageLibVersion: undefined,
     createCallVersion: '1.3.0'
   },
   '1.1.1': {
@@ -40,17 +40,17 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeProxyFactoryVersion: '1.1.1',
     multiSendVersion: '1.1.1',
     multiSendCallOnlyVersion: '1.3.0',
-    signMessageLibVersion: '1.3.0',
+    signMessageLibVersion: undefined,
     createCallVersion: '1.3.0'
   },
   '1.0.0': {
     safeMasterCopyVersion: '1.0.0',
     safeMasterCopyL2Version: undefined,
     safeProxyFactoryVersion: '1.0.0',
-    multiSendVersion: '1.3.0',
-    multiSendCallOnlyVersion: undefined,
+    multiSendVersion: '1.1.1',
+    multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: undefined,
-    createCallVersion: undefined
+    createCallVersion: '1.3.0'
   }
 }
 

@@ -9,6 +9,17 @@ export enum OperationType {
   DelegateCall // 1
 }
 
+export interface SafeSetupConfig {
+  owners: string[],
+  threshold: number,
+  to?: string,
+  data?: string,
+  fallbackHandler?: string,
+  paymentToken?: string,
+  payment?: string,
+  paymentReceiver?: string,
+}
+
 export interface MetaTransactionData {
   readonly to: string
   readonly value: string

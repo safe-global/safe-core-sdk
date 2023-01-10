@@ -21,8 +21,8 @@ const proxyFactoryContracts = {
 const multiSendContracts = {
   '1.3.0': { name: 'MultiSend_SV1_3_0' },
   '1.2.0': { name: 'MultiSend_SV1_2_0' },
-  '1.1.1': { name: 'MultiSend_SV1_1_1' },
-  '1.0.0': { name: 'MultiSend_SV1_1_1' }
+  '1.1.1': { name: 'MultiSend_SV1_2_0' },
+  '1.0.0': { name: 'MultiSend_SV1_2_0' }
 }
 
 const multiSendCallOnlyContracts = {

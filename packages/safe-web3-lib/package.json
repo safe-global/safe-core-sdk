@@ -13,9 +13,9 @@
   ],
   "scripts": {
     "typechain": "ts-node scripts/generateTypechainFiles.ts",
-    "unbuild": "rimraf dist artifacts cache .nyc_output typechain",
-    "build": "hardhat compile && yarn typechain && tsc",
-    "format": "prettier --write \"{src,tests,hardhat,scripts}/**/*.ts\"",
+    "unbuild": "rimraf dist cache .nyc_output typechain",
+    "build": "yarn typechain && tsc",
+    "format": "prettier --write \"{src,scripts}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
   "repository": {
@@ -32,8 +32,6 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@gnosis.pm/safe-contracts-v1.2.0": "npm:@gnosis.pm/safe-contracts@1.2.0",
-    "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@typechain/web3-v1": "^6.0.1",

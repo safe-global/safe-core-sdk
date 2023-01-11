@@ -3,7 +3,8 @@ import {
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
-  SafeVersion
+  SafeVersion,
+  SafeSetupConfig
 } from '@gnosis.pm/safe-core-sdk-types'
 import { Gnosis_safe as GnosisSafe_V1_0_0 } from '../../../typechain/src/web3-v1/v1.0.0/Gnosis_safe'
 import { Gnosis_safe as GnosisSafe_V1_1_1 } from '../../../typechain/src/web3-v1/v1.1.1/Gnosis_safe'
@@ -14,8 +15,13 @@ import { toTxResult } from '../../utils'
 
 abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
   constructor(
-    public contract: GnosisSafe_V1_0_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0
+    public contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0
   ) {}
+
+  abstract setup(
+    setupConfig: SafeSetupConfig,
+    options?: Web3TransactionOptions
+  ): Promise<Web3TransactionResult>
 
   async getVersion(): Promise<SafeVersion> {
     return (await this.contract.methods.VERSION().call()) as SafeVersion

@@ -6,6 +6,7 @@ import {
   TransactionOptions
 } from '@gnosis.pm/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
+import semverSatisfies from 'semver/functions/satisfies'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import { getProxyFactoryContract, getSafeContract } from '../contracts/safeDeploymentContracts'
 import Safe from '../Safe'
@@ -134,6 +135,17 @@ class SafeFactory {
     payment = 0,
     paymentReceiver = ZERO_ADDRESS
   }: SafeAccountConfig): Promise<string> {
+    if (semverSatisfies(this.#safeVersion, '<=1.0.0')) {
+      return this.#gnosisSafeContract.encode('setup', [
+        owners,
+        threshold,
+        to,
+        data,
+        paymentToken,
+        payment,
+        paymentReceiver
+      ])
+    }
     return this.#gnosisSafeContract.encode('setup', [
       owners,
       threshold,

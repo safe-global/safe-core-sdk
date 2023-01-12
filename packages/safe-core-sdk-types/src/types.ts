@@ -112,14 +112,14 @@ export interface GenerateTypedData {
   primaryType: string
   message: {
     to: string
-    value: BigNumber
+    value: string
     data: string
     operation: OperationType
-    safeTxGas: BigNumber
-    baseGas: BigNumber
-    gasPrice: BigNumber
+    safeTxGas: number
+    baseGas: number
+    gasPrice: number
     gasToken: string
     refundReceiver: string
-    nonce: BigNumber
+    nonce: number
   }
 }

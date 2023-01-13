@@ -291,42 +291,245 @@ describe('Transactions execution', () => {
         .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
     })
 
-    it('should execute a transaction with threshold >1', async () => {
-      const { accounts, contractNetworks } = await setupTests()
-      const [account1, account2, account3] = accounts
-      const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
-      const ethAdapter1 = await getEthAdapter(account1.signer)
-      const safeSdk1 = await Safe.create({
-        ethAdapter: ethAdapter1,
-        safeAddress: safe.address,
-        contractNetworks
-      })
-      const ethAdapter2 = await getEthAdapter(account2.signer)
-      const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
-      const ethAdapter3 = await getEthAdapter(account3.signer)
-      const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
-      await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
-      })
-      const safeInitialBalance = await safeSdk1.getBalance()
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: account2.address,
-        value: '500000000000000000', // 0.5 ETH
-        data: '0x'
+    itif(process.env.ETH_LIB === 'web3' && safeVersionDeployed === '1.0.0')(
+      'should execute a transaction with threshold >1 and all different kind of signatures with web3 provider and safeVersion===1.0.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2, account3] = accounts
+        const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+        await account1.signer.sendTransaction({
+          to: safe.address,
+          value: BigNumber.from('1000000000000000000') // 1 ETH
+        })
+        const ethAdapter1 = await getEthAdapter(account1.signer)
+        const ethAdapter2 = await getEthAdapter(account2.signer)
+        const ethAdapter3 = await getEthAdapter(account3.signer)
+        const safeSdk1 = await Safe.create({
+          ethAdapter: ethAdapter1,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+        const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
+        const safeInitialBalance = await safeSdk1.getBalance()
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+        const tx = await safeSdk1.createTransaction({ safeTransactionData })
+
+        // Signature: on-chain
+        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
+        await waitSafeTxReceipt(txResponse1)
+
+        // Signature: default (eth_signTypedData_v4)
+        let signedTx = await safeSdk2.signTransaction(tx)
+
+        // Signature: eth_signTypedData_v4
+        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData_v4')
+
+        const txResponse2 = await safeSdk1.executeTransaction(signedTx)
+        await waitSafeTxReceipt(txResponse2)
+        const safeFinalBalance = await safeSdk1.getBalance()
+        chai
+          .expect(safeInitialBalance.toString())
+          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
       }
-      const tx = await safeSdk1.createTransaction({ safeTransactionData })
-      const signedTx = await safeSdk1.signTransaction(tx)
-      const txHash = await safeSdk2.getTransactionHash(tx)
-      const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
-      await waitSafeTxReceipt(txResponse1)
-      const txResponse2 = await safeSdk3.executeTransaction(signedTx)
-      await waitSafeTxReceipt(txResponse2)
-      const safeFinalBalance = await safeSdk1.getBalance()
-      chai
-        .expect(safeInitialBalance.toString())
-        .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
-    })
+    )
+
+    itif(process.env.ETH_LIB === 'web3' && safeVersionDeployed > '1.0.0')(
+      'should execute a transaction with threshold >1 and all different kind of signatures with web3 provider and safeVersion>1.0.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2, account3, account4] = accounts
+        const safe = await getSafeWithOwners([
+          account1.address,
+          account2.address,
+          account3.address,
+          account4.address
+        ])
+        await account1.signer.sendTransaction({
+          to: safe.address,
+          value: BigNumber.from('1000000000000000000') // 1 ETH
+        })
+        const ethAdapter1 = await getEthAdapter(account1.signer)
+        const ethAdapter2 = await getEthAdapter(account2.signer)
+        const ethAdapter3 = await getEthAdapter(account3.signer)
+        const ethAdapter4 = await getEthAdapter(account4.signer)
+        const safeSdk1 = await Safe.create({
+          ethAdapter: ethAdapter1,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+        const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
+        const safeSdk4 = await safeSdk1.connect({ ethAdapter: ethAdapter4 })
+        const safeInitialBalance = await safeSdk1.getBalance()
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+        const tx = await safeSdk1.createTransaction({ safeTransactionData })
+
+        // Signature: on-chain
+        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
+        await waitSafeTxReceipt(txResponse1)
+
+        // Signature: default (eth_signTypedData_v4)
+        let signedTx = await safeSdk2.signTransaction(tx)
+
+        // Signature: eth_signTypedData_v4
+        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData_v4')
+
+        // Signature: eth_sign
+        signedTx = await safeSdk4.signTransaction(signedTx, 'eth_sign')
+
+        const txResponse2 = await safeSdk1.executeTransaction(signedTx)
+        await waitSafeTxReceipt(txResponse2)
+        const safeFinalBalance = await safeSdk1.getBalance()
+        chai
+          .expect(safeInitialBalance.toString())
+          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+      }
+    )
+
+    itif(process.env.ETH_LIB === 'ethers' && safeVersionDeployed === '1.0.0')(
+      'should execute a transaction with threshold >1 and all different kind of signatures with ethers provider and safeVersion===1.0.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2, account3, account4, account5, account6] = accounts
+        const safe = await getSafeWithOwners([
+          account1.address,
+          account2.address,
+          account3.address,
+          account4.address,
+          account5.address
+        ])
+        await account1.signer.sendTransaction({
+          to: safe.address,
+          value: BigNumber.from('1000000000000000000') // 1 ETH
+        })
+        const ethAdapter1 = await getEthAdapter(account1.signer)
+        const ethAdapter2 = await getEthAdapter(account2.signer)
+        const ethAdapter3 = await getEthAdapter(account3.signer)
+        const ethAdapter4 = await getEthAdapter(account4.signer)
+        const ethAdapter5 = await getEthAdapter(account5.signer)
+        const safeSdk1 = await Safe.create({
+          ethAdapter: ethAdapter1,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+        const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
+        const safeSdk4 = await safeSdk1.connect({ ethAdapter: ethAdapter4 })
+        const safeSdk5 = await safeSdk1.connect({ ethAdapter: ethAdapter5 })
+        const safeInitialBalance = await safeSdk1.getBalance()
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+        const tx = await safeSdk1.createTransaction({ safeTransactionData })
+
+        // Signature: on-chain
+        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
+        await waitSafeTxReceipt(txResponse1)
+
+        // Signature: default (eth_signTypedData_v4)
+        let signedTx = await safeSdk2.signTransaction(tx)
+
+        // Signature: eth_signTypedData
+        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData')
+
+        // Signature: eth_signTypedData_v3
+        signedTx = await safeSdk4.signTransaction(signedTx, 'eth_signTypedData_v3')
+
+        // Signature: eth_signTypedData_v4
+        signedTx = await safeSdk5.signTransaction(signedTx, 'eth_signTypedData_v4')
+
+        const txResponse2 = await safeSdk1.executeTransaction(signedTx)
+        await waitSafeTxReceipt(txResponse2)
+        const safeFinalBalance = await safeSdk1.getBalance()
+        chai
+          .expect(safeInitialBalance.toString())
+          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+      }
+    )
+
+    itif(process.env.ETH_LIB === 'ethers' && safeVersionDeployed > '1.0.0')(
+      'should execute a transaction with threshold >1 and all different kind of signatures with ethers provider and safeVersion>1.0.0',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2, account3, account4, account5, account6] = accounts
+        const safe = await getSafeWithOwners([
+          account1.address,
+          account2.address,
+          account3.address,
+          account4.address,
+          account5.address,
+          account6.address
+        ])
+        await account1.signer.sendTransaction({
+          to: safe.address,
+          value: BigNumber.from('1000000000000000000') // 1 ETH
+        })
+        const ethAdapter1 = await getEthAdapter(account1.signer)
+        const ethAdapter2 = await getEthAdapter(account2.signer)
+        const ethAdapter3 = await getEthAdapter(account3.signer)
+        const ethAdapter4 = await getEthAdapter(account4.signer)
+        const ethAdapter5 = await getEthAdapter(account5.signer)
+        const ethAdapter6 = await getEthAdapter(account6.signer)
+        const safeSdk1 = await Safe.create({
+          ethAdapter: ethAdapter1,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
+        const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
+        const safeSdk4 = await safeSdk1.connect({ ethAdapter: ethAdapter4 })
+        const safeSdk5 = await safeSdk1.connect({ ethAdapter: ethAdapter5 })
+        const safeSdk6 = await safeSdk1.connect({ ethAdapter: ethAdapter6 })
+        const safeInitialBalance = await safeSdk1.getBalance()
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '500000000000000000', // 0.5 ETH
+          data: '0x'
+        }
+        const tx = await safeSdk1.createTransaction({ safeTransactionData })
+
+        // Signature: on-chain
+        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
+        await waitSafeTxReceipt(txResponse1)
+
+        // Signature: default (eth_signTypedData_v4)
+        let signedTx = await safeSdk2.signTransaction(tx)
+
+        // Signature: eth_signTypedData
+        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData')
+
+        // Signature: eth_signTypedData_v3
+        signedTx = await safeSdk4.signTransaction(signedTx, 'eth_signTypedData_v3')
+
+        // Signature: eth_signTypedData_v4
+        signedTx = await safeSdk5.signTransaction(signedTx, 'eth_signTypedData_v4')
+
+        // Signature: eth_sign
+        signedTx = await safeSdk6.signTransaction(signedTx, 'eth_sign')
+
+        const txResponse2 = await safeSdk1.executeTransaction(signedTx)
+        await waitSafeTxReceipt(txResponse2)
+        const safeFinalBalance = await safeSdk1.getBalance()
+        chai
+          .expect(safeInitialBalance.toString())
+          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+      }
+    )
 
     it('should execute a transaction when is not submitted by an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()

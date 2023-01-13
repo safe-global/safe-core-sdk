@@ -451,7 +451,7 @@ class Safe {
     } else {
       const safeVersion = await this.getContractVersion()
       if (!hasFeature(FEATURES.ETH_SIGN, safeVersion)) {
-        throw new Error('"eth_sign" is only supported by Safes >= v1.1.0')
+        throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
       const txHash = await this.getTransactionHash(safeTransaction)
       signature = await this.signTransactionHash(txHash)

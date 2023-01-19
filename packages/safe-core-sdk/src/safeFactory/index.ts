@@ -6,6 +6,7 @@ import {
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
+import semverSatisfies from 'semver/functions/satisfies'
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,
@@ -138,6 +139,17 @@ class SafeFactory {
     payment = 0,
     paymentReceiver = ZERO_ADDRESS
   }: SafeAccountConfig): Promise<string> {
+    if (semverSatisfies(this.#safeVersion, '<=1.0.0')) {
+      return this.#gnosisSafeContract.encode('setup', [
+        owners,
+        threshold,
+        to,
+        data,
+        paymentToken,
+        payment,
+        paymentReceiver
+      ])
+    }
     let fallbackHandlerAddress: string
     if (fallbackHandler) {
       fallbackHandlerAddress = fallbackHandler

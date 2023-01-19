@@ -7,43 +7,50 @@ export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 const gnosisSafeContracts = {
   '1.3.0': { name: 'GnosisSafe_SV1_3_0' },
   '1.2.0': { name: 'GnosisSafe_SV1_2_0' },
-  '1.1.1': { name: 'GnosisSafe_SV1_1_1' }
+  '1.1.1': { name: 'GnosisSafe_SV1_1_1' },
+  '1.0.0': { name: 'GnosisSafe_SV1_0_0' }
 }
 
 const proxyFactoryContracts = {
   '1.3.0': { name: 'ProxyFactory_SV1_3_0' },
   '1.2.0': { name: 'ProxyFactory_SV1_2_0' },
-  '1.1.1': { name: 'ProxyFactory_SV1_1_1' }
+  '1.1.1': { name: 'ProxyFactory_SV1_1_1' },
+  '1.0.0': { name: 'ProxyFactory_SV1_0_0' }
 }
 
 const multiSendContracts = {
   '1.3.0': { name: 'MultiSend_SV1_3_0' },
   '1.2.0': { name: 'MultiSend_SV1_2_0' },
-  '1.1.1': { name: 'MultiSend_SV1_1_1' }
+  '1.1.1': { name: 'MultiSend_SV1_2_0' },
+  '1.0.0': { name: 'MultiSend_SV1_2_0' }
 }
 
 const multiSendCallOnlyContracts = {
   '1.3.0': { name: 'MultiSendCallOnly_SV1_3_0' },
   '1.2.0': { name: 'MultiSendCallOnly_SV1_3_0' },
-  '1.1.1': { name: 'MultiSendCallOnly_SV1_3_0' }
+  '1.1.1': { name: 'MultiSendCallOnly_SV1_3_0' },
+  '1.0.0': { name: 'MultiSendCallOnly_SV1_3_0' }
 }
 
 const compatibilityFallbackHandlerContracts = {
   '1.3.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
   '1.2.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
-  '1.1.1': { name: 'CompatibilityFallbackHandler_SV1_3_0' }
+  '1.1.1': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
+  '1.0.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' }
 }
 
 const signMessageLibContracts = {
   '1.3.0': { name: 'SignMessageLib_SV1_3_0' },
   '1.2.0': { name: 'SignMessageLib_SV1_3_0' },
-  '1.1.1': { name: 'SignMessageLib_SV1_3_0' }
+  '1.1.1': { name: 'SignMessageLib_SV1_3_0' },
+  '1.0.0': { name: 'SignMessageLib_SV1_3_0' }
 }
 
 const createCallContracts = {
   '1.3.0': { name: 'CreateCall_SV1_3_0' },
   '1.2.0': { name: 'CreateCall_SV1_3_0' },
-  '1.1.1': { name: 'CreateCall_SV1_3_0' }
+  '1.1.1': { name: 'CreateCall_SV1_3_0' },
+  '1.0.0': { name: 'CreateCall_SV1_3_0' }
 }
 
 export const gnosisSafeDeployed = gnosisSafeContracts[safeVersionDeployed]
@@ -135,7 +142,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     log: true
   })
 
-  await deploy('DefaultCallbackHandler', {
+  await deploy('DefaultCallbackHandler_SV1_3_0', {
     from: deployer,
     args: [],
     log: true,

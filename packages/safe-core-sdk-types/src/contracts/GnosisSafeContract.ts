@@ -3,11 +3,13 @@ import {
   SafeTransaction,
   SafeTransactionData,
   SafeVersion,
+  SafeSetupConfig,
   TransactionOptions,
   TransactionResult
 } from '../types'
 
 export interface GnosisSafeContract {
+  setup(setupConfig: SafeSetupConfig, options?: TransactionOptions): Promise<TransactionResult>
   getVersion(): Promise<SafeVersion>
   getAddress(): string
   getNonce(): Promise<number>

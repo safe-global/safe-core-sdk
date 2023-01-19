@@ -1,0 +1,26 @@
+name: Safe Core SDK Test - Web3 - Safe v1.1.1
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - development
+env:
+  INFURA_KEY: ${{ secrets.INFURA_KEY }}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: |
+          yarn install
+          yarn build
+          cd packages/safe-core-sdk
+          yarn test:hardhat:web3:v1.1.1

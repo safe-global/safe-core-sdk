@@ -202,53 +202,59 @@ describe('SafeProxyFactory', () => {
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
     })
 
-    it('should predict a new Safe with the default CompatibilityFallbackHandler', async () => {
-      const { accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeFactory = await SafeFactory.create({
-        ethAdapter,
-        safeVersion: safeVersionDeployed,
-        contractNetworks
-      })
-      const owners = [account1.address, account2.address]
-      const threshold = 2
-      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
-      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
-      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
-      const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
-      const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
-      const safe = await safeFactory.deploySafe(deploySafeProps)
-      chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
-      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
-        .address
-      chai.expect(compatibilityFallbackHandler).to.be.eq(await safe.getFallbackHandler())
-    })
-
-    it('should predict a new Safe with a custom fallback handler', async () => {
-      const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
-      const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeFactory = await SafeFactory.create({
-        ethAdapter,
-        safeVersion: safeVersionDeployed,
-        contractNetworks
-      })
-      const owners = [account1.address, account2.address]
-      const threshold = 2
-      const safeAccountConfig: SafeAccountConfig = {
-        owners,
-        threshold,
-        fallbackHandler: defaultCallbackHandler.address
+    itif(safeVersionDeployed > '1.0.0')(
+      'should predict a new Safe with the default CompatibilityFallbackHandler',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeFactory = await SafeFactory.create({
+          ethAdapter,
+          safeVersion: safeVersionDeployed,
+          contractNetworks
+        })
+        const owners = [account1.address, account2.address]
+        const threshold = 2
+        const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+        const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
+        const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+        const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
+        const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
+        const safe = await safeFactory.deploySafe(deploySafeProps)
+        chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+        const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
+          .address
+        chai.expect(compatibilityFallbackHandler).to.be.eq(await safe.getFallbackHandler())
       }
-      const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
-      const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
-      const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
-      const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
-      const safe = await safeFactory.deploySafe(deploySafeProps)
-      chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
-      chai.expect(defaultCallbackHandler.address).to.be.eq(await safe.getFallbackHandler())
-    })
+    )
+
+    itif(safeVersionDeployed > '1.0.0')(
+      'should predict a new Safe with a custom fallback handler',
+      async () => {
+        const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const [account1, account2] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeFactory = await SafeFactory.create({
+          ethAdapter,
+          safeVersion: safeVersionDeployed,
+          contractNetworks
+        })
+        const owners = [account1.address, account2.address]
+        const threshold = 2
+        const safeAccountConfig: SafeAccountConfig = {
+          owners,
+          threshold,
+          fallbackHandler: defaultCallbackHandler.address
+        }
+        const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
+        const predictSafeProps: PredictSafeProps = { safeAccountConfig, safeDeploymentConfig }
+        const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictSafeProps)
+        const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
+        const safe = await safeFactory.deploySafe(deploySafeProps)
+        chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+        chai.expect(defaultCallbackHandler.address).to.be.eq(await safe.getFallbackHandler())
+      }
+    )
   })
 
   describe('deploySafe', async () => {
@@ -313,51 +319,57 @@ describe('SafeProxyFactory', () => {
         .rejectedWith('saltNonce must be greater than or equal to 0')
     })
 
-    it('should deploy a new Safe with custom fallback handler', async () => {
-      const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
-      const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeFactory = await SafeFactory.create({
-        ethAdapter,
-        safeVersion: safeVersionDeployed,
-        contractNetworks
-      })
-      const owners = [account1.address, account2.address]
-      const threshold = 2
-      const safeAccountConfig: SafeAccountConfig = {
-        owners,
-        threshold,
-        fallbackHandler: defaultCallbackHandler.address
+    itif(safeVersionDeployed > '1.0.0')(
+      'should deploy a new Safe with custom fallback handler',
+      async () => {
+        const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const [account1, account2] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeFactory = await SafeFactory.create({
+          ethAdapter,
+          safeVersion: safeVersionDeployed,
+          contractNetworks
+        })
+        const owners = [account1.address, account2.address]
+        const threshold = 2
+        const safeAccountConfig: SafeAccountConfig = {
+          owners,
+          threshold,
+          fallbackHandler: defaultCallbackHandler.address
+        }
+        const deploySafeProps: DeploySafeProps = { safeAccountConfig }
+        const safe = await safeFactory.deploySafe(deploySafeProps)
+        const deployedSafeOwners = await safe.getOwners()
+        chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
+        const deployedSafeThreshold = await safe.getThreshold()
+        chai.expect(deployedSafeThreshold).to.be.eq(threshold)
+        const fallbackHandler = await safe.getFallbackHandler()
+        chai.expect(defaultCallbackHandler.address).to.be.eq(fallbackHandler)
       }
-      const deploySafeProps: DeploySafeProps = { safeAccountConfig }
-      const safe = await safeFactory.deploySafe(deploySafeProps)
-      const deployedSafeOwners = await safe.getOwners()
-      chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
-      const deployedSafeThreshold = await safe.getThreshold()
-      chai.expect(deployedSafeThreshold).to.be.eq(threshold)
-      const fallbackHandler = await safe.getFallbackHandler()
-      chai.expect(defaultCallbackHandler.address).to.be.eq(fallbackHandler)
-    })
+    )
 
-    it('should deploy a new Safe with the default CompatibilityFallbackHandler', async () => {
-      const { accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeFactory = await SafeFactory.create({
-        ethAdapter,
-        safeVersion: safeVersionDeployed,
-        contractNetworks
-      })
-      const owners = [account1.address, account2.address]
-      const threshold = 2
-      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
-      const deploySafeProps: DeploySafeProps = { safeAccountConfig }
-      const safe = await safeFactory.deploySafe(deploySafeProps)
-      const fallbackHandler = await safe.getFallbackHandler()
-      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
-        .address
-      chai.expect(compatibilityFallbackHandler).to.be.eq(fallbackHandler)
-    })
+    itif(safeVersionDeployed > '1.0.0')(
+      'should deploy a new Safe with the default CompatibilityFallbackHandler',
+      async () => {
+        const { accounts, contractNetworks } = await setupTests()
+        const [account1, account2] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeFactory = await SafeFactory.create({
+          ethAdapter,
+          safeVersion: safeVersionDeployed,
+          contractNetworks
+        })
+        const owners = [account1.address, account2.address]
+        const threshold = 2
+        const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+        const deploySafeProps: DeploySafeProps = { safeAccountConfig }
+        const safe = await safeFactory.deploySafe(deploySafeProps)
+        const fallbackHandler = await safe.getFallbackHandler()
+        const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
+          .address
+        chai.expect(compatibilityFallbackHandler).to.be.eq(fallbackHandler)
+      }
+    )
 
     it('should deploy a new Safe without saltNonce', async () => {
       const { accounts, contractNetworks } = await setupTests()

@@ -192,7 +192,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 * The `safeVersion` property
 
-  The `SafeFactory` constructor also accepts the `safeVersion` property to specify the Safe contract version that will be deployed. This string can take the values `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
+  The `SafeFactory` constructor also accepts the `safeVersion` property to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
 
   ```js
   const safeVersion = 'X.Y.Z'
@@ -564,7 +564,7 @@ Returns a Safe transaction ready to be signed by the owners that invalidates the
 const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransaction.data.nonce)
 ```
 
@@ -585,7 +585,7 @@ Returns the transaction hash of a Safe transaction.
 const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 ```
 
@@ -597,7 +597,7 @@ Signs a hash using the current owner account.
 const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const signature = await safeSdk.signTransactionHash(txHash)
 ```
@@ -644,7 +644,7 @@ Approves a hash on-chain using the current owner account.
 const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const txResponse = await safeSdk.approveTransactionHash(txHash)
 await txResponse.transactionResponse?.wait()
@@ -684,7 +684,7 @@ Returns a list of owners who have approved a specific Safe transaction.
 const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const ownerAddresses = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
@@ -893,7 +893,7 @@ Checks if a Safe transaction can be executed successfully with no errors.
 const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const isValidTx = await safeSdk.isValidTransaction(safeTransaction)
 ```
 
@@ -931,7 +931,7 @@ Executes a Safe transaction.
 const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
-const safeTransaction =  await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```

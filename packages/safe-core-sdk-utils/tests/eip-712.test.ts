@@ -23,7 +23,17 @@ const safeTransactionData: SafeTransactionData = {
 
 describe('EIP-712 sign typed data', () => {
   describe('getEip712MessageTypes', async () => {
-    it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes < v1.3.0', async () => {
+    it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.0.0', async () => {
+      const { EIP712Domain } = getEip712MessageTypes('1.0.0')
+      chai.expect(EIP712Domain).to.be.eq(EIP712_DOMAIN_BEFORE_V130)
+    })
+
+    it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.1.1', async () => {
+      const { EIP712Domain } = getEip712MessageTypes('1.1.1')
+      chai.expect(EIP712Domain).to.be.eq(EIP712_DOMAIN_BEFORE_V130)
+    })
+
+    it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.2.0', async () => {
       const { EIP712Domain } = getEip712MessageTypes('1.2.0')
       chai.expect(EIP712Domain).to.be.eq(EIP712_DOMAIN_BEFORE_V130)
     })
@@ -35,7 +45,29 @@ describe('EIP-712 sign typed data', () => {
   })
 
   describe('generateTypedData', async () => {
-    it('should generate the typed data for Safes < v1.3.0', async () => {
+    it('should generate the typed data for Safes == v1.0.0', async () => {
+      const { domain } = generateTypedData({
+        safeAddress,
+        safeVersion: '1.0.0',
+        chainId: 4,
+        safeTransactionData
+      })
+      chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
+      chai.expect(domain.chainId).to.be.undefined
+    })
+
+    it('should generate the typed data for Safes == v1.1.1', async () => {
+      const { domain } = generateTypedData({
+        safeAddress,
+        safeVersion: '1.1.1',
+        chainId: 4,
+        safeTransactionData
+      })
+      chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
+      chai.expect(domain.chainId).to.be.undefined
+    })
+    
+    it('should generate the typed data for Safes == v1.2.0', async () => {
       const { domain } = generateTypedData({
         safeAddress,
         safeVersion: '1.2.0',

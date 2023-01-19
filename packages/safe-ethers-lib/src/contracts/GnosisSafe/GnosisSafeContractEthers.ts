@@ -3,8 +3,10 @@ import {
   GnosisSafeContract,
   SafeTransaction,
   SafeTransactionData,
-  SafeVersion
+  SafeVersion,
+  SafeSetupConfig
 } from '@safe-global/safe-core-sdk-types'
+import { Gnosis_safe as GnosisSafe_V1_0_0 } from '../../../typechain/src/ethers-v5/v1.0.0/Gnosis_safe'
 import { Gnosis_safe as GnosisSafe_V1_1_1 } from '../../../typechain/src/ethers-v5/v1.1.1/Gnosis_safe'
 import { Gnosis_safe as GnosisSafe_V1_2_0 } from '../../../typechain/src/ethers-v5/v1.2.0/Gnosis_safe'
 import {
@@ -15,7 +17,14 @@ import { EthersTransactionOptions, EthersTransactionResult } from '../../types'
 import { toTxResult } from '../../utils'
 
 abstract class GnosisSafeContractEthers implements GnosisSafeContract {
-  constructor(public contract: GnosisSafe_V1_1_1 | GnosisSafe_V1_2_0 | GnosisSafe_V1_3_0) {}
+  constructor(
+    public contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0
+  ) {}
+
+  abstract setup(
+    setupConfig: SafeSetupConfig,
+    options?: EthersTransactionOptions
+  ): Promise<EthersTransactionResult>
 
   async getVersion(): Promise<SafeVersion> {
     return (await this.contract.VERSION()) as SafeVersion

@@ -213,8 +213,8 @@ export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard>
 }
 
 export const getDefaultCallbackHandler = async (): Promise<DefaultCallbackHandler> => {
-  const DefaultCallbackHandlerDeployment = await deployments.get('DefaultCallbackHandler')
-  const DefaultCallbackHandler = await ethers.getContractFactory('DefaultCallbackHandler')
+  const DefaultCallbackHandlerDeployment = await deployments.get('DefaultCallbackHandler_SV1_3_0')
+  const DefaultCallbackHandler = await ethers.getContractFactory('DefaultCallbackHandler_SV1_3_0')
   return DefaultCallbackHandler.attach(
     DefaultCallbackHandlerDeployment.address
   ) as DefaultCallbackHandler

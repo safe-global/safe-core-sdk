@@ -47,7 +47,7 @@ describe('Fallback handler manager', () => {
         await chai
           .expect(tx)
           .to.be.rejectedWith(
-            'Current version of the Safe does not support Safe the fallback handler functionality'
+            'Current version of the Safe does not support the fallback handler functionality'
           )
       }
     )
@@ -75,7 +75,7 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed < '1.1.1')(
       'should fail if enabling a fallback handler is not supported',
       async () => {
-        const { safe, accounts, contractNetworks, fallbackHandlerAddress } = await setupTests()
+        const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
@@ -83,7 +83,7 @@ describe('Fallback handler manager', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const tx = safeSdk.createEnableFallbackHandlerTx(fallbackHandlerAddress)
+        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
         await chai
           .expect(tx)
           .to.be.rejectedWith(

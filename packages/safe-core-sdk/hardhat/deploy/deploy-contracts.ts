@@ -35,7 +35,8 @@ const multiSendCallOnlyContracts = {
 const compatibilityFallbackHandlerContracts = {
   '1.3.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
   '1.2.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
-  '1.1.1': { name: 'CompatibilityFallbackHandler_SV1_3_0' }
+  '1.1.1': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
+  '1.0.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' }
 }
 
 const signMessageLibContracts = {
@@ -141,7 +142,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     log: true
   })
 
-  await deploy('DefaultCallbackHandler', {
+  await deploy('DefaultCallbackHandler_SV1_3_0', {
     from: deployer,
     args: [],
     log: true,

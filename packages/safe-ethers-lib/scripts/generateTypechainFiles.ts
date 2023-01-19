@@ -20,6 +20,7 @@ const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
   `${safeContractsPath}/v1.3.0/multi_send.json`,
   `${safeContractsPath}/v1.3.0/multi_send_call_only.json`,
+  `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`,
   `${safeContractsPath}/v1.3.0/sign_message_lib.json`,
   `${safeContractsPath}/v1.3.0/create_call.json`
 ].join(' ')
@@ -38,7 +39,8 @@ const safeContracts_V1_0_0 = [
 const safeContractsTestV1_3_0Path =
   '../../node_modules/@gnosis.pm/safe-contracts-v1.3.0/build/artifacts/contracts'
 const testContracts_V1_3_0 = [
-  `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`
+  `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`,
+  `${safeContractsTestV1_3_0Path}/examples/guards/DefaultCallbackHandler.sol/DefaultCallbackHandler.json`
 ].join(' ')
 const safeContractsTestV1_2_0Path =
   '../../node_modules/@gnosis.pm/safe-contracts-v1.2.0/build/contracts'

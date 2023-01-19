@@ -1,4 +1,4 @@
-import { SignMessageLibContract } from '@gnosis.pm/safe-core-sdk-types'
+import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   Sign_message_lib as SignMessageLib_V1_3_0,
   Sign_message_libInterface as SignMessageLibContractInterface

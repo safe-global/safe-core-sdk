@@ -1,4 +1,4 @@
-import { Eip3770Address } from '@gnosis.pm/safe-core-sdk-types'
+import { Eip3770Address } from '@safe-global/safe-core-sdk-types'
 import { isAddress, isHexStrict } from 'web3-utils'
 import { networks } from './config'
 

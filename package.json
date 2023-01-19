@@ -4,11 +4,11 @@
   "scripts": {
     "clean": "lerna clean",
     "unbuild": "lerna run unbuild",
-    "build": "lerna run build --stream --npm-client=yarn",
-    "test": "FORCE_COLOR=1 lerna run test --stream --npm-client=yarn",
-    "test:ci": "FORCE_COLOR=1 lerna run test:ci --stream --npm-client=yarn",
-    "play": "ts-node ./playground",
-    "format": "lerna run format --npm-client=yarn",
+    "build": "lerna run build --stream",
+    "test": "FORCE_COLOR=1 lerna run test --stream",
+    "test:ci": "FORCE_COLOR=1 lerna run test:ci --stream",
+    "play": "ts-node ./playground/config/run.ts",
+    "format": "lerna run format && prettier --write \"playground/**/*.ts\"",
     "postinstall": "cd packages/safe-ethers-lib; hardhat compile"
   },
   "workspaces": {
@@ -19,7 +19,8 @@
   "author": "Safe (https://safe.global)",
   "license": "MIT",
   "devDependencies": {
-    "lerna": "^4.0.0",
-    "rimraf": "^3.0.2"
+    "lerna": "^6.0.3",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1"
   }
 }

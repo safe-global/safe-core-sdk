@@ -1,6 +1,6 @@
 # Safe Core SDK
 
-[![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-core-sdk.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-core-sdk)
+[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
@@ -53,7 +53,7 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 To deploy a new Safe account instantiate the `SafeFactory` class and call the `deploySafe` method with the right params to configure the new Safe. This includes defining the list of owners and the threshold of the Safe. A Safe account with three owners and threshold equal three will be used as the starting point for this example but any Safe configuration is valid.
 
 ```js
-import Safe, { SafeFactory, SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
+import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/safe-core-sdk'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 
@@ -79,7 +79,7 @@ const newSafeAddress = safeSdk.getAddress()
 To instantiate the Safe Core SDK from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address. 
 
 ```js
-import Safe from '@gnosis.pm/safe-core-sdk'
+import Safe from '@safe-global/safe-core-sdk'
 
 const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterOwner1, safeAddress })
 ```
@@ -89,7 +89,7 @@ Check the `create` method in the [API Reference](#sdk-api) for more details on a
 ### 3. Create a Safe transaction
 
 ```js
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 
 const safeTransactionData: SafeTransactionDataPartial = {
   to: '0x<address>',
@@ -118,7 +118,7 @@ Because the signature is off-chain, there is no interaction with the contract an
 To connect `owner2` to the Safe we need to create a new instance of the class `EthAdapter` passing to its constructor the owner we would like to connect. After `owner2` account is connected to the SDK as a signer the transaction hash will be approved on-chain.
 
 ```js
-const ethAdapterOwner2 = new EthersAdapter({ ethers, signer: owner2 })
+const ethAdapterOwner2 = new EthersAdapter({ ethers, signerOrProvider: owner2 })
 const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapterOwner2, safeAddress })
 const txHash = await safeSdk2.getTransactionHash(safeTransaction)
 const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
@@ -130,7 +130,7 @@ await approveTxResponse.transactionResponse?.wait()
 Lastly, `owner3` account is connected to the SDK as a signer and executor of the Safe transaction to execute it.
 
 ```js
-const ethAdapterOwner3 = new EthersAdapter({ ethers, signer: owner3 })
+const ethAdapterOwner3 = new EthersAdapter({ ethers, signerOrProvider: owner3 })
 const safeSdk3 = await safeSdk2.connect({ ethAdapter: ethAdapterOwner3, safeAddress })
 const executeTxResponse = await safeSdk3.executeTransaction(safeTransaction)
 await executeTxResponse.transactionResponse?.wait()
@@ -145,7 +145,7 @@ All the signatures used to execute the transaction are now available at `safeTra
 Returns an instance of the Safe Factory.
 
 ```js
-import { SafeFactory } from '@gnosis.pm/safe-core-sdk'
+import { SafeFactory } from '@safe-global/safe-core-sdk'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 ```
@@ -165,21 +165,23 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
-  import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
+  import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
 
-  const id = await ethAdapter.getChainId()
+  const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
-    [id]: {
-      multiSendAddress: '<MULTI_SEND_ADDRESS>',
-      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+    [chainId]: {
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+      fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
-      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
-      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -277,7 +279,7 @@ const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, callback })
 Returns an instance of the Safe Core SDK connected to the `safeAddress`.
 
 ```js
-import Safe from '@gnosis.pm/safe-core-sdk'
+import Safe from '@safe-global/safe-core-sdk'
 
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
@@ -297,21 +299,23 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
-  import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
+  import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
 
-  const id = await ethAdapter.getChainId()
+  const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
-    [id]: {
-      multiSendAddress: '<MULTI_SEND_ADDRESS>',
-      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+    [chainId]: {
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+      fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
-      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
-      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -343,18 +347,23 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
+  import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
+
+  const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
     [chainId]: {
-      multiSendAddress: '<MULTI_SEND_ADDRESS>',
-      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
       safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+      multiSendAddress: '<MULTI_SEND_ADDRESS>',
+      multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+      fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
-      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
-      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+      multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+      multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -459,7 +468,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
   This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
 
   ```js
-  import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+  import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 
   const safeTransactionData: SafeTransactionDataPartial = {
     to,
@@ -678,6 +687,47 @@ const safeTransactionData: SafeTransactionDataPartial = {
 const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const ownerAddresses = await safeSdk.getOwnersWhoApprovedTx(txHash)
+```
+
+### createEnableFallbackHandlerTx
+
+Returns the Safe transaction to enable the fallback handler.
+
+```js
+const safeTransaction = await safeSdk.createEnableFallbackHandlerTx(fallbackHandlerAddress)
+const txResponse = await safeSdk.executeTransaction(safeTransaction)
+await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = {
+  safeTxGas, // Optional
+  baseGas, // Optional
+  gasPrice, // Optional
+  gasToken, // Optional
+  refundReceiver, // Optional
+  nonce // Optional
+}
+const safeTransaction = await safeSdk.createEnableFallbackHandlerTx(fallbackHandlerAddress, options)
+```
+
+### createDisableFallbackHandlerTx
+
+Returns the Safe transaction to disable the fallback handler.
+
+```js
+const safeTransaction = await safeSdk.createDisableFallbackHandlerTx()
+const txResponse = await safeSdk.executeTransaction(safeTransaction)
+await txResponse.transactionResponse?.wait()
+```
+
+This method can optionally receive the `options` parameter:
+
+```js
+const options: SafeTransactionOptionalProps = { ... }
+const safeTransaction = await safeSdk.createDisableFallbackHandlerTx(options)
 ```
 
 ### createEnableGuardTx

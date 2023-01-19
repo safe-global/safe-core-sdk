@@ -1,6 +1,6 @@
 # Safe Ethers Adapters
 
-[![NPM Version](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40gnosis.pm%2Fsafe-ethers-adapters)
+[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
 [Ethers](https://docs.ethers.io/v5/single-page/) adapter that facilitates the interaction with the [Safe Services](https://github.com/safe-global/safe-transaction-service)
@@ -30,11 +30,11 @@ It may be obtained with:
 
 ```js
 import { ethers } from "ethers"
-import Safe from "@gnosis.pm/safe-core-sdk"
-import EthersAdapter from "@gnosis.pm/safe-ethers-lib"
+import Safe from "@safe-global/safe-core-sdk"
+import EthersAdapter from "@safe-global/safe-ethers-lib"
 
 const safe = await Safe.create({
-  ethAdapter: new EthersAdapter({ ethers, signer }),
+  ethAdapter: new EthersAdapter({ ethers, signerOrProvider }),
   safeAddress: "some_safe_address"
 })
 ```

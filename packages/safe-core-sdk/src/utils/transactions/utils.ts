@@ -7,7 +7,7 @@ import {
   OperationType,
   SafeTransactionData,
   SafeTransactionDataPartial
-} from '@gnosis.pm/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 import { ZERO_ADDRESS } from '../constants'
 import { FEATURES, hasFeature } from '../safeVersions'
 import { estimateTxGas } from './gas'
@@ -40,7 +40,7 @@ export async function standardizeSafeTransactionData(
   }
   let safeTxGas: number
 
-  if (tx.safeTxGas) {
+  if (typeof tx.safeTxGas !== 'undefined') {
     return {
       ...standardizedTxs,
       safeTxGas: tx.safeTxGas

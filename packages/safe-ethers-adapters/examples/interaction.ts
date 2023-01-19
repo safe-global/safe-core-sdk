@@ -1,8 +1,8 @@
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import Safe from '@gnosis.pm/safe-core-sdk'
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib'
+import Safe from '@safe-global/safe-core-sdk'
+import EthersAdapter from '@safe-global/safe-ethers-lib'
 import dotenv from 'dotenv'
 import { ethers } from 'ethers'
 import { SafeEthersSigner, SafeService } from '../src'
@@ -15,9 +15,9 @@ const sample = async () => {
     console.log("Setup SafeService")
     const service = new SafeService(process.env.SERVICE_URL!!)
     console.log("Setup Signer")
-    const signer = new Wallet(process.env.SIGNER_KEY!!, provider)
+    const signerOrProvider = new Wallet(process.env.SIGNER_KEY!!, provider)
     console.log("Setup SafeEthersSigner")
-    const ethAdapter = new EthersAdapter({ ethers, signer })
+    const ethAdapter = new EthersAdapter({ ethers, signerOrProvider })
     const safe = await Safe.create({ ethAdapter, safeAddress: process.env.DEPLOYER_SAFE!! })
     const safeSigner = new SafeEthersSigner(safe, service, provider)
     const contract = new Contract("0xe50c6391a6cb10f9B9Ef599aa1C68C82dD88Bd91", ["function pin(string newMessage)"], safeSigner)

@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { OperationType } from '@gnosis.pm/safe-core-sdk-types'
-import EthSafeTransaction from '@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/SafeTransaction'
+import { OperationType } from '@safe-global/safe-core-sdk-types'
+import EthSafeTransaction from '@safe-global/safe-core-sdk/dist/src/utils/transactions/SafeTransaction'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'

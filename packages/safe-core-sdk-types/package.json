@@ -1,6 +1,6 @@
 {
-  "name": "@gnosis.pm/safe-core-sdk-types",
-  "version": "1.6.1",
+  "name": "@safe-global/safe-core-sdk-types",
+  "version": "1.8.0",
   "description": "Safe Core SDK types",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -30,20 +30,20 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@types/node": "^18.7.18",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
-    "eslint": "^8.23.1",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.7.1",
-    "typescript": "^4.8.3"
+    "prettier": "^2.8.0",
+    "typescript": "^4.9.3"
   },
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",
     "@gnosis.pm/safe-deployments": "1.17.0",
-    "web3-core": "^1.8.0",
-    "web3-utils": "^1.8.0"
+    "web3-core": "^1.8.1",
+    "web3-utils": "^1.8.1"
   }
 }

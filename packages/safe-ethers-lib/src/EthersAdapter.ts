@@ -8,10 +8,12 @@ import {
   EthAdapterTransaction,
   GetContractProps,
   SafeTransactionEIP712Args
-} from '@gnosis.pm/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+} from '@safe-global/safe-core-sdk-types'
+import { generateTypedData, validateEip3770Address } from '@safe-global/safe-core-sdk-utils'
 import { ethers } from 'ethers'
+import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import {
+  getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
@@ -108,6 +110,22 @@ class EthersAdapter implements EthAdapter {
     return getSafeContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
+  getSafeProxyFactoryContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress
+  }: GetContractProps): GnosisSafeProxyFactoryEthersContract {
+    const contractAddress = customContractAddress
+      ? customContractAddress
+      : singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SafeProxyFactory contract address')
+    }
+    const signerOrProvider = this.#signer || this.#provider
+    return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, signerOrProvider)
+  }
+
   getMultiSendContract({
     safeVersion,
     chainId,
@@ -140,20 +158,24 @@ class EthersAdapter implements EthAdapter {
     return getMultiSendCallOnlyContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
-  getSafeProxyFactoryContract({
+  getCompatibilityFallbackHandlerContract({
     safeVersion,
     chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): GnosisSafeProxyFactoryEthersContract {
+  }: GetContractProps): CompatibilityFallbackHandlerContractEthers {
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid SafeProxyFactory contract address')
+      throw new Error('Invalid CompatibilityFallbackHandler contract address')
     }
     const signerOrProvider = this.#signer || this.#provider
-    return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, signerOrProvider)
+    return getCompatibilityFallbackHandlerContractInstance(
+      safeVersion,
+      contractAddress,
+      signerOrProvider
+    )
   }
 
   getSignMessageLibContract({

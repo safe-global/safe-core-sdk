@@ -1,4 +1,7 @@
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+import {
+  SafeMultisigTransactionResponse,
+  SafeTransactionDataPartial
+} from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
@@ -272,6 +275,72 @@ describe('Off-chain signatures', () => {
       const signedTx = await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(0)
       chai.expect(signedTx.signatures.size).to.be.eq(1)
+    })
+
+    it('should sign a transaction received from the Safe Transaction Service', async () => {
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const safeServiceTransaction: SafeMultisigTransactionResponse = {
+        safe: '',
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x',
+        operation: 1,
+        gasToken: '0x3333333333333333333333333333333333333333',
+        safeTxGas: 666,
+        baseGas: 111,
+        gasPrice: '222',
+        refundReceiver: '0x4444444444444444444444444444444444444444',
+        nonce: await safeSdk.getNonce(),
+        executionDate: '',
+        submissionDate: '',
+        modified: '',
+        blockNumber: 12345,
+        transactionHash: '',
+        safeTxHash: '',
+        executor: '',
+        isExecuted: false,
+        isSuccessful: false,
+        ethGasPrice: '',
+        gasUsed: 12345,
+        fee: 12345,
+        origin: '',
+        dataDecoded: '',
+        confirmationsRequired: 2,
+        confirmations: [
+          {
+            owner: '0x1111111111111111111111111111111111111111',
+            submissionDate: '',
+            transactionHash: '',
+            confirmationType: '',
+            signature: '0x111111',
+            signatureType: ''
+          },
+          {
+            owner: '0x2222222222222222222222222222222222222222',
+            submissionDate: '',
+            transactionHash: '',
+            confirmationType: '',
+            signature: '0x222222',
+            signatureType: ''
+          }
+        ],
+        signatures: '0x111111222222'
+      }
+      const signedTx = await safeSdk.signTransaction(safeServiceTransaction)
+      chai.expect(safeServiceTransaction.confirmations?.length).to.be.eq(2)
+      chai.expect(signedTx.signatures.size).to.be.eq(3)
+      const signerAddress = await ethAdapter.getSignerAddress()
+      const signerSignature = signedTx.signatures.get(signerAddress!.toLowerCase())?.data
+      chai
+        .expect(signedTx.encodedSignatures())
+        .to.be.eq(safeServiceTransaction.signatures! + signerSignature!.slice(2))
     })
   })
 })

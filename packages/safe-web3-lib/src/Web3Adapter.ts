@@ -5,14 +5,16 @@ import {
   EthAdapterTransaction,
   GetContractProps,
   SafeTransactionEIP712Args
-} from '@gnosis.pm/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '@gnosis.pm/safe-core-sdk-utils'
+} from '@safe-global/safe-core-sdk-types'
+import { generateTypedData, validateEip3770Address } from '@safe-global/safe-core-sdk-utils'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 import type { JsonRPCResponse, Provider } from 'web3/providers'
+import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
 import {
+  getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
   getGnosisSafeProxyFactoryContractInstance,
   getMultiSendCallOnlyContractInstance,
@@ -95,6 +97,24 @@ class Web3Adapter implements EthAdapter {
     return getSafeContractInstance(safeVersion, safeContract)
   }
 
+  getSafeProxyFactoryContract({
+    safeVersion,
+    chainId,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SafeProxyFactory contract address')
+    }
+    const proxyFactoryContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+  }
+
   getMultiSendContract({
     safeVersion,
     chainId,
@@ -131,22 +151,22 @@ class Web3Adapter implements EthAdapter {
     return getMultiSendCallOnlyContractInstance(safeVersion, multiSendContract)
   }
 
-  getSafeProxyFactoryContract({
+  getCompatibilityFallbackHandlerContract({
     safeVersion,
     chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
+  }: GetContractProps): CompatibilityFallbackHandlerWeb3Contract {
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
-      throw new Error('Invalid SafeProxyFactory contract address')
+      throw new Error('Invalid Compatibility Fallback Handler contract address')
     }
-    const proxyFactoryContract = this.getContract(
+    const multiSendContract = this.getContract(
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
-    return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+    return getCompatibilityFallbackHandlerContractInstance(safeVersion, multiSendContract)
   }
 
   getSignMessageLibContract({

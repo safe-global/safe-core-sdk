@@ -1,4 +1,4 @@
-import { BaseTransactionResult } from '@gnosis.pm/safe-core-sdk-types'
+import { BaseTransactionResult } from '@safe-global/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
 export interface Web3TransactionOptions {

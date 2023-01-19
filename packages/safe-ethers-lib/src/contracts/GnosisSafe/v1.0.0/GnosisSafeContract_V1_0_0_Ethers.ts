@@ -1,4 +1,4 @@
-import { SafeSetupConfig } from '@gnosis.pm/safe-core-sdk-types'
+import { SafeSetupConfig } from '@safe-global/safe-core-sdk-types'
 import { EthersTransactionOptions, EthersTransactionResult } from '../../../types'
 import { ZERO_ADDRESS, EMPTY_DATA } from '../../../utils/constants'
 import { Gnosis_safe as GnosisSafe } from '../../../../typechain/src/ethers-v5/v1.0.0/Gnosis_safe'

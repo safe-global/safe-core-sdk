@@ -17,15 +17,15 @@
 To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) into your Dapp or script you will need to install these dependencies:
 
 ```
-@gnosis.pm/safe-core-sdk-types
-@gnosis.pm/safe-core-sdk
-@gnosis.pm/safe-service-client
+@safe-global/safe-core-sdk-types
+@safe-global/safe-core-sdk
+@safe-global/safe-service-client
 ```
 
 And one of these two:
 ```
-@gnosis.pm/safe-web3-lib
-@gnosis.pm/safe-ethers-lib
+@safe-global/safe-web3-lib
+@safe-global/safe-ethers-lib
 ```
 
 ## <a name="initialize-sdks">2. Initialize the SDK’s</a>
@@ -43,10 +43,10 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 
 ### Initialize the Safe Service Client
 
-As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@gnosis.pm/safe-service-client` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
+As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@safe-global/safe-service-client` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
 
 ```js
-import SafeServiceClient from '@gnosis.pm/safe-service-client'
+import SafeServiceClient from '@safe-global/safe-service-client'
 
 const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
 const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
@@ -55,7 +55,7 @@ const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
 ### Initialize the Safe Core SDK
 
 ```js
-import Safe, { SafeFactory } from '@gnosis.pm/safe-core-sdk'
+import Safe, { SafeFactory } from '@safe-global/safe-core-sdk'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 
@@ -75,21 +75,23 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy:
 If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
 
 ```js
-import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
+import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
 
-const id = await ethAdapter.getChainId()
+const chainId = await ethAdapter.getChainId()
 const contractNetworks: ContractNetworksConfig = {
-  [id]: {
-    multiSendAddress: '<MULTI_SEND_ADDRESS>',
-    multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+  [chainId]: {
     safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
     safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
+    multiSendAddress: '<MULTI_SEND_ADDRESS>',
+    multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
+    fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
     signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
     createCallAddress: '<CREATE_CALL_ADDRESS>',
-    multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
-    multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
     safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
     safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
+    multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
+    multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
+    fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
     signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
     createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
   }
@@ -114,7 +116,7 @@ The Safe Core SDK library allows the deployment of new Safes using the `safeFact
 Here, for example, we can create a new Safe account with 3 owners and 2 required signatures.
 
 ```js
-import { SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
+import { SafeAccountConfig } from '@safe-global/safe-core-sdk'
 
 const safeAccountConfig: SafeAccountConfig = {
   owners: ['0x...', '0x...', '0x...']
@@ -135,7 +137,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
 
   ```js
-  import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types'
+  import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 
   const safeTransactionData: SafeTransactionDataPartial = {
     to,
@@ -158,8 +160,8 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
   ```js
-  import { SafeTransactionOptionalProps } from '@gnosis.pm/safe-core-sdk'
-  import { MetaTransactionData } from '@gnosis.pm/safe-core-sdk-types'
+  import { SafeTransactionOptionalProps } from '@safe-global/safe-core-sdk'
+  import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
   const safeTransactionData: MetaTransactionData[] = [
     {
@@ -299,28 +301,7 @@ Once there are enough confirmations in the service the transaction is ready to b
 The method `executeTransaction` accepts an instance of the class `SafeTransaction` so the transaction needs to be transformed from the type `SafeMultisigTransactionResponse`.
 
 ```js
-import { EthSignSignature } from '@gnosis.pm/safe-core-sdk'
-
-// transaction: SafeMultisigTransactionResponse
-
-const safeTransactionData: SafeTransactionData = {
-  to: transaction.to,
-  value: transaction.value,
-  data: transaction.data,
-  operation: transaction.operation,
-  safeTxGas: transaction.safeTxGas,
-  baseGas: transaction.baseGas,
-  gasPrice: transaction.gasPrice,
-  gasToken: transaction.gasToken,
-  refundReceiver: transaction.refundReceiver,
-  nonce: transaction.nonce
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-transaction.confirmations.forEach(confirmation => {
-  const signature = new EthSignSignature(confirmation.owner, confirmation.signature)
-  safeTransaction.addSignature(signature)
-})
-
+const safeTransaction = await safeService.getTransaction(...)
 const executeTxResponse = await safeSdk.executeTransaction(safeTransaction)
 const receipt = executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
 ```

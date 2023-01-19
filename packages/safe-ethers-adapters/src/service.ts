@@ -3,7 +3,7 @@ import {
   SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial
-} from '@gnosis.pm/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 import axios, { AxiosInstance } from 'axios'
 
 export interface SafeTxDetails {

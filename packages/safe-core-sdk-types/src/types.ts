@@ -10,14 +10,14 @@ export enum OperationType {
 }
 
 export interface SafeSetupConfig {
-  owners: string[],
-  threshold: number,
-  to?: string,
-  data?: string,
-  fallbackHandler?: string,
-  paymentToken?: string,
-  payment?: string,
-  paymentReceiver?: string,
+  owners: string[]
+  threshold: number
+  to?: string
+  data?: string
+  fallbackHandler?: string
+  paymentToken?: string
+  payment?: string
+  paymentReceiver?: string
 }
 
 export interface MetaTransactionData {

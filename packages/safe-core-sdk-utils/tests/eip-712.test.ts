@@ -66,7 +66,7 @@ describe('EIP-712 sign typed data', () => {
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
       chai.expect(domain.chainId).to.be.undefined
     })
-    
+
     it('should generate the typed data for Safes == v1.2.0', async () => {
       const { domain } = generateTypedData({
         safeAddress,

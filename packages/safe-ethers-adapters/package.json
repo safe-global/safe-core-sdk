@@ -38,26 +38,38 @@
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^18.11.9",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.1",
     "dotenv": "^16.0.3",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint": "^8.32.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "ethers": "5.7.2",
-    "husky": "^8.0.2",
-    "lint-staged": "^13.0.4",
-    "mocha": "^10.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.8.0",
+    "prettier": "^2.8.3",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "ts-generator": "^0.1.1",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.4"
+  },
+  "peerDependencies": {
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/properties": "^5.7.0"
+  },
+  "dependencies": {
+    "@gnosis.pm/safe-deployments": "1.19.0",
+    "@safe-global/safe-core-sdk": "^3.2.2",
+    "@safe-global/safe-core-sdk-types": "^1.8.0",
+    "axios": "^0.27.2"
   },
   "lint-staged": {
     "src/**/!(*test).ts": [
@@ -69,17 +81,5 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "peerDependencies": {
-    "@ethersproject/abstract-provider": "^5.7.0",
-    "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/bignumber": "^5.7.0",
-    "@ethersproject/properties": "^5.7.0"
-  },
-  "dependencies": {
-    "@gnosis.pm/safe-deployments": "1.17.0",
-    "@safe-global/safe-core-sdk": "^3.2.2",
-    "@safe-global/safe-core-sdk-types": "^1.8.0",
-    "axios": "^0.27.2"
   }
 }

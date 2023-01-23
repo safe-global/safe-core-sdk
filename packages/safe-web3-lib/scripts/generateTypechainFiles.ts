@@ -30,8 +30,18 @@ const safeContracts_V1_1_1 = [
   `${safeContractsPath}/v1.1.1/proxy_factory.json`,
   `${safeContractsPath}/v1.1.1/multi_send.json`
 ].join(' ')
+const safeContracts_V1_0_0 = [
+  `${safeContractsPath}/v1.0.0/gnosis_safe.json`,
+  `${safeContractsPath}/v1.0.0/proxy_factory.json`
+].join(' ')
 
 // Won't be included in dist/ folder
+const safeContractsTestV1_3_0Path =
+  '../../node_modules/@gnosis.pm/safe-contracts-v1.3.0/build/artifacts/contracts'
+const testContracts_V1_3_0 = [
+  `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`,
+  `${safeContractsTestV1_3_0Path}/examples/guards/DefaultCallbackHandler.sol/DefaultCallbackHandler.json`
+].join(' ')
 const safeContractsTestV1_2_0Path =
   '../../node_modules/@gnosis.pm/safe-contracts-v1.2.0/build/contracts'
 const openZeppelinContractsPath = '../../node_modules/openzeppelin-solidity/build/contracts'
@@ -39,12 +49,6 @@ const testContracts_V1_2_0 = [
   `${safeContractsTestV1_2_0Path}/DailyLimitModule.json`,
   `${safeContractsTestV1_2_0Path}/SocialRecoveryModule.json`,
   `${openZeppelinContractsPath}/ERC20Mintable.json`
-].join(' ')
-const safeContractsTestV1_3_0Path =
-  '../../node_modules/@gnosis.pm/safe-contracts-v1.3.0/build/artifacts/contracts'
-const testContracts_V1_3_0 = [
-  `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`,
-  `${safeContractsTestV1_3_0Path}/examples/guards/DefaultCallbackHandler.sol/DefaultCallbackHandler.json`
 ].join(' ')
 
 // Remove existing Typechain files
@@ -85,6 +89,7 @@ const web3V1 = 'web3-v1'
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/v1.3.0`, safeContracts_V1_3_0)
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/v1.2.0`, safeContracts_V1_2_0)
 generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/v1.1.1`, safeContracts_V1_1_1)
+generateTypechainFiles(web3V1, `${outDirSrc}${web3V1}/v1.0.0`, safeContracts_V1_0_0)
 moveTypechainFiles(
   `${typeChainDirectorySrcPath}${web3V1}/v1.3.0`,
   `${typeChainDirectoryBuildPath}${web3V1}/v1.3.0`
@@ -97,7 +102,11 @@ moveTypechainFiles(
   `${typeChainDirectorySrcPath}${web3V1}/v1.1.1`,
   `${typeChainDirectoryBuildPath}${web3V1}/v1.1.1`
 )
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${web3V1}/v1.0.0`,
+  `${typeChainDirectoryBuildPath}${web3V1}/v1.0.0`
+)
 
 // Tests: Web3 V1 types
-generateTypechainFiles(web3V1, `${outDirTests}${web3V1}/v1.2.0`, testContracts_V1_2_0)
 generateTypechainFiles(web3V1, `${outDirTests}${web3V1}/v1.3.0`, testContracts_V1_3_0)
+generateTypechainFiles(web3V1, `${outDirTests}${web3V1}/v1.2.0`, testContracts_V1_2_0)

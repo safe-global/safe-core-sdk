@@ -1,5 +1,9 @@
 import { AddressZero } from '@ethersproject/constants'
 import {
+  Gnosis_safe as GnosisSafe_V1_0_0,
+  Proxy_factory as ProxyFactory_V1_0_0
+} from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.0.0'
+import {
   Gnosis_safe as GnosisSafe_V1_1_1,
   Multi_send as MultiSend_V1_1_1,
   Proxy_factory as ProxyFactory_V1_1_1
@@ -24,6 +28,7 @@ import {
   DefaultCallbackHandler
 } from '@safe-global/safe-ethers-lib/typechain/tests/ethers-v5/v1.3.0'
 import { deployments, ethers } from 'hardhat'
+import semverSatisfies from 'semver/functions/satisfies'
 import { AbiItem } from 'web3-utils'
 import {
   compatibilityFallbackHandlerDeployed,
@@ -32,11 +37,12 @@ import {
   multiSendCallOnlyDeployed,
   multiSendDeployed,
   proxyFactoryDeployed,
+  safeVersionDeployed,
   signMessageLibDeployed
 } from '../../hardhat/deploy/deploy-contracts'
 
 export const getSafeSingleton = async (): Promise<{
-  contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
+  contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0
   abi: AbiItem | AbiItem[]
 }> => {
   const SafeDeployment = await deployments.get(gnosisSafeDeployed.name)
@@ -45,13 +51,14 @@ export const getSafeSingleton = async (): Promise<{
     contract: Safe.attach(SafeDeployment.address) as
       | GnosisSafe_V1_3_0
       | GnosisSafe_V1_2_0
-      | GnosisSafe_V1_1_1,
+      | GnosisSafe_V1_1_1
+      | GnosisSafe_V1_0_0,
     abi: SafeDeployment.abi
   }
 }
 
 export const getFactory = async (): Promise<{
-  contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1
+  contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1 | ProxyFactory_V1_0_0
   abi: AbiItem | AbiItem[]
 }> => {
   const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
@@ -59,39 +66,56 @@ export const getFactory = async (): Promise<{
   return {
     contract: Factory.attach(FactoryDeployment.address) as
       | ProxyFactory_V1_3_0
-      | ProxyFactory_V1_1_1,
+      | ProxyFactory_V1_1_1
+      | ProxyFactory_V1_0_0,
     abi: FactoryDeployment.abi
   }
 }
 
 export const getSafeTemplate = async (): Promise<
-  GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
+  GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0
 > => {
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
   const template = await factory.callStatic.createProxy(singleton.address, '0x')
   await factory.createProxy(singleton.address, '0x').then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
-  return Safe.attach(template) as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
+  return Safe.attach(template) as
+    | GnosisSafe_V1_3_0
+    | GnosisSafe_V1_2_0
+    | GnosisSafe_V1_1_1
+    | GnosisSafe_V1_0_0
 }
 
 export const getSafeWithOwners = async (
   owners: string[],
   threshold?: number,
   fallbackHandler?: string
-): Promise<GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1> => {
+): Promise<GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0> => {
   const template = await getSafeTemplate()
-  await template.setup(
-    owners,
-    threshold || owners.length,
-    AddressZero,
-    '0x',
-    fallbackHandler || (await getCompatibilityFallbackHandler()).contract.address,
-    AddressZero,
-    0,
-    AddressZero
-  )
-  return template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1
+  if (semverSatisfies(safeVersionDeployed, '<=1.0.0')) {
+    await (template as GnosisSafe_V1_0_0).setup(
+      owners,
+      threshold || owners.length,
+      AddressZero,
+      '0x',
+      AddressZero,
+      0,
+      AddressZero
+    )
+  } else {
+    await (template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1).setup(
+      owners,
+      threshold || owners.length,
+      AddressZero,
+      '0x',
+      fallbackHandler || (await getCompatibilityFallbackHandler()).contract.address,
+      AddressZero,
+      0,
+      AddressZero
+    )
+  }
+  return template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0
 }
 
 export const getCompatibilityFallbackHandler = async (): Promise<{
@@ -189,8 +213,8 @@ export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard>
 }
 
 export const getDefaultCallbackHandler = async (): Promise<DefaultCallbackHandler> => {
-  const DefaultCallbackHandlerDeployment = await deployments.get('DefaultCallbackHandler')
-  const DefaultCallbackHandler = await ethers.getContractFactory('DefaultCallbackHandler')
+  const DefaultCallbackHandlerDeployment = await deployments.get('DefaultCallbackHandler_SV1_3_0')
+  const DefaultCallbackHandler = await ethers.getContractFactory('DefaultCallbackHandler_SV1_3_0')
   return DefaultCallbackHandler.attach(
     DefaultCallbackHandlerDeployment.address
   ) as DefaultCallbackHandler

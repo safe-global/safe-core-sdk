@@ -19,7 +19,7 @@
   "author": "Safe (https://safe.global)",
   "license": "MIT",
   "devDependencies": {
-    "lerna": "^6.0.3",
+    "lerna": "^6.4.1",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.1"
   }

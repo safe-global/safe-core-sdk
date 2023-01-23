@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { GenerateTypedData, SafeTransactionEIP712Args } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 
@@ -60,11 +59,11 @@ export function generateTypedData({
     primaryType: 'SafeTx',
     message: {
       ...safeTransactionData,
-      value: BigNumber.from(safeTransactionData.value),
-      safeTxGas: BigNumber.from(safeTransactionData.safeTxGas),
-      baseGas: BigNumber.from(safeTransactionData.baseGas),
-      gasPrice: BigNumber.from(safeTransactionData.gasPrice),
-      nonce: BigNumber.from(safeTransactionData.nonce)
+      value: safeTransactionData.value,
+      safeTxGas: safeTransactionData.safeTxGas,
+      baseGas: safeTransactionData.baseGas,
+      gasPrice: safeTransactionData.gasPrice,
+      nonce: safeTransactionData.nonce
     }
   }
   if (eip712WithChainId) {

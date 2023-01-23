@@ -31,6 +31,7 @@ import {
   standardizeMetaTransactionData,
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
+import { FEATURES, hasFeature } from './utils/safeVersions'
 
 export interface SafeConfig {
   /** ethAdapter - Ethereum adapter */
@@ -438,7 +439,11 @@ class Safe {
    */
   async signTransaction(
     safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
-    signingMethod: 'eth_sign' | 'eth_signTypedData' = 'eth_sign'
+    signingMethod:
+      | 'eth_sign'
+      | 'eth_signTypedData'
+      | 'eth_signTypedData_v3'
+      | 'eth_signTypedData_v4' = 'eth_signTypedData_v4'
   ): Promise<SafeTransaction> {
     let transaction = isSafeMultisigTransactionResponse(safeTransaction)
       ? await this.toSafeTransactionType(safeTransaction)
@@ -455,13 +460,23 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
+
     let signature: SafeSignature
-    if (signingMethod === 'eth_signTypedData') {
+    if (signingMethod === 'eth_signTypedData_v4') {
+      signature = await this.signTypedData(transaction, 'v4')
+    } else if (signingMethod === 'eth_signTypedData_v3') {
+      signature = await this.signTypedData(transaction, 'v3')
+    } else if (signingMethod === 'eth_signTypedData') {
       signature = await this.signTypedData(transaction)
     } else {
+      const safeVersion = await this.getContractVersion()
+      if (!hasFeature(FEATURES.ETH_SIGN, safeVersion)) {
+        throw new Error('eth_sign is only supported by Safes >= v1.1.0')
+      }
       const txHash = await this.getTransactionHash(transaction)
       signature = await this.signTransactionHash(txHash)
     }
+
     const signedSafeTransaction = await this.createTransaction({
       safeTransactionData: transaction.data
     })

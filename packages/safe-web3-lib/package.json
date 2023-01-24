@@ -6,7 +6,6 @@
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
-    "Gnosis",
     "Safe",
     "SDK",
     "Web3"

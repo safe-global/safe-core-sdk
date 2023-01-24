@@ -1,0 +1,28 @@
+name: Safe Core SDK Test - Ethers
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - development
+env:
+  INFURA_KEY: ${{ secrets.INFURA_KEY }}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+        contract-version: [v1.0.0, v1.1.1, v1.2.0,v1.3.0]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: |
+          yarn install
+          yarn build
+          cd packages/safe-core-sdk
+      - name: Test Ethers - Safe ${{ matrix.contract-version }}
+        run: yarn test:hardhat:ethers:${{ matrix.contract-version }}

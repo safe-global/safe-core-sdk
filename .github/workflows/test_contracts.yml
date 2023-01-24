@@ -1,4 +1,4 @@
-name: Safe Core SDK Test - Ethers
+name: Safe Core SDK Test - Contracts
 on:
   pull_request:
   push:
@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
+        provider: [ethers, web3]
         contract-version: [v1.0.0, v1.1.1, v1.2.0,v1.3.0]
     steps:
       - uses: actions/checkout@v3
@@ -20,10 +21,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: yarn
       - run: |
-          yarn install
+          yarn install --frozen-lockfile
           yarn build
-      - name: Test Ethers - Safe ${{ matrix.contract-version }}
+      - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/safe-core-sdk
-          yarn test:hardhat:ethers:${{ matrix.contract-version }}
+          yarn test:hardhat:${{ matrix.provider }}:${{ matrix.contract-version }}

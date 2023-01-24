@@ -23,6 +23,7 @@ jobs:
       - run: |
           yarn install
           yarn build
-          cd packages/safe-core-sdk
       - name: Test Ethers - Safe ${{ matrix.contract-version }}
-        run: yarn test:hardhat:ethers:${{ matrix.contract-version }}
+        run: |
+          cd packages/safe-core-sdk
+          yarn test:hardhat:ethers:${{ matrix.contract-version }}

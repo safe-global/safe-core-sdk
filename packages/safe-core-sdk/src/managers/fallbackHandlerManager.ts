@@ -1,7 +1,7 @@
 import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
 import { isZeroAddress, sameString } from '../utils'
 import { ZERO_ADDRESS } from '../utils/constants'
-import { FEATURES, hasFeature } from '../utils/safeVersions'
+import { SAFE_FEATURES, hasSafeFeature } from '../utils/safeVersions'
 
 class FallbackHandlerManager {
   #ethAdapter: EthAdapter
@@ -38,7 +38,7 @@ class FallbackHandlerManager {
 
   async getFallbackHandler(): Promise<string> {
     const safeVersion = await this.#safeContract.getVersion()
-    if (hasFeature(FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
+    if (hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
       return this.#ethAdapter.getStorageAt(this.#safeContract.getAddress(), this.#slot)
     } else {
       throw new Error(

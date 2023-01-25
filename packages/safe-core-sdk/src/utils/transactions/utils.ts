@@ -9,7 +9,7 @@ import {
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
 import { ZERO_ADDRESS } from '../constants'
-import { FEATURES, hasFeature } from '../safeVersions'
+import { SAFE_FEATURES, hasSafeFeature } from '../safeVersions'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
@@ -47,7 +47,10 @@ export async function standardizeSafeTransactionData(
     }
   }
   const safeVersion = await safeContract.getVersion()
-  if (hasFeature(FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) && standardizedTxs.gasPrice === 0) {
+  if (
+    hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) &&
+    standardizedTxs.gasPrice === 0
+  ) {
     safeTxGas = 0
   } else {
     safeTxGas = await estimateTxGas(

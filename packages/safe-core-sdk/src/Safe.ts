@@ -31,7 +31,7 @@ import {
   standardizeMetaTransactionData,
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
-import { FEATURES, hasFeature } from './utils/safeVersions'
+import { SAFE_FEATURES, hasSafeFeature } from './utils/safeVersions'
 
 export interface SafeConfig {
   /** ethAdapter - Ethereum adapter */
@@ -470,7 +470,7 @@ class Safe {
       signature = await this.signTypedData(transaction)
     } else {
       const safeVersion = await this.getContractVersion()
-      if (!hasFeature(FEATURES.ETH_SIGN, safeVersion)) {
+      if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
       const txHash = await this.getTransactionHash(transaction)

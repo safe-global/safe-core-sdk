@@ -14,9 +14,8 @@ const SAFE_FEATURES_BY_VERSION: Record<SAFE_FEATURES, string> = {
   [SAFE_FEATURES.ETH_SIGN]: '>=1.1.0'
 }
 
-// Note: gatewau returns `SafeInfo['version']` as `null` for unsupported contracts
-export const hasSafeFeature = (feature: SAFE_FEATURES, version: string | null): boolean => {
-  if (!version || !(feature in SAFE_FEATURES_BY_VERSION)) {
+export const hasSafeFeature = (feature: SAFE_FEATURES, version: string): boolean => {
+  if (!(feature in SAFE_FEATURES_BY_VERSION)) {
     return false
   }
 

@@ -11,6 +11,7 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
+import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/safe-core-sdk-utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -31,7 +32,6 @@ import {
   standardizeMetaTransactionData,
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
-import { SAFE_FEATURES, hasSafeFeature } from './utils/safeVersions'
 
 export interface SafeConfig {
   /** ethAdapter - Ethereum adapter */

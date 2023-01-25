@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-core-sdk",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Safe Core SDK",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -86,6 +86,7 @@
   "dependencies": {
     "@ethersproject/solidity": "^5.7.0",
     "@safe-global/safe-core-sdk-types": "^1.9.0",
+    "@safe-global/safe-core-sdk-utils": "^1.7.1",
     "@gnosis.pm/safe-deployments": "1.19.0",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.8",

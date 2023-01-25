@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-ethers-lib",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Ethers library adapter to be used by Safe Core SDK",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@safe-global/safe-core-sdk-types": "^1.9.0",
-    "@safe-global/safe-core-sdk-utils": "^1.7.0",
+    "@safe-global/safe-core-sdk-utils": "^1.7.1",
     "ethers": "5.7.2"
   }
 }

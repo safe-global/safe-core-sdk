@@ -8,8 +8,8 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
+import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/safe-core-sdk-utils'
 import { ZERO_ADDRESS } from '../constants'
-import { SAFE_FEATURES, hasSafeFeature } from '../safeVersions'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(

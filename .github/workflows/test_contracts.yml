@@ -1,4 +1,4 @@
-name: e2e Test
+name: Safe Core SDK Test - Contracts
 on:
   pull_request:
   push:
@@ -13,6 +13,8 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
+        provider: [ethers, web3]
+        contract-version: [v1.0.0, v1.1.1, v1.2.0, v1.3.0]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -23,4 +25,7 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
-          yarn test:ci
+      - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
+        run: |
+          cd packages/safe-core-sdk
+          yarn test:hardhat:${{ matrix.provider }}:${{ matrix.contract-version }}

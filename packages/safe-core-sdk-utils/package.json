@@ -1,12 +1,11 @@
 {
   "name": "@safe-global/safe-core-sdk-utils",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Safe Core SDK Utilities",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
-    "Gnosis",
     "Safe",
     "SDK"
   ],

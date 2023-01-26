@@ -1,12 +1,11 @@
 {
   "name": "@safe-global/safe-web3-lib",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Web3 library adapter to be used by Safe Core SDK",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
-    "Gnosis",
     "Safe",
     "SDK",
     "Web3"
@@ -49,7 +48,7 @@
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
     "@safe-global/safe-core-sdk-types": "^1.9.0",
-    "@safe-global/safe-core-sdk-utils": "^1.7.0",
+    "@safe-global/safe-core-sdk-utils": "^1.7.1",
     "web3": "^1.8.1",
     "web3-core": "^1.8.1",
     "web3-utils": "^1.8.1"

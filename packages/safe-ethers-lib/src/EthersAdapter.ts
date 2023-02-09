@@ -48,7 +48,7 @@ class EthersAdapter implements EthAdapter {
       throw new Error('ethers property missing from options')
     }
     this.#ethers = ethers
-    const isSigner = signerOrProvider instanceof Signer
+    const isSigner = signerOrProvider instanceof ethers.Signer
     if (isSigner) {
       const signer = signerOrProvider as Signer
       if (!signer.provider) {

@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-service-client",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Safe Service Client",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -35,8 +35,8 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/safe-ethers-lib": "^1.9.0",
-    "@safe-global/safe-web3-lib": "^1.9.0",
+    "@safe-global/safe-ethers-lib": "^1.9.2",
+    "@safe-global/safe-web3-lib": "^1.9.2",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",

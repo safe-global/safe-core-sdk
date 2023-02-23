@@ -90,6 +90,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 71402, shortName: 'gw-mainnet-v1' },
   { chainId: 73799, shortName: 'vt' },
   { chainId: 80001, shortName: 'maticmum' },
+  { chainId: 84531, shortName: 'base-gor' },
   { chainId: 200101, shortName: 'milktada' },
   { chainId: 200202, shortName: 'milktalgo' },
   { chainId: 333999, shortName: 'olympus' },

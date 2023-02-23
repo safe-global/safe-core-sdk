@@ -86,7 +86,7 @@
     "@ethersproject/solidity": "^5.7.0",
     "@safe-global/safe-core-sdk-types": "^1.9.0",
     "@safe-global/safe-core-sdk-utils": "^1.7.1",
-    "@safe-global/safe-deployments": "^1.20.1",
+    "@safe-global/safe-deployments": "^1.20.2",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.8",
     "web3-utils": "^1.8.1"

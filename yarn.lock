@@ -2379,10 +2379,10 @@
     path-browserify "^1.0.0"
     url "^0.11.0"
 
-"@safe-global/safe-deployments@^1.20.1":
-  version "1.20.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.20.1.tgz#d95064b6762b1ce42205e7c8cb983d492ebc6ad6"
-  integrity sha512-szwbjw2vq7KO80QBHto4tKFPKJ83LcCLo3s1jd50kL4+nIHhtpF2geAcjDCXhP4rKJPpUrObYE3JJ/Xp6e8avA==
+"@safe-global/safe-deployments@^1.20.2":
+  version "1.20.2"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.20.2.tgz#a005493c584909bba82bb7f06fef40a1e69d8fa8"
+  integrity sha512-4uPNpC5RUl2muGKfWUMMduG5+vKDHZOdPmFPmBkdyG+JL3jDzihgdZzdbKERQClg5xrwPhJY38hJezUFCGPR/w==
   dependencies:
     semver "^7.3.7"
 

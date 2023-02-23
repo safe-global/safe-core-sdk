@@ -1,4 +1,4 @@
-import { DeploymentFilter, getSafeSingletonDeployment } from '@gnosis.pm/safe-deployments'
+import { DeploymentFilter, getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { networks } from '../src/eip-3770/config'
 

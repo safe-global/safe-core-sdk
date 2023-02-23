@@ -13,7 +13,7 @@ const outDirTests = 'typechain/tests/'
 
 // Contract list for which the Typechain files will be generated
 // Will be included in dist/ folder
-const safeContractsPath = '../../node_modules/@gnosis.pm/safe-deployments/dist/assets'
+const safeContractsPath = '../../node_modules/@safe-global/safe-deployments/dist/assets'
 
 const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/gnosis_safe.json`,

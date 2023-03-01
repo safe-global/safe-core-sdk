@@ -96,7 +96,7 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
 
   while (index < decodedData.length) {
     // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
-    // uint8 operation, address to, value uint265, dataLength uint256
+    // uint8 operation, address to, value uint256, dataLength uint256
 
     const operation = `0x${decodedData.slice(index, (index += 2))}`
     const to = `0x${decodedData.slice(index, (index += 40))}`

@@ -83,6 +83,7 @@ export function encodeMultiSendData(txs: MetaTransactionData[]): string {
 }
 
 export function decodeMultiSendData(data: string): MetaTransactionData[] {
+  // We decode hex encoded bytes calldata. As a rule of thumb 1 byte = 2 chars
   // uint8 operation, address to, value uint265, dataLength uint256
   const INDIVIDUAL_TX_DATA_LENGTH = 2 + 40 + 64 + 64
 
@@ -110,7 +111,7 @@ export function decodeMultiSendData(data: string): MetaTransactionData[] {
       ethers.utils.hexZeroPad(txDataEncoded, 32 * 4)
     )
 
-    // Each byte is represented by two characters
+    // Each byte is represented by 2 chars
     const dataLength = (txDataBytesLength as BigNumber).toNumber() * 2
     const txData = `0x${decodedData.slice(
       index,

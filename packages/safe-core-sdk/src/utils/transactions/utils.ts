@@ -1,5 +1,6 @@
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
+import { BigNumber, ethers } from 'ethers'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -48,7 +49,7 @@ export async function standardizeSafeTransactionData(
   }
   const safeVersion = await safeContract.getVersion()
   if (
-    hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) &&
+    // hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) &&
     standardizedTxs.gasPrice === 0
   ) {
     safeTxGas = 0
@@ -79,4 +80,51 @@ function encodeMetaTransaction(tx: MetaTransactionData): string {
 
 export function encodeMultiSendData(txs: MetaTransactionData[]): string {
   return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
+}
+
+export function decodeMultiSendData(data: string): MetaTransactionData[] {
+  // uint8 operation, address to, value uint265, dataLength uint256
+  const INDIVIDUAL_TX_DATA_LENGTH = 2 + 40 + 64 + 64
+
+  const multiSendInterface = new ethers.utils.Interface([
+    'function multiSend(bytes memory transactions) public payable'
+  ])
+  const [decodedData] = multiSendInterface.decodeFunctionData('multiSend', data)
+
+  const abiCoder = new ethers.utils.AbiCoder()
+
+  const txs: MetaTransactionData[] = []
+
+  // Decode after 0x
+  let index = 2
+
+  while (index < decodedData.length) {
+    const txDataEncoded = `0x${decodedData.slice(
+      index,
+      // Traverse next transaction
+      (index += INDIVIDUAL_TX_DATA_LENGTH)
+    )}`
+
+    const [txOperation, txTo, txValue, txDataBytesLength] = abiCoder.decode(
+      ['uint8', 'address', 'uint256', 'uint256'],
+      ethers.utils.hexZeroPad(txDataEncoded, 32 * 4)
+    )
+
+    // Each byte is represented by two characters
+    const dataLength = (txDataBytesLength as BigNumber).toNumber() * 2
+    const txData = `0x${decodedData.slice(
+      index,
+      // Traverse data length
+      (index += dataLength)
+    )}`
+
+    txs.push({
+      operation: txOperation as OperationType,
+      to: txTo,
+      value: (txValue as BigNumber).toString(),
+      data: txData
+    })
+  }
+
+  return txs
 }

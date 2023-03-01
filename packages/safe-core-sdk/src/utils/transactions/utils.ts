@@ -1,6 +1,7 @@
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
-import { BigNumber, ethers } from 'ethers'
+import { Interface } from '@ethersproject/abi'
+import { hexToNumber, toChecksumAddress, hexToNumberString } from 'web3-utils'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -82,17 +83,11 @@ export function encodeMultiSendData(txs: MetaTransactionData[]): string {
   return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
 }
 
-export function decodeMultiSendData(data: string): MetaTransactionData[] {
-  // We decode hex encoded bytes calldata. As a rule of thumb 1 byte = 2 chars
-  // uint8 operation, address to, value uint265, dataLength uint256
-  const INDIVIDUAL_TX_DATA_LENGTH = 2 + 40 + 64 + 64
-
-  const multiSendInterface = new ethers.utils.Interface([
+export function decodeMultiSendData(encodedData: string): MetaTransactionData[] {
+  const multiSendInterface = new Interface([
     'function multiSend(bytes memory transactions) public payable'
   ])
-  const [decodedData] = multiSendInterface.decodeFunctionData('multiSend', data)
-
-  const abiCoder = new ethers.utils.AbiCoder()
+  const [decodedData] = multiSendInterface.decodeFunctionData('multiSend', encodedData)
 
   const txs: MetaTransactionData[] = []
 
@@ -100,30 +95,20 @@ export function decodeMultiSendData(data: string): MetaTransactionData[] {
   let index = 2
 
   while (index < decodedData.length) {
-    const txDataEncoded = `0x${decodedData.slice(
-      index,
-      // Traverse next transaction
-      (index += INDIVIDUAL_TX_DATA_LENGTH)
-    )}`
+    // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
+    // uint8 operation, address to, value uint265, dataLength uint256
 
-    const [txOperation, txTo, txValue, txDataBytesLength] = abiCoder.decode(
-      ['uint8', 'address', 'uint256', 'uint256'],
-      ethers.utils.hexZeroPad(txDataEncoded, 32 * 4)
-    )
-
-    // Each byte is represented by 2 chars
-    const dataLength = (txDataBytesLength as BigNumber).toNumber() * 2
-    const txData = `0x${decodedData.slice(
-      index,
-      // Traverse data length
-      (index += dataLength)
-    )}`
+    const operation = `0x${decodedData.slice(index, (index += 2))}`
+    const to = `0x${decodedData.slice(index, (index += 40))}`
+    const value = `0x${decodedData.slice(index, (index += 64))}`
+    const dataLength = parseInt(decodedData.slice(index, (index += 64)), 16) * 2
+    const data = `0x${decodedData.slice(index, (index += dataLength))}`
 
     txs.push({
-      operation: txOperation as OperationType,
-      to: txTo,
-      value: (txValue as BigNumber).toString(),
-      data: txData
+      operation: hexToNumber(operation),
+      to: toChecksumAddress(to),
+      value: hexToNumberString(value),
+      data
     })
   }
 

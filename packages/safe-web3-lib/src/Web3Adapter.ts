@@ -11,6 +11,9 @@ import Web3 from 'web3'
 import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
+// TODO remove @types/web3 when migrating to web3@v4
+// Deprecated https://www.npmjs.com/package/@types/web3?activeTab=readme
+// Migration guide https://docs.web3js.org/docs/guides/web3_migration_guide#types
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
 import {

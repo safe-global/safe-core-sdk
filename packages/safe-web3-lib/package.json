@@ -35,6 +35,7 @@
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@typechain/web3-v1": "^6.0.2",
     "@types/node": "^18.11.18",
+    "@types/web3": "1.0.19",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "eslint": "^8.32.0",

@@ -31,9 +31,10 @@ describe('getCollectibles', () => {
 
   it('should return the list of collectibles', async () => {
     const safeAddress = '0x72c346260a4887F0231af41178C1c818Ce34543f'
-    const safeCollectibleResponse = await serviceSdk.getCollectibles(safeAddress)
-    chai.expect(safeCollectibleResponse.length).to.be.equal(1)
-    safeCollectibleResponse.map((safeCollectible) => {
+    const safeCollectibleListResponse = await serviceSdk.getCollectibles(safeAddress)
+    chai.expect(safeCollectibleListResponse.count).to.be.equal(1)
+    chai.expect(safeCollectibleListResponse.results.length).to.be.equal(1)
+    safeCollectibleListResponse.results.map((safeCollectible) => {
       chai.expect(safeCollectible.address).to.be.equal('0x39Ec448b891c476e166b3C3242A90830DB556661')
       chai.expect(safeCollectible.tokenName).to.be.equal("Frank's Art Sale")
     })
@@ -42,9 +43,10 @@ describe('getCollectibles', () => {
   it('should return the list of collectibles EIP-3770', async () => {
     const safeAddress = '0x72c346260a4887F0231af41178C1c818Ce34543f'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const safeCollectibleResponse = await serviceSdk.getCollectibles(eip3770SafeAddress)
-    chai.expect(safeCollectibleResponse.length).to.be.equal(1)
-    safeCollectibleResponse.map((safeCollectible) => {
+    const safeCollectibleListResponse = await serviceSdk.getCollectibles(eip3770SafeAddress)
+    chai.expect(safeCollectibleListResponse.count).to.be.equal(1)
+    chai.expect(safeCollectibleListResponse.results.length).to.be.equal(1)
+    safeCollectibleListResponse.results.map((safeCollectible) => {
       chai.expect(safeCollectible.address).to.be.equal('0x39Ec448b891c476e166b3C3242A90830DB556661')
       chai.expect(safeCollectible.tokenName).to.be.equal("Frank's Art Sale")
     })

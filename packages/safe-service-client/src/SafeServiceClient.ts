@@ -16,7 +16,7 @@ import {
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
   SafeBalanceUsdResponse,
-  SafeCollectibleResponse,
+  SafeCollectibleListResponse,
   SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
@@ -616,23 +616,33 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
-   * Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
+   * Returns the collectibles (ERC721 tokens) owned by the given Safe and information about them.
    *
-   * @param safeAddress - The Safe address
-   * @param options - API params
-   * @returns The collectives owned by the given Safe
+   * @param {string} safeAddress - The Safe address
+   * @param {Object} options - API params
+   * @param {number} options.limit
+   * @param {number} options.offset
+   * @param {boolean} options.excludeSpamTokens
+   * @returns The collectibles owned by the given Safe
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
   async getCollectibles(
     safeAddress: string,
     options?: SafeCollectiblesOptions
-  ): Promise<SafeCollectibleResponse[]> {
+  ): Promise<SafeCollectibleListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/collectibles/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/safes/${address}/collectibles/`)
+
+    const limit = options?.limit?.toString() || '10'
+    url.searchParams.set('limit', limit)
+
+    const offset = options?.offset?.toString() || '0'
+    url.searchParams.set('offset', offset)
+
     const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
     url.searchParams.set('exclude_spam', excludeSpam)
 

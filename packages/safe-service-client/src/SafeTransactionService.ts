@@ -11,7 +11,7 @@ import {
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
   SafeBalanceUsdResponse,
-  SafeCollectibleResponse,
+  SafeCollectibleListResponse,
   SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
@@ -85,7 +85,7 @@ interface SafeTransactionService {
   getCollectibles(
     safeAddress: string,
     options?: SafeCollectiblesOptions
-  ): Promise<SafeCollectibleResponse[]>
+  ): Promise<SafeCollectibleListResponse>
 
   // Tokens
   getTokenList(): Promise<TokenInfoListResponse>

@@ -649,7 +649,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/v1/safes/${safeAddress}/collectibles/?exclude_spam=true`,
+        )}/v2/safes/${safeAddress}/collectibles/?limit=10&offset=0&exclude_spam=true`,
         method: 'get'
       })
     })
@@ -661,13 +661,15 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/v1/safes/${safeAddress}/collectibles/?exclude_spam=true`,
+        )}/v2/safes/${safeAddress}/collectibles/?limit=10&offset=0&exclude_spam=true`,
         method: 'get'
       })
     })
 
     it('getCollectibles (with options)', async () => {
       const options: SafeCollectiblesOptions = {
+        limit: 2,
+        offset: 1,
         excludeSpamTokens: false
       }
       await chai
@@ -676,7 +678,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/v1/safes/${safeAddress}/collectibles/?exclude_spam=false`,
+        )}/v2/safes/${safeAddress}/collectibles/?limit=2&offset=1&exclude_spam=false`,
         method: 'get'
       })
     })

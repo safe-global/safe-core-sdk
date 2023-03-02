@@ -38,6 +38,7 @@
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.11.18",
+    "@types/sinon-chai": "^3.2.9",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "chai": "^4.3.7",

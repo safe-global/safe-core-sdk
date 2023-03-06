@@ -25,7 +25,7 @@ export function isRestrictedAddress(address: string): boolean {
 export function isMetaTransactionArray(
   safeTransactions: SafeTransactionDataPartial | MetaTransactionData[]
 ): safeTransactions is MetaTransactionData[] {
-  return (safeTransactions as MetaTransactionData[])?.length !== undefined
+  return Array.isArray(safeTransactions)
 }
 
 export function isSafeMultisigTransactionResponse(

@@ -56,7 +56,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getServiceInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/about`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/about`,
         method: 'get'
       })
     })
@@ -66,7 +66,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getServiceMasterCopiesInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/about/master-copies`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/about/master-copies`,
         method: 'get'
       })
     })
@@ -77,7 +77,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.decodeData(data))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/data-decoder/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/data-decoder/`,
         method: 'post',
         body: { data }
       })
@@ -88,7 +88,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafesByOwner(randomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${randomAddress}/safes/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/owners/${randomAddress}/safes/`,
         method: 'get'
       })
     })
@@ -98,7 +98,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafesByOwner(eip3770RandomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/owners/${randomAddress}/safes/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/owners/${randomAddress}/safes/`,
         method: 'get'
       })
     })
@@ -108,7 +108,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafesByModule(randomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/modules/${randomAddress}/safes/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/modules/${randomAddress}/safes/`,
         method: 'get'
       })
     })
@@ -118,7 +118,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafesByModule(eip3770RandomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/modules/${randomAddress}/safes/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/modules/${randomAddress}/safes/`,
         method: 'get'
       })
     })
@@ -128,7 +128,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getTransaction(safeTxHash))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/multisig-transactions/${safeTxHash}/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/multisig-transactions/${safeTxHash}/`,
         method: 'get'
       })
     })
@@ -140,7 +140,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/multisig-transactions/${safeTxHash}/confirmations/`,
+        )}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
         method: 'get'
       })
     })
@@ -153,7 +153,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/multisig-transactions/${safeTxHash}/confirmations/`,
+        )}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
         method: 'get'
       })
     })
@@ -163,7 +163,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafeInfo(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/`,
         method: 'get'
       })
     })
@@ -173,7 +173,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafeInfo(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/`,
         method: 'get'
       })
     })
@@ -183,7 +183,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafeDelegates(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
         method: 'get'
       })
     })
@@ -193,7 +193,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafeDelegates(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
         method: 'get'
       })
     })
@@ -209,7 +209,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
         method: 'get'
       })
     })
@@ -225,7 +225,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
         method: 'get'
       })
     })
@@ -238,7 +238,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.removeAllSafeDelegates(safeAddress, signer))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
         method: 'delete',
         body: { signature }
       })
@@ -252,7 +252,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.removeAllSafeDelegates(eip3770SafeAddress, signer))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
         method: 'delete',
         body: { signature }
       })
@@ -272,7 +272,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/delegates/${
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/${
           delegateConfig.delegate
         }`,
         method: 'delete',
@@ -300,7 +300,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/delegates/${delegateAddress}`,
+        )}/v1/safes/${safeAddress}/delegates/${delegateAddress}`,
         method: 'delete',
         body: {
           safe: safeAddress,
@@ -315,7 +315,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafeCreationInfo(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/creation/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/creation/`,
         method: 'get'
       })
     })
@@ -325,7 +325,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getSafeCreationInfo(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/creation/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/creation/`,
         method: 'get'
       })
     })
@@ -343,7 +343,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/multisig-transactions/estimations/`,
+        )}/v1/safes/${safeAddress}/multisig-transactions/estimations/`,
         method: 'post',
         body: safeTransaction
       })
@@ -362,7 +362,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/multisig-transactions/estimations/`,
+        )}/v1/safes/${safeAddress}/multisig-transactions/estimations/`,
         method: 'post',
         body: safeTransaction
       })
@@ -399,7 +399,7 @@ describe('Endpoint tests', () => {
         )
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
           ...safeTransactionData,
@@ -442,7 +442,7 @@ describe('Endpoint tests', () => {
         )
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
           ...safeTransactionData,
@@ -459,7 +459,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getIncomingTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/incoming-transfers/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers/`,
         method: 'get'
       })
     })
@@ -469,7 +469,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getIncomingTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/incoming-transfers/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers/`,
         method: 'get'
       })
     })
@@ -479,7 +479,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getModuleTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/module-transactions/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/module-transactions/`,
         method: 'get'
       })
     })
@@ -489,7 +489,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getModuleTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/module-transactions/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/module-transactions/`,
         method: 'get'
       })
     })
@@ -499,7 +499,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getMultisigTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'get'
       })
     })
@@ -509,7 +509,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getMultisigTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'get'
       })
     })
@@ -522,7 +522,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,
+        )}/v1/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,
         method: 'get'
       })
     })
@@ -535,7 +535,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,
+        )}/v1/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,
         method: 'get'
       })
     })
@@ -547,7 +547,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        )}/v1/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
         method: 'get'
       })
     })
@@ -559,7 +559,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        )}/v1/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
         method: 'get'
       })
     })
@@ -571,7 +571,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/balances/?exclude_spam=true`,
+        )}/v1/safes/${safeAddress}/balances/?exclude_spam=true`,
         method: 'get'
       })
     })
@@ -583,7 +583,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/balances/?exclude_spam=true`,
+        )}/v1/safes/${safeAddress}/balances/?exclude_spam=true`,
         method: 'get'
       })
     })
@@ -598,7 +598,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/balances/?exclude_spam=false`,
+        )}/v1/safes/${safeAddress}/balances/?exclude_spam=false`,
         method: 'get'
       })
     })
@@ -610,7 +610,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/balances/usd/?exclude_spam=true`,
+        )}/v1/safes/${safeAddress}/balances/usd/?exclude_spam=true`,
         method: 'get'
       })
     })
@@ -622,7 +622,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/balances/usd/?exclude_spam=true`,
+        )}/v1/safes/${safeAddress}/balances/usd/?exclude_spam=true`,
         method: 'get'
       })
     })
@@ -637,7 +637,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/balances/usd/?exclude_spam=false`,
+        )}/v1/safes/${safeAddress}/balances/usd/?exclude_spam=false`,
         method: 'get'
       })
     })
@@ -649,7 +649,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/collectibles/?exclude_spam=true`,
+        )}/v2/safes/${safeAddress}/collectibles/?limit=10&offset=0&exclude_spam=true`,
         method: 'get'
       })
     })
@@ -661,13 +661,15 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/collectibles/?exclude_spam=true`,
+        )}/v2/safes/${safeAddress}/collectibles/?limit=10&offset=0&exclude_spam=true`,
         method: 'get'
       })
     })
 
     it('getCollectibles (with options)', async () => {
       const options: SafeCollectiblesOptions = {
+        limit: 2,
+        offset: 1,
         excludeSpamTokens: false
       }
       await chai
@@ -676,7 +678,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
           txServiceBaseUrl
-        )}/safes/${safeAddress}/collectibles/?exclude_spam=false`,
+        )}/v2/safes/${safeAddress}/collectibles/?limit=2&offset=1&exclude_spam=false`,
         method: 'get'
       })
     })
@@ -686,7 +688,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getTokenList())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/tokens/`,
         method: 'get'
       })
     })
@@ -696,7 +698,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getToken(tokenAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/${tokenAddress}/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/tokens/${tokenAddress}/`,
         method: 'get'
       })
     })
@@ -706,7 +708,7 @@ describe('Endpoint tests', () => {
         .expect(serviceSdk.getToken(eip3770TokenAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/tokens/${tokenAddress}/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/tokens/${tokenAddress}/`,
         method: 'get'
       })
     })

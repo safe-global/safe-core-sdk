@@ -311,19 +311,21 @@ const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(s
 
 ### getCollectibles
 
-Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
+Returns the collectibles (ERC721 tokens) owned by the given Safe and information about them.
 
 ```js
-const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress)
+const collectibles: SafeCollectibleListResponse = await safeService.getCollectibles(safeAddress)
 ```
 
 This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeCollectiblesOptions = {
+  limit // Optional. Default value is 10. This limit is the maximum available value per service limitation.
+  offset // Optional. Default value is 0.
   excludeSpamTokens // Optional. Default value is `true`.
 }
-const collectibles: SafeCollectibleResponse[] = await safeService.getCollectibles(safeAddress, options)
+const collectibles: SafeCollectibleListResponse = await safeService.getCollectibles(safeAddress, options)
 ```
 
 ### getTokenList

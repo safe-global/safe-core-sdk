@@ -164,57 +164,6 @@ export type Erc20Info = {
   readonly logoUri: string
 }
 
-export type SafeBalancesOptions = {
-  excludeSpamTokens?: boolean
-}
-
-export type SafeBalanceResponse = {
-  readonly tokenAddress: string
-  readonly token: Erc20Info
-  readonly balance: string
-}
-
-export type SafeBalancesUsdOptions = {
-  excludeSpamTokens?: boolean
-}
-
-export type SafeBalanceUsdResponse = {
-  readonly tokenAddress: string
-  readonly token: Erc20Info
-  readonly balance: string
-  readonly ethValue: string
-  readonly timestamp: string
-  readonly fiatBalance: string
-  readonly fiatConversion: string
-  readonly fiatCode: string
-}
-
-export type SafeCollectiblesOptions = {
-  limit?: number
-  offset?: number
-  excludeSpamTokens?: boolean
-}
-
-export type SafeCollectibleResponse = {
-  readonly address: string
-  readonly tokenName: string
-  readonly tokenSymbol: string
-  readonly logoUri: string
-  readonly id: string
-  readonly uri: string
-  readonly name: string
-  readonly description: string
-  readonly imageUri: string
-  readonly metadata: any
-}
-
-export type SafeCollectibleListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: SafeCollectibleResponse[]
-}
-
 export type TokenInfoResponse = {
   readonly type?: string
   readonly address: string

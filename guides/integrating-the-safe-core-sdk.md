@@ -19,7 +19,7 @@ To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) i
 ```
 @safe-global/safe-core-sdk-types
 @safe-global/safe-core-sdk
-@safe-global/safe-service-client
+@safe-global/api-kit
 ```
 
 And one of these two:
@@ -43,10 +43,10 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 
 ### Initialize the Safe Service Client
 
-As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-service-client) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@safe-global/safe-service-client` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
+As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@safe-global/api-kit` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
 
 ```js
-import SafeServiceClient from '@safe-global/safe-service-client'
+import SafeServiceClient from '@safe-global/api-kit'
 
 const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
 const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })

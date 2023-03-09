@@ -1,7 +1,7 @@
 import Safe from '@safe-global/safe-core-sdk'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
-import SafeServiceClient from '@safe-global/safe-service-client'
+import SafeServiceClient from '@safe-global/api-kit'
 import { ethers } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK

@@ -1,6 +1,6 @@
 # Safe Service Client
 
-[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-service-client.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-service-client)
+[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fapi-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fapi-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
@@ -48,7 +48,7 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 ### Initialize the SafeServiceClient
 
 ```js
-import SafeServiceClient from '@safe-global/safe-service-client'
+import SafeServiceClient from '@safe-global/api-kit'
 
 const safeService = new SafeServiceClient({
   txServiceUrl: 'https://safe-transaction-mainnet.safe.global',

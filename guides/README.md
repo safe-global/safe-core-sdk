@@ -24,7 +24,7 @@ In this guide we will use the following packages to deploy new Safes, create tra
 
   Check the complete [API reference](/packages/safe-core-sdk#api-reference) for more details.
 
-* **safe-service-client**
+* **api-kit**
 
   Consumes the Safe Transaction Service API. This library only interacts with this service and every action performed with it happens off-chain. Among others, it allows to execute actions like:
     - Get information of a Safe
@@ -33,7 +33,7 @@ In this guide we will use the following packages to deploy new Safes, create tra
     - Get the transaction history of a Safe (and filter by pending, incoming, multisig transactions, etc.)
     - Get balances, list of tokens, etc.
 
-  Check the complete [API reference](/packages/safe-service-client#api-reference) for more details.
+  Check the complete [API reference](/packages/api-kit#api-reference) for more details.
 
 ## Prerequisites
 

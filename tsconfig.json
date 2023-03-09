@@ -1,12 +1,12 @@
 {
   "files": [],
   "references": [
+    { "path": "api-kit" },
     { "path": "safe-core-sdk" },
     { "path": "safe-core-sdk-types" },
     { "path": "safe-core-sdk-utils" },
     { "path": "safe-ethers-adapters" },
     { "path": "safe-ethers-lib" },
-    { "path": "safe-service-client" },
     { "path": "safe-web3-lib" }
   ]
 }

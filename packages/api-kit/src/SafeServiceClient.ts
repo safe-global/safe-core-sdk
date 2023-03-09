@@ -12,12 +12,6 @@ import {
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
-  SafeBalanceResponse,
-  SafeBalancesOptions,
-  SafeBalancesUsdOptions,
-  SafeBalanceUsdResponse,
-  SafeCollectibleListResponse,
-  SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
   SafeDelegateConfig,
@@ -565,88 +559,6 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const safeInfo = await this.getSafeInfo(address)
     return safeInfo.nonce
-  }
-
-  /**
-   * Returns the balances for Ether and ERC20 tokens of a Safe.
-   *
-   * @param safeAddress - The Safe address
-   * @param options - API params
-   * @returns The balances for Ether and ERC20 tokens
-   * @throws "Invalid Safe address"
-   * @throws "Checksum address validation failed"
-   */
-  async getBalances(
-    safeAddress: string,
-    options?: SafeBalancesOptions
-  ): Promise<SafeBalanceResponse[]> {
-    if (safeAddress === '') {
-      throw new Error('Invalid Safe address')
-    }
-    const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/balances/`)
-    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
-    url.searchParams.set('exclude_spam', excludeSpam)
-
-    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
-  }
-
-  /**
-   * Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversion.
-   *
-   * @param safeAddress - The Safe address
-   * @param options - API params
-   * @returns The balances for Ether and ERC20 tokens with USD fiat conversion
-   * @throws "Invalid Safe address"
-   * @throws "Checksum address validation failed"
-   */
-  async getUsdBalances(
-    safeAddress: string,
-    options?: SafeBalancesUsdOptions
-  ): Promise<SafeBalanceUsdResponse[]> {
-    if (safeAddress === '') {
-      throw new Error('Invalid Safe address')
-    }
-    const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/balances/usd/`)
-    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
-    url.searchParams.set('exclude_spam', excludeSpam)
-
-    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
-  }
-
-  /**
-   * Returns the collectibles (ERC721 tokens) owned by the given Safe and information about them.
-   *
-   * @param {string} safeAddress - The Safe address
-   * @param {Object} options - API params
-   * @param {number} options.limit
-   * @param {number} options.offset
-   * @param {boolean} options.excludeSpamTokens
-   * @returns The collectibles owned by the given Safe
-   * @throws "Invalid Safe address"
-   * @throws "Checksum address validation failed"
-   */
-  async getCollectibles(
-    safeAddress: string,
-    options?: SafeCollectiblesOptions
-  ): Promise<SafeCollectibleListResponse> {
-    if (safeAddress === '') {
-      throw new Error('Invalid Safe address')
-    }
-    const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    const url = new URL(`${this.#txServiceBaseUrl}/v2/safes/${address}/collectibles/`)
-
-    const limit = options?.limit?.toString() || '10'
-    url.searchParams.set('limit', limit)
-
-    const offset = options?.offset?.toString() || '0'
-    url.searchParams.set('offset', offset)
-
-    const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
-    url.searchParams.set('exclude_spam', excludeSpam)
-
-    return sendRequest({ url: url.toString(), method: HttpMethod.Get })
   }
 
   /**

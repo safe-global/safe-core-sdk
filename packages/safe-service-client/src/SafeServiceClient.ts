@@ -16,7 +16,7 @@ import {
   SafeBalancesOptions,
   SafeBalancesUsdOptions,
   SafeBalanceUsdResponse,
-  SafeCollectibleResponse,
+  SafeCollectibleListResponse,
   SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
@@ -60,7 +60,7 @@ class SafeServiceClient implements SafeTransactionService {
    */
   async getServiceInfo(): Promise<SafeServiceInfoResponse> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/about`,
+      url: `${this.#txServiceBaseUrl}/v1/about`,
       method: HttpMethod.Get
     })
   }
@@ -72,7 +72,7 @@ class SafeServiceClient implements SafeTransactionService {
    */
   async getServiceMasterCopiesInfo(): Promise<MasterCopyResponse[]> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/about/master-copies`,
+      url: `${this.#txServiceBaseUrl}/v1/about/master-copies`,
       method: HttpMethod.Get
     })
   }
@@ -91,7 +91,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid data')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/data-decoder/`,
+      url: `${this.#txServiceBaseUrl}/v1/data-decoder/`,
       method: HttpMethod.Post,
       body: { data }
     })
@@ -111,7 +111,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(ownerAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/owners/${address}/safes/`,
+      url: `${this.#txServiceBaseUrl}/v1/owners/${address}/safes/`,
       method: HttpMethod.Get
     })
   }
@@ -130,7 +130,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(moduleAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/modules/${address}/safes/`,
+      url: `${this.#txServiceBaseUrl}/v1/modules/${address}/safes/`,
       method: HttpMethod.Get
     })
   }
@@ -148,7 +148,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid safeTxHash')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/multisig-transactions/${safeTxHash}/`,
+      url: `${this.#txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/`,
       method: HttpMethod.Get
     })
   }
@@ -167,7 +167,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid safeTxHash')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/multisig-transactions/${safeTxHash}/confirmations/`,
+      url: `${this.#txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
       method: HttpMethod.Get
     })
   }
@@ -191,7 +191,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid signature')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/multisig-transactions/${safeTxHash}/confirmations/`,
+      url: `${this.#txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
       method: HttpMethod.Post,
       body: {
         signature
@@ -213,7 +213,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/`,
       method: HttpMethod.Get
     })
   }
@@ -232,7 +232,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/delegates/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/delegates/`,
       method: HttpMethod.Get
     })
   }
@@ -273,7 +273,7 @@ class SafeServiceClient implements SafeTransactionService {
       signature
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/delegates/`,
       method: HttpMethod.Post,
       body
     })
@@ -299,7 +299,7 @@ class SafeServiceClient implements SafeTransactionService {
     const data = address + totp
     const signature = await signer.signMessage(data)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/delegates/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/delegates/`,
       method: HttpMethod.Delete,
       body: { signature }
     })
@@ -329,7 +329,7 @@ class SafeServiceClient implements SafeTransactionService {
     const data = delegateAddress + totp
     const signature = await signer.signMessage(data)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safeAddress}/delegates/${delegateAddress}`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/delegates/${delegateAddress}`,
       method: HttpMethod.Delete,
       body: {
         safe: safeAddress,
@@ -355,7 +355,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/creation/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/creation/`,
       method: HttpMethod.Get
     })
   }
@@ -380,7 +380,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/multisig-transactions/estimations/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/estimations/`,
       method: HttpMethod.Post,
       body: safeTransaction
     })
@@ -413,7 +413,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid safeTxHash')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${safe}/multisig-transactions/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safe}/multisig-transactions/`,
       method: HttpMethod.Post,
       body: {
         ...safeTransactionData,
@@ -439,7 +439,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/incoming-transfers/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers/`,
       method: HttpMethod.Get
     })
   }
@@ -459,7 +459,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/module-transactions/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/module-transactions/`,
       method: HttpMethod.Get
     })
   }
@@ -478,7 +478,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/safes/${address}/multisig-transactions/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/`,
       method: HttpMethod.Get
     })
   }
@@ -501,11 +501,11 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    let nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
+    const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
     return sendRequest({
       url: `${
         this.#txServiceBaseUrl
-      }/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
+      }/v1/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
       method: HttpMethod.Get
     })
   }
@@ -526,7 +526,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    const url = new URL(`${this.#txServiceBaseUrl}/safes/${address}/all-transactions/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
 
     const trusted = options?.trusted?.toString() || 'true'
     url.searchParams.set('trusted', trusted)
@@ -584,7 +584,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    let url = new URL(`${this.#txServiceBaseUrl}/safes/${address}/balances/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/balances/`)
     const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
     url.searchParams.set('exclude_spam', excludeSpam)
 
@@ -608,7 +608,7 @@ class SafeServiceClient implements SafeTransactionService {
       throw new Error('Invalid Safe address')
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    let url = new URL(`${this.#txServiceBaseUrl}/safes/${address}/balances/usd/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/balances/usd/`)
     const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
     url.searchParams.set('exclude_spam', excludeSpam)
 
@@ -616,23 +616,33 @@ class SafeServiceClient implements SafeTransactionService {
   }
 
   /**
-   * Returns the collectives (ERC721 tokens) owned by the given Safe and information about them.
+   * Returns the collectibles (ERC721 tokens) owned by the given Safe and information about them.
    *
-   * @param safeAddress - The Safe address
-   * @param options - API params
-   * @returns The collectives owned by the given Safe
+   * @param {string} safeAddress - The Safe address
+   * @param {Object} options - API params
+   * @param {number} options.limit
+   * @param {number} options.offset
+   * @param {boolean} options.excludeSpamTokens
+   * @returns The collectibles owned by the given Safe
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
   async getCollectibles(
     safeAddress: string,
     options?: SafeCollectiblesOptions
-  ): Promise<SafeCollectibleResponse[]> {
+  ): Promise<SafeCollectibleListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    let url = new URL(`${this.#txServiceBaseUrl}/safes/${address}/collectibles/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/safes/${address}/collectibles/`)
+
+    const limit = options?.limit?.toString() || '10'
+    url.searchParams.set('limit', limit)
+
+    const offset = options?.offset?.toString() || '0'
+    url.searchParams.set('offset', offset)
+
     const excludeSpam = options?.excludeSpamTokens?.toString() || 'true'
     url.searchParams.set('exclude_spam', excludeSpam)
 
@@ -646,7 +656,7 @@ class SafeServiceClient implements SafeTransactionService {
    */
   async getTokenList(): Promise<TokenInfoListResponse> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/tokens/`,
+      url: `${this.#txServiceBaseUrl}/v1/tokens/`,
       method: HttpMethod.Get
     })
   }
@@ -665,7 +675,7 @@ class SafeServiceClient implements SafeTransactionService {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(tokenAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/tokens/${address}/`,
+      url: `${this.#txServiceBaseUrl}/v1/tokens/${address}/`,
       method: HttpMethod.Get
     })
   }

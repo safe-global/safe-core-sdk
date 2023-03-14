@@ -19,7 +19,14 @@
   "author": "Safe (https://safe.global)",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^18.15.3",
+    "@typescript-eslint/eslint-plugin": "^5.55.0",
+    "@typescript-eslint/parser": "^5.55.0",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "lerna": "^6.4.1",
+    "prettier": "^2.8.3",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.1"
   }

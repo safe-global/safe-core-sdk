@@ -1,12 +1,12 @@
 {
   "files": [],
   "references": [
-    { "path": "api-kit" },
-    { "path": "protocol-kit" },
-    { "path": "safe-core-sdk-types" },
-    { "path": "safe-core-sdk-utils" },
-    { "path": "safe-ethers-adapters" },
-    { "path": "safe-ethers-lib" },
-    { "path": "safe-web3-lib" }
+    { "path": "packages/api-kit" },
+    { "path": "packages/protocol-kit" },
+    { "path": "packages/safe-core-sdk-types" },
+    { "path": "packages/safe-core-sdk-utils" },
+    { "path": "packages/safe-ethers-adapters" },
+    { "path": "packages/safe-ethers-lib" },
+    { "path": "packages/safe-web3-lib" }
   ]
 }

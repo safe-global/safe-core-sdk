@@ -10,7 +10,7 @@ Software developer tools that facilitate the interaction with the Safe [contract
 
 | Title | Description |
 | ------- | ----------- |
-| [Integrating the Safe Core SDK](https://github.com/safe-global/safe-core-sdk/blob/main/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk) and [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit). |
+| [Integrating the Safe Core SDK](https://github.com/safe-global/safe-core-sdk/blob/main/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk) and [API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit). |
 
 ## Packages
 

@@ -1,4 +1,4 @@
-import { SafeAccountConfig, SafeDeploymentConfig, SafeFactory } from '@safe-global/safe-core-sdk'
+import { SafeAccountConfig, SafeDeploymentConfig, SafeFactory } from '@safe-global/protocol-kit'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
 import { ethers } from 'ethers'
 

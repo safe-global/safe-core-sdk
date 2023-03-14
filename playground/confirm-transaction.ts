@@ -1,4 +1,4 @@
-import Safe from '@safe-global/safe-core-sdk'
+import Safe from '@safe-global/protocol-kit'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
 import SafeServiceClient from '@safe-global/api-kit'
 import { ethers } from 'ethers'

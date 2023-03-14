@@ -1,7 +1,7 @@
 {
-  "name": "@safe-global/safe-core-sdk",
-  "version": "3.3.2",
-  "description": "Safe Core SDK",
+  "name": "@safe-global/protocol-kit",
+  "version": "0.1.0",
+  "description": "SDK to interact with Safe smart contracts",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [

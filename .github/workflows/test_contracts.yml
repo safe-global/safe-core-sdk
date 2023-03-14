@@ -27,5 +27,5 @@ jobs:
           yarn build
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
-          cd packages/safe-core-sdk
+          cd packages/protocol-kit
           yarn test:hardhat:${{ matrix.provider }}:${{ matrix.contract-version }}

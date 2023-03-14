@@ -18,7 +18,7 @@ To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) i
 
 ```
 @safe-global/safe-core-sdk-types
-@safe-global/safe-core-sdk
+@safe-global/protocol-kit
 @safe-global/api-kit
 ```
 
@@ -55,7 +55,7 @@ const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
 ### Initialize the Safe Core SDK
 
 ```js
-import Safe, { SafeFactory } from '@safe-global/safe-core-sdk'
+import Safe, { SafeFactory } from '@safe-global/protocol-kit'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 
@@ -75,7 +75,7 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy:
 If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
 
 ```js
-import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
+import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 
 const chainId = await ethAdapter.getChainId()
 const contractNetworks: ContractNetworksConfig = {
@@ -116,7 +116,7 @@ The Safe Core SDK library allows the deployment of new Safes using the `safeFact
 Here, for example, we can create a new Safe account with 3 owners and 2 required signatures.
 
 ```js
-import { SafeAccountConfig } from '@safe-global/safe-core-sdk'
+import { SafeAccountConfig } from '@safe-global/protocol-kit'
 
 const safeAccountConfig: SafeAccountConfig = {
   owners: ['0x...', '0x...', '0x...']
@@ -126,7 +126,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
-Calling the method `deploySafe` will deploy the desired Safe and return a Safe Core SDK initialized instance ready to be used. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk#deploysafe) for more details on additional configuration parameters and callbacks.
+Calling the method `deploySafe` will deploy the desired Safe and return a Protocol Kit initialized instance ready to be used. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit#deploysafe) for more details on additional configuration parameters and callbacks.
 
 ## <a name="create-transaction">4. Create a transaction</a>
 
@@ -160,7 +160,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
   ```js
-  import { SafeTransactionOptionalProps } from '@safe-global/safe-core-sdk'
+  import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'
   import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
   const safeTransactionData: MetaTransactionData[] = [

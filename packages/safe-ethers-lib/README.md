@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Ethers.js wrapper that contains some utilities and the Safe contracts types (generated with typechain ethers-v5). It is used to initialize the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk).
+Ethers.js wrapper that contains some utilities and the Safe contracts types (generated with typechain ethers-v5). It is used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit).
 
 ## Table of contents
 * [Installation](#installation)

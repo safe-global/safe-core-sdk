@@ -35,7 +35,7 @@ npm build
 
 ## <a name="getting-started">Getting Started</a>
 
-The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Safe Web App](https://app.safe.global/), it is recommended that you follow this other [guide](/guides/integrating-the-safe-core-sdk.md) that covers the use of the Safe Core SDK, combined with the Safe Service Client.
+The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Safe Web App](https://app.safe.global/), it is recommended that you follow this other [guide](/guides/integrating-the-safe-core-sdk.md) that covers the use of the Protocol Kit, combined with the API Kit.
 
 ### 1. Instantiate an EthAdapter
 
@@ -53,7 +53,7 @@ Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used
 To deploy a new Safe account instantiate the `SafeFactory` class and call the `deploySafe` method with the right params to configure the new Safe. This includes defining the list of owners and the threshold of the Safe. A Safe account with three owners and threshold equal three will be used as the starting point for this example but any Safe configuration is valid.
 
 ```js
-import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/safe-core-sdk'
+import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 
@@ -79,7 +79,7 @@ const newSafeAddress = safeSdk.getAddress()
 To instantiate the Safe Core SDK from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address. 
 
 ```js
-import Safe from '@safe-global/safe-core-sdk'
+import Safe from '@safe-global/protocol-kit'
 
 const safeSdk: Safe = await Safe.create({ ethAdapter: ethAdapterOwner1, safeAddress })
 ```
@@ -145,7 +145,7 @@ All the signatures used to execute the transaction are now available at `safeTra
 Returns an instance of the Safe Factory.
 
 ```js
-import { SafeFactory } from '@safe-global/safe-core-sdk'
+import { SafeFactory } from '@safe-global/protocol-kit'
 
 const safeFactory = await SafeFactory.create({ ethAdapter })
 ```
@@ -165,7 +165,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
-  import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
+  import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 
   const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
@@ -279,7 +279,7 @@ const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, callback })
 Returns an instance of the Safe Core SDK connected to the `safeAddress`.
 
 ```js
-import Safe from '@safe-global/safe-core-sdk'
+import Safe from '@safe-global/protocol-kit'
 
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
@@ -299,7 +299,7 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
-  import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
+  import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 
   const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
@@ -347,7 +347,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
   ```js
-  import { ContractNetworksConfig } from '@safe-global/safe-core-sdk'
+  import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 
   const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {

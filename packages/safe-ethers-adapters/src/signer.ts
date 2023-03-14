@@ -7,7 +7,7 @@ import {
 import { VoidSigner } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Deferrable } from '@ethersproject/properties'
-import Safe from '@safe-global/safe-core-sdk'
+import Safe from '@safe-global/protocol-kit'
 import {
   OperationType,
   SafeTransactionData,

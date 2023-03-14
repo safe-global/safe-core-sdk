@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import Safe from '@safe-global/safe-core-sdk'
+import Safe from '@safe-global/protocol-kit'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
 import dotenv from 'dotenv'
 import { ethers } from 'ethers'

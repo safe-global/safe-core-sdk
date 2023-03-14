@@ -5,6 +5,7 @@
     "clean": "lerna clean",
     "unbuild": "lerna run unbuild",
     "build": "lerna run build --stream",
+    "lint:check": "eslint './packages/**/*.{js,jsx,ts,tsx}'",
     "test": "FORCE_COLOR=1 lerna run test --stream",
     "test:ci": "FORCE_COLOR=1 lerna run test:ci --stream",
     "play": "ts-node ./playground/config/run.ts",

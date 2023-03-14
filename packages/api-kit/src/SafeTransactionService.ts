@@ -7,12 +7,6 @@ import {
   MasterCopyResponse,
   OwnerResponse,
   ProposeTransactionProps,
-  SafeBalanceResponse,
-  SafeBalancesOptions,
-  SafeBalancesUsdOptions,
-  SafeBalanceUsdResponse,
-  SafeCollectibleListResponse,
-  SafeCollectiblesOptions,
   SafeCreationInfoResponse,
   SafeDelegate,
   SafeDelegateConfig,
@@ -75,17 +69,6 @@ interface SafeTransactionService {
     currentNonce?: number
   ): Promise<SafeMultisigTransactionListResponse>
   getNextNonce(safeAddress: string): Promise<number>
-
-  // Balances
-  getBalances(safeAddress: string, options?: SafeBalancesOptions): Promise<SafeBalanceResponse[]>
-  getUsdBalances(
-    safeAddress: string,
-    options?: SafeBalancesUsdOptions
-  ): Promise<SafeBalanceUsdResponse[]>
-  getCollectibles(
-    safeAddress: string,
-    options?: SafeCollectiblesOptions
-  ): Promise<SafeCollectibleListResponse>
 
   // Tokens
   getTokenList(): Promise<TokenInfoListResponse>

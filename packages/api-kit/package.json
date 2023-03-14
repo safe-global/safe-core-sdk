@@ -1,13 +1,14 @@
 {
-  "name": "@safe-global/safe-service-client",
-  "version": "2.0.0",
-  "description": "Safe Service Client",
+  "name": "@safe-global/api-kit",
+  "version": "0.1.0",
+  "description": "Safe API Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Safe",
-    "Service"
+    "Service",
+    "API"
   ],
   "scripts": {
     "unbuild": "rimraf dist",

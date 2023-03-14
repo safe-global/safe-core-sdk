@@ -30,7 +30,7 @@ It may be obtained with:
 
 ```js
 import { ethers } from "ethers"
-import Safe from "@safe-global/safe-core-sdk"
+import Safe from "@safe-global/protocol-kit"
 import EthersAdapter from "@safe-global/safe-ethers-lib"
 
 const safe = await Safe.create({

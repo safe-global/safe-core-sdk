@@ -70,7 +70,7 @@ export const adjustVInSignature: AdjustVOverload = (
       prefix is to check if the signer address is the same as the recovered address.
 
       More info:
-      https://docs.gnosis-safe.io/contracts/signatures
+      https://docs.safe.global/learn/signatures
     */
     if (signatureV < MIN_VALID_V_VALUE_FOR_SAFE_ECDSA) {
       signatureV += MIN_VALID_V_VALUE_FOR_SAFE_ECDSA

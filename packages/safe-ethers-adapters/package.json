@@ -66,7 +66,7 @@
     "@ethersproject/properties": "^5.7.0"
   },
   "dependencies": {
-    "@safe-global/safe-core-sdk": "^3.3.0",
+    "@safe-global/protocol-kit": "^0.1.0",
     "@safe-global/safe-core-sdk-types": "^1.9.0",
     "@safe-global/safe-deployments": "^1.20.2",
     "axios": "^0.27.2"

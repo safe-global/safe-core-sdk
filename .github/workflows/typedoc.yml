@@ -22,7 +22,7 @@ jobs:
       - run: yarn add -W -D typescript typedoc
 
       - name: Create the docs directory locally in CI
-        run: ./node_modules/.bin/typedoc --tsconfig packages/safe-core-sdk/tsconfig.json --readme packages/safe-core-sdk/README.md packages/safe-core-sdk/src
+        run: ./node_modules/.bin/typedoc --tsconfig packages/protocol-kit/tsconfig.json --readme packages/protocol-kit/README.md packages/protocol-kit/src
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4

@@ -13,7 +13,7 @@ In this guide we will use the following packages to deploy new Safes, create tra
   
   Contains the types that are shared among the different packages inside the monorepo.
 
-* **safe-core-sdk**
+* **protocol-kit**
 
   Offers most of the functionality of the Safe contracts. This library only interacts with the Safe contracts and every action then happens on-chain. Among others, it allows for actions such as:
     - Deploy new Safes
@@ -22,7 +22,7 @@ In this guide we will use the following packages to deploy new Safes, create tra
     - Approve Safe transactions on-chain
     - Execute Safe transactions once they have the required confirmations
 
-  Check the complete [API reference](/packages/safe-core-sdk#api-reference) for more details.
+  Check the complete [API reference](/packages/protocol-kit#api-reference) for more details.
 
 * **api-kit**
 

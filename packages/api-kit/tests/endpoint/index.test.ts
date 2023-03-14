@@ -1,15 +1,12 @@
 import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import Safe from '@safe-global/safe-core-sdk'
+import Safe from '@safe-global/protocol-kit'
 import { EthAdapter, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import SafeServiceClient, {
-  SafeBalancesOptions,
-  SafeBalancesUsdOptions,
-  SafeCollectiblesOptions,
   SafeDelegateConfig,
   SafeDelegateDeleteConfig,
   SafeMultisigTransactionEstimate

@@ -1,5 +1,7 @@
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
+import { Interface } from '@ethersproject/abi'
+import { hexToNumber, toChecksumAddress, hexToNumberString } from 'web3-utils'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -79,4 +81,36 @@ function encodeMetaTransaction(tx: MetaTransactionData): string {
 
 export function encodeMultiSendData(txs: MetaTransactionData[]): string {
   return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
+}
+
+export function decodeMultiSendData(encodedData: string): MetaTransactionData[] {
+  const multiSendInterface = new Interface([
+    'function multiSend(bytes memory transactions) public payable'
+  ])
+  const [decodedData] = multiSendInterface.decodeFunctionData('multiSend', encodedData)
+
+  const txs: MetaTransactionData[] = []
+
+  // Decode after 0x
+  let index = 2
+
+  while (index < decodedData.length) {
+    // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
+    // uint8 operation, address to, value uint256, dataLength uint256
+
+    const operation = `0x${decodedData.slice(index, (index += 2))}`
+    const to = `0x${decodedData.slice(index, (index += 40))}`
+    const value = `0x${decodedData.slice(index, (index += 64))}`
+    const dataLength = parseInt(decodedData.slice(index, (index += 64)), 16) * 2
+    const data = `0x${decodedData.slice(index, (index += dataLength))}`
+
+    txs.push({
+      operation: hexToNumber(operation),
+      to: toChecksumAddress(to),
+      value: hexToNumberString(value),
+      data
+    })
+  }
+
+  return txs
 }

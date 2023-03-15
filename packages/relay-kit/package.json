@@ -1,0 +1,43 @@
+{
+  "name": "@safe-global/relay-kit",
+  "version": "0.1.0",
+  "description": "Relay library to abstract transaction gas fees",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "scripts": {
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "unbuild": "rm -rf dist",
+    "build": "rm -rf dist && yarn tsc",
+    "test": "jest src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/safe-global/account-abstraction-sdk.git"
+  },
+  "keywords": [
+    "Safe",
+    "Ethereum",
+    "Account Abstraction",
+    "SDK",
+    "Relay"
+  ],
+  "author": "Safe (https://safe.global)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/safe-global/account-abstraction-sdk/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/safe-global/account-abstraction-sdk#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@gelatonetwork/relay-sdk": "^3.1.0",
+    "@safe-global/safe-core-sdk": "^3.3.2",
+    "@safe-global/safe-core-sdk-types": "^1.9.0",
+    "ethers": "^5.7.2"
+  }
+}

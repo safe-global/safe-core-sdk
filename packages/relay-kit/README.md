@@ -12,4 +12,4 @@ The Relay Kit allows to abstract users from the transaction fees payment (gas fe
 
 ## License
 
-This library is [released under MIT](https://github.com/safe-global/account-abstraction-sdk/blob/main/LICENSE.md).
+This library is [released under MIT](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md).

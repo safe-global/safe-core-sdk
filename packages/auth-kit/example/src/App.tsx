@@ -46,7 +46,7 @@ function App() {
 
       const modalConfig = {
         [WALLET_ADAPTERS.TORUS_EVM]: {
-          label: 'metamask',
+          label: 'torus',
           showOnModal: false
         },
         [WALLET_ADAPTERS.METAMASK]: {

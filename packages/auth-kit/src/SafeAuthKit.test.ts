@@ -42,7 +42,7 @@ jest.mock('@web3auth/modal', () => {
   }
 })
 
-jest.mock('@safe-global/safe-service-client', () => {
+jest.mock('@safe-global/api-kit', () => {
   return jest.fn().mockImplementation(() => {
     return {
       getSafesByOwner: jest.fn().mockImplementation(() => {

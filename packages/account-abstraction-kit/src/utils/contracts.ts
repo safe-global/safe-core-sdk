@@ -1,9 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { arrayify, BytesLike } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
+import { Gnosis_safe as GnosisSafe } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
+import { Proxy_factory as GnosisSafeProxyFactory } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Proxy_factory'
 import { BigNumberish, ethers, Signer } from 'ethers'
-import { GnosisSafe } from '../../typechain/GnosisSafe'
-import { GnosisSafeProxyFactory } from '../../typechain/proxies/GnosisSafeProxyFactory'
 import { PREDETERMINED_SALT_NONCE, ZERO_ADDRESS } from '../constants'
 import { MetaTransactionData, SafeTransactionData } from '../types'
 import {

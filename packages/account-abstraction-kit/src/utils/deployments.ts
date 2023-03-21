@@ -6,13 +6,13 @@ import {
   getSafeL2SingletonDeployment,
   getSafeSingletonDeployment
 } from '@safe-global/safe-deployments'
+import { Gnosis_safe__factory as GnosisSafe__factory } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/factories/Gnosis_safe__factory'
+import { Multi_send_call_only__factory as MultiSendCallOnly__factory } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/factories/Multi_send_call_only__factory'
+import { Proxy_factory__factory as GnosisSafeProxyFactory__factory } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/factories/Proxy_factory__factory'
+import { Gnosis_safe as GnosisSafe } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
+import { Multi_send_call_only as MultiSendCallOnly } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Multi_send_call_only'
+import { Proxy_factory as GnosisSafeProxyFactory } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Proxy_factory'
 import { ethers } from 'ethers'
-import { GnosisSafe__factory } from '../../typechain/factories'
-import { MultiSendCallOnly__factory } from '../../typechain/factories/libraries'
-import { GnosisSafeProxyFactory__factory } from '../../typechain/factories/proxies'
-import { GnosisSafe } from '../../typechain/GnosisSafe'
-import { MultiSendCallOnly } from './../../typechain/libraries/MultiSendCallOnly'
-import { GnosisSafeProxyFactory } from './../../typechain/proxies/GnosisSafeProxyFactory'
 
 export const safeDeploymentsL1ChainIds: number[] = [
   1 // Ethereum Mainnet

@@ -1,17 +1,16 @@
 import { RelayAdapter } from '@safe-global/relay-kit'
 import Safe from '@safe-global/safe-core-sdk'
+import { MetaTransactionOptions, RelayTransaction } from '@safe-global/safe-core-sdk-types'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
+import { Gnosis_safe__factory as GnosisSafe__factory } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/factories/Gnosis_safe__factory'
+import { Gnosis_safe as GnosisSafe } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
+import { Multi_send_call_only as MultiSendCallOnly } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Multi_send_call_only'
+import { Proxy_factory as GnosisSafeProxyFactory } from '@safe-global/safe-ethers-lib/typechain/src/ethers-v5/v1.3.0/Proxy_factory'
 import { ethers } from 'ethers'
-import { GnosisSafe__factory } from '../typechain/factories'
-import { GnosisSafe } from '../typechain/GnosisSafe'
-import { MultiSendCallOnly } from '../typechain/libraries'
-import { GnosisSafeProxyFactory } from '../typechain/proxies'
 import {
   AccountAbstractionConfig,
   MetaTransactionData,
-  MetaTransactionOptions,
-  OperationType,
-  RelayTransaction
+  OperationType
 } from './types'
 import { getMultiSendCallOnlyContract, getSafeContract, getSafeProxyFactoryContract } from './utils'
 import {

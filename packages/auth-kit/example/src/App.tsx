@@ -35,8 +35,8 @@ function App() {
         web3AuthNetwork: 'testnet',
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: '0x5',
-          rpcTarget: `https://goerli.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
+          chainId: '0x1',
+          rpcTarget: `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
         },
         uiConfig: {
           theme: 'dark',
@@ -58,7 +58,7 @@ function App() {
 
       const openloginAdapter = new OpenloginAdapter({
         loginSettings: {
-          mfaLevel: 'none'
+          mfaLevel: 'mandatory'
         },
         adapterSettings: {
           uxMode: 'popup',

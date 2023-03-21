@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { RelayAdapter } from '@safe-global/relay-kit'
 
 export enum OperationType {
@@ -26,30 +25,6 @@ export interface SafeTransactionData extends MetaTransactionData {
   refundReceiver: string
   nonce: number
 }
-
-// TO-DO: Duplicated. Remove local type and import from "types" package
-// {
-
-export interface MetaTransactionOptions {
-  gasLimit: BigNumber
-  gasToken?: string
-  isSponsored?: boolean
-}
-
-export interface RelayTransaction {
-  target: string
-  encodedTransaction: string
-  chainId: number
-  options: MetaTransactionOptions
-}
-
-// import { RelayResponse } from '@gelatonetwork/relay-sdk'
-export interface RelayResponse {
-  taskId: string
-}
-
-// }
-// TO-DO: Duplicated. Remove local type and import from "types" package
 
 export interface SafeSetupConfig {
   owners: string[]

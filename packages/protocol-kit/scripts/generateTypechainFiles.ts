@@ -83,35 +83,30 @@ function moveTypechainFiles(inDir: string, outDir: string): void {
   })
 }
 
-function generateTypes(version) {
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.3.0`, safeContracts_V1_3_0)
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.2.0`, safeContracts_V1_2_0)
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.1.1`, safeContracts_V1_1_1)
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.0.0`, safeContracts_V1_0_0)
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.3.0`,
-    `${typeChainDirectoryBuildPath}${version}/v1.3.0`
-  )
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.2.0`,
-    `${typeChainDirectoryBuildPath}${version}/v1.2.0`
-  )
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.1.1`,
-    `${typeChainDirectoryBuildPath}${version}/v1.1.1`
-  )
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.0.0`,
-    `${typeChainDirectoryBuildPath}${version}/v1.0.0`
-  )
-
-  // Tests types
-  generateTypechainFiles(version, `${outDirTests}${version}/v1.3.0`, testContracts_V1_3_0)
-  generateTypechainFiles(version, `${outDirTests}${version}/v1.2.0`, testContracts_V1_2_0)
-}
+const ethersV5 = 'ethers-v5'
 
 // Src: Ethers V5 types
-generateTypes('ethers-v5')
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/v1.3.0`, safeContracts_V1_3_0)
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/v1.2.0`, safeContracts_V1_2_0)
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/v1.1.1`, safeContracts_V1_1_1)
+generateTypechainFiles(ethersV5, `${outDirSrc}${ethersV5}/v1.0.0`, safeContracts_V1_0_0)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${ethersV5}/v1.3.0`,
+  `${typeChainDirectoryBuildPath}${ethersV5}/v1.3.0`
+)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${ethersV5}/v1.2.0`,
+  `${typeChainDirectoryBuildPath}${ethersV5}/v1.2.0`
+)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${ethersV5}/v1.1.1`,
+  `${typeChainDirectoryBuildPath}${ethersV5}/v1.1.1`
+)
+moveTypechainFiles(
+  `${typeChainDirectorySrcPath}${ethersV5}/v1.0.0`,
+  `${typeChainDirectoryBuildPath}${ethersV5}/v1.0.0`
+)
 
-// Src: Web3 V1 types
-generateTypes('web3-v1')
+// Tests: Ethers V5 types
+generateTypechainFiles(ethersV5, `${outDirTests}${ethersV5}/v1.3.0`, testContracts_V1_3_0)
+generateTypechainFiles(ethersV5, `${outDirTests}${ethersV5}/v1.2.0`, testContracts_V1_2_0)

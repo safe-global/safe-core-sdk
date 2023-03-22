@@ -31,7 +31,7 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat,scripts}/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "typechain": "ts-node scripts/generateTypechainFiles.ts"
+    "typechain": "ts-node ./scripts/generateTypechainFiles.ts"
   },
   "repository": {
     "type": "git",

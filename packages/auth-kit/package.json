@@ -1,0 +1,56 @@
+{
+  "name": "@safe-global/auth-kit",
+  "version": "0.1.0-alpha.2",
+  "description": "Authentication library for web2 logins",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "unbuild": "rm -rf dist",
+    "build": "rm -rf dist && yarn tsc",
+    "test": "jest src --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/safe-global/safe-core-sdk.git"
+  },
+  "keywords": [
+    "Safe",
+    "Ethereum",
+    "Account Abstraction",
+    "SDK",
+    "Authentication"
+  ],
+  "author": "Safe (https://safe.global)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/safe-global/safe-core-sdk/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@web3auth/base": "^4.3.0",
+    "@web3auth/modal": "^4.3.1",
+    "@web3auth/openlogin-adapter": "^4.3.0",
+    "eth-testing": "^1.13.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "dependencies": {
+    "@safe-global/safe-ethers-lib": "^1.9.1",
+    "@safe-global/api-kit": "^0.1.0",
+    "@walletconnect/client": "^1.8.0",
+    "ethers": "^5.7.2"
+  },
+  "peerDependencies": {
+    "@web3auth/base": "^4.3.0",
+    "@web3auth/modal": "^4.3.1",
+    "@web3auth/openlogin-adapter": "^4.3.0"
+  }
+}

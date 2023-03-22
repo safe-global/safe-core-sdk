@@ -62,3 +62,6 @@ export {
   CreateWeb3ProxyProps,
   Web3TransactionResult
 }
+
+export * from './adapters/ethers/types'
+export * from './adapters/web3/types'

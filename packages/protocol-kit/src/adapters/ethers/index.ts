@@ -2,5 +2,10 @@ import { CreateProxyProps } from './contracts/GnosisSafeProxyFactory/GnosisSafeP
 import EthersAdapter, { EthersAdapterConfig } from './EthersAdapter'
 import { EthersTransactionOptions, EthersTransactionResult } from './types'
 
-export default EthersAdapter
-export { EthersAdapterConfig, EthersTransactionOptions, EthersTransactionResult, CreateProxyProps }
+export {
+  EthersAdapter,
+  EthersAdapterConfig,
+  EthersTransactionOptions,
+  EthersTransactionResult,
+  CreateProxyProps
+}

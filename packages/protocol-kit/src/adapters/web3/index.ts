@@ -2,5 +2,10 @@ import { CreateProxyProps } from './contracts/GnosisSafeProxyFactory/GnosisSafeP
 import { Web3TransactionOptions, Web3TransactionResult } from './types'
 import Web3Adapter, { Web3AdapterConfig } from './Web3Adapter'
 
-export default Web3Adapter
-export { Web3AdapterConfig, Web3TransactionOptions, CreateProxyProps, Web3TransactionResult }
+export {
+  Web3Adapter,
+  Web3AdapterConfig,
+  Web3TransactionOptions,
+  CreateProxyProps,
+  Web3TransactionResult
+}

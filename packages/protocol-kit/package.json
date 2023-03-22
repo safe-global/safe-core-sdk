@@ -10,8 +10,8 @@
     "SDK"
   ],
   "scripts": {
-    "unbuild": "rimraf dist artifacts deployments cache .nyc_output",
-    "build": "hardhat compile && tsc",
+    "unbuild": "rimraf dist artifacts deployments cache .nyc_output typechain",
+    "build": "hardhat compile && yarn typechain && tsc",
     "test:ganache:web3:v1.0.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.0.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.1.1": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.1.1 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.2.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.2.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
@@ -30,7 +30,8 @@
     "test:hardhat:ethers:v1.3.0": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.3.0 && hardhat deploy && nyc hardhat test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "format": "prettier --write \"{src,tests,hardhat,scripts}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "typechain": "ts-node scripts/generateTypechainFiles.ts"
   },
   "repository": {
     "type": "git",
@@ -51,8 +52,8 @@
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@safe-global/safe-ethers-lib": "^1.9.2",
-    "@safe-global/safe-web3-lib": "^1.9.2",
+    "@safe-global/safe-core-sdk-types": "^1.9.0",
+    "@safe-global/safe-core-sdk-utils": "^1.7.2",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^10.0.1",
@@ -73,7 +74,11 @@
     "ts-generator": "^0.1.1",
     "typescript": "^4.9.4",
     "web3": "^1.8.1",
-    "yargs": "^17.6.2"
+    "yargs": "^17.6.2",
+    "@types/web3": "1.0.19",
+    "@typechain/ethers-v5": "^10.2.0",
+    "@typechain/web3-v1": "^6.0.2",
+    "typechain": "^8.1.1"
   },
   "dependencies": {
     "@ethersproject/solidity": "^5.7.0",
@@ -82,7 +87,10 @@
     "@safe-global/safe-deployments": "^1.20.2",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.8",
-    "web3-utils": "^1.8.1"
+    "web3-utils": "^1.8.1",
+    "web3": "^1.8.1",
+    "web3-core": "^1.8.1",
+    "@ethersproject/bignumber": "^5.7.0"
   },
   "lint-staged": {
     "src/**/!(*test).ts": [

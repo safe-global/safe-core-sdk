@@ -1,7 +1,7 @@
 import { SafeSetupConfig } from '@safe-global/safe-core-sdk-types'
 import { Web3TransactionOptions, Web3TransactionResult } from '../../../types'
 import { toTxResult } from '../../../utils'
-import { Gnosis_safe as GnosisSafe } from '../../../../typechain/src/web3-v1/v1.3.0/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe } from '../../../../../../typechain/src/web3-v1/v1.3.0/Gnosis_safe'
 import { EMPTY_DATA, SENTINEL_ADDRESS, ZERO_ADDRESS } from '../../../utils/constants'
 import GnosisSafeContractWeb3 from '../GnosisSafeContractWeb3'
 

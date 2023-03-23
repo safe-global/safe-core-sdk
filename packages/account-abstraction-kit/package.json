@@ -34,8 +34,8 @@
     "access": "public"
   },
   "dependencies": {
+    "@safe-global/protocol-kit": "^0.1.0",
     "@safe-global/relay-kit": "^0.1.0-alpha.2",
-    "@safe-global/safe-core-sdk": "^3.3.2",
     "@safe-global/safe-ethers-lib": "^1.9.2",
     "ethereumjs-util": "^7.1.5",
     "ethers": "^5.7.2"

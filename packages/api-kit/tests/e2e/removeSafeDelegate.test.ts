@@ -1,18 +1,18 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient, { SafeDelegateDeleteConfig } from '../../src'
+import SafeApiKit, { SafeDelegateDeleteConfig } from '../../src'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
 
-let serviceSdk: SafeServiceClient
+let safeApiKit: SafeApiKit
 let signer: Signer
 
 describe('removeSafeDelegate', () => {
   before(async () => {
-    ;({ serviceSdk, signer } = await getServiceClient(
+    ;({ safeApiKit, signer } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
     ))
   })
@@ -26,7 +26,7 @@ describe('removeSafeDelegate', () => {
       signer
     }
     await chai
-      .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
@@ -39,7 +39,7 @@ describe('removeSafeDelegate', () => {
       signer
     }
     await chai
-      .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
       .to.be.rejectedWith('Invalid Safe delegate address')
   })
 
@@ -51,7 +51,7 @@ describe('removeSafeDelegate', () => {
       signer
     }
     await chai
-      .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
@@ -64,7 +64,7 @@ describe('removeSafeDelegate', () => {
       signer
     }
     await chai
-      .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
@@ -77,14 +77,14 @@ describe('removeSafeDelegate', () => {
       signer
     }
     await chai
-      .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
       .to.be.rejectedWith(`Safe=${safeAddress} does not exist or it's still not indexed`)
   })
 
   it('should fail if the signer is not an owner of the Safe', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-    const { serviceSdk, signer } = await getServiceClient(
+    const { safeApiKit, signer } = await getServiceClient(
       '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
     )
     const delegateConfig: SafeDelegateDeleteConfig = {
@@ -93,7 +93,7 @@ describe('removeSafeDelegate', () => {
       signer
     }
     await chai
-      .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
       .to.be.rejectedWith('Signing owner is not an owner of the Safe')
   })
 
@@ -105,7 +105,7 @@ describe('removeSafeDelegate', () => {
       delegate: delegateAddress,
       signer
     }
-    await chai.expect(serviceSdk.removeSafeDelegate(delegateConfig)).to.be.rejectedWith('Not found')
+    await chai.expect(safeApiKit.removeSafeDelegate(delegateConfig)).to.be.rejectedWith('Not found')
   })
 
   it('should remove a delegate', async () => {
@@ -116,11 +116,11 @@ describe('removeSafeDelegate', () => {
       delegate: delegateAddress,
       signer
     }
-    await serviceSdk.addSafeDelegate({ ...delegateConfig, label: 'Label' })
-    const { results: initialDelegates } = await serviceSdk.getSafeDelegates(safeAddress)
+    await safeApiKit.addSafeDelegate({ ...delegateConfig, label: 'Label' })
+    const { results: initialDelegates } = await safeApiKit.getSafeDelegates(safeAddress)
     chai.expect(initialDelegates.length).to.be.eq(1)
-    await serviceSdk.removeSafeDelegate(delegateConfig)
-    const { results: finalDelegates } = await serviceSdk.getSafeDelegates(safeAddress)
+    await safeApiKit.removeSafeDelegate(delegateConfig)
+    const { results: finalDelegates } = await safeApiKit.getSafeDelegates(safeAddress)
     chai.expect(finalDelegates.length).to.be.eq(0)
   })
 
@@ -134,11 +134,11 @@ describe('removeSafeDelegate', () => {
       delegate: eip3770DelegateAddress,
       signer
     }
-    await serviceSdk.addSafeDelegate({ ...delegateConfig, label: 'Label' })
-    const { results: initialDelegates } = await serviceSdk.getSafeDelegates(eip3770SafeAddress)
+    await safeApiKit.addSafeDelegate({ ...delegateConfig, label: 'Label' })
+    const { results: initialDelegates } = await safeApiKit.getSafeDelegates(eip3770SafeAddress)
     chai.expect(initialDelegates.length).to.be.eq(1)
-    await serviceSdk.removeSafeDelegate(delegateConfig)
-    const { results: finalDelegates } = await serviceSdk.getSafeDelegates(eip3770SafeAddress)
+    await safeApiKit.removeSafeDelegate(delegateConfig)
+    const { results: finalDelegates } = await safeApiKit.getSafeDelegates(eip3770SafeAddress)
     chai.expect(finalDelegates.length).to.be.eq(0)
   })
 })

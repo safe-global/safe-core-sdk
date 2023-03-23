@@ -107,7 +107,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 1666600000, shortName: 'hmy-s0' },
   { chainId: 1666700000, shortName: 'hmy-b-s0' },
   { chainId: 11297108099, shortName: 'tpalm' },
-  { chainId: 11297108109, shortName: 'palm' },
+  { chainId: 11297108109, shortName: 'palm' }
 ]
 
 if (process.env.TEST_NETWORK === 'hardhat') {

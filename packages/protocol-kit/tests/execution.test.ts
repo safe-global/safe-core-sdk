@@ -3,8 +3,7 @@ import {
   SafeTransactionDataPartial,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import { EthersTransactionOptions } from '@safe-global/safe-ethers-lib'
-import { Web3TransactionOptions } from '@safe-global/safe-web3-lib'
+import { Web3TransactionOptions, EthersTransactionOptions } from '@safe-global/protocol-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'

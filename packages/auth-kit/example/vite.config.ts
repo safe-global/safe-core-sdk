@@ -10,7 +10,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     disabled: false,
-    include: ['@safe-global/safe-ethers-lib', '@safe-global/api-kit'],
+    include: ['@safe-global/protocol-kit', '@safe-global/api-kit'],
     esbuildOptions: {
       define: {
         global: 'globalThis'

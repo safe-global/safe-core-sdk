@@ -43,7 +43,7 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@safe-global/safe-ethers-lib": "^1.9.1",
+    "@safe-global/protocol-kit": "^0.1.0",
     "@safe-global/api-kit": "^0.1.0",
     "@walletconnect/client": "^1.8.0",
     "ethers": "^5.7.2"

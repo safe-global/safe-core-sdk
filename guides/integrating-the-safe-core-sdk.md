@@ -41,15 +41,15 @@ Depending on the library used by the Dapp, there are two options:
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
-### Initialize the Safe Service Client
+### Initialize the Safe API Kit
 
-As stated in the introduction, the [Safe Service Client](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeServiceClient` class, imported from `@safe-global/api-kit` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
+As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
 
 ```js
-import SafeServiceClient from '@safe-global/api-kit'
+import SafeApiKit from '@safe-global/api-kit'
 
 const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
-const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter })
+const safeService = new SafeApiKit({ txServiceUrl, ethAdapter })
 ```
 
 ### Initialize the Safe Core SDK
@@ -192,7 +192,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   ```
 
 
-We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe Service Client instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.
+We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe API Kit instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.
 
 ```js
 const nonce = await safeService.getNextNonce(safeAddress)
@@ -200,7 +200,7 @@ const nonce = await safeService.getNextNonce(safeAddress)
 
 ## <a name="propose-transaction">5. Propose the transaction to the service</a>
 
-Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe Service Client instance and pass an object with the properties:
+Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe API Kit instance and pass an object with the properties:
 - `safeAddress`: The Safe address.
 - `safeTransactionData`: The `data` object inside the Safe transaction object returned from the method `createTransaction`.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.
@@ -284,7 +284,7 @@ type SafeMultisigTransactionResponse = {
 
 ## <a name="confirm-transaction">7. Confirm/reject the transaction</a>
 
-The owners of the Safe can now sign the transaction obtained from the Safe Transaction Service by calling the method `signTransactionHash` from the Safe Core SDK to generate the signature and by calling the method `confirmTransaction` from the Safe Service Client to add the signature to the service.
+The owners of the Safe can now sign the transaction obtained from the Safe Transaction Service by calling the method `signTransactionHash` from the Safe Core SDK to generate the signature and by calling the method `confirmTransaction` from the Safe API Kit to add the signature to the service.
 
 ```js
 // transaction: SafeMultisigTransactionResponse

@@ -1,15 +1,15 @@
-import { ethers } from 'ethers'
+import SafeApiKit from '@safe-global/api-kit'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
-import SafeServiceClient from '@safe-global/api-kit'
+import { ethers } from 'ethers'
+import { getErrorMessage } from './lib/errors'
 import {
-  SafeAuthConfig,
-  SafeAuthSignInData,
+  ISafeAuthKit,
   SafeAuthAdapter,
+  SafeAuthConfig,
   SafeAuthEvent,
   SafeAuthEventListener,
-  ISafeAuthKit
+  SafeAuthSignInData
 } from './types'
-import { getErrorMessage } from './lib/errors'
 
 /**
  * SafeAuthKit provides a simple interface for web2 logins
@@ -128,10 +128,10 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
   }
 
   /**
-   * Get the SafeServiceClient instance
-   * @returns A SafeServiceClient instance
+   * Get the SafeApiKit instance
+   * @returns A SafeApiKit instance
    */
-  #getSafeCoreClient(): SafeServiceClient {
+  #getSafeCoreClient(): SafeApiKit {
     if (!this.#adapter?.provider) {
       throw new Error('Provider is not defined')
     }
@@ -148,7 +148,7 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
       signerOrProvider: safeOwner
     })
 
-    return new SafeServiceClient({
+    return new SafeApiKit({
       txServiceUrl: this.#config.txServiceUrl,
       ethAdapter: adapter
     })

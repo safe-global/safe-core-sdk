@@ -1,16 +1,16 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeServiceClient from '../../src'
+import SafeApiKit from '../../src'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
 
-let serviceSdk: SafeServiceClient
+let safeApiKit: SafeApiKit
 
 describe('getMultisigTransactions', () => {
   before(async () => {
-    ;({ serviceSdk } = await getServiceClient(
+    ;({ safeApiKit } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
     ))
   })
@@ -18,20 +18,20 @@ describe('getMultisigTransactions', () => {
   it('should fail if Safe address is empty', async () => {
     const safeAddress = ''
     await chai
-      .expect(serviceSdk.getMultisigTransactions(safeAddress))
+      .expect(safeApiKit.getMultisigTransactions(safeAddress))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should fail if Safe address is not checksummed', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
     await chai
-      .expect(serviceSdk.getMultisigTransactions(safeAddress))
+      .expect(safeApiKit.getMultisigTransactions(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
   it('should return an empty list if there are no multisig transactions', async () => {
     const safeAddress = '0x3e04a375aC5847C690A7f2fF54b45c59f7eeD6f0' // Safe without multisig transactions
-    const safeMultisigTransactionListResponse = await serviceSdk.getMultisigTransactions(
+    const safeMultisigTransactionListResponse = await safeApiKit.getMultisigTransactions(
       safeAddress
     )
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(0)
@@ -40,7 +40,7 @@ describe('getMultisigTransactions', () => {
 
   it('should return the list of multisig transactions', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with multisig transactions
-    const safeMultisigTransactionListResponse = await serviceSdk.getMultisigTransactions(
+    const safeMultisigTransactionListResponse = await safeApiKit.getMultisigTransactions(
       safeAddress
     )
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(12)
@@ -53,7 +53,7 @@ describe('getMultisigTransactions', () => {
   it('should return the list of multisig transactions EIP-3770', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with multisig transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const safeMultisigTransactionListResponse = await serviceSdk.getMultisigTransactions(
+    const safeMultisigTransactionListResponse = await safeApiKit.getMultisigTransactions(
       eip3770SafeAddress
     )
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(12)

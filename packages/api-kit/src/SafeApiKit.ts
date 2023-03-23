@@ -4,7 +4,6 @@ import {
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
-import SafeTransactionService from './SafeTransactionService'
 import {
   AllTransactionsListResponse,
   AllTransactionsOptions,
@@ -31,18 +30,18 @@ import {
 import { getTxServiceBaseUrl } from './utils'
 import { HttpMethod, sendRequest } from './utils/httpRequests'
 
-export interface SafeServiceClientConfig {
+export interface SafeApiKitConfig {
   /** txServiceUrl - Safe Transaction Service URL */
   txServiceUrl: string
   /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
 }
 
-class SafeServiceClient implements SafeTransactionService {
+class SafeApiKit {
   #txServiceBaseUrl: string
   #ethAdapter: EthAdapter
 
-  constructor({ txServiceUrl, ethAdapter }: SafeServiceClientConfig) {
+  constructor({ txServiceUrl, ethAdapter }: SafeApiKitConfig) {
     this.#txServiceBaseUrl = getTxServiceBaseUrl(txServiceUrl)
     this.#ethAdapter = ethAdapter
   }
@@ -593,4 +592,4 @@ class SafeServiceClient implements SafeTransactionService {
   }
 }
 
-export default SafeServiceClient
+export default SafeApiKit

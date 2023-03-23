@@ -6,7 +6,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import SafeServiceClient, {
+import SafeApiKit, {
   SafeDelegateConfig,
   SafeDelegateDeleteConfig,
   SafeMultisigTransactionEstimate
@@ -34,11 +34,11 @@ const signer = new Wallet(
   provider
 )
 let ethAdapter: EthAdapter
-let serviceSdk: SafeServiceClient
+let safeApiKit: SafeApiKit
 
 describe('Endpoint tests', () => {
   before(async () => {
-    ;({ serviceSdk, ethAdapter } = await getServiceClient(
+    ;({ safeApiKit, ethAdapter } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
     ))
   })
@@ -50,7 +50,7 @@ describe('Endpoint tests', () => {
   describe('', () => {
     it('getServiceInfo', async () => {
       await chai
-        .expect(serviceSdk.getServiceInfo())
+        .expect(safeApiKit.getServiceInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/about`,
@@ -60,7 +60,7 @@ describe('Endpoint tests', () => {
 
     it('getServiceMasterCopiesInfo', async () => {
       await chai
-        .expect(serviceSdk.getServiceMasterCopiesInfo())
+        .expect(safeApiKit.getServiceMasterCopiesInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/about/master-copies`,
@@ -71,7 +71,7 @@ describe('Endpoint tests', () => {
     it('decodeData', async () => {
       const data = '0x610b592500000000000000000000000090F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       await chai
-        .expect(serviceSdk.decodeData(data))
+        .expect(safeApiKit.decodeData(data))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/data-decoder/`,
@@ -82,7 +82,7 @@ describe('Endpoint tests', () => {
 
     it('getSafesByOwner', async () => {
       await chai
-        .expect(serviceSdk.getSafesByOwner(randomAddress))
+        .expect(safeApiKit.getSafesByOwner(randomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/owners/${randomAddress}/safes/`,
@@ -92,7 +92,7 @@ describe('Endpoint tests', () => {
 
     it('getSafesByOwner EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getSafesByOwner(eip3770RandomAddress))
+        .expect(safeApiKit.getSafesByOwner(eip3770RandomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/owners/${randomAddress}/safes/`,
@@ -102,7 +102,7 @@ describe('Endpoint tests', () => {
 
     it('getSafesByModule', async () => {
       await chai
-        .expect(serviceSdk.getSafesByModule(randomAddress))
+        .expect(safeApiKit.getSafesByModule(randomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/modules/${randomAddress}/safes/`,
@@ -112,7 +112,7 @@ describe('Endpoint tests', () => {
 
     it('getSafesByModule EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getSafesByModule(eip3770RandomAddress))
+        .expect(safeApiKit.getSafesByModule(eip3770RandomAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/modules/${randomAddress}/safes/`,
@@ -122,7 +122,7 @@ describe('Endpoint tests', () => {
 
     it('getTransaction', async () => {
       await chai
-        .expect(serviceSdk.getTransaction(safeTxHash))
+        .expect(safeApiKit.getTransaction(safeTxHash))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/multisig-transactions/${safeTxHash}/`,
@@ -132,7 +132,7 @@ describe('Endpoint tests', () => {
 
     it('getTransactionConfirmations', async () => {
       await chai
-        .expect(serviceSdk.getTransactionConfirmations(safeTxHash))
+        .expect(safeApiKit.getTransactionConfirmations(safeTxHash))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -145,7 +145,7 @@ describe('Endpoint tests', () => {
     it('confirmTransaction', async () => {
       const signature = '0x'
       await chai
-        .expect(serviceSdk.confirmTransaction(safeTxHash, signature))
+        .expect(safeApiKit.confirmTransaction(safeTxHash, signature))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -157,7 +157,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeInfo', async () => {
       await chai
-        .expect(serviceSdk.getSafeInfo(safeAddress))
+        .expect(safeApiKit.getSafeInfo(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/`,
@@ -167,7 +167,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeInfo EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getSafeInfo(eip3770SafeAddress))
+        .expect(safeApiKit.getSafeInfo(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/`,
@@ -177,7 +177,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeDelegates', async () => {
       await chai
-        .expect(serviceSdk.getSafeDelegates(safeAddress))
+        .expect(safeApiKit.getSafeDelegates(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
@@ -187,7 +187,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeDelegates EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getSafeDelegates(eip3770SafeAddress))
+        .expect(safeApiKit.getSafeDelegates(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
@@ -203,7 +203,7 @@ describe('Endpoint tests', () => {
         label: ''
       }
       await chai
-        .expect(serviceSdk.addSafeDelegate(delegateConfig))
+        .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
@@ -219,7 +219,7 @@ describe('Endpoint tests', () => {
         label: ''
       }
       await chai
-        .expect(serviceSdk.addSafeDelegate(delegateConfig))
+        .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
@@ -232,7 +232,7 @@ describe('Endpoint tests', () => {
       const data = safeAddress + totp
       const signature = await signer.signMessage(data)
       await chai
-        .expect(serviceSdk.removeAllSafeDelegates(safeAddress, signer))
+        .expect(safeApiKit.removeAllSafeDelegates(safeAddress, signer))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
@@ -246,7 +246,7 @@ describe('Endpoint tests', () => {
       const data = safeAddress + totp
       const signature = await signer.signMessage(data)
       await chai
-        .expect(serviceSdk.removeAllSafeDelegates(eip3770SafeAddress, signer))
+        .expect(safeApiKit.removeAllSafeDelegates(eip3770SafeAddress, signer))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
@@ -266,7 +266,7 @@ describe('Endpoint tests', () => {
       const data = delegate + totp
       const signature = await signer.signMessage(data)
       await chai
-        .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+        .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/${
@@ -292,7 +292,7 @@ describe('Endpoint tests', () => {
       const data = delegate + totp
       const signature = await signer.signMessage(data)
       await chai
-        .expect(serviceSdk.removeSafeDelegate(delegateConfig))
+        .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -309,7 +309,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeCreationInfo', async () => {
       await chai
-        .expect(serviceSdk.getSafeCreationInfo(safeAddress))
+        .expect(safeApiKit.getSafeCreationInfo(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/creation/`,
@@ -319,7 +319,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeCreationInfo EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getSafeCreationInfo(eip3770SafeAddress))
+        .expect(safeApiKit.getSafeCreationInfo(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/creation/`,
@@ -335,7 +335,7 @@ describe('Endpoint tests', () => {
         operation: 0
       }
       await chai
-        .expect(serviceSdk.estimateSafeTransaction(safeAddress, safeTransaction))
+        .expect(safeApiKit.estimateSafeTransaction(safeAddress, safeTransaction))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -354,7 +354,7 @@ describe('Endpoint tests', () => {
         operation: 0
       }
       await chai
-        .expect(serviceSdk.estimateSafeTransaction(eip3770SafeAddress, safeTransaction))
+        .expect(safeApiKit.estimateSafeTransaction(eip3770SafeAddress, safeTransaction))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -378,14 +378,14 @@ describe('Endpoint tests', () => {
         refundReceiver: '0x0000000000000000000000000000000000000000',
         nonce: 1
       }
-      const origin = 'Safe Core SDK: Safe Service Client'
+      const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
       const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
       await chai
         .expect(
-          serviceSdk.proposeTransaction({
+          safeApiKit.proposeTransaction({
             safeAddress,
             safeTransactionData: safeTransaction.data,
             safeTxHash,
@@ -396,7 +396,9 @@ describe('Endpoint tests', () => {
         )
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
           ...safeTransactionData,
@@ -421,14 +423,14 @@ describe('Endpoint tests', () => {
         refundReceiver: '0x0000000000000000000000000000000000000000',
         nonce: 1
       }
-      const origin = 'Safe Core SDK: Safe Service Client'
+      const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
       const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
       await chai
         .expect(
-          serviceSdk.proposeTransaction({
+          safeApiKit.proposeTransaction({
             safeAddress: eip3770SafeAddress,
             safeTransactionData: safeTransaction.data,
             safeTxHash,
@@ -439,7 +441,9 @@ describe('Endpoint tests', () => {
         )
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'post',
         body: {
           ...safeTransactionData,
@@ -453,7 +457,7 @@ describe('Endpoint tests', () => {
 
     it('getIncomingTransactions', async () => {
       await chai
-        .expect(serviceSdk.getIncomingTransactions(safeAddress))
+        .expect(safeApiKit.getIncomingTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers/`,
@@ -463,7 +467,7 @@ describe('Endpoint tests', () => {
 
     it('getIncomingTransactions EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getIncomingTransactions(eip3770SafeAddress))
+        .expect(safeApiKit.getIncomingTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers/`,
@@ -473,40 +477,48 @@ describe('Endpoint tests', () => {
 
     it('getModuleTransactions', async () => {
       await chai
-        .expect(serviceSdk.getModuleTransactions(safeAddress))
+        .expect(safeApiKit.getModuleTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/module-transactions/`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/module-transactions/`,
         method: 'get'
       })
     })
 
     it('getModuleTransactions EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getModuleTransactions(eip3770SafeAddress))
+        .expect(safeApiKit.getModuleTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/module-transactions/`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/module-transactions/`,
         method: 'get'
       })
     })
 
     it('getMultisigTransactions', async () => {
       await chai
-        .expect(serviceSdk.getMultisigTransactions(safeAddress))
+        .expect(safeApiKit.getMultisigTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'get'
       })
     })
 
     it('getMultisigTransactions EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getMultisigTransactions(eip3770SafeAddress))
+        .expect(safeApiKit.getMultisigTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/multisig-transactions/`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/multisig-transactions/`,
         method: 'get'
       })
     })
@@ -514,7 +526,7 @@ describe('Endpoint tests', () => {
     it('getPendingTransactions', async () => {
       const currentNonce = 1
       await chai
-        .expect(serviceSdk.getPendingTransactions(safeAddress, currentNonce))
+        .expect(safeApiKit.getPendingTransactions(safeAddress, currentNonce))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -527,7 +539,7 @@ describe('Endpoint tests', () => {
     it('getPendingTransactions EIP-3770', async () => {
       const currentNonce = 1
       await chai
-        .expect(serviceSdk.getPendingTransactions(eip3770SafeAddress, currentNonce))
+        .expect(safeApiKit.getPendingTransactions(eip3770SafeAddress, currentNonce))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -539,7 +551,7 @@ describe('Endpoint tests', () => {
 
     it('getAllTransactions', async () => {
       await chai
-        .expect(serviceSdk.getAllTransactions(safeAddress))
+        .expect(safeApiKit.getAllTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -551,7 +563,7 @@ describe('Endpoint tests', () => {
 
     it('getAllTransactions EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getAllTransactions(eip3770SafeAddress))
+        .expect(safeApiKit.getAllTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(
@@ -563,7 +575,7 @@ describe('Endpoint tests', () => {
 
     it('getTokens', async () => {
       await chai
-        .expect(serviceSdk.getTokenList())
+        .expect(safeApiKit.getTokenList())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/tokens/`,
@@ -573,7 +585,7 @@ describe('Endpoint tests', () => {
 
     it('getToken', async () => {
       await chai
-        .expect(serviceSdk.getToken(tokenAddress))
+        .expect(safeApiKit.getToken(tokenAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/tokens/${tokenAddress}/`,
@@ -583,7 +595,7 @@ describe('Endpoint tests', () => {
 
     it('getToken EIP-3770', async () => {
       await chai
-        .expect(serviceSdk.getToken(eip3770TokenAddress))
+        .expect(safeApiKit.getToken(eip3770TokenAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/tokens/${tokenAddress}/`,

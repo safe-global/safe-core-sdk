@@ -1,4 +1,4 @@
-# Safe Service Client
+# Safe API Kit
 
 [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fapi-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fapi-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
@@ -45,12 +45,12 @@ Depending on the library used by the Dapp, there are two options:
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
-### Initialize the SafeServiceClient
+### Initialize the SafeApiKit
 
 ```js
-import SafeServiceClient from '@safe-global/api-kit'
+import SafeApiKit from '@safe-global/api-kit'
 
-const safeService = new SafeServiceClient({
+const safeService = new SafeApiKit({
   txServiceUrl: 'https://safe-transaction-mainnet.safe.global',
   ethAdapter
 })

@@ -4,6 +4,8 @@
     { "path": "packages/api-kit" },
     { "path": "packages/protocol-kit" },
     { "path": "packages/relay-kit" },
+    { "path": "packages/auth-kit" },
+    { "path": "packages/onramp-kit" },
     { "path": "packages/safe-core-sdk-types" },
     { "path": "packages/safe-core-sdk-utils" },
     { "path": "packages/safe-ethers-adapters" },

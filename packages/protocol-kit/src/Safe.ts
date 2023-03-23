@@ -11,7 +11,7 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/safe-core-sdk-utils'
+import { SAFE_FEATURES, hasSafeFeature } from './utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -445,7 +445,7 @@ class Safe {
       | 'eth_signTypedData_v3'
       | 'eth_signTypedData_v4' = 'eth_signTypedData_v4'
   ): Promise<SafeTransaction> {
-    let transaction = isSafeMultisigTransactionResponse(safeTransaction)
+    const transaction = isSafeMultisigTransactionResponse(safeTransaction)
       ? await this.toSafeTransactionType(safeTransaction)
       : safeTransaction
 
@@ -528,7 +528,7 @@ class Safe {
    */
   async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
     const owners = await this.getOwners()
-    let ownersWhoApproved: string[] = []
+    const ownersWhoApproved: string[] = []
     for (const owner of owners) {
       const approved = await this.#contractManager.safeContract.approvedHashes(owner, txHash)
       if (approved.gt(0)) {
@@ -812,7 +812,7 @@ class Safe {
     safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
     options?: TransactionOptions
   ): Promise<boolean> {
-    let transaction = isSafeMultisigTransactionResponse(safeTransaction)
+    const transaction = isSafeMultisigTransactionResponse(safeTransaction)
       ? await this.toSafeTransactionType(safeTransaction)
       : safeTransaction
 
@@ -856,7 +856,7 @@ class Safe {
     safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
     options?: TransactionOptions
   ): Promise<TransactionResult> {
-    let transaction = isSafeMultisigTransactionResponse(safeTransaction)
+    const transaction = isSafeMultisigTransactionResponse(safeTransaction)
       ? await this.toSafeTransactionType(safeTransaction)
       : safeTransaction
 

@@ -10,7 +10,7 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/safe-core-sdk-utils'
+import { SAFE_FEATURES, hasSafeFeature } from '../'
 import { ZERO_ADDRESS } from '../constants'
 import { estimateTxGas } from './gas'
 

@@ -6,6 +6,10 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from './constants'
 
+export * from './eip-3770'
+export * from './eip-712'
+export * from './safeVersions'
+
 export function sameString(str1: string, str2: string): boolean {
   return str1.toLowerCase() === str2.toLowerCase()
 }

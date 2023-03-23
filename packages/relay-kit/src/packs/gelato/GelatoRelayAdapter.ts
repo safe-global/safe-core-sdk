@@ -8,7 +8,12 @@ import {
   TransactionStatusResponse
 } from '@gelatonetwork/relay-sdk'
 import Safe from '@safe-global/safe-core-sdk'
-import { MetaTransactionData, MetaTransactionOptions, RelayTransaction, SafeTransaction } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  RelayTransaction,
+  SafeTransaction
+} from '@safe-global/safe-core-sdk-types'
 import { GELATO_FEE_COLLECTOR, GELATO_NATIVE_TOKEN_ADDRESS, ZERO_ADDRESS } from '../../constants'
 import { RelayAdapter } from '../../types'
 

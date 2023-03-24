@@ -39,7 +39,7 @@ interface GetSafeContractInstanceProps extends GetContractInstanceProps {
 export function getSafeContractDeployment(
   safeVersion: SafeVersion,
   chainId: number,
-  isL1SafeMasterCopy: boolean = false
+  isL1SafeMasterCopy = false
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeMasterCopyVersion
   const filters: DeploymentFilter = { version, network: chainId.toString(), released: true }

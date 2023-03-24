@@ -1,0 +1,49 @@
+{
+  "name": "@safe-global/account-abstraction-kit-poc",
+  "version": "0.1.0-alpha.1",
+  "description": "Safe Account Abstraction",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "scripts": {
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "unbuild": "rm -rf dist typechain",
+    "build": "rm -rf dist && ts-node ./scripts/typechain && yarn tsc",
+    "test": "echo \"Error: no test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/safe-global/account-abstraction-sdk.git"
+  },
+  "keywords": [
+    "Safe",
+    "Ethereum",
+    "Account Abstraction",
+    "SDK"
+  ],
+  "author": "Safe (https://safe.global)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/safe-global/account-abstraction-sdk/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/safe-global/account-abstraction-sdk#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v5": "^10.2.0",
+    "typechain": "^8.1.1"
+  },
+  "dependencies": {
+    "@gnosis.pm/safe-contracts": "^1.3.0",
+    "@safe-global/relay-kit": "^0.1.0-alpha.2",
+    "@safe-global/safe-core-sdk": "^3.3.2",
+    "@safe-global/safe-deployments": "^1.20.2",
+    "@safe-global/safe-ethers-lib": "^1.9.2",
+    "ethereumjs-util": "^7.1.5",
+    "ethers": "^5.7.2"
+  }
+}

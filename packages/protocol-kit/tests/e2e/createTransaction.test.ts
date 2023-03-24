@@ -2,7 +2,7 @@ import { MetaTransactionData, SafeTransactionDataPartial } from '@safe-global/sa
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from '../../hardhat/deploy/deploy-contracts'
 import Safe, { SafeTransactionOptionalProps, standardizeSafeTransactionData } from '../src'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'

@@ -83,32 +83,56 @@ function moveTypechainFiles(inDir: string, outDir: string): void {
   })
 }
 
-function generateTypes(version: string) {
+function generateTypes(typechainTarget: string) {
   // Src
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.3.0`, safeContracts_V1_3_0)
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.2.0`, safeContracts_V1_2_0)
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.1.1`, safeContracts_V1_1_1)
-  generateTypechainFiles(version, `${outDirSrc}${version}/v1.0.0`, safeContracts_V1_0_0)
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.3.0`,
-    `${typeChainDirectoryBuildPath}${version}/v1.3.0`
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirSrc}${typechainTarget}/v1.3.0`,
+    safeContracts_V1_3_0
+  )
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirSrc}${typechainTarget}/v1.2.0`,
+    safeContracts_V1_2_0
+  )
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirSrc}${typechainTarget}/v1.1.1`,
+    safeContracts_V1_1_1
+  )
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirSrc}${typechainTarget}/v1.0.0`,
+    safeContracts_V1_0_0
   )
   moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.2.0`,
-    `${typeChainDirectoryBuildPath}${version}/v1.2.0`
+    `${typeChainDirectorySrcPath}${typechainTarget}/v1.3.0`,
+    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.3.0`
   )
   moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.1.1`,
-    `${typeChainDirectoryBuildPath}${version}/v1.1.1`
+    `${typeChainDirectorySrcPath}${typechainTarget}/v1.2.0`,
+    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.2.0`
   )
   moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${version}/v1.0.0`,
-    `${typeChainDirectoryBuildPath}${version}/v1.0.0`
+    `${typeChainDirectorySrcPath}${typechainTarget}/v1.1.1`,
+    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.1.1`
+  )
+  moveTypechainFiles(
+    `${typeChainDirectorySrcPath}${typechainTarget}/v1.0.0`,
+    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.0.0`
   )
 
   // Tests
-  generateTypechainFiles(version, `${outDirTests}${version}/v1.3.0`, testContracts_V1_3_0)
-  generateTypechainFiles(version, `${outDirTests}${version}/v1.2.0`, testContracts_V1_2_0)
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirTests}${typechainTarget}/v1.3.0`,
+    testContracts_V1_3_0
+  )
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirTests}${typechainTarget}/v1.2.0`,
+    testContracts_V1_2_0
+  )
 }
 
 generateTypes('ethers-v5')

@@ -11,14 +11,19 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_FEATURES, hasSafeFeature } from './utils'
+import {
+  SAFE_FEATURES,
+  hasSafeFeature,
+  isMetaTransactionArray,
+  isSafeMultisigTransactionResponse,
+  sameString
+} from './utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
-import { isMetaTransactionArray, isSafeMultisigTransactionResponse, sameString } from './utils'
 import {
   generateEIP712Signature,
   generatePreValidatedSignature,

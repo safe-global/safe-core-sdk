@@ -39,7 +39,7 @@ import {
   proxyFactoryDeployed,
   safeVersionDeployed,
   signMessageLibDeployed
-} from '../../hardhat/deploy/deploy-contracts'
+} from '../../../hardhat/deploy/deploy-contracts'
 
 export const getSafeSingleton = async (): Promise<{
   contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0

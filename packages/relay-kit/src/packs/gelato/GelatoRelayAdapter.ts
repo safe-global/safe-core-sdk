@@ -1,4 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import Safe from '@safe-global/protocol-kit'
 import {
   CallWithSyncFeeRequest,
   GelatoRelay as GelatoNetworkRelay,
@@ -7,7 +8,6 @@ import {
   SponsoredCallRequest,
   TransactionStatusResponse
 } from '@gelatonetwork/relay-sdk'
-import Safe from '@safe-global/safe-core-sdk'
 import {
   MetaTransactionData,
   MetaTransactionOptions,

@@ -1,5 +1,5 @@
+import Safe from '@safe-global/protocol-kit'
 import { RelayResponse, TransactionStatusResponse } from '@gelatonetwork/relay-sdk'
-import Safe from '@safe-global/safe-core-sdk'
 import {
   MetaTransactionData,
   MetaTransactionOptions,

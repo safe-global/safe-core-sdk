@@ -1,10 +1,9 @@
-import {
+import Safe, {
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract
 } from '@safe-global/protocol-kit'
 import { RelayAdapter } from '@safe-global/relay-kit'
-import Safe from '@safe-global/safe-core-sdk'
 import {
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,

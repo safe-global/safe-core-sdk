@@ -1,5 +1,5 @@
-import SafeServiceClient, { SafeServiceClientConfig } from './SafeServiceClient'
+import SafeApiKit, { SafeApiKitConfig } from './SafeApiKit'
 
 export * from './types/safeTransactionServiceTypes'
-export default SafeServiceClient
-export { SafeServiceClientConfig }
+export { SafeApiKitConfig }
+export default SafeApiKit

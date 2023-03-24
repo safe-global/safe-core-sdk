@@ -1,4 +1,15 @@
 import {
+  CompatibilityFallbackHandlerContract,
+  CreateCallContract,
+  EthAdapter,
+  GnosisSafeContract,
+  GnosisSafeProxyFactoryContract,
+  MultiSendCallOnlyContract,
+  MultiSendContract,
+  SafeVersion,
+  SignMessageLibContract
+} from '@safe-global/safe-core-sdk-types'
+import {
   DeploymentFilter,
   getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
@@ -10,17 +21,6 @@ import {
   getSignMessageLibDeployment,
   SingletonDeployment
 } from '@safe-global/safe-deployments'
-import {
-  CompatibilityFallbackHandlerContract,
-  CreateCallContract,
-  EthAdapter,
-  GnosisSafeContract,
-  GnosisSafeProxyFactoryContract,
-  MultiSendCallOnlyContract,
-  MultiSendContract,
-  SafeVersion,
-  SignMessageLibContract
-} from '@safe-global/safe-core-sdk-types'
 import { ContractNetworkConfig } from '../types'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 

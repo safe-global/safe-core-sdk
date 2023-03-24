@@ -1,4 +1,4 @@
-import { ContractNetworksConfig } from '../../src'
+import { ContractNetworksConfig } from '../../../src'
 import {
   getCompatibilityFallbackHandler,
   getCreateCall,

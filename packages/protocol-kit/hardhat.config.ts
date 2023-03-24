@@ -46,7 +46,7 @@ const config: HardhatUserConfig = {
     artifacts: 'artifacts',
     deploy: 'hardhat/deploy',
     sources: 'contracts',
-    tests: 'tests'
+    tests: 'tests/e2e'
   },
   networks: {
     localhost: {

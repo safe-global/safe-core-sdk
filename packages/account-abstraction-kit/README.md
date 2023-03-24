@@ -1,8 +1,8 @@
-# Safe Account Abstraction SDK
+# Safe Account Abstraction Kit PoC
 
-[![NPM Version](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction.svg)](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction-kit-poc)
-[![GitHub Release](https://img.shields.io/github/release/safe-global/account-abstraction-sdk.svg?style=flat)](https://github.com/safe-global/account-abstraction-sdk/releases)
-[![GitHub](https://img.shields.io/github/license/safe-global/account-abstraction-sdk)](https://github.com/safe-global/account-abstraction-sdk/blob/main/LICENSE.md)
+[![NPM Version](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction-kit-poc.svg)](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction-kit-poc)
+[![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
+[![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
 Description TBD
 

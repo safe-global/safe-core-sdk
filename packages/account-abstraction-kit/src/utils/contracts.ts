@@ -1,40 +1,48 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { arrayify, BytesLike } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
-import { BigNumberish, ethers, Signer } from 'ethers'
-import { GnosisSafe } from '../../typechain/GnosisSafe'
-import { GnosisSafeProxyFactory } from '../../typechain/proxies/GnosisSafeProxyFactory'
-import { PREDETERMINED_SALT_NONCE, ZERO_ADDRESS } from '../constants'
-import { MetaTransactionData, SafeTransactionData } from '../types'
+import { getCompatibilityFallbackHandlerContract, getSafeContract } from '@safe-global/protocol-kit'
 import {
-  getCompatibilityFallbackHandlerAddress,
-  getSafeContract,
-  getSafeProxyFactoryContract
-} from './deployments'
+  EthAdapter,
+  GnosisSafeContract,
+  GnosisSafeProxyFactoryContract,
+  MetaTransactionData,
+  SafeTransactionData,
+  SafeVersion
+} from '@safe-global/safe-core-sdk-types'
+import { BigNumberish, ethers, Signer } from 'ethers'
+import { PREDETERMINED_SALT_NONCE, ZERO_ADDRESS } from '../constants'
 
 export function encodeCreateProxyWithNonce(
-  safeProxyFactoryContract: GnosisSafeProxyFactory,
+  safeProxyFactoryContract: GnosisSafeProxyFactoryContract,
   safeSingletonAddress: string,
   initializer: string
 ) {
-  return safeProxyFactoryContract.interface.encodeFunctionData('createProxyWithNonce', [
+  return safeProxyFactoryContract.encode('createProxyWithNonce', [
     safeSingletonAddress,
     initializer,
     PREDETERMINED_SALT_NONCE
   ])
 }
 
-export function encodeSetupCallData(
-  safeContract: GnosisSafe,
+export async function encodeSetupCallData(
+  ethAdapter: EthAdapter,
+  safeVersion: SafeVersion,
+  safeContract: GnosisSafeContract,
   owners: string[],
   chainId: number
-): string {
-  return safeContract.interface.encodeFunctionData('setup', [
+): Promise<string> {
+  const compatibilityFallbackhandlerAddress = await getCompatibilityFallbackHandlerContract({
+    ethAdapter,
+    safeVersion,
+    chainId
+  })
+  return safeContract.encode('setup', [
     owners,
     BigNumber.from(1) as BigNumberish,
     ZERO_ADDRESS,
     '0x' as BytesLike,
-    getCompatibilityFallbackHandlerAddress(chainId),
+    compatibilityFallbackhandlerAddress,
     ZERO_ADDRESS,
     BigNumber.from(0) as BigNumberish,
     ZERO_ADDRESS
@@ -42,11 +50,11 @@ export function encodeSetupCallData(
 }
 
 export function encodeExecTransaction(
-  safeContract: GnosisSafe,
+  safeContract: GnosisSafeContract,
   transaction: SafeTransactionData,
   signature: string
 ): string {
-  return safeContract.interface.encodeFunctionData('execTransaction', [
+  return safeContract.encode('execTransaction', [
     transaction.to,
     transaction.value,
     transaction.data,
@@ -74,36 +82,43 @@ export function encodeMultiSendData(txs: MetaTransactionData[]): string {
 }
 
 export async function getSafeInitializer(
-  safeContract: GnosisSafe,
+  ethAdapter: EthAdapter,
+  safeContract: GnosisSafeContract,
   signerAddress: string,
   chainId: number
 ): Promise<string> {
-  const initializer = await encodeSetupCallData(safeContract, [signerAddress], chainId)
+  const safeVersion = await safeContract.getVersion()
+  const initializer = await encodeSetupCallData(
+    ethAdapter,
+    safeVersion,
+    safeContract,
+    [signerAddress],
+    chainId
+  )
   return initializer
 }
 
 export async function calculateChainSpecificProxyAddress(
-  safeProxyFactoryContract: GnosisSafeProxyFactory,
-  signer: Signer,
-  chainId: number
+  ethAdapter: EthAdapter,
+  safeVersion: SafeVersion,
+  safeProxyFactoryContract: GnosisSafeProxyFactoryContract,
+  signer: Signer
 ): Promise<string> {
-  const safeSingletonContract = getSafeContract(chainId, signer)
-  const deployer = safeProxyFactoryContract.address
+  const chainId = await ethAdapter.getChainId()
+  const safeSingletonContract = await getSafeContract({ ethAdapter, safeVersion, chainId })
+  const deployer = safeProxyFactoryContract.getAddress()
   const signerAddress = await signer.getAddress()
 
   const deploymentCode = ethers.utils.solidityPack(
     ['bytes', 'uint256'],
-    [
-      await getSafeProxyFactoryContract(chainId, signer).proxyCreationCode(),
-      safeSingletonContract.address
-    ]
+    [safeProxyFactoryContract.proxyCreationCode(), safeSingletonContract.getAddress()]
   )
   const salt = ethers.utils.solidityKeccak256(
     ['bytes32', 'uint256'],
     [
       ethers.utils.solidityKeccak256(
         ['bytes'],
-        [await getSafeInitializer(safeSingletonContract, signerAddress, chainId)]
+        [await getSafeInitializer(ethAdapter, safeSingletonContract, signerAddress, chainId)]
       ),
       PREDETERMINED_SALT_NONCE
     ]

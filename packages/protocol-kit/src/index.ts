@@ -1,3 +1,12 @@
+import {
+  getCompatibilityFallbackHandlerContract,
+  getCreateCallContract,
+  getMultiSendCallOnlyContract,
+  getMultiSendContract,
+  getProxyFactoryContract,
+  getSafeContract,
+  getSignMessageLibContract
+} from './contracts/safeDeploymentContracts'
 import ContractManager from './managers/contractManager'
 import Safe, {
   AddOwnerTxParams,
@@ -18,7 +27,6 @@ import { ContractNetworksConfig } from './types'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { standardizeSafeTransactionData } from './utils/transactions/utils'
 
-export default Safe
 export {
   ContractManager,
   SafeFactory,
@@ -35,5 +43,13 @@ export {
   AddOwnerTxParams,
   RemoveOwnerTxParams,
   SwapOwnerTxParams,
-  standardizeSafeTransactionData
+  standardizeSafeTransactionData,
+  getSafeContract,
+  getProxyFactoryContract,
+  getCompatibilityFallbackHandlerContract,
+  getMultiSendContract,
+  getMultiSendCallOnlyContract,
+  getSignMessageLibContract,
+  getCreateCallContract
 }
+export default Safe

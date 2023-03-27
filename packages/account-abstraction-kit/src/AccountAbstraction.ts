@@ -1,10 +1,10 @@
-import {
+import { RelayAdapter } from '@safe-global/relay-kit'
+import Safe, {
+  EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract
 } from '@safe-global/protocol-kit'
-import { RelayAdapter } from '@safe-global/relay-kit'
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import {
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,

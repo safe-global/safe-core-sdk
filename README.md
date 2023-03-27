@@ -8,13 +8,13 @@ Software developer tools that facilitate the interaction with the Safe [contract
 
 ## Guides
 
-| Title                                                                                                                           | Description                                                                                                                                                                                                          |
+| Title | Description |
 | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Integrating the Safe Core SDK](https://github.com/safe-global/safe-core-sdk/blob/main/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit) and [API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit). |
 
 ## Packages
 
-| Package                                                                                                      |                                                                       Release                                                                        | Description                                                                                                                                                                 |
+| Package  | Release | Description  | 
 | ------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [protocol-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit)                 |         [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit)         | TypeScript library that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts)                                                |
 | [auth-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/auth-kit)                         |             [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fauth-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fauth-kit)             | The Auth kit creates an Ethereum address and authenticates a blockchain account using an email address, social media account, or traditional crypto wallets like Metamask   |

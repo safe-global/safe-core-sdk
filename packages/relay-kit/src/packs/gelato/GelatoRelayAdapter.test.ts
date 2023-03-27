@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionStatusResponse } from '@gelatonetwork/relay-sdk'
-import Safe from '@safe-global/safe-core-sdk'
+import Safe from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 
 import { GELATO_FEE_COLLECTOR, GELATO_NATIVE_TOKEN_ADDRESS, ZERO_ADDRESS } from '../../constants'
@@ -58,7 +58,7 @@ jest.mock('@gelatonetwork/relay-sdk', () => {
   }
 })
 
-jest.mock('@safe-global/safe-core-sdk')
+jest.mock('@safe-global/protocol-kit')
 
 const gelatoRelayAdapter = new GelatoRelayAdapter(API_KEY)
 

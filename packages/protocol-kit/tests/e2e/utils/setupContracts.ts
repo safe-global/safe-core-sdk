@@ -23,10 +23,7 @@ import {
   ERC20Mintable,
   SocialRecoveryModule
 } from '@safe-global/protocol-kit/typechain/tests/ethers-v5/v1.2.0'
-import {
-  DebugTransactionGuard,
-  DefaultCallbackHandler
-} from '@safe-global/protocol-kit/typechain/tests/ethers-v5/v1.3.0'
+import { DebugTransactionGuard, DefaultCallbackHandler } from '@/typechain/tests/ethers-v5/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { AbiItem } from 'web3-utils'

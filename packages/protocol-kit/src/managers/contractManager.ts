@@ -9,24 +9,30 @@ import {
   getMultiSendContract,
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
-import { SafeConfig } from '../Safe'
-import { ContractNetworksConfig } from '../types'
+import { ContractNetworksConfig, SafeConfig } from '../types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeMasterCopy?: boolean
-  #safeContract!: GnosisSafeContract
+  #safeContract?: GnosisSafeContract
   #multiSendContract!: MultiSendContract
   #multiSendCallOnlyContract!: MultiSendCallOnlyContract
 
   static async create({
     ethAdapter,
     safeAddress,
+    predictSafe,
     isL1SafeMasterCopy,
     contractNetworks
   }: SafeConfig): Promise<ContractManager> {
     const contractManager = new ContractManager()
-    await contractManager.init({ ethAdapter, safeAddress, isL1SafeMasterCopy, contractNetworks })
+    await contractManager.init({
+      ethAdapter,
+      safeAddress,
+      predictSafe,
+      isL1SafeMasterCopy,
+      contractNetworks
+    })
     return contractManager
   }
 
@@ -41,23 +47,27 @@ class ContractManager {
     this.#contractNetworks = contractNetworks
     this.#isL1SafeMasterCopy = isL1SafeMasterCopy
 
-    const temporarySafeContract = await getSafeContract({
-      ethAdapter,
-      safeVersion: SAFE_LAST_VERSION,
-      chainId,
-      isL1SafeMasterCopy,
-      customSafeAddress: safeAddress,
-      customContracts
-    })
-    const safeVersion = await temporarySafeContract.getVersion()
-    this.#safeContract = await getSafeContract({
-      ethAdapter,
-      safeVersion,
-      chainId,
-      isL1SafeMasterCopy,
-      customSafeAddress: safeAddress,
-      customContracts
-    })
+    let safeVersion = SAFE_LAST_VERSION
+    if (safeAddress) {
+      const temporarySafeContract = await getSafeContract({
+        ethAdapter,
+        safeVersion,
+        chainId,
+        isL1SafeMasterCopy,
+        customSafeAddress: safeAddress,
+        customContracts
+      })
+      safeVersion = await temporarySafeContract.getVersion()
+      this.#safeContract = await getSafeContract({
+        ethAdapter,
+        safeVersion,
+        chainId,
+        isL1SafeMasterCopy,
+        customSafeAddress: safeAddress,
+        customContracts
+      })
+    }
+
     this.#multiSendContract = await getMultiSendContract({
       ethAdapter,
       safeVersion,
@@ -80,7 +90,7 @@ class ContractManager {
     return this.#isL1SafeMasterCopy
   }
 
-  get safeContract(): GnosisSafeContract {
+  get safeContract(): GnosisSafeContract | undefined {
     return this.#safeContract
   }
 

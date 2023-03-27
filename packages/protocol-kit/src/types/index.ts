@@ -6,6 +6,26 @@ import {
 import { SafeTransactionOptionalProps } from 'utils'
 import { AbiItem } from 'web3-utils'
 
+export interface SafeAccountConfig {
+  owners: string[]
+  threshold: number
+  to?: string
+  data?: string
+  fallbackHandler?: string
+  paymentToken?: string
+  payment?: number
+  paymentReceiver?: string
+}
+
+export interface SafeDeploymentConfig {
+  saltNonce: string
+}
+
+export interface PredictSafeProps {
+  safeAccountConfig: SafeAccountConfig
+  safeDeploymentConfig: SafeDeploymentConfig
+}
+
 export interface ContractNetworkConfig {
   /** safeMasterCopyAddress - Address of the GnosisSafe Master Copy contract deployed on a specific network */
   safeMasterCopyAddress: string

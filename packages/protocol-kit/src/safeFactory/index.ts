@@ -14,29 +14,14 @@ import {
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
 import Safe from '../Safe'
-import { ContractNetworksConfig } from '../types'
+import {
+  ContractNetworksConfig,
+  PredictSafeProps,
+  SafeAccountConfig,
+  SafeDeploymentConfig
+} from '../types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
 import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
-
-export interface SafeAccountConfig {
-  owners: string[]
-  threshold: number
-  to?: string
-  data?: string
-  fallbackHandler?: string
-  paymentToken?: string
-  payment?: number
-  paymentReceiver?: string
-}
-
-export interface SafeDeploymentConfig {
-  saltNonce: string
-}
-
-export interface PredictSafeProps {
-  safeAccountConfig: SafeAccountConfig
-  safeDeploymentConfig: SafeDeploymentConfig
-}
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig

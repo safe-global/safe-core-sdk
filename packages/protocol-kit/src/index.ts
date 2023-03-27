@@ -35,19 +35,16 @@ import {
 } from './contracts/safeDeploymentContracts'
 import ContractManager from './managers/contractManager'
 import Safe from './Safe'
-import SafeFactory, {
-  DeploySafeProps,
-  PredictSafeProps,
-  SafeAccountConfig,
-  SafeDeploymentConfig,
-  SafeFactoryConfig
-} from './safeFactory'
+import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
 import {
   AddOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
+  PredictSafeProps,
   RemoveOwnerTxParams,
+  SafeAccountConfig,
   SafeConfig,
+  SafeDeploymentConfig,
   SwapOwnerTxParams
 } from './types'
 

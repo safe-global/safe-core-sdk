@@ -1,4 +1,30 @@
 import {
+  CreateCallEthersContract,
+  CreateProxyProps as CreateEthersProxyProps,
+  EthersAdapter,
+  EthersAdapterConfig,
+  EthersTransactionOptions,
+  EthersTransactionResult,
+  GnosisSafeContractEthers,
+  GnosisSafeProxyFactoryEthersContract,
+  MultiSendCallOnlyEthersContract,
+  MultiSendEthersContract,
+  SignMessageLibEthersContract
+} from './adapters/ethers'
+import {
+  CreateCallWeb3Contract,
+  CreateProxyProps as CreateWeb3ProxyProps,
+  GnosisSafeContractWeb3,
+  GnosisSafeProxyFactoryWeb3Contract,
+  MultiSendCallOnlyWeb3Contract,
+  MultiSendWeb3Contract,
+  SignMessageLibWeb3Contract,
+  Web3Adapter,
+  Web3AdapterConfig,
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from './adapters/web3'
+import {
   getCompatibilityFallbackHandlerContract,
   getCreateCallContract,
   getMultiSendCallOnlyContract,
@@ -8,14 +34,7 @@ import {
   getSignMessageLibContract
 } from './contracts/safeDeploymentContracts'
 import ContractManager from './managers/contractManager'
-import Safe, {
-  AddOwnerTxParams,
-  ConnectSafeConfig,
-  CreateTransactionProps,
-  RemoveOwnerTxParams,
-  SafeConfig,
-  SwapOwnerTxParams
-} from './Safe'
+import Safe from './Safe'
 import SafeFactory, {
   DeploySafeProps,
   PredictSafeProps,
@@ -24,31 +43,13 @@ import SafeFactory, {
   SafeFactoryConfig
 } from './safeFactory'
 import {
-  EthersAdapter,
-  EthersAdapterConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
-  CreateProxyProps as CreateEthersProxyProps,
-  CreateCallEthersContract,
-  GnosisSafeContractEthers,
-  GnosisSafeProxyFactoryEthersContract,
-  MultiSendEthersContract,
-  MultiSendCallOnlyEthersContract,
-  SignMessageLibEthersContract
-} from './adapters/ethers'
-import {
-  Web3Adapter,
-  Web3AdapterConfig,
-  Web3TransactionOptions,
-  CreateProxyProps as CreateWeb3ProxyProps,
-  Web3TransactionResult,
-  CreateCallWeb3Contract,
-  GnosisSafeContractWeb3,
-  GnosisSafeProxyFactoryWeb3Contract,
-  MultiSendWeb3Contract,
-  MultiSendCallOnlyWeb3Contract,
-  SignMessageLibWeb3Contract
-} from './adapters/web3'
+  AddOwnerTxParams,
+  ConnectSafeConfig,
+  CreateTransactionProps,
+  RemoveOwnerTxParams,
+  SafeConfig,
+  SwapOwnerTxParams
+} from './types'
 
 import { ContractNetworksConfig } from './types'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'

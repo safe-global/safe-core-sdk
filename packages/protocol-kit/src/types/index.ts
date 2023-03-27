@@ -1,3 +1,9 @@
+import {
+  EthAdapter,
+  MetaTransactionData,
+  SafeTransactionDataPartial
+} from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionOptionalProps } from 'utils'
 import { AbiItem } from 'web3-utils'
 
 export interface ContractNetworkConfig {
@@ -34,4 +40,56 @@ export interface ContractNetworkConfig {
 export interface ContractNetworksConfig {
   /** id - Network id */
   [id: string]: ContractNetworkConfig
+}
+
+export interface SafeConfig {
+  /** ethAdapter - Ethereum adapter */
+  ethAdapter: EthAdapter
+  /** safeAddress - The address of the Safe account to use */
+  safeAddress: string
+  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
+  isL1SafeMasterCopy?: boolean
+  /** contractNetworks - Contract network configuration */
+  contractNetworks?: ContractNetworksConfig
+}
+
+export interface ConnectSafeConfig {
+  /** ethAdapter - Ethereum adapter */
+  ethAdapter?: EthAdapter
+  /** safeAddress - The address of the Safe account to use */
+  safeAddress?: string
+  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
+  isL1SafeMasterCopy?: boolean
+  /** contractNetworks - Contract network configuration */
+  contractNetworks?: ContractNetworksConfig
+}
+
+export interface CreateTransactionProps {
+  /** safeTransactionData - The transaction or transaction array to process */
+  safeTransactionData: SafeTransactionDataPartial | MetaTransactionData[]
+  /** options - The transaction array optional properties */
+  options?: SafeTransactionOptionalProps
+  /** onlyCalls - Forces the execution of the transaction array with MultiSendCallOnly contract */
+  onlyCalls?: boolean
+}
+
+export interface AddOwnerTxParams {
+  /** ownerAddress - The address of the new owner */
+  ownerAddress: string
+  /** threshold - The new threshold */
+  threshold?: number
+}
+
+export interface RemoveOwnerTxParams {
+  /** ownerAddress - The address of the owner that will be removed */
+  ownerAddress: string
+  /** threshold - The new threshold */
+  threshold?: number
+}
+
+export interface SwapOwnerTxParams {
+  /** oldOwnerAddress - The old owner address */
+  oldOwnerAddress: string
+  /** newOwnerAddress - The new owner address */
+  newOwnerAddress: string
 }

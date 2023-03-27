@@ -2,9 +2,10 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-web3'
 import dotenv from 'dotenv'
-import 'hardhat-deploy'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import yargs from 'yargs'
+
+import 'hardhat-deploy'
 
 const argv = yargs
   .option('network', {
@@ -98,11 +99,6 @@ const config: HardhatUserConfig = {
     goerli: {
       ...sharedNetworkConfig,
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`
-    }
-  },
-  namedAccounts: {
-    deployer: {
-      default: 0
     }
   }
 }

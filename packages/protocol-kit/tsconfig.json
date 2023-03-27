@@ -9,7 +9,10 @@
       "@/typechain/*": ["./typechain/*"],
       "@/hardhat/*": ["./hardhat/*"],
       "@/tests/*": ["./tests/*"]
-    }
+    },
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true
   },
-  "include": ["src", "src/**/*.json", "typechain", "scripts/**/*.ts", "tests", "hardhat"]
+  "include": ["src", "src/**/*.json", "typechain", "tests", "hardhat"],
+  "files": ["./hardhat.config.ts"]
 }

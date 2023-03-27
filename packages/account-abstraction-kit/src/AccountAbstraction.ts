@@ -1,10 +1,12 @@
-import { RelayAdapter } from '@safe-global/relay-kit'
 import Safe, {
+  calculateChainSpecificProxyAddress,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
-  getSafeContract
+  getSafeContract,
+  getSafeInitializer
 } from '@safe-global/protocol-kit'
+import { RelayAdapter } from '@safe-global/relay-kit'
 import {
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
@@ -15,12 +17,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import { AccountAbstractionConfig, OperationType } from './types'
-import {
-  calculateChainSpecificProxyAddress,
-  encodeCreateProxyWithNonce,
-  encodeMultiSendData,
-  getSafeInitializer
-} from './utils/contracts'
+import { encodeCreateProxyWithNonce, encodeMultiSendData } from './utils/contracts'
 
 const safeVersion: SafeVersion = '1.3.0'
 
@@ -56,7 +53,7 @@ class AccountAbstraction {
       this.#ethAdapter,
       safeVersion,
       this.#safeProxyFactoryContract,
-      this.#signer
+      await this.getSignerAddress()
     )
     this.#safeContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,

@@ -33,12 +33,18 @@ import {
   getSafeContract,
   getSignMessageLibContract
 } from './contracts/safeDeploymentContracts'
+import {
+  calculateChainSpecificProxyAddress,
+  getSafeInitializer,
+  PREDETERMINED_SALT_NONCE
+} from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import Safe from './Safe'
 import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
 import {
   AddOwnerTxParams,
   ConnectSafeConfig,
+  ContractNetworksConfig,
   CreateTransactionProps,
   PredictSafeProps,
   RemoveOwnerTxParams,
@@ -47,8 +53,6 @@ import {
   SafeDeploymentConfig,
   SwapOwnerTxParams
 } from './types'
-
-import { ContractNetworksConfig } from './types'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { standardizeSafeTransactionData } from './utils/transactions/utils'
 
@@ -97,7 +101,10 @@ export {
   getMultiSendContract,
   getMultiSendCallOnlyContract,
   getSignMessageLibContract,
-  getCreateCallContract
+  getCreateCallContract,
+  getSafeInitializer,
+  calculateChainSpecificProxyAddress,
+  PREDETERMINED_SALT_NONCE
 }
 
 export default Safe

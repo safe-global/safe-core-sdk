@@ -1,6 +1,6 @@
 import { DeploymentFilter, getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { networks } from '@/utils/eip-3770/config'
+import { networks } from '../src/utils/eip-3770/config'
 
 const safeVersion: SafeVersion = '1.3.0'
 

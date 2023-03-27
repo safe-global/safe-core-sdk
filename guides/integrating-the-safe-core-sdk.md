@@ -30,8 +30,8 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/blob/aa61f1e6e841594e14edb1acfee54bbf1408100b/packages/protocol-kit/src/adapters/ethers)
-- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/blob/aa61f1e6e841594e14edb1acfee54bbf1408100b/packages/protocol-kit/src/adapters/web3)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/ethers)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/web3)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
@@ -185,7 +185,6 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
   ```
 
-
 We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe API Kit instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.
 
 ```js
@@ -195,6 +194,7 @@ const nonce = await safeService.getNextNonce(safeAddress)
 ## <a name="propose-transaction">5. Propose the transaction to the service</a>
 
 Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe API Kit instance and pass an object with the properties:
+
 - `safeAddress`: The Safe address.
 - `safeTransactionData`: The `data` object inside the Safe transaction object returned from the method `createTransaction`.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.

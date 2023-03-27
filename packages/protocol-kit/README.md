@@ -44,8 +44,8 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/blob/aa61f1e6e841594e14edb1acfee54bbf1408100b/packages/protocol-kit/src/adapters/ethers)
-- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/blob/aa61f1e6e841594e14edb1acfee54bbf1408100b/packages/protocol-kit/src/adapters/web3)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/ethers)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/web3)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 

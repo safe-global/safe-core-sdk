@@ -3,7 +3,13 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
-    "baseUrl": "src"
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/typechain/*": ["./typechain/*"],
+      "@/hardhat/*": ["./hardhat/*"],
+      "@/tests/*": ["./tests/*"]
+    }
   },
-  "include": ["src", "src/**/*.json", "typechain/src", "scripts/**/*.ts"]
+  "include": ["src", "src/**/*.json", "typechain", "scripts/**/*.ts", "tests", "hardhat"]
 }

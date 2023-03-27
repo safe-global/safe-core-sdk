@@ -1,8 +1,8 @@
 import { SafeSetupConfig } from '@safe-global/safe-core-sdk-types'
-import { EthersTransactionOptions, EthersTransactionResult } from '../../../types'
-import { toTxResult } from '../../../utils'
-import { Gnosis_safe as GnosisSafe } from '../../../../../../typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
-import { EMPTY_DATA, SENTINEL_ADDRESS, ZERO_ADDRESS } from '../../../utils/constants'
+import { EthersTransactionOptions, EthersTransactionResult } from '@/adapters/ethers/types'
+import { toTxResult } from '@/adapters/ethers/utils'
+import { Gnosis_safe as GnosisSafe } from '@/typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
+import { EMPTY_DATA, SENTINEL_ADDRESS, ZERO_ADDRESS } from '@/adapters/ethers/utils/constants'
 import GnosisSafeContractEthers from '../GnosisSafeContractEthers'
 
 class GnosisSafeContract_V1_3_0_Ethers extends GnosisSafeContractEthers {

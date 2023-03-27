@@ -12,8 +12,8 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_FEATURES, hasSafeFeature } from '../'
-import { ZERO_ADDRESS } from '../constants'
+import { SAFE_FEATURES, hasSafeFeature } from '@/utils'
+import { ZERO_ADDRESS } from '@/utils/constants'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(

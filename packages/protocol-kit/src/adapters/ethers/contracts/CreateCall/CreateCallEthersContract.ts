@@ -2,9 +2,9 @@ import { CreateCallContract } from '@safe-global/safe-core-sdk-types'
 import {
   Create_call as CreateCall_V1_3_0,
   Create_callInterface as CreateCallContractInterface
-} from '../../../../../typechain/src/ethers-v5/v1.3.0/Create_call'
-import { EthersTransactionOptions, EthersTransactionResult } from '../../types'
-import { toTxResult } from '../../utils'
+} from '@/typechain/src/ethers-v5/v1.3.0/Create_call'
+import { EthersTransactionOptions, EthersTransactionResult } from '@/adapters/ethers/types'
+import { toTxResult } from '@/adapters/ethers/utils'
 
 abstract class CreateCallEthersContract implements CreateCallContract {
   constructor(public contract: CreateCall_V1_3_0) {}

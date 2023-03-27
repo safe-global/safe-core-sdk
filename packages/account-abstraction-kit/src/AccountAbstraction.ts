@@ -14,13 +14,13 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
-import { AccountAbstractionConfig, OperationType } from './types'
+import { AccountAbstractionConfig, OperationType } from '@/types'
 import {
   calculateChainSpecificProxyAddress,
   encodeCreateProxyWithNonce,
   encodeMultiSendData,
   getSafeInitializer
-} from './utils/contracts'
+} from '@/utils/contracts'
 
 const safeVersion: SafeVersion = '1.3.0'
 

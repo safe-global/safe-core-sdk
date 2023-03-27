@@ -1,7 +1,7 @@
 {
-  "name": "@safe-global/account-abstraction-kit-poc",
-  "version": "0.1.0-alpha.1",
-  "description": "Safe Account Abstraction Kit PoC",
+  "name": "@safe-global/account-abstraction-kit",
+  "version": "0.1.0",
+  "description": "Safe Account Abstraction Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
@@ -35,7 +35,8 @@
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^0.1.0",
-    "@safe-global/relay-kit": "^0.1.0-alpha.2",
+    "@safe-global/relay-kit": "^0.1.0",
+    "@safe-global/safe-core-sdk-types": "^1.9.0",
     "ethereumjs-util": "^7.1.5",
     "ethers": "^5.7.2"
   }

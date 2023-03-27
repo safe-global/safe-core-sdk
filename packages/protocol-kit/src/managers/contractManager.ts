@@ -3,14 +3,14 @@ import {
   MultiSendCallOnlyContract,
   MultiSendContract
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_LAST_VERSION } from '../contracts/config'
+import { SAFE_LAST_VERSION } from '@/contracts/config'
 import {
   getMultiSendCallOnlyContract,
   getMultiSendContract,
   getSafeContract
-} from '../contracts/safeDeploymentContracts'
-import { SafeConfig } from '../Safe'
-import { ContractNetworksConfig } from '../types'
+} from '@/contracts/safeDeploymentContracts'
+import { SafeConfig } from '@/Safe'
+import { ContractNetworksConfig } from '@/types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig

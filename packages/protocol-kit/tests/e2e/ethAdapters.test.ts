@@ -10,7 +10,7 @@ import {
   getSafeContractDeployment,
   getSafeProxyFactoryContractDeployment,
   getSignMessageLibContractDeployment
-} from '../../src/contracts/safeDeploymentContracts'
+} from '@/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getCompatibilityFallbackHandler,

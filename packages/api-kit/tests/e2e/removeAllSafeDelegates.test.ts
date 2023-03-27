@@ -1,9 +1,9 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeApiKit, { SafeDelegateConfig } from '../../src'
-import config from '../utils/config'
-import { getServiceClient } from '../utils/setupServiceClient'
+import SafeApiKit, { SafeDelegateConfig } from '@/index'
+import config from '@/tests/utils/config'
+import { getServiceClient } from '@/tests/utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
 

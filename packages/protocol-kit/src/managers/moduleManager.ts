@@ -1,6 +1,6 @@
 import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
-import { isRestrictedAddress, sameString } from '../utils/address'
-import { SENTINEL_ADDRESS } from '../utils/constants'
+import { isRestrictedAddress, sameString } from '@/utils/address'
+import { SENTINEL_ADDRESS } from '@/utils/constants'
 
 class ModuleManager {
   #ethAdapter: EthAdapter

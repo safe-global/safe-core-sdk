@@ -11,7 +11,7 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { BigNumberish, ethers, Signer } from 'ethers'
-import { PREDETERMINED_SALT_NONCE, ZERO_ADDRESS } from '../constants'
+import { PREDETERMINED_SALT_NONCE, ZERO_ADDRESS } from '@/constants'
 
 export function encodeCreateProxyWithNonce(
   safeProxyFactoryContract: GnosisSafeProxyFactoryContract,

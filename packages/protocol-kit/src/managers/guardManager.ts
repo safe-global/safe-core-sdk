@@ -1,6 +1,6 @@
 import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
-import { SAFE_FEATURES, hasSafeFeature, isZeroAddress, sameString } from '../utils'
-import { ZERO_ADDRESS } from '../utils/constants'
+import { SAFE_FEATURES, hasSafeFeature, isZeroAddress, sameString } from '@/utils'
+import { ZERO_ADDRESS } from '@/utils/constants'
 
 class GuardManager {
   #ethAdapter: EthAdapter

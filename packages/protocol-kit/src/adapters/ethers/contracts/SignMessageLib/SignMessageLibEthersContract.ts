@@ -2,9 +2,9 @@ import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   Sign_message_lib as SignMessageLib_V1_3_0,
   Sign_message_libInterface as SignMessageLibContractInterface
-} from '../../../../../typechain/src/ethers-v5/v1.3.0/Sign_message_lib'
-import { EthersTransactionOptions, EthersTransactionResult } from '../../types'
-import { toTxResult } from '../../utils'
+} from '@/typechain/src/ethers-v5/v1.3.0/Sign_message_lib'
+import { EthersTransactionOptions, EthersTransactionResult } from '@/adapters/ethers/types'
+import { toTxResult } from '@/adapters/ethers/utils'
 
 abstract class SignMessageLibEthersContract implements SignMessageLibContract {
   constructor(public contract: SignMessageLib_V1_3_0) {}

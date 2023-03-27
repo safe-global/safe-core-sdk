@@ -1,6 +1,6 @@
 import chai from 'chai'
-import SafeApiKit from '../../src'
-import { getServiceClient } from '../utils/setupServiceClient'
+import SafeApiKit from '@/index'
+import { getServiceClient } from '@/tests/utils/setupServiceClient'
 
 let safeApiKit: SafeApiKit
 

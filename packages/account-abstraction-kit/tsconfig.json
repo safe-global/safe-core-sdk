@@ -3,7 +3,10 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
-    "baseUrl": "src"
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src", "typechain"]
 }

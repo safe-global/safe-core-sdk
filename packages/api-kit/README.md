@@ -7,12 +7,13 @@
 Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service).
 
 ## Table of contents
-* [Installation](#installation)
-* [Build](#build)
-* [Initialization](#initialization)
-* [API Reference](#api-reference)
-* [License](#license)
-* [Contributors](#contributors)
+
+- [Installation](#installation)
+- [Build](#build)
+- [Initialization](#initialization)
+- [API Reference](#api-reference)
+- [License](#license)
+- [Contributors](#contributors)
 
 ## <a name="installation">Installation</a>
 
@@ -40,8 +41,8 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
-- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/ethers)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/web3)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
@@ -111,7 +112,8 @@ const tx: SafeMultisigTransactionResponse = await safeService.getTransaction(saf
 Returns the list of confirmations for a given a Safe transaction.
 
 ```js
-const confirmations: SafeMultisigConfirmationListResponse = await safeService.getTransactionConfirmations(safeTxHash)
+const confirmations: SafeMultisigConfirmationListResponse =
+  await safeService.getTransactionConfirmations(safeTxHash)
 ```
 
 ### confirmTransaction
@@ -178,7 +180,9 @@ await safeService.removeSafeDelegate(delegateConfig)
 Returns the creation information of a Safe.
 
 ```js
-const safeCreationInfo: SafeCreationInfoResponse = await safeService.getSafeCreationInfo(safeAddress)
+const safeCreationInfo: SafeCreationInfoResponse = await safeService.getSafeCreationInfo(
+  safeAddress
+)
 ```
 
 ### estimateSafeTransaction
@@ -186,10 +190,8 @@ const safeCreationInfo: SafeCreationInfoResponse = await safeService.getSafeCrea
 Estimates the safeTxGas for a given Safe multi-signature transaction.
 
 ```js
-const estimateTx: SafeMultisigTransactionEstimateResponse = await safeService.estimateSafeTransaction(
-  safeAddress,
-  safeTransaction
-)
+const estimateTx: SafeMultisigTransactionEstimateResponse =
+  await safeService.estimateSafeTransaction(safeAddress, safeTransaction)
 ```
 
 ### proposeTransaction
@@ -221,7 +223,9 @@ const incomingTxs: TransferListResponse = await safeService.getIncomingTransacti
 Returns the history of module transactions of a Safe account.
 
 ```js
-const moduleTxs: SafeModuleTransactionListResponse = await safeService.getModuleTransactions(safeAddress)
+const moduleTxs: SafeModuleTransactionListResponse = await safeService.getModuleTransactions(
+  safeAddress
+)
 ```
 
 ### getMultisigTransactions
@@ -229,7 +233,9 @@ const moduleTxs: SafeModuleTransactionListResponse = await safeService.getModule
 Returns the history of multi-signature transactions of a Safe account.
 
 ```js
-const multisigTxs: SafeMultisigTransactionListResponse = await safeService.getMultisigTransactions(safeAddress)
+const multisigTxs: SafeMultisigTransactionListResponse = await safeService.getMultisigTransactions(
+  safeAddress
+)
 ```
 
 ### getPendingTransactions
@@ -237,7 +243,9 @@ const multisigTxs: SafeMultisigTransactionListResponse = await safeService.getMu
 Returns the list of multi-signature transactions that are waiting for the confirmation of the Safe owners.
 
 ```js
-const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(safeAddress)
+const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(
+  safeAddress
+)
 ```
 
 ```js
@@ -252,7 +260,9 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 Returns a list of transactions for a Safe. The list has different structures depending on the transaction type.
 
 ```js
-const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(safeAddress)
+const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(
+  safeAddress
+)
 ```
 
 ```js
@@ -287,7 +297,7 @@ This method can optionally receive the `options` parameter:
 
 ```js
 const options: SafeBalancesOptions = {
-  excludeSpamTokens  // Optional. Default value is `true`.
+  excludeSpamTokens // Optional. Default value is `true`.
 }
 const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress, options)
 ```

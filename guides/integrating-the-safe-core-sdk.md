@@ -2,15 +2,15 @@
 
 ## Table of contents:
 
-  1. [Install the dependencies](#install-dependencies)
-  2. [Initialize the SDK’s](#initialize-sdks)
-  3. [Deploy a new Safe](#deploy-safe)
-  4. [Create a transaction](#create-transaction)
-  5. [Propose the transaction to the service](#propose-transaction)
-  6. [Get the transaction from the service](#get-transaction)
-  7. [Confirm/reject the transaction](#confirm-transaction)
-  8. [Execute the transaction](#execute-transaction)
-  9. [Interface checks](#interface-checks)
+1. [Install the dependencies](#install-dependencies)
+2. [Initialize the SDK’s](#initialize-sdks)
+3. [Deploy a new Safe](#deploy-safe)
+4. [Create a transaction](#create-transaction)
+5. [Propose the transaction to the service](#propose-transaction)
+6. [Get the transaction from the service](#get-transaction)
+7. [Confirm/reject the transaction](#confirm-transaction)
+8. [Execute the transaction](#execute-transaction)
+9. [Interface checks](#interface-checks)
 
 ## <a name="install-dependencies">1. Install the dependencies</a>
 
@@ -22,12 +22,6 @@ To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) i
 @safe-global/api-kit
 ```
 
-And one of these two:
-```
-@safe-global/safe-web3-lib
-@safe-global/safe-ethers-lib
-```
-
 ## <a name="initialize-sdks">2. Initialize the SDK’s</a>
 
 ### Instantiate an EthAdapter
@@ -36,8 +30,8 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
-- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/ethers)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/web3)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
@@ -91,7 +85,7 @@ const contractNetworks: ContractNetworksConfig = {
     safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
     multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
     multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
-    fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
+    fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
     signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
     createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
   }
@@ -132,7 +126,7 @@ Calling the method `deploySafe` will deploy the desired Safe and return a Protoc
 
 The Safe Core SDK supports the execution of single Safe transactions but also MultiSend transactions. We can create a transaction object by calling the method `createTransaction` in our `Safe` instance.
 
-* **Create a single transaction**
+- **Create a single transaction**
 
   This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
 
@@ -155,7 +149,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
   ```
 
-* **Create a MultiSend transaction**
+- **Create a MultiSend transaction**
 
   This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
@@ -175,7 +169,7 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
       data,
       value,
       operation
-    },
+    }
     // ...
   ]
 
@@ -191,7 +185,6 @@ The Safe Core SDK supports the execution of single Safe transactions but also Mu
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
   ```
 
-
 We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe API Kit instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.
 
 ```js
@@ -201,6 +194,7 @@ const nonce = await safeService.getNextNonce(safeAddress)
 ## <a name="propose-transaction">5. Propose the transaction to the service</a>
 
 Once we have the Safe transaction object we can share it with the other owners of the Safe so they can sign it. To send the transaction to the Safe Transaction Service we need to call the method `proposeTransaction` from the Safe API Kit instance and pass an object with the properties:
+
 - `safeAddress`: The Safe address.
 - `safeTransactionData`: The `data` object inside the Safe transaction object returned from the method `createTransaction`.
 - `safeTxHash`: The Safe transaction hash, calculated by calling the method `getTransactionHash` from the Safe Core SDK.
@@ -319,8 +313,13 @@ During the process of collecting the signatures/executing transactions, some use
 Check if a Safe transaction is already signed by an owner:
 
 ```js
-const isTransactionSignedByAddress = (signerAddress: string, transaction: SafeMultisigTransactionResponse) => {
-  const confirmation = transaction.confirmations.find(confirmation => confirmation.owner === signerAddress)
+const isTransactionSignedByAddress = (
+  signerAddress: string,
+  transaction: SafeMultisigTransactionResponse
+) => {
+  const confirmation = transaction.confirmations.find(
+    (confirmation) => confirmation.owner === signerAddress
+  )
   return !!confirmation
 }
 ```
@@ -328,7 +327,10 @@ const isTransactionSignedByAddress = (signerAddress: string, transaction: SafeMu
 Check if a Safe transaction is ready to be executed:
 
 ```js
-const isTransactionExecutable = (safeThreshold: number, transaction: SafeMultisigTransactionResponse) => {
+const isTransactionExecutable = (
+  safeThreshold: number,
+  transaction: SafeMultisigTransactionResponse
+) => {
   return transaction.confirmations.length >= safeThreshold
 }
 ```

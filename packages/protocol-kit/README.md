@@ -7,13 +7,14 @@
 Software development kit that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts).
 
 ## Table of contents
-* [Installation](#installation)
-* [Build](#build)
-* [Getting Started](#getting-started)
-* [Safe Factory API Reference](#factory-api)
-* [Safe Core SDK API Reference](#sdk-api)
-* [License](#license)
-* [Contributors](#contributors)
+
+- [Installation](#installation)
+- [Build](#build)
+- [Getting Started](#getting-started)
+- [Safe Factory API Reference](#factory-api)
+- [Safe Core SDK API Reference](#sdk-api)
+- [License](#license)
+- [Contributors](#contributors)
 
 ## <a name="installation">Installation</a>
 
@@ -43,8 +44,8 @@ First of all, we need to create an `EthAdapter`, which contains all the required
 
 Depending on the library used by the Dapp, there are two options:
 
-- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-lib#initialization)
-- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-web3-lib#initialization)
+- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/ethers)
+- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/web3)
 
 Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
 
@@ -61,7 +62,7 @@ const owners = ['0x<address>', '0x<address>', '0x<address>']
 const threshold = 3
 const safeAccountConfig: SafeAccountConfig = {
   owners,
-  threshold,
+  threshold
   // ...
 }
 
@@ -76,7 +77,7 @@ Call the `getAddress` method, for example, to check the address of the newly dep
 const newSafeAddress = safeSdk.getAddress()
 ```
 
-To instantiate the Safe Core SDK from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address. 
+To instantiate the Safe Core SDK from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address.
 
 ```js
 import Safe from '@safe-global/protocol-kit'
@@ -150,7 +151,7 @@ import { SafeFactory } from '@safe-global/protocol-kit'
 const safeFactory = await SafeFactory.create({ ethAdapter })
 ```
 
-* The `isL1SafeMasterCopy` flag
+- The `isL1SafeMasterCopy` flag
 
   There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
@@ -160,7 +161,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: true })
   ```
 
-* The `contractNetworks` property
+- The `contractNetworks` property
 
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
@@ -181,7 +182,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
-      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -190,7 +191,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
   ```
 
-* The `safeVersion` property
+- The `safeVersion` property
 
   The `SafeFactory` constructor also accepts the `safeVersion` property to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
 
@@ -248,6 +249,7 @@ const options: Web3TransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const options: EthersTransactionOptions = {
   from, // Optional
@@ -258,6 +260,7 @@ const options: EthersTransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, safeDeploymentConfig, options })
 ```
@@ -284,7 +287,7 @@ import Safe from '@safe-global/protocol-kit'
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
 
-* The `isL1SafeMasterCopy` flag
+- The `isL1SafeMasterCopy` flag
 
   There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
@@ -294,7 +297,7 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
   const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
   ```
 
-* The `contractNetworks` property
+- The `contractNetworks` property
 
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
@@ -315,7 +318,7 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
-      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -332,7 +335,7 @@ Returns a new instance of the Safe Core SDK connected to the `safeAddress`.
 const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 ```
 
-* The `isL1SafeMasterCopy` flag
+- The `isL1SafeMasterCopy` flag
 
   There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
 
@@ -342,7 +345,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
   const safeSdk = await Safe.connect({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
   ```
 
-* The `contractNetworks` property
+- The `contractNetworks` property
 
   If the Safe contracts are not deployed to your current network, the `contractNetworks` property will be required to point to the addresses of the Safe contracts previously deployed by you.
 
@@ -363,7 +366,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
-      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js 
+      fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
       createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
     }
@@ -463,7 +466,7 @@ const isOwner = await safeSdk.isOwner(address)
 
 Returns a Safe transaction ready to be signed by the owners and executed. The Safe Core SDK supports the creation of single Safe transactions but also MultiSend transactions.
 
-* **Single transactions**
+- **Single transactions**
 
   This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
 
@@ -485,7 +488,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
   ```
 
-* **MultiSend transactions**
+- **MultiSend transactions**
 
   This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the `createTransaction` method with the `SafeTransactionOptionalProps` object.
 
@@ -502,7 +505,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
       data,
       value,
       operation // Optional
-    },
+    }
     // ...
   ]
   const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
@@ -523,7 +526,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
       data,
       value,
       operation // Optional
-    },
+    }
     // ...
   ]
   const options: SafeTransactionOptionalProps = {
@@ -541,18 +544,22 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Sa
 
   ```js
   const callsOnly = true
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options, callsOnly })
+  const safeTransaction = await safeSdk.createTransaction({
+    safeTransactionData,
+    options,
+    callsOnly
+  })
   ```
 
 If the optional properties are not manually set, the Safe transaction returned will have the default value for each one:
 
-* `operation`: `OperationType.Call` (0) is the default value.
-* `safeTxGas`: The right gas estimation is the default value.
-* `baseGas`: 0 is the default value.
-* `gasPrice`: 0 is the default value.
-* `gasToken`: 0x address is the default value.
-* `refundReceiver`: 0x address is the default value.
-* `nonce`: The current Safe nonce is the default value.
+- `operation`: `OperationType.Call` (0) is the default value.
+- `safeTxGas`: The right gas estimation is the default value.
+- `baseGas`: 0 is the default value.
+- `gasPrice`: 0 is the default value.
+- `gasToken`: 0x address is the default value.
+- `refundReceiver`: 0x address is the default value.
+- `nonce`: The current Safe nonce is the default value.
 
 Read more about [create transactions from a Safe](https://docs.safe.global/learn/safe-core-account-abstraction-sdk/protocol-kit#making-a-transaction-from-a-safe).
 
@@ -662,6 +669,7 @@ const options: Web3TransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const options: EthersTransactionOptions = {
   from, // Optional
@@ -672,6 +680,7 @@ const options: EthersTransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const txResponse = await safeSdk.approveTransactionHash(txHash, options)
 ```
@@ -909,6 +918,7 @@ const options: Web3TransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const options: EthersTransactionOptions = {
   from, // Optional
@@ -919,6 +929,7 @@ const options: EthersTransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const isValidTx = await safeSdk.isValidTransaction(safeTransaction, options)
 ```
@@ -948,6 +959,7 @@ const options: Web3TransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const options: EthersTransactionOptions = {
   from, // Optional
@@ -958,6 +970,7 @@ const options: EthersTransactionOptions = {
   nonce // Optional
 }
 ```
+
 ```js
 const txResponse = await safeSdk.executeTransaction(safeTransaction, options)
 ```

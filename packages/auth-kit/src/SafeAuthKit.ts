@@ -1,6 +1,6 @@
-import SafeApiKit from '@safe-global/api-kit'
-import EthersAdapter from '@safe-global/safe-ethers-lib'
 import { ethers } from 'ethers'
+import SafeApiKit from '@safe-global/api-kit'
+import { EthersAdapter } from '@safe-global/protocol-kit'
 import { getErrorMessage } from './lib/errors'
 import {
   ISafeAuthKit,

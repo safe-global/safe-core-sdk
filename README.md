@@ -9,22 +9,19 @@ Software developer tools that facilitate the interaction with the Safe [contract
 ## Guides
 
 | Title | Description |
-| ------- | ----------- |
+| ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Integrating the Safe Core SDK](https://github.com/safe-global/safe-core-sdk/blob/main/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit) and [API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit). |
 
 ## Packages
 
-| Package | Release | Description |
-| ------- | :-----: | ----------- |
-| [protocol-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit) | TypeScript library that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts) |
-[auth-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/auth-kit) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fauth-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fauth-kit) | The Auth kit creates an Ethereum address and authenticates a blockchain account using an email address, social media account, or traditional crypto wallets like Metamask |
-[onramp-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/onramp-kit) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fonramp-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fonramp-kit) | The Onramp kit allows users to buy cryptocurrencies using a credit card and other payment options |
-[safe-core-sdk-types](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk-types) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types) | Common types extracted from the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages) packages |
-[safe-core-sdk-utils](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk-utils) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-utils.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-utils) | Utilities for the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages) packages |
-[safe-ethers-lib](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-lib) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-lib.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-lib) | Ethers.js utilities and Safe contracts types (typechain ethers-v5) used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit) |
-[safe-web3-lib](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-web3-lib) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-web3-lib.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-web3-lib) | Web3.js utilities and Safe contracts types (typechain web3-v1) used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit) |
-[api-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fapi-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fapi-kit) | [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service) client library |
-[safe-ethers-adapters](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-adapters) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters) | [Ethers](https://docs.ethers.io/v5/single-page/) adapter that facilitates the interaction with the [Safe Services](https://github.com/safe-global/safe-transaction-service) |
+| Package  | Release | Description  | 
+| ------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [protocol-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit)                 |         [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit)         | TypeScript library that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts)                                                |
+| [auth-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/auth-kit)                         |             [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fauth-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fauth-kit)             | The Auth kit creates an Ethereum address and authenticates a blockchain account using an email address, social media account, or traditional crypto wallets like Metamask   |
+| [onramp-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/onramp-kit)                     |           [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fonramp-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fonramp-kit)           | The Onramp kit allows users to buy cryptocurrencies using a credit card and other payment options                                                                           |
+| [safe-core-sdk-types](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk-types)   |  [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types)  | Common types extracted from the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages) packages                                                   |
+| [api-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit)                           |              [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fapi-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fapi-kit)              | [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service) client library                                                                      |
+| [safe-ethers-adapters](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-adapters) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters) | [Ethers](https://docs.ethers.io/v5/single-page/) adapter that facilitates the interaction with the [Safe Services](https://github.com/safe-global/safe-transaction-service) |
 
 ## Playground
 
@@ -33,21 +30,25 @@ This project includes a [playground](https://github.com/safe-global/safe-core-sd
 Update the config inside the scripts and execute the following commands to run each step:
 
 #### Step 1: Deploy a Safe
+
 ```bash
 yarn play deploy-safe
 ```
 
 #### Step 2: Propose a transaction
+
 ```bash
 yarn play propose-transaction
 ```
 
 #### Step 3: Confirm a transaction
+
 ```bash
 yarn play confirm-transaction
 ```
 
 #### Step 4: Execute a transaction
+
 ```bash
 yarn play execute-transaction
 ```

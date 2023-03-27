@@ -8,9 +8,6 @@
     { "path": "packages/auth-kit" },
     { "path": "packages/onramp-kit" },
     { "path": "packages/safe-core-sdk-types" },
-    { "path": "packages/safe-core-sdk-utils" },
-    { "path": "packages/safe-ethers-adapters" },
-    { "path": "packages/safe-ethers-lib" },
-    { "path": "packages/safe-web3-lib" }
+    { "path": "packages/safe-ethers-adapters" }
   ]
 }

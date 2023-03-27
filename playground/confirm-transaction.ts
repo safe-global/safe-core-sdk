@@ -1,6 +1,5 @@
 import SafeApiKit from '@safe-global/api-kit'
-import Safe from '@safe-global/protocol-kit'
-import EthersAdapter from '@safe-global/safe-ethers-lib'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK

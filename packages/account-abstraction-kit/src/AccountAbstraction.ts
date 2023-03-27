@@ -1,9 +1,10 @@
+import { RelayAdapter } from '@safe-global/relay-kit'
 import Safe, {
+  EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract
 } from '@safe-global/protocol-kit'
-import { RelayAdapter } from '@safe-global/relay-kit'
 import {
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
@@ -12,7 +13,6 @@ import {
   RelayTransaction,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
-import EthersAdapter from '@safe-global/safe-ethers-lib'
 import { ethers } from 'ethers'
 import { AccountAbstractionConfig, OperationType } from './types'
 import {

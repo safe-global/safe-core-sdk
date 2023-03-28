@@ -1,8 +1,8 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig } from '@/index'
-import { ZERO_ADDRESS } from '@/utils/constants'
+import Safe, { ContractNetworksConfig } from '@safe-global/protocol-kit/index'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getCompatibilityFallbackHandler,

@@ -6,6 +6,7 @@ import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import yargs from 'yargs'
 
 import 'hardhat-deploy'
+import 'tsconfig-paths/register'
 
 const argv = yargs
   .option('network', {
@@ -100,12 +101,17 @@ const config: HardhatUserConfig = {
       ...sharedNetworkConfig,
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`
     }
+  },
+  //@ts-expect-error
+  compilerOptions: {
+    paths: { '^@safe-global/protocol-kit/(.*)$': ['../protocol-kit/src/*'] }
+  },
+  //@ts-expect-error
+  namedAccounts: {
+    deployer: {
+      default: 0
+    }
   }
-  // namedAccounts: {
-  //   deployer: {
-  //     default: 0
-  //   }
-  // }
 }
 
 export default config

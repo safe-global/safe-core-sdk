@@ -102,11 +102,10 @@ const config: HardhatUserConfig = {
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`
     }
   },
-  //@ts-expect-error
+  //@ts-expect-error Type not found
   compilerOptions: {
     paths: { '^@safe-global/protocol-kit/(.*)$': ['../protocol-kit/src/*'] }
   },
-  //@ts-expect-error
   namedAccounts: {
     deployer: {
       default: 0

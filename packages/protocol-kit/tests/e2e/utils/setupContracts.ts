@@ -8,7 +8,7 @@ import {
   Multi_send as MultiSend_V1_1_1,
   Proxy_factory as ProxyFactory_V1_1_1
 } from '@/typechain/src/ethers-v5/v1.1.1'
-import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@/typechain/src/ethers-v5/v1.2.0/'
+import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@/typechain/src/ethers-v5/v1.2.0'
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
   Create_call as CreateCall_V1_3_0,
@@ -17,13 +17,13 @@ import {
   Multi_send_call_only as MultiSendCallOnly_V1_3_0,
   Proxy_factory as ProxyFactory_V1_3_0,
   Sign_message_lib as SignMessageLib_V1_3_0
-} from '@/typechain/src/ethers-v5/v1.3.0/'
+} from '@/typechain/src/ethers-v5/v1.3.0'
 import {
   DailyLimitModule,
   ERC20Mintable,
   SocialRecoveryModule
 } from '@/typechain/tests/ethers-v5/v1.2.0'
-import { DebugTransactionGuard, DefaultCallbackHandler } from '@/typechain/tests/ethers-v5/v1.3.0'
+import { DebugTransactionGuard } from '@/typechain/tests/ethers-v5/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { AbiItem } from 'web3-utils'
@@ -209,10 +209,12 @@ export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard>
   ) as DebugTransactionGuard
 }
 
+//@ts-ignore
 export const getDefaultCallbackHandler = async (): Promise<DefaultCallbackHandler> => {
   const DefaultCallbackHandlerDeployment = await deployments.get('DefaultCallbackHandler_SV1_3_0')
   const DefaultCallbackHandler = await ethers.getContractFactory('DefaultCallbackHandler_SV1_3_0')
   return DefaultCallbackHandler.attach(
     DefaultCallbackHandlerDeployment.address
+    //@ts-ignore
   ) as DefaultCallbackHandler
 }

@@ -9,5 +9,5 @@
       "@/tests/*": ["./tests/*"]
     }
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests", "hardhat.config.ts"]
 }

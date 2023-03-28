@@ -101,6 +101,11 @@ const config: HardhatUserConfig = {
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`
     }
   }
+  // namedAccounts: {
+  //   deployer: {
+  //     default: 0
+  //   }
+  // }
 }
 
 export default config

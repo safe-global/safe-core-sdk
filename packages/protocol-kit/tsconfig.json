@@ -13,6 +13,5 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true
   },
-  "include": ["src", "src/**/*.json", "typechain", "tests", "hardhat"],
-  "files": ["./hardhat.config.ts"]
+  "include": ["src", "src/**/*.json", "typechain", "tests", "hardhat", "hardhat.config.ts"]
 }

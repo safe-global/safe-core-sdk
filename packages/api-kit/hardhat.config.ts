@@ -49,6 +49,7 @@ const config: HardhatUserConfig = {
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`
     }
   },
+  //@ts-expect-error
   compilerOptions: {
     paths: { '^@safe-global/protocol-kit/(.*)$': ['../protocol-kit/src/*'] }
   }

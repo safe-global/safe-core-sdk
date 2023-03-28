@@ -6,7 +6,7 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, {
   SafeTransactionOptionalProps,
   standardizeSafeTransactionData
-} from '@safe-global/protocol-kit'
+} from '@safe-global/protocol-kit/index'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'

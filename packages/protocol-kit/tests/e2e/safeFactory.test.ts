@@ -9,7 +9,7 @@ import {
   SafeAccountConfig,
   SafeDeploymentConfig,
   SafeFactory
-} from '@safe-global/protocol-kit'
+} from '@safe-global/protocol-kit/index'
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { itif } from './utils/helpers'

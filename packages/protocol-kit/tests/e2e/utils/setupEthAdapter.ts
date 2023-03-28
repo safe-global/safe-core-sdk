@@ -6,7 +6,7 @@ import {
   EthersAdapterConfig,
   Web3Adapter,
   Web3AdapterConfig
-} from '@safe-global/protocol-kit'
+} from '@safe-global/protocol-kit/index'
 import { ethers, web3 } from 'hardhat'
 
 export async function getEthAdapter(signerOrProvider: Signer | Provider): Promise<EthAdapter> {

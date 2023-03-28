@@ -1,7 +1,7 @@
 {
-  "name": "@safe-global/account-abstraction-kit",
-  "version": "0.1.0",
-  "description": "Safe Account Abstraction Kit",
+  "name": "@safe-global/account-abstraction-kit-poc",
+  "version": "0.1.0-alpha.1",
+  "description": "Safe Account Abstraction Kit PoC",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [

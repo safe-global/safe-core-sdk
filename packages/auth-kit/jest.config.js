@@ -1,3 +1,4 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 const config = {
   roots: ['<rootDir>/src'],
   verbose: true,

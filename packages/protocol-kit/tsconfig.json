@@ -2,16 +2,7 @@
   "extends": "../../tsconfig.settings.json",
   "compilerOptions": {
     "composite": true,
-    "outDir": "dist",
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/typechain/*": ["./typechain/*"],
-      "@/hardhat/*": ["./hardhat/*"],
-      "@/tests/*": ["./tests/*"]
-    },
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "outDir": "dist"
   },
   "include": ["src", "src/**/*.json", "typechain", "tests", "hardhat", "hardhat.config.ts"]
 }

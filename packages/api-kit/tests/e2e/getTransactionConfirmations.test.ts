@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeApiKit from '@/index'
-import { getServiceClient } from '@/tests/utils/setupServiceClient'
+import SafeApiKit from '@safe-global/api-kit/index'
+import { getServiceClient } from '../utils/setupServiceClient'
 
 chai.use(chaiAsPromised)
 

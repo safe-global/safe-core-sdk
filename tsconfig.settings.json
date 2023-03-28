@@ -35,6 +35,7 @@
       "@safe-global/onramp-kit/*": ["./packages/onramp-kit/src/*"],
       "@safe-global/protocol-kit": ["./packages/protocol-kit/src"],
       "@safe-global/protocol-kit/*": ["./packages/protocol-kit/src/*"],
+      "@safe-global/protocol-kit/typechain/*": ["./packages/protocol-kit/typechain/*"],
       "@safe-global/relay-kit": ["./packages/relay-kit/src"],
       "@safe-global/relay-kit/*": ["./packages/relay-kit/src/*"],
       "@safe-global/safe-core-sdk-types": ["./packages/safe-core-sdk-types/src"],
@@ -42,5 +43,6 @@
       "@safe-global/safe-ethers-adapters": ["./packages/safe-ethers-adapters/src"],
       "@safe-global/safe-ethers-adapters/*": ["./packages/safe-ethers-adapters/src/*"]
     }
-  }
+  },
+  "exclude": ["**/.*/", "**/dist", "**/node_modules"]
 }

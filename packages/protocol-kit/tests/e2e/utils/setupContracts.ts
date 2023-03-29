@@ -209,12 +209,12 @@ export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard>
   ) as DebugTransactionGuard
 }
 
-//@ts-ignore
+//@ts-expect-error Type not found
 export const getDefaultCallbackHandler = async (): Promise<DefaultCallbackHandler> => {
   const DefaultCallbackHandlerDeployment = await deployments.get('DefaultCallbackHandler_SV1_3_0')
   const DefaultCallbackHandler = await ethers.getContractFactory('DefaultCallbackHandler_SV1_3_0')
   return DefaultCallbackHandler.attach(
     DefaultCallbackHandlerDeployment.address
-    //@ts-ignore
+    //@ts-expect-error Type not found
   ) as DefaultCallbackHandler
 }

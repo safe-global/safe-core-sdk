@@ -196,6 +196,17 @@ class Safe {
   }
 
   /**
+   * Checks if the current Safe is deployed.
+   *
+   * @returns TRUE if the Safe contract is deployed
+   */
+  async isSafeDeployed(): Promise<boolean> {
+    const safeAddress = await this.getAddress()
+    const isSafeDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
+    return isSafeDeployed
+  }
+
+  /**
    * Returns the Safe Master Copy contract version.
    *
    * @returns The Safe Master Copy contract version

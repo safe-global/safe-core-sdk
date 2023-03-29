@@ -66,7 +66,9 @@ export interface SafeConfig {
   /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
   /** safeAddress - The address of the Safe account to use */
-  safeAddress: string
+  safeAddress?: string
+  /** predictSafe - The configuration of the Safe that is not yet deployed */
+  predictSafe?: PredictSafeProps
   /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
@@ -78,6 +80,8 @@ export interface ConnectSafeConfig {
   ethAdapter?: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
+  /** predictSafe - The configuration of the Safe that is not yet deployed */
+  predictSafe?: PredictSafeProps
   /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */

@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import { SafeThemeProvider } from '@safe-global/safe-react-components'
 import { ThemeProvider, CssBaseline } from '@mui/material'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import Stripe from './components/Stripe'
 import Monerium from './components/Monerium'
@@ -16,6 +16,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
+        element: <Navigate to="/stripe" replace />,
+        index: true
+      },
+      {
+        path: '/stripe',
         element: <Stripe />
       },
       {

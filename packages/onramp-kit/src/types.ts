@@ -1,3 +1,6 @@
+import { MoneriumClient } from '@monerium/sdk'
+import { MoneriumAdapter } from './packs/monerium/MoneriumAdapter'
+import { MoneriumOpenOptions } from './packs/monerium/types'
 import { StripeAdapter } from './packs/stripe/StripeAdapter'
 import {
   StripeSession,
@@ -22,7 +25,15 @@ export interface SafeOnRampAdapter<TAdapter> {
 //    T extends FooAdapter ? FooOpenOptions :
 //    T extends BarAdapter ? BarOpenOptions :
 //    never
-export type SafeOnRampOpenOptions<T> = T extends StripeAdapter ? StripeOpenOptions : never
-export type SafeOnRampOpenResponse<T> = T extends StripeAdapter ? StripeSession : never
+export type SafeOnRampOpenOptions<T> = T extends StripeAdapter
+  ? StripeOpenOptions
+  : T extends MoneriumAdapter
+  ? MoneriumOpenOptions
+  : never
+export type SafeOnRampOpenResponse<T> = T extends StripeAdapter
+  ? StripeSession
+  : T extends MoneriumAdapter
+  ? MoneriumClient
+  : never
 export type SafeOnRampEvent<T> = T extends StripeAdapter ? StripeEvent : never
 export type SafeOnRampEventListener<T> = T extends StripeAdapter ? StripeEventListener : never

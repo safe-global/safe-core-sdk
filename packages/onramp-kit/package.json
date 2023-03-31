@@ -40,11 +40,13 @@
   "devDependencies": {
     "@stripe/crypto": "^0.0.2",
     "@stripe/stripe-js": "^1.48.0",
+    "@monerium/sdk": "^2.0.17",
     "events": "^3.3.0",
     "jest-environment-jsdom": "^29.4.3"
   },
   "peerDependencies": {
     "@stripe/crypto": "^0.0.2",
-    "@stripe/stripe-js": "^1.48.0"
+    "@stripe/stripe-js": "^1.48.0",
+    "@monerium/sdk": "^2.0.17"
   }
 }

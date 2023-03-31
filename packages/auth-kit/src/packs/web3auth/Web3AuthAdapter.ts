@@ -2,8 +2,8 @@ import { IAdapter } from '@web3auth/base'
 import { ModalConfig, Web3Auth, Web3AuthOptions } from '@web3auth/modal'
 import { ExternalProvider } from '@ethersproject/providers'
 
-import type { SafeAuthAdapter } from '../../types'
-import { getErrorMessage } from '../../lib/errors'
+import type { SafeAuthAdapter } from '@safe-global/auth-kit/types'
+import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { Web3AuthEvent, Web3AuthEventListener } from './types'
 
 /**

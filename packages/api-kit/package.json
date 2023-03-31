@@ -36,11 +36,10 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/safe-ethers-lib": "^1.9.2",
-    "@safe-global/safe-web3-lib": "^1.9.2",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@safe-global/protocol-kit": "^0.1.0",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^10.0.1",
@@ -55,6 +54,7 @@
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "ts-generator": "^0.1.1",
+    "tsconfig-paths": "^4.1.2",
     "typescript": "^4.9.4",
     "yargs": "^17.6.2"
   },

@@ -4,7 +4,7 @@ import {
   SafeTransactionEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
-import { sameString } from '../../utils'
+import { sameString } from '../address'
 import EthSignSignature from './SafeSignature'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {

@@ -1,3 +1,4 @@
+import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
@@ -10,7 +11,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     disabled: false,
-    include: ['@safe-global/safe-ethers-lib', '@safe-global/api-kit'],
+    include: ['@safe-global/protocol-kit', '@safe-global/api-kit'],
     esbuildOptions: {
       define: {
         global: 'globalThis'
@@ -27,5 +28,10 @@ export default defineConfig({
   define: {
     'process.env': {},
     global: {}
+  },
+  resolve: {
+    alias: {
+      '@safe-global/auth-kit': path.resolve(__dirname, '../src')
+    }
   }
 })

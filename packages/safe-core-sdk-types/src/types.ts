@@ -170,3 +170,16 @@ export type SafeMultisigTransactionResponse = {
   readonly confirmations?: SafeMultisigConfirmationResponse[]
   readonly signatures?: string
 }
+
+export interface RelayTransaction {
+  target: string
+  encodedTransaction: string
+  chainId: number
+  options: MetaTransactionOptions
+}
+
+export interface MetaTransactionOptions {
+  gasLimit: BigNumber
+  gasToken?: string
+  isSponsored?: boolean
+}

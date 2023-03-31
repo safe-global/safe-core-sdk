@@ -1,4 +1,15 @@
 import {
+  CompatibilityFallbackHandlerContract,
+  CreateCallContract,
+  EthAdapter,
+  GnosisSafeContract,
+  GnosisSafeProxyFactoryContract,
+  MultiSendCallOnlyContract,
+  MultiSendContract,
+  SafeVersion,
+  SignMessageLibContract
+} from '@safe-global/safe-core-sdk-types'
+import {
   DeploymentFilter,
   getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
@@ -10,18 +21,7 @@ import {
   getSignMessageLibDeployment,
   SingletonDeployment
 } from '@safe-global/safe-deployments'
-import {
-  CompatibilityFallbackHandlerContract,
-  CreateCallContract,
-  EthAdapter,
-  GnosisSafeContract,
-  GnosisSafeProxyFactoryContract,
-  MultiSendCallOnlyContract,
-  MultiSendContract,
-  SafeVersion,
-  SignMessageLibContract
-} from '@safe-global/safe-core-sdk-types'
-import { ContractNetworkConfig } from '../types'
+import { ContractNetworkConfig } from '@safe-global/protocol-kit/types'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
 interface GetContractInstanceProps {
@@ -39,7 +39,7 @@ interface GetSafeContractInstanceProps extends GetContractInstanceProps {
 export function getSafeContractDeployment(
   safeVersion: SafeVersion,
   chainId: number,
-  isL1SafeMasterCopy: boolean = false
+  isL1SafeMasterCopy = false
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeMasterCopyVersion
   const filters: DeploymentFilter = { version, network: chainId.toString(), released: true }

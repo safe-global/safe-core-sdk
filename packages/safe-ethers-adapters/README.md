@@ -9,33 +9,33 @@
 
 The only adapter currently provided is the `SafeEthersSigner` which implements the [`Signer` interface](https://docs.ethers.io/v5/api/signer/#Signer) from Ethers.
 
-The `SafeEthersSigner` can be used with [Ethers Contracts](https://docs.ethers.io/v5/getting-started/#getting-started--contracts) to deploy and interact with them. Each of these interactions will create a Safe transaction that is published to the [Safe transaction service](https://docs.gnosis.io/safe/docs/services_transactions/). 
+The `SafeEthersSigner` can be used with [Ethers Contracts](https://docs.ethers.io/v5/getting-started/#getting-started--contracts) to deploy and interact with them. Each of these interactions will create a Safe transaction that is published to the [Safe transaction service](https://docs.gnosis.io/safe/docs/services_transactions/).
 
 For this to work it is required to initialize the `SafeEthersSigner` with an account that is either an owner of the specified Safe or a [delegate](https://docs.gnosis.io/safe/docs/tutorial_tx_service_set_delegate/) of one of the owners.
 
 An example for such an account would be the private key of one of the owners that is used with an [Ethers Wallet](https://docs.ethers.io/v5/api/signer/#Wallet)
 
 ```js
-const signer = new Wallet("some_private_key", ethereumProvider)
+const signer = new Wallet('some_private_key', ethereumProvider)
 ```
 
 It is also necessary to specify a service instance that should be used to publish the Safe transactions. An example for this would be the Mainnet instance of the [Safe Transaction Service](https://safe-transaction-mainnet.safe.global/): `https://safe-transaction-mainnet.safe.global/`
 
 ```js
-const service = new SafeService("some_service_url")
+const service = new SafeService('some_service_url')
 ```
 
 A Safe instance must also be created before obtaining the signer.
 It may be obtained with:
 
 ```js
-import { ethers } from "ethers"
-import Safe from "@safe-global/protocol-kit"
-import EthersAdapter from "@safe-global/safe-ethers-lib"
+import { ethers } from 'ethers'
+import Safe from '@safe-global/protocol-kit'
+import { EthersAdapter } from '@safe-global/protocol-kit'
 
 const safe = await Safe.create({
   ethAdapter: new EthersAdapter({ ethers, signerOrProvider }),
-  safeAddress: "some_safe_address"
+  safeAddress: 'some_safe_address'
 })
 ```
 

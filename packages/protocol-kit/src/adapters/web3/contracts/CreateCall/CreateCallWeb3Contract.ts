@@ -1,7 +1,10 @@
 import { CreateCallContract } from '@safe-global/safe-core-sdk-types'
-import { Create_call as CreateCall_V1_3_0 } from '../../../../../typechain/src/web3-v1/v1.3.0/Create_call'
-import { Web3TransactionOptions, Web3TransactionResult } from '../../types'
-import { toTxResult } from '../../utils'
+import { Create_call as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Create_call'
+import {
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from '@safe-global/protocol-kit/adapters/web3/types'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 
 abstract class CreateCallWeb3Contract implements CreateCallContract {
   constructor(public contract: CreateCall_V1_3_0) {}

@@ -1,11 +1,11 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { GnosisSafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
-import { Proxy_factory as ProxyFactory_V1_0_0 } from '../../../../../typechain/src/web3-v1/v1.0.0/Proxy_factory'
-import { Proxy_factory as ProxyFactory_V1_1_1 } from '../../../../../typechain/src/web3-v1/v1.1.1/Proxy_factory'
-import { Proxy_factory as ProxyFactory_V1_3_0 } from '../../../../../typechain/src/web3-v1/v1.3.0/Proxy_factory'
-import { Web3TransactionOptions } from '../../types'
-import { toTxResult } from '../../utils'
+import { Proxy_factory as ProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Proxy_factory'
+import { Proxy_factory as ProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Proxy_factory'
+import { Proxy_factory as ProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Proxy_factory'
+import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3/types'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 
 export interface CreateProxyProps {
   safeMasterCopyAddress: string

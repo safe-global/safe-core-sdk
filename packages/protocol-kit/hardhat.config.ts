@@ -2,9 +2,11 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-web3'
 import dotenv from 'dotenv'
-import 'hardhat-deploy'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import yargs from 'yargs'
+
+import 'hardhat-deploy'
+import 'tsconfig-paths/register'
 
 const argv = yargs
   .option('network', {
@@ -99,6 +101,10 @@ const config: HardhatUserConfig = {
       ...sharedNetworkConfig,
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`
     }
+  },
+  //@ts-expect-error Type not found
+  compilerOptions: {
+    paths: { '^@safe-global/protocol-kit/(.*)$': ['../protocol-kit/src/*'] }
   },
   namedAccounts: {
     deployer: {

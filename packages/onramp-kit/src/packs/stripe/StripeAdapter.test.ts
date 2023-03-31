@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import { StripeAdapter } from './StripeAdapter'
 import * as stripeApi from './stripeApi'
 
-import type { SafeOnRampOpenOptions } from '../../types'
+import type { SafeOnRampOpenOptions } from '@safe-global/onramp-kit/types'
 import type { StripeSession } from './types'
 
 const openOptions: SafeOnRampOpenOptions<StripeAdapter> = {

@@ -5,7 +5,7 @@ import {
   EIP712_DOMAIN_BEFORE_V130,
   generateTypedData,
   getEip712MessageTypes
-} from '../../src/utils'
+} from '@safe-global/protocol-kit/utils'
 
 const safeAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
 const safeTransactionData: SafeTransactionData = {

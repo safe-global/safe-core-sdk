@@ -26,9 +26,9 @@ import {
   TokenInfoListResponse,
   TokenInfoResponse,
   TransferListResponse
-} from './types/safeTransactionServiceTypes'
-import { getTxServiceBaseUrl } from './utils'
-import { HttpMethod, sendRequest } from './utils/httpRequests'
+} from '@safe-global/api-kit/types/safeTransactionServiceTypes'
+import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
+import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 
 export interface SafeApiKitConfig {
   /** txServiceUrl - Safe Transaction Service URL */

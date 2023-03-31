@@ -10,11 +10,12 @@ import SafeApiKit, {
   SafeDelegateConfig,
   SafeDelegateDeleteConfig,
   SafeMultisigTransactionEstimate
-} from '../../src'
-import { getTxServiceBaseUrl } from '../../src/utils'
-import * as httpRequests from '../../src/utils/httpRequests'
+} from '@safe-global/api-kit/index'
+import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
+import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
+
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 

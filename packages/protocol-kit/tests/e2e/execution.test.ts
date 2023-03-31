@@ -3,13 +3,15 @@ import {
   SafeTransactionDataPartial,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import { Web3TransactionOptions, EthersTransactionOptions } from '@safe-global/protocol-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../../hardhat/deploy/deploy-contracts'
-import Safe from '../../src'
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, {
+  Web3TransactionOptions,
+  EthersTransactionOptions
+} from '@safe-global/protocol-kit/index'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'

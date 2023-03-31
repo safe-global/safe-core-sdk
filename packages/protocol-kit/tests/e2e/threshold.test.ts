@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { SafeTransactionOptionalProps } from '../../src'
+import Safe, { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'

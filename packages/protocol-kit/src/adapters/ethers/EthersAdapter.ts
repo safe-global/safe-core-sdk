@@ -9,7 +9,7 @@ import {
   GetContractProps,
   SafeTransactionEIP712Args
 } from '@safe-global/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '../../utils'
+import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { ethers } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import {

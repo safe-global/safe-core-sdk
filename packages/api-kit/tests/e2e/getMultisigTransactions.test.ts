@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeApiKit from '../../src'
+import SafeApiKit from '@safe-global/api-kit/index'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 

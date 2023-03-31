@@ -14,8 +14,12 @@ import {
   RelayTransaction,
   SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
-import { GELATO_FEE_COLLECTOR, GELATO_NATIVE_TOKEN_ADDRESS, ZERO_ADDRESS } from '../../constants'
-import { RelayAdapter } from '../../types'
+import {
+  GELATO_FEE_COLLECTOR,
+  GELATO_NATIVE_TOKEN_ADDRESS,
+  ZERO_ADDRESS
+} from '@safe-global/relay-kit/constants'
+import { RelayAdapter } from '@safe-global/relay-kit/types'
 
 export class GelatoRelayAdapter implements RelayAdapter {
   #gelatoRelay: GelatoNetworkRelay

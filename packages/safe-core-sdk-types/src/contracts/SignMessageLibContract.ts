@@ -1,4 +1,4 @@
-import { TransactionOptions, TransactionResult } from '../types'
+import { TransactionOptions, TransactionResult } from '@safe-global/safe-core-sdk-types/types'
 
 export interface SignMessageLibContract {
   getAddress(): string

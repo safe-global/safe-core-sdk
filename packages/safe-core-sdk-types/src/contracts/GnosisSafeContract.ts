@@ -6,7 +6,7 @@ import {
   SafeSetupConfig,
   TransactionOptions,
   TransactionResult
-} from '../types'
+} from '@safe-global/safe-core-sdk-types/types'
 
 export interface GnosisSafeContract {
   setup(setupConfig: SafeSetupConfig, options?: TransactionOptions): Promise<TransactionResult>

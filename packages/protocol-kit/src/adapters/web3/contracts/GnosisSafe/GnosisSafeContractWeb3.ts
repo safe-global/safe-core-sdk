@@ -6,12 +6,15 @@ import {
   SafeVersion,
   SafeSetupConfig
 } from '@safe-global/safe-core-sdk-types'
-import { Gnosis_safe as GnosisSafe_V1_0_0 } from '../../../../../typechain/src/web3-v1/v1.0.0/Gnosis_safe'
-import { Gnosis_safe as GnosisSafe_V1_1_1 } from '../../../../../typechain/src/web3-v1/v1.1.1/Gnosis_safe'
-import { Gnosis_safe as GnosisSafe_V1_2_0 } from '../../../../../typechain/src/web3-v1/v1.2.0/Gnosis_safe'
-import { Gnosis_safe as GnosisSafe_V1_3_0 } from '../../../../../typechain/src/web3-v1/v1.3.0/Gnosis_safe'
-import { Web3TransactionOptions, Web3TransactionResult } from '../../types'
-import { toTxResult } from '../../utils'
+import { Gnosis_safe as GnosisSafe_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.2.0/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Gnosis_safe'
+import {
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from '@safe-global/protocol-kit/adapters/web3/types'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 
 abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
   constructor(

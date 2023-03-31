@@ -1,7 +1,10 @@
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
-import { Sign_message_lib as SignMessageLib_V1_3_0 } from '../../../../../typechain/src/web3-v1/v1.3.0/Sign_message_lib'
-import { Web3TransactionOptions, Web3TransactionResult } from '../../types'
-import { toTxResult } from '../../utils'
+import { Sign_message_lib as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Sign_message_lib'
+import {
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from '@safe-global/protocol-kit/adapters/web3/types'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 
 abstract class SignMessageLibWeb3Contract implements SignMessageLibContract {
   constructor(public contract: SignMessageLib_V1_3_0) {}

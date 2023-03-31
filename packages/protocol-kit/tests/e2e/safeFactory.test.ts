@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '../../hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
   ContractNetworksConfig,
   DeploySafeProps,
@@ -9,9 +9,9 @@ import {
   SafeAccountConfig,
   SafeDeploymentConfig,
   SafeFactory
-} from '../../src'
-import { SAFE_LAST_VERSION } from '../../src/contracts/config'
-import { ZERO_ADDRESS } from '../../src/utils/constants'
+} from '@safe-global/protocol-kit/index'
+import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {

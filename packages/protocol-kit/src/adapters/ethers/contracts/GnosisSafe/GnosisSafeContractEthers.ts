@@ -6,15 +6,18 @@ import {
   SafeVersion,
   SafeSetupConfig
 } from '@safe-global/safe-core-sdk-types'
-import { Gnosis_safe as GnosisSafe_V1_0_0 } from '../../../../../typechain/src/ethers-v5/v1.0.0/Gnosis_safe'
-import { Gnosis_safe as GnosisSafe_V1_1_1 } from '../../../../../typechain/src/ethers-v5/v1.1.1/Gnosis_safe'
-import { Gnosis_safe as GnosisSafe_V1_2_0 } from '../../../../../typechain/src/ethers-v5/v1.2.0/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/Gnosis_safe'
+import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0/Gnosis_safe'
 import {
   Gnosis_safe as GnosisSafe_V1_3_0,
   Gnosis_safeInterface as GnosisSafeInterface
-} from '../../../../../typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
-import { EthersTransactionOptions, EthersTransactionResult } from '../../types'
-import { toTxResult } from '../../utils'
+} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
+import {
+  EthersTransactionOptions,
+  EthersTransactionResult
+} from '@safe-global/protocol-kit/adapters/ethers/types'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 
 abstract class GnosisSafeContractEthers implements GnosisSafeContract {
   constructor(

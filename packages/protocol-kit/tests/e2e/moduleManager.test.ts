@@ -1,8 +1,8 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { SafeTransactionOptionalProps } from '../../src'
-import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '../../src/utils/constants'
+import Safe, { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/index'
+import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getDailyLimitModule,

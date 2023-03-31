@@ -2,7 +2,7 @@ import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
   Compatibility_fallback_handlerInterface as CompatibilityFallbackHandlerInterface
-} from '../../../../../typechain/src/ethers-v5/v1.3.0/Compatibility_fallback_handler'
+} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/Compatibility_fallback_handler'
 
 abstract class CompatibilityFallbackHandlerEthersContract
   implements CompatibilityFallbackHandlerContract

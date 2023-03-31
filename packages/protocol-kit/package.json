@@ -14,7 +14,6 @@
     "safe-deployments": "ts-node scripts/checkSafeDeployments.ts",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output typechain *.tsbuildinfo",
     "build": "hardhat compile && yarn typechain && yarn safe-deployments && tsc",
-    "test": "nyc mocha -r ts-node/register tests/unit/**/*.test.ts",
     "test:ganache:web3:v1.0.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.0.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.1.1": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.1.1 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.2.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.2.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
@@ -76,6 +75,7 @@
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "ts-generator": "^0.1.1",
+    "tsconfig-paths": "^4.1.2",
     "typechain": "^8.1.1",
     "typescript": "^4.9.4",
     "yargs": "^17.6.2"

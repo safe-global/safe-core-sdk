@@ -1,7 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeApiKit, { SafeDelegateDeleteConfig } from '../../src'
+import SafeApiKit, { SafeDelegateDeleteConfig } from '@safe-global/api-kit/index'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 

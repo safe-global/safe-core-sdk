@@ -1,14 +1,18 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { SingletonDeployment } from '@safe-global/safe-deployments'
 import { AbiItem } from 'web3-utils'
-import { CompatibilityFallbackHandlerContract } from '../contracts/CompatibilityFallbackHandlerContract'
-import { CreateCallContract } from '../contracts/CreateCallContract'
-import { GnosisSafeContract } from '../contracts/GnosisSafeContract'
-import { GnosisSafeProxyFactoryContract } from '../contracts/GnosisSafeProxyFactoryContract'
-import { MultiSendCallOnlyContract } from '../contracts/MultiSendCallOnlyContract'
-import { MultiSendContract } from '../contracts/MultiSendContract'
-import { SignMessageLibContract } from '../contracts/SignMessageLibContract'
-import { Eip3770Address, SafeTransactionEIP712Args, SafeVersion } from '../types'
+import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types/contracts/CompatibilityFallbackHandlerContract'
+import { CreateCallContract } from '@safe-global/safe-core-sdk-types/contracts/CreateCallContract'
+import { GnosisSafeContract } from '@safe-global/safe-core-sdk-types/contracts/GnosisSafeContract'
+import { GnosisSafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types/contracts/GnosisSafeProxyFactoryContract'
+import { MultiSendCallOnlyContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendCallOnlyContract'
+import { MultiSendContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendContract'
+import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types/contracts/SignMessageLibContract'
+import {
+  Eip3770Address,
+  SafeTransactionEIP712Args,
+  SafeVersion
+} from '@safe-global/safe-core-sdk-types/types'
 
 export interface EthAdapterTransaction {
   to: string

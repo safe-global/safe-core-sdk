@@ -6,7 +6,7 @@ import {
   validateEip3770Address,
   validateEip3770NetworkPrefix,
   validateEthereumAddress
-} from '../../src/utils'
+} from '@safe-global/protocol-kit/utils'
 
 describe('EIP-3770 chain-specific addresses', () => {
   describe('parseEip3770Address', async () => {

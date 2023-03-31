@@ -1,5 +1,5 @@
 import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types'
-import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '../../../../../typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
+import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
 
 abstract class CompatibilityFallbackHandlerWeb3Contract
   implements CompatibilityFallbackHandlerContract

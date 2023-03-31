@@ -1,3 +1,11 @@
+import {
+  AccountAbstractionConfig,
+  OperationType
+} from '@safe-global/account-abstraction-kit-poc/types'
+import {
+  encodeCreateProxyWithNonce,
+  encodeMultiSendData
+} from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
   calculateChainSpecificProxyAddress,
   EthersAdapter,
@@ -16,8 +24,6 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
-import { AccountAbstractionConfig, OperationType } from './types'
-import { encodeCreateProxyWithNonce, encodeMultiSendData } from './utils/contracts'
 
 const safeVersion: SafeVersion = '1.3.0'
 

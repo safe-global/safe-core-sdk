@@ -1,3 +1,17 @@
+import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import {
+  getCompatibilityFallbackHandlerContract,
+  getProxyFactoryContract,
+  getSafeContract
+} from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
+import Safe from '@safe-global/protocol-kit/Safe'
+import {
+  ContractNetworksConfig,
+  PredictSafeProps,
+  SafeAccountConfig,
+  SafeDeploymentConfig
+} from '@safe-global/protocol-kit/types'
+import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -7,20 +21,6 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
-import { SAFE_LAST_VERSION } from '../contracts/config'
-import {
-  getCompatibilityFallbackHandlerContract,
-  getProxyFactoryContract,
-  getSafeContract
-} from '../contracts/safeDeploymentContracts'
-import Safe from '../Safe'
-import {
-  ContractNetworksConfig,
-  PredictSafeProps,
-  SafeAccountConfig,
-  SafeDeploymentConfig
-} from '../types'
-import { EMPTY_DATA, ZERO_ADDRESS } from '../utils/constants'
 import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
 
 export interface DeploySafeProps {

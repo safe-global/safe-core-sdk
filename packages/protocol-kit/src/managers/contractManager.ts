@@ -1,15 +1,15 @@
+import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import {
+  getMultiSendCallOnlyContract,
+  getMultiSendContract,
+  getSafeContract
+} from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
+import { ContractNetworksConfig, SafeConfig } from '@safe-global/protocol-kit/types'
 import {
   GnosisSafeContract,
   MultiSendCallOnlyContract,
   MultiSendContract
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_LAST_VERSION } from '../contracts/config'
-import {
-  getMultiSendCallOnlyContract,
-  getMultiSendContract,
-  getSafeContract
-} from '../contracts/safeDeploymentContracts'
-import { ContractNetworksConfig, SafeConfig } from '../types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig

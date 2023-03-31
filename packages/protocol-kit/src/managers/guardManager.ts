@@ -1,6 +1,11 @@
+import {
+  hasSafeFeature,
+  isZeroAddress,
+  SAFE_FEATURES,
+  sameString
+} from '@safe-global/protocol-kit/utils'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
-import { hasSafeFeature, isZeroAddress, SAFE_FEATURES, sameString } from '../utils'
-import { ZERO_ADDRESS } from '../utils/constants'
 
 class GuardManager {
   #ethAdapter: EthAdapter

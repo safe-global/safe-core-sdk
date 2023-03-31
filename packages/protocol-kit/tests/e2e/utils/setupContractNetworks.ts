@@ -1,4 +1,4 @@
-import { ContractNetworksConfig } from '../../../src'
+import { ContractNetworksConfig } from '@safe-global/protocol-kit/index'
 import {
   getCompatibilityFallbackHandler,
   getCreateCall,

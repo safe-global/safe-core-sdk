@@ -50,7 +50,13 @@ export class SafeEthersSigner extends VoidSigner {
     provider?: Provider,
     options?: SafeEthersSignerOptions
   ) {
-    const safeEthersSigner = new SafeEthersSigner(safe, await safe.getAddress(), service, provider, options)
+    const safeEthersSigner = new SafeEthersSigner(
+      safe,
+      await safe.getAddress(),
+      service,
+      provider,
+      options
+    )
     return safeEthersSigner
   }
 

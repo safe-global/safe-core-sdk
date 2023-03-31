@@ -131,7 +131,7 @@ class Safe {
   }: ConnectSafeConfig): Promise<Safe> {
     return await Safe.create({
       ethAdapter: ethAdapter || this.#ethAdapter,
-      safeAddress: safeAddress || await this.getAddress(),
+      safeAddress: safeAddress || (await this.getAddress()),
       predictSafe: predictSafe || this.#predictSafe,
       isL1SafeMasterCopy: isL1SafeMasterCopy || this.#contractManager.isL1SafeMasterCopy,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
@@ -154,7 +154,12 @@ class Safe {
       if (!signerAddress) {
         throw new Error('EthAdapter must be initialized with a signer to use this method')
       }
-      return calculateChainSpecificProxyAddress(this.#ethAdapter, SAFE_LAST_VERSION, safeProxyContract, signerAddress)
+      return calculateChainSpecificProxyAddress(
+        this.#ethAdapter,
+        SAFE_LAST_VERSION,
+        safeProxyContract,
+        signerAddress
+      )
     }
     return Promise.resolve(this.#contractManager.safeContract.getAddress())
   }

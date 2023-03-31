@@ -10,8 +10,8 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import { getProxyFactoryContract } from 'contracts/safeDeploymentContracts'
 import { SAFE_LAST_VERSION } from './contracts/config'
+import { getProxyFactoryContract } from './contracts/safeDeploymentContracts'
 import { calculateChainSpecificProxyAddress } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'

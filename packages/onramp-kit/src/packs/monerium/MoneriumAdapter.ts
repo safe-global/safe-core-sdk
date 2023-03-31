@@ -4,7 +4,7 @@ import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 
 import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
 
-const STORED_MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
+const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
 
 /**
  * This class implements the SafeOnRampClient interface for the Monerium provider
@@ -34,7 +34,7 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
     }
 
     if (codeParam) {
-      const codeVerifier = localStorage.getItem(STORED_MONERIUM_CODE_VERIFIER) || ''
+      const codeVerifier = localStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
 
       await this.#client.auth({
         client_id: this.#config.clientId,
@@ -43,7 +43,7 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
         redirect_uri: options.redirect_uri
       })
 
-      localStorage.removeItem(STORED_MONERIUM_CODE_VERIFIER)
+      localStorage.removeItem(MONERIUM_CODE_VERIFIER)
     } else {
       const authFlowUrl = this.#client.getAuthFlowURI({
         client_id: this.#config.clientId,
@@ -54,7 +54,8 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
         network: options?.network
       })
 
-      localStorage.setItem(STORED_MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
+      localStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
+
       window.location.replace(authFlowUrl)
     }
 

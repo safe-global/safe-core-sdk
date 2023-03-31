@@ -19,8 +19,8 @@
     "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc hardhat test",
     "test:ci:ethers": "export TESTS_PATH=tests/e2e && export ETH_LIB=ethers && nyc hardhat test",
     "test:ci": "yarn test:ci:ethers",
-    "format": "prettier --write \"{src,tests,e2e}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\""
   },
   "repository": {
     "type": "git",
@@ -48,8 +48,6 @@
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "hardhat": "^2.12.6",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.1.0",
     "mocha": "^10.2.0",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
@@ -62,16 +60,5 @@
     "@ethersproject/abstract-signer": "^5.7.0",
     "@safe-global/safe-core-sdk-types": "^1.9.0",
     "node-fetch": "^2.6.6"
-  },
-  "lint-staged": {
-    "src/**/!(*test).ts": [
-      "yarn lint",
-      "prettier --write"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

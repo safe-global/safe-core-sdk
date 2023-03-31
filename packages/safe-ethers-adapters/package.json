@@ -16,8 +16,8 @@
     "example:creation": "ts-node examples/creation.ts",
     "example:interaction": "ts-node examples/interaction.ts",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "format": "prettier --write \"{src,tests}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json",
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "prepublish": "yarn build"
   },
   "repository": {
@@ -43,8 +43,6 @@
     "coveralls": "^3.1.1",
     "dotenv": "^16.0.3",
     "ethers": "5.7.2",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.1.0",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "sinon": "^14.0.0",
@@ -63,16 +61,5 @@
     "@safe-global/safe-core-sdk-types": "^1.9.0",
     "@safe-global/safe-deployments": "^1.20.2",
     "axios": "^0.27.2"
-  },
-  "lint-staged": {
-    "src/**/!(*test).ts": [
-      "yarn lint",
-      "prettier --write"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

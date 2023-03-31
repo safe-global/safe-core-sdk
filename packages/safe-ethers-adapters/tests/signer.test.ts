@@ -40,7 +40,7 @@ describe('SafeEthersSigner', () => {
         estimateSafeTx: sinon.fake.returns(BigNumber.from(1337)),
         proposeTx: sinon.fake.returns('some_data')
       }
-      const signer = new SafeEthersSigner(safe, service)
+      const signer = await SafeEthersSigner.create(safe, service)
 
       // TODO check response
       await signer.sendTransaction(txData)
@@ -79,7 +79,7 @@ describe('SafeEthersSigner', () => {
         estimateSafeTx: sinon.fake.returns(BigNumber.from(1337)),
         proposeTx: sinon.fake.returns('some_data')
       }
-      const signer = new SafeEthersSigner(safe, service)
+      const signer = await SafeEthersSigner.create(safe, service)
 
       // TODO check response
       await signer.sendTransaction(txData)
@@ -119,7 +119,7 @@ describe('SafeEthersSigner', () => {
       const provider: any = {
         waitForTransaction: sinon.fake.returns({ transactionHash: 'some_eth_tx_hash', logs: [] })
       }
-      const signer = new SafeEthersSigner(safe, service, provider, { pollingDelay: 1 })
+      const signer = await SafeEthersSigner.create(safe, service, provider, { pollingDelay: 1 })
 
       const response = await signer.buildTransactionResponse('some_safe_tx_hash', safeTxData)
       chai.expect(response.operation).to.be.equals(0)
@@ -161,7 +161,7 @@ describe('SafeEthersSigner', () => {
       const provider: any = {
         waitForTransaction: sinon.fake.returns({ transactionHash: 'some_eth_tx_hash', logs })
       }
-      const signer = new SafeEthersSigner(safe, service, provider, { pollingDelay: 1 })
+      const signer = await SafeEthersSigner.create(safe, service, provider, { pollingDelay: 1 })
 
       const response = await signer.buildTransactionResponse('some_safe_tx_hash', safeTxData)
       chai.expect(response.operation).to.be.equals(0)
@@ -203,7 +203,7 @@ describe('SafeEthersSigner', () => {
       const provider: any = {
         waitForTransaction: sinon.fake.returns({ transactionHash: 'some_eth_tx_hash', logs })
       }
-      const signer = new SafeEthersSigner(safe, service, provider, { pollingDelay: 1 })
+      const signer = await SafeEthersSigner.create(safe, service, provider, { pollingDelay: 1 })
 
       const response = await signer.buildTransactionResponse('some_safe_tx_hash', safeTxData)
       chai.expect(response.operation).to.be.equals(0)
@@ -246,7 +246,7 @@ describe('SafeEthersSigner', () => {
       const provider: any = {
         waitForTransaction: sinon.fake.returns({ transactionHash: 'some_eth_tx_hash', logs })
       }
-      const signer = new SafeEthersSigner(safe, service, provider, { pollingDelay: 1 })
+      const signer = await SafeEthersSigner.create(safe, service, provider, { pollingDelay: 1 })
 
       const response = await signer.buildTransactionResponse('some_safe_tx_hash', safeTxData)
       chai.expect(response.operation).to.be.equals(1)
@@ -295,7 +295,7 @@ describe('SafeEthersSigner', () => {
       const provider: any = {
         waitForTransaction: sinon.fake.returns({ transactionHash: 'some_eth_tx_hash', logs })
       }
-      const signer = new SafeEthersSigner(safe, service, provider, { pollingDelay: 1 })
+      const signer = await SafeEthersSigner.create(safe, service, provider, { pollingDelay: 1 })
 
       const response = await signer.buildTransactionResponse('some_safe_tx_hash', safeTxData)
       chai.expect(response.operation).to.be.equals(1)

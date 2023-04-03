@@ -15,7 +15,7 @@
     "unbuild": "rimraf dist dist .nyc_output cache",
     "build": "yarn unbuild && tsc",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "test": "jest src"
   },
   "repository": {

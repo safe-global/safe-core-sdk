@@ -12,8 +12,8 @@
   "scripts": {
     "unbuild": "rimraf dist *.tsbuildinfo",
     "build": "rimraf dist && tsc",
-    "format": "prettier --write \"{src,tests}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\""
   },
   "repository": {
     "type": "git",
@@ -28,9 +28,6 @@
     "dist"
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
-  "devDependencies": {
-    "typescript": "^4.9.4"
-  },
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",

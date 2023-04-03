@@ -19,8 +19,8 @@
     "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc hardhat test",
     "test:ci:ethers": "export TESTS_PATH=tests/e2e && export ETH_LIB=ethers && nyc hardhat test",
     "test:ci": "yarn test:ci:ethers",
-    "format": "prettier --write \"{src,tests,e2e}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\""
   },
   "repository": {
     "type": "git",
@@ -37,7 +37,6 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.2",
-    "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@safe-global/protocol-kit": "^0.1.0",
     "@types/chai": "^4.3.4",
@@ -48,30 +47,16 @@
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "hardhat": "^2.12.6",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.1.0",
     "mocha": "^10.2.0",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "ts-generator": "^0.1.1",
     "tsconfig-paths": "^4.1.2",
-    "typescript": "^4.9.4",
     "yargs": "^17.6.2"
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
     "@safe-global/safe-core-sdk-types": "^1.9.0",
     "node-fetch": "^2.6.6"
-  },
-  "lint-staged": {
-    "src/**/!(*test).ts": [
-      "yarn lint",
-      "prettier --write"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

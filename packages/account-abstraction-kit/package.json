@@ -14,7 +14,7 @@
     "unbuild": "rimraf dist",
     "build": "yarn unbuild && tsc",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "test": "echo \"Error: no test specified\""
   },
   "repository": {

@@ -96,7 +96,7 @@ describe('GelatoRelayAdapter', () => {
   })
 
   it('should allow to make a sponsored transaction', async () => {
-    const response = await gelatoRelayAdapter.sponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)
+    const response = await gelatoRelayAdapter.sendSponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)
 
     expect(response).toBe(RELAY_RESPONSE)
     expect(mockSponsoredCall).toHaveBeenCalledWith(
@@ -112,7 +112,7 @@ describe('GelatoRelayAdapter', () => {
   it('should throw an error when trying to do a sponsored transaction without an api key', async () => {
     const relayAdapter = new GelatoRelayAdapter()
     await expect(
-      relayAdapter.sponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)
+      relayAdapter.sendSponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)
     ).rejects.toThrowError('API key not defined')
   })
 
@@ -187,7 +187,7 @@ describe('GelatoRelayAdapter', () => {
   })
 
   it('should allow to make a paid transaction', async () => {
-    const response = await gelatoRelayAdapter.payTransaction(SAFE_ADDRESS, '0x', CHAIN_ID, {
+    const response = await gelatoRelayAdapter.sendSyncTransaction(SAFE_ADDRESS, '0x', CHAIN_ID, {
       gasLimit: BigNumber.from(100000)
     })
 

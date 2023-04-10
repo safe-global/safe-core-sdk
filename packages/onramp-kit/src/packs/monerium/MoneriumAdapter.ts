@@ -27,23 +27,27 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
   }
 
   async open(options: MoneriumOpenOptions): Promise<MoneriumClient> {
-    const codeParam = new URLSearchParams(window.location.search).get('code')
-
     if (!this.#client) {
       throw new Error('Monerium client not initialized')
     }
 
+    const codeParam = new URLSearchParams(window.location.search).get('code')
+
     if (codeParam) {
       const codeVerifier = localStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
 
-      await this.#client.auth({
-        client_id: this.#config.clientId,
-        code: codeParam,
-        code_verifier: codeVerifier,
-        redirect_uri: options.redirect_uri
-      })
-
-      localStorage.removeItem(MONERIUM_CODE_VERIFIER)
+      try {
+        await this.#client.auth({
+          client_id: this.#config.clientId,
+          code: codeParam,
+          code_verifier: codeVerifier,
+          redirect_uri: options.redirect_uri
+        })
+      } catch (e) {
+        throw new Error(getErrorMessage(e))
+      } finally {
+        localStorage.removeItem(MONERIUM_CODE_VERIFIER)
+      }
     } else {
       const authFlowUrl = this.#client.getAuthFlowURI({
         client_id: this.#config.clientId,

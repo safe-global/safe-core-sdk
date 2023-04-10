@@ -5,14 +5,29 @@ import { SafeOnRampKit, MoneriumAdapter } from '../../../../src'
 
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
+  const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<MoneriumAdapter>>()
+
+  useEffect(() => {
+    ;(async () => {
+      const client = await SafeOnRampKit.init(
+        new MoneriumAdapter({
+          clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
+          environment: 'sandbox'
+        })
+      )
+
+      setOnRampClient(client)
+    })()
+  }, [])
+
+  useEffect(() => {
+    const codeParam = new URLSearchParams(window.location.search).get('code')
+
+    if (codeParam) startMoneriumFlow()
+  }, [onRampClient])
 
   const startMoneriumFlow = async () => {
-    const onRampClient = await SafeOnRampKit.init(
-      new MoneriumAdapter({
-        clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
-        environment: 'sandbox'
-      })
-    )
+    if (!onRampClient) return
 
     const moneriumClient = await onRampClient.open({
       redirect_uri: 'http://localhost:3000/monerium',

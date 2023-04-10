@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^0.1.0",
-    "@safe-global/api-kit": "^0.1.0",
+    "@safe-global/api-kit": "^1.0.0",
     "@walletconnect/client": "^1.8.0",
     "ethers": "^5.7.2"
   },

@@ -286,59 +286,6 @@ Returns the right nonce to propose a new transaction right after the last pendin
 const nextNonce = await safeService.getNextNonce(safeAddress)
 ```
 
-### getBalances
-
-Returns the balances for Ether and ERC20 tokens of a Safe.
-
-```js
-const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress)
-```
-
-This method can optionally receive the `options` parameter:
-
-```js
-const options: SafeBalancesOptions = {
-  excludeSpamTokens // Optional. Default value is `true`.
-}
-const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress, options)
-```
-
-### getUsdBalances
-
-Returns the balances for Ether and ERC20 tokens of a Safe with USD fiat conversion.
-
-```js
-const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress)
-```
-
-This method can optionally receive the `options` parameter:
-
-```js
-const options: SafeBalancesUsdOptions = {
-  excludeSpamTokens // Optional. Default value is `true`.
-}
-const usdBalances: SafeBalanceUsdResponse[] = await safeService.getUsdBalances(safeAddress, options)
-```
-
-### getCollectibles
-
-Returns the collectibles (ERC721 tokens) owned by the given Safe and information about them.
-
-```js
-const collectibles: SafeCollectibleListResponse = await safeService.getCollectibles(safeAddress)
-```
-
-This method can optionally receive the `options` parameter:
-
-```js
-const options: SafeCollectiblesOptions = {
-  limit // Optional. Default value is 10. This limit is the maximum available value per service limitation.
-  offset // Optional. Default value is 0.
-  excludeSpamTokens // Optional. Default value is `true`.
-}
-const collectibles: SafeCollectibleListResponse = await safeService.getCollectibles(safeAddress, options)
-```
-
 ### getTokenList
 
 Returns the list of all the ERC20 tokens handled by the Safe.

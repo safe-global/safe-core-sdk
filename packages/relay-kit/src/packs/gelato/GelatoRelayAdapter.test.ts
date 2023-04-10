@@ -140,20 +140,18 @@ describe('GelatoRelayAdapter', () => {
       safe.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
     })
 
-    it('should allow you to create an sponsored one', async () => {
+    it('should allow you to create a sponsored one', async () => {
       await relayAdapter.createRelayedTransaction(args[0], args[1], args[2])
 
       expect(safe.createTransaction).toHaveBeenCalledWith({
         safeTransactionData: args[1],
         options: expect.objectContaining({
-          baseGas: 0,
-          gasPrice: 0,
-          refundReceiver: ZERO_ADDRESS
+          nonce: 0
         })
       })
     })
 
-    it('should allow to create a paid one', async () => {
+    it('should allow to create a sync fee one', async () => {
       await relayAdapter.createRelayedTransaction(args[0], args[1], {
         ...args[2],
         isSponsored: false
@@ -174,19 +172,23 @@ describe('GelatoRelayAdapter', () => {
 
       await relayAdapter.createRelayedTransaction(args[0], args[1], {
         ...args[2],
+        isSponsored: false,
         gasToken: GAS_TOKEN
       })
 
       expect(safe.createTransaction).toHaveBeenCalledWith({
         safeTransactionData: args[1],
         options: expect.objectContaining({
-          gasToken: GAS_TOKEN
+          baseGas: 100000,
+          gasPrice: 1,
+          gasToken: GAS_TOKEN,
+          refundReceiver: GELATO_FEE_COLLECTOR
         })
       })
     })
   })
 
-  it('should allow to make a paid transaction', async () => {
+  it('should allow to make a sync fee transaction', async () => {
     const response = await gelatoRelayAdapter.sendSyncTransaction(SAFE_ADDRESS, '0x', CHAIN_ID, {
       gasLimit: BigNumber.from(100000)
     })
@@ -206,7 +208,7 @@ describe('GelatoRelayAdapter', () => {
     )
   })
 
-  it('should expose a relayTransaction doing an sponsored or paid transaction depending on an option parameter', async () => {
+  it('should expose a relayTransaction doing a sponsored or sync fee transaction depending on an optional parameter', async () => {
     const sponsoredResponse = await gelatoRelayAdapter.relayTransaction({
       target: SAFE_ADDRESS,
       encodedTransaction: '0x',

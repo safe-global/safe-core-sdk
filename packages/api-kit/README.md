@@ -137,7 +137,15 @@ const safeInfo: SafeInfoResponse = await safeService.getSafeInfo(safeAddress)
 Returns the list of delegates for a given Safe address.
 
 ```js
-const delegates: SafeDelegateListResponse = await safeService.getSafeDelegates(safeAddress)
+const delegateConfig: GetSafeDelegateProps = {
+  safeAddress, // Optional
+  delegateAddress, // Optional
+  delegatorAddress, // Optional
+  label, // Optional
+  limit, // Optional
+  offset // Optional
+}
+const delegates: SafeDelegateListResponse = await safeService.getSafeDelegates(delegateConfig)
 ```
 
 ### addSafeDelegate
@@ -145,21 +153,14 @@ const delegates: SafeDelegateListResponse = await safeService.getSafeDelegates(s
 Adds a new delegate for a given Safe address.
 
 ```js
-const delegateConfig: SafeDelegateConfig = {
-  safe,
-  delegate,
+const delegateConfig: AddSafeDelegateProps = {
+  safeAddress, // Optional
+  delegateAddress,
+  delegatorAddress,
   label,
   signer
 }
 await safeService.addSafeDelegate(delegateConfig)
-```
-
-### removeAllSafeDelegates
-
-Removes all delegates for a given Safe address.
-
-```js
-await safeService.removeAllSafeDelegates(safeAddress, signer)
 ```
 
 ### removeSafeDelegate
@@ -167,9 +168,9 @@ await safeService.removeAllSafeDelegates(safeAddress, signer)
 Removes a delegate for a given Safe address.
 
 ```js
-const delegateConfig: SafeDelegateDeleteConfig = {
-  safe,
-  delegate,
+const delegateConfig: DeleteSafeDelegateProps = {
+  delegateAddress,
+  delegatorAddress,
   signer
 }
 await safeService.removeSafeDelegate(delegateConfig)

@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Safe API Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

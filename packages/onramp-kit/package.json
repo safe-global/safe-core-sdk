@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/onramp-kit",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0",
   "description": "Onramp library",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

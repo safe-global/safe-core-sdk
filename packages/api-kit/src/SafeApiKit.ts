@@ -290,7 +290,7 @@ class SafeApiKit {
     const data = delegate + totp
     const signature = await signer.signMessage(data)
     const body: any = {
-      safe: (safeAddress) ? (await this.#ethAdapter.getEip3770Address(safeAddress)).address : null,
+      safe: safeAddress ? (await this.#ethAdapter.getEip3770Address(safeAddress)).address : null,
       delegate,
       delegator,
       label,

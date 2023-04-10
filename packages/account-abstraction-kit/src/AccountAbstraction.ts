@@ -1,5 +1,6 @@
 import { RelayAdapter } from '@safe-global/relay-kit'
 import Safe, {
+  encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
@@ -21,7 +22,6 @@ import {
 import {
   calculateChainSpecificProxyAddress,
   encodeCreateProxyWithNonce,
-  encodeMultiSendData,
   getSafeInitializer
 } from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 

@@ -1,13 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { arrayify, BytesLike } from '@ethersproject/bytes'
-import { pack as solidityPack } from '@ethersproject/solidity'
+import { BytesLike } from '@ethersproject/bytes'
 import { getCompatibilityFallbackHandlerContract, getSafeContract } from '@safe-global/protocol-kit'
 import {
   EthAdapter,
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
-  MetaTransactionData,
-  SafeTransactionData,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { BigNumberish, ethers, Signer } from 'ethers'
@@ -28,7 +25,7 @@ export function encodeCreateProxyWithNonce(
   ])
 }
 
-export async function encodeSetupCallData(
+async function encodeSetupCallData(
   ethAdapter: EthAdapter,
   safeVersion: SafeVersion,
   safeContract: GnosisSafeContract,
@@ -50,38 +47,6 @@ export async function encodeSetupCallData(
     BigNumber.from(0) as BigNumberish,
     ZERO_ADDRESS
   ])
-}
-
-export function encodeExecTransaction(
-  safeContract: GnosisSafeContract,
-  transaction: SafeTransactionData,
-  signature: string
-): string {
-  return safeContract.encode('execTransaction', [
-    transaction.to,
-    transaction.value,
-    transaction.data,
-    transaction.operation,
-    transaction.safeTxGas,
-    transaction.baseGas,
-    transaction.gasPrice,
-    transaction.gasToken,
-    transaction.refundReceiver,
-    signature
-  ])
-}
-
-function encodeMetaTransaction(tx: MetaTransactionData): string {
-  const data = arrayify(tx.data)
-  const encoded = solidityPack(
-    ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
-    [tx.operation, tx.to, tx.value, data.length, data]
-  )
-  return encoded.slice(2)
-}
-
-export function encodeMultiSendData(txs: MetaTransactionData[]): string {
-  return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
 }
 
 export async function getSafeInitializer(

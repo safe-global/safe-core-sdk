@@ -51,12 +51,11 @@ describe('getSafeDelegates', () => {
       delegatorAddress,
       signer
     }
-    const a = await safeApiKit.addSafeDelegate({
+    await safeApiKit.addSafeDelegate({
       safeAddress,
       label: 'Label1',
       ...delegateConfig1
     })
-    console.log(a)
     await safeApiKit.addSafeDelegate({
       safeAddress,
       label: 'Label2',
@@ -66,9 +65,11 @@ describe('getSafeDelegates', () => {
     const { results } = safeDelegateListResponse
     const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
     chai.expect(sortedResults.length).to.be.eq(2)
+    chai.expect(sortedResults[0].safe).to.be.eq(safeAddress)
     chai.expect(sortedResults[0].delegate).to.be.eq(delegateConfig1.delegateAddress)
     chai.expect(sortedResults[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
     chai.expect(sortedResults[0].label).to.be.eq('Label1')
+    chai.expect(sortedResults[1].safe).to.be.eq(safeAddress)
     chai.expect(sortedResults[1].delegate).to.be.eq(delegateConfig2.delegateAddress)
     chai.expect(sortedResults[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
     chai.expect(sortedResults[1].label).to.be.eq('Label2')

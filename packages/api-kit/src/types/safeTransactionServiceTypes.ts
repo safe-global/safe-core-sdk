@@ -79,16 +79,23 @@ export type DeleteSafeDelegateProps = {
 }
 
 export type SafeDelegateResponse = {
+  readonly safe: string
   readonly delegate: string
   readonly delegator: string
   readonly label: string
+  readonly signature: string
 }
 
 export type SafeDelegateListResponse = {
   readonly count: number
   readonly next?: string
   readonly previous?: string
-  readonly results: SafeDelegateResponse[]
+  readonly results: {
+    readonly safe: string
+    readonly delegate: string
+    readonly delegator: string
+    readonly label: string
+  }[]
 }
 
 export type SafeMultisigTransactionEstimate = {

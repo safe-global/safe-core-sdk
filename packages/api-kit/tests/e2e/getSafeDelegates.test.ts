@@ -109,7 +109,9 @@ describe('getSafeDelegates', () => {
       label: 'Label2',
       ...delegateConfig2
     })
-    const safeDelegateListResponse = await safeApiKit.getSafeDelegates({ safeAddress: eip3770SafeAddress })
+    const safeDelegateListResponse = await safeApiKit.getSafeDelegates({
+      safeAddress: eip3770SafeAddress
+    })
     const { results } = safeDelegateListResponse
     const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
     chai.expect(sortedResults.length).to.be.eq(2)

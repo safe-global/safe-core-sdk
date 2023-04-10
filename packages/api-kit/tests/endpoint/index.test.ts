@@ -2,7 +2,8 @@ import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
 import SafeApiKit, {
   AddSafeDelegateProps,
-  DeleteSafeDelegateProps, SafeMultisigTransactionEstimate
+  DeleteSafeDelegateProps,
+  SafeMultisigTransactionEstimate
 } from '@safe-global/api-kit/index'
 import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
@@ -264,7 +265,9 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates/${delegateConfig.delegateAddress}`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates/${
+          delegateConfig.delegateAddress
+        }`,
         method: 'delete',
         body: {
           delegate: delegateAddress,
@@ -450,7 +453,9 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
         method: 'get'
       })
     })
@@ -460,7 +465,9 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
+        url: `${getTxServiceBaseUrl(
+          txServiceBaseUrl
+        )}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
         method: 'get'
       })
     })

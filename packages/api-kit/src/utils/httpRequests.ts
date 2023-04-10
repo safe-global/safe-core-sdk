@@ -49,5 +49,11 @@ export async function sendRequest<T>({ url, method, body }: HttpRequest): Promis
   if (jsonResponse.delegate) {
     throw new Error(jsonResponse.delegate)
   }
+  if (jsonResponse.safe) {
+    throw new Error(jsonResponse.safe)
+  }
+  if (jsonResponse.delegator) {
+    throw new Error(jsonResponse.delegator)
+  }
   throw new Error(response.statusText)
 }

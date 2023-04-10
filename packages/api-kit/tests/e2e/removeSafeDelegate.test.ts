@@ -1,7 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer'
+import SafeApiKit, { DeleteSafeDelegateProps } from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import SafeApiKit, { SafeDelegateDeleteConfig } from '@safe-global/api-kit/index'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
@@ -17,25 +17,12 @@ describe('removeSafeDelegate', () => {
     ))
   })
 
-  it('should fail if Safe address is empty', async () => {
-    const safeAddress = ''
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: delegateAddress,
-      signer
-    }
-    await chai
-      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith('Invalid Safe address')
-  })
-
   it('should fail if Safe delegate address is empty', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = ''
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: delegateAddress,
+    const delegatorAddress = await signer.getAddress()
+    const delegateConfig: DeleteSafeDelegateProps = {
+      delegateAddress,
+      delegatorAddress,
       signer
     }
     await chai
@@ -43,102 +30,99 @@ describe('removeSafeDelegate', () => {
       .to.be.rejectedWith('Invalid Safe delegate address')
   })
 
-  it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0',
+  it('should fail if Safe delegator address is empty', async () => {
+    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegatorAddress = ''
+    const delegateConfig: DeleteSafeDelegateProps = {
+      delegateAddress,
+      delegatorAddress,
       signer
     }
     await chai
       .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith('Checksum address validation failed')
+      .to.be.rejectedWith('Invalid Safe delegator address')
   })
 
   it('should fail if Safe delegate address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'.toLowerCase()
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: delegateAddress,
+    const delegatorAddress = await signer.getAddress()
+    const delegateConfig: DeleteSafeDelegateProps = {
+      delegateAddress,
+      delegatorAddress,
       signer
     }
     await chai
       .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith('Checksum address validation failed')
+      .to.be.rejectedWith(`Checksum address validation failed`)
   })
 
-  it('should fail if Safe does not exist', async () => {
-    const safeAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
+  it('should fail if Safe delegator address is not checksummed', async () => {
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: delegateAddress,
+    const delegatorAddress = (await signer.getAddress()).toLowerCase()
+    const delegateConfig: DeleteSafeDelegateProps = {
+      delegateAddress,
+      delegatorAddress,
       signer
     }
     await chai
       .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Safe=${safeAddress} does not exist or it's still not indexed`)
-  })
-
-  it('should fail if the signer is not an owner of the Safe', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-    const { safeApiKit, signer } = await getServiceClient(
-      '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
-    )
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: delegateAddress,
-      signer
-    }
-    await chai
-      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith('Signing owner is not an owner of the Safe')
+      .to.be.rejectedWith(`Address ${delegatorAddress} is not checksumed`)
   })
 
   it('should fail if the delegate to remove is not a delegate', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: delegateAddress,
+    const delegatorAddress = await signer.getAddress()
+    const delegateConfig: DeleteSafeDelegateProps = {
+      delegateAddress,
+      delegatorAddress,
       signer
     }
-    await chai.expect(safeApiKit.removeSafeDelegate(delegateConfig)).to.be.rejectedWith('Not found')
+    await chai.expect(safeApiKit.removeSafeDelegate(delegateConfig)).to.be.rejectedWith('Not Found')
   })
 
   it('should remove a delegate', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: safeAddress,
-      delegate: delegateAddress,
+    const delegatorAddress = await signer.getAddress()
+    const delegateConfig: DeleteSafeDelegateProps = {
+      delegateAddress,
+      delegatorAddress,
       signer
     }
     await safeApiKit.addSafeDelegate({ ...delegateConfig, label: 'Label' })
-    const { results: initialDelegates } = await safeApiKit.getSafeDelegates(safeAddress)
+    const { results: initialDelegates } = await safeApiKit.getSafeDelegates({
+      delegateAddress,
+      delegatorAddress
+    })
     chai.expect(initialDelegates.length).to.be.eq(1)
     await safeApiKit.removeSafeDelegate(delegateConfig)
-    const { results: finalDelegates } = await safeApiKit.getSafeDelegates(safeAddress)
+    const { results: finalDelegates } = await safeApiKit.getSafeDelegates({
+      delegateAddress,
+      delegatorAddress
+    })
     chai.expect(finalDelegates.length).to.be.eq(0)
   })
 
   it('should remove a delegate EIP-3770', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-    const delegateConfig: SafeDelegateDeleteConfig = {
-      safe: eip3770SafeAddress,
-      delegate: eip3770DelegateAddress,
+    const delegatorAddress = await signer.getAddress()
+    const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
+    const delegateConfig: DeleteSafeDelegateProps = {
+      delegateAddress: eip3770DelegateAddress,
+      delegatorAddress: eip3770DelegatorAddress,
       signer
     }
     await safeApiKit.addSafeDelegate({ ...delegateConfig, label: 'Label' })
-    const { results: initialDelegates } = await safeApiKit.getSafeDelegates(eip3770SafeAddress)
+    const { results: initialDelegates } = await safeApiKit.getSafeDelegates({
+      delegateAddress: eip3770DelegateAddress,
+      delegatorAddress: eip3770DelegatorAddress
+    })
     chai.expect(initialDelegates.length).to.be.eq(1)
     await safeApiKit.removeSafeDelegate(delegateConfig)
-    const { results: finalDelegates } = await safeApiKit.getSafeDelegates(eip3770SafeAddress)
+    const { results: finalDelegates } = await safeApiKit.getSafeDelegates({
+      delegateAddress: eip3770DelegateAddress,
+      delegatorAddress: eip3770DelegatorAddress
+    })
     chai.expect(finalDelegates.length).to.be.eq(0)
   })
 })

@@ -1,21 +1,16 @@
-import { Signer } from '@ethersproject/abstract-signer'
 import {
-  EthAdapter,
-  SafeMultisigConfirmationListResponse,
-  SafeMultisigTransactionResponse
-} from '@safe-global/safe-core-sdk-types'
-import {
+  AddSafeDelegateProps,
   AllTransactionsListResponse,
   AllTransactionsOptions,
+  DeleteSafeDelegateProps,
+  GetSafeDelegateProps,
   MasterCopyResponse,
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
   SafeCreationInfoResponse,
-  SafeDelegate,
-  SafeDelegateConfig,
-  SafeDelegateDeleteConfig,
   SafeDelegateListResponse,
+  SafeDelegateResponse,
   SafeInfoResponse,
   SafeModuleTransactionListResponse,
   SafeMultisigTransactionEstimate,
@@ -29,6 +24,11 @@ import {
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
+import {
+  EthAdapter,
+  SafeMultisigConfirmationListResponse,
+  SafeMultisigTransactionResponse
+} from '@safe-global/safe-core-sdk-types'
 
 export interface SafeApiKitConfig {
   /** txServiceUrl - Safe Transaction Service URL */
@@ -212,20 +212,45 @@ class SafeApiKit {
   }
 
   /**
-   * Returns the list of delegates for a given Safe address.
+   * Returns the list of delegates.
    *
-   * @param safeAddress - The Safe address
+   * @param getSafeDelegateProps - Properties to filter the returned list of delegates
    * @returns The list of delegates
-   * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
-  async getSafeDelegates(safeAddress: string): Promise<SafeDelegateListResponse> {
-    if (safeAddress === '') {
-      throw new Error('Invalid Safe address')
+  async getSafeDelegates({
+    safeAddress,
+    delegateAddress,
+    delegatorAddress,
+    label,
+    limit,
+    offset
+  }: GetSafeDelegateProps): Promise<SafeDelegateListResponse> {
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/delegates`)
+
+    if (safeAddress) {
+      const { address: safe } = await this.#ethAdapter.getEip3770Address(safeAddress)
+      url.searchParams.set('safe', safe)
     }
-    const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
+    if (delegateAddress) {
+      const { address: delegate } = await this.#ethAdapter.getEip3770Address(delegateAddress)
+      url.searchParams.set('delegate', delegate)
+    }
+    if (delegatorAddress) {
+      const { address: delegator } = await this.#ethAdapter.getEip3770Address(delegatorAddress)
+      url.searchParams.set('delegator', delegator)
+    }
+    if (label) {
+      url.searchParams.set('label', label)
+    }
+    if (limit) {
+      url.searchParams.set('limit', limit)
+    }
+    if (offset) {
+      url.searchParams.set('offset', offset)
+    }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/delegates/`,
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }
@@ -233,100 +258,84 @@ class SafeApiKit {
   /**
    * Adds a new delegate for a given Safe address.
    *
-   * @param delegateConfig - The configuration of the new delegate
+   * @param addSafeDelegateProps - The configuration of the new delegate
    * @returns
-   * @throws "Invalid Safe address"
    * @throws "Invalid Safe delegate address"
+   * @throws "Invalid Safe delegator address"
+   * @throws "Invalid label"
    * @throws "Checksum address validation failed"
    * @throws "Address <delegate_address> is not checksumed"
    * @throws "Safe=<safe_address> does not exist or it's still not indexed"
    * @throws "Signing owner is not an owner of the Safe"
    */
   async addSafeDelegate({
-    safe,
-    delegate,
+    safeAddress,
+    delegateAddress,
+    delegatorAddress,
     label,
     signer
-  }: SafeDelegateConfig): Promise<SafeDelegate> {
-    if (safe === '') {
-      throw new Error('Invalid Safe address')
-    }
-    if (delegate === '') {
+  }: AddSafeDelegateProps): Promise<SafeDelegateResponse> {
+    if (delegateAddress === '') {
       throw new Error('Invalid Safe delegate address')
     }
-    const { address: safeAddress } = await this.#ethAdapter.getEip3770Address(safe)
-    const { address: delegateAddress } = await this.#ethAdapter.getEip3770Address(delegate)
+    if (delegatorAddress === '') {
+      throw new Error('Invalid Safe delegator address')
+    }
+    if (label === '') {
+      throw new Error('Invalid label')
+    }
+    const { address: delegate } = await this.#ethAdapter.getEip3770Address(delegateAddress)
+    const { address: delegator } = await this.#ethAdapter.getEip3770Address(delegatorAddress)
     const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegateAddress + totp
+    const data = delegate + totp
     const signature = await signer.signMessage(data)
-    const body: SafeDelegate = {
-      safe: safeAddress,
-      delegate: delegateAddress,
+    const body: any = {
+      safe: (safeAddress) ? (await this.#ethAdapter.getEip3770Address(safeAddress)).address : null,
+      delegate,
+      delegator,
       label,
       signature
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/delegates/`,
+      url: `${this.#txServiceBaseUrl}/v1/delegates/`,
       method: HttpMethod.Post,
       body
     })
   }
 
   /**
-   * Removes all delegates for a given Safe address.
-   *
-   * @param safeAddress - The Safe address
-   * @param signer - A Signer that owns the Safe
-   * @returns
-   * @throws "Invalid Safe address"
-   * @throws "Checksum address validation failed"
-   * @throws "Safe=<safe_address> does not exist or it's still not indexed"
-   * @throws "Signing owner is not an owner of the Safe"
-   */
-  async removeAllSafeDelegates(safeAddress: string, signer: Signer): Promise<void> {
-    if (safeAddress === '') {
-      throw new Error('Invalid Safe address')
-    }
-    const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
-    const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = address + totp
-    const signature = await signer.signMessage(data)
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/delegates/`,
-      method: HttpMethod.Delete,
-      body: { signature }
-    })
-  }
-
-  /**
    * Removes a delegate for a given Safe address.
    *
-   * @param delegateConfig - The configuration for the delegate that will be removed
+   * @param deleteSafeDelegateProps - The configuration for the delegate that will be removed
    * @returns
-   * @throws "Invalid Safe address"
    * @throws "Invalid Safe delegate address"
+   * @throws "Invalid Safe delegator address"
    * @throws "Checksum address validation failed"
    * @throws "Signing owner is not an owner of the Safe"
    * @throws "Not found"
    */
-  async removeSafeDelegate({ safe, delegate, signer }: SafeDelegateDeleteConfig): Promise<void> {
-    if (safe === '') {
-      throw new Error('Invalid Safe address')
-    }
-    if (delegate === '') {
+  async removeSafeDelegate({
+    delegateAddress,
+    delegatorAddress,
+    signer
+  }: DeleteSafeDelegateProps): Promise<void> {
+    if (delegateAddress === '') {
       throw new Error('Invalid Safe delegate address')
     }
-    const { address: safeAddress } = await this.#ethAdapter.getEip3770Address(safe)
-    const { address: delegateAddress } = await this.#ethAdapter.getEip3770Address(delegate)
+    if (delegatorAddress === '') {
+      throw new Error('Invalid Safe delegator address')
+    }
+    const { address: delegate } = await this.#ethAdapter.getEip3770Address(delegateAddress)
+    const { address: delegator } = await this.#ethAdapter.getEip3770Address(delegatorAddress)
     const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegateAddress + totp
+    const data = delegate + totp
     const signature = await signer.signMessage(data)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/delegates/${delegateAddress}`,
+      url: `${this.#txServiceBaseUrl}/v1/delegates/${delegate}`,
       method: HttpMethod.Delete,
       body: {
-        safe: safeAddress,
-        delegate: delegateAddress,
+        delegate,
+        delegator,
         signature
       }
     })
@@ -432,7 +441,7 @@ class SafeApiKit {
     }
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers?executed=true`,
       method: HttpMethod.Get
     })
   }

@@ -1,18 +1,17 @@
 import { getDefaultProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
+import SafeApiKit, {
+  AddSafeDelegateProps,
+  DeleteSafeDelegateProps, SafeMultisigTransactionEstimate
+} from '@safe-global/api-kit/index'
+import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
+import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
 import { EthAdapter, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import SafeApiKit, {
-  SafeDelegateConfig,
-  SafeDelegateDeleteConfig,
-  SafeMultisigTransactionEstimate
-} from '@safe-global/api-kit/index'
-import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
-import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
 
@@ -36,12 +35,16 @@ const signer = new Wallet(
 )
 let ethAdapter: EthAdapter
 let safeApiKit: SafeApiKit
+let delegatorAddress: string
+let eip3770DelegatorAddress: string
 
 describe('Endpoint tests', () => {
   before(async () => {
     ;({ safeApiKit, ethAdapter } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
     ))
+    delegatorAddress = await signer.getAddress()
+    eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
   })
 
   const fetchData = sinon
@@ -178,131 +181,117 @@ describe('Endpoint tests', () => {
 
     it('getSafeDelegates', async () => {
       await chai
-        .expect(safeApiKit.getSafeDelegates(safeAddress))
+        .expect(safeApiKit.getSafeDelegates({ safeAddress }))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates?safe=${safeAddress}`,
         method: 'get'
       })
     })
 
     it('getSafeDelegates EIP-3770', async () => {
       await chai
-        .expect(safeApiKit.getSafeDelegates(eip3770SafeAddress))
+        .expect(safeApiKit.getSafeDelegates({ safeAddress: eip3770SafeAddress }))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates?safe=${safeAddress}`,
         method: 'get'
       })
     })
 
     it('addSafeDelegate', async () => {
-      const delegateConfig: SafeDelegateConfig = {
-        safe: safeAddress,
-        delegate: delegateAddress,
+      const delegateConfig: AddSafeDelegateProps = {
+        delegateAddress,
+        delegatorAddress,
         signer,
-        label: ''
+        label: 'label'
       }
+      const totp = Math.floor(Date.now() / 1000 / 3600)
+      const data = delegateAddress + totp
+      const signature = await signer.signMessage(data)
       await chai
         .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
-        method: 'get'
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates/`,
+        method: 'post',
+        body: {
+          safe: null,
+          delegate: delegateAddress,
+          delegator: delegatorAddress,
+          label: 'label',
+          signature
+        }
       })
     })
 
     it('addSafeDelegate EIP-3770', async () => {
-      const delegateConfig: SafeDelegateConfig = {
-        safe: eip3770SafeAddress,
-        delegate: eip3770DelegateAddress,
+      const delegateConfig: AddSafeDelegateProps = {
+        delegateAddress: eip3770DelegateAddress,
+        delegatorAddress: eip3770DelegatorAddress,
         signer,
-        label: ''
+        label: 'label'
       }
+      const totp = Math.floor(Date.now() / 1000 / 3600)
+      const data = delegateAddress + totp
+      const signature = await signer.signMessage(data)
       await chai
         .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
-        method: 'get'
-      })
-    })
-
-    it('removeAllSafeDelegates', async () => {
-      const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = safeAddress + totp
-      const signature = await signer.signMessage(data)
-      await chai
-        .expect(safeApiKit.removeAllSafeDelegates(safeAddress, signer))
-        .to.be.eventually.deep.equals({ data: { success: true } })
-      chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
-        method: 'delete',
-        body: { signature }
-      })
-    })
-
-    it('removeAllSafeDelegates EIP-3770', async () => {
-      const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = safeAddress + totp
-      const signature = await signer.signMessage(data)
-      await chai
-        .expect(safeApiKit.removeAllSafeDelegates(eip3770SafeAddress, signer))
-        .to.be.eventually.deep.equals({ data: { success: true } })
-      chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/`,
-        method: 'delete',
-        body: { signature }
-      })
-    })
-
-    it('removeSafeDelegate', async () => {
-      const delegate = delegateAddress
-      const delegateConfig: SafeDelegateDeleteConfig = {
-        safe: safeAddress,
-        delegate,
-        signer
-      }
-      const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = delegate + totp
-      const signature = await signer.signMessage(data)
-      await chai
-        .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-        .to.be.eventually.deep.equals({ data: { success: true } })
-      chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/delegates/${
-          delegateConfig.delegate
-        }`,
-        method: 'delete',
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates/`,
+        method: 'post',
         body: {
-          safe: delegateConfig.safe,
-          delegate: delegateConfig.delegate,
+          safe: null,
+          delegate: delegateAddress,
+          delegator: delegatorAddress,
+          label: 'label',
           signature
         }
       })
     })
 
     it('removeSafeDelegate', async () => {
-      const delegate = delegateAddress
-      const delegateConfig: SafeDelegateDeleteConfig = {
-        safe: eip3770SafeAddress,
-        delegate: eip3770DelegateAddress,
+      const delegateConfig: DeleteSafeDelegateProps = {
+        delegateAddress,
+        delegatorAddress,
         signer
       }
       const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = delegate + totp
+      const data = delegateAddress + totp
       const signature = await signer.signMessage(data)
       await chai
         .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(
-          txServiceBaseUrl
-        )}/v1/safes/${safeAddress}/delegates/${delegateAddress}`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates/${delegateConfig.delegateAddress}`,
         method: 'delete',
         body: {
-          safe: safeAddress,
           delegate: delegateAddress,
+          delegator: delegatorAddress,
+          signature
+        }
+      })
+    })
+
+    it('removeSafeDelegate', async () => {
+      const delegateConfig: DeleteSafeDelegateProps = {
+        delegateAddress: eip3770DelegateAddress,
+        delegatorAddress,
+        signer
+      }
+      const totp = Math.floor(Date.now() / 1000 / 3600)
+      const data = delegateAddress + totp
+      const signature = await signer.signMessage(data)
+      await chai
+        .expect(safeApiKit.removeSafeDelegate(delegateConfig))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/delegates/${delegateAddress}`,
+        method: 'delete',
+        body: {
+          delegate: delegateAddress,
+          delegator: delegatorAddress,
           signature
         }
       })
@@ -461,7 +450,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
         method: 'get'
       })
     })
@@ -471,7 +460,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers/`,
+        url: `${getTxServiceBaseUrl(txServiceBaseUrl)}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
         method: 'get'
       })
     })

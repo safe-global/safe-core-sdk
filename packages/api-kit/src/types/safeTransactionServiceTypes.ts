@@ -55,34 +55,47 @@ export type SafeCreationInfoResponse = {
   readonly dataDecoded?: string
 }
 
-export type SafeDelegateDeleteConfig = {
-  readonly safe: string
-  readonly delegate: string
-  readonly signer: Signer
+export type GetSafeDelegateProps = {
+  safeAddress?: string
+  delegateAddress?: string
+  delegatorAddress?: string
+  label?: string
+  limit?: string
+  offset?: string
 }
 
-export type SafeDelegateConfig = SafeDelegateDeleteConfig & {
-  readonly label: string
+export type AddSafeDelegateProps = {
+  safeAddress?: string
+  delegateAddress: string
+  delegatorAddress: string
+  signer: Signer
+  label: string
 }
 
-export type SafeDelegate = {
-  readonly safe: string
-  readonly delegate: string
-  readonly signature: string
-  readonly label: string
+export type DeleteSafeDelegateProps = {
+  delegateAddress: string
+  delegatorAddress: string
+  signer: Signer
 }
 
 export type SafeDelegateResponse = {
+  readonly safe: string
   readonly delegate: string
   readonly delegator: string
   readonly label: string
+  readonly signature: string
 }
 
 export type SafeDelegateListResponse = {
   readonly count: number
   readonly next?: string
   readonly previous?: string
-  readonly results: SafeDelegateResponse[]
+  readonly results: {
+    readonly safe: string
+    readonly delegate: string
+    readonly delegator: string
+    readonly label: string
+  }[]
 }
 
 export type SafeMultisigTransactionEstimate = {

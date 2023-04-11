@@ -2,7 +2,7 @@
 
 ## What is Safe
 
-Read about the basics of Safe and how it compares to other solutions [here](https://help.gnosis-safe.io/en/articles/3876456-what-is-gnosis-safe).
+Read about the basics of Safe and how it compares to other solutions [here](https://help.safe.global/en/articles/3876456-what-is-safe).
 
 ## Safe Core SDK
 
@@ -41,6 +41,6 @@ We'll assume that you are familiar with TypeScript (JavaScript), Ethereum and ha
 
 ## Help
 
-If you need help, you can reach Safe developers in the #safe-developers channel at https://chat.gnosis-safe.io/ or create a discussion at https://github.com/safe-global/safe-core-sdk/discussions.
+If you need help, you can reach Safe developers in the #safe-developers channel at https://chat.safe.global/ or create a discussion at https://github.com/safe-global/safe-core-sdk/discussions.
 
 Let's jump into the guide: [Integrating the Safe Core SDK](/guides/integrating-the-safe-core-sdk.md)

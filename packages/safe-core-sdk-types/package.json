@@ -10,10 +10,10 @@
     "SDK"
   ],
   "scripts": {
-    "unbuild": "rimraf dist *.tsbuildinfo",
-    "build": "rimraf dist && tsc",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write \"*/**/*.{js,json,md,ts}\""
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
+    "unbuild": "rimraf dist *.tsbuildinfo",
+    "build": "yarn unbuild && tsc -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",

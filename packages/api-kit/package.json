@@ -11,8 +11,6 @@
     "API"
   ],
   "scripts": {
-    "unbuild": "rimraf dist",
-    "build": "yarn rimraf dist .nyc_output cache && tsc",
     "test:web3": "export TESTS_PATH=tests/endpoint && export ETH_LIB=web3 && nyc hardhat test",
     "test:ethers": "export TESTS_PATH=tests/endpoint && export ETH_LIB=ethers && nyc hardhat test",
     "test": "yarn test:ethers",
@@ -20,7 +18,9 @@
     "test:ci:ethers": "export TESTS_PATH=tests/e2e && export ETH_LIB=ethers && nyc hardhat test",
     "test:ci": "yarn test:ci:ethers",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write \"*/**/*.{js,json,md,ts}\""
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
+    "unbuild": "rimraf dist .nyc_output cache",
+    "build": "yarn unbuild && tsc -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",

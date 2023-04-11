@@ -12,11 +12,11 @@
     "Relay"
   ],
   "scripts": {
-    "unbuild": "rimraf dist dist .nyc_output cache",
-    "build": "yarn unbuild && tsc",
+    "test": "jest src",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
-    "test": "jest src"
+    "unbuild": "rimraf dist .nyc_output cache",
+    "build": "yarn unbuild && tsc -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",

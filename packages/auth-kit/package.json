@@ -5,11 +5,11 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
+    "test": "jest src --coverage",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rm -rf dist",
-    "build": "rm -rf dist && yarn tsc",
-    "test": "jest src --coverage"
+    "build": "yarn unbuild && yarn tsc -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",

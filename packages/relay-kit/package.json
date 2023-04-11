@@ -37,7 +37,7 @@
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^3.1.0",
     "@safe-global/protocol-kit": "^0.1.0",
-    "@safe-global/safe-core-sdk-types": "^1.9.0",
+    "@safe-global/safe-core-sdk-types": "^1.10.0",
     "ethers": "^5.7.2"
   }
 }

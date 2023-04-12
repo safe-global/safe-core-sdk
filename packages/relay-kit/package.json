@@ -12,11 +12,11 @@
     "Relay"
   ],
   "scripts": {
-    "unbuild": "rimraf dist dist .nyc_output cache",
-    "build": "yarn unbuild && tsc",
+    "test": "jest src",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write */**/*.{js,json,md,ts}",
-    "test": "jest src"
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
+    "unbuild": "rimraf dist .nyc_output cache",
+    "build": "yarn unbuild && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^3.1.0",
     "@safe-global/protocol-kit": "^0.1.0",
-    "@safe-global/safe-core-sdk-types": "^1.9.0",
+    "@safe-global/safe-core-sdk-types": "^1.10.0",
     "ethers": "^5.7.2"
   }
 }

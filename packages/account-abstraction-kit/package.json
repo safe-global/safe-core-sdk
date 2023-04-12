@@ -12,9 +12,9 @@
   ],
   "scripts": {
     "unbuild": "rimraf dist",
-    "build": "yarn unbuild && tsc",
+    "build": "yarn unbuild && tsc && tsc-alias",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "test": "echo \"Error: no test specified\""
   },
   "repository": {
@@ -36,7 +36,7 @@
   "dependencies": {
     "@safe-global/protocol-kit": "^0.1.0",
     "@safe-global/relay-kit": "^0.1.0",
-    "@safe-global/safe-core-sdk-types": "^1.9.0",
+    "@safe-global/safe-core-sdk-types": "^1.10.0",
     "ethereumjs-util": "^7.1.5",
     "ethers": "^5.7.2"
   }

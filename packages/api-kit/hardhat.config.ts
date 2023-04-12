@@ -1,5 +1,4 @@
 import '@nomiclabs/hardhat-ethers'
-import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-web3'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'

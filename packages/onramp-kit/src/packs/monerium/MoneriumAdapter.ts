@@ -5,6 +5,7 @@ import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
 
 const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
+const MONERIUM_REFRESH_TOKEN = 'monerium_refresh_token'
 
 /**
  * This class implements the SafeOnRampClient interface for the Monerium provider
@@ -43,31 +44,55 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
           code_verifier: codeVerifier,
           redirect_uri: options.redirect_uri
         })
+
+        localStorage.setItem(
+          MONERIUM_REFRESH_TOKEN,
+          this.#client?.bearerProfile?.refresh_token || ''
+        )
+
+        this.#cleanQueryString()
       } catch (e) {
         throw new Error(getErrorMessage(e))
       } finally {
         localStorage.removeItem(MONERIUM_CODE_VERIFIER)
       }
     } else {
-      const authFlowUrl = this.#client.getAuthFlowURI({
-        client_id: this.#config.clientId,
-        redirect_uri: options.redirect_uri,
-        address: options?.address,
-        signature: options?.signature,
-        chain: options?.chain,
-        network: options?.network
-      })
+      const refreshToken = localStorage.getItem(MONERIUM_REFRESH_TOKEN)
+      if (refreshToken) {
+        try {
+          await this.#client.auth({
+            client_id: this.#config.clientId,
+            refresh_token: refreshToken
+          })
+          localStorage.setItem(
+            MONERIUM_REFRESH_TOKEN,
+            this.#client?.bearerProfile?.refresh_token || ''
+          )
+        } catch (e) {
+          throw new Error(getErrorMessage(e))
+        }
+      } else {
+        const authFlowUrl = this.#client.getAuthFlowURI({
+          client_id: this.#config.clientId,
+          redirect_uri: options.redirect_uri,
+          address: options?.address,
+          signature: options?.signature,
+          chain: options?.chain,
+          network: options?.network
+        })
 
-      localStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
+        localStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
 
-      window.location.replace(authFlowUrl)
+        window.location.replace(authFlowUrl)
+      }
     }
 
     return this.#client
   }
 
   async close() {
-    throw new Error('Method not implemented.')
+    localStorage.removeItem(MONERIUM_CODE_VERIFIER)
+    localStorage.removeItem(MONERIUM_REFRESH_TOKEN)
   }
 
   subscribe(): void {
@@ -76,5 +101,15 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
 
   unsubscribe(): void {
     throw new Error('Method not implemented.')
+  }
+
+  #cleanQueryString() {
+    const url = window.location.href
+    const [baseUrl, queryString] = url.split('?')
+
+    // Check if there is a query string
+    if (queryString) {
+      window.history.replaceState(null, '', baseUrl)
+    }
   }
 }

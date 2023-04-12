@@ -5,7 +5,6 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
@@ -16,7 +15,11 @@ import {
 import Safe from '@safe-global/protocol-kit/Safe'
 import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
+import {
+  predictSafeAddress,
+  validateSafeAccountConfig,
+  validateSafeDeploymentConfig
+} from './utils'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -129,7 +132,15 @@ class SafeFactory {
     return this.#ethAdapter.getChainId()
   }
 
-  private async encodeSetupCallData({
+  getSafeProxyFactoryContract(): GnosisSafeProxyFactoryContract {
+    return this.#safeProxyFactoryContract
+  }
+
+  getSafeContract(): GnosisSafeContract {
+    return this.#gnosisSafeContract
+  }
+
+  async encodeSetupCallData({
     owners,
     threshold,
     to = ZERO_ADDRESS,
@@ -180,30 +191,11 @@ class SafeFactory {
     safeAccountConfig,
     safeDeploymentConfig
   }: PredictSafeProps): Promise<string> {
-    validateSafeAccountConfig(safeAccountConfig)
-    validateSafeDeploymentConfig(safeDeploymentConfig)
-
-    const from = this.#safeProxyFactoryContract.getAddress()
-
-    const initializer = await this.encodeSetupCallData(safeAccountConfig)
-    const saltNonce = safeDeploymentConfig.saltNonce
-    const encodedNonce = toBuffer(
-      this.#ethAdapter.encodeParameters(['uint256'], [saltNonce])
-    ).toString('hex')
-
-    const salt = keccak256(
-      toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
-    )
-
-    const proxyCreationCode = await this.#safeProxyFactoryContract.proxyCreationCode()
-    const constructorData = toBuffer(
-      this.#ethAdapter.encodeParameters(['address'], [this.#gnosisSafeContract.getAddress()])
-    ).toString('hex')
-    const initCode = proxyCreationCode + constructorData
-
-    const proxyAddress =
-      '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
-    return this.#ethAdapter.getChecksummedAddress(proxyAddress)
+    return predictSafeAddress({
+      ethAdapter: this.#ethAdapter,
+      safeAccountConfig,
+      safeDeploymentConfig
+    })
   }
 
   async deploySafe({

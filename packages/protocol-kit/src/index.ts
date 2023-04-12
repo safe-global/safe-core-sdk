@@ -53,6 +53,7 @@ import {
 import { ContractNetworksConfig } from './types'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
+import { predictSafeAddress } from './safeFactory/utils'
 
 export {
   ContractManager,
@@ -100,7 +101,8 @@ export {
   getMultiSendContract,
   getMultiSendCallOnlyContract,
   getSignMessageLibContract,
-  getCreateCallContract
+  getCreateCallContract,
+  predictSafeAddress
 }
 
 export default Safe

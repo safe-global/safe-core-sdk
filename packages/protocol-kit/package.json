@@ -32,7 +32,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output typechain *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && yarn typechain && yarn safe-deployments && tsc -p tsconfig.build.json"
+    "build": "yarn unbuild && hardhat compile && yarn typechain && yarn safe-deployments && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",

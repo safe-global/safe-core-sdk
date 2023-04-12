@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "unbuild": "rimraf dist *.tsbuildinfo",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "test": "nyc mocha -r ts-node/register tests/**/*.test.ts",
     "example:creation": "ts-node examples/creation.ts",
     "example:interaction": "ts-node examples/interaction.ts",

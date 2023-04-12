@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "SDK to interact with Safe smart contracts",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -53,7 +53,7 @@
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@safe-global/safe-core-sdk-types": "^1.10.0",
+    "@safe-global/safe-core-sdk-types": "^1.10.1",
     "@typechain/ethers-v5": "^10.2.0",
     "@typechain/web3-v1": "^6.0.2",
     "@types/chai": "^4.3.4",

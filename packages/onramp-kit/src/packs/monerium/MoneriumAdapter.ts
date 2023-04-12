@@ -1,6 +1,6 @@
-import { MoneriumClient } from '@monerium/sdk'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
+import { SafeMoneriumClient } from './SafeMoneriumClient'
 
 import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
 
@@ -12,7 +12,7 @@ const MONERIUM_REFRESH_TOKEN = 'monerium_refresh_token'
  * @class MoneriumAdapter
  */
 export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
-  #client?: MoneriumClient
+  #client?: SafeMoneriumClient
   #config: MoneriumProviderConfig
 
   constructor(config: MoneriumProviderConfig) {
@@ -21,13 +21,13 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
 
   async init() {
     try {
-      this.#client = new MoneriumClient(this.#config.environment)
+      this.#client = new SafeMoneriumClient(this.#config.environment)
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
   }
 
-  async open(options: MoneriumOpenOptions): Promise<MoneriumClient> {
+  async open(options: MoneriumOpenOptions): Promise<SafeMoneriumClient> {
     if (!this.#client) {
       throw new Error('Monerium client not initialized')
     }

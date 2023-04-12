@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.10.5",
     "@monerium/sdk": "^2.0.17",
     "@mui/material": "^5.11.7",
+    "@safe-global/api-kit": "^1.0.1",
     "@safe-global/safe-react-components": "^2.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

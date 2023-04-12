@@ -1,19 +1,11 @@
 import { useState, useEffect } from 'react'
-import {
-  AuthContext,
-  Chain,
-  Currency,
-  MoneriumClient,
-  Network,
-  OrderKind,
-  PaymentStandard
-} from '@monerium/sdk'
+import { AuthContext, Chain, Currency, Network, OrderKind, PaymentStandard } from '@monerium/sdk'
 import { Box, Button } from '@mui/material'
-import { SafeOnRampKit, MoneriumAdapter } from '../../../../src'
+import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
 
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
-  const [moneriumClient, setMoneriumClient] = useState<MoneriumClient>()
+  const [moneriumClient, setMoneriumClient] = useState<SafeMoneriumClient>()
   const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<MoneriumAdapter>>()
 
   useEffect(() => {
@@ -69,14 +61,16 @@ function Monerium() {
   }
 
   const placeOrder = async () => {
+    const safeAddress = '0x1D762aB2D95F133c28e824cbBE90594c87A260Cb'
     const date = new Date().toISOString()
+    const messageToSign = `Send EUR 1 to GR16 0110 1250 0000 0001 2300 695 at ${date}`
 
     const newOrder = {
       kind: OrderKind.redeem,
       amount: '1',
       signature: '0x',
       accountId: '053b82db-d871-11ed-8347-d21c9f8d80e1',
-      address: '0x1D762aB2D95F133c28e824cbBE90594c87A260Cb',
+      address: safeAddress,
       currency: Currency.eur,
       counterpart: {
         identifier: {
@@ -90,15 +84,15 @@ function Monerium() {
         }
       },
       memo: 'Testing Safe-Monerium integration',
-      message: `Send EUR 1 to GR16 0110 1250 0000 0001 2300 695 at ${date}`,
+      message: messageToSign,
       chain: Chain.ethereum,
       network: Network.goerli,
       supportingDocumentId: ''
     }
 
-    const order = await moneriumClient?.placeOrder(newOrder, authContext?.defaultProfile)
-
-    console.log('New Order generated: ', order)
+    // const order = await moneriumClient?.placeOrder(newOrder, authContext?.defaultProfile)
+    await moneriumClient?.signMessage(safeAddress, messageToSign, 5)
+    // console.log('New Order generated: ', order)
   }
 
   return (

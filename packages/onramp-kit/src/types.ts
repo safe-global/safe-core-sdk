@@ -1,5 +1,5 @@
-import { MoneriumClient } from '@monerium/sdk'
 import { MoneriumAdapter } from './packs/monerium/MoneriumAdapter'
+import { SafeMoneriumClient } from './packs/monerium/SafeMoneriumClient'
 import { MoneriumOpenOptions } from './packs/monerium/types'
 import { StripeAdapter } from './packs/stripe/StripeAdapter'
 import {
@@ -8,6 +8,12 @@ import {
   StripeEventListener,
   StripeOpenOptions
 } from './packs/stripe/types'
+
+declare global {
+  interface Window {
+    ethereum?: any
+  }
+}
 
 // The new adapters must implement this interface
 export interface SafeOnRampAdapter<TAdapter> {
@@ -33,7 +39,7 @@ export type SafeOnRampOpenOptions<T> = T extends StripeAdapter
 export type SafeOnRampOpenResponse<T> = T extends StripeAdapter
   ? StripeSession
   : T extends MoneriumAdapter
-  ? MoneriumClient
+  ? SafeMoneriumClient
   : never
 export type SafeOnRampEvent<T> = T extends StripeAdapter ? StripeEvent : never
 export type SafeOnRampEventListener<T> = T extends StripeAdapter ? StripeEventListener : never

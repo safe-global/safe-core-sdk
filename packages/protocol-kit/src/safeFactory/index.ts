@@ -7,7 +7,7 @@ import {
 import Safe from '@safe-global/protocol-kit/Safe'
 import {
   ContractNetworksConfig,
-  PredictSafeProps,
+  PredictedSafeProps,
   SafeAccountConfig,
   SafeDeploymentConfig
 } from '@safe-global/protocol-kit/types'
@@ -164,7 +164,7 @@ class SafeFactory {
   async predictSafeAddress({
     safeAccountConfig,
     safeDeploymentConfig
-  }: PredictSafeProps): Promise<string> {
+  }: PredictedSafeProps): Promise<string> {
     validateSafeAccountConfig(safeAccountConfig)
     validateSafeDeploymentConfig(safeDeploymentConfig)
 

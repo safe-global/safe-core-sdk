@@ -21,7 +21,7 @@ class ContractManager {
   static async create({
     ethAdapter,
     safeAddress,
-    predictSafe,
+    predictedSafe,
     isL1SafeMasterCopy,
     contractNetworks
   }: SafeConfig): Promise<ContractManager> {
@@ -29,7 +29,7 @@ class ContractManager {
     await contractManager.init({
       ethAdapter,
       safeAddress,
-      predictSafe,
+      predictedSafe,
       isL1SafeMasterCopy,
       contractNetworks
     })

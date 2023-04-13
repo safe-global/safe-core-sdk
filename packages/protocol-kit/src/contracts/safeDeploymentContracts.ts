@@ -1,3 +1,4 @@
+import { ContractNetworkConfig } from '@safe-global/protocol-kit/types'
 import {
   CompatibilityFallbackHandlerContract,
   CreateCallContract,
@@ -21,7 +22,6 @@ import {
   getSignMessageLibDeployment,
   SingletonDeployment
 } from '@safe-global/safe-deployments'
-import { ContractNetworkConfig } from '@safe-global/protocol-kit/types'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
 interface GetContractInstanceProps {

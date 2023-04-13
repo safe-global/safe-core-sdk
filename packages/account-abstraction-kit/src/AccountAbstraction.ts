@@ -7,7 +7,7 @@ import {
   encodeMultiSendData
 } from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
-  calculateChainSpecificProxyAddress,
+  calculateProxyAddress,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
@@ -55,7 +55,7 @@ class AccountAbstraction {
       safeVersion,
       chainId
     })
-    const safeAddress = await calculateChainSpecificProxyAddress(
+    const safeAddress = await calculateProxyAddress(
       this.#ethAdapter,
       safeVersion,
       this.#safeProxyFactoryContract,

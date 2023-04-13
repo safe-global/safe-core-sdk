@@ -12,7 +12,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { SAFE_LAST_VERSION } from './contracts/config'
 import { getProxyFactoryContract } from './contracts/safeDeploymentContracts'
-import { calculateChainSpecificProxyAddress } from './contracts/utils'
+import { calculateProxyAddress } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -22,7 +22,7 @@ import {
   AddOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
-  PredictSafeProps,
+  PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeConfig,
   SwapOwnerTxParams
@@ -49,7 +49,7 @@ import {
 } from './utils/transactions/utils'
 
 class Safe {
-  #predictSafe?: PredictSafeProps
+  #predictedSafe?: PredictedSafeProps
   #ethAdapter!: EthAdapter
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
@@ -61,6 +61,7 @@ class Safe {
    * Creates an instance of the Safe Core SDK.
    * @param config - Ethers Safe configuration
    * @returns The Safe Core SDK instance
+   * @throws "The SDK must be initialized with a safeAddress or a predictedSafe"
    * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
@@ -68,15 +69,20 @@ class Safe {
   static async create({
     ethAdapter,
     safeAddress,
-    predictSafe,
+    predictedSafe,
     isL1SafeMasterCopy,
     contractNetworks
   }: SafeConfig): Promise<Safe> {
+    if (safeAddress && predictedSafe) {
+      throw new Error(
+        'The SDK cannot be initialized with a safeAddress and a predictedSafe at the same time'
+      )
+    }
     const safeSdk = new Safe()
     await safeSdk.init({
       ethAdapter,
       safeAddress,
-      predictSafe,
+      predictedSafe,
       isL1SafeMasterCopy,
       contractNetworks
     })
@@ -94,12 +100,12 @@ class Safe {
   private async init({
     ethAdapter,
     safeAddress,
-    predictSafe,
+    predictedSafe,
     isL1SafeMasterCopy,
     contractNetworks
   }: SafeConfig): Promise<void> {
     this.#ethAdapter = ethAdapter
-    this.#predictSafe = predictSafe
+    this.#predictedSafe = predictedSafe
     this.#contractManager = await ContractManager.create({
       ethAdapter: this.#ethAdapter,
       safeAddress,
@@ -118,6 +124,7 @@ class Safe {
   /**
    * Returns a new instance of the Safe Core SDK.
    * @param config - Connect Safe configuration
+   * @throws "A safeAddress and a predictedSafe cannot be connected at the same time"
    * @throws "SafeProxy contract is not deployed on the current network"
    * @throws "MultiSend contract is not deployed on the current network"
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
@@ -125,14 +132,17 @@ class Safe {
   async connect({
     ethAdapter,
     safeAddress,
-    predictSafe,
+    predictedSafe,
     isL1SafeMasterCopy,
     contractNetworks
   }: ConnectSafeConfig): Promise<Safe> {
+    if (safeAddress && predictedSafe) {
+      throw new Error('A safeAddress and a predictedSafe cannot be connected at the same time')
+    }
     return await Safe.create({
       ethAdapter: ethAdapter || this.#ethAdapter,
-      safeAddress: safeAddress || (await this.getAddress()),
-      predictSafe: predictSafe || this.#predictSafe,
+      safeAddress: predictedSafe ? undefined : safeAddress || (await this.getAddress()),
+      predictedSafe: safeAddress ? undefined : predictedSafe || this.#predictedSafe,
       isL1SafeMasterCopy: isL1SafeMasterCopy || this.#contractManager.isL1SafeMasterCopy,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     })
@@ -145,20 +155,23 @@ class Safe {
    */
   async getAddress(): Promise<string> {
     if (!this.#contractManager.safeContract) {
+      const chainId = await this.#ethAdapter.getChainId()
       const safeProxyContract = await getProxyFactoryContract({
         ethAdapter: this.#ethAdapter,
         safeVersion: SAFE_LAST_VERSION,
-        chainId: await this.#ethAdapter.getChainId()
+        chainId,
+        customContracts: this.#contractManager.contractNetworks?.[chainId]
       })
       const signerAddress = await this.#ethAdapter.getSignerAddress()
       if (!signerAddress) {
         throw new Error('EthAdapter must be initialized with a signer to use this method')
       }
-      return calculateChainSpecificProxyAddress(
+      return calculateProxyAddress(
         this.#ethAdapter,
         SAFE_LAST_VERSION,
         safeProxyContract,
-        signerAddress
+        signerAddress,
+        this.#contractManager.contractNetworks?.[chainId]
       )
     }
     return Promise.resolve(this.#contractManager.safeContract.getAddress())

@@ -21,7 +21,7 @@ export interface SafeDeploymentConfig {
   saltNonce: string
 }
 
-export interface PredictSafeProps {
+export interface PredictedSafeProps {
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig: SafeDeploymentConfig
 }
@@ -67,8 +67,8 @@ export interface SafeConfig {
   ethAdapter: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
-  /** predictSafe - The configuration of the Safe that is not yet deployed */
-  predictSafe?: PredictSafeProps
+  /** predictedSafe - The configuration of the Safe that is not yet deployed */
+  predictedSafe?: PredictedSafeProps
   /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
@@ -80,8 +80,8 @@ export interface ConnectSafeConfig {
   ethAdapter?: EthAdapter
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
-  /** predictSafe - The configuration of the Safe that is not yet deployed */
-  predictSafe?: PredictSafeProps
+  /** predictedSafe - The configuration of the Safe that is not yet deployed */
+  predictedSafe?: PredictedSafeProps
   /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */

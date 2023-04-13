@@ -34,7 +34,7 @@ import {
   getSignMessageLibContract
 } from './contracts/safeDeploymentContracts'
 import {
-  calculateChainSpecificProxyAddress,
+  calculateProxyAddress,
   getSafeInitializer,
   PREDETERMINED_SALT_NONCE
 } from './contracts/utils'
@@ -46,7 +46,7 @@ import {
   ConnectSafeConfig,
   ContractNetworksConfig,
   CreateTransactionProps,
-  PredictSafeProps,
+  PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeAccountConfig,
   SafeConfig,
@@ -62,7 +62,7 @@ export {
   SafeFactoryConfig,
   SafeAccountConfig,
   SafeDeploymentConfig,
-  PredictSafeProps,
+  PredictedSafeProps,
   DeploySafeProps,
   SafeConfig,
   ConnectSafeConfig,
@@ -103,7 +103,7 @@ export {
   getSignMessageLibContract,
   getCreateCallContract,
   getSafeInitializer,
-  calculateChainSpecificProxyAddress,
+  calculateProxyAddress,
   PREDETERMINED_SALT_NONCE
 }
 

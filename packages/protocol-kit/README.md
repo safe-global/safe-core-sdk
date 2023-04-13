@@ -1,6 +1,6 @@
-# Safe Core SDK
+# Protocol Kit
 
-[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk)
+[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
@@ -36,7 +36,7 @@ npm build
 
 ## <a name="getting-started">Getting Started</a>
 
-The following steps show how to set up the Safe Core SDK, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Safe Core SDK alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Safe Web App](https://app.safe.global/), it is recommended that you follow this other [guide](/guides/integrating-the-safe-core-sdk.md) that covers the use of the Protocol Kit, combined with the API Kit.
+The following steps show how to set up the Protocol Kit, deploy a new Safe, create a Safe transaction, generate the required signatures from owners and execute the transaction. However, using the Protocol Kit alone will not allow for the collection of owner signatures off-chain. To do this and be able to see and confirm the pending transactions shown in the [Safe Web App](https://app.safe.global/), it is recommended that you follow this other [guide](/guides/integrating-the-safe-core-sdk.md) that covers the use of the Protocol Kit, combined with the API Kit.
 
 ### 1. Instantiate an EthAdapter
 
@@ -69,7 +69,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk: Safe = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
-The `deploySafe` method executes a transaction from the `owner1` account, deploys a new Safe and returns an instance of the Safe Core SDK connected to the new Safe. Check the `deploySafe` method in the [API Reference](#factory-api) for more details on additional configuration parameters and callbacks.
+The `deploySafe` method executes a transaction from the `owner1` account, deploys a new Safe and returns an instance of the Protocol Kit connected to the new Safe. Check the `deploySafe` method in the [API Reference](#factory-api) for more details on additional configuration parameters and callbacks.
 
 Call the `getAddress` method, for example, to check the address of the newly deployed Safe.
 
@@ -77,7 +77,7 @@ Call the `getAddress` method, for example, to check the address of the newly dep
 const newSafeAddress = safeSdk.getAddress()
 ```
 
-To instantiate the Safe Core SDK from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address.
+To instantiate the Protocol Kit from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address.
 
 ```js
 import Safe from '@safe-global/protocol-kit'
@@ -202,7 +202,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 ### deploySafe
 
-Deploys a new Safe and returns an instance of the Safe Core SDK connected to the deployed Safe. The address of the Master Copy, Safe contract version and the contract (`GnosisSafe.sol` or `GnosisSafeL2.sol`) of the deployed Safe will depend on the initialization of the `safeFactory` instance.
+Deploys a new Safe and returns an instance of the Protocol Kit connected to the deployed Safe. The address of the Master Copy, Safe contract version and the contract (`GnosisSafe.sol` or `GnosisSafeL2.sol`) of the deployed Safe will depend on the initialization of the `safeFactory` instance.
 
 ```js
 const safeAccountConfig: SafeAccountConfig = {
@@ -265,7 +265,7 @@ const options: EthersTransactionOptions = {
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, safeDeploymentConfig, options })
 ```
 
-It can also take an optional callback which receives the `txHash` of the Safe deployment transaction prior to returning a new instance of the Safe Core SDK:
+It can also take an optional callback which receives the `txHash` of the Safe deployment transaction prior to returning a new instance of the Protocol Kit:
 
 ```js
 const callback = (txHash: string): void => {
@@ -279,7 +279,7 @@ const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, callback })
 
 ### create
 
-Returns an instance of the Safe Core SDK connected to the `safeAddress`.
+Returns an instance of the Protocol Kit connected to the `safeAddress`.
 
 ```js
 import Safe from '@safe-global/protocol-kit'
@@ -329,7 +329,7 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 
 ### connect
 
-Returns a new instance of the Safe Core SDK connected to the `safeAddress`.
+Returns a new instance of the Protocol Kit connected to the `safeAddress`.
 
 ```js
 const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
@@ -464,7 +464,7 @@ const isOwner = await safeSdk.isOwner(address)
 
 ### createTransaction
 
-Returns a Safe transaction ready to be signed by the owners and executed. The Safe Core SDK supports the creation of single Safe transactions but also MultiSend transactions.
+Returns a Safe transaction ready to be signed by the owners and executed. The Protocol Kit supports the creation of single Safe transactions but also MultiSend transactions.
 
 - **Single transactions**
 

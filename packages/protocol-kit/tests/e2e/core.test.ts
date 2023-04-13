@@ -6,7 +6,6 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import { PREDETERMINED_SALT_NONCE } from './../../src/contracts/utils'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -27,7 +26,7 @@ describe('Safe Info', () => {
         threshold: 1
       },
       safeDeploymentConfig: {
-        saltNonce: PREDETERMINED_SALT_NONCE
+        saltNonce: ''
       }
     }
     return {

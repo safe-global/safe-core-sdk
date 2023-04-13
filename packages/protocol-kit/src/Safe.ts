@@ -171,21 +171,17 @@ class Safe {
   async getAddress(): Promise<string> {
     if (!this.#contractManager.safeContract) {
       const chainId = await this.#ethAdapter.getChainId()
-      const safeProxyContract = await getProxyFactoryContract({
+      const safeProxyFactoryContract = await getProxyFactoryContract({
         ethAdapter: this.#ethAdapter,
         safeVersion: SAFE_LAST_VERSION,
         chainId,
         customContracts: this.#contractManager.contractNetworks?.[chainId]
       })
-      const signerAddress = await this.#ethAdapter.getSignerAddress()
-      if (!signerAddress) {
-        throw new Error('EthAdapter must be initialized with a signer to use this method')
-      }
       return calculateProxyAddress(
         this.#ethAdapter,
         SAFE_LAST_VERSION,
-        safeProxyContract,
-        signerAddress,
+        safeProxyFactoryContract,
+        this.#predictedSafe!,
         this.#contractManager.contractNetworks?.[chainId]
       )
     }

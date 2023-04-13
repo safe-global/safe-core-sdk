@@ -1,3 +1,4 @@
+import { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -5,49 +6,78 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { BigNumber, BigNumberish, BytesLike, ethers } from 'ethers'
+import semverSatisfies from 'semver/functions/satisfies'
 import {
   getCompatibilityFallbackHandlerContract,
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
-import { ContractNetworkConfig } from '../types'
+import { ContractNetworkConfig, SafeAccountConfig } from '../types'
 import { ZERO_ADDRESS } from '../utils/constants'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =
   '0xb1073742015cbcf5a3a4d9d1ae33ecf619439710b89475f92e2abd2117e90f90'
 
+export function encodeCreateProxyWithNonce(
+  safeProxyFactoryContract: GnosisSafeProxyFactoryContract,
+  safeSingletonAddress: string,
+  initializer: string
+) {
+  return safeProxyFactoryContract.encode('createProxyWithNonce', [
+    safeSingletonAddress,
+    initializer,
+    PREDETERMINED_SALT_NONCE
+  ])
+}
+
 // TO-DO: Merge with encodeSetupCallData from the SafeFactory class
 export async function encodeDefaultSetupCallData(
   ethAdapter: EthAdapter,
   safeVersion: SafeVersion,
   safeContract: GnosisSafeContract,
-  owners: string[],
+  safeAccountConfig: SafeAccountConfig,
   chainId: number,
   customContracts?: ContractNetworkConfig
 ): Promise<string> {
-  const compatibilityFallbackHandler = await getCompatibilityFallbackHandlerContract({
-    ethAdapter,
-    safeVersion,
-    chainId,
-    customContracts
-  })
+  if (semverSatisfies(safeVersion, '<=1.0.0')) {
+    return safeContract.encode('setup', [
+      safeAccountConfig.owners, // required
+      safeAccountConfig.threshold as BigNumberish, // required
+      safeAccountConfig.to || ZERO_ADDRESS,
+      (safeAccountConfig.data as BytesLike) || '0x',
+      safeAccountConfig.paymentToken || ZERO_ADDRESS,
+      (safeAccountConfig.payment as BigNumberish) || BigNumber.from(0),
+      safeAccountConfig.paymentReceiver || ZERO_ADDRESS
+    ])
+  }
+
+  let fallbackHandlerAddress = safeAccountConfig.fallbackHandler
+  if (!fallbackHandlerAddress) {
+    const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
+      ethAdapter,
+      safeVersion,
+      chainId,
+      customContracts
+    })
+    fallbackHandlerAddress = fallbackHandlerContract.getAddress()
+  }
 
   return safeContract.encode('setup', [
-    owners,
-    BigNumber.from(1) as BigNumberish,
-    ZERO_ADDRESS,
-    '0x' as BytesLike,
-    compatibilityFallbackHandler.getAddress(),
-    ZERO_ADDRESS,
-    BigNumber.from(0) as BigNumberish,
-    ZERO_ADDRESS
+    safeAccountConfig.owners, // required
+    safeAccountConfig.threshold as BigNumberish, // required
+    safeAccountConfig.to || ZERO_ADDRESS,
+    (safeAccountConfig.data as BytesLike) || '0x',
+    fallbackHandlerAddress,
+    safeAccountConfig.paymentToken || ZERO_ADDRESS,
+    (safeAccountConfig.payment as BigNumberish) || BigNumber.from(0),
+    safeAccountConfig.paymentReceiver || ZERO_ADDRESS
   ])
 }
 
 export async function getSafeInitializer(
   ethAdapter: EthAdapter,
   safeContract: GnosisSafeContract,
-  signerAddress: string,
+  predictedSafe: PredictedSafeProps,
   chainId: number,
   customContracts?: ContractNetworkConfig
 ): Promise<string> {
@@ -56,7 +86,7 @@ export async function getSafeInitializer(
     ethAdapter,
     safeVersion,
     safeContract,
-    [signerAddress],
+    predictedSafe.safeAccountConfig,
     chainId,
     customContracts
   )
@@ -68,7 +98,7 @@ export async function calculateProxyAddress(
   ethAdapter: EthAdapter,
   safeVersion: SafeVersion,
   safeProxyFactoryContract: GnosisSafeProxyFactoryContract,
-  signerAddress: string,
+  predictedSafe: PredictedSafeProps,
   customContracts?: ContractNetworkConfig
 ): Promise<string> {
   const chainId = await ethAdapter.getChainId()
@@ -93,15 +123,16 @@ export async function calculateProxyAddress(
           await getSafeInitializer(
             ethAdapter,
             safeSingletonContract,
-            signerAddress,
+            predictedSafe,
             chainId,
             customContracts
           )
         ]
       ),
-      PREDETERMINED_SALT_NONCE
+      predictedSafe.safeDeploymentConfig.saltNonce || PREDETERMINED_SALT_NONCE
     ]
   )
+
   const derivedAddress = ethers.utils.getCreate2Address(
     deployer,
     salt,

@@ -53,7 +53,7 @@ import {
 import { ContractNetworksConfig } from './types'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
-import { predictSafeAddress } from './safeFactory/utils'
+import { predictSafeAddress } from './contracts/utils'
 
 export {
   ContractManager,

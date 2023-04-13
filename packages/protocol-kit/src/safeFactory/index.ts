@@ -15,11 +15,8 @@ import {
 import Safe from '@safe-global/protocol-kit/Safe'
 import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import {
-  predictSafeAddress,
-  validateSafeAccountConfig,
-  validateSafeDeploymentConfig
-} from './utils'
+import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
+import { predictSafeAddress } from '@safe-global/protocol-kit/contracts/utils'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -132,14 +129,6 @@ class SafeFactory {
     return this.#ethAdapter.getChainId()
   }
 
-  getSafeProxyFactoryContract(): GnosisSafeProxyFactoryContract {
-    return this.#safeProxyFactoryContract
-  }
-
-  getSafeContract(): GnosisSafeContract {
-    return this.#gnosisSafeContract
-  }
-
   async encodeSetupCallData({
     owners,
     threshold,
@@ -191,10 +180,16 @@ class SafeFactory {
     safeAccountConfig,
     safeDeploymentConfig
   }: PredictSafeProps): Promise<string> {
+    const chainId = await this.#ethAdapter.getChainId()
+    const customContracts = this.#contractNetworks?.[chainId]
+
     return predictSafeAddress({
       ethAdapter: this.#ethAdapter,
       safeAccountConfig,
-      safeDeploymentConfig
+      safeDeploymentConfig,
+      safeVersion: this.#safeVersion,
+      isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
+      customContracts
     })
   }
 

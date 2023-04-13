@@ -60,21 +60,14 @@ function Monerium() {
     setAuthContext(undefined)
   }
 
-  const placeOrder = async () => {
-    const safeAddress = '0x1D762aB2D95F133c28e824cbBE90594c87A260Cb'
-    const date = new Date().toISOString()
-    const messageToSign = `Send EUR 1 to GR16 0110 1250 0000 0001 2300 695 at ${date}`
-
-    const newOrder = {
-      kind: OrderKind.redeem,
+  const transfer = async () => {
+    moneriumClient?.send({
+      safeAddress: '0x1D762aB2D95F133c28e824cbBE90594c87A260Cb',
       amount: '1',
-      signature: '0x',
-      accountId: '053b82db-d871-11ed-8347-d21c9f8d80e1',
-      address: safeAddress,
       currency: Currency.eur,
       counterpart: {
         identifier: {
-          standard: PaymentStandard.iban as PaymentStandard.iban,
+          standard: 'iban' as PaymentStandard.iban,
           iban: 'GR16 0110 1250 0000 0001 2300 695'
         },
         details: {
@@ -83,16 +76,10 @@ function Monerium() {
           country: 'ES'
         }
       },
-      memo: 'Testing Safe-Monerium integration',
-      message: messageToSign,
-      chain: Chain.ethereum,
       network: Network.goerli,
-      supportingDocumentId: ''
-    }
-
-    const order = await moneriumClient?.placeOrder(newOrder, authContext?.defaultProfile)
-    const receipt = await moneriumClient?.signMessage(safeAddress, messageToSign, 5)
-    console.log('New Order generated: ', order, receipt)
+      chain: Chain.ethereum,
+      memo: 'Testing Safe-Monerium integration'
+    })
   }
 
   return (
@@ -104,7 +91,7 @@ function Monerium() {
           <p>Name: {authContext.name}</p>
           <p>Profile: {authContext.defaultProfile}</p>
 
-          <Button variant="contained" onClick={placeOrder}>
+          <Button variant="contained" onClick={transfer}>
             Place order
           </Button>
 

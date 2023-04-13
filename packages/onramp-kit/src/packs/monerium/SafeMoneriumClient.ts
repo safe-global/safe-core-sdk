@@ -2,9 +2,45 @@ import Safe, { EthersAdapter, getSignMessageLibContract } from '@safe-global/pro
 import SafeApiKit from '@safe-global/api-kit'
 import { ethers } from 'ethers'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
-import { MoneriumClient } from '@monerium/sdk'
+import { Chain, Counterpart, Currency, MoneriumClient, Network, OrderKind } from '@monerium/sdk'
+
+type SafeMoneriumOrder = {
+  safeAddress: string
+  amount: string
+  currency: Currency
+  counterpart: Counterpart // Beneficiary
+  network: Network
+  chain: Chain
+  memo: string
+}
 
 export class SafeMoneriumClient extends MoneriumClient {
+  async send(order: SafeMoneriumOrder) {
+    const date = new Date().toISOString()
+    const messageToSign = `Send ${order.currency.toUpperCase()} ${
+      order.amount
+    } to GR16 0110 1250 0000 0001 2300 695 at ${date}`
+
+    const newOrder = {
+      kind: OrderKind.redeem,
+      amount: order.amount,
+      signature: '0x',
+      address: order.safeAddress,
+      currency: order.currency,
+      counterpart: order.counterpart,
+      memo: order.memo,
+      message: messageToSign,
+      chain: Chain.ethereum,
+      network: Network.goerli,
+      supportingDocumentId: ''
+    }
+
+    const moneriumOrderReponse = await this.placeOrder(newOrder)
+    const safeSignResponse = await this.signMessage(order.safeAddress, messageToSign, 5)
+
+    console.log(moneriumOrderReponse, safeSignResponse)
+  }
+
   async signMessage(safeAddress: string, message: string, chainId: number) {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
 

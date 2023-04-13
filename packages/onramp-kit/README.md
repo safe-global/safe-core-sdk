@@ -2,7 +2,7 @@
 
 This package is provided for testing purposes only. It's not ready for production use. We are working with Stripe and participating in the pilot test for their new [crypto on-ramp](https://stripe.com/es/blog/crypto-onramp). Considering this, we provide a public key and a testing server already configured during the [Safe Account Abstraction hackathon](https://gnosis-safe.notion.site/Safe-d6c6ed61389041e28f5c7c925f653701)
 
-Once the hackathon and Stripe pilot are over, the server will be removed and you should use your own keys and server in case you opt-in for the [StripeAdapter](https://github.com/safe-global/safe-core-sdk/blob/59c5f90b08eecf976d617af5f7a8259e058c4580/packages/onramp-kit/src/packs/stripe/StripeAdapter.ts).
+Once the hackathon and Stripe pilot are over, the server will be removed and you should use your own keys and server in case you opt-in for the [StripeAdapter](https://github.com/safe-global/safe-core-sdk/blob/main/packages/onramp-kit/src/packs/stripe/StripeAdapter.ts).
 
 # OnRamp Kit
 
@@ -18,7 +18,7 @@ The Onramp Kit allows users to buy cryptocurrencies using a credit card and othe
 
 ## Example
 
-[Check a functional demo](https://github.com/safe-global/safe-core-sdk/blob/59c5f90b08eecf976d617af5f7a8259e058c4580/packages/onramp-kit/example) using the `onramp-kit`
+[Check a functional demo](https://github.com/safe-global/safe-core-sdk/tree/main/packages/onramp-kit/example) using the `onramp-kit`
 
 ## License
 

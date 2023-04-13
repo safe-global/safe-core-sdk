@@ -54,7 +54,7 @@ import {
   SwapOwnerTxParams
 } from './types'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
-import { standardizeSafeTransactionData } from './utils/transactions/utils'
+import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
 
 export {
   ContractManager,
@@ -72,6 +72,7 @@ export {
   AddOwnerTxParams,
   RemoveOwnerTxParams,
   SwapOwnerTxParams,
+  encodeMultiSendData,
   standardizeSafeTransactionData,
   EthersAdapter,
   EthersAdapterConfig,

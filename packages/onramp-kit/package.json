@@ -1,15 +1,15 @@
 {
   "name": "@safe-global/onramp-kit",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.1",
   "description": "Onramp library",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
+    "test": "jest src --coverage",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rm -rf dist",
-    "build": "rm -rf dist && yarn tsc",
-    "test": "jest src --coverage"
+    "build": "yarn unbuild && yarn tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",

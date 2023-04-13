@@ -58,7 +58,7 @@ export class SafeService {
     safeTxHash: string,
     safeTx: SafeTransaction,
     signature: SafeSignature
-  ): Promise<String> {
+  ): Promise<string> {
     const url = `${this.serviceUrl}/api/v1/safes/${safeAddress}/multisig-transactions/`
     const data = {
       ...safeTx.data,

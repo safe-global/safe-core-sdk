@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-core-sdk-types",
-  "version": "1.9.0",
+  "version": "1.10.1",
   "description": "Safe Core SDK types",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -10,10 +10,10 @@
     "SDK"
   ],
   "scripts": {
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist *.tsbuildinfo",
-    "build": "rimraf dist && tsc",
-    "format": "prettier --write \"{src,tests}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "build": "yarn unbuild && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -28,9 +28,6 @@
     "dist"
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
-  "devDependencies": {
-    "typescript": "^4.9.4"
-  },
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",

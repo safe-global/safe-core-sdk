@@ -1,15 +1,15 @@
 {
   "name": "@safe-global/auth-kit",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.1",
   "description": "Authentication library for web2 logins",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
+    "test": "jest src --coverage",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
-    "format": "prettier --write */**/*.{js,json,md,ts}",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rm -rf dist",
-    "build": "rm -rf dist && yarn tsc",
-    "test": "jest src --coverage"
+    "build": "yarn unbuild && yarn tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -43,8 +43,8 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^0.1.0",
-    "@safe-global/api-kit": "^0.1.0",
+    "@safe-global/api-kit": "^1.0.1",
+    "@safe-global/protocol-kit": "^0.1.1",
     "@walletconnect/client": "^1.8.0",
     "ethers": "^5.7.2"
   },

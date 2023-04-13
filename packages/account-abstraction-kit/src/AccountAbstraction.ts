@@ -2,12 +2,10 @@ import {
   AccountAbstractionConfig,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
-import {
-  encodeCreateProxyWithNonce,
-  encodeMultiSendData
-} from '@safe-global/account-abstraction-kit-poc/utils/contracts'
+import { encodeCreateProxyWithNonce } from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
   calculateProxyAddress,
+  encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,

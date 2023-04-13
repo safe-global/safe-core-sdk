@@ -49,7 +49,7 @@ export class GelatoRelayAdapter implements RelayAdapter {
   }
 
   async getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined> {
-    return await this.#gelatoRelay.getTaskStatus(taskId)
+    return this.#gelatoRelay.getTaskStatus(taskId)
   }
 
   async createRelayedTransaction(
@@ -58,24 +58,36 @@ export class GelatoRelayAdapter implements RelayAdapter {
     options: MetaTransactionOptions
   ): Promise<SafeTransaction> {
     const { gasLimit, gasToken, isSponsored } = options
-    const chainId = await safe.getChainId()
-    const estimation = await this.getEstimateFee(chainId, gasLimit, gasToken)
     const nonce = await safe.getNonce()
 
-    const relayedSafeTransaction = await safe.createTransaction({
+    if (isSponsored) {
+      const sponsoredTransaction = await safe.createTransaction({
+        safeTransactionData: transactions,
+        options: {
+          nonce
+        }
+      })
+
+      return sponsoredTransaction
+    }
+
+    const chainId = await safe.getChainId()
+    const estimation = await this.getEstimateFee(chainId, gasLimit, gasToken)
+
+    const syncTransaction = await safe.createTransaction({
       safeTransactionData: transactions,
       options: {
-        baseGas: !isSponsored ? estimation.toNumber() : 0,
-        gasPrice: !isSponsored ? 1 : 0,
+        baseGas: estimation.toNumber(),
+        gasPrice: 1,
         gasToken: gasToken ?? ZERO_ADDRESS,
-        refundReceiver: !isSponsored ? this.getFeeCollector() : ZERO_ADDRESS,
+        refundReceiver: this.getFeeCollector(),
         nonce
       }
     })
-    return relayedSafeTransaction
+    return syncTransaction
   }
 
-  async sponsorTransaction(
+  async sendSponsorTransaction(
     target: string,
     encodedTransaction: string,
     chainId: number
@@ -92,7 +104,7 @@ export class GelatoRelayAdapter implements RelayAdapter {
     return response
   }
 
-  async payTransaction(
+  async sendSyncTransaction(
     target: string,
     encodedTransaction: string,
     chainId: number,
@@ -121,8 +133,8 @@ export class GelatoRelayAdapter implements RelayAdapter {
     options
   }: RelayTransaction): Promise<RelayResponse> {
     const response = options.isSponsored
-      ? this.sponsorTransaction(target, encodedTransaction, chainId)
-      : this.payTransaction(target, encodedTransaction, chainId, options)
+      ? this.sendSponsorTransaction(target, encodedTransaction, chainId)
+      : this.sendSyncTransaction(target, encodedTransaction, chainId, options)
     return response
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "SDK to interact with Safe smart contracts",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -10,10 +10,8 @@
     "SDK"
   ],
   "scripts": {
-    "typechain": "ts-node ./scripts/generateTypechainFiles.ts",
     "safe-deployments": "ts-node scripts/checkSafeDeployments.ts",
-    "unbuild": "rimraf dist artifacts deployments cache .nyc_output typechain *.tsbuildinfo",
-    "build": "hardhat compile && yarn typechain && yarn safe-deployments && tsc",
+    "typechain": "ts-node ./scripts/generateTypechainFiles.ts",
     "test:ganache:web3:v1.0.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.0.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.1.1": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.1.1 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.2.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.2.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
@@ -31,8 +29,10 @@
     "test:hardhat:ethers:v1.2.0": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.2.0 && hardhat deploy && nyc hardhat test",
     "test:hardhat:ethers:v1.3.0": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.3.0 && hardhat deploy && nyc hardhat test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "format": "prettier --write \"{src,tests,hardhat,scripts}/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
+    "unbuild": "rimraf dist artifacts deployments cache .nyc_output typechain *.tsbuildinfo",
+    "build": "yarn unbuild && hardhat compile && yarn typechain && yarn safe-deployments && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -53,7 +53,7 @@
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@safe-global/safe-core-sdk-types": "^1.9.0",
+    "@safe-global/safe-core-sdk-types": "^1.10.1",
     "@typechain/ethers-v5": "^10.2.0",
     "@typechain/web3-v1": "^6.0.2",
     "@types/chai": "^4.3.4",
@@ -66,18 +66,15 @@
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.1",
     "dotenv": "^16.0.3",
-    "ethereum-waffle": "^3.4.4",
+    "ethereum-waffle": "^4.0.10",
     "ethers": "5.7.2",
     "hardhat": "^2.12.6",
     "hardhat-deploy": "^0.11.22",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.1.0",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "ts-generator": "^0.1.1",
     "tsconfig-paths": "^4.1.2",
     "typechain": "^8.1.1",
-    "typescript": "^4.9.4",
     "yargs": "^17.6.2"
   },
   "dependencies": {
@@ -89,16 +86,5 @@
     "web3": "^1.8.1",
     "web3-core": "^1.8.1",
     "web3-utils": "^1.8.1"
-  },
-  "lint-staged": {
-    "src/**/!(*test).ts": [
-      "yarn lint",
-      "prettier --write"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

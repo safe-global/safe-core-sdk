@@ -35,6 +35,7 @@ import {
 } from './contracts/safeDeploymentContracts'
 import {
   calculateProxyAddress,
+  encodeCreateProxyWithNonce,
   getSafeInitializer,
   PREDETERMINED_SALT_NONCE
 } from './contracts/utils'
@@ -105,7 +106,8 @@ export {
   getCreateCallContract,
   getSafeInitializer,
   calculateProxyAddress,
-  PREDETERMINED_SALT_NONCE
+  PREDETERMINED_SALT_NONCE,
+  encodeCreateProxyWithNonce
 }
 
 export default Safe

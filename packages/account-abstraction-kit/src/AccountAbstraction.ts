@@ -2,9 +2,9 @@ import {
   AccountAbstractionConfig,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
-import { encodeCreateProxyWithNonce } from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
   calculateProxyAddress,
+  encodeCreateProxyWithNonce,
   encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
@@ -12,6 +12,7 @@ import Safe, {
   getSafeContract,
   getSafeInitializer
 } from '@safe-global/protocol-kit'
+import { PREDETERMINED_SALT_NONCE, PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { RelayAdapter } from '@safe-global/relay-kit'
 import {
   GnosisSafeContract,
@@ -47,6 +48,16 @@ class AccountAbstraction {
     const { relayAdapter } = options
     this.setRelayAdapter(relayAdapter)
 
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [await this.getSignerAddress()],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        saltNonce: PREDETERMINED_SALT_NONCE
+      }
+    }
+
     const chainId = await this.#ethAdapter.getChainId()
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter: this.#ethAdapter,
@@ -57,7 +68,7 @@ class AccountAbstraction {
       this.#ethAdapter,
       safeVersion,
       this.#safeProxyFactoryContract,
-      await this.getSignerAddress()
+      predictedSafe
     )
     this.#safeContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,

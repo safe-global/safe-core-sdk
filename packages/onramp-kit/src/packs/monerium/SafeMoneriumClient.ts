@@ -1,6 +1,7 @@
 import Safe, { EthersAdapter, getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { ethers } from 'ethers'
+import { OperationType } from '@safe-global/safe-core-sdk-types'
 import { MoneriumClient } from '@monerium/sdk'
 
 export class SafeMoneriumClient extends MoneriumClient {
@@ -27,9 +28,10 @@ export class SafeMoneriumClient extends MoneriumClient {
 
     const safeTransaction = await safeSdk.createTransaction({
       safeTransactionData: {
-        to: safeAddress,
+        to: signMessageContract.getAddress(),
         value: '0',
-        data: txData
+        data: txData,
+        operation: OperationType.DelegateCall
       }
     })
 
@@ -45,7 +47,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       ethAdapter
     })
 
-    const proposeResult = await apiKit.proposeTransaction({
+    await apiKit.proposeTransaction({
       safeAddress,
       safeTransactionData: safeTransaction.data,
       safeTxHash,
@@ -53,6 +55,12 @@ export class SafeMoneriumClient extends MoneriumClient {
       senderSignature: senderSignature.data
     })
 
-    console.log(proposeResult)
+    const transaction = await apiKit.getTransaction(safeTxHash)
+
+    if (transaction.confirmations?.length === transaction.confirmationsRequired) {
+      const executeTxResponse = await safeSdk.executeTransaction(transaction)
+      const receipt = await executeTxResponse.transactionResponse?.wait()
+      console.log(receipt)
+    }
   }
 }

@@ -90,9 +90,9 @@ function Monerium() {
       supportingDocumentId: ''
     }
 
-    // const order = await moneriumClient?.placeOrder(newOrder, authContext?.defaultProfile)
-    await moneriumClient?.signMessage(safeAddress, messageToSign, 5)
-    // console.log('New Order generated: ', order)
+    const order = await moneriumClient?.placeOrder(newOrder, authContext?.defaultProfile)
+    const receipt = await moneriumClient?.signMessage(safeAddress, messageToSign, 5)
+    console.log('New Order generated: ', order, receipt)
   }
 
   return (

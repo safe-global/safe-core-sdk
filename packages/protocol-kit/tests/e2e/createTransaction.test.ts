@@ -1,5 +1,6 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
+  PredictedSafeProps,
   SafeTransactionOptionalProps,
   standardizeSafeTransactionData
 } from '@safe-global/protocol-kit/index'
@@ -25,12 +26,22 @@ describe('Transactions creation', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [accounts[0].address],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        saltNonce: ''
+      }
+    }
     return {
       erc20Mintable: await getERC20Mintable(),
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       accounts,
       chainId,
-      contractNetworks
+      contractNetworks,
+      predictedSafe
     }
   })
 
@@ -200,6 +211,30 @@ describe('Transactions creation', () => {
   })
 
   describe('createTransaction', async () => {
+    it('should create a single transaction with gasPrice=0', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const safeTransactionData: SafeTransactionDataPartial = {
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x',
+        baseGas: 111,
+        gasPrice: 0,
+        gasToken: '0x333',
+        refundReceiver: '0x444',
+        nonce: 555,
+        safeTxGas: 666
+      }
+      const tx = safeSdk.createTransaction({ safeTransactionData })
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should create a single transaction with gasPrice=0', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts

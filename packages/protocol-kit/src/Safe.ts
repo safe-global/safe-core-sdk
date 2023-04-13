@@ -139,10 +139,25 @@ class Safe {
     if (safeAddress && predictedSafe) {
       throw new Error('A safeAddress and a predictedSafe cannot be connected at the same time')
     }
+
+    let safe: string | undefined
+    let undeployedSafe: PredictedSafeProps | undefined
+
+    if (safeAddress) {
+      undeployedSafe = undefined
+      safe = safeAddress
+    } else if (predictedSafe) {
+      undeployedSafe = predictedSafe
+      safe = undefined
+    } else {
+      undeployedSafe = this.#predictedSafe
+      safe = !this.#predictedSafe ? await this.getAddress() : undefined
+    }
+
     return await Safe.create({
       ethAdapter: ethAdapter || this.#ethAdapter,
-      safeAddress: predictedSafe ? undefined : safeAddress || (await this.getAddress()),
-      predictedSafe: safeAddress ? undefined : predictedSafe || this.#predictedSafe,
+      safeAddress: safe,
+      predictedSafe: undeployedSafe,
       isL1SafeMasterCopy: isL1SafeMasterCopy || this.#contractManager.isL1SafeMasterCopy,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     })

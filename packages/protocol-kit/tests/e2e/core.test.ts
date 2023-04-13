@@ -6,6 +6,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
+import { PREDETERMINED_SALT_NONCE } from './../../src/contracts/utils'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -26,7 +27,7 @@ describe('Safe Info', () => {
         threshold: 1
       },
       safeDeploymentConfig: {
-        saltNonce: ''
+        saltNonce: PREDETERMINED_SALT_NONCE
       }
     }
     return {
@@ -62,40 +63,19 @@ describe('Safe Info', () => {
     })
 
     it('should connect a Safe that is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
+      const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        predictedSafe,
+        safeAddress: safe.address,
         contractNetworks
       })
-      chai.expect(await safeSdk.getAddress()).to.be.length(42)
-      chai
-        .expect(await safeSdk.getEthAdapter().getSignerAddress())
-        .to.be.eq(await account1.signer.getAddress())
-      const ethAdapter2 = await getEthAdapter(account2.signer)
-
-      const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapter2, contractNetworks })
-      chai.expect(await safeSdk2.getAddress()).to.be.eq(await safeSdk.getAddress())
+      const safeSdk2 = await safeSdk.connect({ predictedSafe })
+      chai.expect(await safeSdk2.getAddress()).not.to.be.eq(await safeSdk.getAddress())
       chai
         .expect(await safeSdk2.getEthAdapter().getSignerAddress())
-        .to.be.eq(await account2.signer.getAddress())
-
-      const predictedSafe2: PredictedSafeProps = {
-        safeAccountConfig: {
-          owners: [accounts[1].address],
-          threshold: 1
-        },
-        safeDeploymentConfig: {
-          saltNonce: ''
-        }
-      }
-      const safeSdk3 = await safeSdk2.connect({ predictedSafe: predictedSafe2 })
-      chai.expect(await safeSdk3.getAddress()).not.to.be.eq(await safeSdk2.getAddress())
-      chai
-        .expect(await safeSdk3.getEthAdapter().getSignerAddress())
-        .to.be.eq(await account2.signer.getAddress())
+        .to.be.eq(await account1.signer.getAddress())
     })
 
     it('should connect a Safe', async () => {

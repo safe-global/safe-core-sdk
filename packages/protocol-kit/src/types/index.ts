@@ -5,6 +5,7 @@ import {
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
 import { AbiItem } from 'web3-utils'
+import { SafeVersion } from './../../../safe-core-sdk-types/dist/src/types.d'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -18,7 +19,8 @@ export interface SafeAccountConfig {
 }
 
 export interface SafeDeploymentConfig {
-  saltNonce: string
+  saltNonce?: string
+  safeVersion?: SafeVersion
 }
 
 export interface PredictedSafeProps {

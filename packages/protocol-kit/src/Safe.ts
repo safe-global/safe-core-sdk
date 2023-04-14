@@ -173,13 +173,14 @@ class Safe {
       const chainId = await this.#ethAdapter.getChainId()
       const safeProxyFactoryContract = await getProxyFactoryContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion: SAFE_LAST_VERSION,
+        safeVersion: this.#predictedSafe!.safeDeploymentConfig.safeVersion || SAFE_LAST_VERSION,
         chainId,
         customContracts: this.#contractManager.contractNetworks?.[chainId]
       })
+
       return calculateProxyAddress(
         this.#ethAdapter,
-        SAFE_LAST_VERSION,
+        this.#predictedSafe!.safeDeploymentConfig.safeVersion || SAFE_LAST_VERSION,
         safeProxyFactoryContract,
         this.#predictedSafe!,
         this.#contractManager.contractNetworks?.[chainId]

@@ -5,7 +5,7 @@ import {
   GnosisSafeProxyFactoryContract,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
-import { BigNumber, BigNumberish, BytesLike, ethers } from 'ethers'
+import { BigNumberish, BytesLike, ethers } from 'ethers'
 import semverSatisfies from 'semver/functions/satisfies'
 import {
   getCompatibilityFallbackHandlerContract,
@@ -46,11 +46,10 @@ export async function encodeDefaultSetupCallData(
       safeAccountConfig.to || ZERO_ADDRESS,
       (safeAccountConfig.data as BytesLike) || '0x',
       safeAccountConfig.paymentToken || ZERO_ADDRESS,
-      (safeAccountConfig.payment as BigNumberish) || BigNumber.from(0),
+      (safeAccountConfig.payment as BigNumberish) || 0,
       safeAccountConfig.paymentReceiver || ZERO_ADDRESS
     ])
   }
-
   let fallbackHandlerAddress = safeAccountConfig.fallbackHandler
   if (!fallbackHandlerAddress) {
     const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
@@ -69,7 +68,7 @@ export async function encodeDefaultSetupCallData(
     (safeAccountConfig.data as BytesLike) || '0x',
     fallbackHandlerAddress,
     safeAccountConfig.paymentToken || ZERO_ADDRESS,
-    (safeAccountConfig.payment as BigNumberish) || BigNumber.from(0),
+    (safeAccountConfig.payment as BigNumberish) || 0,
     safeAccountConfig.paymentReceiver || ZERO_ADDRESS
   ])
 }

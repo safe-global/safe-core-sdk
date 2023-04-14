@@ -44,8 +44,12 @@
   },
   "dependencies": {
     "@safe-global/api-kit": "^1.0.1",
+    "@safe-global/auth-kit": "^0.1.1",
     "@safe-global/protocol-kit": "^0.1.1",
     "@walletconnect/client": "^1.8.0",
+    "@web3auth/base": "^5.1.0",
+    "@web3auth/modal": "^5.1.1",
+    "@web3auth/openlogin-adapter": "^5.1.1",
     "ethers": "^5.7.2"
   },
   "peerDependencies": {

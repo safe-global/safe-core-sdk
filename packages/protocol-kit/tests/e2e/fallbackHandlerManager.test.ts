@@ -32,7 +32,7 @@ describe('Fallback handler manager', () => {
         threshold: 1
       },
       safeDeploymentConfig: {
-        saltNonce: ''
+        safeVersion: safeVersionDeployed
       }
     }
     return {

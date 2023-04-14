@@ -26,7 +26,7 @@ describe('Safe Info', () => {
         threshold: 1
       },
       safeDeploymentConfig: {
-        saltNonce: ''
+        safeVersion: safeVersionDeployed
       }
     }
     return {
@@ -40,7 +40,7 @@ describe('Safe Info', () => {
 
   describe('connect', async () => {
     it('should fail if a safeAddress and a predictedSafe are connected', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const { predictedSafe, accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({

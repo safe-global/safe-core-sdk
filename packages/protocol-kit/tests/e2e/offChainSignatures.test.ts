@@ -27,7 +27,7 @@ describe('Off-chain signatures', () => {
         threshold: 1
       },
       safeDeploymentConfig: {
-        saltNonce: ''
+        safeVersion: safeVersionDeployed
       }
     }
     return {

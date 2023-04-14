@@ -1,3 +1,4 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
@@ -44,7 +45,7 @@ describe('Safe contracts manager', () => {
           threshold: 1
         },
         safeDeploymentConfig: {
-          saltNonce: ''
+          safeVersion: safeVersionDeployed
         }
       }
       await chai.expect(

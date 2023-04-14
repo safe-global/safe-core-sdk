@@ -28,7 +28,7 @@ describe('Safe guard manager', () => {
         threshold: 1
       },
       safeDeploymentConfig: {
-        saltNonce: ''
+        safeVersion: safeVersionDeployed
       }
     }
     return {

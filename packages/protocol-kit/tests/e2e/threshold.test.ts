@@ -1,3 +1,4 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
   PredictedSafeProps,
   SafeTransactionOptionalProps
@@ -25,7 +26,7 @@ describe('Safe Threshold', () => {
         threshold: 1
       },
       safeDeploymentConfig: {
-        saltNonce: ''
+        safeVersion: safeVersionDeployed
       }
     }
     return {

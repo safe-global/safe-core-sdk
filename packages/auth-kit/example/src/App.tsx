@@ -16,7 +16,7 @@ import {
   SafeAuthSignInData,
   Web3AuthAdapter,
   Web3AuthEventListener
-} from '../../src/index'
+} from '@safe-global/auth-kit'
 
 const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED', data)
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)

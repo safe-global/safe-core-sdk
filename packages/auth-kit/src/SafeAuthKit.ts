@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
-import SafeApiKit from '@safe-global/api-kit'
-import { EthersAdapter } from '@safe-global/protocol-kit'
+import SafeApiKit from '../example/node_modules/@safe-global/api-kit'
+import { EthersAdapter } from '../example/node_modules/@safe-global/protocol-kit'
 import { getErrorMessage } from './lib/errors'
 import {
   ISafeAuthKit,

@@ -10,9 +10,10 @@ import Safe, {
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract,
-  getSafeInitializer
+  getSafeInitializer,
+  PREDETERMINED_SALT_NONCE,
+  PredictedSafeProps
 } from '@safe-global/protocol-kit'
-import { PREDETERMINED_SALT_NONCE, PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { RelayAdapter } from '@safe-global/relay-kit'
 import {
   GnosisSafeContract,
@@ -158,10 +159,20 @@ class AccountAbstraction {
         safeVersion,
         chainId
       })
+
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig: {
+          owners: [await this.getSignerAddress()],
+          threshold: 1
+        },
+        safeDeploymentConfig: {
+          saltNonce: PREDETERMINED_SALT_NONCE
+        }
+      }
       const initializer = await getSafeInitializer(
         this.#ethAdapter,
         this.#safeContract,
-        await this.getSignerAddress(),
+        predictedSafe,
         chainId
       )
 

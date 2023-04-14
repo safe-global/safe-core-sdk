@@ -1,7 +1,8 @@
+import { Interface } from '@ethersproject/abi'
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
-import { Interface } from '@ethersproject/abi'
-import { hexToNumber, toChecksumAddress, hexToNumberString } from 'web3-utils'
+import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -12,8 +13,7 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
-import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { hexToNumber, hexToNumberString, toChecksumAddress } from 'web3-utils'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
@@ -107,7 +107,7 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
     const data = `0x${decodedData.slice(index, (index += dataLength))}`
 
     txs.push({
-      operation: hexToNumber(operation),
+      operation: hexToNumber(operation) as OperationType,
       to: toChecksumAddress(to),
       value: hexToNumberString(value),
       data

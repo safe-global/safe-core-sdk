@@ -2,6 +2,7 @@ import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Provider } from '@ethersproject/providers'
+import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import {
   Eip3770Address,
   EthAdapter,
@@ -9,7 +10,6 @@ import {
   GetContractProps,
   SafeTransactionEIP712Args
 } from '@safe-global/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { ethers } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import {
@@ -94,12 +94,12 @@ class EthersAdapter implements EthAdapter {
     return this.#ethers.utils.getAddress(address)
   }
 
-  getSafeContract({
+  async getSafeContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): GnosisSafeContractEthers {
+  }: GetContractProps): Promise<GnosisSafeContractEthers> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
@@ -110,12 +110,12 @@ class EthersAdapter implements EthAdapter {
     return getSafeContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
-  getSafeProxyFactoryContract({
+  async getSafeProxyFactoryContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): GnosisSafeProxyFactoryEthersContract {
+  }: GetContractProps): Promise<GnosisSafeProxyFactoryEthersContract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
@@ -126,12 +126,12 @@ class EthersAdapter implements EthAdapter {
     return getSafeProxyFactoryContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
-  getMultiSendContract({
+  async getMultiSendContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): MultiSendEthersContract {
+  }: GetContractProps): Promise<MultiSendEthersContract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
@@ -142,12 +142,12 @@ class EthersAdapter implements EthAdapter {
     return getMultiSendContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
-  getMultiSendCallOnlyContract({
+  async getMultiSendCallOnlyContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): MultiSendCallOnlyEthersContract {
+  }: GetContractProps): Promise<MultiSendCallOnlyEthersContract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
@@ -158,12 +158,12 @@ class EthersAdapter implements EthAdapter {
     return getMultiSendCallOnlyContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
-  getCompatibilityFallbackHandlerContract({
+  async getCompatibilityFallbackHandlerContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): CompatibilityFallbackHandlerContractEthers {
+  }: GetContractProps): Promise<CompatibilityFallbackHandlerContractEthers> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
@@ -178,12 +178,12 @@ class EthersAdapter implements EthAdapter {
     )
   }
 
-  getSignMessageLibContract({
+  async getSignMessageLibContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): SignMessageLibEthersContract {
+  }: GetContractProps): Promise<SignMessageLibEthersContract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]
@@ -194,12 +194,12 @@ class EthersAdapter implements EthAdapter {
     return getSignMessageLibContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
-  getCreateCallContract({
+  async getCreateCallContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): CreateCallEthersContract {
+  }: GetContractProps): Promise<CreateCallEthersContract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress
       ? customContractAddress
       : singletonDeployment?.networkAddresses[chainId]

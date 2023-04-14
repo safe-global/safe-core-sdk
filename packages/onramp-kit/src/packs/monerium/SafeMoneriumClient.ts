@@ -1,8 +1,21 @@
-import Safe, { EthersAdapter, getSignMessageLibContract } from '@safe-global/protocol-kit'
+import Safe, {
+  EthersAdapter,
+  getCompatibilityFallbackHandlerContract,
+  getSignMessageLibContract
+} from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { ethers } from 'ethers'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
-import { Chain, Counterpart, Currency, MoneriumClient, Network, OrderKind } from '@monerium/sdk'
+import {
+  Chain,
+  Counterpart,
+  Currency,
+  IBAN,
+  MoneriumClient,
+  Network,
+  OrderKind
+} from '@monerium/sdk'
+import { EIP_1271_INTERFACE, MAGIC_VALUE } from './signatures'
 
 type SafeMoneriumOrder = {
   safeAddress: string
@@ -17,9 +30,9 @@ type SafeMoneriumOrder = {
 export class SafeMoneriumClient extends MoneriumClient {
   async send(order: SafeMoneriumOrder) {
     const date = new Date().toISOString()
-    const messageToSign = `Send ${order.currency.toUpperCase()} ${
-      order.amount
-    } to GR16 0110 1250 0000 0001 2300 695 at ${date}`
+    const messageToSign = `Send ${order.currency.toUpperCase()} ${order.amount} to ${
+      (order.counterpart.identifier as IBAN).iban
+    } at ${date}`
 
     const newOrder = {
       kind: OrderKind.redeem,
@@ -95,8 +108,47 @@ export class SafeMoneriumClient extends MoneriumClient {
 
     if (transaction.confirmations?.length === transaction.confirmationsRequired) {
       const executeTxResponse = await safeSdk.executeTransaction(transaction)
-      const receipt = await executeTxResponse.transactionResponse?.wait()
-      console.log(receipt)
+      // This stops showing the Monerium UI so should be avoided
+      // const receipt = await executeTxResponse.transactionResponse?.wait()
+      // console.log(receipt)
     }
+  }
+
+  async isValidSignature(safeAddress: string, message: string, chainId: number) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+
+    const safeOwner = provider.getSigner(0)
+
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signerOrProvider: safeOwner
+    })
+
+    const safeSdk = await Safe.create({
+      ethAdapter,
+      safeAddress,
+      isL1SafeMasterCopy: true
+    })
+    const safeVersion = await safeSdk.getContractVersion()
+
+    const fallbackHandler = await getCompatibilityFallbackHandlerContract({
+      ethAdapter,
+      safeVersion,
+      chainId
+    })
+
+    // We should add signature validation for legacy contracts
+    const txData = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [
+      ethers.utils.hashMessage(message),
+      '0x'
+    ])
+
+    const response = await ethAdapter.call({
+      from: safeAddress,
+      to: fallbackHandler.getAddress(),
+      data: txData
+    })
+
+    return response.slice(0, 10).toLowerCase() === MAGIC_VALUE
   }
 }

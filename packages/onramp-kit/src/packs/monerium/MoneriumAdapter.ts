@@ -1,7 +1,6 @@
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 import { SafeMoneriumClient } from './SafeMoneriumClient'
-
 import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
 
 const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
@@ -64,6 +63,7 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
             client_id: this.#config.clientId,
             refresh_token: refreshToken
           })
+
           localStorage.setItem(
             MONERIUM_REFRESH_TOKEN,
             this.#client?.bearerProfile?.refresh_token || ''
@@ -72,11 +72,24 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
           throw new Error(getErrorMessage(e))
         }
       } else {
+        if (options?.address) {
+          try {
+            const message = 'I hereby declare that I am the address owner.'
+            const isSigned = await this.#client.isValidSignature(options?.address, message, 5)
+
+            if (!isSigned) {
+              await this.#client.signMessage(options?.address, message, 5)
+            }
+          } catch (e) {
+            console.log(getErrorMessage(e))
+          }
+        }
+
         const authFlowUrl = this.#client.getAuthFlowURI({
           client_id: this.#config.clientId,
           redirect_uri: options.redirect_uri,
           address: options?.address,
-          signature: options?.signature,
+          signature: options?.address ? options?.signature || '0x' : undefined,
           chain: options?.chain,
           network: options?.network
         })
@@ -96,10 +109,12 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
   }
 
   subscribe(): void {
+    // TODO: Check websocket connection through Monerium API
     throw new Error('Method not implemented.')
   }
 
   unsubscribe(): void {
+    // TODO: Check websocket connection through Monerium API
     throw new Error('Method not implemented.')
   }
 

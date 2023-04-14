@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { AuthContext, Chain, Currency, Network, OrderKind, PaymentStandard } from '@monerium/sdk'
-import { Box, Button } from '@mui/material'
+import { AuthContext, Chain, Currency, Network, PaymentStandard } from '@monerium/sdk'
+import { Alert, Box, Button, Input, TextField } from '@mui/material'
 import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
 
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
+  const [address, setAddress] = useState<string>('')
+  const [counterpartIban, setCounterpartIban] = useState<string>('')
   const [moneriumClient, setMoneriumClient] = useState<SafeMoneriumClient>()
   const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<MoneriumAdapter>>()
 
@@ -32,11 +34,10 @@ function Monerium() {
     if (!onRampClient) return
 
     const moneriumClient = await onRampClient.open({
-      redirect_uri: 'http://localhost:3000/monerium'
-      // address: '0x5f0155fA3eFe175Aa7e18EC19Fd8aC1C1Fa7104D',
-      // signature: '0x',
-      // chain: Chain.ethereum,
-      // network: Network.goerli
+      redirect_uri: 'http://localhost:3000/monerium',
+      address,
+      chain: Chain.ethereum,
+      network: Network.goerli
     })
 
     const authContext = await moneriumClient.getAuthContext()
@@ -62,13 +63,13 @@ function Monerium() {
 
   const transfer = async () => {
     moneriumClient?.send({
-      safeAddress: '0x1D762aB2D95F133c28e824cbBE90594c87A260Cb',
+      safeAddress: address,
       amount: '1',
       currency: Currency.eur,
       counterpart: {
         identifier: {
           standard: 'iban' as PaymentStandard.iban,
-          iban: 'GR16 0110 1250 0000 0001 2300 695'
+          iban: counterpartIban
         },
         details: {
           firstName: 'John',
@@ -88,21 +89,51 @@ function Monerium() {
         <>
           <p>Email: {authContext.email}</p>
           <p>User Id: {authContext.userId}</p>
-          <p>Name: {authContext.name}</p>
-          <p>Profile: {authContext.defaultProfile}</p>
+          <p>Default profile: {authContext.defaultProfile}</p>
 
-          <Button variant="contained" onClick={transfer}>
-            Place order
-          </Button>
+          <TextField
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Enter your Safe address"
+            sx={{ mb: 2, width: '24em' }}
+          />
+
+          <TextField
+            value={counterpartIban}
+            onChange={(e) => setCounterpartIban(e.target.value)}
+            placeholder="Enter the recipient's IBAN"
+            sx={{ mb: 2, width: '24em' }}
+          />
+
+          <br />
+
+          {counterpartIban && address && (
+            <>
+              <Alert severity="info">{`You are going to transfer 1 EUR from ${address} to ${counterpartIban}`}</Alert>
+
+              <Button variant="contained" onClick={transfer} sx={{ my: 2, mr: 2 }}>
+                Transfer
+              </Button>
+            </>
+          )}
 
           <Button variant="contained" color="error" onClick={closeMoneriumFlow}>
             Logout
           </Button>
         </>
       ) : (
-        <Button variant="contained" onClick={startMoneriumFlow}>
-          Authenticate
-        </Button>
+        <>
+          <TextField
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Enter your Safe address"
+            sx={{ mb: 2, width: '24em' }}
+          />
+          <br />
+          <Button variant="contained" onClick={startMoneriumFlow}>
+            Authenticate with monerium
+          </Button>
+        </>
       )}
     </Box>
   )

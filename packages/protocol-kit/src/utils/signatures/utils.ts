@@ -5,7 +5,6 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
-import EthSignSignature from './SafeSignature'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -14,7 +13,7 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
     '0000000000000000000000000000000000000000000000000000000000000000' +
     '01'
 
-  return new EthSignSignature(ownerAddress, signature)
+  return new SafeSignature(ownerAddress, signature)
 }
 
 export function isTxHashSignedWithPrefix(
@@ -98,26 +97,26 @@ export const adjustVInSignature: AdjustVOverload = (
 export async function generateSignature(
   ethAdapter: EthAdapter,
   hash: string
-): Promise<EthSignSignature> {
+): Promise<SafeSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
   let signature = await ethAdapter.signMessage(hash)
   signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
-  return new EthSignSignature(signerAddress, signature)
+  return new SafeSignature(signerAddress, signature)
 }
 
 export async function generateEIP712Signature(
   ethAdapter: EthAdapter,
   safeTransactionEIP712Args: SafeTransactionEIP712Args,
   methodVersion?: 'v3' | 'v4'
-): Promise<EthSignSignature> {
+): Promise<SafeSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
   let signature = await ethAdapter.signTypedData(safeTransactionEIP712Args, methodVersion)
   signature = adjustVInSignature('eth_signTypedData', signature)
-  return new EthSignSignature(signerAddress, signature)
+  return new SafeSignature(signerAddress, signature)
 }

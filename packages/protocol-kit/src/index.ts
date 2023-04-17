@@ -52,7 +52,7 @@ import SafeFactory, {
 import { ContractNetworksConfig } from './types'
 import {
   encodeMultiSendData,
-  EthSignSignature,
+  SafeSignature,
   SafeTransactionOptionalProps,
   standardizeSafeTransactionData
 } from './utils'
@@ -104,7 +104,7 @@ export {
   getMultiSendCallOnlyContract,
   getSignMessageLibContract,
   getCreateCallContract,
-  EthSignSignature
+  SafeSignature
 }
 
 export default Safe

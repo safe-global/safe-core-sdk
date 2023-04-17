@@ -1,6 +1,6 @@
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 
-export class EthSignSignature implements SafeSignature {
+export class SafeSignature implements SafeSignature {
   signer: string
   data: string
 

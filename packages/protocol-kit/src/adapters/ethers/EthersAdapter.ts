@@ -100,9 +100,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<GnosisSafeContractEthers> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress
-      ? customContractAddress
-      : singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
     }
@@ -116,9 +114,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<GnosisSafeProxyFactoryEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress
-      ? customContractAddress
-      : singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
@@ -132,9 +128,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<MultiSendEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress
-      ? customContractAddress
-      : singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
     }
@@ -148,9 +142,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<MultiSendCallOnlyEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress
-      ? customContractAddress
-      : singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid MultiSendCallOnly contract address')
     }
@@ -164,9 +156,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<CompatibilityFallbackHandlerContractEthers> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress
-      ? customContractAddress
-      : singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid CompatibilityFallbackHandler contract address')
     }
@@ -184,9 +174,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<SignMessageLibEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress
-      ? customContractAddress
-      : singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
@@ -200,9 +188,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<CreateCallEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress
-      ? customContractAddress
-      : singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
     }

@@ -4,6 +4,7 @@ import {
   MetaTransactionData,
   OperationType,
   SafeMultisigTransactionResponse,
+  SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial,
   SafeTransactionEIP712Args,
@@ -18,10 +19,10 @@ import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import { ContractNetworksConfig } from './types'
 import {
+  EthSafeSignature,
   hasSafeFeature,
   isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
-  SafeSignature,
   SAFE_FEATURES,
   sameString
 } from './utils'
@@ -800,7 +801,7 @@ class Safe {
     }
     const safeTransaction = await this.createTransaction({ safeTransactionData })
     serviceTransactionResponse.confirmations?.map((confirmation) => {
-      const signature = new SafeSignature(confirmation.owner, confirmation.signature)
+      const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
       safeTransaction.addSignature(signature)
     })
     return safeTransaction

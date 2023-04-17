@@ -5,6 +5,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
+import { EthSafeSignature } from './SafeSignature'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -13,7 +14,7 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
     '0000000000000000000000000000000000000000000000000000000000000000' +
     '01'
 
-  return new SafeSignature(ownerAddress, signature)
+  return new EthSafeSignature(ownerAddress, signature)
 }
 
 export function isTxHashSignedWithPrefix(
@@ -104,7 +105,7 @@ export async function generateSignature(
   }
   let signature = await ethAdapter.signMessage(hash)
   signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
-  return new SafeSignature(signerAddress, signature)
+  return new EthSafeSignature(signerAddress, signature)
 }
 
 export async function generateEIP712Signature(
@@ -118,5 +119,5 @@ export async function generateEIP712Signature(
   }
   let signature = await ethAdapter.signTypedData(safeTransactionEIP712Args, methodVersion)
   signature = adjustVInSignature('eth_signTypedData', signature)
-  return new SafeSignature(signerAddress, signature)
+  return new EthSafeSignature(signerAddress, signature)
 }

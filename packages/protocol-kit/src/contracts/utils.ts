@@ -62,16 +62,30 @@ export async function encodeSetupCallData({
     ])
   }
 
-  const fallbackHandlerAddress =
-    fallbackHandler ||
-    (
-      await getCompatibilityFallbackHandlerContract({
-        ethAdapter,
-        safeVersion,
-        chainId: await ethAdapter.getChainId(),
-        customContracts
-      })
-    ).getAddress()
+  const customFallbackHandler = !!fallbackHandler
+
+  if (customFallbackHandler) {
+    return safeContract.encode('setup', [
+      owners,
+      threshold,
+      to,
+      data,
+      fallbackHandler,
+      paymentToken,
+      payment,
+      paymentReceiver
+    ])
+  }
+
+  const chainId = await ethAdapter.getChainId()
+  const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
+    ethAdapter,
+    safeVersion,
+    chainId,
+    customContracts
+  })
+
+  const fallbackHandlerAddress = fallbackHandlerContract.getAddress()
 
   return safeContract.encode('setup', [
     owners,

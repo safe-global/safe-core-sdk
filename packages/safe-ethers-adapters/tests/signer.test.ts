@@ -57,7 +57,7 @@ describe('SafeEthersSigner', () => {
         data: '0xbaddad42'
       }
       const parsedTxData = {
-        to: createLibAddress!!.defaultAddress,
+        to: createLibAddress!.defaultAddress,
         data: '0x4c8c9ea1000000000000000000000000000000000000000000000000000000000000004200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000004baddad4200000000000000000000000000000000000000000000000000000000',
         value: '0',
         operation: 1
@@ -217,7 +217,7 @@ describe('SafeEthersSigner', () => {
     it('should not fail for creation tx without creation log', async () => {
       const createLibDeployment = getCreateCallDeployment()
       const parsedTxData = {
-        to: createLibDeployment!!.defaultAddress,
+        to: createLibDeployment!.defaultAddress,
         data: '0xbaddad42',
         value: '0',
         operation: 1
@@ -260,7 +260,7 @@ describe('SafeEthersSigner', () => {
     it('should map creation tx', async () => {
       const createLibDeployment = getCreateCallDeployment()
       const parsedTxData = {
-        to: createLibDeployment!!.defaultAddress,
+        to: createLibDeployment!.defaultAddress,
         data: '0xbaddad42',
         value: '0',
         operation: 1

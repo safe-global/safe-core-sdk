@@ -5,8 +5,8 @@ import { getCreateCallDeployment } from '@safe-global/safe-deployments'
 import { SafeTransactionData } from '@safe-global/safe-core-sdk-types'
 
 export const createLibDeployment = getCreateCallDeployment()
-export const createLibAddress = createLibDeployment!!.defaultAddress
-export const createLibInterface = new Interface(createLibDeployment!!.abi)
+export const createLibAddress = createLibDeployment!.defaultAddress
+export const createLibInterface = new Interface(createLibDeployment!.abi)
 
 const mapStatus = (receipt: TransactionReceipt): number => {
   // Search for ExecutionSuccess event (see https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol#L49)

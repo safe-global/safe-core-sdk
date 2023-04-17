@@ -35,11 +35,11 @@ export class GelatoRelayAdapter implements RelayAdapter {
   }
 
   // TODO: Should be moved to the protocol-kit
-  private async _getSafeNonce(safe: Safe): Promise<number> {
+  private async _getSafeNonce(safe: Safe): Promise<string> {
     try {
       return await safe.getNonce()
     } catch {
-      return 0
+      return '0'
     }
   }
 
@@ -86,8 +86,8 @@ export class GelatoRelayAdapter implements RelayAdapter {
     const syncTransaction = await safe.createTransaction({
       safeTransactionData: transactions,
       options: {
-        baseGas: estimation.toNumber(),
-        gasPrice: 1,
+        baseGas: estimation.toString(),
+        gasPrice: '1',
         gasToken: gasToken ?? ZERO_ADDRESS,
         refundReceiver: this.getFeeCollector(),
         nonce

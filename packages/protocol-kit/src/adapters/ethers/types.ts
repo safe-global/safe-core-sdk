@@ -1,13 +1,14 @@
+import { BigNumberish } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { BaseTransactionResult } from '@safe-global/safe-core-sdk-types'
 
 export interface EthersTransactionOptions {
   from?: string
-  gasLimit?: number | string
-  gasPrice?: number | string
-  maxFeePerGas?: number | string
-  maxPriorityFeePerGas?: number | string
-  nonce?: number
+  gasLimit?: BigNumberish
+  gasPrice?: BigNumberish
+  maxFeePerGas?: BigNumberish
+  maxPriorityFeePerGas?: BigNumberish
+  nonce?: BigNumberish
 }
 
 export interface EthersTransactionResult extends BaseTransactionResult {

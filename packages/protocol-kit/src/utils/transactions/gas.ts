@@ -21,8 +21,8 @@ export async function estimateTxGas(
   valueInWei: string,
   data: string,
   operation: OperationType
-): Promise<number> {
-  let txGasEstimation = 0
+): Promise<string> {
+  let txGasEstimation = BigNumber.from(0)
   const safeAddress = safeContract.getAddress()
 
   const estimateData: string = safeContract.encode('requiredTxGas', [
@@ -39,10 +39,10 @@ export async function estimateTxGas(
         data: estimateData
       })
     ).toString()
-    txGasEstimation = BigNumber.from('0x' + estimateResponse.substring(138)).toNumber() + 10000
+    txGasEstimation = BigNumber.from('0x' + estimateResponse.substring(138)).add(10000)
   } catch (error) {}
 
-  if (txGasEstimation > 0) {
+  if (txGasEstimation.gt(0)) {
     const dataGasEstimation = estimateDataGasCosts(estimateData)
     let additionalGas = 10000
     for (let i = 0; i < 10; i++) {
@@ -51,17 +51,17 @@ export async function estimateTxGas(
           to: safeAddress,
           from: safeAddress,
           data: estimateData,
-          gasPrice: 0,
-          gasLimit: txGasEstimation + dataGasEstimation + additionalGas
+          gasPrice: '0',
+          gasLimit: txGasEstimation.add(dataGasEstimation).add(additionalGas).toString()
         })
         if (estimateResponse !== '0x') {
           break
         }
       } catch (error) {}
-      txGasEstimation += additionalGas
+      txGasEstimation = txGasEstimation.add(additionalGas)
       additionalGas *= 2
     }
-    return txGasEstimation + additionalGas
+    return txGasEstimation.add(additionalGas).toString()
   }
 
   try {
@@ -71,10 +71,10 @@ export async function estimateTxGas(
       value: valueInWei,
       data
     })
-    return estimateGas
+    return estimateGas.toString()
   } catch (error) {
     if (operation === OperationType.DelegateCall) {
-      return 0
+      return '0'
     }
     return Promise.reject(error)
   }

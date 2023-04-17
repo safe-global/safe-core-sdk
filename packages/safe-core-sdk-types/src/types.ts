@@ -1,4 +1,4 @@
-import { BigNumber } from '@ethersproject/bignumber'
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
@@ -29,21 +29,21 @@ export interface MetaTransactionData {
 
 export interface SafeTransactionData extends MetaTransactionData {
   readonly operation: OperationType
-  readonly safeTxGas: number
-  readonly baseGas: number
-  readonly gasPrice: number
+  readonly safeTxGas: string
+  readonly baseGas: string
+  readonly gasPrice: string
   readonly gasToken: string
   readonly refundReceiver: string
-  readonly nonce: number
+  readonly nonce: string
 }
 
 export interface SafeTransactionDataPartial extends MetaTransactionData {
-  readonly safeTxGas?: number
-  readonly baseGas?: number
-  readonly gasPrice?: number
+  readonly safeTxGas?: string
+  readonly baseGas?: string
+  readonly gasPrice?: string
   readonly gasToken?: string
   readonly refundReceiver?: string
-  readonly nonce?: number
+  readonly nonce?: string
 }
 
 export interface SafeSignature {
@@ -62,12 +62,12 @@ export interface SafeTransaction {
 
 export interface TransactionOptions {
   from?: string
-  gas?: number | string
-  gasLimit?: number | string
-  gasPrice?: number | string
-  maxFeePerGas?: number | string
-  maxPriorityFeePerGas?: number | string
-  nonce?: number | string
+  gas?: BigNumberish
+  gasLimit?: BigNumberish
+  gasPrice?: BigNumberish
+  maxFeePerGas?: BigNumberish
+  maxPriorityFeePerGas?: BigNumberish
+  nonce?: BigNumberish
 }
 
 export interface BaseTransactionResult {
@@ -115,12 +115,12 @@ export interface GenerateTypedData {
     value: string
     data: string
     operation: OperationType
-    safeTxGas: number
-    baseGas: number
-    gasPrice: number
+    safeTxGas: string
+    baseGas: string
+    gasPrice: string
     gasToken: string
     refundReceiver: string
-    nonce: number
+    nonce: string
   }
 }
 
@@ -147,11 +147,11 @@ export type SafeMultisigTransactionResponse = {
   readonly data?: string
   readonly operation: number
   readonly gasToken: string
-  readonly safeTxGas: number
-  readonly baseGas: number
+  readonly safeTxGas: string
+  readonly baseGas: string
   readonly gasPrice: string
   readonly refundReceiver?: string
-  readonly nonce: number
+  readonly nonce: string
   readonly executionDate: string
   readonly submissionDate: string
   readonly modified: string
@@ -162,8 +162,8 @@ export type SafeMultisigTransactionResponse = {
   readonly isExecuted: boolean
   readonly isSuccessful?: boolean
   readonly ethGasPrice?: string
-  readonly gasUsed?: number
-  readonly fee?: number
+  readonly gasUsed?: BigNumber
+  readonly fee?: BigNumber
   readonly origin: string
   readonly dataDecoded?: string
   readonly confirmationsRequired: number

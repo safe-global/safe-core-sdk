@@ -3,11 +3,7 @@ import { TransactionStatusResponse } from '@gelatonetwork/relay-sdk'
 import Safe from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 
-import {
-  GELATO_FEE_COLLECTOR,
-  GELATO_NATIVE_TOKEN_ADDRESS,
-  ZERO_ADDRESS
-} from '@safe-global/relay-kit/constants'
+import { GELATO_FEE_COLLECTOR, GELATO_NATIVE_TOKEN_ADDRESS } from '@safe-global/relay-kit/constants'
 import { GelatoRelayAdapter } from './GelatoRelayAdapter'
 
 enum TaskState {
@@ -32,9 +28,9 @@ const RELAY_RESPONSE = {
 const SAFE_TRANSACTION = {
   data: {
     operation: OperationType.Call,
-    safeTxGas: 0,
-    baseGas: 0,
-    gasPrice: 0,
+    safeTxGas: '0',
+    baseGas: '0',
+    gasPrice: '0',
     nonce: 0,
     gasToken: '0x',
     refundReceiver: '0x',
@@ -160,8 +156,8 @@ describe('GelatoRelayAdapter', () => {
       expect(safe.createTransaction).toHaveBeenCalledWith({
         safeTransactionData: args[1],
         options: expect.objectContaining({
-          baseGas: 100000,
-          gasPrice: 1,
+          baseGas: '100000',
+          gasPrice: '1',
           refundReceiver: GELATO_FEE_COLLECTOR
         })
       })
@@ -179,8 +175,8 @@ describe('GelatoRelayAdapter', () => {
       expect(safe.createTransaction).toHaveBeenCalledWith({
         safeTransactionData: args[1],
         options: expect.objectContaining({
-          baseGas: 100000,
-          gasPrice: 1,
+          baseGas: '100000',
+          gasPrice: '1',
           gasToken: GAS_TOKEN,
           refundReceiver: GELATO_FEE_COLLECTOR
         })

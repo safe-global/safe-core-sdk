@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionOptions } from '@safe-global/safe-core-sdk-types/types'
 
 export interface CreateProxyProps {
@@ -13,5 +14,5 @@ export interface GnosisSafeProxyFactoryContract {
   proxyCreationCode(): Promise<string>
   createProxy(options: CreateProxyProps): Promise<string>
   encode(methodName: string, params: any[]): string
-  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>
+  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<string>
 }

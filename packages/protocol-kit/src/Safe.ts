@@ -236,7 +236,7 @@ class Safe {
    *
    * @returns The Safe nonce
    */
-  async getNonce(): Promise<number> {
+  async getNonce(): Promise<string> {
     return this.#contractManager.safeContract.getNonce()
   }
 
@@ -365,13 +365,13 @@ class Safe {
    * @param nonce - The nonce of the transaction/s that are going to be rejected
    * @returns The Safe transaction that invalidates the pending Safe transaction/s
    */
-  async createRejectionTransaction(nonce: number): Promise<SafeTransaction> {
+  async createRejectionTransaction(nonce: string): Promise<SafeTransaction> {
     const safeTransactionData: SafeTransactionDataPartial = {
       to: this.getAddress(),
       nonce,
       value: '0',
       data: '0x',
-      safeTxGas: 0
+      safeTxGas: '0'
     }
     return this.createTransaction({ safeTransactionData })
   }
@@ -793,7 +793,7 @@ class Safe {
       operation: serviceTransactionResponse.operation,
       safeTxGas: serviceTransactionResponse.safeTxGas,
       baseGas: serviceTransactionResponse.baseGas,
-      gasPrice: Number(serviceTransactionResponse.gasPrice),
+      gasPrice: serviceTransactionResponse.gasPrice,
       gasToken: serviceTransactionResponse.gasToken,
       refundReceiver: serviceTransactionResponse.refundReceiver,
       nonce: serviceTransactionResponse.nonce

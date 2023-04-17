@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionOptions, TransactionResult } from '@safe-global/safe-core-sdk-types/types'
 
 export interface SignMessageLibContract {
@@ -5,5 +6,5 @@ export interface SignMessageLibContract {
   signMessage(data: string, options?: TransactionOptions): Promise<TransactionResult>
   getMessageHash(message: string): Promise<string>
   encode(methodName: any, params: any): string
-  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>
+  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<string>
 }

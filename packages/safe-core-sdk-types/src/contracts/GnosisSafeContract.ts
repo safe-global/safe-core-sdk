@@ -12,7 +12,7 @@ export interface GnosisSafeContract {
   setup(setupConfig: SafeSetupConfig, options?: TransactionOptions): Promise<TransactionResult>
   getVersion(): Promise<SafeVersion>
   getAddress(): string
-  getNonce(): Promise<number>
+  getNonce(): Promise<string>
   getThreshold(): Promise<number>
   getOwners(): Promise<string[]>
   isOwner(address: string): Promise<boolean>
@@ -30,5 +30,5 @@ export interface GnosisSafeContract {
     options?: TransactionOptions
   ): Promise<TransactionResult>
   encode(methodName: string, params: any): string
-  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>
+  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<string>
 }

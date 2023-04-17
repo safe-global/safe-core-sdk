@@ -82,8 +82,8 @@ class EthersAdapter implements EthAdapter {
     return BigNumber.from(await this.#provider.getBalance(address, blockTag))
   }
 
-  async getNonce(address: string, blockTag?: string | number): Promise<number> {
-    return this.#provider.getTransactionCount(address, blockTag)
+  async getNonce(address: string, blockTag?: string | number): Promise<string> {
+    return (await this.#provider.getTransactionCount(address, blockTag)).toString()
   }
 
   async getChainId(): Promise<number> {
@@ -257,8 +257,8 @@ class EthersAdapter implements EthAdapter {
     throw new Error('The current signer does not implement EIP-712 to sign typed data')
   }
 
-  async estimateGas(transaction: EthAdapterTransaction): Promise<number> {
-    return (await this.#provider.estimateGas(transaction)).toNumber()
+  async estimateGas(transaction: EthAdapterTransaction): Promise<string> {
+    return (await this.#provider.estimateGas(transaction)).toString()
   }
 
   call(transaction: EthAdapterTransaction, blockTag?: string | number): Promise<string> {

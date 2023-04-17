@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   Sign_message_lib as SignMessageLib_V1_3_0,
@@ -42,8 +43,8 @@ abstract class SignMessageLibEthersContract implements SignMessageLibContract {
     methodName: string,
     params: any[],
     options: EthersTransactionOptions
-  ): Promise<number> {
-    return (await (this.contract.estimateGas as any)[methodName](...params, options)).toNumber()
+  ): Promise<string> {
+    return (await (this.contract.estimateGas as any)[methodName](...params, options)).toString()
   }
 }
 

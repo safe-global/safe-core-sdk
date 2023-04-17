@@ -19,8 +19,8 @@ export interface EthAdapterTransaction {
   from: string
   data: string
   value?: string
-  gasPrice?: number
-  gasLimit?: number
+  gasPrice?: number | string
+  gasLimit?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
 }
@@ -37,7 +37,7 @@ export interface EthAdapter {
   isAddress(address: string): boolean
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
   getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber>
-  getNonce(address: string, defaultBlock?: string | number): Promise<number>
+  getNonce(address: string, defaultBlock?: string | number): Promise<string>
   getChainId(): Promise<number>
   getChecksummedAddress(address: string): string
   getSafeContract({
@@ -102,7 +102,7 @@ export interface EthAdapter {
   estimateGas(
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void
-  ): Promise<number>
+  ): Promise<string>
   call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string>
   encodeParameters(types: string[], values: any[]): string
   decodeParameters(types: any[], values: string): { [key: string]: any }

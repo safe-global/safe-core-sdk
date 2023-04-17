@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import { Sign_message_lib as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Sign_message_lib'
 import {
@@ -36,14 +37,10 @@ abstract class SignMessageLibWeb3Contract implements SignMessageLibContract {
     methodName: string,
     params: any[],
     options: Web3TransactionOptions
-  ): Promise<number> {
-    try {
-      return Number(
-        await (this.contract.methods as any)[methodName](...params).estimateGas(options)
-      )
-    } catch (error) {
-      return Promise.reject(error)
-    }
+  ): Promise<string> {
+    return (
+      await (this.contract.methods as any)[methodName](...params).estimateGas(options)
+    ).toString()
   }
 }
 

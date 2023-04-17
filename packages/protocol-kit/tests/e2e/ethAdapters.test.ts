@@ -21,8 +21,8 @@ import {
   getSafeSingleton,
   getSignMessageLib
 } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
-import { getAccounts, getNetworkProvider } from './utils/setupTestNetwork'
+import { getEthAdapter, getNetworkProvider } from './utils/setupEthAdapter'
+import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 

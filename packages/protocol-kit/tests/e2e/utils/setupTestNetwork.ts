@@ -1,13 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer'
-import { Provider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import dotenv from 'dotenv'
 import { ethers, waffle, Web3 } from 'hardhat'
-
-dotenv.config()
-
-type Network = 'mainnet' | 'goerli' | 'gnosis'
-
 interface Account {
   signer: Signer
   address: string
@@ -40,19 +33,4 @@ export async function getAccounts(): Promise<Account[]> {
   const accounts =
     process.env.TEST_NETWORK === 'ganache' ? await getGanacheAccounts() : getHardhatAccounts()
   return accounts
-}
-
-export function getNetworkProvider(network: Network): Provider {
-  let rpcUrl: string
-  switch (network) {
-    case 'gnosis':
-      rpcUrl = 'https://rpc.gnosischain.com'
-      break
-    default:
-      rpcUrl = `https://${network}.infura.io/v3/${process.env.INFURA_KEY}`
-      break
-  }
-
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl)
-  return provider
 }

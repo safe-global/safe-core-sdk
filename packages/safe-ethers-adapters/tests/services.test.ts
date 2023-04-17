@@ -103,7 +103,7 @@ describe('SafeServices', () => {
         gasPrice: '0',
         gasToken: 'some_gas_token',
         refundReceiver: 'some_gas_token',
-        nonce: 42
+        nonce: '42'
       })
       const signature: any = {
         signer: 'some_signer',
@@ -141,7 +141,7 @@ describe('SafeServices', () => {
         gasPrice: '0',
         gasToken: 'some_gas_token',
         refundReceiver: 'some_gas_token',
-        nonce: 42
+        nonce: '42'
       })
       const signature: any = {
         signer: 'some_signer',

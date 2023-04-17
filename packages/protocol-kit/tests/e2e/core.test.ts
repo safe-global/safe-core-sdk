@@ -114,7 +114,7 @@ describe('Safe Info', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      chai.expect(await safeSdk.getNonce()).to.be.eq(0)
+      chai.expect(await safeSdk.getNonce()).to.be.eq('0')
       const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
         value: '0',
@@ -123,7 +123,7 @@ describe('Safe Info', () => {
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.getNonce()).to.be.eq(1)
+      chai.expect(await safeSdk.getNonce()).to.be.eq('1')
     })
   })
 

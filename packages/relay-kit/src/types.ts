@@ -8,14 +8,25 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { BigNumber } from 'ethers'
 
+export interface CreateTransactionProps {
+  safe: Safe
+  /** transactions - The transaction array to process */
+  transactions: MetaTransactionData[]
+  /** options - The transaction array optional properties */
+  options?: MetaTransactionOptions
+  /** onlyCalls - Forces the execution of the transaction array with MultiSendCallOnly contract */
+  onlyCalls?: boolean
+}
+
 export interface RelayAdapter {
   getFeeCollector(): string
   getEstimateFee(chainId: number, gasLimit: BigNumber, gasToken?: string): Promise<BigNumber>
   getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined>
-  createRelayedTransaction(
-    safe: Safe,
-    transactions: MetaTransactionData[],
-    options: MetaTransactionOptions
-  ): Promise<SafeTransaction>
+  createRelayedTransaction({
+    safe,
+    transactions,
+    options,
+    onlyCalls
+  }: CreateTransactionProps): Promise<SafeTransaction>
   relayTransaction(transaction: RelayTransaction): Promise<RelayResponse>
 }

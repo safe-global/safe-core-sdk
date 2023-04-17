@@ -118,11 +118,11 @@ class AccountAbstraction {
       safeAddress
     })
 
-    const standardizedSafeTx = await this.#relayAdapter.createRelayedTransaction(
+    const standardizedSafeTx = await this.#relayAdapter.createRelayedTransaction({
       safe,
       transactions,
       options
-    )
+    })
 
     const signedSafeTx = await safe.signTransaction(standardizedSafeTx)
 

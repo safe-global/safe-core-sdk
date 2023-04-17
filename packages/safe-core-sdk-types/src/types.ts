@@ -175,11 +175,11 @@ export interface RelayTransaction {
   target: string
   encodedTransaction: string
   chainId: number
-  options: MetaTransactionOptions
+  options?: MetaTransactionOptions
 }
 
 export interface MetaTransactionOptions {
-  gasLimit: BigNumber
+  gasLimit?: BigNumber
   gasToken?: string
   isSponsored?: boolean
 }

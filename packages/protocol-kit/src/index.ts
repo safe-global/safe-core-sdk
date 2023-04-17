@@ -52,6 +52,7 @@ import {
 
 import { ContractNetworksConfig } from './types'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
+import { estimateTxBaseGas, estimateTxGas } from './utils/transactions/gas'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
 
 export {
@@ -70,6 +71,8 @@ export {
   AddOwnerTxParams,
   RemoveOwnerTxParams,
   SwapOwnerTxParams,
+  estimateTxBaseGas,
+  estimateTxGas,
   encodeMultiSendData,
   standardizeSafeTransactionData,
   EthersAdapter,

@@ -15,12 +15,12 @@ import { SafeOnRampKit, SafeOnRampProviderType } from '../../src/index'
 
 To use the example properly in your local machine follow these steps:
 
-**In the project root**
+**In the project root folder**
 
 1. `yarn install`
 2. `yarn build`
 
-**In the onramp-kit client example root**
+**In the onramp-kit client example root folder**
 
 3. `yarn install`
 4. Configure `.env` following `.env.sample`

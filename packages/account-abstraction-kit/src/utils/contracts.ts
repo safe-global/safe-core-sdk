@@ -1,5 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { BytesLike } from '@ethersproject/bytes'
+import {
+  PREDETERMINED_SALT_NONCE,
+  ZERO_ADDRESS
+} from '@safe-global/account-abstraction-kit-poc/constants'
 import { getCompatibilityFallbackHandlerContract, getSafeContract } from '@safe-global/protocol-kit'
 import {
   EthAdapter,
@@ -8,10 +12,6 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { BigNumberish, ethers, Signer } from 'ethers'
-import {
-  PREDETERMINED_SALT_NONCE,
-  ZERO_ADDRESS
-} from '@safe-global/account-abstraction-kit-poc/constants'
 
 export function encodeCreateProxyWithNonce(
   safeProxyFactoryContract: GnosisSafeProxyFactoryContract,
@@ -29,13 +29,11 @@ async function encodeSetupCallData(
   ethAdapter: EthAdapter,
   safeVersion: SafeVersion,
   safeContract: GnosisSafeContract,
-  owners: string[],
-  chainId: number
+  owners: string[]
 ): Promise<string> {
   const compatibilityFallbackhandlerAddress = await getCompatibilityFallbackHandlerContract({
     ethAdapter,
-    safeVersion,
-    chainId
+    safeVersion
   })
   return safeContract.encode('setup', [
     owners,
@@ -52,17 +50,12 @@ async function encodeSetupCallData(
 export async function getSafeInitializer(
   ethAdapter: EthAdapter,
   safeContract: GnosisSafeContract,
-  signerAddress: string,
-  chainId: number
+  signerAddress: string
 ): Promise<string> {
   const safeVersion = await safeContract.getVersion()
-  const initializer = await encodeSetupCallData(
-    ethAdapter,
-    safeVersion,
-    safeContract,
-    [signerAddress],
-    chainId
-  )
+  const initializer = await encodeSetupCallData(ethAdapter, safeVersion, safeContract, [
+    signerAddress
+  ])
   return initializer
 }
 
@@ -72,8 +65,7 @@ export async function calculateChainSpecificProxyAddress(
   safeProxyFactoryContract: GnosisSafeProxyFactoryContract,
   signer: Signer
 ): Promise<string> {
-  const chainId = await ethAdapter.getChainId()
-  const safeSingletonContract = await getSafeContract({ ethAdapter, safeVersion, chainId })
+  const safeSingletonContract = await getSafeContract({ ethAdapter, safeVersion })
   const deployer = safeProxyFactoryContract.getAddress()
   const signerAddress = await signer.getAddress()
 
@@ -86,7 +78,7 @@ export async function calculateChainSpecificProxyAddress(
     [
       ethers.utils.solidityKeccak256(
         ['bytes'],
-        [await getSafeInitializer(ethAdapter, safeSingletonContract, signerAddress, chainId)]
+        [await getSafeInitializer(ethAdapter, safeSingletonContract, signerAddress)]
       ),
       PREDETERMINED_SALT_NONCE
     ]

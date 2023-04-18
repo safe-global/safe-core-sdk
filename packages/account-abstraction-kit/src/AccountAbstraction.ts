@@ -1,20 +1,3 @@
-import { RelayAdapter } from '@safe-global/relay-kit'
-import Safe, {
-  encodeMultiSendData,
-  EthersAdapter,
-  getMultiSendCallOnlyContract,
-  getProxyFactoryContract,
-  getSafeContract
-} from '@safe-global/protocol-kit'
-import {
-  GnosisSafeContract,
-  GnosisSafeProxyFactoryContract,
-  MetaTransactionData,
-  MetaTransactionOptions,
-  RelayTransaction,
-  SafeVersion
-} from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
 import {
   AccountAbstractionConfig,
   OperationType
@@ -24,6 +7,23 @@ import {
   encodeCreateProxyWithNonce,
   getSafeInitializer
 } from '@safe-global/account-abstraction-kit-poc/utils/contracts'
+import Safe, {
+  encodeMultiSendData,
+  EthersAdapter,
+  getMultiSendCallOnlyContract,
+  getProxyFactoryContract,
+  getSafeContract
+} from '@safe-global/protocol-kit'
+import { RelayAdapter } from '@safe-global/relay-kit'
+import {
+  GnosisSafeContract,
+  GnosisSafeProxyFactoryContract,
+  MetaTransactionData,
+  MetaTransactionOptions,
+  RelayTransaction,
+  SafeVersion
+} from '@safe-global/safe-core-sdk-types'
+import { ethers } from 'ethers'
 
 const safeVersion: SafeVersion = '1.3.0'
 
@@ -49,11 +49,9 @@ class AccountAbstraction {
     const { relayAdapter } = options
     this.setRelayAdapter(relayAdapter)
 
-    const chainId = await this.#ethAdapter.getChainId()
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter: this.#ethAdapter,
-      safeVersion,
-      chainId
+      safeVersion
     })
     const safeAddress = await calculateChainSpecificProxyAddress(
       this.#ethAdapter,
@@ -64,8 +62,7 @@ class AccountAbstraction {
     this.#safeContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
-      customSafeAddress: safeAddress,
-      chainId
+      customSafeAddress: safeAddress
     })
   }
 
@@ -110,9 +107,7 @@ class AccountAbstraction {
       throw new Error('SDK not initialized')
     }
 
-    const chainId = await this.#ethAdapter.getChainId()
     const safeAddress = this.getSafeAddress()
-
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,
       safeAddress
@@ -140,20 +135,17 @@ class AccountAbstraction {
     } else {
       const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId
+        safeVersion
       })
       relayTransactionTarget = multiSendCallOnlyContract.getAddress()
       const safeSingletonContract = await getSafeContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId
+        safeVersion
       })
       const initializer = await getSafeInitializer(
         this.#ethAdapter,
         this.#safeContract,
-        await this.getSignerAddress(),
-        chainId
+        await this.getSignerAddress()
       )
 
       const safeDeploymentTransaction: MetaTransactionData = {
@@ -177,6 +169,7 @@ class AccountAbstraction {
       encodedTransaction = multiSendCallOnlyContract.encode('multiSend', [multiSendData])
     }
 
+    const chainId = await this.#ethAdapter.getChainId()
     const relayTransaction: RelayTransaction = {
       target: relayTransactionTarget,
       encodedTransaction: encodedTransaction,

@@ -1,5 +1,5 @@
-import { DeploymentFilter, getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { DeploymentFilter, getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { networks } from '../src/utils/eip-3770/config'
 
 const safeVersion: SafeVersion = '1.3.0'
@@ -20,9 +20,16 @@ function getLocalNetworksConfig(): string[] {
 function checkConfigDiff() {
   const safeDeployments = getSafeDeploymentNetworks()
   const localNetworks = getLocalNetworksConfig()
-  if (safeDeployments.length !== localNetworks.length) {
-    const chainIdsDiff = safeDeployments.filter((chainId) => !localNetworks.includes(chainId))
-    const errorMessage = `EIP-3770 local config is missing chainIds: ${chainIdsDiff}`
+
+  const chainIdsMissingDiff = safeDeployments.filter((chainId) => !localNetworks.includes(chainId))
+  if (chainIdsMissingDiff.length > 0) {
+    const errorMessage = `EIP-3770 local config is missing chainIds: ${chainIdsMissingDiff}`
+    throw new Error(errorMessage)
+  }
+
+  const chainIdsExtraDiff = localNetworks.filter((chainId) => !safeDeployments.includes(chainId))
+  if (chainIdsExtraDiff.length > 0) {
+    const errorMessage = `EIP-3770 local config are not required chainIds: ${chainIdsExtraDiff}`
     throw new Error(errorMessage)
   }
 }

@@ -77,7 +77,7 @@ describe('GelatoRelayAdapter', () => {
     expect(mockGetEstimateFee).toHaveBeenCalledWith(
       chainId,
       GELATO_NATIVE_TOKEN_ADDRESS,
-      gasLimit,
+      BigNumber.from(gasLimit),
       true
     )
     expect(BigNumber.from(estimation).gt(BigNumber.from(0))).toBe(true)

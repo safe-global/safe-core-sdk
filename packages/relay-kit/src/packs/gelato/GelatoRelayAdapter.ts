@@ -87,7 +87,7 @@ export class GelatoRelayAdapter implements RelayAdapter {
     const syncTransaction = await safe.createTransaction({
       safeTransactionData: transactions,
       options: {
-        baseGas: estimation.toString(),
+        baseGas: estimation,
         gasPrice: '1',
         gasToken: gasToken ?? ZERO_ADDRESS,
         refundReceiver: this.getFeeCollector(),
@@ -130,7 +130,7 @@ export class GelatoRelayAdapter implements RelayAdapter {
       isRelayContext: false
     }
     const relayRequestOptions: RelayRequestOptions = {
-      gasLimit: gasLimit && gasLimit.toString()
+      gasLimit
     }
     const response = await this.#gelatoRelay.callWithSyncFee(request, relayRequestOptions)
     return response

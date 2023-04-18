@@ -69,7 +69,7 @@ describe('GelatoRelayAdapter', () => {
 
   it('should allow to get a fee estimation', async () => {
     const chainId = 1
-    const gasLimit = BigNumber.from(100000)
+    const gasLimit = '100000'
     const gasToken = '0x0000000000000000000000000000000000000000'
     const estimation = await gelatoRelayAdapter.getEstimateFee(chainId, gasLimit, gasToken)
 
@@ -80,7 +80,7 @@ describe('GelatoRelayAdapter', () => {
       gasLimit,
       true
     )
-    expect(estimation.gt(BigNumber.from(0))).toBe(true)
+    expect(BigNumber.from(estimation).gt(BigNumber.from(0))).toBe(true)
   })
 
   it('should allow to check the task status', async () => {

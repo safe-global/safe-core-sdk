@@ -47,7 +47,7 @@ export class GelatoRelayAdapter implements RelayAdapter {
     return GELATO_FEE_COLLECTOR
   }
 
-  async getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<BigNumber> {
+  async getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string> {
     const feeToken = this._getFeeToken(gasToken)
     const estimation = await this.#gelatoRelay.getEstimatedFee(
       chainId,
@@ -55,7 +55,7 @@ export class GelatoRelayAdapter implements RelayAdapter {
       BigNumber.from(gasLimit),
       true
     )
-    return estimation
+    return estimation.toString()
   }
 
   async getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined> {

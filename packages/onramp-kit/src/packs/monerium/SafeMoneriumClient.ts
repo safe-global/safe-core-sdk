@@ -15,7 +15,12 @@ import {
   Network,
   OrderKind
 } from '@monerium/sdk'
-import { EIP_1271_INTERFACE, MAGIC_VALUE } from './signatures'
+import {
+  EIP_1271_BYTES_INTERFACE,
+  EIP_1271_INTERFACE,
+  MAGIC_VALUE,
+  MAGIC_VALUE_BYTES
+} from './signatures'
 
 type SafeMoneriumOrder = {
   safeAddress: string
@@ -114,7 +119,13 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
-  async isValidSignature(safeAddress: string, message: string, chainId: number) {
+  async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
+    const messageHash = ethers.utils.hashMessage(message)
+    const messageHashSigned = await this.#isMessageHashSigned(safeAddress, messageHash)
+    return messageHashSigned
+  }
+
+  async #isMessageHashSigned(safeAddress: string, messageHash: string): Promise<boolean> {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
 
     const safeOwner = provider.getSigner(0)
@@ -124,31 +135,30 @@ export class SafeMoneriumClient extends MoneriumClient {
       signerOrProvider: safeOwner
     })
 
-    const safeSdk = await Safe.create({
-      ethAdapter,
-      safeAddress,
-      isL1SafeMasterCopy: true
+    const txData1 = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [messageHash, '0x'])
+
+    const response1 = await ethAdapter.call({
+      from: safeAddress,
+      to: safeAddress,
+      data: txData1
     })
-    const safeVersion = await safeSdk.getContractVersion()
-    debugger
-    const fallbackHandler = await getCompatibilityFallbackHandlerContract({
-      ethAdapter,
-      safeVersion,
-      chainId
-    })
-    debugger
-    // We should add signature validation for legacy contracts
-    const txData = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [
-      ethers.utils.hashMessage(message),
+
+    const msgBytes = ethers.utils.arrayify(messageHash)
+
+    const txData2 = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
+      msgBytes,
       '0x'
     ])
-    debugger
-    const response = await ethAdapter.call({
+
+    const response2 = await ethAdapter.call({
       from: safeAddress,
-      to: fallbackHandler.getAddress(),
-      data: txData
+      to: safeAddress,
+      data: txData2
     })
-    debugger
-    return response.slice(0, 10).toLowerCase() === MAGIC_VALUE
+
+    return (
+      response1.slice(0, 10).toLowerCase() === MAGIC_VALUE ||
+      response2.slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES
+    )
   }
 }

@@ -190,7 +190,7 @@ export type TokenInfoListResponse = {
   readonly count: number
   readonly next?: string
   readonly previous?: string
-  readonly results: TokenInfoListResponse[]
+  readonly results: TokenInfoResponse[]
 }
 
 export type TransferWithTokenInfoResponse = TransferResponse & {

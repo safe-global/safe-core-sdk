@@ -130,25 +130,25 @@ export class SafeMoneriumClient extends MoneriumClient {
       isL1SafeMasterCopy: true
     })
     const safeVersion = await safeSdk.getContractVersion()
-
+    debugger
     const fallbackHandler = await getCompatibilityFallbackHandlerContract({
       ethAdapter,
       safeVersion,
       chainId
     })
-
+    debugger
     // We should add signature validation for legacy contracts
     const txData = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [
       ethers.utils.hashMessage(message),
       '0x'
     ])
-
+    debugger
     const response = await ethAdapter.call({
       from: safeAddress,
       to: fallbackHandler.getAddress(),
       data: txData
     })
-
+    debugger
     return response.slice(0, 10).toLowerCase() === MAGIC_VALUE
   }
 }

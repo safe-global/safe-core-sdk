@@ -75,11 +75,11 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
         if (options?.address) {
           try {
             const message = 'I hereby declare that I am the address owner.'
-            const isSigned = await this.#client.isValidSignature(options?.address, message, 5)
+            // const isSigned = await this.#client.isValidSignature(options?.address, message, 5)
 
-            if (!isSigned) {
-              await this.#client.signMessage(options?.address, message, 5)
-            }
+            // if (!isSigned) {
+            await this.#client.signMessage(options?.address, message, 5)
+            // }
           } catch (e) {
             console.log(getErrorMessage(e))
           }

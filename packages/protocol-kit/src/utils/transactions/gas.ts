@@ -32,13 +32,11 @@ export async function estimateTxGas(
     operation
   ])
   try {
-    const estimateResponse = (
-      await ethAdapter.estimateGas({
-        to: safeAddress,
-        from: safeAddress,
-        data: estimateData
-      })
-    ).toString()
+    const estimateResponse = await ethAdapter.estimateGas({
+      to: safeAddress,
+      from: safeAddress,
+      data: estimateData
+    })
     txGasEstimation = BigNumber.from('0x' + estimateResponse.substring(138)).add(10000)
   } catch (error) {}
 
@@ -71,7 +69,7 @@ export async function estimateTxGas(
       value: valueInWei,
       data
     })
-    return estimateGas.toString()
+    return estimateGas
   } catch (error) {
     if (operation === OperationType.DelegateCall) {
       return '0'

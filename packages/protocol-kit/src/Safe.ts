@@ -3,6 +3,7 @@ import {
   EthAdapter,
   OperationType,
   SafeMultisigTransactionResponse,
+  SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial,
   SafeTransactionEIP712Args,
@@ -28,6 +29,7 @@ import {
   SwapOwnerTxParams
 } from './types'
 import {
+  EthSafeSignature,
   hasSafeFeature,
   isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
@@ -38,8 +40,7 @@ import {
   generateEIP712Signature,
   generatePreValidatedSignature,
   generateSignature
-} from './utils/signatures'
-import SafeSignature from './utils/signatures/SafeSignature'
+} from './utils/signatures/utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
@@ -843,7 +844,7 @@ class Safe {
     }
     const safeTransaction = await this.createTransaction({ safeTransactionData })
     serviceTransactionResponse.confirmations?.map((confirmation) => {
-      const signature = new SafeSignature(confirmation.owner, confirmation.signature)
+      const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
       safeTransaction.addSignature(signature)
     })
     return safeTransaction

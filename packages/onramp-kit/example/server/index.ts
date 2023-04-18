@@ -5,9 +5,9 @@ import routes from './src/router/router'
 
 dotenv.config()
 
-const { SERVER_PORT, FRONTEND_ORGIN } = process.env
+const { SERVER_PORT, FRONTEND_ORIGIN } = process.env
 
-const allowedOrigins = FRONTEND_ORGIN?.split(',')
+const allowedOrigins = FRONTEND_ORIGIN?.split(',')
 
 const DEFAULT_SERVER_PORT = '3001'
 

@@ -54,6 +54,7 @@ import {
   SafeDeploymentConfig,
   SwapOwnerTxParams
 } from './types'
+import { EthSafeSignature } from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
 
@@ -107,7 +108,8 @@ export {
   getSafeInitializer,
   calculateProxyAddress,
   PREDETERMINED_SALT_NONCE,
-  encodeCreateProxyWithNonce
+  encodeCreateProxyWithNonce,
+  EthSafeSignature
 }
 
 export default Safe

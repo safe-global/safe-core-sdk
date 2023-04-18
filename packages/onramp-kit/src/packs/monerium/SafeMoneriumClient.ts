@@ -1,11 +1,7 @@
-import Safe, {
-  EthersAdapter,
-  getCompatibilityFallbackHandlerContract,
-  getSignMessageLibContract
-} from '@safe-global/protocol-kit'
+import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { ethers } from 'ethers'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter, OperationType } from '@safe-global/safe-core-sdk-types'
 import {
   Chain,
   Counterpart,
@@ -21,6 +17,7 @@ import {
   MAGIC_VALUE,
   MAGIC_VALUE_BYTES
 } from './signatures'
+import { MoneriumInitOptions } from './types'
 
 type SafeMoneriumOrder = {
   safeAddress: string
@@ -33,6 +30,14 @@ type SafeMoneriumOrder = {
 }
 
 export class SafeMoneriumClient extends MoneriumClient {
+  #ethAdapter: EthAdapter
+
+  constructor(environment: 'production' | 'sandbox', options: MoneriumInitOptions) {
+    super(environment)
+
+    this.#ethAdapter = options.ethAdapter
+  }
+
   async send(order: SafeMoneriumOrder) {
     const date = new Date().toISOString()
     const messageToSign = `Send ${order.currency.toUpperCase()} ${order.amount} to ${
@@ -60,20 +65,15 @@ export class SafeMoneriumClient extends MoneriumClient {
   }
 
   async signMessage(safeAddress: string, message: string, chainId: number) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-
-    const safeOwner = provider.getSigner(0)
-
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: safeOwner
+    const safeSdk = await Safe.create({
+      ethAdapter: this.#ethAdapter,
+      safeAddress,
+      isL1SafeMasterCopy: true
     })
-
-    const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
     const safeVersion = await safeSdk.getContractVersion()
 
     const signMessageContract = await getSignMessageLibContract({
-      ethAdapter,
+      ethAdapter: this.#ethAdapter,
       safeVersion,
       chainId
     })
@@ -98,25 +98,25 @@ export class SafeMoneriumClient extends MoneriumClient {
 
     const apiKit = new SafeApiKit({
       txServiceUrl: 'https://safe-transaction-goerli.safe.global',
-      ethAdapter
+      ethAdapter: this.#ethAdapter
     })
 
     await apiKit.proposeTransaction({
       safeAddress,
       safeTransactionData: safeTransaction.data,
       safeTxHash,
-      senderAddress: await safeOwner.getAddress(),
+      senderAddress: (await this.#ethAdapter.getSignerAddress()) || '',
       senderSignature: senderSignature.data
     })
 
-    const transaction = await apiKit.getTransaction(safeTxHash)
+    // TODO: Remove as This stops showing the Monerium UI so should be avoided
+    // const transaction = await apiKit.getTransaction(safeTxHash)
 
-    if (transaction.confirmations?.length === transaction.confirmationsRequired) {
-      const executeTxResponse = await safeSdk.executeTransaction(transaction)
-      // This stops showing the Monerium UI so should be avoided
-      // const receipt = await executeTxResponse.transactionResponse?.wait()
-      // console.log(receipt)
-    }
+    // if (transaction.confirmations?.length === transaction.confirmationsRequired) {
+    //   const executeTxResponse = await safeSdk.executeTransaction(transaction)
+    //   const receipt = await executeTxResponse.transactionResponse?.wait()
+    //   console.log(receipt)
+    // }
   }
 
   async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
@@ -126,18 +126,9 @@ export class SafeMoneriumClient extends MoneriumClient {
   }
 
   async #isMessageHashSigned(safeAddress: string, messageHash: string): Promise<boolean> {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-
-    const safeOwner = provider.getSigner(0)
-
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: safeOwner
-    })
-
     const txData1 = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [messageHash, '0x'])
 
-    const response1 = await ethAdapter.call({
+    const response1 = await this.#ethAdapter.call({
       from: safeAddress,
       to: safeAddress,
       data: txData1
@@ -150,7 +141,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       '0x'
     ])
 
-    const response2 = await ethAdapter.call({
+    const response2 = await this.#ethAdapter.call({
       from: safeAddress,
       to: safeAddress,
       data: txData2

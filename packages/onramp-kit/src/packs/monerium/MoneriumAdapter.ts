@@ -1,7 +1,8 @@
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 import { SafeMoneriumClient } from './SafeMoneriumClient'
-import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
+import { MoneriumInitOptions, MoneriumOpenOptions, MoneriumProviderConfig } from './types'
+import { EthAdapter } from 'packages/safe-core-sdk-types/dist/src'
 
 const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
 const MONERIUM_REFRESH_TOKEN = 'monerium_refresh_token'
@@ -18,9 +19,9 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
     this.#config = config
   }
 
-  async init() {
+  async init(options: MoneriumInitOptions) {
     try {
-      this.#client = new SafeMoneriumClient(this.#config.environment)
+      this.#client = new SafeMoneriumClient(this.#config.environment, options)
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }

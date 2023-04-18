@@ -186,7 +186,7 @@ describe('GelatoRelayAdapter', () => {
 
   it('should allow to make a sync fee transaction', async () => {
     const response = await gelatoRelayAdapter.sendSyncTransaction(SAFE_ADDRESS, '0x', CHAIN_ID, {
-      gasLimit: BigNumber.from(100000)
+      gasLimit: '100000'
     })
 
     expect(response).toBe(RELAY_RESPONSE)
@@ -210,7 +210,7 @@ describe('GelatoRelayAdapter', () => {
       encodedTransaction: '0x',
       chainId: CHAIN_ID,
       options: {
-        gasLimit: BigNumber.from(100000),
+        gasLimit: '100000',
         isSponsored: true
       }
     })
@@ -230,7 +230,7 @@ describe('GelatoRelayAdapter', () => {
       encodedTransaction: '0x',
       chainId: CHAIN_ID,
       options: {
-        gasLimit: BigNumber.from(100000),
+        gasLimit: '100000',
         isSponsored: false
       }
     })

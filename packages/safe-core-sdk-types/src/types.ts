@@ -34,7 +34,7 @@ export interface SafeTransactionData extends MetaTransactionData {
   readonly gasPrice: string
   readonly gasToken: string
   readonly refundReceiver: string
-  readonly nonce: string
+  readonly nonce: number
 }
 
 export interface SafeTransactionDataPartial extends MetaTransactionData {
@@ -43,7 +43,7 @@ export interface SafeTransactionDataPartial extends MetaTransactionData {
   readonly gasPrice?: string
   readonly gasToken?: string
   readonly refundReceiver?: string
-  readonly nonce?: string
+  readonly nonce?: number
 }
 
 export interface SafeSignature {
@@ -120,7 +120,7 @@ export interface GenerateTypedData {
     gasPrice: string
     gasToken: string
     refundReceiver: string
-    nonce: string
+    nonce: number
   }
 }
 
@@ -151,7 +151,7 @@ export type SafeMultisigTransactionResponse = {
   readonly baseGas: string
   readonly gasPrice: string
   readonly refundReceiver?: string
-  readonly nonce: string
+  readonly nonce: number
   readonly executionDate: string
   readonly submissionDate: string
   readonly modified: string
@@ -179,7 +179,7 @@ export interface RelayTransaction {
 }
 
 export interface MetaTransactionOptions {
-  gasLimit: BigNumber
+  gasLimit: string
   gasToken?: string
   isSponsored?: boolean
 }

@@ -134,7 +134,7 @@ describe('Transactions creation', () => {
           ethAdapter,
           txDataPartial
         )
-        chai.expect(safeTxData.safeTxGas).to.be.gt(0)
+        chai.expect(Number(safeTxData.safeTxGas)).to.be.gt(0)
       }
     )
 

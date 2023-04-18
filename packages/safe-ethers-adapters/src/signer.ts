@@ -69,7 +69,7 @@ export class SafeEthersSigner extends VoidSigner {
       operation: safeTx.operation,
       gasLimit: BigNumber.from(safeTx.safeTxGas),
       gasPrice: BigNumber.from(0),
-      nonce: Number(safeTx.nonce),
+      nonce: safeTx.nonce,
       chainId: await connectedSafe.getChainId(),
       hash: safeTxHash,
       from: this.address,

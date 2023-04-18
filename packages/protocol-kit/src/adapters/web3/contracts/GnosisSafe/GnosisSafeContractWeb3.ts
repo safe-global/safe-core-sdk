@@ -34,8 +34,8 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
     return this.contract.options.address
   }
 
-  async getNonce(): Promise<string> {
-    return await this.contract.methods.nonce().call()
+  async getNonce(): Promise<number> {
+    return Number(await this.contract.methods.nonce().call())
   }
 
   async getThreshold(): Promise<number> {

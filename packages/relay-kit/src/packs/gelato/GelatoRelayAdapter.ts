@@ -35,11 +35,11 @@ export class GelatoRelayAdapter implements RelayAdapter {
   }
 
   // TODO: Should be moved to the protocol-kit
-  private async _getSafeNonce(safe: Safe): Promise<string> {
+  private async _getSafeNonce(safe: Safe): Promise<number> {
     try {
       return await safe.getNonce()
     } catch {
-      return '0'
+      return 0
     }
   }
 
@@ -47,13 +47,14 @@ export class GelatoRelayAdapter implements RelayAdapter {
     return GELATO_FEE_COLLECTOR
   }
 
-  async getEstimateFee(
-    chainId: number,
-    gasLimit: BigNumber,
-    gasToken?: string
-  ): Promise<BigNumber> {
+  async getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<BigNumber> {
     const feeToken = this._getFeeToken(gasToken)
-    const estimation = await this.#gelatoRelay.getEstimatedFee(chainId, feeToken, gasLimit, true)
+    const estimation = await this.#gelatoRelay.getEstimatedFee(
+      chainId,
+      feeToken,
+      BigNumber.from(gasLimit),
+      true
+    )
     return estimation
   }
 

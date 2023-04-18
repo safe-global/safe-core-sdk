@@ -10,7 +10,7 @@ import { BigNumber } from 'ethers'
 
 export interface RelayAdapter {
   getFeeCollector(): string
-  getEstimateFee(chainId: number, gasLimit: BigNumber, gasToken?: string): Promise<BigNumber>
+  getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<BigNumber>
   getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined>
   createRelayedTransaction(
     safe: Safe,

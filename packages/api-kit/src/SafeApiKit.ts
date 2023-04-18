@@ -561,7 +561,7 @@ class SafeApiKit {
     const { address } = await this.#ethAdapter.getEip3770Address(safeAddress)
     const pendingTransactions = await this.getPendingTransactions(address)
     if (pendingTransactions.results.length > 0) {
-      const nonces = pendingTransactions.results.map((tx) => Number(tx.nonce))
+      const nonces = pendingTransactions.results.map((tx) => tx.nonce)
       const lastNonce = Math.max(...nonces)
       return lastNonce + 1
     }

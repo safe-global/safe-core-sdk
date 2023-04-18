@@ -12,7 +12,7 @@ export interface GnosisSafeContract {
   setup(setupConfig: SafeSetupConfig, options?: TransactionOptions): Promise<TransactionResult>
   getVersion(): Promise<SafeVersion>
   getAddress(): string
-  getNonce(): Promise<string>
+  getNonce(): Promise<number>
   getThreshold(): Promise<number>
   getOwners(): Promise<string[]>
   isOwner(address: string): Promise<boolean>

@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   Sign_message_lib as SignMessageLib_V1_3_0,

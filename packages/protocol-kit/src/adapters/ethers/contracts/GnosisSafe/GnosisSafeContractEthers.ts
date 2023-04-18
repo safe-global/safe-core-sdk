@@ -37,8 +37,8 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
     return this.contract.address
   }
 
-  async getNonce(): Promise<string> {
-    return (await this.contract.nonce()).toString()
+  async getNonce(): Promise<number> {
+    return (await this.contract.nonce()).toNumber()
   }
 
   async getThreshold(): Promise<number> {

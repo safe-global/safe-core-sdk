@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionOptions, TransactionResult } from '@safe-global/safe-core-sdk-types/types'
 
 export interface SignMessageLibContract {

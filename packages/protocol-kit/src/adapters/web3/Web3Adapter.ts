@@ -68,11 +68,11 @@ class Web3Adapter implements EthAdapter {
     return BigNumber.from(balance)
   }
 
-  async getNonce(address: string, defaultBlock?: string | number): Promise<string> {
+  async getNonce(address: string, defaultBlock?: string | number): Promise<number> {
     const nonce = defaultBlock
       ? await this.#web3.eth.getTransactionCount(address, defaultBlock)
       : await this.#web3.eth.getTransactionCount(address)
-    return nonce.toString()
+    return nonce
   }
 
   async getChainId(): Promise<number> {

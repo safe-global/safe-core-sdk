@@ -78,11 +78,11 @@ class AccountAbstraction {
     return signerAddress
   }
 
-  async getNonce(): Promise<string> {
+  async getNonce(): Promise<number> {
     if (!this.#safeContract) {
       throw new Error('SDK not initialized')
     }
-    return (await this.isSafeDeployed()) ? await this.#safeContract.getNonce() : '0'
+    return (await this.isSafeDeployed()) ? await this.#safeContract.getNonce() : 0
   }
 
   getSafeAddress(): string {

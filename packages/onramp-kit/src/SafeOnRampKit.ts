@@ -2,6 +2,7 @@ import {
   SafeOnRampAdapter,
   SafeOnRampEvent,
   SafeOnRampEventListener,
+  SafeOnRampInitOptions,
   SafeOnRampOpenOptions,
   SafeOnRampOpenResponse
 } from './types'
@@ -28,12 +29,15 @@ export class SafeOnRampKit<TAdapter extends SafeOnRampAdapter<TAdapter>> {
    * @returns A SafeOnRampKit instance
    * @throws Error if the adapter is not defined
    */
-  static async init<T extends SafeOnRampAdapter<T>>(adapter: T): Promise<SafeOnRampKit<T>> {
+  static async init<T extends SafeOnRampAdapter<T>>(
+    adapter: T,
+    initOptions?: SafeOnRampInitOptions<T>
+  ): Promise<SafeOnRampKit<T>> {
     if (!adapter) {
       throw new Error('The adapter is not defined')
     }
 
-    await adapter.init()
+    await adapter.init(initOptions)
     return new this(adapter)
   }
 

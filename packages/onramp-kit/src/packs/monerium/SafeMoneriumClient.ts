@@ -65,58 +65,63 @@ export class SafeMoneriumClient extends MoneriumClient {
   }
 
   async signMessage(safeAddress: string, message: string, chainId: number) {
-    const safeSdk = await Safe.create({
-      ethAdapter: this.#ethAdapter,
-      safeAddress,
-      isL1SafeMasterCopy: true
-    })
-    const safeVersion = await safeSdk.getContractVersion()
+    try {
+      const safeSdk = await Safe.create({
+        ethAdapter: this.#ethAdapter,
+        safeAddress,
+        isL1SafeMasterCopy: true
+      })
 
-    const signMessageContract = await getSignMessageLibContract({
-      ethAdapter: this.#ethAdapter,
-      safeVersion,
-      chainId
-    })
+      const safeVersion = await safeSdk.getContractVersion()
 
-    const txData = signMessageContract.encode('signMessage', [ethers.utils.hashMessage(message)])
+      const signMessageContract = await getSignMessageLibContract({
+        ethAdapter: this.#ethAdapter,
+        safeVersion,
+        chainId
+      })
 
-    const safeTransaction = await safeSdk.createTransaction({
-      safeTransactionData: {
-        to: signMessageContract.getAddress(),
-        value: '0',
-        data: txData,
-        operation: OperationType.DelegateCall
-      }
-    })
+      const txData = signMessageContract.encode('signMessage', [ethers.utils.hashMessage(message)])
 
-    console.log(safeTransaction)
+      const safeTransaction = await safeSdk.createTransaction({
+        safeTransactionData: {
+          to: signMessageContract.getAddress(),
+          value: '0',
+          data: txData,
+          operation: OperationType.DelegateCall
+        }
+      })
 
-    const safeTxHash = await safeSdk.getTransactionHash(safeTransaction)
+      console.log(safeTransaction)
 
-    // Sign transaction to verify that the transaction is coming from owner 1
-    const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
+      const safeTxHash = await safeSdk.getTransactionHash(safeTransaction)
 
-    const apiKit = new SafeApiKit({
-      txServiceUrl: 'https://safe-transaction-goerli.safe.global',
-      ethAdapter: this.#ethAdapter
-    })
+      // Sign transaction to verify that the transaction is coming from owner 1
+      const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
 
-    await apiKit.proposeTransaction({
-      safeAddress,
-      safeTransactionData: safeTransaction.data,
-      safeTxHash,
-      senderAddress: (await this.#ethAdapter.getSignerAddress()) || '',
-      senderSignature: senderSignature.data
-    })
+      const apiKit = new SafeApiKit({
+        txServiceUrl: 'https://safe-transaction-goerli.safe.global',
+        ethAdapter: this.#ethAdapter
+      })
 
-    // TODO: Remove as This stops showing the Monerium UI so should be avoided
-    // const transaction = await apiKit.getTransaction(safeTxHash)
+      await apiKit.proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash,
+        senderAddress: (await this.#ethAdapter.getSignerAddress()) || '',
+        senderSignature: senderSignature.data
+      })
 
-    // if (transaction.confirmations?.length === transaction.confirmationsRequired) {
-    //   const executeTxResponse = await safeSdk.executeTransaction(transaction)
-    //   const receipt = await executeTxResponse.transactionResponse?.wait()
-    //   console.log(receipt)
-    // }
+      // TODO: Remove as This stops showing the Monerium UI so should be avoided
+      // const transaction = await apiKit.getTransaction(safeTxHash)
+
+      // if (transaction.confirmations?.length === transaction.confirmationsRequired) {
+      //   const executeTxResponse = await safeSdk.executeTransaction(transaction)
+      //   const receipt = await executeTxResponse.transactionResponse?.wait()
+      //   console.log(receipt)
+      // }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {

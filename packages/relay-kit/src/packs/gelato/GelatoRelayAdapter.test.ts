@@ -73,7 +73,7 @@ describe('GelatoRelayAdapter', () => {
     const gasToken = '0x0000000000000000000000000000000000000000'
     const estimation = await gelatoRelayAdapter.getEstimateFee(chainId, gasLimit, gasToken)
 
-    expect(estimation).toBe(FEE_ESTIMATION)
+    expect(estimation).toBe(FEE_ESTIMATION.toString())
     expect(mockGetEstimateFee).toHaveBeenCalledWith(
       chainId,
       GELATO_NATIVE_TOKEN_ADDRESS,

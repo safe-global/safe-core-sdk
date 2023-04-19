@@ -1,3 +1,4 @@
+import Safe from '@safe-global/protocol-kit'
 import {
   SafeOnRampAdapter,
   SafeOnRampEvent,
@@ -30,7 +31,7 @@ export class SafeOnRampKit<TAdapter extends SafeOnRampAdapter<TAdapter>> {
    */
   static async init<T extends SafeOnRampAdapter<T>>(
     adapter: T,
-    safeSdk?: SafeOnRampInitOptions<T>
+    safeSdk?: Safe
   ): Promise<SafeOnRampKit<T>> {
     if (!adapter) {
       throw new Error('The adapter is not defined')

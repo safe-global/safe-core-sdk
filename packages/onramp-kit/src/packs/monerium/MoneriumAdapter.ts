@@ -81,8 +81,8 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
             if (!isSigned) {
               await this.#client.signMessage(options?.address, message, 5)
             }
-          } catch (e) {
-            console.log(getErrorMessage(e))
+          } catch (error) {
+            throw new Error(getErrorMessage(error))
           }
         }
 

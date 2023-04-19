@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
-import { AuthContext, Chain, Currency, Network, PaymentStandard } from '@monerium/sdk'
+import { AuthContext, Currency, PaymentStandard } from '@monerium/sdk'
 import { Alert, Box, Button, TextField } from '@mui/material'
 import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
@@ -13,6 +13,10 @@ function Monerium() {
   const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<MoneriumAdapter>>()
 
   useEffect(() => {
+    if (!ethers.utils.isAddress(address)) {
+      return
+    }
+
     ;(async () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       await window.ethereum.request({ method: 'eth_requestAccounts' })
@@ -21,7 +25,7 @@ function Monerium() {
 
       const safeSdk = await Safe.create({
         ethAdapter: ethAdapter,
-        safeAddress: '0x4f6d4BBb51C9E5dAD0D523Ce98B6f7c2929AFE38',
+        safeAddress: address,
         isL1SafeMasterCopy: true
       })
 
@@ -35,7 +39,7 @@ function Monerium() {
 
       setOnRampClient(client)
     })()
-  }, [])
+  }, [address])
 
   useEffect(() => {
     const codeParam = new URLSearchParams(window.location.search).get('code')
@@ -49,9 +53,7 @@ function Monerium() {
 
     const moneriumClient = await onRampClient.open({
       redirect_uri: 'http://localhost:3000/monerium',
-      address,
-      chain: Chain.ethereum,
-      network: Network.goerli
+      address
     })
 
     const authContext = await moneriumClient.getAuthContext()
@@ -91,8 +93,6 @@ function Monerium() {
           country: 'ES'
         }
       },
-      network: Network.goerli,
-      chain: Chain.ethereum,
       memo: 'Testing Safe-Monerium integration'
     })
   }

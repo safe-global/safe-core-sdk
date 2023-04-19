@@ -1,5 +1,4 @@
-import { Chain, Network } from '@monerium/sdk'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { Chain, Currency, Counterpart, Network } from '@monerium/sdk'
 
 export interface MoneriumProviderConfig {
   clientId: string
@@ -12,4 +11,12 @@ export interface MoneriumOpenOptions {
   signature?: string
   chain?: Chain
   network?: Network
+}
+
+export interface SafeMoneriumOrder {
+  safeAddress: string
+  amount: string
+  currency: Currency
+  counterpart: Counterpart
+  memo: string
 }

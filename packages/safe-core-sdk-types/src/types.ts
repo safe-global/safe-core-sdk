@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
@@ -21,29 +20,29 @@ export interface SafeSetupConfig {
 }
 
 export interface MetaTransactionData {
-  readonly to: string
-  readonly value: string
-  readonly data: string
-  readonly operation?: OperationType
+  to: string
+  value: string
+  data: string
+  operation?: OperationType
 }
 
 export interface SafeTransactionData extends MetaTransactionData {
-  readonly operation: OperationType
-  readonly safeTxGas: string
-  readonly baseGas: string
-  readonly gasPrice: string
-  readonly gasToken: string
-  readonly refundReceiver: string
-  readonly nonce: number
+  operation: OperationType
+  safeTxGas: string
+  baseGas: string
+  gasPrice: string
+  gasToken: string
+  refundReceiver: string
+  nonce: number
 }
 
 export interface SafeTransactionDataPartial extends MetaTransactionData {
-  readonly safeTxGas?: string
-  readonly baseGas?: string
-  readonly gasPrice?: string
-  readonly gasToken?: string
-  readonly refundReceiver?: string
-  readonly nonce?: number
+  safeTxGas?: string
+  baseGas?: string
+  gasPrice?: string
+  gasToken?: string
+  refundReceiver?: string
+  nonce?: number
 }
 
 export interface SafeSignature {
@@ -162,12 +161,13 @@ export type SafeMultisigTransactionResponse = {
   readonly isExecuted: boolean
   readonly isSuccessful?: boolean
   readonly ethGasPrice?: string
-  readonly gasUsed?: BigNumber
-  readonly fee?: BigNumber
+  readonly gasUsed?: number
+  readonly fee?: string
   readonly origin: string
   readonly dataDecoded?: string
   readonly confirmationsRequired: number
   readonly confirmations?: SafeMultisigConfirmationResponse[]
+  readonly trusted: boolean
   readonly signatures?: string
 }
 

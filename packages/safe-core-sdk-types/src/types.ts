@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
+import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
@@ -62,12 +62,12 @@ export interface SafeTransaction {
 
 export interface TransactionOptions {
   from?: string
-  gas?: BigNumberish
-  gasLimit?: BigNumberish
-  gasPrice?: BigNumberish
-  maxFeePerGas?: BigNumberish
-  maxPriorityFeePerGas?: BigNumberish
-  nonce?: BigNumberish
+  gas?: number | string
+  gasLimit?: number | string
+  gasPrice?: number | string
+  maxFeePerGas?: number | string
+  maxPriorityFeePerGas?: number | string
+  nonce?: number
 }
 
 export interface BaseTransactionResult {

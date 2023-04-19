@@ -1,6 +1,4 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { SingletonDeployment } from '@safe-global/safe-deployments'
-import { AbiItem } from 'web3-utils'
 import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types/contracts/CompatibilityFallbackHandlerContract'
 import { CreateCallContract } from '@safe-global/safe-core-sdk-types/contracts/CreateCallContract'
 import { GnosisSafeContract } from '@safe-global/safe-core-sdk-types/contracts/GnosisSafeContract'
@@ -13,6 +11,8 @@ import {
   SafeTransactionEIP712Args,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types/types'
+import { SingletonDeployment } from '@safe-global/safe-deployments'
+import { AbiItem } from 'web3-utils'
 
 export interface EthAdapterTransaction {
   to: string
@@ -27,7 +27,6 @@ export interface EthAdapterTransaction {
 
 export interface GetContractProps {
   safeVersion: SafeVersion
-  chainId: number
   singletonDeployment?: SingletonDeployment
   customContractAddress?: string
   customContractAbi?: AbiItem | AbiItem[]
@@ -42,53 +41,46 @@ export interface EthAdapter {
   getChecksummedAddress(address: string): string
   getSafeContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): GnosisSafeContract
+  }: GetContractProps): Promise<GnosisSafeContract>
   getMultiSendContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): MultiSendContract
+  }: GetContractProps): Promise<MultiSendContract>
   getMultiSendCallOnlyContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): MultiSendCallOnlyContract
+  }: GetContractProps): Promise<MultiSendCallOnlyContract>
   getCompatibilityFallbackHandlerContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): CompatibilityFallbackHandlerContract
+  }: GetContractProps): Promise<CompatibilityFallbackHandlerContract>
   getSafeProxyFactoryContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): GnosisSafeProxyFactoryContract
+  }: GetContractProps): Promise<GnosisSafeProxyFactoryContract>
   getSignMessageLibContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): SignMessageLibContract
+  }: GetContractProps): Promise<SignMessageLibContract>
   getCreateCallContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): CreateCallContract
+  }: GetContractProps): Promise<CreateCallContract>
   getContractCode(address: string, defaultBlock?: string | number): Promise<string>
   isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean>
   getStorageAt(address: string, position: string): Promise<string>

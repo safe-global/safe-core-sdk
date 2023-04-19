@@ -1,3 +1,4 @@
+import { ContractNetworkConfig } from '@safe-global/protocol-kit/types'
 import {
   CompatibilityFallbackHandlerContract,
   CreateCallContract,
@@ -21,13 +22,11 @@ import {
   getSignMessageLibDeployment,
   SingletonDeployment
 } from '@safe-global/safe-deployments'
-import { ContractNetworkConfig } from '@safe-global/protocol-kit/types'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
 interface GetContractInstanceProps {
   ethAdapter: EthAdapter
   safeVersion: SafeVersion
-  chainId: number
   customContracts?: ContractNetworkConfig
 }
 
@@ -104,15 +103,14 @@ export function getCreateCallContractDeployment(
 export async function getSafeContract({
   ethAdapter,
   safeVersion,
-  chainId,
   customSafeAddress,
   isL1SafeMasterCopy,
   customContracts
 }: GetSafeContractInstanceProps): Promise<GnosisSafeContract> {
+  const chainId = await ethAdapter.getChainId()
   const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeMasterCopy)
-  const gnosisSafeContract = ethAdapter.getSafeContract({
+  const gnosisSafeContract = await ethAdapter.getSafeContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress: customSafeAddress ?? customContracts?.safeMasterCopyAddress,
     customContractAbi: customContracts?.safeMasterCopyAbi
@@ -127,13 +125,12 @@ export async function getSafeContract({
 export async function getProxyFactoryContract({
   ethAdapter,
   safeVersion,
-  chainId,
   customContracts
 }: GetContractInstanceProps): Promise<GnosisSafeProxyFactoryContract> {
+  const chainId = await ethAdapter.getChainId()
   const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
   const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
     safeVersion,
-    chainId,
     singletonDeployment: proxyFactoryDeployment,
     customContractAddress: customContracts?.safeProxyFactoryAddress,
     customContractAbi: customContracts?.safeProxyFactoryAbi
@@ -150,16 +147,15 @@ export async function getProxyFactoryContract({
 export async function getCompatibilityFallbackHandlerContract({
   ethAdapter,
   safeVersion,
-  chainId,
   customContracts
 }: GetContractInstanceProps): Promise<CompatibilityFallbackHandlerContract> {
+  const chainId = await ethAdapter.getChainId()
   const fallbackHandlerDeployment = getCompatibilityFallbackHandlerContractDeployment(
     safeVersion,
     chainId
   )
   const fallbackHandlerContract = await ethAdapter.getCompatibilityFallbackHandlerContract({
     safeVersion,
-    chainId,
     singletonDeployment: fallbackHandlerDeployment,
     customContractAddress: customContracts?.fallbackHandlerAddress,
     customContractAbi: customContracts?.fallbackHandlerAbi
@@ -176,13 +172,12 @@ export async function getCompatibilityFallbackHandlerContract({
 export async function getMultiSendContract({
   ethAdapter,
   safeVersion,
-  chainId,
   customContracts
 }: GetContractInstanceProps): Promise<MultiSendContract> {
+  const chainId = await ethAdapter.getChainId()
   const multiSendDeployment = getMultiSendContractDeployment(safeVersion, chainId)
   const multiSendContract = await ethAdapter.getMultiSendContract({
     safeVersion,
-    chainId,
     singletonDeployment: multiSendDeployment,
     customContractAddress: customContracts?.multiSendAddress,
     customContractAbi: customContracts?.multiSendAbi
@@ -197,13 +192,12 @@ export async function getMultiSendContract({
 export async function getMultiSendCallOnlyContract({
   ethAdapter,
   safeVersion,
-  chainId,
   customContracts
 }: GetContractInstanceProps): Promise<MultiSendCallOnlyContract> {
+  const chainId = await ethAdapter.getChainId()
   const multiSendCallOnlyDeployment = getMultiSendCallOnlyContractDeployment(safeVersion, chainId)
   const multiSendCallOnlyContract = await ethAdapter.getMultiSendCallOnlyContract({
     safeVersion,
-    chainId,
     singletonDeployment: multiSendCallOnlyDeployment,
     customContractAddress: customContracts?.multiSendCallOnlyAddress,
     customContractAbi: customContracts?.multiSendCallOnlyAbi
@@ -220,13 +214,12 @@ export async function getMultiSendCallOnlyContract({
 export async function getSignMessageLibContract({
   ethAdapter,
   safeVersion,
-  chainId,
   customContracts
 }: GetContractInstanceProps): Promise<SignMessageLibContract> {
+  const chainId = await ethAdapter.getChainId()
   const signMessageLibDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
   const signMessageLibContract = await ethAdapter.getSignMessageLibContract({
     safeVersion,
-    chainId,
     singletonDeployment: signMessageLibDeployment,
     customContractAddress: customContracts?.signMessageLibAddress,
     customContractAbi: customContracts?.signMessageLibAbi
@@ -243,13 +236,12 @@ export async function getSignMessageLibContract({
 export async function getCreateCallContract({
   ethAdapter,
   safeVersion,
-  chainId,
   customContracts
 }: GetContractInstanceProps): Promise<CreateCallContract> {
+  const chainId = await ethAdapter.getChainId()
   const createCallDeployment = getCreateCallContractDeployment(safeVersion, chainId)
   const createCallContract = await ethAdapter.getCreateCallContract({
     safeVersion,
-    chainId,
     singletonDeployment: createCallDeployment,
     customContractAddress: customContracts?.createCallAddress,
     customContractAbi: customContracts?.createCallAbi

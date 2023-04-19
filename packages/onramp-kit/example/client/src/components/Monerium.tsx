@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 import { AuthContext, Chain, Currency, Network, PaymentStandard } from '@monerium/sdk'
 import { Alert, Box, Button, TextField } from '@mui/material'
 import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
-import { EthersAdapter } from '@safe-global/protocol-kit'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
@@ -15,17 +15,22 @@ function Monerium() {
   useEffect(() => {
     ;(async () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const safeOwner = provider.getSigner(0)
+      await window.ethereum.request({ method: 'eth_requestAccounts' })
+      const safeOwner = provider.getSigner()
       const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: safeOwner })
+
+      const safeSdk = await Safe.create({
+        ethAdapter: ethAdapter,
+        safeAddress: '0x4f6d4BBb51C9E5dAD0D523Ce98B6f7c2929AFE38',
+        isL1SafeMasterCopy: true
+      })
 
       const client = await SafeOnRampKit.init(
         new MoneriumAdapter({
           clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
           environment: 'sandbox'
         }),
-        {
-          ethAdapter
-        }
+        safeSdk
       )
 
       setOnRampClient(client)

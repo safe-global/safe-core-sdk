@@ -1,7 +1,8 @@
+import Safe from '@safe-global/protocol-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 import { SafeMoneriumClient } from './SafeMoneriumClient'
-import { MoneriumInitOptions, MoneriumOpenOptions, MoneriumProviderConfig } from './types'
+import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
 
 const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
 const MONERIUM_REFRESH_TOKEN = 'monerium_refresh_token'
@@ -18,9 +19,9 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
     this.#config = config
   }
 
-  async init(options: MoneriumInitOptions) {
+  async init(safeSdk: Safe) {
     try {
-      this.#client = new SafeMoneriumClient(this.#config.environment, options)
+      this.#client = new SafeMoneriumClient(this.#config.environment, safeSdk)
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -75,11 +76,11 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
         if (options?.address) {
           try {
             const message = 'I hereby declare that I am the address owner.'
-            // const isSigned = await this.#client.isValidSignature(options?.address, message, 5)
+            const isSigned = await this.#client.isMessageSigned(options?.address, message)
 
-            // if (!isSigned) {
-            await this.#client.signMessage(options?.address, message, 5)
-            // }
+            if (!isSigned) {
+              await this.#client.signMessage(options?.address, message, 5)
+            }
           } catch (e) {
             console.log(getErrorMessage(e))
           }

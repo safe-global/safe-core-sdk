@@ -17,7 +17,6 @@ import {
   MAGIC_VALUE,
   MAGIC_VALUE_BYTES
 } from './signatures'
-import { MoneriumInitOptions } from './types'
 
 type SafeMoneriumOrder = {
   safeAddress: string
@@ -30,12 +29,14 @@ type SafeMoneriumOrder = {
 }
 
 export class SafeMoneriumClient extends MoneriumClient {
+  #safeSdk: Safe
   #ethAdapter: EthAdapter
 
-  constructor(environment: 'production' | 'sandbox', options: MoneriumInitOptions) {
+  constructor(environment: 'production' | 'sandbox', safeSdk: Safe) {
     super(environment)
 
-    this.#ethAdapter = options.ethAdapter
+    this.#safeSdk = safeSdk
+    this.#ethAdapter = safeSdk.getEthAdapter()
   }
 
   async send(order: SafeMoneriumOrder) {
@@ -66,13 +67,7 @@ export class SafeMoneriumClient extends MoneriumClient {
 
   async signMessage(safeAddress: string, message: string, chainId: number) {
     try {
-      const safeSdk = await Safe.create({
-        ethAdapter: this.#ethAdapter,
-        safeAddress,
-        isL1SafeMasterCopy: true
-      })
-
-      const safeVersion = await safeSdk.getContractVersion()
+      const safeVersion = await this.#safeSdk.getContractVersion()
 
       const signMessageContract = await getSignMessageLibContract({
         ethAdapter: this.#ethAdapter,
@@ -82,7 +77,7 @@ export class SafeMoneriumClient extends MoneriumClient {
 
       const txData = signMessageContract.encode('signMessage', [ethers.utils.hashMessage(message)])
 
-      const safeTransaction = await safeSdk.createTransaction({
+      const safeTransaction = await this.#safeSdk.createTransaction({
         safeTransactionData: {
           to: signMessageContract.getAddress(),
           value: '0',
@@ -93,10 +88,10 @@ export class SafeMoneriumClient extends MoneriumClient {
 
       console.log(safeTransaction)
 
-      const safeTxHash = await safeSdk.getTransactionHash(safeTransaction)
+      const safeTxHash = await this.#safeSdk.getTransactionHash(safeTransaction)
 
       // Sign transaction to verify that the transaction is coming from owner 1
-      const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
+      const senderSignature = await this.#safeSdk.signTransactionHash(safeTxHash)
 
       const apiKit = new SafeApiKit({
         txServiceUrl: 'https://safe-transaction-goerli.safe.global',
@@ -131,30 +126,35 @@ export class SafeMoneriumClient extends MoneriumClient {
   }
 
   async #isMessageHashSigned(safeAddress: string, messageHash: string): Promise<boolean> {
-    const txData1 = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [messageHash, '0x'])
+    try {
+      const txData1 = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [messageHash, '0x'])
 
-    const response1 = await this.#ethAdapter.call({
-      from: safeAddress,
-      to: safeAddress,
-      data: txData1
-    })
+      const response1 = await this.#ethAdapter.call({
+        from: safeAddress,
+        to: safeAddress,
+        data: txData1
+      })
 
-    const msgBytes = ethers.utils.arrayify(messageHash)
+      const msgBytes = ethers.utils.arrayify(messageHash)
 
-    const txData2 = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
-      msgBytes,
-      '0x'
-    ])
+      const txData2 = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
+        msgBytes,
+        '0x'
+      ])
 
-    const response2 = await this.#ethAdapter.call({
-      from: safeAddress,
-      to: safeAddress,
-      data: txData2
-    })
+      const response2 = await this.#ethAdapter.call({
+        from: safeAddress,
+        to: safeAddress,
+        data: txData2
+      })
 
-    return (
-      response1.slice(0, 10).toLowerCase() === MAGIC_VALUE ||
-      response2.slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES
-    )
+      return (
+        response1.slice(0, 10).toLowerCase() === MAGIC_VALUE ||
+        response2.slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES
+      )
+    } catch (error) {
+      console.error(error)
+      return false
+    }
   }
 }

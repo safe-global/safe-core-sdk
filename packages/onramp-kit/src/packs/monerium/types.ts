@@ -13,7 +13,3 @@ export interface MoneriumOpenOptions {
   chain?: Chain
   network?: Network
 }
-
-export interface MoneriumInitOptions {
-  ethAdapter: EthAdapter
-}

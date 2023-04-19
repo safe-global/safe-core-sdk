@@ -1,6 +1,7 @@
+import Safe from '@safe-global/protocol-kit'
 import { MoneriumAdapter } from './packs/monerium/MoneriumAdapter'
 import { SafeMoneriumClient } from './packs/monerium/SafeMoneriumClient'
-import { MoneriumInitOptions, MoneriumOpenOptions } from './packs/monerium/types'
+import { MoneriumOpenOptions } from './packs/monerium/types'
 import { StripeAdapter } from './packs/stripe/StripeAdapter'
 import {
   StripeSession,
@@ -17,7 +18,7 @@ declare global {
 
 // The new adapters must implement this interface
 export interface SafeOnRampAdapter<TAdapter> {
-  init(options?: SafeOnRampInitOptions<TAdapter>): Promise<void>
+  init(safeSdk?: Safe): Promise<void>
   open(options?: SafeOnRampOpenOptions<TAdapter>): Promise<SafeOnRampOpenResponse<TAdapter>>
   close(): Promise<void>
   subscribe(event: SafeOnRampEvent<TAdapter>, handler: SafeOnRampEventListener<TAdapter>): void
@@ -31,7 +32,6 @@ export interface SafeOnRampAdapter<TAdapter> {
 //    T extends FooAdapter ? FooOpenOptions :
 //    T extends BarAdapter ? BarOpenOptions :
 //    never
-export type SafeOnRampInitOptions<T> = T extends MoneriumAdapter ? MoneriumInitOptions : undefined
 export type SafeOnRampOpenOptions<T> = T extends StripeAdapter
   ? StripeOpenOptions
   : T extends MoneriumAdapter

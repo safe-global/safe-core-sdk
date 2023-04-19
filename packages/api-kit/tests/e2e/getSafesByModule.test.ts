@@ -16,14 +16,14 @@ describe('getSafesByModule', () => {
     ))
   })
 
-  it('should fail if owner address is empty', async () => {
+  it('should fail if module address is empty', async () => {
     const moduleAddress = ''
     await chai
       .expect(safeApiKit.getSafesByModule(moduleAddress))
       .to.be.rejectedWith('Invalid module address')
   })
 
-  it('should fail if owner address is not checksummed', async () => {
+  it('should fail if module address is not checksummed', async () => {
     const moduleAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'.toLowerCase()
     await chai
       .expect(safeApiKit.getSafesByModule(moduleAddress))
@@ -44,7 +44,7 @@ describe('getSafesByModule', () => {
     chai.expect(safes.length).to.be.greaterThan(10)
   })
 
-  it('should return the array of Safes EIP-3770', async () => {
+  it('should return the array of Safes with the module enabled when using EIP-3770 module address', async () => {
     const moduleAddress = goerliSpendingLimitModule
     const eip3770ModuleAddress = `${config.EIP_3770_PREFIX}:${moduleAddress}`
     const moduleResponse = await safeApiKit.getSafesByModule(eip3770ModuleAddress)

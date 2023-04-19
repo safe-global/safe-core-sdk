@@ -372,7 +372,7 @@ class Safe {
       nonce,
       value: '0',
       data: '0x',
-      safeTxGas: 0
+      safeTxGas: '0'
     }
     return this.createTransaction({ safeTransactionData })
   }
@@ -794,7 +794,7 @@ class Safe {
       operation: serviceTransactionResponse.operation,
       safeTxGas: serviceTransactionResponse.safeTxGas,
       baseGas: serviceTransactionResponse.baseGas,
-      gasPrice: Number(serviceTransactionResponse.gasPrice),
+      gasPrice: serviceTransactionResponse.gasPrice,
       gasToken: serviceTransactionResponse.gasToken,
       refundReceiver: serviceTransactionResponse.refundReceiver,
       nonce: serviceTransactionResponse.nonce

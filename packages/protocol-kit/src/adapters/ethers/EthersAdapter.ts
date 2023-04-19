@@ -243,8 +243,8 @@ class EthersAdapter implements EthAdapter {
     throw new Error('The current signer does not implement EIP-712 to sign typed data')
   }
 
-  async estimateGas(transaction: EthAdapterTransaction): Promise<number> {
-    return (await this.#provider.estimateGas(transaction)).toNumber()
+  async estimateGas(transaction: EthAdapterTransaction): Promise<string> {
+    return (await this.#provider.estimateGas(transaction)).toString()
   }
 
   call(transaction: EthAdapterTransaction, blockTag?: string | number): Promise<string> {

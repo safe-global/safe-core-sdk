@@ -123,7 +123,7 @@ export class SafeEthersSigner extends VoidSigner {
     const connectedSafe = await this.safe
     const safeTransactionData: SafeTransactionDataPartial = {
       ...baseTx,
-      safeTxGas: safeTxGas.toNumber()
+      safeTxGas: safeTxGas.toString()
     }
     const safeTx = await connectedSafe.createTransaction({ safeTransactionData })
     const safeTxHash = await connectedSafe.getTransactionHash(safeTx)

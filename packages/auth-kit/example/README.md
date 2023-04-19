@@ -12,3 +12,16 @@ This example can be used as a playground to test the package as it is relatively
 ```typescript
 import { SafeAuthKit, SafeAuthProviderType, SafeAuthSignInData } from '../../src/index'
 ```
+
+To use the example properly in your local machine follow these steps:
+
+**In the project root folder**
+
+1. `yarn install`
+2. `yarn build`
+
+**In the auth-kit example root folder**
+
+3. `yarn install`
+4. Configure `.env` following `.env.sample`
+5. `yarn start`

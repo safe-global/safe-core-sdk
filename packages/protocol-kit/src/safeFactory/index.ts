@@ -1,12 +1,3 @@
-import {
-  EthAdapter,
-  GnosisSafeContract,
-  GnosisSafeProxyFactoryContract,
-  SafeVersion,
-  TransactionOptions
-} from '@safe-global/safe-core-sdk-types'
-import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
-import semverSatisfies from 'semver/functions/satisfies'
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,
@@ -16,6 +7,15 @@ import {
 import Safe from '@safe-global/protocol-kit/Safe'
 import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import {
+  EthAdapter,
+  GnosisSafeContract,
+  GnosisSafeProxyFactoryContract,
+  SafeVersion,
+  TransactionOptions
+} from '@safe-global/safe-core-sdk-types'
+import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
+import semverSatisfies from 'semver/functions/satisfies'
 import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
 
 export interface SafeAccountConfig {
@@ -101,13 +101,11 @@ class SafeFactory {
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
     this.#gnosisSafeContract = await getSafeContract({
       ethAdapter,
       safeVersion,
-      chainId,
       isL1SafeMasterCopy,
       customContracts
     })
@@ -159,7 +157,6 @@ class SafeFactory {
       const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
         ethAdapter: this.#ethAdapter,
         safeVersion: this.#safeVersion,
-        chainId,
         customContracts
       })
       fallbackHandlerAddress = fallbackHandlerContract.getAddress()

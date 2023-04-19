@@ -1,8 +1,3 @@
-import {
-  GnosisSafeContract,
-  MultiSendCallOnlyContract,
-  MultiSendContract
-} from '@safe-global/safe-core-sdk-types'
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getMultiSendCallOnlyContract,
@@ -11,6 +6,11 @@ import {
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { SafeConfig } from '@safe-global/protocol-kit/Safe'
 import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
+import {
+  GnosisSafeContract,
+  MultiSendCallOnlyContract,
+  MultiSendContract
+} from '@safe-global/safe-core-sdk-types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
@@ -44,7 +44,6 @@ class ContractManager {
     const temporarySafeContract = await getSafeContract({
       ethAdapter,
       safeVersion: SAFE_LAST_VERSION,
-      chainId,
       isL1SafeMasterCopy,
       customSafeAddress: safeAddress,
       customContracts
@@ -53,7 +52,6 @@ class ContractManager {
     this.#safeContract = await getSafeContract({
       ethAdapter,
       safeVersion,
-      chainId,
       isL1SafeMasterCopy,
       customSafeAddress: safeAddress,
       customContracts
@@ -61,13 +59,11 @@ class ContractManager {
     this.#multiSendContract = await getMultiSendContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
     this.#multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
   }

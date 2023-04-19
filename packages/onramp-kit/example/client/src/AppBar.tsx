@@ -1,7 +1,10 @@
-import { AppBar as MuiAppBar, Typography, styled, Link } from '@mui/material'
+import { AppBar as MuiAppBar, Typography, styled, Link, Button, Box } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
+import { useAuth } from './AuthContext'
 
 const AppBar = () => {
+  const { logIn, logOut, isLoggedIn } = useAuth()
+
   return (
     <StyledAppBar position="static" color="default">
       <Typography variant="h3" pl={4} fontWeight={700}>
@@ -15,6 +18,17 @@ const AppBar = () => {
           Monerium
         </Link>
       </nav>
+      <Box mr={5}>
+        {isLoggedIn ? (
+          <Button variant="contained" onClick={logOut}>
+            Log Out
+          </Button>
+        ) : (
+          <Button variant="contained" onClick={logIn}>
+            Login
+          </Button>
+        )}
+      </Box>
     </StyledAppBar>
   )
 }

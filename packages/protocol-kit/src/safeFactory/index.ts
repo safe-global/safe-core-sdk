@@ -87,13 +87,11 @@ class SafeFactory {
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
     this.#gnosisSafeContract = await getSafeContract({
       ethAdapter,
       safeVersion,
-      chainId,
       isL1SafeMasterCopy,
       customContracts
     })

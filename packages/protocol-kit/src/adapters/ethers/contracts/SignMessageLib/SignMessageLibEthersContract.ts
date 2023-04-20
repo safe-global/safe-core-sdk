@@ -42,8 +42,8 @@ abstract class SignMessageLibEthersContract implements SignMessageLibContract {
     methodName: string,
     params: any[],
     options: EthersTransactionOptions
-  ): Promise<number> {
-    return (await (this.contract.estimateGas as any)[methodName](...params, options)).toNumber()
+  ): Promise<string> {
+    return (await (this.contract.estimateGas as any)[methodName](...params, options)).toString()
   }
 }
 

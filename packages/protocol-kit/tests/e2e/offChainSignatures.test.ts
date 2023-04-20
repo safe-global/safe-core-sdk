@@ -356,7 +356,7 @@ describe('Off-chain signatures', () => {
         isSuccessful: false,
         ethGasPrice: '',
         gasUsed: 12345,
-        fee: 12345,
+        fee: '12345',
         origin: '',
         dataDecoded: '',
         confirmationsRequired: 2,
@@ -378,6 +378,7 @@ describe('Off-chain signatures', () => {
             signatureType: ''
           }
         ],
+        trusted: true,
         signatures: '0x111111222222'
       }
       const signedTx = await safeSdk.signTransaction(safeServiceTransaction)

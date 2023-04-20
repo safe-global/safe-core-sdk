@@ -65,12 +65,9 @@ class AccountAbstraction {
       safeVersion
     }
 
-    const chainId = await this.#ethAdapter.getChainId()
-
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter: this.#ethAdapter,
-      safeVersion,
-      chainId
+      safeVersion
     })
 
     const safeAddress = await predictSafeAddress({
@@ -82,8 +79,7 @@ class AccountAbstraction {
     this.#safeContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
-      customSafeAddress: safeAddress,
-      chainId
+      customSafeAddress: safeAddress
     })
   }
 
@@ -128,9 +124,7 @@ class AccountAbstraction {
       throw new Error('SDK not initialized')
     }
 
-    const chainId = await this.#ethAdapter.getChainId()
     const safeAddress = this.getSafeAddress()
-
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,
       safeAddress
@@ -158,14 +152,12 @@ class AccountAbstraction {
     } else {
       const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId
+        safeVersion
       })
       relayTransactionTarget = multiSendCallOnlyContract.getAddress()
       const safeSingletonContract = await getSafeContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId
+        safeVersion
       })
 
       const predictedSafe: PredictedSafeProps = {
@@ -205,6 +197,7 @@ class AccountAbstraction {
       encodedTransaction = multiSendCallOnlyContract.encode('multiSend', [multiSendData])
     }
 
+    const chainId = await this.#ethAdapter.getChainId()
     const relayTransaction: RelayTransaction = {
       target: relayTransactionTarget,
       encodedTransaction: encodedTransaction,

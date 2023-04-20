@@ -75,7 +75,6 @@ describe.only('Safe Info', () => {
         contractNetworks
       })
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safe.address)
-      chai.expect(await safeSdk2.getAddress()).to.be.eq(safe.address)
       chai
         .expect(await safeSdk2.getEthAdapter().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
@@ -90,7 +89,7 @@ describe.only('Safe Info', () => {
   })
 
   describe('getContractVersion', async () => {
-    it('should return the contract version of the configuration of a Safe that is not deployed', async () => {
+    it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -103,7 +102,7 @@ describe.only('Safe Info', () => {
       chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
     })
 
-    it('should return the contract last version if a Safe that is not deployed', async () => {
+    it('should return the contract version of a Safe that is not deployed with a default version configuration', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)

@@ -1,4 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import {
   Eip3770Address,
   EthAdapter,
@@ -6,7 +7,6 @@ import {
   GetContractProps,
   SafeTransactionEIP712Args
 } from '@safe-global/safe-core-sdk-types'
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
@@ -64,6 +64,7 @@ class Web3Adapter implements EthAdapter {
     const balance = defaultBlock
       ? await this.#web3.eth.getBalance(address, defaultBlock)
       : await this.#web3.eth.getBalance(address)
+    // FIXME Web3 Adapter is forced to return an Ethers type
     return BigNumber.from(balance)
   }
 
@@ -82,13 +83,13 @@ class Web3Adapter implements EthAdapter {
     return this.#web3.utils.toChecksumAddress(address)
   }
 
-  getSafeContract({
+  async getSafeContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): GnosisSafeContractWeb3 {
+  }: GetContractProps): Promise<GnosisSafeContractWeb3> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
@@ -100,13 +101,13 @@ class Web3Adapter implements EthAdapter {
     return getSafeContractInstance(safeVersion, safeContract)
   }
 
-  getSafeProxyFactoryContract({
+  async getSafeProxyFactoryContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): GnosisSafeProxyFactoryWeb3Contract {
+  }: GetContractProps): Promise<GnosisSafeProxyFactoryWeb3Contract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
@@ -118,13 +119,13 @@ class Web3Adapter implements EthAdapter {
     return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
-  getMultiSendContract({
+  async getMultiSendContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): MultiSendWeb3Contract {
+  }: GetContractProps): Promise<MultiSendWeb3Contract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
@@ -136,13 +137,13 @@ class Web3Adapter implements EthAdapter {
     return getMultiSendContractInstance(safeVersion, multiSendContract)
   }
 
-  getMultiSendCallOnlyContract({
+  async getMultiSendCallOnlyContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): MultiSendCallOnlyWeb3Contract {
+  }: GetContractProps): Promise<MultiSendCallOnlyWeb3Contract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid MultiSendCallOnly contract address')
@@ -154,13 +155,13 @@ class Web3Adapter implements EthAdapter {
     return getMultiSendCallOnlyContractInstance(safeVersion, multiSendContract)
   }
 
-  getCompatibilityFallbackHandlerContract({
+  async getCompatibilityFallbackHandlerContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): CompatibilityFallbackHandlerWeb3Contract {
+  }: GetContractProps): Promise<CompatibilityFallbackHandlerWeb3Contract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid Compatibility Fallback Handler contract address')
@@ -172,13 +173,13 @@ class Web3Adapter implements EthAdapter {
     return getCompatibilityFallbackHandlerContractInstance(safeVersion, multiSendContract)
   }
 
-  getSignMessageLibContract({
+  async getSignMessageLibContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): SignMessageLibWeb3Contract {
+  }: GetContractProps): Promise<SignMessageLibWeb3Contract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
@@ -190,13 +191,13 @@ class Web3Adapter implements EthAdapter {
     return getSignMessageLibContractInstance(safeVersion, signMessageLibContract)
   }
 
-  getCreateCallContract({
+  async getCreateCallContract({
     safeVersion,
-    chainId,
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): CreateCallWeb3Contract {
+  }: GetContractProps): Promise<CreateCallWeb3Contract> {
+    const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
@@ -289,11 +290,11 @@ class Web3Adapter implements EthAdapter {
     })
   }
 
-  estimateGas(
+  async estimateGas(
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void
-  ): Promise<number> {
-    return this.#web3.eth.estimateGas(transaction, callback)
+  ): Promise<string> {
+    return (await this.#web3.eth.estimateGas(transaction, callback)).toString()
   }
 
   call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string> {

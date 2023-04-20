@@ -42,7 +42,6 @@ class ContractManager {
       const temporarySafeContract = await getSafeContract({
         ethAdapter,
         safeVersion: SAFE_LAST_VERSION,
-        chainId,
         isL1SafeMasterCopy,
         customSafeAddress: config.safeAddress,
         customContracts
@@ -51,7 +50,6 @@ class ContractManager {
       this.#safeContract = await getSafeContract({
         ethAdapter,
         safeVersion,
-        chainId,
         isL1SafeMasterCopy,
         customSafeAddress: config.safeAddress,
         customContracts
@@ -61,13 +59,11 @@ class ContractManager {
     this.#multiSendContract = await getMultiSendContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
     this.#multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
   }

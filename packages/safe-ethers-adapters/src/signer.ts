@@ -97,7 +97,7 @@ export class SafeEthersSigner extends VoidSigner {
             const txDetails = await connectedService.getSafeTxDetails(safeTxHash)
             if (txDetails.transactionHash) {
               this._checkProvider('sendTransaction')
-              const receipt = await this.provider!!.waitForTransaction(
+              const receipt = await this.provider!.waitForTransaction(
                 txDetails.transactionHash,
                 confirmations
               )
@@ -131,7 +131,7 @@ export class SafeEthersSigner extends VoidSigner {
       operation = OperationType.DelegateCall
     }
     const baseTx = {
-      to: to!!,
+      to: to!,
       data,
       value: value.toString(),
       operation
@@ -140,7 +140,7 @@ export class SafeEthersSigner extends VoidSigner {
     const connectedSafe = await this.safe
     const safeTransactionData: SafeTransactionDataPartial = {
       ...baseTx,
-      safeTxGas: safeTxGas.toNumber()
+      safeTxGas: safeTxGas.toString()
     }
     const safeTx = await connectedSafe.createTransaction({ safeTransactionData })
     const safeTxHash = await connectedSafe.getTransactionHash(safeTx)

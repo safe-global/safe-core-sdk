@@ -6,11 +6,10 @@ import {
   RelayTransaction,
   SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
-import { BigNumber } from 'ethers'
 
 export interface RelayAdapter {
   getFeeCollector(): string
-  getEstimateFee(chainId: number, gasLimit: BigNumber, gasToken?: string): Promise<BigNumber>
+  getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string>
   getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined>
   createRelayedTransaction(
     safe: Safe,

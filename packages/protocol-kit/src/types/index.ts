@@ -154,17 +154,23 @@ export interface SwapOwnerTxParams {
 }
 
 type StandardizeSafeTxDataWithSafeContractProps = {
+  /** safeContract - The Safe contract to use */
   safeContract: GnosisSafeContract
+  /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe?: never
 }
 
 type StandardizeSafeTxDataWithPredictedSafeProps = {
+  /** safeContract - The Safe contract to use */
   safeContract?: never
+  /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe: PredictedSafeProps
 }
 
 interface StandardizeSafeTransactionData {
+  /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
+  /** tx - Safe transaction */
   tx: SafeTransactionDataPartial
 }
 

@@ -60,12 +60,6 @@ export class Web3AuthAdapter implements SafeAuthAdapter<Web3AuthAdapter> {
     if (!this.web3authInstance) return
 
     this.provider = await this.web3authInstance.connect()
-    console.log(
-      'KEY:',
-      await this.provider?.request?.({
-        method: 'eth_private_key'
-      })
-    )
   }
 
   /**

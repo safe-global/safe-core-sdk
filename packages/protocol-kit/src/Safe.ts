@@ -170,6 +170,11 @@ class Safe {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
     }
+
+    if (!this.#contractManager.safeContract) {
+      throw new Error('Safe is not deployed')
+    }
+
     return Promise.resolve(this.#contractManager.safeContract.getAddress())
   }
 
@@ -229,9 +234,11 @@ class Safe {
     if (this.#contractManager.safeContract) {
       return this.#contractManager.safeContract.getVersion()
     }
+
     if (this.#predictedSafe?.safeDeploymentConfig.safeVersion) {
       return this.#predictedSafe.safeDeploymentConfig.safeVersion
     }
+
     return Promise.resolve(SAFE_LAST_VERSION)
   }
 
@@ -349,17 +356,21 @@ class Safe {
         'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
       )
     }
+
     if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length === 0) {
       throw new Error('Invalid empty array of transactions')
     }
+
     let newTransaction: SafeTransactionDataPartial
     if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length > 1) {
       const multiSendContract = onlyCalls
         ? this.#contractManager.multiSendCallOnlyContract
         : this.#contractManager.multiSendContract
+
       const multiSendData = encodeMultiSendData(
         safeTransactionData.map(standardizeMetaTransactionData)
       )
+
       const multiSendTransaction = {
         ...options,
         to: multiSendContract.getAddress(),
@@ -408,7 +419,7 @@ class Safe {
       nonce,
       value: '0',
       data: '0x',
-      safeTxGas: 0
+      safeTxGas: '0'
     }
     return this.createTransaction({ safeTransactionData })
   }
@@ -840,9 +851,9 @@ class Safe {
       value: serviceTransactionResponse.value,
       data: serviceTransactionResponse.data || '0x',
       operation: serviceTransactionResponse.operation,
-      safeTxGas: serviceTransactionResponse.safeTxGas,
-      baseGas: serviceTransactionResponse.baseGas,
-      gasPrice: Number(serviceTransactionResponse.gasPrice),
+      safeTxGas: serviceTransactionResponse.safeTxGas.toString(),
+      baseGas: serviceTransactionResponse.baseGas.toString(),
+      gasPrice: serviceTransactionResponse.gasPrice,
       gasToken: serviceTransactionResponse.gasToken,
       refundReceiver: serviceTransactionResponse.refundReceiver,
       nonce: serviceTransactionResponse.nonce

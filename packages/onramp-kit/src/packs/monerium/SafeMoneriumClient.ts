@@ -25,6 +25,10 @@ export class SafeMoneriumClient extends MoneriumClient {
     this.#ethAdapter = safeSdk.getEthAdapter()
   }
 
+  async getSafeAddress(): Promise<string> {
+    return this.#safeSdk.getAddress()
+  }
+
   async send(order: SafeMoneriumOrder) {
     const newOrder = await this.#createOrder(order)
 

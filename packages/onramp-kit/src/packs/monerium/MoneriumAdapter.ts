@@ -1,12 +1,15 @@
+import { Currency } from '@monerium/sdk'
+
 import Safe from '@safe-global/protocol-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
+
 import { SafeMoneriumClient } from './SafeMoneriumClient'
 import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
-import { Currency } from '@monerium/sdk'
 
 const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
 const MONERIUM_REFRESH_TOKEN = 'monerium_refresh_token'
+const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
 
 /**
  * This class implements the SafeOnRampClient interface for the Monerium provider
@@ -33,106 +36,124 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
       throw new Error('Monerium client not initialized')
     }
 
-    const codeParam = new URLSearchParams(window.location.search).get('code')
+    try {
+      const codeParam = new URLSearchParams(window.location.search).get('code')
+      const safeAddress = await this.#client.getSafeAddress()
 
-    if (codeParam) {
-      const codeVerifier = localStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
-
-      try {
-        await this.#client.auth({
-          client_id: this.#config.clientId,
-          code: codeParam,
-          code_verifier: codeVerifier,
-          redirect_uri: options.redirect_uri
-        })
-
-        localStorage.setItem(
-          MONERIUM_REFRESH_TOKEN,
-          this.#client?.bearerProfile?.refresh_token || ''
-        )
-
-        const authContext = await this.#client.getAuthContext()
-        const profile = await this.#client.getProfile(authContext.defaultProfile)
-        if (profile) {
-          const isSafeAddressLinked = profile.accounts.some(
-            (account) => account.address === options.address
-          )
-
-          if (!isSafeAddressLinked && options.address) {
-            await this.#client.linkAddress(authContext.defaultProfile, {
-              address: options.address,
-              message: 'I hereby declare that I am the address owner.',
-              signature: '0x',
-              // @ts-expect-error - network and chain are not defined in the type and mandatory for multisig (signature 0x)
-              network: await this.#client.getNetwork(),
-              chain: await this.#client.getChain(),
-              accounts: [
-                {
-                  network: await this.#client.getNetwork(),
-                  chain: await this.#client.getChain(),
-                  currency: Currency.eur
-                }
-              ]
-            })
-          }
-        }
-
-        this.#cleanQueryString()
-      } catch (e) {
-        throw new Error(getErrorMessage(e))
-      } finally {
-        localStorage.removeItem(MONERIUM_CODE_VERIFIER)
-      }
-    } else {
-      const refreshToken = localStorage.getItem(MONERIUM_REFRESH_TOKEN)
-      if (refreshToken) {
-        try {
-          await this.#client.auth({
-            client_id: this.#config.clientId,
-            refresh_token: refreshToken
-          })
-
-          localStorage.setItem(
-            MONERIUM_REFRESH_TOKEN,
-            this.#client?.bearerProfile?.refresh_token || ''
-          )
-        } catch (e) {
-          throw new Error(getErrorMessage(e))
-        }
+      if (codeParam) {
+        await this.#startCodeParamFlow(codeParam, safeAddress, options.redirect_uri)
       } else {
-        if (options?.address) {
-          try {
-            const message = 'I hereby declare that I am the address owner.'
-            const isSigned = await this.#client.isMessageSigned(options?.address, message)
-
-            if (!isSigned) {
-              const isPending = await this.#client.isSignMessagePending(options?.address, message)
-
-              if (!isPending) {
-                await this.#client.signMessage(options?.address, message)
-              }
-            }
-          } catch (error) {
-            throw new Error(getErrorMessage(error))
-          }
+        const refreshToken = localStorage.getItem(MONERIUM_REFRESH_TOKEN)
+        if (refreshToken) {
+          await this.#startRefreshTokenFlow(safeAddress, refreshToken)
+        } else {
+          await this.#startAuthCodeFlow(safeAddress, options.redirect_uri)
         }
+      }
 
-        const authFlowUrl = this.#client.getAuthFlowURI({
-          client_id: this.#config.clientId,
-          redirect_uri: options.redirect_uri,
-          address: options?.address,
-          signature: options?.address ? options?.signature || '0x' : undefined,
-          chain: await this.#client.getChain(),
-          network: await this.#client.getNetwork()
-        })
+      return this.#client
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  }
 
-        localStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
+  async #startCodeParamFlow(codeParam: string, safeAddress: string, redirectUrl: string) {
+    if (!this.#client) return
 
-        window.location.replace(authFlowUrl)
+    const codeVerifier = localStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
+
+    await this.#client.auth({
+      client_id: this.#config.clientId,
+      code: codeParam,
+      code_verifier: codeVerifier,
+      redirect_uri: redirectUrl
+    })
+
+    localStorage.setItem(MONERIUM_REFRESH_TOKEN, this.#client?.bearerProfile?.refresh_token || '')
+
+    await this.#addAccountIfNotLinked(safeAddress)
+
+    this.#cleanQueryString()
+
+    localStorage.removeItem(MONERIUM_CODE_VERIFIER)
+  }
+
+  async #startRefreshTokenFlow(safeAddress: string, refreshToken: string) {
+    if (!this.#client) return
+
+    await this.#client.auth({
+      client_id: this.#config.clientId,
+      refresh_token: refreshToken
+    })
+
+    const newRefreshToken = this.#client?.bearerProfile?.refresh_token || ''
+
+    localStorage.setItem(MONERIUM_REFRESH_TOKEN, newRefreshToken)
+
+    this.#addAccountIfNotLinked(safeAddress)
+  }
+
+  async #startAuthCodeFlow(safeAddress: string, redirectUrl: string) {
+    if (!this.#client) return
+
+    if (safeAddress) {
+      const isSigned = await this.#client.isMessageSigned(safeAddress, SIGNATURE_MESSAGE)
+
+      if (!isSigned) {
+        const isPending = await this.#client.isSignMessagePending(safeAddress, SIGNATURE_MESSAGE)
+
+        if (!isPending) {
+          await this.#client.signMessage(safeAddress, SIGNATURE_MESSAGE)
+        }
       }
     }
 
-    return this.#client
+    const authFlowUrl = this.#client.getAuthFlowURI({
+      client_id: this.#config.clientId,
+      redirect_uri: redirectUrl,
+      address: safeAddress,
+      signature: '0x',
+      chain: await this.#client.getChain(),
+      network: await this.#client.getNetwork()
+    })
+
+    localStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
+
+    window.location.replace(authFlowUrl)
+  }
+
+  async #addAccountIfNotLinked(safeAddress: string) {
+    if (!this.#client) return
+
+    const authContext = await this.#client.getAuthContext()
+
+    if (!authContext) return
+
+    const profile = await this.#client.getProfile(authContext.defaultProfile)
+
+    if (profile) {
+      const isSafeAddressLinked = profile.accounts.some(
+        (account) => account.address === safeAddress
+      )
+
+      if (!isSafeAddressLinked && safeAddress) {
+        await this.#client.linkAddress(authContext.defaultProfile, {
+          address: safeAddress,
+          message: SIGNATURE_MESSAGE,
+          signature: '0x',
+          // @ts-expect-error - network and chain are not defined in the type and mandatory for multisig (signature 0x)
+          network: await this.#client.getNetwork(),
+          chain: await this.#client.getChain(),
+          accounts: [
+            {
+              network: await this.#client.getNetwork(),
+              chain: await this.#client.getChain(),
+              currency: Currency.eur
+            }
+          ]
+        })
+      }
+    }
   }
 
   async close() {

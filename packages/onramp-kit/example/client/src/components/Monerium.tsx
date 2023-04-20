@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ethers } from 'ethers'
 import { AuthContext, Currency, PaymentStandard } from '@monerium/sdk'
 import { Alert, Box, Button, TextField, Typography } from '@mui/material'
@@ -8,6 +8,7 @@ import { useAuth } from '../AuthContext'
 
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
+  const [safeThreshold, setSafeThreshold] = useState<string>()
   const [counterpartIban, setCounterpartIban] = useState<string>('')
   const [moneriumClient, setMoneriumClient] = useState<SafeMoneriumClient>()
   const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<MoneriumAdapter>>()
@@ -36,6 +37,10 @@ function Monerium() {
         safeSdk
       )
 
+      const threshold = await safeSdk.getThreshold()
+      const owners = await safeSdk.getOwners()
+
+      setSafeThreshold(`${threshold}/${owners.length}`)
       setOnRampClient(client)
     })()
   }, [authProvider, selectedSafe])
@@ -146,13 +151,51 @@ function Monerium() {
         </>
       ) : (
         <>
-          {!selectedSafe && <Typography>You need to login with an owner with Safes</Typography>}
+          {!selectedSafe && (
+            <>
+              <Typography variant="h5" color="primary">
+                No Safes found
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                You need to connect with an owner with at least one Safe. Click the deploy Safe
+                button and then reload.
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                ⚠️ Remember to add the connected address as an owner of the Safe. ⚠️
+              </Typography>
+              <Button
+                color="primary"
+                variant="contained"
+                href="https://app.safe.global/new-safe/create"
+                target="_blank"
+                sx={{ mt: 2 }}
+              >
+                Deploy new Safe
+              </Button>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={() => window.location.reload()}
+                sx={{ mt: 2, ml: 2 }}
+              >
+                Reload tab
+              </Button>
+            </>
+          )}
 
           {selectedSafe && (
             <>
-              <Typography sx={{ mb: 2, width: '24em' }}>
-                You are going to login with Monerium and bind your your Safe ({selectedSafe}) with
-                your account
+              <Typography variant="h5" color="primary">
+                Connected !!
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                You are connected and have selected the following Safe:{' '}
+                <Typography color="primary" component="span">
+                  {selectedSafe} ({safeThreshold})
+                </Typography>
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                You now can login with Monerium and link the selected Safe with your account
               </Typography>
               <br />
               <Button variant="contained" onClick={startMoneriumFlow}>

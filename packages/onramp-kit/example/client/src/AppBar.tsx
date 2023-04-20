@@ -42,13 +42,23 @@ const AppBar = () => {
                 }
                 sx={{ height: '54px' }}
               >
-                first{' '}
                 {data?.safes.map((safe, index) => (
                   <MenuItem key={safe} value={safe}>
                     <EthHashInfo name={`Safe ${index + 1}`} address={safe} showCopyButton />
                   </MenuItem>
                 ))}
               </Select>
+            )}
+
+            {data && data?.safes && !data?.safes?.length && (
+              <Button
+                color="primary"
+                variant="text"
+                href="https://app.safe.global/new-safe/create"
+                target="_blank"
+              >
+                Deploy new Safe
+              </Button>
             )}
 
             <Button variant="contained" color="error" onClick={logOut} sx={{ ml: 2 }}>

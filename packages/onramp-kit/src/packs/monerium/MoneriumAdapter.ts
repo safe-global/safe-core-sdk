@@ -24,6 +24,10 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
   }
 
   async init(safeSdk: Safe) {
+    if (!safeSdk) {
+      throw new Error('You need to provide an instance of the protocol kit')
+    }
+
     try {
       this.#client = new SafeMoneriumClient(this.#config.environment, safeSdk)
     } catch (e) {

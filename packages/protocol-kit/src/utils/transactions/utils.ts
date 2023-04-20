@@ -63,7 +63,7 @@ export async function standardizeSafeTransactionData({
 
   const hasSafeTxGasOptional = hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)
   if (
-    (hasSafeTxGasOptional && standardizedTxs.gasPrice === 0) ||
+    (hasSafeTxGasOptional && standardizedTxs.gasPrice === '0') ||
     (hasSafeTxGasOptional && predictedSafe)
   ) {
     return {

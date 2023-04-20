@@ -92,11 +92,9 @@ export async function encodeSetupCallData({
     ])
   }
 
-  const chainId = await ethAdapter.getChainId()
   const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
     ethAdapter,
     safeVersion,
-    chainId,
     customContracts
   })
 
@@ -124,14 +122,12 @@ export async function predictSafeAddress({
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
-  const chainId = await ethAdapter.getChainId()
   const { safeVersion = SAFE_LAST_VERSION, saltNonce = PREDETERMINED_SALT_NONCE } =
     safeDeploymentConfig
 
   const safeProxyFactoryContract = await getProxyFactoryContract({
     ethAdapter,
     safeVersion,
-    chainId,
     customContracts
   })
 
@@ -140,7 +136,6 @@ export async function predictSafeAddress({
   const safeContract = await getSafeContract({
     ethAdapter,
     safeVersion,
-    chainId,
     isL1SafeMasterCopy,
     customContracts
   })

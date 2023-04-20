@@ -3,16 +3,18 @@ import {
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
 import Safe, {
-  calculateProxyAddress,
-  encodeCreateProxyWithNonce,
+  predictSafeAddress,
   encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract,
-  getSafeInitializer,
+  PredictedSafeProps,
   PREDETERMINED_SALT_NONCE,
-  PredictedSafeProps
+  SafeDeploymentConfig,
+  encodeCreateProxyWithNonce,
+  SafeAccountConfig,
+  encodeSetupCallData
 } from '@safe-global/protocol-kit'
 import { RelayAdapter } from '@safe-global/relay-kit'
 import {
@@ -49,28 +51,34 @@ class AccountAbstraction {
     const { relayAdapter } = options
     this.setRelayAdapter(relayAdapter)
 
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [await this.getSignerAddress()],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        saltNonce: PREDETERMINED_SALT_NONCE
-      }
+    const signer = await this.getSignerAddress()
+    const owners = [signer]
+    const threshold = 1
+    const saltNonce = PREDETERMINED_SALT_NONCE
+
+    const safeAccountConfig: SafeAccountConfig = {
+      owners,
+      threshold
+    }
+    const safeDeploymentConfig: SafeDeploymentConfig = {
+      saltNonce,
+      safeVersion
     }
 
     const chainId = await this.#ethAdapter.getChainId()
+
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
       chainId
     })
-    const safeAddress = await calculateProxyAddress(
-      this.#ethAdapter,
-      safeVersion,
-      this.#safeProxyFactoryContract,
-      predictedSafe
-    )
+
+    const safeAddress = await predictSafeAddress({
+      ethAdapter: this.#ethAdapter,
+      safeAccountConfig,
+      safeDeploymentConfig
+    })
+
     this.#safeContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
@@ -169,12 +177,12 @@ class AccountAbstraction {
           saltNonce: PREDETERMINED_SALT_NONCE
         }
       }
-      const initializer = await getSafeInitializer(
-        this.#ethAdapter,
-        this.#safeContract,
-        predictedSafe,
-        chainId
-      )
+
+      const initializer = await encodeSetupCallData({
+        ethAdapter: this.#ethAdapter,
+        safeContract: this.#safeContract,
+        safeAccountConfig: predictedSafe.safeAccountConfig
+      })
 
       const safeDeploymentTransaction: MetaTransactionData = {
         to: this.#safeProxyFactoryContract.getAddress(),

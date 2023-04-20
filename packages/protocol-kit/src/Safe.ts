@@ -13,8 +13,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import { SAFE_LAST_VERSION } from './contracts/config'
-import { getProxyFactoryContract } from './contracts/safeDeploymentContracts'
-import { calculateProxyAddress } from './contracts/utils'
+import { predictSafeAddress } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -162,22 +161,11 @@ class Safe {
   async getAddress(): Promise<string> {
     if (this.#predictedSafe) {
       const chainId = await this.#ethAdapter.getChainId()
-      const safeVersion = await this.getContractVersion()
-      console.log({ safeVersion })
-      const safeProxyFactoryContract = await getProxyFactoryContract({
+      return predictSafeAddress({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId,
-        customContracts: this.#contractManager.contractNetworks?.[chainId]
+        customContracts: this.#contractManager.contractNetworks?.[chainId],
+        ...this.#predictedSafe
       })
-
-      return calculateProxyAddress(
-        this.#ethAdapter,
-        safeVersion,
-        safeProxyFactoryContract,
-        this.#predictedSafe,
-        this.#contractManager.contractNetworks?.[chainId]
-      )
     }
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
@@ -448,6 +436,10 @@ class Safe {
    * @returns The transaction hash of the Safe transaction
    */
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
+    if (!this.#contractManager.safeContract) {
+      throw new Error('Safe is not deployed')
+    }
+
     const safeTransactionData = safeTransaction.data
     const txHash = await this.#contractManager.safeContract.getTransactionHash(safeTransactionData)
     return txHash

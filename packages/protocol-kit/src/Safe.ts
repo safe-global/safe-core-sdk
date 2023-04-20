@@ -167,7 +167,6 @@ class Safe {
       const safeProxyFactoryContract = await getProxyFactoryContract({
         ethAdapter: this.#ethAdapter,
         safeVersion,
-        chainId,
         customContracts: this.#contractManager.contractNetworks?.[chainId]
       })
 

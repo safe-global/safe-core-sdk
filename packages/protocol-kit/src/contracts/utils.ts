@@ -36,7 +36,6 @@ export async function encodeDefaultSetupCallData(
   safeVersion: SafeVersion,
   safeContract: GnosisSafeContract,
   safeAccountConfig: SafeAccountConfig,
-  chainId: number,
   customContracts?: ContractNetworkConfig
 ): Promise<string> {
   if (semverSatisfies(safeVersion, '<=1.0.0')) {
@@ -55,7 +54,6 @@ export async function encodeDefaultSetupCallData(
     const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
     fallbackHandlerAddress = fallbackHandlerContract.getAddress()
@@ -77,7 +75,6 @@ export async function getSafeInitializer(
   ethAdapter: EthAdapter,
   safeContract: GnosisSafeContract,
   predictedSafe: PredictedSafeProps,
-  chainId: number,
   customContracts?: ContractNetworkConfig
 ): Promise<string> {
   const safeVersion = await safeContract.getVersion()
@@ -86,7 +83,6 @@ export async function getSafeInitializer(
     safeVersion,
     safeContract,
     predictedSafe.safeAccountConfig,
-    chainId,
     customContracts
   )
 
@@ -100,11 +96,9 @@ export async function calculateProxyAddress(
   predictedSafe: PredictedSafeProps,
   customContracts?: ContractNetworkConfig
 ): Promise<string> {
-  const chainId = await ethAdapter.getChainId()
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
     safeVersion,
-    chainId,
     customContracts
   })
   const deployer = safeProxyFactoryContract.getAddress()
@@ -123,7 +117,6 @@ export async function calculateProxyAddress(
             ethAdapter,
             safeSingletonContract,
             predictedSafe,
-            chainId,
             customContracts
           )
         ]

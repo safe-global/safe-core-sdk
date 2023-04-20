@@ -1,10 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { BytesLike } from '@ethersproject/bytes'
 import {
-  PREDETERMINED_SALT_NONCE,
-  ZERO_ADDRESS
-} from '@safe-global/account-abstraction-kit-poc/constants'
-import { getCompatibilityFallbackHandlerContract, getSafeContract } from '@safe-global/protocol-kit'
+  getCompatibilityFallbackHandlerContract,
+  getSafeContract,
+  PREDETERMINED_SALT_NONCE
+} from '@safe-global/protocol-kit'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -12,6 +12,8 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { BigNumberish, ethers, Signer } from 'ethers'
+
+const ZERO_ADDRESS = `0x${'0'.repeat(40)}`
 
 export function encodeCreateProxyWithNonce(
   safeProxyFactoryContract: GnosisSafeProxyFactoryContract,

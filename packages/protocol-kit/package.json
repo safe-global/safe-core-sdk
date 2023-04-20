@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "SDK to interact with Safe smart contracts",
   "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Safe",

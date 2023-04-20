@@ -36,13 +36,13 @@ export async function standardizeSafeTransactionData(
     value: tx.value,
     data: tx.data,
     operation: tx.operation ?? OperationType.Call,
-    baseGas: tx.baseGas ?? 0,
-    gasPrice: tx.gasPrice ?? 0,
+    baseGas: tx.baseGas ?? '0',
+    gasPrice: tx.gasPrice ?? '0',
     gasToken: tx.gasToken || ZERO_ADDRESS,
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
     nonce: tx.nonce ?? (await safeContract.getNonce())
   }
-  let safeTxGas: number
+  let safeTxGas: string
 
   if (typeof tx.safeTxGas !== 'undefined') {
     return {
@@ -53,9 +53,9 @@ export async function standardizeSafeTransactionData(
   const safeVersion = await safeContract.getVersion()
   if (
     hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) &&
-    standardizedTxs.gasPrice === 0
+    standardizedTxs.gasPrice === '0'
   ) {
-    safeTxGas = 0
+    safeTxGas = '0'
   } else {
     safeTxGas = await estimateTxGas(
       safeContract,

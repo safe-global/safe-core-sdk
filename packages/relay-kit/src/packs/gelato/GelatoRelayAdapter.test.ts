@@ -3,11 +3,7 @@ import { TransactionStatusResponse } from '@gelatonetwork/relay-sdk'
 import Safe from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 
-import {
-  GELATO_FEE_COLLECTOR,
-  GELATO_NATIVE_TOKEN_ADDRESS,
-  ZERO_ADDRESS
-} from '@safe-global/relay-kit/constants'
+import { GELATO_FEE_COLLECTOR, GELATO_NATIVE_TOKEN_ADDRESS } from '@safe-global/relay-kit/constants'
 import { GelatoRelayAdapter } from './GelatoRelayAdapter'
 
 enum TaskState {
@@ -32,9 +28,9 @@ const RELAY_RESPONSE = {
 const SAFE_TRANSACTION = {
   data: {
     operation: OperationType.Call,
-    safeTxGas: 0,
-    baseGas: 0,
-    gasPrice: 0,
+    safeTxGas: '0',
+    baseGas: '0',
+    gasPrice: '0',
     nonce: 0,
     gasToken: '0x',
     refundReceiver: '0x',
@@ -73,18 +69,18 @@ describe('GelatoRelayAdapter', () => {
 
   it('should allow to get a fee estimation', async () => {
     const chainId = 1
-    const gasLimit = BigNumber.from(100000)
+    const gasLimit = '100000'
     const gasToken = '0x0000000000000000000000000000000000000000'
     const estimation = await gelatoRelayAdapter.getEstimateFee(chainId, gasLimit, gasToken)
 
-    expect(estimation).toBe(FEE_ESTIMATION)
+    expect(estimation).toBe(FEE_ESTIMATION.toString())
     expect(mockGetEstimateFee).toHaveBeenCalledWith(
       chainId,
       GELATO_NATIVE_TOKEN_ADDRESS,
-      gasLimit,
+      BigNumber.from(gasLimit),
       true
     )
-    expect(estimation.gt(BigNumber.from(0))).toBe(true)
+    expect(BigNumber.from(estimation).gt(BigNumber.from(0))).toBe(true)
   })
 
   it('should allow to check the task status', async () => {
@@ -160,8 +156,8 @@ describe('GelatoRelayAdapter', () => {
       expect(safe.createTransaction).toHaveBeenCalledWith({
         safeTransactionData: args[1],
         options: expect.objectContaining({
-          baseGas: 100000,
-          gasPrice: 1,
+          baseGas: '100000',
+          gasPrice: '1',
           refundReceiver: GELATO_FEE_COLLECTOR
         })
       })
@@ -179,8 +175,8 @@ describe('GelatoRelayAdapter', () => {
       expect(safe.createTransaction).toHaveBeenCalledWith({
         safeTransactionData: args[1],
         options: expect.objectContaining({
-          baseGas: 100000,
-          gasPrice: 1,
+          baseGas: '100000',
+          gasPrice: '1',
           gasToken: GAS_TOKEN,
           refundReceiver: GELATO_FEE_COLLECTOR
         })
@@ -190,7 +186,7 @@ describe('GelatoRelayAdapter', () => {
 
   it('should allow to make a sync fee transaction', async () => {
     const response = await gelatoRelayAdapter.sendSyncTransaction(SAFE_ADDRESS, '0x', CHAIN_ID, {
-      gasLimit: BigNumber.from(100000)
+      gasLimit: '100000'
     })
 
     expect(response).toBe(RELAY_RESPONSE)
@@ -214,7 +210,7 @@ describe('GelatoRelayAdapter', () => {
       encodedTransaction: '0x',
       chainId: CHAIN_ID,
       options: {
-        gasLimit: BigNumber.from(100000),
+        gasLimit: '100000',
         isSponsored: true
       }
     })
@@ -234,7 +230,7 @@ describe('GelatoRelayAdapter', () => {
       encodedTransaction: '0x',
       chainId: CHAIN_ID,
       options: {
-        gasLimit: BigNumber.from(100000),
+        gasLimit: '100000',
         isSponsored: false
       }
     })

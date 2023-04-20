@@ -38,6 +38,7 @@ export type SafeInfoResponse = {
   readonly masterCopy: string
   readonly modules: string[]
   readonly fallbackHandler: string
+  readonly guard: string
   readonly version: string
 }
 

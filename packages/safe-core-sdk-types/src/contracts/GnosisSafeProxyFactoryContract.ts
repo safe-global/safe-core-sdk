@@ -13,5 +13,5 @@ export interface GnosisSafeProxyFactoryContract {
   proxyCreationCode(): Promise<string>
   createProxy(options: CreateProxyProps): Promise<string>
   encode(methodName: string, params: any[]): string
-  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<number>
+  estimateGas(methodName: string, params: any[], options: TransactionOptions): Promise<string>
 }

@@ -64,6 +64,7 @@ class Web3Adapter implements EthAdapter {
     const balance = defaultBlock
       ? await this.#web3.eth.getBalance(address, defaultBlock)
       : await this.#web3.eth.getBalance(address)
+    // FIXME Web3 Adapter is forced to return an Ethers type
     return BigNumber.from(balance)
   }
 
@@ -289,11 +290,11 @@ class Web3Adapter implements EthAdapter {
     })
   }
 
-  estimateGas(
+  async estimateGas(
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void
-  ): Promise<number> {
-    return this.#web3.eth.estimateGas(transaction, callback)
+  ): Promise<string> {
+    return (await this.#web3.eth.estimateGas(transaction, callback)).toString()
   }
 
   call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string> {

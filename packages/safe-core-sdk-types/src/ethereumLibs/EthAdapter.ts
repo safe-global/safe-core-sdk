@@ -19,8 +19,8 @@ export interface EthAdapterTransaction {
   from: string
   data: string
   value?: string
-  gasPrice?: number
-  gasLimit?: number
+  gasPrice?: number | string
+  gasLimit?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
 }
@@ -94,7 +94,7 @@ export interface EthAdapter {
   estimateGas(
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void
-  ): Promise<number>
+  ): Promise<string>
   call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string>
   encodeParameters(types: string[], values: any[]): string
   decodeParameters(types: any[], values: string): { [key: string]: any }

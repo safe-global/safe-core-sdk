@@ -7,8 +7,7 @@ import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 import { SafeMoneriumClient } from './SafeMoneriumClient'
 import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
 
-const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
-const MONERIUM_REFRESH_TOKEN = 'monerium_refresh_token'
+const MONERIUM_CODE_VERIFIER = 'OnRampKit__monerium_code_verifier'
 const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
 
 /**
@@ -40,18 +39,20 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
       throw new Error('Monerium client not initialized')
     }
 
+    if (options.authCode && options.refreshToken) {
+      throw new Error('You can not provide both authCode and refreshToken')
+    }
+
     try {
-      const codeParam = new URLSearchParams(window.location.search).get('code')
       const safeAddress = await this.#client.getSafeAddress()
 
-      if (codeParam) {
-        await this.#startCodeParamFlow(codeParam, safeAddress, options.redirect_uri)
+      if (options.authCode) {
+        await this.#startAuthCodeFlow(options.authCode, safeAddress, options.redirect_uri)
       } else {
-        const refreshToken = localStorage.getItem(MONERIUM_REFRESH_TOKEN)
-        if (refreshToken) {
-          await this.#startRefreshTokenFlow(safeAddress, refreshToken)
+        if (options.refreshToken) {
+          await this.#startRefreshTokenFlow(safeAddress, options.refreshToken)
         } else {
-          await this.#startAuthCodeFlow(safeAddress, options.redirect_uri)
+          await this.#startAuthFlow(safeAddress, options.redirect_uri)
         }
       }
 
@@ -61,10 +62,10 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
     }
   }
 
-  async #startCodeParamFlow(codeParam: string, safeAddress: string, redirectUrl: string) {
+  async #startAuthCodeFlow(codeParam: string, safeAddress: string, redirectUrl: string) {
     if (!this.#client) return
 
-    const codeVerifier = localStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
+    const codeVerifier = sessionStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
 
     await this.#client.auth({
       client_id: this.#config.clientId,
@@ -72,8 +73,6 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
       code_verifier: codeVerifier,
       redirect_uri: redirectUrl
     })
-
-    localStorage.setItem(MONERIUM_REFRESH_TOKEN, this.#client?.bearerProfile?.refresh_token || '')
 
     await this.#addAccountIfNotLinked(safeAddress)
 
@@ -90,14 +89,10 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
       refresh_token: refreshToken
     })
 
-    const newRefreshToken = this.#client?.bearerProfile?.refresh_token || ''
-
-    localStorage.setItem(MONERIUM_REFRESH_TOKEN, newRefreshToken)
-
     this.#addAccountIfNotLinked(safeAddress)
   }
 
-  async #startAuthCodeFlow(safeAddress: string, redirectUrl: string) {
+  async #startAuthFlow(safeAddress: string, redirectUrl: string) {
     if (!this.#client) return
 
     if (safeAddress) {
@@ -121,7 +116,7 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
       network: await this.#client.getNetwork()
     })
 
-    localStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
+    sessionStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
 
     window.location.replace(authFlowUrl)
   }
@@ -162,7 +157,6 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
 
   async close() {
     localStorage.removeItem(MONERIUM_CODE_VERIFIER)
-    localStorage.removeItem(MONERIUM_REFRESH_TOKEN)
   }
 
   subscribe(): void {

@@ -1,4 +1,4 @@
-import { Chain, Currency, Counterpart, Network } from '@monerium/sdk'
+import { Currency, Counterpart } from '@monerium/sdk'
 
 export interface MoneriumProviderConfig {
   clientId: string
@@ -7,10 +7,8 @@ export interface MoneriumProviderConfig {
 
 export interface MoneriumOpenOptions {
   redirect_uri: string
-  address?: string
-  signature?: string
-  chain?: Chain
-  network?: Network
+  authCode?: string
+  refreshToken?: string
 }
 
 export interface SafeMoneriumOrder {

@@ -1,5 +1,13 @@
 import { ethers } from 'ethers'
-import { Chain, IBAN, MoneriumClient, Network, NewOrder, OrderKind } from '@monerium/sdk'
+import {
+  AuthContext,
+  Chain,
+  IBAN,
+  MoneriumClient,
+  Network,
+  NewOrder,
+  OrderKind
+} from '@monerium/sdk'
 
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
@@ -39,6 +47,12 @@ export class SafeMoneriumClient extends MoneriumClient {
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
+  }
+
+  async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
+    const messageHash = ethers.utils.hashMessage(message)
+    const messageHashSigned = await this.#isValidSignature(safeAddress, messageHash)
+    return messageHashSigned
   }
 
   async isSignMessagePending(safeAddress: string, message: string): Promise<boolean> {
@@ -114,12 +128,6 @@ export class SafeMoneriumClient extends MoneriumClient {
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
-  }
-
-  async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
-    const messageHash = ethers.utils.hashMessage(message)
-    const messageHashSigned = await this.#isValidSignature(safeAddress, messageHash)
-    return messageHashSigned
   }
 
   async getChain() {

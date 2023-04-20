@@ -7,6 +7,8 @@ import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { useAuth } from '../AuthContext'
 import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
 
+const MONERIUM_TOKEN = 'monerium_token'
+
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
   const [safeThreshold, setSafeThreshold] = useState<string>()
@@ -47,18 +49,19 @@ function Monerium() {
   }, [authProvider, selectedSafe])
 
   useEffect(() => {
-    const codeParam = new URLSearchParams(window.location.search).get('code')
-    const refreshToken = localStorage.getItem('monerium_refresh_token')
+    const authCode = new URLSearchParams(window.location.search).get('code') || undefined
+    const refreshToken = localStorage.getItem(MONERIUM_TOKEN) || undefined
 
-    if (codeParam || refreshToken) startMoneriumFlow()
+    if (authCode || refreshToken) startMoneriumFlow(authCode, refreshToken)
   }, [onRampKit])
 
-  const startMoneriumFlow = async () => {
+  const startMoneriumFlow = async (authCode?: string, refreshToken?: string) => {
     if (!onRampKit) return
 
     const moneriumClient = await onRampKit.open({
       redirect_uri: 'http://localhost:3000/monerium',
-      address: selectedSafe
+      authCode,
+      refreshToken
     })
 
     const authContext = await moneriumClient.getAuthContext()
@@ -73,12 +76,17 @@ function Monerium() {
     console.log('Orders', orders)
     console.groupEnd()
 
+    if (moneriumClient.bearerProfile) {
+      localStorage.setItem(MONERIUM_TOKEN, moneriumClient.bearerProfile.refresh_token)
+    }
+
     setMoneriumClient(moneriumClient)
     setAuthContext(authContext)
   }
 
   const closeMoneriumFlow = async () => {
     onRampKit?.close()
+    localStorage.removeItem(MONERIUM_TOKEN)
     setAuthContext(undefined)
   }
 
@@ -199,7 +207,7 @@ function Monerium() {
                 You now can login with Monerium and link the selected Safe with your account
               </Typography>
               <br />
-              <Button variant="contained" onClick={startMoneriumFlow}>
+              <Button variant="contained" onClick={() => startMoneriumFlow()}>
                 Login with Monerium
               </Button>
             </>

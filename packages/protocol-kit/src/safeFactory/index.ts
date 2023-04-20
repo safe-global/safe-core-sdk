@@ -86,13 +86,11 @@ class SafeFactory {
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter,
       safeVersion,
-      chainId,
       customContracts
     })
     this.#gnosisSafeContract = await getSafeContract({
       ethAdapter,
       safeVersion,
-      chainId,
       isL1SafeMasterCopy,
       customContracts
     })
@@ -144,7 +142,6 @@ class SafeFactory {
       const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
         ethAdapter: this.#ethAdapter,
         safeVersion: this.#safeVersion,
-        chainId,
         customContracts
       })
       fallbackHandlerAddress = fallbackHandlerContract.getAddress()

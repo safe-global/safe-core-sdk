@@ -1,7 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { ethers, waffle, Web3 } from 'hardhat'
-
 interface Account {
   signer: Signer
   address: string

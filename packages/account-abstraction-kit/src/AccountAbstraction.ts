@@ -2,15 +2,17 @@ import {
   AccountAbstractionConfig,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
+import {
+  encodeCreateProxyWithNonce,
+  getSafeInitializer
+} from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
   calculateProxyAddress,
-  encodeCreateProxyWithNonce,
   encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract,
-  getSafeInitializer,
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps
 } from '@safe-global/protocol-kit'
@@ -59,11 +61,9 @@ class AccountAbstraction {
       }
     }
 
-    const chainId = await this.#ethAdapter.getChainId()
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter: this.#ethAdapter,
-      safeVersion,
-      chainId
+      safeVersion
     })
     const safeAddress = await calculateProxyAddress(
       this.#ethAdapter,
@@ -74,8 +74,7 @@ class AccountAbstraction {
     this.#safeContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
-      customSafeAddress: safeAddress,
-      chainId
+      customSafeAddress: safeAddress
     })
   }
 
@@ -120,9 +119,7 @@ class AccountAbstraction {
       throw new Error('SDK not initialized')
     }
 
-    const chainId = await this.#ethAdapter.getChainId()
     const safeAddress = this.getSafeAddress()
-
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,
       safeAddress
@@ -150,14 +147,12 @@ class AccountAbstraction {
     } else {
       const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId
+        safeVersion
       })
       relayTransactionTarget = multiSendCallOnlyContract.getAddress()
       const safeSingletonContract = await getSafeContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId
+        safeVersion
       })
 
       const predictedSafe: PredictedSafeProps = {
@@ -172,8 +167,7 @@ class AccountAbstraction {
       const initializer = await getSafeInitializer(
         this.#ethAdapter,
         this.#safeContract,
-        predictedSafe,
-        chainId
+        await this.getSignerAddress()
       )
 
       const safeDeploymentTransaction: MetaTransactionData = {
@@ -197,6 +191,7 @@ class AccountAbstraction {
       encodedTransaction = multiSendCallOnlyContract.encode('multiSend', [multiSendData])
     }
 
+    const chainId = await this.#ethAdapter.getChainId()
     const relayTransaction: RelayTransaction = {
       target: relayTransactionTarget,
       encodedTransaction: encodedTransaction,

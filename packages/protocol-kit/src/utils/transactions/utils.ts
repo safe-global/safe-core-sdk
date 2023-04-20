@@ -37,8 +37,8 @@ export async function standardizeSafeTransactionData({
     value: tx.value,
     data: tx.data,
     operation: tx.operation ?? OperationType.Call,
-    baseGas: tx.baseGas ?? 0,
-    gasPrice: tx.gasPrice ?? 0,
+    baseGas: tx.baseGas ?? '0',
+    gasPrice: tx.gasPrice ?? '0',
     gasToken: tx.gasToken || ZERO_ADDRESS,
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
     nonce: tx.nonce ?? (safeContract ? await safeContract.getNonce() : 0)
@@ -68,7 +68,7 @@ export async function standardizeSafeTransactionData({
   ) {
     return {
       ...standardizedTxs,
-      safeTxGas: 0
+      safeTxGas: '0'
     }
   }
 

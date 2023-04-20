@@ -257,7 +257,7 @@ type SafeMultisigTransactionResponse = {
   isSuccessful?: boolean
   ethGasPrice?: string
   gasUsed?: number
-  fee?: number
+  fee?: string
   origin: string
   dataDecoded?: string
   confirmationsRequired: number

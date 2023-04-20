@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { MetaTransactionData, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -89,7 +90,7 @@ describe('Transactions creation', () => {
           ethAdapter,
           txDataPartial
         )
-        chai.expect(Number(safeTxData.safeTxGas)).to.be.gt(0)
+        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
     )
 
@@ -143,7 +144,7 @@ describe('Transactions creation', () => {
           ethAdapter,
           txDataPartial
         )
-        chai.expect(Number(safeTxData.safeTxGas)).to.be.gt(0)
+        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
     )
 

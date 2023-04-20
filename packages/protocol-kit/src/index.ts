@@ -45,13 +45,18 @@ import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
 import {
   AddOwnerTxParams,
   ConnectSafeConfig,
+  ConnectSafeConfigWithPredictedSafe,
+  ConnectSafeConfigWithSafeAddress,
   ContractNetworksConfig,
   CreateTransactionProps,
   PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeAccountConfig,
   SafeConfig,
+  SafeConfigWithPredictedSafe,
+  SafeConfigWithSafeAddress,
   SafeDeploymentConfig,
+  StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams
 } from './types'
 import { EthSafeSignature } from './utils'
@@ -67,7 +72,11 @@ export {
   PredictedSafeProps,
   DeploySafeProps,
   SafeConfig,
+  SafeConfigWithSafeAddress,
+  SafeConfigWithPredictedSafe,
   ConnectSafeConfig,
+  ConnectSafeConfigWithSafeAddress,
+  ConnectSafeConfigWithPredictedSafe,
   ContractNetworksConfig,
   SafeTransactionOptionalProps,
   CreateTransactionProps,
@@ -76,6 +85,7 @@ export {
   SwapOwnerTxParams,
   encodeMultiSendData,
   standardizeSafeTransactionData,
+  StandardizeSafeTransactionDataProps,
   EthersAdapter,
   EthersAdapterConfig,
   EthersTransactionOptions,

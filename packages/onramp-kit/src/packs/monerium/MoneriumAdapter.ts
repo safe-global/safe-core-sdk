@@ -30,8 +30,8 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
 
     try {
       this.#client = new SafeMoneriumClient(this.#config.environment, safeSdk)
-    } catch (e) {
-      throw new Error(getErrorMessage(e))
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
     }
   }
 

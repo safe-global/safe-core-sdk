@@ -63,11 +63,11 @@ describe('Transactions creation', () => {
           value: '0',
           data: '0x'
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract as GnosisSafeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq(0)
       }
     )
@@ -90,11 +90,11 @@ describe('Transactions creation', () => {
           data: '0x',
           gasPrice: 123
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract as GnosisSafeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.gt(0)
       }
     )
@@ -118,11 +118,11 @@ describe('Transactions creation', () => {
           data: '0x',
           safeTxGas
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract as GnosisSafeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
     )
@@ -144,11 +144,11 @@ describe('Transactions creation', () => {
           value: '0',
           data: '0x'
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract as GnosisSafeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.gt(0)
       }
     )
@@ -172,11 +172,11 @@ describe('Transactions creation', () => {
           data: '0x',
           safeTxGas
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract as GnosisSafeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
     )
@@ -200,11 +200,11 @@ describe('Transactions creation', () => {
           data: '0x',
           safeTxGas
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract as GnosisSafeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
     )

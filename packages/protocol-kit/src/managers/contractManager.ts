@@ -10,6 +10,8 @@ import {
   MultiSendCallOnlyContract,
   MultiSendContract
 } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from 'packages/safe-core-sdk-types/dist/src/types'
+import { isSafeConfigWithPredictedSafe } from '../utils/types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
@@ -18,43 +20,31 @@ class ContractManager {
   #multiSendContract!: MultiSendContract
   #multiSendCallOnlyContract!: MultiSendCallOnlyContract
 
-  static async create({
-    ethAdapter,
-    safeAddress,
-    predictedSafe,
-    isL1SafeMasterCopy,
-    contractNetworks
-  }: SafeConfig): Promise<ContractManager> {
+  static async create(config: SafeConfig): Promise<ContractManager> {
     const contractManager = new ContractManager()
-    await contractManager.init({
-      ethAdapter,
-      safeAddress,
-      predictedSafe,
-      isL1SafeMasterCopy,
-      contractNetworks
-    })
+    await contractManager.init(config)
     return contractManager
   }
 
-  async init({
-    ethAdapter,
-    safeAddress,
-    isL1SafeMasterCopy,
-    contractNetworks
-  }: SafeConfig): Promise<void> {
+  async init(config: SafeConfig): Promise<void> {
+    const { ethAdapter, isL1SafeMasterCopy, contractNetworks } = config
+
     const chainId = await ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
     this.#contractNetworks = contractNetworks
     this.#isL1SafeMasterCopy = isL1SafeMasterCopy
 
-    let safeVersion = SAFE_LAST_VERSION
-    if (safeAddress) {
+    let safeVersion: SafeVersion
+
+    if (isSafeConfigWithPredictedSafe(config)) {
+      safeVersion = config.predictedSafe.safeDeploymentConfig.safeVersion ?? SAFE_LAST_VERSION
+    } else {
       const temporarySafeContract = await getSafeContract({
         ethAdapter,
-        safeVersion,
+        safeVersion: SAFE_LAST_VERSION,
         chainId,
         isL1SafeMasterCopy,
-        customSafeAddress: safeAddress,
+        customSafeAddress: config.safeAddress,
         customContracts
       })
       safeVersion = await temporarySafeContract.getVersion()
@@ -63,7 +53,7 @@ class ContractManager {
         safeVersion,
         chainId,
         isL1SafeMasterCopy,
-        customSafeAddress: safeAddress,
+        customSafeAddress: config.safeAddress,
         customContracts
       })
     }

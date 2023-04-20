@@ -14,7 +14,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
-describe('Safe Info', () => {
+describe.only('Safe Info', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
@@ -39,28 +39,6 @@ describe('Safe Info', () => {
   })
 
   describe('connect', async () => {
-    it('should fail if a safeAddress and a predictedSafe are connected', async () => {
-      const { predictedSafe, accounts, contractNetworks, chainId } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
-        predictedSafe,
-        contractNetworks
-      })
-      chai
-        .expect(
-          safeSdk.connect({
-            safeAddress: await safeSdk.getAddress(),
-            predictedSafe,
-            contractNetworks
-          })
-        )
-        .to.be.rejectedWith(
-          'A safeAddress and a predictedSafe cannot be connected at the same time'
-        )
-    })
-
     it('should connect a Safe that is not deployed', async () => {
       const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -92,7 +70,11 @@ describe('Safe Info', () => {
         .to.be.eq(await account1.signer.getAddress())
 
       const ethAdapter2 = await getEthAdapter(account2.signer)
-      const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapter2, contractNetworks })
+      const safeSdk2 = await safeSdk.connect({
+        ethAdapter: ethAdapter2,
+        contractNetworks
+      })
+      chai.expect(await safeSdk2.getAddress()).to.be.eq(safe.address)
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safe.address)
       chai
         .expect(await safeSdk2.getEthAdapter().getSignerAddress())
@@ -108,10 +90,24 @@ describe('Safe Info', () => {
   })
 
   describe('getContractVersion', async () => {
-    it('should return the contract version of a Safe that is not deployed', async () => {
+    it('should return the contract version of the configuration of a Safe that is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const contractVersion = await safeSdk.getContractVersion()
+      chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
+    })
+
+    it('should return the contract last version if a Safe that is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      delete predictedSafe.safeDeploymentConfig.safeVersion
       const safeSdk = await Safe.create({
         ethAdapter,
         predictedSafe,

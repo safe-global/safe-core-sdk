@@ -1,6 +1,7 @@
 import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/utils/transactions'
 import {
   EthAdapter,
+  GnosisSafeContract,
   MetaTransactionData,
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
@@ -64,31 +65,63 @@ export interface ContractNetworksConfig {
   [id: string]: ContractNetworkConfig
 }
 
-export interface SafeConfig {
+type SafeConfigWithSafeAddressProps = {
+  /** safeAddress - The address of the Safe account to use */
+  safeAddress: string
+  /** predictedSafe - The configuration of the Safe that is not yet deployed */
+  predictedSafe?: never
+}
+
+type SafeConfigWithPredictedSafeProps = {
+  /** safeAddress - The address of the Safe account to use */
+  safeAddress?: never
+  /** predictedSafe - The configuration of the Safe that is not yet deployed */
+  predictedSafe: PredictedSafeProps
+}
+
+export type SafeConfigProps = {
   /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
-  /** safeAddress - The address of the Safe account to use */
-  safeAddress?: string
-  /** predictedSafe - The configuration of the Safe that is not yet deployed */
-  predictedSafe?: PredictedSafeProps
   /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
 
-export interface ConnectSafeConfig {
-  /** ethAdapter - Ethereum adapter */
-  ethAdapter?: EthAdapter
+export type SafeConfigWithSafeAddress = SafeConfigProps & SafeConfigWithSafeAddressProps
+export type SafeConfigWithPredictedSafe = SafeConfigProps & SafeConfigWithPredictedSafeProps
+export type SafeConfig = SafeConfigWithSafeAddress | SafeConfigWithPredictedSafe
+
+type ConnectSafeConfigWithSafeAddressProps = {
   /** safeAddress - The address of the Safe account to use */
   safeAddress?: string
   /** predictedSafe - The configuration of the Safe that is not yet deployed */
+  predictedSafe?: never
+}
+
+type ConnectSafeConfigWithPredictedSafeProps = {
+  /** safeAddress - The address of the Safe account to use */
+  safeAddress?: never
+  /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe?: PredictedSafeProps
+}
+
+type ConnectSafeConfigProps = {
+  /** ethAdapter - Ethereum adapter */
+  ethAdapter?: EthAdapter
   /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
+
+export type ConnectSafeConfigWithSafeAddress = ConnectSafeConfigProps &
+  ConnectSafeConfigWithSafeAddressProps
+export type ConnectSafeConfigWithPredictedSafe = ConnectSafeConfigProps &
+  ConnectSafeConfigWithPredictedSafeProps
+export type ConnectSafeConfig =
+  | ConnectSafeConfigWithSafeAddress
+  | ConnectSafeConfigWithPredictedSafe
 
 export interface CreateTransactionProps {
   /** safeTransactionData - The transaction or transaction array to process */
@@ -119,3 +152,26 @@ export interface SwapOwnerTxParams {
   /** newOwnerAddress - The new owner address */
   newOwnerAddress: string
 }
+
+type StandardizeSafeTxDataWithSafeContractProps = {
+  safeContract: GnosisSafeContract
+  predictedSafe?: never
+}
+
+type StandardizeSafeTxDataWithPredictedSafeProps = {
+  safeContract?: never
+  predictedSafe: PredictedSafeProps
+}
+
+interface StandardizeSafeTransactionData {
+  ethAdapter: EthAdapter
+  tx: SafeTransactionDataPartial
+}
+
+export type StandardizeSafeTxDataWithSafeContract = StandardizeSafeTransactionData &
+  StandardizeSafeTxDataWithSafeContractProps
+export type StandardizeSafeTxDataWithPredictedSafe = StandardizeSafeTransactionData &
+  StandardizeSafeTxDataWithPredictedSafeProps
+export type StandardizeSafeTransactionDataProps =
+  | StandardizeSafeTxDataWithSafeContract
+  | StandardizeSafeTxDataWithPredictedSafe

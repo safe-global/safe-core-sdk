@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react'
 import { Web3AuthOptions } from '@web3auth/modal'
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS } from '@web3auth/base'
 import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
-import { SafeAuthKit, Web3AuthAdapter, SafeAuthSignInData } from '@safe-global/auth-kit'
+import { SafeAuthKit, Web3AuthAdapter, SafeAuthSignInData } from '../../../../auth-kit/src/index'
 
 type AuthContextProviderProps = {
   children: React.ReactNode
@@ -12,17 +12,23 @@ interface AuthContextType {
   isLoggedIn: boolean
   provider?: SafeEventEmitterProvider
   data?: SafeAuthSignInData
+  selectedSafe: string
+  setSelectedSafe?: (safe: string) => void
   logIn?: () => void
   logOut?: () => void
 }
 
-export const AuthContext = createContext<AuthContextType>({ isLoggedIn: false })
+export const AuthContext = createContext<AuthContextType>({
+  isLoggedIn: false,
+  selectedSafe: ''
+})
 
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthAdapter>>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | undefined>()
+  const [selectedSafe, setSelectedSafe] = useState('')
 
   useEffect(() => {
     ;(async () => {
@@ -70,6 +76,17 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
+      const provider = safeAuthKit.getProvider()
+
+      if (provider) {
+        const response = await safeAuthKit.signIn()
+        setSafeAuthSignInResponse(response)
+        setSelectedSafe(response?.safes?.[0] || '')
+        setProvider(provider as SafeEventEmitterProvider)
+
+        setIsLoggedIn(true)
+      }
+
       setSafeAuth(safeAuthKit)
     })()
   }, [])
@@ -81,6 +98,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
     console.log('SIGN IN RESPONSE: ', response)
 
     setSafeAuthSignInResponse(response)
+    setSelectedSafe(response?.safes?.[0] || '')
     setProvider(safeAuth.getProvider() as SafeEventEmitterProvider)
 
     setIsLoggedIn(true)
@@ -99,7 +117,15 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, provider, data: safeAuthSignInResponse, logIn, logOut }}
+      value={{
+        isLoggedIn,
+        provider,
+        data: safeAuthSignInResponse,
+        logIn,
+        logOut,
+        selectedSafe,
+        setSelectedSafe
+      }}
     >
       {children}
     </AuthContext.Provider>

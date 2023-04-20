@@ -1,14 +1,25 @@
-import { AppBar as MuiAppBar, Typography, styled, Link, Button, Box } from '@mui/material'
+import {
+  AppBar as MuiAppBar,
+  Typography,
+  styled,
+  Link,
+  Button,
+  Box,
+  MenuItem,
+  Select,
+  SelectChangeEvent
+} from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { useAuth } from './AuthContext'
+import { EthHashInfo } from '@safe-global/safe-react-components'
 
 const AppBar = () => {
-  const { logIn, logOut, isLoggedIn } = useAuth()
+  const { logIn, logOut, isLoggedIn, data, selectedSafe, setSelectedSafe } = useAuth()
 
   return (
     <StyledAppBar position="static" color="default">
-      <Typography variant="h3" pl={4} fontWeight={700}>
-        OnRamp Kit
+      <Typography variant="h3" pl={3} fontWeight={700}>
+        OnRamp
       </Typography>
       <nav>
         <Link to={`/stripe`} component={RouterLink} pl={2} sx={{ textDecoration: 'none' }}>
@@ -18,14 +29,35 @@ const AppBar = () => {
           Monerium
         </Link>
       </nav>
-      <Box mr={5}>
+      <Box mr={5} display="flex" justifyContent="flex-end" alignItems="center" width="100%">
         {isLoggedIn ? (
-          <Button variant="contained" onClick={logOut}>
-            Log Out
-          </Button>
+          <>
+            <EthHashInfo name="Owner" address={data?.eoa || ''} showCopyButton />
+
+            {data && data?.safes && data?.safes?.length > 0 && (
+              <Select
+                value={selectedSafe}
+                onChange={(event: SelectChangeEvent<string>) =>
+                  setSelectedSafe?.(event.target.value)
+                }
+                sx={{ height: '54px' }}
+              >
+                first{' '}
+                {data?.safes.map((safe, index) => (
+                  <MenuItem key={safe} value={safe}>
+                    <EthHashInfo name={`Safe ${index + 1}`} address={safe} showCopyButton />
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+
+            <Button variant="contained" color="error" onClick={logOut} sx={{ ml: 2 }}>
+              Disconnect
+            </Button>
+          </>
         ) : (
           <Button variant="contained" onClick={logIn}>
-            Login
+            Connect
           </Button>
         )}
       </Box>

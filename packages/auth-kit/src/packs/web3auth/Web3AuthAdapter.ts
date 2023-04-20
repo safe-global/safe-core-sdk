@@ -44,9 +44,9 @@ export class Web3AuthAdapter implements SafeAuthAdapter<Web3AuthAdapter> {
 
       this.#adapters?.forEach((adapter) => this.web3authInstance?.configureAdapter(adapter))
 
-      this.provider = this.web3authInstance.provider
-
       await this.web3authInstance.initModal({ modalConfig: this.#modalConfig })
+
+      this.provider = this.web3authInstance.provider
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }

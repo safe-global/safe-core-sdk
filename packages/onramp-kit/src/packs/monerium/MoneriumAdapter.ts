@@ -3,6 +3,7 @@ import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 import { SafeMoneriumClient } from './SafeMoneriumClient'
 import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
+import { Currency } from '@monerium/sdk'
 
 const MONERIUM_CODE_VERIFIER = 'monerium_code_verifier'
 const MONERIUM_REFRESH_TOKEN = 'monerium_refresh_token'
@@ -50,6 +51,32 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
           this.#client?.bearerProfile?.refresh_token || ''
         )
 
+        const authContext = await this.#client.getAuthContext()
+        const profile = await this.#client.getProfile(authContext.defaultProfile)
+        if (profile) {
+          const isSafeAddressLinked = profile.accounts.some(
+            (account) => account.address === options.address
+          )
+
+          if (!isSafeAddressLinked && options.address) {
+            await this.#client.linkAddress(authContext.defaultProfile, {
+              address: options.address,
+              message: 'I hereby declare that I am the address owner.',
+              signature: '0x',
+              // @ts-expect-error - network and chain are not defined in the type and mandatory for multisig (signature 0x)
+              network: await this.#client.getNetwork(),
+              chain: await this.#client.getChain(),
+              accounts: [
+                {
+                  network: await this.#client.getNetwork(),
+                  chain: await this.#client.getChain(),
+                  currency: Currency.eur
+                }
+              ]
+            })
+          }
+        }
+
         this.#cleanQueryString()
       } catch (e) {
         throw new Error(getErrorMessage(e))
@@ -79,7 +106,11 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
             const isSigned = await this.#client.isMessageSigned(options?.address, message)
 
             if (!isSigned) {
-              await this.#client.signMessage(options?.address, message, 5)
+              const isPending = await this.#client.isSignMessagePending(options?.address, message)
+
+              if (!isPending) {
+                await this.#client.signMessage(options?.address, message)
+              }
             }
           } catch (error) {
             throw new Error(getErrorMessage(error))
@@ -91,8 +122,8 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
           redirect_uri: options.redirect_uri,
           address: options?.address,
           signature: options?.address ? options?.signature || '0x' : undefined,
-          chain: options?.chain,
-          network: options?.network
+          chain: await this.#client.getChain(),
+          network: await this.#client.getNetwork()
         })
 
         localStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')

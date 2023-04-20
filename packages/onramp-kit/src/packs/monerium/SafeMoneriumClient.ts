@@ -26,8 +26,7 @@ export class SafeMoneriumClient extends MoneriumClient {
   }
 
   async send(order: SafeMoneriumOrder) {
-    const chainId = await this.#safeSdk.getChainId()
-    const newOrder = this.#createOrder(order, chainId)
+    const newOrder = await this.#createOrder(order)
 
     try {
       // Place the order to Monerium and Safe systems for being related and confirmed
@@ -36,6 +35,30 @@ export class SafeMoneriumClient extends MoneriumClient {
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
+  }
+
+  async isSignMessagePending(safeAddress: string, message: string): Promise<boolean> {
+    const apiKit = new SafeApiKit({
+      txServiceUrl: await this.getTransactionServiceUrl(),
+      ethAdapter: this.#ethAdapter
+    })
+
+    const pendingTransactions = await apiKit.getPendingTransactions(safeAddress)
+
+    const isMessagePending = pendingTransactions.results.some((tx) => {
+      if (
+        // @ts-expect-error - dataDecoded should have the method property
+        tx?.dataDecoded?.method === 'signMessage' &&
+        // @ts-expect-error - dataDecoded should have the method property
+        tx?.dataDecoded?.parameters[0]?.value === ethers.utils.hashMessage(message)
+      ) {
+        return true
+      }
+
+      return false
+    })
+
+    return isMessagePending
   }
 
   async signMessage(safeAddress: string, message: string) {
@@ -66,7 +89,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       const senderSignature = await this.#safeSdk.signTransactionHash(safeTxHash)
 
       const apiKit = new SafeApiKit({
-        txServiceUrl: this.#getTransactionServiceUrl(chainId),
+        txServiceUrl: await this.getTransactionServiceUrl(),
         ethAdapter: this.#ethAdapter
       })
 
@@ -133,7 +156,7 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
-  #createOrder(order: SafeMoneriumOrder, chainId: number): NewOrder {
+  async #createOrder(order: SafeMoneriumOrder): Promise<Promise<Promise<NewOrder>>> {
     return {
       kind: OrderKind.redeem,
       amount: order.amount,
@@ -143,8 +166,8 @@ export class SafeMoneriumClient extends MoneriumClient {
       counterpart: order.counterpart,
       memo: order.memo,
       message: this.#getSendMessage(order),
-      chain: this.#getChain(chainId),
-      network: this.#getNetwork(chainId),
+      chain: await this.getChain(),
+      network: await this.getNetwork(),
       supportingDocumentId: ''
     }
   }
@@ -157,7 +180,9 @@ export class SafeMoneriumClient extends MoneriumClient {
     } at ${currentDate}`
   }
 
-  #getChain(chainId: number) {
+  async getChain() {
+    const chainId = await this.#safeSdk.getChainId()
+
     switch (chainId) {
       case 1:
       case 5:
@@ -173,7 +198,9 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
-  #getNetwork(chainId: number) {
+  async getNetwork() {
+    const chainId = await this.#safeSdk.getChainId()
+
     switch (chainId) {
       case 1:
       case 100:
@@ -190,7 +217,9 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
-  #getTransactionServiceUrl(chainId: number) {
+  async getTransactionServiceUrl() {
+    const chainId = await this.#safeSdk.getChainId()
+
     switch (chainId) {
       case 1:
         return 'https://safe-transaction-mainnet.safe.global'

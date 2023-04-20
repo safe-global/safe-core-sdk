@@ -49,7 +49,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       if (
         // @ts-expect-error - dataDecoded should have the method property
         tx?.dataDecoded?.method === 'signMessage' &&
-        // @ts-expect-error - dataDecoded should have the method property
+        // @ts-expect-error - dataDecoded should have the parameters array
         tx?.dataDecoded?.parameters[0]?.value === ethers.utils.hashMessage(message)
       ) {
         return true
@@ -114,11 +114,65 @@ export class SafeMoneriumClient extends MoneriumClient {
 
   async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
     const messageHash = ethers.utils.hashMessage(message)
-    const messageHashSigned = await this.#isMessageHashSigned(safeAddress, messageHash)
+    const messageHashSigned = await this.#isValidSignature(safeAddress, messageHash)
     return messageHashSigned
   }
 
-  async #isMessageHashSigned(safeAddress: string, messageHash: string): Promise<boolean> {
+  async getChain() {
+    const chainId = await this.#safeSdk.getChainId()
+
+    switch (chainId) {
+      case 1:
+      case 5:
+        return Chain.ethereum
+      case 100:
+      case 10200:
+        return Chain.gnosis
+      case 137:
+      case 80001:
+        return Chain.polygon
+      default:
+        throw new Error(`Chain not supported: ${chainId}`)
+    }
+  }
+
+  async getNetwork() {
+    const chainId = await this.#safeSdk.getChainId()
+
+    switch (chainId) {
+      case 1:
+      case 100:
+      case 137:
+        return Network.mainnet
+      case 5:
+        return Network.goerli
+      case 10200:
+        return Network.chiado
+      case 80001:
+        return Network.mumbai
+      default:
+        throw new Error(`Network not supported: ${chainId}`)
+    }
+  }
+
+  async getTransactionServiceUrl() {
+    const chainId = await this.#safeSdk.getChainId()
+
+    switch (chainId) {
+      case 1:
+        return 'https://safe-transaction-mainnet.safe.global'
+      case 5:
+        return 'https://safe-transaction-goerli.safe.global'
+      case 100:
+        return 'https://safe-transaction-gnosis.safe.global'
+      case 137:
+        return 'https://safe-transaction-polygon.safe.global'
+      default:
+        throw new Error(`Chain not supported: ${chainId}`)
+    }
+  }
+
+  async #isValidSignature(safeAddress: string, messageHash: string): Promise<boolean> {
     try {
       const eip1271data = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [
         messageHash,
@@ -178,59 +232,5 @@ export class SafeMoneriumClient extends MoneriumClient {
     return `Send ${order.currency.toUpperCase()} ${order.amount} to ${
       (order.counterpart.identifier as IBAN).iban
     } at ${currentDate}`
-  }
-
-  async getChain() {
-    const chainId = await this.#safeSdk.getChainId()
-
-    switch (chainId) {
-      case 1:
-      case 5:
-        return Chain.ethereum
-      case 100:
-      case 10200:
-        return Chain.gnosis
-      case 137:
-      case 80001:
-        return Chain.polygon
-      default:
-        throw new Error(`Chain not supported: ${chainId}`)
-    }
-  }
-
-  async getNetwork() {
-    const chainId = await this.#safeSdk.getChainId()
-
-    switch (chainId) {
-      case 1:
-      case 100:
-      case 137:
-        return Network.mainnet
-      case 5:
-        return Network.goerli
-      case 10200:
-        return Network.chiado
-      case 80001:
-        return Network.mumbai
-      default:
-        throw new Error(`Network not supported: ${chainId}`)
-    }
-  }
-
-  async getTransactionServiceUrl() {
-    const chainId = await this.#safeSdk.getChainId()
-
-    switch (chainId) {
-      case 1:
-        return 'https://safe-transaction-mainnet.safe.global'
-      case 5:
-        return 'https://safe-transaction-goerli.safe.global'
-      case 100:
-        return 'https://safe-transaction-gnosis.safe.global'
-      case 137:
-        return 'https://safe-transaction-polygon.safe.global'
-      default:
-        throw new Error(`Chain not supported: ${chainId}`)
-    }
   }
 }

@@ -1,17 +1,18 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { AuthContext, Currency, PaymentStandard } from '@monerium/sdk'
 import { Alert, Box, Button, TextField, Typography } from '@mui/material'
-import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+
 import { useAuth } from '../AuthContext'
+import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
 
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
   const [safeThreshold, setSafeThreshold] = useState<string>()
   const [counterpartIban, setCounterpartIban] = useState<string>('')
   const [moneriumClient, setMoneriumClient] = useState<SafeMoneriumClient>()
-  const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<MoneriumAdapter>>()
+  const [onRampKit, setOnRampKit] = useState<SafeOnRampKit<MoneriumAdapter>>()
   const { isLoggedIn, selectedSafe, provider: authProvider } = useAuth()
 
   useEffect(() => {
@@ -41,7 +42,7 @@ function Monerium() {
       const owners = await safeSdk.getOwners()
 
       setSafeThreshold(`${threshold}/${owners.length}`)
-      setOnRampClient(client)
+      setOnRampKit(client)
     })()
   }, [authProvider, selectedSafe])
 
@@ -50,12 +51,12 @@ function Monerium() {
     const refreshToken = localStorage.getItem('monerium_refresh_token')
 
     if (codeParam || refreshToken) startMoneriumFlow()
-  }, [onRampClient])
+  }, [onRampKit])
 
   const startMoneriumFlow = async () => {
-    if (!onRampClient) return
+    if (!onRampKit) return
 
-    const moneriumClient = await onRampClient.open({
+    const moneriumClient = await onRampKit.open({
       redirect_uri: 'http://localhost:3000/monerium',
       address: selectedSafe
     })
@@ -77,7 +78,7 @@ function Monerium() {
   }
 
   const closeMoneriumFlow = async () => {
-    onRampClient?.close()
+    onRampKit?.close()
     setAuthContext(undefined)
   }
 

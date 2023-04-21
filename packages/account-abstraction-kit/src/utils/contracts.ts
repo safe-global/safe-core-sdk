@@ -13,7 +13,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { BigNumberish, ethers, Signer } from 'ethers'
 
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+const ZERO_ADDRESS = `0x${'0'.repeat(40)}`
 
 export function encodeCreateProxyWithNonce(
   safeProxyFactoryContract: GnosisSafeProxyFactoryContract,

@@ -167,9 +167,6 @@ class Safe {
         ...this.#predictedSafe
       })
     }
-    if (!this.#contractManager.safeContract) {
-      throw new Error('Safe is not deployed')
-    }
 
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')

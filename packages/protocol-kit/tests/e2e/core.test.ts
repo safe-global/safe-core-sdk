@@ -14,7 +14,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
-describe.only('Safe Info', () => {
+describe('Safe Info', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()

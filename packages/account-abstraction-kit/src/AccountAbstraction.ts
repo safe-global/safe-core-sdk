@@ -2,17 +2,15 @@ import {
   AccountAbstractionConfig,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
-import {
-  encodeCreateProxyWithNonce,
-  getSafeInitializer
-} from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
   calculateProxyAddress,
+  encodeCreateProxyWithNonce,
   encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract,
+  getSafeInitializer,
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps
 } from '@safe-global/protocol-kit'
@@ -167,7 +165,7 @@ class AccountAbstraction {
       const initializer = await getSafeInitializer(
         this.#ethAdapter,
         this.#safeContract,
-        await this.getSignerAddress()
+        predictedSafe
       )
 
       const safeDeploymentTransaction: MetaTransactionData = {

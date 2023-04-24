@@ -11,7 +11,6 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import semverSatisfies from 'semver/functions/satisfies'
 import { SAFE_LAST_VERSION } from './contracts/config'
 import { getProxyFactoryContract } from './contracts/safeDeploymentContracts'
 import { calculateProxyAddress } from './contracts/utils'
@@ -161,9 +160,14 @@ class Safe {
    */
   async getAddress(): Promise<string> {
     if (this.#predictedSafe) {
-      const chainId = await this.#ethAdapter.getChainId()
       const safeVersion = await this.getContractVersion()
+      if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+        throw new Error(
+          'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+        )
+      }
 
+      const chainId = await this.#ethAdapter.getChainId()
       const safeProxyFactoryContract = await getProxyFactoryContract({
         ethAdapter: this.#ethAdapter,
         safeVersion,
@@ -244,7 +248,7 @@ class Safe {
     }
 
     if (this.#predictedSafe?.safeDeploymentConfig.safeVersion) {
-      return this.#predictedSafe.safeDeploymentConfig.safeVersion
+      return Promise.resolve(this.#predictedSafe.safeDeploymentConfig.safeVersion)
     }
 
     return Promise.resolve(SAFE_LAST_VERSION)
@@ -359,7 +363,7 @@ class Safe {
     options
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const safeVersion = await this.getContractVersion()
-    if (semverSatisfies(safeVersion, '<1.3.0') && this.#predictedSafe) {
+    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
       throw new Error(
         'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
       )

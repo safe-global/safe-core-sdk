@@ -129,24 +129,32 @@ class Safe {
       isL1SafeMasterCopy: isL1SafeMasterCopy || this.#contractManager.isL1SafeMasterCopy,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     }
+
+    // A new existing Safe is connected to the Signer
     if (safeAddress) {
       return await Safe.create({
         safeAddress,
         ...configProps
       })
     }
+
+    // A new predicted Safe is connected to the Signer
     if (predictedSafe) {
       return await Safe.create({
         predictedSafe,
         ...configProps
       })
     }
+
+    // The previous predicted Safe is connected to a new Signer
     if (this.#predictedSafe) {
       return await Safe.create({
         predictedSafe: this.#predictedSafe,
         ...configProps
       })
     }
+
+    // The previous existing Safe is connected to a new Signer
     return await Safe.create({
       safeAddress: await this.getAddress(),
       ...configProps

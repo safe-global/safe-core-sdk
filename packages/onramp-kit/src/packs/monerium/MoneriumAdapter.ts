@@ -1,5 +1,4 @@
 import { Currency } from '@monerium/sdk'
-
 import Safe from '@safe-global/protocol-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
@@ -37,10 +36,6 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
   async open(options: MoneriumOpenOptions): Promise<SafeMoneriumClient> {
     if (!this.#client) {
       throw new Error('Monerium client not initialized')
-    }
-
-    if (options.authCode && options.refreshToken) {
-      throw new Error('You can not provide both authCode and refreshToken')
     }
 
     try {
@@ -135,7 +130,7 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
         (account) => account.address === safeAddress
       )
 
-      if (!isSafeAddressLinked && safeAddress) {
+      if (!isSafeAddressLinked) {
         await this.#client.linkAddress(authContext.defaultProfile, {
           address: safeAddress,
           message: SIGNATURE_MESSAGE,

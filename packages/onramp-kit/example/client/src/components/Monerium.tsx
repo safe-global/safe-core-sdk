@@ -74,6 +74,7 @@ function Monerium() {
     console.log('Profile', profile)
     console.log('Balances', balances)
     console.log('Orders', orders)
+    console.log('Bearer Profile', moneriumClient.bearerProfile)
     console.groupEnd()
 
     if (moneriumClient.bearerProfile) {

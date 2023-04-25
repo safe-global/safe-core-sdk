@@ -124,9 +124,9 @@ describe('SafeProxyFactory', () => {
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '1' }
-      const PredictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const predictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
       await chai
-        .expect(safeFactory.predictSafeAddress(PredictedSafeProps))
+        .expect(safeFactory.predictSafeAddress(predictedSafeProps))
         .rejectedWith('Owner list must have at least one owner')
     })
 
@@ -139,9 +139,9 @@ describe('SafeProxyFactory', () => {
       const threshold = 0
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '1' }
-      const PredictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const predictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
       await chai
-        .expect(safeFactory.predictSafeAddress(PredictedSafeProps))
+        .expect(safeFactory.predictSafeAddress(predictedSafeProps))
         .rejectedWith('Threshold must be greater than or equal to 1')
     })
 
@@ -154,9 +154,9 @@ describe('SafeProxyFactory', () => {
       const threshold = 3
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '1' }
-      const PredictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const predictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
       await chai
-        .expect(safeFactory.predictSafeAddress(PredictedSafeProps))
+        .expect(safeFactory.predictSafeAddress(predictedSafeProps))
         .rejectedWith('Threshold must be lower than or equal to owners length')
     })
 
@@ -173,9 +173,9 @@ describe('SafeProxyFactory', () => {
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '-1' }
-      const PredictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const predictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
       await chai
-        .expect(safeFactory.predictSafeAddress(PredictedSafeProps))
+        .expect(safeFactory.predictSafeAddress(predictedSafeProps))
         .rejectedWith('saltNonce must be greater than or equal to 0')
     })
 
@@ -192,8 +192,8 @@ describe('SafeProxyFactory', () => {
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
-      const PredictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
-      const counterfactualSafeAddress = await safeFactory.predictSafeAddress(PredictedSafeProps)
+      const predictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
+      const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictedSafeProps)
       const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
       const safe = await safeFactory.deploySafe(deploySafeProps)
       chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
@@ -217,8 +217,8 @@ describe('SafeProxyFactory', () => {
         const threshold = 2
         const safeAccountConfig: SafeAccountConfig = { owners, threshold }
         const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
-        const PredictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
-        const counterfactualSafeAddress = await safeFactory.predictSafeAddress(PredictedSafeProps)
+        const predictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
+        const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictedSafeProps)
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
         const safe = await safeFactory.deploySafe(deploySafeProps)
         chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
@@ -247,8 +247,8 @@ describe('SafeProxyFactory', () => {
           fallbackHandler: defaultCallbackHandler.address
         }
         const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce: '12345' }
-        const PredictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
-        const counterfactualSafeAddress = await safeFactory.predictSafeAddress(PredictedSafeProps)
+        const predictedSafeProps: PredictedSafeProps = { safeAccountConfig, safeDeploymentConfig }
+        const counterfactualSafeAddress = await safeFactory.predictSafeAddress(predictedSafeProps)
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, safeDeploymentConfig }
         const safe = await safeFactory.deploySafe(deploySafeProps)
         chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())

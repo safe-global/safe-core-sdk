@@ -42,7 +42,7 @@ export class SafeAuthKit<TPack extends SafeAuthPack<TPack>> implements ISafeAuth
     config?: SafeAuthConfig
   ): Promise<SafeAuthKit<T>> {
     if (!pack) {
-      throw new Error('The adapter is not defined')
+      throw new Error('The pack is not defined')
     }
 
     await pack.init()

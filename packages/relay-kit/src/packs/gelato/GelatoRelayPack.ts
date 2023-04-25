@@ -19,9 +19,9 @@ import {
   GELATO_NATIVE_TOKEN_ADDRESS,
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
-import { RelayAdapter } from '@safe-global/relay-kit/types'
+import { RelayPack } from '@safe-global/relay-kit/types'
 
-export class GelatoRelayAdapter implements RelayAdapter {
+export class GelatoRelayPack implements RelayPack {
   #gelatoRelay: GelatoNetworkRelay
   #apiKey?: string
 

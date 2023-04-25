@@ -1,2 +1,2 @@
-export * from './packs/gelato/GelatoRelayAdapter'
+export * from './packs/gelato/GelatoRelayPack'
 export * from './types'

@@ -39,7 +39,7 @@ describe('Off-chain signatures', () => {
   })
 
   describe('signTransactionHash', async () => {
-    it('should sign a transaction hash with the current signer if Safe is not deployed', async () => {
+    it('should sign a transaction hash with the current signer if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -75,28 +75,57 @@ describe('Off-chain signatures', () => {
   })
 
   describe('signTransaction', async () => {
-    it('should fail if the Safe is not deployed', async () => {
-      const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
-      const account3 = accounts[2]
-      const ethAdapter = await getEthAdapter(account3.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
-        predictedSafe,
-        contractNetworks
-      })
-      const safeSdk2 = await Safe.create({
-        ethAdapter,
-        safeAddress: safe.address,
-        contractNetworks
-      })
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: await safeSdk.getAddress(),
-        value: '0',
-        data: '0x'
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail if the Safe with version <v1.3.0 is not deployed',
+      async () => {
+        const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
+        const account3 = accounts[2]
+        const ethAdapter = await getEthAdapter(account3.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const safeSdkExistingSafe = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: await safeSdkExistingSafe.getAddress(),
+          value: '0',
+          data: '0x'
+        }
+        const tx = await safeSdkExistingSafe.createTransaction({ safeTransactionData })
+        await chai.expect(safeSdk.signTransaction(tx)).to.be.rejectedWith('Safe is not deployed')
       }
-      const tx = await safeSdk2.createTransaction({ safeTransactionData })
-      await chai.expect(safeSdk.signTransaction(tx)).to.be.rejectedWith('Safe is not deployed')
-    })
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should fail if the Safe with version >=v1.3.0 is not deployed',
+      async () => {
+        const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
+        const account3 = accounts[2]
+        const ethAdapter = await getEthAdapter(account3.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const safeSdkExistingSafe = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: await safeSdkExistingSafe.getAddress(),
+          value: '0',
+          data: '0x'
+        }
+        const tx = await safeSdkExistingSafe.createTransaction({ safeTransactionData })
+        await chai.expect(safeSdk.signTransaction(tx)).to.be.rejectedWith('Safe is not deployed')
+      }
+    )
 
     it('should fail if the signature is added by an account that is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()

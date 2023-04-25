@@ -9,20 +9,20 @@ import type {
   StripeOpenOptions,
   StripeSession
 } from './types'
-import type { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
+import type { SafeOnRampPack } from '@safe-global/onramp-kit/types'
 
 /**
  * This class implements the SafeOnRampClient interface for the Stripe provider
- * @class StripeAdapter
+ * @class StripePack
  */
-export class StripeAdapter implements SafeOnRampAdapter<StripeAdapter> {
+export class StripePack implements SafeOnRampPack<StripePack> {
   #element?: string
   #stripeOnRamp?: StripeOnramp
   #onRampSession?: OnrampSession
   #config: StripeProviderConfig
 
   /**
-   * Initialize the StripeAdapter
+   * Initialize the StripePack
    * @constructor
    * @param config The configuration object for the Stripe provider. Ideally we will put here things like api keys, secrets, urls, etc.
    */

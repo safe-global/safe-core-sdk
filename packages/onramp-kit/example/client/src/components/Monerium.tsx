@@ -5,7 +5,7 @@ import { Alert, Box, Button, TextField, Typography } from '@mui/material'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
 import { useAuth } from '../AuthContext'
-import { SafeOnRampKit, MoneriumAdapter, SafeMoneriumClient } from '../../../../src'
+import { SafeOnRampKit, MoneriumPack, SafeMoneriumClient } from '../../../../src'
 
 const MONERIUM_TOKEN = 'monerium_token'
 
@@ -14,7 +14,7 @@ function Monerium() {
   const [safeThreshold, setSafeThreshold] = useState<string>()
   const [counterpartIban, setCounterpartIban] = useState<string>('')
   const [moneriumClient, setMoneriumClient] = useState<SafeMoneriumClient>()
-  const [onRampKit, setOnRampKit] = useState<SafeOnRampKit<MoneriumAdapter>>()
+  const [onRampKit, setOnRampKit] = useState<SafeOnRampKit<MoneriumPack>>()
   const { isLoggedIn, selectedSafe, provider: authProvider } = useAuth()
 
   useEffect(() => {
@@ -33,7 +33,7 @@ function Monerium() {
       })
 
       const client = await SafeOnRampKit.init(
-        new MoneriumAdapter({
+        new MoneriumPack({
           clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
           environment: 'sandbox'
         }),

@@ -11,7 +11,7 @@ const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
 
 /**
  * This class implements the SafeOnRampClient interface for the Monerium provider
- * @class MoneriumAdapter
+ * @class MoneriumPack
  */
 export class MoneriumPack implements SafeOnRampAdapter<MoneriumPack> {
   #client?: SafeMoneriumClient

@@ -42,7 +42,7 @@
     "ethers": "^5.7.0"
   },
   "devDependencies": {
-    "@monerium/sdk": "^2.0.17",
+    "@monerium/sdk": "^2.1.23",
     "@stripe/crypto": "^0.0.2",
     "@stripe/stripe-js": "^1.48.0",
     "events": "^3.3.0",

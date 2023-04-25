@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import { MoneriumAdapter } from './packs/monerium/MoneriumAdapter'
+import { MoneriumPack } from './packs/monerium/MoneriumPack'
 import { SafeMoneriumClient } from './packs/monerium/SafeMoneriumClient'
 import { MoneriumOpenOptions } from './packs/monerium/types'
 import { StripeAdapter } from './packs/stripe/StripeAdapter'
@@ -34,12 +34,12 @@ export interface SafeOnRampAdapter<TAdapter> {
 //    never
 export type SafeOnRampOpenOptions<T> = T extends StripeAdapter
   ? StripeOpenOptions
-  : T extends MoneriumAdapter
+  : T extends MoneriumPack
   ? MoneriumOpenOptions
   : never
 export type SafeOnRampOpenResponse<T> = T extends StripeAdapter
   ? StripeSession
-  : T extends MoneriumAdapter
+  : T extends MoneriumPack
   ? SafeMoneriumClient
   : never
 export type SafeOnRampEvent<T> = T extends StripeAdapter ? StripeEvent : never

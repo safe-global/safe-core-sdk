@@ -1,13 +1,5 @@
 import { ethers } from 'ethers'
-import {
-  AuthContext,
-  Chain,
-  IBAN,
-  MoneriumClient,
-  Network,
-  NewOrder,
-  OrderKind
-} from '@monerium/sdk'
+import { Chain, IBAN, MoneriumClient, Network, NewOrder, OrderKind } from '@monerium/sdk'
 
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
@@ -81,14 +73,11 @@ export class SafeMoneriumClient extends MoneriumClient {
 
   async signMessage(safeAddress: string, message: string) {
     try {
-      const chainId = await this.#safeSdk.getChainId()
-
       const safeVersion = await this.#safeSdk.getContractVersion()
 
       const signMessageContract = await getSignMessageLibContract({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        chainId
+        safeVersion
       })
 
       const txData = signMessageContract.encode('signMessage', [ethers.utils.hashMessage(message)])

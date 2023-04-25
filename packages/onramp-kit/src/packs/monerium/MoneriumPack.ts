@@ -13,7 +13,7 @@ const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
  * This class implements the SafeOnRampClient interface for the Monerium provider
  * @class MoneriumAdapter
  */
-export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
+export class MoneriumPack implements SafeOnRampAdapter<MoneriumPack> {
   #client?: SafeMoneriumClient
   #config: MoneriumProviderConfig
 
@@ -135,7 +135,6 @@ export class MoneriumAdapter implements SafeOnRampAdapter<MoneriumAdapter> {
           address: safeAddress,
           message: SIGNATURE_MESSAGE,
           signature: '0x',
-          // @ts-expect-error - network and chain are not defined in the type and mandatory for multisig (signature 0x)
           network: await this.#client.getNetwork(),
           chain: await this.#client.getChain(),
           accounts: [

@@ -1624,10 +1624,10 @@
   resolved "https://registry.npmjs.org/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
-"@monerium/sdk@^2.0.17":
-  version "2.0.17"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.0.17.tgz#a796c0c443b89aa42b27be49125194124224491b"
-  integrity sha512-CtEY5HvhSFzw9LB3Mt/LyWxLI683YkapjuwvmY9CQ4saBLR7JmjNedfIUBpeUqz2QtQVNobpfWzQr69MgePo4A==
+"@monerium/sdk@^2.1.23":
+  version "2.1.23"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.1.23.tgz#64ddc06dc63d966c7e72155d58eb9c943d467a52"
+  integrity sha512-IkVM985PqAVapXRFoOYYb6INz1jH7JQ4hNt3qaa+ayR5IhO2PzHsbyTmpQsjxjfMZO5AOkGo6trWS4puowrwSg==
 
 "@morgan-stanley/ts-mocking-bird@^0.6.2":
   version "0.6.4"

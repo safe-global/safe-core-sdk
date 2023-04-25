@@ -14,7 +14,7 @@ import AppBar from './AppBar'
 import {
   SafeAuthKit,
   SafeAuthSignInData,
-  Web3AuthAdapter,
+  Web3AuthModalPack,
   Web3AuthEventListener
 } from '../../src/index'
 
@@ -25,7 +25,7 @@ function App() {
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData | null>(
     null
   )
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthAdapter>>()
+  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
 
   useEffect(() => {
@@ -68,9 +68,9 @@ function App() {
         }
       })
 
-      const adapter = new Web3AuthAdapter(options, [openloginAdapter], modalConfig)
+      const web3AuthModalPack = new Web3AuthModalPack(options, [openloginAdapter], modalConfig)
 
-      const safeAuthKit = await SafeAuthKit.init(adapter, {
+      const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack, {
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 

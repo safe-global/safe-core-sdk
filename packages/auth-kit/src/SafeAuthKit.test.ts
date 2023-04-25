@@ -2,7 +2,7 @@ import { ADAPTER_EVENTS, CHAIN_NAMESPACES } from '@web3auth/base'
 import * as web3AuthModal from '@web3auth/modal'
 import { Web3AuthOptions } from '@web3auth/modal'
 import { SafeAuthKit } from './SafeAuthKit'
-import { Web3AuthAdapter } from './packs/web3auth/Web3AuthAdapter'
+import { Web3AuthModalPack } from './packs/web3auth/Web3AuthModalPack'
 
 import { generateTestingUtils } from 'eth-testing'
 import EventEmitter from 'events'
@@ -63,21 +63,21 @@ const config: Web3AuthOptions = {
 }
 
 describe('SafeAuthKit', () => {
-  let adapter: Web3AuthAdapter
+  let web3AuthModalPack: Web3AuthModalPack
 
   beforeEach(() => {
-    adapter = new Web3AuthAdapter(config)
+    web3AuthModalPack = new Web3AuthModalPack(config)
   })
 
   it('should create a SafeAuthKit instance', async () => {
-    const safeAuthKit = await SafeAuthKit.init(adapter)
+    const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack)
 
     expect(safeAuthKit).toBeInstanceOf(SafeAuthKit)
     expect(safeAuthKit?.safeAuthData).toBeUndefined()
   })
 
   it('should clean the auth data when signing out', async () => {
-    const safeAuthKit = await SafeAuthKit.init(adapter)
+    const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack)
 
     testingUtils.lowLevel.mockRequest('eth_accounts', [
       '0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'
@@ -90,13 +90,13 @@ describe('SafeAuthKit', () => {
   })
 
   it('should allow to get the provider', async () => {
-    const safeAuthKit = await SafeAuthKit.init(adapter)
+    const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack)
 
     expect(safeAuthKit?.getProvider()).toBe(mockProvider)
   })
 
   it('should allow to subscribe to events', async () => {
-    const safeAuthKit = await SafeAuthKit.init(adapter)
+    const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack)
     const signedIn = jest.fn()
     const signedOut = jest.fn()
 
@@ -117,7 +117,7 @@ describe('SafeAuthKit', () => {
   })
 
   it('should allow to unsubscribe to events', async () => {
-    const safeAuthKit = await SafeAuthKit.init(adapter)
+    const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack)
     const signedIn = jest.fn()
     const signedOut = jest.fn()
 
@@ -139,7 +139,7 @@ describe('SafeAuthKit', () => {
     expect(signedOut).toHaveBeenCalledTimes(0)
   })
 
-  describe('using the Web3AuthAdapter', () => {
+  describe('using the Web3AuthModalPack', () => {
     const MockedWeb3Auth = jest.mocked(web3AuthModal.Web3Auth)
 
     beforeEach(() => {
@@ -150,7 +150,7 @@ describe('SafeAuthKit', () => {
     })
 
     it('should call the initModal method after create a Web3Auth instance', async () => {
-      await SafeAuthKit.init(adapter)
+      await SafeAuthKit.init(web3AuthModalPack)
 
       expect(MockedWeb3Auth).toHaveBeenCalledTimes(1)
       expect(mockInitModal).toHaveBeenCalledTimes(1)
@@ -158,7 +158,7 @@ describe('SafeAuthKit', () => {
     })
 
     it('should return the associated eoa when the user is signed in', async () => {
-      const safeAuthKit = await SafeAuthKit.init(adapter)
+      const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack)
 
       testingUtils.lowLevel.mockRequest('eth_accounts', [
         '0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'
@@ -175,7 +175,7 @@ describe('SafeAuthKit', () => {
 
   describe('when adding the txServiceUrl to the config', () => {
     it('should return the associated eoa and safes when the user is signed in', async () => {
-      const safeAuthKit = await SafeAuthKit.init(adapter, {
+      const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack, {
         txServiceUrl: 'https://safe-transaction.safe.global'
       })
 

@@ -21,30 +21,30 @@ const config = {
 jest.mock('./packs/stripe/StripePack')
 
 describe('SafeOnRampKit', () => {
-  let stripePack: stripePack.StripePack
+  let pack: stripePack.StripePack
 
   beforeEach(() => {
     jest.clearAllMocks()
     jest.restoreAllMocks()
 
-    stripePack = new stripePack.StripePack(config)
+    pack = new stripePack.StripePack(config)
   })
 
   it('should create a SafeOnRampKit instance when using the init() method', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(stripePack)
+    const safeOnRampKit = await SafeOnRampKit.init(pack)
 
     expect(safeOnRampKit).toBeInstanceOf(SafeOnRampKit)
   })
 
   it('should create a XXXPack instance using the provider config and call the init() method in the instance', async () => {
-    await SafeOnRampKit.init(stripePack)
+    await SafeOnRampKit.init(pack)
 
     expect(stripePack.StripePack).toHaveBeenCalledWith(expect.objectContaining(config))
     expect(stripePack.StripePack.prototype.init).toHaveBeenCalledWith()
   })
 
   it('should call the open method in the XXXPack with the corresponding options', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(stripePack)
+    const safeOnRampKit = await SafeOnRampKit.init(pack)
 
     safeOnRampKit.open(openOptions)
 
@@ -54,7 +54,7 @@ describe('SafeOnRampKit', () => {
   })
 
   it('should call the close method in the XXXPack', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(stripePack)
+    const safeOnRampKit = await SafeOnRampKit.init(pack)
 
     safeOnRampKit.close()
 

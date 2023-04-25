@@ -28,7 +28,9 @@ export class SafeOnRampKit<TPack extends SafeOnRampPack<TPack>> {
    * @returns A SafeOnRampKit instance
    * @throws Error if the pack is not defined
    */
-  static async init<TPack extends SafeOnRampPack<T>>(pack: TPack): Promise<SafeOnRampKit<TPack>> {
+  static async init<TPack extends SafeOnRampPack<TPack>>(
+    pack: TPack
+  ): Promise<SafeOnRampKit<TPack>> {
     if (!pack) {
       throw new Error('The pack is not defined')
     }

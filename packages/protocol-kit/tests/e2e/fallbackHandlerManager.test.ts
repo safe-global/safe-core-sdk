@@ -97,6 +97,44 @@ describe('Fallback handler manager', () => {
   })
 
   describe('createEnableFallbackHandlerTx', async () => {
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail if the Safe with version <v1.3.0 is not deployed',
+      async () => {
+        const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
+          await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+        await chai
+          .expect(tx)
+          .to.be.rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
+      }
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should fail if the Safe with version >=v1.3.0 is not deployed',
+      async () => {
+        const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
+          await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+        await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+      }
+    )
+
     itif(safeVersionDeployed < '1.1.1')(
       'should fail if enabling a fallback handler is not supported',
       async () => {
@@ -116,20 +154,6 @@ describe('Fallback handler manager', () => {
           )
       }
     )
-
-    itif(safeVersionDeployed >= '1.1.1')('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
-        await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
-        predictedSafe,
-        contractNetworks
-      })
-      const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
-      await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
-    })
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
@@ -228,6 +252,43 @@ describe('Fallback handler manager', () => {
   })
 
   describe('createDisableFallbackHandlerTx', async () => {
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail if the Safe with version <v1.3.0 is not deployed',
+      async () => {
+        const { predictedSafe, accounts, contractNetworks } = await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const tx = safeSdk.createDisableFallbackHandlerTx()
+        await chai
+          .expect(tx)
+          .to.be.rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
+      }
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should fail if the Safe with version >=v1.3.0 is not deployed',
+      async () => {
+        const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
+          await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const tx = safeSdk.createDisableFallbackHandlerTx(defaultCallbackHandler.address)
+        await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+      }
+    )
+
     itif(safeVersionDeployed < '1.1.1')(
       'should fail if disabling a fallback handler is not supported',
       async () => {
@@ -248,19 +309,6 @@ describe('Fallback handler manager', () => {
           )
       }
     )
-
-    itif(safeVersionDeployed >= '1.1.1')('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
-        predictedSafe,
-        contractNetworks
-      })
-      const tx = safeSdk.createDisableFallbackHandlerTx()
-      await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
-    })
 
     itif(safeVersionDeployed >= '1.1.1')(
       'should fail if no fallback handler is enabled',

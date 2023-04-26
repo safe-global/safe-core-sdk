@@ -29,16 +29,20 @@ describe('getSafeInfo', () => {
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
-  it('should return an empty array if the safeTxHash is not found', async () => {
+  it('should return the Safe info if the address is correct', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const safeInfoResponse = await safeApiKit.getSafeInfo(safeAddress)
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
+    chai.expect(safeInfoResponse.nonce).to.be.a('number')
+    chai.expect(safeInfoResponse.threshold).to.be.a('number')
   })
 
-  it('should return an empty array if the safeTxHash is not found EIP-3770', async () => {
+  it('should return the Safe info if EIP-3770 address is correct', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeInfoResponse = await safeApiKit.getSafeInfo(eip3770SafeAddress)
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
+    chai.expect(safeInfoResponse.nonce).to.be.a('number')
+    chai.expect(safeInfoResponse.threshold).to.be.a('number')
   })
 })

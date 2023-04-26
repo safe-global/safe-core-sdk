@@ -38,6 +38,7 @@ export type SafeInfoResponse = {
   readonly masterCopy: string
   readonly modules: string[]
   readonly fallbackHandler: string
+  readonly guard: string
   readonly version: string
 }
 
@@ -190,7 +191,7 @@ export type TokenInfoListResponse = {
   readonly count: number
   readonly next?: string
   readonly previous?: string
-  readonly results: TokenInfoListResponse[]
+  readonly results: TokenInfoResponse[]
 }
 
 export type TransferWithTokenInfoResponse = TransferResponse & {

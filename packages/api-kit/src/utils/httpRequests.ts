@@ -9,7 +9,7 @@ export enum HttpMethod {
 interface HttpRequest {
   url: string
   method: HttpMethod
-  body?: Object
+  body?: any
 }
 
 export async function sendRequest<T>({ url, method, body }: HttpRequest): Promise<T> {

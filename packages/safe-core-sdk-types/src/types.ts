@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { ContractTransaction } from '@ethersproject/contracts'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
@@ -21,29 +20,29 @@ export interface SafeSetupConfig {
 }
 
 export interface MetaTransactionData {
-  readonly to: string
-  readonly value: string
-  readonly data: string
-  readonly operation?: OperationType
+  to: string
+  value: string
+  data: string
+  operation?: OperationType
 }
 
 export interface SafeTransactionData extends MetaTransactionData {
-  readonly operation: OperationType
-  readonly safeTxGas: number
-  readonly baseGas: number
-  readonly gasPrice: number
-  readonly gasToken: string
-  readonly refundReceiver: string
-  readonly nonce: number
+  operation: OperationType
+  safeTxGas: string
+  baseGas: string
+  gasPrice: string
+  gasToken: string
+  refundReceiver: string
+  nonce: number
 }
 
 export interface SafeTransactionDataPartial extends MetaTransactionData {
-  readonly safeTxGas?: number
-  readonly baseGas?: number
-  readonly gasPrice?: number
-  readonly gasToken?: string
-  readonly refundReceiver?: string
-  readonly nonce?: number
+  safeTxGas?: string
+  baseGas?: string
+  gasPrice?: string
+  gasToken?: string
+  refundReceiver?: string
+  nonce?: number
 }
 
 export interface SafeSignature {
@@ -67,7 +66,7 @@ export interface TransactionOptions {
   gasPrice?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
-  nonce?: number | string
+  nonce?: number
 }
 
 export interface BaseTransactionResult {
@@ -115,9 +114,9 @@ export interface GenerateTypedData {
     value: string
     data: string
     operation: OperationType
-    safeTxGas: number
-    baseGas: number
-    gasPrice: number
+    safeTxGas: string
+    baseGas: string
+    gasPrice: string
     gasToken: string
     refundReceiver: string
     nonce: number
@@ -163,11 +162,12 @@ export type SafeMultisigTransactionResponse = {
   readonly isSuccessful?: boolean
   readonly ethGasPrice?: string
   readonly gasUsed?: number
-  readonly fee?: number
+  readonly fee?: string
   readonly origin: string
   readonly dataDecoded?: string
   readonly confirmationsRequired: number
   readonly confirmations?: SafeMultisigConfirmationResponse[]
+  readonly trusted: boolean
   readonly signatures?: string
 }
 
@@ -179,7 +179,7 @@ export interface RelayTransaction {
 }
 
 export interface MetaTransactionOptions {
-  gasLimit: BigNumber
+  gasLimit: string
   gasToken?: string
   isSponsored?: boolean
 }

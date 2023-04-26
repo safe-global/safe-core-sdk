@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { MetaTransactionData, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -14,6 +15,15 @@ import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
+
+const BASE_OPTIONS: SafeTransactionOptionalProps = {
+  baseGas: '111',
+  gasPrice: '222',
+  gasToken: '0x333',
+  refundReceiver: '0x444',
+  nonce: 555,
+  safeTxGas: '666'
+}
 
 describe('Transactions creation', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
@@ -53,7 +63,7 @@ describe('Transactions creation', () => {
           ethAdapter,
           txDataPartial
         )
-        chai.expect(safeTxData.safeTxGas).to.be.eq(0)
+        chai.expect(safeTxData.safeTxGas).to.be.eq('0')
       }
     )
 
@@ -73,14 +83,14 @@ describe('Transactions creation', () => {
           to: account2.address,
           value: '0',
           data: '0x',
-          gasPrice: 123
+          gasPrice: '123'
         }
         const safeTxData = await standardizeSafeTransactionData(
           safeSdk.getContractManager().safeContract,
           ethAdapter,
           txDataPartial
         )
-        chai.expect(safeTxData.safeTxGas).to.be.gt(0)
+        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
     )
 
@@ -96,7 +106,7 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = 111
+        const safeTxGas = '111'
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
@@ -134,7 +144,7 @@ describe('Transactions creation', () => {
           ethAdapter,
           txDataPartial
         )
-        chai.expect(safeTxData.safeTxGas).to.be.gt(0)
+        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
     )
 
@@ -150,7 +160,7 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = 0
+        const safeTxGas = '0'
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
@@ -178,7 +188,7 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = 111
+        const safeTxGas = '111'
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
@@ -210,23 +220,18 @@ describe('Transactions creation', () => {
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x',
-        baseGas: 111,
-        gasPrice: 0,
-        gasToken: '0x333',
-        refundReceiver: '0x444',
-        nonce: 555,
-        safeTxGas: 666
+        ...BASE_OPTIONS
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)
       chai.expect(tx.data.value).to.be.eq('500000000000000000')
       chai.expect(tx.data.data).to.be.eq('0x')
-      chai.expect(tx.data.baseGas).to.be.eq(111)
-      chai.expect(tx.data.gasPrice).to.be.eq(0)
-      chai.expect(tx.data.gasToken).to.be.eq('0x333')
-      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
-      chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+      chai.expect(tx.data.baseGas).to.be.eq(BASE_OPTIONS.baseGas)
+      chai.expect(tx.data.gasPrice).to.be.eq(BASE_OPTIONS.gasPrice)
+      chai.expect(tx.data.gasToken).to.be.eq(BASE_OPTIONS.gasToken)
+      chai.expect(tx.data.refundReceiver).to.be.eq(BASE_OPTIONS.refundReceiver)
+      chai.expect(tx.data.nonce).to.be.eq(BASE_OPTIONS.nonce)
+      chai.expect(tx.data.safeTxGas).to.be.eq(BASE_OPTIONS.safeTxGas)
     })
 
     it('should create a single transaction with gasPrice>0', async () => {
@@ -243,23 +248,18 @@ describe('Transactions creation', () => {
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x',
-        baseGas: 111,
-        gasPrice: 222,
-        gasToken: '0x333',
-        refundReceiver: '0x444',
-        nonce: 555,
-        safeTxGas: 666
+        ...BASE_OPTIONS
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)
       chai.expect(tx.data.value).to.be.eq('500000000000000000')
       chai.expect(tx.data.data).to.be.eq('0x')
-      chai.expect(tx.data.baseGas).to.be.eq(111)
-      chai.expect(tx.data.gasPrice).to.be.eq(222)
-      chai.expect(tx.data.gasToken).to.be.eq('0x333')
-      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
-      chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+      chai.expect(tx.data.baseGas).to.be.eq(BASE_OPTIONS.baseGas)
+      chai.expect(tx.data.gasPrice).to.be.eq(BASE_OPTIONS.gasPrice)
+      chai.expect(tx.data.gasToken).to.be.eq(BASE_OPTIONS.gasToken)
+      chai.expect(tx.data.refundReceiver).to.be.eq(BASE_OPTIONS.refundReceiver)
+      chai.expect(tx.data.nonce).to.be.eq(BASE_OPTIONS.nonce)
+      chai.expect(tx.data.safeTxGas).to.be.eq(BASE_OPTIONS.safeTxGas)
     })
 
     it('should create a single transaction when passing a transaction array with length=1', async () => {
@@ -302,24 +302,17 @@ describe('Transactions creation', () => {
           data: '0x'
         }
       ]
-      const options: SafeTransactionOptionalProps = {
-        baseGas: 111,
-        gasPrice: 222,
-        gasToken: '0x333',
-        refundReceiver: '0x444',
-        nonce: 555,
-        safeTxGas: 666
-      }
+      const options: SafeTransactionOptionalProps = BASE_OPTIONS
       const tx = await safeSdk.createTransaction({ safeTransactionData, options })
       chai.expect(tx.data.to).to.be.eq(account2.address)
       chai.expect(tx.data.value).to.be.eq('500000000000000000')
       chai.expect(tx.data.data).to.be.eq('0x')
-      chai.expect(tx.data.baseGas).to.be.eq(111)
-      chai.expect(tx.data.gasPrice).to.be.eq(222)
-      chai.expect(tx.data.gasToken).to.be.eq('0x333')
-      chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
-      chai.expect(tx.data.nonce).to.be.eq(555)
-      chai.expect(tx.data.safeTxGas).to.be.eq(666)
+      chai.expect(tx.data.baseGas).to.be.eq(BASE_OPTIONS.baseGas)
+      chai.expect(tx.data.gasPrice).to.be.eq(BASE_OPTIONS.gasPrice)
+      chai.expect(tx.data.gasToken).to.be.eq(BASE_OPTIONS.gasToken)
+      chai.expect(tx.data.refundReceiver).to.be.eq(BASE_OPTIONS.refundReceiver)
+      chai.expect(tx.data.nonce).to.be.eq(BASE_OPTIONS.nonce)
+      chai.expect(tx.data.safeTxGas).to.be.eq(BASE_OPTIONS.safeTxGas)
     })
 
     it('should fail when creating a MultiSend transaction passing a transaction array with length=0', async () => {
@@ -379,14 +372,8 @@ describe('Transactions creation', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      const options: SafeTransactionOptionalProps = {
-        baseGas: 111,
-        gasPrice: 222,
-        gasToken: '0x333',
-        refundReceiver: '0x444',
-        nonce: 555,
-        safeTxGas: 666
-      }
+      const options: SafeTransactionOptionalProps = BASE_OPTIONS
+
       const safeTransactionData: MetaTransactionData[] = [
         {
           to: erc20Mintable.address,
@@ -408,12 +395,12 @@ describe('Transactions creation', () => {
       const multiSendTx = await safeSdk.createTransaction({ safeTransactionData, options })
       chai.expect(multiSendTx.data.to).to.be.eq(contractNetworks[chainId].multiSendAddress)
       chai.expect(multiSendTx.data.value).to.be.eq('0')
-      chai.expect(multiSendTx.data.baseGas).to.be.eq(111)
-      chai.expect(multiSendTx.data.gasPrice).to.be.eq(222)
-      chai.expect(multiSendTx.data.gasToken).to.be.eq('0x333')
-      chai.expect(multiSendTx.data.refundReceiver).to.be.eq('0x444')
-      chai.expect(multiSendTx.data.nonce).to.be.eq(555)
-      chai.expect(multiSendTx.data.safeTxGas).to.be.eq(666)
+      chai.expect(multiSendTx.data.baseGas).to.be.eq(BASE_OPTIONS.baseGas)
+      chai.expect(multiSendTx.data.gasPrice).to.be.eq(BASE_OPTIONS.gasPrice)
+      chai.expect(multiSendTx.data.gasToken).to.be.eq(BASE_OPTIONS.gasToken)
+      chai.expect(multiSendTx.data.refundReceiver).to.be.eq(BASE_OPTIONS.refundReceiver)
+      chai.expect(multiSendTx.data.nonce).to.be.eq(BASE_OPTIONS.nonce)
+      chai.expect(multiSendTx.data.safeTxGas).to.be.eq(BASE_OPTIONS.safeTxGas)
     })
   })
 })

@@ -180,14 +180,10 @@ abstract class GnosisSafeContractWeb3 implements GnosisSafeContract {
     methodName: string,
     params: any[],
     options: Web3TransactionOptions
-  ): Promise<number> {
-    try {
-      return Number(
-        await (this.contract.methods as any)[methodName](...params).estimateGas(options)
-      )
-    } catch (error) {
-      return Promise.reject(error)
-    }
+  ): Promise<string> {
+    return (
+      await (this.contract.methods as any)[methodName](...params).estimateGas(options)
+    ).toString()
   }
 }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
-import { AuthContext, Currency, PaymentStandard } from '@monerium/sdk'
+import { AuthContext, Currency, OrderState, PaymentStandard } from '@monerium/sdk'
 import { Alert, Box, Button, TextField, Typography } from '@mui/material'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
@@ -39,6 +39,14 @@ function Monerium() {
         }),
         safeSdk
       )
+
+      client.subscribe(OrderState.placed, (notification) => {
+        console.log('Order placed', notification)
+      })
+
+      client.subscribe(OrderState.processed, (notification) => {
+        console.log('Order processed', notification)
+      })
 
       const threshold = await safeSdk.getThreshold()
       const owners = await safeSdk.getOwners()

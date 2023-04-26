@@ -13,12 +13,12 @@ export const connectToOrderNotifications = ({
   const socket = new WebSocket(socketUrl)
 
   socket.addEventListener('open', () => {
-    console.info(`Connected to ${socketUrl}`)
+    console.info(`Socket connected: ${socketUrl}`)
   })
 
   socket.addEventListener('error', (event) => {
     console.error(event)
-    throw new Error(`Websocket error: ${socketUrl}`)
+    throw new Error(`Socket error: ${socketUrl}`)
   })
 
   socket.addEventListener('message', (event) => {
@@ -28,7 +28,7 @@ export const connectToOrderNotifications = ({
   })
 
   socket.addEventListener('close', () => {
-    console.info(`Socket connection to ${socketUrl} closed`)
+    console.info(`Socket connection closed: ${socketUrl}`)
   })
 
   return socket

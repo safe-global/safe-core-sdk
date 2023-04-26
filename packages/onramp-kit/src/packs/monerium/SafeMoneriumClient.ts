@@ -18,6 +18,11 @@ export class SafeMoneriumClient extends MoneriumClient {
   #safeSdk: Safe
   #ethAdapter: EthAdapter
 
+  /**
+   * Constructor where the Monerium environment and the Protocol kit instance are set
+   * @param environment The Monerium environment
+   * @param safeSdk The Protocol kit instance
+   */
   constructor(environment: 'production' | 'sandbox', safeSdk: Safe) {
     super(environment)
 
@@ -25,10 +30,18 @@ export class SafeMoneriumClient extends MoneriumClient {
     this.#ethAdapter = safeSdk.getEthAdapter()
   }
 
+  /**
+   * We get the Safe address using the Protocol kit instance
+   * @returns The Safe address
+   */
   async getSafeAddress(): Promise<string> {
     return this.#safeSdk.getAddress()
   }
 
+  /**
+   * Allow to make transactions using the Monerium SDK
+   * @param order The order to be placed
+   */
   async send(order: SafeMoneriumOrder) {
     const newOrder = await this.#createOrder(order)
 
@@ -41,12 +54,24 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
+  /**
+   * Check if the message is signed in the smart contract
+   * @param safeAddress The Safe address
+   * @param message The message to be signed
+   * @returns A boolean indicating if the message is signed
+   */
   async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
     const messageHash = ethers.utils.hashMessage(message)
     const messageHashSigned = await this.#isValidSignature(safeAddress, messageHash)
     return messageHashSigned
   }
 
+  /**
+   * Check if the message is pending (multi owner or not executed) using the Transaction Service
+   * @param safeAddress The Safe address
+   * @param message The message to be signed
+   * @returns A boolean indicating if the message is signed
+   */
   async isSignMessagePending(safeAddress: string, message: string): Promise<boolean> {
     const apiKit = new SafeApiKit({
       txServiceUrl: await this.getTransactionServiceUrl(),
@@ -71,6 +96,11 @@ export class SafeMoneriumClient extends MoneriumClient {
     return isMessagePending
   }
 
+  /**
+   * Sign a message using the Safe SDK
+   * @param safeAddress The Safe address
+   * @param message The message to be signed
+   */
   async signMessage(safeAddress: string, message: string) {
     try {
       const safeVersion = await this.#safeSdk.getContractVersion()
@@ -119,6 +149,10 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
+  /**
+   * Get the corresponding Monerium SDK Chain from the current chain id
+   * @returns The Chain
+   */
   async getChain() {
     const chainId = await this.#safeSdk.getChainId()
 
@@ -137,6 +171,10 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
+  /**
+   * Get the corresponding Monerium SDK Network from the current chain id
+   * @returns The Network
+   */
   async getNetwork() {
     const chainId = await this.#safeSdk.getChainId()
 
@@ -156,6 +194,10 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
+  /**
+   * Get the corresponding transaction service url from the current chain id
+   * @returns The Transaction Service URL
+   */
   async getTransactionServiceUrl() {
     const chainId = await this.#safeSdk.getChainId()
 
@@ -173,6 +215,12 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
+  /**
+   * Check if the message signature is valid using the fallback handler Smart Contract
+   * @param safeAddress The Safe address
+   * @param messageHash The message hash
+   * @returns A boolean indicating if the message is signed
+   */
   async #isValidSignature(safeAddress: string, messageHash: string): Promise<boolean> {
     try {
       const eip1271data = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [
@@ -211,6 +259,11 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
+  /**
+   * Create a valid order for the Monerium SDK
+   * @param order The order to be created
+   * @returns The Monerium type order
+   */
   async #createOrder(order: SafeMoneriumOrder): Promise<Promise<Promise<NewOrder>>> {
     return {
       kind: OrderKind.redeem,
@@ -227,6 +280,11 @@ export class SafeMoneriumClient extends MoneriumClient {
     }
   }
 
+  /**
+   * Format a valid message to be signed for executing a transaction
+   * @param order The order : ;
+   * @returns The message to be signed
+   */
   #getSendMessage(order: SafeMoneriumOrder) {
     const currentDate = new Date().toISOString()
 

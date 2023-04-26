@@ -30,7 +30,7 @@ const BASE_OPTIONS: SafeTransactionOptionalProps = {
   safeTxGas: '666'
 }
 
-describe.only('Transactions creation', () => {
+describe('Transactions creation', () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()

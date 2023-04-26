@@ -4,7 +4,13 @@ import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
 
 import { SafeMoneriumClient } from './SafeMoneriumClient'
-import { MoneriumOpenOptions, MoneriumProviderConfig } from './types'
+import {
+  MoneriumEvent,
+  MoneriumEventListener,
+  MoneriumOpenOptions,
+  MoneriumProviderConfig
+} from './types'
+import { connectToOrderNotifications } from './sockets'
 
 const MONERIUM_CODE_VERIFIER = 'OnRampKit__monerium_code_verifier'
 const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
@@ -16,6 +22,8 @@ const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
 export class MoneriumPack implements SafeOnRampAdapter<MoneriumPack> {
   #client?: SafeMoneriumClient
   #config: MoneriumProviderConfig
+  #socket?: WebSocket
+  #subscriptions: Map<MoneriumEvent, MoneriumEventListener> = new Map()
 
   constructor(config: MoneriumProviderConfig) {
     this.#config = config
@@ -49,6 +57,15 @@ export class MoneriumPack implements SafeOnRampAdapter<MoneriumPack> {
         } else {
           await this.#startAuthFlow(safeAddress, options.redirect_uri)
         }
+      }
+
+      if (this.#client.bearerProfile?.access_token && this.#subscriptions.size > 0) {
+        this.#socket = connectToOrderNotifications({
+          profile: this.#client.bearerProfile?.profile,
+          env: this.#config.environment,
+          accessToken: this.#client.bearerProfile?.access_token,
+          subscriptions: this.#subscriptions
+        })
       }
 
       return this.#client
@@ -153,14 +170,17 @@ export class MoneriumPack implements SafeOnRampAdapter<MoneriumPack> {
     localStorage.removeItem(MONERIUM_CODE_VERIFIER)
   }
 
-  subscribe(): void {
-    // TODO: Check websocket connection through Monerium API
-    throw new Error('Method not implemented.')
+  subscribe(event: MoneriumEvent, handler: MoneriumEventListener): void {
+    this.#subscriptions.set(event, handler)
   }
 
-  unsubscribe(): void {
-    // TODO: Check websocket connection through Monerium API
-    throw new Error('Method not implemented.')
+  unsubscribe(event: MoneriumEvent): void {
+    this.#subscriptions.delete(event)
+
+    if (this.#subscriptions.size === 0) {
+      this.#socket?.close()
+      this.#socket = undefined
+    }
   }
 
   #cleanQueryString() {

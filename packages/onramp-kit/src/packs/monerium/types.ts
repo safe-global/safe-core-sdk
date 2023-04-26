@@ -1,4 +1,5 @@
-import { Currency, Counterpart } from '@monerium/sdk'
+import { OrderState } from '@monerium/sdk'
+import { Currency, Counterpart, Order } from '@monerium/sdk'
 
 export interface MoneriumProviderConfig {
   clientId: string
@@ -23,10 +24,10 @@ export type MoneriumWebSocketOptions = {
   profile: string
   accessToken: string
   env: 'production' | 'sandbox'
-  onMessage: (message: MoneriumNotificationMessage) => void
+  subscriptions: Map<MoneriumEvent, MoneriumEventListener>
 }
 
-export type MoneriumNotificationMessage = {
+export type MoneriumNotification = {
   id: string
   profile: string
   accountId: string
@@ -54,3 +55,7 @@ export type MoneriumNotificationMessage = {
     sentAmount: string
   }
 }
+
+export type MoneriumEvent = OrderState
+
+export type MoneriumEventListener = (notification: MoneriumNotification) => void

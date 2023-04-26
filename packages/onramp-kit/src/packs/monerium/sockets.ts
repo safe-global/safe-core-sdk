@@ -1,10 +1,11 @@
-import { MoneriumWebSocketOptions } from './types'
+import { OrderState } from '@monerium/sdk'
+import { MoneriumNotification, MoneriumWebSocketOptions } from './types'
 
 export const connectToOrderNotifications = ({
   profile,
   accessToken,
   env,
-  onMessage
+  subscriptions
 }: MoneriumWebSocketOptions): WebSocket => {
   const baseUrl = env === 'production' ? 'wss://api.monerium.app' : 'wss://api.monerium.app'
   const socketUrl = `${baseUrl}/profile/${profile}/orders?access_token=${accessToken}`
@@ -21,7 +22,9 @@ export const connectToOrderNotifications = ({
   })
 
   socket.addEventListener('message', (event) => {
-    onMessage(event.data)
+    const notification = event.data as MoneriumNotification
+
+    subscriptions.get(notification.meta.state as OrderState)?.(notification)
   })
 
   socket.addEventListener('close', () => {

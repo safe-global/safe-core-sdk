@@ -27,7 +27,7 @@ import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFac
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
 import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
 import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
-import { isTypedDataSigner } from './utils'
+import { isSignerCompatible, isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
 
@@ -48,7 +48,7 @@ class EthersAdapter implements EthAdapter {
       throw new Error('ethers property missing from options')
     }
     this.#ethers = ethers
-    const isSigner = signerOrProvider instanceof Signer
+    const isSigner = isSignerCompatible(signerOrProvider)
     if (isSigner) {
       const signer = signerOrProvider as Signer
       if (!signer.provider) {

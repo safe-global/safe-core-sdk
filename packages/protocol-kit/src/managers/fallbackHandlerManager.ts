@@ -1,19 +1,19 @@
-import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
 import {
-  SAFE_FEATURES,
   hasSafeFeature,
   isZeroAddress,
+  SAFE_FEATURES,
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
 
 class FallbackHandlerManager {
   #ethAdapter: EthAdapter
-  #safeContract: GnosisSafeContract
+  #safeContract?: GnosisSafeContract
   // keccak256("fallback_manager.handler.address")
   #slot = '0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5'
 
-  constructor(ethAdapter: EthAdapter, safeContract: GnosisSafeContract) {
+  constructor(ethAdapter: EthAdapter, safeContract?: GnosisSafeContract) {
     this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }
@@ -41,6 +41,9 @@ class FallbackHandlerManager {
   }
 
   async getFallbackHandler(): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     const safeVersion = await this.#safeContract.getVersion()
     if (hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
       return this.#ethAdapter.getStorageAt(this.#safeContract.getAddress(), this.#slot)
@@ -52,6 +55,9 @@ class FallbackHandlerManager {
   }
 
   async encodeEnableFallbackHandlerData(fallbackHandlerAddress: string): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     this.validateFallbackHandlerAddress(fallbackHandlerAddress)
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
@@ -59,6 +65,9 @@ class FallbackHandlerManager {
   }
 
   async encodeDisableFallbackHandlerData(): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsEnabled(currentFallbackHandler)
     return this.#safeContract.encode('setFallbackHandler', [ZERO_ADDRESS])

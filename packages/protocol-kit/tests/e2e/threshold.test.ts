@@ -1,7 +1,11 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, {
+  PredictedSafeProps,
+  SafeTransactionOptionalProps
+} from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -16,14 +20,36 @@ describe('Safe Threshold', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [accounts[0].address],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        safeVersion: safeVersionDeployed
+      }
+    }
     return {
       safe: await getSafeWithOwners([accounts[0].address]),
       accounts,
-      contractNetworks
+      contractNetworks,
+      predictedSafe
     }
   })
 
   describe('getThreshold', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      chai.expect(safeSdk.getThreshold()).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should return the Safe threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -38,6 +64,21 @@ describe('Safe Threshold', () => {
   })
 
   describe('createChangeThresholdTx', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const newThreshold = 2
+      chai
+        .expect(safeSdk.createChangeThresholdTx(newThreshold))
+        .to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should fail if the threshold is bigger than the number of owners', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts

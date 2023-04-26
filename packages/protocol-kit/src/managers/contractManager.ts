@@ -4,58 +4,58 @@ import {
   getMultiSendContract,
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
-import { SafeConfig } from '@safe-global/protocol-kit/Safe'
-import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
+import { ContractNetworksConfig, SafeConfig } from '@safe-global/protocol-kit/types'
 import {
   GnosisSafeContract,
   MultiSendCallOnlyContract,
   MultiSendContract
 } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from 'packages/safe-core-sdk-types/dist/src/types'
+import { isSafeConfigWithPredictedSafe } from '../utils/types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeMasterCopy?: boolean
-  #safeContract!: GnosisSafeContract
+  #safeContract?: GnosisSafeContract
   #multiSendContract!: MultiSendContract
   #multiSendCallOnlyContract!: MultiSendCallOnlyContract
 
-  static async create({
-    ethAdapter,
-    safeAddress,
-    isL1SafeMasterCopy,
-    contractNetworks
-  }: SafeConfig): Promise<ContractManager> {
+  static async create(config: SafeConfig): Promise<ContractManager> {
     const contractManager = new ContractManager()
-    await contractManager.init({ ethAdapter, safeAddress, isL1SafeMasterCopy, contractNetworks })
+    await contractManager.init(config)
     return contractManager
   }
 
-  async init({
-    ethAdapter,
-    safeAddress,
-    isL1SafeMasterCopy,
-    contractNetworks
-  }: SafeConfig): Promise<void> {
+  async init(config: SafeConfig): Promise<void> {
+    const { ethAdapter, isL1SafeMasterCopy, contractNetworks } = config
+
     const chainId = await ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
     this.#contractNetworks = contractNetworks
     this.#isL1SafeMasterCopy = isL1SafeMasterCopy
 
-    const temporarySafeContract = await getSafeContract({
-      ethAdapter,
-      safeVersion: SAFE_LAST_VERSION,
-      isL1SafeMasterCopy,
-      customSafeAddress: safeAddress,
-      customContracts
-    })
-    const safeVersion = await temporarySafeContract.getVersion()
-    this.#safeContract = await getSafeContract({
-      ethAdapter,
-      safeVersion,
-      isL1SafeMasterCopy,
-      customSafeAddress: safeAddress,
-      customContracts
-    })
+    let safeVersion: SafeVersion
+
+    if (isSafeConfigWithPredictedSafe(config)) {
+      safeVersion = config.predictedSafe.safeDeploymentConfig.safeVersion ?? SAFE_LAST_VERSION
+    } else {
+      const temporarySafeContract = await getSafeContract({
+        ethAdapter,
+        safeVersion: SAFE_LAST_VERSION,
+        isL1SafeMasterCopy,
+        customSafeAddress: config.safeAddress,
+        customContracts
+      })
+      safeVersion = await temporarySafeContract.getVersion()
+      this.#safeContract = await getSafeContract({
+        ethAdapter,
+        safeVersion,
+        isL1SafeMasterCopy,
+        customSafeAddress: config.safeAddress,
+        customContracts
+      })
+    }
+
     this.#multiSendContract = await getMultiSendContract({
       ethAdapter,
       safeVersion,
@@ -76,7 +76,7 @@ class ContractManager {
     return this.#isL1SafeMasterCopy
   }
 
-  get safeContract(): GnosisSafeContract {
+  get safeContract(): GnosisSafeContract | undefined {
     return this.#safeContract
   }
 

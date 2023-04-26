@@ -1,8 +1,9 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -17,14 +18,39 @@ describe('On-chain signatures', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [accounts[0].address],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        safeVersion: safeVersionDeployed
+      }
+    }
     return {
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       accounts,
-      contractNetworks
+      contractNetworks,
+      predictedSafe
     }
   })
 
   describe('approveTransactionHash', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const hash = '0xcbf14050c5fcc9b71d4a3ab874cc728db101d19d4466d56fcdbb805117a28c64'
+      await chai
+        .expect(safeSdk1.approveTransactionHash(hash))
+        .to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
@@ -94,6 +120,20 @@ describe('On-chain signatures', () => {
   })
 
   describe('getOwnersWhoApprovedTx', async () => {
+    it('should fail if Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter: ethAdapter1,
+        predictedSafe,
+        contractNetworks
+      })
+      const txHash = '0xcbf14050c5fcc9b71d4a3ab874cc728db101d19d4466d56fcdbb805117a28c64'
+      const ownersWhoApproved = safeSdk1.getOwnersWhoApprovedTx(txHash)
+      chai.expect(ownersWhoApproved).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should return the list of owners who approved a transaction hash', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts

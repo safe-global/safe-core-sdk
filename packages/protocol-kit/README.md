@@ -74,7 +74,7 @@ The `deploySafe` method executes a transaction from the `owner1` account, deploy
 Call the `getAddress` method, for example, to check the address of the newly deployed Safe.
 
 ```js
-const newSafeAddress = safeSdk.getAddress()
+const newSafeAddress = await safeSdk.getAddress()
 ```
 
 To instantiate the Protocol Kit from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address.
@@ -379,7 +379,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 Returns the address of the current SafeProxy contract.
 
 ```js
-const safeAddress = safeSdk.getAddress()
+const safeAddress = await safeSdk.getAddress()
 ```
 
 ### getContractVersion

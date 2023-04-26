@@ -2,17 +2,17 @@ import {
   AccountAbstractionConfig,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
-import {
-  calculateChainSpecificProxyAddress,
-  encodeCreateProxyWithNonce,
-  getSafeInitializer
-} from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
+  calculateProxyAddress,
+  encodeCreateProxyWithNonce,
   encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
-  getSafeContract
+  getSafeContract,
+  getSafeInitializer,
+  PREDETERMINED_SALT_NONCE,
+  PredictedSafeProps
 } from '@safe-global/protocol-kit'
 import { RelayAdapter } from '@safe-global/relay-kit'
 import {
@@ -49,15 +49,25 @@ class AccountAbstraction {
     const { relayAdapter } = options
     this.setRelayAdapter(relayAdapter)
 
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [await this.getSignerAddress()],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        saltNonce: PREDETERMINED_SALT_NONCE
+      }
+    }
+
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter: this.#ethAdapter,
       safeVersion
     })
-    const safeAddress = await calculateChainSpecificProxyAddress(
+    const safeAddress = await calculateProxyAddress(
       this.#ethAdapter,
       safeVersion,
       this.#safeProxyFactoryContract,
-      this.#signer
+      predictedSafe
     )
     this.#safeContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
@@ -142,10 +152,20 @@ class AccountAbstraction {
         ethAdapter: this.#ethAdapter,
         safeVersion
       })
+
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig: {
+          owners: [await this.getSignerAddress()],
+          threshold: 1
+        },
+        safeDeploymentConfig: {
+          saltNonce: PREDETERMINED_SALT_NONCE
+        }
+      }
       const initializer = await getSafeInitializer(
         this.#ethAdapter,
         this.#safeContract,
-        await this.getSignerAddress()
+        predictedSafe
       )
 
       const safeDeploymentTransaction: MetaTransactionData = {

@@ -1,8 +1,12 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, {
+  PredictedSafeProps,
+  SafeTransactionOptionalProps
+} from '@safe-global/protocol-kit/index'
+import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/index'
-import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getDailyLimitModule,
@@ -21,16 +25,38 @@ describe('Safe modules manager', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [accounts[0].address],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        safeVersion: safeVersionDeployed
+      }
+    }
     return {
       dailyLimitModule: await getDailyLimitModule(),
       socialRecoveryModule: await getSocialRecoveryModule(),
       safe: await getSafeWithOwners([accounts[0].address]),
       accounts,
-      contractNetworks
+      contractNetworks,
+      predictedSafe
     }
   })
 
   describe('getModules', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      chai.expect(safeSdk.getModules()).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should return all the enabled modules', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -49,6 +75,19 @@ describe('Safe modules manager', () => {
   })
 
   describe('isModuleEnabled', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const tx = safeSdk.isModuleEnabled(dailyLimitModule.address)
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should return true if a module is enabled', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -67,6 +106,19 @@ describe('Safe modules manager', () => {
   })
 
   describe('createEnableModuleTx', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const tx = safeSdk.createEnableModuleTx(dailyLimitModule.address)
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -168,6 +220,19 @@ describe('Safe modules manager', () => {
   })
 
   describe('createDisableModuleTx', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const tx = safeSdk.createDisableModuleTx(dailyLimitModule.address)
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts

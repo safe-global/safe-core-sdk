@@ -1,4 +1,5 @@
 import { ExternalProvider } from '@ethersproject/providers'
+import { UserInfo } from '@web3auth/base'
 
 import { Web3AuthEvent, Web3AuthEventListener } from './packs/web3auth/types'
 import { Web3AuthModalPack } from './packs/web3auth/Web3AuthModalPack'
@@ -13,6 +14,7 @@ export interface SafeAuthPack<TPack> {
   init(): Promise<void>
   signIn(): Promise<SafeSignInResponse<TPack>>
   signOut(): Promise<void>
+  getUserInfo(): Promise<SafeGetUserInfoResponse<TAdapter>>
   subscribe(event: SafeAuthEvent<TPack>, handler: SafeAuthEventListener<TPack>): void
   unsubscribe(event: SafeAuthEvent<TPack>, handler: SafeAuthEventListener<TPack>): void
 }
@@ -30,6 +32,7 @@ export type SafeAuthEventListener<TPack> = TPack extends Web3AuthModalPack
   ? Web3AuthEventListener
   : never
 export type SafeSignInResponse<TPack> = TPack extends Web3AuthModalPack ? void : never
+export type SafeGetUserInfoResponse<T> = T extends Web3AuthAdapter ? Partial<UserInfo> : never
 
 export interface SafeAuthConfig {
   txServiceUrl?: string

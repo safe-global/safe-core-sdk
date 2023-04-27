@@ -108,6 +108,15 @@ export class SafeAuthKit<TPack extends SafeAuthPack<TPack>> implements ISafeAuth
   }
 
   /**
+   * Retrieve the user info
+   */
+  async getUserInfo() {
+    if (!this.#adapter) return null
+
+    return this.#adapter?.getUserInfo()
+  }
+
+  /**
    * Subscribe to an event
    * @param eventName The event name to subscribe to. Choose from SafeAuthEvents type
    * @param listener The callback function to be called when the event is emitted

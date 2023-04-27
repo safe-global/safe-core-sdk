@@ -180,6 +180,6 @@ export const validateSafeAccountConfig = ({ owners, threshold }: SafeAccountConf
 }
 
 export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig): void => {
-  if (BigNumber.from(saltNonce).lt(0))
+  if (saltNonce && BigNumber.from(saltNonce).lt(0))
     throw new Error('saltNonce must be greater than or equal to 0')
 }

@@ -3,10 +3,10 @@ import {
   EthAdapter,
   GnosisSafeContract,
   MetaTransactionData,
-  SafeTransactionDataPartial
+  SafeTransactionDataPartial,
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { AbiItem } from 'web3-utils'
-import { SafeVersion } from './../../../safe-core-sdk-types/dist/src/types.d'
 
 export interface SafeAccountConfig {
   owners: string[]

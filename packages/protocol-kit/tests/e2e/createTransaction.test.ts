@@ -98,7 +98,7 @@ describe('Transactions creation', () => {
           to: account2.address,
           value: '0',
           data: '0x',
-          gasPrice: '123'
+          gasPrice: BASE_OPTIONS.gasPrice
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
@@ -121,7 +121,7 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = '111'
+        const safeTxGas = BASE_OPTIONS.safeTxGas
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
@@ -203,7 +203,7 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = '111'
+        const safeTxGas = BASE_OPTIONS.safeTxGas
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
@@ -231,15 +231,11 @@ describe('Transactions creation', () => {
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
+        ...BASE_OPTIONS,
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x',
-        baseGas: 111,
-        gasPrice: 0,
-        gasToken: '0x333',
-        refundReceiver: '0x444',
-        nonce: 555,
-        safeTxGas: 666
+        gasPrice: '0'
       }
       const tx = safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
@@ -256,10 +252,10 @@ describe('Transactions creation', () => {
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
+        ...BASE_OPTIONS,
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
-        data: '0x',
-        ...BASE_OPTIONS
+        data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)
@@ -284,10 +280,10 @@ describe('Transactions creation', () => {
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
+        ...BASE_OPTIONS,
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
-        data: '0x',
-        ...BASE_OPTIONS
+        data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)

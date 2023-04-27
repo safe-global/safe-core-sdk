@@ -40,7 +40,7 @@ export class SafeAuthKit<TPack extends SafeAuthPack<TPack>> implements ISafeAuth
   static async init<TPack extends SafeAuthPack<TPack>>(
     pack: TPack,
     config?: SafeAuthConfig
-  ): Promise<SafeAuthKit<T>> {
+  ): Promise<SafeAuthKit<TPack>> {
     if (!pack) {
       throw new Error('The pack is not defined')
     }
@@ -111,9 +111,9 @@ export class SafeAuthKit<TPack extends SafeAuthPack<TPack>> implements ISafeAuth
    * Retrieve the user info
    */
   async getUserInfo() {
-    if (!this.#adapter) return null
+    if (!this.#pack) return null
 
-    return this.#adapter?.getUserInfo()
+    return this.#pack?.getUserInfo()
   }
 
   /**

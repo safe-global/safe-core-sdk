@@ -14,7 +14,7 @@ export interface SafeAuthPack<TPack> {
   init(): Promise<void>
   signIn(): Promise<SafeSignInResponse<TPack>>
   signOut(): Promise<void>
-  getUserInfo(): Promise<SafeGetUserInfoResponse<TAdapter>>
+  getUserInfo(): Promise<SafeGetUserInfoResponse<TPack>>
   subscribe(event: SafeAuthEvent<TPack>, handler: SafeAuthEventListener<TPack>): void
   unsubscribe(event: SafeAuthEvent<TPack>, handler: SafeAuthEventListener<TPack>): void
 }

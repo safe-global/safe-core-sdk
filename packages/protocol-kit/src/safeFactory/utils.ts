@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { SafeAccountConfig, SafeDeploymentConfig } from './'
+import { SafeAccountConfig, SafeDeploymentConfig } from '../types'
 
 export const validateSafeAccountConfig = ({ owners, threshold }: SafeAccountConfig): void => {
   if (owners.length <= 0) throw new Error('Owner list must have at least one owner')

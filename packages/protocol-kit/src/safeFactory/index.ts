@@ -5,7 +5,12 @@ import {
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import Safe from '@safe-global/protocol-kit/Safe'
-import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
+import {
+  ContractNetworksConfig,
+  PredictedSafeProps,
+  SafeAccountConfig,
+  SafeDeploymentConfig
+} from '@safe-global/protocol-kit/types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
   EthAdapter,
@@ -17,26 +22,6 @@ import {
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
-
-export interface SafeAccountConfig {
-  owners: string[]
-  threshold: number
-  to?: string
-  data?: string
-  fallbackHandler?: string
-  paymentToken?: string
-  payment?: number
-  paymentReceiver?: string
-}
-
-export interface SafeDeploymentConfig {
-  saltNonce: string
-}
-
-export interface PredictSafeProps {
-  safeAccountConfig: SafeAccountConfig
-  safeDeploymentConfig: SafeDeploymentConfig
-}
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
@@ -176,7 +161,7 @@ class SafeFactory {
   async predictSafeAddress({
     safeAccountConfig,
     safeDeploymentConfig
-  }: PredictSafeProps): Promise<string> {
+  }: PredictedSafeProps): Promise<string> {
     validateSafeAccountConfig(safeAccountConfig)
     validateSafeDeploymentConfig(safeDeploymentConfig)
 

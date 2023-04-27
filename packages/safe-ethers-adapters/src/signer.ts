@@ -32,9 +32,9 @@ export interface SafeFactory extends Promise<Safe> {
 }
 
 export class SafeEthersSigner extends VoidSigner {
-  readonly service: SafeService
-  readonly safe: Safe | SafeFactory
-  readonly options?: SafeEthersSignerOptions
+  service!: SafeService
+  safe!: Safe | SafeFactory
+  options?: SafeEthersSignerOptions
 
   /**
    * Creates an instance of the SafeEthersSigner.
@@ -44,13 +44,30 @@ export class SafeEthersSigner extends VoidSigner {
    * @param options - (Optional) Additional options (e.g. polling delay when waiting for a transaction to be mined)
    * @returns The SafeEthersSigner instance
    */
-  constructor(
+  static async create(
     safe: Safe | SafeFactory,
     service: SafeService,
     provider?: Provider,
     options?: SafeEthersSignerOptions
   ) {
-    super(safe.getAddress(), provider)
+    const safeEthersSigner = new SafeEthersSigner(
+      safe,
+      await safe.getAddress(),
+      service,
+      provider,
+      options
+    )
+    return safeEthersSigner
+  }
+
+  constructor(
+    safe: Safe | SafeFactory,
+    safeAddress: string,
+    service: SafeService,
+    provider?: Provider,
+    options?: SafeEthersSignerOptions
+  ) {
+    super(safeAddress, provider)
     this.service = service
     this.safe = safe
     this.options = options

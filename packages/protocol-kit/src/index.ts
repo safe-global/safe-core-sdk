@@ -33,29 +33,35 @@ import {
   getSafeContract,
   getSignMessageLibContract
 } from './contracts/safeDeploymentContracts'
+import {
+  calculateProxyAddress,
+  encodeCreateProxyWithNonce,
+  getSafeInitializer,
+  PREDETERMINED_SALT_NONCE
+} from './contracts/utils'
 import ContractManager from './managers/contractManager'
-import Safe, {
+import Safe from './Safe'
+import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
+import {
   AddOwnerTxParams,
   ConnectSafeConfig,
+  ConnectSafeConfigWithPredictedSafe,
+  ConnectSafeConfigWithSafeAddress,
+  ContractNetworksConfig,
   CreateTransactionProps,
+  PredictedSafeProps,
   RemoveOwnerTxParams,
-  SafeConfig,
-  SwapOwnerTxParams
-} from './Safe'
-import SafeFactory, {
-  DeploySafeProps,
-  PredictSafeProps,
   SafeAccountConfig,
+  SafeConfig,
+  SafeConfigWithPredictedSafe,
+  SafeConfigWithSafeAddress,
   SafeDeploymentConfig,
-  SafeFactoryConfig
-} from './safeFactory'
-import { ContractNetworksConfig } from './types'
-import {
-  encodeMultiSendData,
-  EthSafeSignature,
-  SafeTransactionOptionalProps,
-  standardizeSafeTransactionData
-} from './utils'
+  StandardizeSafeTransactionDataProps,
+  SwapOwnerTxParams
+} from './types'
+import { EthSafeSignature } from './utils'
+import { SafeTransactionOptionalProps } from './utils/transactions/types'
+import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
 
 export {
   ContractManager,
@@ -63,10 +69,14 @@ export {
   SafeFactoryConfig,
   SafeAccountConfig,
   SafeDeploymentConfig,
-  PredictSafeProps,
+  PredictedSafeProps,
   DeploySafeProps,
   SafeConfig,
+  SafeConfigWithSafeAddress,
+  SafeConfigWithPredictedSafe,
   ConnectSafeConfig,
+  ConnectSafeConfigWithSafeAddress,
+  ConnectSafeConfigWithPredictedSafe,
   ContractNetworksConfig,
   SafeTransactionOptionalProps,
   CreateTransactionProps,
@@ -75,6 +85,7 @@ export {
   SwapOwnerTxParams,
   encodeMultiSendData,
   standardizeSafeTransactionData,
+  StandardizeSafeTransactionDataProps,
   EthersAdapter,
   EthersAdapterConfig,
   EthersTransactionOptions,
@@ -104,6 +115,10 @@ export {
   getMultiSendCallOnlyContract,
   getSignMessageLibContract,
   getCreateCallContract,
+  getSafeInitializer,
+  calculateProxyAddress,
+  PREDETERMINED_SALT_NONCE,
+  encodeCreateProxyWithNonce,
   EthSafeSignature
 }
 

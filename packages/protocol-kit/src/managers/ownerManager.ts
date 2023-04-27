@@ -4,9 +4,9 @@ import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
 class OwnerManager {
   #ethAdapter: EthAdapter
-  #safeContract: GnosisSafeContract
+  #safeContract?: GnosisSafeContract
 
-  constructor(ethAdapter: EthAdapter, safeContract: GnosisSafeContract) {
+  constructor(ethAdapter: EthAdapter, safeContract?: GnosisSafeContract) {
     this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }
@@ -53,19 +53,31 @@ class OwnerManager {
   }
 
   async getOwners(): Promise<string[]> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     const owners = await this.#safeContract.getOwners()
     return [...owners]
   }
 
   async getThreshold(): Promise<number> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     return this.#safeContract.getThreshold()
   }
 
   async isOwner(ownerAddress: string): Promise<boolean> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     return this.#safeContract.isOwner(ownerAddress)
   }
 
   async encodeAddOwnerWithThresholdData(ownerAddress: string, threshold?: number): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     this.validateOwnerAddress(ownerAddress)
     const owners = await this.getOwners()
     this.validateAddressIsNotOwner(ownerAddress, owners)
@@ -75,6 +87,9 @@ class OwnerManager {
   }
 
   async encodeRemoveOwnerData(ownerAddress: string, threshold?: number): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     this.validateOwnerAddress(ownerAddress)
     const owners = await this.getOwners()
     const ownerIndex = this.validateAddressIsOwner(ownerAddress, owners)
@@ -85,6 +100,9 @@ class OwnerManager {
   }
 
   async encodeSwapOwnerData(oldOwnerAddress: string, newOwnerAddress: string): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     this.validateOwnerAddress(newOwnerAddress, 'Invalid new owner address provided')
     this.validateOwnerAddress(oldOwnerAddress, 'Invalid old owner address provided')
     const owners = await this.getOwners()
@@ -107,6 +125,9 @@ class OwnerManager {
   }
 
   async encodeChangeThresholdData(threshold: number): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     const owners = await this.getOwners()
     this.validateThreshold(threshold, owners.length)
     return this.#safeContract.encode('changeThreshold', [threshold])

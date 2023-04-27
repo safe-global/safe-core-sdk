@@ -37,8 +37,8 @@ export class SafeAuthKit<TPack extends SafeAuthPack<TPack>> implements ISafeAuth
    * @returns A SafeAuthKit instance
    * @throws Error if the provider type is not supported
    */
-  static async init<T extends SafeAuthPack<T>>(
-    pack: T,
+  static async init<TPack extends SafeAuthPack<TPack>>(
+    pack: TPack,
     config?: SafeAuthConfig
   ): Promise<SafeAuthKit<T>> {
     if (!pack) {

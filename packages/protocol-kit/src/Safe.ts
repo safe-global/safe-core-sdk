@@ -461,7 +461,6 @@ class Safe {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
     }
-
     const safeTransactionData = safeTransaction.data
     const txHash = await this.#contractManager.safeContract.getTransactionHash(safeTransactionData)
     return txHash

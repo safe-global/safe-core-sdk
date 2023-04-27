@@ -110,6 +110,15 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
   }
 
   /**
+   * Retrieve the user info
+   */
+  async getUserInfo() {
+    if (!this.#adapter) return null
+
+    return this.#adapter?.getUserInfo()
+  }
+
+  /**
    * Subscribe to an event
    * @param eventName The event name to subscribe to. Choose from SafeAuthEvents type
    * @param listener The callback function to be called when the event is emitted

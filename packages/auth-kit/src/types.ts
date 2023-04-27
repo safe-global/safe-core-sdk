@@ -32,7 +32,9 @@ export type SafeAuthEventListener<TPack> = TPack extends Web3AuthModalPack
   ? Web3AuthEventListener
   : never
 export type SafeSignInResponse<TPack> = TPack extends Web3AuthModalPack ? void : never
-export type SafeGetUserInfoResponse<T> = T extends Web3AuthAdapter ? Partial<UserInfo> : never
+export type SafeGetUserInfoResponse<TPack> = TPack extends Web3AuthModalPack
+  ? Partial<UserInfo>
+  : never
 
 export interface SafeAuthConfig {
   txServiceUrl?: string

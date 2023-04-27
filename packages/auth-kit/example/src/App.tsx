@@ -23,11 +23,11 @@ const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
 
 function App() {
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthAdapter>>()
+  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<SafeGetUserInfoResponse<Web3AuthAdapter>>()
+  const [userInfo, setUserInfo] = useState<SafeGetUserInfoResponse<Web3AuthModalPack>>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
 
   useEffect(() => {

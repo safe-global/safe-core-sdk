@@ -58,7 +58,7 @@ export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
    */
   async signIn() {
     if (!this.web3authInstance) {
-      throw new Error('Web3AuthAdapter is not initialized')
+      throw new Error('Web3AuthModalPack is not initialized')
     }
 
     this.provider = await this.web3authInstance.connect()
@@ -69,7 +69,7 @@ export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
    */
   async signOut() {
     if (!this.web3authInstance) {
-      throw new Error('Web3AuthAdapter is not initialized')
+      throw new Error('Web3AuthModalPack is not initialized')
     }
 
     this.provider = null
@@ -82,7 +82,7 @@ export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
    */
   async getUserInfo(): Promise<Partial<UserInfo>> {
     if (!this.web3authInstance) {
-      throw new Error('Web3AuthAdapter is not initialized')
+      throw new Error('Web3AuthModalPack is not initialized')
     }
 
     const userInfo = await this.web3authInstance.getUserInfo()

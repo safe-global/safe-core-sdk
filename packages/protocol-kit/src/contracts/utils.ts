@@ -4,6 +4,7 @@ import {
   GnosisSafeProxyFactoryContract
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
+import { isAddress } from '@ethersproject/address'
 import { BigNumber } from '@ethersproject/bignumber'
 import semverSatisfies from 'semver/functions/satisfies'
 import {
@@ -77,28 +78,17 @@ export async function encodeSetupCallData({
     ])
   }
 
-  const isCustomFallbackHandlerDefined = !!fallbackHandler
+  let fallbackHandlerAddress = fallbackHandler
+  const isValidAddress = fallbackHandlerAddress !== undefined && isAddress(fallbackHandlerAddress)
+  if (!isValidAddress) {
+    const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
+      ethAdapter,
+      safeVersion,
+      customContracts
+    })
 
-  if (isCustomFallbackHandlerDefined) {
-    return safeContract.encode('setup', [
-      owners,
-      threshold,
-      to,
-      data,
-      fallbackHandler,
-      paymentToken,
-      payment,
-      paymentReceiver
-    ])
+    fallbackHandlerAddress = fallbackHandlerContract.getAddress()
   }
-
-  const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
-    ethAdapter,
-    safeVersion,
-    customContracts
-  })
-
-  const fallbackHandlerAddress = fallbackHandlerContract.getAddress()
 
   return safeContract.encode('setup', [
     owners,

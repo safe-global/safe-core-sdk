@@ -18,9 +18,9 @@ export interface SafeOnRampPack<TPack> {
 // When creating new packs these types should be updated:
 // e.g.:
 // export type SafeOnRampOpenOptions<T> =
-//    T extends StripePack ? StripeOpenOptions :
-//    T extends FooPack ? FooOpenOptions :
-//    T extends BarPack ? BarOpenOptions :
+//    TPack extends StripePack ? StripeOpenOptions :
+//    TPack extends FooPack ? FooOpenOptions :
+//    TPack extends BarPack ? BarOpenOptions :
 //    never
 export type SafeOnRampOpenOptions<TPack> = TPack extends StripePack ? StripeOpenOptions : never
 export type SafeOnRampOpenResponse<TPack> = TPack extends StripePack ? StripeSession : never

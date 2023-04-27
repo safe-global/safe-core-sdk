@@ -7,8 +7,8 @@ export const connectToOrderNotifications = ({
   env,
   subscriptions
 }: MoneriumWebSocketOptions): WebSocket => {
-  const baseUrl = env === 'production' ? 'wss://api.monerium.app' : 'wss://api.monerium.app'
-  const socketUrl = `${baseUrl}/profile/${profile}/orders?access_token=${accessToken}`
+  const baseUrl = env === 'production' ? 'wss://api.monerium.app' : 'wss://api.monerium.dev'
+  const socketUrl = `${baseUrl}/profiles/${profile}/orders?access_token=${accessToken}`
 
   const socket = new WebSocket(socketUrl)
 

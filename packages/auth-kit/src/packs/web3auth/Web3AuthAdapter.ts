@@ -85,7 +85,7 @@ export class Web3AuthAdapter implements SafeAuthAdapter<Web3AuthAdapter> {
       throw new Error('Web3AuthAdapter is not initialized')
     }
 
-    const userInfo = await this.web3authInstance?.getUserInfo()
+    const userInfo = await this.web3authInstance.getUserInfo()
 
     return userInfo
   }

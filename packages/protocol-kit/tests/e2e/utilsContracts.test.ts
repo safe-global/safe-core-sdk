@@ -82,8 +82,12 @@ describe('Contract utils', () => {
         ethAdapter,
         contractNetworks
       )
+
+      // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
+      const isSafeDeployed = await deployedSafe.isSafeDeployed()
       const expectedSafeAddress = await deployedSafe.getAddress()
 
+      chai.expect(isSafeDeployed).to.be.true
       chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
     })
 
@@ -121,8 +125,12 @@ describe('Contract utils', () => {
         ethAdapter,
         contractNetworks
       )
+
+      // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
+      const isSafeDeployed = await deployedSafe.isSafeDeployed()
       const expectedSafeAddress = await deployedSafe.getAddress()
 
+      chai.expect(isSafeDeployed).to.be.true
       chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
     })
 
@@ -160,8 +168,12 @@ describe('Contract utils', () => {
         ethAdapter,
         contractNetworks
       )
+
+      // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
+      const isSafeDeployed = await deployedSafe.isSafeDeployed()
       const expectedSafeAddress = await deployedSafe.getAddress()
 
+      chai.expect(isSafeDeployed).to.be.true
       chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
     })
 
@@ -333,6 +345,8 @@ describe('Contract utils', () => {
         contractNetworks
       )
 
+      // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
+      chai.expect(await firstDeployedSafe.isSafeDeployed()).to.be.true
       // expected safe address for saltNonce = 1
       chai.expect(predictedSafeAddress1).to.be.equal(await firstDeployedSafe.getAddress())
 
@@ -353,6 +367,8 @@ describe('Contract utils', () => {
         contractNetworks
       )
 
+      // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
+      chai.expect(await secondDeployedSafe.isSafeDeployed()).to.be.true
       // expected safe address for saltNonce = 2
       chai.expect(predictedSafeAddress2).to.be.equal(await secondDeployedSafe.getAddress())
 
@@ -373,6 +389,8 @@ describe('Contract utils', () => {
         contractNetworks
       )
 
+      // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
+      chai.expect(await thirdDeployedSafe.isSafeDeployed()).to.be.true
       // expected safe address for saltNonce = 3
       chai.expect(predictedSafeAddress3).to.be.equal(await thirdDeployedSafe.getAddress())
     })
@@ -404,6 +422,8 @@ describe('Contract utils', () => {
         ethAdapter,
         contractNetworks
       )
+      // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
+      const isSafeDeployed = await deployedSafe.isSafeDeployed()
       const expectedSafeAddress = await deployedSafe.getAddress()
 
       const firstPredictedSafeAddress = await predictSafeAddress({
@@ -427,6 +447,7 @@ describe('Contract utils', () => {
         customContracts
       })
 
+      chai.expect(isSafeDeployed).to.be.true
       // returns the same predicted address each call
       chai.expect(firstPredictedSafeAddress).to.be.equal(expectedSafeAddress)
       chai.expect(secondPredictedSafeAddress).to.be.equal(expectedSafeAddress)

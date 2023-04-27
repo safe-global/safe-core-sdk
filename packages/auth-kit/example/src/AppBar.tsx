@@ -1,12 +1,14 @@
 import { AppBar as MuiAppBar, Typography, styled, Box, Button } from '@mui/material'
+import { SafeGetUserInfoResponse, Web3AuthAdapter } from '../../src'
 
 type AppBarProps = {
   isLoggedIn: boolean
   onLogin: () => void
   onLogout: () => void
+  userInfo?: SafeGetUserInfoResponse<Web3AuthAdapter>
 }
 
-const AppBar = ({ isLoggedIn, onLogin, onLogout }: AppBarProps) => {
+const AppBar = ({ isLoggedIn, onLogin, onLogout, userInfo }: AppBarProps) => {
   return (
     <StyledAppBar position="static" color="default">
       <Typography variant="h3" pl={4} fontWeight={700}>
@@ -15,9 +17,16 @@ const AppBar = ({ isLoggedIn, onLogin, onLogout }: AppBarProps) => {
 
       <Box mr={5}>
         {isLoggedIn ? (
-          <Button variant="contained" onClick={onLogout}>
-            Log Out
-          </Button>
+          <Box display="flex" alignItems="center">
+            {userInfo && (
+              <Typography variant="body1" fontWeight={700}>
+                Hello {userInfo.name || userInfo.email} !!
+              </Typography>
+            )}
+            <Button variant="contained" onClick={onLogout} sx={{ ml: 2 }}>
+              Log Out
+            </Button>
+          </Box>
         ) : (
           <Button variant="contained" onClick={onLogin}>
             Login

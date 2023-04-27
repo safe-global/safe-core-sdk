@@ -1,4 +1,5 @@
 import { ExternalProvider } from '@ethersproject/providers'
+import { UserInfo } from '@web3auth/base'
 
 import { Web3AuthEvent, Web3AuthEventListener } from './packs/web3auth/types'
 import { Web3AuthAdapter } from './packs/web3auth/Web3AuthAdapter'
@@ -13,6 +14,7 @@ export interface SafeAuthAdapter<TAdapter> {
   init(): Promise<void>
   signIn(): Promise<SafeSignInResponse<TAdapter>>
   signOut(): Promise<void>
+  getUserInfo(): Promise<SafeGetUserInfoResponse<TAdapter>>
   subscribe(event: SafeAuthEvent<TAdapter>, handler: SafeAuthEventListener<TAdapter>): void
   unsubscribe(event: SafeAuthEvent<TAdapter>, handler: SafeAuthEventListener<TAdapter>): void
 }
@@ -28,6 +30,7 @@ export interface ISafeAuthKit<TAdapter> {
 export type SafeAuthEvent<T> = T extends Web3AuthAdapter ? Web3AuthEvent : never
 export type SafeAuthEventListener<T> = T extends Web3AuthAdapter ? Web3AuthEventListener : never
 export type SafeSignInResponse<T> = T extends Web3AuthAdapter ? void : never
+export type SafeGetUserInfoResponse<T> = T extends Web3AuthAdapter ? Partial<UserInfo> : never
 
 export interface SafeAuthConfig {
   txServiceUrl?: string

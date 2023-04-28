@@ -11,7 +11,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@monerium/sdk": "^2.0.17",
+    "@monerium/sdk": "^2.2.2",
     "@mui/material": "^5.11.7",
     "@safe-global/api-kit": "^1.0.1",
     "@safe-global/auth-kit": "^0.1.1",

@@ -42,14 +42,14 @@
     "ethers": "^5.7.0"
   },
   "devDependencies": {
-    "@monerium/sdk": "^2.1.23",
+    "@monerium/sdk": "^2.2.2",
     "@stripe/crypto": "^0.0.2",
     "@stripe/stripe-js": "^1.48.0",
     "events": "^3.3.0",
     "jest-environment-jsdom": "^29.4.3"
   },
   "peerDependencies": {
-    "@monerium/sdk": "^2.0.17",
+    "@monerium/sdk": "^2.2.2",
     "@stripe/crypto": "^0.0.2",
     "@stripe/stripe-js": "^1.48.0"
   }

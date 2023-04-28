@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { isAddress } from '@ethersproject/address'
-import { SafeOnRampKit, StripeSession, StripeAdapter } from '../../../../src'
+import { SafeOnRampKit, StripeSession, StripePack } from '../../../../src'
 import { Grid, TextField, Button } from '@mui/material'
 
 const isSessionValid = (sessionId: string) => sessionId.length === 28
@@ -8,7 +8,7 @@ const isSessionValid = (sessionId: string) => sessionId.length === 28
 function Stripe() {
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [sessionId, setSessionId] = useState<string>('')
-  const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<StripeAdapter>>()
+  const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<StripePack>>()
   const stripeRootRef = useRef<HTMLDivElement>(null)
 
   const handleCreateSession = async () => {
@@ -49,7 +49,7 @@ function Stripe() {
   useEffect(() => {
     ;(async () => {
       const onRampClient = await SafeOnRampKit.init(
-        new StripeAdapter({
+        new StripePack({
           stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
           onRampBackendUrl: import.meta.env.VITE_SAFE_STRIPE_BACKEND_BASE_URL
         })

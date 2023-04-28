@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react'
 import { Web3AuthOptions } from '@web3auth/modal'
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS } from '@web3auth/base'
 import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
-import { SafeAuthKit, Web3AuthAdapter, SafeAuthSignInData } from '../../../../auth-kit/src/index'
+import { SafeAuthKit, Web3AuthModalPack, SafeAuthSignInData } from '../../../../auth-kit/src/index'
 
 type AuthContextProviderProps = {
   children: React.ReactNode
@@ -25,7 +25,7 @@ export const AuthContext = createContext<AuthContextType>({
 
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthAdapter>>()
+  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | undefined>()
   const [selectedSafe, setSelectedSafe] = useState('')
@@ -70,9 +70,9 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         }
       })
 
-      const adapter = new Web3AuthAdapter(options, [openloginAdapter], modalConfig)
+      const web3AuthPack = new Web3AuthModalPack(options, [openloginAdapter], modalConfig)
 
-      const safeAuthKit = await SafeAuthKit.init(adapter, {
+      const safeAuthKit = await SafeAuthKit.init(web3AuthPack, {
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 

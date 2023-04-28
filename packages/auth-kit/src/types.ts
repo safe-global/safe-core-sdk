@@ -2,35 +2,39 @@ import { ExternalProvider } from '@ethersproject/providers'
 import { UserInfo } from '@web3auth/base'
 
 import { Web3AuthEvent, Web3AuthEventListener } from './packs/web3auth/types'
-import { Web3AuthAdapter } from './packs/web3auth/Web3AuthAdapter'
+import { Web3AuthModalPack } from './packs/web3auth/Web3AuthModalPack'
 
 export interface SafeAuthSignInData {
   eoa: string
   safes?: string[]
 }
 
-export interface SafeAuthAdapter<TAdapter> {
+export interface SafeAuthPack<TPack> {
   provider: ExternalProvider | null
   init(): Promise<void>
-  signIn(): Promise<SafeSignInResponse<TAdapter>>
+  signIn(): Promise<SafeSignInResponse<TPack>>
   signOut(): Promise<void>
-  getUserInfo(): Promise<SafeGetUserInfoResponse<TAdapter>>
-  subscribe(event: SafeAuthEvent<TAdapter>, handler: SafeAuthEventListener<TAdapter>): void
-  unsubscribe(event: SafeAuthEvent<TAdapter>, handler: SafeAuthEventListener<TAdapter>): void
+  getUserInfo(): Promise<SafeGetUserInfoResponse<TPack>>
+  subscribe(event: SafeAuthEvent<TPack>, handler: SafeAuthEventListener<TPack>): void
+  unsubscribe(event: SafeAuthEvent<TPack>, handler: SafeAuthEventListener<TPack>): void
 }
 
-export interface ISafeAuthKit<TAdapter> {
+export interface ISafeAuthKit<TPack> {
   signIn(): Promise<SafeAuthSignInData>
   signOut(): Promise<void>
   getProvider(): ExternalProvider | null
-  subscribe(event: SafeAuthEvent<TAdapter>, listener: SafeAuthEventListener<TAdapter>): void
-  unsubscribe(event: SafeAuthEvent<TAdapter>, listener: SafeAuthEventListener<TAdapter>): void
+  subscribe(event: SafeAuthEvent<TPack>, listener: SafeAuthEventListener<TPack>): void
+  unsubscribe(event: SafeAuthEvent<TPack>, listener: SafeAuthEventListener<TPack>): void
 }
 
-export type SafeAuthEvent<T> = T extends Web3AuthAdapter ? Web3AuthEvent : never
-export type SafeAuthEventListener<T> = T extends Web3AuthAdapter ? Web3AuthEventListener : never
-export type SafeSignInResponse<T> = T extends Web3AuthAdapter ? void : never
-export type SafeGetUserInfoResponse<T> = T extends Web3AuthAdapter ? Partial<UserInfo> : never
+export type SafeAuthEvent<TPack> = TPack extends Web3AuthModalPack ? Web3AuthEvent : never
+export type SafeAuthEventListener<TPack> = TPack extends Web3AuthModalPack
+  ? Web3AuthEventListener
+  : never
+export type SafeSignInResponse<TPack> = TPack extends Web3AuthModalPack ? void : never
+export type SafeGetUserInfoResponse<TPack> = TPack extends Web3AuthModalPack
+  ? Partial<UserInfo>
+  : never
 
 export interface SafeAuthConfig {
   txServiceUrl?: string

@@ -4,7 +4,7 @@ import { EthersAdapter } from '@safe-global/protocol-kit'
 import { getErrorMessage } from './lib/errors'
 import {
   ISafeAuthKit,
-  SafeAuthAdapter,
+  SafeAuthPack,
   SafeAuthConfig,
   SafeAuthEvent,
   SafeAuthEventListener,
@@ -14,21 +14,19 @@ import {
 /**
  * SafeAuthKit provides a simple interface for web2 logins
  */
-export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
-  implements ISafeAuthKit<TAdapter>
-{
-  #adapter: TAdapter
+export class SafeAuthKit<TPack extends SafeAuthPack<TPack>> implements ISafeAuthKit<TPack> {
+  #pack: TPack
   #config: SafeAuthConfig | undefined
   safeAuthData?: SafeAuthSignInData
 
   /**
    * Initialize the SafeAuthKit
    * @constructor
-   * @param client The client implementing the SafeAuthClient interface
+   * @param pack The pack implementing the SafeAuthClient interface
    * @param config The configuration options
    */
-  constructor(adapter: TAdapter, config?: SafeAuthConfig) {
-    this.#adapter = adapter
+  constructor(pack: TPack, config?: SafeAuthConfig) {
+    this.#pack = pack
     this.#config = config
   }
 
@@ -39,16 +37,16 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
    * @returns A SafeAuthKit instance
    * @throws Error if the provider type is not supported
    */
-  static async init<T extends SafeAuthAdapter<T>>(
-    adapter: T,
+  static async init<TPack extends SafeAuthPack<TPack>>(
+    pack: TPack,
     config?: SafeAuthConfig
-  ): Promise<SafeAuthKit<T>> {
-    if (!adapter) {
-      throw new Error('The adapter is not defined')
+  ): Promise<SafeAuthKit<TPack>> {
+    if (!pack) {
+      throw new Error('The pack is not defined')
     }
 
-    await adapter.init()
-    return new this(adapter, config)
+    await pack.init()
+    return new this(pack, config)
   }
 
   /**
@@ -58,13 +56,13 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
    * @throws Error if there was an error while trying to get the safes for the current user using the provided txServiceUrl
    */
   async signIn(): Promise<SafeAuthSignInData> {
-    await this.#adapter.signIn()
+    await this.#pack.signIn()
 
-    if (!this.#adapter.provider) {
+    if (!this.#pack.provider) {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new ethers.providers.Web3Provider(this.#adapter.provider)
+    const ethersProvider = new ethers.providers.Web3Provider(this.#pack.provider)
 
     const signer = ethersProvider.getSigner()
 
@@ -94,7 +92,7 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
    * Sign out the user
    */
   async signOut(): Promise<void> {
-    await this.#adapter.signOut()
+    await this.#pack.signOut()
 
     this.safeAuthData = undefined
   }
@@ -104,18 +102,18 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
    * @returns The Ethereum provider
    */
   getProvider() {
-    if (!this.#adapter) return null
+    if (!this.#pack) return null
 
-    return this.#adapter?.provider
+    return this.#pack?.provider
   }
 
   /**
    * Retrieve the user info
    */
   async getUserInfo() {
-    if (!this.#adapter) return null
+    if (!this.#pack) return null
 
-    return this.#adapter?.getUserInfo()
+    return this.#pack?.getUserInfo()
   }
 
   /**
@@ -123,8 +121,8 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
    * @param eventName The event name to subscribe to. Choose from SafeAuthEvents type
    * @param listener The callback function to be called when the event is emitted
    */
-  subscribe(event: SafeAuthEvent<TAdapter>, listener: SafeAuthEventListener<TAdapter>) {
-    this.#adapter.subscribe(event, listener)
+  subscribe(event: SafeAuthEvent<TPack>, listener: SafeAuthEventListener<TPack>) {
+    this.#pack.subscribe(event, listener)
   }
 
   /**
@@ -132,8 +130,8 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
    * @param eventName The event name to unsubscribe from. Choose from SafeAuthEvents type
    * @param listener The callback function to unsubscribe
    */
-  unsubscribe(event: SafeAuthEvent<TAdapter>, listener: SafeAuthEventListener<TAdapter>) {
-    this.#adapter.unsubscribe(event, listener)
+  unsubscribe(event: SafeAuthEvent<TPack>, listener: SafeAuthEventListener<TPack>) {
+    this.#pack.unsubscribe(event, listener)
   }
 
   /**
@@ -141,7 +139,7 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
    * @returns A SafeApiKit instance
    */
   #getSafeCoreClient(): SafeApiKit {
-    if (!this.#adapter?.provider) {
+    if (!this.#pack?.provider) {
       throw new Error('Provider is not defined')
     }
 
@@ -149,7 +147,7 @@ export class SafeAuthKit<TAdapter extends SafeAuthAdapter<TAdapter>>
       throw new Error('txServiceUrl is not defined')
     }
 
-    const provider = new ethers.providers.Web3Provider(this.#adapter.provider)
+    const provider = new ethers.providers.Web3Provider(this.#pack.provider)
     const safeOwner = provider.getSigner(0)
 
     const adapter = new EthersAdapter({

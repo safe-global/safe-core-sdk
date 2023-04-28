@@ -15,7 +15,7 @@ import {
   SafeAuthKit,
   SafeAuthSignInData,
   SafeGetUserInfoResponse,
-  Web3AuthAdapter,
+  Web3AuthModalPack,
   Web3AuthEventListener
 } from '../../src/index'
 
@@ -23,11 +23,11 @@ const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
 
 function App() {
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthAdapter>>()
+  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<SafeGetUserInfoResponse<Web3AuthAdapter>>()
+  const [userInfo, setUserInfo] = useState<SafeGetUserInfoResponse<Web3AuthModalPack>>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
 
   useEffect(() => {
@@ -70,9 +70,9 @@ function App() {
         }
       })
 
-      const adapter = new Web3AuthAdapter(options, [openloginAdapter], modalConfig)
+      const web3AuthModalPack = new Web3AuthModalPack(options, [openloginAdapter], modalConfig)
 
-      const safeAuthKit = await SafeAuthKit.init(adapter, {
+      const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack, {
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 

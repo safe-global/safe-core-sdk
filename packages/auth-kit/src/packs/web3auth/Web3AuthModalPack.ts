@@ -2,15 +2,15 @@ import { IAdapter, UserInfo } from '@web3auth/base'
 import { ModalConfig, Web3Auth, Web3AuthOptions } from '@web3auth/modal'
 import { ExternalProvider } from '@ethersproject/providers'
 
-import type { SafeAuthAdapter } from '@safe-global/auth-kit/types'
+import type { SafeAuthPack } from '@safe-global/auth-kit/types'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { Web3AuthEvent, Web3AuthEventListener } from './types'
 
 /**
- * Web3AuthAdapter implements the SafeAuthClient interface for adapting the Web3Auth service provider
+ * Web3AuthModalPack implements the SafeAuthClient interface for adapting the Web3Auth service provider
  * @class
  */
-export class Web3AuthAdapter implements SafeAuthAdapter<Web3AuthAdapter> {
+export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
   provider: ExternalProvider | null
   private web3authInstance?: Web3Auth
   #options: Web3AuthOptions
@@ -58,7 +58,7 @@ export class Web3AuthAdapter implements SafeAuthAdapter<Web3AuthAdapter> {
    */
   async signIn() {
     if (!this.web3authInstance) {
-      throw new Error('Web3AuthAdapter is not initialized')
+      throw new Error('Web3AuthModalPack is not initialized')
     }
 
     this.provider = await this.web3authInstance.connect()
@@ -69,7 +69,7 @@ export class Web3AuthAdapter implements SafeAuthAdapter<Web3AuthAdapter> {
    */
   async signOut() {
     if (!this.web3authInstance) {
-      throw new Error('Web3AuthAdapter is not initialized')
+      throw new Error('Web3AuthModalPack is not initialized')
     }
 
     this.provider = null
@@ -82,7 +82,7 @@ export class Web3AuthAdapter implements SafeAuthAdapter<Web3AuthAdapter> {
    */
   async getUserInfo(): Promise<Partial<UserInfo>> {
     if (!this.web3authInstance) {
-      throw new Error('Web3AuthAdapter is not initialized')
+      throw new Error('Web3AuthModalPack is not initialized')
     }
 
     const userInfo = await this.web3authInstance.getUserInfo()

@@ -1,9 +1,9 @@
 import { SafeOnRampOpenOptions } from './types'
 
 import { SafeOnRampKit } from './SafeOnRampKit'
-import * as stripeAdapter from './packs/stripe/StripeAdapter'
+import * as stripePack from './packs/stripe/StripePack'
 
-const openOptions: SafeOnRampOpenOptions<stripeAdapter.StripeAdapter> = {
+const openOptions: SafeOnRampOpenOptions<stripePack.StripePack> = {
   element: '#root',
   defaultOptions: {
     transaction_details: {
@@ -18,46 +18,46 @@ const config = {
   onRampBackendUrl: 'onramp-backend-url'
 }
 
-jest.mock('./packs/stripe/StripeAdapter')
+jest.mock('./packs/stripe/StripePack')
 
 describe('SafeOnRampKit', () => {
-  let adapter: stripeAdapter.StripeAdapter
+  let pack: stripePack.StripePack
 
   beforeEach(() => {
     jest.clearAllMocks()
     jest.restoreAllMocks()
 
-    adapter = new stripeAdapter.StripeAdapter(config)
+    pack = new stripePack.StripePack(config)
   })
 
   it('should create a SafeOnRampKit instance when using the init() method', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(adapter)
+    const safeOnRampKit = await SafeOnRampKit.init(pack)
 
     expect(safeOnRampKit).toBeInstanceOf(SafeOnRampKit)
   })
 
-  it('should create a XXXAdapter instance using the provider config and call the init() method in the instance', async () => {
-    await SafeOnRampKit.init(adapter)
+  it('should create a XXXPack instance using the provider config and call the init() method in the instance', async () => {
+    await SafeOnRampKit.init(pack)
 
-    expect(stripeAdapter.StripeAdapter).toHaveBeenCalledWith(expect.objectContaining(config))
-    expect(stripeAdapter.StripeAdapter.prototype.init).toHaveBeenCalledWith()
+    expect(stripePack.StripePack).toHaveBeenCalledWith(expect.objectContaining(config))
+    expect(stripePack.StripePack.prototype.init).toHaveBeenCalledWith()
   })
 
-  it('should call the open method in the XXXAdapter with the corresponding options', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(adapter)
+  it('should call the open method in the XXXPack with the corresponding options', async () => {
+    const safeOnRampKit = await SafeOnRampKit.init(pack)
 
     safeOnRampKit.open(openOptions)
 
-    expect(stripeAdapter.StripeAdapter.prototype.open).toHaveBeenCalledWith(
+    expect(stripePack.StripePack.prototype.open).toHaveBeenCalledWith(
       expect.objectContaining(openOptions)
     )
   })
 
-  it('should call the close method in the XXXAdapter', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(adapter)
+  it('should call the close method in the XXXPack', async () => {
+    const safeOnRampKit = await SafeOnRampKit.init(pack)
 
     safeOnRampKit.close()
 
-    expect(stripeAdapter.StripeAdapter.prototype.close).toHaveBeenCalled()
+    expect(stripePack.StripePack.prototype.close).toHaveBeenCalled()
   })
 })

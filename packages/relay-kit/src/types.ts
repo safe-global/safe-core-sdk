@@ -7,7 +7,7 @@ import {
   SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
 
-export interface RelayAdapter {
+export interface RelayPack {
   getFeeCollector(): string
   getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string>
   getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined>

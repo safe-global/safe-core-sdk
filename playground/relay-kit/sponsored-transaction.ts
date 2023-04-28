@@ -3,7 +3,7 @@ import AccountAbstraction, {
   MetaTransactionOptions,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc'
-import { GelatoRelayAdapter } from '@safe-global/relay-kit'
+import { GelatoRelayPack } from '@safe-global/relay-kit'
 import { BigNumber, ethers } from 'ethers'
 import { AccountAbstractionConfig } from './../../packages/account-abstraction-kit/src/types/index'
 
@@ -43,11 +43,11 @@ async function main() {
   const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
   const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
 
-  const relayAdapter = new GelatoRelayAdapter(config.RELAY_API_KEY)
+  const relayPack = new GelatoRelayPack(config.RELAY_API_KEY)
 
   const safeAccountAbstraction = new AccountAbstraction(signer)
   const sdkConfig: AccountAbstractionConfig = {
-    relayAdapter
+    relayPack
   }
   await safeAccountAbstraction.init(sdkConfig)
 

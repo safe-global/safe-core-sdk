@@ -4,7 +4,7 @@ import AccountAbstraction, {
   MetaTransactionOptions,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc'
-import { GelatoRelayAdapter } from '@safe-global/relay-kit'
+import { GelatoRelayPack } from '@safe-global/relay-kit'
 import { BigNumber, ethers } from 'ethers'
 
 // Check the status of a transaction after it is relayed:
@@ -40,11 +40,11 @@ async function main() {
   const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
   const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
 
-  const relayAdapter = new GelatoRelayAdapter()
+  const relayPack = new GelatoRelayPack()
 
   const safeAccountAbstraction = new AccountAbstraction(signer)
   const sdkConfig: AccountAbstractionConfig = {
-    relayAdapter
+    relayPack
   }
   await safeAccountAbstraction.init(sdkConfig)
 
@@ -59,11 +59,7 @@ async function main() {
   // Fake on-ramp to transfer enough funds to the Safe address
 
   const chainId = (await signer.provider.getNetwork()).chainId
-  const relayFee = await relayAdapter.getEstimateFee(
-    chainId,
-    txConfig.GAS_LIMIT,
-    txConfig.GAS_TOKEN
-  )
+  const relayFee = await relayPack.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
   const safeBalance = await provider.getBalance(predictedSafeAddress)
   console.log({ minSafeBalance: ethers.utils.formatEther(relayFee.toString()) })
   console.log({ safeBalance: ethers.utils.formatEther(safeBalance.toString()) })

@@ -1,11 +1,11 @@
 import EventEmitter from 'events'
-import { StripeAdapter } from './StripeAdapter'
+import { StripePack } from './StripePack'
 import * as stripeApi from './stripeApi'
 
 import type { SafeOnRampOpenOptions } from '@safe-global/onramp-kit/types'
 import type { StripeSession } from './types'
 
-const openOptions: SafeOnRampOpenOptions<StripeAdapter> = {
+const openOptions: SafeOnRampOpenOptions<StripePack> = {
   element: '#root',
   defaultOptions: {
     transaction_details: {
@@ -61,15 +61,15 @@ jest.mock('@stripe/crypto', () => {
   }
 })
 
-describe('StripeAdapter', () => {
+describe('StripePack', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it('should create a StripeAdapter instance', () => {
-    const stripeAdapter = new StripeAdapter(config)
+  it('should create a StripePack instance', () => {
+    const stripePack = new StripePack(config)
 
-    expect(stripeAdapter).toBeInstanceOf(StripeAdapter)
+    expect(stripePack).toBeInstanceOf(StripePack)
   })
 
   it('should try to mount the node specified in the config when open() is called', async () => {
@@ -77,11 +77,11 @@ describe('StripeAdapter', () => {
       .spyOn(stripeApi, 'createSession')
       .mockImplementationOnce(() => Promise.resolve(session))
 
-    const stripeAdapter = new StripeAdapter(config)
+    const stripePack = new StripePack(config)
 
-    await stripeAdapter.init()
+    await stripePack.init()
 
-    const returnedSession = await stripeAdapter.open(openOptions)
+    const returnedSession = await stripePack.open(openOptions)
 
     expect(mockMount).toHaveBeenCalledWith(openOptions.element)
     expect(returnedSession).toEqual(session)
@@ -98,11 +98,11 @@ describe('StripeAdapter', () => {
 
     jest.spyOn(stripeApi, 'createSession').mockImplementationOnce(() => Promise.reject(error))
 
-    const stripeAdapter = new StripeAdapter(config)
+    const stripePack = new StripePack(config)
 
-    await stripeAdapter.init()
+    await stripePack.init()
 
-    await expect(stripeAdapter.open(openOptions)).rejects.toThrowError(error)
+    await expect(stripePack.open(openOptions)).rejects.toThrowError(error)
   })
 
   it('should try to get the session if a sessionId is provided', async () => {
@@ -110,11 +110,11 @@ describe('StripeAdapter', () => {
       .spyOn(stripeApi, 'getSession')
       .mockImplementationOnce(() => Promise.resolve(session))
 
-    const stripeAdapter = new StripeAdapter(config)
+    const stripePack = new StripePack(config)
 
-    await stripeAdapter.init()
+    await stripePack.init()
 
-    const returnedSession = await stripeAdapter.open({ ...openOptions, sessionId: 'session-id' })
+    const returnedSession = await stripePack.open({ ...openOptions, sessionId: 'session-id' })
 
     expect(mockMount).toHaveBeenCalledWith(openOptions.element)
     expect(returnedSession).toEqual(session)
@@ -127,19 +127,19 @@ describe('StripeAdapter', () => {
 
     jest.spyOn(stripeApi, 'createSession').mockImplementationOnce(() => Promise.resolve(session))
 
-    const stripeAdapter = new StripeAdapter(config)
+    const stripePack = new StripePack(config)
 
-    await stripeAdapter.init()
+    await stripePack.init()
 
-    await stripeAdapter.open({
+    await stripePack.open({
       ...openOptions
     })
 
-    stripeAdapter.subscribe('onramp_ui_loaded', mockOnLoaded)
-    stripeAdapter.subscribe('onramp_session_updated', mockOnSessionUpdated)
+    stripePack.subscribe('onramp_ui_loaded', mockOnLoaded)
+    stripePack.subscribe('onramp_session_updated', mockOnSessionUpdated)
 
     // TODO: Change to 2 when the hack for not allowing more than 10$ is removed
-    // https://github.com/safe-global/safe-core-sdk/blob/59c5f90b08eecf976d617af5f7a8259e058c4580/packages/onramp-kit/src/packs/stripe/StripeAdapter.ts#L77-L83
+    // https://github.com/safe-global/safe-core-sdk/blob/59c5f90b08eecf976d617af5f7a8259e058c4580/packages/onramp-kit/src/packs/stripe/StripePack.ts#L77-L83
     expect(mockAddEventListener).toHaveBeenCalledTimes(3)
     mockDispatch('onramp_ui_loaded', 'sessionData')
     expect(mockOnLoaded).toHaveBeenCalled()

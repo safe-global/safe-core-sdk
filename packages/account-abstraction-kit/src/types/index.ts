@@ -1,4 +1,4 @@
-import { RelayAdapter } from '@safe-global/relay-kit'
+import { RelayPack } from '@safe-global/relay-kit'
 
 export enum OperationType {
   Call,
@@ -6,5 +6,5 @@ export enum OperationType {
 }
 
 export interface AccountAbstractionConfig {
-  relayAdapter: RelayAdapter
+  relayPack: RelayPack
 }

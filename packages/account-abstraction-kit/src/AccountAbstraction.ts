@@ -16,7 +16,7 @@ import Safe, {
   SafeAccountConfig,
   encodeSetupCallData
 } from '@safe-global/protocol-kit'
-import { RelayAdapter } from '@safe-global/relay-kit'
+import { RelayPack } from '@safe-global/relay-kit'
 import {
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
@@ -34,7 +34,7 @@ class AccountAbstraction {
   #signer: ethers.Signer
   #safeContract?: GnosisSafeContract
   #safeProxyFactoryContract?: GnosisSafeProxyFactoryContract
-  #relayAdapter?: RelayAdapter
+  #relayPack?: RelayPack
 
   constructor(signer: ethers.Signer) {
     if (!signer.provider) {
@@ -48,8 +48,8 @@ class AccountAbstraction {
   }
 
   async init(options: AccountAbstractionConfig) {
-    const { relayAdapter } = options
-    this.setRelayAdapter(relayAdapter)
+    const { relayPack } = options
+    this.setRelayPack(relayPack)
 
     const signer = await this.getSignerAddress()
     const owners = [signer]
@@ -83,8 +83,8 @@ class AccountAbstraction {
     })
   }
 
-  setRelayAdapter(relayAdapter: RelayAdapter) {
-    this.#relayAdapter = relayAdapter
+  setRelayPack(relayPack: RelayPack) {
+    this.#relayPack = relayPack
   }
 
   async getSignerAddress(): Promise<string> {
@@ -120,7 +120,7 @@ class AccountAbstraction {
     transactions: MetaTransactionData[],
     options: MetaTransactionOptions
   ): Promise<string> {
-    if (!this.#relayAdapter || !this.#safeContract || !this.#safeProxyFactoryContract) {
+    if (!this.#relayPack || !this.#safeContract || !this.#safeProxyFactoryContract) {
       throw new Error('SDK not initialized')
     }
 
@@ -130,7 +130,7 @@ class AccountAbstraction {
       safeAddress
     })
 
-    const standardizedSafeTx = await this.#relayAdapter.createRelayedTransaction(
+    const standardizedSafeTx = await this.#relayPack.createRelayedTransaction(
       safe,
       transactions,
       options
@@ -204,7 +204,7 @@ class AccountAbstraction {
       chainId,
       options
     }
-    const response = await this.#relayAdapter.relayTransaction(relayTransaction)
+    const response = await this.#relayPack.relayTransaction(relayTransaction)
     return response.taskId
   }
 }

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { AuthContext, Currency, OrderState, PaymentStandard } from '@monerium/sdk'
 import { Alert, Box, Button, TextField, Typography } from '@mui/material'
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
 import { useAuth } from '../AuthContext'
 import { SafeOnRampKit, MoneriumPack, SafeMoneriumClient } from '../../../../src'

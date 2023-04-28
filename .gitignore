@@ -60,3 +60,6 @@ typechain
 openapi/
 
 .idea
+
+.yalc
+yalc.lock

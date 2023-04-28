@@ -22,7 +22,7 @@ export const connectToOrderNotifications = ({
   })
 
   socket.addEventListener('message', (event) => {
-    const notification = event.data as MoneriumNotification
+    const notification = JSON.parse(event.data) as MoneriumNotification
 
     subscriptions.get(notification.meta.state as OrderState)?.(notification)
   })

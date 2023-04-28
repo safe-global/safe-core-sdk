@@ -34,9 +34,9 @@ import {
   getSignMessageLibContract
 } from './contracts/safeDeploymentContracts'
 import {
-  calculateProxyAddress,
+  predictSafeAddress,
+  encodeSetupCallData,
   encodeCreateProxyWithNonce,
-  getSafeInitializer,
   PREDETERMINED_SALT_NONCE
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
@@ -115,8 +115,8 @@ export {
   getMultiSendCallOnlyContract,
   getSignMessageLibContract,
   getCreateCallContract,
-  getSafeInitializer,
-  calculateProxyAddress,
+  predictSafeAddress,
+  encodeSetupCallData,
   PREDETERMINED_SALT_NONCE,
   encodeCreateProxyWithNonce,
   EthSafeSignature

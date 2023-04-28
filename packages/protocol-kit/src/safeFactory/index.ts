@@ -1,17 +1,14 @@
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
-  getCompatibilityFallbackHandlerContract,
   getProxyFactoryContract,
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import Safe from '@safe-global/protocol-kit/Safe'
 import {
   ContractNetworksConfig,
-  PredictedSafeProps,
   SafeAccountConfig,
   SafeDeploymentConfig
 } from '@safe-global/protocol-kit/types'
-import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
   EthAdapter,
   GnosisSafeContract,
@@ -19,13 +16,17 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
-import semverSatisfies from 'semver/functions/satisfies'
-import { validateSafeAccountConfig, validateSafeDeploymentConfig } from './utils'
+import {
+  predictSafeAddress,
+  encodeSetupCallData,
+  PREDETERMINED_SALT_NONCE,
+  validateSafeAccountConfig,
+  validateSafeDeploymentConfig
+} from '@safe-global/protocol-kit/contracts/utils'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
-  safeDeploymentConfig?: SafeDeploymentConfig
+  saltNonce?: string
   options?: TransactionOptions
   callback?: (txHash: string) => void
 }
@@ -112,100 +113,46 @@ class SafeFactory {
     return this.#ethAdapter.getChainId()
   }
 
-  private async encodeSetupCallData({
-    owners,
-    threshold,
-    to = ZERO_ADDRESS,
-    data = EMPTY_DATA,
-    fallbackHandler,
-    paymentToken = ZERO_ADDRESS,
-    payment = 0,
-    paymentReceiver = ZERO_ADDRESS
-  }: SafeAccountConfig): Promise<string> {
-    if (semverSatisfies(this.#safeVersion, '<=1.0.0')) {
-      return this.#gnosisSafeContract.encode('setup', [
-        owners,
-        threshold,
-        to,
-        data,
-        paymentToken,
-        payment,
-        paymentReceiver
-      ])
-    }
-    let fallbackHandlerAddress: string
-    if (fallbackHandler) {
-      fallbackHandlerAddress = fallbackHandler
-    } else {
-      const chainId = await this.#ethAdapter.getChainId()
-      const customContracts = this.#contractNetworks?.[chainId]
-      const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
-        ethAdapter: this.#ethAdapter,
-        safeVersion: this.#safeVersion,
-        customContracts
-      })
-      fallbackHandlerAddress = fallbackHandlerContract.getAddress()
-    }
-    return this.#gnosisSafeContract.encode('setup', [
-      owners,
-      threshold,
-      to,
-      data,
-      fallbackHandlerAddress,
-      paymentToken,
-      payment,
-      paymentReceiver
-    ])
-  }
+  async predictSafeAddress(
+    safeAccountConfig: SafeAccountConfig,
+    saltNonce = PREDETERMINED_SALT_NONCE
+  ): Promise<string> {
+    const chainId = await this.#ethAdapter.getChainId()
+    const customContracts = this.#contractNetworks?.[chainId]
+    const safeVersion = this.#safeVersion
+    const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce, safeVersion }
 
-  async predictSafeAddress({
-    safeAccountConfig,
-    safeDeploymentConfig
-  }: PredictedSafeProps): Promise<string> {
-    validateSafeAccountConfig(safeAccountConfig)
-    validateSafeDeploymentConfig(safeDeploymentConfig)
-
-    const from = this.#safeProxyFactoryContract.getAddress()
-
-    const initializer = await this.encodeSetupCallData(safeAccountConfig)
-    const saltNonce = safeDeploymentConfig.saltNonce
-    const encodedNonce = toBuffer(
-      this.#ethAdapter.encodeParameters(['uint256'], [saltNonce])
-    ).toString('hex')
-
-    const salt = keccak256(
-      toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
-    )
-
-    const proxyCreationCode = await this.#safeProxyFactoryContract.proxyCreationCode()
-    const constructorData = toBuffer(
-      this.#ethAdapter.encodeParameters(['address'], [this.#gnosisSafeContract.getAddress()])
-    ).toString('hex')
-    const initCode = proxyCreationCode + constructorData
-
-    const proxyAddress =
-      '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
-    return this.#ethAdapter.getChecksummedAddress(proxyAddress)
+    return predictSafeAddress({
+      ethAdapter: this.#ethAdapter,
+      safeAccountConfig,
+      safeDeploymentConfig,
+      isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
+      customContracts
+    })
   }
 
   async deploySafe({
     safeAccountConfig,
-    safeDeploymentConfig,
+    saltNonce = PREDETERMINED_SALT_NONCE,
     options,
     callback
   }: DeploySafeProps): Promise<Safe> {
     validateSafeAccountConfig(safeAccountConfig)
-    if (safeDeploymentConfig) {
-      validateSafeDeploymentConfig(safeDeploymentConfig)
-    }
+    validateSafeDeploymentConfig({ saltNonce })
+
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     if (!signerAddress) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    const initializer = await this.encodeSetupCallData(safeAccountConfig)
-    const saltNonce =
-      safeDeploymentConfig?.saltNonce ??
-      (Date.now() * 1000 + Math.floor(Math.random() * 1000)).toString()
+
+    const chainId = await this.getChainId()
+    const customContracts = this.#contractNetworks?.[chainId]
+    const initializer = await encodeSetupCallData({
+      ethAdapter: this.#ethAdapter,
+      safeAccountConfig,
+      safeContract: this.#gnosisSafeContract,
+      customContracts
+    })
 
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')

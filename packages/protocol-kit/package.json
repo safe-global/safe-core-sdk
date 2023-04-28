@@ -78,6 +78,7 @@
     "yargs": "^17.6.2"
   },
   "dependencies": {
+    "@ethersproject/address": "^5.7.0",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/solidity": "^5.7.0",
     "@safe-global/safe-deployments": "^1.22.0",

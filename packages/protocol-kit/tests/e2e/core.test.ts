@@ -1,10 +1,12 @@
+import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe from '@safe-global/protocol-kit/index'
+import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -19,16 +21,68 @@ describe('Safe Info', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [accounts[0].address],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        safeVersion: safeVersionDeployed
+      }
+    }
+    const predictedSafeAddress = '0x1A154d62d3d6a71115Bd4636C641B9E2b8Aa605d'
     return {
       chainId: (await waffle.provider.getNetwork()).chainId,
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
+      predictedSafe,
+      predictedSafeAddress,
       accounts,
       contractNetworks
     }
   })
 
   describe('connect', async () => {
-    it('should connect ethAdapter to Safe address', async () => {
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail to connect a Safe <v1.3.0 that is not deployed',
+      async () => {
+        const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeSdk2 = safeSdk.connect({ predictedSafe })
+        chai
+          .expect(safeSdk2)
+          .to.be.rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
+      }
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should connect a Safe >=v1.3.0 that is not deployed',
+      async () => {
+        const { predictedSafe, predictedSafeAddress, safe, accounts, contractNetworks } =
+          await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
+        const safeSdk2 = await safeSdk.connect({ predictedSafe })
+        chai.expect(await safeSdk2.getAddress()).to.be.eq(predictedSafeAddress)
+        chai
+          .expect(await safeSdk2.getEthAdapter().getSignerAddress())
+          .to.be.eq(await account1.signer.getAddress())
+      }
+    )
+
+    it('should connect a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -37,21 +91,24 @@ describe('Safe Info', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      chai.expect(safeSdk.getAddress()).to.be.eq(safe.address)
+      chai.expect(await safeSdk.getAddress()).to.be.eq(safe.address)
       chai
         .expect(await safeSdk.getEthAdapter().getSignerAddress())
         .to.be.eq(await account1.signer.getAddress())
 
       const ethAdapter2 = await getEthAdapter(account2.signer)
-      const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapter2, contractNetworks })
-      chai.expect(safeSdk2.getAddress()).to.be.eq(safe.address)
+      const safeSdk2 = await safeSdk.connect({
+        ethAdapter: ethAdapter2,
+        contractNetworks
+      })
+      chai.expect(await safeSdk2.getAddress()).to.be.eq(safe.address)
       chai
         .expect(await safeSdk2.getEthAdapter().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
 
       const safe2 = await getSafeWithOwners([accounts[2].address])
       const safeSdk3 = await safeSdk2.connect({ safeAddress: safe2.address })
-      chai.expect(safeSdk3.getAddress()).to.be.eq(safe2.address)
+      chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2.address)
       chai
         .expect(await safeSdk3.getEthAdapter().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
@@ -59,6 +116,36 @@ describe('Safe Info', () => {
   })
 
   describe('getContractVersion', async () => {
+    it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const contractVersion = await safeSdk.getContractVersion()
+      chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
+    })
+
+    it('should return the contract version of a Safe that is not deployed with a default version configuration', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeConfig: PredictedSafeProps = {
+        ...predictedSafe,
+        safeDeploymentConfig: {}
+      }
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe: safeConfig,
+        contractNetworks
+      })
+      const contractVersion = await safeSdk.getContractVersion()
+      chai.expect(contractVersion).to.be.eq(SAFE_LAST_VERSION)
+    })
+
     it('should return the Safe contract version', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -74,7 +161,44 @@ describe('Safe Info', () => {
   })
 
   describe('getAddress', async () => {
-    it('should return the Safe contract address', async () => {
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail to return the address of a Safe <v1.3.0 that is not deployed',
+      async () => {
+        const { predictedSafe, accounts, contractNetworks } = await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const getSafeAaddress = safeSdk.getAddress()
+        chai
+          .expect(getSafeAaddress)
+          .to.be.rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
+      }
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should return the address of a Safe >=v1.3.0 that is not deployed',
+      async () => {
+        const { predictedSafe, accounts, predictedSafeAddress, contractNetworks } =
+          await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const getSafeAaddress = safeSdk.getAddress()
+        chai.expect(await getSafeAaddress).to.be.eq(predictedSafeAddress)
+      }
+    )
+
+    it('should return the address of a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -83,7 +207,7 @@ describe('Safe Info', () => {
         safeAddress: safe.address,
         contractNetworks
       })
-      chai.expect(safeSdk.getAddress()).to.be.eq(safe.address)
+      chai.expect(await safeSdk.getAddress()).to.be.eq(safe.address)
     })
   })
 
@@ -104,6 +228,18 @@ describe('Safe Info', () => {
   })
 
   describe('getNonce', async () => {
+    it('should return the nonce of a Safe that is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      chai.expect(await safeSdk.getNonce()).to.be.eq(0)
+    })
+
     it('should return the Safe nonce', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
@@ -128,6 +264,18 @@ describe('Safe Info', () => {
   })
 
   describe('getChainId', async () => {
+    it('should return the chainId of a Safe that is not deployed', async () => {
+      const { predictedSafe, accounts, chainId, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
+    })
+
     it('should return the chainId of the current network', async () => {
       const { safe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -142,7 +290,46 @@ describe('Safe Info', () => {
   })
 
   describe('getBalance', async () => {
-    it('should return the balance of the Safe contract', async () => {
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail to return the balance of a Safe <v1.3.0 that is not deployed',
+      async () => {
+        const { predictedSafe, accounts, contractNetworks } = await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        chai
+          .expect(safeSdk.getBalance())
+          .to.be.rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
+      }
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should return the balance of a Safe >=v1.3.0 that is not deployed',
+      async () => {
+        const { predictedSafe, accounts, contractNetworks } = await setupTests()
+        const [account1] = accounts
+        const ethAdapter = await getEthAdapter(account1.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        chai.expect(await safeSdk.getBalance()).to.be.eq(0)
+        await account1.signer.sendTransaction({
+          to: await safeSdk.getAddress(),
+          value: BigNumber.from(`${1e18}`).toHexString()
+        })
+        chai.expect(await safeSdk.getBalance()).to.be.eq(BigNumber.from(`${1e18}`))
+      }
+    )
+
+    it('should return the balance of a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
@@ -153,7 +340,7 @@ describe('Safe Info', () => {
       })
       chai.expect(await safeSdk.getBalance()).to.be.eq(0)
       await account1.signer.sendTransaction({
-        to: safe.address,
+        to: await safeSdk.getAddress(),
         value: BigNumber.from(`${1e18}`).toHexString()
       })
       chai.expect(await safeSdk.getBalance()).to.be.eq(BigNumber.from(`${1e18}`))

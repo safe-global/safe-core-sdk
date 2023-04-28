@@ -4,9 +4,9 @@ import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
 class ModuleManager {
   #ethAdapter: EthAdapter
-  #safeContract: GnosisSafeContract
+  #safeContract?: GnosisSafeContract
 
-  constructor(ethAdapter: EthAdapter, safeContract: GnosisSafeContract) {
+  constructor(ethAdapter: EthAdapter, safeContract?: GnosisSafeContract) {
     this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }
@@ -36,14 +36,23 @@ class ModuleManager {
   }
 
   async getModules(): Promise<string[]> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     return this.#safeContract.getModules()
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     return this.#safeContract.isModuleEnabled(moduleAddress)
   }
 
   async encodeEnableModuleData(moduleAddress: string): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     this.validateModuleAddress(moduleAddress)
     const modules = await this.getModules()
     this.validateModuleIsNotEnabled(moduleAddress, modules)
@@ -51,6 +60,9 @@ class ModuleManager {
   }
 
   async encodeDisableModuleData(moduleAddress: string): Promise<string> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
     this.validateModuleAddress(moduleAddress)
     const modules = await this.getModules()
     const moduleIndex = this.validateModuleIsEnabled(moduleAddress, modules)

@@ -14,7 +14,8 @@ import AppBar from './AppBar'
 import {
   SafeAuthKit,
   SafeAuthSignInData,
-  Web3AuthAdapter,
+  SafeGetUserInfoResponse,
+  Web3AuthModalPack,
   Web3AuthEventListener
 } from '../../src/index'
 
@@ -22,10 +23,11 @@ const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
 
 function App() {
+  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData | null>(
     null
   )
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthAdapter>>()
+  const [userInfo, setUserInfo] = useState<SafeGetUserInfoResponse<Web3AuthModalPack>>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
 
   useEffect(() => {
@@ -68,9 +70,9 @@ function App() {
         }
       })
 
-      const adapter = new Web3AuthAdapter(options, [openloginAdapter], modalConfig)
+      const web3AuthModalPack = new Web3AuthModalPack(options, [openloginAdapter], modalConfig)
 
-      const safeAuthKit = await SafeAuthKit.init(adapter, {
+      const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack, {
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
@@ -90,10 +92,14 @@ function App() {
   const login = async () => {
     if (!safeAuth) return
 
-    const response = await safeAuth.signIn()
-    console.log('SIGN IN RESPONSE: ', response)
+    const signInInfo = await safeAuth.signIn()
+    console.log('SIGN IN RESPONSE: ', signInInfo)
 
-    setSafeAuthSignInResponse(response)
+    const userInfo = await safeAuth.getUserInfo()
+    console.log('USER INFO: ', userInfo)
+
+    setSafeAuthSignInResponse(signInInfo)
+    setUserInfo(userInfo || undefined)
     setProvider(safeAuth.getProvider() as SafeEventEmitterProvider)
   }
 
@@ -108,7 +114,7 @@ function App() {
 
   return (
     <>
-      <AppBar onLogin={login} onLogout={logout} isLoggedIn={!!provider} />
+      <AppBar onLogin={login} onLogout={logout} userInfo={userInfo} isLoggedIn={!!provider} />
       {safeAuthSignInResponse?.eoa && (
         <Grid container>
           <Grid item md={4} p={4}>

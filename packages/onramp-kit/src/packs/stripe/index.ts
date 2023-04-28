@@ -1,2 +1,2 @@
-export * from './StripeAdapter'
+export * from './StripePack'
 export * from './types'

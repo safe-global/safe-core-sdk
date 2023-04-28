@@ -1,19 +1,19 @@
+import { Interface } from '@ethersproject/abi'
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
-import { Interface } from '@ethersproject/abi'
-import { hexToNumber, toChecksumAddress, hexToNumberString } from 'web3-utils'
+import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
+import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
-  EthAdapter,
-  GnosisSafeContract,
   MetaTransactionData,
   OperationType,
   SafeMultisigTransactionResponse,
   SafeTransaction,
   SafeTransactionData,
-  SafeTransactionDataPartial
+  SafeTransactionDataPartial,
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
-import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { hexToNumber, hexToNumberString, toChecksumAddress } from 'web3-utils'
 import { estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
@@ -26,11 +26,12 @@ export function standardizeMetaTransactionData(
   return standardizedTxs
 }
 
-export async function standardizeSafeTransactionData(
-  safeContract: GnosisSafeContract,
-  ethAdapter: EthAdapter,
-  tx: SafeTransactionDataPartial
-): Promise<SafeTransactionData> {
+export async function standardizeSafeTransactionData({
+  safeContract,
+  predictedSafe,
+  ethAdapter,
+  tx
+}: StandardizeSafeTransactionDataProps): Promise<SafeTransactionData> {
   const standardizedTxs = {
     to: tx.to,
     value: tx.value,
@@ -40,9 +41,8 @@ export async function standardizeSafeTransactionData(
     gasPrice: tx.gasPrice ?? '0',
     gasToken: tx.gasToken || ZERO_ADDRESS,
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
-    nonce: tx.nonce ?? (await safeContract.getNonce())
+    nonce: tx.nonce ?? (safeContract ? await safeContract.getNonce() : 0)
   }
-  let safeTxGas: string
 
   if (typeof tx.safeTxGas !== 'undefined') {
     return {
@@ -50,22 +50,39 @@ export async function standardizeSafeTransactionData(
       safeTxGas: tx.safeTxGas
     }
   }
-  const safeVersion = await safeContract.getVersion()
-  if (
-    hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion) &&
-    standardizedTxs.gasPrice === '0'
-  ) {
-    safeTxGas = '0'
+
+  let safeVersion: SafeVersion
+  if (predictedSafe?.safeDeploymentConfig.safeVersion) {
+    safeVersion = predictedSafe?.safeDeploymentConfig.safeVersion
   } else {
-    safeTxGas = await estimateTxGas(
-      safeContract,
-      ethAdapter,
-      standardizedTxs.to,
-      standardizedTxs.value,
-      standardizedTxs.data,
-      standardizedTxs.operation
-    )
+    if (!safeContract) {
+      throw new Error('Safe is not deployed')
+    }
+    safeVersion = await safeContract.getVersion()
   }
+
+  const hasSafeTxGasOptional = hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)
+  if (
+    (hasSafeTxGasOptional && standardizedTxs.gasPrice === '0') ||
+    (hasSafeTxGasOptional && predictedSafe)
+  ) {
+    return {
+      ...standardizedTxs,
+      safeTxGas: '0'
+    }
+  }
+
+  if (!safeContract) {
+    throw new Error('Safe is not deployed')
+  }
+  const safeTxGas = await estimateTxGas(
+    safeContract,
+    ethAdapter,
+    standardizedTxs.to,
+    standardizedTxs.value,
+    standardizedTxs.data,
+    standardizedTxs.operation
+  )
   return {
     ...standardizedTxs,
     safeTxGas
@@ -107,7 +124,7 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
     const data = `0x${decodedData.slice(index, (index += dataLength))}`
 
     txs.push({
-      operation: hexToNumber(operation),
+      operation: hexToNumber(operation) as OperationType,
       to: toChecksumAddress(to),
       value: hexToNumberString(value),
       data

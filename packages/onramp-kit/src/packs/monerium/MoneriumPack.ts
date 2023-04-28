@@ -1,7 +1,7 @@
 import { Currency } from '@monerium/sdk'
 import Safe from '@safe-global/protocol-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
-import { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
+import { SafeOnRampPack } from '@safe-global/onramp-kit/types'
 
 import { SafeMoneriumClient } from './SafeMoneriumClient'
 import {
@@ -19,7 +19,7 @@ const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
  * This class implements the SafeOnRampClient interface for the Monerium provider
  * @class MoneriumPack
  */
-export class MoneriumPack implements SafeOnRampAdapter<MoneriumPack> {
+export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
   #client?: SafeMoneriumClient
   #config: MoneriumProviderConfig
   #socket?: WebSocket

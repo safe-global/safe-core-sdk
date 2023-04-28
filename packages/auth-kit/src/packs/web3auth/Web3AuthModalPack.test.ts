@@ -1,4 +1,4 @@
-import { Web3AuthAdapter } from './Web3AuthAdapter'
+import { Web3AuthModalPack } from './Web3AuthModalPack'
 import { generateTestingUtils } from 'eth-testing'
 import { CHAIN_NAMESPACES } from '@web3auth/base'
 
@@ -21,11 +21,11 @@ jest.mock('@web3auth/modal', () => {
   }
 })
 
-describe('Web3AuthAdapter', () => {
-  let adapter: Web3AuthAdapter
+describe('Web3AuthModalPack', () => {
+  let web3AuthModalPack: Web3AuthModalPack
 
   beforeAll(() => {
-    adapter = new Web3AuthAdapter({
+    web3AuthModalPack = new Web3AuthModalPack({
       clientId: '123',
       web3AuthNetwork: 'mainnet',
       chainConfig: {
@@ -44,17 +44,17 @@ describe('Web3AuthAdapter', () => {
   })
 
   it('should initialize Web3Auth on init', async () => {
-    await adapter.init()
-    expect(adapter.provider).not.toBeNull()
+    await web3AuthModalPack.init()
+    expect(web3AuthModalPack.provider).not.toBeNull()
   })
 
   it('should connect to Web3Auth on signIn', async () => {
-    await adapter.signIn()
-    expect(adapter.provider).not.toBeNull()
+    await web3AuthModalPack.signIn()
+    expect(web3AuthModalPack.provider).not.toBeNull()
   })
 
   it('should disconnect from Web3Auth on signOut', async () => {
-    await adapter.signOut()
-    expect(adapter.provider).toBeNull()
+    await web3AuthModalPack.signOut()
+    expect(web3AuthModalPack.provider).toBeNull()
   })
 })

@@ -1,13 +1,18 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { MetaTransactionData, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
+  PredictedSafeProps,
   SafeTransactionOptionalProps,
   standardizeSafeTransactionData
 } from '@safe-global/protocol-kit/index'
+import {
+  GnosisSafeContract,
+  MetaTransactionData,
+  SafeTransactionDataPartial
+} from '@safe-global/safe-core-sdk-types'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import { deployments, waffle } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
@@ -31,12 +36,22 @@ describe('Transactions creation', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [accounts[0].address],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        safeVersion: safeVersionDeployed
+      }
+    }
     return {
       erc20Mintable: await getERC20Mintable(),
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       accounts,
       chainId,
-      contractNetworks
+      contractNetworks,
+      predictedSafe
     }
   })
 
@@ -58,11 +73,11 @@ describe('Transactions creation', () => {
           value: '0',
           data: '0x'
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq('0')
       }
     )
@@ -83,13 +98,13 @@ describe('Transactions creation', () => {
           to: account2.address,
           value: '0',
           data: '0x',
-          gasPrice: '123'
+          gasPrice: BASE_OPTIONS.gasPrice
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
     )
@@ -106,18 +121,18 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = '111'
+        const safeTxGas = BASE_OPTIONS.safeTxGas
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
           data: '0x',
           safeTxGas
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
     )
@@ -139,11 +154,11 @@ describe('Transactions creation', () => {
           value: '0',
           data: '0x'
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
     )
@@ -167,11 +182,11 @@ describe('Transactions creation', () => {
           data: '0x',
           safeTxGas
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
     )
@@ -188,24 +203,44 @@ describe('Transactions creation', () => {
           safeAddress: safe.address,
           contractNetworks
         })
-        const safeTxGas = '111'
+        const safeTxGas = BASE_OPTIONS.safeTxGas
         const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
           data: '0x',
           safeTxGas
         }
-        const safeTxData = await standardizeSafeTransactionData(
-          safeSdk.getContractManager().safeContract,
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
           ethAdapter,
-          txDataPartial
-        )
+          tx: txDataPartial
+        })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
     )
   })
 
   describe('createTransaction', async () => {
+    it('should create a single transaction with gasPrice=0', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const safeTransactionData: SafeTransactionDataPartial = {
+        ...BASE_OPTIONS,
+        to: account2.address,
+        value: '500000000000000000', // 0.5 ETH
+        data: '0x',
+        gasPrice: '0'
+      }
+      const tx = safeSdk.createTransaction({ safeTransactionData })
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should create a single transaction with gasPrice=0', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
@@ -217,10 +252,10 @@ describe('Transactions creation', () => {
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
+        ...BASE_OPTIONS,
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
-        data: '0x',
-        ...BASE_OPTIONS
+        data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)
@@ -245,10 +280,10 @@ describe('Transactions creation', () => {
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
+        ...BASE_OPTIONS,
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
-        data: '0x',
-        ...BASE_OPTIONS
+        data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       chai.expect(tx.data.to).to.be.eq(account2.address)

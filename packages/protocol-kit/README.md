@@ -219,7 +219,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
-This method can optionally receive the `safeDeploymentConfig` parameter to define the `saltNonce`.
+This method can optionally receive the `saltNonce` parameter.
 
 ```js
 const safeAccountConfig: SafeAccountConfig = {
@@ -232,9 +232,10 @@ const safeAccountConfig: SafeAccountConfig = {
   payment, // Optional
   paymentReceiver // Optional
 }
-const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce }
 
-const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, safeDeploymentConfig })
+const saltNonce = '<YOUR_CUSTOM_VALUE>'
+
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, saltNonce })
 ```
 
 Optionally, some properties can be passed as execution options:

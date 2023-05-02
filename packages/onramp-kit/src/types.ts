@@ -1,14 +1,19 @@
-import { StripePack } from './packs/stripe/StripePack'
-import { MoneriumPack } from './packs/monerium/MoneriumPack'
 import Safe from '@safe-global/protocol-kit'
-import { SafeMoneriumClient } from './packs/monerium/SafeMoneriumClient'
-import { MoneriumEvent, MoneriumEventListener, MoneriumOpenOptions } from './packs/monerium/types'
+
 import {
+  StripePack,
   StripeSession,
   StripeEvent,
   StripeEventListener,
   StripeOpenOptions
-} from './packs/stripe/types'
+} from './packs/stripe'
+import {
+  MoneriumPack,
+  SafeMoneriumClient,
+  MoneriumEvent,
+  MoneriumEventListener,
+  MoneriumOpenOptions
+} from './packs/monerium'
 
 declare global {
   interface Window {

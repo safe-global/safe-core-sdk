@@ -39,11 +39,7 @@ export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
       throw new Error('You need to provide an instance of the protocol kit')
     }
 
-    try {
-      this.#client = new SafeMoneriumClient(this.#config.environment, safeSdk)
-    } catch (error) {
-      throw new Error(getErrorMessage(error))
-    }
+    this.#client = new SafeMoneriumClient(this.#config.environment, safeSdk)
   }
 
   /**

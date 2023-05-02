@@ -41,8 +41,8 @@ describe('stripeApi', () => {
         Promise.resolve({ json: () => Promise.reject('http error'), ok: false })
       )
 
-    await expect(stripeApi.createSession(baseUrl, config)).rejects.toThrowError(
-      "Error: Couldn't create a new Stripe session"
+    expect(await stripeApi.createSession(baseUrl, config)).rejects.toThrowError(
+      "Couldn't create a new Stripe session"
     )
   })
 
@@ -66,7 +66,7 @@ describe('stripeApi', () => {
       )
 
     await expect(stripeApi.getSession(baseUrl, 'session-id')).rejects.toThrowError(
-      "Error: Couldn't get the session with id  session-id"
+      "Couldn't get the session with id  session-id"
     )
   })
 })

@@ -51,7 +51,7 @@ jest.mock('@stripe/crypto', () => {
   return {
     loadStripeOnramp: jest.fn().mockImplementation(() => {
       return Promise.resolve({
-        createSession: jest.fn().mockResolvedValue({
+        createSession: jest.fn().mockReturnValue({
           mount: mockMount,
           addEventListener: mockAddEventListener,
           dispatchEvent: mockDispatch

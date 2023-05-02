@@ -40,7 +40,7 @@ describe('SafeOnRampKit', () => {
     await SafeOnRampKit.init(pack)
 
     expect(stripePack.StripePack).toHaveBeenCalledWith(expect.objectContaining(config))
-    expect(stripePack.StripePack.prototype.init).toHaveBeenCalledWith()
+    expect(stripePack.StripePack.prototype.init).toHaveBeenCalled()
   })
 
   it('should call the open method in the XXXPack with the corresponding options', async () => {

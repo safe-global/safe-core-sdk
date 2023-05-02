@@ -1,5 +1,7 @@
+import { OrderMetadata } from '@monerium/sdk'
+import { Fee } from '@monerium/sdk'
 import { OrderState } from '@monerium/sdk'
-import { Currency, Counterpart, Order } from '@monerium/sdk'
+import { Currency, Counterpart } from '@monerium/sdk'
 
 export interface MoneriumProviderConfig {
   clientId: string
@@ -36,24 +38,12 @@ export type MoneriumNotification = {
   amount: string
   currency: string
   totalFee: string
-  fees: any[]
-  counterpart: {
-    identifier: any
-    details: any
-  }
+  fees: Fee[]
+  counterpart: Counterpart
   memo: string
-  rejectedReason: any
+  rejectedReason: string
   supportingDocumentId: string
-  meta: {
-    approvedAt: string
-    processedAt: string
-    rejectedAt: string
-    state: string
-    placedBy: string
-    placedAt: string
-    receivedAmount: string
-    sentAmount: string
-  }
+  meta: OrderMetadata
 }
 
 export type MoneriumEvent = OrderState

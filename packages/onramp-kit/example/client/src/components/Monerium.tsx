@@ -2,7 +2,14 @@ import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { AuthContext, Currency, OrderState, PaymentStandard } from '@monerium/sdk'
-import { Alert, Box, Button, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  TextField,
+  Typography,
+  CircularProgress as Loader
+} from '@mui/material'
 
 import { useAuth } from '../AuthContext'
 import { SafeOnRampKit, MoneriumPack, SafeMoneriumClient } from '../../../../src'
@@ -15,6 +22,7 @@ function Monerium() {
   const [counterpartIban, setCounterpartIban] = useState<string>('')
   const [moneriumClient, setMoneriumClient] = useState<SafeMoneriumClient>()
   const [onRampKit, setOnRampKit] = useState<SafeOnRampKit<MoneriumPack>>()
+  const [orderState, setOrderState] = useState<OrderState>()
   const { isLoggedIn, selectedSafe, provider: authProvider } = useAuth()
 
   useEffect(() => {
@@ -40,12 +48,30 @@ function Monerium() {
         safeSdk
       )
 
+      client.subscribe(OrderState.pending, (notification) => {
+        console.log('Order ', notification.meta.state)
+        setOrderState(notification.meta.state)
+      })
+
       client.subscribe(OrderState.placed, (notification) => {
-        console.log('Order placed', notification)
+        console.log('Order ', notification.meta.state)
+        setOrderState(notification.meta.state)
+      })
+
+      client.subscribe(OrderState.rejected, (notification) => {
+        console.log('Order ', notification.meta.state)
+        setOrderState(notification.meta.state)
+        setTimeout(() => {
+          setOrderState(undefined)
+        }, 5000)
       })
 
       client.subscribe(OrderState.processed, (notification) => {
-        console.log('Order processed', notification)
+        console.log('Order ', notification.meta.state)
+        setOrderState(notification.meta.state)
+        setTimeout(() => {
+          setOrderState(undefined)
+        }, 5000)
       })
 
       const threshold = await safeSdk.getThreshold()
@@ -144,28 +170,42 @@ function Monerium() {
           <p>User Id: {authContext.userId}</p>
           <p>Default profile: {authContext.defaultProfile}</p>
 
-          <TextField
-            value={counterpartIban}
-            onChange={(e) => setCounterpartIban(e.target.value)}
-            placeholder="Enter the recipient's IBAN"
-            sx={{ mb: 2, width: '24em' }}
-          />
-
-          <br />
-
-          {counterpartIban && selectedSafe && (
+          {orderState ? (
+            <Box display="flex" alignItems="center">
+              <Loader color="primary" size={40} sx={{ mr: 2 }} />
+              {orderState === OrderState.placed && <Alert severity="info">Order placed</Alert>}
+              {orderState === OrderState.pending && <Alert severity="info">Order pending</Alert>}
+              {orderState === OrderState.rejected && <Alert severity="error">Order rejected</Alert>}
+              {orderState === OrderState.processed && (
+                <Alert severity="success">Order processed</Alert>
+              )}
+            </Box>
+          ) : (
             <>
-              <Alert severity="info">{`You are going to transfer 1 EUR from ${selectedSafe} to ${counterpartIban}`}</Alert>
+              <TextField
+                value={counterpartIban}
+                onChange={(e) => setCounterpartIban(e.target.value)}
+                placeholder="Enter the recipient's IBAN"
+                sx={{ mb: 2, width: '24em' }}
+              />
 
-              <Button variant="contained" onClick={transfer} sx={{ my: 2, mr: 2 }}>
-                Transfer
+              <br />
+
+              {counterpartIban && selectedSafe && (
+                <>
+                  <Alert severity="info">{`You are going to transfer 1 EUR from ${selectedSafe} to ${counterpartIban}`}</Alert>
+
+                  <Button variant="contained" onClick={transfer} sx={{ my: 2, mr: 2 }}>
+                    Transfer
+                  </Button>
+                </>
+              )}
+
+              <Button variant="contained" color="error" onClick={closeMoneriumFlow}>
+                Logout from Monerium
               </Button>
             </>
           )}
-
-          <Button variant="contained" color="error" onClick={closeMoneriumFlow}>
-            Logout from Monerium
-          </Button>
         </>
       ) : (
         <>

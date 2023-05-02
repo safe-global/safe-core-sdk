@@ -12,8 +12,7 @@ import {
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import { SAFE_LAST_VERSION } from './contracts/config'
-import { getProxyFactoryContract } from './contracts/safeDeploymentContracts'
-import { calculateProxyAddress } from './contracts/utils'
+import { predictSafeAddress } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -176,19 +175,11 @@ class Safe {
       }
 
       const chainId = await this.#ethAdapter.getChainId()
-      const safeProxyFactoryContract = await getProxyFactoryContract({
+      return predictSafeAddress({
         ethAdapter: this.#ethAdapter,
-        safeVersion,
-        customContracts: this.#contractManager.contractNetworks?.[chainId]
+        customContracts: this.#contractManager.contractNetworks?.[chainId],
+        ...this.#predictedSafe
       })
-
-      return calculateProxyAddress(
-        this.#ethAdapter,
-        safeVersion,
-        safeProxyFactoryContract,
-        this.#predictedSafe,
-        this.#contractManager.contractNetworks?.[chainId]
-      )
     }
 
     if (!this.#contractManager.safeContract) {

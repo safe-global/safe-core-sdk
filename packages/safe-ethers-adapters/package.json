@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-ethers-adapters",
-  "version": "0.1.0-alpha.16",
+  "version": "0.2.0-alpha.0",
   "description": "Safe Ethers Adapters",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -56,8 +56,8 @@
     "@ethersproject/properties": "^5.7.0"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^0.1.1",
-    "@safe-global/safe-core-sdk-types": "^1.10.1",
+    "@safe-global/protocol-kit": "^1.0.0",
+    "@safe-global/safe-core-sdk-types": "^2.0.0",
     "@safe-global/safe-deployments": "^1.22.0",
     "axios": "^0.27.2"
   }

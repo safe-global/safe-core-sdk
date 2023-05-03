@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Safe API Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@safe-global/protocol-kit": "^0.1.1",
+    "@safe-global/protocol-kit": "^1.0.0",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^10.0.1",
@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
-    "@safe-global/safe-core-sdk-types": "^1.10.1",
+    "@safe-global/safe-core-sdk-types": "^2.0.0",
     "node-fetch": "^2.6.6"
   }
 }

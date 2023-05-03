@@ -280,12 +280,27 @@ const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, callback })
 
 ### create
 
-Returns an instance of the Protocol Kit connected to the `safeAddress`.
+Returns an instance of the Protocol Kit connected to a Safe. The provided Safe must be a `safeAddress` or a `predictedSafe`.
+
+Initialization of a deployed Safe using the `safeAddress` property:
 
 ```js
 import Safe from '@safe-global/protocol-kit'
 
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+```
+
+Initialization of a not deployed Safe using the `predictedSafe` property. Because Safes are deployed in a deterministic way, passing a `predictedSafe` will allow to initialize the SDK with the Safe configuration and use it to some extent before it is deployed:
+
+```js
+import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit'
+
+const predictedSafe: PredictedSafeProps = {
+  safeAccountConfig,
+  safeDeploymentConfig
+}
+
+const safeSdk = await Safe.create({ ethAdapter, predictedSafe })
 ```
 
 - The `isL1SafeMasterCopy` flag
@@ -330,10 +345,25 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 
 ### connect
 
-Returns a new instance of the Protocol Kit connected to the `safeAddress`.
+Returns a new instance of the Protocol Kit connected to a new Safe or a new Signer. The new connected signer can be passed via the `ethAdapter` property while the new connected Safe can be passed using a `safeAddress` or a `predictedSafe`.
+
+Connection of a deployed Safe using the `safeAddress` property:
 
 ```js
-const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
+const safeSdk = await safeSdk.connect({ ethAdapter, safeAddress })
+```
+
+Connection of a not deployed Safe using the `predictedSafe` property. Because Safes are deployed in a deterministic way, passing a `predictedSafe` will allow to connect a Safe to the SDK with the Safe configuration:
+
+```js
+import { PredictedSafeProps } from '@safe-global/protocol-kit'
+
+const predictedSafe: PredictedSafeProps = {
+  safeAccountConfig,
+  safeDeploymentConfig
+}
+
+const safeSdk = await safeSdk.connect({ ethAdapter, predictedSafe })
 ```
 
 - The `isL1SafeMasterCopy` flag

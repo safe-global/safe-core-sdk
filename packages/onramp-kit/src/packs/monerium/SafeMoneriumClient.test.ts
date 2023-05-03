@@ -119,6 +119,16 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should allow to sign a message', async () => {
+    const txData = {
+      operation: OperationType.DelegateCall,
+      baseGas: 0,
+      safeTxGas: 1000000,
+      gasPrice: 0,
+      gasToken: '0x000',
+      refundReceiver: '0x00000000',
+      nonce: 0
+    }
+
     jest.spyOn(protocolKit, 'getSignMessageLibContract').mockResolvedValueOnce({
       encode: jest.fn(),
       getAddress: jest.fn(),
@@ -128,15 +138,7 @@ describe('SafeMoneriumClient', () => {
     })
 
     safeSdk.createTransaction = jest.fn().mockResolvedValueOnce({
-      data: {
-        operation: OperationType.DelegateCall,
-        safeTxGas: 1000000,
-        baseGas: 0,
-        gasPrice: 0,
-        gasToken: '0x000',
-        refundReceiver: '0x00000000',
-        nonce: 0
-      }
+      data: txData
     })
 
     safeSdk.getTransactionHash = jest.fn().mockResolvedValueOnce('0xTransactionHash')
@@ -155,15 +157,7 @@ describe('SafeMoneriumClient', () => {
     expect(proposeTransactionSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         safeAddress: '0xSafeAddress',
-        safeTransactionData: {
-          baseGas: 0,
-          gasPrice: 0,
-          gasToken: '0x000',
-          nonce: 0,
-          operation: 1,
-          refundReceiver: '0x00000000',
-          safeTxGas: 1000000
-        },
+        safeTransactionData: txData,
         safeTxHash: '0xTransactionHash',
         senderAddress: '0xSignerAddress',
         senderSignature: undefined

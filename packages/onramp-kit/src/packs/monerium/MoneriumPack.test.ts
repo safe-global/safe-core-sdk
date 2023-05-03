@@ -1,6 +1,8 @@
 import Safe from '@safe-global/protocol-kit'
 import { MoneriumPack } from './MoneriumPack'
 import * as safeMoneriumClient from './SafeMoneriumClient'
+import * as sockets from './sockets'
+import { OrderState } from '@monerium/sdk'
 
 Object.defineProperty(window, 'location', {
   writable: true,
@@ -10,11 +12,23 @@ Object.defineProperty(window, 'location', {
   }
 })
 
+Object.defineProperty(safeMoneriumClient.SafeMoneriumClient.prototype, 'bearerProfile', {
+  get: jest.fn(() => ({
+    access_token: 'access-token',
+    token_type: 'bearer',
+    expires_in: 3600,
+    refresh_token: 'refresh-token',
+    profile: 'profile',
+    userId: 'userId'
+  }))
+})
+
 const config = {
   clientId: 'monerium-client-id',
   environment: 'sandbox' as const
 }
 
+jest.mock('./sockets.ts')
 jest.mock('@monerium/sdk')
 jest.mock('@safe-global/protocol-kit')
 jest.mock('./SafeMoneriumClient')
@@ -100,6 +114,79 @@ describe('MoneriumPack', () => {
           signature: '0x'
         })
       )
+    })
+
+    it('should check if the message is in the queue when not signed', async () => {
+      jest
+        .spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'isMessageSigned')
+        .mockResolvedValue(false)
+
+      jest
+        .spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'getSafeAddress')
+        .mockResolvedValue('0xSafeAddress')
+
+      const isMessagePendingSpy = jest.spyOn(
+        safeMoneriumClient.SafeMoneriumClient.prototype,
+        'isSignMessagePending'
+      )
+
+      await moneriumPack.open({
+        redirect_uri: 'http://localhost:3000'
+      })
+
+      expect(isMessagePendingSpy).toHaveBeenCalledWith(
+        '0xSafeAddress',
+        'I hereby declare that I am the address owner.'
+      )
+    })
+  })
+
+  describe('subscribe() / unsubscribe()', () => {
+    it('should try to subscribe to order notifications after authentication finished and subscriptions placed', async () => {
+      const safeSdk = new Safe()
+
+      await moneriumPack.init(safeSdk)
+
+      const socket = { close: jest.fn() }
+
+      // @ts-expect-error - Mock
+      jest.spyOn(sockets, 'connectToOrderNotifications').mockReturnValue(socket)
+
+      moneriumPack.subscribe(OrderState.placed, jest.fn())
+      moneriumPack.subscribe(OrderState.processed, jest.fn())
+
+      await moneriumPack.open({
+        redirect_uri: 'http://localhost:3000'
+      })
+
+      expect(sockets.connectToOrderNotifications).toHaveBeenCalledWith({
+        accessToken: 'access-token',
+        profile: 'profile',
+        env: 'sandbox',
+        subscriptions: new Map([
+          [OrderState.placed, expect.any(Function)],
+          [OrderState.processed, expect.any(Function)]
+        ])
+      })
+
+      moneriumPack.unsubscribe(OrderState.placed)
+      moneriumPack.unsubscribe(OrderState.processed)
+
+      expect(socket.close).toHaveBeenCalled()
+    })
+  })
+
+  describe('close()', () => {
+    it('should remove the codeverifier from the storage', async () => {
+      const localStorageSpy = jest.spyOn(window.localStorage.__proto__, 'removeItem')
+
+      const safeSdk = new Safe()
+
+      await moneriumPack.init(safeSdk)
+
+      await moneriumPack.close()
+
+      expect(localStorageSpy).toHaveBeenCalledWith('OnRampKit__monerium_code_verifier')
     })
   })
 })

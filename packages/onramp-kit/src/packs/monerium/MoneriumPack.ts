@@ -206,6 +206,8 @@ export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
    */
   async close() {
     localStorage.removeItem(MONERIUM_CODE_VERIFIER)
+    this.#subscriptions.clear()
+    this.#socket?.close()
   }
 
   /**

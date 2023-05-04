@@ -15,12 +15,6 @@ import {
   MoneriumOpenOptions
 } from './packs/monerium'
 
-declare global {
-  interface Window {
-    ethereum?: any
-  }
-}
-
 // The new packs must implement this interface
 export interface SafeOnRampPack<TPack> {
   init(safeSdk?: Safe): Promise<void>

@@ -1,9 +1,10 @@
 import { ethers } from 'ethers'
+import { Chain, Currency, Network, PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit'
+
 import { SafeMoneriumClient } from './SafeMoneriumClient'
-import { Chain, Currency, Network, PaymentStandard } from '@monerium/sdk'
 import { MAGIC_VALUE } from './signatures'
 
 jest.mock('@monerium/sdk')

@@ -2,13 +2,15 @@ import React, { createContext, useState, useEffect } from 'react'
 import { Web3AuthOptions } from '@web3auth/modal'
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS } from '@web3auth/base'
 import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
+
+// TODO: Change to @safe-global/auth-kit when next version published
 import { SafeAuthKit, Web3AuthModalPack, SafeAuthSignInData } from '../../../../auth-kit/src/index'
 
 type AuthContextProviderProps = {
   children: React.ReactNode
 }
 
-interface AuthContextType {
+type AuthContextType = {
   isLoggedIn: boolean
   provider?: SafeEventEmitterProvider
   data?: SafeAuthSignInData
@@ -100,7 +102,6 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
     setSafeAuthSignInResponse(response)
     setSelectedSafe(response?.safes?.[0] || '')
     setProvider(safeAuth.getProvider() as SafeEventEmitterProvider)
-
     setIsLoggedIn(true)
   }
 
@@ -111,7 +112,6 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
 
     setProvider(undefined)
     setSafeAuthSignInResponse(undefined)
-
     setIsLoggedIn(false)
   }
 

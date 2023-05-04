@@ -4,7 +4,7 @@ import { ThemeProvider, CssBaseline } from '@mui/material'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import Stripe from './components/Stripe'
-import Monerium from './components/Monerium'
+import Monerium from './components/monerium/Monerium'
 import App from './App'
 
 import './index.css'

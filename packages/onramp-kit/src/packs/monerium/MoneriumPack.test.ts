@@ -1,8 +1,8 @@
+import { OrderState } from '@monerium/sdk'
 import Safe from '@safe-global/protocol-kit'
 import { MoneriumPack } from './MoneriumPack'
 import * as safeMoneriumClient from './SafeMoneriumClient'
 import * as sockets from './sockets'
-import { OrderState } from '@monerium/sdk'
 
 Object.defineProperty(window, 'location', {
   writable: true,
@@ -27,6 +27,8 @@ const config = {
   clientId: 'monerium-client-id',
   environment: 'sandbox' as const
 }
+
+const REDIRECT_URL = 'http://localhost:3000'
 
 jest.mock('./sockets.ts')
 jest.mock('@monerium/sdk')
@@ -69,26 +71,26 @@ describe('MoneriumPack', () => {
       await moneriumPack.init(safeSdk)
     })
 
-    it('should start the authorization code flow if an authCode is provided', async () => {
+    it('should start the authorization code flow if the authCode is provided', async () => {
       const getAuthSpy = jest.spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'auth')
 
-      await moneriumPack.open({ redirect_uri: 'http://localhost:3000', authCode: 'auth-code' })
+      await moneriumPack.open({ redirect_uri: REDIRECT_URL, authCode: 'auth-code' })
 
       expect(getAuthSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           client_id: 'monerium-client-id',
           code: 'auth-code',
           code_verifier: '',
-          redirect_uri: 'http://localhost:3000'
+          redirect_uri: REDIRECT_URL
         })
       )
     })
 
-    it('should start the refresh token flow if an refreshToken is provided', async () => {
+    it('should start the refresh token flow if the refreshToken is provided', async () => {
       const getAuthSpy = jest.spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'auth')
 
       await moneriumPack.open({
-        redirect_uri: 'http://localhost:3000',
+        redirect_uri: REDIRECT_URL,
         refreshToken: 'refresh-token'
       })
 
@@ -97,26 +99,26 @@ describe('MoneriumPack', () => {
       )
     })
 
-    it('should start the Login with Monerium flow when no authCode and refreshToken are provided', async () => {
+    it('should start the Login with Monerium flow when no authCode or refreshToken are provided', async () => {
       const getAuthFlowSpy = jest.spyOn(
         safeMoneriumClient.SafeMoneriumClient.prototype,
         'getAuthFlowURI'
       )
 
       await moneriumPack.open({
-        redirect_uri: 'http://localhost:3000'
+        redirect_uri: REDIRECT_URL
       })
 
       expect(getAuthFlowSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           client_id: 'monerium-client-id',
-          redirect_uri: 'http://localhost:3000',
+          redirect_uri: REDIRECT_URL,
           signature: '0x'
         })
       )
     })
 
-    it('should check if the message is in the queue when not signed', async () => {
+    it('should check if the message is in the pending safe transactions queue when not signed', async () => {
       jest
         .spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'isMessageSigned')
         .mockResolvedValue(false)
@@ -131,7 +133,7 @@ describe('MoneriumPack', () => {
       )
 
       await moneriumPack.open({
-        redirect_uri: 'http://localhost:3000'
+        redirect_uri: REDIRECT_URL
       })
 
       expect(isMessagePendingSpy).toHaveBeenCalledWith(
@@ -149,14 +151,14 @@ describe('MoneriumPack', () => {
 
       const socket = { close: jest.fn() }
 
-      // @ts-expect-error - Mock
+      // @ts-expect-error - Mocking the socket
       jest.spyOn(sockets, 'connectToOrderNotifications').mockReturnValue(socket)
 
       moneriumPack.subscribe(OrderState.placed, jest.fn())
       moneriumPack.subscribe(OrderState.processed, jest.fn())
 
       await moneriumPack.open({
-        redirect_uri: 'http://localhost:3000'
+        redirect_uri: REDIRECT_URL
       })
 
       expect(sockets.connectToOrderNotifications).toHaveBeenCalledWith({
@@ -177,7 +179,7 @@ describe('MoneriumPack', () => {
   })
 
   describe('close()', () => {
-    it('should remove the codeverifier from the storage', async () => {
+    it('should remove the codeVerifier from the storage', async () => {
       const localStorageSpy = jest.spyOn(window.localStorage.__proto__, 'removeItem')
 
       const safeSdk = new Safe()

@@ -1,5 +1,6 @@
-import AppBar from './AppBar'
 import { Outlet } from 'react-router-dom'
+
+import AppBar from './AppBar'
 import { AuthProvider } from './AuthContext'
 
 function App() {

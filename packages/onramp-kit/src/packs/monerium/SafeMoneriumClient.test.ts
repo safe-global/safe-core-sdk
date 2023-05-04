@@ -7,10 +7,6 @@ import SafeApiKit from '@safe-global/api-kit'
 import { SafeMoneriumClient } from './SafeMoneriumClient'
 import { MAGIC_VALUE } from './signatures'
 
-jest.mock('@monerium/sdk')
-jest.mock('@safe-global/protocol-kit')
-jest.mock('@safe-global/api-kit')
-
 const newOrder = {
   amount: '100',
   currency: Currency.eur,
@@ -26,6 +22,10 @@ const newOrder = {
   },
   memo: 'memo'
 }
+
+jest.mock('@monerium/sdk')
+jest.mock('@safe-global/protocol-kit')
+jest.mock('@safe-global/api-kit')
 
 describe('SafeMoneriumClient', () => {
   const safeSdk = new Safe()
@@ -45,12 +45,12 @@ describe('SafeMoneriumClient', () => {
     expect(safeMoneriumClient).toBeInstanceOf(SafeMoneriumClient)
   })
 
-  it('should get the Safe address', async () => {
+  it('should allow to get the Safe address', async () => {
     safeSdk.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
     expect(await safeMoneriumClient.getSafeAddress()).toBe('0xSafeAddress')
   })
 
-  it('should allow to send tokens', async () => {
+  it('should allow to send tokens from then Safe to any IBAN', async () => {
     const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
 
     const signMessageSpy = jest.spyOn(safeMoneriumClient, 'signMessage').mockResolvedValueOnce()
@@ -76,7 +76,7 @@ describe('SafeMoneriumClient', () => {
     )
   })
 
-  it('should allow to check if a message is signed in the contract', async () => {
+  it('should allow to check if a message is signed in the smart contract', async () => {
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(
       '0xSafeAddress',
       'message to sign'
@@ -85,7 +85,7 @@ describe('SafeMoneriumClient', () => {
     expect(isMessageSigned).toBe(true)
   })
 
-  it('should allow to check if a message is pending in the transactions queue', async () => {
+  it('should allow to check if a message is pending in the safe transaction queue', async () => {
     jest.spyOn(SafeApiKit.prototype, 'getPendingTransactions').mockResolvedValueOnce({
       count: 0,
       results: []

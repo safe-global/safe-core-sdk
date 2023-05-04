@@ -1,3 +1,4 @@
+import { Link as RouterLink } from 'react-router-dom'
 import {
   AppBar as MuiAppBar,
   Typography,
@@ -9,9 +10,9 @@ import {
   Select,
   SelectChangeEvent
 } from '@mui/material'
-import { Link as RouterLink } from 'react-router-dom'
-import { useAuth } from './AuthContext'
 import { EthHashInfo } from '@safe-global/safe-react-components'
+
+import { useAuth } from './AuthContext'
 
 const AppBar = () => {
   const { logIn, logOut, isLoggedIn, data, selectedSafe, setSelectedSafe } = useAuth()

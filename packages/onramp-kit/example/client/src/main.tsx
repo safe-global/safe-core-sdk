@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client'
-import { SafeThemeProvider } from '@safe-global/safe-react-components'
-import { ThemeProvider, CssBaseline } from '@mui/material'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { ThemeProvider, CssBaseline } from '@mui/material'
+import { SafeThemeProvider } from '@safe-global/safe-react-components'
 
 import Stripe from './components/Stripe'
 import Monerium from './components/monerium/Monerium'

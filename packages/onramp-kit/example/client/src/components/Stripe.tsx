@@ -1,7 +1,8 @@
-import { ethers } from 'ethers'
 import { useEffect, useState, useRef } from 'react'
-import { SafeOnRampKit, StripeSession, StripePack } from '../../../../src'
+import { ethers } from 'ethers'
 import { Grid, TextField, Button } from '@mui/material'
+
+import { SafeOnRampKit, StripeSession, StripePack } from '../../../../src'
 
 const isSessionValid = (sessionId: string) => sessionId.length === 28
 

@@ -1,6 +1,6 @@
+import { useState, useEffect } from 'react'
 import { AuthContext, OrderState } from '@monerium/sdk'
 import { Alert, Box, Button, TextField, CircularProgress as Loader } from '@mui/material'
-import { useState } from 'react'
 
 type ConnectedProps = {
   authContext: AuthContext
@@ -12,6 +12,16 @@ type ConnectedProps = {
 
 function Connected({ authContext, orderState, safe, onLogout, onTransfer }: ConnectedProps) {
   const [counterpartIban, setCounterpartIban] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (orderState === OrderState.processed || orderState === OrderState.rejected) {
+      setCounterpartIban('')
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 5000)
+    }
+  }, [orderState])
 
   return (
     <>
@@ -19,13 +29,19 @@ function Connected({ authContext, orderState, safe, onLogout, onTransfer }: Conn
       <p>User Id: {authContext.userId}</p>
       <p>Default profile: {authContext.defaultProfile}</p>
 
-      {orderState ? (
+      {isLoading ? (
         <Box display="flex" alignItems="center">
           <Loader color="primary" size={40} sx={{ mr: 2 }} />
-          {orderState === OrderState.placed && <Alert severity="info">Order placed</Alert>}
-          {orderState === OrderState.pending && <Alert severity="info">Order pending</Alert>}
-          {orderState === OrderState.rejected && <Alert severity="error">Order rejected</Alert>}
-          {orderState === OrderState.processed && <Alert severity="success">Order processed</Alert>}
+          {orderState && (
+            <>
+              {orderState === OrderState.placed && <Alert severity="info">Order placed</Alert>}
+              {orderState === OrderState.pending && <Alert severity="info">Order pending</Alert>}
+              {orderState === OrderState.rejected && <Alert severity="error">Order rejected</Alert>}
+              {orderState === OrderState.processed && (
+                <Alert severity="success">Order processed</Alert>
+              )}
+            </>
+          )}
         </Box>
       ) : (
         <>
@@ -44,7 +60,10 @@ function Connected({ authContext, orderState, safe, onLogout, onTransfer }: Conn
 
               <Button
                 variant="contained"
-                onClick={() => onTransfer(counterpartIban, '1')}
+                onClick={() => {
+                  onTransfer(counterpartIban, '1')
+                  setIsLoading(true)
+                }}
                 sx={{ my: 2, mr: 2 }}
               >
                 Transfer

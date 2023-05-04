@@ -35,7 +35,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@ethersproject/address": "^5.7.0",
     "@safe-global/api-kit": "^1.0.1",
     "@safe-global/protocol-kit": "^0.1.1",
     "@safe-global/safe-core-sdk-types": "^1.10.1",

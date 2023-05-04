@@ -1,5 +1,5 @@
+import { ethers } from 'ethers'
 import { useEffect, useState, useRef } from 'react'
-import { isAddress } from '@ethersproject/address'
 import { SafeOnRampKit, StripeSession, StripePack } from '../../../../src'
 import { Grid, TextField, Button } from '@mui/material'
 
@@ -12,7 +12,7 @@ function Stripe() {
   const stripeRootRef = useRef<HTMLDivElement>(null)
 
   const handleCreateSession = async () => {
-    if (!isSessionValid(sessionId) && !isAddress(walletAddress)) return
+    if (!isSessionValid(sessionId) && !ethers.utils.isAddress(walletAddress)) return
 
     if (stripeRootRef.current) {
       stripeRootRef.current.innerHTML = ''

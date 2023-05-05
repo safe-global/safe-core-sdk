@@ -157,7 +157,7 @@ function Monerium() {
             <LoginWithMonerium
               safe={selectedSafe}
               threshold={safeThreshold || ''}
-              onLogin={startMoneriumFlow}
+              onLogin={() => startMoneriumFlow()}
             />
           )}
         </>

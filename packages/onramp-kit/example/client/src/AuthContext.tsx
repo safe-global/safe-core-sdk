@@ -40,7 +40,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
           chainId: '0x5',
-          rpcTarget: `https://goerli.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
+          rpcTarget: 'https://rpc.ankr.com/eth_goerli'
         },
         uiConfig: {
           theme: 'dark',

@@ -35,8 +35,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@safe-global/onramp-kit': path.resolve(__dirname, '../../src'),
-      '@safe-global/auth-kit': path.resolve(__dirname, '../../../auth-kit/src')
+      '@safe-global/onramp-kit': path.resolve(__dirname, '../../src')
     }
   }
 })

@@ -1,11 +1,13 @@
-import { OrderMetadata } from '@monerium/sdk'
-import { Fee } from '@monerium/sdk'
-import { OrderState } from '@monerium/sdk'
-import { Currency, Counterpart } from '@monerium/sdk'
+import { OrderMetadata, Fee, OrderState, Currency, Counterpart } from '@monerium/sdk'
+import Safe from '@safe-global/protocol-kit'
 
 export interface MoneriumProviderConfig {
   clientId: string
   environment: 'production' | 'sandbox'
+}
+
+export interface MoneriumInitOptions {
+  safeSdk: Safe
 }
 
 export interface MoneriumOpenOptions {

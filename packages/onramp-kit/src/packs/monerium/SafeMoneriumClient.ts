@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { Chain, IBAN, MoneriumClient, Network, NewOrder, OrderKind } from '@monerium/sdk'
+import { Chain, IBAN, MoneriumClient, Networks, NewOrder, OrderKind } from '@monerium/sdk'
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
@@ -152,19 +152,19 @@ export class SafeMoneriumClient extends MoneriumClient {
    * Get the corresponding Monerium SDK Chain from the current chain id
    * @returns The Chain
    */
-  async getChain() {
+  async getChain(): Promise<Chain> {
     const chainId = await this.#safeSdk.getChainId()
 
     switch (chainId) {
       case 1:
       case 5:
-        return Chain.ethereum
+        return 'ethereum'
       case 100:
       case 10200:
-        return Chain.gnosis
+        return 'gnosis'
       case 137:
       case 80001:
-        return Chain.polygon
+        return 'polygon'
       default:
         throw new Error(`Chain not supported: ${chainId}`)
     }
@@ -174,20 +174,20 @@ export class SafeMoneriumClient extends MoneriumClient {
    * Get the corresponding Monerium SDK Network from the current chain id
    * @returns The Network
    */
-  async getNetwork() {
+  async getNetwork(): Promise<Networks> {
     const chainId = await this.#safeSdk.getChainId()
 
     switch (chainId) {
       case 1:
       case 100:
       case 137:
-        return Network.mainnet
+        return 'mainnet'
       case 5:
-        return Network.goerli
+        return 'goerli'
       case 10200:
-        return Network.chiado
+        return 'chiado'
       case 80001:
-        return Network.mumbai
+        return 'mumbai'
       default:
         throw new Error(`Network not supported: ${chainId}`)
     }

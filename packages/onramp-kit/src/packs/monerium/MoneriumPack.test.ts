@@ -51,7 +51,7 @@ describe('MoneriumPack', () => {
     it('should initialize the pack', async () => {
       const safeSdk = new Safe()
 
-      await moneriumPack.init(safeSdk)
+      await moneriumPack.init({ safeSdk })
 
       expect(safeMoneriumClient.SafeMoneriumClient).toHaveBeenCalledWith('sandbox', safeSdk)
     })
@@ -68,7 +68,7 @@ describe('MoneriumPack', () => {
     beforeEach(async () => {
       const safeSdk = new Safe()
 
-      await moneriumPack.init(safeSdk)
+      await moneriumPack.init({ safeSdk })
     })
 
     it('should start the authorization code flow if the authCode is provided', async () => {
@@ -147,7 +147,7 @@ describe('MoneriumPack', () => {
     it('should try to subscribe to order notifications after authentication finished and subscriptions placed', async () => {
       const safeSdk = new Safe()
 
-      await moneriumPack.init(safeSdk)
+      await moneriumPack.init({ safeSdk })
 
       const socket = { close: jest.fn() }
 
@@ -184,7 +184,7 @@ describe('MoneriumPack', () => {
 
       const safeSdk = new Safe()
 
-      await moneriumPack.init(safeSdk)
+      await moneriumPack.init({ safeSdk })
 
       await moneriumPack.close()
 

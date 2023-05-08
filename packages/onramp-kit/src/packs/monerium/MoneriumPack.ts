@@ -1,5 +1,4 @@
 import { Currency } from '@monerium/sdk'
-import Safe from '@safe-global/protocol-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { SafeOnRampPack } from '@safe-global/onramp-kit/types'
 
@@ -7,6 +6,7 @@ import { SafeMoneriumClient } from './SafeMoneriumClient'
 import {
   MoneriumEvent,
   MoneriumEventListener,
+  MoneriumInitOptions,
   MoneriumOpenOptions,
   MoneriumProviderConfig
 } from './types'
@@ -31,15 +31,15 @@ export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
 
   /**
    * Initializes the SafeMoneriumClient
-   * @param {Safe} safeSdk Protocol kit instance
+   * @param options The MoneriumInitOptions object
    * @throws {Error} If the Monerium client is not initialized
    */
-  async init(safeSdk: Safe) {
-    if (!safeSdk) {
+  async init(options: MoneriumInitOptions) {
+    if (!options?.safeSdk) {
       throw new Error('You need to provide an instance of the protocol kit')
     }
 
-    this.#client = new SafeMoneriumClient(this.#config.environment, safeSdk)
+    this.#client = new SafeMoneriumClient(this.#config.environment, options.safeSdk)
   }
 
   /**

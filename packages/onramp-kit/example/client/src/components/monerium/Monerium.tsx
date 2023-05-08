@@ -41,7 +41,7 @@ function Monerium() {
           clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
           environment: 'sandbox'
         }),
-        safeSdk
+        { safeSdk }
       )
 
       client.subscribe(OrderState.pending, (notification) => {

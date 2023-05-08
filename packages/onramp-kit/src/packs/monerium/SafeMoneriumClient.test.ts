@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { Chain, Currency, Network, PaymentStandard } from '@monerium/sdk'
+import { Currency, PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit'
@@ -170,34 +170,34 @@ describe('SafeMoneriumClient', () => {
 
   it('should map the protocol kit chainId to the Monerium Chain types', async () => {
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(1)
-    expect(await safeMoneriumClient.getChain()).toBe(Chain.ethereum)
+    expect(await safeMoneriumClient.getChain()).toBe('ethereum')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(5)
-    expect(await safeMoneriumClient.getChain()).toBe(Chain.ethereum)
+    expect(await safeMoneriumClient.getChain()).toBe('ethereum')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(100)
-    expect(await safeMoneriumClient.getChain()).toBe(Chain.gnosis)
+    expect(await safeMoneriumClient.getChain()).toBe('gnosis')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(10200)
-    expect(await safeMoneriumClient.getChain()).toBe(Chain.gnosis)
+    expect(await safeMoneriumClient.getChain()).toBe('gnosis')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(137)
-    expect(await safeMoneriumClient.getChain()).toBe(Chain.polygon)
+    expect(await safeMoneriumClient.getChain()).toBe('polygon')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(80001)
-    expect(await safeMoneriumClient.getChain()).toBe(Chain.polygon)
+    expect(await safeMoneriumClient.getChain()).toBe('polygon')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(300)
     expect(safeMoneriumClient.getChain()).rejects.toThrowError('Chain not supported: 300')
   })
 
   it('should map the protocol kit chainId to the Monerium Network types', async () => {
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(1)
-    expect(await safeMoneriumClient.getNetwork()).toBe(Network.mainnet)
+    expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(5)
-    expect(await safeMoneriumClient.getNetwork()).toBe(Network.goerli)
+    expect(await safeMoneriumClient.getNetwork()).toBe('goerli')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(100)
-    expect(await safeMoneriumClient.getNetwork()).toBe(Network.mainnet)
+    expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(10200)
-    expect(await safeMoneriumClient.getNetwork()).toBe(Network.chiado)
+    expect(await safeMoneriumClient.getNetwork()).toBe('chiado')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(137)
-    expect(await safeMoneriumClient.getNetwork()).toBe(Network.mainnet)
+    expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(80001)
-    expect(await safeMoneriumClient.getNetwork()).toBe(Network.mumbai)
+    expect(await safeMoneriumClient.getNetwork()).toBe('mumbai')
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(300)
     expect(safeMoneriumClient.getNetwork()).rejects.toThrowError('Network not supported: 300')
   })

@@ -31,20 +31,20 @@ describe('SafeOnRampKit', () => {
   })
 
   it('should create a SafeOnRampKit instance when using the init() method', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(pack)
+    const safeOnRampKit = await SafeOnRampKit.init(pack, undefined)
 
     expect(safeOnRampKit).toBeInstanceOf(SafeOnRampKit)
   })
 
   it('should create a XXXPack instance using the provider config and call the init() method in the instance', async () => {
-    await SafeOnRampKit.init(pack)
+    await SafeOnRampKit.init(pack, undefined)
 
     expect(stripePack.StripePack).toHaveBeenCalledWith(expect.objectContaining(config))
     expect(stripePack.StripePack.prototype.init).toHaveBeenCalled()
   })
 
   it('should call the open method in the XXXPack with the corresponding options', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(pack)
+    const safeOnRampKit = await SafeOnRampKit.init(pack, undefined)
 
     safeOnRampKit.open(openOptions)
 
@@ -54,7 +54,7 @@ describe('SafeOnRampKit', () => {
   })
 
   it('should call the close method in the XXXPack', async () => {
-    const safeOnRampKit = await SafeOnRampKit.init(pack)
+    const safeOnRampKit = await SafeOnRampKit.init(pack, undefined)
 
     safeOnRampKit.close()
 

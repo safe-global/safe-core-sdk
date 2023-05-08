@@ -12,12 +12,13 @@ import {
   SafeMoneriumClient,
   MoneriumEvent,
   MoneriumEventListener,
+  MoneriumInitOptions,
   MoneriumOpenOptions
 } from './packs/monerium'
 
 // The new packs must implement this interface
 export interface SafeOnRampPack<TPack> {
-  init(safeSdk?: Safe): Promise<void>
+  init(options: SafeOnRampInitOptions<TPack>): Promise<void>
   open(options?: SafeOnRampOpenOptions<TPack>): Promise<SafeOnRampOpenResponse<TPack>>
   close(): Promise<void>
   subscribe(event: SafeOnRampEvent<TPack>, handler: SafeOnRampEventListener<TPack>): void
@@ -31,6 +32,11 @@ export interface SafeOnRampPack<TPack> {
 //    TPack extends FooPack ? FooOpenOptions :
 //    TPack extends BarPack ? BarOpenOptions :
 //    never
+export type SafeOnRampInitOptions<TPack> = TPack extends StripePack
+  ? undefined
+  : TPack extends MoneriumPack
+  ? MoneriumInitOptions
+  : never
 export type SafeOnRampOpenOptions<TPack> = TPack extends StripePack
   ? StripeOpenOptions
   : TPack extends MoneriumPack

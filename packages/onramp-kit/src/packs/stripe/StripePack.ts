@@ -51,7 +51,7 @@ export class StripePack implements SafeOnRampPack<StripePack> {
     sessionId,
     defaultOptions
   }: StripeOpenOptions): Promise<StripeSession> {
-    if (!this.#client) throw new Error('StripeOnRamp is not initialized')
+    if (!this.#client) throw new Error('The Stripe crypto SDK is not initialized')
 
     try {
       let session

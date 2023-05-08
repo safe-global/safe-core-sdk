@@ -26,6 +26,7 @@ export class SafeOnRampKit<TPack extends SafeOnRampPack<TPack>> {
   /**
    * This method initializes the SafeOnRampKit asynchronously. This is the place where we can put initialization magic
    * @param pack The pack implementing the SafeOnRampClient interface for the specific provider
+   * @param safeSdk The Safe SDK instance
    * @returns A SafeOnRampKit instance
    * @throws Error if the pack is not defined
    */

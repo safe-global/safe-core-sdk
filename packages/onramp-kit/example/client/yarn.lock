@@ -982,10 +982,10 @@
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
-"@monerium/sdk@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.2.2.tgz#14008c200411ad273a26719f885d35e22a938e88"
-  integrity sha512-nySi4wwlGgk1bp6YqWIPMBwGqhP2AMeA0AeEcHSuoAMC07RmTsBlIf4HyaFm+l5zX0xcikBaJh6MTO8qc7AVOw==
+"@monerium/sdk@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.3.0.tgz#0e7eab2179eb8cbd45f6f75fe085e11fe3d44750"
+  integrity sha512-gTcPFN9oYdm+yzBpsJuvsQR67GRBIu21wx+gPKxejwdttO+BSeFsRbO8Nd8R0WU3KdSTqghpfDhgn7uktKofRw==
 
 "@mui/base@5.0.0-alpha.117":
   version "5.0.0-alpha.117"
@@ -1140,42 +1140,31 @@
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
 
-"@safe-global/api-kit@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/api-kit/-/api-kit-1.0.1.tgz#7176024cfeacccbf5a383e49f5b37d25cca97efc"
-  integrity sha512-pEytEt4TdiCYAIvdgRRvgUHAPIPh6IDDmsib8qCbika4eMJWgemHb6NsMfltP3SMEdgWSNWFKHiE5GRoZ5sVLw==
+"@safe-global/api-kit@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/api-kit/-/api-kit-1.1.0.tgz#b46bcb4491d43576832488183019769d37e3f3e6"
+  integrity sha512-3HB+Vl3dFunID4kadpAqYQQ9lfIJuCk9pYoJsfSWGeEgOOGFwexg3UtO8hh0JXoIO+bX8pm8x5GEF6pX8HeNTQ==
   dependencies:
     "@ethersproject/abstract-signer" "^5.7.0"
-    "@safe-global/safe-core-sdk-types" "^1.10.1"
+    "@safe-global/safe-core-sdk-types" "^2.0.0"
     node-fetch "^2.6.6"
 
-"@safe-global/auth-kit@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/auth-kit/-/auth-kit-0.1.1.tgz#d30919fc5fba9aceb5c92a39bd9df6c5fd6e17a4"
-  integrity sha512-6dvoXKGhgYP/TL/L4ANK5BMuKRqja0uIhIEBLTI0gsXSUHMD+y3rpByAkG7U41SlAKvtH12JC9iZrctWW8g8uQ==
+"@safe-global/auth-kit@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/auth-kit/-/auth-kit-1.0.0.tgz#a72ff8014ad8565db5e5f6e093988d3aaed7fc50"
+  integrity sha512-XUb3nvYBtUd/MsMRqgt93joKQFeGvR++yh7qnYxAEhUbSxA1+8a5BQIJR6YryzAm5D/5WmkC/NHNpi/i+0fJpA==
   dependencies:
-    "@safe-global/api-kit" "^1.0.1"
-    "@safe-global/protocol-kit" "^0.1.1"
+    "@safe-global/api-kit" "^1.1.0"
+    "@safe-global/protocol-kit" "^1.0.0"
     "@walletconnect/client" "^1.8.0"
     ethers "^5.7.2"
 
-"@safe-global/protocol-kit@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/protocol-kit/-/protocol-kit-0.1.1.tgz#f971975b250dd945113037ecdd710358979be24d"
-  integrity sha512-lRTeO/+WyfIacTYclaGRLPsCnnZKgzCtgfZuVMwhM6kX/8FET+rDiM26FVucVUFBVwCml8ogvJlrqKB8bCkAgQ==
+"@safe-global/protocol-kit@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/protocol-kit/-/protocol-kit-1.0.0.tgz#92a50d975bc3a9971993590c254a48a184c054bf"
+  integrity sha512-dRU4ik7PVAWW/j9N1njaxAMA5qeXS7TQGrls2sKrwEfZTjoAJ0Jzn9BWn43yP9CaQJ++g5vZ9FjcHnAkVikblg==
   dependencies:
-    "@ethersproject/bignumber" "^5.7.0"
-    "@ethersproject/solidity" "^5.7.0"
-    "@safe-global/safe-deployments" "^1.20.2"
-    ethereumjs-util "^7.1.5"
-    semver "^7.3.8"
-    web3 "^1.8.1"
-    web3-core "^1.8.1"
-    web3-utils "^1.8.1"
-
-"@safe-global/protocol-kit@file:.yalc/@safe-global/protocol-kit":
-  version "0.1.1"
-  dependencies:
+    "@ethersproject/address" "^5.7.0"
     "@ethersproject/bignumber" "^5.7.0"
     "@ethersproject/solidity" "^5.7.0"
     "@safe-global/safe-deployments" "^1.22.0"
@@ -1185,23 +1174,16 @@
     web3-core "^1.8.1"
     web3-utils "^1.8.1"
 
-"@safe-global/safe-core-sdk-types@^1.10.1":
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-core-sdk-types/-/safe-core-sdk-types-1.10.1.tgz#94331b982671d2f2b8cc23114c58baf63d460c81"
-  integrity sha512-BKvuYTLOlY16Rq6qCXglmnL6KxInDuXMFqZMaCzwDKiEh+uoHu3xCumG5tVtWOkCgBF4XEZXMqwZUiLcon7IsA==
+"@safe-global/safe-core-sdk-types@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-core-sdk-types/-/safe-core-sdk-types-2.0.0.tgz#643dd87c9738ff8b3eaecb06ce399cae8a48af02"
+  integrity sha512-9bcGaEuJCRG1ccGxKNjLzJuXMqdJZEFkWi+1vf6UFO8gpmanasvBozMEo6fzUMtDBGgkkStYywhO6Cp0tKyD3Q==
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@ethersproject/contracts" "^5.7.0"
-    "@safe-global/safe-deployments" "^1.20.2"
+    "@safe-global/safe-deployments" "^1.22.0"
     web3-core "^1.8.1"
     web3-utils "^1.8.1"
-
-"@safe-global/safe-deployments@^1.20.2":
-  version "1.21.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.21.1.tgz#28849ab9441855eb10c50f3ae835f34ec69dede4"
-  integrity sha512-W5+EGdidRupGvMCHBaV3iNvcfqwzjOZcYWlMndCTo/JSHfe1az79AqOyKVSKK5AyEDt5iUlH8tTjmk8vTuQDwA==
-  dependencies:
-    semver "^7.3.7"
 
 "@safe-global/safe-deployments@^1.22.0":
   version "1.22.0"
@@ -1210,10 +1192,10 @@
   dependencies:
     semver "^7.3.7"
 
-"@safe-global/safe-react-components@^2.0.1":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-react-components/-/safe-react-components-2.0.2.tgz#c56e84b994e02b3cd6dd678bf1c8a8cd913ea3dd"
-  integrity sha512-BbgD5lKFPdftT6Cxl7JCWOVAU7YpgsjO957QTypUQb/ZNw+zW9yWMHdoKIy4paZ0EkX2OvFleKx82BYi+p5/IA==
+"@safe-global/safe-react-components@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-react-components/-/safe-react-components-2.0.5.tgz#294b1198ef27322d74eac5f49e54652b57b6eb55"
+  integrity sha512-ExrE2ZAV+3qm6wi5QfEGUcb4R7rFsvP2oHcZ4k6gGZDLsvAnP8X5LMnXldriOvBjLBD3m3RoLYLfDER5hBrQ3A==
   dependencies:
     "@ethersproject/address" "^5.7.0"
     ethereum-blockies-base64 "^1.0.2"

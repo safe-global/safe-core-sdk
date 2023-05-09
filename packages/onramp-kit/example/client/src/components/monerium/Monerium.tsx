@@ -85,7 +85,7 @@ function Monerium() {
     if (!onRampKit) return
 
     const moneriumClient = await onRampKit.open({
-      redirect_uri: 'http://localhost:3000/monerium',
+      redirectUrl: 'http://localhost:3000/monerium',
       authCode,
       refreshToken
     })

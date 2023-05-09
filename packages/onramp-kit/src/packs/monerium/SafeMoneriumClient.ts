@@ -45,7 +45,7 @@ export class SafeMoneriumClient extends MoneriumClient {
     const newOrder = await this.#createOrder(order)
 
     try {
-      // Place the order to Monerium and Safe systems for being related and confirmed
+      // Place the order to Monerium and Safe systems for being linked between each other and confirmed
       await this.placeOrder(newOrder)
       await this.signMessage(order.safeAddress, newOrder.message)
     } catch (error) {

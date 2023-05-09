@@ -57,12 +57,12 @@ export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
       const safeAddress = await this.#client.getSafeAddress()
 
       if (options.authCode) {
-        await this.#startAuthCodeFlow(options.authCode, safeAddress, options.redirect_uri)
+        await this.#startAuthCodeFlow(options.authCode, safeAddress, options.redirectUrl || '')
       } else {
         if (options.refreshToken) {
           await this.#startRefreshTokenFlow(safeAddress, options.refreshToken)
         } else {
-          await this.#startAuthFlow(safeAddress, options.redirect_uri)
+          await this.#startAuthFlow(safeAddress, options.redirectUrl || '')
         }
       }
 

@@ -11,7 +11,7 @@ export interface MoneriumInitOptions {
 }
 
 export interface MoneriumOpenOptions {
-  redirect_uri: string
+  redirectUrl?: string
   authCode?: string
   refreshToken?: string
 }

@@ -74,14 +74,14 @@ describe('MoneriumPack', () => {
     it('should start the authorization code flow if the authCode is provided', async () => {
       const getAuthSpy = jest.spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'auth')
 
-      await moneriumPack.open({ redirect_uri: REDIRECT_URL, authCode: 'auth-code' })
+      await moneriumPack.open({ redirectUrl: REDIRECT_URL, authCode: 'auth-code' })
 
       expect(getAuthSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           client_id: 'monerium-client-id',
           code: 'auth-code',
           code_verifier: '',
-          redirect_uri: REDIRECT_URL
+          redirectUrl: REDIRECT_URL
         })
       )
     })
@@ -90,7 +90,7 @@ describe('MoneriumPack', () => {
       const getAuthSpy = jest.spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'auth')
 
       await moneriumPack.open({
-        redirect_uri: REDIRECT_URL,
+        redirectUrl: REDIRECT_URL,
         refreshToken: 'refresh-token'
       })
 
@@ -106,13 +106,13 @@ describe('MoneriumPack', () => {
       )
 
       await moneriumPack.open({
-        redirect_uri: REDIRECT_URL
+        redirectUrl: REDIRECT_URL
       })
 
       expect(getAuthFlowSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           client_id: 'monerium-client-id',
-          redirect_uri: REDIRECT_URL,
+          redirectUrl: REDIRECT_URL,
           signature: '0x'
         })
       )
@@ -133,7 +133,7 @@ describe('MoneriumPack', () => {
       )
 
       await moneriumPack.open({
-        redirect_uri: REDIRECT_URL
+        redirectUrl: REDIRECT_URL
       })
 
       expect(isMessagePendingSpy).toHaveBeenCalledWith(
@@ -158,7 +158,7 @@ describe('MoneriumPack', () => {
       moneriumPack.subscribe(OrderState.processed, jest.fn())
 
       await moneriumPack.open({
-        redirect_uri: REDIRECT_URL
+        redirectUrl: REDIRECT_URL
       })
 
       expect(sockets.connectToOrderNotifications).toHaveBeenCalledWith({

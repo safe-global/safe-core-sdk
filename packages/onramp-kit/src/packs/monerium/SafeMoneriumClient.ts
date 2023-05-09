@@ -263,7 +263,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @param order The order to be created
    * @returns The Monerium type order
    */
-  async #createOrder(order: SafeMoneriumOrder): Promise<Promise<Promise<NewOrder>>> {
+  async #createOrder(order: SafeMoneriumOrder): Promise<NewOrder> {
     return {
       kind: OrderKind.redeem,
       amount: order.amount,

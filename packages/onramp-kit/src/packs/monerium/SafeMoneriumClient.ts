@@ -281,10 +281,10 @@ export class SafeMoneriumClient extends MoneriumClient {
 
   /**
    * Format a valid message to be signed for executing a transaction
-   * @param order The order : ;
-   * @returns The message to be signed
+   * @param order The created order
+   * @returns The message to be signed containing the order details
    */
-  #getSendMessage(order: SafeMoneriumOrder) {
+  #getSendMessage(order: SafeMoneriumOrder): string {
     const currentDate = new Date().toISOString()
 
     return `Send ${order.currency.toUpperCase()} ${order.amount} to ${

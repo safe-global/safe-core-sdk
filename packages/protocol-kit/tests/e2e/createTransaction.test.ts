@@ -437,5 +437,30 @@ describe('Transactions creation', () => {
       chai.expect(multiSendTx.data.nonce).to.be.eq(BASE_OPTIONS.nonce)
       chai.expect(multiSendTx.data.safeTxGas).to.be.eq(BASE_OPTIONS.safeTxGas)
     })
+
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail to create a transaction if the Safe with version <v1.3.0 is using predicted config',
+      async () => {
+        const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
+        const account = accounts[0]
+        const ethAdapter = await getEthAdapter(account.signer)
+        const safeSdk = await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: safe.address,
+          value: '0',
+          data: '0x'
+        }
+        const tx = safeSdk.createTransaction({ safeTransactionData })
+        await chai
+          .expect(tx)
+          .to.be.rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
+      }
+    )
   })
 })

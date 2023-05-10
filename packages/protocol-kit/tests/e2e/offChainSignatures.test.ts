@@ -86,12 +86,17 @@ describe('Off-chain signatures', () => {
           predictedSafe,
           contractNetworks
         })
+        const safeSdkExistingSafe = await Safe.create({
+          ethAdapter,
+          safeAddress: safe.address,
+          contractNetworks
+        })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: await safeSdkExistingSafe.getAddress(),
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdkExistingSafe.createTransaction({ safeTransactionData })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx)
         chai.expect(tx.signatures.size).to.be.eq(0)

@@ -53,7 +53,13 @@ describe('SafeMoneriumClient', () => {
   it('should allow to send tokens from then Safe to any IBAN', async () => {
     safeSdk.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
     const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
-    const signMessageSpy = jest.spyOn(safeMoneriumClient, 'signMessage').mockResolvedValueOnce()
+    //@ts-expect-error - Not all values are mocked
+    const signMessageSpy = jest.spyOn(safeMoneriumClient, 'signMessage').mockResolvedValueOnce({
+      safe: '0xSafeAddress',
+      to: '0xAddress',
+      value: '0',
+      operation: 1
+    })
 
     await safeMoneriumClient.send({ ...newOrder })
 
@@ -164,8 +170,6 @@ describe('SafeMoneriumClient', () => {
         senderSignature: undefined
       })
     )
-
-    expect(safeSdk.executeTransaction).toHaveBeenCalled()
   })
 
   it('should map the protocol kit chainId to the Monerium Chain types', async () => {

@@ -17,6 +17,7 @@ import {
 } from '@safe-global/protocol-kit/types'
 import Safe, { SafeFactory, DeploySafeProps } from '@safe-global/protocol-kit/index'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { itif } from './utils/helpers'
 
 // test util funcion to deploy a safe (needed to check the expected Safe Address)
 async function deploySafe(
@@ -454,37 +455,40 @@ describe('Contract utils', () => {
       chai.expect(thirdPredictedSafeAddress).to.be.equal(expectedSafeAddress)
     })
 
-    it('safeDeploymentConfig is an optional parameter', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+    itif(safeVersionDeployed > '1.0.0')(
+      'safeDeploymentConfig is an optional parameter',
+      async () => {
+        const { accounts, contractNetworks, chainId } = await setupTests()
 
-      // 1/1 Safe
-      const [owner1] = accounts
-      const owners = [owner1.address]
-      const threshold = 1
-      const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+        // 1/1 Safe
+        const [owner1] = accounts
+        const owners = [owner1.address]
+        const threshold = 1
+        const ethAdapter = await getEthAdapter(owner1.signer)
+        const customContracts = contractNetworks[chainId]
 
-      const safeAccountConfig: SafeAccountConfig = {
-        owners,
-        threshold
+        const safeAccountConfig: SafeAccountConfig = {
+          owners,
+          threshold
+        }
+
+        const predictedSafeAddress = await predictSafeAddress({
+          ethAdapter,
+          safeAccountConfig,
+          customContracts
+        })
+
+        // we deploy the Safe by providing only the safeAccountConfig (owners & threshold)
+        const deployedSafe = await deploySafe({ safeAccountConfig }, ethAdapter, contractNetworks)
+
+        // We ensure the Safe is deployed
+        const isSafeDeployed = await deployedSafe.isSafeDeployed()
+        chai.expect(isSafeDeployed).to.be.true
+
+        // The deployed Safe address should be equal to the predicted address
+        const expectedSafeAddress = await deployedSafe.getAddress()
+        chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
       }
-
-      const predictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
-        safeAccountConfig,
-        customContracts
-      })
-
-      // we deploy the Safe by providing only the safeAccountConfig (owners & threshold)
-      const deployedSafe = await deploySafe({ safeAccountConfig }, ethAdapter, contractNetworks)
-
-      // We ensure the Safe is deployed
-      const isSafeDeployed = await deployedSafe.isSafeDeployed()
-      chai.expect(isSafeDeployed).to.be.true
-
-      // The deployed Safe address should be equal to the predicted address
-      const expectedSafeAddress = await deployedSafe.getAddress()
-      chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
-    })
+    )
   })
 })

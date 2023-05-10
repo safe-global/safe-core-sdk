@@ -20,7 +20,7 @@ import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 export const PREDETERMINED_SALT_NONCE =
   '0xb1073742015cbcf5a3a4d9d1ae33ecf619439710b89475f92e2abd2117e90f90'
 
-export interface PredictSafeProps {
+export interface PredictSafeAddressProps {
   ethAdapter: EthAdapter
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig?: SafeDeploymentConfig
@@ -108,7 +108,7 @@ export async function predictSafeAddress({
   safeDeploymentConfig = {},
   isL1SafeMasterCopy = false,
   customContracts
-}: PredictSafeProps): Promise<string> {
+}: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 

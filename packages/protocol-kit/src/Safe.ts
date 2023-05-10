@@ -259,6 +259,10 @@ class Safe {
    * @returns The list of owners
    */
   async getOwners(): Promise<string[]> {
+    if (this.#predictedSafe?.safeAccountConfig.owners) {
+      return Promise.resolve(this.#predictedSafe.safeAccountConfig.owners)
+    }
+
     return this.#ownerManager.getOwners()
   }
 
@@ -271,6 +275,7 @@ class Safe {
     if (!this.#contractManager.safeContract) {
       return Promise.resolve(0)
     }
+
     return this.#contractManager.safeContract.getNonce()
   }
 
@@ -280,6 +285,10 @@ class Safe {
    * @returns The Safe threshold
    */
   async getThreshold(): Promise<number> {
+    if (this.#predictedSafe?.safeAccountConfig.threshold) {
+      return Promise.resolve(this.#predictedSafe.safeAccountConfig.threshold)
+    }
+
     return this.#ownerManager.getThreshold()
   }
 
@@ -346,6 +355,14 @@ class Safe {
    * @returns TRUE if the account is an owner
    */
   async isOwner(ownerAddress: string): Promise<boolean> {
+    if (this.#predictedSafe?.safeAccountConfig.owners) {
+      return Promise.resolve(
+        this.#predictedSafe?.safeAccountConfig.owners.some((owner: string) =>
+          sameString(owner, ownerAddress)
+        )
+      )
+    }
+
     return this.#ownerManager.isOwner(ownerAddress)
   }
 
@@ -521,7 +538,7 @@ class Safe {
     if (!signerAddress) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    const addressIsOwner = owners.find(
+    const addressIsOwner = owners.some(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
@@ -576,7 +593,7 @@ class Safe {
     if (!signerAddress) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    const addressIsOwner = owners.find(
+    const addressIsOwner = owners.some(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {

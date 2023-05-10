@@ -76,7 +76,7 @@ describe('Off-chain signatures', () => {
 
   describe('signTransaction', async () => {
     itif(safeVersionDeployed < '1.3.0')(
-      'should sign a transaction with the current signer if the Safe with version <v1.3.0 is using predicted config',
+      'should fail to sign a transaction if the Safe with version <v1.3.0 is using predicted config',
       async () => {
         const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
         const account = accounts[0]

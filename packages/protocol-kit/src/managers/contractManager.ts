@@ -37,7 +37,7 @@ class ContractManager {
     let safeVersion: SafeVersion
 
     if (isSafeConfigWithPredictedSafe(config)) {
-      safeVersion = config.predictedSafe.safeDeploymentConfig.safeVersion ?? SAFE_LAST_VERSION
+      safeVersion = config.predictedSafe.safeDeploymentConfig?.safeVersion ?? SAFE_LAST_VERSION
     } else {
       const temporarySafeContract = await getSafeContract({
         ethAdapter,

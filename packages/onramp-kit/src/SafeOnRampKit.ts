@@ -32,13 +32,14 @@ export class SafeOnRampKit<TPack extends SafeOnRampPack<TPack>> {
    */
   static async init<TPack extends SafeOnRampPack<TPack>>(
     pack: TPack,
-    options: SafeOnRampInitOptions<TPack>
+    options?: SafeOnRampInitOptions<TPack>
   ): Promise<SafeOnRampKit<TPack>> {
     if (!pack) {
       throw new Error('The pack is not defined')
     }
 
     await pack.init(options)
+
     return new this(pack)
   }
 

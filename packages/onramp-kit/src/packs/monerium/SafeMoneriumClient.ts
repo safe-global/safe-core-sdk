@@ -42,12 +42,13 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @param order The order to be placed
    */
   async send(order: SafeMoneriumOrder) {
-    const newOrder = await this.#createOrder(order)
+    const safeAddress = await this.getSafeAddress()
+    const newOrder = await this.#createOrder(safeAddress, order)
 
     try {
       // Place the order to Monerium and Safe systems for being linked between each other and confirmed
       await this.placeOrder(newOrder)
-      await this.signMessage(order.safeAddress, newOrder.message)
+      await this.signMessage(safeAddress, newOrder.message)
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
@@ -263,12 +264,12 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @param order The order to be created
    * @returns The Monerium type order
    */
-  async #createOrder(order: SafeMoneriumOrder): Promise<NewOrder> {
+  async #createOrder(safeAddress: string, order: SafeMoneriumOrder): Promise<NewOrder> {
     return {
       kind: OrderKind.redeem,
       amount: order.amount,
       signature: '0x',
-      address: order.safeAddress,
+      address: safeAddress,
       currency: order.currency,
       counterpart: order.counterpart,
       memo: order.memo,

@@ -17,7 +17,6 @@ export interface MoneriumOpenOptions {
 }
 
 export interface SafeMoneriumOrder {
-  safeAddress: string
   amount: string
   currency: Currency
   counterpart: Counterpart

@@ -51,11 +51,11 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should allow to send tokens from then Safe to any IBAN', async () => {
+    safeSdk.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
     const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
-
     const signMessageSpy = jest.spyOn(safeMoneriumClient, 'signMessage').mockResolvedValueOnce()
 
-    await safeMoneriumClient.send({ ...newOrder, safeAddress: '0xSafeAddress' })
+    await safeMoneriumClient.send({ ...newOrder })
 
     expect(placeOrderSpy).toHaveBeenCalledWith(
       expect.objectContaining({

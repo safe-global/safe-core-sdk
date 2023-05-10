@@ -18,7 +18,7 @@ import {
 
 // The new packs must implement this interface
 export interface SafeOnRampPack<TPack> {
-  init(options: SafeOnRampInitOptions<TPack>): Promise<void>
+  init(options?: SafeOnRampInitOptions<TPack>): Promise<void>
   open(options?: SafeOnRampOpenOptions<TPack>): Promise<SafeOnRampOpenResponse<TPack>>
   close(): Promise<void>
   subscribe(event: SafeOnRampEvent<TPack>, handler: SafeOnRampEventListener<TPack>): void

@@ -119,7 +119,6 @@ function Monerium() {
 
   const transfer = async (iban: string, amount: string) => {
     moneriumClient?.send({
-      safeAddress: selectedSafe,
       amount,
       currency: Currency.eur,
       counterpart: {

@@ -23,7 +23,7 @@ export const PREDETERMINED_SALT_NONCE =
 export interface PredictSafeProps {
   ethAdapter: EthAdapter
   safeAccountConfig: SafeAccountConfig
-  safeDeploymentConfig: SafeDeploymentConfig
+  safeDeploymentConfig?: SafeDeploymentConfig
   isL1SafeMasterCopy?: boolean
   customContracts?: ContractNetworkConfig
 }
@@ -105,7 +105,7 @@ export async function encodeSetupCallData({
 export async function predictSafeAddress({
   ethAdapter,
   safeAccountConfig,
-  safeDeploymentConfig,
+  safeDeploymentConfig = {},
   isL1SafeMasterCopy = false,
   customContracts
 }: PredictSafeProps): Promise<string> {

@@ -26,7 +26,7 @@ export interface SafeDeploymentConfig {
 
 export interface PredictedSafeProps {
   safeAccountConfig: SafeAccountConfig
-  safeDeploymentConfig: SafeDeploymentConfig
+  safeDeploymentConfig?: SafeDeploymentConfig
 }
 
 export interface ContractNetworkConfig {

@@ -246,7 +246,7 @@ class Safe {
       return this.#contractManager.safeContract.getVersion()
     }
 
-    if (this.#predictedSafe?.safeDeploymentConfig.safeVersion) {
+    if (this.#predictedSafe?.safeDeploymentConfig?.safeVersion) {
       return Promise.resolve(this.#predictedSafe.safeDeploymentConfig.safeVersion)
     }
 

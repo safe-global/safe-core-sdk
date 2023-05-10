@@ -97,10 +97,12 @@ describe('Off-chain signatures', () => {
           data: '0x'
         }
         const tx = await safeSdkExistingSafe.createTransaction({ safeTransactionData })
-        chai.expect(tx.signatures.size).to.be.eq(0)
-        const signedTx = await safeSdk.signTransaction(tx)
-        chai.expect(tx.signatures.size).to.be.eq(0)
-        chai.expect(signedTx.signatures.size).to.be.eq(1)
+        const signedTx = safeSdk.signTransaction(tx)
+        await chai
+          .expect(signedTx)
+          .to.be.rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
       }
     )
 

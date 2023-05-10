@@ -81,7 +81,7 @@ describe('MoneriumPack', () => {
           client_id: 'monerium-client-id',
           code: 'auth-code',
           code_verifier: '',
-          redirectUrl: REDIRECT_URL
+          redirect_uri: REDIRECT_URL
         })
       )
     })
@@ -112,7 +112,7 @@ describe('MoneriumPack', () => {
       expect(getAuthFlowSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           client_id: 'monerium-client-id',
-          redirectUrl: REDIRECT_URL,
+          redirect_uri: REDIRECT_URL,
           signature: '0x'
         })
       )

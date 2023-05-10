@@ -118,7 +118,7 @@ function Monerium() {
   }
 
   const transfer = async (iban: string, amount: string) => {
-    moneriumClient?.send({
+    const tx = await moneriumClient?.send({
       amount,
       currency: Currency.eur,
       counterpart: {
@@ -134,6 +134,8 @@ function Monerium() {
       },
       memo: 'Testing Safe-Monerium integration'
     })
+
+    console.log('New proposed transaction', tx)
   }
 
   if (!isLoggedIn) return <Disconnected />

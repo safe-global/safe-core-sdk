@@ -3,7 +3,11 @@ import { Chain, IBAN, MoneriumClient, Networks, NewOrder, OrderKind } from '@mon
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
-import { EthAdapter, OperationType } from '@safe-global/safe-core-sdk-types'
+import {
+  EthAdapter,
+  OperationType,
+  SafeMultisigTransactionResponse
+} from '@safe-global/safe-core-sdk-types'
 
 import {
   EIP_1271_BYTES_INTERFACE,
@@ -41,14 +45,17 @@ export class SafeMoneriumClient extends MoneriumClient {
    * Allow to make transactions using the Monerium SDK
    * @param order The order to be placed
    */
-  async send(order: SafeMoneriumOrder) {
+  async send(order: SafeMoneriumOrder): Promise<SafeMultisigTransactionResponse> {
     const safeAddress = await this.getSafeAddress()
     const newOrder = await this.#createOrder(safeAddress, order)
 
     try {
       // Place the order to Monerium and Safe systems for being linked between each other and confirmed
       await this.placeOrder(newOrder)
-      await this.signMessage(safeAddress, newOrder.message)
+
+      const safeTransaction = await this.signMessage(safeAddress, newOrder.message)
+
+      return safeTransaction
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
@@ -80,20 +87,14 @@ export class SafeMoneriumClient extends MoneriumClient {
 
     const pendingTransactions = await apiKit.getPendingTransactions(safeAddress)
 
-    const isMessagePending = pendingTransactions.results.some((tx) => {
-      if (
+    return pendingTransactions.results.some((tx) => {
+      return (
         // @ts-expect-error - dataDecoded should have the method property
         tx?.dataDecoded?.method === 'signMessage' &&
         // @ts-expect-error - dataDecoded should have the parameters array
         tx?.dataDecoded?.parameters[0]?.value === ethers.utils.hashMessage(message)
-      ) {
-        return true
-      }
-
-      return false
+      )
     })
-
-    return isMessagePending
   }
 
   /**
@@ -101,7 +102,10 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @param safeAddress The Safe address
    * @param message The message to be signed
    */
-  async signMessage(safeAddress: string, message: string) {
+  async signMessage(
+    safeAddress: string,
+    message: string
+  ): Promise<SafeMultisigTransactionResponse> {
     try {
       const safeVersion = await this.#safeSdk.getContractVersion()
 
@@ -140,10 +144,7 @@ export class SafeMoneriumClient extends MoneriumClient {
 
       const transaction = await apiKit.getTransaction(safeTxHash)
 
-      // With 1/1 Safes we can execute the transaction right away
-      if (transaction.confirmations?.length === transaction.confirmationsRequired) {
-        await this.#safeSdk.executeTransaction(transaction)
-      }
+      return transaction
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }

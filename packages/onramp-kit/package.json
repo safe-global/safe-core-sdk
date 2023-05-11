@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/onramp-kit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Onramp library",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@safe-global/api-kit": "^1.1.0",
-    "@safe-global/protocol-kit": "^1.0.0",
+    "@safe-global/protocol-kit": "^1.0.1",
     "@safe-global/safe-core-sdk-types": "^2.0.0",
     "ethers": "^5.7.0"
   },

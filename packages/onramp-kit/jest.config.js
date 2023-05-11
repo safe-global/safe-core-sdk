@@ -1,4 +1,6 @@
 const config = {
+  testEnvironment: 'jsdom',
+  collectCoverageFrom: ['src/**/*.{ts,tsx}'],
   roots: ['<rootDir>/src'],
   verbose: true,
   transform: {

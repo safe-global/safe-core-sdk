@@ -3,6 +3,7 @@ import {
   SafeOnRampEvent,
   SafeOnRampEventListener,
   SafeOnRampOpenOptions,
+  SafeOnRampInitOptions,
   SafeOnRampOpenResponse
 } from './types'
 
@@ -25,17 +26,20 @@ export class SafeOnRampKit<TPack extends SafeOnRampPack<TPack>> {
   /**
    * This method initializes the SafeOnRampKit asynchronously. This is the place where we can put initialization magic
    * @param pack The pack implementing the SafeOnRampClient interface for the specific provider
+   * @param options The options to initialize the specific pack
    * @returns A SafeOnRampKit instance
    * @throws Error if the pack is not defined
    */
   static async init<TPack extends SafeOnRampPack<TPack>>(
-    pack: TPack
+    pack: TPack,
+    options?: SafeOnRampInitOptions<TPack>
   ): Promise<SafeOnRampKit<TPack>> {
     if (!pack) {
       throw new Error('The pack is not defined')
     }
 
-    await pack.init()
+    await pack.init(options)
+
     return new this(pack)
   }
 

@@ -17,9 +17,9 @@ import type { SafeOnRampPack } from '@safe-global/onramp-kit/types'
  */
 export class StripePack implements SafeOnRampPack<StripePack> {
   #element?: string
-  #stripeOnRamp?: StripeOnramp
-  #onRampSession?: OnrampSession
+  #client?: StripeOnramp
   #config: StripeProviderConfig
+  #onRampSession?: OnrampSession
 
   /**
    * Initialize the StripePack
@@ -35,7 +35,7 @@ export class StripePack implements SafeOnRampPack<StripePack> {
    */
   async init() {
     try {
-      this.#stripeOnRamp = (await loadStripeOnramp(this.#config.stripePublicKey)) || undefined
+      this.#client = (await loadStripeOnramp(this.#config.stripePublicKey)) || undefined
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -51,7 +51,7 @@ export class StripePack implements SafeOnRampPack<StripePack> {
     sessionId,
     defaultOptions
   }: StripeOpenOptions): Promise<StripeSession> {
-    if (!this.#stripeOnRamp) throw new Error('StripeOnRamp is not initialized')
+    if (!this.#client) throw new Error('The Stripe crypto SDK is not initialized')
 
     try {
       let session
@@ -62,7 +62,7 @@ export class StripePack implements SafeOnRampPack<StripePack> {
         session = await stripeApi.createSession(this.#config.onRampBackendUrl, defaultOptions)
       }
 
-      const onRampSession = await this.#stripeOnRamp.createSession({
+      const onRampSession = this.#client.createSession({
         clientSecret: session.client_secret,
         appearance: {
           theme: theme

@@ -35,16 +35,21 @@
     "access": "public"
   },
   "dependencies": {
-    "@ethersproject/address": "^5.7.0"
+    "@safe-global/api-kit": "^1.1.0",
+    "@safe-global/protocol-kit": "^1.0.0",
+    "@safe-global/safe-core-sdk-types": "^2.0.0",
+    "ethers": "^5.7.0"
   },
   "devDependencies": {
-    "@stripe/crypto": "^0.0.2",
-    "@stripe/stripe-js": "^1.48.0",
+    "@monerium/sdk": "^2.3.0",
+    "@stripe/crypto": "^0.0.4",
+    "@stripe/stripe-js": "^1.52.0",
     "events": "^3.3.0",
-    "jest-environment-jsdom": "^29.4.3"
+    "jest-environment-jsdom": "^29.5.0"
   },
   "peerDependencies": {
-    "@stripe/crypto": "^0.0.2",
-    "@stripe/stripe-js": "^1.48.0"
+    "@monerium/sdk": "^2.3.0",
+    "@stripe/crypto": "^0.0.4",
+    "@stripe/stripe-js": "^1.52.0"
   }
 }

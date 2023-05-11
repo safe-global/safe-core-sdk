@@ -76,12 +76,6 @@ class AccountAbstraction {
     })
 
     try {
-      await getSafeContract({
-        ethAdapter: this.#ethAdapter,
-        safeVersion,
-        customSafeAddress: safeAddress
-      })
-
       this.#safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
     } catch {
       const predictedSafe: PredictedSafeProps = {

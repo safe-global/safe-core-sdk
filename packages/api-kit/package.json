@@ -38,7 +38,7 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@safe-global/protocol-kit": "^1.0.0",
+    "@safe-global/protocol-kit": "^1.0.1",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^10.0.1",

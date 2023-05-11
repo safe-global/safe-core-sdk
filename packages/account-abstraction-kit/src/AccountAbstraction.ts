@@ -18,7 +18,6 @@ import Safe, {
 } from '@safe-global/protocol-kit'
 import { RelayPack } from '@safe-global/relay-kit'
 import {
-  GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
   MetaTransactionData,
   MetaTransactionOptions,
@@ -32,7 +31,7 @@ const safeVersion: SafeVersion = '1.3.0'
 class AccountAbstraction {
   #ethAdapter: EthersAdapter
   #signer: ethers.Signer
-  #safeContract?: GnosisSafeContract
+  #safeSdk?: Safe
   #safeProxyFactoryContract?: GnosisSafeProxyFactoryContract
   #relayPack?: RelayPack
 
@@ -76,11 +75,22 @@ class AccountAbstraction {
       safeDeploymentConfig
     })
 
-    this.#safeContract = await getSafeContract({
-      ethAdapter: this.#ethAdapter,
-      safeVersion,
-      customSafeAddress: safeAddress
-    })
+    try {
+      await getSafeContract({
+        ethAdapter: this.#ethAdapter,
+        safeVersion,
+        customSafeAddress: safeAddress
+      })
+
+      this.#safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
+    } catch {
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig,
+        safeDeploymentConfig
+      }
+
+      this.#safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, predictedSafe })
+    }
   }
 
   setRelayPack(relayPack: RelayPack) {
@@ -93,59 +103,68 @@ class AccountAbstraction {
   }
 
   async getNonce(): Promise<number> {
-    if (!this.#safeContract) {
+    if (!this.#safeSdk) {
       throw new Error('SDK not initialized')
     }
-    return (await this.isSafeDeployed()) ? await this.#safeContract.getNonce() : 0
+
+    return this.#safeSdk.getNonce()
   }
 
-  getSafeAddress(): string {
-    if (!this.#safeContract) {
+  async getSafeAddress(): Promise<string> {
+    if (!this.#safeSdk) {
       throw new Error('SDK not initialized')
     }
-    return this.#safeContract.getAddress()
+
+    return this.#safeSdk.getAddress()
   }
 
   async isSafeDeployed(): Promise<boolean> {
-    if (!this.#signer.provider) {
+    if (!this.#safeSdk) {
       throw new Error('SDK not initialized')
     }
-    const address = this.getSafeAddress()
-    const codeAtAddress = await this.#signer.provider.getCode(address)
-    const isDeployed = codeAtAddress !== '0x'
-    return isDeployed
+
+    return this.#safeSdk.isSafeDeployed()
   }
 
   async relayTransaction(
     transactions: MetaTransactionData[],
     options: MetaTransactionOptions
   ): Promise<string> {
-    if (!this.#relayPack || !this.#safeContract || !this.#safeProxyFactoryContract) {
+    if (!this.#relayPack || !this.#safeSdk || !this.#safeProxyFactoryContract) {
       throw new Error('SDK not initialized')
     }
 
-    const safeAddress = this.getSafeAddress()
-    const safe = await Safe.create({
-      ethAdapter: this.#ethAdapter,
-      safeAddress
-    })
+    const safeAddress = await this.#safeSdk.getAddress()
 
     const standardizedSafeTx = await this.#relayPack.createRelayedTransaction(
-      safe,
+      this.#safeSdk,
       transactions,
       options
     )
 
-    const signedSafeTx = await safe.signTransaction(standardizedSafeTx)
+    const safeSingletonContract = await getSafeContract({
+      ethAdapter: this.#ethAdapter,
+      safeVersion
+    })
 
-    const transactionData = this.#safeContract.encode('execTransaction', [
-      signedSafeTx.data,
+    const signedSafeTx = await this.#safeSdk.signTransaction(standardizedSafeTx)
+
+    const transactionData = safeSingletonContract.encode('execTransaction', [
+      signedSafeTx.data.to,
+      signedSafeTx.data.value,
+      signedSafeTx.data.data,
+      signedSafeTx.data.operation,
+      signedSafeTx.data.safeTxGas,
+      signedSafeTx.data.baseGas,
+      signedSafeTx.data.gasPrice,
+      signedSafeTx.data.gasToken,
+      signedSafeTx.data.refundReceiver,
       signedSafeTx.encodedSignatures()
     ])
 
     let relayTransactionTarget = ''
     let encodedTransaction = ''
-    const isSafeDeployed = await this.isSafeDeployed()
+    const isSafeDeployed = await this.#safeSdk.isSafeDeployed()
     if (isSafeDeployed) {
       relayTransactionTarget = safeAddress
       encodedTransaction = transactionData
@@ -172,7 +191,7 @@ class AccountAbstraction {
 
       const initializer = await encodeSetupCallData({
         ethAdapter: this.#ethAdapter,
-        safeContract: this.#safeContract,
+        safeContract: safeSingletonContract,
         safeAccountConfig: predictedSafe.safeAccountConfig
       })
 

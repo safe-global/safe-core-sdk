@@ -35,21 +35,16 @@
     "access": "public"
   },
   "dependencies": {
+    "@monerium/sdk": "^2.3.0",
     "@safe-global/api-kit": "^1.1.0",
     "@safe-global/protocol-kit": "^1.0.1",
     "@safe-global/safe-core-sdk-types": "^2.0.0",
+    "@stripe/crypto": "^0.0.4",
+    "@stripe/stripe-js": "^1.52.0",
     "ethers": "^5.7.0"
   },
   "devDependencies": {
-    "@monerium/sdk": "^2.3.0",
-    "@stripe/crypto": "^0.0.4",
-    "@stripe/stripe-js": "^1.52.0",
     "events": "^3.3.0",
     "jest-environment-jsdom": "^29.5.0"
-  },
-  "peerDependencies": {
-    "@monerium/sdk": "^2.3.0",
-    "@stripe/crypto": "^0.0.4",
-    "@stripe/stripe-js": "^1.52.0"
   }
 }

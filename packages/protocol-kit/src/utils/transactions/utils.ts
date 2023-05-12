@@ -4,6 +4,7 @@ import { pack as solidityPack } from '@ethersproject/solidity'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   MetaTransactionData,
   OperationType,
@@ -52,8 +53,8 @@ export async function standardizeSafeTransactionData({
   }
 
   let safeVersion: SafeVersion
-  if (predictedSafe?.safeDeploymentConfig?.safeVersion) {
-    safeVersion = predictedSafe?.safeDeploymentConfig.safeVersion
+  if (predictedSafe) {
+    safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion || SAFE_LAST_VERSION
   } else {
     if (!safeContract) {
       throw new Error('Safe is not deployed')

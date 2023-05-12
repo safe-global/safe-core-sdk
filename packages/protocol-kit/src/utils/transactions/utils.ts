@@ -53,7 +53,7 @@ export async function standardizeSafeTransactionData({
   }
 
   let safeVersion: SafeVersion
-  if (!!predictedSafe) {
+  if (predictedSafe) {
     safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion || SAFE_LAST_VERSION
   } else {
     if (!safeContract) {

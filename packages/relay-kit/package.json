@@ -38,6 +38,6 @@
     "@gelatonetwork/relay-sdk": "^3.1.0",
     "@safe-global/protocol-kit": "^1.0.0",
     "@safe-global/safe-core-sdk-types": "^2.0.0",
-    "ethers": "^5.7.2"
+    "ethers": "^6.3.0"
   }
 }

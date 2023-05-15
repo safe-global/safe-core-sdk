@@ -12,7 +12,6 @@ import { EthHashInfo } from '@safe-global/safe-react-components'
 
 import AppBar from './AppBar'
 import {
-  SafeAuthKit,
   SafeAuthSignInData,
   SafeGetUserInfoResponse,
   Web3AuthModalPack,
@@ -23,7 +22,7 @@ const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
 
 function App() {
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
+  const [safeAuth, setSafeAuth] = useState<Web3AuthModalPack>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData | null>(
     null
   )
@@ -70,21 +69,21 @@ function App() {
         }
       })
 
-      const web3AuthModalPack = new Web3AuthModalPack(options, [openloginAdapter], modalConfig)
-
-      const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack, {
+      const web3AuthModalPack = new Web3AuthModalPack({
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
-      safeAuthKit.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
+      await web3AuthModalPack.init({ options, adapters: [openloginAdapter], modalConfig })
 
-      safeAuthKit.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
+      web3AuthModalPack.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
 
-      setSafeAuth(safeAuthKit)
+      web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
+
+      setSafeAuth(web3AuthModalPack)
 
       return () => {
-        safeAuthKit.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
-        safeAuthKit.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
+        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
+        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
       }
     })()
   }, [])

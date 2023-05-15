@@ -1,7 +1,7 @@
 import { ADAPTER_EVENTS, CHAIN_NAMESPACES } from '@web3auth/base'
 import * as web3AuthModal from '@web3auth/modal'
 import { Web3AuthOptions } from '@web3auth/modal'
-import { SafeAuthKit } from './SafeAuthKit'
+import { SafeAuthKit } from './BasePack'
 import { Web3AuthModalPack } from './packs/web3auth/Web3AuthModalPack'
 
 import { generateTestingUtils } from 'eth-testing'

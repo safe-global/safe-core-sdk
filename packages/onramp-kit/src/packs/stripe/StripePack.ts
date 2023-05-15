@@ -1,6 +1,8 @@
 import { loadStripeOnramp, OnrampSession, OnrampUIEventMap, StripeOnramp } from '@stripe/crypto'
-import * as stripeApi from './stripeApi'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
+import { BasePack } from '@safe-global/onramp-kit/BasePack'
+
+import * as stripeApi from './stripeApi'
 
 import type {
   StripeProviderConfig,
@@ -9,16 +11,21 @@ import type {
   StripeOpenOptions,
   StripeSession
 } from './types'
-import type { SafeOnRampPack } from '@safe-global/onramp-kit/types'
 
 /**
  * This class implements the SafeOnRampClient interface for the Stripe provider
  * @class StripePack
  */
-export class StripePack implements SafeOnRampPack<StripePack> {
+export class StripePack extends BasePack<
+  StripeProviderConfig,
+  undefined,
+  StripeOpenOptions,
+  StripeSession,
+  StripeEvent,
+  StripeEventListener
+> {
   #element?: string
   #client?: StripeOnramp
-  #config: StripeProviderConfig
   #onRampSession?: OnrampSession
 
   /**
@@ -27,7 +34,7 @@ export class StripePack implements SafeOnRampPack<StripePack> {
    * @param config The configuration object for the Stripe provider. Ideally we will put here things like api keys, secrets, urls, etc.
    */
   constructor(config: StripeProviderConfig) {
-    this.#config = config
+    super(config)
   }
 
   /**
@@ -35,7 +42,7 @@ export class StripePack implements SafeOnRampPack<StripePack> {
    */
   async init() {
     try {
-      this.#client = (await loadStripeOnramp(this.#config.stripePublicKey)) || undefined
+      this.#client = (await loadStripeOnramp(this.config.stripePublicKey)) || undefined
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -57,9 +64,9 @@ export class StripePack implements SafeOnRampPack<StripePack> {
       let session
 
       if (sessionId) {
-        session = await stripeApi.getSession(this.#config.onRampBackendUrl, sessionId)
+        session = await stripeApi.getSession(this.config.onRampBackendUrl, sessionId)
       } else {
-        session = await stripeApi.createSession(this.#config.onRampBackendUrl, defaultOptions)
+        session = await stripeApi.createSession(this.config.onRampBackendUrl, defaultOptions)
       }
 
       const onRampSession = this.#client.createSession({

@@ -1,42 +1,42 @@
 import { AddressZero } from '@ethersproject/constants'
 import {
-  Gnosis_safe as GnosisSafe_V1_0_0,
-  Proxy_factory as ProxyFactory_V1_0_0
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0'
+    compatibilityFallbackHandlerDeployed,
+    createCallDeployed,
+    gnosisSafeDeployed,
+    multiSendCallOnlyDeployed,
+    multiSendDeployed,
+    proxyFactoryDeployed,
+    safeVersionDeployed,
+    signMessageLibDeployed
+} from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
-  Gnosis_safe as GnosisSafe_V1_1_1,
-  Multi_send as MultiSend_V1_1_1,
-  Proxy_factory as ProxyFactory_V1_1_1
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1'
-import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0'
+    Gnosis_safe as GnosisSafe_V1_0_0,
+    Proxy_factory as ProxyFactory_V1_0_0
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0'
 import {
-  Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
-  Create_call as CreateCall_V1_3_0,
-  Gnosis_safe as GnosisSafe_V1_3_0,
-  Multi_send as MultiSend_V1_3_0,
-  Multi_send_call_only as MultiSendCallOnly_V1_3_0,
-  Proxy_factory as ProxyFactory_V1_3_0,
-  Sign_message_lib as SignMessageLib_V1_3_0
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0'
+    Gnosis_safe as GnosisSafe_V1_1_1,
+    Multi_send as MultiSend_V1_1_1,
+    Proxy_factory as ProxyFactory_V1_1_1
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1'
+import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0'
 import {
-  DailyLimitModule,
-  ERC20Mintable,
-  SocialRecoveryModule
-} from '@safe-global/protocol-kit/typechain/tests/ethers-v5/v1.2.0'
-import { DebugTransactionGuard } from '@safe-global/protocol-kit/typechain/tests/ethers-v5/v1.3.0'
+    Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
+    Create_call as CreateCall_V1_3_0,
+    Gnosis_safe as GnosisSafe_V1_3_0,
+    Multi_send_call_only as MultiSendCallOnly_V1_3_0,
+    Multi_send as MultiSend_V1_3_0,
+    Proxy_factory as ProxyFactory_V1_3_0,
+    Sign_message_lib as SignMessageLib_V1_3_0
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0'
+import {
+    DailyLimitModule,
+    ERC20Mintable,
+    SocialRecoveryModule
+} from '@safe-global/protocol-kit/typechain/tests/ethers-v6/v1.2.0'
+import { DebugTransactionGuard } from '@safe-global/protocol-kit/typechain/tests/ethers-v6/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { AbiItem } from 'web3-utils'
-import {
-  compatibilityFallbackHandlerDeployed,
-  createCallDeployed,
-  gnosisSafeDeployed,
-  multiSendCallOnlyDeployed,
-  multiSendDeployed,
-  proxyFactoryDeployed,
-  safeVersionDeployed,
-  signMessageLibDeployed
-} from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 
 export const getSafeSingleton = async (): Promise<{
   contract: GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0

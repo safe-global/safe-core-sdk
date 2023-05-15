@@ -3157,10 +3157,18 @@
     "@tufjs/canonical-json" "1.0.0"
     minimatch "^8.0.3"
 
-"@typechain/ethers-v5@^10.0.0", "@typechain/ethers-v5@^10.2.0":
+"@typechain/ethers-v5@^10.0.0":
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-10.2.0.tgz#68f5963efb5214cb2d881477228e4b5b315473e1"
   integrity sha512-ikaq0N/w9fABM+G01OFmU3U3dNnyRwEahkdvi9mqy1a3XwKiPZaF/lu54OcNaEWnpvEYyhhS0N7buCtLQqC92w==
+  dependencies:
+    lodash "^4.17.15"
+    ts-essentials "^7.0.1"
+
+"@typechain/ethers-v6@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@typechain/ethers-v6/-/ethers-v6-0.3.2.tgz#c7c9ed2cbe6869a131e55646ce775e3673f0c123"
+  integrity sha512-LUxAVAHICc6lROLf16JIl/j0FVuCQ93qLkGxlVFM1QCN5V4QRUE2scNwhKLIh8urik1c0FcvFujOPtBV4erqYg==
   dependencies:
     lodash "^4.17.15"
     ts-essentials "^7.0.1"

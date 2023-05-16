@@ -1,10 +1,17 @@
 import { ethers } from 'ethers'
 import SafeApiKit from '@safe-global/api-kit'
 import { EthersAdapter } from '@safe-global/protocol-kit'
+
 import { getErrorMessage } from './lib/errors'
 import { SafeAuthSignInData } from './types'
 
-export abstract class BasePack<TConfig, TInitOptions, TUserInfoResponse, TEvent, TEventHandler> {
+export abstract class AuthBasePack<
+  TConfig,
+  TInitOptions,
+  TUserInfoResponse,
+  TEvent,
+  TEventHandler
+> {
   config?: TConfig
   safeAuthData?: SafeAuthSignInData
 

@@ -1,4 +1,4 @@
-export abstract class BasePack<
+export abstract class OnRampBasePack<
   TConfig,
   TInitOptions,
   TOpenOptions,

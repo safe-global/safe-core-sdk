@@ -3,28 +3,18 @@ import SafeApiKit from '@safe-global/api-kit'
 import { EthersAdapter } from '@safe-global/protocol-kit'
 
 import { getErrorMessage } from './lib/errors'
-import { SafeAuthSignInData } from './types'
+import type { AuthKitSignInData } from './types'
 
 export abstract class AuthKitBasePack {
-  safeAuthData?: SafeAuthSignInData
+  safeAuthData?: AuthKitSignInData
 
   abstract init(options?: unknown): Promise<void>
-  abstract signIn(): Promise<SafeAuthSignInData>
+  abstract signIn(): Promise<AuthKitSignInData>
   abstract signOut(): Promise<void>
-  abstract getProvider(): ethers.providers.ExternalProvider
+  abstract getProvider(): ethers.providers.ExternalProvider | null
   abstract getUserInfo(): Promise<unknown>
   abstract subscribe(event: unknown, handler: unknown): void
   abstract unsubscribe(event: unknown, handler: unknown): void
-
-  async getAddress(): Promise<string> {
-    const ethersProvider = new ethers.providers.Web3Provider(this.getProvider())
-
-    const signer = ethersProvider.getSigner()
-
-    const address = await signer.getAddress()
-
-    return address
-  }
 
   async getSafes(txServiceUrl: string): Promise<string[]> {
     const apiKit = this.#getApiKit(txServiceUrl)
@@ -37,6 +27,16 @@ export abstract class AuthKitBasePack {
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
+  }
+
+  async getAddress(): Promise<string> {
+    const ethersProvider = new ethers.providers.Web3Provider(this.getProvider())
+
+    const signer = ethersProvider.getSigner()
+
+    const address = await signer.getAddress()
+
+    return address
   }
 
   /**

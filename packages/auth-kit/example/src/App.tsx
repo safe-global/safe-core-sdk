@@ -3,6 +3,7 @@ import {
   ADAPTER_EVENTS,
   CHAIN_NAMESPACES,
   SafeEventEmitterProvider,
+  UserInfo,
   WALLET_ADAPTERS
 } from '@web3auth/base'
 import { Box, Divider, Grid, Typography } from '@mui/material'
@@ -11,22 +12,17 @@ import { Web3AuthOptions } from '@web3auth/modal'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 
 import AppBar from './AppBar'
-import {
-  SafeAuthSignInData,
-  SafeGetUserInfoResponse,
-  Web3AuthModalPack,
-  Web3AuthEventListener
-} from '../../src/index'
+import { AuthKitSignInData, Web3AuthModalPack, Web3AuthEventListener } from '../../src/index'
 
 const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED', data)
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
 
 function App() {
   const [safeAuth, setSafeAuth] = useState<Web3AuthModalPack>()
-  const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData | null>(
+  const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<SafeGetUserInfoResponse<Web3AuthModalPack>>()
+  const [userInfo, setUserInfo] = useState<Partial<UserInfo>>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
 
   useEffect(() => {
@@ -87,6 +83,14 @@ function App() {
       }
     })()
   }, [])
+
+  useEffect(() => {
+    if (safeAuth && safeAuth.getProvider()) {
+      ;(async () => {
+        await login()
+      })()
+    }
+  }, [safeAuth])
 
   const login = async () => {
     if (!safeAuth) return

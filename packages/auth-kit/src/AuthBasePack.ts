@@ -5,27 +5,16 @@ import { EthersAdapter } from '@safe-global/protocol-kit'
 import { getErrorMessage } from './lib/errors'
 import { SafeAuthSignInData } from './types'
 
-export abstract class AuthBasePack<
-  TConfig,
-  TInitOptions,
-  TUserInfoResponse,
-  TEvent,
-  TEventHandler
-> {
-  config?: TConfig
+export abstract class AuthBasePack {
   safeAuthData?: SafeAuthSignInData
 
-  constructor(config?: TConfig) {
-    this.config = config
-  }
-
-  abstract init(options?: TInitOptions): Promise<void>
+  abstract init(options?: unknown): Promise<void>
   abstract signIn(): Promise<SafeAuthSignInData>
   abstract signOut(): Promise<void>
   abstract getProvider(): ethers.providers.ExternalProvider
-  abstract getUserInfo(): Promise<TUserInfoResponse>
-  abstract subscribe(event: TEvent, handler: TEventHandler): void
-  abstract unsubscribe(event: TEvent, handler: TEventHandler): void
+  abstract getUserInfo(): Promise<unknown>
+  abstract subscribe(event: unknown, handler: unknown): void
+  abstract unsubscribe(event: unknown, handler: unknown): void
 
   async getAddress(): Promise<string> {
     const ethersProvider = new ethers.providers.Web3Provider(this.getProvider())

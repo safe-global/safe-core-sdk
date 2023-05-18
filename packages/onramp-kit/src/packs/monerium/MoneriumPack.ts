@@ -1,4 +1,4 @@
-import { Currency } from '@monerium/sdk'
+import { Currency, OrderState } from '@monerium/sdk'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { OnRampBasePack } from '@safe-global/onramp-kit/OnRampBasePack'
 
@@ -19,20 +19,15 @@ const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
  * This class implements the SafeOnRampClient interface for the Monerium provider
  * @class MoneriumPack
  */
-export class MoneriumPack extends OnRampBasePack<
-  MoneriumProviderConfig,
-  MoneriumInitOptions,
-  MoneriumOpenOptions,
-  SafeMoneriumClient,
-  MoneriumEvent,
-  MoneriumEventListener
-> {
+export class MoneriumPack extends OnRampBasePack {
+  #config: MoneriumProviderConfig
   #client?: SafeMoneriumClient
   #socket?: WebSocket
   #subscriptions: Map<MoneriumEvent, MoneriumEventListener> = new Map()
 
   constructor(config: MoneriumProviderConfig) {
-    super(config)
+    super()
+    this.#config = config
   }
 
   /**
@@ -45,7 +40,7 @@ export class MoneriumPack extends OnRampBasePack<
       throw new Error('You need to provide an instance of the protocol kit')
     }
 
-    this.#client = new SafeMoneriumClient(this.config.environment, options.safeSdk)
+    this.#client = new SafeMoneriumClient(this.#config.environment, options.safeSdk)
   }
 
   /**
@@ -77,7 +72,7 @@ export class MoneriumPack extends OnRampBasePack<
       if (this.#client.bearerProfile?.access_token && this.#subscriptions.size > 0) {
         this.#socket = connectToOrderNotifications({
           profile: this.#client.bearerProfile?.profile,
-          env: this.config.environment,
+          env: this.#config.environment,
           accessToken: this.#client.bearerProfile?.access_token,
           subscriptions: this.#subscriptions
         })
@@ -102,7 +97,7 @@ export class MoneriumPack extends OnRampBasePack<
     const codeVerifier = sessionStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
 
     await this.#client.auth({
-      client_id: this.config.clientId,
+      client_id: this.#config.clientId,
       code: codeParam,
       code_verifier: codeVerifier,
       redirect_uri: redirectUrl
@@ -125,7 +120,7 @@ export class MoneriumPack extends OnRampBasePack<
     if (!this.#client) return
 
     await this.#client.auth({
-      client_id: this.config.clientId,
+      client_id: this.#config.clientId,
       refresh_token: refreshToken
     })
 
@@ -157,7 +152,7 @@ export class MoneriumPack extends OnRampBasePack<
     }
 
     const authFlowUrl = this.#client.getAuthFlowURI({
-      client_id: this.config.clientId,
+      client_id: this.#config.clientId,
       redirect_uri: redirectUrl,
       address: safeAddress,
       signature: '0x',
@@ -224,7 +219,7 @@ export class MoneriumPack extends OnRampBasePack<
    * @param handler The handler to be called when the event is triggered
    */
   subscribe(event: MoneriumEvent, handler: MoneriumEventListener): void {
-    this.#subscriptions.set(event, handler)
+    this.#subscriptions.set(event as OrderState, handler)
   }
 
   /**
@@ -232,7 +227,7 @@ export class MoneriumPack extends OnRampBasePack<
    * @param event The event to unsubscribe from
    */
   unsubscribe(event: MoneriumEvent): void {
-    this.#subscriptions.delete(event)
+    this.#subscriptions.delete(event as OrderState)
 
     if (this.#subscriptions.size === 0) {
       this.#socket?.close()

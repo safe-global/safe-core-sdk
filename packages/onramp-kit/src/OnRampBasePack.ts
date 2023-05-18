@@ -1,20 +1,7 @@
-export abstract class OnRampBasePack<
-  TConfig,
-  TInitOptions,
-  TOpenOptions,
-  TOpenResponse,
-  TEvent,
-  TEventHandler
-> {
-  config: TConfig
-
-  constructor(config: TConfig) {
-    this.config = config
-  }
-
-  abstract init(options?: TInitOptions): Promise<void>
-  abstract open(options?: TOpenOptions): Promise<TOpenResponse>
+export abstract class OnRampBasePack {
+  abstract init(options?: unknown): Promise<void>
+  abstract open(options?: unknown): Promise<unknown>
   abstract close(): Promise<void>
-  abstract subscribe(event: TEvent, handler: TEventHandler): void
-  abstract unsubscribe(event: TEvent, handler: TEventHandler): void
+  abstract subscribe(event: unknown, handler: unknown): void
+  abstract unsubscribe(event: unknown, handler: unknown): void
 }

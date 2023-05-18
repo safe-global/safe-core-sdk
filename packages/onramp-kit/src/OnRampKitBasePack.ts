@@ -1,4 +1,4 @@
-export abstract class OnRampBasePack {
+export abstract class OnRampKitBasePack {
   abstract init(options?: unknown): Promise<void>
   abstract open(options?: unknown): Promise<unknown>
   abstract close(): Promise<void>

@@ -5,7 +5,7 @@ import { EthersAdapter } from '@safe-global/protocol-kit'
 import { getErrorMessage } from './lib/errors'
 import { SafeAuthSignInData } from './types'
 
-export abstract class AuthBasePack {
+export abstract class AuthKitBasePack {
   safeAuthData?: SafeAuthSignInData
 
   abstract init(options?: unknown): Promise<void>

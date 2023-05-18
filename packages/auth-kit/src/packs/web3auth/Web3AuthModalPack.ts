@@ -4,23 +4,14 @@ import { ExternalProvider } from '@ethersproject/providers'
 
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { Web3AuthEvent, Web3AuthEventListener } from './types'
-import { AuthBasePack } from '@safe-global/auth-kit/AuthBasePack'
+import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 
 /**
  * Web3AuthModalPack implements the SafeAuthClient interface for adapting the Web3Auth service provider
  * @class
  */
-export class Web3AuthModalPack extends AuthBasePack<
-  { txServiceUrl: string },
-  {
-    options: Web3AuthOptions
-    adapters?: IAdapter<unknown>[]
-    modalConfig?: Record<string, ModalConfig>
-  },
-  Partial<UserInfo>,
-  Web3AuthEvent,
-  Web3AuthEventListener
-> {
+export class Web3AuthModalPack extends AuthKitBasePack {
+  #config: { txServiceUrl: string }
   provider: ExternalProvider | null
   private web3authInstance?: Web3Auth
 
@@ -31,7 +22,8 @@ export class Web3AuthModalPack extends AuthBasePack<
    * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
    */
   constructor(config: { txServiceUrl: string }) {
-    super(config)
+    super()
+    this.#config = config
     this.provider = null
   }
 
@@ -74,7 +66,7 @@ export class Web3AuthModalPack extends AuthBasePack<
 
     return {
       eoa: await this.getAddress(),
-      safes: await this.getSafes(this.config?.txServiceUrl || '')
+      safes: await this.getSafes(this.#config?.txServiceUrl || '')
     }
   }
 

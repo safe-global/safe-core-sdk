@@ -1,6 +1,6 @@
 import { loadStripeOnramp, OnrampSession, OnrampUIEventMap, StripeOnramp } from '@stripe/crypto'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
-import { OnRampBasePack } from '@safe-global/onramp-kit/OnRampBasePack'
+import { OnRampKitBasePack } from '@safe-global/onramp-kit/OnRampKitBasePack'
 
 import * as stripeApi from './stripeApi'
 
@@ -16,14 +16,8 @@ import type {
  * This class implements the SafeOnRampClient interface for the Stripe provider
  * @class StripePack
  */
-export class StripePack extends OnRampBasePack<
-  StripeProviderConfig,
-  undefined,
-  StripeOpenOptions,
-  StripeSession,
-  StripeEvent,
-  StripeEventListener
-> {
+export class StripePack extends OnRampKitBasePack {
+  #config: StripeProviderConfig
   #element?: string
   #client?: StripeOnramp
   #onRampSession?: OnrampSession
@@ -34,7 +28,8 @@ export class StripePack extends OnRampBasePack<
    * @param config The configuration object for the Stripe provider. Ideally we will put here things like api keys, secrets, urls, etc.
    */
   constructor(config: StripeProviderConfig) {
-    super(config)
+    super()
+    this.#config = config
   }
 
   /**
@@ -42,7 +37,7 @@ export class StripePack extends OnRampBasePack<
    */
   async init() {
     try {
-      this.#client = (await loadStripeOnramp(this.config.stripePublicKey)) || undefined
+      this.#client = (await loadStripeOnramp(this.#config.stripePublicKey)) || undefined
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -64,9 +59,9 @@ export class StripePack extends OnRampBasePack<
       let session
 
       if (sessionId) {
-        session = await stripeApi.getSession(this.config.onRampBackendUrl, sessionId)
+        session = await stripeApi.getSession(this.#config.onRampBackendUrl, sessionId)
       } else {
-        session = await stripeApi.createSession(this.config.onRampBackendUrl, defaultOptions)
+        session = await stripeApi.createSession(this.#config.onRampBackendUrl, defaultOptions)
       }
 
       const onRampSession = this.#client.createSession({

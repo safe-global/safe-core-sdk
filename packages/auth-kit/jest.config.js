@@ -1,4 +1,5 @@
 const config = {
+  testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   verbose: true,
   transform: {

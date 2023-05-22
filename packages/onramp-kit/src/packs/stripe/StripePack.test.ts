@@ -2,10 +2,10 @@ import EventEmitter from 'events'
 import { StripePack } from './StripePack'
 import * as stripeApi from './stripeApi'
 
-import type { SafeOnRampOpenOptions } from '@safe-global/onramp-kit/OnRampKitBasePack'
 import type { StripeSession } from './types'
+import { OnRampKitBasePack } from '../..'
 
-const openOptions: SafeOnRampOpenOptions<StripePack> = {
+const openOptions = {
   element: '#root',
   defaultOptions: {
     transaction_details: {
@@ -70,6 +70,7 @@ describe('StripePack', () => {
     const stripePack = new StripePack(config)
 
     expect(stripePack).toBeInstanceOf(StripePack)
+    expect(stripePack).toBeInstanceOf(OnRampKitBasePack)
   })
 
   it('should try to mount the node specified in the config when open() is called', async () => {

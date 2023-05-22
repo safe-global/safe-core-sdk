@@ -30,7 +30,13 @@ export abstract class AuthKitBasePack {
   }
 
   async getAddress(): Promise<string> {
-    const ethersProvider = new ethers.providers.Web3Provider(this.getProvider())
+    if (!this.getProvider()) {
+      throw new Error('Provider is not defined')
+    }
+
+    const ethersProvider = new ethers.providers.Web3Provider(
+      this.getProvider() as ethers.providers.ExternalProvider
+    )
 
     const signer = ethersProvider.getSigner()
 
@@ -48,7 +54,9 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const provider = new ethers.providers.Web3Provider(this.getProvider())
+    const provider = new ethers.providers.Web3Provider(
+      this.getProvider() as ethers.providers.ExternalProvider
+    )
     const safeOwner = provider.getSigner(0)
 
     const adapter = new EthersAdapter({

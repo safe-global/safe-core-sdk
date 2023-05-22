@@ -65,9 +65,12 @@ export class Web3AuthModalPack extends AuthKitBasePack {
 
     this.provider = await this.#web3authInstance.connect()
 
+    const eoa = await this.getAddress()
+    const safes = await this.getSafes(this.#config?.txServiceUrl || '')
+
     const signInData = {
-      eoa: await this.getAddress(),
-      safes: await this.getSafes(this.#config?.txServiceUrl || '')
+      eoa,
+      safes
     }
 
     return signInData

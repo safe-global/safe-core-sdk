@@ -17,10 +17,8 @@ export class Web3AuthModalPack extends AuthKitBasePack {
   #web3authInstance?: Web3Auth
 
   /**
-   *
-   * @param options Web3Auth options {@link https://web3auth.io/docs/sdk/web/modal/initialize#arguments}
-   * @param config Web3Auth adapters {@link https://web3auth.io/docs/sdk/web/modal/initialize#configuring-adapters}
-   * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
+   * Instantiate the Web3AuthModalPack
+   * @param config Web3Auth specific config
    */
   constructor(config: Web3AuthConfig) {
     super()
@@ -30,6 +28,9 @@ export class Web3AuthModalPack extends AuthKitBasePack {
 
   /**
    * Initialize the Web3Auth service provider
+   * @param options Web3Auth options {@link https://web3auth.io/docs/sdk/web/modal/initialize#arguments}
+   * @param adapters Web3Auth adapters {@link https://web3auth.io/docs/sdk/web/modal/initialize#configuring-adapters}
+   * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
    * @throws Error if there was an error initializing Web3Auth
    */
   async init({
@@ -56,7 +57,7 @@ export class Web3AuthModalPack extends AuthKitBasePack {
 
   /**
    * Connect to the Web3Auth service provider
-   * @returns
+   * @returns The sign in data from the provider
    */
   async signIn(): Promise<AuthKitSignInData> {
     if (!this.#web3authInstance) {

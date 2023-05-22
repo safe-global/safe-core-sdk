@@ -13,7 +13,7 @@ import type {
 } from './types'
 
 /**
- * This class implements the SafeOnRampClient interface for the Stripe provider
+ * This class extends the OnRampKitBasePack to work with the Stripe platform
  * @class StripePack
  */
 export class StripePack extends OnRampKitBasePack {

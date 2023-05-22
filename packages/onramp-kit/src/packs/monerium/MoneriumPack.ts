@@ -16,7 +16,7 @@ const MONERIUM_CODE_VERIFIER = 'OnRampKit__monerium_code_verifier'
 const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
 
 /**
- * This class implements the SafeOnRampClient interface for the Monerium provider
+ * This class extends the OnRampKitBasePack to work with the Monerium platform
  * @class MoneriumPack
  */
 export class MoneriumPack extends OnRampKitBasePack {
@@ -25,6 +25,11 @@ export class MoneriumPack extends OnRampKitBasePack {
   #socket?: WebSocket
   #subscriptions: Map<MoneriumEvent, MoneriumEventListener> = new Map()
 
+  /**
+   * The constructor of the MoneriumPack
+   * @constructor
+   * @param config The configuration object for the Monerium provider
+   */
   constructor(config: MoneriumProviderConfig) {
     super()
     this.#config = config

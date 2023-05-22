@@ -9,7 +9,7 @@ const isSessionValid = (sessionId: string) => sessionId.length === 28
 function Stripe() {
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [sessionId, setSessionId] = useState<string>('')
-  const [stripePAck, setStripePack] = useState<StripePack>()
+  const [stripePack, setStripePack] = useState<StripePack>()
   const stripeRootRef = useRef<HTMLDivElement>(null)
 
   const handleCreateSession = async () => {
@@ -19,7 +19,7 @@ function Stripe() {
       stripeRootRef.current.innerHTML = ''
     }
 
-    const sessionData = (await stripePAck?.open({
+    const sessionData = (await stripePack?.open({
       element: '#stripe-root',
       sessionId: sessionId,
       theme: 'light',
@@ -36,11 +36,11 @@ function Stripe() {
       }
     })) as StripeSession
 
-    stripePAck?.subscribe('onramp_ui_loaded', () => {
+    stripePack?.subscribe('onramp_ui_loaded', () => {
       console.log('UI loaded')
     })
 
-    stripePAck?.subscribe('onramp_session_updated', (e) => {
+    stripePack?.subscribe('onramp_session_updated', (e) => {
       console.log('Session Updated', e.payload)
     })
 

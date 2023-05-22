@@ -18,7 +18,7 @@ const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
 
 function App() {
-  const [safeAuth, setSafeAuth] = useState<Web3AuthModalPack>()
+  const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
@@ -75,7 +75,7 @@ function App() {
 
       web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
 
-      setSafeAuth(web3AuthModalPack)
+      setWeb3AuthModalPack(web3AuthModalPack)
 
       return () => {
         web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
@@ -85,31 +85,31 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (safeAuth && safeAuth.getProvider()) {
+    if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
       ;(async () => {
         await login()
       })()
     }
-  }, [safeAuth])
+  }, [web3AuthModalPack])
 
   const login = async () => {
-    if (!safeAuth) return
+    if (!web3AuthModalPack) return
 
-    const signInInfo = await safeAuth.signIn()
+    const signInInfo = await web3AuthModalPack.signIn()
     console.log('SIGN IN RESPONSE: ', signInInfo)
 
-    const userInfo = await safeAuth.getUserInfo()
+    const userInfo = await web3AuthModalPack.getUserInfo()
     console.log('USER INFO: ', userInfo)
 
     setSafeAuthSignInResponse(signInInfo)
     setUserInfo(userInfo || undefined)
-    setProvider(safeAuth.getProvider() as SafeEventEmitterProvider)
+    setProvider(web3AuthModalPack.getProvider() as SafeEventEmitterProvider)
   }
 
   const logout = async () => {
-    if (!safeAuth) return
+    if (!web3AuthModalPack) return
 
-    await safeAuth.signOut()
+    await web3AuthModalPack.signOut()
 
     setProvider(null)
     setSafeAuthSignInResponse(null)

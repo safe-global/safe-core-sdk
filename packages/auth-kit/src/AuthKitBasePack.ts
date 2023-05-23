@@ -63,9 +63,10 @@ export abstract class AuthKitBasePack {
 
     try {
       const safesByOwner = await apiKit.getSafesByOwner(address)
+
       return safesByOwner.safes
     } catch (e) {
-      throw new Error(getErrorMessage(e))
+      return []
     }
   }
 

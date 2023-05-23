@@ -1,4 +1,4 @@
-import { loadStripeOnramp, OnrampSession, OnrampUIEventMap, StripeOnramp } from '@stripe/crypto'
+import { loadStripeOnramp, OnrampSession, StripeOnramp } from '@stripe/crypto'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { OnRampKitBasePack } from '@safe-global/onramp-kit/OnRampKitBasePack'
 
@@ -76,14 +76,6 @@ export class StripePack extends OnRampKitBasePack {
 
       onRampSession.mount(element)
 
-      // TODO: Remove this check when not required
-      this.subscribe(
-        'onramp_session_updated',
-        (stripeEvent: OnrampUIEventMap['onramp_session_updated']) => {
-          this.checkAmount(stripeEvent)
-        }
-      )
-
       return session
     } catch (e) {
       throw new Error(getErrorMessage(e))
@@ -113,18 +105,5 @@ export class StripePack extends OnRampKitBasePack {
    */
   unsubscribe(event: StripeEvent, handler: StripeEventListener): void {
     this.#onRampSession?.removeEventListener(event as '*', handler)
-  }
-
-  // This is only in order to preserve testnets liquidity pools during the hackaton
-  private checkAmount(stripeEvent: any): void {
-    if (
-      stripeEvent.payload.session.quote &&
-      Number(stripeEvent.payload.session.quote.source_monetary_amount?.replace(',', '.')) > 10
-    ) {
-      document.querySelector(this.#element as string)?.remove()
-      throw new Error(
-        "The amount you are trying to use to complete your purchase can't be greater than 10 in order to preserve testnets liquidity pools"
-      )
-    }
   }
 }

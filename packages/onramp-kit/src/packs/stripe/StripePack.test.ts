@@ -139,9 +139,7 @@ describe('StripePack', () => {
     stripePack.subscribe('onramp_ui_loaded', mockOnLoaded)
     stripePack.subscribe('onramp_session_updated', mockOnSessionUpdated)
 
-    // TODO: Change to 2 when the hack for not allowing more than 10$ is removed
-    // https://github.com/safe-global/safe-core-sdk/blob/59c5f90b08eecf976d617af5f7a8259e058c4580/packages/onramp-kit/src/packs/stripe/StripePack.ts#L77-L83
-    expect(mockAddEventListener).toHaveBeenCalledTimes(3)
+    expect(mockAddEventListener).toHaveBeenCalledTimes(2)
     mockDispatch('onramp_ui_loaded', 'sessionData')
     expect(mockOnLoaded).toHaveBeenCalled()
 

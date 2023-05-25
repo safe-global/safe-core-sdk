@@ -30,10 +30,10 @@ import {
 } from './types'
 import {
   EthSafeSignature,
+  SAFE_FEATURES,
   hasSafeFeature,
   isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
-  SAFE_FEATURES,
   sameString
 } from './utils'
 import {
@@ -212,7 +212,7 @@ class Safe {
    *
    * @returns The address of the MultiSend contract
    */
-  getMultiSendAddress(): string {
+  getMultiSendAddress(): Promise<string> {
     return this.#contractManager.multiSendContract.getAddress()
   }
 
@@ -221,7 +221,7 @@ class Safe {
    *
    * @returns The address of the MultiSendCallOnly contract
    */
-  getMultiSendCallOnlyAddress(): string {
+  getMultiSendCallOnlyAddress(): Promise<string> {
     return this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
@@ -401,7 +401,7 @@ class Safe {
 
       const multiSendTransaction = {
         ...options,
-        to: multiSendContract.getAddress(),
+        to: await multiSendContract.getAddress(),
         value: '0',
         data: multiSendContract.encode('multiSend', [multiSendData]),
         operation: OperationType.DelegateCall

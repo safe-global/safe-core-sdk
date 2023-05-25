@@ -43,7 +43,7 @@ class GuardManager {
     }
     const safeVersion = await this.#safeContract.getVersion()
     if (hasSafeFeature(SAFE_FEATURES.SAFE_TX_GUARDS, safeVersion)) {
-      return this.#ethAdapter.getStorageAt(this.#safeContract.getAddress(), this.#slot)
+      return this.#ethAdapter.getStorageAt(await this.#safeContract.getAddress(), this.#slot)
     } else {
       throw new Error(
         'Current version of the Safe does not support Safe transaction guards functionality'

@@ -9,7 +9,7 @@ export interface CreateProxyProps {
 }
 
 export interface GnosisSafeProxyFactoryContract {
-  getAddress(): string
+  getAddress(): Promise<string>
   proxyCreationCode(): Promise<string>
   createProxy(options: CreateProxyProps): Promise<string>
   encode(methodName: string, params: any[]): string

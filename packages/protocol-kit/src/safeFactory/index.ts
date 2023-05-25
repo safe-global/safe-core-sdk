@@ -1,9 +1,16 @@
+import Safe from '@safe-global/protocol-kit/Safe'
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getProxyFactoryContract,
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
-import Safe from '@safe-global/protocol-kit/Safe'
+import {
+  PREDETERMINED_SALT_NONCE,
+  encodeSetupCallData,
+  predictSafeAddress,
+  validateSafeAccountConfig,
+  validateSafeDeploymentConfig
+} from '@safe-global/protocol-kit/contracts/utils'
 import {
   ContractNetworksConfig,
   SafeAccountConfig,
@@ -16,13 +23,6 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import {
-  predictSafeAddress,
-  encodeSetupCallData,
-  PREDETERMINED_SALT_NONCE,
-  validateSafeAccountConfig,
-  validateSafeDeploymentConfig
-} from '@safe-global/protocol-kit/contracts/utils'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
@@ -105,7 +105,7 @@ class SafeFactory {
     return this.#safeVersion
   }
 
-  getAddress(): string {
+  getAddress(): Promise<string> {
     return this.#safeProxyFactoryContract.getAddress()
   }
 
@@ -158,7 +158,7 @@ class SafeFactory {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
-      safeMasterCopyAddress: this.#gnosisSafeContract.getAddress(),
+      safeMasterCopyAddress: await this.#gnosisSafeContract.getAddress(),
       initializer,
       saltNonce,
       options: {

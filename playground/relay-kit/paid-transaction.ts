@@ -29,7 +29,7 @@ const txConfig = {
   VALUE: '<VALUE>',
   // Options:
   GAS_LIMIT: BigNumber.from('<GAS_LIMIT>'),
-  GAS_TOKEN: ethers.constants.AddressZero
+  GAS_TOKEN: ethers.ZeroAddress
 }
 
 async function main() {
@@ -61,8 +61,8 @@ async function main() {
   const chainId = (await signer.provider.getNetwork()).chainId
   const relayFee = await relayPack.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
   const safeBalance = await provider.getBalance(predictedSafeAddress)
-  console.log({ minSafeBalance: ethers.utils.formatEther(relayFee.toString()) })
-  console.log({ safeBalance: ethers.utils.formatEther(safeBalance.toString()) })
+  console.log({ minSafeBalance: ethers.formatEther(relayFee.toString()) })
+  console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
 
   if (safeBalance.lt(relayFee)) {
     const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
@@ -73,11 +73,11 @@ async function main() {
       to: predictedSafeAddress,
       value: fundingAmount
     })
-    console.log(`Funding the Safe with ${ethers.utils.formatEther(fundingAmount.toString())} ETH`)
+    console.log(`Funding the Safe with ${ethers.formatEther(fundingAmount.toString())} ETH`)
     await onRampResponse.wait()
 
     const safeBalanceAfter = await provider.getBalance(predictedSafeAddress)
-    console.log({ safeBalance: ethers.utils.formatEther(safeBalanceAfter.toString()) })
+    console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
   }
 
   // Relay the transaction

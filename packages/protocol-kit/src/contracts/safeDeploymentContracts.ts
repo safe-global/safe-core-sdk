@@ -12,6 +12,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import {
   DeploymentFilter,
+  SingletonDeployment,
   getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
   getMultiSendCallOnlyDeployment,
@@ -19,8 +20,7 @@ import {
   getProxyFactoryDeployment,
   getSafeL2SingletonDeployment,
   getSafeSingletonDeployment,
-  getSignMessageLibDeployment,
-  SingletonDeployment
+  getSignMessageLibDeployment
 } from '@safe-global/safe-deployments'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
@@ -115,7 +115,7 @@ export async function getSafeContract({
     customContractAddress: customSafeAddress ?? customContracts?.safeMasterCopyAddress,
     customContractAbi: customContracts?.safeMasterCopyAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(gnosisSafeContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(await gnosisSafeContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('SafeProxy contract is not deployed on the current network')
   }
@@ -136,7 +136,7 @@ export async function getProxyFactoryContract({
     customContractAbi: customContracts?.safeProxyFactoryAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    safeProxyFactoryContract.getAddress()
+    await safeProxyFactoryContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('SafeProxyFactory contract is not deployed on the current network')
@@ -161,7 +161,7 @@ export async function getCompatibilityFallbackHandlerContract({
     customContractAbi: customContracts?.fallbackHandlerAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    fallbackHandlerContract.getAddress()
+    await fallbackHandlerContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('CompatibilityFallbackHandler contract is not deployed on the current network')
@@ -182,7 +182,7 @@ export async function getMultiSendContract({
     customContractAddress: customContracts?.multiSendAddress,
     customContractAbi: customContracts?.multiSendAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(multiSendContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(await multiSendContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('MultiSend contract is not deployed on the current network')
   }
@@ -203,7 +203,7 @@ export async function getMultiSendCallOnlyContract({
     customContractAbi: customContracts?.multiSendCallOnlyAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    multiSendCallOnlyContract.getAddress()
+    await multiSendCallOnlyContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('MultiSendCallOnly contract is not deployed on the current network')
@@ -225,7 +225,7 @@ export async function getSignMessageLibContract({
     customContractAbi: customContracts?.signMessageLibAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    signMessageLibContract.getAddress()
+    await signMessageLibContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('SignMessageLib contract is not deployed on the current network')
@@ -246,7 +246,7 @@ export async function getCreateCallContract({
     customContractAddress: customContracts?.createCallAddress,
     customContractAbi: customContracts?.createCallAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(createCallContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(await createCallContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('CreateCall contract is not deployed on the current network')
   }

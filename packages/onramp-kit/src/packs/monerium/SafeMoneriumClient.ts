@@ -1,13 +1,13 @@
-import { ethers } from 'ethers'
 import { Chain, IBAN, MoneriumClient, Networks, NewOrder, OrderKind } from '@monerium/sdk'
-import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
+import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import {
   EthAdapter,
   OperationType,
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
+import { ethers } from 'ethers'
 
 import {
   EIP_1271_BYTES_INTERFACE,
@@ -68,7 +68,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns A boolean indicating if the message is signed
    */
   async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
-    const messageHash = ethers.utils.hashMessage(message)
+    const messageHash = ethers.hashMessage(message)
     const messageHashSigned = await this.#isValidSignature(safeAddress, messageHash)
     return messageHashSigned
   }
@@ -92,7 +92,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         // @ts-expect-error - dataDecoded should have the method property
         tx?.dataDecoded?.method === 'signMessage' &&
         // @ts-expect-error - dataDecoded should have the parameters array
-        tx?.dataDecoded?.parameters[0]?.value === ethers.utils.hashMessage(message)
+        tx?.dataDecoded?.parameters[0]?.value === ethers.hashMessage(message)
       )
     })
   }
@@ -114,7 +114,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         safeVersion
       })
 
-      const txData = signMessageContract.encode('signMessage', [ethers.utils.hashMessage(message)])
+      const txData = signMessageContract.encode('signMessage', [ethers.hashMessage(message)])
 
       const safeTransaction = await this.#safeSdk.createTransaction({
         safeTransactionData: {
@@ -228,7 +228,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         messageHash,
         '0x'
       ])
-      const msgBytes = ethers.utils.arrayify(messageHash)
+      const msgBytes = ethers.getBytes(messageHash)
 
       const eip1271BytesData = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
         msgBytes,

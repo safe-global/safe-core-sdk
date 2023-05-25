@@ -23,7 +23,7 @@ export async function estimateTxGas(
   operation: OperationType
 ): Promise<string> {
   let txGasEstimation = BigNumber.from(0)
-  const safeAddress = safeContract.getAddress()
+  const safeAddress = await safeContract.getAddress()
 
   const estimateData: string = safeContract.encode('requiredTxGas', [
     to,

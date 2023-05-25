@@ -1,37 +1,37 @@
-import { AddressZero } from '@ethersproject/constants'
+import { ZeroAddress } from '@ethers'
 import {
-    compatibilityFallbackHandlerDeployed,
-    createCallDeployed,
-    gnosisSafeDeployed,
-    multiSendCallOnlyDeployed,
-    multiSendDeployed,
-    proxyFactoryDeployed,
-    safeVersionDeployed,
-    signMessageLibDeployed
+  compatibilityFallbackHandlerDeployed,
+  createCallDeployed,
+  gnosisSafeDeployed,
+  multiSendCallOnlyDeployed,
+  multiSendDeployed,
+  proxyFactoryDeployed,
+  safeVersionDeployed,
+  signMessageLibDeployed
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
-    Gnosis_safe as GnosisSafe_V1_0_0,
-    Proxy_factory as ProxyFactory_V1_0_0
+  Gnosis_safe as GnosisSafe_V1_0_0,
+  Proxy_factory as ProxyFactory_V1_0_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0'
 import {
-    Gnosis_safe as GnosisSafe_V1_1_1,
-    Multi_send as MultiSend_V1_1_1,
-    Proxy_factory as ProxyFactory_V1_1_1
+  Gnosis_safe as GnosisSafe_V1_1_1,
+  Multi_send as MultiSend_V1_1_1,
+  Proxy_factory as ProxyFactory_V1_1_1
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1'
 import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0'
 import {
-    Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
-    Create_call as CreateCall_V1_3_0,
-    Gnosis_safe as GnosisSafe_V1_3_0,
-    Multi_send_call_only as MultiSendCallOnly_V1_3_0,
-    Multi_send as MultiSend_V1_3_0,
-    Proxy_factory as ProxyFactory_V1_3_0,
-    Sign_message_lib as SignMessageLib_V1_3_0
+  Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
+  Create_call as CreateCall_V1_3_0,
+  Gnosis_safe as GnosisSafe_V1_3_0,
+  Multi_send_call_only as MultiSendCallOnly_V1_3_0,
+  Multi_send as MultiSend_V1_3_0,
+  Proxy_factory as ProxyFactory_V1_3_0,
+  Sign_message_lib as SignMessageLib_V1_3_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0'
 import {
-    DailyLimitModule,
-    ERC20Mintable,
-    SocialRecoveryModule
+  DailyLimitModule,
+  ERC20Mintable,
+  SocialRecoveryModule
 } from '@safe-global/protocol-kit/typechain/tests/ethers-v6/v1.2.0'
 import { DebugTransactionGuard } from '@safe-global/protocol-kit/typechain/tests/ethers-v6/v1.3.0'
 import { deployments, ethers } from 'hardhat'
@@ -74,8 +74,8 @@ export const getSafeTemplate = async (): Promise<
 > => {
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
-  const template = await factory.callStatic.createProxy(singleton.address, '0x')
-  await factory.createProxy(singleton.address, '0x').then((tx: any) => tx.wait())
+  const template = await factory.createProxy.staticCall(await singleton.getAddress(), '0x')
+  await factory.createProxy(await singleton.getAddress(), '0x').then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory(gnosisSafeDeployed.name)
   return Safe.attach(template) as
     | GnosisSafe_V1_3_0
@@ -94,22 +94,22 @@ export const getSafeWithOwners = async (
     await (template as GnosisSafe_V1_0_0).setup(
       owners,
       threshold || owners.length,
-      AddressZero,
+      ZeroAddress,
       '0x',
-      AddressZero,
+      ZeroAddress,
       0,
-      AddressZero
+      ZeroAddress
     )
   } else {
     await (template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1).setup(
       owners,
       threshold || owners.length,
-      AddressZero,
+      ZeroAddress,
       '0x',
-      fallbackHandler || (await getCompatibilityFallbackHandler()).contract.address,
-      AddressZero,
+      fallbackHandler || await (await getCompatibilityFallbackHandler()).contract.getAddress(),
+      ZeroAddress,
       0,
-      AddressZero
+      ZeroAddress
     )
   }
   return template as GnosisSafe_V1_3_0 | GnosisSafe_V1_2_0 | GnosisSafe_V1_1_1 | GnosisSafe_V1_0_0

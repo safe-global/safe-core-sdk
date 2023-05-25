@@ -100,7 +100,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await safeContract.getAddress())
-        .to.be.eq((await getSafeSingleton()).contract.address)
+        .to.be.eq(await (await getSafeSingleton()).contract.getAddress())
     })
   })
 
@@ -132,7 +132,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendContract.getAddress())
-        .to.be.eq((await getMultiSend()).contract.address)
+        .to.be.eq(await (await getMultiSend()).contract.getAddress())
     })
   })
 
@@ -164,7 +164,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendCallOnlyContract.getAddress())
-        .to.be.eq((await getMultiSendCallOnly()).contract.address)
+        .to.be.eq(await (await getMultiSendCallOnly()).contract.getAddress())
     })
   })
 
@@ -201,7 +201,7 @@ describe('Safe contracts', () => {
         })
       chai
         .expect(await compatibilityFallbackHandlerContract.getAddress())
-        .to.be.eq((await getCompatibilityFallbackHandler()).contract.address)
+        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.getAddress())
     })
   })
 
@@ -233,7 +233,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await factoryContract.getAddress())
-        .to.be.eq((await getFactory()).contract.address)
+        .to.be.eq(await (await getFactory()).contract.getAddress())
     })
   })
 
@@ -265,7 +265,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await signMessageLibContract.getAddress())
-        .to.be.eq((await getSignMessageLib()).contract.address)
+        .to.be.eq(await (await getSignMessageLib()).contract.getAddress())
     })
   })
 
@@ -297,7 +297,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await createCallContract.getAddress())
-        .to.be.eq((await getCreateCall()).contract.address)
+        .to.be.eq(await (await getCreateCall()).contract.getAddress())
     })
   })
 })

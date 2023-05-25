@@ -1,22 +1,21 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
-    EthersTransactionOptions,
-    EthersTransactionResult
+  EthersTransactionOptions,
+  EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import { Gnosis_safe as GnosisSafe_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0/Gnosis_safe'
 import { Gnosis_safe as GnosisSafe_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1/Gnosis_safe'
 import { Gnosis_safe as GnosisSafe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0/Gnosis_safe'
 import {
-    Gnosis_safeInterface as GnosisSafeInterface,
-    Gnosis_safe as GnosisSafe_V1_3_0
+  Gnosis_safeInterface as GnosisSafeInterface,
+  Gnosis_safe as GnosisSafe_V1_3_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/Gnosis_safe'
 import {
-    GnosisSafeContract,
-    SafeSetupConfig,
-    SafeTransaction,
-    SafeTransactionData,
-    SafeVersion
+  GnosisSafeContract,
+  SafeSetupConfig,
+  SafeTransaction,
+  SafeTransactionData,
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 
 abstract class GnosisSafeContractEthers implements GnosisSafeContract {
@@ -33,16 +32,16 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
     return (await this.contract.VERSION()) as SafeVersion
   }
 
-  getAddress(): string {
-    return this.contract.address
+  getAddress(): Promise<string> {
+    return this.contract.getAddress()
   }
 
   async getNonce(): Promise<number> {
-    return (await this.contract.nonce()).toNumber()
+    return Number(await this.contract.nonce())
   }
 
   async getThreshold(): Promise<number> {
-    return (await this.contract.getThreshold()).toNumber()
+    return Number(await this.contract.getThreshold())
   }
 
   async getOwners(): Promise<string[]> {
@@ -68,7 +67,7 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
     )
   }
 
-  async approvedHashes(ownerAddress: string, hash: string): Promise<BigNumber> {
+  async approvedHashes(ownerAddress: string, hash: string): Promise<bigint> {
     return this.contract.approvedHashes(ownerAddress, hash)
   }
 
@@ -79,7 +78,7 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
     if (options && !options.gasLimit) {
       options.gasLimit = await this.estimateGas('approveHash', [hash], { ...options })
     }
-    const txResponse = await this.contract.approveHash(hash, options)
+    const txResponse = await this.contract.approveHash(hash)
     return toTxResult(txResponse, options)
   }
 
@@ -113,7 +112,7 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
           }
         )
       }
-      isTxValid = await this.contract.callStatic.execTransaction(
+      isTxValid = await this.contract.execTransaction.staticCall(
         safeTransaction.data.to,
         safeTransaction.data.value,
         safeTransaction.data.data,
@@ -123,8 +122,7 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
         safeTransaction.data.gasPrice,
         safeTransaction.data.gasToken,
         safeTransaction.data.refundReceiver,
-        safeTransaction.encodedSignatures(),
-        options
+        safeTransaction.encodedSignatures()
       )
     } catch {}
     return isTxValid
@@ -164,8 +162,7 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
       safeTransaction.data.gasPrice,
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
-      safeTransaction.encodedSignatures(),
-      options
+      safeTransaction.encodedSignatures()
     )
     return toTxResult(txResponse, options)
   }
@@ -179,7 +176,7 @@ abstract class GnosisSafeContractEthers implements GnosisSafeContract {
     params: any[],
     options: EthersTransactionOptions
   ): Promise<string> {
-    return (await (this.contract.estimateGas as any)[methodName](...params, options)).toString()
+    return (await (this.contract as any)[methodName].estimateGas(...params, options)).toString()
   }
 }
 

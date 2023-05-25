@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef } from 'react'
+import { Button, Grid, TextField } from '@mui/material'
 import { ethers } from 'ethers'
-import { Grid, TextField, Button } from '@mui/material'
+import { useEffect, useRef, useState } from 'react'
 
-import { SafeOnRampKit, StripeSession, StripePack } from '../../../../src'
+import { SafeOnRampKit, StripePack, StripeSession } from '../../../../src'
 
 const isSessionValid = (sessionId: string) => sessionId.length === 28
 
@@ -13,7 +13,7 @@ function Stripe() {
   const stripeRootRef = useRef<HTMLDivElement>(null)
 
   const handleCreateSession = async () => {
-    if (!isSessionValid(sessionId) && !ethers.utils.isAddress(walletAddress)) return
+    if (!isSessionValid(sessionId) && !ethers.isAddress(walletAddress)) return
 
     if (stripeRootRef.current) {
       stripeRootRef.current.innerHTML = ''

@@ -1,9 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
+  SafeSetupConfig,
   SafeTransaction,
   SafeTransactionData,
   SafeVersion,
-  SafeSetupConfig,
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types/types'
@@ -11,7 +11,7 @@ import {
 export interface GnosisSafeContract {
   setup(setupConfig: SafeSetupConfig, options?: TransactionOptions): Promise<TransactionResult>
   getVersion(): Promise<SafeVersion>
-  getAddress(): string
+  getAddress(): Promise<string>
   getNonce(): Promise<number>
   getThreshold(): Promise<number>
   getOwners(): Promise<string[]>

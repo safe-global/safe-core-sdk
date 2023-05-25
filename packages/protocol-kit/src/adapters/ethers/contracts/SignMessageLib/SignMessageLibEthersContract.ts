@@ -1,19 +1,19 @@
 import {
-    EthersTransactionOptions,
-    EthersTransactionResult
+  EthersTransactionOptions,
+  EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import {
-    Sign_message_lib as SignMessageLib_V1_3_0,
-    Sign_message_libInterface as SignMessageLibContractInterface
+  Sign_message_libInterface as SignMessageLibContractInterface,
+  Sign_message_lib as SignMessageLib_V1_3_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/Sign_message_lib'
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 
 abstract class SignMessageLibEthersContract implements SignMessageLibContract {
   constructor(public contract: SignMessageLib_V1_3_0) {}
 
-  getAddress(): string {
-    return this.contract.address
+  getAddress(): Promise<string> {
+    return this.contract.getAddress()
   }
 
   async signMessage(

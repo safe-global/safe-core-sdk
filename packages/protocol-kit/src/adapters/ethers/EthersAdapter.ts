@@ -12,6 +12,12 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
+import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
+import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
+import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
+import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
+import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
+import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -21,18 +27,12 @@ import {
   getSafeProxyFactoryContractInstance,
   getSignMessageLibContractInstance
 } from './contracts/contractInstancesEthers'
-import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
-import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
-import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
-import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
-import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
-import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
 import { isSignerCompatible, isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
 
 export interface EthersAdapterConfig {
-  /** ethers - Ethers v5 library */
+  /** ethers - Ethers v6 library */
   ethers: Ethers
   /** signerOrProvider - Ethers signer or provider */
   signerOrProvider: Signer | Provider
@@ -70,7 +70,7 @@ class EthersAdapter implements EthAdapter {
   }
 
   isAddress(address: string): boolean {
-    return this.#ethers.utils.isAddress(address)
+    return this.#ethers.isAddress(address)
   }
 
   async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
@@ -91,7 +91,7 @@ class EthersAdapter implements EthAdapter {
   }
 
   getChecksummedAddress(address: string): string {
-    return this.#ethers.utils.getAddress(address)
+    return this.#ethers.getAddress(address)
   }
 
   async getSafeContract({
@@ -223,7 +223,7 @@ class EthersAdapter implements EthAdapter {
     if (!this.#signer) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    const messageArray = this.#ethers.utils.arrayify(message)
+    const messageArray = this.#ethers.getBytes(message)
     return this.#signer.signMessage(messageArray)
   }
 
@@ -252,11 +252,11 @@ class EthersAdapter implements EthAdapter {
   }
 
   encodeParameters(types: string[], values: any[]): string {
-    return new this.#ethers.utils.AbiCoder().encode(types, values)
+    return new this.#ethers.AbiCoder().encode(types, values)
   }
 
   decodeParameters(types: string[], values: string): { [key: string]: any } {
-    return new this.#ethers.utils.AbiCoder().decode(types, values)
+    return new this.#ethers.AbiCoder().decode(types, values)
   }
 }
 

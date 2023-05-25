@@ -1,11 +1,13 @@
+import { isAddress } from '@ethersproject/address'
+import { BigNumber } from '@ethersproject/bignumber'
+import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
   EthAdapter,
   GnosisSafeContract,
   GnosisSafeProxyFactoryContract
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
-import { isAddress } from '@ethersproject/address'
-import { BigNumber } from '@ethersproject/bignumber'
 import semverSatisfies from 'semver/functions/satisfies'
 import {
   getCompatibilityFallbackHandlerContract,
@@ -13,8 +15,6 @@ import {
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
 import { ContractNetworkConfig, SafeAccountConfig, SafeDeploymentConfig } from '../types'
-import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =
@@ -87,7 +87,7 @@ export async function encodeSetupCallData({
       customContracts
     })
 
-    fallbackHandlerAddress = fallbackHandlerContract.getAddress()
+    fallbackHandlerAddress = await fallbackHandlerContract.getAddress()
   }
 
   return safeContract.encode('setup', [
@@ -146,7 +146,7 @@ export async function predictSafeAddress({
   )
 
   const constructorData = toBuffer(
-    ethAdapter.encodeParameters(['address'], [safeContract.getAddress()])
+    ethAdapter.encodeParameters(['address'], [await safeContract.getAddress()])
   ).toString('hex')
 
   const initCode = proxyCreationCode + constructorData
@@ -154,7 +154,7 @@ export async function predictSafeAddress({
   const proxyAddress =
     '0x' +
     generateAddress2(
-      toBuffer(safeProxyFactoryContract.getAddress()),
+      toBuffer(await safeProxyFactoryContract.getAddress()),
       toBuffer(salt),
       toBuffer(initCode)
     ).toString('hex')

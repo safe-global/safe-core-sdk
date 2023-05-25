@@ -17,8 +17,8 @@ export interface CreateProxyProps {
 class GnosisSafeProxyFactoryEthersContract implements GnosisSafeProxyFactoryContract {
   constructor(public contract: ProxyFactory_V1_3_0 | ProxyFactory_V1_1_1 | ProxyFactory_V1_0_0) {}
 
-  getAddress(): string {
-    return this.contract.address
+  getAddress(): Promise<string> {
+    return this.contract.getAddress()
   }
 
   async proxyCreationCode(): Promise<string> {

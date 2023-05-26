@@ -23,7 +23,7 @@ class EthSafeTransaction implements SafeTransaction {
     let dynamicParts = ''
     signers.forEach((signerAddress) => {
       const signature = this.signatures.get(signerAddress)
-      staticParts += signature?.staticPart(/*baseOffset + dynamicParts.length / 2*/).slice(2)
+      staticParts += signature?.staticPart(baseOffset + dynamicParts.length / 2).slice(2)
       dynamicParts += signature?.dynamicPart()
     })
     return '0x' + staticParts + dynamicParts

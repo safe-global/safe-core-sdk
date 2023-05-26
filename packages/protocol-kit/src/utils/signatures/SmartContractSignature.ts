@@ -1,6 +1,7 @@
+import { hexlify, hexZeroPad } from 'ethers/lib/utils'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 
-export class EthSafeSignature implements SafeSignature {
+export class SmartContractSafeSignature implements SafeSignature {
   signer: string
   data: string
 
@@ -21,9 +22,8 @@ export class EthSafeSignature implements SafeSignature {
    *
    * @returns The static part of the Safe signature
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  staticPart(_dynamicOffset: number) {
-    return this.data
+  staticPart(dynamicOffset: number) {
+    return hexZeroPad(this.signer, 32) + hexZeroPad(hexlify(dynamicOffset), 32).slice(2) + '00'
   }
 
   /**
@@ -32,6 +32,7 @@ export class EthSafeSignature implements SafeSignature {
    * @returns The dynamic part of the Safe signature
    */
   dynamicPart() {
-    return ''
+    const byteLength = hexZeroPad(hexlify(this.data.slice(2).length / 2), 32)
+    return (byteLength + this.data.slice(2)).slice(2)
   }
 }

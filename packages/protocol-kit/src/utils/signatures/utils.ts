@@ -5,6 +5,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
+import { SmartContractSafeSignature } from './SmartContractSignature'
 import { EthSafeSignature } from './SafeSignature'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
@@ -103,9 +104,15 @@ export async function generateSignature(
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
+  const isSmartContract = await ethAdapter.isContractDeployed(signerAddress)
+
   let signature = await ethAdapter.signMessage(hash)
-  signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
-  return new EthSafeSignature(signerAddress, signature)
+  if (!isSmartContract) {
+    signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
+    return new EthSafeSignature(signerAddress, signature)
+  }
+
+  return new SmartContractSafeSignature(signature, signerAddress)
 }
 
 export async function generateEIP712Signature(
@@ -117,7 +124,13 @@ export async function generateEIP712Signature(
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
+  const isSmartContract = await ethAdapter.isContractDeployed(signerAddress)
+
   let signature = await ethAdapter.signTypedData(safeTransactionEIP712Args, methodVersion)
-  signature = adjustVInSignature('eth_signTypedData', signature)
-  return new EthSafeSignature(signerAddress, signature)
+  if (!isSmartContract) {
+    signature = adjustVInSignature('eth_signTypedData', signature)
+    return new EthSafeSignature(signerAddress, signature)
+  }
+
+  return new SmartContractSafeSignature(signature, signerAddress)
 }

@@ -2,7 +2,7 @@ import { getErrorMessage } from './errors'
 
 describe('errors', () => {
   describe('getErrorMessage()', () => {
-    it('should return the message if is an Error object with a message', () => {
+    it('should return the message if it is an Error object with a message', () => {
       expect(getErrorMessage(new Error('error message'))).toBe('error message')
     })
 

@@ -12,9 +12,9 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
  * @class
  */
 export class Web3AuthModalPack extends AuthKitBasePack {
-  web3Auth?: Web3Auth
   #provider: ExternalProvider | null
   #config: Web3AuthConfig
+  web3Auth?: Web3Auth
 
   /**
    * Instantiate the Web3AuthModalPack

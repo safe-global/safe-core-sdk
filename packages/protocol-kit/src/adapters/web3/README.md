@@ -1,6 +1,6 @@
 # Web3 Adapter
 
-Web3.js wrapper that contains some utilities and the Safe contracts types (generated with typechain web3-v1). It is used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit).
+Web3.js wrapper that contains some utilities and the Safe contracts types (generated with `typechain` `web3-v1`). It is used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit).
 
 ## How to use
 

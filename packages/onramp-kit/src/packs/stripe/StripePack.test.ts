@@ -2,10 +2,10 @@ import EventEmitter from 'events'
 import { StripePack } from './StripePack'
 import * as stripeApi from './stripeApi'
 
-import type { StripeSession } from './types'
+import type { StripeOpenOptions, StripeSession } from './types'
 import { OnRampKitBasePack } from '../..'
 
-const openOptions = {
+const openOptions: StripeOpenOptions = {
   element: '#root',
   defaultOptions: {
     transaction_details: {

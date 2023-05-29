@@ -12,9 +12,9 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
  * @class
  */
 export class Web3AuthModalPack extends AuthKitBasePack {
-  provider: ExternalProvider | null
+  web3Auth?: Web3Auth
+  #provider: ExternalProvider | null
   #config: Web3AuthConfig
-  #web3authInstance?: Web3Auth
 
   /**
    * Instantiate the Web3AuthModalPack
@@ -23,7 +23,7 @@ export class Web3AuthModalPack extends AuthKitBasePack {
   constructor(config: Web3AuthConfig) {
     super()
     this.#config = config
-    this.provider = null
+    this.#provider = null
   }
 
   /**
@@ -43,13 +43,13 @@ export class Web3AuthModalPack extends AuthKitBasePack {
     modalConfig?: Record<string, ModalConfig>
   }) {
     try {
-      this.#web3authInstance = new Web3Auth(options)
+      this.web3Auth = new Web3Auth(options)
 
-      adapters?.forEach((adapter) => this.#web3authInstance?.configureAdapter(adapter))
+      adapters?.forEach((adapter) => this.web3Auth?.configureAdapter(adapter))
 
-      await this.#web3authInstance.initModal({ modalConfig: modalConfig })
+      await this.web3Auth.initModal({ modalConfig: modalConfig })
 
-      this.provider = this.#web3authInstance.provider
+      this.#provider = this.web3Auth.provider
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -60,11 +60,11 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @returns The sign in data from the provider
    */
   async signIn(): Promise<AuthKitSignInData> {
-    if (!this.#web3authInstance) {
+    if (!this.web3Auth) {
       throw new Error('Web3AuthModalPack is not initialized')
     }
 
-    this.provider = await this.#web3authInstance.connect()
+    this.#provider = await this.web3Auth.connect()
 
     const eoa = await this.getAddress()
     const safes = await this.getSafes(this.#config?.txServiceUrl || '')
@@ -78,19 +78,19 @@ export class Web3AuthModalPack extends AuthKitBasePack {
   }
 
   getProvider(): ExternalProvider | null {
-    return this.provider
+    return this.#provider
   }
 
   /**
    * Disconnect from the Web3Auth service provider
    */
   async signOut() {
-    if (!this.#web3authInstance) {
+    if (!this.web3Auth) {
       throw new Error('Web3AuthModalPack is not initialized')
     }
 
-    this.provider = null
-    await this.#web3authInstance.logout()
+    this.#provider = null
+    await this.web3Auth.logout()
   }
 
   /**
@@ -98,11 +98,11 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @returns The user info
    */
   async getUserInfo(): Promise<Partial<UserInfo>> {
-    if (!this.#web3authInstance) {
+    if (!this.web3Auth) {
       throw new Error('Web3AuthModalPack is not initialized')
     }
 
-    const userInfo = await this.#web3authInstance.getUserInfo()
+    const userInfo = await this.web3Auth.getUserInfo()
 
     return userInfo
   }
@@ -113,7 +113,7 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @param handler The event handler
    */
   subscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
-    this.#web3authInstance?.on(event, handler)
+    this.web3Auth?.on(event, handler)
   }
 
   /**
@@ -122,6 +122,6 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @param handler The event handler
    */
   unsubscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
-    this.#web3authInstance?.off(event, handler)
+    this.web3Auth?.off(event, handler)
   }
 }

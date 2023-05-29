@@ -8,7 +8,9 @@ The Auth Kit provides a way to authenticate blockchain accounts using email addr
 
 ## Reference
 
-- [Auth Kit docs](https://docs.safe.global/learn/safe-core-account-abstraction-sdk/auth-kit)
+- [Auth Kit integration guides](https://docs.safe.global/learn/safe-core-account-abstraction-sdk/auth-kit)
+
+- [Auth Kit reference](https://docs.safe.global/reference/safe-core-sdk/auth-kit)
 
 ## Example
 

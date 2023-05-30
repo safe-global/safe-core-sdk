@@ -40,12 +40,13 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@web3auth/base": "^4.3.0",
-    "@web3auth/modal": "^4.3.1",
-    "@web3auth/openlogin-adapter": "^4.3.0",
     "@safe-global/api-kit": "^1.1.0",
     "@safe-global/protocol-kit": "^1.0.0",
     "@walletconnect/client": "^1.8.0",
-    "ethers": "^5.7.2"
+    "@web3auth/base": "^4.3.0",
+    "@web3auth/modal": "^4.3.1",
+    "@web3auth/openlogin-adapter": "^4.3.0",
+    "ethers": "^5.7.2",
+    "magic-sdk": "^17.3.0"
   }
 }

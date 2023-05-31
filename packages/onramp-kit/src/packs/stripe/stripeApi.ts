@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { StripeDefaultOpenOptions, StripeSession } from './types'
 
 export const createSession = async (
@@ -16,8 +17,8 @@ export const createSession = async (
     if (!response.ok) throw new Error("Couldn't create a new Stripe session")
 
     return response.json()
-  } catch (e) {
-    throw new Error(e as string)
+  } catch (error) {
+    throw new Error(getErrorMessage(error))
   }
 }
 
@@ -28,7 +29,7 @@ export const getSession = async (baseUrl: string, sessionId: string) => {
     if (!response.ok) throw new Error(`Couldn't get the session with id  ${sessionId}`)
 
     return response.json()
-  } catch (e) {
-    throw new Error(e as string)
+  } catch (error) {
+    throw new Error(getErrorMessage(error))
   }
 }

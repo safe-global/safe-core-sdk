@@ -17,7 +17,7 @@ export interface CreateTransactionProps {
   onlyCalls?: boolean
 }
 
-export interface RelayAdapter {
+export interface RelayPack {
   getFeeCollector(): string
   getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string>
   getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined>

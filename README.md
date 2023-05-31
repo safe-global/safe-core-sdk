@@ -50,6 +50,20 @@ yarn play confirm-transaction
 
 #### Step 4: Execute a transaction
 
+To execute a transaction:
+
 ```bash
 yarn play execute-transaction
+```
+
+To execute a transaction using a relay:
+
+```bash
+yarn play relay-paid-transaction
+```
+
+To execute a sponsored transaction using a relay:
+
+```bash
+yarn play relay-sponsored-transaction
 ```

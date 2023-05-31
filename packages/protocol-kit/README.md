@@ -21,8 +21,8 @@ Software development kit that facilitates the interaction with the [Safe contrac
 Install the package with yarn or npm:
 
 ```bash
-yarn install
-npm install
+yarn add @safe-global/protocol-kit
+npm install @safe-global/protocol-kit
 ```
 
 ## <a name="build">Build</a>
@@ -31,7 +31,7 @@ Build the package with yarn or npm:
 
 ```bash
 yarn build
-npm build
+npm run build
 ```
 
 ## <a name="getting-started">Getting Started</a>
@@ -74,7 +74,7 @@ The `deploySafe` method executes a transaction from the `owner1` account, deploy
 Call the `getAddress` method, for example, to check the address of the newly deployed Safe.
 
 ```js
-const newSafeAddress = safeSdk.getAddress()
+const newSafeAddress = await safeSdk.getAddress()
 ```
 
 To instantiate the Protocol Kit from an existing Safe just pass to it an instance of the `EthAdapter` class and the Safe address.
@@ -219,7 +219,7 @@ const safeAccountConfig: SafeAccountConfig = {
 const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
-This method can optionally receive the `safeDeploymentConfig` parameter to define the `saltNonce`.
+This method can optionally receive the `saltNonce` parameter.
 
 ```js
 const safeAccountConfig: SafeAccountConfig = {
@@ -232,9 +232,10 @@ const safeAccountConfig: SafeAccountConfig = {
   payment, // Optional
   paymentReceiver // Optional
 }
-const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce }
 
-const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, safeDeploymentConfig })
+const saltNonce = '<YOUR_CUSTOM_VALUE>'
+
+const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, saltNonce })
 ```
 
 Optionally, some properties can be passed as execution options:
@@ -279,12 +280,27 @@ const safeSdk = await safeFactory.deploySafe({ safeAccountConfig, callback })
 
 ### create
 
-Returns an instance of the Protocol Kit connected to the `safeAddress`.
+Returns an instance of the Protocol Kit connected to a Safe. The provided Safe must be a `safeAddress` or a `predictedSafe`.
+
+Initialization of a deployed Safe using the `safeAddress` property:
 
 ```js
 import Safe from '@safe-global/protocol-kit'
 
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+```
+
+Initialization of a not deployed Safe using the `predictedSafe` property. Because Safes are deployed in a deterministic way, passing a `predictedSafe` will allow to initialize the SDK with the Safe configuration and use it to some extent before it is deployed:
+
+```js
+import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit'
+
+const predictedSafe: PredictedSafeProps = {
+  safeAccountConfig,
+  safeDeploymentConfig
+}
+
+const safeSdk = await Safe.create({ ethAdapter, predictedSafe })
 ```
 
 - The `isL1SafeMasterCopy` flag
@@ -329,10 +345,25 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 
 ### connect
 
-Returns a new instance of the Protocol Kit connected to the `safeAddress`.
+Returns a new instance of the Protocol Kit connected to a new Safe or a new Signer. The new connected signer can be passed via the `ethAdapter` property while the new connected Safe can be passed using a `safeAddress` or a `predictedSafe`.
+
+Connection of a deployed Safe using the `safeAddress` property:
 
 ```js
-const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
+const safeSdk = await safeSdk.connect({ ethAdapter, safeAddress })
+```
+
+Connection of a not deployed Safe using the `predictedSafe` property. Because Safes are deployed in a deterministic way, passing a `predictedSafe` will allow to connect a Safe to the SDK with the Safe configuration:
+
+```js
+import { PredictedSafeProps } from '@safe-global/protocol-kit'
+
+const predictedSafe: PredictedSafeProps = {
+  safeAccountConfig,
+  safeDeploymentConfig
+}
+
+const safeSdk = await safeSdk.connect({ ethAdapter, predictedSafe })
 ```
 
 - The `isL1SafeMasterCopy` flag
@@ -379,7 +410,7 @@ const safeSdk2 = await safeSdk.connect({ ethAdapter, safeAddress })
 Returns the address of the current SafeProxy contract.
 
 ```js
-const safeAddress = safeSdk.getAddress()
+const safeAddress = await safeSdk.getAddress()
 ```
 
 ### getContractVersion

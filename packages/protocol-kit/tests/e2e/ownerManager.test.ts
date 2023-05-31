@@ -1,8 +1,12 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, {
+  PredictedSafeProps,
+  SafeTransactionOptionalProps
+} from '@safe-global/protocol-kit/index'
+import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/index'
-import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -17,6 +21,15 @@ describe('Safe owners manager', () => {
     const accounts = await getAccounts()
     const chainId: number = (await waffle.provider.getNetwork()).chainId
     const contractNetworks = await getContractNetworks(chainId)
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig: {
+        owners: [accounts[0].address],
+        threshold: 1
+      },
+      safeDeploymentConfig: {
+        safeVersion: safeVersionDeployed
+      }
+    }
     return {
       safe: await getSafeWithOwners([
         accounts[0].address,
@@ -24,11 +37,24 @@ describe('Safe owners manager', () => {
         accounts[2].address
       ]),
       accounts,
-      contractNetworks
+      contractNetworks,
+      predictedSafe
     }
   })
 
   describe('getOwners', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      chai.expect(safeSdk.getOwners()).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should return the list of Safe owners', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
@@ -47,6 +73,18 @@ describe('Safe owners manager', () => {
   })
 
   describe('isOwner', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      chai.expect(safeSdk.isOwner(account1.address)).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should return true if an account is an owner of the connected Safe', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -77,6 +115,19 @@ describe('Safe owners manager', () => {
   })
 
   describe('createAddOwnerTx', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const tx = safeSdk.createAddOwnerTx({ ownerAddress: account2.address, threshold: 2 })
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should fail if address is invalid', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -248,6 +299,19 @@ describe('Safe owners manager', () => {
   })
 
   describe('createRemoveOwnerTx', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: account2.address, threshold: 1 })
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -461,6 +525,22 @@ describe('Safe owners manager', () => {
   })
 
   describe('createSwapOwnerTx', async () => {
+    it('should fail if the Safe is not deployed', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+      const tx = safeSdk.createSwapOwnerTx({
+        oldOwnerAddress: account1.address,
+        newOwnerAddress: account1.address
+      })
+      chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
+    })
+
     it('should fail if old address is invalid', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts

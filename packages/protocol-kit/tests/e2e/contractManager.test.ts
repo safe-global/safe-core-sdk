@@ -1,8 +1,9 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/protocol-kit/index'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
-import Safe, { ContractNetworksConfig } from '@safe-global/protocol-kit/index'
-import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getCompatibilityFallbackHandler,
@@ -34,6 +35,28 @@ describe('Safe contracts manager', () => {
   })
 
   describe('create', async () => {
+    it('should initialize the SDK with a Safe that is not deployed', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig: {
+          owners: [accounts[0].address],
+          threshold: 1
+        },
+        safeDeploymentConfig: {
+          safeVersion: safeVersionDeployed
+        }
+      }
+      await chai.expect(
+        await Safe.create({
+          ethAdapter,
+          predictedSafe,
+          contractNetworks
+        })
+      ).not.to.be.undefined
+    })
+
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
       const { safe, accounts } = await setupTests()
       const [account1] = accounts

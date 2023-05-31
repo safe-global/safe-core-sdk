@@ -2,21 +2,22 @@ import {
   AccountAbstractionConfig,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
-import {
-  calculateChainSpecificProxyAddress,
-  encodeCreateProxyWithNonce,
-  getSafeInitializer
-} from '@safe-global/account-abstraction-kit-poc/utils/contracts'
 import Safe, {
+  predictSafeAddress,
   encodeMultiSendData,
   EthersAdapter,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
-  getSafeContract
+  getSafeContract,
+  PredictedSafeProps,
+  PREDETERMINED_SALT_NONCE,
+  SafeDeploymentConfig,
+  encodeCreateProxyWithNonce,
+  SafeAccountConfig,
+  encodeSetupCallData
 } from '@safe-global/protocol-kit'
-import { RelayAdapter } from '@safe-global/relay-kit'
+import { RelayPack } from '@safe-global/relay-kit'
 import {
-  GnosisSafeContract,
   GnosisSafeProxyFactoryContract,
   MetaTransactionData,
   MetaTransactionOptions,
@@ -30,9 +31,9 @@ const safeVersion: SafeVersion = '1.3.0'
 class AccountAbstraction {
   #ethAdapter: EthersAdapter
   #signer: ethers.Signer
-  #safeContract?: GnosisSafeContract
+  #safeSdk?: Safe
   #safeProxyFactoryContract?: GnosisSafeProxyFactoryContract
-  #relayAdapter?: RelayAdapter
+  #relayPack?: RelayPack
 
   constructor(signer: ethers.Signer) {
     if (!signer.provider) {
@@ -46,28 +47,54 @@ class AccountAbstraction {
   }
 
   async init(options: AccountAbstractionConfig) {
-    const { relayAdapter } = options
-    this.setRelayAdapter(relayAdapter)
+    const { relayPack } = options
+    this.setRelayPack(relayPack)
+
+    const signer = await this.getSignerAddress()
+    const owners = [signer]
+    const threshold = 1
+    const saltNonce = PREDETERMINED_SALT_NONCE
+
+    const safeAccountConfig: SafeAccountConfig = {
+      owners,
+      threshold
+    }
+    const safeDeploymentConfig: SafeDeploymentConfig = {
+      saltNonce,
+      safeVersion
+    }
 
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter: this.#ethAdapter,
       safeVersion
     })
-    const safeAddress = await calculateChainSpecificProxyAddress(
-      this.#ethAdapter,
-      safeVersion,
-      this.#safeProxyFactoryContract,
-      this.#signer
-    )
-    this.#safeContract = await getSafeContract({
+
+    const safeAddress = await predictSafeAddress({
       ethAdapter: this.#ethAdapter,
-      safeVersion,
-      customSafeAddress: safeAddress
+      safeAccountConfig,
+      safeDeploymentConfig
     })
+
+    try {
+      await getSafeContract({
+        ethAdapter: this.#ethAdapter,
+        safeVersion,
+        customSafeAddress: safeAddress
+      })
+
+      this.#safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
+    } catch {
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig,
+        safeDeploymentConfig
+      }
+
+      this.#safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, predictedSafe })
+    }
   }
 
-  setRelayAdapter(relayAdapter: RelayAdapter) {
-    this.#relayAdapter = relayAdapter
+  setRelayPack(relayPack: RelayPack) {
+    this.#relayPack = relayPack
   }
 
   async getSignerAddress(): Promise<string> {
@@ -76,59 +103,68 @@ class AccountAbstraction {
   }
 
   async getNonce(): Promise<number> {
-    if (!this.#safeContract) {
+    if (!this.#safeSdk) {
       throw new Error('SDK not initialized')
     }
-    return (await this.isSafeDeployed()) ? await this.#safeContract.getNonce() : 0
+
+    return this.#safeSdk.getNonce()
   }
 
-  getSafeAddress(): string {
-    if (!this.#safeContract) {
+  async getSafeAddress(): Promise<string> {
+    if (!this.#safeSdk) {
       throw new Error('SDK not initialized')
     }
-    return this.#safeContract.getAddress()
+
+    return this.#safeSdk.getAddress()
   }
 
   async isSafeDeployed(): Promise<boolean> {
-    if (!this.#signer.provider) {
+    if (!this.#safeSdk) {
       throw new Error('SDK not initialized')
     }
-    const address = this.getSafeAddress()
-    const codeAtAddress = await this.#signer.provider.getCode(address)
-    const isDeployed = codeAtAddress !== '0x'
-    return isDeployed
+
+    return this.#safeSdk.isSafeDeployed()
   }
 
   async relayTransaction(
     transactions: MetaTransactionData[],
     options: MetaTransactionOptions
   ): Promise<string> {
-    if (!this.#relayAdapter || !this.#safeContract || !this.#safeProxyFactoryContract) {
+    if (!this.#relayPack || !this.#safeSdk || !this.#safeProxyFactoryContract) {
       throw new Error('SDK not initialized')
     }
 
-    const safeAddress = this.getSafeAddress()
-    const safe = await Safe.create({
-      ethAdapter: this.#ethAdapter,
-      safeAddress
-    })
+    const safeAddress = await this.#safeSdk.getAddress()
 
-    const standardizedSafeTx = await this.#relayAdapter.createRelayedTransaction({
-      safe,
+    const standardizedSafeTx = await this.#relayPack.createRelayedTransaction({
+      safe: this.#safeSdk,
       transactions,
       options
     })
 
-    const signedSafeTx = await safe.signTransaction(standardizedSafeTx)
+    const safeSingletonContract = await getSafeContract({
+      ethAdapter: this.#ethAdapter,
+      safeVersion
+    })
 
-    const transactionData = this.#safeContract.encode('execTransaction', [
-      signedSafeTx.data,
+    const signedSafeTx = await this.#safeSdk.signTransaction(standardizedSafeTx)
+
+    const transactionData = safeSingletonContract.encode('execTransaction', [
+      signedSafeTx.data.to,
+      signedSafeTx.data.value,
+      signedSafeTx.data.data,
+      signedSafeTx.data.operation,
+      signedSafeTx.data.safeTxGas,
+      signedSafeTx.data.baseGas,
+      signedSafeTx.data.gasPrice,
+      signedSafeTx.data.gasToken,
+      signedSafeTx.data.refundReceiver,
       signedSafeTx.encodedSignatures()
     ])
 
     let relayTransactionTarget = ''
     let encodedTransaction = ''
-    const isSafeDeployed = await this.isSafeDeployed()
+    const isSafeDeployed = await this.#safeSdk.isSafeDeployed()
     if (isSafeDeployed) {
       relayTransactionTarget = safeAddress
       encodedTransaction = transactionData
@@ -142,11 +178,22 @@ class AccountAbstraction {
         ethAdapter: this.#ethAdapter,
         safeVersion
       })
-      const initializer = await getSafeInitializer(
-        this.#ethAdapter,
-        this.#safeContract,
-        await this.getSignerAddress()
-      )
+
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig: {
+          owners: [await this.getSignerAddress()],
+          threshold: 1
+        },
+        safeDeploymentConfig: {
+          saltNonce: PREDETERMINED_SALT_NONCE
+        }
+      }
+
+      const initializer = await encodeSetupCallData({
+        ethAdapter: this.#ethAdapter,
+        safeContract: safeSingletonContract,
+        safeAccountConfig: predictedSafe.safeAccountConfig
+      })
 
       const safeDeploymentTransaction: MetaTransactionData = {
         to: this.#safeProxyFactoryContract.getAddress(),
@@ -176,7 +223,7 @@ class AccountAbstraction {
       chainId,
       options
     }
-    const response = await this.#relayAdapter.relayTransaction(relayTransaction)
+    const response = await this.#relayPack.relayTransaction(relayTransaction)
     return response.taskId
   }
 }

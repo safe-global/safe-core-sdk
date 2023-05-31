@@ -42,7 +42,7 @@ const safe = await Safe.create({
 Using these components it is possible to create an instance of the `SafeEthersSigner`
 
 ```js
-const safeSigner = new SafeEthersSigner(safe, service, provider)
+const safeSigner = await SafeEthersSigner.create(safe, service, provider)
 ```
 
 See [examples](/packages/safe-ethers-adapters/examples) for more information.

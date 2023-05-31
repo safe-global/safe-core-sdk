@@ -1,4 +1,4 @@
-import { SafeAccountConfig, SafeDeploymentConfig, SafeFactory } from '@safe-global/protocol-kit'
+import { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
 
@@ -42,15 +42,15 @@ async function main() {
     owners: config.DEPLOY_SAFE.OWNERS,
     threshold: config.DEPLOY_SAFE.THRESHOLD
   }
-  const safeDeploymentConfig: SafeDeploymentConfig = {
-    saltNonce: config.DEPLOY_SAFE.SALT_NONCE
-  }
+  const saltNonce = config.DEPLOY_SAFE.SALT_NONCE
 
   // Predict deployed address
-  const predictedDeployAddress = await safeFactory.predictSafeAddress({
+  const predictedDeploySafeAddress = await safeFactory.predictSafeAddress(
     safeAccountConfig,
-    safeDeploymentConfig
-  })
+    saltNonce
+  )
+
+  console.log('Predicted deployed Safe address:', predictedDeploySafeAddress)
 
   function callback(txHash: string) {
     console.log('Transaction hash:', txHash)
@@ -59,11 +59,10 @@ async function main() {
   // Deploy Safe
   const safe = await safeFactory.deploySafe({
     safeAccountConfig,
-    safeDeploymentConfig,
+    saltNonce,
     callback
   })
 
-  console.log('Predicted deployed address:', predictedDeployAddress)
   console.log('Deployed Safe:', safe.getAddress())
 }
 

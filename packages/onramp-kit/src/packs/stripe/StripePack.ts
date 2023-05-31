@@ -9,20 +9,20 @@ import type {
   StripeOpenOptions,
   StripeSession
 } from './types'
-import type { SafeOnRampAdapter } from '@safe-global/onramp-kit/types'
+import type { SafeOnRampPack } from '@safe-global/onramp-kit/types'
 
 /**
  * This class implements the SafeOnRampClient interface for the Stripe provider
- * @class StripeAdapter
+ * @class StripePack
  */
-export class StripeAdapter implements SafeOnRampAdapter<StripeAdapter> {
+export class StripePack implements SafeOnRampPack<StripePack> {
   #element?: string
-  #stripeOnRamp?: StripeOnramp
-  #onRampSession?: OnrampSession
+  #client?: StripeOnramp
   #config: StripeProviderConfig
+  #onRampSession?: OnrampSession
 
   /**
-   * Initialize the StripeAdapter
+   * Initialize the StripePack
    * @constructor
    * @param config The configuration object for the Stripe provider. Ideally we will put here things like api keys, secrets, urls, etc.
    */
@@ -35,7 +35,7 @@ export class StripeAdapter implements SafeOnRampAdapter<StripeAdapter> {
    */
   async init() {
     try {
-      this.#stripeOnRamp = (await loadStripeOnramp(this.#config.stripePublicKey)) || undefined
+      this.#client = (await loadStripeOnramp(this.#config.stripePublicKey)) || undefined
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -51,7 +51,7 @@ export class StripeAdapter implements SafeOnRampAdapter<StripeAdapter> {
     sessionId,
     defaultOptions
   }: StripeOpenOptions): Promise<StripeSession> {
-    if (!this.#stripeOnRamp) throw new Error('StripeOnRamp is not initialized')
+    if (!this.#client) throw new Error('The Stripe crypto SDK is not initialized')
 
     try {
       let session
@@ -62,7 +62,7 @@ export class StripeAdapter implements SafeOnRampAdapter<StripeAdapter> {
         session = await stripeApi.createSession(this.#config.onRampBackendUrl, defaultOptions)
       }
 
-      const onRampSession = await this.#stripeOnRamp.createSession({
+      const onRampSession = this.#client.createSession({
         clientSecret: session.client_secret,
         appearance: {
           theme: theme

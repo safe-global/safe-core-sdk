@@ -11,6 +11,11 @@ export default defineConfig({
   },
   optimizeDeps: {
     disabled: false,
+    include: [
+      '@safe-global/protocol-kit',
+      '@safe-global/api-kit',
+      '@safe-global/safe-core-sdk-types'
+    ],
     esbuildOptions: {
       define: {
         global: 'globalThis'

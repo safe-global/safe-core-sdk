@@ -7,20 +7,20 @@ import {
   SponsoredCallRequest,
   TransactionStatusResponse
 } from '@gelatonetwork/relay-sdk'
-import Safe, { estimateTxBaseGas } from '@safe-global/protocol-kit'
-import {
-  MetaTransactionOptions,
-  RelayTransaction,
-  SafeTransaction
-} from '@safe-global/safe-core-sdk-types'
+import { estimateTxBaseGas } from '@safe-global/protocol-kit'
 import {
   GELATO_FEE_COLLECTOR,
   GELATO_NATIVE_TOKEN_ADDRESS,
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
-import { CreateTransactionProps, RelayAdapter } from '@safe-global/relay-kit/types'
+import { RelayPack, CreateTransactionProps } from '@safe-global/relay-kit/types'
+import {
+  MetaTransactionOptions,
+  RelayTransaction,
+  SafeTransaction
+} from '@safe-global/safe-core-sdk-types'
 
-export class GelatoRelayAdapter implements RelayAdapter {
+export class GelatoRelayPack implements RelayPack {
   #gelatoRelay: GelatoNetworkRelay
   #apiKey?: string
 
@@ -31,15 +31,6 @@ export class GelatoRelayAdapter implements RelayAdapter {
 
   private _getFeeToken(gasToken?: string): string {
     return !gasToken || gasToken === ZERO_ADDRESS ? GELATO_NATIVE_TOKEN_ADDRESS : gasToken
-  }
-
-  // TODO: Should be moved to the protocol-kit
-  private async _getSafeNonce(safe: Safe): Promise<number> {
-    try {
-      return await safe.getNonce()
-    } catch {
-      return 0
-    }
   }
 
   getFeeCollector(): string {
@@ -68,7 +59,7 @@ export class GelatoRelayAdapter implements RelayAdapter {
     options = {}
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const { gasLimit, gasToken, isSponsored } = options
-    const nonce = await this._getSafeNonce(safe)
+    const nonce = await safe.getNonce()
 
     if (isSponsored) {
       const sponsoredTransaction = await safe.createTransaction({
@@ -95,8 +86,15 @@ export class GelatoRelayAdapter implements RelayAdapter {
         }
       })
 
+      const safeContract = safe.getContractManager().safeContract
+
+      // TODO: review this with Dani
+      if (!safeContract) {
+        throw new Error('Safe is not deployed')
+      }
+
       const baseGas = await estimateTxBaseGas({
-        safeContract: safe.getContractManager().safeContract,
+        safeContract,
         ...estimateGasTx.data
       })
 

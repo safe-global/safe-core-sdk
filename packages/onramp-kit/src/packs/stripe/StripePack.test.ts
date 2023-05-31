@@ -2,10 +2,10 @@ import EventEmitter from 'events'
 import { StripePack } from './StripePack'
 import * as stripeApi from './stripeApi'
 
-import type { SafeOnRampOpenOptions } from '@safe-global/onramp-kit/types'
-import type { StripeSession } from './types'
+import type { StripeOpenOptions, StripeSession } from './types'
+import { OnRampKitBasePack } from '../..'
 
-const openOptions: SafeOnRampOpenOptions<StripePack> = {
+const openOptions: StripeOpenOptions = {
   element: '#root',
   defaultOptions: {
     transaction_details: {
@@ -70,6 +70,7 @@ describe('StripePack', () => {
     const stripePack = new StripePack(config)
 
     expect(stripePack).toBeInstanceOf(StripePack)
+    expect(stripePack).toBeInstanceOf(OnRampKitBasePack)
   })
 
   it('should try to mount the node specified in the config when open() is called', async () => {
@@ -138,9 +139,7 @@ describe('StripePack', () => {
     stripePack.subscribe('onramp_ui_loaded', mockOnLoaded)
     stripePack.subscribe('onramp_session_updated', mockOnSessionUpdated)
 
-    // TODO: Change to 2 when the hack for not allowing more than 10$ is removed
-    // https://github.com/safe-global/safe-core-sdk/blob/59c5f90b08eecf976d617af5f7a8259e058c4580/packages/onramp-kit/src/packs/stripe/StripePack.ts#L77-L83
-    expect(mockAddEventListener).toHaveBeenCalledTimes(3)
+    expect(mockAddEventListener).toHaveBeenCalledTimes(2)
     mockDispatch('onramp_ui_loaded', 'sessionData')
     expect(mockOnLoaded).toHaveBeenCalled()
 

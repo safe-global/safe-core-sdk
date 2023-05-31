@@ -3,6 +3,7 @@ import {
   ADAPTER_EVENTS,
   CHAIN_NAMESPACES,
   SafeEventEmitterProvider,
+  UserInfo,
   WALLET_ADAPTERS
 } from '@web3auth/base'
 import { Box, Divider, Grid, Typography } from '@mui/material'
@@ -11,23 +12,17 @@ import { Web3AuthOptions } from '@web3auth/modal'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 
 import AppBar from './AppBar'
-import {
-  SafeAuthKit,
-  SafeAuthSignInData,
-  SafeGetUserInfoResponse,
-  Web3AuthModalPack,
-  Web3AuthEventListener
-} from '../../src/index'
+import { AuthKitSignInData, Web3AuthModalPack, Web3AuthEventListener } from '../../src/index'
 
 const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED', data)
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
 
 function App() {
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
-  const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData | null>(
+  const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
+  const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<SafeGetUserInfoResponse<Web3AuthModalPack>>()
+  const [userInfo, setUserInfo] = useState<Partial<UserInfo>>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
 
   useEffect(() => {
@@ -70,43 +65,51 @@ function App() {
         }
       })
 
-      const web3AuthModalPack = new Web3AuthModalPack(options, [openloginAdapter], modalConfig)
-
-      const safeAuthKit = await SafeAuthKit.init(web3AuthModalPack, {
+      const web3AuthModalPack = new Web3AuthModalPack({
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
-      safeAuthKit.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
+      await web3AuthModalPack.init({ options, adapters: [openloginAdapter], modalConfig })
 
-      safeAuthKit.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
+      web3AuthModalPack.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
 
-      setSafeAuth(safeAuthKit)
+      web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
+
+      setWeb3AuthModalPack(web3AuthModalPack)
 
       return () => {
-        safeAuthKit.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
-        safeAuthKit.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
+        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
+        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
       }
     })()
   }, [])
 
-  const login = async () => {
-    if (!safeAuth) return
+  useEffect(() => {
+    if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
+      ;(async () => {
+        await login()
+      })()
+    }
+  }, [web3AuthModalPack])
 
-    const signInInfo = await safeAuth.signIn()
+  const login = async () => {
+    if (!web3AuthModalPack) return
+
+    const signInInfo = await web3AuthModalPack.signIn()
     console.log('SIGN IN RESPONSE: ', signInInfo)
 
-    const userInfo = await safeAuth.getUserInfo()
+    const userInfo = await web3AuthModalPack.getUserInfo()
     console.log('USER INFO: ', userInfo)
 
     setSafeAuthSignInResponse(signInInfo)
     setUserInfo(userInfo || undefined)
-    setProvider(safeAuth.getProvider() as SafeEventEmitterProvider)
+    setProvider(web3AuthModalPack.getProvider() as SafeEventEmitterProvider)
   }
 
   const logout = async () => {
-    if (!safeAuth) return
+    if (!web3AuthModalPack) return
 
-    await safeAuth.signOut()
+    await web3AuthModalPack.signOut()
 
     setProvider(null)
     setSafeAuthSignInResponse(null)

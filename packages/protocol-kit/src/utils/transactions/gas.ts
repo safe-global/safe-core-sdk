@@ -6,21 +6,51 @@ import {
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
 import { ZERO_ADDRESS } from '../constants'
+import { getSafeContract } from '../../contracts/safeDeploymentContracts'
+import Safe from '@safe-global/protocol-kit/Safe'
 
-const GAS_CALL_DATA_ZERO_BYTE = 4
-const GAS_CALL_DATA_BYTE = 16 // 68 before Istanbul
+// Every byte == 00 -> 4  Gas cost
+const CALL_DATA_ZERO_BYTE_GAS_COST = 4
+
+// Every byte != 00 -> 16 Gas cost (68 before Istanbul)
+const CALL_DATA_BYTE_GAS_COST = 16
+
+// gas cost initialization of a Safe
+const INITIZATION_GAS_COST = 20_000
+
+// increment nonce gas cost
+const INCREMENT_NONCE_GAS_COST = 5_000
+
+// Keccak gas cost for the hash of the Safe transaction
+const HASH_GENERATION_GAS_COST = 1_500
+
+// ecrecover gas cost for ecdsa ~= 4K gas, we use 6K
+const ECRECOVER_GAS_COST = 6_000
+
+// transfer gas cost
+const TRANSAFER_GAS_COST = 32_000
+
+// numbers < 256 (0x00(31*2)..ff) are 192 -> 31 * 4 + 1 * CALL_DATA_BYTE_GAS_COST
+// numbers < 65535 (0x(30*2)..ffff) are 256 -> 30 * 4 + 2 * CALL_DATA_BYTE_GAS_COST
+// Calculate gas for signatures
+// (array count (3 -> r, s, v) + ecrecover costs) * signature count
+const GAS_COST_PER_SIGNATURE =
+  1 * CALL_DATA_BYTE_GAS_COST + 2 * 32 * CALL_DATA_BYTE_GAS_COST + ECRECOVER_GAS_COST
 
 function estimateDataGasCosts(data: string): number {
-  const reducer = (accumulator: number, currentValue: string) => {
-    if (currentValue === '0x') {
-      return accumulator + 0
+  const bytes = data.match(/.{2}/g) as string[]
+
+  return bytes.reduce((gasCost: number, currentByte: string) => {
+    if (currentByte === '0x') {
+      return gasCost + 0
     }
-    if (currentValue === '00') {
-      return accumulator + GAS_CALL_DATA_ZERO_BYTE
+
+    if (currentByte === '00') {
+      return gasCost + CALL_DATA_ZERO_BYTE_GAS_COST
     }
-    return accumulator + GAS_CALL_DATA_BYTE
-  }
-  return (data.match(/.{2}/g) as string[]).reduce(reducer, 0)
+
+    return gasCost + CALL_DATA_BYTE_GAS_COST
+  }, 0)
 }
 
 export async function estimateTxGas(
@@ -87,36 +117,21 @@ export async function estimateTxGas(
   }
 }
 
-export interface EstimateTxBaseGasProps extends SafeTransactionDataPartial {
-  /** safeContract - The transaction or transaction array to process */
-  safeContract: GnosisSafeContract
+export type EstimateTxBaseGasProps = {
+  safe: Safe
+  safeTransactionData: SafeTransactionDataPartial
 }
 
 export async function estimateTxBaseGas({
-  safeContract,
-  to,
-  value,
-  data,
-  operation,
-  safeTxGas,
-  gasToken,
-  refundReceiver
+  safe,
+  safeTransactionData
 }: EstimateTxBaseGasProps): Promise<number> {
-  let baseGas = 0
-  const threshold = await safeContract.getThreshold()
-  const nonce = await safeContract.getNonce()
+  const { to, value, data, operation, safeTxGas, gasToken, refundReceiver } = safeTransactionData
 
-  // Every byte == 0 -> 4  Gas
-  // Every byte != 0 -> 16 Gas (68 before Istanbul)
-  // numbers < 256 (0x00(31*2)..ff) are 192 -> 31 * 4 + 1 * GAS_CALL_DATA_BYTE
-  // numbers < 65535 (0x(30*2)..ffff) are 256 -> 30 * 4 + 2 * GAS_CALL_DATA_BYTE
+  const safeThreshold = await safe.getThreshold()
+  const safeNonce = await safe.getNonce()
 
-  // Calculate gas for signatures
-  // (array count (3 -> r, s, v) + ecrecover costs) * signature count
-  // ecrecover for ecdsa ~= 4K gas, we use 6K
-  const ECRECOVER_GAS = 6000
-  const signatureGas =
-    threshold * (1 * GAS_CALL_DATA_BYTE + 2 * 32 * GAS_CALL_DATA_BYTE + ECRECOVER_GAS)
+  const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE
 
   const encodeSafeTxGas = safeTxGas || 0
   const encodeBaseGas = 0
@@ -124,7 +139,17 @@ export async function estimateTxBaseGas({
   const encodeGasToken = gasToken || ZERO_ADDRESS
   const encodeRefundReceiver = refundReceiver || ZERO_ADDRESS
   const signatures = '0x'
-  const estimateData: string = safeContract.encode('execTransaction', [
+
+  const chainId = await safe.getChainId()
+
+  const safeSingletonContract = await getSafeContract({
+    ethAdapter: safe.getEthAdapter(),
+    safeVersion: await safe.getContractVersion(),
+    isL1SafeMasterCopy: safe.getContractManager().isL1SafeMasterCopy,
+    customContracts: safe.getContractManager().contractNetworks?.[chainId]
+  })
+
+  const execTransactionData: string = safeSingletonContract.encode('execTransaction', [
     to,
     value,
     data,
@@ -138,21 +163,20 @@ export async function estimateTxBaseGas({
   ])
 
   // If nonce == 0, nonce storage has to be initialized
-  let nonceGas = 5000
-  if (nonce == 0) {
-    nonceGas = 20000
-  }
+  const isSafeInitialized = safeNonce !== 0
+  const incrementNonceGasCost = isSafeInitialized ? INCREMENT_NONCE_GAS_COST : INITIZATION_GAS_COST
 
-  // Keccak cost for the hash of the safe tx
-  const HASH_GENERATION_GAS = 1500
-
-  baseGas = signatureGas + estimateDataGasCosts(estimateData) + nonceGas + HASH_GENERATION_GAS
+  let baseGas =
+    signaturesGasCost +
+    estimateDataGasCosts(execTransactionData) +
+    incrementNonceGasCost +
+    HASH_GENERATION_GAS_COST
 
   // Add additional gas costs
   baseGas > 65536 ? (baseGas += 64) : (baseGas += 128)
 
   // Base tx costs, transfer costs...
-  baseGas += 32000
+  baseGas += TRANSAFER_GAS_COST
 
   return baseGas
 }

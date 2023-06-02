@@ -86,29 +86,20 @@ export class GelatoRelayPack implements RelayPack {
         }
       })
 
-      const safeContract = safe.getContractManager().safeContract
-
-      // TODO: review this with Dani
-      if (!safeContract) {
-        throw new Error('Safe is not deployed')
-      }
-
       const baseGas = await estimateTxBaseGas({
-        safeContract,
-        ...estimateGasTx.data
+        safe,
+        safeTransactionData: estimateGasTx.data
       })
 
       // https://docs.gelato.network/developer-services/relay/quick-start/optional-parameters#optional-parameters
-      const GELATO_GAS_EXECUTION_OVERHEAD = 150000
+      const GELATO_GAS_EXECUTION_OVERHEAD = 150_000
       estimateGas = Math.ceil(
         baseGas * 1.2 + GELATO_GAS_EXECUTION_OVERHEAD + Number(estimateGasTx.data.safeTxGas) * 1.2
       ).toString()
     }
 
-    console.log(`Estimated base gas ${estimateGas.toString()}`)
     const chainId = await safe.getChainId()
     const estimation = await this.getEstimateFee(chainId, estimateGas, gasToken)
-    console.log(`Total fee estimation ${estimation}`)
 
     const syncTransaction = await safe.createTransaction({
       safeTransactionData: transactions,

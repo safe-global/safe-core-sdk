@@ -49,7 +49,7 @@ class EthersAdapter implements EthAdapter {
     }
     this.#ethers = ethers
     const isSigner = signerOrProvider instanceof Signer
-    if (isSigner) {
+    if (isSigner) { // TODO: validate why this check does not work
       const signer = signerOrProvider as Signer
       if (!signer.provider) {
         throw new Error('Signer must be connected to a provider')
@@ -57,7 +57,8 @@ class EthersAdapter implements EthAdapter {
       this.#provider = signer.provider
       this.#signer = signer
     } else {
-      this.#provider = signerOrProvider as Provider
+      this.#provider = (signerOrProvider as any).provider as Provider // these lines have been adjusted to make it work
+      this.#signer = signerOrProvider as any as Signer
     }
   }
 

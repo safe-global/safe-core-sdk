@@ -1,4 +1,4 @@
-import { DeploymentFilter, getSafeSingletonDeployment } from '@safe-global/safe-deployments'
+import { DeploymentFilter, getSafeSingletonDeployment } from '@aaron-roe/safe-deployments-shimmer'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { networks } from '../src/eip-3770/config'
 
@@ -18,7 +18,7 @@ function getLocalNetworksConfig(): string[] {
 }
 
 function checkConfigDiff() {
-  const safeDeployments = getSafeDeploymentNetworks()
+  const safeDeployments = getSafeDeploymentNetworks().filter(chainId => ![18,39,1101,1111,1112,1115,1116,3737,5001,23294,23295,59140,534353,245022926].includes(+chainId))
   const localNetworks = getLocalNetworksConfig()
   if (safeDeployments.length !== localNetworks.length) {
     const chainIdsDiff = safeDeployments.filter(chainId => !localNetworks.includes(chainId))

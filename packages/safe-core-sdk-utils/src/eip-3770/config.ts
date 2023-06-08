@@ -50,6 +50,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 787, shortName: 'aca' },
   { chainId: 1001, shortName: 'baobab' },
   { chainId: 1008, shortName: 'eun' },
+  { chainId: 1071, shortName: 'smr' },
   { chainId: 1088, shortName: 'metis-andromeda' },
   { chainId: 1284, shortName: 'mbeam' },
   { chainId: 1285, shortName: 'mriver' },

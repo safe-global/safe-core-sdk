@@ -1,7 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import { getAddress } from '@ethersproject/address'
-import { getCreateCallDeployment } from '@safe-global/safe-deployments'
+import { getCreateCallDeployment } from '@aaron-roe/safe-deployments-shimmer'
 import { SafeTransactionData } from '@safe-global/safe-core-sdk-types'
 
 export const createLibDeployment = getCreateCallDeployment()

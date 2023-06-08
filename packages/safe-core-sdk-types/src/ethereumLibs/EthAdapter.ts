@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { SingletonDeployment } from '@safe-global/safe-deployments'
+import { SingletonDeployment } from '@aaron-roe/safe-deployments-shimmer'
 import { AbiItem } from 'web3-utils'
 import { CompatibilityFallbackHandlerContract } from '../contracts/CompatibilityFallbackHandlerContract'
 import { CreateCallContract } from '../contracts/CreateCallContract'

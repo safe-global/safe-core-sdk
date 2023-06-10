@@ -39,6 +39,7 @@ export function getSafeContractInstance(
   | GnosisSafeContract_V1_0_0_Ethers {
   let safeContract
   switch (safeVersion) {
+    case '1.4.0':
     case '1.3.0':
       safeContract = SafeMasterCopy_V1_3_0.connect(contractAddress, signerOrProvider)
       return new GnosisSafeContract_V1_3_0_Ethers(safeContract)
@@ -63,6 +64,7 @@ export function getCompatibilityFallbackHandlerContractInstance(
 ): CompatibilityFallbackHandler_V1_3_0_Ethers {
   let compatibilityFallbackHandlerContract
   switch (safeVersion) {
+    case '1.4.0':
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
@@ -83,6 +85,7 @@ export function getMultiSendContractInstance(
 ): MultiSendContract_V1_3_0_Ethers | MultiSendContract_V1_1_1_Ethers {
   let multiSendContract
   switch (safeVersion) {
+    case '1.4.0':
     case '1.3.0':
       multiSendContract = MultiSend_V1_3_0.connect(contractAddress, signerOrProvider)
       return new MultiSendContract_V1_3_0_Ethers(multiSendContract)
@@ -103,6 +106,7 @@ export function getMultiSendCallOnlyContractInstance(
 ): MultiSendCallOnlyContract_V1_3_0_Ethers {
   let multiSendCallOnlyContract
   switch (safeVersion) {
+    case '1.4.0':
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
@@ -127,6 +131,7 @@ export function getSafeProxyFactoryContractInstance(
   | GnosisSafeProxyFactoryContract_V1_0_0_Ethers {
   let gnosisSafeProxyFactoryContract
   switch (safeVersion) {
+    case '1.4.0':
     case '1.3.0':
       gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_3_0.connect(
         contractAddress,
@@ -158,6 +163,7 @@ export function getSignMessageLibContractInstance(
 ): SignMessageLibContract_V1_3_0_Ethers {
   let signMessageLibContract
   switch (safeVersion) {
+    case '1.4.0':
     case '1.3.0':
       signMessageLibContract = SignMessageLib_V1_3_0.connect(contractAddress, signerOrProvider)
       return new SignMessageLibContract_V1_3_0_Ethers(signMessageLibContract)
@@ -173,6 +179,7 @@ export function getCreateCallContractInstance(
 ): CreateCallContract_V1_3_0_Ethers {
   let createCallContract
   switch (safeVersion) {
+    case '1.4.0':
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':

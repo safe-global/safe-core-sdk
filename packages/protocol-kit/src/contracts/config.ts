@@ -17,6 +17,16 @@ type SafeDeploymentsVersions = {
 }
 
 export const safeDeploymentsVersions: SafeDeploymentsVersions = {
+  '1.4.0': {
+    safeMasterCopyVersion: '1.4.0',
+    safeMasterCopyL2Version: '1.4.0',
+    safeProxyFactoryVersion: '1.4.0',
+    compatibilityFallbackHandler: '1.4.0',
+    multiSendVersion: '1.4.0',
+    multiSendCallOnlyVersion: '1.4.0',
+    signMessageLibVersion: '1.4.0',
+    createCallVersion: '1.4.0'
+  },
   '1.3.0': {
     safeMasterCopyVersion: '1.3.0',
     safeMasterCopyL2Version: '1.3.0',

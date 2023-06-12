@@ -67,3 +67,9 @@ To execute a sponsored transaction using a relay:
 ```bash
 yarn play relay-sponsored-transaction
 ```
+
+#### Optional Step: Generate a custon Safe address
+
+```bash
+yarn play generate-safe-address
+```

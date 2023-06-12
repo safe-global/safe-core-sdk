@@ -1,7 +1,8 @@
 import {
   EthAdapter,
   GnosisSafeContract,
-  GnosisSafeProxyFactoryContract
+  GnosisSafeProxyFactoryContract,
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import { isAddress } from '@ethersproject/address'
@@ -14,6 +15,7 @@ import {
 } from '../contracts/safeDeploymentContracts'
 import { ContractNetworkConfig, SafeAccountConfig, SafeDeploymentConfig } from '../types'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
@@ -33,6 +35,7 @@ export interface encodeSetupCallDataProps {
   safeAccountConfig: SafeAccountConfig
   safeContract: GnosisSafeContract
   customContracts?: ContractNetworkConfig
+  customSafeVersion?: SafeVersion
 }
 
 export function encodeCreateProxyWithNonce(
@@ -47,11 +50,16 @@ export function encodeCreateProxyWithNonce(
   ])
 }
 
+const memoizedGetCompatibilityFallbackHandlerContract = createMemoizedFunction(
+  getCompatibilityFallbackHandlerContract
+)
+
 export async function encodeSetupCallData({
   ethAdapter,
   safeAccountConfig,
   safeContract,
-  customContracts
+  customContracts,
+  customSafeVersion
 }: encodeSetupCallDataProps): Promise<string> {
   const {
     owners,
@@ -64,7 +72,7 @@ export async function encodeSetupCallData({
     paymentReceiver = ZERO_ADDRESS
   } = safeAccountConfig
 
-  const safeVersion = await safeContract.getVersion()
+  const safeVersion = customSafeVersion || (await safeContract.getVersion())
 
   if (semverSatisfies(safeVersion, '<=1.0.0')) {
     return safeContract.encode('setup', [
@@ -81,7 +89,7 @@ export async function encodeSetupCallData({
   let fallbackHandlerAddress = fallbackHandler
   const isValidAddress = fallbackHandlerAddress !== undefined && isAddress(fallbackHandlerAddress)
   if (!isValidAddress) {
-    const fallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
+    const fallbackHandlerContract = await memoizedGetCompatibilityFallbackHandlerContract({
       ethAdapter,
       safeVersion,
       customContracts
@@ -102,6 +110,28 @@ export async function encodeSetupCallData({
   ])
 }
 
+const memoizedGetProxyFactoryContract = createMemoizedFunction(getProxyFactoryContract)
+const memoizedGetSafeContract = createMemoizedFunction(getSafeContract)
+const memoizedGetProxyCreationCode = createMemoizedFunction(
+  async ({
+    ethAdapter,
+    safeVersion,
+    customContracts
+  }: {
+    ethAdapter: EthAdapter
+    safeVersion: SafeVersion
+    customContracts?: ContractNetworkConfig
+  }) => {
+    const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
+      ethAdapter,
+      safeVersion,
+      customContracts
+    })
+
+    return safeProxyFactoryContract.proxyCreationCode()
+  }
+)
+
 export async function predictSafeAddress({
   ethAdapter,
   safeAccountConfig,
@@ -115,15 +145,19 @@ export async function predictSafeAddress({
   const { safeVersion = SAFE_LAST_VERSION, saltNonce = PREDETERMINED_SALT_NONCE } =
     safeDeploymentConfig
 
-  const safeProxyFactoryContract = await getProxyFactoryContract({
+  const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     ethAdapter,
     safeVersion,
     customContracts
   })
 
-  const proxyCreationCode = await safeProxyFactoryContract.proxyCreationCode()
+  const proxyCreationCode = await memoizedGetProxyCreationCode({
+    ethAdapter,
+    safeVersion,
+    customContracts
+  })
 
-  const safeContract = await getSafeContract({
+  const safeContract = await memoizedGetSafeContract({
     ethAdapter,
     safeVersion,
     isL1SafeMasterCopy,
@@ -134,7 +168,8 @@ export async function predictSafeAddress({
     ethAdapter,
     safeAccountConfig,
     safeContract,
-    customContracts
+    customContracts,
+    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
   const encodedNonce = toBuffer(ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(

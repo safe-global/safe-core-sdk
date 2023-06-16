@@ -1,10 +1,12 @@
 # Ethers Adapter
 
-Ethers.js wrapper that contains some utilities and the Safe contracts types (generated with typechain ethers-v5). It is used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit).
+Ethers.js wrapper that contains some utilities and the Safe contracts types (generated with `typechain` `ethers-v5`). It is used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit).
 
 ## How to use
 
-If the app integrating the SDK is using `Ethers` `v5`, create an instance of the `EthersAdapter`, where `signer` is the Ethereum account we are connecting and the one who will sign the transactions.
+If the app integrating the SDK is using `ethers`, create an instance of the `EthersAdapter`, where `signer` is the Ethereum account we are connecting and the one who will sign the transactions.
+
+> :warning: **NOTE**: Currently only `ethers` `v5` is supported.
 
 ```js
 import { ethers } from 'ethers'

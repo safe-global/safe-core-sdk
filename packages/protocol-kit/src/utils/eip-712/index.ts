@@ -1,4 +1,13 @@
-import { GenerateTypedData, SafeTransactionEIP712Args } from '@safe-global/safe-core-sdk-types'
+import {
+  SafeTransactionTypedData,
+  SafeMessageTypedData,
+  SafeTransactionEIP712Args,
+  SafeMessageEIP712Args,
+  EIP712TypedData
+} from '@safe-global/safe-core-sdk-types'
+import { hashMessage, _TypedDataEncoder } from 'ethers/lib/utils'
+import type { TypedDataDomain } from 'ethers'
+
 import semverSatisfies from 'semver/functions/satisfies'
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -22,7 +31,7 @@ export const EIP712_DOMAIN = [
 ]
 
 // This function returns the types structure for signing off-chain messages according to EIP-712
-export function getEip712MessageTypes(safeVersion: string): {
+export function getEip712TransactionMessageTypes(safeVersion: string): {
   EIP712Domain: typeof EIP712_DOMAIN | typeof EIP712_DOMAIN_BEFORE_V130
   SafeTx: Array<{ type: string; name: string }>
 } {
@@ -44,15 +53,26 @@ export function getEip712MessageTypes(safeVersion: string): {
   }
 }
 
-export function generateTypedData({
+export function getEip712SafeMessageMessageTypes(safeVersion: string): {
+  EIP712Domain: typeof EIP712_DOMAIN | typeof EIP712_DOMAIN_BEFORE_V130
+  SafeMessage: [{ type: 'bytes'; name: 'message' }]
+} {
+  const eip712WithChainId = semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)
+  return {
+    EIP712Domain: eip712WithChainId ? EIP712_DOMAIN : EIP712_DOMAIN_BEFORE_V130,
+    SafeMessage: [{ type: 'bytes', name: 'message' }]
+  }
+}
+
+export function generateTransactionTypedData({
   safeAddress,
   safeVersion,
   chainId,
   safeTransactionData
-}: SafeTransactionEIP712Args): GenerateTypedData {
+}: SafeTransactionEIP712Args): SafeTransactionTypedData {
   const eip712WithChainId = semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)
-  const typedData: GenerateTypedData = {
-    types: getEip712MessageTypes(safeVersion),
+  const typedData: SafeTransactionTypedData = {
+    types: getEip712TransactionMessageTypes(safeVersion),
     domain: {
       verifyingContract: safeAddress
     },
@@ -64,6 +84,39 @@ export function generateTypedData({
       baseGas: safeTransactionData.baseGas,
       gasPrice: safeTransactionData.gasPrice,
       nonce: safeTransactionData.nonce
+    }
+  }
+  if (eip712WithChainId) {
+    typedData.domain.chainId = chainId
+  }
+  return typedData
+}
+
+export const hashTypedData = (typedData: EIP712TypedData): string => {
+  // `ethers` doesn't require `EIP712Domain` and otherwise throws
+  const { EIP712Domain: _, ...types } = typedData.types
+  return _TypedDataEncoder.hash(typedData.domain as TypedDataDomain, types, typedData.message)
+}
+
+const hashSafeMessage = (message: string | EIP712TypedData): string => {
+  return typeof message === 'string' ? hashMessage(message) : hashTypedData(message)
+}
+
+export function generateSafeMessageTypedData({
+  safeAddress,
+  safeVersion,
+  chainId,
+  message
+}: SafeMessageEIP712Args): SafeMessageTypedData {
+  const eip712WithChainId = semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)
+  const typedData: SafeMessageTypedData = {
+    types: getEip712SafeMessageMessageTypes(safeVersion),
+    domain: {
+      verifyingContract: safeAddress
+    },
+    primaryType: 'SafeMessage',
+    message: {
+      message: hashSafeMessage(message)
     }
   }
   if (eip712WithChainId) {

@@ -2,7 +2,10 @@ import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Provider } from '@ethersproject/providers'
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import {
+  generateTransactionTypedData,
+  validateEip3770Address
+} from '@safe-global/protocol-kit/utils'
 import {
   Eip3770Address,
   EthAdapter,
@@ -232,7 +235,7 @@ class EthersAdapter implements EthAdapter {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
     if (isTypedDataSigner(this.#signer)) {
-      const typedData = generateTypedData(safeTransactionEIP712Args)
+      const typedData = generateTransactionTypedData(safeTransactionEIP712Args)
       const signature = await this.#signer._signTypedData(
         typedData.domain,
         { SafeTx: typedData.types.SafeTx },

@@ -1,5 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
+  Eip712MessageTypes,
   EthAdapter,
   OperationType,
   SafeMultisigTransactionResponse,
@@ -500,7 +501,7 @@ class Safe {
    * @param methodVersion - EIP-712 version. Optional
    * @returns The Safe signature
    */
-  async signTypedData(
+  async signTransactionTypedData(
     safeTransaction: SafeTransaction,
     methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
@@ -547,11 +548,11 @@ class Safe {
 
     let signature: SafeSignature
     if (signingMethod === 'eth_signTypedData_v4') {
-      signature = await this.signTypedData(transaction, 'v4')
+      signature = await this.signTransactionTypedData(transaction, 'v4')
     } else if (signingMethod === 'eth_signTypedData_v3') {
-      signature = await this.signTypedData(transaction, 'v3')
+      signature = await this.signTransactionTypedData(transaction, 'v3')
     } else if (signingMethod === 'eth_signTypedData') {
-      signature = await this.signTypedData(transaction)
+      signature = await this.signTransactionTypedData(transaction)
     } else {
       const safeVersion = await this.getContractVersion()
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {

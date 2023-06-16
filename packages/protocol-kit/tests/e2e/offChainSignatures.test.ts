@@ -50,7 +50,7 @@ describe('Off-chain signatures', () => {
       })
       const txHash = '0xcbf14050c5fcc9b71d4a3ab874cc728db101d19d4466d56fcdbb805117a28c64'
       const signature = await safeSdk.signTransactionHash(txHash)
-      chai.expect(signature.staticPart().length).to.be.eq(132)
+      chai.expect(signature.staticPart(0).length).to.be.eq(132)
     })
 
     it('should sign a transaction hash with the current signer', async () => {
@@ -70,7 +70,41 @@ describe('Off-chain signatures', () => {
       const tx = await safeSdk.createTransaction({ safeTransactionData })
       const txHash = await safeSdk.getTransactionHash(tx)
       const signature = await safeSdk.signTransactionHash(txHash)
-      chai.expect(signature.staticPart().length).to.be.eq(132)
+      chai.expect(signature.staticPart(0).length).to.be.eq(132)
+    })
+
+    /**
+     * Setup:
+     *
+     * ```
+     * account1 (EOA)  --owner--> safe --owner--> parentSafe
+     * ```
+     *
+     * `parentSafe` wants to sign a transaction hash and calls signTypedData via Safe which needs account1 to sign the the transaction.
+     *
+     */
+    it('should use smart contract signatures for smart contract owners', async () => {
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+
+      const parentSafe = await getSafeWithOwners([safe.address])
+
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+
+      const safeTransactionData: SafeTransactionDataPartial = {
+        to: safe.address,
+        value: '0',
+        data: '0x'
+      }
+      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const txHash = await safeSdk.getTransactionHash(tx)
+      const signature = await safeSdk.signTransactionHash(txHash)
+      chai.expect(signature.staticPart(0).length).to.be.eq(132)
     })
   })
 

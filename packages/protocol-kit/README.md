@@ -640,7 +640,7 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const signature = await safeSdk.signTransactionHash(txHash)
 ```
 
-### signTypedData
+### signTransactionTypedData
 
 Signs a transaction according to the EIP-712 using the current signer account.
 
@@ -649,7 +649,7 @@ const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
 const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-const signature = await safeSdk.signTypedData(safeTransaction)
+const signature = await safeSdk.signTransactionTypedData(safeTransaction)
 ```
 
 ### signTransaction

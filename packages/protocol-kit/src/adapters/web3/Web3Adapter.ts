@@ -1,5 +1,8 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import {
+  generateTransactionTypedData,
+  validateEip3770Address
+} from '@safe-global/protocol-kit/utils'
 import {
   Eip3770Address,
   EthAdapter,
@@ -253,7 +256,7 @@ class Web3Adapter implements EthAdapter {
     if (!this.#signerAddress) {
       throw new Error('This method requires a signer')
     }
-    const typedData = generateTypedData(safeTransactionEIP712Args)
+    const typedData = generateTransactionTypedData(safeTransactionEIP712Args)
     let method = 'eth_signTypedData_v3'
     if (methodVersion === 'v4') {
       method = 'eth_signTypedData_v4'

@@ -1,5 +1,6 @@
 import { ContractTransaction } from '@ethersproject/contracts'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
+import { EthAdapter } from './ethereumLibs/EthAdapter'
 
 export type SafeVersion = '1.3.0' | '1.2.0' | '1.1.1' | '1.0.0'
 
@@ -91,7 +92,14 @@ export interface SafeTransactionEIP712Args {
   safeTransactionData: SafeTransactionData
 }
 
-export interface Eip712MessageTypes {
+export interface SafeMessageEIP712Args {
+  safeAddress: string
+  safeVersion: string
+  chainId: number
+  message: string | EIP712TypedData
+}
+
+export interface Eip712TransactionTypes {
   EIP712Domain: {
     type: string
     name: string
@@ -102,8 +110,8 @@ export interface Eip712MessageTypes {
   }[]
 }
 
-export interface GenerateTypedData {
-  types: Eip712MessageTypes
+export interface SafeTransactionTypedData {
+  types: Eip712TransactionTypes
   domain: {
     chainId?: number
     verifyingContract: string
@@ -121,6 +129,52 @@ export interface GenerateTypedData {
     refundReceiver: string
     nonce: number
   }
+}
+
+export interface Eip712MessageTypes {
+  EIP712Domain: {
+    type: string
+    name: string
+  }[]
+  SafeMessage: [
+    {
+      type: 'bytes'
+      name: 'message'
+    }
+  ]
+}
+
+export interface SafeMessageTypedData {
+  types: Eip712MessageTypes
+  domain: {
+    chainId?: number
+    verifyingContract: string
+  }
+  primaryType: 'SafeMessage'
+  message: {
+    message: string
+  }
+}
+// Types for arbitrary off-chain messages
+interface TypedDataDomain {
+  name?: string
+  version?: string
+  chainId?: unknown
+  verifyingContract?: string
+  salt?: ArrayLike<number> | string
+}
+interface TypedDataTypes {
+  name: string
+  type: string
+}
+type TypedMessageTypes = {
+  [key: string]: TypedDataTypes[]
+}
+
+export type EIP712TypedData = {
+  domain: TypedDataDomain
+  types: TypedMessageTypes
+  message: Record<string, unknown>
 }
 
 export type SafeMultisigConfirmationResponse = {

@@ -1,8 +1,6 @@
-# Safe Core SDK Monorepo
-
-[![Logo](https://raw.githubusercontent.com/safe-global/safe-core-sdk/main/assets/logo.png)](https://safe.global/)
-
 ![license](https://img.shields.io/github/license/safe-global/safe-core-sdk)
+
+![Safe_Logos_Core_SDK_Black](https://github.com/safe-global/safe-core-sdk/assets/6764315/b6f87103-540f-4d36-a108-56ee9eb4e919)
 
 Software developer tools that facilitate the interaction with the Safe [contracts](https://github.com/safe-global/safe-contracts) and [services](https://github.com/safe-global/safe-transaction-service).
 

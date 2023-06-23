@@ -21,8 +21,8 @@ Software development kit that facilitates the interaction with the [Safe contrac
 Install the package with yarn or npm:
 
 ```bash
-yarn install
-npm install
+yarn add @safe-global/protocol-kit
+npm install @safe-global/protocol-kit
 ```
 
 ## <a name="build">Build</a>
@@ -31,7 +31,7 @@ Build the package with yarn or npm:
 
 ```bash
 yarn build
-npm build
+npm run build
 ```
 
 ## <a name="getting-started">Getting Started</a>

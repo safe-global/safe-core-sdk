@@ -1,10 +1,7 @@
-import AccountAbstraction, {
-  MetaTransactionData,
-  MetaTransactionOptions,
-  OperationType
-} from '@safe-global/account-abstraction-kit-poc'
+import AccountAbstraction, { OperationType } from '@safe-global/account-abstraction-kit-poc'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
-import { BigNumber, ethers } from 'ethers'
+import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
+import { ethers } from 'ethers'
 import { AccountAbstractionConfig } from './../../packages/account-abstraction-kit/src/types/index'
 
 // Fund the 1Balance account that will sponsor the transaction and get the API key:
@@ -32,7 +29,7 @@ const txConfig = {
   DATA: '<DATA>',
   VALUE: '<VALUE>',
   // Options:
-  GAS_LIMIT: BigNumber.from('<GAS_LIMIT>')
+  GAS_LIMIT: '<GAS_LIMIT>'
 }
 
 async function main() {

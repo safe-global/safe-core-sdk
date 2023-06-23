@@ -4,11 +4,11 @@ import { ExternalProvider } from '@ethersproject/providers'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
+
 import { MagicConfig, MagicInitOptions, MagicEvent, MagicEventListener } from './types'
 
 /**
- * MagicConnectPack implements the SafeAuthClient interface for adapting the Magic service provider
- * This pack uses the Connect product from Magic
+ * MagicConnectPack adapts Magic Connect to be used with Safe Accounts
  * @class
  */
 export class MagicConnectPack extends AuthKitBasePack {
@@ -27,13 +27,13 @@ export class MagicConnectPack extends AuthKitBasePack {
   }
 
   /**
-   * Initialize the Web3Auth service provider
+   * Initialize the Magic SDK
    * @param options Magic options {@link https://magic.link/docs/connect/wallet-api-reference/javascript-client-sdk#magic()}
    * @throws Error if there was an error initializing Magic
    */
-  async init({ apiKey, network }: MagicInitOptions) {
+  async init({ apiKey, options }: MagicInitOptions) {
     try {
-      this.magicSdk = new Magic(apiKey, network)
+      this.magicSdk = new Magic(apiKey, options)
 
       this.#provider = (await this.magicSdk.wallet.getProvider()) as ExternalProvider
     } catch (e) {
@@ -47,7 +47,7 @@ export class MagicConnectPack extends AuthKitBasePack {
    */
   async signIn(): Promise<AuthKitSignInData> {
     if (!this.magicSdk) {
-      throw new Error('MagicPack is not initialized')
+      throw new Error('The Magic SDK is not initialized')
     }
 
     const isLoggedIn = await this.magicSdk.user.isLoggedIn()
@@ -78,7 +78,7 @@ export class MagicConnectPack extends AuthKitBasePack {
    */
   async signOut() {
     if (!this.magicSdk) {
-      throw new Error('MagicPack is not initialized')
+      throw new Error('The Magic SDK is not initialized')
     }
 
     this.#provider = null
@@ -87,12 +87,12 @@ export class MagicConnectPack extends AuthKitBasePack {
 
   /**
    * Get user information. Currently only email is supported
-   * This method shows a UI to the user asking for permissions to share personal data
+   * This method shows an UI to the user asking for permissions to share personal data
    * @returns The user info
    */
   async getUserInfo(): Promise<{ email?: string }> {
     if (!this.magicSdk) {
-      throw new Error('Web3AuthModalPack is not initialized')
+      throw new Error('The Magic SDK is not initialized')
     }
 
     const userInfo = await this.magicSdk.wallet.requestUserInfoWithUI({

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ethers } from 'ethers'
 import { SafeEventEmitterProvider, UserInfo } from '@web3auth/base'
 import { Box, Divider, Grid, Typography, Button } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
@@ -21,7 +22,7 @@ function MagicConnect() {
 
       await magicConnectPack.init({
         apiKey: import.meta.env.VITE_MAGIC_API_KEY || '',
-        network: 'goerli'
+        options: { network: 'goerli' }
       })
 
       setMagicConnectPack(magicConnectPack)
@@ -59,6 +60,23 @@ function MagicConnect() {
     setSafeAuthSignInResponse(null)
   }
 
+  const sendTransaction = async () => {
+    if (!magicConnectPack) return
+
+    const provider = new ethers.providers.Web3Provider(
+      magicConnectPack.getProvider() as ethers.providers.ExternalProvider
+    )
+
+    const signer = provider.getSigner()
+
+    const destination = signer.getAddress()
+
+    await signer.sendTransaction({
+      to: destination,
+      value: 0
+    })
+  }
+
   return (
     <Box p={4}>
       <Typography variant="h3" color="secondary" fontWeight={700}>
@@ -67,52 +85,57 @@ function MagicConnect() {
       <Divider sx={{ my: 3 }} />
       <Login onLogin={login} onLogout={logout} userInfo={userInfo} isLoggedIn={!!provider} />
       {safeAuthSignInResponse?.eoa && (
-        <Grid container>
-          <Grid item md={4} mt={4}>
-            <Typography variant="h3" color="secondary" fontWeight={700}>
-              Owner account
-            </Typography>
-            <Divider sx={{ my: 3 }} />
-            <EthHashInfo
-              address={safeAuthSignInResponse.eoa}
-              showCopyButton
-              showPrefix
-              prefix={getPrefix('0x5')}
-            />
-          </Grid>
-          <Grid item md={8} mt={4} pl={4}>
-            <>
+        <>
+          <Grid container>
+            <Grid item md={4} mt={4}>
               <Typography variant="h3" color="secondary" fontWeight={700}>
-                Available Safes
+                Owner account
               </Typography>
               <Divider sx={{ my: 3 }} />
-              {safeAuthSignInResponse?.safes?.length ? (
-                safeAuthSignInResponse?.safes?.map((safe, index) => (
-                  <Box sx={{ my: 3 }} key={index}>
-                    <EthHashInfo address={safe} showCopyButton shortAddress={false} />
+              <EthHashInfo
+                address={safeAuthSignInResponse.eoa}
+                showCopyButton
+                showPrefix
+                prefix={getPrefix('0x5')}
+              />
+            </Grid>
+            <Grid item md={8} mt={4} pl={4}>
+              <>
+                <Typography variant="h3" color="secondary" fontWeight={700}>
+                  Available Safes
+                </Typography>
+                <Divider sx={{ my: 3 }} />
+                {safeAuthSignInResponse?.safes?.length ? (
+                  safeAuthSignInResponse?.safes?.map((safe, index) => (
+                    <Box sx={{ my: 3 }} key={index}>
+                      <EthHashInfo address={safe} showCopyButton shortAddress={false} />
+                    </Box>
+                  ))
+                ) : (
+                  <Box display="inline-flex" alignItems="center">
+                    <Typography variant="body1" color="secondary" fontWeight={700}>
+                      No Available Safes
+                    </Typography>
+                    <Button
+                      color="primary"
+                      variant="text"
+                      href="https://app.safe.global/new-safe/create"
+                      target="_blank"
+                      sx={{
+                        ml: 2
+                      }}
+                    >
+                      Deploy new Safe
+                    </Button>
                   </Box>
-                ))
-              ) : (
-                <Box display="inline-flex" alignItems="center">
-                  <Typography variant="body1" color="secondary" fontWeight={700}>
-                    No Available Safes
-                  </Typography>
-                  <Button
-                    color="primary"
-                    variant="text"
-                    href="https://app.safe.global/new-safe/create"
-                    target="_blank"
-                    sx={{
-                      ml: 2
-                    }}
-                  >
-                    Deploy new Safe
-                  </Button>
-                </Box>
-              )}
-            </>
+                )}
+              </>
+            </Grid>
           </Grid>
-        </Grid>
+          <Button variant="contained" onClick={sendTransaction} sx={{ mt: 4 }}>
+            Send dummy transaction
+          </Button>
+        </>
       )}
     </Box>
   )
@@ -121,7 +144,6 @@ function MagicConnect() {
 const getPrefix = (chainId: string) => {
   switch (chainId) {
     case '0x1':
-      return 'eth'
     case '0x5':
       return 'gor'
     case '0x100':

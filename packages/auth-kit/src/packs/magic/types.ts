@@ -8,5 +8,5 @@ export type MagicConfig = {
 }
 export type MagicInitOptions = {
   apiKey: string
-  network?: string | MagicSDKAdditionalConfiguration<string, MagicSDKExtensionsOption<string>>
+  options?: MagicSDKAdditionalConfiguration<string, MagicSDKExtensionsOption<string>>
 }

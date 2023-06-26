@@ -14,6 +14,7 @@
     "@mui/material": "^5.11.7",
     "@safe-global/safe-react-components": "^2.0.1",
     "ethers": "^5.7.2",
+    "events": "^3.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0"

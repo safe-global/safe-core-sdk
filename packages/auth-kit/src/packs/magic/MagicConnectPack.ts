@@ -1,11 +1,19 @@
 import { Magic } from 'magic-sdk'
+import EventEmitter from 'events'
 import { ExternalProvider } from '@ethersproject/providers'
 
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 
-import { MagicConfig, MagicInitOptions, MagicEvent, MagicEventListener } from './types'
+import {
+  MagicConfig,
+  MagicInitOptions,
+  MagicEvent,
+  MagicEventListener,
+  MAGIC_EVENT_DISCONNECTED,
+  MAGIC_EVENT_CONNECTED
+} from './types'
 
 /**
  * MagicConnectPack adapts Magic Connect to be used with Safe Accounts
@@ -15,6 +23,7 @@ export class MagicConnectPack extends AuthKitBasePack {
   #provider: ExternalProvider | null
   #config: MagicConfig
   magicSdk?: Magic
+  #eventEmitter: EventEmitter
 
   /**
    * Instantiate the MagicConnectPack
@@ -24,6 +33,7 @@ export class MagicConnectPack extends AuthKitBasePack {
     super()
     this.#config = config
     this.#provider = null
+    this.#eventEmitter = new EventEmitter()
   }
 
   /**
@@ -66,6 +76,8 @@ export class MagicConnectPack extends AuthKitBasePack {
       safes
     }
 
+    this.#eventEmitter.emit(MAGIC_EVENT_CONNECTED, signInData)
+
     return signInData
   }
 
@@ -81,8 +93,10 @@ export class MagicConnectPack extends AuthKitBasePack {
       throw new Error('The Magic SDK is not initialized')
     }
 
-    this.#provider = null
     await this.magicSdk.wallet.disconnect()
+
+    this.#provider = null
+    this.#eventEmitter.emit(MAGIC_EVENT_DISCONNECTED)
   }
 
   /**
@@ -108,7 +122,7 @@ export class MagicConnectPack extends AuthKitBasePack {
    * @param handler The event handler
    */
   subscribe(event: MagicEvent, handler: MagicEventListener): void {
-    throw new Error('Method not implemented yet')
+    this.#eventEmitter.on(event, handler)
   }
 
   /**
@@ -117,6 +131,6 @@ export class MagicConnectPack extends AuthKitBasePack {
    * @param handler The event handler
    */
   unsubscribe(event: MagicEvent, handler: MagicEventListener): void {
-    throw new Error('Method not implemented yet')
+    this.#eventEmitter.off(event, handler)
   }
 }

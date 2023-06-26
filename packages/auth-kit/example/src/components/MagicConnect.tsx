@@ -4,7 +4,12 @@ import { SafeEventEmitterProvider, UserInfo } from '@web3auth/base'
 import { Box, Divider, Grid, Typography, Button } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 import Login from '../Login'
-import { AuthKitSignInData, MagicConnectPack } from '../../../src/index'
+import {
+  AuthKitSignInData,
+  MAGIC_EVENT_CONNECTED,
+  MAGIC_EVENT_DISCONNECTED,
+  MagicConnectPack
+} from '../../../src/index'
 
 function MagicConnect() {
   const [magicConnectPack, setMagicConnectPack] = useState<MagicConnectPack>()
@@ -23,6 +28,14 @@ function MagicConnect() {
       await magicConnectPack.init({
         apiKey: import.meta.env.VITE_MAGIC_API_KEY || '',
         options: { network: 'goerli' }
+      })
+
+      magicConnectPack.subscribe(MAGIC_EVENT_CONNECTED, (data) => {
+        console.log('CONNECTED: ', data)
+      })
+
+      magicConnectPack.subscribe(MAGIC_EVENT_DISCONNECTED, () => {
+        console.log('DISCONNECTED')
       })
 
       setMagicConnectPack(magicConnectPack)

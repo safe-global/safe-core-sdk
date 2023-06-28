@@ -153,9 +153,9 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 - The `isL1SafeMasterCopy` flag
 
-  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+  There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
+  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `Safe.sol` contract.
 
   ```js
   const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: true })
@@ -193,7 +193,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 - The `safeVersion` property
 
-  The `SafeFactory` constructor also accepts the `safeVersion` property to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
+  The `SafeFactory` constructor also accepts the `safeVersion` property to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0`, `1.3.0` or `1.4.1`. If not specified, the most recent contract version will be used by default.
 
   ```js
   const safeVersion = 'X.Y.Z'
@@ -305,9 +305,9 @@ const safeSdk = await Safe.create({ ethAdapter, predictedSafe })
 
 - The `isL1SafeMasterCopy` flag
 
-  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+  There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
+  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `Safe.sol` contract.
 
   ```js
   const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
@@ -368,9 +368,9 @@ const safeSdk = await safeSdk.connect({ ethAdapter, predictedSafe })
 
 - The `isL1SafeMasterCopy` flag
 
-  There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+  There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `GnosisSafe.sol` contract.
+  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `Safe.sol` contract.
 
   ```js
   const safeSdk = await Safe.connect({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })

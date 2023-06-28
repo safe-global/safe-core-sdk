@@ -68,7 +68,7 @@ Build the package with yarn or npm:
 
 ```bash
 yarn build
-npm build
+npm run build
 ```
 
 ## License

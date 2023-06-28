@@ -1,9 +1,9 @@
 import { Magic } from 'magic-sdk'
 import EventEmitter from 'events'
 import { ExternalProvider } from '@ethersproject/providers'
-
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
+
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 
 import {

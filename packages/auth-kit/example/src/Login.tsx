@@ -4,7 +4,7 @@ type AppBarProps = {
   isLoggedIn: boolean
   onLogin: () => void
   onLogout: () => void
-  userInfo?: any
+  userInfo?: { name?: string; email: string }
 }
 
 const Login = ({ isLoggedIn, onLogin, onLogout, userInfo }: AppBarProps) => {

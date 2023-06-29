@@ -4,56 +4,71 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 
-const gnosisSafeContracts = {
-  '1.3.0': { name: 'GnosisSafe_SV1_3_0' },
-  '1.2.0': { name: 'GnosisSafe_SV1_2_0' },
-  '1.1.1': { name: 'GnosisSafe_SV1_1_1' },
-  '1.0.0': { name: 'GnosisSafe_SV1_0_0' }
+type SafeVersions = {
+  '1.4.1': SafeVersion
+  '1.3.0': SafeVersion
+  '1.2.0': SafeVersion
+  '1.1.1': SafeVersion
+  '1.0.0': SafeVersion
 }
 
-const proxyFactoryContracts = {
-  '1.3.0': { name: 'ProxyFactory_SV1_3_0' },
-  '1.2.0': { name: 'ProxyFactory_SV1_2_0' },
-  '1.1.1': { name: 'ProxyFactory_SV1_1_1' },
-  '1.0.0': { name: 'ProxyFactory_SV1_0_0' }
+const safeContracts: SafeVersions = {
+  '1.4.1': { name: 'Safe_SV1_4_1' },
+  '1.3.0': { name: 'Safe_SV1_3_0' },
+  '1.2.0': { name: 'Safe_SV1_2_0' },
+  '1.1.1': { name: 'Safe_SV1_1_1' },
+  '1.0.0': { name: 'Safe_SV1_0_0' }
 }
 
-const multiSendContracts = {
+const proxyFactoryContracts: SafeVersions = {
+  '1.4.1': { name: 'SafeProxyFactory_SV1_4_1' },
+  '1.3.0': { name: 'SafeProxyFactory_SV1_3_0' },
+  '1.2.0': { name: 'SafeProxyFactory_SV1_2_0' },
+  '1.1.1': { name: 'SafeProxyFactory_SV1_1_1' },
+  '1.0.0': { name: 'SafeProxyFactory_SV1_0_0' }
+}
+
+const multiSendContracts: SafeVersions = {
+  '1.4.1': { name: 'MultiSend_SV1_4_1' },
   '1.3.0': { name: 'MultiSend_SV1_3_0' },
   '1.2.0': { name: 'MultiSend_SV1_2_0' },
   '1.1.1': { name: 'MultiSend_SV1_2_0' },
   '1.0.0': { name: 'MultiSend_SV1_2_0' }
 }
 
-const multiSendCallOnlyContracts = {
+const multiSendCallOnlyContracts: SafeVersions = {
+  '1.4.1': { name: 'MultiSendCallOnly_SV1_4_1' },
   '1.3.0': { name: 'MultiSendCallOnly_SV1_3_0' },
   '1.2.0': { name: 'MultiSendCallOnly_SV1_3_0' },
   '1.1.1': { name: 'MultiSendCallOnly_SV1_3_0' },
   '1.0.0': { name: 'MultiSendCallOnly_SV1_3_0' }
 }
 
-const compatibilityFallbackHandlerContracts = {
+const compatibilityFallbackHandlerContracts: SafeVersions = {
+  '1.4.1': { name: 'CompatibilityFallbackHandler_SV1_4_1' },
   '1.3.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
   '1.2.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
   '1.1.1': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
   '1.0.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' }
 }
 
-const signMessageLibContracts = {
+const signMessageLibContracts: SafeVersions = {
+  '1.4.1': { name: 'SignMessageLib_SV1_4_1' },
   '1.3.0': { name: 'SignMessageLib_SV1_3_0' },
   '1.2.0': { name: 'SignMessageLib_SV1_3_0' },
   '1.1.1': { name: 'SignMessageLib_SV1_3_0' },
   '1.0.0': { name: 'SignMessageLib_SV1_3_0' }
 }
 
-const createCallContracts = {
+const createCallContracts: SafeVersions = {
+  '1.4.1': { name: 'CreateCall_SV1_4_1' },
   '1.3.0': { name: 'CreateCall_SV1_3_0' },
   '1.2.0': { name: 'CreateCall_SV1_3_0' },
   '1.1.1': { name: 'CreateCall_SV1_3_0' },
   '1.0.0': { name: 'CreateCall_SV1_3_0' }
 }
 
-export const gnosisSafeDeployed = gnosisSafeContracts[safeVersionDeployed]
+export const safeDeployed = safeContracts[safeVersionDeployed]
 export const proxyFactoryDeployed = proxyFactoryContracts[safeVersionDeployed]
 export const multiSendDeployed = multiSendContracts[safeVersionDeployed]
 export const multiSendCallOnlyDeployed = multiSendCallOnlyContracts[safeVersionDeployed]
@@ -67,7 +82,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
   const { deployer } = await getNamedAccounts()
   const { deploy } = deployments
 
-  await deploy(gnosisSafeDeployed.name, {
+  await deploy(safeDeployed.name, {
     from: deployer,
     args: [],
     log: true,

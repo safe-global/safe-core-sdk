@@ -10,6 +10,6 @@ import { DailyLimitModule } from "@gnosis.pm/safe-contracts-v1.2.0/contracts/mod
 import { SocialRecoveryModule } from "@gnosis.pm/safe-contracts-v1.2.0/contracts/modules/SocialRecoveryModule.sol";
 import { ERC20Mintable } from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 
-contract ProxyFactory_SV1_2_0 is GnosisSafeProxyFactory {}
-contract GnosisSafe_SV1_2_0 is GnosisSafe {}
+contract SafeProxyFactory_SV1_2_0 is GnosisSafeProxyFactory {}
+contract Safe_SV1_2_0 is GnosisSafe {}
 contract MultiSend_SV1_2_0 is MultiSend {}

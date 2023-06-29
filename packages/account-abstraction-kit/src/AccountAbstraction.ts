@@ -3,36 +3,36 @@ import {
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
 import Safe, {
-  predictSafeAddress,
-  encodeMultiSendData,
   EthersAdapter,
+  PREDETERMINED_SALT_NONCE,
+  PredictedSafeProps,
+  SafeAccountConfig,
+  SafeDeploymentConfig,
+  encodeCreateProxyWithNonce,
+  encodeMultiSendData,
+  encodeSetupCallData,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract,
-  PredictedSafeProps,
-  PREDETERMINED_SALT_NONCE,
-  SafeDeploymentConfig,
-  encodeCreateProxyWithNonce,
-  SafeAccountConfig,
-  encodeSetupCallData
+  predictSafeAddress
 } from '@safe-global/protocol-kit'
 import { RelayPack } from '@safe-global/relay-kit'
 import {
-  GnosisSafeProxyFactoryContract,
   MetaTransactionData,
   MetaTransactionOptions,
   RelayTransaction,
+  SafeProxyFactoryContract,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 
-const safeVersion: SafeVersion = '1.3.0'
+const safeVersion: SafeVersion = '1.4.1'
 
 class AccountAbstraction {
   #ethAdapter: EthersAdapter
   #signer: ethers.Signer
   #safeSdk?: Safe
-  #safeProxyFactoryContract?: GnosisSafeProxyFactoryContract
+  #safeProxyFactoryContract?: SafeProxyFactoryContract
   #relayPack?: RelayPack
 
   constructor(signer: ethers.Signer) {

@@ -1,10 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types/contracts/CompatibilityFallbackHandlerContract'
 import { CreateCallContract } from '@safe-global/safe-core-sdk-types/contracts/CreateCallContract'
-import { GnosisSafeContract } from '@safe-global/safe-core-sdk-types/contracts/GnosisSafeContract'
-import { GnosisSafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types/contracts/GnosisSafeProxyFactoryContract'
 import { MultiSendCallOnlyContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendCallOnlyContract'
 import { MultiSendContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendContract'
+import { SafeContract } from '@safe-global/safe-core-sdk-types/contracts/SafeContract'
+import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types/contracts/SafeProxyFactoryContract'
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types/contracts/SignMessageLibContract'
 import {
   Eip3770Address,
@@ -44,7 +44,7 @@ export interface EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<GnosisSafeContract>
+  }: GetContractProps): Promise<SafeContract>
   getMultiSendContract({
     safeVersion,
     singletonDeployment,
@@ -68,7 +68,7 @@ export interface EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<GnosisSafeProxyFactoryContract>
+  }: GetContractProps): Promise<SafeProxyFactoryContract>
   getSignMessageLibContract({
     safeVersion,
     singletonDeployment,

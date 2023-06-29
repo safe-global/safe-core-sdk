@@ -6,8 +6,8 @@ import Safe, {
   standardizeSafeTransactionData
 } from '@safe-global/protocol-kit/index'
 import {
-  GnosisSafeContract,
   MetaTransactionData,
+  SafeContract,
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
@@ -74,7 +74,7 @@ describe('Transactions creation', () => {
           data: '0x'
         }
         const safeTxData = await standardizeSafeTransactionData({
-          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
+          safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
           tx: txDataPartial
         })
@@ -101,7 +101,7 @@ describe('Transactions creation', () => {
           gasPrice: BASE_OPTIONS.gasPrice
         }
         const safeTxData = await standardizeSafeTransactionData({
-          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
+          safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
           tx: txDataPartial
         })
@@ -129,7 +129,7 @@ describe('Transactions creation', () => {
           safeTxGas
         }
         const safeTxData = await standardizeSafeTransactionData({
-          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
+          safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
           tx: txDataPartial
         })
@@ -155,7 +155,7 @@ describe('Transactions creation', () => {
           data: '0x'
         }
         const safeTxData = await standardizeSafeTransactionData({
-          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
+          safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
           tx: txDataPartial
         })
@@ -183,7 +183,7 @@ describe('Transactions creation', () => {
           safeTxGas
         }
         const safeTxData = await standardizeSafeTransactionData({
-          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
+          safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
           tx: txDataPartial
         })
@@ -211,7 +211,7 @@ describe('Transactions creation', () => {
           safeTxGas
         }
         const safeTxData = await standardizeSafeTransactionData({
-          safeContract: safeSdk.getContractManager().safeContract as GnosisSafeContract,
+          safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
           tx: txDataPartial
         })

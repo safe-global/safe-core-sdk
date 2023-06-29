@@ -1,6 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { Provider } from '@ethersproject/providers'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { Gnosis_safe__factory as SafeMasterCopy_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/factories/Gnosis_safe__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/factories/Proxy_factory__factory'
 import { Gnosis_safe__factory as SafeMasterCopy_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Gnosis_safe__factory'
@@ -8,24 +7,25 @@ import { Multi_send__factory as MultiSend_V1_1_1 } from '@safe-global/protocol-k
 import { Proxy_factory__factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Proxy_factory__factory'
 import { Gnosis_safe__factory as SafeMasterCopy_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0/factories/Gnosis_safe__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Compatibility_fallback_handler__factory'
+import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Create_call__factory'
 import { Gnosis_safe__factory as SafeMasterCopy_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Gnosis_safe__factory'
-import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send_call_only__factory'
 import { Multi_send__factory as MultiSend_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send__factory'
+import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send_call_only__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Proxy_factory__factory'
 import { Sign_message_lib__factory as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Sign_message_lib__factory'
-import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Create_call__factory'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
 import CreateCallContract_V1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Ethers'
-import GnosisSafeContract_V1_0_0_Ethers from './GnosisSafe/v1.0.0/GnosisSafeContract_V1_0_0_Ethers'
-import GnosisSafeContract_V1_1_1_Ethers from './GnosisSafe/v1.1.1/GnosisSafeContract_V1_1_1_Ethers'
-import GnosisSafeContract_V1_2_0_Ethers from './GnosisSafe/v1.2.0/GnosisSafeContract_V1_2_0_Ethers'
-import GnosisSafeContract_V1_3_0_Ethers from './GnosisSafe/v1.3.0/GnosisSafeContract_V1_3_0_Ethers'
-import GnosisSafeProxyFactoryContract_V1_0_0_Ethers from './GnosisSafeProxyFactory/v1.0.0/GnosisSafeProxyFactoryContract_V1_0_0_Ethers'
-import GnosisSafeProxyFactoryContract_V1_1_1_Ethers from './GnosisSafeProxyFactory/v1.1.1/GnosisSafeProxyFactoryContract_V1_1_1_Ethers'
-import GnosisSafeProxyFactoryContract_V1_3_0_Ethers from './GnosisSafeProxyFactory/v1.3.0/GnosisSafeProxyFactoryContract_V1_3_0_Ethers'
 import MultiSendContract_V1_1_1_Ethers from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
 import MultiSendContract_V1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
 import MultiSendCallOnlyContract_V1_3_0_Ethers from './MultiSendCallOnly/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Ethers'
+import SafeContract_V1_0_0_Ethers from './Safe/v1.0.0/SafeContract_V1_0_0_Ethers'
+import SafeContract_V1_1_1_Ethers from './Safe/v1.1.1/SafeContract_V1_1_1_Ethers'
+import SafeContract_V1_2_0_Ethers from './Safe/v1.2.0/SafeContract_V1_2_0_Ethers'
+import SafeContract_V1_3_0_Ethers from './Safe/v1.3.0/SafeContract_V1_3_0_Ethers'
+import SafeProxyFactoryContract_V1_0_0_Ethers from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_V1_0_0_Ethers'
+import SafeProxyFactoryContract_V1_1_1_Ethers from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_V1_1_1_Ethers'
+import SafeProxyFactoryContract_V1_3_0_Ethers from './SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_V1_3_0_Ethers'
 import SignMessageLibContract_V1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Ethers'
 
 export function getSafeContractInstance(
@@ -33,24 +33,24 @@ export function getSafeContractInstance(
   contractAddress: string,
   signerOrProvider: Signer | Provider
 ):
-  | GnosisSafeContract_V1_3_0_Ethers
-  | GnosisSafeContract_V1_2_0_Ethers
-  | GnosisSafeContract_V1_1_1_Ethers
-  | GnosisSafeContract_V1_0_0_Ethers {
+  | SafeContract_V1_3_0_Ethers
+  | SafeContract_V1_2_0_Ethers
+  | SafeContract_V1_1_1_Ethers
+  | SafeContract_V1_0_0_Ethers {
   let safeContract
   switch (safeVersion) {
     case '1.3.0':
       safeContract = SafeMasterCopy_V1_3_0.connect(contractAddress, signerOrProvider)
-      return new GnosisSafeContract_V1_3_0_Ethers(safeContract)
+      return new SafeContract_V1_3_0_Ethers(safeContract)
     case '1.2.0':
       safeContract = SafeMasterCopy_V1_2_0.connect(contractAddress, signerOrProvider)
-      return new GnosisSafeContract_V1_2_0_Ethers(safeContract)
+      return new SafeContract_V1_2_0_Ethers(safeContract)
     case '1.1.1':
       safeContract = SafeMasterCopy_V1_1_1.connect(contractAddress, signerOrProvider)
-      return new GnosisSafeContract_V1_1_1_Ethers(safeContract)
+      return new SafeContract_V1_1_1_Ethers(safeContract)
     case '1.0.0':
       safeContract = SafeMasterCopy_V1_0_0.connect(contractAddress, signerOrProvider)
-      return new GnosisSafeContract_V1_0_0_Ethers(safeContract)
+      return new SafeContract_V1_0_0_Ethers(safeContract)
     default:
       throw new Error('Invalid Safe version')
   }
@@ -122,30 +122,21 @@ export function getSafeProxyFactoryContractInstance(
   contractAddress: string,
   signerOrProvider: Signer | Provider
 ):
-  | GnosisSafeProxyFactoryContract_V1_3_0_Ethers
-  | GnosisSafeProxyFactoryContract_V1_1_1_Ethers
-  | GnosisSafeProxyFactoryContract_V1_0_0_Ethers {
-  let gnosisSafeProxyFactoryContract
+  | SafeProxyFactoryContract_V1_3_0_Ethers
+  | SafeProxyFactoryContract_V1_1_1_Ethers
+  | SafeProxyFactoryContract_V1_0_0_Ethers {
+  let safeProxyFactoryContract
   switch (safeVersion) {
     case '1.3.0':
-      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_3_0.connect(
-        contractAddress,
-        signerOrProvider
-      )
-      return new GnosisSafeProxyFactoryContract_V1_3_0_Ethers(gnosisSafeProxyFactoryContract)
+      safeProxyFactoryContract = SafeProxyFactory_V1_3_0.connect(contractAddress, signerOrProvider)
+      return new SafeProxyFactoryContract_V1_3_0_Ethers(safeProxyFactoryContract)
     case '1.2.0':
     case '1.1.1':
-      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_1_1.connect(
-        contractAddress,
-        signerOrProvider
-      )
-      return new GnosisSafeProxyFactoryContract_V1_1_1_Ethers(gnosisSafeProxyFactoryContract)
+      safeProxyFactoryContract = SafeProxyFactory_V1_1_1.connect(contractAddress, signerOrProvider)
+      return new SafeProxyFactoryContract_V1_1_1_Ethers(safeProxyFactoryContract)
     case '1.0.0':
-      gnosisSafeProxyFactoryContract = SafeProxyFactory_V1_0_0.connect(
-        contractAddress,
-        signerOrProvider
-      )
-      return new GnosisSafeProxyFactoryContract_V1_0_0_Ethers(gnosisSafeProxyFactoryContract)
+      safeProxyFactoryContract = SafeProxyFactory_V1_0_0.connect(contractAddress, signerOrProvider)
+      return new SafeProxyFactoryContract_V1_0_0_Ethers(safeProxyFactoryContract)
     default:
       throw new Error('Invalid Safe version')
   }

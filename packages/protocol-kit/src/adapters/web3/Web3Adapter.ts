@@ -16,21 +16,21 @@ import { AbiItem } from 'web3-utils'
 // Migration guide https://docs.web3js.org/docs/guides/web3_migration_guide#types
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
+import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
+import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
+import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
+import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
+import SafeProxyFactoryWeb3Contract from './contracts/SafeProxyFactory/SafeProxyFactoryWeb3Contract'
+import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
-  getGnosisSafeProxyFactoryContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance,
+  getSafeProxyFactoryContractInstance,
   getSignMessageLibContractInstance
 } from './contracts/contractInstancesWeb3'
-import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
-import GnosisSafeContractWeb3 from './contracts/GnosisSafe/GnosisSafeContractWeb3'
-import GnosisSafeProxyFactoryWeb3Contract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryWeb3Contract'
-import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
-import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
-import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -88,7 +88,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<GnosisSafeContractWeb3> {
+  }: GetContractProps): Promise<SafeContractWeb3> {
     const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
@@ -106,7 +106,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<GnosisSafeProxyFactoryWeb3Contract> {
+  }: GetContractProps): Promise<SafeProxyFactoryWeb3Contract> {
     const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
@@ -116,7 +116,7 @@ class Web3Adapter implements EthAdapter {
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
-    return getGnosisSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+    return getSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
   async getMultiSendContract({

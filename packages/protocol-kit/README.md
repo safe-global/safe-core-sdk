@@ -153,7 +153,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 - The `isL1SafeMasterCopy` flag
 
-  There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
+  There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
   By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `Safe.sol` contract.
 
@@ -202,7 +202,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 ### deploySafe
 
-Deploys a new Safe and returns an instance of the Protocol Kit connected to the deployed Safe. The address of the Master Copy, Safe contract version and the contract (`GnosisSafe.sol` or `GnosisSafeL2.sol`) of the deployed Safe will depend on the initialization of the `safeFactory` instance.
+Deploys a new Safe and returns an instance of the Protocol Kit connected to the deployed Safe. The address of the Master Copy, Safe contract version and the contract (`Safe.sol` or `SafeL2.sol`) of the deployed Safe will depend on the initialization of the `safeFactory` instance.
 
 ```js
 const safeAccountConfig: SafeAccountConfig = {

@@ -13,8 +13,8 @@ import { DefaultCallbackHandler } from "@gnosis.pm/safe-contracts-v1.3.0/contrac
 // Testing contracts
 import { DebugTransactionGuard } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/examples/guards/DebugTransactionGuard.sol";
 
-contract ProxyFactory_SV1_3_0 is GnosisSafeProxyFactory {}
-contract GnosisSafe_SV1_3_0 is GnosisSafe {}
+contract SafeProxyFactory_SV1_3_0 is GnosisSafeProxyFactory {}
+contract Safe_SV1_3_0 is GnosisSafe {}
 contract CompatibilityFallbackHandler_SV1_3_0 is CompatibilityFallbackHandler {}
 contract MultiSend_SV1_3_0 is MultiSend {}
 contract MultiSendCallOnly_SV1_3_0 is MultiSendCallOnly {}

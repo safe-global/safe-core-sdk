@@ -3,15 +3,16 @@ import {
   CompatibilityFallbackHandlerContract,
   CreateCallContract,
   EthAdapter,
-  GnosisSafeContract,
-  GnosisSafeProxyFactoryContract,
   MultiSendCallOnlyContract,
   MultiSendContract,
+  SafeContract,
+  SafeProxyFactoryContract,
   SafeVersion,
   SignMessageLibContract
 } from '@safe-global/safe-core-sdk-types'
 import {
   DeploymentFilter,
+  SingletonDeployment,
   getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
   getMultiSendCallOnlyDeployment,
@@ -19,8 +20,7 @@ import {
   getProxyFactoryDeployment,
   getSafeL2SingletonDeployment,
   getSafeSingletonDeployment,
-  getSignMessageLibDeployment,
-  SingletonDeployment
+  getSignMessageLibDeployment
 } from '@safe-global/safe-deployments'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
@@ -106,27 +106,27 @@ export async function getSafeContract({
   customSafeAddress,
   isL1SafeMasterCopy,
   customContracts
-}: GetSafeContractInstanceProps): Promise<GnosisSafeContract> {
+}: GetSafeContractInstanceProps): Promise<SafeContract> {
   const chainId = await ethAdapter.getChainId()
   const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeMasterCopy)
-  const gnosisSafeContract = await ethAdapter.getSafeContract({
+  const safeContract = await ethAdapter.getSafeContract({
     safeVersion,
     singletonDeployment,
     customContractAddress: customSafeAddress ?? customContracts?.safeMasterCopyAddress,
     customContractAbi: customContracts?.safeMasterCopyAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(gnosisSafeContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(safeContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('SafeProxy contract is not deployed on the current network')
   }
-  return gnosisSafeContract
+  return safeContract
 }
 
 export async function getProxyFactoryContract({
   ethAdapter,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<GnosisSafeProxyFactoryContract> {
+}: GetContractInstanceProps): Promise<SafeProxyFactoryContract> {
   const chainId = await ethAdapter.getChainId()
   const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
   const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({

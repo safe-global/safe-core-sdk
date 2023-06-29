@@ -42,13 +42,9 @@ jobs:
       - name: Auth Kit coverage
         uses: romeovs/lcov-reporter-action@v0.2.16
         with:
-          title: Auth Kit coverage
-          delete-old-comments: true
           lcov-file: ./packages/auth-kit/coverage/lcov.info
 
       - name: OnRamp Kit coverage
         uses: romeovs/lcov-reporter-action@v0.2.16
         with:
-          title: OnRamp Kit coverage
-          delete-old-comments: true
           lcov-file: ./packages/onramp-kit/coverage/lcov.info

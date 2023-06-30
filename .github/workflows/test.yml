@@ -43,19 +43,19 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: ./packages/auth-kit
-          file: ./packages/auth-kit/coverage/lcov.info
+          base-path: packages/auth-kit
+          file: packages/auth-kit/coverage/lcov.info
 
       - name: OnRamp Kit coverage
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: ./packages/onramp-kit
-          file: ./packages/onramp-kit/coverage/lcov.info
+          base-path: packages/onramp-kit
+          file: packages/onramp-kit/coverage/lcov.info
 
       - name: Relay Kit coverage
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: ./packages/relay-kit
-          file: ./packages/relay-kit/coverage/lcov.info
+          base-path: packages/relay-kit
+          file: packages/relay-kit/coverage/lcov.info

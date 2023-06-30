@@ -42,6 +42,7 @@ jobs:
       - name: Auth Kit coverage
         uses: romeovs/lcov-reporter-action@v0.2.16
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           lcov-file: ./packages/auth-kit/coverage/lcov.info
 
       - name: OnRamp Kit coverage

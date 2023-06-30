@@ -39,8 +39,8 @@ describe('getIncomingTransactions', () => {
   it('should return the list of incoming transactions', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with incoming transactions
     const transferListResponse = await safeApiKit.getIncomingTransactions(safeAddress)
-    chai.expect(transferListResponse.count).to.be.equal(4)
-    chai.expect(transferListResponse.results.length).to.be.equal(4)
+    chai.expect(transferListResponse.count).to.be.equal(5)
+    chai.expect(transferListResponse.results.length).to.be.equal(5)
     transferListResponse.results.map((transaction) => {
       chai.expect(transaction.to).to.be.equal(safeAddress)
     })
@@ -50,8 +50,8 @@ describe('getIncomingTransactions', () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with incoming transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transferListResponse = await safeApiKit.getIncomingTransactions(eip3770SafeAddress)
-    chai.expect(transferListResponse.count).to.be.equal(4)
-    chai.expect(transferListResponse.results.length).to.be.equal(4)
+    chai.expect(transferListResponse.count).to.be.equal(5)
+    chai.expect(transferListResponse.results.length).to.be.equal(5)
     transferListResponse.results.map((transaction) => {
       chai.expect(transaction.to).to.be.equal(safeAddress)
     })

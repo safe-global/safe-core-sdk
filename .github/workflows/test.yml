@@ -40,7 +40,7 @@ jobs:
         run: yarn test
 
       - name: Coverage
-        uses: ScaCap/code-coverage-assistant@v1
+        uses: ScaCap/code-coverage-assistant@v1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           monorepo-base-path: './packages'

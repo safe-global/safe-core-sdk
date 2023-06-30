@@ -12,7 +12,7 @@
     "Relay"
   ],
   "scripts": {
-    "test": "jest src",
+    "test": "jest src --coverage",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist .nyc_output cache",

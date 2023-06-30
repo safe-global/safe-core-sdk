@@ -10,7 +10,8 @@ const config = {
     '^@safe-global/protocol-kit/typechain/(.*)$': '<rootDir>/../protocol-kit/typechain/$1',
     '^@safe-global/protocol-kit/(.*)$': '<rootDir>/../protocol-kit/src/$1',
     '^@safe-global/onramp-kit/(.*)$': '<rootDir>/src/$1'
-  }
+  },
+  coverageReporters: ['html', ['lcovonly', { projectRoot: '../../' }], 'text-summary']
 }
 
 module.exports = config

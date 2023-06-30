@@ -43,16 +43,16 @@ jobs:
         uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/auth-kit
+          base-path: ./packages/auth-kit
 
       - name: OnRamp Kit coverage
         uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/onramp-kit
+          base-path: ./packages/onramp-kit
 
       - name: Relay Kit coverage
         uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/relay-kit
+          base-path: ./packages/relay-kit

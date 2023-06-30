@@ -39,8 +39,20 @@ jobs:
       - name: Test
         run: yarn test
 
-      - name: Coverage
-        uses: ScaCap/code-coverage-assistant@v1.1
+      - name: Auth Kit coverage
+        uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          monorepo-base-path: './packages'
+          base-path: packages/auth-kit
+
+      - name: OnRamp Kit coverage
+        uses: coverallsapp/github-action@1.1.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: packages/onramp-kit
+
+      - name: Relay Kit coverage
+        uses: coverallsapp/github-action@1.1.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: packages/relay-kit

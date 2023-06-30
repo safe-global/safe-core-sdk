@@ -39,21 +39,23 @@ jobs:
       - name: Test
         run: yarn test
 
-      - name: Coverage
-        uses: coverallsapp/github-action@1.1.3
+      - name: Auth Kit coverage
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: ./packages/auth-kit
+          path-to-lcov: ./packages/auth-kit/coverage/lcov.info
 
-      # - name: OnRamp Kit coverage
-      #   uses: coverallsapp/github-action@1.1.3
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     base-path: ./packages/onramp-kit
-      #     path-to-lcov: coverage/lcov.info
+      - name: OnRamp Kit coverage
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: ./packages/onramp-kit
+          path-to-lcov: ./packages/onramp-kit/coverage/lcov.info
 
-      # - name: Relay Kit coverage
-      #   uses: coverallsapp/github-action@1.1.3
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     base-path: ./packages/relay-kit
-      #     path-to-lcov: coverage/lcov.info
+      - name: Relay Kit coverage
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: ./packages/relay-kit
+          path-to-lcov: ./packages/relay-kit/coverage/lcov.info

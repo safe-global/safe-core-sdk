@@ -59,3 +59,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base-path: packages/relay-kit
           file: packages/relay-kit/coverage/lcov.info
+
+      - name: Api Kit coverage
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: packages/api-kit
+          file: packages/api-kit/coverage/lcov.info

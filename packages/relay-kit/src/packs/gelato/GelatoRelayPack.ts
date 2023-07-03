@@ -7,7 +7,11 @@ import {
   SponsoredCallRequest,
   TransactionStatusResponse
 } from '@gelatonetwork/relay-sdk'
-import { estimateTxBaseGas } from '@safe-global/protocol-kit'
+import Safe, {
+  estimateTxBaseGas,
+  estimateSafeTxGas,
+  estimateSafeDeploymentGas
+} from '@safe-global/protocol-kit'
 import {
   GELATO_FEE_COLLECTOR,
   GELATO_NATIVE_TOKEN_ADDRESS,
@@ -52,14 +56,21 @@ export class GelatoRelayPack implements RelayPack {
     return this.#gelatoRelay.getTaskStatus(taskId)
   }
 
+  /**
+   * Creates a Safe transaction designed to be executed using the Gelato Relayer.
+   *
+   * @param {CreateTransactionProps} createTransactionProps - Properties required to create the transaction.
+   * @returns {Promise<SafeTransaction>} Returns a Promise that resolves with a SafeTransaction object.
+   */
   async createRelayedTransaction({
     safe,
     transactions,
     onlyCalls = false,
     options = {}
   }: CreateTransactionProps): Promise<SafeTransaction> {
-    const { gasLimit, gasToken, isSponsored } = options
+    const { gasLimit, isSponsored = false } = options
     const nonce = await safe.getNonce()
+    const chainId = await safe.getChainId()
 
     if (isSponsored) {
       const sponsoredTransaction = await safe.createTransaction({
@@ -73,42 +84,77 @@ export class GelatoRelayPack implements RelayPack {
       return sponsoredTransaction
     }
 
-    let estimateGas = gasLimit
-    if (!estimateGas) {
-      const estimateGasTx = await safe.createTransaction({
+    const gasPrice = '1'
+    const gasToken = options.gasToken ?? ZERO_ADDRESS
+    const refundReceiver = this.getFeeCollector()
+
+    // if a custom gasLimit is provided, we do not need to estimate the gas cost
+    if (gasLimit) {
+      const baseGas = await this.getEstimateFee(chainId, gasLimit, gasToken)
+
+      const syncTransaction = await safe.createTransaction({
         safeTransactionData: transactions,
-        onlyCalls,
         options: {
-          gasPrice: '1',
-          gasToken: gasToken ?? ZERO_ADDRESS,
-          refundReceiver: this.getFeeCollector(),
+          baseGas,
+          gasPrice,
+          gasToken,
+          refundReceiver,
           nonce
         }
       })
 
-      const baseGas = await estimateTxBaseGas({
-        safe,
-        safeTransactionData: estimateGasTx.data
-      })
-
-      // https://docs.gelato.network/developer-services/relay/quick-start/optional-parameters#optional-parameters
-      const GELATO_GAS_EXECUTION_OVERHEAD = 150_000
-      estimateGas = Math.ceil(
-        baseGas * 1.2 + GELATO_GAS_EXECUTION_OVERHEAD + Number(estimateGasTx.data.safeTxGas) * 1.2
-      ).toString()
+      return syncTransaction
     }
 
-    const chainId = await safe.getChainId()
-    const estimation = await this.getEstimateFee(chainId, estimateGas, gasToken)
+    // if gasLimit is not provided, we need to estimate the gas cost
 
-    const syncTransaction = await safe.createTransaction({
+    // we create a transaction to estimate the safeTxGas first
+    const transactionToEstimateSafeTxGas = await safe.createTransaction({
       safeTransactionData: transactions,
       onlyCalls,
       options: {
-        baseGas: estimation,
-        gasPrice: '1',
-        gasToken: gasToken ?? ZERO_ADDRESS,
-        refundReceiver: this.getFeeCollector(),
+        nonce
+      }
+    })
+
+    const safeTxGas = await estimateSafeTxGas(safe, transactionToEstimateSafeTxGas)
+
+    // we create a transaction to estimate the baseGas including the safeTxGas estimation
+    const transactionToEstimateBaseGas = await safe.createTransaction({
+      safeTransactionData: transactions,
+      options: {
+        gasPrice,
+        safeTxGas, // we include our safeTxGas estimation here
+        gasToken,
+        refundReceiver,
+        nonce
+      }
+    })
+
+    const estimatedBaseGas = await estimateTxBaseGas(safe, transactionToEstimateBaseGas)
+
+    const safeDeploymentGasCost = await estimateSafeDeploymentGas(safe)
+
+    // see: https://docs.gelato.network/developer-services/relay/quick-start/optional-parameters#optional-parameters
+    const GELATO_GAS_EXECUTION_OVERHEAD = 150_000
+
+    const totalGas =
+      Number(estimatedBaseGas) + // baseGas
+      Number(safeTxGas) + // safeTxGas
+      Number(safeDeploymentGasCost) + // Safe deploymet gas cost if it is required
+      GELATO_GAS_EXECUTION_OVERHEAD // Gelato overhead
+
+    // the baseGas value is the payment to Gelato
+    const baseGas = await this.getEstimateFee(chainId, String(totalGas), gasToken)
+
+    const syncTransaction = await safe.createTransaction({
+      safeTransactionData: transactions,
+      options: {
+        baseGas, // payment to Gelato
+        gasPrice,
+        safeTxGas,
+        gasToken,
+        refundReceiver,
         nonce
       }
     })
@@ -165,5 +211,44 @@ export class GelatoRelayPack implements RelayPack {
       ? this.sendSponsorTransaction(target, encodedTransaction, chainId)
       : this.sendSyncTransaction(target, encodedTransaction, chainId, options)
     return response
+  }
+
+  /**
+   * Sends the Safe transaction to the Gelato Relayer for execution.
+   * If the Safe is not deployed, it creates a batch of transactions including the Safe deployment transaction.
+   *
+   * @param {SafeTransaction} safeTransaction - The Safe transaction to be executed.
+   * @param {Safe} safe - The Safe object related to the transaction.
+   * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
+   */
+  async executeRelayTransaction(
+    safeTransaction: SafeTransaction,
+    safe: Safe
+  ): Promise<RelayResponse> {
+    const isSafeDeployed = await safe.isSafeDeployed()
+    const chainId = await safe.getChainId()
+    const safeAddress = await safe.getAddress()
+    const safeTransactionEncodedData = await safe.getEncodedTransaction(safeTransaction)
+
+    if (isSafeDeployed) {
+      const relayTransaction: RelayTransaction = {
+        target: safeAddress,
+        encodedTransaction: safeTransactionEncodedData,
+        chainId
+      }
+
+      return this.relayTransaction(relayTransaction)
+    }
+
+    // if the Safe is not deployed we create a batch with the Safe deployment transaction and the provided Safe transaction
+    const safeDeploymentBatch = await safe.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
+
+    const relayTransaction: RelayTransaction = {
+      target: safeDeploymentBatch.to, // multiSend Contract address
+      encodedTransaction: safeDeploymentBatch.data,
+      chainId
+    }
+
+    return this.relayTransaction(relayTransaction)
   }
 }

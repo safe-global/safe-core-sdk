@@ -84,8 +84,8 @@
   },
   "dependencies": {
     "@ethersproject/solidity": "^5.7.0",
-    "@safe-global/safe-core-sdk-types": "^1.9.1",
-    "@safe-global/safe-core-sdk-utils": "^1.7.3",
+    "@safe-global/safe-core-sdk-types": "^1.9.2",
+    "@safe-global/safe-core-sdk-utils": "^1.7.4",
     "@safe-global/safe-deployments": "^1.25.0",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.8",

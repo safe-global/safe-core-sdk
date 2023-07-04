@@ -33,8 +33,7 @@
       "@safe-global/protocol-kit/typechain/*": ["./packages/protocol-kit/typechain/*"],
       "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"],
       "@safe-global/relay-kit/*": ["./packages/relay-kit/src/*"],
-      "@safe-global/safe-core-sdk-types/*": ["./packages/safe-core-sdk-types/src/*"],
-      "@safe-global/safe-ethers-adapters/*": ["./packages/safe-ethers-adapters/src/*"]
+      "@safe-global/safe-core-sdk-types/*": ["./packages/safe-core-sdk-types/src/*"]
     }
   },
   "exclude": ["**/dist", "**/node_modules"]

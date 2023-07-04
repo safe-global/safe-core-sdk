@@ -94,6 +94,7 @@ export class GelatoRelayPack implements RelayPack {
 
       const syncTransaction = await safe.createTransaction({
         safeTransactionData: transactions,
+        onlyCalls,
         options: {
           baseGas,
           gasPrice,
@@ -122,6 +123,7 @@ export class GelatoRelayPack implements RelayPack {
     // we create a transaction to estimate the baseGas including the safeTxGas estimation
     const transactionToEstimateBaseGas = await safe.createTransaction({
       safeTransactionData: transactions,
+      onlyCalls,
       options: {
         gasPrice,
         safeTxGas, // we include our safeTxGas estimation here
@@ -142,13 +144,14 @@ export class GelatoRelayPack implements RelayPack {
       Number(estimatedBaseGas) + // baseGas
       Number(safeTxGas) + // safeTxGas
       Number(safeDeploymentGasCost) + // Safe deploymet gas cost if it is required
-      GELATO_GAS_EXECUTION_OVERHEAD // Gelato overhead
+      GELATO_GAS_EXECUTION_OVERHEAD // Gelato execution overhead
 
     // the baseGas value is the payment to Gelato
     const baseGas = await this.getEstimateFee(chainId, String(totalGas), gasToken)
 
     const syncTransaction = await safe.createTransaction({
       safeTransactionData: transactions,
+      onlyCalls,
       options: {
         baseGas, // payment to Gelato
         gasPrice,

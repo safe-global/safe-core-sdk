@@ -10,6 +10,7 @@ Software development kit that facilitates the interaction with the [Safe contrac
 
 - [Installation](#installation)
 - [Build](#build)
+- [Tests](#tests)
 - [Getting Started](#getting-started)
 - [Safe Factory API Reference](#factory-api)
 - [Safe Core SDK API Reference](#sdk-api)
@@ -32,6 +33,17 @@ Build the package with yarn or npm:
 ```bash
 yarn build
 npm run build
+```
+
+## <a name="tests">Tests</a>
+
+Create a `.env` file with environment variables. You can use the `.env.example` file as a reference.
+
+Test the package with yarn or npm:
+
+```bash
+yarn test
+npm run test
 ```
 
 ## <a name="getting-started">Getting Started</a>

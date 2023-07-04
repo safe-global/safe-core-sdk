@@ -10,6 +10,7 @@ Software development kit that facilitates the interaction with the [Safe Transac
 
 - [Installation](#installation)
 - [Build](#build)
+- [Tests](#tests)
 - [Initialization](#initialization)
 - [API Reference](#api-reference)
 - [License](#license)
@@ -30,7 +31,18 @@ Build the package with yarn or npm:
 
 ```bash
 yarn build
-npm build
+npm run build
+```
+
+## <a name="tests">Tests</a>
+
+Create a `.env` file with environment variables. You can use the `.env.example` file as a reference.
+
+Test the package with yarn or npm:
+
+```bash
+yarn test
+npm run test
 ```
 
 ## <a name="initialization">Initialization</a>

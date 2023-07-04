@@ -1,4 +1,4 @@
-![license](https://img.shields.io/github/license/safe-global/safe-core-sdk)
+![license](https://img.shields.io/github/license/safe-global/safe-core-sdk) [![Coverage Status](https://coveralls.io/repos/github/safe-global/safe-core-sdk/badge.svg?branch=main)](https://coveralls.io/github/safe-global/safe-core-sdk?branch=main)
 
 ![Safe_Logos_Core_SDK_Black](https://github.com/safe-global/safe-core-sdk/assets/6764315/b6f87103-540f-4d36-a108-56ee9eb4e919)
 

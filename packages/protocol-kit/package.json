@@ -28,7 +28,7 @@
     "test:hardhat:ethers:v1.1.1": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.1.1 && hardhat deploy && nyc hardhat test",
     "test:hardhat:ethers:v1.2.0": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.2.0 && hardhat deploy && nyc hardhat test",
     "test:hardhat:ethers:v1.3.0": "export TEST_NETWORK=hardhat && export ETH_LIB=ethers && export SAFE_VERSION=1.3.0 && hardhat deploy && nyc hardhat test",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "coverage": "nyc report --reporter=lcov",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output typechain *.tsbuildinfo",

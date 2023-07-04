@@ -6,6 +6,7 @@ import Safe, {
   EthersAdapter,
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,
+  SAFE_LAST_VERSION,
   SafeAccountConfig,
   SafeDeploymentConfig,
   encodeCreateProxyWithNonce,
@@ -26,7 +27,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 
-const safeVersion: SafeVersion = '1.4.1'
+const safeVersion: SafeVersion = SAFE_LAST_VERSION
 
 class AccountAbstraction {
   #ethAdapter: EthersAdapter

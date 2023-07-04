@@ -1,3 +1,4 @@
+import Safe from './Safe'
 import {
   CreateCallEthersContract,
   CreateProxyProps as CreateEthersProxyProps,
@@ -24,6 +25,7 @@ import {
   Web3TransactionOptions,
   Web3TransactionResult
 } from './adapters/web3'
+import { SAFE_LAST_VERSION } from './contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,
   getCreateCallContract,
@@ -34,13 +36,12 @@ import {
   getSignMessageLibContract
 } from './contracts/safeDeploymentContracts'
 import {
+  PREDETERMINED_SALT_NONCE,
   encodeCreateProxyWithNonce,
   encodeSetupCallData,
-  PREDETERMINED_SALT_NONCE,
   predictSafeAddress
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
-import Safe from './Safe'
 import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
 import {
   AddOwnerTxParams,
@@ -76,29 +77,19 @@ export {
   CreateTransactionProps,
   CreateWeb3ProxyProps,
   DeploySafeProps,
-  encodeCreateProxyWithNonce,
-  encodeMultiSendData,
-  encodeSetupCallData,
+  EthSafeSignature,
   EthersAdapter,
   EthersAdapterConfig,
   EthersTransactionOptions,
   EthersTransactionResult,
-  EthSafeSignature,
-  getCompatibilityFallbackHandlerContract,
-  getCreateCallContract,
-  getMultiSendCallOnlyContract,
-  getMultiSendContract,
-  getProxyFactoryContract,
-  getSafeContract,
-  getSignMessageLibContract,
   MultiSendCallOnlyEthersContract,
   MultiSendCallOnlyWeb3Contract,
   MultiSendEthersContract,
   MultiSendWeb3Contract,
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,
-  predictSafeAddress,
   RemoveOwnerTxParams,
+  SAFE_LAST_VERSION,
   SafeAccountConfig,
   SafeConfig,
   SafeConfigWithPredictedSafe,
@@ -113,13 +104,24 @@ export {
   SafeTransactionOptionalProps,
   SignMessageLibEthersContract,
   SignMessageLibWeb3Contract,
-  standardizeSafeTransactionData,
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams,
   Web3Adapter,
   Web3AdapterConfig,
   Web3TransactionOptions,
-  Web3TransactionResult
+  Web3TransactionResult,
+  encodeCreateProxyWithNonce,
+  encodeMultiSendData,
+  encodeSetupCallData,
+  getCompatibilityFallbackHandlerContract,
+  getCreateCallContract,
+  getMultiSendCallOnlyContract,
+  getMultiSendContract,
+  getProxyFactoryContract,
+  getSafeContract,
+  getSignMessageLibContract,
+  predictSafeAddress,
+  standardizeSafeTransactionData
 }
 
 export default Safe

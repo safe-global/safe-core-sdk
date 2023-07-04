@@ -11,6 +11,7 @@ import {
   Gnosis_safeInterface as SafeInterface,
   Gnosis_safe as Safe_V1_3_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/Gnosis_safe'
+import { Safe as Safe_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/Safe'
 import {
   SafeContract,
   SafeSetupConfig,
@@ -20,7 +21,9 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 abstract class SafeContractEthers implements SafeContract {
-  constructor(public contract: Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1 | Safe_V1_0_0) {}
+  constructor(
+    public contract: Safe_V1_4_1 | Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1 | Safe_V1_0_0
+  ) {}
 
   abstract setup(
     setupConfig: SafeSetupConfig,

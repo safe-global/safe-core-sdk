@@ -163,6 +163,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     log: true,
     deterministicDeployment: true
   })
+
+  await deploy('TokenCallbackHandler_SV1_4_1', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
 }
 
 export default deploy

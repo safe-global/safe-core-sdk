@@ -6,6 +6,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
+import semverSatisfies from 'semver/functions/satisfies'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
@@ -30,7 +31,9 @@ describe('Safe Info', () => {
         safeVersion: safeVersionDeployed
       }
     }
-    const predictedSafeAddress = '0x1A154d62d3d6a71115Bd4636C641B9E2b8Aa605d'
+    const predictedSafeAddress = semverSatisfies(safeVersionDeployed, '1.3.0')
+      ? '0xe37d3CA59F5e702eA928688409Ccd74E14be2EF4'
+      : '0x2374BBC0a7fe89F9A782Dbc6CF95ADA2817AE5F9'
     return {
       chainId: (await waffle.provider.getNetwork()).chainId,
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),

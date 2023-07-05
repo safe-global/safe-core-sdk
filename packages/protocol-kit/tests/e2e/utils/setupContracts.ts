@@ -46,7 +46,6 @@ import { DebugTransactionGuard } from '@safe-global/protocol-kit/typechain/tests
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { AbiItem } from 'web3-utils'
-import { PREDETERMINED_SALT_NONCE } from '../../../src/contracts/utils'
 
 export const getSafeSingleton = async (): Promise<{
   contract: Safe_V1_4_1 | Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1 | Safe_V1_0_0
@@ -88,15 +87,16 @@ export const getFactory = async (): Promise<{
 export const getSafeTemplate = async (): Promise<
   Safe_V1_4_1 | Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1 | Safe_V1_0_0
 > => {
+  const randomSaltNonce = Math.floor(Math.random() * 1000000000) + 1
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
   const template = await factory.callStatic.createProxyWithNonce(
     singleton.address,
     '0x',
-    PREDETERMINED_SALT_NONCE
+    randomSaltNonce
   )
   await factory
-    .createProxyWithNonce(singleton.address, '0x', PREDETERMINED_SALT_NONCE)
+    .createProxyWithNonce(singleton.address, '0x', randomSaltNonce)
     .then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory(safeDeployed.name)
   return Safe.attach(template) as

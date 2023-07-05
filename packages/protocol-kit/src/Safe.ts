@@ -30,10 +30,10 @@ import {
 } from './types'
 import {
   EthSafeSignature,
+  SAFE_FEATURES,
   hasSafeFeature,
   isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
-  SAFE_FEATURES,
   sameString
 } from './utils'
 import {

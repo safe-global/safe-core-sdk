@@ -68,7 +68,7 @@ describe('Transactions execution', () => {
       await waitSafeTxReceipt(txRejectResponse)
       const signedTx = await safeSdk1.signTransaction(tx)
       const isTxExecutable = await safeSdk2.isValidTransaction(signedTx)
-      await chai.expect(isTxExecutable).to.be.eq(false)
+      chai.expect(isTxExecutable).to.be.eq(false)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai.expect(safeInitialBalance.toString()).to.be.eq(safeFinalBalance.toString())
     })
@@ -95,7 +95,7 @@ describe('Transactions execution', () => {
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const isTxExecutable = await safeSdk1.isValidTransaction(tx)
-      await chai.expect(isTxExecutable).to.be.eq(true)
+      chai.expect(isTxExecutable).to.be.eq(true)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai.expect(safeInitialBalance.toString()).to.be.eq(safeFinalBalance.toString())
     })
@@ -402,7 +402,7 @@ describe('Transactions execution', () => {
       'should execute a transaction with threshold >1 and all different kind of signatures with ethers provider and safeVersion===1.0.0',
       async () => {
         const { accounts, contractNetworks } = await setupTests()
-        const [account1, account2, account3, account4, account5, account6] = accounts
+        const [account1, account2, account3, account4, account5] = accounts
         const safe = await getSafeWithOwners([
           account1.address,
           account2.address,

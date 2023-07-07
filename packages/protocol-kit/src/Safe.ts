@@ -966,12 +966,16 @@ class Safe {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
+    const threshold = await this.getThreshold()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
-    if (signerAddress && owners.includes(signerAddress)) {
+    if (
+      threshold - signedSafeTransaction.signatures.size > 1 &&
+      signerAddress &&
+      owners.includes(signerAddress)
+    ) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
-    const threshold = await this.getThreshold()
     if (threshold > signedSafeTransaction.signatures.size) {
       const signaturesMissing = threshold - signedSafeTransaction.signatures.size
       throw new Error(

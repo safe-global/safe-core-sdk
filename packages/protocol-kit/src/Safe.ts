@@ -969,7 +969,7 @@ class Safe {
     const threshold = await this.getThreshold()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
     if (
-      threshold - signedSafeTransaction.signatures.size > 1 &&
+      threshold > signedSafeTransaction.signatures.size &&
       signerAddress &&
       owners.includes(signerAddress)
     ) {

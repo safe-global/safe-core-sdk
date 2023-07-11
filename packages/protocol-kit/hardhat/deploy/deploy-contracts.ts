@@ -4,13 +4,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 
-type SafeVersions = {
-  '1.4.1': SafeVersion
-  '1.3.0': SafeVersion
-  '1.2.0': SafeVersion
-  '1.1.1': SafeVersion
-  '1.0.0': SafeVersion
-}
+type SafeVersions = { [key: string]: { name: string} }
 
 const safeContracts: SafeVersions = {
   '1.4.1': { name: 'Safe_SV1_4_1' },

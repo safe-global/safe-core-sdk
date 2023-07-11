@@ -1,3 +1,8 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, {
+  EthersTransactionOptions,
+  Web3TransactionOptions
+} from '@safe-global/protocol-kit/index'
 import {
   MetaTransactionData,
   SafeTransactionDataPartial,
@@ -7,11 +12,6 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, {
-  Web3TransactionOptions,
-  EthersTransactionOptions
-} from '@safe-global/protocol-kit/index'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
@@ -205,7 +205,7 @@ describe('Transactions execution', () => {
       const signedTx = await safeSdk1.signTransaction(tx)
       await chai
         .expect(safeSdk2.executeTransaction(signedTx))
-        .to.be.rejectedWith(safeVersionDeployed === '1.3.0' ? 'GS026' : 'Invalid owner provided')
+        .to.be.rejectedWith(safeVersionDeployed >= '1.3.0' ? 'GS026' : 'Invalid owner provided')
     })
 
     it('should fail if a user tries to execute a transaction with options: { gas, gasLimit }', async () => {

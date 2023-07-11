@@ -7,6 +7,7 @@ import { Proxy_factory as GnosisSafeProxyFactory_V1_1_1 } from '@safe-global/pro
 import { Gnosis_safe as SafeMasterCopy_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.2.0/Gnosis_safe'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Create_call'
+import { Simulate_tx_accessor as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Simulate_tx_accessor'
 import { Gnosis_safe as SafeMasterCopy_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Gnosis_safe'
 import { Multi_send as MultiSend_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Multi_send'
 import { Multi_send_call_only as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Multi_send_call_only'
@@ -14,6 +15,7 @@ import { Proxy_factory as GnosisSafeProxyFactory_V1_3_0 } from '@safe-global/pro
 import { Sign_message_lib as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Sign_message_lib'
 import CompatibilityFallbackHandler_V1_3_0_Web3 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Web3'
 import CreateCallContract_V1_3_0_Web3 from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Web3'
+import SimulateTxAccessorContract_V1_3_0_Web3 from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorEthersContract_V1_3_0_Web3'
 import GnosisSafeContract_V1_0_0_Web3 from './GnosisSafe/v1.0.0/GnosisSafeContract_V1_0_0_Web3'
 import GnosisSafeContract_V1_1_1_Web3 from './GnosisSafe/v1.1.1/GnosisSafeContract_V1_1_1_Web3'
 import GnosisSafeContract_V1_2_0_Web3 from './GnosisSafe/v1.2.0/GnosisSafeContract_V1_2_0_Web3'
@@ -152,6 +154,23 @@ export function getCreateCallContractInstance(
     case '1.1.1':
     case '1.0.0':
       return new CreateCallContract_V1_3_0_Web3(createCallContract as CreateCall_V1_3_0)
+    default:
+      throw new Error('Invalid Safe version')
+  }
+}
+
+export function getSimulateTxAccessorContractInstance(
+  safeVersion: SafeVersion,
+  simulateTxAccessorContract: SimulateTxAccessor_V1_3_0
+): SimulateTxAccessorContract_V1_3_0_Web3 {
+  switch (safeVersion) {
+    case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
+    case '1.0.0':
+      return new SimulateTxAccessorContract_V1_3_0_Web3(
+        simulateTxAccessorContract as SimulateTxAccessor_V1_3_0
+      )
     default:
       throw new Error('Invalid Safe version')
   }

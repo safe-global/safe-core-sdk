@@ -7,6 +7,7 @@ import {
   GnosisSafeProxyFactoryContract,
   MultiSendCallOnlyContract,
   MultiSendContract,
+  SimulateTxAccessorContract,
   SafeVersion,
   SignMessageLibContract
 } from '@safe-global/safe-core-sdk-types'
@@ -20,6 +21,7 @@ import {
   getSafeL2SingletonDeployment,
   getSafeSingletonDeployment,
   getSignMessageLibDeployment,
+  getSimulateTxAccessorDeployment,
   SingletonDeployment
 } from '@safe-global/safe-deployments'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
@@ -251,4 +253,28 @@ export async function getCreateCallContract({
     throw new Error('CreateCall contract is not deployed on the current network')
   }
   return createCallContract
+}
+
+export async function getSimulateTxAccessorContract({
+  ethAdapter,
+  safeVersion
+}: GetContractInstanceProps): Promise<SimulateTxAccessorContract> {
+  const chainId = await ethAdapter.getChainId()
+  const simutaleTxAccessorDeployment = getSimulateTxAccessorDeployment({
+    version: safeVersion,
+    network: chainId.toString(),
+    released: true
+  })
+  const simulateTxAccessorContract = await ethAdapter.getSimulateTxAccessorContract({
+    safeVersion,
+    singletonDeployment: simutaleTxAccessorDeployment
+  })
+  const isContractDeployed = await ethAdapter.isContractDeployed(
+    simulateTxAccessorContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('simutaleTxContract contract is not deployed on the current network')
+  }
+
+  return simulateTxAccessorContract
 }

@@ -19,7 +19,8 @@ import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
-  getSignMessageLibContractInstance
+  getSignMessageLibContractInstance,
+  getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
@@ -27,6 +28,7 @@ import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFac
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
 import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
 import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
+import SimulateTxAccessorContract from './contracts/SimulateTxAccessor/SimulateTxAccessorEthersContract'
 import { isSignerCompatible, isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
@@ -205,6 +207,21 @@ class EthersAdapter implements EthAdapter {
     return contractCode !== '0x'
   }
 
+  async getSimulateTxAccessorContract({
+    safeVersion,
+    singletonDeployment
+  }: // customContractAddress
+  GetContractProps): Promise<SimulateTxAccessorContract> {
+    const chainId = await this.getChainId()
+    // const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress = singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SimulateTxAccessor contract address')
+    }
+    const signerOrProvider = this.#signer || this.#provider
+    return getSimulateTxAccessorContractInstance(safeVersion, contractAddress, signerOrProvider)
+  }
+
   async getStorageAt(address: string, position: string): Promise<string> {
     const content = await this.#provider.getStorageAt(address, position)
     const decodedContent = this.decodeParameters(['address'], content)
@@ -256,6 +273,7 @@ class EthersAdapter implements EthAdapter {
   }
 
   decodeParameters(types: string[], values: string): { [key: string]: any } {
+    console.log('decodeParameters: ', types, values)
     return new this.#ethers.utils.AbiCoder().decode(types, values)
   }
 }

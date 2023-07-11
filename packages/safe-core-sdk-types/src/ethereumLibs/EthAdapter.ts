@@ -6,6 +6,7 @@ import { GnosisSafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types
 import { MultiSendCallOnlyContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendCallOnlyContract'
 import { MultiSendContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendContract'
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types/contracts/SignMessageLibContract'
+import { SimulateTxAccessorContract } from '@safe-global/safe-core-sdk-types/contracts/SimulateTxAccessorContract'
 import {
   Eip3770Address,
   SafeTransactionEIP712Args,
@@ -81,6 +82,10 @@ export interface EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): Promise<CreateCallContract>
+  getSimulateTxAccessorContract({
+    safeVersion,
+    singletonDeployment
+  }: GetContractProps): Promise<SimulateTxAccessorContract>
   getContractCode(address: string, defaultBlock?: string | number): Promise<string>
   isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean>
   getStorageAt(address: string, position: string): Promise<string>

@@ -4,7 +4,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 
-type SafeVersions = { [key: string]: { name: string} }
+type SafeVersions = { [key: string]: { name: string } }
 
 const safeContracts: SafeVersions = {
   '1.4.1': { name: 'Safe_SV1_4_1' },
@@ -62,6 +62,14 @@ const createCallContracts: SafeVersions = {
   '1.0.0': { name: 'CreateCall_SV1_3_0' }
 }
 
+const simulateTxAccessorContracts: SafeVersions = {
+  '1.4.1': { name: 'SimulateTxAccessor_SV1_4_1' },
+  '1.3.0': { name: 'SimulateTxAccessor_SV1_3_0' },
+  '1.2.0': { name: 'SimulateTxAccessor_SV1_3_0' },
+  '1.1.1': { name: 'SimulateTxAccessor_SV1_3_0' },
+  '1.0.0': { name: 'SimulateTxAccessor_SV1_3_0' }
+}
+
 export const safeDeployed = safeContracts[safeVersionDeployed]
 export const proxyFactoryDeployed = proxyFactoryContracts[safeVersionDeployed]
 export const multiSendDeployed = multiSendContracts[safeVersionDeployed]
@@ -70,6 +78,7 @@ export const compatibilityFallbackHandlerDeployed =
   compatibilityFallbackHandlerContracts[safeVersionDeployed]
 export const signMessageLibDeployed = signMessageLibContracts[safeVersionDeployed]
 export const createCallDeployed = createCallContracts[safeVersionDeployed]
+export const simulateTxAccessorDeployed = simulateTxAccessorContracts[safeVersionDeployed]
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   const { deployments, getNamedAccounts } = hre
@@ -125,6 +134,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     deterministicDeployment: true
   })
 
+  await deploy(simulateTxAccessorDeployed.name, {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
   await deploy('DailyLimitModule', {
     from: deployer,
     args: [],
@@ -145,13 +161,21 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     log: true
   })
 
-  await deploy('DebugTransactionGuard', {
+  await deploy('DebugTransactionGuard_SV1_3_0', {
     from: deployer,
     args: [],
-    log: true
+    log: true,
+    deterministicDeployment: true
   })
 
   await deploy('DefaultCallbackHandler_SV1_3_0', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('DebugTransactionGuard_SV1_4_1', {
     from: deployer,
     args: [],
     log: true,

@@ -76,7 +76,8 @@ describe('Transactions creation', () => {
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
-          tx: txDataPartial
+          tx: txDataPartial,
+          contractNetworks
         })
         chai.expect(safeTxData.safeTxGas).to.be.eq('0')
       }
@@ -103,7 +104,8 @@ describe('Transactions creation', () => {
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
-          tx: txDataPartial
+          tx: txDataPartial,
+          contractNetworks
         })
         chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
@@ -131,7 +133,8 @@ describe('Transactions creation', () => {
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
-          tx: txDataPartial
+          tx: txDataPartial,
+          contractNetworks
         })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
@@ -157,7 +160,8 @@ describe('Transactions creation', () => {
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
-          tx: txDataPartial
+          tx: txDataPartial,
+          contractNetworks
         })
         chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
       }
@@ -185,7 +189,8 @@ describe('Transactions creation', () => {
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
-          tx: txDataPartial
+          tx: txDataPartial,
+          contractNetworks
         })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }
@@ -213,7 +218,8 @@ describe('Transactions creation', () => {
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
           ethAdapter,
-          tx: txDataPartial
+          tx: txDataPartial,
+          contractNetworks
         })
         chai.expect(safeTxData.safeTxGas).to.be.eq(safeTxGas)
       }

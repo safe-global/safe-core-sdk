@@ -180,7 +180,8 @@ abstract class SafeContractEthers implements SafeContract {
     params: any[],
     options: EthersTransactionOptions
   ): Promise<string> {
-    return (await (this.contract.estimateGas as any)[methodName](...params, options)).toString()
+    const a = (await (this.contract.estimateGas as any)[methodName](...params, options)).toString()
+    return a
   }
 }
 

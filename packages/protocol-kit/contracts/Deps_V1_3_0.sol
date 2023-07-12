@@ -9,6 +9,7 @@ import { MultiSendCallOnly } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/li
 import { SignMessageLib } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/examples/libraries/SignMessage.sol";
 import { CreateCall } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/libraries/CreateCall.sol";
 import { DefaultCallbackHandler } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/handler/DefaultCallbackHandler.sol";
+import { SimulateTxAccessor } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/accessors/SimulateTxAccessor.sol";
 
 // Testing contracts
 import { DebugTransactionGuard } from "@gnosis.pm/safe-contracts-v1.3.0/contracts/examples/guards/DebugTransactionGuard.sol";
@@ -21,3 +22,7 @@ contract MultiSendCallOnly_SV1_3_0 is MultiSendCallOnly {}
 contract SignMessageLib_SV1_3_0 is SignMessageLib {}
 contract CreateCall_SV1_3_0 is CreateCall {}
 contract DefaultCallbackHandler_SV1_3_0 is DefaultCallbackHandler {}
+contract SimulateTxAccessor_SV1_3_0 is SimulateTxAccessor {}
+
+// Testing contracts
+contract DebugTransactionGuard_SV1_3_0 is DebugTransactionGuard {}

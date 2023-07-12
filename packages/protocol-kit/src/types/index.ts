@@ -58,6 +58,10 @@ export interface ContractNetworkConfig {
   createCallAddress: string
   /** createCallAbi - Abi of the CreateCall contract deployed on a specific network */
   createCallAbi?: AbiItem | AbiItem[]
+  /** simulateTxAccessorAddress - Address of the SimulateTxAccessor contract deployed on a specific network */
+  simulateTxAccessorAddress: string
+  /** simulateTxAccessorAbi - Abi of the SimulateTxAccessor contract deployed on a specific network */
+  simulateTxAccessorAbi?: AbiItem | AbiItem[]
 }
 
 export interface ContractNetworksConfig {
@@ -172,6 +176,8 @@ interface StandardizeSafeTransactionData {
   ethAdapter: EthAdapter
   /** tx - Safe transaction */
   tx: SafeTransactionDataPartial
+  /** contractNetworks - Contract network configuration */
+  contractNetworks?: ContractNetworksConfig
 }
 
 export type StandardizeSafeTxDataWithSafeContract = StandardizeSafeTransactionData &

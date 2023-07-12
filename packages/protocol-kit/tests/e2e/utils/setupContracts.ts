@@ -7,7 +7,8 @@ import {
   proxyFactoryDeployed,
   safeDeployed,
   safeVersionDeployed,
-  signMessageLibDeployed
+  signMessageLibDeployed,
+  simulateTxAccessorDeployed
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
   Proxy_factory as SafeProxyFactory_V1_0_0,
@@ -26,7 +27,8 @@ import {
   Multi_send as MultiSend_V1_3_0,
   Proxy_factory as SafeProxyFactory_V1_3_0,
   Gnosis_safe as Safe_V1_3_0,
-  Sign_message_lib as SignMessageLib_V1_3_0
+  Sign_message_lib as SignMessageLib_V1_3_0,
+  Simulate_tx_accessor as SimulateTxAccessor_V1_3_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0'
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1,
@@ -35,7 +37,8 @@ import {
   Multi_send as MultiSend_V1_4_1,
   Safe_proxy_factory as SafeProxyFactory_V1_4_1,
   Safe as Safe_V1_4_1,
-  Sign_message_lib as SignMessageLib_V1_4_1
+  Sign_message_lib as SignMessageLib_V1_4_1,
+  Simulate_tx_accessor as SimulateTxAccessor_V1_4_1
 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1'
 import {
   DailyLimitModule,
@@ -213,6 +216,20 @@ export const getCreateCall = async (): Promise<{
   }
 }
 
+export const getSimulateTxAccessor = async (): Promise<{
+  contract: SimulateTxAccessor_V1_4_1 | SimulateTxAccessor_V1_3_0
+  abi: AbiItem | AbiItem[]
+}> => {
+  const SimulateTxAccessorDeployment = await deployments.get(simulateTxAccessorDeployed.name)
+  const SimulateTxAccessor = await ethers.getContractFactory(simulateTxAccessorDeployed.name)
+  return {
+    contract: SimulateTxAccessor.attach(SimulateTxAccessorDeployment.address) as
+      | SimulateTxAccessor_V1_4_1
+      | SimulateTxAccessor_V1_3_0,
+    abi: SimulateTxAccessorDeployment.abi
+  }
+}
+
 export const getDailyLimitModule = async (): Promise<DailyLimitModule> => {
   const DailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
   const DailyLimitModule = await ethers.getContractFactory('DailyLimitModule')
@@ -232,8 +249,11 @@ export const getERC20Mintable = async (): Promise<ERC20Mintable> => {
 }
 
 export const getDebugTransactionGuard = async (): Promise<DebugTransactionGuard> => {
-  const DebugTransactionGuardDeployment = await deployments.get('DebugTransactionGuard')
-  const DebugTransactionGuard = await ethers.getContractFactory('DebugTransactionGuard')
+  const contractName = semverSatisfies(safeVersionDeployed, '<=1.3.0')
+    ? 'DebugTransactionGuard_SV1_3_0'
+    : 'DebugTransactionGuard_SV1_4_1'
+  const DebugTransactionGuardDeployment = await deployments.get(contractName)
+  const DebugTransactionGuard = await ethers.getContractFactory(contractName)
   return DebugTransactionGuard.attach(
     DebugTransactionGuardDeployment.address
   ) as DebugTransactionGuard

@@ -418,7 +418,8 @@ class Safe {
         await standardizeSafeTransactionData({
           predictedSafe: this.#predictedSafe,
           ethAdapter: this.#ethAdapter,
-          tx: newTransaction
+          tx: newTransaction,
+          contractNetworks: this.#contractManager.contractNetworks
         })
       )
     }
@@ -430,7 +431,8 @@ class Safe {
       await standardizeSafeTransactionData({
         safeContract: this.#contractManager.safeContract,
         ethAdapter: this.#ethAdapter,
-        tx: newTransaction
+        tx: newTransaction,
+        contractNetworks: this.#contractManager.contractNetworks
       })
     )
   }

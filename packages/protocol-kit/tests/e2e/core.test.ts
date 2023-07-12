@@ -63,8 +63,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should connect a Safe >=v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, safe, accounts, contractNetworks } =
-          await setupTests()
+        const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({

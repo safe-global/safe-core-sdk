@@ -3,7 +3,8 @@ import { execSync } from 'child_process'
 const playInput = process.argv[2]
 
 const playgroundProtocolKitPaths = {
-  'deploy-safe': 'protocol-kit/deploy-safe'
+  'deploy-safe': 'protocol-kit/deploy-safe',
+  'generate-safe-address': 'protocol-kit/generate-safe-address'
 }
 const playgroundApiKitPaths = {
   'propose-transaction': 'api-kit/propose-transaction',

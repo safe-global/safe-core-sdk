@@ -1,8 +1,6 @@
-# Safe Core SDK Monorepo
+![license](https://img.shields.io/github/license/safe-global/safe-core-sdk) [![Coverage Status](https://coveralls.io/repos/github/safe-global/safe-core-sdk/badge.svg?branch=main)](https://coveralls.io/github/safe-global/safe-core-sdk?branch=main)
 
-[![Logo](https://raw.githubusercontent.com/safe-global/safe-core-sdk/main/assets/logo.png)](https://safe.global/)
-
-![license](https://img.shields.io/github/license/safe-global/safe-core-sdk)
+![Safe_Logos_Core_SDK_Black](https://github.com/safe-global/safe-core-sdk/assets/6764315/b6f87103-540f-4d36-a108-56ee9eb4e919)
 
 Software developer tools that facilitate the interaction with the Safe [contracts](https://github.com/safe-global/safe-contracts) and [services](https://github.com/safe-global/safe-transaction-service).
 
@@ -22,7 +20,6 @@ Software developer tools that facilitate the interaction with the Safe [contract
 | [protocol-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit)                 | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit)       | TypeScript library that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts)                                                |
 | [relay-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/relay-kit)                       | ​​​[​![NPM Version](https://badge.fury.io/js/%40safe-global%2Frelay-kit.svg)​](https://badge.fury.io/js/%40safe-global%2Frelay-kit)​             | Library to abstract transaction fees payment (gas fees), allowing the use of native tokens or ERC-20​​                                                                                 |
 | [safe-core-sdk-types](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk-types)   | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types)  | Common types extracted from the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages) packages                                                   |
-| [safe-ethers-adapters](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-ethers-adapters) | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-ethers-adapters) | [Ethers](https://docs.ethers.io/v5/single-page/) adapter that facilitates the interaction with the [Safe Services](https://github.com/safe-global/safe-transaction-service) |
 
 ## Playground
 
@@ -66,4 +63,10 @@ To execute a sponsored transaction using a relay:
 
 ```bash
 yarn play relay-sponsored-transaction
+```
+
+#### Optional Step: Generate a custon Safe address
+
+```bash
+yarn play generate-safe-address
 ```

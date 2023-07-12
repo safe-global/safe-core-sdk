@@ -5,7 +5,7 @@ import { Box } from '@mui/material'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
 import { useAuth } from '../../AuthContext'
-import { SafeOnRampKit, MoneriumPack, SafeMoneriumClient } from '../../../../../src'
+import { MoneriumPack, SafeMoneriumClient } from '../../../../../src'
 import Disconnected from './Disconnected'
 import DeploySafe from './DeploySafe'
 import LoginWithMonerium from './LoginWithMonerium'
@@ -17,7 +17,7 @@ function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
   const [safeThreshold, setSafeThreshold] = useState<string>()
   const [moneriumClient, setMoneriumClient] = useState<SafeMoneriumClient>()
-  const [onRampKit, setOnRampKit] = useState<SafeOnRampKit<MoneriumPack>>()
+  const [moneriumPack, setMoneriumPack] = useState<MoneriumPack>()
   const [orderState, setOrderState] = useState<OrderState>()
   const { isLoggedIn, selectedSafe, provider: authProvider } = useAuth()
 
@@ -36,30 +36,31 @@ function Monerium() {
         isL1SafeMasterCopy: true
       })
 
-      const client = await SafeOnRampKit.init(
-        new MoneriumPack({
-          clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
-          environment: 'sandbox'
-        }),
-        { safeSdk }
-      )
+      const pack = new MoneriumPack({
+        clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
+        environment: 'sandbox'
+      })
 
-      client.subscribe(OrderState.pending, (notification) => {
+      await pack.init({
+        safeSdk
+      })
+
+      pack.subscribe(OrderState.pending, (notification) => {
         setOrderState(notification.meta.state)
       })
 
-      client.subscribe(OrderState.placed, (notification) => {
+      pack.subscribe(OrderState.placed, (notification) => {
         setOrderState(notification.meta.state)
       })
 
-      client.subscribe(OrderState.rejected, (notification) => {
+      pack.subscribe(OrderState.rejected, (notification) => {
         setOrderState(notification.meta.state)
         setTimeout(() => {
           setOrderState(undefined)
         }, 5000)
       })
 
-      client.subscribe(OrderState.processed, (notification) => {
+      pack.subscribe(OrderState.processed, (notification) => {
         setOrderState(notification.meta.state)
         setTimeout(() => {
           setOrderState(undefined)
@@ -70,7 +71,7 @@ function Monerium() {
       const owners = await safeSdk.getOwners()
 
       setSafeThreshold(`${threshold}/${owners.length}`)
-      setOnRampKit(client)
+      setMoneriumPack(pack)
     })()
   }, [authProvider, selectedSafe])
 
@@ -79,12 +80,12 @@ function Monerium() {
     const refreshToken = localStorage.getItem(MONERIUM_TOKEN) || undefined
 
     if (authCode || refreshToken) startMoneriumFlow(authCode, refreshToken)
-  }, [onRampKit])
+  }, [moneriumPack])
 
   const startMoneriumFlow = async (authCode?: string, refreshToken?: string) => {
-    if (!onRampKit) return
+    if (!moneriumPack) return
 
-    const moneriumClient = await onRampKit.open({
+    const moneriumClient = await moneriumPack.open({
       redirectUrl: 'http://localhost:3000/monerium',
       authCode,
       refreshToken
@@ -112,7 +113,7 @@ function Monerium() {
   }
 
   const closeMoneriumFlow = async () => {
-    onRampKit?.close()
+    moneriumPack?.close()
     localStorage.removeItem(MONERIUM_TOKEN)
     setAuthContext(undefined)
   }

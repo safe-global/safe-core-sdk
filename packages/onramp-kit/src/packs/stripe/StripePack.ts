@@ -1,6 +1,8 @@
-import { loadStripeOnramp, OnrampSession, OnrampUIEventMap, StripeOnramp } from '@stripe/crypto'
-import * as stripeApi from './stripeApi'
+import { loadStripeOnramp, OnrampSession, StripeOnramp } from '@stripe/crypto'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
+import { OnRampKitBasePack } from '@safe-global/onramp-kit/OnRampKitBasePack'
+
+import * as stripeApi from './stripeApi'
 
 import type {
   StripeProviderConfig,
@@ -9,16 +11,15 @@ import type {
   StripeOpenOptions,
   StripeSession
 } from './types'
-import type { SafeOnRampPack } from '@safe-global/onramp-kit/types'
 
 /**
- * This class implements the SafeOnRampClient interface for the Stripe provider
+ * This class extends the OnRampKitBasePack to work with the Stripe platform
  * @class StripePack
  */
-export class StripePack implements SafeOnRampPack<StripePack> {
+export class StripePack extends OnRampKitBasePack {
+  #config: StripeProviderConfig
   #element?: string
   #client?: StripeOnramp
-  #config: StripeProviderConfig
   #onRampSession?: OnrampSession
 
   /**
@@ -27,6 +28,7 @@ export class StripePack implements SafeOnRampPack<StripePack> {
    * @param config The configuration object for the Stripe provider. Ideally we will put here things like api keys, secrets, urls, etc.
    */
   constructor(config: StripeProviderConfig) {
+    super()
     this.#config = config
   }
 
@@ -74,14 +76,6 @@ export class StripePack implements SafeOnRampPack<StripePack> {
 
       onRampSession.mount(element)
 
-      // TODO: Remove this check when not required
-      this.subscribe(
-        'onramp_session_updated',
-        (stripeEvent: OnrampUIEventMap['onramp_session_updated']) => {
-          this.checkAmount(stripeEvent)
-        }
-      )
-
       return session
     } catch (e) {
       throw new Error(getErrorMessage(e))
@@ -111,18 +105,5 @@ export class StripePack implements SafeOnRampPack<StripePack> {
    */
   unsubscribe(event: StripeEvent, handler: StripeEventListener): void {
     this.#onRampSession?.removeEventListener(event as '*', handler)
-  }
-
-  // This is only in order to preserve testnets liquidity pools during the hackaton
-  private checkAmount(stripeEvent: any): void {
-    if (
-      stripeEvent.payload.session.quote &&
-      Number(stripeEvent.payload.session.quote.source_monetary_amount?.replace(',', '.')) > 10
-    ) {
-      document.querySelector(this.#element as string)?.remove()
-      throw new Error(
-        "The amount you are trying to use to complete your purchase can't be greater than 10 in order to preserve testnets liquidity pools"
-      )
-    }
   }
 }

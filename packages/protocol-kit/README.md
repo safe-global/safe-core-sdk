@@ -190,13 +190,15 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
       fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
+      simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
-      createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
+      createCallAbi: '<CREATE_CALL_ABI>', // Optional. Only needed with web3.js
+      simulateTxAccessorAbi: '<SIMULATE_TX_ACCESSOR_ABI>' // Optional. Only needed with web3.js
     }
   }
 
@@ -342,13 +344,15 @@ const safeSdk = await Safe.create({ ethAdapter, predictedSafe })
       fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
+      simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
-      createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
+      createCallAbi: '<CREATE_CALL_ABI>', // Optional. Only needed with web3.js
+      simulateTxAccessorAbi: '<SIMULATE_TX_ACCESSOR_ABI>' // Optional. Only needed with web3.js
     }
   }
 
@@ -405,13 +409,15 @@ const safeSdk = await safeSdk.connect({ ethAdapter, predictedSafe })
       fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
+      simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
       safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
       fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
       signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
-      createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
+      createCallAbi: '<CREATE_CALL_ABI>', // Optional. Only needed with web3.js
+      simulateTxAccessorAbi: '<SIMULATE_TX_ACCESSOR_ABI>' // Optional. Only needed with web3.js
     }
   }
   const safeSdk = await Safe.connect({ ethAdapter, safeAddress, contractNetworks })

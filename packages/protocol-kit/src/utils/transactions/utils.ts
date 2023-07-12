@@ -78,7 +78,7 @@ export async function standardizeSafeTransactionData({
   if (!safeContract) {
     throw new Error('Safe is not deployed')
   }
-  
+
   let safeTxGas
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     safeTxGas = await estimateGas(

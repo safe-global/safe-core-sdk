@@ -207,9 +207,13 @@ export function getSimulateTxAccessorContractInstance(
 ): SimulateTxAccessorContract_V1_4_1_Web3 | SimulateTxAccessorContract_V1_3_0_Web3 {
   switch (safeVersion) {
     case '1.4.1':
-      return new SimulateTxAccessorContract_V1_4_1_Web3(simulateTxAccessorContract as SimulateTxAccessor_V1_4_1)
+      return new SimulateTxAccessorContract_V1_4_1_Web3(
+        simulateTxAccessorContract as SimulateTxAccessor_V1_4_1
+      )
     case '1.3.0':
-      return new SimulateTxAccessorContract_V1_3_0_Web3(simulateTxAccessorContract as SimulateTxAccessor_V1_3_0)
+      return new SimulateTxAccessorContract_V1_3_0_Web3(
+        simulateTxAccessorContract as SimulateTxAccessor_V1_3_0
+      )
     default:
       throw new Error('Invalid Safe version')
   }

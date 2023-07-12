@@ -233,10 +233,16 @@ export function getSimulateTxAccessorContractInstance(
   let simulateTxAccessorContract
   switch (safeVersion) {
     case '1.4.1':
-      simulateTxAccessorContract = SimulateTxAccessor_V1_4_1.connect(contractAddress, signerOrProvider)
+      simulateTxAccessorContract = SimulateTxAccessor_V1_4_1.connect(
+        contractAddress,
+        signerOrProvider
+      )
       return new SimulateTxAccessorContract_V1_4_1_Ethers(simulateTxAccessorContract)
     case '1.3.0':
-      simulateTxAccessorContract = SimulateTxAccessor_V1_3_0.connect(contractAddress, signerOrProvider)
+      simulateTxAccessorContract = SimulateTxAccessor_V1_3_0.connect(
+        contractAddress,
+        signerOrProvider
+      )
       return new SimulateTxAccessorContract_V1_3_0_Ethers(simulateTxAccessorContract)
     default:
       throw new Error('Invalid Safe version')

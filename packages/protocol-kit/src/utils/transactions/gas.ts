@@ -1,6 +1,11 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
-import { EthAdapter, OperationType, SafeContract, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  EthAdapter,
+  OperationType,
+  SafeContract,
+  SafeVersion
+} from '@safe-global/safe-core-sdk-types'
 import { getSimulateTxAccessorContract } from '../../contracts/safeDeploymentContracts'
 
 function estimateDataGasCosts(data: string): number {
@@ -24,7 +29,7 @@ export async function estimateGas(
   valueInWei: string,
   data: string,
   operation: OperationType,
-  customContracts?: ContractNetworksConfig 
+  customContracts?: ContractNetworksConfig
 ) {
   const chainId = await ethAdapter.getChainId()
   const simulateTxAccessorContract = await getSimulateTxAccessorContract({
@@ -32,7 +37,7 @@ export async function estimateGas(
     safeVersion,
     customContracts: customContracts?.[chainId]
   })
-  
+
   const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
     to,
     valueInWei,

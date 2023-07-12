@@ -5,15 +5,15 @@ import {
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
 
 class FallbackHandlerManager {
   #ethAdapter: EthAdapter
-  #safeContract?: GnosisSafeContract
+  #safeContract?: SafeContract
   // keccak256("fallback_manager.handler.address")
   #slot = '0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5'
 
-  constructor(ethAdapter: EthAdapter, safeContract?: GnosisSafeContract) {
+  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
     this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }

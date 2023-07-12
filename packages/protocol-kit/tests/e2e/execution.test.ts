@@ -1,3 +1,8 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import Safe, {
+  EthersTransactionOptions,
+  Web3TransactionOptions
+} from '@safe-global/protocol-kit/index'
 import {
   MetaTransactionData,
   SafeTransactionDataPartial,
@@ -7,11 +12,6 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, {
-  Web3TransactionOptions,
-  EthersTransactionOptions
-} from '@safe-global/protocol-kit/index'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
@@ -68,7 +68,7 @@ describe('Transactions execution', () => {
       await waitSafeTxReceipt(txRejectResponse)
       const signedTx = await safeSdk1.signTransaction(tx)
       const isTxExecutable = await safeSdk2.isValidTransaction(signedTx)
-      await chai.expect(isTxExecutable).to.be.eq(false)
+      chai.expect(isTxExecutable).to.be.eq(false)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai.expect(safeInitialBalance.toString()).to.be.eq(safeFinalBalance.toString())
     })
@@ -95,7 +95,7 @@ describe('Transactions execution', () => {
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const isTxExecutable = await safeSdk1.isValidTransaction(tx)
-      await chai.expect(isTxExecutable).to.be.eq(true)
+      chai.expect(isTxExecutable).to.be.eq(true)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai.expect(safeInitialBalance.toString()).to.be.eq(safeFinalBalance.toString())
     })
@@ -205,7 +205,7 @@ describe('Transactions execution', () => {
       const signedTx = await safeSdk1.signTransaction(tx)
       await chai
         .expect(safeSdk2.executeTransaction(signedTx))
-        .to.be.rejectedWith(safeVersionDeployed === '1.3.0' ? 'GS026' : 'Invalid owner provided')
+        .to.be.rejectedWith(safeVersionDeployed >= '1.3.0' ? 'GS026' : 'Invalid owner provided')
     })
 
     it('should fail if a user tries to execute a transaction with options: { gas, gasLimit }', async () => {
@@ -402,7 +402,7 @@ describe('Transactions execution', () => {
       'should execute a transaction with threshold >1 and all different kind of signatures with ethers provider and safeVersion===1.0.0',
       async () => {
         const { accounts, contractNetworks } = await setupTests()
-        const [account1, account2, account3, account4, account5, account6] = accounts
+        const [account1, account2, account3, account4, account5] = accounts
         const safe = await getSafeWithOwners([
           account1.address,
           account2.address,

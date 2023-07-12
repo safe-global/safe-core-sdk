@@ -1,10 +1,10 @@
 import { Interface } from '@ethersproject/abi'
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
+import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   MetaTransactionData,
   OperationType,
@@ -14,8 +14,9 @@ import {
   SafeTransactionDataPartial,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
+import semverSatisfies from 'semver/functions/satisfies'
 import { hexToNumber, hexToNumberString, toChecksumAddress } from 'web3-utils'
-import { estimateTxGas } from './gas'
+import { estimateGas, estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
@@ -31,7 +32,8 @@ export async function standardizeSafeTransactionData({
   safeContract,
   predictedSafe,
   ethAdapter,
-  tx
+  tx,
+  contractNetworks
 }: StandardizeSafeTransactionDataProps): Promise<SafeTransactionData> {
   const standardizedTxs = {
     to: tx.to,
@@ -76,14 +78,29 @@ export async function standardizeSafeTransactionData({
   if (!safeContract) {
     throw new Error('Safe is not deployed')
   }
-  const safeTxGas = await estimateTxGas(
-    safeContract,
-    ethAdapter,
-    standardizedTxs.to,
-    standardizedTxs.value,
-    standardizedTxs.data,
-    standardizedTxs.operation
-  )
+
+  let safeTxGas
+  if (semverSatisfies(safeVersion, '>=1.3.0')) {
+    safeTxGas = await estimateGas(
+      safeVersion,
+      safeContract,
+      ethAdapter,
+      standardizedTxs.to,
+      standardizedTxs.value,
+      standardizedTxs.data,
+      standardizedTxs.operation,
+      contractNetworks
+    )
+  } else {
+    safeTxGas = await estimateTxGas(
+      safeContract,
+      ethAdapter,
+      standardizedTxs.to,
+      standardizedTxs.value,
+      standardizedTxs.data,
+      standardizedTxs.operation
+    )
+  }
   return {
     ...standardizedTxs,
     safeTxGas

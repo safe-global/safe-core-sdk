@@ -1,17 +1,19 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import {
   EthAdapter,
-  GnosisSafeContract,
+  SafeContract,
   OperationType,
+  SafeVersion,
   SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
+import Safe from '@safe-global/protocol-kit/Safe'
+import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 import { ZERO_ADDRESS } from '../constants'
 import {
   getSafeContract,
   getSimulateTxAccessorContract
 } from '../../contracts/safeDeploymentContracts'
-import Safe from '@safe-global/protocol-kit/Safe'
 
 // Every byte == 00 -> 4  Gas cost
 const CALL_DATA_ZERO_BYTE_GAS_COST = 4
@@ -57,9 +59,75 @@ function estimateDataGasCosts(data: string): number {
   }, 0)
 }
 
-// TODO: deprecate this function
+export async function estimateGas(
+  safeVersion: SafeVersion,
+  safeContract: SafeContract,
+  ethAdapter: EthAdapter,
+  to: string,
+  valueInWei: string,
+  data: string,
+  operation: OperationType,
+  customContracts?: ContractNetworksConfig
+) {
+  const chainId = await ethAdapter.getChainId()
+  const simulateTxAccessorContract = await getSimulateTxAccessorContract({
+    ethAdapter,
+    safeVersion,
+    customContracts: customContracts?.[chainId]
+  })
+
+  const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
+    to,
+    valueInWei,
+    data,
+    operation
+  ])
+  const safeFunctionToEstimate = safeContract.encode('simulateAndRevert', [
+    await simulateTxAccessorContract.getAddress(),
+    transactionDataToEstimate
+  ])
+  const safeAddress = safeContract.getAddress()
+  const transactionToEstimateGas = {
+    to: safeAddress,
+    value: '0',
+    data: safeFunctionToEstimate,
+    from: safeAddress
+  }
+
+  // TO-DO: Improve decoding
+  /*
+  const simulateAndRevertResponse = ethAdapter.decodeParameters(
+    ['bool', 'bytes'],
+    encodedResponse
+  )
+  const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
+  */
+  try {
+    const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
+
+    return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+  } catch (error: any) {
+    // Ethers
+    if (error?.error?.body) {
+      const revertData = JSON.parse(error.error.body).error.data
+      if (revertData && revertData.startsWith('Reverted ')) {
+        const [, encodedResponse] = revertData.split('Reverted ')
+        const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+
+        return safeTxGas
+      }
+    }
+
+    // Web3
+    const [, encodedResponse] = error.message.split('return data: ')
+    const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+
+    return safeTxGas
+  }
+}
+
 export async function estimateTxGas(
-  safeContract: GnosisSafeContract,
+  safeContract: SafeContract,
   ethAdapter: EthAdapter,
   to: string,
   valueInWei: string,
@@ -330,7 +398,7 @@ async function estimateSafeTxGasWithSimulate(
     safeTransaction.data.operation
   ])
 
-  // // if the Safe is not deployed we can use the singleton address to simulate
+  // if the Safe is not deployed we can use the singleton address to simulate
   const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
 
   const safeFunctionToEstimate: string = safeSingletonContract.encode('simulateAndRevert', [

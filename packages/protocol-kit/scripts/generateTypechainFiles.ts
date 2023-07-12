@@ -15,6 +15,16 @@ const outDirTests = 'typechain/tests/'
 // Will be included in dist/ folder
 const safeContractsPath = '../../node_modules/@safe-global/safe-deployments/dist/assets'
 
+const safeContracts_V1_4_1 = [
+  `${safeContractsPath}/v1.4.1/safe.json`,
+  `${safeContractsPath}/v1.4.1/safe_proxy_factory.json`,
+  `${safeContractsPath}/v1.4.1/multi_send.json`,
+  `${safeContractsPath}/v1.4.1/multi_send_call_only.json`,
+  `${safeContractsPath}/v1.4.1/compatibility_fallback_handler.json`,
+  `${safeContractsPath}/v1.4.1/sign_message_lib.json`,
+  `${safeContractsPath}/v1.4.1/create_call.json`,
+  `${safeContractsPath}/v1.4.1/simulate_tx_accessor.json`
+].join(' ')
 const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/gnosis_safe.json`,
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
@@ -37,6 +47,11 @@ const safeContracts_V1_0_0 = [
 ].join(' ')
 
 // Won't be included in dist/ folder
+const safeContractsTestV1_4_1Path =
+  '../../node_modules/@safe-global/safe-contracts-v1.4.1/build/artifacts/contracts'
+const testContracts_V1_4_1 = [
+  `${safeContractsTestV1_4_1Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`
+].join(' ')
 const safeContractsTestV1_3_0Path =
   '../../node_modules/@gnosis.pm/safe-contracts-v1.3.0/build/artifacts/contracts'
 const testContracts_V1_3_0 = [
@@ -88,6 +103,11 @@ function generateTypes(typechainTarget: string) {
   // Src
   generateTypechainFiles(
     typechainTarget,
+    `${outDirSrc}${typechainTarget}/v1.4.1`,
+    safeContracts_V1_4_1
+  )
+  generateTypechainFiles(
+    typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.3.0`,
     safeContracts_V1_3_0
   )
@@ -107,6 +127,10 @@ function generateTypes(typechainTarget: string) {
     safeContracts_V1_0_0
   )
   moveTypechainFiles(
+    `${typeChainDirectorySrcPath}${typechainTarget}/v1.4.1`,
+    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.4.1`
+  )
+  moveTypechainFiles(
     `${typeChainDirectorySrcPath}${typechainTarget}/v1.3.0`,
     `${typeChainDirectoryBuildPath}${typechainTarget}/v1.3.0`
   )
@@ -124,6 +148,11 @@ function generateTypes(typechainTarget: string) {
   )
 
   // Tests
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirTests}${typechainTarget}/v1.4.1`,
+    testContracts_V1_4_1
+  )
   generateTypechainFiles(
     typechainTarget,
     `${outDirTests}${typechainTarget}/v1.3.0`,

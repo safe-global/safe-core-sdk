@@ -12,6 +12,13 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
+import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
+import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
+import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
+import SafeContractEthers from './contracts/Safe/SafeContractEthers'
+import SafeProxyFactoryEthersContract from './contracts/SafeProxyFactory/SafeProxyFactoryEthersContract'
+import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
+import SimulateTxAccessorEthersContract from './contracts/SimulateTxAccessor/SimulateTxAccessorEthersContract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -22,13 +29,6 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
-import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
-import GnosisSafeContractEthers from './contracts/GnosisSafe/GnosisSafeContractEthers'
-import GnosisSafeProxyFactoryEthersContract from './contracts/GnosisSafeProxyFactory/GnosisSafeProxyFactoryEthersContract'
-import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
-import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
-import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
-import SimulateTxAccessorContract from './contracts/SimulateTxAccessor/SimulateTxAccessorEthersContract'
 import { isSignerCompatible, isTypedDataSigner } from './utils'
 
 type Ethers = typeof ethers
@@ -100,7 +100,7 @@ class EthersAdapter implements EthAdapter {
     safeVersion,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): Promise<GnosisSafeContractEthers> {
+  }: GetContractProps): Promise<SafeContractEthers> {
     const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
@@ -114,7 +114,7 @@ class EthersAdapter implements EthAdapter {
     safeVersion,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): Promise<GnosisSafeProxyFactoryEthersContract> {
+  }: GetContractProps): Promise<SafeProxyFactoryEthersContract> {
     const chainId = await this.getChainId()
     const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
     if (!contractAddress) {
@@ -198,6 +198,20 @@ class EthersAdapter implements EthAdapter {
     return getCreateCallContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
+  async getSimulateTxAccessorContract({
+    safeVersion,
+    singletonDeployment,
+    customContractAddress
+  }: GetContractProps): Promise<SimulateTxAccessorEthersContract> {
+    const chainId = await this.getChainId()
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SimulateTxAccessor contract address')
+    }
+    const signerOrProvider = this.#signer || this.#provider
+    return getSimulateTxAccessorContractInstance(safeVersion, contractAddress, signerOrProvider)
+  }
+
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
     return this.#provider.getCode(address, blockTag)
   }
@@ -205,21 +219,6 @@ class EthersAdapter implements EthAdapter {
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
     const contractCode = await this.#provider.getCode(address, blockTag)
     return contractCode !== '0x'
-  }
-
-  async getSimulateTxAccessorContract({
-    safeVersion,
-    singletonDeployment
-  }: // customContractAddress
-  GetContractProps): Promise<SimulateTxAccessorContract> {
-    const chainId = await this.getChainId()
-    // const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
-    const contractAddress = singletonDeployment?.networkAddresses[chainId]
-    if (!contractAddress) {
-      throw new Error('Invalid SimulateTxAccessor contract address')
-    }
-    const signerOrProvider = this.#signer || this.#provider
-    return getSimulateTxAccessorContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {

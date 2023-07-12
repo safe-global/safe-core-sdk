@@ -3,16 +3,17 @@ import {
   CompatibilityFallbackHandlerContract,
   CreateCallContract,
   EthAdapter,
-  GnosisSafeContract,
-  GnosisSafeProxyFactoryContract,
   MultiSendCallOnlyContract,
   MultiSendContract,
-  SimulateTxAccessorContract,
+  SafeContract,
+  SafeProxyFactoryContract,
   SafeVersion,
-  SignMessageLibContract
+  SignMessageLibContract,
+  SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import {
   DeploymentFilter,
+  SingletonDeployment,
   getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
   getMultiSendCallOnlyDeployment,
@@ -21,8 +22,7 @@ import {
   getSafeL2SingletonDeployment,
   getSafeSingletonDeployment,
   getSignMessageLibDeployment,
-  getSimulateTxAccessorDeployment,
-  SingletonDeployment
+  getSimulateTxAccessorDeployment
 } from '@safe-global/safe-deployments'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
@@ -102,33 +102,41 @@ export function getCreateCallContractDeployment(
   return getCreateCallDeployment({ version, network: chainId.toString(), released: true })
 }
 
+export function getSimulateTxAccessorContractDeployment(
+  safeVersion: SafeVersion,
+  chainId: number
+): SingletonDeployment | undefined {
+  const version = safeDeploymentsVersions[safeVersion].createCallVersion
+  return getSimulateTxAccessorDeployment({ version, network: chainId.toString(), released: true })
+}
+
 export async function getSafeContract({
   ethAdapter,
   safeVersion,
   customSafeAddress,
   isL1SafeMasterCopy,
   customContracts
-}: GetSafeContractInstanceProps): Promise<GnosisSafeContract> {
+}: GetSafeContractInstanceProps): Promise<SafeContract> {
   const chainId = await ethAdapter.getChainId()
   const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeMasterCopy)
-  const gnosisSafeContract = await ethAdapter.getSafeContract({
+  const safeContract = await ethAdapter.getSafeContract({
     safeVersion,
     singletonDeployment,
     customContractAddress: customSafeAddress ?? customContracts?.safeMasterCopyAddress,
     customContractAbi: customContracts?.safeMasterCopyAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(gnosisSafeContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(safeContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('SafeProxy contract is not deployed on the current network')
   }
-  return gnosisSafeContract
+  return safeContract
 }
 
 export async function getProxyFactoryContract({
   ethAdapter,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<GnosisSafeProxyFactoryContract> {
+}: GetContractInstanceProps): Promise<SafeProxyFactoryContract> {
   const chainId = await ethAdapter.getChainId()
   const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
   const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
@@ -257,24 +265,22 @@ export async function getCreateCallContract({
 
 export async function getSimulateTxAccessorContract({
   ethAdapter,
-  safeVersion
+  safeVersion,
+  customContracts
 }: GetContractInstanceProps): Promise<SimulateTxAccessorContract> {
   const chainId = await ethAdapter.getChainId()
-  const simutaleTxAccessorDeployment = getSimulateTxAccessorDeployment({
-    version: safeVersion,
-    network: chainId.toString(),
-    released: true
-  })
+  const simulateTxAccessorDeployment = getSimulateTxAccessorContractDeployment(safeVersion, chainId)
   const simulateTxAccessorContract = await ethAdapter.getSimulateTxAccessorContract({
     safeVersion,
-    singletonDeployment: simutaleTxAccessorDeployment
+    singletonDeployment: simulateTxAccessorDeployment,
+    customContractAddress: customContracts?.simulateTxAccessorAddress,
+    customContractAbi: customContracts?.simulateTxAccessorAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
     simulateTxAccessorContract.getAddress()
   )
   if (!isContractDeployed) {
-    throw new Error('simutaleTxContract contract is not deployed on the current network')
+    throw new Error('SimulateTxAccessor contract is not deployed on the current network')
   }
-
   return simulateTxAccessorContract
 }

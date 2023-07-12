@@ -5,8 +5,12 @@ import {
   OperationType,
   SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
+import semverSatisfies from 'semver/functions/satisfies'
 import { ZERO_ADDRESS } from '../constants'
-import { getSafeContract } from '../../contracts/safeDeploymentContracts'
+import {
+  getSafeContract,
+  getSimulateTxAccessorContract
+} from '../../contracts/safeDeploymentContracts'
 import Safe from '@safe-global/protocol-kit/Safe'
 
 // Every byte == 00 -> 4  Gas cost
@@ -200,6 +204,10 @@ export async function estimateTxBaseGas(
  * The safeTxGas value represents the amount of gas required to execute the Safe transaction itself.
  * It does not include costs such as signature verification, transaction hash generation, nonce incrementing, and so on.
  *
+ * The estimation method differs based on the version of the Safe:
+ * - For versions >= 1.3.0, the simulate function defined in the simulateTxAccessor Contract is used.
+ * - For versions < 1.3.0, the deprecated requiredTxGas method defined in the GnosisSafe contract is used.
+ *
  * @async
  * @function estimateSafeTxGas
  * @param {Safe} safe - The Safe instance containing all the necessary information about the safe.
@@ -208,6 +216,30 @@ export async function estimateTxBaseGas(
  *
  */
 export async function estimateSafeTxGas(
+  safe: Safe,
+  safeTransaction: SafeTransaction
+): Promise<string> {
+  const safeVersion = await safe.getContractVersion()
+
+  if (semverSatisfies(safeVersion, '>=1.3.0')) {
+    return estimateSafeTxGasWithSimulate(safe, safeTransaction)
+  } else {
+    return estimateSafeTxGasWithRequiredTxGas(safe, safeTransaction)
+  }
+}
+
+/**
+ * This function estimates the safeTxGas of a Safe transaction.
+ * Using the deprecated method of requiredTxGas defined in the GnosisSafe contract. This method is meant to be used for Safe versions < 1.3.0.
+ *
+ * @async
+ * @function estimateSafeTxGasWithRequiredTxGas
+ * @param {Safe} safe - The Safe instance containing all the necessary information about the safe.
+ * @param {SafeTransaction} safeTransaction - The transaction for which the safeTxGas is to be estimated.
+ * @returns {Promise<string>} A Promise that resolves with the estimated safeTxGas as a string.
+ *
+ */
+async function estimateSafeTxGasWithRequiredTxGas(
   safe: Safe,
   safeTransaction: SafeTransaction
 ): Promise<string> {
@@ -221,16 +253,13 @@ export async function estimateSafeTxGas(
   })
 
   // deprecated method to estimate the safeTxGas of a Safe transaction, see: https://github.com/safe-global/safe-contracts/blob/v1.2.0/contracts/GnosisSafe.sol#L276
-  const simulationMethod = 'requiredTxGas'
-
-  const transactionDataToEstimate: string = safeSingletonContract.encode(simulationMethod, [
+  const transactionDataToEstimate: string = safeSingletonContract.encode('requiredTxGas', [
     safeTransaction.data.to,
     safeTransaction.data.value,
     safeTransaction.data.data,
     safeTransaction.data.operation
   ])
 
-  // if the Safe is not deployed we can use the singleton address to simulate
   const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
 
   const transactionToEstimateGas = {
@@ -239,13 +268,12 @@ export async function estimateSafeTxGas(
     data: transactionDataToEstimate,
     from: safeAddress
   }
-
   try {
-    const response = await ethAdapter.call(transactionToEstimateGas)
+    const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
-    const safeTxGas = '0x' + response.slice(-32)
+    const safeTxGas = '0x' + encodedResponse.slice(-32)
 
-    return Number(safeTxGas).toString()
+    return safeTxGas
 
     // if the call throws an error we try to parse the returned value
   } catch (error: any) {
@@ -256,6 +284,85 @@ export async function estimateSafeTxGas(
         const [, safeTxGas] = revertData.split('Reverted ')
 
         return Number(safeTxGas).toString()
+      }
+    } catch {
+      return '0'
+    }
+  }
+
+  return '0'
+}
+
+/**
+ * This function estimates the safeTxGas of a Safe transaction.
+ * It uses the simulate function defined in the SimulateTxAccessor contract. This method is meant to be used for Safe versions >= 1.3.0.
+ *
+ * @async
+ * @function estimateSafeTxGasWithSimulate
+ * @param {Safe} safe - The Safe instance containing all the necessary information about the safe.
+ * @param {SafeTransaction} safeTransaction - The transaction for which the safeTxGas is to be estimated.
+ * @returns {Promise<string>} A Promise that resolves with the estimated safeTxGas as a string.
+ *
+ */
+async function estimateSafeTxGasWithSimulate(
+  safe: Safe,
+  safeTransaction: SafeTransaction
+): Promise<string> {
+  const isSafeDeployed = await safe.isSafeDeployed()
+  const safeAddress = await safe.getAddress()
+  const safeVersion = await safe.getContractVersion()
+  const ethAdapter = safe.getEthAdapter()
+  const safeSingletonContract = await getSafeContract({
+    ethAdapter,
+    safeVersion
+  })
+
+  // new version of the estimation
+  const simulateTxAccessorContract = await getSimulateTxAccessorContract({
+    ethAdapter,
+    safeVersion
+  })
+
+  const transactionDataToEstimate: string = simulateTxAccessorContract.encode('simulate', [
+    safeTransaction.data.to,
+    safeTransaction.data.value,
+    safeTransaction.data.data,
+    safeTransaction.data.operation
+  ])
+
+  // // if the Safe is not deployed we can use the singleton address to simulate
+  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
+
+  const safeFunctionToEstimate: string = safeSingletonContract.encode('simulateAndRevert', [
+    await simulateTxAccessorContract.getAddress(),
+    transactionDataToEstimate
+  ])
+
+  const transactionToEstimateGas = {
+    to,
+    value: '0',
+    data: safeFunctionToEstimate,
+    from: safeAddress
+  }
+
+  try {
+    const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
+
+    const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+
+    return safeTxGas
+
+    // if the call throws an error we try to parse the returned value
+  } catch (error: any) {
+    try {
+      const revertData = JSON.parse(error.error.body).error.data
+
+      if (revertData && revertData.startsWith('Reverted ')) {
+        const [, encodedResponse] = revertData.split('Reverted ')
+
+        const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+
+        return safeTxGas
       }
     } catch {
       return '0'

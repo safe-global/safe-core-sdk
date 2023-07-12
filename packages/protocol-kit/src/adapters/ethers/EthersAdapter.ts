@@ -273,7 +273,6 @@ class EthersAdapter implements EthAdapter {
   }
 
   decodeParameters(types: string[], values: string): { [key: string]: any } {
-    console.log('decodeParameters: ', types, values)
     return new this.#ethers.utils.AbiCoder().decode(types, values)
   }
 }

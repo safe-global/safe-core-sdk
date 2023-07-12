@@ -86,7 +86,7 @@
     "@ethersproject/address": "^5.7.0",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/solidity": "^5.7.0",
-    "@safe-global/safe-deployments": "^1.24.0",
+    "@safe-global/safe-deployments": "^1.25.0",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.8",
     "web3": "^1.8.1",

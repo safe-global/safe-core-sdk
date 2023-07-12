@@ -237,6 +237,8 @@ export type AllTransactionsListResponse = {
     | SafeMultisigTransactionWithTransfersResponse
     | EthereumTxWithTransfersResponse
   >
+  readonly getNext: () => Promise<AllTransactionsListResponse>
+  readonly getPrevious: () => Promise<AllTransactionsListResponse>
 }
 
 export type ModulesResponse = {

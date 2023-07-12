@@ -539,9 +539,31 @@ class SafeApiKit {
     const executed = options?.executed?.toString() || 'false'
     url.searchParams.set('executed', executed)
 
-    return sendRequest({
+    return sendRequest<AllTransactionsListResponse>({
       url: url.toString(),
       method: HttpMethod.Get
+    }).then((resultParam) => {
+      const result = { ...resultParam }
+
+      if (result.next) {
+        const url = result.next
+        result.getNext = () =>
+          sendRequest<AllTransactionsListResponse>({
+            url,
+            method: HttpMethod.Get
+          })
+      }
+
+      if (result.previous) {
+        const url = result.previous
+        result.getPrevious = () =>
+          sendRequest<AllTransactionsListResponse>({
+            url,
+            method: HttpMethod.Get
+          })
+      }
+
+      return result
     })
   }
 

@@ -1,7 +1,5 @@
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
-// TODO: Update last version to v1.4.1 when the "released" flag in safe-deployments is true
-// https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.4.1/safe.json#L3
 export const SAFE_LAST_VERSION: SafeVersion = '1.4.1'
 export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
 

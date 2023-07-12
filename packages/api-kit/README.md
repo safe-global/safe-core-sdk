@@ -260,6 +260,8 @@ const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPen
 
 Returns a list of transactions for a Safe. The list has different structures depending on the transaction type.
 
+Return type includes `getNext` and `getPrevious` functions if next / previous exists.
+
 ```js
 const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(
   safeAddress

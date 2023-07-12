@@ -1,12 +1,11 @@
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
+import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { BigNumber } from 'ethers'
 import { deployments, waffle } from 'hardhat'
-import semverSatisfies from 'semver/functions/satisfies'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
@@ -31,14 +30,10 @@ describe('Safe Info', () => {
         safeVersion: safeVersionDeployed
       }
     }
-    const predictedSafeAddress = semverSatisfies(safeVersionDeployed, '1.3.0')
-      ? '0xe37d3CA59F5e702eA928688409Ccd74E14be2EF4'
-      : '0x2374BBC0a7fe89F9A782Dbc6CF95ADA2817AE5F9'
     return {
       chainId: (await waffle.provider.getNetwork()).chainId,
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       predictedSafe,
-      predictedSafeAddress,
       accounts,
       contractNetworks
     }
@@ -68,7 +63,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should connect a Safe >=v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, predictedSafeAddress, safe, accounts, contractNetworks } =
+        const { predictedSafe, safe, accounts, contractNetworks } =
           await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
@@ -78,7 +73,6 @@ describe('Safe Info', () => {
           contractNetworks
         })
         const safeSdk2 = await safeSdk.connect({ predictedSafe })
-        chai.expect(await safeSdk2.getAddress()).to.be.eq(predictedSafeAddress)
         chai
           .expect(await safeSdk2.getEthAdapter().getSignerAddress())
           .to.be.eq(await account1.signer.getAddress())
@@ -187,8 +181,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the address of a Safe >=v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, accounts, predictedSafeAddress, contractNetworks } =
-          await setupTests()
+        const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
@@ -196,8 +189,17 @@ describe('Safe Info', () => {
           predictedSafe,
           contractNetworks
         })
-        const getSafeAaddress = safeSdk.getAddress()
-        chai.expect(await getSafeAaddress).to.be.eq(predictedSafeAddress)
+        const safeAddress = await safeSdk.getAddress()
+
+        const safeFactory = await SafeFactory.create({
+          ethAdapter,
+          safeVersion: safeVersionDeployed,
+          contractNetworks
+        })
+        const deployedSdk = await safeFactory.deploySafe(predictedSafe)
+        const expectedSafeAddress = await deployedSdk.getAddress()
+
+        chai.expect(safeAddress).to.be.eq(expectedSafeAddress)
       }
     )
 

@@ -30,10 +30,10 @@ import {
 } from './types'
 import {
   EthSafeSignature,
+  SAFE_FEATURES,
   hasSafeFeature,
   isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
-  SAFE_FEATURES,
   sameString
 } from './utils'
 import {
@@ -418,7 +418,8 @@ class Safe {
         await standardizeSafeTransactionData({
           predictedSafe: this.#predictedSafe,
           ethAdapter: this.#ethAdapter,
-          tx: newTransaction
+          tx: newTransaction,
+          contractNetworks: this.#contractManager.contractNetworks
         })
       )
     }
@@ -430,7 +431,8 @@ class Safe {
       await standardizeSafeTransactionData({
         safeContract: this.#contractManager.safeContract,
         ethAdapter: this.#ethAdapter,
-        tx: newTransaction
+        tx: newTransaction,
+        contractNetworks: this.#contractManager.contractNetworks
       })
     )
   }

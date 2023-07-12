@@ -1,8 +1,8 @@
 import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/utils/transactions'
 import {
   EthAdapter,
-  GnosisSafeContract,
   MetaTransactionData,
+  SafeContract,
   SafeTransactionDataPartial,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
@@ -30,13 +30,13 @@ export interface PredictedSafeProps {
 }
 
 export interface ContractNetworkConfig {
-  /** safeMasterCopyAddress - Address of the GnosisSafe Master Copy contract deployed on a specific network */
+  /** safeMasterCopyAddress - Address of the Safe Master Copy contract deployed on a specific network */
   safeMasterCopyAddress: string
-  /** safeMasterCopyAbi - Abi of the GnosisSafe Master Copy contract deployed on a specific network */
+  /** safeMasterCopyAbi - Abi of the Safe Master Copy contract deployed on a specific network */
   safeMasterCopyAbi?: AbiItem | AbiItem[]
-  /** safeProxyFactoryAddress - Address of the GnosisSafeProxyFactory contract deployed on a specific network */
+  /** safeProxyFactoryAddress - Address of the SafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAddress: string
-  /** safeProxyFactoryAbi - Abi of the GnosisSafeProxyFactory contract deployed on a specific network */
+  /** safeProxyFactoryAbi - Abi of the SafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAbi?: AbiItem | AbiItem[]
   /** multiSendAddress - Address of the MultiSend contract deployed on a specific network */
   multiSendAddress: string
@@ -58,6 +58,10 @@ export interface ContractNetworkConfig {
   createCallAddress: string
   /** createCallAbi - Abi of the CreateCall contract deployed on a specific network */
   createCallAbi?: AbiItem | AbiItem[]
+  /** simulateTxAccessorAddress - Address of the SimulateTxAccessor contract deployed on a specific network */
+  simulateTxAccessorAddress: string
+  /** simulateTxAccessorAbi - Abi of the SimulateTxAccessor contract deployed on a specific network */
+  simulateTxAccessorAbi?: AbiItem | AbiItem[]
 }
 
 export interface ContractNetworksConfig {
@@ -82,7 +86,7 @@ type SafeConfigWithPredictedSafeProps = {
 export type SafeConfigProps = {
   /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
-  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
@@ -109,7 +113,7 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 type ConnectSafeConfigProps = {
   /** ethAdapter - Ethereum adapter */
   ethAdapter?: EthAdapter
-  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
@@ -155,7 +159,7 @@ export interface SwapOwnerTxParams {
 
 type StandardizeSafeTxDataWithSafeContractProps = {
   /** safeContract - The Safe contract to use */
-  safeContract: GnosisSafeContract
+  safeContract: SafeContract
   /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe?: never
 }
@@ -172,6 +176,8 @@ interface StandardizeSafeTransactionData {
   ethAdapter: EthAdapter
   /** tx - Safe transaction */
   tx: SafeTransactionDataPartial
+  /** contractNetworks - Contract network configuration */
+  contractNetworks?: ContractNetworksConfig
 }
 
 export type StandardizeSafeTxDataWithSafeContract = StandardizeSafeTransactionData &

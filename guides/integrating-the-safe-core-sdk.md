@@ -56,9 +56,9 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 ```
 
-There are two versions of the Safe contracts: [GnosisSafe.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafe.sol) that does not trigger events in order to save gas and [GnosisSafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.3.0/contracts/GnosisSafeL2.sol) that does, which is more appropriate for L2 networks.
+There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-By default `GnosisSafe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `GnosisSafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `GnosisSafe.sol` contract.
+By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `Safe.sol` contract.
 
 ```js
 const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: true })
@@ -81,13 +81,15 @@ const contractNetworks: ContractNetworksConfig = {
     fallbackHandlerAddress: '<FALLBACK_HANDLER_ADDRESS>',
     signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
     createCallAddress: '<CREATE_CALL_ADDRESS>',
+    simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
     safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
     safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
     multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
     multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
     fallbackHandlerAbi: '<FALLBACK_HANDLER_ABI>', // Optional. Only needed with web3.js
     signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
-    createCallAbi: '<CREATE_CALL_ABI>' // Optional. Only needed with web3.js
+    createCallAbi: '<CREATE_CALL_ABI>', // Optional. Only needed with web3.js
+    simulateTxAccessorAbi: '<SIMULATE_TX_ACCESSOR_ABI>' // Optional. Only needed with web3.js
   }
 }
 

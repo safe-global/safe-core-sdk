@@ -6,9 +6,9 @@ import {
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { ContractNetworksConfig, SafeConfig } from '@safe-global/protocol-kit/types'
 import {
-  GnosisSafeContract,
   MultiSendCallOnlyContract,
-  MultiSendContract
+  MultiSendContract,
+  SafeContract
 } from '@safe-global/safe-core-sdk-types'
 import { SafeVersion } from 'packages/safe-core-sdk-types/dist/src/types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
@@ -16,7 +16,7 @@ import { isSafeConfigWithPredictedSafe } from '../utils/types'
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeMasterCopy?: boolean
-  #safeContract?: GnosisSafeContract
+  #safeContract?: SafeContract
   #multiSendContract!: MultiSendContract
   #multiSendCallOnlyContract!: MultiSendCallOnlyContract
 
@@ -76,7 +76,7 @@ class ContractManager {
     return this.#isL1SafeMasterCopy
   }
 
-  get safeContract(): GnosisSafeContract | undefined {
+  get safeContract(): SafeContract | undefined {
     return this.#safeContract
   }
 

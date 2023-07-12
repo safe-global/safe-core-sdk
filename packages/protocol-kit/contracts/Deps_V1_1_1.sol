@@ -6,7 +6,7 @@ import { GnosisSafe } from "./safe_V1_1_1/GnosisSafe.sol";
 import { MultiSend } from "./safe_V1_1_1/libraries/MultiSend.sol";
 import { CreateCall } from "./safe_V1_1_1/libraries/CreateCall.sol";
 
-contract ProxyFactory_SV1_1_1 is ProxyFactory {}
-contract GnosisSafe_SV1_1_1 is GnosisSafe {}
+contract SafeProxyFactory_SV1_1_1 is ProxyFactory {}
+contract Safe_SV1_1_1 is GnosisSafe {}
 contract MultiSend_SV1_1_1 is GnosisSafe {}
 contract CreateCall_SV1_1_1 is GnosisSafe {}

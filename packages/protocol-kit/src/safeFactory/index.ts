@@ -1,9 +1,16 @@
+import Safe from '@safe-global/protocol-kit/Safe'
 import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getProxyFactoryContract,
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
-import Safe from '@safe-global/protocol-kit/Safe'
+import {
+  PREDETERMINED_SALT_NONCE,
+  encodeSetupCallData,
+  predictSafeAddress,
+  validateSafeAccountConfig,
+  validateSafeDeploymentConfig
+} from '@safe-global/protocol-kit/contracts/utils'
 import {
   ContractNetworksConfig,
   SafeAccountConfig,
@@ -11,18 +18,11 @@ import {
 } from '@safe-global/protocol-kit/types'
 import {
   EthAdapter,
-  GnosisSafeContract,
-  GnosisSafeProxyFactoryContract,
+  SafeContract,
+  SafeProxyFactoryContract,
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import {
-  predictSafeAddress,
-  encodeSetupCallData,
-  PREDETERMINED_SALT_NONCE,
-  validateSafeAccountConfig,
-  validateSafeDeploymentConfig
-} from '@safe-global/protocol-kit/contracts/utils'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
@@ -36,7 +36,7 @@ export interface SafeFactoryConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
-  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
@@ -47,7 +47,7 @@ interface SafeFactoryInitConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion
-  /** isL1SafeMasterCopy - Forces to use the GnosisSafe L1 version of the contract instead of the L2 version */
+  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
@@ -58,8 +58,8 @@ class SafeFactory {
   #isL1SafeMasterCopy?: boolean
   #safeVersion!: SafeVersion
   #ethAdapter!: EthAdapter
-  #safeProxyFactoryContract!: GnosisSafeProxyFactoryContract
-  #gnosisSafeContract!: GnosisSafeContract
+  #safeProxyFactoryContract!: SafeProxyFactoryContract
+  #safeContract!: SafeContract
 
   static async create({
     ethAdapter,
@@ -89,7 +89,7 @@ class SafeFactory {
       safeVersion,
       customContracts
     })
-    this.#gnosisSafeContract = await getSafeContract({
+    this.#safeContract = await getSafeContract({
       ethAdapter,
       safeVersion,
       isL1SafeMasterCopy,
@@ -150,7 +150,7 @@ class SafeFactory {
     const initializer = await encodeSetupCallData({
       ethAdapter: this.#ethAdapter,
       safeAccountConfig,
-      safeContract: this.#gnosisSafeContract,
+      safeContract: this.#safeContract,
       customContracts
     })
 
@@ -158,7 +158,7 @@ class SafeFactory {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
-      safeMasterCopyAddress: this.#gnosisSafeContract.getAddress(),
+      safeMasterCopyAddress: this.#safeContract.getAddress(),
       initializer,
       saltNonce,
       options: {

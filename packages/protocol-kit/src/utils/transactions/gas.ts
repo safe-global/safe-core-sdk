@@ -55,11 +55,8 @@ export async function estimateGas(
     data: safeFunctionToEstimate,
     from: safeAddress
   }
-  const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
   // TO-DO: Improve decoding
-  const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
-
   /*
   const simulateAndRevertResponse = ethAdapter.decodeParameters(
     ['bool', 'bytes'],
@@ -67,8 +64,29 @@ export async function estimateGas(
   )
   const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
   */
+  try {
+    const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
-  return safeTxGas
+    return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+  }
+  catch(error: any) {
+    // Ethers
+    if (error?.error?.body) {
+      const revertData = JSON.parse(error.error.body).error.data
+      if (revertData && revertData.startsWith('Reverted ')) {
+        const [, encodedResponse] = revertData.split('Reverted ')
+        const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+        
+        return safeTxGas
+      }
+    }
+
+    // Web3
+    const [, encodedResponse] = error.message.split('return data: ')
+    const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+
+    return safeTxGas
+  }
 }
 
 export async function estimateTxGas(

@@ -53,7 +53,7 @@ export async function estimateGas(
   const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
   // TO-DO: Improve decoding
-  const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10))
+  const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
 
   /*
   const simulateAndRevertResponse = ethAdapter.decodeParameters(

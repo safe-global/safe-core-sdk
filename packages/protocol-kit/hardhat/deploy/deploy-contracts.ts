@@ -1,7 +1,6 @@
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
-import semverSatisfies from 'semver/functions/satisfies'
 
 export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 
@@ -135,14 +134,12 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     deterministicDeployment: true
   })
 
-  if (semverSatisfies(safeVersionDeployed, '>=1.3.0')) {
-    await deploy(simulateTxAccessorDeployed.name, {
-      from: deployer,
-      args: [],
-      log: true,
-      deterministicDeployment: true
-    })
-  }
+  await deploy(simulateTxAccessorDeployed.name, {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
 
   await deploy('DailyLimitModule', {
     from: deployer,
@@ -164,35 +161,31 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     log: true
   })
 
-  if (semverSatisfies(safeVersionDeployed, '1.3.0')) {
-    await deploy('DebugTransactionGuard_SV1_3_0', {
-      from: deployer,
-      args: [],
-      log: true
-    })
+  await deploy('DebugTransactionGuard_SV1_3_0', {
+    from: deployer,
+    args: [],
+    log: true
+  })
 
-    await deploy('DefaultCallbackHandler_SV1_3_0', {
-      from: deployer,
-      args: [],
-      log: true,
-      deterministicDeployment: true
-    })
-  }
+  await deploy('DefaultCallbackHandler_SV1_3_0', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
 
-  if (semverSatisfies(safeVersionDeployed, '1.4.1')) {
-    await deploy('DebugTransactionGuard_SV1_4_1', {
-      from: deployer,
-      args: [],
-      log: true
-    })
+  await deploy('DebugTransactionGuard_SV1_4_1', {
+    from: deployer,
+    args: [],
+    log: true
+  })
 
-    await deploy('TokenCallbackHandler_SV1_4_1', {
-      from: deployer,
-      args: [],
-      log: true,
-      deterministicDeployment: true
-    })
-  }
+  await deploy('TokenCallbackHandler_SV1_4_1', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
 }
 
 export default deploy

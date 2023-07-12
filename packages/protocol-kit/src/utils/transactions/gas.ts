@@ -68,15 +68,14 @@ export async function estimateGas(
     const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
     return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
-  }
-  catch(error: any) {
+  } catch (error: any) {
     // Ethers
     if (error?.error?.body) {
       const revertData = JSON.parse(error.error.body).error.data
       if (revertData && revertData.startsWith('Reverted ')) {
         const [, encodedResponse] = revertData.split('Reverted ')
         const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
-        
+
         return safeTxGas
       }
     }

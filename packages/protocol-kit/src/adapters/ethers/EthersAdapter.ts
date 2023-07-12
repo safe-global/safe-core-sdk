@@ -18,6 +18,7 @@ import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/Multi
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import SafeProxyFactoryEthersContract from './contracts/SafeProxyFactory/SafeProxyFactoryEthersContract'
 import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
+import SimulateTxAccessorEthersContract from './contracts/SimulateTxAccessor/SimulateTxAccessorEthersContract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -25,7 +26,8 @@ import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
-  getSignMessageLibContractInstance
+  getSignMessageLibContractInstance,
+  getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
 import { isSignerCompatible, isTypedDataSigner } from './utils'
 
@@ -194,6 +196,20 @@ class EthersAdapter implements EthAdapter {
     }
     const signerOrProvider = this.#signer || this.#provider
     return getCreateCallContractInstance(safeVersion, contractAddress, signerOrProvider)
+  }
+
+  async getSimulateTxAccessorContract({
+    safeVersion,
+    singletonDeployment,
+    customContractAddress
+  }: GetContractProps): Promise<SimulateTxAccessorEthersContract> {
+    const chainId = await this.getChainId()
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SimulateTxAccessor contract address')
+    }
+    const signerOrProvider = this.#signer || this.#provider
+    return getSimulateTxAccessorContractInstance(safeVersion, contractAddress, signerOrProvider)
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {

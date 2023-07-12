@@ -22,6 +22,7 @@ import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSe
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
 import SafeProxyFactoryWeb3Contract from './contracts/SafeProxyFactory/SafeProxyFactoryWeb3Contract'
 import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
+import SimulateTxAccessorWeb3Contract from './contracts/SimulateTxAccessor/SimulateTxAccessorWeb3Contract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -29,7 +30,8 @@ import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
-  getSignMessageLibContractInstance
+  getSignMessageLibContractInstance,
+  getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesWeb3'
 
 export interface Web3AdapterConfig {
@@ -207,6 +209,24 @@ class Web3Adapter implements EthAdapter {
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
     return getCreateCallContractInstance(safeVersion, createCallContract)
+  }
+
+  async getSimulateTxAccessorContract({
+    safeVersion,
+    singletonDeployment,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<SimulateTxAccessorWeb3Contract> {
+    const chainId = await this.getChainId()
+    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    if (!contractAddress) {
+      throw new Error('Invalid SimulateTxAccessor contract address')
+    }
+    const simulateTxAccessorContract = this.getContract(
+      contractAddress,
+      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+    )
+    return getSimulateTxAccessorContractInstance(safeVersion, simulateTxAccessorContract)
   }
 
   getContract(address: string, abi: AbiItem | AbiItem[], options?: ContractOptions): any {

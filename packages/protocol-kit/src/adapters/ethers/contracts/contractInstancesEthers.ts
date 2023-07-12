@@ -13,6 +13,7 @@ import { Multi_send__factory as MultiSend_V1_3_0 } from '@safe-global/protocol-k
 import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send_call_only__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Proxy_factory__factory'
 import { Sign_message_lib__factory as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Sign_message_lib__factory'
+import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Simulate_tx_accessor__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Create_call__factory'
 import { Multi_send__factory as MultiSend_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Multi_send__factory'
@@ -20,6 +21,7 @@ import { Multi_send_call_only__factory as MultiSendCallOnly_V1_4_1 } from '@safe
 import { Safe__factory as SafeMasterCopy_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Safe__factory'
 import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Safe_proxy_factory__factory'
 import { Sign_message_lib__factory as SignMessageLib_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Sign_message_lib__factory'
+import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Simulate_tx_accessor__factory'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
 import CompatibilityFallbackHandler_V1_4_1_Ethers from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Ethers'
@@ -41,6 +43,8 @@ import SafeProxyFactoryContract_V1_3_0_Ethers from './SafeProxyFactory/v1.3.0/Sa
 import SafeProxyFactoryContract_V1_4_1_Ethers from './SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_V1_4_1_Ethers'
 import SignMessageLibContract_V1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Ethers'
 import SignMessageLibContract_V1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Ethers'
+import SimulateTxAccessorContract_V1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Ethers'
+import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Ethers'
 
 export function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -216,6 +220,24 @@ export function getCreateCallContractInstance(
     case '1.0.0':
       createCallContract = CreateCall_V1_3_0.connect(contractAddress, signerOrProvider)
       return new CreateCallContract_V1_3_0_Ethers(createCallContract)
+    default:
+      throw new Error('Invalid Safe version')
+  }
+}
+
+export function getSimulateTxAccessorContractInstance(
+  safeVersion: SafeVersion,
+  contractAddress: string,
+  signerOrProvider: Signer | Provider
+): SimulateTxAccessorContract_V1_4_1_Ethers | SimulateTxAccessorContract_V1_3_0_Ethers {
+  let simulateTxAccessorContract
+  switch (safeVersion) {
+    case '1.4.1':
+      simulateTxAccessorContract = SimulateTxAccessor_V1_4_1.connect(contractAddress, signerOrProvider)
+      return new SimulateTxAccessorContract_V1_4_1_Ethers(simulateTxAccessorContract)
+    case '1.3.0':
+      simulateTxAccessorContract = SimulateTxAccessor_V1_3_0.connect(contractAddress, signerOrProvider)
+      return new SimulateTxAccessorContract_V1_3_0_Ethers(simulateTxAccessorContract)
     default:
       throw new Error('Invalid Safe version')
   }

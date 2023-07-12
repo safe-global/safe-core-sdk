@@ -32,7 +32,8 @@ const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/multi_send_call_only.json`,
   `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`,
   `${safeContractsPath}/v1.3.0/sign_message_lib.json`,
-  `${safeContractsPath}/v1.3.0/create_call.json`
+  `${safeContractsPath}/v1.3.0/create_call.json`,
+  `${safeContractsPath}/v1.3.0/simulate_tx_accessor.json`
 ].join(' ')
 const safeContracts_V1_2_0 = [`${safeContractsPath}/v1.2.0/gnosis_safe.json`].join(' ')
 const safeContracts_V1_1_1 = [
@@ -46,6 +47,11 @@ const safeContracts_V1_0_0 = [
 ].join(' ')
 
 // Won't be included in dist/ folder
+const safeContractsTestV1_4_1Path =
+  '../../node_modules/@safe-global/safe-contracts-v1.4.1/build/artifacts/contracts'
+const testContracts_V1_4_1 = [
+  `${safeContractsTestV1_4_1Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`
+].join(' ')
 const safeContractsTestV1_3_0Path =
   '../../node_modules/@gnosis.pm/safe-contracts-v1.3.0/build/artifacts/contracts'
 const testContracts_V1_3_0 = [
@@ -142,6 +148,11 @@ function generateTypes(typechainTarget: string) {
   )
 
   // Tests
+  generateTypechainFiles(
+    typechainTarget,
+    `${outDirTests}${typechainTarget}/v1.4.1`,
+    testContracts_V1_4_1
+  )
   generateTypechainFiles(
     typechainTarget,
     `${outDirTests}${typechainTarget}/v1.3.0`,

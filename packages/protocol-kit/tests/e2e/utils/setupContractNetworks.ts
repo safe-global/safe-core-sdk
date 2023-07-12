@@ -6,7 +6,8 @@ import {
   getMultiSend,
   getMultiSendCallOnly,
   getSafeSingleton,
-  getSignMessageLib
+  getSignMessageLib,
+  getSimulateTxAccessor
 } from './setupContracts'
 
 export async function getContractNetworks(chainId: number): Promise<ContractNetworksConfig> {
@@ -25,7 +26,9 @@ export async function getContractNetworks(chainId: number): Promise<ContractNetw
       signMessageLibAddress: (await getSignMessageLib()).contract.address,
       signMessageLibAbi: (await getSignMessageLib()).abi,
       createCallAddress: (await getCreateCall()).contract.address,
-      createCallAbi: (await getCreateCall()).abi
+      createCallAbi: (await getCreateCall()).abi,
+      simulateTxAccessorAddress: (await getSimulateTxAccessor()).contract.address,
+      simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi
     }
   }
 }

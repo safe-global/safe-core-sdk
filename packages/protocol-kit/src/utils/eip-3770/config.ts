@@ -78,6 +78,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 4689, shortName: 'iotex-mainnet' },
   { chainId: 4918, shortName: 'txvm' },
   { chainId: 4919, shortName: 'xvm' },
+  { chainId: 5000, shortName: 'mantle' },
   { chainId: 5001, shortName: 'mantle-testnet' },
   { chainId: 7341, shortName: 'shyft' },
   { chainId: 7700, shortName: 'canto' },

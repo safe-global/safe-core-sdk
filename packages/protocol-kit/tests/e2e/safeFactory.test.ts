@@ -1,4 +1,4 @@
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
   ContractNetworksConfig,
@@ -440,7 +440,7 @@ describe('SafeProxyFactory', () => {
       chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
     })
 
-    itif(safeVersionDeployed === SAFE_LAST_VERSION)(
+    itif(safeVersionDeployed === DEFAULT_SAFE_VERSION)(
       'should deploy last Safe version by default',
       async () => {
         const { accounts, contractNetworks } = await setupTests()

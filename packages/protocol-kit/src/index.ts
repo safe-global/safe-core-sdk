@@ -25,7 +25,7 @@ import {
   Web3TransactionOptions,
   Web3TransactionResult
 } from './adapters/web3'
-import { SAFE_LAST_VERSION } from './contracts/config'
+import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,
   getCreateCallContract,
@@ -76,6 +76,7 @@ export {
   CreateEthersProxyProps,
   CreateTransactionProps,
   CreateWeb3ProxyProps,
+  DEFAULT_SAFE_VERSION,
   DeploySafeProps,
   EthSafeSignature,
   EthersAdapter,
@@ -89,7 +90,6 @@ export {
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,
   RemoveOwnerTxParams,
-  SAFE_LAST_VERSION,
   SafeAccountConfig,
   SafeConfig,
   SafeConfigWithPredictedSafe,

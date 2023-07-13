@@ -1,4 +1,4 @@
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getMultiSendCallOnlyContract,
   getMultiSendContract,
@@ -37,11 +37,11 @@ class ContractManager {
     let safeVersion: SafeVersion
 
     if (isSafeConfigWithPredictedSafe(config)) {
-      safeVersion = config.predictedSafe.safeDeploymentConfig?.safeVersion ?? SAFE_LAST_VERSION
+      safeVersion = config.predictedSafe.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
     } else {
       const temporarySafeContract = await getSafeContract({
         ethAdapter,
-        safeVersion: SAFE_LAST_VERSION,
+        safeVersion: DEFAULT_SAFE_VERSION,
         isL1SafeMasterCopy,
         customSafeAddress: config.safeAddress,
         customContracts

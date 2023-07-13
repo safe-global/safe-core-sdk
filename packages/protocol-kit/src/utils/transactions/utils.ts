@@ -1,7 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 import { arrayify } from '@ethersproject/bytes'
 import { pack as solidityPack } from '@ethersproject/solidity'
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -56,7 +56,7 @@ export async function standardizeSafeTransactionData({
 
   let safeVersion: SafeVersion
   if (predictedSafe) {
-    safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion || SAFE_LAST_VERSION
+    safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion || DEFAULT_SAFE_VERSION
   } else {
     if (!safeContract) {
       throw new Error('Safe is not deployed')

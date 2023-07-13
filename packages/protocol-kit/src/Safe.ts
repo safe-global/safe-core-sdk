@@ -11,7 +11,7 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_LAST_VERSION } from './contracts/config'
+import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import { predictSafeAddress } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
@@ -250,7 +250,7 @@ class Safe {
       return Promise.resolve(this.#predictedSafe.safeDeploymentConfig.safeVersion)
     }
 
-    return Promise.resolve(SAFE_LAST_VERSION)
+    return Promise.resolve(DEFAULT_SAFE_VERSION)
   }
 
   /**

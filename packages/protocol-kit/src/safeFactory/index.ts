@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit/Safe'
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getProxyFactoryContract,
   getSafeContract
@@ -63,7 +63,7 @@ class SafeFactory {
 
   static async create({
     ethAdapter,
-    safeVersion = SAFE_LAST_VERSION,
+    safeVersion = DEFAULT_SAFE_VERSION,
     isL1SafeMasterCopy = false,
     contractNetworks
   }: SafeFactoryConfig): Promise<SafeFactory> {

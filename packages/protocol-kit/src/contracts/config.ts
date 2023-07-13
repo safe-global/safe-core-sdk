@@ -1,6 +1,6 @@
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
-export const SAFE_LAST_VERSION: SafeVersion = '1.3.0'
+export const SAFE_LAST_VERSION: SafeVersion = '1.4.1'
 export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
 
 type SafeDeploymentsVersions = {
@@ -17,6 +17,16 @@ type SafeDeploymentsVersions = {
 }
 
 export const safeDeploymentsVersions: SafeDeploymentsVersions = {
+  '1.4.1': {
+    safeMasterCopyVersion: '1.4.1',
+    safeMasterCopyL2Version: '1.4.1',
+    safeProxyFactoryVersion: '1.4.1',
+    compatibilityFallbackHandler: '1.4.1',
+    multiSendVersion: '1.4.1',
+    multiSendCallOnlyVersion: '1.4.1',
+    signMessageLibVersion: '1.4.1',
+    createCallVersion: '1.4.1'
+  },
   '1.3.0': {
     safeMasterCopyVersion: '1.3.0',
     safeMasterCopyL2Version: '1.3.0',

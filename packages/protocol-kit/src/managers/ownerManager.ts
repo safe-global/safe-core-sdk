@@ -1,12 +1,12 @@
-import { EthAdapter, GnosisSafeContract } from '@safe-global/safe-core-sdk-types'
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
 
 class OwnerManager {
   #ethAdapter: EthAdapter
-  #safeContract?: GnosisSafeContract
+  #safeContract?: SafeContract
 
-  constructor(ethAdapter: EthAdapter, safeContract?: GnosisSafeContract) {
+  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
     this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }

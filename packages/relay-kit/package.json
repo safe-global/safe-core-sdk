@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/relay-kit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Safe Relay Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -12,7 +12,7 @@
     "Relay"
   ],
   "scripts": {
-    "test": "jest src",
+    "test": "jest src --coverage",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist .nyc_output cache",
@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^3.1.0",
-    "@safe-global/protocol-kit": "^1.0.0",
-    "@safe-global/safe-core-sdk-types": "^2.0.0",
+    "@safe-global/protocol-kit": "^1.1.0",
+    "@safe-global/safe-core-sdk-types": "^2.1.0",
     "ethers": "^5.7.2"
   }
 }

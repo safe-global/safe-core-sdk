@@ -30,10 +30,10 @@ import {
 } from './types'
 import {
   EthSafeSignature,
+  SAFE_FEATURES,
   hasSafeFeature,
   isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
-  SAFE_FEATURES,
   sameString
 } from './utils'
 import {
@@ -418,7 +418,8 @@ class Safe {
         await standardizeSafeTransactionData({
           predictedSafe: this.#predictedSafe,
           ethAdapter: this.#ethAdapter,
-          tx: newTransaction
+          tx: newTransaction,
+          contractNetworks: this.#contractManager.contractNetworks
         })
       )
     }
@@ -430,7 +431,8 @@ class Safe {
       await standardizeSafeTransactionData({
         safeContract: this.#contractManager.safeContract,
         ethAdapter: this.#ethAdapter,
-        tx: newTransaction
+        tx: newTransaction,
+        contractNetworks: this.#contractManager.contractNetworks
       })
     )
   }
@@ -966,12 +968,16 @@ class Safe {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
+    const threshold = await this.getThreshold()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
-    if (signerAddress && owners.includes(signerAddress)) {
+    if (
+      threshold > signedSafeTransaction.signatures.size &&
+      signerAddress &&
+      owners.includes(signerAddress)
+    ) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
-    const threshold = await this.getThreshold()
     if (threshold > signedSafeTransaction.signatures.size) {
       const signaturesMissing = threshold - signedSafeTransaction.signatures.size
       throw new Error(

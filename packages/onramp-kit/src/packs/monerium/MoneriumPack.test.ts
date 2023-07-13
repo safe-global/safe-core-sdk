@@ -3,6 +3,7 @@ import Safe from '@safe-global/protocol-kit'
 import { MoneriumPack } from './MoneriumPack'
 import * as safeMoneriumClient from './SafeMoneriumClient'
 import * as sockets from './sockets'
+import { OnRampKitBasePack } from '../../OnRampKitBasePack'
 
 Object.defineProperty(window, 'location', {
   writable: true,
@@ -46,6 +47,7 @@ describe('MoneriumPack', () => {
   describe('init()', () => {
     it('should create a MoneriumPack instance', () => {
       expect(moneriumPack).toBeInstanceOf(MoneriumPack)
+      expect(moneriumPack).toBeInstanceOf(OnRampKitBasePack)
     })
 
     it('should initialize the pack', async () => {

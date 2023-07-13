@@ -1,6 +1,6 @@
-import { Currency } from '@monerium/sdk'
+import { Currency, OrderState } from '@monerium/sdk'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
-import { SafeOnRampPack } from '@safe-global/onramp-kit/types'
+import { OnRampKitBasePack } from '@safe-global/onramp-kit/OnRampKitBasePack'
 
 import { SafeMoneriumClient } from './SafeMoneriumClient'
 import {
@@ -16,16 +16,22 @@ const MONERIUM_CODE_VERIFIER = 'OnRampKit__monerium_code_verifier'
 const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
 
 /**
- * This class implements the SafeOnRampClient interface for the Monerium provider
+ * This class extends the OnRampKitBasePack to work with the Monerium platform
  * @class MoneriumPack
  */
-export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
-  #client?: SafeMoneriumClient
+export class MoneriumPack extends OnRampKitBasePack {
   #config: MoneriumProviderConfig
+  #client?: SafeMoneriumClient
   #socket?: WebSocket
   #subscriptions: Map<MoneriumEvent, MoneriumEventListener> = new Map()
 
+  /**
+   * The constructor of the MoneriumPack
+   * @constructor
+   * @param config The configuration object for the Monerium provider
+   */
   constructor(config: MoneriumProviderConfig) {
+    super()
     this.#config = config
   }
 
@@ -218,7 +224,7 @@ export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
    * @param handler The handler to be called when the event is triggered
    */
   subscribe(event: MoneriumEvent, handler: MoneriumEventListener): void {
-    this.#subscriptions.set(event, handler)
+    this.#subscriptions.set(event as OrderState, handler)
   }
 
   /**
@@ -226,7 +232,7 @@ export class MoneriumPack implements SafeOnRampPack<MoneriumPack> {
    * @param event The event to unsubscribe from
    */
   unsubscribe(event: MoneriumEvent): void {
-    this.#subscriptions.delete(event)
+    this.#subscriptions.delete(event as OrderState)
 
     if (this.#subscriptions.size === 0) {
       this.#socket?.close()

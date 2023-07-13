@@ -2,14 +2,14 @@ import { useEffect, useState, useRef } from 'react'
 import { ethers } from 'ethers'
 import { Grid, TextField, Button } from '@mui/material'
 
-import { SafeOnRampKit, StripeSession, StripePack } from '../../../../src'
+import { StripeSession, StripePack } from '../../../../src'
 
 const isSessionValid = (sessionId: string) => sessionId.length === 28
 
 function Stripe() {
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [sessionId, setSessionId] = useState<string>('')
-  const [onRampClient, setOnRampClient] = useState<SafeOnRampKit<StripePack>>()
+  const [stripePack, setStripePack] = useState<StripePack>()
   const stripeRootRef = useRef<HTMLDivElement>(null)
 
   const handleCreateSession = async () => {
@@ -19,7 +19,7 @@ function Stripe() {
       stripeRootRef.current.innerHTML = ''
     }
 
-    const sessionData = (await onRampClient?.open({
+    const sessionData = (await stripePack?.open({
       element: '#stripe-root',
       sessionId: sessionId,
       theme: 'light',
@@ -36,11 +36,11 @@ function Stripe() {
       }
     })) as StripeSession
 
-    onRampClient?.subscribe('onramp_ui_loaded', () => {
+    stripePack?.subscribe('onramp_ui_loaded', () => {
       console.log('UI loaded')
     })
 
-    onRampClient?.subscribe('onramp_session_updated', (e) => {
+    stripePack?.subscribe('onramp_session_updated', (e) => {
       console.log('Session Updated', e.payload)
     })
 
@@ -49,14 +49,14 @@ function Stripe() {
 
   useEffect(() => {
     ;(async () => {
-      const onRampClient = await SafeOnRampKit.init(
-        new StripePack({
-          stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
-          onRampBackendUrl: import.meta.env.VITE_SAFE_STRIPE_BACKEND_BASE_URL
-        })
-      )
+      const pack = new StripePack({
+        stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
+        onRampBackendUrl: import.meta.env.VITE_SAFE_STRIPE_BACKEND_BASE_URL
+      })
 
-      setOnRampClient(onRampClient)
+      await pack.init()
+
+      setStripePack(pack)
     })()
   }, [])
 

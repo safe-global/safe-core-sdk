@@ -2,51 +2,54 @@ import { IAdapter, UserInfo } from '@web3auth/base'
 import { ModalConfig, Web3Auth, Web3AuthOptions } from '@web3auth/modal'
 import { ExternalProvider } from '@ethersproject/providers'
 
-import type { SafeAuthPack } from '@safe-global/auth-kit/types'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
-import { Web3AuthEvent, Web3AuthEventListener } from './types'
+import { Web3AuthConfig, Web3AuthEvent, Web3AuthEventListener } from './types'
+import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
+import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 
 /**
  * Web3AuthModalPack implements the SafeAuthClient interface for adapting the Web3Auth service provider
  * @class
  */
-export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
-  provider: ExternalProvider | null
-  private web3authInstance?: Web3Auth
-  #options: Web3AuthOptions
-  #adapters?: IAdapter<unknown>[]
-  #modalConfig?: Record<string, ModalConfig>
+export class Web3AuthModalPack extends AuthKitBasePack {
+  #provider: ExternalProvider | null
+  #config: Web3AuthConfig
+  web3Auth?: Web3Auth
 
   /**
-   *
-   * @param options Web3Auth options {@link https://web3auth.io/docs/sdk/web/modal/initialize#arguments}
-   * @param config Web3Auth adapters {@link https://web3auth.io/docs/sdk/web/modal/initialize#configuring-adapters}
-   * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
+   * Instantiate the Web3AuthModalPack
+   * @param config Web3Auth specific config
    */
-  constructor(
-    options: Web3AuthOptions,
-    adapters?: IAdapter<unknown>[],
-    modalConfig?: Record<string, ModalConfig>
-  ) {
-    this.provider = null
-    this.#options = options
-    this.#adapters = adapters
-    this.#modalConfig = modalConfig
+  constructor(config: Web3AuthConfig) {
+    super()
+    this.#config = config
+    this.#provider = null
   }
 
   /**
    * Initialize the Web3Auth service provider
+   * @param options Web3Auth options {@link https://web3auth.io/docs/sdk/web/modal/initialize#arguments}
+   * @param adapters Web3Auth adapters {@link https://web3auth.io/docs/sdk/web/modal/initialize#configuring-adapters}
+   * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
    * @throws Error if there was an error initializing Web3Auth
    */
-  async init() {
+  async init({
+    options,
+    adapters,
+    modalConfig
+  }: {
+    options: Web3AuthOptions
+    adapters?: IAdapter<unknown>[]
+    modalConfig?: Record<string, ModalConfig>
+  }) {
     try {
-      this.web3authInstance = new Web3Auth(this.#options)
+      this.web3Auth = new Web3Auth(options)
 
-      this.#adapters?.forEach((adapter) => this.web3authInstance?.configureAdapter(adapter))
+      adapters?.forEach((adapter) => this.web3Auth?.configureAdapter(adapter))
 
-      await this.web3authInstance.initModal({ modalConfig: this.#modalConfig })
+      await this.web3Auth.initModal({ modalConfig: modalConfig })
 
-      this.provider = this.web3authInstance.provider
+      this.#provider = this.web3Auth.provider
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -54,26 +57,40 @@ export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
 
   /**
    * Connect to the Web3Auth service provider
-   * @returns
+   * @returns The sign in data from the provider
    */
-  async signIn() {
-    if (!this.web3authInstance) {
+  async signIn(): Promise<AuthKitSignInData> {
+    if (!this.web3Auth) {
       throw new Error('Web3AuthModalPack is not initialized')
     }
 
-    this.provider = await this.web3authInstance.connect()
+    this.#provider = await this.web3Auth.connect()
+
+    const eoa = await this.getAddress()
+    const safes = await this.getSafes(this.#config?.txServiceUrl || '')
+
+    const signInData = {
+      eoa,
+      safes
+    }
+
+    return signInData
+  }
+
+  getProvider(): ExternalProvider | null {
+    return this.#provider
   }
 
   /**
    * Disconnect from the Web3Auth service provider
    */
   async signOut() {
-    if (!this.web3authInstance) {
+    if (!this.web3Auth) {
       throw new Error('Web3AuthModalPack is not initialized')
     }
 
-    this.provider = null
-    await this.web3authInstance.logout()
+    this.#provider = null
+    await this.web3Auth.logout()
   }
 
   /**
@@ -81,11 +98,11 @@ export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
    * @returns The user info
    */
   async getUserInfo(): Promise<Partial<UserInfo>> {
-    if (!this.web3authInstance) {
+    if (!this.web3Auth) {
       throw new Error('Web3AuthModalPack is not initialized')
     }
 
-    const userInfo = await this.web3authInstance.getUserInfo()
+    const userInfo = await this.web3Auth.getUserInfo()
 
     return userInfo
   }
@@ -96,7 +113,7 @@ export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
    * @param handler The event handler
    */
   subscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
-    this.web3authInstance?.on(event, handler)
+    this.web3Auth?.on(event, handler)
   }
 
   /**
@@ -105,6 +122,6 @@ export class Web3AuthModalPack implements SafeAuthPack<Web3AuthModalPack> {
    * @param handler The event handler
    */
   unsubscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
-    this.web3authInstance?.off(event, handler)
+    this.web3Auth?.off(event, handler)
   }
 }

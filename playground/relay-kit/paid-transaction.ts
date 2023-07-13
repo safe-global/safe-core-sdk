@@ -1,10 +1,9 @@
 import AccountAbstraction, {
   AccountAbstractionConfig,
-  MetaTransactionData,
-  MetaTransactionOptions,
   OperationType
 } from '@safe-global/account-abstraction-kit-poc'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
+import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
 import { BigNumber, ethers } from 'ethers'
 
 // Check the status of a transaction after it is relayed:
@@ -28,7 +27,7 @@ const txConfig = {
   DATA: '<DATA>',
   VALUE: '<VALUE>',
   // Options:
-  GAS_LIMIT: BigNumber.from('<GAS_LIMIT>'),
+  GAS_LIMIT: '<GAS_LIMIT>',
   GAS_TOKEN: ethers.constants.AddressZero
 }
 
@@ -67,7 +66,7 @@ async function main() {
   if (safeBalance.lt(relayFee)) {
     const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
     const fundingAmount = safeBalance.lt(relayFee)
-      ? relayFee.sub(safeBalance)
+      ? BigNumber.from(relayFee).sub(safeBalance)
       : safeBalance.sub(relayFee)
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,

@@ -36,23 +36,23 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@safe-global/protocol-kit": "^1.1.0",
-    "@types/chai": "^4.3.4",
+    "@types/chai": "^4.3.5",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^10.0.1",
     "@types/sinon-chai": "^3.2.9",
     "@types/yargs": "^16.0.1",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
-    "hardhat": "^2.12.6",
+    "hardhat": "^2.16.1",
     "mocha": "^10.2.0",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "ts-generator": "^0.1.1",
-    "tsconfig-paths": "^4.1.2",
-    "yargs": "^17.6.2"
+    "tsconfig-paths": "^4.2.0",
+    "yargs": "^17.7.2"
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",

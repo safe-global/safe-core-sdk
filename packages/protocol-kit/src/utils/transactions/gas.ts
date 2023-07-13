@@ -361,6 +361,10 @@ async function estimateSafeTxGasWithRequiredTxGas(
   return '0'
 }
 
+function decodeSafeTxGas(encodedSafeTxGas: string): string {
+  return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
+}
+
 /**
  * This function estimates the safeTxGas of a Safe transaction.
  * It uses the simulate function defined in the SimulateTxAccessor contract. This method is meant to be used for Safe versions >= 1.3.0.
@@ -416,7 +420,7 @@ async function estimateSafeTxGasWithSimulate(
   try {
     const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
-    const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+    const safeTxGas = decodeSafeTxGas(encodedResponse)
 
     return safeTxGas
 
@@ -428,7 +432,7 @@ async function estimateSafeTxGasWithSimulate(
       if (revertData && revertData.startsWith('Reverted ')) {
         const [, encodedResponse] = revertData.split('Reverted ')
 
-        const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+        const safeTxGas = decodeSafeTxGas(encodedResponse)
 
         return safeTxGas
       }

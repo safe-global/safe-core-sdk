@@ -13,12 +13,12 @@ import {
   MultiSendTransaction,
   Transaction
 } from '@safe-global/safe-core-sdk-types'
-import { SAFE_LAST_VERSION } from './contracts/config'
 import {
   PREDETERMINED_SALT_NONCE,
   encodeSetupCallData,
   predictSafeAddress
 } from './contracts/utils'
+import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -261,7 +261,7 @@ class Safe {
       return Promise.resolve(this.#predictedSafe.safeDeploymentConfig.safeVersion)
     }
 
-    return Promise.resolve(SAFE_LAST_VERSION)
+    return Promise.resolve(DEFAULT_SAFE_VERSION)
   }
 
   /**

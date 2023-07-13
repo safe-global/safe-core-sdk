@@ -3,10 +3,10 @@ import {
   OperationType
 } from '@safe-global/account-abstraction-kit-poc/types'
 import Safe, {
+  DEFAULT_SAFE_VERSION,
   EthersAdapter,
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,
-  SAFE_LAST_VERSION,
   SafeAccountConfig,
   SafeDeploymentConfig,
   encodeCreateProxyWithNonce,
@@ -27,7 +27,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 
-const safeVersion: SafeVersion = SAFE_LAST_VERSION
+const safeVersion: SafeVersion = DEFAULT_SAFE_VERSION
 
 class AccountAbstraction {
   #ethAdapter: EthersAdapter

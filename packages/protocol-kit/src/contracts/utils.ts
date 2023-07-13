@@ -1,6 +1,6 @@
 import { isAddress } from '@ethersproject/address'
 import { BigNumber } from '@ethersproject/bignumber'
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
 import {
@@ -142,7 +142,7 @@ export async function predictSafeAddress({
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
-  const { safeVersion = SAFE_LAST_VERSION, saltNonce = PREDETERMINED_SALT_NONCE } =
+  const { safeVersion = DEFAULT_SAFE_VERSION, saltNonce = PREDETERMINED_SALT_NONCE } =
     safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({

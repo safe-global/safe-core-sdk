@@ -1,4 +1,4 @@
-import { SAFE_LAST_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
@@ -139,7 +139,7 @@ describe('Safe Info', () => {
         contractNetworks
       })
       const contractVersion = await safeSdk.getContractVersion()
-      chai.expect(contractVersion).to.be.eq(SAFE_LAST_VERSION)
+      chai.expect(contractVersion).to.be.eq(DEFAULT_SAFE_VERSION)
     })
 
     it('should return the Safe contract version', async () => {

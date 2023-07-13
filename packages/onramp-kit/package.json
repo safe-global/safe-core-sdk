@@ -45,6 +45,6 @@
   },
   "devDependencies": {
     "events": "^3.3.0",
-    "jest-environment-jsdom": "^29.5.0"
+    "jest-environment-jsdom": "^29.6.1"
   }
 }

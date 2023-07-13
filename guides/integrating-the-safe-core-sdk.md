@@ -98,7 +98,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
 const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
 ```
 
-The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will deploy. This string can take the values `1.0.0`, `1.1.1`, `1.2.0` or `1.3.0`. If not specified, the most recent contract version will be used by default.
+The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0`, `1.3.0` or `1.4.1`. If not specified, the `DEFAULT_SAFE_VERSION` value will be used.
 
 ```js
 const safeVersion = 'X.Y.Z'

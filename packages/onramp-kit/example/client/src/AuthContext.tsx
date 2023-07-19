@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react'
 import { Web3AuthOptions } from '@web3auth/modal'
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS } from '@web3auth/base'
 import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
-import { SafeAuthKit, Web3AuthModalPack, SafeAuthSignInData } from '@safe-global/auth-kit'
+import { Web3AuthModalPack, AuthKitSignInData } from '@safe-global/auth-kit'
 
 type AuthContextProviderProps = {
   children: React.ReactNode
@@ -11,7 +11,7 @@ type AuthContextProviderProps = {
 type AuthContextType = {
   isLoggedIn: boolean
   provider?: SafeEventEmitterProvider
-  data?: SafeAuthSignInData
+  data?: AuthKitSignInData
   selectedSafe: string
   setSelectedSafe?: (safe: string) => void
   logIn?: () => void
@@ -25,8 +25,8 @@ export const AuthContext = createContext<AuthContextType>({
 
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [safeAuth, setSafeAuth] = useState<SafeAuthKit<Web3AuthModalPack>>()
-  const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<SafeAuthSignInData>()
+  const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthModalPack>()
+  const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | undefined>()
   const [selectedSafe, setSelectedSafe] = useState('')
 
@@ -70,16 +70,16 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         }
       })
 
-      const web3AuthPack = new Web3AuthModalPack(options, [openloginAdapter], modalConfig)
-
-      const safeAuthKit = await SafeAuthKit.init(web3AuthPack, {
+      const web3AuthPack = new Web3AuthModalPack({
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
-      const provider = safeAuthKit.getProvider()
+      await web3AuthPack.init({ options, adapters: [openloginAdapter], modalConfig })
+
+      const provider = web3AuthPack.getProvider()
 
       if (provider) {
-        const response = await safeAuthKit.signIn()
+        const response = await web3AuthPack.signIn()
         setSafeAuthSignInResponse(response)
         setSelectedSafe(response?.safes?.[0] || '')
         setProvider(provider as SafeEventEmitterProvider)
@@ -87,26 +87,26 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         setIsLoggedIn(true)
       }
 
-      setSafeAuth(safeAuthKit)
+      setWeb3AuthPack(web3AuthPack)
     })()
   }, [])
 
   const logIn = async () => {
-    if (!safeAuth) return
+    if (!web3AuthPack) return
 
-    const response = await safeAuth.signIn()
+    const response = await web3AuthPack.signIn()
     console.log('SIGN IN RESPONSE: ', response)
 
     setSafeAuthSignInResponse(response)
     setSelectedSafe(response?.safes?.[0] || '')
-    setProvider(safeAuth.getProvider() as SafeEventEmitterProvider)
+    setProvider(web3AuthPack.getProvider() as SafeEventEmitterProvider)
     setIsLoggedIn(true)
   }
 
   const logOut = async () => {
-    if (!safeAuth) return
+    if (!web3AuthPack) return
 
-    await safeAuth.signOut()
+    await web3AuthPack.signOut()
 
     setProvider(undefined)
     setSafeAuthSignInResponse(undefined)

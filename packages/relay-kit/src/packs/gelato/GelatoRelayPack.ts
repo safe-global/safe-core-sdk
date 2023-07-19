@@ -226,7 +226,8 @@ export class GelatoRelayPack implements RelayPack {
    */
   async executeRelayTransaction(
     safeTransaction: SafeTransaction,
-    safe: Safe
+    safe: Safe,
+    options?: MetaTransactionOptions
   ): Promise<RelayResponse> {
     const isSafeDeployed = await safe.isSafeDeployed()
     const chainId = await safe.getChainId()
@@ -237,7 +238,8 @@ export class GelatoRelayPack implements RelayPack {
       const relayTransaction: RelayTransaction = {
         target: safeAddress,
         encodedTransaction: safeTransactionEncodedData,
-        chainId
+        chainId,
+        options
       }
 
       return this.relayTransaction(relayTransaction)
@@ -249,7 +251,8 @@ export class GelatoRelayPack implements RelayPack {
     const relayTransaction: RelayTransaction = {
       target: safeDeploymentBatch.to, // multiSend Contract address
       encodedTransaction: safeDeploymentBatch.data,
-      chainId
+      chainId,
+      options
     }
 
     return this.relayTransaction(relayTransaction)

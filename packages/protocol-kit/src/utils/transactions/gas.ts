@@ -292,6 +292,7 @@ export async function estimateSafeTxGas(
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     return estimateSafeTxGasWithSimulate(safe, safeTransaction)
   } else {
+    // deprecated method to estimate the safeTxGas of a Safe transaction
     return estimateSafeTxGasWithRequiredTxGas(safe, safeTransaction)
   }
 }
@@ -299,6 +300,7 @@ export async function estimateSafeTxGas(
 /**
  * This function estimates the safeTxGas of a Safe transaction.
  * Using the deprecated method of requiredTxGas defined in the GnosisSafe contract. This method is meant to be used for Safe versions < 1.3.0.
+ * see: https://github.com/safe-global/safe-contracts/blob/v1.2.0/contracts/GnosisSafe.sol#L276
  *
  * @async
  * @function estimateSafeTxGasWithRequiredTxGas
@@ -320,7 +322,6 @@ async function estimateSafeTxGasWithRequiredTxGas(
     safeVersion
   })
 
-  // deprecated method to estimate the safeTxGas of a Safe transaction, see: https://github.com/safe-global/safe-contracts/blob/v1.2.0/contracts/GnosisSafe.sol#L276
   const transactionDataToEstimate: string = safeSingletonContract.encode('requiredTxGas', [
     safeTransaction.data.to,
     safeTransaction.data.value,

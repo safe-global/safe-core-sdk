@@ -10,7 +10,7 @@ import {
   SafeVersion,
   TransactionOptions,
   TransactionResult,
-  MultiSendTransaction,
+  MetaTransactionData,
   Transaction
 } from '@safe-global/safe-core-sdk-types'
 import {
@@ -1079,7 +1079,7 @@ class Safe {
     const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(customSaltNonce)
 
     // First transaction of the batch: The Safe deployment Transaction
-    const firstTransaction = {
+    const safeDeploymentBatchTransaction = {
       to: safeDeploymentTransaction.to,
       value: safeDeploymentTransaction.value,
       data: safeDeploymentTransaction.data,
@@ -1087,7 +1087,7 @@ class Safe {
     }
 
     // Second transaction of the batch: The Safe Transaction
-    const secondTransaction = {
+    const safeBatchTransaction = {
       to: await this.getAddress(),
       value: '0',
       data: await this.getEncodedTransaction(safeTransaction),
@@ -1095,13 +1095,10 @@ class Safe {
     }
 
     // transactions for the batch
-    const transactions = [
-      firstTransaction, // the Safe deployment transaction
-      secondTransaction // the Safe transaction provided
-    ]
+    const transactions = [safeDeploymentBatchTransaction, safeBatchTransaction]
 
     // this is the transaction with the batch
-    const safeDeploymentBatch = this.createTransactionBatch(transactions, transactionOptions)
+    const safeDeploymentBatch = await this.createTransactionBatch(transactions, transactionOptions)
 
     return safeDeploymentBatch
   }
@@ -1177,13 +1174,13 @@ class Safe {
    *
    * @async
    * @function createTransactionBatch
-   * @param {MultiSendTransaction[]} transactions - An array of MultiSendTransaction objects to be batched together.
+   * @param {MetaTransactionData[]} transactions - An array of MetaTransactionData objects to be batched together.
    * @param {TransactionOption} [transactionOptions] - Optional TransactionOption object to specify additional options for the transaction batch.
    * @returns {Promise<Transaction>} A Promise that resolves with the created transaction batch.
    *
    */
   async createTransactionBatch(
-    transactions: MultiSendTransaction[],
+    transactions: MetaTransactionData[],
     transactionOptions?: TransactionOptions
   ): Promise<Transaction> {
     const chainId = await this.#ethAdapter.getChainId()

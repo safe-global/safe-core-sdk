@@ -58,24 +58,12 @@ export interface SafeTransaction {
   encodedSignatures(): string
 }
 
-export interface Transaction {
-  to: string
-  value: string
-  data: string
-  from?: string
-  gas?: number | string
-  gasLimit?: number | string
-  gasPrice?: number | string
-  maxFeePerGas?: number | string
-  maxPriorityFeePerGas?: number | string
-  nonce?: number
-}
+export type Transaction = TransactionBase & TransactionOptions
 
-export interface MultiSendTransaction {
+interface TransactionBase {
   to: string
   value: string
   data: string
-  operation?: OperationType
 }
 
 export interface TransactionOptions {

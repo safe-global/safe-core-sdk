@@ -36,31 +36,31 @@ function Monerium() {
         isL1SafeMasterCopy: true
       })
 
-      const pack = new MoneriumPack({
+      const moneriumPack = new MoneriumPack({
         clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
         environment: 'sandbox'
       })
 
-      await pack.init({
+      await moneriumPack.init({
         safeSdk
       })
 
-      pack.subscribe(OrderState.pending, (notification) => {
+      moneriumPack.subscribe(OrderState.pending, (notification) => {
         setOrderState(notification.meta.state)
       })
 
-      pack.subscribe(OrderState.placed, (notification) => {
+      moneriumPack.subscribe(OrderState.placed, (notification) => {
         setOrderState(notification.meta.state)
       })
 
-      pack.subscribe(OrderState.rejected, (notification) => {
+      moneriumPack.subscribe(OrderState.rejected, (notification) => {
         setOrderState(notification.meta.state)
         setTimeout(() => {
           setOrderState(undefined)
         }, 5000)
       })
 
-      pack.subscribe(OrderState.processed, (notification) => {
+      moneriumPack.subscribe(OrderState.processed, (notification) => {
         setOrderState(notification.meta.state)
         setTimeout(() => {
           setOrderState(undefined)
@@ -71,7 +71,7 @@ function Monerium() {
       const owners = await safeSdk.getOwners()
 
       setSafeThreshold(`${threshold}/${owners.length}`)
-      setMoneriumPack(pack)
+      setMoneriumPack(moneriumPack)
     })()
   }, [authProvider, selectedSafe])
 
@@ -80,7 +80,7 @@ function Monerium() {
     const refreshToken = localStorage.getItem(MONERIUM_TOKEN) || undefined
 
     if (authCode || refreshToken) startMoneriumFlow(authCode, refreshToken)
-  }, [moneriumPack])
+  }, [])
 
   const startMoneriumFlow = async (authCode?: string, refreshToken?: string) => {
     if (!moneriumPack) return

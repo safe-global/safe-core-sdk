@@ -273,8 +273,8 @@ export async function estimateTxBaseGas(
  * It does not include costs such as signature verification, transaction hash generation, nonce incrementing, and so on.
  *
  * The estimation method differs based on the version of the Safe:
- * - For versions >= 1.3.0, the simulate function defined in the simulateTxAccessor Contract is used.
- * - For versions < 1.3.0, the deprecated requiredTxGas method defined in the GnosisSafe contract is used.
+ * - For versions >= 1.3.0, the simulate function defined in the simulateTxAccessor.sol Contract is used.
+ * - For versions < 1.3.0, the deprecated requiredTxGas method defined in the GnosisSafe.sol contract is used.
  *
  * @async
  * @function estimateSafeTxGas
@@ -290,11 +290,28 @@ export async function estimateSafeTxGas(
   const safeVersion = await safe.getContractVersion()
 
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
-    return estimateSafeTxGasWithSimulate(safe, safeTransaction)
-  } else {
-    // deprecated method to estimate the safeTxGas of a Safe transaction
-    return estimateSafeTxGasWithRequiredTxGas(safe, safeTransaction)
+    const safeTxGas = await estimateSafeTxGasWithSimulate(safe, safeTransaction)
+
+    return addExtraGasForSafety(safeTxGas)
   }
+
+  // deprecated method to estimate the safeTxGas of a Safe transaction
+  const safeTxGas = await estimateSafeTxGasWithRequiredTxGas(safe, safeTransaction)
+
+  return addExtraGasForSafety(safeTxGas)
+}
+
+/**
+ * Increase the given safeTxGas gas amount by 5% as a security margin to avoid running out of gas.
+ * In some contexts, the safeTxGas might be underestimated, leading to 'out of gas' errors during the Safe transaction execution
+ *
+ * @param {string} safeTxGas - The original safeTxGas gas amount.
+ * @returns {string} The new safeTxGas gas amount, increased by 5% rounded.
+ */
+function addExtraGasForSafety(safeTxGas: string): string {
+  const INCREASE_GAS_FACTOR = 1.05 // increase the gas by 5% as a security margin
+
+  return Math.round(Number(safeTxGas) * INCREASE_GAS_FACTOR).toString()
 }
 
 /**

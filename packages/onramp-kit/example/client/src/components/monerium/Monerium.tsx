@@ -36,31 +36,31 @@ function Monerium() {
         isL1SafeMasterCopy: true
       })
 
-      const moneriumPack = new MoneriumPack({
+      const pack = new MoneriumPack({
         clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
         environment: 'sandbox'
       })
 
-      await moneriumPack.init({
+      await pack.init({
         safeSdk
       })
 
-      moneriumPack.subscribe(OrderState.pending, (notification) => {
+      pack.subscribe(OrderState.pending, (notification) => {
         setOrderState(notification.meta.state)
       })
 
-      moneriumPack.subscribe(OrderState.placed, (notification) => {
+      pack.subscribe(OrderState.placed, (notification) => {
         setOrderState(notification.meta.state)
       })
 
-      moneriumPack.subscribe(OrderState.rejected, (notification) => {
+      pack.subscribe(OrderState.rejected, (notification) => {
         setOrderState(notification.meta.state)
         setTimeout(() => {
           setOrderState(undefined)
         }, 5000)
       })
 
-      moneriumPack.subscribe(OrderState.processed, (notification) => {
+      pack.subscribe(OrderState.processed, (notification) => {
         setOrderState(notification.meta.state)
         setTimeout(() => {
           setOrderState(undefined)
@@ -71,7 +71,7 @@ function Monerium() {
       const owners = await safeSdk.getOwners()
 
       setSafeThreshold(`${threshold}/${owners.length}`)
-      setMoneriumPack(moneriumPack)
+      setMoneriumPack(pack)
     })()
   }, [authProvider, selectedSafe])
 

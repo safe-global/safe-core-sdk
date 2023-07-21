@@ -80,7 +80,7 @@ function Monerium() {
     const refreshToken = localStorage.getItem(MONERIUM_TOKEN) || undefined
 
     if (authCode || refreshToken) startMoneriumFlow(authCode, refreshToken)
-  }, [])
+  }, [moneriumPack])
 
   const startMoneriumFlow = async (authCode?: string, refreshToken?: string) => {
     if (!moneriumPack) return

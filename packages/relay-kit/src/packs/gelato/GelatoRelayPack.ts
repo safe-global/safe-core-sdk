@@ -291,6 +291,8 @@ async function getERC20Decimals(tokenAddress: string, ethAdapter: EthAdapter): P
   return decimals
 }
 
+const STANDARD_ERC20_DECIMALS = 18
+
 async function isGasTokenCompatibleWithSafe(gasToken: string, safe: Safe) {
   const ethAdapter = safe.getEthAdapter()
   const isNativeToken = gasToken === ZERO_ADDRESS
@@ -301,7 +303,7 @@ async function isGasTokenCompatibleWithSafe(gasToken: string, safe: Safe) {
 
   // only ERC20 tokens with standard 18 decimals are compatibles
   const gasTokenDecimals = await getERC20Decimals(gasToken, ethAdapter)
-  const isStandardERC20Token = gasTokenDecimals === 18
+  const isStandardERC20Token = gasTokenDecimals === STANDARD_ERC20_DECIMALS
 
   return isStandardERC20Token
 }

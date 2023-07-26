@@ -94,35 +94,12 @@ export async function estimateGas(
     from: safeAddress
   }
 
-  // TO-DO: Improve decoding
-  /*
-  const simulateAndRevertResponse = ethAdapter.decodeParameters(
-    ['bool', 'bytes'],
-    encodedResponse
-  )
-  const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
-  */
   try {
     const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
     return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
   } catch (error: any) {
-    // Ethers
-    if (error?.error?.body) {
-      const revertData = JSON.parse(error.error.body).error.data
-      if (revertData && revertData.startsWith('Reverted ')) {
-        const [, encodedResponse] = revertData.split('Reverted ')
-        const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
-
-        return safeTxGas
-      }
-    }
-
-    // Web3
-    const [, encodedResponse] = error.message.split('return data: ')
-    const safeTxGas = Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
-
-    return safeTxGas
+    return parseSafeTxGasErrorResponse(error)
   }
 }
 
@@ -379,8 +356,35 @@ async function estimateSafeTxGasWithRequiredTxGas(
   return '0'
 }
 
+// TO-DO: Improve decoding
+/*
+  const simulateAndRevertResponse = ethAdapter.decodeParameters(
+    ['bool', 'bytes'],
+    encodedResponse
+  )
+  const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
+  */
 function decodeSafeTxGas(encodedSafeTxGas: string): string {
   return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
+}
+
+function parseSafeTxGasErrorResponse(error: any) {
+  // Ethers
+  if (error?.error?.body) {
+    const revertData = JSON.parse(error.error.body).error.data
+    if (revertData && revertData.startsWith('Reverted ')) {
+      const [, encodedResponse] = revertData.split('Reverted ')
+      const safeTxGas = decodeSafeTxGas(encodedResponse)
+
+      return safeTxGas
+    }
+  }
+
+  // Web3
+  const [, encodedResponse] = error.message.split('return data: ')
+  const safeTxGas = decodeSafeTxGas(encodedResponse)
+
+  return safeTxGas
 }
 
 /**
@@ -444,19 +448,7 @@ async function estimateSafeTxGasWithSimulate(
 
     // if the call throws an error we try to parse the returned value
   } catch (error: any) {
-    try {
-      const revertData = JSON.parse(error.error.body).error.data
-
-      if (revertData && revertData.startsWith('Reverted ')) {
-        const [, encodedResponse] = revertData.split('Reverted ')
-
-        const safeTxGas = decodeSafeTxGas(encodedResponse)
-
-        return safeTxGas
-      }
-    } catch {
-      return '0'
-    }
+    return parseSafeTxGasErrorResponse(error)
   }
 
   return '0'

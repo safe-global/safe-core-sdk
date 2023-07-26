@@ -1028,9 +1028,16 @@ class Safe {
    *
    */
   async getEncodedTransaction(safeTransaction: SafeTransaction): Promise<string> {
+    const safeVersion = await this.getContractVersion()
+    const chainId = await this.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId]
+    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
+
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
-      safeVersion: await this.getContractVersion()
+      safeVersion: safeVersion,
+      isL1SafeMasterCopy,
+      customContracts
     })
 
     const encodedTransaction: string = safeSingletonContract.encode('execTransaction', [
@@ -1129,18 +1136,21 @@ class Safe {
     const safeVersion = await this.getContractVersion()
     const ethAdapter = this.#ethAdapter
     const chainId = await ethAdapter.getChainId()
+    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
+    const customContracts = this.#contractManager.contractNetworks?.[chainId]
 
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
+      isL1SafeMasterCopy,
+      customContracts
     })
 
     // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol
     const safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter,
       safeVersion,
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
+      customContracts
     })
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/Safe.sol#L95
@@ -1148,7 +1158,7 @@ class Safe {
       ethAdapter,
       safeContract: safeSingletonContract,
       safeAccountConfig: safeAccountConfig,
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
+      customContracts
     })
 
     const saltNonce = customSaltNonce || safeDeploymentConfig?.saltNonce || PREDETERMINED_SALT_NONCE

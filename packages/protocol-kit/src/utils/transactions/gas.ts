@@ -203,13 +203,17 @@ export async function estimateTxBaseGas(
   const encodeRefundReceiver = refundReceiver || ZERO_ADDRESS
   const signatures = '0x'
 
+  const safeVersion = await safe.getContractVersion()
+  const ethAdapter = safe.getEthAdapter()
+  const isL1SafeMasterCopy = safe.getContractManager().isL1SafeMasterCopy
   const chainId = await safe.getChainId()
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
 
   const safeSingletonContract = await getSafeContract({
-    ethAdapter: safe.getEthAdapter(),
-    safeVersion: await safe.getContractVersion(),
-    isL1SafeMasterCopy: safe.getContractManager().isL1SafeMasterCopy,
-    customContracts: safe.getContractManager().contractNetworks?.[chainId]
+    ethAdapter,
+    safeVersion,
+    isL1SafeMasterCopy,
+    customContracts
   })
 
   const execTransactionData: string = safeSingletonContract.encode('execTransaction', [
@@ -311,9 +315,15 @@ async function estimateSafeTxGasWithRequiredTxGas(
   const safeAddress = await safe.getAddress()
   const safeVersion = await safe.getContractVersion()
   const ethAdapter = safe.getEthAdapter()
+  const isL1SafeMasterCopy = safe.getContractManager().isL1SafeMasterCopy
+  const chainId = await safe.getChainId()
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
-    safeVersion
+    safeVersion,
+    isL1SafeMasterCopy,
+    customContracts
   })
 
   const transactionDataToEstimate: string = safeSingletonContract.encode('requiredTxGas', [
@@ -406,15 +416,22 @@ async function estimateSafeTxGasWithSimulate(
   const safeAddress = await safe.getAddress()
   const safeVersion = await safe.getContractVersion()
   const ethAdapter = safe.getEthAdapter()
+  const chainId = await safe.getChainId()
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const isL1SafeMasterCopy = safe.getContractManager().isL1SafeMasterCopy
+
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
-    safeVersion
+    safeVersion,
+    isL1SafeMasterCopy,
+    customContracts
   })
 
   // new version of the estimation
   const simulateTxAccessorContract = await getSimulateTxAccessorContract({
     ethAdapter,
-    safeVersion
+    safeVersion,
+    customContracts
   })
 
   const transactionDataToEstimate: string = simulateTxAccessorContract.encode('simulate', [

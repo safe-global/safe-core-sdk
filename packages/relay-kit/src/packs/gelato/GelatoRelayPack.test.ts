@@ -166,6 +166,10 @@ describe('GelatoRelayPack', () => {
     })
 
     it('should return the correct gasToken when being sent through the options', async () => {
+      safe.getEthAdapter = jest.fn().mockImplementation(() => ({
+        call: jest.fn().mockResolvedValue(18) // to return ERC20 18 decimals
+      }))
+
       const GAS_TOKEN = '0x...gasToken'
 
       await relayPack.createRelayedTransaction({

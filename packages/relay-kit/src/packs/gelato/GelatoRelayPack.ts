@@ -276,7 +276,7 @@ export class GelatoRelayPack implements RelayPack {
   }
 }
 
-async function getTokenDecimals(tokenAddress: string, ethAdapter: EthAdapter): Promise<number> {
+async function getERC20Decimals(tokenAddress: string, ethAdapter: EthAdapter): Promise<number> {
   const getTokenDecimalsTransaction = {
     to: tokenAddress,
     from: tokenAddress,
@@ -299,9 +299,9 @@ async function isGasTokenCompatibleWithSafe(gasToken: string, safe: Safe) {
     return true
   }
 
-  // ERC20 tokens with standard 18 decimals is required
-  const gasTokenDecimals = await getTokenDecimals(gasToken, ethAdapter)
-  const isGasTokenLessThan18decimals = gasTokenDecimals < 18
+  // only ERC20 tokens with standard 18 decimals are compatibles
+  const gasTokenDecimals = await getERC20Decimals(gasToken, ethAdapter)
+  const isStandardERC20Token = gasTokenDecimals === 18
 
-  return isGasTokenLessThan18decimals
+  return isStandardERC20Token
 }

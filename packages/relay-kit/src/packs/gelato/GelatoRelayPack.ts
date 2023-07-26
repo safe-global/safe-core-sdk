@@ -21,7 +21,8 @@ import { RelayPack, CreateTransactionProps } from '@safe-global/relay-kit/types'
 import {
   MetaTransactionOptions,
   RelayTransaction,
-  SafeTransaction
+  SafeTransaction,
+  EthAdapter
 } from '@safe-global/safe-core-sdk-types'
 
 export class GelatoRelayPack implements RelayPack {
@@ -87,6 +88,14 @@ export class GelatoRelayPack implements RelayPack {
     const gasPrice = '1'
     const gasToken = options.gasToken ?? ZERO_ADDRESS
     const refundReceiver = this.getFeeCollector()
+
+    const isGasTokenCompatible = await isGasTokenCompatibleWithSafe(gasToken, safe)
+
+    if (!isGasTokenCompatible) {
+      throw new Error(
+        'The ERC20 token used for gas payment is not compatible, does not have the standard 18 decimals.'
+      )
+    }
 
     // if a custom gasLimit is provided, we do not need to estimate the gas cost
     if (gasLimit) {
@@ -265,4 +274,34 @@ export class GelatoRelayPack implements RelayPack {
 
     return this.relayTransaction(relayTransaction)
   }
+}
+
+async function getTokenDecimals(tokenAddress: string, ethAdapter: EthAdapter): Promise<number> {
+  const getTokenDecimalsTransaction = {
+    to: tokenAddress,
+    from: tokenAddress,
+    value: '0',
+    data: '0x313ce567' // decimals() ERC20 function encoded
+  }
+
+  const response = await ethAdapter.call(getTokenDecimalsTransaction)
+
+  const decimals = Number(response)
+
+  return decimals
+}
+
+async function isGasTokenCompatibleWithSafe(gasToken: string, safe: Safe) {
+  const ethAdapter = safe.getEthAdapter()
+  const isNativeToken = gasToken === ZERO_ADDRESS
+
+  if (isNativeToken) {
+    return true
+  }
+
+  // ERC20 tokens with standard 18 decimals is required
+  const gasTokenDecimals = await getTokenDecimals(gasToken, ethAdapter)
+  const isGasTokenLessThan18decimals = gasTokenDecimals < 18
+
+  return isGasTokenLessThan18decimals
 }

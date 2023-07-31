@@ -69,6 +69,7 @@ import {
 } from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
+import { encodeTransferERC20Token } from './utils/erc-20'
 
 export {
   AddOwnerTxParams,
@@ -123,6 +124,7 @@ export {
   encodeCreateProxyWithNonce,
   encodeMultiSendData,
   encodeSetupCallData,
+  encodeTransferERC20Token,
   getCompatibilityFallbackHandlerContract,
   getCreateCallContract,
   getMultiSendCallOnlyContract,

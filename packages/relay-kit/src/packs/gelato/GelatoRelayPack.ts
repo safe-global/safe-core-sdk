@@ -190,7 +190,7 @@ export class GelatoRelayPack implements RelayPack {
 
   /**
    * Creates a Safe transaction designed to be executed using the Gelato Relayer and
-   * uses a separate ERC20 transafer to pay the fees to the Gelato relayer.
+   * uses a separate ERC20 transfer to pay the fees to the Gelato relayer.
    *
    * @async
    * @function createTransactionWithTransfer

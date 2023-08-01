@@ -18,7 +18,6 @@ export interface SafeSetupConfig {
   payment?: string
   paymentReceiver?: string
 }
-
 export interface MetaTransactionData {
   to: string
   value: string
@@ -57,6 +56,14 @@ export interface SafeTransaction {
   readonly signatures: Map<string, SafeSignature>
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
+}
+
+export type Transaction = TransactionBase & TransactionOptions
+
+interface TransactionBase {
+  to: string
+  value: string
+  data: string
 }
 
 export interface TransactionOptions {
@@ -175,11 +182,11 @@ export interface RelayTransaction {
   target: string
   encodedTransaction: string
   chainId: number
-  options: MetaTransactionOptions
+  options?: MetaTransactionOptions
 }
 
 export interface MetaTransactionOptions {
-  gasLimit: string
+  gasLimit?: string
   gasToken?: string
   isSponsored?: boolean
 }

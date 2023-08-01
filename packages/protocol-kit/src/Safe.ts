@@ -9,10 +9,16 @@ import {
   SafeTransactionEIP712Args,
   SafeVersion,
   TransactionOptions,
-  TransactionResult
+  TransactionResult,
+  MetaTransactionData,
+  Transaction
 } from '@safe-global/safe-core-sdk-types'
+import {
+  PREDETERMINED_SALT_NONCE,
+  encodeSetupCallData,
+  predictSafeAddress
+} from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
-import { predictSafeAddress } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -49,6 +55,11 @@ import {
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
 import { isSafeConfigWithPredictedSafe } from './utils/types'
+import {
+  getMultiSendCallOnlyContract,
+  getProxyFactoryContract,
+  getSafeContract
+} from './contracts/safeDeploymentContracts'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -1006,6 +1017,204 @@ class Safe {
       }
     )
     return txResponse
+  }
+
+  /**
+   * Returns the Safe Transaction encoded
+   *
+   * @async
+   * @param {SafeTransaction} safeTransaction - The Safe transaction to be encoded.
+   * @returns {Promise<string>} The encoded transaction
+   *
+   */
+  async getEncodedTransaction(safeTransaction: SafeTransaction): Promise<string> {
+    const safeVersion = await this.getContractVersion()
+    const chainId = await this.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId]
+    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
+
+    const safeSingletonContract = await getSafeContract({
+      ethAdapter: this.#ethAdapter,
+      safeVersion: safeVersion,
+      isL1SafeMasterCopy,
+      customContracts
+    })
+
+    const encodedTransaction: string = safeSingletonContract.encode('execTransaction', [
+      safeTransaction.data.to,
+      safeTransaction.data.value,
+      safeTransaction.data.data,
+      safeTransaction.data.operation,
+      safeTransaction.data.safeTxGas,
+      safeTransaction.data.baseGas,
+      safeTransaction.data.gasPrice,
+      safeTransaction.data.gasToken,
+      safeTransaction.data.refundReceiver,
+      safeTransaction.encodedSignatures()
+    ]) as string
+
+    return encodedTransaction
+  }
+
+  /**
+   * Wraps a Safe transaction into a Safe deployment batch.
+   *
+   * This function creates a transaction batch of 2 transactions, which includes the
+   * deployment of the Safe and the provided Safe transaction.
+   *
+   * @async
+   * @param {SafeTransaction} safeTransaction - The Safe transaction to be wrapped into the deployment batch.
+   * @param {TransactionOptions} [transactionOptions] - Optional. Options for the transaction, such as from, gas price, gas limit, etc.
+   * @param {string} [customSaltNonce] - Optional. a Custom salt nonce to be used for the deployment of the Safe. If not provided, a default value is used.
+   * @returns {Promise<Transaction>} A promise that resolves to a Transaction object representing the prepared batch of transactions.
+   * @throws Will throw an error if the safe is already deployed.
+   *
+   */
+  async wrapSafeTransactionIntoDeploymentBatch(
+    safeTransaction: SafeTransaction,
+    transactionOptions?: TransactionOptions,
+    customSaltNonce?: string
+  ): Promise<Transaction> {
+    const isSafeDeployed = await this.isSafeDeployed()
+
+    // if the safe is already deployed throws an error
+    if (isSafeDeployed) {
+      throw new Error('Safe already deployed')
+    }
+
+    // we create the deployment transaction
+    const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(customSaltNonce)
+
+    // First transaction of the batch: The Safe deployment Transaction
+    const safeDeploymentBatchTransaction = {
+      to: safeDeploymentTransaction.to,
+      value: safeDeploymentTransaction.value,
+      data: safeDeploymentTransaction.data,
+      operation: OperationType.Call
+    }
+
+    // Second transaction of the batch: The Safe Transaction
+    const safeBatchTransaction = {
+      to: await this.getAddress(),
+      value: '0',
+      data: await this.getEncodedTransaction(safeTransaction),
+      operation: OperationType.Call
+    }
+
+    // transactions for the batch
+    const transactions = [safeDeploymentBatchTransaction, safeBatchTransaction]
+
+    // this is the transaction with the batch
+    const safeDeploymentBatch = await this.createTransactionBatch(transactions, transactionOptions)
+
+    return safeDeploymentBatch
+  }
+
+  /**
+   * Creates a Safe deployment transaction.
+   *
+   * This function prepares a transaction for the deployment of a Safe.
+   * Both the saltNonce and options parameters are optional, and if not
+   * provided, default values will be used.
+   *
+   * @async
+   * @param {string} [customSaltNonce] - Optional. a Custom salt nonce to be used for the deployment of the Safe. If not provided, a default value is used.
+   * @param {TransactionOptions} [options] - Optional. Options for the transaction, such as gas price, gas limit, etc.
+   * @returns {Promise<Transaction>} A promise that resolves to a Transaction object representing the prepared Safe deployment transaction.
+   *
+   */
+  async createSafeDeploymentTransaction(
+    customSaltNonce?: string,
+    transactionOptions?: TransactionOptions
+  ): Promise<Transaction> {
+    if (!this.#predictedSafe) {
+      throw new Error('Predict Safe should be present')
+    }
+
+    const { safeAccountConfig, safeDeploymentConfig } = this.#predictedSafe
+
+    const safeVersion = await this.getContractVersion()
+    const ethAdapter = this.#ethAdapter
+    const chainId = await ethAdapter.getChainId()
+    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
+    const customContracts = this.#contractManager.contractNetworks?.[chainId]
+
+    const safeSingletonContract = await getSafeContract({
+      ethAdapter: this.#ethAdapter,
+      safeVersion,
+      isL1SafeMasterCopy,
+      customContracts
+    })
+
+    // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol
+    const safeProxyFactoryContract = await getProxyFactoryContract({
+      ethAdapter,
+      safeVersion,
+      customContracts
+    })
+
+    // this is the call to the setup method that sets the threshold & owners of the new Safe, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/Safe.sol#L95
+    const initializer = await encodeSetupCallData({
+      ethAdapter,
+      safeContract: safeSingletonContract,
+      safeAccountConfig: safeAccountConfig,
+      customContracts
+    })
+
+    const saltNonce = customSaltNonce || safeDeploymentConfig?.saltNonce || PREDETERMINED_SALT_NONCE
+
+    const safeDeployTransactionData = {
+      ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
+      to: safeProxyFactoryContract.getAddress(),
+      value: '0',
+      // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
+      data: safeProxyFactoryContract.encode('createProxyWithNonce', [
+        safeSingletonContract.getAddress(),
+        initializer, // call to the setup method to set the threshold & owners of the new Safe
+        saltNonce
+      ])
+    }
+
+    return safeDeployTransactionData
+  }
+
+  /**
+   * This function creates a batch of the provided Safe transactions using the MultiSend contract.
+   * It groups the transactions together into a single transaction which can then be executed atomically.
+   *
+   * @async
+   * @function createTransactionBatch
+   * @param {MetaTransactionData[]} transactions - An array of MetaTransactionData objects to be batched together.
+   * @param {TransactionOption} [transactionOptions] - Optional TransactionOption object to specify additional options for the transaction batch.
+   * @returns {Promise<Transaction>} A Promise that resolves with the created transaction batch.
+   *
+   */
+  async createTransactionBatch(
+    transactions: MetaTransactionData[],
+    transactionOptions?: TransactionOptions
+  ): Promise<Transaction> {
+    const chainId = await this.#ethAdapter.getChainId()
+
+    // we use the MultiSend contract to create the batch, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/libraries/MultiSendCallOnly.sol
+    const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
+      ethAdapter: this.#ethAdapter,
+      safeVersion: await this.getContractVersion(),
+      customContracts: this.#contractManager.contractNetworks?.[chainId]
+    })
+
+    // multiSend method with the transactions encoded
+    const batchData = multiSendCallOnlyContract.encode('multiSend', [
+      encodeMultiSendData(transactions) // encoded transactions
+    ])
+
+    const transactionBatch = {
+      ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
+      to: multiSendCallOnlyContract.getAddress(),
+      value: '0',
+      data: batchData
+    }
+
+    return transactionBatch
   }
 }
 

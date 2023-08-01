@@ -27,7 +27,7 @@ class ContractManager {
   }
 
   async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeMasterCopy, contractNetworks } = config
+    const { ethAdapter, isL1SafeMasterCopy, contractNetworks, predictedSafe, safeAddress } = config
 
     const chainId = await ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
@@ -37,23 +37,32 @@ class ContractManager {
     let safeVersion: SafeVersion
 
     if (isSafeConfigWithPredictedSafe(config)) {
-      safeVersion = config.predictedSafe.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
+      safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
     } else {
-      const temporarySafeContract = await getSafeContract({
+      // We use the lastest version of the Safe contract to get the correct version of this Safe
+      const latestVersionOfTheSafeContract = await getSafeContract({
         ethAdapter,
         safeVersion: DEFAULT_SAFE_VERSION,
         isL1SafeMasterCopy,
-        customSafeAddress: config.safeAddress,
+        customSafeAddress: safeAddress,
         customContracts
       })
-      safeVersion = await temporarySafeContract.getVersion()
-      this.#safeContract = await getSafeContract({
-        ethAdapter,
-        safeVersion,
-        isL1SafeMasterCopy,
-        customSafeAddress: config.safeAddress,
-        customContracts
-      })
+
+      // We get the correct version of the Safe from the blockchain
+      safeVersion = await latestVersionOfTheSafeContract.getVersion()
+
+      // We get the correct Safe Contract if the real Safe version is not the lastest
+      const isTheLastSafeVersion = safeVersion === DEFAULT_SAFE_VERSION
+
+      this.#safeContract = isTheLastSafeVersion
+        ? latestVersionOfTheSafeContract
+        : await getSafeContract({
+            ethAdapter,
+            safeVersion,
+            isL1SafeMasterCopy,
+            customSafeAddress: safeAddress,
+            customContracts
+          })
     }
 
     this.#multiSendContract = await getMultiSendContract({
@@ -61,6 +70,7 @@ class ContractManager {
       safeVersion,
       customContracts
     })
+
     this.#multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
       ethAdapter,
       safeVersion,

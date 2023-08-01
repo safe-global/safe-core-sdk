@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionStatusResponse } from '@gelatonetwork/relay-sdk'
 import Safe from '@safe-global/protocol-kit'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
 
 import { GELATO_FEE_COLLECTOR, GELATO_NATIVE_TOKEN_ADDRESS } from '@safe-global/relay-kit/constants'
 import { GelatoRelayPack } from './GelatoRelayPack'
@@ -78,7 +78,7 @@ describe('GelatoRelayPack', () => {
       chainId,
       GELATO_NATIVE_TOKEN_ADDRESS,
       BigNumber.from(gasLimit),
-      true
+      false
     )
     expect(BigNumber.from(estimation).gt(BigNumber.from(0))).toBe(true)
   })
@@ -115,18 +115,17 @@ describe('GelatoRelayPack', () => {
   describe('when creating a relayed transaction', () => {
     let relayPack: GelatoRelayPack
     const safe: Safe = new Safe()
-    const args: any = [
-      safe,
+    const transactions: MetaTransactionData[] = [
       {
         to: ADDRESS,
         data: '0x',
         value: '0'
-      },
-      {
-        gasLimit: BigNumber.from(100),
-        isSponsored: true
       }
     ]
+    const options = {
+      gasLimit: '100',
+      isSponsored: true
+    }
 
     beforeEach(() => {
       jest.clearAllMocks()
@@ -137,10 +136,11 @@ describe('GelatoRelayPack', () => {
     })
 
     it('should allow you to create a sponsored one', async () => {
-      await relayPack.createRelayedTransaction(args[0], args[1], args[2])
+      await relayPack.createRelayedTransaction({ safe, transactions, options })
 
       expect(safe.createTransaction).toHaveBeenCalledWith({
-        safeTransactionData: args[1],
+        safeTransactionData: transactions,
+        onlyCalls: false,
         options: expect.objectContaining({
           nonce: 0
         })
@@ -148,13 +148,15 @@ describe('GelatoRelayPack', () => {
     })
 
     it('should allow to create a sync fee one', async () => {
-      await relayPack.createRelayedTransaction(args[0], args[1], {
-        ...args[2],
-        isSponsored: false
+      await relayPack.createRelayedTransaction({
+        safe,
+        transactions,
+        options: { ...options, isSponsored: false }
       })
 
       expect(safe.createTransaction).toHaveBeenCalledWith({
-        safeTransactionData: args[1],
+        safeTransactionData: transactions,
+        onlyCalls: false,
         options: expect.objectContaining({
           baseGas: '100000',
           gasPrice: '1',
@@ -164,16 +166,21 @@ describe('GelatoRelayPack', () => {
     })
 
     it('should return the correct gasToken when being sent through the options', async () => {
+      safe.getEthAdapter = jest.fn().mockImplementation(() => ({
+        call: jest.fn().mockResolvedValue(18) // to return ERC20 18 decimals
+      }))
+
       const GAS_TOKEN = '0x...gasToken'
 
-      await relayPack.createRelayedTransaction(args[0], args[1], {
-        ...args[2],
-        isSponsored: false,
-        gasToken: GAS_TOKEN
+      await relayPack.createRelayedTransaction({
+        safe,
+        transactions,
+        options: { ...options, isSponsored: false, gasToken: GAS_TOKEN }
       })
 
       expect(safe.createTransaction).toHaveBeenCalledWith({
-        safeTransactionData: args[1],
+        safeTransactionData: transactions,
+        onlyCalls: false,
         options: expect.objectContaining({
           baseGas: '100000',
           gasPrice: '1',

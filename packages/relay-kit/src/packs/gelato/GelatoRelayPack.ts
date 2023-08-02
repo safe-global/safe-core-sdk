@@ -11,7 +11,8 @@ import Safe, {
   estimateTxBaseGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
-  encodeTransferERC20Token
+  createERC20tokenTransferTransaction,
+  isGasTokenCompatibleWithHandlePayment
 } from '@safe-global/protocol-kit'
 import {
   GELATO_FEE_COLLECTOR,
@@ -22,8 +23,7 @@ import { RelayPack, CreateTransactionProps } from '@safe-global/relay-kit/types'
 import {
   MetaTransactionOptions,
   RelayTransaction,
-  SafeTransaction,
-  EthAdapter
+  SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
 
 export class GelatoRelayPack implements RelayPack {
@@ -231,10 +231,8 @@ export class GelatoRelayPack implements RelayPack {
     }
 
     // If gasLimit is not provided, we need to estimate the gas cost.
-    // To estimate the gas cost accurately, we first create an estimation without the Gelato payment.
-    // After that, we re-estimate the gas cost including the Gelato payment.
 
-    // this transaction is only used for gas estimations (without Gelato payment)
+    // this transaction is only used for gas estimations
     const transactionToEstimateGas = await safe.createTransaction({
       safeTransactionData: transactions,
       onlyCalls,
@@ -243,53 +241,26 @@ export class GelatoRelayPack implements RelayPack {
       }
     })
 
-    const safeTxGasWithoutPayment = await estimateSafeTxGas(safe, transactionToEstimateGas)
+    const safeTxGas = await estimateSafeTxGas(safe, transactionToEstimateGas)
     const baseGas = await estimateTxBaseGas(safe, transactionToEstimateGas)
     const safeDeploymentGasCost = await estimateSafeDeploymentGas(safe)
 
     // see: https://docs.gelato.network/developer-services/relay/quick-start/optional-parameters#optional-parameters
     const GELATO_GAS_EXECUTION_OVERHEAD = 150_000
 
-    const totalGasWithoutPayment =
-      Number(baseGas) + // baseGas
-      Number(safeTxGasWithoutPayment) + // safeTxGas without payment
-      Number(safeDeploymentGasCost) + // Safe deploymet gas cost if it is required
-      GELATO_GAS_EXECUTION_OVERHEAD // Gelato execution overhead
-
-    const paymentToGelatoToEstimateGas = await this.getEstimateFee(
-      chainId,
-      String(totalGasWithoutPayment),
-      gasToken
-    )
-
-    // This Gelato payment transaction is only used for gas estimations.
-    const transferToGelatoToEstimateGas = createERC20tokenTransferTransaction(
-      gasToken,
-      gelatoAddress,
-      paymentToGelatoToEstimateGas
-    )
-
-    // We can re-estimate the gas cost including the Gelato payment.
-
-    // This transaction is only used for gas estimations (including the Gelato payment).
-    const transactionWithPaymentToEstimateGas = await safe.createTransaction({
-      safeTransactionData: [...transactions, transferToGelatoToEstimateGas],
-      onlyCalls,
-      options: {
-        nonce
-      }
-    })
-
-    const safeTxGas = await estimateSafeTxGas(safe, transactionWithPaymentToEstimateGas)
+    // gas cost of the separate ERC20 transfer to pay the fees to the Gelato relayer
+    const GELATO_TRANSFER_GAS_COST = 15_000
 
     const totalGas =
       Number(baseGas) + // baseGas
-      Number(safeTxGas) + // safeTxGas with Gelato payment
+      Number(safeTxGas) + // safeTxGas without Gelato payment transfer
       Number(safeDeploymentGasCost) + // Safe deploymet gas cost if it is required
+      GELATO_TRANSFER_GAS_COST + // Gelato payment transfer
       GELATO_GAS_EXECUTION_OVERHEAD // Gelato execution overhead
 
     const paymentToGelato = await this.getEstimateFee(chainId, String(totalGas), gasToken)
 
+    // The Gelato payment transaction
     const transferToGelato = createERC20tokenTransferTransaction(
       gasToken,
       gelatoAddress,
@@ -408,50 +379,4 @@ export class GelatoRelayPack implements RelayPack {
 
     return this.relayTransaction(relayTransaction)
   }
-}
-
-async function getERC20Decimals(tokenAddress: string, ethAdapter: EthAdapter): Promise<number> {
-  const getTokenDecimalsTransaction = {
-    to: tokenAddress,
-    from: tokenAddress,
-    value: '0',
-    data: '0x313ce567' // decimals() ERC20 function encoded
-  }
-
-  const response = await ethAdapter.call(getTokenDecimalsTransaction)
-
-  const decimals = Number(response)
-
-  return decimals
-}
-
-const STANDARD_ERC20_DECIMALS = 18
-
-async function isGasTokenCompatibleWithHandlePayment(gasToken: string, safe: Safe) {
-  const ethAdapter = safe.getEthAdapter()
-  const isNativeToken = gasToken === ZERO_ADDRESS
-
-  if (isNativeToken) {
-    return true
-  }
-
-  // Only ERC20 tokens with the standard 18 decimals are compatible
-  const gasTokenDecimals = await getERC20Decimals(gasToken, ethAdapter)
-  const isStandardERC20Token = gasTokenDecimals === STANDARD_ERC20_DECIMALS
-
-  return isStandardERC20Token
-}
-
-function createERC20tokenTransferTransaction(
-  tokenAddress: string,
-  toAddress: string,
-  amount: string
-) {
-  const transferTransaction = {
-    to: tokenAddress,
-    value: '0',
-    data: encodeTransferERC20Token(toAddress, amount) as string
-  }
-
-  return transferTransaction
 }

@@ -1,9 +1,63 @@
 import { Interface } from '@ethersproject/abi'
+import Safe from '@safe-global/protocol-kit/Safe'
+import { Transaction } from '@safe-global/safe-core-sdk-types'
 
-const ERC20_ABI = ['function transfer(address recipient, uint256 amount) returns (bool)']
+import { ZERO_ADDRESS } from '../constants'
 
-export function encodeTransferERC20Token(tokenAddress: string, amount: string): string {
+const ERC20_ABI = [
+  'function transfer(address recipient, uint256 amount) returns (bool)',
+  'function decimals() view returns (uint8)'
+]
+
+export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promise<number> {
+  const ethAdapter = safe.getEthAdapter()
   const erc20Interface = new Interface(ERC20_ABI)
 
-  return erc20Interface.encodeFunctionData('transfer', [tokenAddress, amount])
+  const getTokenDecimalsTransaction = {
+    to: tokenAddress,
+    from: tokenAddress,
+    value: '0',
+    data: erc20Interface.encodeFunctionData('decimals')
+  }
+
+  const response = await ethAdapter.call(getTokenDecimalsTransaction)
+
+  const decimals = Number(response)
+
+  return decimals
+}
+
+const STANDARD_ERC20_DECIMALS = 18
+
+export async function isGasTokenCompatibleWithHandlePayment(
+  gasToken: string,
+  safe: Safe
+): Promise<boolean> {
+  const isNativeToken = gasToken === ZERO_ADDRESS
+
+  if (isNativeToken) {
+    return true
+  }
+
+  // Only ERC20 tokens with the standard 18 decimals are compatible
+  const gasTokenDecimals = await getERC20Decimals(gasToken, safe)
+  const isStandardERC20Token = gasTokenDecimals === STANDARD_ERC20_DECIMALS
+
+  return isStandardERC20Token
+}
+
+export function createERC20tokenTransferTransaction(
+  tokenAddress: string,
+  toAddress: string,
+  amount: string
+): Transaction {
+  const erc20Interface = new Interface(ERC20_ABI)
+
+  const transferTransaction = {
+    to: tokenAddress,
+    value: '0',
+    data: erc20Interface.encodeFunctionData('transfer', [toAddress, amount])
+  }
+
+  return transferTransaction
 }

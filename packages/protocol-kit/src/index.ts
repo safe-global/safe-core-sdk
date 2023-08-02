@@ -69,7 +69,11 @@ import {
 } from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
-import { encodeTransferERC20Token } from './utils/erc-20'
+import {
+  getERC20Decimals,
+  isGasTokenCompatibleWithHandlePayment,
+  createERC20tokenTransferTransaction
+} from './utils/erc-20'
 
 export {
   AddOwnerTxParams,
@@ -84,6 +88,7 @@ export {
   ContractNetworksConfig,
   CreateCallEthersContract,
   CreateCallWeb3Contract,
+  createERC20tokenTransferTransaction,
   CreateEthersProxyProps,
   CreateTransactionProps,
   CreateWeb3ProxyProps,
@@ -124,14 +129,15 @@ export {
   encodeCreateProxyWithNonce,
   encodeMultiSendData,
   encodeSetupCallData,
-  encodeTransferERC20Token,
   getCompatibilityFallbackHandlerContract,
   getCreateCallContract,
+  getERC20Decimals,
   getMultiSendCallOnlyContract,
   getMultiSendContract,
   getProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
+  isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   standardizeSafeTransactionData
 }

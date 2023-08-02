@@ -9,6 +9,14 @@ const ERC20_ABI = [
   'function decimals() view returns (uint8)'
 ]
 
+/**
+ * Returns the number of decimals of a given ERC-20 token.
+ *
+ * @async
+ * @param {string} tokenAddress - The address of the ERC-20 token.
+ * @param {Safe} safe - The Safe object.
+ * @returns {Promise<number>} The number of decimals that the token uses.
+ */
 export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promise<number> {
   const ethAdapter = safe.getEthAdapter()
   const erc20Interface = new Interface(ERC20_ABI)
@@ -29,6 +37,16 @@ export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promis
 
 const STANDARD_ERC20_DECIMALS = 18
 
+/**
+ * Checks if the given gas token is compatible with the handlePayment function present in the Safe smart contract.
+ * A token is considered compatible if it is a native token or a standard ERC-20 token with 18 decimals.
+ *
+ * @async
+ * @export
+ * @param {string} gasToken - The address of the gas token.
+ * @param {Safe} safe - The Safe object.
+ * @returns {Promise<boolean>} Returns true if the gas token is compatible, otherwise false.
+ */
 export async function isGasTokenCompatibleWithHandlePayment(
   gasToken: string,
   safe: Safe
@@ -46,6 +64,15 @@ export async function isGasTokenCompatibleWithHandlePayment(
   return isStandardERC20Token
 }
 
+/**
+ * Creates a transaction object to perform a transfer of a specified amount of ERC-20 tokens to a given address.
+ *
+ * @export
+ * @param {string} tokenAddress - The address of the ERC-20 token.
+ * @param {string} toAddress - The address to which the tokens should be transferred.
+ * @param {string} amount - The amount of tokens to transfer.
+ * @returns {Transaction} Returns a transaction object that represents the transfer.
+ */
 export function createERC20tokenTransferTransaction(
   tokenAddress: string,
   toAddress: string,

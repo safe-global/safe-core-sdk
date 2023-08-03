@@ -8,9 +8,9 @@ The Onramp Kit allows users to buy cryptocurrencies using a credit card and othe
 
 ## Reference
 
-- [OnRamp Kit integration guides](https://docs.safe.global/learn/safe-core-account-abstraction-sdk/onramp-kit)
+- [OnRamp Kit integration guides](https://docs.safe.global/safe-core-aa-sdk/onramp-kit)
 
-- [OnRamp Kit reference](https://docs.safe.global/reference/safe-core-sdk/onramp-kit)
+- [OnRamp Kit reference](https://docs.safe.global/reference/onramp-kit)
 
 ## Example
 

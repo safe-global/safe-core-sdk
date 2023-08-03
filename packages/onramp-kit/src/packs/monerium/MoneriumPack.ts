@@ -21,7 +21,7 @@ const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
  */
 export class MoneriumPack extends OnRampKitBasePack {
   #config: MoneriumProviderConfig
-  #client?: SafeMoneriumClient
+  client?: SafeMoneriumClient
   #socket?: WebSocket
   #subscriptions: Map<MoneriumEvent, MoneriumEventListener> = new Map()
 
@@ -45,7 +45,7 @@ export class MoneriumPack extends OnRampKitBasePack {
       throw new Error('You need to provide an instance of the protocol kit')
     }
 
-    this.#client = new SafeMoneriumClient(this.#config.environment, options.safeSdk)
+    this.client = new SafeMoneriumClient(this.#config.environment, options.safeSdk)
   }
 
   /**
@@ -55,12 +55,12 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @returns A {@link SafeMoneriumClient} instance
    */
   async open(options: MoneriumOpenOptions): Promise<SafeMoneriumClient> {
-    if (!this.#client) {
+    if (!this.client) {
       throw new Error('Monerium client not initialized')
     }
 
     try {
-      const safeAddress = await this.#client.getSafeAddress()
+      const safeAddress = await this.client.getSafeAddress()
 
       if (options.authCode) {
         await this.#startAuthCodeFlow(options.authCode, safeAddress, options.redirectUrl || '')
@@ -74,16 +74,16 @@ export class MoneriumPack extends OnRampKitBasePack {
 
       // When the user is authenticated, we connect to the order notifications socket in case
       // the user has subscribed to any event
-      if (this.#client.bearerProfile?.access_token && this.#subscriptions.size > 0) {
+      if (this.client.bearerProfile?.access_token && this.#subscriptions.size > 0) {
         this.#socket = connectToOrderNotifications({
-          profile: this.#client.bearerProfile?.profile,
+          profile: this.client.bearerProfile?.profile,
           env: this.#config.environment,
-          accessToken: this.#client.bearerProfile?.access_token,
+          accessToken: this.client.bearerProfile?.access_token,
           subscriptions: this.#subscriptions
         })
       }
 
-      return this.#client
+      return this.client
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
@@ -97,11 +97,11 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @param redirectUrl The redirect url from the Monerium UI
    */
   async #startAuthCodeFlow(codeParam: string, safeAddress: string, redirectUrl: string) {
-    if (!this.#client) return
+    if (!this.client) return
 
     const codeVerifier = sessionStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
 
-    await this.#client.auth({
+    await this.client.auth({
       client_id: this.#config.clientId,
       code: codeParam,
       code_verifier: codeVerifier,
@@ -122,9 +122,9 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @param refreshToken The refresh token
    */
   async #startRefreshTokenFlow(safeAddress: string, refreshToken: string) {
-    if (!this.#client) return
+    if (!this.client) return
 
-    await this.#client.auth({
+    await this.client.auth({
       client_id: this.#config.clientId,
       refresh_token: refreshToken
     })
@@ -139,33 +139,33 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @param redirectUrl The redirect url from the Monerium UI
    */
   async #startAuthFlow(safeAddress: string, redirectUrl: string) {
-    if (!this.#client) return
+    if (!this.client) return
 
     // Check if the user has already signed the message
     if (safeAddress) {
       // Check if the Safe has a completed transaction with the signature message
-      const isSigned = await this.#client.isMessageSigned(safeAddress, SIGNATURE_MESSAGE)
+      const isSigned = await this.client.isMessageSigned(safeAddress, SIGNATURE_MESSAGE)
 
       if (!isSigned) {
         // Check if the Safe has a pending transaction with the signature message
-        const isPending = await this.#client.isSignMessagePending(safeAddress, SIGNATURE_MESSAGE)
+        const isPending = await this.client.isSignMessagePending(safeAddress, SIGNATURE_MESSAGE)
 
         if (!isPending) {
-          await this.#client.signMessage(safeAddress, SIGNATURE_MESSAGE)
+          await this.client.signMessage(safeAddress, SIGNATURE_MESSAGE)
         }
       }
     }
 
-    const authFlowUrl = this.#client.getAuthFlowURI({
+    const authFlowUrl = this.client.getAuthFlowURI({
       client_id: this.#config.clientId,
       redirect_uri: redirectUrl,
       address: safeAddress,
       signature: '0x',
-      chain: await this.#client.getChain(),
-      network: await this.#client.getNetwork()
+      chain: await this.client.getChain(),
+      network: await this.client.getNetwork()
     })
 
-    sessionStorage.setItem(MONERIUM_CODE_VERIFIER, this.#client.codeVerifier || '')
+    sessionStorage.setItem(MONERIUM_CODE_VERIFIER, this.client.codeVerifier || '')
 
     window.location.replace(authFlowUrl)
   }
@@ -175,13 +175,13 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @param safeAddress The address of the Safe
    */
   async #addAccountIfNotLinked(safeAddress: string) {
-    if (!this.#client) return
+    if (!this.client) return
 
-    const authContext = await this.#client.getAuthContext()
+    const authContext = await this.client.getAuthContext()
 
     if (!authContext) return
 
-    const profile = await this.#client.getProfile(authContext.defaultProfile)
+    const profile = await this.client.getProfile(authContext.defaultProfile)
 
     if (profile) {
       const isSafeAddressLinked = profile.accounts.some(
@@ -189,16 +189,16 @@ export class MoneriumPack extends OnRampKitBasePack {
       )
 
       if (!isSafeAddressLinked) {
-        await this.#client.linkAddress(authContext.defaultProfile, {
+        await this.client.linkAddress(authContext.defaultProfile, {
           address: safeAddress,
           message: SIGNATURE_MESSAGE,
           signature: '0x',
-          network: await this.#client.getNetwork(),
-          chain: await this.#client.getChain(),
+          network: await this.client.getNetwork(),
+          chain: await this.client.getChain(),
           accounts: [
             {
-              network: await this.#client.getNetwork(),
-              chain: await this.#client.getChain(),
+              network: await this.client.getNetwork(),
+              chain: await this.client.getChain(),
               currency: Currency.eur
             }
           ]

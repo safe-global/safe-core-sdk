@@ -1,6 +1,6 @@
 import SafeApiKit from '@safe-global/api-kit'
-import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK
@@ -16,7 +16,7 @@ const config: Config = {
   RPC_URL: 'https://goerli.infura.io/v3/<INFURA_KEY>',
   SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
   SAFE_ADDRESS: '<SAFE_ADDRESS>',
-  TX_SERVICE_URL: 'https://safe-transaction-goerli.safe.global/' // Check https://docs.safe.global/backend/available-services
+  TX_SERVICE_URL: 'https://safe-transaction-goerli.safe.global/' // Check https://docs.safe.global/safe-core-api/available-services
 }
 
 async function main() {

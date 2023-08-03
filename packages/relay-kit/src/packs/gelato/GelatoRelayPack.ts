@@ -72,6 +72,7 @@ export class GelatoRelayPack implements RelayPack {
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const { isSponsored = false } = options
     const nonce = await safe.getNonce()
+    const chainId = await safe.getChainId()
 
     if (isSponsored) {
       const sponsoredTransaction = await safe.createTransaction({

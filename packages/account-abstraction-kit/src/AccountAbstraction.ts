@@ -137,11 +137,11 @@ class AccountAbstraction {
 
     const safeAddress = await this.#safeSdk.getAddress()
 
-    const standardizedSafeTx = await this.#relayPack.createRelayedTransaction(
-      this.#safeSdk,
+    const standardizedSafeTx = await this.#relayPack.createRelayedTransaction({
+      safe: this.#safeSdk,
       transactions,
       options
-    )
+    })
 
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,

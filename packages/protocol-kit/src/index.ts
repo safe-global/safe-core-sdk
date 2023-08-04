@@ -60,12 +60,22 @@ import {
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams
 } from './types'
-import { EthSafeSignature } from './utils'
+import {
+  EthSafeSignature,
+  estimateTxBaseGas,
+  estimateTxGas,
+  estimateSafeTxGas,
+  estimateSafeDeploymentGas
+} from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
 
 export {
   AddOwnerTxParams,
+  estimateTxBaseGas,
+  estimateTxGas,
+  estimateSafeTxGas,
+  estimateSafeDeploymentGas,
   ConnectSafeConfig,
   ConnectSafeConfigWithPredictedSafe,
   ConnectSafeConfigWithSafeAddress,

@@ -25,3 +25,4 @@ Software developer tools that facilitate the interaction with the Safe [contract
 ## Playground
 
 This project includes a [playground](https://github.com/safe-global/safe-core-sdk/tree/main/playground/README.md) with a few scripts that can be used as a starting point to use the Safe Core SDK.
+main.md

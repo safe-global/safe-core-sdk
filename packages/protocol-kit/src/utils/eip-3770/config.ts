@@ -77,6 +77,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 2008, shortName: 'cloudwalk_testnet' },
   { chainId: 2019, shortName: 'pmint_test' },
   { chainId: 2020, shortName: 'pmint' },
+  { chainId: 2021, shortName: 'edg' },
   { chainId: 2221, shortName: 'tkava' },
   { chainId: 2222, shortName: 'kava' },
   { chainId: 3737, shortName: 'csb' },

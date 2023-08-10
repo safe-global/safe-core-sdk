@@ -5,7 +5,7 @@ import Safe, {
   estimateTxBaseGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
-  createERC20tokenTransferTransaction
+  createERC20TokenTransferTransaction
 } from '@safe-global/protocol-kit'
 import { MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
 
@@ -26,7 +26,7 @@ const ADDRESS = '0x...address'
 const GAS_TOKEN = '0x...gasToken'
 const SAFE_ADDRESS = '0x...safe-address'
 const API_KEY = 'api-key'
-const FEE_ESTIMATION = BigNumber.from(100000)
+const FEE_ESTIMATION = BigNumber.from(100_000)
 const BASEGAS_ESTIMATION = '20000'
 const SAFETXGAS_ESTIMATION = '10000'
 const SAFE_DEPLOYMENT_GAS_ESTIMATION = '30000'
@@ -81,9 +81,9 @@ const mockEstimateSafeTxGas = estimateSafeTxGas as jest.MockedFunction<typeof es
 const mockEstimateSafeDeploymentGas = estimateSafeDeploymentGas as jest.MockedFunction<
   typeof estimateSafeDeploymentGas
 >
-const mockCreateERC20tokenTransferTransaction =
-  createERC20tokenTransferTransaction as jest.MockedFunction<
-    typeof createERC20tokenTransferTransaction
+const mockCreateERC20TokenTransferTransaction =
+  createERC20TokenTransferTransaction as jest.MockedFunction<
+    typeof createERC20TokenTransferTransaction
   >
 const mockedIsGasTokenCompatibleWithHandlePayment =
   isGasTokenCompatibleWithHandlePayment as jest.MockedFunction<
@@ -95,7 +95,7 @@ jest.doMock('@safe-global/protocol-kit', () => ({
   estimateTxBaseGas: mockEstimateTxBaseGas,
   estimateSafeTxGas: mockEstimateSafeTxGas,
   estimateSafeDeploymentGas: mockEstimateSafeDeploymentGas,
-  createERC20tokenTransferTransaction: mockCreateERC20tokenTransferTransaction,
+  createERC20TokenTransferTransaction: mockCreateERC20TokenTransferTransaction,
   isGasTokenCompatibleWithHandlePayment: mockedIsGasTokenCompatibleWithHandlePayment
 }))
 
@@ -249,7 +249,7 @@ describe('GelatoRelayPack', () => {
           data: '0x'
         }
 
-        mockCreateERC20tokenTransferTransaction.mockReturnValue(transferToGelato)
+        mockCreateERC20TokenTransferTransaction.mockReturnValue(transferToGelato)
 
         await relayPack.createRelayedTransaction({ safe, transactions, options })
 
@@ -363,7 +363,7 @@ describe('GelatoRelayPack', () => {
             data: '0x'
           }
 
-          mockCreateERC20tokenTransferTransaction.mockReturnValue(transferToGelato)
+          mockCreateERC20TokenTransferTransaction.mockReturnValue(transferToGelato)
 
           await relayPack.createRelayedTransaction({ safe, transactions, options })
 

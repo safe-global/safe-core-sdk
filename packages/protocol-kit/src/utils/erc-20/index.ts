@@ -16,6 +16,7 @@ const ERC20_ABI = [
  * @param {string} tokenAddress - The address of the ERC-20 token.
  * @param {Safe} safe - The Safe object.
  * @returns {Promise<number>} The number of decimals that the token uses.
+ * @throws "Invalid ERC-20 decimals"
  */
 export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promise<number> {
   const ethAdapter = safe.getEthAdapter()
@@ -31,6 +32,10 @@ export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promis
   const response = await ethAdapter.call(getTokenDecimalsTransaction)
 
   const decimals = Number(response)
+
+  if (Number.isNaN(decimals)) {
+    throw new Error('Invalid ERC-20 decimals')
+  }
 
   return decimals
 }
@@ -59,9 +64,9 @@ export async function isGasTokenCompatibleWithHandlePayment(
 
   // Only ERC20 tokens with the standard 18 decimals are compatible
   const gasTokenDecimals = await getERC20Decimals(gasToken, safe)
-  const isStandardERC20Token = gasTokenDecimals === STANDARD_ERC20_DECIMALS
+  const hasTokenStandardERC20Decimals = gasTokenDecimals === STANDARD_ERC20_DECIMALS
 
-  return isStandardERC20Token
+  return hasTokenStandardERC20Decimals
 }
 
 /**
@@ -73,7 +78,7 @@ export async function isGasTokenCompatibleWithHandlePayment(
  * @param {string} amount - The amount of tokens to transfer.
  * @returns {Transaction} Returns a transaction object that represents the transfer.
  */
-export function createERC20tokenTransferTransaction(
+export function createERC20TokenTransferTransaction(
   tokenAddress: string,
   toAddress: string,
   amount: string

@@ -11,7 +11,7 @@ import Safe, {
   estimateTxBaseGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
-  createERC20tokenTransferTransaction,
+  createERC20TokenTransferTransaction,
   isGasTokenCompatibleWithHandlePayment
 } from '@safe-global/protocol-kit'
 import {
@@ -71,9 +71,10 @@ export class GelatoRelayPack implements RelayPack {
     options = {}
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const { isSponsored = false } = options
-    const nonce = await safe.getNonce()
 
     if (isSponsored) {
+      const nonce = await safe.getNonce()
+
       const sponsoredTransaction = await safe.createTransaction({
         safeTransactionData: transactions,
         onlyCalls,
@@ -214,7 +215,7 @@ export class GelatoRelayPack implements RelayPack {
     if (gasLimit) {
       const paymentToGelato = await this.getEstimateFee(chainId, gasLimit, gasToken)
 
-      const transferToGelato = createERC20tokenTransferTransaction(
+      const transferToGelato = createERC20TokenTransferTransaction(
         gasToken,
         gelatoAddress,
         paymentToGelato
@@ -263,7 +264,7 @@ export class GelatoRelayPack implements RelayPack {
     const paymentToGelato = await this.getEstimateFee(chainId, String(totalGas), gasToken)
 
     // The Gelato payment transaction
-    const transferToGelato = createERC20tokenTransferTransaction(
+    const transferToGelato = createERC20TokenTransferTransaction(
       gasToken,
       gelatoAddress,
       paymentToGelato

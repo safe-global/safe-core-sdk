@@ -72,7 +72,7 @@ import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/tra
 import {
   getERC20Decimals,
   isGasTokenCompatibleWithHandlePayment,
-  createERC20tokenTransferTransaction
+  createERC20TokenTransferTransaction
 } from './utils/erc-20'
 
 export {
@@ -88,7 +88,7 @@ export {
   ContractNetworksConfig,
   CreateCallEthersContract,
   CreateCallWeb3Contract,
-  createERC20tokenTransferTransaction,
+  createERC20TokenTransferTransaction,
   CreateEthersProxyProps,
   CreateTransactionProps,
   CreateWeb3ProxyProps,

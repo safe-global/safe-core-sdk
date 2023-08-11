@@ -28,4 +28,9 @@ export interface RelayPack {
     onlyCalls
   }: CreateTransactionProps): Promise<SafeTransaction>
   relayTransaction(transaction: RelayTransaction): Promise<RelayResponse>
+  executeRelayTransaction(
+    safeTransaction: SafeTransaction,
+    safe: Safe,
+    options?: MetaTransactionOptions
+  ): Promise<RelayResponse>
 }

@@ -127,10 +127,18 @@ class AccountAbstraction {
     return this.#safeSdk.isSafeDeployed()
   }
 
-  async relayTransaction(
+  /**
+   * You can sign transaction on the client side, then, send in to the server side
+   * and, eventually, send transaction to relayer (via relaySignedTransaction) without sharing an ApiKey
+   * (you can create relayPack instance without an ApiKey)
+   * @param transactions
+   * @param options
+   * @returns
+   */
+  async getSignedTransactionToRelayer(
     transactions: MetaTransactionData[],
     options: MetaTransactionOptions
-  ): Promise<string> {
+  ): Promise<RelayTransaction> {
     if (!this.#relayPack || !this.#safeSdk || !this.#safeProxyFactoryContract) {
       throw new Error('SDK not initialized')
     }
@@ -218,14 +226,34 @@ class AccountAbstraction {
     }
 
     const chainId = await this.#ethAdapter.getChainId()
-    const relayTransaction: RelayTransaction = {
+    return {
       target: relayTransactionTarget,
       encodedTransaction: encodedTransaction,
       chainId,
       options
     }
+  }
+
+  async relaySignedTransaction(relayTransaction: RelayTransaction): Promise<string> {
+    if (!this.#relayPack) {
+      throw new Error('SDK not initialized')
+    }
+
     const response = await this.#relayPack.relayTransaction(relayTransaction)
     return response.taskId
+  }
+
+  async relayTransaction(
+    transactions: MetaTransactionData[],
+    options: MetaTransactionOptions
+  ): Promise<string> {
+    if (!this.#relayPack || !this.#safeSdk || !this.#safeProxyFactoryContract) {
+      throw new Error('SDK not initialized')
+    }
+
+    return this.relaySignedTransaction(
+      await this.getSignedTransactionToRelayer(transactions, options)
+    )
   }
 }
 

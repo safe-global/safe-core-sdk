@@ -16,14 +16,17 @@ import Safe, {
 } from '@safe-global/protocol-kit'
 import {
   GELATO_FEE_COLLECTOR,
+  GELATO_GAS_EXECUTION_OVERHEAD,
   GELATO_NATIVE_TOKEN_ADDRESS,
+  GELATO_TRANSFER_GAS_COST,
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
 import { RelayPack, CreateTransactionProps } from '@safe-global/relay-kit/types'
 import {
   MetaTransactionOptions,
   RelayTransaction,
-  SafeTransaction
+  SafeTransaction,
+  Transaction
 } from '@safe-global/safe-core-sdk-types'
 
 export class GelatoRelayPack implements RelayPack {
@@ -56,6 +59,39 @@ export class GelatoRelayPack implements RelayPack {
 
   async getTaskStatus(taskId: string): Promise<TransactionStatusResponse | undefined> {
     return this.#gelatoRelay.getTaskStatus(taskId)
+  }
+
+  /**
+   * Creates a payment transaction to Gelato
+   *
+   * @private
+   * @async
+   * @function
+   * @param {Safe} safe - The Safe object
+   * @param {string} gas - The gas amount for the payment.
+   * @param {MetaTransactionOptions} options - Options for the meta transaction.
+   * @returns {Promise<Transaction>} Promise object representing the created payment transaction.
+   *
+   */
+  private async createPaymentToGelato(
+    safe: Safe,
+    gas: string,
+    options: MetaTransactionOptions
+  ): Promise<Transaction> {
+    const chainId = await safe.getChainId()
+    const gelatoAddress = this.getFeeCollector()
+    const gasToken = options.gasToken ?? ZERO_ADDRESS
+
+    const paymentToGelato = await this.getEstimateFee(chainId, gas, gasToken)
+
+    // The Gelato payment transaction
+    const transferToGelato = createERC20TokenTransferTransaction(
+      gasToken,
+      gelatoAddress,
+      paymentToGelato
+    )
+
+    return transferToGelato
   }
 
   /**
@@ -162,9 +198,6 @@ export class GelatoRelayPack implements RelayPack {
     const baseGas = await estimateTxBaseGas(safe, transactionToEstimateGas)
     const safeDeploymentGasCost = await estimateSafeDeploymentGas(safe)
 
-    // see: https://docs.gelato.network/developer-services/relay/quick-start/optional-parameters#optional-parameters
-    const GELATO_GAS_EXECUTION_OVERHEAD = 150_000
-
     const totalGas =
       Number(baseGas) + // baseGas
       Number(safeTxGas) + // safeTxGas
@@ -208,18 +241,10 @@ export class GelatoRelayPack implements RelayPack {
     const { gasLimit } = options
     const nonce = await safe.getNonce()
     const gasToken = options.gasToken ?? ZERO_ADDRESS
-    const chainId = await safe.getChainId()
-    const gelatoAddress = this.getFeeCollector()
 
     // if a custom gasLimit is provided, we do not need to estimate the gas cost
     if (gasLimit) {
-      const paymentToGelato = await this.getEstimateFee(chainId, gasLimit, gasToken)
-
-      const transferToGelato = createERC20TokenTransferTransaction(
-        gasToken,
-        gelatoAddress,
-        paymentToGelato
-      )
+      const transferToGelato = await this.createPaymentToGelato(safe, gasLimit, options)
 
       const syncTransaction = await safe.createTransaction({
         safeTransactionData: [...transactions, transferToGelato],
@@ -248,12 +273,6 @@ export class GelatoRelayPack implements RelayPack {
     const baseGas = await estimateTxBaseGas(safe, transactionToEstimateGas)
     const safeDeploymentGasCost = await estimateSafeDeploymentGas(safe)
 
-    // see: https://docs.gelato.network/developer-services/relay/quick-start/optional-parameters#optional-parameters
-    const GELATO_GAS_EXECUTION_OVERHEAD = 150_000
-
-    // gas cost of the separate ERC20 transfer to pay the fees to the Gelato relayer
-    const GELATO_TRANSFER_GAS_COST = 15_000
-
     const totalGas =
       Number(baseGas) + // baseGas
       Number(safeTxGas) + // safeTxGas without Gelato payment transfer
@@ -261,14 +280,7 @@ export class GelatoRelayPack implements RelayPack {
       GELATO_TRANSFER_GAS_COST + // Gelato payment transfer
       GELATO_GAS_EXECUTION_OVERHEAD // Gelato execution overhead
 
-    const paymentToGelato = await this.getEstimateFee(chainId, String(totalGas), gasToken)
-
-    // The Gelato payment transaction
-    const transferToGelato = createERC20TokenTransferTransaction(
-      gasToken,
-      gelatoAddress,
-      paymentToGelato
-    )
+    const transferToGelato = await this.createPaymentToGelato(safe, String(totalGas), options)
 
     const syncTransaction = await safe.createTransaction({
       safeTransactionData: [...transactions, transferToGelato],

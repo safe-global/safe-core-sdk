@@ -11,7 +11,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
-import * as zksync from 'zksync-web3'
+import { utils as zkSyncUtils } from 'zksync-web3'
 
 import {
   getCompatibilityFallbackHandlerContract,
@@ -24,6 +24,8 @@ import { ContractNetworkConfig, SafeAccountConfig, SafeDeploymentConfig } from '
 export const PREDETERMINED_SALT_NONCE =
   '0xb1073742015cbcf5a3a4d9d1ae33ecf619439710b89475f92e2abd2117e90f90'
 
+const ZKSYNC_MAINNET = 324
+const ZKSYNC_TESTNET = 280
 const ZKSYNC_DEPLOYED_BYTECODE: { [version: string]: { deployedBytecode: string } } = {
   '1.3.0': {
     deployedBytecode:
@@ -194,11 +196,11 @@ export async function predictSafeAddress({
   const chainId = await ethAdapter.getChainId()
   // zkSync Era counterfactual deployment is calculated differently
   // https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#create-create2
-  if ([280, 324].includes(chainId)) {
-    const bytecodeHash = zksync.utils.hashBytecode(
+  if ([ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)) {
+    const bytecodeHash = zkSyncUtils.hashBytecode(
       ZKSYNC_DEPLOYED_BYTECODE[safeVersion].deployedBytecode
     )
-    return zksync.utils.create2Address(
+    return zkSyncUtils.create2Address(
       safeProxyFactoryContract.getAddress(),
       bytecodeHash,
       salt,

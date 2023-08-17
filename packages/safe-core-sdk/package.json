@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-core-sdk",
-  "version": "3.3.4",
+  "version": "3.3.5",
   "description": "Safe Core SDK",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -51,8 +51,8 @@
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@safe-global/safe-ethers-lib": "^1.9.3",
-    "@safe-global/safe-web3-lib": "^1.9.3",
+    "@safe-global/safe-ethers-lib": "^1.9.4",
+    "@safe-global/safe-web3-lib": "^1.9.4",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^10.0.1",

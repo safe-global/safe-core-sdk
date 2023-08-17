@@ -89,7 +89,8 @@
     "@safe-global/safe-deployments": "^1.25.0",
     "ethereumjs-util": "^7.1.5",
     "semver": "^7.3.8",
-    "web3-utils": "^1.8.1"
+    "web3-utils": "^1.8.1",
+    "zksync-web3": "^0.14.3"
   },
   "lint-staged": {
     "src/**/!(*test).ts": [

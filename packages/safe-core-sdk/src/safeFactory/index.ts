@@ -7,6 +7,8 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
+import { utils as zkSyncUtils } from 'zksync-web3'
+
 import { SAFE_LAST_VERSION } from '../contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,
@@ -65,6 +67,24 @@ interface SafeFactoryInitConfig {
   isL1SafeMasterCopy?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
+}
+
+const ZKSYNC_MAINNET = 324
+const ZKSYNC_TESTNET = 280
+// For bundle size efficiency we store SafeProxy.sol/GnosisSafeProxy.sol zksync bytecode hash in hex.
+// To get the values below we need to:
+// 1. Compile Safe smart contracts for zksync
+// 2. Get `deployedBytecode` from SafeProxy.json/GnosisSafeProxy.json
+// 3. Use zksync-web3 SDK to get the bytecode hash
+//    const bytecodeHash = zkSyncUtils.hashBytecode(${deployedBytecode})
+// 4. Use ethers to convert the array into hex
+//    const deployedBytecodeHash = ethers.utils.hexlify(bytecodeHash)
+const ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE: {
+  [version: string]: { deployedBytecodeHash: string }
+} = {
+  '1.3.0': {
+    deployedBytecodeHash: '0x0100004124426fb9ebb25e27d670c068e52f9ba631bd383279a188be47e3f86d'
+  }
 }
 
 class SafeFactory {
@@ -196,9 +216,22 @@ class SafeFactory {
     )
 
     const proxyCreationCode = await this.#safeProxyFactoryContract.proxyCreationCode()
-    const constructorData = toBuffer(
-      this.#ethAdapter.encodeParameters(['address'], [this.#gnosisSafeContract.getAddress()])
-    ).toString('hex')
+
+    const input = this.#ethAdapter.encodeParameters(
+      ['address'],
+      [this.#gnosisSafeContract.getAddress()]
+    )
+
+    const chainId = await this.#ethAdapter.getChainId()
+    // zkSync Era counterfactual deployment is calculated differently
+    // https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#create-create2
+    if ([ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)) {
+      const safeVersion = await this.#gnosisSafeContract.getVersion()
+      const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
+      return zkSyncUtils.create2Address(from, bytecodeHash, salt, input)
+    }
+
+    const constructorData = toBuffer(input).toString('hex')
     const initCode = proxyCreationCode + constructorData
 
     const proxyAddress =

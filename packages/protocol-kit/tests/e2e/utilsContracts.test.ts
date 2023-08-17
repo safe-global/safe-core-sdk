@@ -4,7 +4,7 @@ import { deployments, waffle } from 'hardhat'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEthAdapter, getNetworkProvider } from './utils/setupEthAdapter'
 import {
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
@@ -488,6 +488,86 @@ describe('Contract utils', () => {
         // The deployed Safe address should be equal to the predicted address
         const expectedSafeAddress = await deployedSafe.getAddress()
         chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
+      }
+    )
+    itif(safeVersionDeployed === '1.3.0')(
+      'returns the predicted address for Safes deployed on zkSync Era',
+      async () => {
+        const { contractNetworks } = await setupTests()
+
+        const safeVersion = safeVersionDeployed
+        // Create EthAdapter instance
+        const ethAdapter = await getEthAdapter(getNetworkProvider('zksync'))
+        const chainId = await ethAdapter.getChainId()
+        const customContracts = contractNetworks[chainId]
+
+        // We check real deployments from zksync return the expected address.
+
+        // 1/1 Safe
+        const safeAccountConfig1: SafeAccountConfig = {
+          owners: ['0xc6b82bA149CFA113f8f48d5E3b1F78e933e16DfD'],
+          threshold: 1
+        }
+        const safeDeploymentConfig1: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1691490995332'
+        }
+        const expectedSafeAddress1 = '0x4e19dA81a54eFbaBeb9AD50646f7643076475D65'
+
+        const firstPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter,
+          safeAccountConfig: safeAccountConfig1,
+          safeDeploymentConfig: safeDeploymentConfig1,
+          customContracts
+        })
+
+        // 1/2 Safe
+        const safeAccountConfig2: SafeAccountConfig = {
+          owners: [
+            '0x7E5E1C1FC6d625C1e60d78fDAB1CCE91e32261e4',
+            '0x6994Dc2544C1137b355488A9fc7b4F6EC2Bfeb5D'
+          ],
+          threshold: 1
+        }
+        const safeDeploymentConfig2: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1690771277826'
+        }
+        const expectedSafeAddress2 = '0x60c7F13dE7C8Fb88b3845e58859658bdc44243F8'
+
+        const secondPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter,
+          safeAccountConfig: safeAccountConfig2,
+          safeDeploymentConfig: safeDeploymentConfig2,
+          customContracts
+        })
+
+        // 2/3 Safe
+        const safeAccountConfig3: SafeAccountConfig = {
+          owners: [
+            '0x99999A3C4cB8427c44294Ad36895b6a3A047060d',
+            '0x1234561fEd41DD2D867a038bBdB857f291864225',
+            '0xe2c1F5DDcc99B0D70584fB4aD9D52b49cD4Cab03'
+          ],
+          threshold: 2
+        }
+        const safeDeploymentConfig3: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1690944491662'
+        }
+        const expectedSafeAddress3 = '0xD971FAA20db3ad4d51D453047ca03Ce4ec164CE2'
+
+        const thirdPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter,
+          safeAccountConfig: safeAccountConfig3,
+          safeDeploymentConfig: safeDeploymentConfig3,
+          customContracts
+        })
+
+        // returns the same predicted address each call
+        chai.expect(firstPredictedSafeAddress).to.be.equal(expectedSafeAddress1)
+        chai.expect(secondPredictedSafeAddress).to.be.equal(expectedSafeAddress2)
+        chai.expect(thirdPredictedSafeAddress).to.be.equal(expectedSafeAddress3)
       }
     )
   })

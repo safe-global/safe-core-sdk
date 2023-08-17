@@ -13,7 +13,7 @@ import Web3 from 'web3'
 
 dotenv.config()
 
-type Network = 'mainnet' | 'goerli' | 'gnosis'
+type Network = 'mainnet' | 'goerli' | 'gnosis' | 'zksync'
 
 export async function getEthAdapter(
   signerOrProvider: Signer | Provider | Web3
@@ -44,6 +44,9 @@ export async function getEthAdapter(
 export function getNetworkProvider(network: Network): Provider | Web3 {
   let rpcUrl: string
   switch (network) {
+    case 'zksync':
+      rpcUrl = 'https://mainnet.era.zksync.io'
+      break
     case 'gnosis':
       rpcUrl = 'https://rpc.gnosischain.com'
       break

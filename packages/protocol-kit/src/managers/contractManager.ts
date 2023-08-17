@@ -39,8 +39,8 @@ class ContractManager {
     if (isSafeConfigWithPredictedSafe(config)) {
       safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
     } else {
-      // We use the lastest version of the Safe contract to get the correct version of this Safe
-      const latestVersionOfTheSafeContract = await getSafeContract({
+      // We use the default version of the Safe contract to get the correct version of this Safe
+      const defaultSafeContractInstance = await getSafeContract({
         ethAdapter,
         safeVersion: DEFAULT_SAFE_VERSION,
         isL1SafeMasterCopy,
@@ -48,14 +48,14 @@ class ContractManager {
         customContracts
       })
 
-      // We get the correct version of the Safe from the blockchain
-      safeVersion = await latestVersionOfTheSafeContract.getVersion()
+      // We check the correct version of the Safe from the blockchain
+      safeVersion = await defaultSafeContractInstance.getVersion()
 
       // We get the correct Safe Contract if the real Safe version is not the lastest
-      const isTheLastSafeVersion = safeVersion === DEFAULT_SAFE_VERSION
+      const isTheDefaultSafeVersion = safeVersion === DEFAULT_SAFE_VERSION
 
-      this.#safeContract = isTheLastSafeVersion
-        ? latestVersionOfTheSafeContract
+      this.#safeContract = isTheDefaultSafeVersion
+        ? defaultSafeContractInstance
         : await getSafeContract({
             ethAdapter,
             safeVersion,

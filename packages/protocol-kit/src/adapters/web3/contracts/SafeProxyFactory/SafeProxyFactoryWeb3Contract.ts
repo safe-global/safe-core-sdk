@@ -63,12 +63,19 @@ class SafeProxyFactoryWeb3Contract implements SafeProxyFactoryContract {
     const txResult: TransactionReceipt = await new Promise((resolve, reject) =>
       txResponse.once('receipt', (receipt: TransactionReceipt) => resolve(receipt)).catch(reject)
     )
-    const proxyAddress = txResult.events?.ProxyCreation?.returnValues?.proxy
-    if (!proxyAddress) {
+    // const proxyAddress = txResult.events?.ProxyCreation?.returnValues?.proxy
+
+    //FRAN CODE START
+    const events = await this.contract.getPastEvents('ProxyCreation')
+    const proxyAddress = events[0]['returnValues']['0']
+
+    // if (!proxyAddress) {
+    if (proxyAddress == '0x0000000000000000000000000000000000000000') {
       throw new Error('SafeProxy was not deployed correctly')
     }
     return proxyAddress
   }
+  //FRAN CODE FINISH
 
   encode(methodName: string, params: any[]): string {
     return (this.contract as any).methods[methodName](...params).encodeABI()

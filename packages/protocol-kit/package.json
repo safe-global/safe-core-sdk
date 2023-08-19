@@ -1,6 +1,7 @@
 {
-  "name": "@safe-global/protocol-kit",
-  "version": "1.2.0",
+  "name": "@safe-global/protocol-kit-fixed",
+  "version": "1.0.0",
+  "private": false,
   "description": "SDK to interact with Safe smart contracts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -40,12 +41,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/safe-global/safe-core-sdk.git"
+    "url": "git+https://github.com/franvf/safe-core-sdk-fixed"
   },
-  "author": "Safe (https://safe.global)",
+  "author": "Fran Vañó",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/safe-global/safe-core-sdk/issues"
+    "url": "https://github.com/franvf"
   },
   "files": [
     "dist"

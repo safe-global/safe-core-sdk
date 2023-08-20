@@ -1,5 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { Event } from '@ethersproject/contracts'
+import { ethers } from 'ethers'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/Proxy_factory'
 import { Proxy_factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/Proxy_factory'
@@ -49,7 +50,7 @@ class SafeProxyFactoryEthersContract implements SafeProxyFactoryContract {
           ...options
         }
       )
-    }
+   }
     const proxyAddress = this.contract
       .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce, options)
       .then(async (txResponse) => {
@@ -57,13 +58,39 @@ class SafeProxyFactoryEthersContract implements SafeProxyFactoryContract {
           callback(txResponse.hash)
         }
         const txReceipt = await txResponse.wait()
-        const proxyCreationEvent = txReceipt?.events?.find(
-          ({ event }: Event) => event === 'ProxyCreation'
-        )
-        if (!proxyCreationEvent || !proxyCreationEvent.args) {
+        const proxyCreationLog = txReceipt?.events?.find(
+          ({ topics }: Event) =>
+            topics[0] === '0x4f51faf6c4561ff95f067657e43439f0f856d97c04d9ec9070a6199ad418e235'
+        ) as Event | undefined
+
+        let proxyCreationEventArgs: { 0: string; 1: string; proxy: string; singleton: string }
+          | undefined
+        if (proxyCreationLog) {
+          if (proxyCreationLog.topics.length == 1) {
+            const ifaceNonIndexedProxyAddress = new ethers.utils.Interface([
+              'event ProxyCreation(address proxy, address singleton)'
+            ])
+            proxyCreationEventArgs = ifaceNonIndexedProxyAddress.decodeEventLog(
+              'ProxyCreation',
+              proxyCreationLog.data,
+              proxyCreationLog.topics
+            ) as unknown as typeof proxyCreationEventArgs
+          } else if (proxyCreationLog.topics.length == 2) {
+            const ifaceIndexedProxyAddress = new ethers.utils.Interface([
+              'event ProxyCreation(address indexed proxy, address singleton)'
+            ])
+            proxyCreationEventArgs = ifaceIndexedProxyAddress.decodeEventLog(
+              'ProxyCreation',
+              proxyCreationLog.data,
+              proxyCreationLog.topics
+            ) as unknown as typeof proxyCreationEventArgs
+            }
+        }
+
+        if (!proxyCreationEventArgs?.proxy) {
           throw new Error('SafeProxy was not deployed correctly')
         }
-        const proxyAddress: string = proxyCreationEvent.args[0]
+        const proxyAddress: string = proxyCreationEventArgs.proxy
         return proxyAddress
       })
     return proxyAddress

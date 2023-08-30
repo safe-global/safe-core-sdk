@@ -1,4 +1,4 @@
-import { SafeTransactionData } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import {
   EIP712_DOMAIN,
@@ -12,7 +12,7 @@ const safeTransactionData: SafeTransactionData = {
   to: '0x000',
   value: '111',
   data: '0x222',
-  operation: 333,
+  operation: OperationType.DelegateCall,
   safeTxGas: '444',
   baseGas: '555',
   gasPrice: '666',

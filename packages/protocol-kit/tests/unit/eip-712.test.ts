@@ -13,9 +13,9 @@ const safeTransactionData: SafeTransactionData = {
   value: '111',
   data: '0x222',
   operation: 333,
-  safeTxGas: 444,
-  baseGas: 555,
-  gasPrice: 666,
+  safeTxGas: '444',
+  baseGas: '555',
+  gasPrice: '666',
   gasToken: '0x777',
   refundReceiver: '0x888',
   nonce: 999

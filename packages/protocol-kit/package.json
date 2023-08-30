@@ -12,6 +12,7 @@
   "scripts": {
     "safe-deployments": "ts-node scripts/checkSafeDeployments.ts",
     "typechain": "ts-node ./scripts/generateTypechainFiles.ts",
+    "test": "mocha -r ts-node/register -r tsconfig-paths/register tests/unit/**/*.ts",
     "test:ganache:web3:v1.0.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.0.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.1.1": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.1.1 && hardhat --network localhost deploy && nyc hardhat --network localhost test",
     "test:ganache:web3:v1.2.0": "export TEST_NETWORK=ganache && export ETH_LIB=web3 && export SAFE_VERSION=1.2.0 && hardhat --network localhost deploy && nyc hardhat --network localhost test",

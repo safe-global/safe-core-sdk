@@ -125,6 +125,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 333999, shortName: 'olympus' },
   { chainId: 421611, shortName: 'arb-rinkeby' },
   { chainId: 421613, shortName: 'arb-goerli' },
+  { chainId: 534351, shortName: 'scr-sepolia' },
   { chainId: 534353, shortName: 'scr-alpha' },
   { chainId: 7777777, shortName: 'zora' },
   { chainId: 11155111, shortName: 'sep' },

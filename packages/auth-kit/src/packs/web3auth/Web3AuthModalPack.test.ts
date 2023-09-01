@@ -1,3 +1,5 @@
+import { ethers } from 'ethers'
+import { EthersAdapter } from '@safe-global/protocol-kit'
 import { Web3AuthModalPack } from './Web3AuthModalPack'
 import { generateTestingUtils } from 'eth-testing'
 import EventEmitter from 'events'
@@ -75,7 +77,12 @@ describe('Web3AuthModalPack', () => {
   let web3AuthModalPack: Web3AuthModalPack
 
   beforeAll(async () => {
+    const provider = new ethers.providers.Web3Provider(mockProvider, '0xAddress')
     web3AuthModalPack = new Web3AuthModalPack({
+      ethAdapter: new EthersAdapter({
+        ethers,
+        signerOrProvider: provider.getSigner()
+      }),
       txServiceUrl: 'https://txservice-url.com'
     })
 

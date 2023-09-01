@@ -1,11 +1,15 @@
-import { ethers } from 'ethers'
 import SafeApiKit from '@safe-global/api-kit'
-import { EthersAdapter } from '@safe-global/protocol-kit'
+import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 
-import type { AuthKitSignInData } from './types'
+import type { AuthKitEthereumProvider, AuthKitSignInData } from './types'
 
 export abstract class AuthKitBasePack {
+  ethAdapter: EthAdapter
   safeAuthData?: AuthKitSignInData
+
+  constructor(ethAdapter: EthAdapter) {
+    this.ethAdapter = ethAdapter
+  }
 
   /**
    * Initialize the pack
@@ -28,7 +32,7 @@ export abstract class AuthKitBasePack {
    * Get the provider instance based on the pack
    * @returns The provider instance
    */
-  abstract getProvider(): ethers.providers.ExternalProvider | null
+  abstract getProvider(): AuthKitEthereumProvider | null
 
   /**
    * Get the user info from the provider
@@ -78,15 +82,9 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
+    const owner = await this.ethAdapter.getSignerAddress()
 
-    const signer = ethersProvider.getSigner()
-
-    const address = await signer.getAddress()
-
-    return address
+    return owner || ''
   }
 
   /**
@@ -98,19 +96,9 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const provider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
-    const safeOwner = provider.getSigner(0)
-
-    const adapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: safeOwner
-    })
-
     return new SafeApiKit({
       txServiceUrl,
-      ethAdapter: adapter
+      ethAdapter: this.ethAdapter
     })
   }
 }

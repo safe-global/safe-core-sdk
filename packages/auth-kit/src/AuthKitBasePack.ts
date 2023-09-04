@@ -1,15 +1,10 @@
+import { Web3Provider, ExternalProvider } from '@ethersproject/providers'
 import SafeApiKit from '@safe-global/api-kit'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 
 import type { AuthKitEthereumProvider, AuthKitSignInData } from './types'
 
 export abstract class AuthKitBasePack {
-  ethAdapter: EthAdapter
   safeAuthData?: AuthKitSignInData
-
-  constructor(ethAdapter: EthAdapter) {
-    this.ethAdapter = ethAdapter
-  }
 
   /**
    * Initialize the pack
@@ -59,8 +54,8 @@ export abstract class AuthKitBasePack {
    * @param txServiceUrl The URL of the Safe Transaction Service
    * @returns The list of Safe addresses owned by the user in the chain
    */
-  async getSafes(txServiceUrl: string): Promise<string[]> {
-    const apiKit = this.#getApiKit(txServiceUrl)
+  async getSafes(txServiceUrl: string, chainId: number): Promise<string[]> {
+    const apiKit = this.#getApiKit(txServiceUrl, chainId)
 
     const address = await this.getAddress()
 
@@ -78,27 +73,43 @@ export abstract class AuthKitBasePack {
    * @returns The signer address
    */
   async getAddress(): Promise<string> {
-    if (!this.getProvider()) {
+    const authKitProvider = this.getProvider()
+
+    if (!authKitProvider) {
       throw new Error('Provider is not defined')
     }
 
-    const owner = await this.ethAdapter.getSignerAddress()
+    const ethersProvider = new Web3Provider(authKitProvider as ExternalProvider)
+    const signer = ethersProvider.getSigner()
 
-    return owner || ''
+    return signer.getAddress()
+  }
+
+  async getChainId(): Promise<number> {
+    const authKitProvider = this.getProvider()
+
+    if (!authKitProvider) {
+      throw new Error('Provider is not defined')
+    }
+
+    const ethersProvider = new Web3Provider(authKitProvider as ExternalProvider)
+    const networkDetails = await ethersProvider.getNetwork()
+
+    return networkDetails.chainId
   }
 
   /**
    * Get the SafeApiKit instance
    * @returns A SafeApiKit instance
    */
-  #getApiKit(txServiceUrl: string): SafeApiKit {
+  #getApiKit(txServiceUrl: string, chainId: number): SafeApiKit {
     if (!this.getProvider()) {
       throw new Error('Provider is not defined')
     }
 
     return new SafeApiKit({
       txServiceUrl,
-      ethAdapter: this.ethAdapter
+      chainId
     })
   }
 }

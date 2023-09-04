@@ -15,6 +15,6 @@ export async function getServiceClient(signerPk: string): Promise<ServiceClientC
   const provider = getDefaultProvider(config.JSON_RPC)
   const signer = new Wallet(signerPk, provider)
   const ethAdapter = await getEthAdapter(signer)
-  const safeApiKit = new SafeApiKit({ txServiceUrl: config.BASE_URL, ethAdapter })
+  const safeApiKit = new SafeApiKit({ txServiceUrl: config.BASE_URL, chainId: config.CHAIN_ID })
   return { safeApiKit, ethAdapter, signer }
 }

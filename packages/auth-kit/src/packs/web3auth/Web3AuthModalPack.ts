@@ -20,7 +20,7 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @param config Web3Auth specific config
    */
   constructor(config: Web3AuthConfig) {
-    super(config.ethAdapter)
+    super()
     this.#config = config
     this.#provider = null
   }
@@ -66,7 +66,8 @@ export class Web3AuthModalPack extends AuthKitBasePack {
     this.#provider = await this.web3Auth.connect()
 
     const eoa = await this.getAddress()
-    const safes = await this.getSafes(this.#config?.txServiceUrl || '')
+    const chainId = await this.getChainId()
+    const safes = await this.getSafes(this.#config?.txServiceUrl || '', chainId)
 
     const signInData = {
       eoa,

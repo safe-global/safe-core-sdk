@@ -81,9 +81,11 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns A boolean indicating if the message is signed
    */
   async isSignMessagePending(safeAddress: string, message: string): Promise<boolean> {
+    const chainId = await this.#safeSdk.getChainId()
+
     const apiKit = new SafeApiKit({
       txServiceUrl: await this.getTransactionServiceUrl(),
-      ethAdapter: this.#ethAdapter
+      chainId
     })
 
     const pendingTransactions = await apiKit.getPendingTransactions(safeAddress)
@@ -130,9 +132,11 @@ export class SafeMoneriumClient extends MoneriumClient {
 
       const senderSignature = await this.#safeSdk.signTransactionHash(safeTxHash)
 
+      const chainId = await this.#safeSdk.getChainId()
+
       const apiKit = new SafeApiKit({
         txServiceUrl: await this.getTransactionServiceUrl(),
-        ethAdapter: this.#ethAdapter
+        chainId
       })
 
       await apiKit.proposeTransaction({

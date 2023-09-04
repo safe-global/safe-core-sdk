@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { hashMessage } from '@ethersproject/hash'
 import { Currency, PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
@@ -111,7 +111,7 @@ describe('SafeMoneriumClient', () => {
           // @ts-expect-error - dataDecoded should have the method property
           dataDecoded: {
             method: 'signMessage',
-            parameters: [{ value: ethers.utils.hashMessage('message to sign') }]
+            parameters: [{ value: hashMessage('message to sign') }]
           }
         }
       ]

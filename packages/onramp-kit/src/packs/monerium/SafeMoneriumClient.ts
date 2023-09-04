@@ -1,4 +1,5 @@
-import { ethers } from 'ethers'
+import { hashMessage } from '@ethersproject/hash'
+import { arrayify } from '@ethersproject/bytes'
 import { Chain, IBAN, MoneriumClient, Networks, NewOrder, OrderKind } from '@monerium/sdk'
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
@@ -68,7 +69,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns A boolean indicating if the message is signed
    */
   async isMessageSigned(safeAddress: string, message: string): Promise<boolean> {
-    const messageHash = ethers.utils.hashMessage(message)
+    const messageHash = hashMessage(message)
     const messageHashSigned = await this.#isValidSignature(safeAddress, messageHash)
     return messageHashSigned
   }
@@ -92,7 +93,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         // @ts-expect-error - dataDecoded should have the method property
         tx?.dataDecoded?.method === 'signMessage' &&
         // @ts-expect-error - dataDecoded should have the parameters array
-        tx?.dataDecoded?.parameters[0]?.value === ethers.utils.hashMessage(message)
+        tx?.dataDecoded?.parameters[0]?.value === hashMessage(message)
       )
     })
   }
@@ -114,7 +115,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         safeVersion
       })
 
-      const txData = signMessageContract.encode('signMessage', [ethers.utils.hashMessage(message)])
+      const txData = signMessageContract.encode('signMessage', [hashMessage(message)])
 
       const safeTransaction = await this.#safeSdk.createTransaction({
         safeTransactionData: {
@@ -228,7 +229,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         messageHash,
         '0x'
       ])
-      const msgBytes = ethers.utils.arrayify(messageHash)
+      const msgBytes = arrayify(messageHash)
 
       const eip1271BytesData = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
         msgBytes,

@@ -30,10 +30,11 @@ import {
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
+import { TRANSACTION_SERVICE_URLS } from './utils/config'
 
 export interface SafeApiKitConfig {
   /** txServiceUrl - Safe Transaction Service URL */
-  txServiceUrl: string
+  txServiceUrl?: string
   /** chainId - The chainId */
   chainId: number
 }
@@ -43,7 +44,19 @@ class SafeApiKit {
   #chainId: number
 
   constructor({ txServiceUrl, chainId }: SafeApiKitConfig) {
-    this.#txServiceBaseUrl = getTxServiceBaseUrl(txServiceUrl)
+    if (txServiceUrl) {
+      this.#txServiceBaseUrl = getTxServiceBaseUrl(txServiceUrl)
+    } else {
+      const url = TRANSACTION_SERVICE_URLS[chainId]
+      if (!url) {
+        throw new TypeError(
+          `There is no transaction service deployment available for the chainId: ${chainId}. Please use the parameter txServiceUrl for a custom deployment`
+        )
+      }
+
+      this.#txServiceBaseUrl = getTxServiceBaseUrl(url)
+    }
+
     this.#chainId = chainId
   }
 

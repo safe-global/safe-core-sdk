@@ -22,7 +22,6 @@ import {
   TokenInfoResponse,
   TransferListResponse
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
-import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 import { validateEip3770Address } from '@safe-global/protocol-kit'
 import {
@@ -45,7 +44,7 @@ class SafeApiKit {
 
   constructor({ txServiceUrl, chainId }: SafeApiKitConfig) {
     if (txServiceUrl) {
-      this.#txServiceBaseUrl = getTxServiceBaseUrl(txServiceUrl)
+      this.#txServiceBaseUrl = txServiceUrl
     } else {
       const url = TRANSACTION_SERVICE_URLS[chainId]
       if (!url) {
@@ -54,7 +53,7 @@ class SafeApiKit {
         )
       }
 
-      this.#txServiceBaseUrl = getTxServiceBaseUrl(url)
+      this.#txServiceBaseUrl = `${url}/api`
     }
 
     this.#chainId = chainId

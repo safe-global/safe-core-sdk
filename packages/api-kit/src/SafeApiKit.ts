@@ -24,7 +24,7 @@ import {
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { getTxServiceBaseUrl } from '@safe-global/api-kit/utils'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
-import { validateEip3770Address } from '@safe-global/protocol-kit/dist/src/utils'
+import { validateEip3770Address } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
   SafeMultisigConfirmationListResponse,

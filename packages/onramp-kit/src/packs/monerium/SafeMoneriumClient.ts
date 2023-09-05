@@ -89,7 +89,9 @@ export class SafeMoneriumClient extends MoneriumClient {
 
     return pendingTransactions.results.some((tx: SafeMultisigTransactionResponse) => {
       return (
+        // @ts-expect-error - dataDecoded should have the method property
         tx?.dataDecoded?.method === 'signMessage' &&
+        // @ts-expect-error - dataDecoded should have the parameters array
         tx?.dataDecoded?.parameters[0]?.value === hashMessage(message)
       )
     })

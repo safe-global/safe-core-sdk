@@ -65,7 +65,8 @@ import {
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
-  estimateSafeDeploymentGas
+  estimateSafeDeploymentGas,
+  validateEip3770Address
 } from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
@@ -139,7 +140,8 @@ export {
   getSignMessageLibContract,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
-  standardizeSafeTransactionData
+  standardizeSafeTransactionData,
+  validateEip3770Address
 }
 
 export default Safe

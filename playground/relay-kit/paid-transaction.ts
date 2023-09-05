@@ -1,9 +1,12 @@
 import AccountAbstraction, {
-  AccountAbstractionConfig,
-  OperationType
+  AccountAbstractionConfig
 } from '@safe-global/account-abstraction-kit-poc'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
-import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  OperationType
+} from '@safe-global/safe-core-sdk-types'
 import { BigNumber, ethers } from 'ethers'
 
 // Check the status of a transaction after it is relayed:

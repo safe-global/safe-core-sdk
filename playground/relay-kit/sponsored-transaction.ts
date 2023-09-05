@@ -1,8 +1,13 @@
-import AccountAbstraction, { OperationType } from '@safe-global/account-abstraction-kit-poc'
+import AccountAbstraction, {
+  AccountAbstractionConfig
+} from '@safe-global/account-abstraction-kit-poc'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
-import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  OperationType
+} from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
-import { AccountAbstractionConfig } from './../../packages/account-abstraction-kit/src/types/index'
 
 // Fund the 1Balance account that will sponsor the transaction and get the API key:
 // https://relay.gelato.network/
@@ -27,9 +32,7 @@ const mockOnRampConfig = {
 const txConfig = {
   TO: '<TO>',
   DATA: '<DATA>',
-  VALUE: '<VALUE>',
-  // Options:
-  GAS_LIMIT: '<GAS_LIMIT>'
+  VALUE: '<VALUE>'
 }
 
 async function main() {
@@ -84,7 +87,6 @@ async function main() {
     }
   ]
   const options: MetaTransactionOptions = {
-    gasLimit: txConfig.GAS_LIMIT,
     isSponsored: true
   }
 

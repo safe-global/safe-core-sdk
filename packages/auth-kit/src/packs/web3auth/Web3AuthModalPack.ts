@@ -12,14 +12,14 @@ import type { AuthKitEthereumProvider, AuthKitSignInData } from '@safe-global/au
  */
 export class Web3AuthModalPack extends AuthKitBasePack {
   #provider: SafeEventEmitterProvider | null
-  #config: Web3AuthConfig
+  #config?: Web3AuthConfig
   web3Auth?: Web3Auth
 
   /**
    * Instantiate the Web3AuthModalPack
    * @param config Web3Auth specific config
    */
-  constructor(config: Web3AuthConfig) {
+  constructor(config?: Web3AuthConfig) {
     super()
     this.#config = config
     this.#provider = null

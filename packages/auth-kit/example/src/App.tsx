@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { ethers } from 'ethers'
 import {
   ADAPTER_EVENTS,
   CHAIN_NAMESPACES,
@@ -14,7 +13,6 @@ import { EthHashInfo } from '@safe-global/safe-react-components'
 
 import AppBar from './AppBar'
 import { AuthKitSignInData, Web3AuthModalPack, Web3AuthEventListener } from '../../src/index'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 
 const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED', data)
 const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
@@ -29,20 +27,14 @@ function App() {
 
   useEffect(() => {
     ;(async () => {
-      const rpcUrl = `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
-      const provider = new ethers.providers.JsonRpcProvider(rpcUrl)
-      const signer = provider.getSigner('0xD725e11588f040d86c4C49d8236E32A5868549F0')
-      const ethAdapter = new EthersAdapter({
-        ethers,
-        signerOrProvider: signer
-      })
+      const rpcUrl = `https://goerli.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
 
       const options: Web3AuthOptions = {
         clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
         web3AuthNetwork: 'testnet',
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: '0x1',
+          chainId: '0x5',
           rpcTarget: rpcUrl
         },
         uiConfig: {
@@ -75,10 +67,7 @@ function App() {
         }
       })
 
-      const web3AuthModalPack = new Web3AuthModalPack({
-        ethAdapter,
-        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
-      })
+      const web3AuthModalPack = new Web3AuthModalPack()
 
       await web3AuthModalPack.init({ options, adapters: [openloginAdapter], modalConfig })
 

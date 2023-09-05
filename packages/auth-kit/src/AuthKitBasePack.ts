@@ -93,7 +93,7 @@ export abstract class AuthKitBasePack {
     }
 
     const ethersProvider = new Web3Provider(authKitProvider as ExternalProvider)
-    console.log(ethersProvider)
+
     const networkDetails = await ethersProvider.getNetwork()
 
     return networkDetails.chainId

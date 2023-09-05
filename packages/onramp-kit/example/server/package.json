@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/onramp-kit-example-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Account abstraction basic Stripe service",
   "main": "index.ts",
   "license": "MIT",

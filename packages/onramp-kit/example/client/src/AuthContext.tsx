@@ -70,9 +70,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         }
       })
 
-      const web3AuthPack = new Web3AuthModalPack({
-        txServiceUrl: 'http://loquito.com'
-      })
+      const web3AuthPack = new Web3AuthModalPack()
 
       await web3AuthPack.init({ options, adapters: [openloginAdapter], modalConfig })
 

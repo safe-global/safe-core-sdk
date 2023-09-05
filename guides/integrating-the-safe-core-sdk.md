@@ -43,7 +43,13 @@ As stated in the introduction, the [Safe API Kit](https://github.com/safe-global
 import SafeApiKit from '@safe-global/api-kit'
 
 const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
-const safeService = new SafeApiKit({ txServiceUrl, ethAdapter })
+const safeService = new SafeApiKit({ chainId })
+```
+
+Using the `chainId`, we will map internally the URL to the corresponding Safe Transaction Service endpoint. If we don't have a deployment for the desired chain, then the `txServiceUrl` can be used.
+
+```js
+const safeService = new SafeApiKit({ chainId, txServiceUrl: 'https://txServiceUrl.com' })
 ```
 
 ### Initialize the Protocol Kit

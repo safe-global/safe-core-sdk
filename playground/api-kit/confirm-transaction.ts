@@ -5,6 +5,7 @@ import { ethers } from 'ethers'
 // This file can be used to play around with the Safe Core SDK
 
 interface Config {
+  CHAIN_ID: number
   RPC_URL: string
   SIGNER_ADDRESS_PRIVATE_KEY: string
   SAFE_ADDRESS: string
@@ -13,6 +14,7 @@ interface Config {
 }
 
 const config: Config = {
+  CHAIN_ID: 5,
   RPC_URL: 'https://goerli.infura.io/v3/<INFURA_KEY>',
   SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
   SAFE_ADDRESS: '<SAFE_ADDRESS>',
@@ -38,8 +40,7 @@ async function main() {
 
   // Create Safe API Kit instance
   const service = new SafeApiKit({
-    txServiceUrl: config.TX_SERVICE_URL,
-    ethAdapter
+    chainId: config.CHAIN_ID
   })
 
   // Get the transaction

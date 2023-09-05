@@ -67,7 +67,7 @@ export class Web3AuthModalPack extends AuthKitBasePack {
 
     const eoa = await this.getAddress()
     const chainId = await this.getChainId()
-    const safes = await this.getSafes(this.#config?.txServiceUrl || '', chainId)
+    const safes = await this.getSafes(chainId, this.#config?.txServiceUrl)
 
     const signInData = {
       eoa,

@@ -109,8 +109,8 @@ export abstract class AuthKitBasePack {
     }
 
     return new SafeApiKit({
-      txServiceUrl,
-      chainId
+      chainId,
+      txServiceUrl
     })
   }
 }

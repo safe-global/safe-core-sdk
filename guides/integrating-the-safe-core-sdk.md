@@ -45,7 +45,7 @@ import SafeApiKit from '@safe-global/api-kit'
 const safeService = new SafeApiKit({ chainId })
 ```
 
-Using the `chainId`, we will map internally the URL to the corresponding Safe Transaction Service endpoint. If we don't have a deployment for the desired chain, then the `txServiceUrl` should be used.
+Using the `chainId` is enough for chains where Safe runs a Transaction Service. For those chains where Safe doesn't run a service, use the `txServiceUrl` parameter to set the custom service endpoint.
 
 ```js
 const safeService = new SafeApiKit({

@@ -32,17 +32,19 @@ import {
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 
 export interface SafeApiKitConfig {
-  /** txServiceUrl - Safe Transaction Service URL */
-  txServiceUrl?: string
   /** chainId - The chainId */
   chainId: number
+  /** txServiceUrl - Safe Transaction Service URL */
+  txServiceUrl?: string
 }
 
 class SafeApiKit {
-  #txServiceBaseUrl: string
   #chainId: number
+  #txServiceBaseUrl: string
 
-  constructor({ txServiceUrl, chainId }: SafeApiKitConfig) {
+  constructor({ chainId, txServiceUrl }: SafeApiKitConfig) {
+    this.#chainId = chainId
+
     if (txServiceUrl) {
       this.#txServiceBaseUrl = txServiceUrl
     } else {
@@ -55,11 +57,9 @@ class SafeApiKit {
 
       this.#txServiceBaseUrl = `${url}/api`
     }
-
-    this.#chainId = chainId
   }
 
-  getEip3770Address(fullAddress: string): Eip3770Address {
+  #getEip3770Address(fullAddress: string): Eip3770Address {
     return validateEip3770Address(fullAddress, this.#chainId)
   }
 
@@ -119,7 +119,7 @@ class SafeApiKit {
     if (ownerAddress === '') {
       throw new Error('Invalid owner address')
     }
-    const { address } = this.getEip3770Address(ownerAddress)
+    const { address } = this.#getEip3770Address(ownerAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/owners/${address}/safes/`,
       method: HttpMethod.Get
@@ -138,7 +138,7 @@ class SafeApiKit {
     if (moduleAddress === '') {
       throw new Error('Invalid module address')
     }
-    const { address } = this.getEip3770Address(moduleAddress)
+    const { address } = this.#getEip3770Address(moduleAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/modules/${address}/safes/`,
       method: HttpMethod.Get
@@ -221,7 +221,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/`,
       method: HttpMethod.Get
@@ -246,15 +246,15 @@ class SafeApiKit {
     const url = new URL(`${this.#txServiceBaseUrl}/v1/delegates`)
 
     if (safeAddress) {
-      const { address: safe } = this.getEip3770Address(safeAddress)
+      const { address: safe } = this.#getEip3770Address(safeAddress)
       url.searchParams.set('safe', safe)
     }
     if (delegateAddress) {
-      const { address: delegate } = this.getEip3770Address(delegateAddress)
+      const { address: delegate } = this.#getEip3770Address(delegateAddress)
       url.searchParams.set('delegate', delegate)
     }
     if (delegatorAddress) {
-      const { address: delegator } = this.getEip3770Address(delegatorAddress)
+      const { address: delegator } = this.#getEip3770Address(delegatorAddress)
       url.searchParams.set('delegator', delegator)
     }
     if (label) {
@@ -301,13 +301,13 @@ class SafeApiKit {
     if (label === '') {
       throw new Error('Invalid label')
     }
-    const { address: delegate } = this.getEip3770Address(delegateAddress)
-    const { address: delegator } = this.getEip3770Address(delegatorAddress)
+    const { address: delegate } = this.#getEip3770Address(delegateAddress)
+    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
     const totp = Math.floor(Date.now() / 1000 / 3600)
     const data = delegate + totp
     const signature = await signer.signMessage(data)
     const body: any = {
-      safe: safeAddress ? this.getEip3770Address(safeAddress).address : null,
+      safe: safeAddress ? this.#getEip3770Address(safeAddress).address : null,
       delegate,
       delegator,
       label,
@@ -342,8 +342,8 @@ class SafeApiKit {
     if (delegatorAddress === '') {
       throw new Error('Invalid Safe delegator address')
     }
-    const { address: delegate } = this.getEip3770Address(delegateAddress)
-    const { address: delegator } = this.getEip3770Address(delegatorAddress)
+    const { address: delegate } = this.#getEip3770Address(delegateAddress)
+    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
     const totp = Math.floor(Date.now() / 1000 / 3600)
     const data = delegate + totp
     const signature = await signer.signMessage(data)
@@ -372,7 +372,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/creation/`,
       method: HttpMethod.Get
@@ -397,7 +397,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/estimations/`,
       method: HttpMethod.Post,
@@ -426,8 +426,8 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address: safe } = this.getEip3770Address(safeAddress)
-    const { address: sender } = this.getEip3770Address(senderAddress)
+    const { address: safe } = this.#getEip3770Address(safeAddress)
+    const { address: sender } = this.#getEip3770Address(senderAddress)
     if (safeTxHash === '') {
       throw new Error('Invalid safeTxHash')
     }
@@ -456,7 +456,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers?executed=true`,
       method: HttpMethod.Get
@@ -476,7 +476,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/module-transactions/`,
       method: HttpMethod.Get
@@ -495,7 +495,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/`,
       method: HttpMethod.Get
@@ -519,7 +519,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
     return sendRequest({
       url: `${
@@ -544,7 +544,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
 
     const trusted = options?.trusted?.toString() || 'true'
@@ -575,7 +575,7 @@ class SafeApiKit {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const { address } = this.getEip3770Address(safeAddress)
+    const { address } = this.#getEip3770Address(safeAddress)
     const pendingTransactions = await this.getPendingTransactions(address)
     if (pendingTransactions.results.length > 0) {
       const nonces = pendingTransactions.results.map((tx) => tx.nonce)
@@ -610,7 +610,7 @@ class SafeApiKit {
     if (tokenAddress === '') {
       throw new Error('Invalid token address')
     }
-    const { address } = this.getEip3770Address(tokenAddress)
+    const { address } = this.#getEip3770Address(tokenAddress)
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/tokens/${address}/`,
       method: HttpMethod.Get

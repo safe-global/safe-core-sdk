@@ -51,13 +51,13 @@ describe('Endpoint tests', () => {
     .stub(httpRequests, 'sendRequest')
     .returns(Promise.resolve({ data: { success: true } }))
 
-  describe('', () => {
+  describe('Default txServiceUrl', () => {
     it('getServiceInfo', async () => {
       await chai
         .expect(safeApiKit.getServiceInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/api/v1/about`,
+        url: `${txServiceBaseUrl}/v1/about`,
         method: 'get'
       })
     })
@@ -561,6 +561,24 @@ describe('Endpoint tests', () => {
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/tokens/${tokenAddress}/`,
+        method: 'get'
+      })
+    })
+  })
+
+  describe('Custom endpoint', () => {
+    const txServiceUrl = 'http://my-custom-tx-service.com/api'
+
+    it('should can instantiate the SafeApiKit with a custom endpoint', async () => {
+      ;({ safeApiKit } = await getServiceClient(
+        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
+        txServiceUrl
+      ))
+
+      await chai.expect(safeApiKit.getServiceInfo())
+
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceUrl}/v1/about`,
         method: 'get'
       })
     })

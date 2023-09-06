@@ -49,7 +49,10 @@ const safeService = new SafeApiKit({ chainId })
 Using the `chainId`, we will map internally the URL to the corresponding Safe Transaction Service endpoint. If we don't have a deployment for the desired chain, then the `txServiceUrl` should be used.
 
 ```js
-const safeService = new SafeApiKit({ chainId, txServiceUrl: 'https://txServiceUrl.com' })
+const safeService = new SafeApiKit({
+  chainId,
+  txServiceUrl: 'https://txServiceUrl.com'
+})
 ```
 
 ### Initialize the Protocol Kit

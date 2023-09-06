@@ -42,7 +42,6 @@ As stated in the introduction, the [Safe API Kit](https://github.com/safe-global
 ```js
 import SafeApiKit from '@safe-global/api-kit'
 
-const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
 const safeService = new SafeApiKit({ chainId })
 ```
 

@@ -1,4 +1,4 @@
-import { Web3Provider, ExternalProvider } from '@ethersproject/providers'
+import { Web3Provider } from '@ethersproject/providers'
 import SafeApiKit from '@safe-global/api-kit'
 
 import type { AuthKitEthereumProvider, AuthKitSignInData } from './types'
@@ -79,7 +79,7 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new Web3Provider(authKitProvider as ExternalProvider)
+    const ethersProvider = new Web3Provider(authKitProvider)
     const signer = ethersProvider.getSigner()
 
     return signer.getAddress()
@@ -92,7 +92,7 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new Web3Provider(authKitProvider as ExternalProvider)
+    const ethersProvider = new Web3Provider(authKitProvider)
 
     const networkDetails = await ethersProvider.getNetwork()
 

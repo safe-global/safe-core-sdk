@@ -51,7 +51,7 @@ class SafeApiKit {
       const url = TRANSACTION_SERVICE_URLS[chainId]
       if (!url) {
         throw new TypeError(
-          `There is no transaction service deployment available for the chainId: ${chainId}. Please use the parameter txServiceUrl for a custom deployment`
+          `There is no transaction service available for chainId ${chainId}. Please set the txServiceUrl property to use a custom transaction service.`
         )
       }
 

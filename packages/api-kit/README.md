@@ -47,25 +47,15 @@ npm run test
 
 ## <a name="initialization">Initialization</a>
 
-### Instantiate an EthAdapter
-
-First of all, we need to create an `EthAdapter`, which contains all the required utilities for the SDKs to interact with the blockchain. It acts as a wrapper for [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/) Ethereum libraries.
-
-Depending on the library used by the Dapp, there are two options:
-
-- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/ethers)
-- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/web3)
-
-Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
-
 ### Initialize the SafeApiKit
 
 ```js
 import SafeApiKit from '@safe-global/api-kit'
 
 const safeService = new SafeApiKit({
-  txServiceUrl: 'https://safe-transaction-mainnet.safe.global',
-  ethAdapter
+  chainId: 1,
+  // Optional. txServiceUrl must be used to set a custom service. For example on chains where Safe doesn't run services.
+  txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
 })
 ```
 

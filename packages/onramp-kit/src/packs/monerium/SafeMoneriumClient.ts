@@ -81,14 +81,13 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns A boolean indicating if the message is signed
    */
   async isSignMessagePending(safeAddress: string, message: string): Promise<boolean> {
-    const apiKit = new SafeApiKit({
-      txServiceUrl: await this.getTransactionServiceUrl(),
-      ethAdapter: this.#ethAdapter
-    })
+    const chainId = await this.#safeSdk.getChainId()
+
+    const apiKit = new SafeApiKit({ chainId })
 
     const pendingTransactions = await apiKit.getPendingTransactions(safeAddress)
 
-    return pendingTransactions.results.some((tx) => {
+    return pendingTransactions.results.some((tx: SafeMultisigTransactionResponse) => {
       return (
         // @ts-expect-error - dataDecoded should have the method property
         tx?.dataDecoded?.method === 'signMessage' &&
@@ -130,10 +129,9 @@ export class SafeMoneriumClient extends MoneriumClient {
 
       const senderSignature = await this.#safeSdk.signTransactionHash(safeTxHash)
 
-      const apiKit = new SafeApiKit({
-        txServiceUrl: await this.getTransactionServiceUrl(),
-        ethAdapter: this.#ethAdapter
-      })
+      const chainId = await this.#safeSdk.getChainId()
+
+      const apiKit = new SafeApiKit({ chainId })
 
       await apiKit.proposeTransaction({
         safeAddress,
@@ -193,27 +191,6 @@ export class SafeMoneriumClient extends MoneriumClient {
         return 'mumbai'
       default:
         throw new Error(`Network not supported: ${chainId}`)
-    }
-  }
-
-  /**
-   * Get the corresponding transaction service url from the current chain id
-   * @returns The Transaction Service URL
-   */
-  async getTransactionServiceUrl() {
-    const chainId = await this.#safeSdk.getChainId()
-
-    switch (chainId) {
-      case 1:
-        return 'https://safe-transaction-mainnet.safe.global'
-      case 5:
-        return 'https://safe-transaction-goerli.safe.global'
-      case 100:
-        return 'https://safe-transaction-gnosis.safe.global'
-      case 137:
-        return 'https://safe-transaction-polygon.safe.global'
-      default:
-        throw new Error(`Chain not supported: ${chainId}`)
     }
   }
 

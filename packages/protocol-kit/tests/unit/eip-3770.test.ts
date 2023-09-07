@@ -202,7 +202,10 @@ describe('EIP-3770 chain-specific addresses', () => {
     it('should validate an address with no prefix', async () => {
       const testChainId = 100
       const testFullAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
-      validateEip3770Address(`${testFullAddress}`, testChainId)
+      const { prefix, address } = validateEip3770Address(`${testFullAddress}`, testChainId)
+
+      chai.expect(prefix).to.be.equal('')
+      chai.expect(address).to.be.equal(testFullAddress)
     })
 
     it('should validate a full address with address and prefix of the current chainId', async () => {

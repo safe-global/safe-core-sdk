@@ -54,7 +54,7 @@ import SafeApiKit from '@safe-global/api-kit'
 
 const safeService = new SafeApiKit({
   chainId: 1,
-  // Optional. txServiceUrl should be used if no Safe deployment for the chainId
+  // Optional. txServiceUrl must be used to set a custom service. For example on chains where Safe doesn't run services.
   txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
 })
 ```

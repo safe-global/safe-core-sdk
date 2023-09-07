@@ -1,8 +1,7 @@
-import { ethers } from 'ethers'
+import { Web3Provider } from '@ethersproject/providers'
 import SafeApiKit from '@safe-global/api-kit'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 
-import type { AuthKitSignInData } from './types'
+import type { AuthKitEthereumProvider, AuthKitSignInData } from './types'
 
 export abstract class AuthKitBasePack {
   safeAuthData?: AuthKitSignInData
@@ -28,7 +27,7 @@ export abstract class AuthKitBasePack {
    * Get the provider instance based on the pack
    * @returns The provider instance
    */
-  abstract getProvider(): ethers.providers.ExternalProvider | null
+  abstract getProvider(): AuthKitEthereumProvider | null
 
   /**
    * Get the user info from the provider
@@ -55,8 +54,8 @@ export abstract class AuthKitBasePack {
    * @param txServiceUrl The URL of the Safe Transaction Service
    * @returns The list of Safe addresses owned by the user in the chain
    */
-  async getSafes(txServiceUrl: string): Promise<string[]> {
-    const apiKit = this.#getApiKit(txServiceUrl)
+  async getSafes(chainId: number, txServiceUrl?: string): Promise<string[]> {
+    const apiKit = this.#getApiKit(chainId, txServiceUrl)
 
     const address = await this.getAddress()
 
@@ -74,43 +73,44 @@ export abstract class AuthKitBasePack {
    * @returns The signer address
    */
   async getAddress(): Promise<string> {
-    if (!this.getProvider()) {
+    const authKitProvider = this.getProvider()
+
+    if (!authKitProvider) {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
-
+    const ethersProvider = new Web3Provider(authKitProvider)
     const signer = ethersProvider.getSigner()
 
-    const address = await signer.getAddress()
+    return signer.getAddress()
+  }
 
-    return address
+  async getChainId(): Promise<number> {
+    const authKitProvider = this.getProvider()
+
+    if (!authKitProvider) {
+      throw new Error('Provider is not defined')
+    }
+
+    const ethersProvider = new Web3Provider(authKitProvider)
+
+    const networkDetails = await ethersProvider.getNetwork()
+
+    return networkDetails.chainId
   }
 
   /**
    * Get the SafeApiKit instance
    * @returns A SafeApiKit instance
    */
-  #getApiKit(txServiceUrl: string): SafeApiKit {
+  #getApiKit(chainId: number, txServiceUrl?: string): SafeApiKit {
     if (!this.getProvider()) {
       throw new Error('Provider is not defined')
     }
 
-    const provider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
-    const safeOwner = provider.getSigner(0)
-
-    const adapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: safeOwner
-    })
-
     return new SafeApiKit({
-      txServiceUrl,
-      ethAdapter: adapter
+      chainId,
+      txServiceUrl
     })
   }
 }

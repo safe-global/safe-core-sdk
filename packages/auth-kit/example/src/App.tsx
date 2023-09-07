@@ -27,13 +27,15 @@ function App() {
 
   useEffect(() => {
     ;(async () => {
+      const rpcUrl = `https://goerli.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
+
       const options: Web3AuthOptions = {
         clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
         web3AuthNetwork: 'testnet',
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: '0x1',
-          rpcTarget: `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
+          chainId: '0x5',
+          rpcTarget: rpcUrl
         },
         uiConfig: {
           theme: 'dark',
@@ -65,9 +67,7 @@ function App() {
         }
       })
 
-      const web3AuthModalPack = new Web3AuthModalPack({
-        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
-      })
+      const web3AuthModalPack = new Web3AuthModalPack()
 
       await web3AuthModalPack.init({ options, adapters: [openloginAdapter], modalConfig })
 

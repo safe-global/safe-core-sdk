@@ -89,6 +89,7 @@ describe('Web3AuthModalPack', () => {
     testingUtils.clearAllMocks()
     mockInitModal.mockClear()
     mockConnect.mockClear()
+    testingUtils.mockChainId('0x1')
   })
 
   describe('init()', () => {
@@ -125,7 +126,7 @@ describe('Web3AuthModalPack', () => {
         modalConfig
       })
 
-      const authKitSignInData = await web3AuthModalPack.signIn()
+      await web3AuthModalPack.signIn()
 
       expect(web3AuthModalPack.getProvider()).toBe(mockProvider)
     })

@@ -205,27 +205,4 @@ describe('SafeMoneriumClient', () => {
     safeSdk.getChainId = jest.fn().mockResolvedValueOnce(300)
     expect(safeMoneriumClient.getNetwork()).rejects.toThrowError('Network not supported: 300')
   })
-
-  it('should map the protocol kit chainId to the Safe transaction service urls', async () => {
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(1)
-    expect(await safeMoneriumClient.getTransactionServiceUrl()).toBe(
-      'https://safe-transaction-mainnet.safe.global'
-    )
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(5)
-    expect(await safeMoneriumClient.getTransactionServiceUrl()).toBe(
-      'https://safe-transaction-goerli.safe.global'
-    )
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(100)
-    expect(await safeMoneriumClient.getTransactionServiceUrl()).toBe(
-      'https://safe-transaction-gnosis.safe.global'
-    )
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(137)
-    expect(await safeMoneriumClient.getTransactionServiceUrl()).toBe(
-      'https://safe-transaction-polygon.safe.global'
-    )
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(300)
-    expect(safeMoneriumClient.getTransactionServiceUrl()).rejects.toThrowError(
-      'Chain not supported: 300'
-    )
-  })
 })

@@ -57,11 +57,11 @@ import {
 } from './utils/transactions/utils'
 import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
+  getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
-import { hashMessage, toUtf8String } from 'ethers/lib/utils'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -1224,21 +1224,34 @@ class Safe {
    * @param hash The hash
    * @returns A boolean indicating if the signature is valid
    */
-  async isValidSignature(hash: string, signature: string): Promise<boolean> {
+  async isValidSignature(hash: string, signature = '0x'): Promise<boolean> {
     const MAGIC_VALUE = '0x1626ba7e'
     const MAGIC_VALUE_BYTES = '0x20c13b0b'
 
     const safeAddress = await this.getAddress()
+    console.log('SAFE ADDRESS', safeAddress)
+    const safeVersion = await this.getContractVersion()
+    console.log
+    const chainId = await this.#ethAdapter.getChainId()
+    console.log('CHAIN ID', chainId)
 
-    const fallbackHandler = await this.#ethAdapter.getCompatibilityFallbackHandlerContract({
-      safeVersion: await this.getContractVersion()
+    const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
+      ethAdapter: this.#ethAdapter,
+      safeVersion,
+      customContracts: this.#contractManager.contractNetworks?.[chainId]
     })
 
-    const eip1271data = fallbackHandler.encode('isValidSignature', [hash, signature])
+    const eip1271data = compatibilityFallbackHandlerContract.encode(
+      'isValidSignature(bytes32,bytes)',
+      [hash, signature]
+    )
 
     const msgBytes = arrayify(hash)
 
-    const eip1271BytesData = fallbackHandler.encode('isValidSignature', [msgBytes, signature])
+    const eip1271BytesData = compatibilityFallbackHandlerContract.encode(
+      'isValidSignature(bytes,bytes)',
+      [msgBytes, signature]
+    )
 
     const checks = [
       this.#ethAdapter.call({
@@ -1254,6 +1267,8 @@ class Safe {
     ]
 
     const response = await Promise.all(checks)
+
+    console.log('RESPONSE', response)
 
     return (
       !!response.length &&

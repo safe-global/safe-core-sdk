@@ -42,7 +42,7 @@ export function getSafeContractDeployment(
   chainId: number,
   isL1SafeSingleton = false
 ): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].safeMasterCopyVersion
+  const version = safeDeploymentsVersions[safeVersion].safeSingletonVersion
   const filters: DeploymentFilter = { version, network: chainId.toString(), released: true }
   if (safeDeploymentsL1ChainIds.includes(chainId) || isL1SafeSingleton) {
     return getSafeSingletonDeployment(filters)

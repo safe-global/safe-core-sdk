@@ -18,7 +18,7 @@ const hashMessage = (message: string): string => {
 
 const MESSAGE = 'testing isValidateSignature!'
 
-describe.only('isValidSignature', async () => {
+describe('isValidSignature', async () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()

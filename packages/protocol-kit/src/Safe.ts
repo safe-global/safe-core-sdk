@@ -1,5 +1,4 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { arrayify } from '@ethersproject/bytes'
 import {
   EthAdapter,
   OperationType,
@@ -57,11 +56,11 @@ import {
 } from './utils/transactions/utils'
 import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
-  getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
   getProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
+import { validateSignature } from './utils/eip-1271'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -1221,60 +1220,13 @@ class Safe {
 
   /**
    * Check if the message signature is valid using the fallback handler Smart Contract
-   * @param hash The hash
+   * @param messageHash The message hash
+   * @param signature The concatenated signatures or '0x' for check approved hashes
+   * @link https://ethereum.org/es/developers/tutorials/eip-1271-smart-contract-signatures
    * @returns A boolean indicating if the signature is valid
    */
-  async isValidSignature(hash: string, signature = '0x'): Promise<boolean> {
-    const MAGIC_VALUE = '0x1626ba7e'
-    const MAGIC_VALUE_BYTES = '0x20c13b0b'
-
-    const safeAddress = await this.getAddress()
-    console.log('SAFE ADDRESS', safeAddress)
-    const safeVersion = await this.getContractVersion()
-    console.log
-    const chainId = await this.#ethAdapter.getChainId()
-    console.log('CHAIN ID', chainId)
-
-    const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
-      ethAdapter: this.#ethAdapter,
-      safeVersion,
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
-    })
-
-    const eip1271data = compatibilityFallbackHandlerContract.encode(
-      'isValidSignature(bytes32,bytes)',
-      [hash, signature]
-    )
-
-    const msgBytes = arrayify(hash)
-
-    const eip1271BytesData = compatibilityFallbackHandlerContract.encode(
-      'isValidSignature(bytes,bytes)',
-      [msgBytes, signature]
-    )
-
-    const checks = [
-      this.#ethAdapter.call({
-        from: safeAddress,
-        to: safeAddress,
-        data: eip1271data
-      }),
-      this.#ethAdapter.call({
-        from: safeAddress,
-        to: safeAddress,
-        data: eip1271BytesData
-      })
-    ]
-
-    const response = await Promise.all(checks)
-
-    console.log('RESPONSE', response)
-
-    return (
-      !!response.length &&
-      (response[0].slice(0, 10).toLowerCase() === MAGIC_VALUE ||
-        response[1].slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES)
-    )
+  async isValidSignature(messageHash: string, signature = '0x'): Promise<boolean> {
+    return validateSignature(messageHash, signature, this)
   }
 }
 

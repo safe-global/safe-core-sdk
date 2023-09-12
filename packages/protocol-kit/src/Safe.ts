@@ -248,9 +248,9 @@ class Safe {
   }
 
   /**
-   * Returns the Safe Master Copy contract version.
+   * Returns the Safe Singleton contract version.
    *
-   * @returns The Safe Master Copy contract version
+   * @returns The Safe Singleton contract version
    */
   async getContractVersion(): Promise<SafeVersion> {
     if (this.#contractManager.safeContract) {

@@ -71,7 +71,7 @@ const serviceInfo: SafeServiceInfoResponse = await safeService.getServiceInfo()
 
 ### getServiceSingletonsInfo
 
-Returns the list of Safe master copies.
+Returns the list of Safe singleton copies.
 
 ```js
 const singletons: SafeSingletonResponse = await safeService.getServiceSingletonsInfo()

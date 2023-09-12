@@ -216,7 +216,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 ### deploySafe
 
-Deploys a new Safe and returns an instance of the Protocol Kit connected to the deployed Safe. The address of the Master Copy, Safe contract version and the contract (`Safe.sol` or `SafeL2.sol`) of the deployed Safe will depend on the initialization of the `safeFactory` instance.
+Deploys a new Safe and returns an instance of the Protocol Kit connected to the deployed Safe. The address of the Safe Singleton, Safe contract version and the contract (`Safe.sol` or `SafeL2.sol`) of the deployed Safe will depend on the initialization of the `safeFactory` instance.
 
 ```js
 const safeAccountConfig: SafeAccountConfig = {
@@ -433,7 +433,7 @@ const safeAddress = await safeSdk.getAddress()
 
 ### getContractVersion
 
-Returns the Safe Master Copy contract version.
+Returns the Safe Singleton contract version.
 
 ```js
 const contractVersion = await safeSdk.getContractVersion()

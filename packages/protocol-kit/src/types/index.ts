@@ -30,9 +30,9 @@ export interface PredictedSafeProps {
 }
 
 export interface ContractNetworkConfig {
-  /** safeSingletonAddress - Address of the Safe Master Copy contract deployed on a specific network */
+  /** safeSingletonAddress - Address of the Safe Singleton contract deployed on a specific network */
   safeSingletonAddress: string
-  /** safeSingletonAbi - Abi of the Safe Master Copy contract deployed on a specific network */
+  /** safeSingletonAbi - Abi of the Safe Singleton contract deployed on a specific network */
   safeSingletonAbi?: AbiItem | AbiItem[]
   /** safeProxyFactoryAddress - Address of the SafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAddress: string

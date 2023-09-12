@@ -4,7 +4,7 @@ import {
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
-  MasterCopyResponse,
+  SafeSingletonResponse,
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -80,7 +80,7 @@ class SafeApiKit {
    *
    * @returns The list of Safe master copies
    */
-  async getServiceMasterCopiesInfo(): Promise<MasterCopyResponse[]> {
+  async getServiceMasterCopiesInfo(): Promise<SafeSingletonResponse[]> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/about/master-copies`,
       method: HttpMethod.Get

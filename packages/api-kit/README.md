@@ -74,7 +74,7 @@ const serviceInfo: SafeServiceInfoResponse = await safeService.getServiceInfo()
 Returns the list of Safe master copies.
 
 ```js
-const masterCopies: MasterCopyResponse = await safeService.getServiceMasterCopiesInfo()
+const masterCopies: SafeSingletonResponse = await safeService.getServiceMasterCopiesInfo()
 ```
 
 ### decodeData

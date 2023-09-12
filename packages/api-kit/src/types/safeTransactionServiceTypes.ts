@@ -22,7 +22,7 @@ export type SafeServiceInfoResponse = {
   }
 }
 
-export type MasterCopyResponse = {
+export type SafeSingletonResponse = {
   address: string
   version: string
   deployer: string

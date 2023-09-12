@@ -86,8 +86,8 @@ type SafeConfigWithPredictedSafeProps = {
 export type SafeConfigProps = {
   /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
-  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeMasterCopy?: boolean
+  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
+  isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
@@ -113,8 +113,8 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 type ConnectSafeConfigProps = {
   /** ethAdapter - Ethereum adapter */
   ethAdapter?: EthAdapter
-  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeMasterCopy?: boolean
+  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
+  isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }

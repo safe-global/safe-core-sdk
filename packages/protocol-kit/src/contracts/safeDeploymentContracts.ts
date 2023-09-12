@@ -33,18 +33,18 @@ interface GetContractInstanceProps {
 }
 
 interface GetSafeContractInstanceProps extends GetContractInstanceProps {
-  isL1SafeMasterCopy?: boolean
+  isL1SafeSingleton?: boolean
   customSafeAddress?: string
 }
 
 export function getSafeContractDeployment(
   safeVersion: SafeVersion,
   chainId: number,
-  isL1SafeMasterCopy = false
+  isL1SafeSingleton = false
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeMasterCopyVersion
   const filters: DeploymentFilter = { version, network: chainId.toString(), released: true }
-  if (safeDeploymentsL1ChainIds.includes(chainId) || isL1SafeMasterCopy) {
+  if (safeDeploymentsL1ChainIds.includes(chainId) || isL1SafeSingleton) {
     return getSafeSingletonDeployment(filters)
   }
   return getSafeL2SingletonDeployment(filters)
@@ -114,11 +114,11 @@ export async function getSafeContract({
   ethAdapter,
   safeVersion,
   customSafeAddress,
-  isL1SafeMasterCopy,
+  isL1SafeSingleton,
   customContracts
 }: GetSafeContractInstanceProps): Promise<SafeContract> {
   const chainId = await ethAdapter.getChainId()
-  const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeMasterCopy)
+  const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeSingleton)
   const safeContract = await ethAdapter.getSafeContract({
     safeVersion,
     singletonDeployment,

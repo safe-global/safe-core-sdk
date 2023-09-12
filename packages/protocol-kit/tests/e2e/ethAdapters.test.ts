@@ -72,12 +72,8 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(getNetworkProvider('gnosis'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100
-      const isL1SafeMasterCopy = true
-      const singletonDeployment = getSafeContractDeployment(
-        safeVersion,
-        chainId,
-        isL1SafeMasterCopy
-      )
+      const isL1SafeSingleton = true
+      const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeSingleton)
       const safeContract = await ethAdapter.getSafeContract({
         safeVersion,
         singletonDeployment

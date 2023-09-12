@@ -15,7 +15,7 @@ import { isSafeConfigWithPredictedSafe } from '../utils/types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
-  #isL1SafeMasterCopy?: boolean
+  #isL1SafeSingleton?: boolean
   #safeContract?: SafeContract
   #multiSendContract!: MultiSendContract
   #multiSendCallOnlyContract!: MultiSendCallOnlyContract
@@ -27,12 +27,12 @@ class ContractManager {
   }
 
   async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeMasterCopy, contractNetworks, predictedSafe, safeAddress } = config
+    const { ethAdapter, isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
 
     const chainId = await ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId]
     this.#contractNetworks = contractNetworks
-    this.#isL1SafeMasterCopy = isL1SafeMasterCopy
+    this.#isL1SafeSingleton = isL1SafeSingleton
 
     let safeVersion: SafeVersion
 
@@ -43,7 +43,7 @@ class ContractManager {
       const defaultSafeContractInstance = await getSafeContract({
         ethAdapter,
         safeVersion: DEFAULT_SAFE_VERSION,
-        isL1SafeMasterCopy,
+        isL1SafeSingleton,
         customSafeAddress: safeAddress,
         customContracts
       })
@@ -59,7 +59,7 @@ class ContractManager {
         : await getSafeContract({
             ethAdapter,
             safeVersion,
-            isL1SafeMasterCopy,
+            isL1SafeSingleton,
             customSafeAddress: safeAddress,
             customContracts
           })
@@ -82,8 +82,8 @@ class ContractManager {
     return this.#contractNetworks
   }
 
-  get isL1SafeMasterCopy(): boolean | undefined {
-    return this.#isL1SafeMasterCopy
+  get isL1SafeSingleton(): boolean | undefined {
+    return this.#isL1SafeSingleton
   }
 
   get safeContract(): SafeContract | undefined {

@@ -13,7 +13,7 @@ import { soliditySha3, utf8ToHex } from 'web3-utils'
 chai.use(chaiAsPromised)
 
 const hashMessage = (message: string): string => {
-  return soliditySha3(utf8ToHex('testing isValidateSignature!')) || ''
+  return soliditySha3(utf8ToHex(message)) || ''
 }
 
 const MESSAGE = 'testing isValidateSignature!'

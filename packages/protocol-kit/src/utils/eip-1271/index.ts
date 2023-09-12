@@ -62,6 +62,8 @@ export const validateSignature = async (
         isValidSignatureResponse[1].slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES)
     )
   } catch (error) {
+    console.error(error)
+
     return false
   }
 }

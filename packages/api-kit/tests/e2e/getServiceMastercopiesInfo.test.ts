@@ -14,8 +14,8 @@ describe('getServiceMasterCopiesInfo', () => {
   it('should call getServiceMasterCopiesInfo', async () => {
     const masterCopiesResponse = await safeApiKit.getServiceMasterCopiesInfo()
     chai.expect(masterCopiesResponse.length).to.be.greaterThan(1)
-    masterCopiesResponse.map((masterCopy) => {
-      chai.expect(masterCopy.deployer).to.be.equal('Gnosis')
+    masterCopiesResponse.map((singleton) => {
+      chai.expect(singleton.deployer).to.be.equal('Gnosis')
     })
   })
 })

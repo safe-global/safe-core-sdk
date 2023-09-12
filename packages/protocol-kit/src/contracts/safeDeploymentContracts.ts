@@ -122,8 +122,8 @@ export async function getSafeContract({
   const safeContract = await ethAdapter.getSafeContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress: customSafeAddress ?? customContracts?.safeMasterCopyAddress,
-    customContractAbi: customContracts?.safeMasterCopyAbi
+    customContractAddress: customSafeAddress ?? customContracts?.safeSingletonAddress,
+    customContractAbi: customContracts?.safeSingletonAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(safeContract.getAddress())
   if (!isContractDeployed) {

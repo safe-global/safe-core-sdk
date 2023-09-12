@@ -82,7 +82,7 @@ import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 const chainId = await ethAdapter.getChainId()
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
-    safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
+    safeSingletonAddress: '<SINGLETON_ADDRESS>',
     safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
     multiSendAddress: '<MULTI_SEND_ADDRESS>',
     multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
@@ -90,7 +90,7 @@ const contractNetworks: ContractNetworksConfig = {
     signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
     createCallAddress: '<CREATE_CALL_ADDRESS>',
     simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
-    safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+    safeSingletonAbi: '<SINGLETON_ABI>', // Optional. Only needed with web3.js
     safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
     multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
     multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js

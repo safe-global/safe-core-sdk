@@ -158,7 +158,7 @@ class SafeFactory {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
-      safeMasterCopyAddress: this.#safeContract.getAddress(),
+      safeSingletonAddress: this.#safeContract.getAddress(),
       initializer,
       saltNonce,
       options: {

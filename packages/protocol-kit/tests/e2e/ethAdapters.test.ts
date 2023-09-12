@@ -91,8 +91,8 @@ describe('Safe contracts', () => {
       const customContract = contractNetworks[chainId]
       const safeContract = await ethAdapter.getSafeContract({
         safeVersion,
-        customContractAddress: customContract?.safeMasterCopyAddress,
-        customContractAbi: customContract?.safeMasterCopyAbi
+        customContractAddress: customContract?.safeSingletonAddress,
+        customContractAbi: customContract?.safeSingletonAbi
       })
       chai
         .expect(await safeContract.getAddress())

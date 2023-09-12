@@ -64,7 +64,6 @@ describe.only('isValidSignature', async () => {
 
     const tx = await safeSdk1.createTransaction({ safeTransactionData })
     const signedTx = await safeSdk1.signTransaction(tx)
-
     const txResponse = await safeSdk1.executeTransaction(signedTx)
 
     await waitSafeTxReceipt(txResponse)
@@ -72,5 +71,21 @@ describe.only('isValidSignature', async () => {
     const txResponse2 = await safeSdk1.isValidSignature(hashMessage(MESSAGE), '0x')
 
     chai.expect(txResponse2).to.be.true
+  })
+
+  it('should revert if message is not signed', async () => {
+    const { accounts, contractNetworks } = await setupTests()
+    const [account1] = accounts
+    const safe = await getSafeWithOwners([account1.address])
+    const ethAdapter1 = await getEthAdapter(account1.signer)
+    const safeSdk1 = await Safe.create({
+      ethAdapter: ethAdapter1,
+      safeAddress: safe.address,
+      contractNetworks
+    })
+
+    const response = await safeSdk1.isValidSignature(hashMessage(MESSAGE), '0x')
+
+    chai.expect(response).to.be.false
   })
 })

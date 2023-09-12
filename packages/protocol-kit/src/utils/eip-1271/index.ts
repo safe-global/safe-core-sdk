@@ -42,22 +42,26 @@ export const validateSignature = async (
     [msgBytes, signature]
   )
 
-  const isValidSignatureResponse = await Promise.all([
-    ethAdapter.call({
-      from: safeAddress,
-      to: safeAddress,
-      data: eip1271data
-    }),
-    ethAdapter.call({
-      from: safeAddress,
-      to: safeAddress,
-      data: eip1271BytesData
-    })
-  ])
+  try {
+    const isValidSignatureResponse = await Promise.all([
+      ethAdapter.call({
+        from: safeAddress,
+        to: safeAddress,
+        data: eip1271data
+      }),
+      ethAdapter.call({
+        from: safeAddress,
+        to: safeAddress,
+        data: eip1271BytesData
+      })
+    ])
 
-  return (
-    !!isValidSignatureResponse.length &&
-    (isValidSignatureResponse[0].slice(0, 10).toLowerCase() === MAGIC_VALUE ||
-      isValidSignatureResponse[1].slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES)
-  )
+    return (
+      !!isValidSignatureResponse.length &&
+      (isValidSignatureResponse[0].slice(0, 10).toLowerCase() === MAGIC_VALUE ||
+        isValidSignatureResponse[1].slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES)
+    )
+  } catch (error) {
+    return false
+  }
 }

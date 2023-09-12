@@ -1,4 +1,4 @@
-import Safe, { getCompatibilityFallbackHandlerContract } from '@safe-global/protocol-kit'
+import Safe, { getCompatibilityFallbackHandlerContract } from '@safe-global/protocol-kit/index'
 import { hexToBytes } from 'web3-utils'
 
 export const MAGIC_VALUE = '0x1626ba7e'

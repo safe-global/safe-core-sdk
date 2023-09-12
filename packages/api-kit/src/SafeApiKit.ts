@@ -80,7 +80,7 @@ class SafeApiKit {
    *
    * @returns The list of Safe master copies
    */
-  async getServiceMasterCopiesInfo(): Promise<SafeSingletonResponse[]> {
+  async getServiceSingletonsInfo(): Promise<SafeSingletonResponse[]> {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/about/master-copies`,
       method: HttpMethod.Get

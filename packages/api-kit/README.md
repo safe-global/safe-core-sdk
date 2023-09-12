@@ -69,12 +69,12 @@ Returns the information and configuration of the service.
 const serviceInfo: SafeServiceInfoResponse = await safeService.getServiceInfo()
 ```
 
-### getServiceMasterCopiesInfo
+### getServiceSingletonsInfo
 
 Returns the list of Safe master copies.
 
 ```js
-const masterCopies: SafeSingletonResponse = await safeService.getServiceMasterCopiesInfo()
+const singletons: SafeSingletonResponse = await safeService.getServiceSingletonsInfo()
 ```
 
 ### decodeData

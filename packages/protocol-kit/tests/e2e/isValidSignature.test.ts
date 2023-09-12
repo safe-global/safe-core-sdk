@@ -1,4 +1,5 @@
 import Safe from '@safe-global/protocol-kit/index'
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -9,6 +10,7 @@ import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { soliditySha3, utf8ToHex } from 'web3-utils'
+import { itif } from './utils/helpers'
 
 chai.use(chaiAsPromised)
 
@@ -32,7 +34,7 @@ describe('isValidSignature', async () => {
     }
   })
 
-  it('should validate signed messages', async () => {
+  itif(safeVersionDeployed >= '1.3.0')('should validate signed messages', async () => {
     const { accounts, contractNetworks } = await setupTests()
     const [account1] = accounts
     const safe = await getSafeWithOwners([account1.address])
@@ -73,7 +75,7 @@ describe('isValidSignature', async () => {
     chai.expect(txResponse2).to.be.true
   })
 
-  it('should revert if message is not signed', async () => {
+  itif(safeVersionDeployed >= '1.3.0')('should revert if message is not signed', async () => {
     const { accounts, contractNetworks } = await setupTests()
     const [account1] = accounts
     const safe = await getSafeWithOwners([account1.address])

@@ -1,5 +1,5 @@
-import { RelayPack } from '@safe-global/relay-kit'
+import { RelayKitBasePack } from '@safe-global/relay-kit'
 
 export interface AccountAbstractionConfig {
-  relayPack: RelayPack
+  relayPack: RelayKitBasePack
 }

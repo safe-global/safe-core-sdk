@@ -1,10 +1,20 @@
 import Safe from '@safe-global/protocol-kit'
 import { RelayResponse } from '@gelatonetwork/relay-sdk'
-import { MetaTransactionOptions, SafeTransaction } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  SafeTransaction
+} from '@safe-global/safe-core-sdk-types'
 
 import { CreateTransactionProps } from './types'
 
 export abstract class RelayKitBasePack {
+  safeSdk: Safe
+
+  constructor(safeSdk: Safe) {
+    this.safeSdk = safeSdk
+  }
+
   /**
    * Get an estimation of the fee that will be paid for a transaction
    * @param chainId The chain id
@@ -19,7 +29,6 @@ export abstract class RelayKitBasePack {
    * @returns {Promise<SafeTransaction>} - Returns a Promise that resolves with a SafeTransaction object.
    */
   abstract createRelayedTransaction({
-    safe,
     transactions,
     options,
     onlyCalls
@@ -29,13 +38,29 @@ export abstract class RelayKitBasePack {
    * Sends the Safe transaction to the relayer for execution.
    * If the Safe is not deployed, it creates a batch of transactions including the Safe deployment transaction.
    * @param {SafeTransaction} safeTransaction - The Safe transaction to be executed
-   * @param {Safe} safe - The Safe object related to the transaction
    * @param {MetaTransactionOptions} options - The transaction options
    * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
    */
   abstract executeRelayTransaction(
     safeTransaction: SafeTransaction,
-    safe: Safe,
     options?: MetaTransactionOptions
   ): Promise<RelayResponse>
+
+  async relayTransaction(
+    transactions: MetaTransactionData[],
+    options?: MetaTransactionOptions
+  ): Promise<unknown> {
+    if (!this.safeSdk) {
+      throw new Error('SDK not initialized')
+    }
+
+    const relayedTransaction = await this.createRelayedTransaction({
+      transactions,
+      options
+    })
+
+    const signedSafeTransaction = await this.safeSdk.signTransaction(relayedTransaction)
+
+    return await this.executeRelayTransaction(signedSafeTransaction)
+  }
 }

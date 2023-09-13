@@ -1,35 +1,22 @@
-import { AccountAbstractionConfig } from '@safe-global/account-abstraction-kit-poc/types'
-import Safe, {
-  EthersAdapter,
-  SafeAccountConfig,
-  predictSafeAddress
-} from '@safe-global/protocol-kit'
-import { RelayPack } from '@safe-global/relay-kit'
-import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
+import Safe, { SafeAccountConfig, predictSafeAddress } from '@safe-global/protocol-kit'
+import { RelayKitBasePack } from '@safe-global/relay-kit'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  EthAdapter
+} from '@safe-global/safe-core-sdk-types'
 
 class AccountAbstraction {
-  #ethAdapter: EthersAdapter
-  #signer: ethers.Signer
-  #safeSdk?: Safe
-  #relayPack?: RelayPack
+  #ethAdapter: EthAdapter
+  #safeSdk: Safe
+  #relayPack?: RelayKitBasePack
 
-  constructor(signer: ethers.Signer) {
-    if (!signer.provider) {
-      throw new Error('Signer must be connected to a provider')
-    }
-    this.#signer = signer
-    this.#ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: this.#signer
-    })
+  constructor(ethAdapter: EthAdapter) {
+    this.#ethAdapter = ethAdapter
   }
 
-  async init(options: AccountAbstractionConfig) {
-    const { relayPack } = options
-    this.setRelayPack(relayPack)
-
-    const signer = await this.getSignerAddress()
+  async init(): Promise<Safe> {
+    const signer = await this.#ethAdapter.getSignerAddress()
     const owners = [signer]
     const threshold = 1
 
@@ -53,14 +40,17 @@ class AccountAbstraction {
         predictedSafe: { safeAccountConfig }
       })
     }
+
+    return this.#safeSdk
   }
 
-  setRelayPack(relayPack: RelayPack) {
+  setRelayPack(relayPack: RelayKitBasePack) {
     this.#relayPack = relayPack
   }
 
   async getSignerAddress(): Promise<string> {
-    const signerAddress = await this.#signer.getAddress()
+    const signerAddress = await this.#ethAdapter.getSignerAddress()
+
     return signerAddress
   }
 
@@ -91,25 +81,12 @@ class AccountAbstraction {
   async relayTransaction(
     transactions: MetaTransactionData[],
     options?: MetaTransactionOptions
-  ): Promise<string> {
-    if (!this.#relayPack || !this.#safeSdk) {
-      throw new Error('SDK not initialized')
+  ): Promise<unknown> {
+    if (!this.#relayPack) {
+      throw new Error('Relay is not initialized')
     }
 
-    const relayedTransaction = await this.#relayPack.createRelayedTransaction({
-      safe: this.#safeSdk,
-      transactions,
-      options
-    })
-
-    const signedSafeTransaction = await this.#safeSdk.signTransaction(relayedTransaction)
-
-    const response = await this.#relayPack.executeRelayTransaction(
-      signedSafeTransaction,
-      this.#safeSdk
-    )
-
-    return response.taskId
+    return await this.#relayPack.relayTransaction(transactions, options)
   }
 }
 

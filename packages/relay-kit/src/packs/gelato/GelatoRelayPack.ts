@@ -14,6 +14,7 @@ import Safe, {
   createERC20TokenTransferTransaction,
   isGasTokenCompatibleWithHandlePayment
 } from '@safe-global/protocol-kit'
+import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
   GELATO_FEE_COLLECTOR,
   GELATO_GAS_EXECUTION_OVERHEAD,
@@ -21,7 +22,7 @@ import {
   GELATO_TRANSFER_GAS_COST,
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
-import { RelayPack, CreateTransactionProps } from '@safe-global/relay-kit/types'
+import { CreateTransactionProps } from '@safe-global/relay-kit/types'
 import {
   MetaTransactionOptions,
   RelayTransaction,
@@ -29,11 +30,12 @@ import {
   Transaction
 } from '@safe-global/safe-core-sdk-types'
 
-export class GelatoRelayPack implements RelayPack {
+export class GelatoRelayPack extends RelayKitBasePack {
   #gelatoRelay: GelatoNetworkRelay
   #apiKey?: string
 
   constructor(apiKey?: string) {
+    super()
     this.#gelatoRelay = new GelatoNetworkRelay()
     this.#apiKey = apiKey
   }

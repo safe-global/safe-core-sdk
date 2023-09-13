@@ -8,7 +8,7 @@ import {
 
 class AccountAbstraction {
   #ethAdapter: EthAdapter
-  #safeSdk: Safe
+  #safeSdk!: Safe
   #relayPack?: RelayKitBasePack
 
   constructor(ethAdapter: EthAdapter) {
@@ -17,6 +17,11 @@ class AccountAbstraction {
 
   async init(): Promise<Safe> {
     const signer = await this.#ethAdapter.getSignerAddress()
+
+    if (!signer) {
+      throw new Error("There's no signer in the provided EthAdapter")
+    }
+
     const owners = [signer]
     const threshold = 1
 
@@ -46,36 +51,6 @@ class AccountAbstraction {
 
   setRelayPack(relayPack: RelayKitBasePack) {
     this.#relayPack = relayPack
-  }
-
-  async getSignerAddress(): Promise<string> {
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
-
-    return signerAddress
-  }
-
-  async getNonce(): Promise<number> {
-    if (!this.#safeSdk) {
-      throw new Error('SDK not initialized')
-    }
-
-    return this.#safeSdk.getNonce()
-  }
-
-  async getSafeAddress(): Promise<string> {
-    if (!this.#safeSdk) {
-      throw new Error('SDK not initialized')
-    }
-
-    return this.#safeSdk.getAddress()
-  }
-
-  async isSafeDeployed(): Promise<boolean> {
-    if (!this.#safeSdk) {
-      throw new Error('SDK not initialized')
-    }
-
-    return this.#safeSdk.isSafeDeployed()
   }
 
   async relayTransaction(

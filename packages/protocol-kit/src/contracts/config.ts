@@ -5,8 +5,8 @@ export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
 
 type SafeDeploymentsVersions = {
   [version: string]: {
-    safeMasterCopyVersion: string
-    safeMasterCopyL2Version?: string
+    safeSingletonVersion: string
+    safeSingletonL2Version?: string
     safeProxyFactoryVersion: string
     compatibilityFallbackHandler: string
     multiSendVersion: string
@@ -18,8 +18,8 @@ type SafeDeploymentsVersions = {
 
 export const safeDeploymentsVersions: SafeDeploymentsVersions = {
   '1.4.1': {
-    safeMasterCopyVersion: '1.4.1',
-    safeMasterCopyL2Version: '1.4.1',
+    safeSingletonVersion: '1.4.1',
+    safeSingletonL2Version: '1.4.1',
     safeProxyFactoryVersion: '1.4.1',
     compatibilityFallbackHandler: '1.4.1',
     multiSendVersion: '1.4.1',
@@ -28,8 +28,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     createCallVersion: '1.4.1'
   },
   '1.3.0': {
-    safeMasterCopyVersion: '1.3.0',
-    safeMasterCopyL2Version: '1.3.0',
+    safeSingletonVersion: '1.3.0',
+    safeSingletonL2Version: '1.3.0',
     safeProxyFactoryVersion: '1.3.0',
     compatibilityFallbackHandler: '1.3.0',
     multiSendVersion: '1.3.0',
@@ -38,8 +38,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     createCallVersion: '1.3.0'
   },
   '1.2.0': {
-    safeMasterCopyVersion: '1.2.0',
-    safeMasterCopyL2Version: undefined,
+    safeSingletonVersion: '1.2.0',
+    safeSingletonL2Version: undefined,
     safeProxyFactoryVersion: '1.1.1',
     compatibilityFallbackHandler: '1.3.0',
     multiSendVersion: '1.1.1',
@@ -48,8 +48,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     createCallVersion: '1.3.0'
   },
   '1.1.1': {
-    safeMasterCopyVersion: '1.1.1',
-    safeMasterCopyL2Version: undefined,
+    safeSingletonVersion: '1.1.1',
+    safeSingletonL2Version: undefined,
     safeProxyFactoryVersion: '1.1.1',
     compatibilityFallbackHandler: '1.3.0',
     multiSendVersion: '1.1.1',
@@ -58,8 +58,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     createCallVersion: '1.3.0'
   },
   '1.0.0': {
-    safeMasterCopyVersion: '1.0.0',
-    safeMasterCopyL2Version: undefined,
+    safeSingletonVersion: '1.0.0',
+    safeSingletonL2Version: undefined,
     safeProxyFactoryVersion: '1.0.0',
     compatibilityFallbackHandler: '1.3.0',
     multiSendVersion: '1.1.1',

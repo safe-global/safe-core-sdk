@@ -94,8 +94,8 @@ describe('Safe contracts manager', () => {
       const { safe, accounts, chainId } = await setupTests()
       const customContractNetworks: ContractNetworksConfig = {
         [chainId]: {
-          safeMasterCopyAddress: ZERO_ADDRESS,
-          safeMasterCopyAbi: (await getSafeSingleton()).abi,
+          safeSingletonAddress: ZERO_ADDRESS,
+          safeSingletonAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,
           safeProxyFactoryAbi: (await getFactory()).abi,
           multiSendAddress: ZERO_ADDRESS,

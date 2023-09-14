@@ -8,7 +8,7 @@ import { Safe_proxy_factory as SafeProxyFactory_V1_4_1 } from '@safe-global/prot
 import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types'
 
 export interface CreateProxyProps {
-  safeMasterCopyAddress: string
+  safeSingletonAddress: string
   initializer: string
   saltNonce: string
   options?: EthersTransactionOptions
@@ -33,7 +33,7 @@ class SafeProxyFactoryEthersContract implements SafeProxyFactoryContract {
   }
 
   async createProxy({
-    safeMasterCopyAddress,
+    safeSingletonAddress,
     initializer,
     saltNonce,
     options,
@@ -44,14 +44,14 @@ class SafeProxyFactoryEthersContract implements SafeProxyFactoryContract {
     if (options && !options.gasLimit) {
       options.gasLimit = await this.estimateGas(
         'createProxyWithNonce',
-        [safeMasterCopyAddress, initializer, saltNonce],
+        [safeSingletonAddress, initializer, saltNonce],
         {
           ...options
         }
       )
     }
     const proxyAddress = this.contract
-      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce, options)
+      .createProxyWithNonce(safeSingletonAddress, initializer, saltNonce, options)
       .then(async (txResponse) => {
         if (callback) {
           callback(txResponse.hash)

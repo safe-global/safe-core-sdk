@@ -9,7 +9,7 @@ import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 
 export interface CreateProxyProps {
-  safeMasterCopyAddress: string
+  safeSingletonAddress: string
   initializer: string
   saltNonce: string
   options?: Web3TransactionOptions
@@ -34,7 +34,7 @@ class SafeProxyFactoryWeb3Contract implements SafeProxyFactoryContract {
   }
 
   async createProxy({
-    safeMasterCopyAddress,
+    safeSingletonAddress,
     initializer,
     saltNonce,
     options,
@@ -45,14 +45,14 @@ class SafeProxyFactoryWeb3Contract implements SafeProxyFactoryContract {
     if (options && !options.gas) {
       options.gas = await this.estimateGas(
         'createProxyWithNonce',
-        [safeMasterCopyAddress, initializer, saltNonce],
+        [safeSingletonAddress, initializer, saltNonce],
         {
           ...options
         }
       )
     }
     const txResponse = this.contract.methods
-      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce)
+      .createProxyWithNonce(safeSingletonAddress, initializer, saltNonce)
       .send(options)
 
     if (callback) {

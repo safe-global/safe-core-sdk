@@ -57,11 +57,22 @@ class AccountAbstraction {
     transactions: MetaTransactionData[],
     options?: MetaTransactionOptions
   ): Promise<unknown> {
-    if (!this.#relayPack) {
-      throw new Error('Relay is not initialized')
+    if (!this.#safeSdk) {
+      throw new Error('SDK not initialized')
     }
 
-    return await this.#relayPack.relayTransaction(transactions, options)
+    if (!this.#relayPack) {
+      throw new Error('Relay pack not initialized. Call setRelayPack(pack) first')
+    }
+
+    const relayedTransaction = await this.#relayPack.createRelayedTransaction({
+      transactions,
+      options
+    })
+
+    const signedSafeTransaction = await this.#safeSdk.signTransaction(relayedTransaction)
+
+    return await this.#relayPack.executeRelayTransaction(signedSafeTransaction)
   }
 }
 

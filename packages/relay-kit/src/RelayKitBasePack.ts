@@ -45,22 +45,4 @@ export abstract class RelayKitBasePack {
     safeTransaction: SafeTransaction,
     options?: MetaTransactionOptions
   ): Promise<RelayResponse>
-
-  async relayTransaction(
-    transactions: MetaTransactionData[],
-    options?: MetaTransactionOptions
-  ): Promise<unknown> {
-    if (!this.safeSdk) {
-      throw new Error('SDK not initialized')
-    }
-
-    const relayedTransaction = await this.createRelayedTransaction({
-      transactions,
-      options
-    })
-
-    const signedSafeTransaction = await this.safeSdk.signTransaction(relayedTransaction)
-
-    return await this.executeRelayTransaction(signedSafeTransaction)
-  }
 }

@@ -12,9 +12,9 @@ describe('getServiceSingletonsInfo', () => {
   })
 
   it('should call getServiceSingletonsInfo', async () => {
-    const singletonResponse = await safeApiKit.getServiceSingletonsInfo()
-    chai.expect(singletonResponse.length).to.be.greaterThan(1)
-    singletonResponse.map((singleton) => {
+    const singletonsResponse = await safeApiKit.getServiceSingletonsInfo()
+    chai.expect(singletonsResponse.length).to.be.greaterThan(1)
+    singletonsResponse.map((singleton) => {
       chai.expect(singleton.deployer).to.be.equal('Gnosis')
     })
   })

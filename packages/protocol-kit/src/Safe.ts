@@ -94,7 +94,7 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeMasterCopy, contractNetworks } = config
+    const { ethAdapter, isL1SafeSingleton, contractNetworks } = config
 
     this.#ethAdapter = ethAdapter
 
@@ -103,14 +103,14 @@ class Safe {
       this.#contractManager = await ContractManager.create({
         ethAdapter: this.#ethAdapter,
         predictedSafe: this.#predictedSafe,
-        isL1SafeMasterCopy,
+        isL1SafeSingleton,
         contractNetworks
       })
     } else {
       this.#contractManager = await ContractManager.create({
         ethAdapter: this.#ethAdapter,
         safeAddress: config.safeAddress,
-        isL1SafeMasterCopy,
+        isL1SafeSingleton,
         contractNetworks
       })
     }
@@ -133,10 +133,10 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect(config: ConnectSafeConfig): Promise<Safe> {
-    const { ethAdapter, safeAddress, predictedSafe, isL1SafeMasterCopy, contractNetworks } = config
+    const { ethAdapter, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } = config
     const configProps: SafeConfigProps = {
       ethAdapter: ethAdapter || this.#ethAdapter,
-      isL1SafeMasterCopy: isL1SafeMasterCopy || this.#contractManager.isL1SafeMasterCopy,
+      isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     }
 
@@ -248,9 +248,9 @@ class Safe {
   }
 
   /**
-   * Returns the Safe Master Copy contract version.
+   * Returns the Safe Singleton contract version.
    *
-   * @returns The Safe Master Copy contract version
+   * @returns The Safe Singleton contract version
    */
   async getContractVersion(): Promise<SafeVersion> {
     if (this.#contractManager.safeContract) {
@@ -1031,12 +1031,12 @@ class Safe {
     const safeVersion = await this.getContractVersion()
     const chainId = await this.getChainId()
     const customContracts = this.#contractManager.contractNetworks?.[chainId]
-    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
+    const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion: safeVersion,
-      isL1SafeMasterCopy,
+      isL1SafeSingleton,
       customContracts
     })
 
@@ -1136,13 +1136,13 @@ class Safe {
     const safeVersion = await this.getContractVersion()
     const ethAdapter = this.#ethAdapter
     const chainId = await ethAdapter.getChainId()
-    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
+    const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId]
 
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
-      isL1SafeMasterCopy,
+      isL1SafeSingleton,
       customContracts
     })
 

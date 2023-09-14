@@ -1,14 +1,14 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { Provider } from '@ethersproject/providers'
-import { Gnosis_safe__factory as SafeMasterCopy_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/factories/Gnosis_safe__factory'
+import { Gnosis_safe__factory as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/factories/Gnosis_safe__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/factories/Proxy_factory__factory'
-import { Gnosis_safe__factory as SafeMasterCopy_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Gnosis_safe__factory'
+import { Gnosis_safe__factory as SafeSingleton_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Gnosis_safe__factory'
 import { Multi_send__factory as MultiSend_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Multi_send__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Proxy_factory__factory'
-import { Gnosis_safe__factory as SafeMasterCopy_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0/factories/Gnosis_safe__factory'
+import { Gnosis_safe__factory as SafeSingleton_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0/factories/Gnosis_safe__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Create_call__factory'
-import { Gnosis_safe__factory as SafeMasterCopy_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Gnosis_safe__factory'
+import { Gnosis_safe__factory as SafeSingleton_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Gnosis_safe__factory'
 import { Multi_send__factory as MultiSend_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send__factory'
 import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send_call_only__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Proxy_factory__factory'
@@ -18,7 +18,7 @@ import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler
 import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Create_call__factory'
 import { Multi_send__factory as MultiSend_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Multi_send__factory'
 import { Multi_send_call_only__factory as MultiSendCallOnly_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Multi_send_call_only__factory'
-import { Safe__factory as SafeMasterCopy_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Safe__factory'
+import { Safe__factory as SafeSingleton_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Safe__factory'
 import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Safe_proxy_factory__factory'
 import { Sign_message_lib__factory as SignMessageLib_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Sign_message_lib__factory'
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Simulate_tx_accessor__factory'
@@ -59,19 +59,19 @@ export function getSafeContractInstance(
   let safeContract
   switch (safeVersion) {
     case '1.4.1':
-      safeContract = SafeMasterCopy_V1_4_1.connect(contractAddress, signerOrProvider)
+      safeContract = SafeSingleton_V1_4_1.connect(contractAddress, signerOrProvider)
       return new SafeContract_V1_4_1_Ethers(safeContract)
     case '1.3.0':
-      safeContract = SafeMasterCopy_V1_3_0.connect(contractAddress, signerOrProvider)
+      safeContract = SafeSingleton_V1_3_0.connect(contractAddress, signerOrProvider)
       return new SafeContract_V1_3_0_Ethers(safeContract)
     case '1.2.0':
-      safeContract = SafeMasterCopy_V1_2_0.connect(contractAddress, signerOrProvider)
+      safeContract = SafeSingleton_V1_2_0.connect(contractAddress, signerOrProvider)
       return new SafeContract_V1_2_0_Ethers(safeContract)
     case '1.1.1':
-      safeContract = SafeMasterCopy_V1_1_1.connect(contractAddress, signerOrProvider)
+      safeContract = SafeSingleton_V1_1_1.connect(contractAddress, signerOrProvider)
       return new SafeContract_V1_1_1_Ethers(safeContract)
     case '1.0.0':
-      safeContract = SafeMasterCopy_V1_0_0.connect(contractAddress, signerOrProvider)
+      safeContract = SafeSingleton_V1_0_0.connect(contractAddress, signerOrProvider)
       return new SafeContract_V1_0_0_Ethers(safeContract)
     default:
       throw new Error('Invalid Safe version')

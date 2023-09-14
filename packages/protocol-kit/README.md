@@ -163,14 +163,14 @@ import { SafeFactory } from '@safe-global/protocol-kit'
 const safeFactory = await SafeFactory.create({ ethAdapter })
 ```
 
-- The `isL1SafeMasterCopy` flag
+- The `isL1SafeSingleton` flag
 
   There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `Safe.sol` contract.
+  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeSingleton` flag to force the use of the `Safe.sol` contract.
 
   ```js
-  const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: true })
+  const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeSingleton: true })
   ```
 
 - The `contractNetworks` property
@@ -183,7 +183,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
   const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
     [chainId]: {
-      safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
+      safeSingletonAddress: '<SINGLETON_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
       multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
@@ -191,7 +191,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
       simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
-      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeSingletonAbi: '<SINGLETON_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
@@ -216,7 +216,7 @@ const safeFactory = await SafeFactory.create({ ethAdapter })
 
 ### deploySafe
 
-Deploys a new Safe and returns an instance of the Protocol Kit connected to the deployed Safe. The address of the Master Copy, Safe contract version and the contract (`Safe.sol` or `SafeL2.sol`) of the deployed Safe will depend on the initialization of the `safeFactory` instance.
+Deploys a new Safe and returns an instance of the Protocol Kit connected to the deployed Safe. The Singleton address, contract version and layer instance (`Safe.sol` or `SafeL2.sol`) of the deployed Safe will depend on the configuration used to create the `safeFactory`.
 
 ```js
 const safeAccountConfig: SafeAccountConfig = {
@@ -317,14 +317,14 @@ const predictedSafe: PredictedSafeProps = {
 const safeSdk = await Safe.create({ ethAdapter, predictedSafe })
 ```
 
-- The `isL1SafeMasterCopy` flag
+- The `isL1SafeSingleton` flag
 
   There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `Safe.sol` contract.
+  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeSingleton` flag to force the use of the `Safe.sol` contract.
 
   ```js
-  const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
+  const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeSingleton: true })
   ```
 
 - The `contractNetworks` property
@@ -337,7 +337,7 @@ const safeSdk = await Safe.create({ ethAdapter, predictedSafe })
   const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
     [chainId]: {
-      safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
+      safeSingletonAddress: '<SINGLETON_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
       multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
@@ -345,7 +345,7 @@ const safeSdk = await Safe.create({ ethAdapter, predictedSafe })
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
       simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
-      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeSingletonAbi: '<SINGLETON_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
@@ -382,14 +382,14 @@ const predictedSafe: PredictedSafeProps = {
 const safeSdk = await safeSdk.connect({ ethAdapter, predictedSafe })
 ```
 
-- The `isL1SafeMasterCopy` flag
+- The `isL1SafeSingleton` flag
 
   There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeMasterCopy` flag to force the use of the `Safe.sol` contract.
+  By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the `isL1SafeSingleton` flag to force the use of the `Safe.sol` contract.
 
   ```js
-  const safeSdk = await Safe.connect({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
+  const safeSdk = await Safe.connect({ ethAdapter, safeAddress, isL1SafeSingleton: true })
   ```
 
 - The `contractNetworks` property
@@ -402,7 +402,7 @@ const safeSdk = await safeSdk.connect({ ethAdapter, predictedSafe })
   const chainId = await ethAdapter.getChainId()
   const contractNetworks: ContractNetworksConfig = {
     [chainId]: {
-      safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
+      safeSingletonAddress: '<SINGLETON_ADDRESS>',
       safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
       multiSendAddress: '<MULTI_SEND_ADDRESS>',
       multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
@@ -410,7 +410,7 @@ const safeSdk = await safeSdk.connect({ ethAdapter, predictedSafe })
       signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
       createCallAddress: '<CREATE_CALL_ADDRESS>',
       simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
-      safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+      safeSingletonAbi: '<SINGLETON_ABI>', // Optional. Only needed with web3.js
       safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
       multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
       multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
@@ -433,7 +433,7 @@ const safeAddress = await safeSdk.getAddress()
 
 ### getContractVersion
 
-Returns the Safe Master Copy contract version.
+Returns the Safe Singleton contract version.
 
 ```js
 const contractVersion = await safeSdk.getContractVersion()

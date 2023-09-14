@@ -46,7 +46,7 @@ export interface PredictSafeAddressProps {
   ethAdapter: EthAdapter
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig?: SafeDeploymentConfig
-  isL1SafeMasterCopy?: boolean
+  isL1SafeSingleton?: boolean
   customContracts?: ContractNetworkConfig
 }
 
@@ -156,7 +156,7 @@ export async function predictSafeAddress({
   ethAdapter,
   safeAccountConfig,
   safeDeploymentConfig = {},
-  isL1SafeMasterCopy = false,
+  isL1SafeSingleton = false,
   customContracts
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
@@ -180,7 +180,7 @@ export async function predictSafeAddress({
   const safeContract = await memoizedGetSafeContract({
     ethAdapter,
     safeVersion,
-    isL1SafeMasterCopy,
+    isL1SafeSingleton,
     customContracts
   })
 

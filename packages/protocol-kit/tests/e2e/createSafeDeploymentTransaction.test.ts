@@ -177,8 +177,8 @@ describe('createSafeDeploymentTransaction', () => {
     const customContract = contractNetworks[chainId]
     const safeContract = await ethAdapter.getSafeContract({
       safeVersion: safeVersionDeployed,
-      customContractAddress: customContract?.safeMasterCopyAddress,
-      customContractAbi: customContract?.safeMasterCopyAbi
+      customContractAddress: customContract?.safeSingletonAddress,
+      customContractAbi: customContract?.safeSingletonAbi
     })
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe

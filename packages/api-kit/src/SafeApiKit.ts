@@ -76,9 +76,9 @@ class SafeApiKit {
   }
 
   /**
-   * Returns the list of Safe singleton copies.
+   * Returns the list of Safe singletons.
    *
-   * @returns The list of Safe singleton copies
+   * @returns The list of Safe singletons
    */
   async getServiceSingletonsInfo(): Promise<SafeSingletonResponse[]> {
     return sendRequest({

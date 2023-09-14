@@ -57,8 +57,8 @@ describe('SafeProxyFactory', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const contractNetworks: ContractNetworksConfig = {
         [chainId]: {
-          safeMasterCopyAddress: ZERO_ADDRESS,
-          safeMasterCopyAbi: (await getSafeSingleton()).abi,
+          safeSingletonAddress: ZERO_ADDRESS,
+          safeSingletonAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,
           safeProxyFactoryAbi: (await getFactory()).abi,
           multiSendAddress: ZERO_ADDRESS,

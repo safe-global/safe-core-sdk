@@ -66,12 +66,12 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 
 There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `Safe.sol` contract.
+By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeSingleton` to force the use of the `Safe.sol` contract.
 
 ```js
-const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: true })
+const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeSingleton: true })
 
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeSingleton: true })
 ```
 
 If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
@@ -82,7 +82,7 @@ import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 const chainId = await ethAdapter.getChainId()
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
-    safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
+    safeSingletonAddress: '<SINGLETON_ADDRESS>',
     safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
     multiSendAddress: '<MULTI_SEND_ADDRESS>',
     multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
@@ -90,7 +90,7 @@ const contractNetworks: ContractNetworksConfig = {
     signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
     createCallAddress: '<CREATE_CALL_ADDRESS>',
     simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
-    safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+    safeSingletonAbi: '<SINGLETON_ABI>', // Optional. Only needed with web3.js
     safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
     multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
     multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js

@@ -22,7 +22,7 @@ export type SafeServiceInfoResponse = {
   }
 }
 
-export type MasterCopyResponse = {
+export type SafeSingletonResponse = {
   address: string
   version: string
   deployer: string
@@ -35,7 +35,7 @@ export type SafeInfoResponse = {
   readonly nonce: number
   readonly threshold: number
   readonly owners: string[]
-  readonly masterCopy: string
+  readonly singleton: string
   readonly modules: string[]
   readonly fallbackHandler: string
   readonly guard: string
@@ -51,7 +51,7 @@ export type SafeCreationInfoResponse = {
   readonly creator: string
   readonly transactionHash: string
   readonly factoryAddress: string
-  readonly masterCopy: string
+  readonly singleton: string
   readonly setupData: string
   readonly dataDecoded?: string
 }

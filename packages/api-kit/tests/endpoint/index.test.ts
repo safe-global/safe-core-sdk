@@ -62,9 +62,9 @@ describe('Endpoint tests', () => {
       })
     })
 
-    it('getServiceMasterCopiesInfo', async () => {
+    it('getServiceSingletonsInfo', async () => {
       await chai
-        .expect(safeApiKit.getServiceMasterCopiesInfo())
+        .expect(safeApiKit.getServiceSingletonsInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/about/master-copies`,

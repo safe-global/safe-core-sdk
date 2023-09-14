@@ -33,7 +33,7 @@ function Monerium() {
       const safeSdk = await Safe.create({
         ethAdapter: ethAdapter,
         safeAddress: selectedSafe,
-        isL1SafeMasterCopy: true
+        isL1SafeSingleton: true
       })
 
       const pack = new MoneriumPack({

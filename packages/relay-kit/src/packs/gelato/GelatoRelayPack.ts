@@ -30,13 +30,13 @@ import {
   Transaction
 } from '@safe-global/safe-core-sdk-types'
 
-import { GelatoRelayPackOptions } from './types'
+import { GelatoOptions } from './types'
 
 export class GelatoRelayPack extends RelayKitBasePack {
   #gelatoRelay: GelatoNetworkRelay
   #apiKey?: string
 
-  constructor({ apiKey, safeSdk }: GelatoRelayPackOptions) {
+  constructor({ apiKey, safeSdk }: GelatoOptions) {
     super(safeSdk)
     this.#gelatoRelay = new GelatoNetworkRelay()
 

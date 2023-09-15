@@ -1,6 +1,6 @@
 import Safe from '@safe-global/protocol-kit'
 
-export type GelatoRelayPackOptions = {
+export type GelatoOptions = {
   apiKey?: string
   safeSdk: Safe
 }

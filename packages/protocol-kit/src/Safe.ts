@@ -27,7 +27,7 @@ import OwnerManager from './managers/ownerManager'
 import {
   AddOwnerTxParams,
   ConnectSafeConfig,
-  RelayKitTransaction,
+  CreateTransactionProps,
   PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeConfig,
@@ -380,7 +380,7 @@ class Safe {
   /**
    * Returns a Safe transaction ready to be signed by the owners.
    *
-   * @param RelayKitTransaction - The createTransaction props
+   * @param CreateTransactionProps - The createTransaction props
    * @returns The Safe transaction
    * @throws "Invalid empty array of transactions"
    */
@@ -388,7 +388,7 @@ class Safe {
     safeTransactionData,
     onlyCalls = false,
     options
-  }: RelayKitTransaction): Promise<SafeTransaction> {
+  }: CreateTransactionProps): Promise<SafeTransaction> {
     const safeVersion = await this.getContractVersion()
     if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
       throw new Error(

@@ -1,6 +1,4 @@
-import AccountAbstraction, {
-  AccountAbstractionConfig
-} from '@safe-global/account-abstraction-kit-poc'
+import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {

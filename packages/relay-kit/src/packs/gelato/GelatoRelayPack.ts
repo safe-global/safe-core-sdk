@@ -337,7 +337,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     return response
   }
 
-  async sendTransactionToRelayer({
+  async relayTransaction({
     target,
     encodedTransaction,
     chainId,
@@ -378,7 +378,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
         }
       }
 
-      return this.sendTransactionToRelayer(relayTransaction)
+      return this.relayTransaction(relayTransaction)
     }
 
     // if the Safe is not deployed we create a batch with the Safe deployment transaction and the provided Safe transaction
@@ -396,6 +396,6 @@ export class GelatoRelayPack extends RelayKitBasePack {
       }
     }
 
-    return this.sendTransactionToRelayer(relayTransaction)
+    return this.relayTransaction(relayTransaction)
   }
 }

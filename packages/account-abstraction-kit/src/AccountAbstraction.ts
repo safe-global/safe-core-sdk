@@ -7,9 +7,9 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 class AccountAbstraction {
+  safeSdk!: Safe
+  relayPack?: RelayKitBasePack
   #ethAdapter: EthAdapter
-  #safeSdk!: Safe
-  #relayPack?: RelayKitBasePack
 
   constructor(ethAdapter: EthAdapter) {
     this.#ethAdapter = ethAdapter
@@ -38,41 +38,41 @@ class AccountAbstraction {
     const isSafeDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
 
     if (isSafeDeployed) {
-      this.#safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
+      this.safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
     } else {
-      this.#safeSdk = await Safe.create({
+      this.safeSdk = await Safe.create({
         ethAdapter: this.#ethAdapter,
         predictedSafe: { safeAccountConfig }
       })
     }
 
-    return this.#safeSdk
+    return this.safeSdk
   }
 
   setRelayPack(relayPack: RelayKitBasePack) {
-    this.#relayPack = relayPack
+    this.relayPack = relayPack
   }
 
   async relayTransaction(
     transactions: MetaTransactionData[],
     options?: MetaTransactionOptions
   ): Promise<unknown> {
-    if (!this.#safeSdk) {
+    if (!this.safeSdk) {
       throw new Error('SDK not initialized')
     }
 
-    if (!this.#relayPack) {
+    if (!this.relayPack) {
       throw new Error('Relay pack not initialized. Call setRelayPack(pack) first')
     }
 
-    const relayedTransaction = await this.#relayPack.createRelayedTransaction({
+    const relayedTransaction = await this.relayPack.createRelayedTransaction({
       transactions,
       options
     })
 
-    const signedSafeTransaction = await this.#safeSdk.signTransaction(relayedTransaction)
+    const signedSafeTransaction = await this.safeSdk.signTransaction(relayedTransaction)
 
-    return await this.#relayPack.executeRelayTransaction(signedSafeTransaction)
+    return await this.relayPack.executeRelayTransaction(signedSafeTransaction)
   }
 }
 

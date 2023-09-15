@@ -399,7 +399,7 @@ describe('GelatoRelayPack', () => {
   })
 
   it('should expose a relayTransaction doing a sponsored or sync fee transaction depending on an optional parameter', async () => {
-    const sponsoredResponse = await gelatoRelayPack.sendTransactionToRelayer({
+    const sponsoredResponse = await gelatoRelayPack.relayTransaction({
       target: SAFE_ADDRESS,
       encodedTransaction: '0x',
       chainId: CHAIN_ID,
@@ -419,7 +419,7 @@ describe('GelatoRelayPack', () => {
       API_KEY
     )
 
-    const paidResponse = await gelatoRelayPack.sendTransactionToRelayer({
+    const paidResponse = await gelatoRelayPack.relayTransaction({
       target: SAFE_ADDRESS,
       encodedTransaction: '0x',
       chainId: CHAIN_ID,

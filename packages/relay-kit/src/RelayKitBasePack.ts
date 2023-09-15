@@ -1,10 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import { RelayResponse } from '@gelatonetwork/relay-sdk'
-import {
-  MetaTransactionData,
-  MetaTransactionOptions,
-  SafeTransaction
-} from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionOptions, SafeTransaction } from '@safe-global/safe-core-sdk-types'
 
 import { CreateTransactionProps } from './types'
 
@@ -44,5 +39,5 @@ export abstract class RelayKitBasePack {
   abstract executeRelayTransaction(
     safeTransaction: SafeTransaction,
     options?: MetaTransactionOptions
-  ): Promise<RelayResponse>
+  ): Promise<unknown>
 }

@@ -1,11 +1,16 @@
 import Safe from '@safe-global/protocol-kit'
 import { MetaTransactionOptions, SafeTransaction } from '@safe-global/safe-core-sdk-types'
 
-import { CreateTransactionProps } from './types'
+import { RelayKitTransaction } from './types'
 
 export abstract class RelayKitBasePack {
   safeSdk: Safe
 
+  /**
+   * The packs implemented using our SDK should extend this class and therefore provide a Safe SDK instance
+   * @constructor
+   * @param safeSdk The Safe SDK instance
+   */
   constructor(safeSdk: Safe) {
     this.safeSdk = safeSdk
   }
@@ -20,14 +25,14 @@ export abstract class RelayKitBasePack {
 
   /**
    * Creates a Safe transaction designed to be executed using the relayer.
-   * @param {CreateTransactionProps} createTransactionProps - Properties required to create the transaction.
+   * @param {RelayKitTransaction} RelayKitTransaction - Properties required to create the transaction.
    * @returns {Promise<SafeTransaction>} - Returns a Promise that resolves with a SafeTransaction object.
    */
   abstract createRelayedTransaction({
     transactions,
     options,
     onlyCalls
-  }: CreateTransactionProps): Promise<SafeTransaction>
+  }: RelayKitTransaction): Promise<SafeTransaction>
 
   /**
    * Sends the Safe transaction to the relayer for execution.

@@ -127,7 +127,7 @@ export type ConnectSafeConfig =
   | ConnectSafeConfigWithSafeAddress
   | ConnectSafeConfigWithPredictedSafe
 
-export interface CreateTransactionProps {
+export interface RelayKitTransaction {
   /** safeTransactionData - The transaction or transaction array to process */
   safeTransactionData: SafeTransactionDataPartial | MetaTransactionData[]
   /** options - The transaction array optional properties */

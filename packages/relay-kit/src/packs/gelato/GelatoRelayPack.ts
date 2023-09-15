@@ -22,7 +22,7 @@ import {
   GELATO_TRANSFER_GAS_COST,
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
-import { CreateTransactionProps } from '@safe-global/relay-kit/types'
+import { RelayKitTransaction } from '@safe-global/relay-kit/types'
 import {
   MetaTransactionOptions,
   RelayTransaction,
@@ -30,10 +30,7 @@ import {
   Transaction
 } from '@safe-global/safe-core-sdk-types'
 
-type GelatoRelayPackOptions = {
-  apiKey?: string
-  safeSdk: Safe
-}
+import { GelatoRelayPackOptions } from './types'
 
 export class GelatoRelayPack extends RelayKitBasePack {
   #gelatoRelay: GelatoNetworkRelay
@@ -104,14 +101,14 @@ export class GelatoRelayPack extends RelayKitBasePack {
   /**
    * Creates a Safe transaction designed to be executed using the Gelato Relayer.
    *
-   * @param {CreateTransactionProps} createTransactionProps - Properties required to create the transaction.
+   * @param {RelayKitTransaction} RelayKitTransaction - Properties required to create the transaction.
    * @returns {Promise<SafeTransaction>} Returns a Promise that resolves with a SafeTransaction object.
    */
   async createRelayedTransaction({
     transactions,
     onlyCalls = false,
     options = {}
-  }: CreateTransactionProps): Promise<SafeTransaction> {
+  }: RelayKitTransaction): Promise<SafeTransaction> {
     const { isSponsored = false } = options
 
     if (isSponsored) {
@@ -150,7 +147,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
    *
    * @async
    * @function createTransactionWithHandlePayment
-   * @param {CreateTransactionProps} createTransactionProps - Properties needed to create the transaction.
+   * @param {RelayKitTransaction} RelayKitTransaction - Properties needed to create the transaction.
    * @returns {Promise<SafeTransaction>} Returns a promise that resolves to the created SafeTransaction.
    * @private
    */
@@ -158,7 +155,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     transactions,
     onlyCalls = false,
     options = {}
-  }: CreateTransactionProps): Promise<SafeTransaction> {
+  }: RelayKitTransaction): Promise<SafeTransaction> {
     const { gasLimit } = options
     const nonce = await this.safeSdk.getNonce()
 
@@ -233,7 +230,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
    *
    * @async
    * @function createTransactionWithTransfer
-   * @param {CreateTransactionProps} createTransactionProps - Properties needed to create the transaction.
+   * @param {RelayKitTransaction} RelayKitTransaction - Properties needed to create the transaction.
    * @returns {Promise<SafeTransaction>} Returns a promise that resolves to the created SafeTransaction.
    * @private
    */
@@ -241,7 +238,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     transactions,
     onlyCalls = false,
     options = {}
-  }: CreateTransactionProps): Promise<SafeTransaction> {
+  }: RelayKitTransaction): Promise<SafeTransaction> {
     const { gasLimit } = options
     const nonce = await this.safeSdk.getNonce()
     const gasToken = options.gasToken ?? ZERO_ADDRESS

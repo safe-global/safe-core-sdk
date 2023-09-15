@@ -380,7 +380,7 @@ class Safe {
   /**
    * Returns a Safe transaction ready to be signed by the owners.
    *
-   * @param CreateTransactionProps - The createTransaction props
+   * @param createTransactionProps - The createTransaction props
    * @returns The Safe transaction
    * @throws "Invalid empty array of transactions"
    */

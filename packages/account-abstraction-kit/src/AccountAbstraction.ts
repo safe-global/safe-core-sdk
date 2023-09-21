@@ -60,7 +60,7 @@ class AccountAbstraction {
    * The current implementation only works for a single owner Safe with threshold 1. This will be improved in the future
    */
   async init() {
-    this.#initializeProtocolKit()
+    await this.#initializeProtocolKit()
   }
 
   /**

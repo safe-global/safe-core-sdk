@@ -63,7 +63,7 @@ async function main() {
     callback
   })
 
-  console.log('Deployed Safe:', safe.getAddress())
+  console.log('Deployed Safe:', await safe.getAddress())
 }
 
 main()

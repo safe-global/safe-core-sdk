@@ -101,7 +101,7 @@ jest.doMock('@safe-global/protocol-kit', () => ({
 
 const safe: Safe = new Safe()
 
-const gelatoRelayPack = new GelatoRelayPack({ apiKey: API_KEY, safeSdk: safe })
+const gelatoRelayPack = new GelatoRelayPack({ apiKey: API_KEY, protocolKit: safe })
 
 describe('GelatoRelayPack', () => {
   beforeEach(() => {
@@ -150,7 +150,7 @@ describe('GelatoRelayPack', () => {
   })
 
   it('should throw an error when trying to do a sponsored transaction without an api key', async () => {
-    const relayPack = new GelatoRelayPack({ safeSdk: safe })
+    const relayPack = new GelatoRelayPack({ protocolKit: safe })
 
     await expect(
       relayPack.sendSponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)
@@ -174,7 +174,7 @@ describe('GelatoRelayPack', () => {
 
       beforeEach(() => {
         jest.clearAllMocks()
-        relayPack = new GelatoRelayPack({ safeSdk: safe })
+        relayPack = new GelatoRelayPack({ protocolKit: safe })
         safe.getNonce = jest.fn().mockResolvedValue(0)
         safe.getContractManager = jest.fn().mockReturnValue({ safeContract: {} })
         safe.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
@@ -276,7 +276,7 @@ describe('GelatoRelayPack', () => {
 
       beforeEach(() => {
         jest.clearAllMocks()
-        relayPack = new GelatoRelayPack({ safeSdk: safe })
+        relayPack = new GelatoRelayPack({ protocolKit: safe })
         safe.getNonce = jest.fn().mockResolvedValue(0)
         safe.getContractManager = jest.fn().mockReturnValue({ safeContract: {} })
         safe.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)

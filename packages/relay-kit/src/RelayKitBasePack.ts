@@ -4,15 +4,15 @@ import { MetaTransactionOptions, SafeTransaction } from '@safe-global/safe-core-
 import { RelayKitTransaction } from './types'
 
 export abstract class RelayKitBasePack {
-  safeSdk: Safe
+  protocolKit: Safe
 
   /**
    * The packs implemented using our SDK should extend this class and therefore provide a Safe SDK instance
    * @constructor
-   * @param safeSdk The Safe SDK instance
+   * @param protocolKit The Safe SDK instance
    */
-  constructor(safeSdk: Safe) {
-    this.safeSdk = safeSdk
+  constructor(protocolKit: Safe) {
+    this.protocolKit = protocolKit
   }
 
   /**

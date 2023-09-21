@@ -1,12 +1,12 @@
-import AccountAbstraction, {
-  AccountAbstractionConfig
-} from '@safe-global/account-abstraction-kit-poc'
+import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
   MetaTransactionOptions,
   OperationType
 } from '@safe-global/safe-core-sdk-types'
+import { EthersAdapter } from '@safe-global/protocol-kit'
+
 import { BigNumber, ethers } from 'ethers'
 
 // Check the status of a transaction after it is relayed:
@@ -42,20 +42,25 @@ async function main() {
   const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
   const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
 
-  const relayPack = new GelatoRelayPack()
+  const safeAccountAbstraction = new AccountAbstraction(
+    new EthersAdapter({
+      ethers,
+      signerOrProvider: signer
+    })
+  )
 
-  const safeAccountAbstraction = new AccountAbstraction(signer)
-  const sdkConfig: AccountAbstractionConfig = {
-    relayPack
-  }
-  await safeAccountAbstraction.init(sdkConfig)
+  await safeAccountAbstraction.init()
+
+  const relayPack = new GelatoRelayPack({ protocolKit: safeAccountAbstraction.protocolKit })
+
+  safeAccountAbstraction.setRelayKit(relayPack)
 
   // Calculate Safe address
 
-  const predictedSafeAddress = safeAccountAbstraction.getSafeAddress()
+  const predictedSafeAddress = await safeAccountAbstraction.protocolKit.getAddress()
   console.log({ predictedSafeAddress })
 
-  const isSafeDeployed = await safeAccountAbstraction.isSafeDeployed()
+  const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
   // Fake on-ramp to transfer enough funds to the Safe address

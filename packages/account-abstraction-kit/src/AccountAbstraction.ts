@@ -1,35 +1,35 @@
-import { AccountAbstractionConfig } from '@safe-global/account-abstraction-kit-poc/types'
-import Safe, {
-  EthersAdapter,
-  SafeAccountConfig,
-  predictSafeAddress
-} from '@safe-global/protocol-kit'
-import { RelayPack } from '@safe-global/relay-kit'
-import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
+import Safe, { SafeAccountConfig, predictSafeAddress } from '@safe-global/protocol-kit'
+import { RelayKitBasePack } from '@safe-global/relay-kit'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  EthAdapter
+} from '@safe-global/safe-core-sdk-types'
 
+/**
+ * @class
+ * This class helps to abstract the Account Abstraction logic required to interact with the Safe contracts using our Kits
+ */
 class AccountAbstraction {
-  #ethAdapter: EthersAdapter
-  #signer: ethers.Signer
-  #safeSdk?: Safe
-  #relayPack?: RelayPack
+  protocolKit!: Safe
+  relayKit?: RelayKitBasePack
+  #ethAdapter: EthAdapter
 
-  constructor(signer: ethers.Signer) {
-    if (!signer.provider) {
-      throw new Error('Signer must be connected to a provider')
-    }
-    this.#signer = signer
-    this.#ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: this.#signer
-    })
+  /**
+   * @constructor
+   * @param ethAdapter The EthAdapter instance to be used by the Account Abstraction (e.g. EthersAdapter)
+   */
+  constructor(ethAdapter: EthAdapter) {
+    this.#ethAdapter = ethAdapter
   }
 
-  async init(options: AccountAbstractionConfig) {
-    const { relayPack } = options
-    this.setRelayPack(relayPack)
+  #initializeProtocolKit = async () => {
+    const signer = await this.#ethAdapter.getSignerAddress()
 
-    const signer = await this.getSignerAddress()
+    if (!signer) {
+      throw new Error("There's no signer in the provided EthAdapter")
+    }
+
     const owners = [signer]
     const threshold = 1
 
@@ -46,70 +46,58 @@ class AccountAbstraction {
     const isSafeDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
 
     if (isSafeDeployed) {
-      this.#safeSdk = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
+      this.protocolKit = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
     } else {
-      this.#safeSdk = await Safe.create({
+      this.protocolKit = await Safe.create({
         ethAdapter: this.#ethAdapter,
         predictedSafe: { safeAccountConfig }
       })
     }
   }
 
-  setRelayPack(relayPack: RelayPack) {
-    this.#relayPack = relayPack
+  /**
+   * Initialize the AccountAbstraction instance with the safe address or the predicted safe address
+   * The current implementation only works for a single owner Safe with threshold 1. This will be improved in the future
+   */
+  async init() {
+    await this.#initializeProtocolKit()
   }
 
-  async getSignerAddress(): Promise<string> {
-    const signerAddress = await this.#signer.getAddress()
-    return signerAddress
+  /**
+   * Use this method to set the Relay Pack instance to be used by the AccountAbstraction instance
+   * It's mandatory to set the instance before using the relayTransaction() method
+   * @param relayPack The RelayPack instance to be used by the AccountAbstraction instance (e.g. GelatoRelayPack)
+   */
+  setRelayKit(relayPack: RelayKitBasePack) {
+    this.relayKit = relayPack
   }
 
-  async getNonce(): Promise<number> {
-    if (!this.#safeSdk) {
-      throw new Error('SDK not initialized')
-    }
-
-    return this.#safeSdk.getNonce()
-  }
-
-  async getSafeAddress(): Promise<string> {
-    if (!this.#safeSdk) {
-      throw new Error('SDK not initialized')
-    }
-
-    return this.#safeSdk.getAddress()
-  }
-
-  async isSafeDeployed(): Promise<boolean> {
-    if (!this.#safeSdk) {
-      throw new Error('SDK not initialized')
-    }
-
-    return this.#safeSdk.isSafeDeployed()
-  }
-
+  /**
+   * Use this method to relay a transaction using the Relay Pack instance set in the AccountAbstraction instance
+   * @param transactions The list of transactions to be relayed
+   * @param options The transaction options
+   * @returns The result of the relay transaction execution (e.g. taskId in the case of Gelato)
+   */
   async relayTransaction(
     transactions: MetaTransactionData[],
     options?: MetaTransactionOptions
-  ): Promise<string> {
-    if (!this.#relayPack || !this.#safeSdk) {
-      throw new Error('SDK not initialized')
+  ): Promise<unknown> {
+    if (!this.protocolKit) {
+      throw new Error('protocolKit not initialized. Call init() first')
     }
 
-    const relayedTransaction = await this.#relayPack.createRelayedTransaction({
-      safe: this.#safeSdk,
+    if (!this.relayKit) {
+      throw new Error('relayKit not initialized. Call setRelayKit(pack) first')
+    }
+
+    const relayedTransaction = await this.relayKit.createRelayedTransaction({
       transactions,
       options
     })
 
-    const signedSafeTransaction = await this.#safeSdk.signTransaction(relayedTransaction)
+    const signedSafeTransaction = await this.protocolKit.signTransaction(relayedTransaction)
 
-    const response = await this.#relayPack.executeRelayTransaction(
-      signedSafeTransaction,
-      this.#safeSdk
-    )
-
-    return response.taskId
+    return await this.relayKit.executeRelayTransaction(signedSafeTransaction)
   }
 }
 

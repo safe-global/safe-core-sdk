@@ -99,7 +99,9 @@ jest.doMock('@safe-global/protocol-kit', () => ({
   isGasTokenCompatibleWithHandlePayment: mockedIsGasTokenCompatibleWithHandlePayment
 }))
 
-const gelatoRelayPack = new GelatoRelayPack(API_KEY)
+const safe: Safe = new Safe()
+
+const gelatoRelayPack = new GelatoRelayPack({ apiKey: API_KEY, protocolKit: safe })
 
 describe('GelatoRelayPack', () => {
   beforeEach(() => {
@@ -148,7 +150,8 @@ describe('GelatoRelayPack', () => {
   })
 
   it('should throw an error when trying to do a sponsored transaction without an api key', async () => {
-    const relayPack = new GelatoRelayPack()
+    const relayPack = new GelatoRelayPack({ protocolKit: safe })
+
     await expect(
       relayPack.sendSponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)
     ).rejects.toThrowError('API key not defined')
@@ -157,7 +160,6 @@ describe('GelatoRelayPack', () => {
   describe('when creating a relayed transaction', () => {
     describe('When gas limit is manually defined', () => {
       let relayPack: GelatoRelayPack
-      const safe: Safe = new Safe()
       const transactions: MetaTransactionData[] = [
         {
           to: ADDRESS,
@@ -172,7 +174,7 @@ describe('GelatoRelayPack', () => {
 
       beforeEach(() => {
         jest.clearAllMocks()
-        relayPack = new GelatoRelayPack()
+        relayPack = new GelatoRelayPack({ protocolKit: safe })
         safe.getNonce = jest.fn().mockResolvedValue(0)
         safe.getContractManager = jest.fn().mockReturnValue({ safeContract: {} })
         safe.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
@@ -180,7 +182,7 @@ describe('GelatoRelayPack', () => {
       })
 
       it('should allow you to create a sponsored one', async () => {
-        await relayPack.createRelayedTransaction({ safe, transactions, options })
+        await relayPack.createRelayedTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
           safeTransactionData: transactions,
@@ -193,7 +195,6 @@ describe('GelatoRelayPack', () => {
 
       it('should allow to create a sync fee one', async () => {
         await relayPack.createRelayedTransaction({
-          safe,
           transactions,
           options: { ...options, isSponsored: false }
         })
@@ -214,7 +215,6 @@ describe('GelatoRelayPack', () => {
 
       it('should return the correct gasToken when being sent through the options', async () => {
         await relayPack.createRelayedTransaction({
-          safe,
           transactions,
           options: { ...options, isSponsored: false, gasToken: GAS_TOKEN }
         })
@@ -251,7 +251,7 @@ describe('GelatoRelayPack', () => {
 
         mockCreateERC20TokenTransferTransaction.mockReturnValue(transferToGelato)
 
-        await relayPack.createRelayedTransaction({ safe, transactions, options })
+        await relayPack.createRelayedTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
           safeTransactionData: [...transactions, transferToGelato], // the transfer to Gelato is prensent
@@ -266,8 +266,6 @@ describe('GelatoRelayPack', () => {
 
     describe('When gas limit is automatically estimate', () => {
       let relayPack: GelatoRelayPack
-      const safe: Safe = new Safe()
-
       const mockTransferTransacton: MetaTransactionData = {
         to: ADDRESS,
         data: '0x',
@@ -278,7 +276,7 @@ describe('GelatoRelayPack', () => {
 
       beforeEach(() => {
         jest.clearAllMocks()
-        relayPack = new GelatoRelayPack()
+        relayPack = new GelatoRelayPack({ protocolKit: safe })
         safe.getNonce = jest.fn().mockResolvedValue(0)
         safe.getContractManager = jest.fn().mockReturnValue({ safeContract: {} })
         safe.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
@@ -290,7 +288,7 @@ describe('GelatoRelayPack', () => {
           isSponsored: true
         }
 
-        await relayPack.createRelayedTransaction({ safe, transactions, options })
+        await relayPack.createRelayedTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
           safeTransactionData: transactions,
@@ -308,7 +306,7 @@ describe('GelatoRelayPack', () => {
         })
 
         it('should allow you to create relay transaction using the native token to pay Gelato fees', async () => {
-          await relayPack.createRelayedTransaction({ safe, transactions })
+          await relayPack.createRelayedTransaction({ transactions })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
             safeTransactionData: transactions,
@@ -329,7 +327,7 @@ describe('GelatoRelayPack', () => {
             gasToken: GAS_TOKEN
           }
 
-          await relayPack.createRelayedTransaction({ safe, transactions, options })
+          await relayPack.createRelayedTransaction({ transactions, options })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
             safeTransactionData: transactions,
@@ -365,7 +363,7 @@ describe('GelatoRelayPack', () => {
 
           mockCreateERC20TokenTransferTransaction.mockReturnValue(transferToGelato)
 
-          await relayPack.createRelayedTransaction({ safe, transactions, options })
+          await relayPack.createRelayedTransaction({ transactions, options })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
             safeTransactionData: [...transactions, transferToGelato], // the transfer to Gelato is prensent
@@ -451,8 +449,6 @@ describe('GelatoRelayPack', () => {
   })
 
   describe('executeRelayTransaction', () => {
-    const safe: Safe = new Safe()
-
     const ENCODED_TRANSACTION_DATA = '0x...txData'
     const MULTISEND_ADDRESS = '0x...multiSendAddress'
     const SAFE_DEPLOYMENT_BATCH = {
@@ -489,7 +485,6 @@ describe('GelatoRelayPack', () => {
 
         const gelatoResponse = await gelatoRelayPack.executeRelayTransaction(
           relayTransaction as SafeTransaction,
-          safe,
           options
         )
 
@@ -523,8 +518,7 @@ describe('GelatoRelayPack', () => {
         }
 
         const gelatoResponse = await gelatoRelayPack.executeRelayTransaction(
-          relayTransaction as SafeTransaction,
-          safe
+          relayTransaction as SafeTransaction
         )
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
@@ -563,7 +557,6 @@ describe('GelatoRelayPack', () => {
 
         const gelatoResponse = await gelatoRelayPack.executeRelayTransaction(
           relayTransaction as SafeTransaction,
-          safe,
           options
         )
 
@@ -600,8 +593,7 @@ describe('GelatoRelayPack', () => {
         }
 
         const gelatoResponse = await gelatoRelayPack.executeRelayTransaction(
-          relayTransaction as SafeTransaction,
-          safe
+          relayTransaction as SafeTransaction
         )
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)

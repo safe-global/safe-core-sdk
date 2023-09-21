@@ -49,17 +49,18 @@ async function main() {
     })
   )
 
-  const safeSdk = await safeAccountAbstraction.init()
-  const relayPack = new GelatoRelayPack({ safeSdk })
+  await safeAccountAbstraction.init()
 
-  safeAccountAbstraction.setRelayPack(relayPack)
+  const relayPack = new GelatoRelayPack({ protocolKit: safeAccountAbstraction.protocolKit })
+
+  safeAccountAbstraction.setRelayKit(relayPack)
 
   // Calculate Safe address
 
-  const predictedSafeAddress = await safeSdk.getAddress()
+  const predictedSafeAddress = await safeAccountAbstraction.protocolKit.getAddress()
   console.log({ predictedSafeAddress })
 
-  const isSafeDeployed = await safeSdk.isSafeDeployed()
+  const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
   // Fake on-ramp to transfer enough funds to the Safe address

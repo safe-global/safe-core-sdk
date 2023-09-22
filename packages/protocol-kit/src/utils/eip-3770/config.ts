@@ -15,6 +15,8 @@ export const networks: NetworkShortName[] = [
   { chainId: 18, shortName: 'tst' },
   { chainId: 25, shortName: 'cro' },
   { chainId: 28, shortName: 'bobarinkeby' },
+  { chainId: 30, shortName: 'rsk' },
+  { chainId: 31, shortName: 'trsk' },
   { chainId: 39, shortName: 'u2u' },
   { chainId: 40, shortName: 'telosevm' },
   { chainId: 41, shortName: 'telosevmtestnet' },

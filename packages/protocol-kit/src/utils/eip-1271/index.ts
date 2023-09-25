@@ -1,8 +1,6 @@
 import Safe, { getCompatibilityFallbackHandlerContract } from '@safe-global/protocol-kit/index'
-import { hexToBytes } from 'web3-utils'
 
 export const MAGIC_VALUE = '0x1626ba7e'
-export const MAGIC_VALUE_BYTES = '0x20c13b0b'
 
 /**
  *
@@ -35,35 +33,16 @@ export const validateSignature = async (
     [messageHash, signature]
   )
 
-  const msgBytes = hexToBytes(messageHash)
-
-  const eip1271BytesData = compatibilityFallbackHandlerContract.encode(
-    'isValidSignature(bytes,bytes)',
-    [msgBytes, signature]
-  )
-
   try {
-    const isValidSignatureResponse = await Promise.all([
-      ethAdapter.call({
-        from: safeAddress,
-        to: safeAddress,
-        data: eip1271data
-      }),
-      ethAdapter.call({
-        from: safeAddress,
-        to: safeAddress,
-        data: eip1271BytesData
-      })
-    ])
+    const isValidSignatureResponse = await ethAdapter.call({
+      from: safeAddress,
+      to: safeAddress,
+      data: eip1271data
+    })
 
-    return (
-      !!isValidSignatureResponse.length &&
-      (isValidSignatureResponse[0].slice(0, 10).toLowerCase() === MAGIC_VALUE ||
-        isValidSignatureResponse[1].slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES)
-    )
+    return isValidSignatureResponse.slice(0, 10).toLowerCase() === MAGIC_VALUE
   } catch (error) {
     console.error(error)
-
     return false
   }
 }

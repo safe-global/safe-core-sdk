@@ -43,11 +43,7 @@ import {
   isSafeMultisigTransactionResponse,
   sameString
 } from './utils'
-import {
-  generateEIP712Signature,
-  generatePreValidatedSignature,
-  generateSignature
-} from './utils/signatures/utils'
+import { generateEIP712Signature, generatePreValidatedSignature } from './utils/signatures/utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
@@ -514,7 +510,7 @@ class Safe {
    * @returns The Safe signature
    */
   async signTransactionHash(hash: string): Promise<SafeSignature> {
-    return generateSignature(this.#ethAdapter, hash)
+    return this.signatures.signEIP191Message(hash)
   }
 
   /**
@@ -534,7 +530,7 @@ class Safe {
       chainId: await this.getEthAdapter().getChainId(),
       safeTransactionData: safeTransaction.data
     }
-    return generateEIP712Signature(this.#ethAdapter, safeTransactionEIP712Args, methodVersion)
+    return this.signatures.signEIP712Message(safeTransactionEIP712Args, methodVersion)
   }
 
   /**

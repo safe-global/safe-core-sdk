@@ -1,4 +1,7 @@
-import Safe, { EthSafeSignature } from '@safe-global/protocol-kit/index'
+import Safe, {
+  EthSafeSignature,
+  getCompatibilityFallbackHandlerContract
+} from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
   OperationType,
@@ -153,29 +156,42 @@ describe.only('isValidSignature', async () => {
       const { accounts, contractNetworks, chainId, safe } = await setupTests()
       const [account1, account2] = accounts
 
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const ethAdapter2 = await getEthAdapter(account2.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        ethAdapter: ethAdapter1,
         safeAddress: safe.address,
         contractNetworks
       })
+      const safeVersion = await safeSdk.getContractVersion()
 
-      const dataHash = ethers.utils.keccak256('0xbaddad')
+      const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
+        ethAdapter: ethAdapter1,
+        safeVersion,
+        customContracts: contractNetworks?.[chainId]
+      })
 
-      const fallbackHandlerAddress = await safeSdk.getFallbackHandler()
+      const messageHash = hashMessage('I am the owner of this Safe account')
+      const txData = compatibilityFallbackHandlerContract.encode('getMessageHash', [messageHash])
 
-      const ethSignSig1 = await signHash(
-        account1.signer,
-        calculateSafeMessageHash(fallbackHandlerAddress, dataHash, chainId)
-      )
+      const safeMessageHash = await ethAdapter1.call({
+        from: safe.address,
+        to: safe.address,
+        data: txData
+      })
 
-      const ethSignSig2 = await signHash(
-        account2.signer,
-        calculateSafeMessageHash(fallbackHandlerAddress, dataHash, chainId)
-      )
+      console.log('safeMessageHash:', safeMessageHash)
+
+      const ethSignSig1 = await signHash(account1.signer, safeMessageHash)
+
+      console.log('ethSignSig1:', ethSignSig1)
+
+      const ethSignSig2 = await signHash(account2.signer, safeMessageHash)
+
+      console.log('ethSignSig2:', ethSignSig2)
 
       const isValid = await safeSdk.isValidSignature(
-        dataHash,
+        messageHash,
         buildSignatureBytes([ethSignSig1, ethSignSig2])
       )
 

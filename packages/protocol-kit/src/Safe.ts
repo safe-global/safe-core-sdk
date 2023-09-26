@@ -23,6 +23,7 @@ import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
 import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
+import SignatureManager from './managers/signatureManager'
 import {
   AddOwnerTxParams,
   ConnectSafeConfig,
@@ -59,7 +60,7 @@ import {
   getProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
-import { validateSignature } from './utils/eip-1271'
+import SignaturesManager from './managers/signatureManager'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -69,6 +70,7 @@ class Safe {
   #moduleManager!: ModuleManager
   #guardManager!: GuardManager
   #fallbackHandlerManager!: FallbackHandlerManager
+  signatures!: SignaturesManager
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -122,6 +124,14 @@ class Safe {
       this.#ethAdapter,
       this.#contractManager.safeContract
     )
+
+    this.signatures = new SignaturesManager(
+      this.#ethAdapter,
+      this.#contractManager.safeContract,
+      contractNetworks
+    )
+
+    await this.signatures.init()
   }
 
   /**
@@ -1215,17 +1225,6 @@ class Safe {
     }
 
     return transactionBatch
-  }
-
-  /**
-   * Check if the message signature is valid using the fallback handler Smart Contract
-   * @param messageHash The message hash
-   * @param signature The concatenated signatures or '0x' for check approved hashes
-   * @link https://ethereum.org/es/developers/tutorials/eip-1271-smart-contract-signatures
-   * @returns A boolean indicating if the signature is valid
-   */
-  async isValidSignature(messageHash: string, signature = '0x'): Promise<boolean> {
-    return validateSignature(messageHash, signature, this)
   }
 }
 

@@ -1,7 +1,4 @@
-import Safe, {
-  EthSafeSignature,
-  getCompatibilityFallbackHandlerContract
-} from '@safe-global/protocol-kit/index'
+import Safe, { EthSafeSignature } from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
   OperationType,
@@ -18,32 +15,9 @@ import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { soliditySha3, utf8ToHex } from 'web3-utils'
 import { itif } from './utils/helpers'
-import { ethers, Signer } from 'ethers'
+import { ethers } from 'ethers'
 
 chai.use(chaiAsPromised)
-
-const hashMessage = (message: string): string => {
-  return soliditySha3(utf8ToHex(message)) || ''
-}
-
-const buildSignatureBytes = (signatures: SafeSignature[]): string => {
-  signatures.sort((left, right) =>
-    left.signer.toLowerCase().localeCompare(right.signer.toLowerCase())
-  )
-
-  let signatureBytes = '0x'
-
-  for (const sig of signatures) {
-    signatureBytes += sig.data.slice(2)
-  }
-
-  return signatureBytes
-}
-
-export const EIP712_SAFE_MESSAGE_TYPE = {
-  // "SafeMessage(bytes message)"
-  SafeMessage: [{ type: 'bytes', name: 'message' }]
-}
 
 export const calculateSafeMessageHash = (
   safeAddress: string,
@@ -57,13 +31,13 @@ export const calculateSafeMessageHash = (
   )
 }
 
-export const signHash = async (signer: Signer, hash: string): Promise<SafeSignature> => {
-  const signerAddress = await signer.getAddress()
-  const data = (await signer.signMessage(ethers.utils.arrayify(hash)))
-    .replace(/1b$/, '1f')
-    .replace(/1c$/, '20')
+const hashMessage = (message: string): string => {
+  return soliditySha3(utf8ToHex(message)) || ''
+}
 
-  return new EthSafeSignature(signerAddress, data)
+export const EIP712_SAFE_MESSAGE_TYPE = {
+  // "SafeMessage(bytes message)"
+  SafeMessage: [{ type: 'bytes', name: 'message' }]
 }
 
 const MESSAGE = 'I am the owner of this Safe account'
@@ -129,7 +103,7 @@ describe.only('isValidSignature', async () => {
 
       await waitSafeTxReceipt(txResponse)
 
-      const txResponse2 = await safeSdk1.isValidSignature(hashMessage(MESSAGE), '0x')
+      const txResponse2 = await safeSdk1.signatures.isValidSignature(hashMessage(MESSAGE), '0x')
 
       chai.expect(txResponse2).to.be.true
     }
@@ -146,54 +120,62 @@ describe.only('isValidSignature', async () => {
       contractNetworks
     })
 
-    const response = await safeSdk1.isValidSignature(hashMessage(MESSAGE), '0x')
+    const response = await safeSdk1.signatures.isValidSignature(hashMessage(MESSAGE), '0x')
 
     chai.expect(response).to.be.false
+  })
+
+  itif(safeVersionDeployed >= '1.3.0')('should generate the correct hash', async () => {
+    const { safe, accounts, contractNetworks } = await setupTests()
+    const [account1] = accounts
+    const ethAdapter = await getEthAdapter(account1.signer)
+    const safeSdk = await Safe.create({
+      ethAdapter: ethAdapter,
+      safeAddress: safe.address,
+      contractNetworks
+    })
+
+    const chainId = await safeSdk.getChainId()
+    const safeMessageHash = await safeSdk.signatures.getMessageHash(hashMessage(MESSAGE))
+
+    chai
+      .expect(safeMessageHash)
+      .to.be.eq(calculateSafeMessageHash(safe.address, hashMessage(MESSAGE), chainId))
   })
 
   itif(safeVersionDeployed >= '1.3.0')(
     'should validate off chain signatures (Safe 2 owners, threshold 2)',
     async () => {
-      const { accounts, contractNetworks, chainId, safe } = await setupTests()
+      const { accounts, contractNetworks, safe } = await setupTests()
       const [account1, account2] = accounts
-
       const ethAdapter = await getEthAdapter(account1.signer)
+      const ethAdapter2 = await getEthAdapter(account2.signer)
 
-      const safeSdk = await Safe.create({
+      const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter,
         safeAddress: safe.address,
         contractNetworks
       })
-      const safeVersion = await safeSdk.getContractVersion()
 
-      const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
-        ethAdapter,
-        safeVersion,
-        customContracts: contractNetworks?.[chainId]
+      const safeSdk2 = await Safe.create({
+        ethAdapter: ethAdapter2,
+        safeAddress: safe.address,
+        contractNetworks
       })
 
+      // Hash the message
       const messageHash = hashMessage(MESSAGE)
-      const txData = compatibilityFallbackHandlerContract.encode('getMessageHash', [messageHash])
+      // Get the Safe message hash of the hashed message
+      const safeMessageHash = await safeSdk1.signatures.getMessageHash(messageHash)
 
-      const safeMessageHash = await ethAdapter.call({
-        from: safe.address,
-        to: safe.address,
-        data: txData
-      })
+      // Sign the Safe message hash with the owners
+      const ethSignSig1 = await safeSdk1.signatures.signEIP191Message(safeMessageHash)
+      const ethSignSig2 = await safeSdk2.signatures.signEIP191Message(safeMessageHash)
 
-      console.log('safeMessageHash:', safeMessageHash)
-
-      const ethSignSig1 = await signHash(account1.signer, safeMessageHash)
-
-      console.log('ethSignSig1:', ethSignSig1)
-
-      const ethSignSig2 = await signHash(account2.signer, safeMessageHash)
-
-      console.log('ethSignSig2:', ethSignSig2)
-
-      const isValid = await safeSdk.isValidSignature(
+      // Validate the signature
+      const isValid = await safeSdk1.signatures.isValidSignature(
         messageHash,
-        buildSignatureBytes([ethSignSig1, ethSignSig2])
+        safeSdk1.signatures.buildSignature([ethSignSig1, ethSignSig2])
       )
 
       chai.expect(isValid).to.be.true

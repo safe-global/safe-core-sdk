@@ -58,14 +58,15 @@ export const calculateSafeMessageHash = (
 }
 
 export const signHash = async (signer: Signer, hash: string): Promise<SafeSignature> => {
-  const typedDataHash = ethers.utils.arrayify(hash)
   const signerAddress = await signer.getAddress()
-  const data = (await signer.signMessage(typedDataHash)).replace(/1b$/, '1f').replace(/1c$/, '20')
+  const data = (await signer.signMessage(ethers.utils.arrayify(hash)))
+    .replace(/1b$/, '1f')
+    .replace(/1c$/, '20')
 
   return new EthSafeSignature(signerAddress, data)
 }
 
-const MESSAGE = 'testing isValidateSignature!'
+const MESSAGE = 'I am the owner of this Safe account'
 
 describe.only('isValidSignature', async () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
@@ -156,25 +157,25 @@ describe.only('isValidSignature', async () => {
       const { accounts, contractNetworks, chainId, safe } = await setupTests()
       const [account1, account2] = accounts
 
-      const ethAdapter1 = await getEthAdapter(account1.signer)
-      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const ethAdapter = await getEthAdapter(account1.signer)
+
       const safeSdk = await Safe.create({
-        ethAdapter: ethAdapter1,
+        ethAdapter: ethAdapter,
         safeAddress: safe.address,
         contractNetworks
       })
       const safeVersion = await safeSdk.getContractVersion()
 
       const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
-        ethAdapter: ethAdapter1,
+        ethAdapter,
         safeVersion,
         customContracts: contractNetworks?.[chainId]
       })
 
-      const messageHash = hashMessage('I am the owner of this Safe account')
+      const messageHash = hashMessage(MESSAGE)
       const txData = compatibilityFallbackHandlerContract.encode('getMessageHash', [messageHash])
 
-      const safeMessageHash = await ethAdapter1.call({
+      const safeMessageHash = await ethAdapter.call({
         from: safe.address,
         to: safe.address,
         data: txData

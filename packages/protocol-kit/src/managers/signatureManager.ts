@@ -8,6 +8,7 @@ import {
 import { getCompatibilityFallbackHandlerContract } from '../contracts/safeDeploymentContracts'
 import { ContractNetworksConfig } from '../types'
 import { generateSignature, generateEIP712Signature } from '../utils'
+import { DEFAULT_SAFE_VERSION } from '../contracts/config'
 
 class SignatureManager {
   #ethAdapter: EthAdapter
@@ -28,7 +29,7 @@ class SignatureManager {
   }
 
   async init() {
-    const safeVersion = (await this.#safeContract?.getVersion()) ?? '1.3.0'
+    const safeVersion = (await this.#safeContract?.getVersion()) ?? DEFAULT_SAFE_VERSION
     const chainId = await this.#ethAdapter.getChainId()
 
     const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({

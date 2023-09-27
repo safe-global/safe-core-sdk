@@ -173,6 +173,14 @@ describe.only('isValidSignature', async () => {
       const ethSignSig1 = await safeSdk1.signatures.signEIP191Message(safeMessageHash)
       const ethSignSig2 = await safeSdk2.signatures.signEIP191Message(safeMessageHash)
 
+      console.log(
+        'PARSE SIGNATURES: ',
+        safeSdk1.signatures.parseSignature(
+          safeSdk1.signatures.buildSignature([ethSignSig1, ethSignSig2]),
+          safeMessageHash
+        )
+      )
+
       // Validate the signature sending the Safe message hash and the concatenated signatures
       const isValid1 = await safeSdk1.signatures.isValidSignature(
         messageHash,
@@ -188,6 +196,11 @@ describe.only('isValidSignature', async () => {
       ])
 
       chai.expect(isValid2).to.be.true
+
+      // Validate the signature is not valid when not enough signers has signed
+      const isValid3 = await safeSdk1.signatures.isValidSignature(messageHash, [ethSignSig1])
+
+      chai.expect(isValid3).to.be.false
     }
   )
 })

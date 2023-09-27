@@ -1,10 +1,6 @@
-import Safe, { EthSafeSignature } from '@safe-global/protocol-kit/index'
+import Safe from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import {
-  OperationType,
-  SafeSignature,
-  SafeTransactionDataPartial
-} from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
@@ -99,13 +95,18 @@ describe.only('isValidSignature', async () => {
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const signedTx = await safeSdk1.signTransaction(tx)
       const signedTx2 = await safeSdk2.signTransaction(signedTx)
-      const txResponse = await safeSdk1.executeTransaction(signedTx2)
+      const execResponse = await safeSdk1.executeTransaction(signedTx2)
 
-      await waitSafeTxReceipt(txResponse)
+      await waitSafeTxReceipt(execResponse)
 
-      const txResponse2 = await safeSdk1.signatures.isValidSignature(hashMessage(MESSAGE), '0x')
+      const validatedResponse1 = await safeSdk1.signatures.isValidSignature(hashMessage(MESSAGE))
+      chai.expect(validatedResponse1).to.be.true
 
-      chai.expect(txResponse2).to.be.true
+      const validatedResponse2 = await safeSdk1.signatures.isValidSignature(
+        hashMessage(MESSAGE),
+        '0x'
+      )
+      chai.expect(validatedResponse2).to.be.true
     }
   )
 
@@ -172,13 +173,21 @@ describe.only('isValidSignature', async () => {
       const ethSignSig1 = await safeSdk1.signatures.signEIP191Message(safeMessageHash)
       const ethSignSig2 = await safeSdk2.signatures.signEIP191Message(safeMessageHash)
 
-      // Validate the signature
-      const isValid = await safeSdk1.signatures.isValidSignature(
+      // Validate the signature sending the Safe message hash and the concatenated signatures
+      const isValid1 = await safeSdk1.signatures.isValidSignature(
         messageHash,
         safeSdk1.signatures.buildSignature([ethSignSig1, ethSignSig2])
       )
 
-      chai.expect(isValid).to.be.true
+      chai.expect(isValid1).to.be.true
+
+      // Validate the signature sending the Safe message hash and the array of SafeSignature
+      const isValid2 = await safeSdk1.signatures.isValidSignature(messageHash, [
+        ethSignSig1,
+        ethSignSig2
+      ])
+
+      chai.expect(isValid2).to.be.true
     }
   )
 })

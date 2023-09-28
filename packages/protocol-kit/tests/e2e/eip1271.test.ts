@@ -49,9 +49,6 @@ describe('EIP1271', () => {
 
       // Create a 1/1 Safe to sign the messages
       const signerSafe = await getSafeWithOwners([accounts[0].address], 1)
-      console.log('SIGNER SAFE: ', signerSafe.address)
-      console.log('account1: ', account1.address)
-      console.log('account2: ', account2.address)
 
       // Create a 2/3 Safe
       const safe = await getSafeWithOwners(

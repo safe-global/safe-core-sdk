@@ -91,14 +91,16 @@ export interface Eip3770Address {
   address: string
 }
 
-export interface SafeTransactionEIP712Args {
+type SafeMessage = string
+
+export interface SafeEIP712Args {
   safeAddress: string
   safeVersion: string
   chainId: number
-  safeTransactionData: SafeTransactionData
+  data: SafeTransactionData | SafeMessage
 }
 
-export interface Eip712MessageTypes {
+export interface EIP712TxTypes {
   EIP712Domain: {
     type: string
     name: string
@@ -109,13 +111,30 @@ export interface Eip712MessageTypes {
   }[]
 }
 
-export interface GenerateTypedData {
-  types: Eip712MessageTypes
+export interface EIP712MessageTypes {
+  EIP712Domain: {
+    type: string
+    name: string
+  }[]
+  SafeMessage: [
+    {
+      type: 'bytes'
+      name: 'message'
+    }
+  ]
+}
+
+export type EIP712Types = EIP712TxTypes | EIP712MessageTypes
+
+export type EIP712TypedData = EIP712TypedDataTx | EIP712TypedDataMessage
+
+export interface EIP712TypedDataTx {
+  types: EIP712TxTypes
   domain: {
     chainId?: number
     verifyingContract: string
   }
-  primaryType: string
+  primaryType: 'SafeTx'
   message: {
     to: string
     value: string
@@ -127,6 +146,18 @@ export interface GenerateTypedData {
     gasToken: string
     refundReceiver: string
     nonce: number
+  }
+}
+
+export interface EIP712TypedDataMessage {
+  types: EIP712MessageTypes
+  domain: {
+    chainId?: number
+    verifyingContract: string
+  }
+  primaryType: 'SafeMessage'
+  message: {
+    message: string
   }
 }
 

@@ -6,11 +6,7 @@ import { SafeContract } from '@safe-global/safe-core-sdk-types/contracts/SafeCon
 import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types/contracts/SafeProxyFactoryContract'
 import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types/contracts/SignMessageLibContract'
 import { SimulateTxAccessorContract } from '@safe-global/safe-core-sdk-types/contracts/SimulateTxAccessorContract'
-import {
-  Eip3770Address,
-  SafeTransactionEIP712Args,
-  SafeVersion
-} from '@safe-global/safe-core-sdk-types/types'
+import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-core-sdk-types/types'
 import { SingletonDeployment } from '@safe-global/safe-deployments'
 import { AbiItem } from 'web3-utils'
 
@@ -93,10 +89,7 @@ export interface EthAdapter {
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string | undefined>
   signMessage(message: string): Promise<string>
-  signTypedData(
-    safeTransactionEIP712Args: SafeTransactionEIP712Args,
-    signTypedDataVersion?: string
-  ): Promise<string>
+  signTypedData(safeEIP712Args: SafeEIP712Args, signTypedDataVersion?: string): Promise<string>
   estimateGas(
     transaction: EthAdapterTransaction,
     callback?: (error: Error, gas: number) => void

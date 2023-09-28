@@ -5,7 +5,7 @@ import {
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeTransactionEIP712Args
+  SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
@@ -267,13 +267,13 @@ class Web3Adapter implements EthAdapter {
   }
 
   async signTypedData(
-    safeTransactionEIP712Args: SafeTransactionEIP712Args,
+    safeEIP712Args: SafeEIP712Args,
     methodVersion?: 'v3' | 'v4'
   ): Promise<string> {
     if (!this.#signerAddress) {
       throw new Error('This method requires a signer')
     }
-    const typedData = generateTypedData(safeTransactionEIP712Args)
+    const typedData = generateTypedData(safeEIP712Args)
     let method = 'eth_signTypedData_v3'
     if (methodVersion === 'v4') {
       method = 'eth_signTypedData_v4'

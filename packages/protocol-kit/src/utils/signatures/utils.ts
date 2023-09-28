@@ -1,8 +1,4 @@
-import {
-  EthAdapter,
-  SafeSignature,
-  SafeTransactionEIP712Args
-} from '@safe-global/safe-core-sdk-types'
+import { EthAdapter, SafeSignature, SafeEIP712Args } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
@@ -110,14 +106,14 @@ export async function generateSignature(
 
 export async function generateEIP712Signature(
   ethAdapter: EthAdapter,
-  safeTransactionEIP712Args: SafeTransactionEIP712Args,
+  safeEIP712Args: SafeEIP712Args,
   methodVersion?: 'v3' | 'v4'
 ): Promise<SafeSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
-  let signature = await ethAdapter.signTypedData(safeTransactionEIP712Args, methodVersion)
+  let signature = await ethAdapter.signTypedData(safeEIP712Args, methodVersion)
   signature = adjustVInSignature('eth_signTypedData', signature)
   return new EthSafeSignature(signerAddress, signature)
 }

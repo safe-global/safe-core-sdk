@@ -3,10 +3,11 @@ import {
   EthAdapter,
   OperationType,
   SafeMultisigTransactionResponse,
+  SafeMultisigConfirmationResponse,
   SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial,
-  SafeTransactionEIP712Args,
+  SafeEIP712Args,
   SafeVersion,
   TransactionOptions,
   TransactionResult,
@@ -43,7 +44,7 @@ import {
   isSafeMultisigTransactionResponse,
   sameString
 } from './utils'
-import { generateEIP712Signature, generatePreValidatedSignature } from './utils/signatures/utils'
+import { generatePreValidatedSignature } from './utils/signatures/utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
@@ -57,7 +58,6 @@ import {
   getProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
-import SignaturesManager from './managers/signatureManager'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -122,7 +122,7 @@ class Safe {
       this.#contractManager.safeContract
     )
 
-    this.signatures = new SignaturesManager(
+    this.signatures = new SignatureManager(
       this.#ethAdapter,
       this.#contractManager.safeContract,
       contractNetworks
@@ -482,7 +482,7 @@ class Safe {
     const signedSafeTransaction = await this.createTransaction({
       safeTransactionData: safeTransaction.data
     })
-    safeTransaction.signatures.forEach((signature) => {
+    safeTransaction.signatures.forEach((signature: EthSafeSignature) => {
       signedSafeTransaction.addSignature(signature)
     })
     return signedSafeTransaction
@@ -524,13 +524,13 @@ class Safe {
     safeTransaction: SafeTransaction,
     methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
-    const safeTransactionEIP712Args: SafeTransactionEIP712Args = {
+    const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
       chainId: await this.getEthAdapter().getChainId(),
-      safeTransactionData: safeTransaction.data
+      data: safeTransaction.data
     }
-    return this.signatures.signEIP712Message(safeTransactionEIP712Args, methodVersion)
+    return this.signatures.signEIP712Message(safeEIP712Args, methodVersion)
   }
 
   /**
@@ -584,7 +584,7 @@ class Safe {
     const signedSafeTransaction = await this.createTransaction({
       safeTransactionData: transaction.data
     })
-    transaction.signatures.forEach((signature) => {
+    transaction.signatures.forEach((signature: EthSafeSignature) => {
       signedSafeTransaction.addSignature(signature)
     })
     signedSafeTransaction.addSignature(signature)
@@ -906,10 +906,12 @@ class Safe {
       nonce: serviceTransactionResponse.nonce
     }
     const safeTransaction = await this.createTransaction({ safeTransactionData })
-    serviceTransactionResponse.confirmations?.map((confirmation) => {
-      const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
-      safeTransaction.addSignature(signature)
-    })
+    serviceTransactionResponse.confirmations?.map(
+      (confirmation: SafeMultisigConfirmationResponse) => {
+        const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
+        safeTransaction.addSignature(signature)
+      }
+    )
     return safeTransaction
   }
 

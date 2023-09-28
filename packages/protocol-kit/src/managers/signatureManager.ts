@@ -3,13 +3,13 @@ import {
   EthAdapter,
   SafeContract,
   SafeSignature,
-  SafeTransactionEIP712Args
+  SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import { getCompatibilityFallbackHandlerContract } from '../contracts/safeDeploymentContracts'
 import { ContractNetworksConfig } from '../types'
-import { generateSignature, generateEIP712Signature, EthSafeSignature } from '../utils'
+import { generateSignature, generateEIP712Signature } from '../utils'
 import { DEFAULT_SAFE_VERSION } from '../contracts/config'
-import { ethers } from 'hardhat'
+import { ethers } from 'ethers'
 
 /**
  * @class SignatureManager
@@ -138,24 +138,22 @@ class SignatureManager {
 
   /**
    * Helper function to generate a signature for a message using the EIP712 standard
-   * @param safeTransactionEIP712Args The arguments to generate the EIP712 signature
+   * @param safeEIP712Args The arguments to generate the EIP712 signature
    * @param methodVersion The version of the EIP712 signature
    * @returns The signature of the message
    */
   async signEIP712Message(
-    safeTransactionEIP712Args: SafeTransactionEIP712Args,
+    safeEIP712Args: SafeEIP712Args,
     methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
-    const signature = await generateEIP712Signature(
-      this.#ethAdapter,
-      safeTransactionEIP712Args,
-      methodVersion
-    )
+    const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
 
     return signature
   }
 
   parseSignature(signatures: any, safeTxHash: string, ignoreTrailing = true): string[] {
+    console.log(safeTxHash)
+
     if (!signatures) {
       return []
     }

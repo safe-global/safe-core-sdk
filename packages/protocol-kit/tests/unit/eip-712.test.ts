@@ -4,7 +4,7 @@ import {
   EIP712_DOMAIN,
   EIP712_DOMAIN_BEFORE_V130,
   generateTypedData,
-  getEip712MessageTypes
+  getEip712TxTypes
 } from '@safe-global/protocol-kit/utils'
 
 const safeAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
@@ -22,24 +22,24 @@ const safeTransactionData: SafeTransactionData = {
 }
 
 describe('EIP-712 sign typed data', () => {
-  describe('getEip712MessageTypes', async () => {
+  describe('getEip712TxTypes', async () => {
     it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.0.0', async () => {
-      const { EIP712Domain } = getEip712MessageTypes('1.0.0')
+      const { EIP712Domain } = getEip712TxTypes('1.0.0')
       chai.expect(EIP712Domain).to.be.eq(EIP712_DOMAIN_BEFORE_V130)
     })
 
     it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.1.1', async () => {
-      const { EIP712Domain } = getEip712MessageTypes('1.1.1')
+      const { EIP712Domain } = getEip712TxTypes('1.1.1')
       chai.expect(EIP712Domain).to.be.eq(EIP712_DOMAIN_BEFORE_V130)
     })
 
     it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.2.0', async () => {
-      const { EIP712Domain } = getEip712MessageTypes('1.2.0')
+      const { EIP712Domain } = getEip712TxTypes('1.2.0')
       chai.expect(EIP712Domain).to.be.eq(EIP712_DOMAIN_BEFORE_V130)
     })
 
     it('should have the domain typed as EIP712_DOMAIN for Safes >= v1.3.0', async () => {
-      const { EIP712Domain } = getEip712MessageTypes('1.3.0')
+      const { EIP712Domain } = getEip712TxTypes('1.3.0')
       chai.expect(EIP712Domain).to.be.eq(EIP712_DOMAIN)
     })
   })

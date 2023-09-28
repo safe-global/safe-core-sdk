@@ -38,7 +38,7 @@ export const EIP712_SAFE_MESSAGE_TYPE = {
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe.only('Using a 2/3 Safe in the context of the EIP1271', async () => {
+describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
   const setupTests = deployments.createFixture(async ({ deployments }) => {
     await deployments.fixture()
     const accounts = await getAccounts()

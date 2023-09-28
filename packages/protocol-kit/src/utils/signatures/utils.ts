@@ -99,9 +99,16 @@ export async function generateSignature(
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
+
+  const isSmartContract = await ethAdapter.isContractDeployed(signerAddress)
   let signature = await ethAdapter.signMessage(hash)
-  signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
-  return new EthSafeSignature(signerAddress, signature)
+
+  if (!isSmartContract) {
+    signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
+    return new EthSafeSignature(signerAddress, signature)
+  }
+
+  return new EthSafeSignature(signerAddress, signature, true)
 }
 
 export async function generateEIP712Signature(
@@ -113,7 +120,14 @@ export async function generateEIP712Signature(
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
+
+  const isSmartContract = await ethAdapter.isContractDeployed(signerAddress)
   let signature = await ethAdapter.signTypedData(safeEIP712Args, methodVersion)
-  signature = adjustVInSignature('eth_signTypedData', signature)
-  return new EthSafeSignature(signerAddress, signature)
+
+  if (!isSmartContract) {
+    signature = adjustVInSignature('eth_signTypedData', signature)
+    return new EthSafeSignature(signerAddress, signature)
+  }
+
+  return new EthSafeSignature(signerAddress, signature, true)
 }

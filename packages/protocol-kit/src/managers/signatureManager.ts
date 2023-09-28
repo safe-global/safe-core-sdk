@@ -122,6 +122,7 @@ class SignatureManager {
     let dynamicBytes = ''
 
     for (const sig of signatures) {
+      console.log(sig)
       if (sig.isSmartContractSignature) {
         /* 
           A contract signature has a static part of 65 bytes and the dynamic part that needs to be appended 

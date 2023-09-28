@@ -122,7 +122,6 @@ class SignatureManager {
     let dynamicBytes = ''
 
     for (const sig of signatures) {
-      console.log(sig)
       if (sig.isSmartContractSignature) {
         /* 
           A contract signature has a static part of 65 bytes and the dynamic part that needs to be appended 
@@ -190,8 +189,6 @@ class SignatureManager {
   }
 
   parseSignature(signatures: any, safeTxHash: string, ignoreTrailing = true): string[] {
-    console.log(safeTxHash)
-
     if (!signatures) {
       return []
     }
@@ -244,11 +241,10 @@ class SignatureManager {
         // EOA
         safeSignature = 'EOA'
       }
-      console.log(safeSignature)
+
       safeSignatures.push(safeSignature)
     }
 
-    console.log('Safe Signatures:', safeSignatures)
     return safeSignatures
   }
 }

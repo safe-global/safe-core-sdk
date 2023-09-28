@@ -191,8 +191,6 @@ describe('EIP1271', () => {
           data: messageHash // TODO: Why the messageHash and not the safeMessageHash ?
         })
 
-        console.log('typedDataSig2: ', typedDataSig)
-
         // Validate the signature sending the Safe message hash and the concatenated signatures
         const isValid = await safeSdk1.signatures.isValidSignature(messageHash, [
           typedDataSig,
@@ -213,7 +211,7 @@ describe('EIP1271', () => {
 
         // Hash the message
         const messageHash = hashMessage(MESSAGE)
-        // Get the Safe message hash of the hashed message
+        // Get the Safe message hash
         const safeMessageHash = await safeSdk1.signatures.getMessageHash(messageHash)
 
         // Sign the Safe message with the owners
@@ -225,7 +223,7 @@ describe('EIP1271', () => {
           data: messageHash // TODO: Why the messageHash and not the safeMessageHash ?
         })
 
-        // Smart contract signature
+        // Sign with the Smart contract
         const signerSafeMessageHash = await safeSdk3.signatures.getMessageHash(messageHash)
         const signerSafeSig = await safeSdk3.signatures.signSafeMessageHash(signerSafeMessageHash)
 

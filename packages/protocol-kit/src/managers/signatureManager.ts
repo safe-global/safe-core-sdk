@@ -7,7 +7,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { getCompatibilityFallbackHandlerContract } from '../contracts/safeDeploymentContracts'
 import { ContractNetworksConfig } from '../types'
-import { generateSignature, generateEIP712Signature } from '../utils'
+import { generateSignature, generateEIP712Signature, EthSafeSignature } from '../utils'
 import { DEFAULT_SAFE_VERSION } from '../contracts/config'
 import { ethers } from 'ethers'
 
@@ -160,6 +160,18 @@ class SignatureManager {
     const signature = await generateSignature(this.#ethAdapter, messageHash)
 
     return signature
+  }
+
+  /**
+   * Helper function to generate a Smart contract signature for a message
+   * @param messageHash This is the Safe message hash
+   * @returns A signature of the message (Smart contract signature)
+   */
+  async signSafeMessageHash(messageHash: string): Promise<SafeSignature> {
+    const signature = await generateSignature(this.#ethAdapter, messageHash)
+    const safeAddress = this.#safeContract?.getAddress() || ''
+
+    return new EthSafeSignature(safeAddress, signature.data, true)
   }
 
   /**

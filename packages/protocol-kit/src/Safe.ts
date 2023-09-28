@@ -67,7 +67,7 @@ class Safe {
   #moduleManager!: ModuleManager
   #guardManager!: GuardManager
   #fallbackHandlerManager!: FallbackHandlerManager
-  signatures!: SignaturesManager
+  signatures!: SignatureManager
 
   /**
    * Creates an instance of the Safe Core SDK.

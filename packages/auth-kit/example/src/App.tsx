@@ -1,21 +1,11 @@
 import { useEffect, useState } from 'react'
-import {
-  ADAPTER_EVENTS,
-  CHAIN_NAMESPACES,
-  SafeEventEmitterProvider,
-  UserInfo,
-  WALLET_ADAPTERS
-} from '@web3auth/base'
 import { Box, Divider, Grid, Typography } from '@mui/material'
-import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
-import { Web3AuthOptions } from '@web3auth/modal'
 import { EthHashInfo } from '@safe-global/safe-react-components'
+import { Web3AuthOptions, UserInfo, WEB3AUTH_NETWORK } from '@web3auth/mpc-core-kit'
 
 import AppBar from './AppBar'
-import { AuthKitSignInData, Web3AuthModalPack, Web3AuthEventListener } from '../../src/index'
-
-const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED', data)
-const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
+import { AuthKitSignInData, Web3AuthModalPack } from '../../src/index'
+import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from '@web3auth/base'
 
 function App() {
   const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
@@ -28,59 +18,29 @@ function App() {
   useEffect(() => {
     ;(async () => {
       const options: Web3AuthOptions = {
-        clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
-        web3AuthNetwork: 'testnet',
+        web3AuthClientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
+        web3AuthNetwork: WEB3AUTH_NETWORK.DEVNET,
+        uxMode: 'popup',
+        baseUrl: 'http://localhost:3000',
+        redirectPathName: '',
         chainConfig: {
+          displayName: 'Ethereum Mainnet',
+          blockExplorer: 'https://etherscan.io',
           chainNamespace: CHAIN_NAMESPACES.EIP155,
           chainId: '0x1',
-          rpcTarget: `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
-        },
-        uiConfig: {
-          theme: 'dark',
-          loginMethodsOrder: ['google', 'facebook']
+          rpcTarget: `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`,
+          ticker: 'ETH',
+          tickerName: 'Ether'
         }
       }
-
-      const modalConfig = {
-        [WALLET_ADAPTERS.TORUS_EVM]: {
-          label: 'torus',
-          showOnModal: false
-        },
-        [WALLET_ADAPTERS.METAMASK]: {
-          label: 'metamask',
-          showOnDesktop: true,
-          showOnMobile: false
-        }
-      }
-
-      const openloginAdapter = new OpenloginAdapter({
-        loginSettings: {
-          mfaLevel: 'mandatory'
-        },
-        adapterSettings: {
-          uxMode: 'popup',
-          whiteLabel: {
-            name: 'Safe'
-          }
-        }
-      })
 
       const web3AuthModalPack = new Web3AuthModalPack({
-        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
+        txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
       })
 
-      await web3AuthModalPack.init({ options, adapters: [openloginAdapter], modalConfig })
-
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
-
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
+      await web3AuthModalPack.init(options)
 
       setWeb3AuthModalPack(web3AuthModalPack)
-
-      return () => {
-        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
-        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
-      }
     })()
   }, [])
 

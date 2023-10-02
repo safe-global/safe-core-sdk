@@ -45,6 +45,7 @@
     "@walletconnect/client": "^1.8.0",
     "@web3auth/base": "^4.3.0",
     "@web3auth/modal": "^4.3.1",
+    "@web3auth/mpc-core-kit": "^1.0.3",
     "@web3auth/openlogin-adapter": "^4.3.0",
     "ethers": "^5.7.2"
   }

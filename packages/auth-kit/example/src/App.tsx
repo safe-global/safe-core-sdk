@@ -20,9 +20,9 @@ function App() {
       const options: Web3AuthOptions = {
         web3AuthClientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
         web3AuthNetwork: WEB3AUTH_NETWORK.DEVNET,
-        uxMode: 'popup',
+        uxMode: 'redirect',
         baseUrl: 'http://localhost:3000',
-        redirectPathName: '',
+        redirectPathName: 'auth',
         chainConfig: {
           displayName: 'Ethereum Mainnet',
           blockExplorer: 'https://etherscan.io',
@@ -44,13 +44,13 @@ function App() {
     })()
   }, [])
 
-  useEffect(() => {
-    if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
-      ;(async () => {
-        await login()
-      })()
-    }
-  }, [web3AuthModalPack])
+  // useEffect(() => {
+  //   if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
+  //     ;(async () => {
+  //       await login()
+  //     })()
+  //   }
+  // }, [web3AuthModalPack])
 
   const login = async () => {
     if (!web3AuthModalPack) return
@@ -58,12 +58,12 @@ function App() {
     const signInInfo = await web3AuthModalPack.signIn()
     console.log('SIGN IN RESPONSE: ', signInInfo)
 
-    const userInfo = await web3AuthModalPack.getUserInfo()
-    console.log('USER INFO: ', userInfo)
+    // const userInfo = await web3AuthModalPack.getUserInfo()
+    // console.log('USER INFO: ', userInfo)
 
-    setSafeAuthSignInResponse(signInInfo)
-    setUserInfo(userInfo || undefined)
-    setProvider(web3AuthModalPack.getProvider() as SafeEventEmitterProvider)
+    // setSafeAuthSignInResponse(signInInfo)
+    // setUserInfo(userInfo || undefined)
+    // setProvider(web3AuthModalPack.getProvider() as SafeEventEmitterProvider)
   }
 
   const logout = async () => {
@@ -115,21 +115,6 @@ function App() {
       )}
     </>
   )
-}
-
-const getPrefix = (chainId: string) => {
-  switch (chainId) {
-    case '0x1':
-      return 'eth'
-    case '0x5':
-      return 'gor'
-    case '0x100':
-      return 'gno'
-    case '0x137':
-      return 'matic'
-    default:
-      return 'eth'
-  }
 }
 
 export default App

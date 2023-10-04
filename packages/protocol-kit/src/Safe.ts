@@ -508,6 +508,7 @@ class Safe {
    * @param hash - The hash to sign
    * @returns The Safe signature
    */
+  // TODO: Evaluate the method removal as it can be use4d through the new Signatures class
   async signTransactionHash(hash: string): Promise<SafeSignature> {
     return this.signatures.signEIP191Message(hash)
   }

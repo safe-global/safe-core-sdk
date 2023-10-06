@@ -12,6 +12,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
 import { BigNumber, ethers } from 'ethers'
 import { buildSignature } from '@safe-global/protocol-kit/utils'
+import { soliditySha3, utf8ToHex } from 'web3-utils'
 
 chai.use(chaiAsPromised)
 
@@ -28,7 +29,7 @@ export const calculateSafeMessageHash = (
 }
 
 const hashMessage = (message: string): string => {
-  return ethers.utils.hashMessage(message)
+  return soliditySha3(utf8ToHex(message)) || '0x'
 }
 
 export const EIP712_SAFE_MESSAGE_TYPE = {
@@ -138,12 +139,10 @@ describe.only('EIP1271', () => {
 
       // Hash the message
       const messageHash = hashMessage(MESSAGE)
-      // Get the Safe message hash of the hashed message
-      const safeMessageHash = await safeSdk1.getMessageHash(messageHash)
 
       // Sign the Safe message hash with the owners
-      const ethSignSig1 = await safeSdk1.signMessageHash(safeMessageHash)
-      const ethSignSig2 = await safeSdk2.signMessageHash(safeMessageHash)
+      const ethSignSig1 = await safeSdk1.signMessageHash(messageHash)
+      const ethSignSig2 = await safeSdk2.signMessageHash(messageHash)
 
       // Validate the signature sending the Safe message hash and the concatenated signatures
       const isValid1 = await safeSdk1.isValidSignature(
@@ -171,11 +170,9 @@ describe.only('EIP1271', () => {
 
         // Hash the message
         const messageHash = hashMessage(MESSAGE)
-        // Get the Safe message hash of the hashed message
-        const safeMessageHash = await safeSdk1.getMessageHash(messageHash)
 
         // Sign the Safe message with the owners
-        const ethSignSig = await safeSdk1.signMessageHash(safeMessageHash)
+        const ethSignSig = await safeSdk1.signMessageHash(messageHash)
         const typedDataSig = await safeSdk2.signTypedData(messageHash)
 
         // Validate the signature sending the Safe message hash and the concatenated signatures
@@ -185,37 +182,31 @@ describe.only('EIP1271', () => {
       }
     )
 
-    describe.only('focus', () => {
-      itif(safeVersionDeployed >= '1.3.0')(
-        'should allow to use a Smart Contract signatures',
-        async () => {
-          const { safeSdk1, safeSdk2, safeSdk3 } = await setupTests()
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should allow to use a Smart Contract signatures',
+      async () => {
+        const { safeSdk1, safeSdk2, safeSdk3 } = await setupTests()
 
-          // Hash the message
-          const messageHash = hashMessage(MESSAGE)
-          // Get the Safe message hash
-          const safeMessageHash = await safeSdk1.getMessageHash(messageHash)
+        // Hash the message
+        const messageHash = hashMessage(MESSAGE)
 
-          // Sign the Safe message with the owners
-          const ethSignSig = await safeSdk1.signMessageHash(safeMessageHash)
-          console.log('signer', await safeSdk1.getEthAdapter().getSignerAddress())
-          const typedDataSig = await safeSdk2.signTypedData(messageHash)
+        // Sign the Safe message with the owners
+        const ethSignSig = await safeSdk1.signMessageHash(messageHash)
+        const typedDataSig = await safeSdk2.signTypedData(messageHash)
 
-          // Sign with the Smart contract
-          const signerSafeMessageHash = await safeSdk3.getMessageHash(messageHash)
-          const signerSafeSig = await safeSdk3.signMessageHash(signerSafeMessageHash, true)
+        // Sign with the Smart contract
+        const signerSafeSig = await safeSdk3.signMessageHash(messageHash, true)
 
-          // Validate the signature sending the Safe message hash and the concatenated signatures
-          const isValid = await safeSdk1.isValidSignature(messageHash, [
-            signerSafeSig,
-            ethSignSig,
-            typedDataSig
-          ])
+        // Validate the signature sending the Safe message hash and the concatenated signatures
+        const isValid = await safeSdk1.isValidSignature(messageHash, [
+          signerSafeSig,
+          ethSignSig,
+          typedDataSig
+        ])
 
-          chai.expect(isValid).to.be.true
-        }
-      )
-    })
+        chai.expect(isValid).to.be.true
+      }
+    )
 
     itif(safeVersionDeployed >= '1.3.0')('should revert when message is not signed', async () => {
       const { safeSdk1 } = await setupTests()

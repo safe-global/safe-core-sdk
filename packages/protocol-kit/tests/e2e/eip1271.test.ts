@@ -10,7 +10,7 @@ import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 
 chai.use(chaiAsPromised)
 
@@ -259,5 +259,44 @@ describe('EIP1271', () => {
           .to.be.eq(calculateSafeMessageHash(safe.address, hashMessage(MESSAGE), chainId))
       }
     )
+
+    it.only('should allow to use a Smart Contract signatures', async () => {
+      const { safe, accounts, safeSdk1, safeSdk2 } = await setupTests()
+
+      const [account1, account2] = accounts
+
+      await account1.signer.sendTransaction({
+        to: safe.address,
+        value: BigNumber.from('1000000000000000000') // 1 ETH
+      })
+
+      const balanceBefore = await safeSdk1.getBalance()
+      console.log('BALANCE BEFORE: ', balanceBefore.toString())
+
+      const safeTransactionData: SafeTransactionDataPartial = {
+        to: account1.address,
+        value: '100000000000000000', // 0.01 ETH
+        data: '0x'
+      }
+
+      const tx = await safeSdk1.createTransaction({ safeTransactionData })
+
+      const signature1 = await safeSdk1.signTypedData(tx)
+      const signature2 = await safeSdk2.signTypedData(tx)
+
+      tx.addSignature(signature1)
+      tx.addSignature(signature2)
+
+      const execResponse = await safeSdk1.executeTransaction(tx)
+
+      await waitSafeTxReceipt(execResponse)
+
+      const receipt = await waitSafeTxReceipt(execResponse)
+      const balanceAfter = await safeSdk1.getBalance()
+      console.log('BALANCE AFTER: ', balanceAfter.toString())
+      console.log('RECEIPT:', receipt)
+      chai.expect(tx.signatures.size).to.be.eq(2)
+      chai.expect(await safeSdk1.isValidTransaction(tx)).to.be.true
+    })
   })
 })

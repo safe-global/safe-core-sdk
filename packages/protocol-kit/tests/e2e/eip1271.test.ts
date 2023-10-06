@@ -230,7 +230,7 @@ describe.only('EIP1271', () => {
       }
     )
 
-    it.skip('should allow to use a sign transactions using smart contracts', async () => {
+    it.only('should allow to use a sign transactions using smart contracts', async () => {
       const { safe, accounts, safeSdk1, safeSdk2 } = await setupTests()
 
       const [account1, account2] = accounts
@@ -266,7 +266,7 @@ describe.only('EIP1271', () => {
       console.log('BALANCE AFTER: ', balanceAfter.toString())
       console.log('RECEIPT:', receipt)
       chai.expect(tx.signatures.size).to.be.eq(2)
-      chai.expect(await safeSdk1.isValidTransaction(tx)).to.be.true
+      chai.expect(receipt?.status).to.be.eq(1)
     })
   })
 })

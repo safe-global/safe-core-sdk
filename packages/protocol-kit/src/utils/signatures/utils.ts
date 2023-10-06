@@ -132,7 +132,7 @@ export async function generateEIP712Signature(
   return new EthSafeSignature(signerAddress, signature, true)
 }
 
-export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
+export const buildSignature = (signatures: SafeSignature[]): string => {
   const SIGNATURE_LENGTH_BYTES = 65
 
   signatures.sort((left, right) =>

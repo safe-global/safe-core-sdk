@@ -3,7 +3,7 @@ import {
   SafeTransaction,
   SafeTransactionData
 } from '@safe-global/safe-core-sdk-types'
-import { buildSignatureBytes } from '../signatures'
+import { buildSignature } from '../signatures'
 
 class EthSafeTransaction implements SafeTransaction {
   data: SafeTransactionData
@@ -18,7 +18,7 @@ class EthSafeTransaction implements SafeTransaction {
   }
 
   encodedSignatures(): string {
-    return buildSignatureBytes(Array.from(this.signatures.values()))
+    return buildSignature(Array.from(this.signatures.values()))
   }
 }
 

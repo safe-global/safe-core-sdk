@@ -1,5 +1,4 @@
-import { getDefaultProvider } from '@ethersproject/providers'
-import { Wallet } from '@ethersproject/wallet'
+import { getDefaultProvider, Wallet } from 'ethers'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import config from '../utils/config'

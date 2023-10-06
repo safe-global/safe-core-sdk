@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import ethers, { Eip1193Provider } from 'ethers'
 import SafeApiKit from '@safe-global/api-kit'
 import { EthersAdapter } from '@safe-global/protocol-kit'
 
@@ -28,7 +28,7 @@ export abstract class AuthKitBasePack {
    * Get the provider instance based on the pack
    * @returns The provider instance
    */
-  abstract getProvider(): ethers.providers.ExternalProvider | null
+  abstract getProvider(): Eip1193Provider | null
 
   /**
    * Get the user info from the provider
@@ -56,7 +56,7 @@ export abstract class AuthKitBasePack {
    * @returns The list of Safe addresses owned by the user in the chain
    */
   async getSafes(txServiceUrl: string): Promise<string[]> {
-    const apiKit = this.#getApiKit(txServiceUrl)
+    const apiKit = await this.#getApiKit(txServiceUrl)
 
     const address = await this.getAddress()
 
@@ -78,11 +78,9 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
+    const ethersProvider = new ethers.BrowserProvider(this.getProvider() as Eip1193Provider)
 
-    const signer = ethersProvider.getSigner()
+    const signer = await ethersProvider.getSigner()
 
     const address = await signer.getAddress()
 
@@ -93,15 +91,14 @@ export abstract class AuthKitBasePack {
    * Get the SafeApiKit instance
    * @returns A SafeApiKit instance
    */
-  #getApiKit(txServiceUrl: string): SafeApiKit {
+  async #getApiKit(txServiceUrl: string): Promise<SafeApiKit> {
     if (!this.getProvider()) {
       throw new Error('Provider is not defined')
     }
 
-    const provider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
-    const safeOwner = provider.getSigner(0)
+    const provider = new ethers.BrowserProvider(this.getProvider() as Eip1193Provider)
+
+    const safeOwner = await provider.getSigner(0)
 
     const adapter = new EthersAdapter({
       ethers,

@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   EthAdapter,
   SafeContract,
@@ -86,7 +85,7 @@ export async function estimateGas(
     await simulateTxAccessorContract.getAddress(),
     transactionDataToEstimate
   ])
-  const safeAddress = safeContract.getAddress()
+  const safeAddress = await safeContract.getAddress()
   const transactionToEstimateGas = {
     to: safeAddress,
     value: '0',
@@ -111,8 +110,8 @@ export async function estimateTxGas(
   data: string,
   operation: OperationType
 ): Promise<string> {
-  let txGasEstimation = BigNumber.from(0)
-  const safeAddress = safeContract.getAddress()
+  let txGasEstimation = 0
+  const safeAddress = await safeContract.getAddress()
 
   const estimateData: string = safeContract.encode('requiredTxGas', [
     to,
@@ -126,10 +125,10 @@ export async function estimateTxGas(
       from: safeAddress,
       data: estimateData
     })
-    txGasEstimation = BigNumber.from('0x' + estimateResponse.substring(138)).add(10000)
+    txGasEstimation = Number('0x' + estimateResponse.substring(138)) + 10000
   } catch (error) {}
 
-  if (txGasEstimation.gt(0)) {
+  if (txGasEstimation > 0) {
     const dataGasEstimation = estimateDataGasCosts(estimateData)
     let additionalGas = 10000
     for (let i = 0; i < 10; i++) {
@@ -139,16 +138,16 @@ export async function estimateTxGas(
           from: safeAddress,
           data: estimateData,
           gasPrice: '0',
-          gasLimit: txGasEstimation.add(dataGasEstimation).add(additionalGas).toString()
+          gasLimit: (txGasEstimation + dataGasEstimation + additionalGas).toString()
         })
         if (estimateResponse !== '0x') {
           break
         }
       } catch (error) {}
-      txGasEstimation = txGasEstimation.add(additionalGas)
+      txGasEstimation = txGasEstimation + additionalGas
       additionalGas *= 2
     }
-    return txGasEstimation.add(additionalGas).toString()
+    return (txGasEstimation + additionalGas).toString()
   }
 
   try {
@@ -333,7 +332,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     safeTransaction.data.operation
   ])
 
-  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
 
   const transactionToEstimateGas = {
     to,
@@ -442,7 +441,7 @@ async function estimateSafeTxGasWithSimulate(
   ])
 
   // if the Safe is not deployed we can use the singleton address to simulate
-  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
 
   const safeFunctionToEstimate: string = safeSingletonContract.encode('simulateAndRevert', [
     await simulateTxAccessorContract.getAddress(),

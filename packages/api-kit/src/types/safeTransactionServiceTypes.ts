@@ -1,4 +1,4 @@
-import { Signer } from '@ethersproject/abstract-signer'
+import { Signer } from 'ethers'
 import {
   SafeMultisigTransactionResponse,
   SafeTransactionData

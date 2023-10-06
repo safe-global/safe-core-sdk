@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionStatusResponse } from '@gelatonetwork/relay-sdk'
 import Safe, {
   isGasTokenCompatibleWithHandlePayment,
@@ -26,7 +25,7 @@ const ADDRESS = '0x...address'
 const GAS_TOKEN = '0x...gasToken'
 const SAFE_ADDRESS = '0x...safe-address'
 const API_KEY = 'api-key'
-const FEE_ESTIMATION = BigNumber.from(100_000)
+const FEE_ESTIMATION = BigInt(100_000)
 const BASEGAS_ESTIMATION = '20000'
 const SAFETXGAS_ESTIMATION = '10000'
 const SAFE_DEPLOYMENT_GAS_ESTIMATION = '30000'
@@ -119,10 +118,10 @@ describe('GelatoRelayPack', () => {
     expect(mockGetEstimateFee).toHaveBeenCalledWith(
       chainId,
       GELATO_NATIVE_TOKEN_ADDRESS,
-      BigNumber.from(gasLimit),
+      BigInt(gasLimit),
       false
     )
-    expect(BigNumber.from(estimation).gt(BigNumber.from(0))).toBe(true)
+    expect(BigInt(estimation) > 0).toBe(true)
   })
 
   it('should allow to check the task status', async () => {

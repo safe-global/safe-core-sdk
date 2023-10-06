@@ -1,6 +1,6 @@
 import { IAdapter, UserInfo } from '@web3auth/base'
 import { ModalConfig, Web3Auth, Web3AuthOptions } from '@web3auth/modal'
-import { ExternalProvider } from '@ethersproject/providers'
+import { Eip1193Provider } from 'ethers'
 
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { Web3AuthConfig, Web3AuthEvent, Web3AuthEventListener } from './types'
@@ -12,7 +12,7 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
  * @class
  */
 export class Web3AuthModalPack extends AuthKitBasePack {
-  #provider: ExternalProvider | null
+  #provider: Eip1193Provider | null
   #config: Web3AuthConfig
   web3Auth?: Web3Auth
 
@@ -77,7 +77,7 @@ export class Web3AuthModalPack extends AuthKitBasePack {
     return signInData
   }
 
-  getProvider(): ExternalProvider | null {
+  getProvider(): Eip1193Provider | null {
     return this.#provider
   }
 

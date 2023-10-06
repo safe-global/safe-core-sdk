@@ -1,5 +1,4 @@
-import { Signer } from '@ethersproject/abstract-signer'
-import { Wallet } from '@ethersproject/wallet'
+import { Signer, Wallet } from 'ethers'
 import { ethers, waffle, Web3 } from 'hardhat'
 interface Account {
   signer: Signer

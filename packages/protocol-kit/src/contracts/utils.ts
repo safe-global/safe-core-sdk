@@ -1,5 +1,4 @@
-import { isAddress } from '@ethersproject/address'
-import { BigNumber } from '@ethersproject/bignumber'
+import { isAddress } from 'ethers'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
@@ -11,7 +10,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
-import { utils as zkSyncUtils } from 'zksync-web3'
+// import { utils as zkSyncUtils } from 'zksync-web3'
 
 import {
   getCompatibilityFallbackHandlerContract,
@@ -115,7 +114,7 @@ export async function encodeSetupCallData({
       customContracts
     })
 
-    fallbackHandlerAddress = fallbackHandlerContract.getAddress()
+    fallbackHandlerAddress = await fallbackHandlerContract.getAddress()
   }
 
   return safeContract.encode('setup', [
@@ -200,20 +199,20 @@ export async function predictSafeAddress({
     toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
   )
 
-  const input = ethAdapter.encodeParameters(['address'], [safeContract.getAddress()])
+  const input = ethAdapter.encodeParameters(['address'], [await safeContract.getAddress()])
 
   const chainId = await ethAdapter.getChainId()
   // zkSync Era counterfactual deployment is calculated differently
   // https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#create-create2
-  if ([ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)) {
-    const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
-    return zkSyncUtils.create2Address(
-      safeProxyFactoryContract.getAddress(),
-      bytecodeHash,
-      salt,
-      input
-    )
-  }
+  // if ([ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)) {
+  //   const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
+  //   return zkSyncUtils.create2Address(
+  //     await safeProxyFactoryContract.getAddress(),
+  //     bytecodeHash,
+  //     salt,
+  //     input
+  //   )
+  // }
 
   const constructorData = toBuffer(input).toString('hex')
 
@@ -222,7 +221,7 @@ export async function predictSafeAddress({
   const proxyAddress =
     '0x' +
     generateAddress2(
-      toBuffer(safeProxyFactoryContract.getAddress()),
+      toBuffer(await safeProxyFactoryContract.getAddress()),
       toBuffer(salt),
       toBuffer(initCode)
     ).toString('hex')
@@ -238,6 +237,6 @@ export const validateSafeAccountConfig = ({ owners, threshold }: SafeAccountConf
 }
 
 export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig): void => {
-  if (saltNonce && BigNumber.from(saltNonce).lt(0))
+  if (saltNonce && BigInt(saltNonce) < 0)
     throw new Error('saltNonce must be greater than or equal to 0')
 }

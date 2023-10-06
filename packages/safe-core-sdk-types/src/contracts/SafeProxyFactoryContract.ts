@@ -9,7 +9,7 @@ export interface CreateProxyProps {
 }
 
 export interface SafeProxyFactoryContract {
-  getAddress(): string
+  getAddress(): Promise<string>
   proxyCreationCode(): Promise<string>
   createProxy(options: CreateProxyProps): Promise<string>
   encode(methodName: string, params: any[]): string

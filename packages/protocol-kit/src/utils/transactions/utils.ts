@@ -1,6 +1,4 @@
-import { Interface } from '@ethersproject/abi'
-import { arrayify } from '@ethersproject/bytes'
-import { pack as solidityPack } from '@ethersproject/solidity'
+import { Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
@@ -108,7 +106,7 @@ export async function standardizeSafeTransactionData({
 }
 
 function encodeMetaTransaction(tx: MetaTransactionData): string {
-  const data = arrayify(tx.data)
+  const data = getBytes(tx.data)
   const encoded = solidityPack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
     [tx.operation, tx.to, tx.value, data.length, data]

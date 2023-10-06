@@ -10,8 +10,8 @@ import { CreateCallContract } from '@safe-global/safe-core-sdk-types'
 abstract class CreateCallWeb3Contract implements CreateCallContract {
   constructor(public contract: CreateCall_V1_4_1 | CreateCall_V1_3_0) {}
 
-  getAddress(): string {
-    return this.contract.options.address
+  getAddress(): Promise<string> {
+    return Promise.resolve(this.contract.options.address)
   }
 
   async performCreate2(

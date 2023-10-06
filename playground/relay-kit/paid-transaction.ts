@@ -31,7 +31,7 @@ const txConfig = {
   VALUE: '<VALUE>',
   // Options:
   GAS_LIMIT: '<GAS_LIMIT>',
-  GAS_TOKEN: ethers.constants.AddressZero
+  GAS_TOKEN: ethers.ZeroAddress
 }
 
 async function main() {

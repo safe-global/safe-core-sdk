@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types/contracts/CompatibilityFallbackHandlerContract'
 import { CreateCallContract } from '@safe-global/safe-core-sdk-types/contracts/CreateCallContract'
 import { MultiSendCallOnlyContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendCallOnlyContract'
@@ -36,7 +35,7 @@ export interface GetContractProps {
 export interface EthAdapter {
   isAddress(address: string): boolean
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
-  getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber>
+  getBalance(address: string, defaultBlock?: string | number): Promise<bigint>
   getNonce(address: string, defaultBlock?: string | number): Promise<number>
   getChainId(): Promise<number>
   getChecksummedAddress(address: string): string

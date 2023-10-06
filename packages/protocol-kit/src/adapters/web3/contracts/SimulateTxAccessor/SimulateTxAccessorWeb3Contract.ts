@@ -5,8 +5,8 @@ import { SimulateTxAccessorContract } from '@safe-global/safe-core-sdk-types'
 abstract class SimulateTxAccessorWeb3Contract implements SimulateTxAccessorContract {
   constructor(public contract: SimulateTxAccessor_V1_4_1 | SimulateTxAccessor_V1_3_0) {}
 
-  getAddress(): string {
-    return this.contract.options.address
+  getAddress(): Promise<string> {
+    return Promise.resolve(this.contract.options.address)
   }
 
   encode(methodName: string, params: any[]): string {

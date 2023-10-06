@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
   PredictedSafeProps,
@@ -107,7 +106,7 @@ describe('Transactions creation', () => {
           tx: txDataPartial,
           contractNetworks
         })
-        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
+        chai.expect(BigInt(safeTxData.safeTxGas) > 0).to.be.true
       }
     )
 
@@ -163,7 +162,7 @@ describe('Transactions creation', () => {
           tx: txDataPartial,
           contractNetworks
         })
-        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
+        chai.expect(BigInt(safeTxData.safeTxGas) > 0).to.be.true
       }
     )
 

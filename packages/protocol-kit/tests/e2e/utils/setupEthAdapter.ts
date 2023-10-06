@@ -1,11 +1,11 @@
-import { Signer } from '@ethersproject/abstract-signer'
-import { Provider } from '@ethersproject/providers'
+import { Signer, Provider } from 'ethers'
 import {
   EthersAdapter,
   EthersAdapterConfig,
   Web3Adapter,
   Web3AdapterConfig
 } from '@safe-global/protocol-kit/index'
+import { isSignerCompatible } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import dotenv from 'dotenv'
 import { ethers, web3 } from 'hardhat'
@@ -21,8 +21,9 @@ export async function getEthAdapter(
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
     case 'web3':
-      const signerAddress =
-        signerOrProvider instanceof Signer ? await signerOrProvider.getAddress() : undefined
+      const signerAddress = isSignerCompatible(signerOrProvider)
+        ? await (signerOrProvider as Signer).getAddress()
+        : undefined
       const web3Instance = signerOrProvider instanceof Web3 ? signerOrProvider : (web3 as any)
       const web3AdapterConfig: Web3AdapterConfig = { web3: web3Instance, signerAddress }
       ethAdapter = new Web3Adapter(web3AdapterConfig)

@@ -133,7 +133,7 @@ describe('Safe contracts manager', () => {
         contractNetworks
       })
       chai
-        .expect(safeSdk.getMultiSendAddress())
+        .expect(await safeSdk.getMultiSendAddress())
         .to.be.eq(contractNetworks[chainId].multiSendAddress)
     })
   })

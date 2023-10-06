@@ -1266,19 +1266,14 @@ class Safe {
    * @returns The Safe signature
    */
   async signMessageHash(hash: string, isSmartContract = false): Promise<SafeSignature> {
-    let signature
+    const safeMessageHash = await this.getMessageHash(hash)
+    const signature = await generateSignature(this.#ethAdapter, safeMessageHash)
 
     if (isSmartContract) {
-      const signerSafeMessageHash = await this.getMessageHash(hash)
-      signature = await generateSignature(this.#ethAdapter, signerSafeMessageHash)
       const safeAddress = await this.getAddress()
 
       return new EthSafeSignature(safeAddress, signature.data, isSmartContract)
     }
-
-    const safeMessageHash = await this.getMessageHash(hash)
-
-    signature = await generateSignature(this.#ethAdapter, safeMessageHash)
 
     return signature
   }

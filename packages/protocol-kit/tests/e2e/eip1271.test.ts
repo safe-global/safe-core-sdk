@@ -11,7 +11,7 @@ import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
 import { BigNumber, ethers } from 'ethers'
-import { buildSignature } from '@safe-global/protocol-kit/utils'
+import { EthSafeSignature, buildSignature } from '@safe-global/protocol-kit/utils'
 import { soliditySha3, utf8ToHex } from 'web3-utils'
 
 chai.use(chaiAsPromised)
@@ -231,9 +231,9 @@ describe.only('EIP1271', () => {
     )
 
     it.only('should allow to use a sign transactions using smart contracts', async () => {
-      const { safe, accounts, safeSdk1, safeSdk2 } = await setupTests()
+      const { safe, accounts, safeSdk1, safeSdk3, signerSafe } = await setupTests()
 
-      const [account1, account2] = accounts
+      const [account1] = accounts
 
       await account1.signer.sendTransaction({
         to: safe.address,
@@ -251,13 +251,17 @@ describe.only('EIP1271', () => {
 
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
 
-      const signature1 = await safeSdk1.signTypedData(tx)
-      const signature2 = await safeSdk2.signTypedData(tx)
+      const signature1 = await safeSdk1.signTransactionHash(await safeSdk1.getTransactionHash(tx))
+      let signature2 = await safeSdk3.signTypedData(tx)
+      signature2 = new EthSafeSignature(signerSafe.address, signature2.data, true)
 
       tx.addSignature(signature1)
       tx.addSignature(signature2)
 
-      const execResponse = await safeSdk1.executeTransaction(tx)
+      console.log('OWNER 1: ', signature1.signer)
+      console.log('OWNER 2: ', signature2.signer)
+
+      const execResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 1000000 })
 
       await waitSafeTxReceipt(execResponse)
 

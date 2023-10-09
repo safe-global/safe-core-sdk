@@ -97,42 +97,45 @@ describe.only('EIP1271', () => {
       }
     })
 
-    itif(safeVersionDeployed >= '1.3.0')('should validate on-chain messages', async () => {
-      const { contractNetworks, safeSdk1, safeSdk2, ethAdapter1 } = await setupTests()
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should validate on-chain messages (Approved hashes)',
+      async () => {
+        const { contractNetworks, safeSdk1, safeSdk2, ethAdapter1 } = await setupTests()
 
-      const chainId: number = await safeSdk1.getChainId()
-      const safeVersion = await safeSdk1.getContractVersion()
+        const chainId: number = await safeSdk1.getChainId()
+        const safeVersion = await safeSdk1.getContractVersion()
 
-      const customContract = contractNetworks[chainId]
+        const customContract = contractNetworks[chainId]
 
-      const signMessageLibContract = await ethAdapter1.getSignMessageLibContract({
-        safeVersion,
-        customContractAddress: customContract.signMessageLibAddress,
-        customContractAbi: customContract.signMessageLibAbi
-      })
+        const signMessageLibContract = await ethAdapter1.getSignMessageLibContract({
+          safeVersion,
+          customContractAddress: customContract.signMessageLibAddress,
+          customContractAbi: customContract.signMessageLibAbi
+        })
 
-      const txData = signMessageLibContract.encode('signMessage', [hashMessage(MESSAGE)])
+        const txData = signMessageLibContract.encode('signMessage', [hashMessage(MESSAGE)])
 
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: customContract.signMessageLibAddress,
-        value: '0',
-        data: txData,
-        operation: OperationType.DelegateCall
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: customContract.signMessageLibAddress,
+          value: '0',
+          data: txData,
+          operation: OperationType.DelegateCall
+        }
+
+        const tx = await safeSdk1.createTransaction({ safeTransactionData })
+        const signedTx = await safeSdk1.signTransaction(tx)
+        const signedTx2 = await safeSdk2.signTransaction(signedTx)
+        const execResponse = await safeSdk1.executeTransaction(signedTx2)
+
+        await waitSafeTxReceipt(execResponse)
+
+        const validatedResponse1 = await safeSdk1.isValidSignature(hashMessage(MESSAGE))
+        chai.expect(validatedResponse1).to.be.true
+
+        const validatedResponse2 = await safeSdk1.isValidSignature(hashMessage(MESSAGE), '0x')
+        chai.expect(validatedResponse2).to.be.true
       }
-
-      const tx = await safeSdk1.createTransaction({ safeTransactionData })
-      const signedTx = await safeSdk1.signTransaction(tx)
-      const signedTx2 = await safeSdk2.signTransaction(signedTx)
-      const execResponse = await safeSdk1.executeTransaction(signedTx2)
-
-      await waitSafeTxReceipt(execResponse)
-
-      const validatedResponse1 = await safeSdk1.isValidSignature(hashMessage(MESSAGE))
-      chai.expect(validatedResponse1).to.be.true
-
-      const validatedResponse2 = await safeSdk1.isValidSignature(hashMessage(MESSAGE), '0x')
-      chai.expect(validatedResponse2).to.be.true
-    })
+    )
 
     itif(safeVersionDeployed >= '1.3.0')('should validate off-chain messages', async () => {
       const { safeSdk1, safeSdk2 } = await setupTests()
@@ -164,7 +167,7 @@ describe.only('EIP1271', () => {
     })
 
     itif(safeVersionDeployed >= '1.3.0')(
-      'should allow to validate a mix EIP191 and EIP712 signatures',
+      'should validate a mix EIP191 and EIP712 signatures',
       async () => {
         const { safeSdk1, safeSdk2 } = await setupTests()
 
@@ -183,7 +186,7 @@ describe.only('EIP1271', () => {
     )
 
     itif(safeVersionDeployed >= '1.3.0')(
-      'should allow to use a Smart Contract signatures',
+      'should validate Smart contracts as signers (threshold = 1)',
       async () => {
         const { safeSdk1, safeSdk2, safeSdk3 } = await setupTests()
 
@@ -230,7 +233,7 @@ describe.only('EIP1271', () => {
       }
     )
 
-    it.only('should allow to use a sign transactions using smart contracts', async () => {
+    it.only('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
       const { safe, accounts, safeSdk1, safeSdk3, signerSafe } = await setupTests()
 
       const [account1] = accounts
@@ -251,8 +254,12 @@ describe.only('EIP1271', () => {
 
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
 
-      const signature1 = await safeSdk1.signTransactionHash(await safeSdk1.getTransactionHash(tx))
-      let signature2 = await safeSdk3.signTypedData(tx)
+      const signature1 = await safeSdk1.signTransactionHash(
+        await safeSdk1.getMessageHash(await safeSdk1.getTransactionHash(tx))
+      )
+      let signature2 = await safeSdk3.signTransactionHash(
+        await safeSdk3.getMessageHash(await safeSdk3.getTransactionHash(tx))
+      )
       signature2 = new EthSafeSignature(signerSafe.address, signature2.data, true)
 
       tx.addSignature(signature1)

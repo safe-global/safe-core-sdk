@@ -506,8 +506,14 @@ class Safe {
    * @param hash - The hash to sign
    * @returns The Safe signature
    */
-  async signTransactionHash(hash: string): Promise<SafeSignature> {
+  async signHash(hash: string, isSmartContract = false): Promise<SafeSignature> {
     const signature = await generateSignature(this.#ethAdapter, hash)
+
+    if (isSmartContract) {
+      const safeAddress = await this.getAddress()
+
+      return new EthSafeSignature(safeAddress, signature.data, isSmartContract)
+    }
 
     return signature
   }
@@ -1232,7 +1238,7 @@ class Safe {
    * @returns Returns the hash of a message to be signed by owners
    * @link https://github.com/safe-global/safe-contracts/blob/8ffae95faa815acf86ec8b50021ebe9f96abde10/contracts/handler/CompatibilityFallbackHandler.sol#L26-L28
    */
-  getMessageHash = async (messageHash: string): Promise<string> => {
+  getSafeMessageHash = async (messageHash: string): Promise<string> => {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
     }
@@ -1257,25 +1263,6 @@ class Safe {
     })
 
     return safeMessageHash
-  }
-
-  /**
-   * Signs a hash using the current signer account.
-   *
-   * @param hash - The hash to sign
-   * @returns The Safe signature
-   */
-  async signMessageHash(hash: string, isSmartContract = false): Promise<SafeSignature> {
-    const safeMessageHash = await this.getMessageHash(hash)
-    const signature = await generateSignature(this.#ethAdapter, safeMessageHash)
-
-    if (isSmartContract) {
-      const safeAddress = await this.getAddress()
-
-      return new EthSafeSignature(safeAddress, signature.data, isSmartContract)
-    }
-
-    return signature
   }
 
   /**

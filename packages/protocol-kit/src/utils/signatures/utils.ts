@@ -158,5 +158,6 @@ export const buildSignature = (signatures: SafeSignature[]): string => {
     }
   }
 
+  console.log('signatureBytes', signatureBytes)
   return signatureBytes + dynamicBytes
 }

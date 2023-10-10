@@ -5,7 +5,6 @@ import {
   SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
-import { _TypedDataEncoder, hashMessage } from 'ethers/lib/utils'
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
@@ -53,12 +52,6 @@ export function getEip712MessageTypes(safeVersion: string): EIP712MessageTypes {
     EIP712Domain: eip712WithChainId ? EIP712_DOMAIN : EIP712_DOMAIN_BEFORE_V130,
     SafeMessage: [{ type: 'bytes', name: 'message' }]
   }
-}
-
-export const hashTypedData = (typedData: EIP712TypedData): string => {
-  // `ethers` doesn't require `EIP712Domain` and otherwise throws
-  const { EIP712Domain: _, ...types } = typedData.types
-  return _TypedDataEncoder.hash(typedData.domain, types, typedData.message)
 }
 
 export function generateTypedData({

@@ -539,7 +539,8 @@ class Safe {
    */
   async signTypedData(
     eip712Data: SafeTransaction | EIP712TypedData | string,
-    methodVersion?: 'v3' | 'v4'
+    methodVersion?: 'v3' | 'v4',
+    isSmartContract = false
   ): Promise<SafeSignature> {
     let data
 
@@ -556,7 +557,16 @@ class Safe {
       data
     }
 
-    return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
+    const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
+
+    // If is a Smart Contract signature the signer is the Safe and not the signer account
+    if (isSmartContract) {
+      const safeAddress = await this.getAddress()
+
+      return new EthSafeSignature(safeAddress, signature.data, isSmartContract)
+    }
+
+    return signature
   }
 
   /**
@@ -573,7 +583,8 @@ class Safe {
       | 'eth_sign'
       | 'eth_signTypedData'
       | 'eth_signTypedData_v3'
-      | 'eth_signTypedData_v4' = 'eth_signTypedData_v4'
+      | 'eth_signTypedData_v4' = 'eth_signTypedData_v4',
+    isSmartContract = false
   ): Promise<SafeTransaction> {
     const transaction = isSafeMultisigTransactionResponse(safeTransaction)
       ? await this.toSafeTransactionType(safeTransaction)
@@ -593,18 +604,18 @@ class Safe {
 
     let signature: SafeSignature
     if (signingMethod === 'eth_signTypedData_v4') {
-      signature = await this.signTypedData(transaction, 'v4')
+      signature = await this.signTypedData(transaction, 'v4', isSmartContract)
     } else if (signingMethod === 'eth_signTypedData_v3') {
-      signature = await this.signTypedData(transaction, 'v3')
+      signature = await this.signTypedData(transaction, 'v3', isSmartContract)
     } else if (signingMethod === 'eth_signTypedData') {
-      signature = await this.signTypedData(transaction)
+      signature = await this.signTypedData(transaction, undefined, isSmartContract)
     } else {
       const safeVersion = await this.getContractVersion()
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
       const txHash = await this.getHash(transaction)
-      signature = await this.signHash(txHash)
+      signature = await this.signHash(txHash, isSmartContract)
     }
 
     const signedSafeTransaction = await this.createTransaction({

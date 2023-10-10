@@ -66,7 +66,7 @@ describe('On-chain signatures', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
-      const hash = await safeSdk1.getTransactionHash(tx)
+      const hash = await safeSdk1.getHash(tx)
       await chai
         .expect(safeSdk1.approveTransactionHash(hash))
         .to.be.rejectedWith('Transaction hashes can only be approved by Safe owners')
@@ -87,7 +87,7 @@ describe('On-chain signatures', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
-      const txHash = await safeSdk1.getTransactionHash(tx)
+      const txHash = await safeSdk1.getHash(tx)
       const txResponse = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(1)
@@ -108,7 +108,7 @@ describe('On-chain signatures', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
-      const txHash = await safeSdk1.getTransactionHash(tx)
+      const txHash = await safeSdk1.getHash(tx)
       chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(0)
       const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
@@ -151,7 +151,7 @@ describe('On-chain signatures', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
-      const txHash = await safeSdk1.getTransactionHash(tx)
+      const txHash = await safeSdk1.getHash(tx)
       const ownersWhoApproved0 = await safeSdk1.getOwnersWhoApprovedTx(txHash)
       chai.expect(ownersWhoApproved0.length).to.be.eq(0)
       const txResponse1 = await safeSdk1.approveTransactionHash(txHash)

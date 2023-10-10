@@ -52,8 +52,8 @@ async function main() {
   const safeTransaction = await safe.createTransaction({ safeTransactionData })
 
   const senderAddress = await signer.getAddress()
-  const safeTxHash = await safe.getTransactionHash(safeTransaction)
-  const signature = await safe.signTransactionHash(safeTxHash)
+  const safeTxHash = await safe.getHash(safeTransaction)
+  const signature = await safe.signHash(safeTxHash)
 
   // Propose transaction to the service
   await service.proposeTransaction({

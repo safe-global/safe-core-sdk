@@ -52,7 +52,7 @@ async function main() {
   // const transactions = await service.getAllTransactions()
 
   const safeTxHash = transaction.transactionHash
-  const signature = await safe.signTransactionHash(safeTxHash)
+  const signature = await safe.signHash(safeTxHash)
 
   // Confirm the Safe transaction
   const signatureResponse = await service.confirmTransaction(safeTxHash, signature.data)

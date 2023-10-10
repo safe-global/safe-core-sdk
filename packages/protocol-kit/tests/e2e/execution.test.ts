@@ -144,7 +144,7 @@ describe('Transactions execution', () => {
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const signedTx = await safeSdk1.signTransaction(tx)
-      const txHash = await safeSdk2.getTransactionHash(tx)
+      const txHash = await safeSdk2.getHash(tx)
       const txResponse = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse)
       await chai
@@ -321,7 +321,7 @@ describe('Transactions execution', () => {
         const tx = await safeSdk1.createTransaction({ safeTransactionData })
 
         // Signature: on-chain
-        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txHash = await safeSdk1.getHash(tx)
         const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
         await waitSafeTxReceipt(txResponse1)
 
@@ -376,7 +376,7 @@ describe('Transactions execution', () => {
         const tx = await safeSdk1.createTransaction({ safeTransactionData })
 
         // Signature: on-chain
-        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txHash = await safeSdk1.getHash(tx)
         const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
         await waitSafeTxReceipt(txResponse1)
 
@@ -437,7 +437,7 @@ describe('Transactions execution', () => {
         const tx = await safeSdk1.createTransaction({ safeTransactionData })
 
         // Signature: on-chain
-        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txHash = await safeSdk1.getHash(tx)
         const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
         await waitSafeTxReceipt(txResponse1)
 
@@ -504,7 +504,7 @@ describe('Transactions execution', () => {
         const tx = await safeSdk1.createTransaction({ safeTransactionData })
 
         // Signature: on-chain
-        const txHash = await safeSdk1.getTransactionHash(tx)
+        const txHash = await safeSdk1.getHash(tx)
         const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
         await waitSafeTxReceipt(txResponse1)
 
@@ -557,7 +557,7 @@ describe('Transactions execution', () => {
       }
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
       const signedTx = await safeSdk1.signTransaction(tx)
-      const txHash = await safeSdk2.getTransactionHash(tx)
+      const txHash = await safeSdk2.getHash(tx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
       const txResponse2 = await safeSdk3.executeTransaction(signedTx)
@@ -835,7 +835,7 @@ describe('Transactions execution', () => {
       ]
       const multiSendTx = await safeSdk1.createTransaction({ safeTransactionData })
       const signedMultiSendTx = await safeSdk1.signTransaction(multiSendTx)
-      const txHash = await safeSdk2.getTransactionHash(multiSendTx)
+      const txHash = await safeSdk2.getHash(multiSendTx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
       const txResponse2 = await safeSdk3.executeTransaction(signedMultiSendTx)
@@ -892,7 +892,7 @@ describe('Transactions execution', () => {
       ]
       const multiSendTx = await safeSdk1.createTransaction({ safeTransactionData })
       const signedMultiSendTx = await safeSdk1.signTransaction(multiSendTx)
-      const txHash = await safeSdk2.getTransactionHash(multiSendTx)
+      const txHash = await safeSdk2.getHash(multiSendTx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
       const txResponse2 = await safeSdk3.executeTransaction(signedMultiSendTx)

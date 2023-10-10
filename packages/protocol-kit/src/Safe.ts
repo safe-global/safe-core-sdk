@@ -12,7 +12,9 @@ import {
   TransactionOptions,
   TransactionResult,
   MetaTransactionData,
-  Transaction
+  Transaction,
+  CompatibilityFallbackHandlerContract,
+  EIP712TypedData
 } from '@safe-global/safe-core-sdk-types'
 import { soliditySha3, utf8ToHex } from 'web3-utils'
 import {
@@ -64,8 +66,6 @@ import {
   getProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
-import { type } from 'os'
-import { CompatibilityFallbackHandlerContract } from 'packages/safe-core-sdk-types/dist/src'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -533,19 +533,27 @@ class Safe {
   /**
    * Signs a transaction according to the EIP-712 using the current signer account.
    *
-   * @param txOrHash - The Safe Transaction or message hash to be signed
+   * @param eip712Data - The Safe Transaction or message hash to be signed
    * @param methodVersion - EIP-712 version. Optional
    * @returns The Safe signature
    */
   async signTypedData(
-    txOrHash: SafeTransaction | string,
+    eip712Data: SafeTransaction | EIP712TypedData | string,
     methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
+    let data
+
+    if (eip712Data.hasOwnProperty('signatures')) {
+      data = (eip712Data as SafeTransaction).data
+    } else {
+      data = eip712Data as EIP712TypedData | string
+    }
+
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
       chainId: await this.getEthAdapter().getChainId(),
-      data: typeof txOrHash === 'string' ? txOrHash : txOrHash.data
+      data
     }
 
     return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
@@ -1245,6 +1253,10 @@ class Safe {
   }
 
   private async getFallbackHandlerContract(): Promise<CompatibilityFallbackHandlerContract> {
+    if (!this.#contractManager.safeContract) {
+      throw new Error('Safe is not deployed')
+    }
+
     const safeVersion =
       (await this.#contractManager.safeContract.getVersion()) ?? DEFAULT_SAFE_VERSION
     const chainId = await this.#ethAdapter.getChainId()
@@ -1265,9 +1277,6 @@ class Safe {
    * @link https://github.com/safe-global/safe-contracts/blob/8ffae95faa815acf86ec8b50021ebe9f96abde10/contracts/handler/CompatibilityFallbackHandler.sol#L26-L28
    */
   getSafeMessageHash = async (messageHash: string): Promise<string> => {
-    if (!this.#contractManager.safeContract) {
-      throw new Error('Safe is not deployed')
-    }
     const safeAddress = await this.getAddress()
     const fallbackHandler = await this.getFallbackHandlerContract()
 
@@ -1296,10 +1305,6 @@ class Safe {
     messageHash: string,
     signature: SafeSignature[] | string = '0x'
   ): Promise<boolean> => {
-    if (!this.#contractManager.safeContract) {
-      throw new Error('Safe is not deployed')
-    }
-
     const safeAddress = await this.getAddress()
     const fallbackHandler = await this.getFallbackHandlerContract()
 

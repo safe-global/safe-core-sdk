@@ -1,8 +1,14 @@
+import { TypedDataDomain } from 'ethers'
+import { _TypedDataEncoder, hashMessage } from 'ethers/lib/utils'
+import { soliditySha3, utf8ToHex } from 'web3-utils'
 import {
   EIP712MessageTypes,
   EIP712TxTypes,
   EIP712TypedData,
-  SafeEIP712Args
+  SafeEIP712Args,
+  SafeTransactionData,
+  EIP712TypedDataMessage,
+  EIP712TypedDataTx
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 
@@ -54,27 +60,35 @@ export function getEip712MessageTypes(safeVersion: string): EIP712MessageTypes {
   }
 }
 
+export const hashTypedData = (typedData: EIP712TypedData): string => {
+  // `ethers` doesn't require `EIP712Domain` and otherwise throws
+  const { EIP712Domain: _, ...types } = typedData.types
+  return _TypedDataEncoder.hash(typedData.domain as TypedDataDomain, types, typedData.message)
+}
+
+const hashMessage = (message: string): string => {
+  return soliditySha3(utf8ToHex(message)) || ''
+}
+
+const hashSafeMessage = (message: string | EIP712TypedData): string => {
+  return typeof message === 'string' ? hashMessage(message) : hashTypedData(message)
+}
+
 export function generateTypedData({
   safeAddress,
   safeVersion,
   chainId,
   data
-}: SafeEIP712Args): EIP712TypedData {
-  const isMessage = typeof data === 'string'
+}: SafeEIP712Args): EIP712TypedDataTx | EIP712TypedDataMessage {
+  const isSafeTransactionDataType = data.hasOwnProperty('to')
+
   const eip712WithChainId = semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)
 
-  let typedData: EIP712TypedData
+  let typedData: EIP712TypedDataTx | EIP712TypedDataMessage
 
-  if (isMessage) {
-    typedData = {
-      types: getEip712MessageTypes(safeVersion),
-      domain: {
-        verifyingContract: safeAddress
-      },
-      primaryType: 'SafeMessage',
-      message: { message: data }
-    }
-  } else {
+  if (isSafeTransactionDataType) {
+    const txData = data as SafeTransactionData
+
     typedData = {
       types: getEip712TxTypes(safeVersion),
       domain: {
@@ -82,13 +96,24 @@ export function generateTypedData({
       },
       primaryType: 'SafeTx',
       message: {
-        ...data,
-        value: data.value,
-        safeTxGas: data.safeTxGas,
-        baseGas: data.baseGas,
-        gasPrice: data.gasPrice,
-        nonce: data.nonce
+        ...txData,
+        value: txData.value,
+        safeTxGas: txData.safeTxGas,
+        baseGas: txData.baseGas,
+        gasPrice: txData.gasPrice,
+        nonce: txData.nonce
       }
+    }
+  } else {
+    const message = data as string | EIP712TypedData
+
+    typedData = {
+      types: getEip712MessageTypes(safeVersion),
+      domain: {
+        verifyingContract: safeAddress
+      },
+      primaryType: 'SafeMessage',
+      message: { message: hashSafeMessage(message) }
     }
   }
 

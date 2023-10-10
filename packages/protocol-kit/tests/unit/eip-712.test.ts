@@ -21,7 +21,7 @@ const safeTransactionData: SafeTransactionData = {
   nonce: 999
 }
 
-describe('EIP-712 sign typed data', () => {
+describe.only('EIP-712 sign typed data', () => {
   describe('getEip712TxTypes', async () => {
     it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.0.0', async () => {
       const { EIP712Domain } = getEip712TxTypes('1.0.0')
@@ -44,13 +44,13 @@ describe('EIP-712 sign typed data', () => {
     })
   })
 
-  describe('generateTypedData', async () => {
+  describe.only('generateTypedData', async () => {
     it('should generate the typed data for Safes == v1.0.0', async () => {
       const { domain } = generateTypedData({
         safeAddress,
         safeVersion: '1.0.0',
         chainId: 4,
-        safeTransactionData
+        data: safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
       chai.expect(domain.chainId).to.be.undefined
@@ -61,7 +61,7 @@ describe('EIP-712 sign typed data', () => {
         safeAddress,
         safeVersion: '1.1.1',
         chainId: 4,
-        safeTransactionData
+        data: safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
       chai.expect(domain.chainId).to.be.undefined
@@ -72,7 +72,7 @@ describe('EIP-712 sign typed data', () => {
         safeAddress,
         safeVersion: '1.2.0',
         chainId: 4,
-        safeTransactionData
+        data: safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
       chai.expect(domain.chainId).to.be.undefined
@@ -84,10 +84,266 @@ describe('EIP-712 sign typed data', () => {
         safeAddress,
         safeVersion: '1.3.0',
         chainId,
-        safeTransactionData
+        data: safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
       chai.expect(domain.chainId).to.be.eq(chainId)
+    })
+
+    it('should generate the correct types for a EIP-191 message for >= 1.3.0 Safes', () => {
+      const message = 'Hello world!'
+
+      const safeMessage = generateTypedData({
+        safeAddress,
+        safeVersion: '1.3.0',
+        chainId: 1,
+        data: message
+      })
+
+      chai.expect(safeMessage).to.deep.eq({
+        types: {
+          EIP712Domain: [
+            {
+              name: 'chainId',
+              type: 'uint256'
+            },
+            {
+              name: 'verifyingContract',
+              type: 'address'
+            }
+          ],
+          SafeMessage: [{ name: 'message', type: 'bytes' }]
+        },
+        domain: {
+          chainId: 1,
+          verifyingContract: safeAddress
+        },
+        primaryType: 'SafeMessage',
+        message: {
+          message: '0xecd0e108a98e192af1d2c25055f4e3bed784b5c877204e73219a5203251feaab'
+        }
+      })
+    })
+
+    it('should generate the correct types for a EIP-191 message for < 1.3.0 Safes', () => {
+      const message = 'Hello world!'
+
+      const safeMessage = generateTypedData({
+        safeAddress,
+        safeVersion: '1.1.1',
+        chainId: 1,
+        data: message
+      })
+
+      chai.expect(safeMessage).to.deep.eq({
+        types: {
+          EIP712Domain: [
+            {
+              name: 'verifyingContract',
+              type: 'address'
+            }
+          ],
+          SafeMessage: [{ name: 'message', type: 'bytes' }]
+        },
+        domain: {
+          verifyingContract: safeAddress
+        },
+        primaryType: 'SafeMessage',
+        message: {
+          message: '0xecd0e108a98e192af1d2c25055f4e3bed784b5c877204e73219a5203251feaab'
+        }
+      })
+    })
+
+    it('should generate the correct types for an EIP-712 message for >=1.3.0 Safes', () => {
+      const message = {
+        domain: {
+          chainId: 1,
+          name: 'Ether Mail',
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+          version: '1'
+        },
+        message: {
+          contents: 'Hello, Bob!',
+          from: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
+          },
+          to: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
+          }
+        },
+        primaryType: 'Mail',
+        types: {
+          EIP712Domain: [
+            {
+              name: 'name',
+              type: 'string'
+            },
+            {
+              name: 'version',
+              type: 'string'
+            },
+            {
+              name: 'chainId',
+              type: 'uint256'
+            },
+            {
+              name: 'verifyingContract',
+              type: 'address'
+            }
+          ],
+          Mail: [
+            {
+              name: 'from',
+              type: 'Person'
+            },
+            {
+              name: 'to',
+              type: 'Person'
+            },
+            {
+              name: 'contents',
+              type: 'string'
+            }
+          ],
+          Person: [
+            {
+              name: 'name',
+              type: 'string'
+            },
+            {
+              name: 'wallet',
+              type: 'address'
+            }
+          ]
+        }
+      }
+
+      const safeMessage = generateTypedData({
+        safeAddress,
+        safeVersion: '1.3.0',
+        chainId: 1,
+        data: message
+      })
+
+      chai.expect(safeMessage).to.deep.eq({
+        types: {
+          EIP712Domain: [
+            {
+              name: 'chainId',
+              type: 'uint256'
+            },
+            {
+              name: 'verifyingContract',
+              type: 'address'
+            }
+          ],
+          SafeMessage: [{ name: 'message', type: 'bytes' }]
+        },
+        domain: {
+          chainId: 1,
+          verifyingContract: safeAddress
+        },
+        primaryType: 'SafeMessage',
+        message: {
+          message: '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
+        }
+      })
+    })
+
+    it('should generate the correct types for an EIP-712 message for <1.3.0 Safes', () => {
+      const message = {
+        domain: {
+          chainId: 1,
+          name: 'Ether Mail',
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+          version: '1'
+        },
+        message: {
+          contents: 'Hello, Bob!',
+          from: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
+          },
+          to: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
+          }
+        },
+        primaryType: 'Mail',
+        types: {
+          EIP712Domain: [
+            {
+              name: 'name',
+              type: 'string'
+            },
+            {
+              name: 'version',
+              type: 'string'
+            },
+            {
+              name: 'chainId',
+              type: 'uint256'
+            },
+            {
+              name: 'verifyingContract',
+              type: 'address'
+            }
+          ],
+          Mail: [
+            {
+              name: 'from',
+              type: 'Person'
+            },
+            {
+              name: 'to',
+              type: 'Person'
+            },
+            {
+              name: 'contents',
+              type: 'string'
+            }
+          ],
+          Person: [
+            {
+              name: 'name',
+              type: 'string'
+            },
+            {
+              name: 'wallet',
+              type: 'address'
+            }
+          ]
+        }
+      }
+
+      const safeMessage = generateTypedData({
+        safeAddress,
+        safeVersion: '1.1.1',
+        chainId: 1,
+        data: message
+      })
+
+      chai.expect(safeMessage).to.deep.eq({
+        types: {
+          EIP712Domain: [
+            {
+              name: 'verifyingContract',
+              type: 'address'
+            }
+          ],
+          SafeMessage: [{ name: 'message', type: 'bytes' }]
+        },
+        domain: {
+          verifyingContract: safeAddress
+        },
+        primaryType: 'SafeMessage',
+        message: {
+          message: '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
+        }
+      })
     })
   })
 })

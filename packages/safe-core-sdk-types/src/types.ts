@@ -92,13 +92,11 @@ export interface Eip3770Address {
   address: string
 }
 
-type SafeMessage = string
-
 export interface SafeEIP712Args {
   safeAddress: string
   safeVersion: string
   chainId: number
-  data: SafeTransactionData | SafeMessage
+  data: SafeTransactionData | EIP712TypedData | string
 }
 
 export interface EIP712TxTypes {
@@ -126,8 +124,6 @@ export interface EIP712MessageTypes {
 }
 
 export type EIP712Types = EIP712TxTypes | EIP712MessageTypes
-
-export type EIP712TypedData = EIP712TypedDataTx | EIP712TypedDataMessage
 
 export interface EIP712TypedDataTx {
   types: EIP712TxTypes
@@ -160,6 +156,30 @@ export interface EIP712TypedDataMessage {
   message: {
     message: string
   }
+}
+
+interface TypedDataDomain {
+  name?: string
+  version?: string
+  chainId?: unknown
+  verifyingContract?: string
+  salt?: ArrayLike<number> | string
+}
+
+interface TypedDataTypes {
+  name: string
+  type: string
+}
+
+type TypedMessageTypes = {
+  [key: string]: TypedDataTypes[]
+}
+
+export interface EIP712TypedData {
+  domain: TypedDataDomain
+  types: TypedMessageTypes
+  message: Record<string, unknown>
+  primaryType?: string
 }
 
 export type SafeMultisigConfirmationResponse = {

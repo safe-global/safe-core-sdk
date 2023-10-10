@@ -245,19 +245,18 @@ class EthersAdapter implements EthAdapter {
     if (!this.#signer) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    const isMessage = typeof safeEIP712Args.data === 'string'
-
     if (isTypedDataSigner(this.#signer)) {
       const typedData = generateTypedData(safeEIP712Args)
       const signature = await this.#signer.signTypedData(
         typedData.domain,
-        isMessage
+        typedData.primaryType === 'SafeMessage'
           ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
           : { SafeTx: (typedData as EIP712TypedDataTx).types.SafeTx },
         typedData.message
       )
       return signature
     }
+
     throw new Error('The current signer does not implement EIP-712 to sign typed data')
   }
 

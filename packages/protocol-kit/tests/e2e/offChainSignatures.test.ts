@@ -38,7 +38,7 @@ describe('Off-chain signatures', () => {
     }
   })
 
-  describe('signTransactionHash', async () => {
+  describe('signHash', async () => {
     it('should sign a transaction hash with the current signer if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -49,7 +49,7 @@ describe('Off-chain signatures', () => {
         contractNetworks
       })
       const txHash = '0xcbf14050c5fcc9b71d4a3ab874cc728db101d19d4466d56fcdbb805117a28c64'
-      const signature = await safeSdk.signTransactionHash(txHash)
+      const signature = await safeSdk.signHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
     })
 
@@ -69,8 +69,8 @@ describe('Off-chain signatures', () => {
         data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
-      const txHash = await safeSdk.getTransactionHash(tx)
-      const signature = await safeSdk.signTransactionHash(txHash)
+      const txHash = await safeSdk.getHash(tx)
+      const signature = await safeSdk.signHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
     })
   })

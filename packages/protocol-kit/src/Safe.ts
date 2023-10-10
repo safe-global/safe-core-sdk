@@ -13,6 +13,7 @@ import {
   MetaTransactionData,
   Transaction
 } from '@safe-global/safe-core-sdk-types'
+import { soliditySha3, utf8ToHex } from 'web3-utils'
 import {
   PREDETERMINED_SALT_NONCE,
   encodeSetupCallData,
@@ -491,11 +492,16 @@ class Safe {
    * @param safeTransaction - The Safe transaction
    * @returns The transaction hash of the Safe transaction
    */
-  async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
+  async getHash(txOrMessage: SafeTransaction | string): Promise<string> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
     }
-    const safeTransactionData = safeTransaction.data
+
+    if (typeof txOrMessage === 'string') {
+      return soliditySha3(utf8ToHex(txOrMessage)) || ''
+    }
+
+    const safeTransactionData = txOrMessage.data
     const txHash = await this.#contractManager.safeContract.getTransactionHash(safeTransactionData)
     return txHash
   }
@@ -583,8 +589,8 @@ class Safe {
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
-      const txHash = await this.getTransactionHash(transaction)
-      signature = await this.signTransactionHash(txHash)
+      const txHash = await this.getHash(transaction)
+      signature = await this.signHash(txHash)
     }
 
     const signedSafeTransaction = await this.createTransaction({
@@ -941,7 +947,7 @@ class Safe {
 
     const signedSafeTransaction = await this.copyTransaction(transaction)
 
-    const txHash = await this.getTransactionHash(signedSafeTransaction)
+    const txHash = await this.getHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
@@ -988,7 +994,7 @@ class Safe {
 
     const signedSafeTransaction = await this.copyTransaction(transaction)
 
-    const txHash = await this.getTransactionHash(signedSafeTransaction)
+    const txHash = await this.getHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))

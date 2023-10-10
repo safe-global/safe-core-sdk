@@ -363,7 +363,7 @@ describe('Endpoint tests', () => {
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-      const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
+      const senderSignature = await safeSdk.signHash(safeTxHash)
       await chai
         .expect(
           safeApiKit.proposeTransaction({
@@ -406,7 +406,7 @@ describe('Endpoint tests', () => {
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
       const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-      const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
+      const senderSignature = await safeSdk.signHash(safeTxHash)
       await chai
         .expect(
           safeApiKit.proposeTransaction({

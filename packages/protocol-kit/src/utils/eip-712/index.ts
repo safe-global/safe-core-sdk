@@ -1,5 +1,5 @@
 import { TypedDataDomain } from 'ethers'
-import { _TypedDataEncoder, hashMessage } from 'ethers/lib/utils'
+import { _TypedDataEncoder } from 'ethers/lib/utils'
 import { soliditySha3, utf8ToHex } from 'web3-utils'
 import {
   EIP712MessageTypes,

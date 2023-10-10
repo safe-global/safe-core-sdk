@@ -63,6 +63,8 @@ import {
   getProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
+import { type } from 'os'
+import { CompatibilityFallbackHandlerContract } from 'packages/safe-core-sdk-types/dist/src'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -489,8 +491,8 @@ class Safe {
   /**
    * Returns the transaction hash of a Safe transaction.
    *
-   * @param safeTransaction - The Safe transaction
-   * @returns The transaction hash of the Safe transaction
+   * @param txOrMessage - The Safe transaction or a raw message
+   * @returns The hashed Safe transaction or message
    */
   async getHash(txOrMessage: SafeTransaction | string): Promise<string> {
     if (!this.#contractManager.safeContract) {
@@ -503,6 +505,7 @@ class Safe {
 
     const safeTransactionData = txOrMessage.data
     const txHash = await this.#contractManager.safeContract.getTransactionHash(safeTransactionData)
+
     return txHash
   }
 
@@ -510,11 +513,13 @@ class Safe {
    * Signs a hash using the current signer account.
    *
    * @param hash - The hash to sign
+   * @param isSmartContract - If the signature is a Smart Contract signature following EIP-1271. Optional. Default value is false
    * @returns The Safe signature
    */
   async signHash(hash: string, isSmartContract = false): Promise<SafeSignature> {
     const signature = await generateSignature(this.#ethAdapter, hash)
 
+    // If is a Smart Contract signature the signer is the Safe and not the signer account
     if (isSmartContract) {
       const safeAddress = await this.getAddress()
 
@@ -527,19 +532,19 @@ class Safe {
   /**
    * Signs a transaction according to the EIP-712 using the current signer account.
    *
-   * @param safeTransaction - The Safe transaction to be signed
+   * @param txOrMessage - The Safe Transaction or message to be signed
    * @param methodVersion - EIP-712 version. Optional
    * @returns The Safe signature
    */
   async signTypedData(
-    data: SafeTransaction | string,
+    txOrMessage: SafeTransaction | string,
     methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
       chainId: await this.getEthAdapter().getChainId(),
-      data: typeof data === 'string' ? data : data.data
+      data: typeof txOrMessage === 'string' ? txOrMessage : txOrMessage.data
     }
 
     return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
@@ -1238,18 +1243,7 @@ class Safe {
     return transactionBatch
   }
 
-  /**
-   * Call the getMessageHash method of the Safe CompatibilityFallbackHandler contract
-   * @param messageHash The hash of the message to be signed
-   * @returns Returns the hash of a message to be signed by owners
-   * @link https://github.com/safe-global/safe-contracts/blob/8ffae95faa815acf86ec8b50021ebe9f96abde10/contracts/handler/CompatibilityFallbackHandler.sol#L26-L28
-   */
-  getSafeMessageHash = async (messageHash: string): Promise<string> => {
-    if (!this.#contractManager.safeContract) {
-      throw new Error('Safe is not deployed')
-    }
-
-    const safeAddress = await this.getAddress()
+  private async getFallbackHandlerContract(): Promise<CompatibilityFallbackHandlerContract> {
     const safeVersion =
       (await this.#contractManager.safeContract.getVersion()) ?? DEFAULT_SAFE_VERSION
     const chainId = await this.#ethAdapter.getChainId()
@@ -1260,7 +1254,23 @@ class Safe {
       customContracts: this.#contractManager.contractNetworks?.[chainId]
     })
 
-    const data = compatibilityFallbackHandlerContract?.encode('getMessageHash', [messageHash])
+    return compatibilityFallbackHandlerContract
+  }
+
+  /**
+   * Call the CompatibilityFallbackHandler getMessageHash method
+   * @param messageHash The hash of the message
+   * @returns Returns the Safe message hash to be signed
+   * @link https://github.com/safe-global/safe-contracts/blob/8ffae95faa815acf86ec8b50021ebe9f96abde10/contracts/handler/CompatibilityFallbackHandler.sol#L26-L28
+   */
+  getSafeMessageHash = async (messageHash: string): Promise<string> => {
+    if (!this.#contractManager.safeContract) {
+      throw new Error('Safe is not deployed')
+    }
+    const safeAddress = await this.getAddress()
+    const fallbackHandler = await this.getFallbackHandlerContract()
+
+    const data = fallbackHandler.encode('getMessageHash', [messageHash])
 
     const safeMessageHash = await this.#ethAdapter.call({
       from: safeAddress,
@@ -1272,12 +1282,12 @@ class Safe {
   }
 
   /**
-   * Call the isValidSignature method of the Safe CompatibilityFallbackHandler contract
-   * @param messageHash The hash of the message to be signed
-   * @param signature The signature to be validated or '0x'. You can pass
-   *  1) An array of SafeSignature. In this case the signatures will be concatenated for validation
-   *  2) The concatenated signatures
-   *  3) '0x' if you want to validate an onchain message (Initialized by default)
+   * Call the CompatibilityFallbackHandler isValidSignature method
+   * @param messageHash The hash of the message
+   * @param signature The signature to be validated or '0x'. You can send as signature one of the following:
+   *  1) An array of SafeSignature. In this case the signatures are concatenated for validation (buildSignature())
+   *  2) The concatenated signatures as string
+   *  3) '0x' if you want to validate an onchain message (Approved hash)
    * @returns A boolean indicating if the signature is valid
    * @link https://github.com/safe-global/safe-contracts/blob/main/contracts/handler/CompatibilityFallbackHandler.sol
    */
@@ -1290,17 +1300,9 @@ class Safe {
     }
 
     const safeAddress = await this.getAddress()
-    const safeVersion =
-      (await this.#contractManager.safeContract.getVersion()) ?? DEFAULT_SAFE_VERSION
-    const chainId = await this.#ethAdapter.getChainId()
+    const fallbackHandler = await this.getFallbackHandlerContract()
 
-    const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
-      ethAdapter: this.#ethAdapter,
-      safeVersion,
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
-    })
-
-    const data = compatibilityFallbackHandlerContract.encode('isValidSignature(bytes32,bytes)', [
+    const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
       messageHash,
       signature && Array.isArray(signature) ? buildSignature(signature) : signature
     ])

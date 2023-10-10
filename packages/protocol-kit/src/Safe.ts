@@ -532,19 +532,19 @@ class Safe {
   /**
    * Signs a transaction according to the EIP-712 using the current signer account.
    *
-   * @param txOrMessage - The Safe Transaction or message to be signed
+   * @param txOrHash - The Safe Transaction or message hash to be signed
    * @param methodVersion - EIP-712 version. Optional
    * @returns The Safe signature
    */
   async signTypedData(
-    txOrMessage: SafeTransaction | string,
+    txOrHash: SafeTransaction | string,
     methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
       chainId: await this.getEthAdapter().getChainId(),
-      data: typeof txOrMessage === 'string' ? txOrMessage : txOrMessage.data
+      data: typeof txOrHash === 'string' ? txOrHash : txOrHash.data
     }
 
     return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)

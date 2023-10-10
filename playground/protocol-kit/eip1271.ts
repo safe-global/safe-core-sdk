@@ -45,25 +45,14 @@ async function main() {
 
   const MESSAGE_TO_SIGN = 'I am the owner of this Safe account'
 
-  const chainId: number = await safeSdk1.getChainId()
-  const safeVersion = await safeSdk1.getContractVersion()
+  const messageHash = await safeSdk1.getHash(MESSAGE_TO_SIGN)
+  const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
-  const messageHash = ethers.utils.hashMessage(MESSAGE_TO_SIGN)
-  const safeMessageHash = await safeSdk1.signatures.getMessageHash(messageHash)
-
-  const ethSignSig = await safeSdk1.signatures.signEIP191Message(safeMessageHash)
-  const typedDataSig = await safeSdk2.signatures.signEIP712Message({
-    safeAddress: config.SAFE_2_3_ADDRESS,
-    safeVersion,
-    chainId,
-    data: messageHash
-  })
+  const ethSignSig = await safeSdk1.signHash(safeMessageHash)
+  const typedDataSig = await safeSdk2.signTypedData(messageHash)
 
   // Validate the signature sending the Safe message hash and the concatenated signatures
-  const isValid = await safeSdk1.signatures.isValidSignature(messageHash, [
-    typedDataSig,
-    ethSignSig
-  ])
+  const isValid = await safeSdk1.isValidSignature(messageHash, [typedDataSig, ethSignSig])
 
   console.log('Message: ', MESSAGE_TO_SIGN)
   console.log('Message Hash: ', messageHash)

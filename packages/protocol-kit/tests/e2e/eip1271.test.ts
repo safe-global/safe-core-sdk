@@ -172,8 +172,8 @@ describe('EIP1271', () => {
 
         // Sign the Safe message with the owners
         const ethSignSig = await safeSdk1.signHash(safeMessageHash)
-        const typedDataSig = await safeSdk2.signTypedData(messageHash)
 
+        const typedDataSig = await safeSdk2.signTypedData(MESSAGE)
         // Validate the signature sending the Safe message hash and the concatenated signatures
         const isValid = await safeSdk1.isValidSignature(messageHash, [typedDataSig, ethSignSig])
 

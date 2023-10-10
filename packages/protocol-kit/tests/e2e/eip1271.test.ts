@@ -22,14 +22,11 @@ export const calculateSafeMessageHash = (
 ): string => {
   return ethers.utils._TypedDataEncoder.hash(
     { verifyingContract: safeAddress, chainId },
-    EIP712_SAFE_MESSAGE_TYPE,
+    {
+      SafeMessage: [{ type: 'bytes', name: 'message' }]
+    },
     { message }
   )
-}
-
-export const EIP712_SAFE_MESSAGE_TYPE = {
-  // "SafeMessage(bytes message)"
-  SafeMessage: [{ type: 'bytes', name: 'message' }]
 }
 
 const MESSAGE = 'I am the owner of this Safe account'

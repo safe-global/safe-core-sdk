@@ -1,5 +1,4 @@
-import { getDefaultProvider } from '@ethersproject/providers'
-import { Wallet } from '@ethersproject/wallet'
+import { getDefaultProvider, Wallet } from 'ethers'
 import SafeApiKit, {
   AddSafeDelegateProps,
   DeleteSafeDelegateProps,

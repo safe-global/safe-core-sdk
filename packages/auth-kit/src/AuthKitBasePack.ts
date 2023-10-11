@@ -1,4 +1,4 @@
-import ethers, { Eip1193Provider } from 'ethers'
+import { ethers, Eip1193Provider } from 'ethers'
 import SafeApiKit from '@safe-global/api-kit'
 import { EthersAdapter } from '@safe-global/protocol-kit'
 

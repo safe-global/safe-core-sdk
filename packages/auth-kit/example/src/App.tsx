@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Box, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
-import { Web3AuthOptions, UserInfo, WEB3AUTH_NETWORK } from '@web3auth/mpc-core-kit'
+import { TorusParams, UserInfo } from '@web3auth/ws-embed'
 
 import AppBar from './AppBar'
 import { AuthKitSignInData, Web3AuthModalPack } from '../../src/index'
-import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from '@web3auth/base'
+import { SafeEventEmitterProvider } from '@web3auth/base'
 
 function App() {
   const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
@@ -17,16 +17,11 @@ function App() {
 
   useEffect(() => {
     ;(async () => {
-      const options: Web3AuthOptions = {
-        web3AuthClientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
-        web3AuthNetwork: WEB3AUTH_NETWORK.DEVNET,
-        uxMode: 'redirect',
-        baseUrl: 'http://localhost:3000',
-        redirectPathName: 'auth',
+      const options: TorusParams = {
         chainConfig: {
+          logo: 'https://raw.githubusercontent.com/torusresearch/torus-assets/master/torus.png',
           displayName: 'Ethereum Mainnet',
-          blockExplorer: 'https://etherscan.io',
-          chainNamespace: CHAIN_NAMESPACES.EIP155,
+          blockExplorerUrl: 'https://etherscan.io',
           chainId: '0x1',
           rpcTarget: `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`,
           ticker: 'ETH',

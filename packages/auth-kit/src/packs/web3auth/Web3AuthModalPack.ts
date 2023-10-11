@@ -1,10 +1,5 @@
 import { ExternalProvider } from '@ethersproject/providers'
-import {
-  AggregateVerifierLoginParams,
-  UserInfo,
-  Web3AuthMPCCoreKit,
-  Web3AuthOptions
-} from '@web3auth/mpc-core-kit'
+import Torus, { TorusParams, UserInfo } from '@web3auth/ws-embed'
 
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { Web3AuthConfig, Web3AuthEvent, Web3AuthEventListener } from './types'
@@ -18,7 +13,7 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 export class Web3AuthModalPack extends AuthKitBasePack {
   #provider: ExternalProvider | null
   #config: Web3AuthConfig
-  web3Auth!: Web3AuthMPCCoreKit
+  torus!: Torus
 
   /**
    * Instantiate the Web3AuthModalPack
@@ -37,14 +32,14 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
    * @throws Error if there was an error initializing Web3Auth
    */
-  async init(options: Web3AuthOptions) {
+  async init(options: TorusParams) {
     try {
-      this.web3Auth = new Web3AuthMPCCoreKit(options)
+      this.torus = new Torus()
 
-      await this.web3Auth.init()
+      await this.torus.init(options)
 
-      if (this.web3Auth.provider) {
-        this.#provider = this.web3Auth.provider
+      if (this.torus.provider) {
+        this.#provider = this.torus.provider
       }
     } catch (e) {
       throw new Error(getErrorMessage(e))
@@ -56,25 +51,14 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @returns The sign in data from the provider
    */
   async signIn(): Promise<AuthKitSignInData> {
-    if (!this.web3Auth) {
-      throw new Error('Web3Auth is not initialized')
+    if (!this.torus) {
+      throw new Error('Web3Auth SDK is not initialized')
     }
 
-    const verifierConfig = {
-      aggregateVerifierIdentifier: 'auth-kit',
-      subVerifierDetailsArray: [
-        {
-          typeOfLogin: 'google',
-          verifier: 'auth-kit',
-          clientId: '1050634748617-ajb9h2kkv32nf6v152u08sqola6i567r.apps.googleusercontent.com'
-        }
-      ]
-    } as AggregateVerifierLoginParams
+    await this.torus.login()
 
-    await this.web3Auth.loginWithOauth(verifierConfig)
-
-    if (this.web3Auth.provider) {
-      this.#provider = this.web3Auth.provider
+    if (this.torus.provider) {
+      this.#provider = this.torus.provider
     }
 
     const eoa = await this.getAddress()
@@ -96,12 +80,12 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * Disconnect from the Web3Auth service provider
    */
   async signOut() {
-    if (!this.web3Auth) {
-      throw new Error('Web3AuthModalPack is not initialized')
+    if (!this.torus) {
+      throw new Error('Web3Auth SDK is not initialized')
     }
 
     this.#provider = null
-    await this.web3Auth.logout()
+    await this.torus.logout()
   }
 
   /**
@@ -109,11 +93,11 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @returns The user info
    */
   async getUserInfo(): Promise<UserInfo> {
-    if (!this.web3Auth) {
-      throw new Error('Web3AuthModalPack is not initialized')
+    if (!this.torus) {
+      throw new Error('Web3Auth SDK is not initialized')
     }
 
-    const userInfo = this.web3Auth.getUserInfo()
+    const userInfo = this.torus.getUserInfo()
 
     return userInfo
   }

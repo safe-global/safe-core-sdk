@@ -350,7 +350,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     // if the call throws an error we try to parse the returned value
   } catch (error: any) {
     try {
-      const revertData = JSON.parse(error.error.body).error.data
+      const revertData = error?.info?.error?.data
 
       if (revertData && revertData.startsWith('Reverted ')) {
         const [, safeTxGas] = revertData.split('Reverted ')
@@ -378,18 +378,13 @@ function decodeSafeTxGas(encodedSafeTxGas: string): string {
 }
 
 function parseSafeTxGasErrorResponse(error: any) {
-  // Ethers
-  if (error?.error?.body) {
-    const revertData = JSON.parse(error.error.body).error.data
-    if (revertData && revertData.startsWith('Reverted ')) {
-      const [, encodedResponse] = revertData.split('Reverted ')
-      const safeTxGas = decodeSafeTxGas(encodedResponse)
-
-      return safeTxGas
-    }
+  // Ethers v6
+  const Ethersv6RevertData = error?.info?.error?.data
+  if (Ethersv6RevertData) {
+    return decodeSafeTxGas(Ethersv6RevertData)
   }
 
-  // Web3
+  // Web3 v1
   const [, encodedResponse] = error.message.split('return data: ')
   const safeTxGas = decodeSafeTxGas(encodedResponse)
 

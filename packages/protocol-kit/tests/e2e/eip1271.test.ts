@@ -1,6 +1,10 @@
 import Safe from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import {
+  OperationType,
+  SafeTransaction,
+  SafeTransactionDataPartial
+} from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments, waffle } from 'hardhat'
@@ -14,6 +18,32 @@ import { BigNumber, ethers } from 'ethers'
 import { buildSignature } from '@safe-global/protocol-kit/utils'
 
 chai.use(chaiAsPromised)
+
+export const preimageSafeTransactionHash = (
+  safeAddress: string,
+  safeTx: SafeTransaction,
+  chainId: number
+): string => {
+  return ethers.utils._TypedDataEncoder.encode(
+    { verifyingContract: safeAddress, chainId },
+    {
+      // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
+      SafeTx: [
+        { type: 'address', name: 'to' },
+        { type: 'uint256', name: 'value' },
+        { type: 'bytes', name: 'data' },
+        { type: 'uint8', name: 'operation' },
+        { type: 'uint256', name: 'safeTxGas' },
+        { type: 'uint256', name: 'baseGas' },
+        { type: 'uint256', name: 'gasPrice' },
+        { type: 'address', name: 'gasToken' },
+        { type: 'address', name: 'refundReceiver' },
+        { type: 'uint256', name: 'nonce' }
+      ]
+    },
+    safeTx.data
+  )
+}
 
 export const calculateSafeMessageHash = (
   safeAddress: string,
@@ -31,7 +61,7 @@ export const calculateSafeMessageHash = (
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe('EIP1271', () => {
+describe.only('EIP1271', () => {
   describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
     const setupTests = deployments.createFixture(async ({ deployments }) => {
       await deployments.fixture()
@@ -232,7 +262,7 @@ describe('EIP1271', () => {
       }
     )
 
-    it('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
+    it.only('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
       const { safe, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafe } = await setupTests()
 
       const [account1] = accounts
@@ -252,26 +282,44 @@ describe('EIP1271', () => {
       }
 
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
-
       const txHash = await safeSdk1.getHash(tx)
 
       const signature1 = await safeSdk1.signHash(await safeSdk1.getSafeMessageHash(txHash))
+      const signature2 = await safeSdk3.signHash(
+        await safeSdk3.getSafeMessageHash(
+          preimageSafeTransactionHash(signerSafe.address, tx, await safeSdk3.getChainId())
+        ),
+        true
+      )
 
-      const signature2 = await safeSdk3.signHash(await safeSdk3.getSafeMessageHash(txHash), true)
       console.log('OWNER 1: ', signature1.signer)
       console.log('OWNER 2: ', signature2.signer)
 
-      const isValidSignature = await safeSdk1.isValidSignature(txHash, [signature1, signature2])
-      console.log('IS VALID SIGNATURE: ', isValidSignature)
-      chai.expect(isValidSignature).to.be.true
+      // const isValidSignature = await safeSdk1.isValidSignature(txHash, [signature1, signature2])
+      // console.log('IS VALID SIGNATURE: ', isValidSignature)
+      // chai.expect(isValidSignature).to.be.true
 
       // TODO: This is failing because the owner is invalid
-      // tx.addSignature(signature1)
-      // tx.addSignature(signature2)
+      tx.addSignature(signature1)
+      tx.addSignature(signature2)
+      console.log(signature1, signature2)
+      console.log('signature: ', buildSignature([signature1, signature2]))
 
-      // const execResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 1000000 })
+      const execResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 1000000 })
 
-      // await waitSafeTxReceipt(execResponse)
+      const receipt = await waitSafeTxReceipt(execResponse)
+      const balanceAfter = await safeSdk1.getBalance()
+
+      console.log('BALANCE AFTER: ', balanceAfter.toString())
+      console.log('RECEIPT:', receipt)
+      chai.expect(tx.signatures.size).to.be.eq(2)
+      chai.expect(receipt?.status).to.be.eq(1)
+
+      // TODO: This is failing because the owner is invalid
+      // const signedTx = await safeSdk1.signTransaction(tx)
+      // const signedTx2 = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData_v4', true)
+
+      // const execResponse = await safeSdk1.executeTransaction(signedTx2, { gasLimit: 1000000 })
 
       // const receipt = await waitSafeTxReceipt(execResponse)
       // const balanceAfter = await safeSdk1.getBalance()

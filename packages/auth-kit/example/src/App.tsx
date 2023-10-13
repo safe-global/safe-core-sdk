@@ -78,7 +78,8 @@ function App() {
   }
 
   const signMessage = async (message: string) => {
-    await provider?.send('personal_sign', [message, '0x03cD3E862972746B9bF9a2Ba56308566FD270562'])
+    // await provider?.send('personal_sign', [message, "address"])
+    await web3AuthModalPack?.torus.personalSign(message)
   }
 
   const sendTransaction = async () => {

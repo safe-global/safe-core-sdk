@@ -14,16 +14,16 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 const SDK_NOT_INITIALIZED = 'Web3Auth SDK is not initialized'
 
 /**
- * Web3AuthModalPack implements the SafeAuthClient interface for adapting the Web3Auth service provider
+ * Web3AuthPack implements the SafeAuthClient interface for adapting the Web3Auth service provider
  * @class
  */
-export class Web3AuthModalPack extends AuthKitBasePack {
+export class Web3AuthPack extends AuthKitBasePack {
   #provider: ExternalProvider | null
   #config: Web3AuthConfig
   torus!: Torus
 
   /**
-   * Instantiate the Web3AuthModalPack
+   * Instantiate the Web3AuthPack
    * @param config Web3Auth specific config
    */
   constructor(config: Web3AuthConfig) {

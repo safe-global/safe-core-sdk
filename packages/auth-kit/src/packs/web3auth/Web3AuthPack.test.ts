@@ -1,4 +1,4 @@
-import { Web3AuthModalPack } from './Web3AuthModalPack'
+import { Web3AuthPack } from './Web3AuthPack'
 import { generateTestingUtils } from 'eth-testing'
 import EventEmitter from 'events'
 import { ADAPTER_EVENTS, CHAIN_NAMESPACES, WALLET_ADAPTERS } from '@web3auth/base'
@@ -71,16 +71,17 @@ const modalConfig = {
   }
 }
 
-describe('Web3AuthModalPack', () => {
-  let web3AuthModalPack: Web3AuthModalPack
+describe('Web3AuthPack', () => {
+  let web3AuthPack: Web3AuthPack
 
   beforeAll(async () => {
-    web3AuthModalPack = new Web3AuthModalPack({
+    web3AuthPack = new Web3AuthPack({
       txServiceUrl: 'https://txservice-url.com'
     })
 
-    await web3AuthModalPack.init({
-      options: web3AuthOptions
+    await web3AuthPack.init({
+      options: web3AuthOptions,
+      modalConfig
     })
   })
 
@@ -93,13 +94,13 @@ describe('Web3AuthModalPack', () => {
 
   describe('init()', () => {
     it('should initialize Web3Auth', async () => {
-      expect(web3AuthModalPack.getProvider()).not.toBeNull()
-      expect(web3AuthModalPack).toBeInstanceOf(Web3AuthModalPack)
-      expect(web3AuthModalPack).toBeInstanceOf(AuthKitBasePack)
+      expect(web3AuthPack.getProvider()).not.toBeNull()
+      expect(web3AuthPack).toBeInstanceOf(Web3AuthPack)
+      expect(web3AuthPack).toBeInstanceOf(AuthKitBasePack)
     })
 
     it('should configure the adapters', async () => {
-      await web3AuthModalPack.init({
+      await web3AuthPack.init({
         options: web3AuthOptions,
         // @ts-expect-error - Does not match IAdapter interface
         adapters: [jest.fn(), jest.fn()]
@@ -109,7 +110,7 @@ describe('Web3AuthModalPack', () => {
     })
 
     it('should call initModal()', async () => {
-      await web3AuthModalPack.init({
+      await web3AuthPack.init({
         options: web3AuthOptions,
         modalConfig
       })
@@ -120,14 +121,14 @@ describe('Web3AuthModalPack', () => {
     it('should initialize the provider', async () => {
       testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
 
-      await web3AuthModalPack.init({
+      await web3AuthPack.init({
         options: web3AuthOptions,
         modalConfig
       })
 
-      const authKitSignInData = await web3AuthModalPack.signIn()
+      await web3AuthPack.signIn()
 
-      expect(web3AuthModalPack.getProvider()).toBe(mockProvider)
+      expect(web3AuthPack.getProvider()).toBe(mockProvider)
     })
   })
 
@@ -135,7 +136,7 @@ describe('Web3AuthModalPack', () => {
     it('should call the connect() method', async () => {
       testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
 
-      const authKitSignInData = await web3AuthModalPack.signIn()
+      const authKitSignInData = await web3AuthPack.signIn()
 
       expect(mockConnect).toHaveBeenCalled()
       expect(authKitSignInData).toEqual({
@@ -147,30 +148,30 @@ describe('Web3AuthModalPack', () => {
 
   describe('signOut()', () => {
     it('should call the logout() method', async () => {
-      await web3AuthModalPack.signOut()
+      await web3AuthPack.signOut()
 
-      expect(web3AuthModalPack.getProvider()).toBeNull()
+      expect(web3AuthPack.getProvider()).toBeNull()
       expect(mockLogout).toHaveBeenCalled()
     })
   })
 
   describe('getProvider()', () => {
     it('should return null if not signed in', async () => {
-      expect(web3AuthModalPack.getProvider()).toBeNull()
+      expect(web3AuthPack.getProvider()).toBeNull()
     })
 
     it('should return the provider after signIn', async () => {
       testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
 
-      await web3AuthModalPack.signIn()
+      await web3AuthPack.signIn()
 
-      expect(web3AuthModalPack.getProvider()).toEqual(mockProvider)
+      expect(web3AuthPack.getProvider()).toEqual(mockProvider)
     })
   })
 
   describe('getUserInfo()', () => {
     it('should return null if not signed in', async () => {
-      expect(await web3AuthModalPack.getUserInfo()).toEqual({ email: 'mockMail@mail.com' })
+      expect(await web3AuthPack.getUserInfo()).toEqual({ email: 'mockMail@mail.com' })
     })
   })
 
@@ -179,16 +180,16 @@ describe('Web3AuthModalPack', () => {
       const signedIn = jest.fn()
       const signedOut = jest.fn()
 
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.CONNECTED, signedIn)
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, signedOut)
+      web3AuthPack.subscribe(ADAPTER_EVENTS.CONNECTED, signedIn)
+      web3AuthPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, signedOut)
 
       testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
 
-      await web3AuthModalPack.signIn()
+      await web3AuthPack.signIn()
 
       expect(signedIn).toHaveBeenCalled()
 
-      await web3AuthModalPack.signOut()
+      await web3AuthPack.signOut()
 
       expect(signedOut).toHaveBeenCalled()
     })
@@ -197,18 +198,18 @@ describe('Web3AuthModalPack', () => {
       const signedIn = jest.fn()
       const signedOut = jest.fn()
 
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.CONNECTED, signedIn)
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, signedOut)
-      web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.CONNECTED, signedIn)
-      web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, signedOut)
+      web3AuthPack.subscribe(ADAPTER_EVENTS.CONNECTED, signedIn)
+      web3AuthPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, signedOut)
+      web3AuthPack.unsubscribe(ADAPTER_EVENTS.CONNECTED, signedIn)
+      web3AuthPack.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, signedOut)
 
       testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
 
-      await web3AuthModalPack.signIn()
+      await web3AuthPack.signIn()
 
       expect(signedIn).toHaveBeenCalledTimes(0)
 
-      await web3AuthModalPack.signOut()
+      await web3AuthPack.signOut()
 
       expect(signedOut).toHaveBeenCalledTimes(0)
     })

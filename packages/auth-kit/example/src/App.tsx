@@ -4,11 +4,11 @@ import { EthHashInfo } from '@safe-global/safe-react-components'
 import { TorusParams, UserInfo } from '@web3auth/ws-embed'
 
 import AppBar from './AppBar'
-import { AuthKitSignInData, Web3AuthModalPack } from '../../src/index'
+import { AuthKitSignInData, Web3AuthPack } from '../../src/index'
 import { ethers } from 'ethers'
 
 function App() {
-  const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
+  const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthPack>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
@@ -35,37 +35,37 @@ function App() {
         }
       }
 
-      const web3AuthModalPack = new Web3AuthModalPack({
+      const web3AuthPack = new Web3AuthPack({
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
-      await web3AuthModalPack.init(options)
+      await web3AuthPack.init(options)
 
-      web3AuthModalPack.subscribe('chainChanged', (result) =>
+      web3AuthPack.subscribe('chainChanged', (result: any) =>
         console.log('web3authpack:chainChanged', result)
       )
 
-      setWeb3AuthModalPack(web3AuthModalPack)
+      setWeb3AuthPack(web3AuthPack)
     })()
   }, [])
 
   const login = async () => {
-    if (!web3AuthModalPack) return
+    if (!web3AuthPack) return
 
-    const signInInfo = await web3AuthModalPack.signIn()
+    const signInInfo = await web3AuthPack.signIn()
     console.log('SIGN IN RESPONSE: ', signInInfo)
 
-    const userInfo = await web3AuthModalPack.getUserInfo()
+    const userInfo = await web3AuthPack.getUserInfo()
     console.log('USER INFO: ', userInfo)
 
     setSafeAuthSignInResponse(signInInfo)
     setUserInfo(userInfo || undefined)
 
-    const web3Provider = web3AuthModalPack.getProvider()
+    const web3Provider = web3AuthPack.getProvider()
 
     if (web3Provider) {
       const provider = new ethers.providers.Web3Provider(
-        web3AuthModalPack.getProvider() as ethers.providers.ExternalProvider
+        web3AuthPack.getProvider() as ethers.providers.ExternalProvider
       )
       setProvider(provider)
       setChainId((await provider?.getNetwork()).chainId.toString())
@@ -76,9 +76,9 @@ function App() {
   }
 
   const logout = async () => {
-    if (!web3AuthModalPack) return
+    if (!web3AuthPack) return
 
-    await web3AuthModalPack.signOut()
+    await web3AuthPack.signOut()
 
     setProvider(undefined)
     setSafeAuthSignInResponse(null)
@@ -86,7 +86,7 @@ function App() {
 
   const signMessage = async (message: string) => {
     // TODO. Should allow to wrap using ethers or web3
-    await web3AuthModalPack?.torus.provider.sendAsync({
+    await web3AuthPack?.torus.provider.sendAsync({
       method: 'personal_sign',
       params: {
         data: message,
@@ -118,7 +118,7 @@ function App() {
         onLogin={login}
         onLogout={logout}
         userInfo={userInfo}
-        isLoggedIn={!!web3AuthModalPack?.isAuthenticated}
+        isLoggedIn={!!web3AuthPack?.isAuthenticated}
       />
       {safeAuthSignInResponse?.eoa && (
         <Grid container>
@@ -139,7 +139,7 @@ function App() {
               fullWidth
               color="primary"
               sx={{ my: 1 }}
-              onClick={() => web3AuthModalPack?.torus.showWalletUi()}
+              onClick={() => web3AuthPack?.torus.showWalletUi()}
             >
               Show Wallet
             </Button>

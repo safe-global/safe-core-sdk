@@ -1,10 +1,17 @@
 import { ExternalProvider } from '@ethersproject/providers'
-import Torus, { TorusParams, UserInfo } from '@web3auth/ws-embed'
+import Torus, {
+  LOGIN_PROVIDER_TYPE,
+  TorusInPageProvider,
+  TorusParams,
+  UserInfo
+} from '@web3auth/ws-embed'
 
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import { Web3AuthConfig, Web3AuthEvent, Web3AuthEventListener } from './types'
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
+
+const SDK_NOT_INITIALIZED = 'Web3Auth SDK is not initialized'
 
 /**
  * Web3AuthModalPack implements the SafeAuthClient interface for adapting the Web3Auth service provider
@@ -21,8 +28,16 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    */
   constructor(config: Web3AuthConfig) {
     super()
+
     this.#config = config
     this.#provider = null
+  }
+
+  /**
+   * The user is authenticated when the provider is available
+   */
+  get isAuthenticated(): boolean {
+    return this.torus.communicationProvider.isLoggedIn
   }
 
   /**
@@ -50,12 +65,15 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * Connect to the Web3Auth service provider
    * @returns The sign in data from the provider
    */
-  async signIn(): Promise<AuthKitSignInData> {
+  async signIn(options?: {
+    loginProvider?: LOGIN_PROVIDER_TYPE
+    login_hint?: string
+  }): Promise<AuthKitSignInData> {
     if (!this.torus) {
-      throw new Error('Web3Auth SDK is not initialized')
+      throw new Error(SDK_NOT_INITIALIZED)
     }
 
-    await this.torus.login()
+    await this.torus.login(options)
 
     if (this.torus.provider) {
       this.#provider = this.torus.provider
@@ -81,11 +99,11 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    */
   async signOut() {
     if (!this.torus) {
-      throw new Error('Web3Auth SDK is not initialized')
+      throw new Error(SDK_NOT_INITIALIZED)
     }
 
     this.#provider = null
-    await this.torus.logout()
+    await this.torus.cleanUp()
   }
 
   /**
@@ -94,7 +112,7 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    */
   async getUserInfo(): Promise<UserInfo> {
     if (!this.torus) {
-      throw new Error('Web3Auth SDK is not initialized')
+      throw new Error(SDK_NOT_INITIALIZED)
     }
 
     const userInfo = this.torus.getUserInfo()
@@ -108,7 +126,9 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @param handler The event handler
    */
   subscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
-    throw new Error('Method not implemented.')
+    const provider = this.getProvider() as TorusInPageProvider
+
+    provider.on(event, handler)
   }
 
   /**
@@ -117,6 +137,8 @@ export class Web3AuthModalPack extends AuthKitBasePack {
    * @param handler The event handler
    */
   unsubscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
-    throw new Error('Method not implemented.')
+    const provider = this.getProvider() as TorusInPageProvider
+
+    provider.off(event, handler)
   }
 }

@@ -12,7 +12,7 @@ function App() {
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<Partial<UserInfo>>()
+  const [userInfo, setUserInfo] = useState<UserInfo>()
   const [chainId, setChainId] = useState<string>()
   const [balance, setBalance] = useState<string>()
 
@@ -41,6 +41,10 @@ function App() {
 
       await web3AuthModalPack.init(options)
 
+      web3AuthModalPack.subscribe('chainChanged', (result) =>
+        console.log('web3authpack:chainChanged', result)
+      )
+
       setWeb3AuthModalPack(web3AuthModalPack)
     })()
   }, [])
@@ -58,8 +62,11 @@ function App() {
     setUserInfo(userInfo || undefined)
 
     const web3Provider = web3AuthModalPack.getProvider()
+
     if (web3Provider) {
-      const provider = new ethers.providers.Web3Provider(web3AuthModalPack.getProvider() as any)
+      const provider = new ethers.providers.Web3Provider(
+        web3AuthModalPack.getProvider() as ethers.providers.ExternalProvider
+      )
       setProvider(provider)
       setChainId((await provider?.getNetwork()).chainId.toString())
       setBalance(
@@ -78,8 +85,14 @@ function App() {
   }
 
   const signMessage = async (message: string) => {
-    // await provider?.send('personal_sign', [message, "address"])
-    await web3AuthModalPack?.torus.personalSign(message)
+    // TODO. Should allow to wrap using ethers or web3
+    await web3AuthModalPack?.torus.provider.sendAsync({
+      method: 'personal_sign',
+      params: {
+        data: message,
+        from: safeAuthSignInResponse?.eoa
+      }
+    })
   }
 
   const sendTransaction = async () => {
@@ -101,7 +114,12 @@ function App() {
   }
   return (
     <>
-      <AppBar onLogin={login} onLogout={logout} userInfo={userInfo} isLoggedIn={!!provider} />
+      <AppBar
+        onLogin={login}
+        onLogout={logout}
+        userInfo={userInfo}
+        isLoggedIn={!!web3AuthModalPack?.isAuthenticated}
+      />
       {safeAuthSignInResponse?.eoa && (
         <Grid container>
           <Grid item md={4} p={4}>

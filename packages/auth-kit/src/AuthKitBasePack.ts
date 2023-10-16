@@ -8,6 +8,12 @@ export abstract class AuthKitBasePack {
   safeAuthData?: AuthKitSignInData
 
   /**
+   * Get the authentication status
+   * The derived classes should provide a mechanism to identify the authentication status
+   */
+  abstract get isAuthenticated(): boolean
+
+  /**
    * Initialize the pack
    * @param options The provider specific options
    */
@@ -17,7 +23,7 @@ export abstract class AuthKitBasePack {
    * Start the sign in flow in the pack
    * @returns The sign in data from the provider
    */
-  abstract signIn(): Promise<AuthKitSignInData>
+  abstract signIn(options?: unknown): Promise<AuthKitSignInData>
 
   /**
    * Start the sign out flow in the pack

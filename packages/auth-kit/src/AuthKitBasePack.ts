@@ -28,7 +28,7 @@ export abstract class AuthKitBasePack {
   /**
    * Start the sign out flow in the pack
    */
-  abstract signOut(): Promise<void>
+  abstract signOut(options?: unknown): Promise<void>
 
   /**
    * Get the provider instance based on the pack

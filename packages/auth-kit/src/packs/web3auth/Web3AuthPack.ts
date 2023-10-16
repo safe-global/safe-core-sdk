@@ -97,13 +97,18 @@ export class Web3AuthPack extends AuthKitBasePack {
   /**
    * Disconnect from the Web3Auth service provider
    */
-  async signOut() {
+  async signOut(options?: { reset: boolean }) {
     if (!this.torus) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
 
     this.#provider = null
-    await this.torus.cleanUp()
+
+    if (options?.reset) {
+      await this.torus.cleanUp()
+    } else {
+      await this.torus.logout()
+    }
   }
 
   /**

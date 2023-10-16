@@ -42,7 +42,7 @@ abstract class CreateCallEthersContract implements CreateCallContract {
         ...options
       })
     }
-    const txResponse = await this.contract.performCreate(value, deploymentData)
+    const txResponse = await this.contract.performCreate(value, deploymentData, { ...options })
     return toTxResult(txResponse, options)
   }
 
@@ -58,7 +58,9 @@ abstract class CreateCallEthersContract implements CreateCallContract {
     params: any[],
     options: EthersTransactionOptions
   ): Promise<string> {
-    return (await (this.contract as any)[methodName].estimateGas(...params, options)).toString()
+    const method = this.contract.getFunction(methodName)
+
+    return (await method.estimateGas(...params, options)).toString()
   }
 }
 

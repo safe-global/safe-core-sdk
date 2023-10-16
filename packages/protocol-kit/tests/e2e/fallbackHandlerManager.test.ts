@@ -6,7 +6,7 @@ import Safe, {
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
@@ -21,10 +21,10 @@ import { waitSafeTxReceipt } from './utils/transactions'
 chai.use(chaiAsPromised)
 
 describe('Fallback handler manager', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -49,11 +49,12 @@ describe('Fallback handler manager', () => {
       'should fail if getting the enabled fallback handler is not supported',
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
+        const safeAddress = await safe.getAddress()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const tx = safeSdk.getFallbackHandler()
@@ -81,18 +82,24 @@ describe('Fallback handler manager', () => {
       const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
-        .address
+      const compatibilityFallbackHandler = await (
+        await getCompatibilityFallbackHandler()
+      ).contract.getAddress()
       chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(compatibilityFallbackHandler)
-      const tx = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+      const tx = await safeSdk.createEnableFallbackHandlerTx(
+        await defaultCallbackHandler.getAddress()
+      )
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
+      chai
+        .expect(await safeSdk.getFallbackHandler())
+        .to.be.eq(await defaultCallbackHandler.getAddress())
     })
   })
 
@@ -109,7 +116,7 @@ describe('Fallback handler manager', () => {
           predictedSafe,
           contractNetworks
         })
-        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+        const tx = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
         await chai
           .expect(tx)
           .to.be.rejectedWith(
@@ -130,7 +137,7 @@ describe('Fallback handler manager', () => {
           predictedSafe,
           contractNetworks
         })
-        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+        const tx = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
         await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
       }
     )
@@ -141,12 +148,13 @@ describe('Fallback handler manager', () => {
         const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+        const tx = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
         await chai
           .expect(tx)
           .to.be.rejectedWith(
@@ -159,9 +167,10 @@ describe('Fallback handler manager', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const tx = safeSdk.createEnableFallbackHandlerTx('0x123')
@@ -174,9 +183,10 @@ describe('Fallback handler manager', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const tx = safeSdk.createEnableFallbackHandlerTx(ZERO_ADDRESS)
@@ -188,15 +198,18 @@ describe('Fallback handler manager', () => {
       const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const tx1 = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+      const tx1 = await safeSdk.createEnableFallbackHandlerTx(
+        await defaultCallbackHandler.getAddress()
+      )
       const txResponse = await safeSdk.executeTransaction(tx1)
       await waitSafeTxReceipt(txResponse)
-      const tx2 = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+      const tx2 = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
       await chai.expect(tx2).to.be.rejectedWith('Fallback handler provided is already enabled')
     })
 
@@ -206,29 +219,30 @@ describe('Fallback handler manager', () => {
         const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const options: SafeTransactionOptionalProps = {
-          baseGas: 111,
-          gasPrice: 222,
+          baseGas: '111',
+          gasPrice: '222',
           gasToken: '0x333',
           refundReceiver: '0x444',
           nonce: 555,
-          safeTxGas: 666
+          safeTxGas: '666'
         }
         const tx = await safeSdk.createEnableFallbackHandlerTx(
-          defaultCallbackHandler.address,
+          await defaultCallbackHandler.getAddress(),
           options
         )
-        chai.expect(tx.data.baseGas).to.be.eq(111)
-        chai.expect(tx.data.gasPrice).to.be.eq(222)
+        chai.expect(tx.data.baseGas).to.be.eq('111')
+        chai.expect(tx.data.gasPrice).to.be.eq('222')
         chai.expect(tx.data.gasToken).to.be.eq('0x333')
         chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
         chai.expect(tx.data.nonce).to.be.eq(555)
-        chai.expect(tx.data.safeTxGas).to.be.eq(666)
+        chai.expect(tx.data.safeTxGas).to.be.eq('666')
       }
     )
 
@@ -236,18 +250,24 @@ describe('Fallback handler manager', () => {
       const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
-        .address
+      const compatibilityFallbackHandler = await (
+        await getCompatibilityFallbackHandler()
+      ).contract.getAddress()
       chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(compatibilityFallbackHandler)
-      const tx = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+      const tx = await safeSdk.createEnableFallbackHandlerTx(
+        await defaultCallbackHandler.getAddress()
+      )
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
+      chai
+        .expect(await safeSdk.getFallbackHandler())
+        .to.be.eq(await defaultCallbackHandler.getAddress())
     })
   })
 
@@ -284,7 +304,7 @@ describe('Fallback handler manager', () => {
           predictedSafe,
           contractNetworks
         })
-        const tx = safeSdk.createDisableFallbackHandlerTx(defaultCallbackHandler.address)
+        const tx = safeSdk.createDisableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
         await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
       }
     )
@@ -295,10 +315,11 @@ describe('Fallback handler manager', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const tx = safeSdk.createDisableFallbackHandlerTx()
@@ -316,9 +337,10 @@ describe('Fallback handler manager', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 
@@ -338,32 +360,37 @@ describe('Fallback handler manager', () => {
         const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 
-        const tx1 = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+        const tx1 = await safeSdk.createEnableFallbackHandlerTx(
+          await defaultCallbackHandler.getAddress()
+        )
         const txResponse1 = await safeSdk.executeTransaction(tx1)
         await waitSafeTxReceipt(txResponse1)
-        chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
+        chai
+          .expect(await safeSdk.getFallbackHandler())
+          .to.be.eq(await defaultCallbackHandler.getAddress())
         const options: SafeTransactionOptionalProps = {
-          baseGas: 111,
-          gasPrice: 222,
+          baseGas: '111',
+          gasPrice: '222',
           gasToken: '0x333',
           refundReceiver: '0x444',
           nonce: 555,
-          safeTxGas: 666
+          safeTxGas: '666'
         }
         const tx2 = await safeSdk.createDisableFallbackHandlerTx(options)
-        chai.expect(tx2.data.baseGas).to.be.eq(111)
-        chai.expect(tx2.data.gasPrice).to.be.eq(222)
+        chai.expect(tx2.data.baseGas).to.be.eq('111')
+        chai.expect(tx2.data.gasPrice).to.be.eq('222')
         chai.expect(tx2.data.gasToken).to.be.eq('0x333')
         chai.expect(tx2.data.refundReceiver).to.be.eq('0x444')
         chai.expect(tx2.data.nonce).to.be.eq(555)
-        chai.expect(tx2.data.safeTxGas).to.be.eq(666)
+        chai.expect(tx2.data.safeTxGas).to.be.eq('666')
       }
     )
 
@@ -371,17 +398,22 @@ describe('Fallback handler manager', () => {
       const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
 
-      const tx = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
+      const tx = await safeSdk.createEnableFallbackHandlerTx(
+        await defaultCallbackHandler.getAddress()
+      )
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
+      chai
+        .expect(await safeSdk.getFallbackHandler())
+        .to.be.eq(await defaultCallbackHandler.getAddress())
 
       const tx1 = await safeSdk.createDisableFallbackHandlerTx()
       const txResponse1 = await safeSdk.executeTransaction(tx1)

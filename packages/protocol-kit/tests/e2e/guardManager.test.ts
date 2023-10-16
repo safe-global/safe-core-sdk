@@ -6,7 +6,7 @@ import Safe, {
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDebugTransactionGuard, getSafeWithOwners } from './utils/setupContracts'
@@ -17,10 +17,10 @@ import { waitSafeTxReceipt } from './utils/transactions'
 chai.use(chaiAsPromised)
 
 describe('Safe guard manager', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -47,9 +47,10 @@ describe('Safe guard manager', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const tx = safeSdk.getGuard()
@@ -79,9 +80,10 @@ describe('Safe guard manager', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         chai.expect(await safeSdk.getGuard()).to.be.eq(ZERO_ADDRESS)
@@ -92,16 +94,17 @@ describe('Safe guard manager', () => {
       const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       chai.expect(await safeSdk.getGuard()).to.be.eq(ZERO_ADDRESS)
-      const tx = await safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+      const tx = await safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.getGuard()).to.be.eq(debugTransactionGuard.address)
+      chai.expect(await safeSdk.getGuard()).to.be.eq(await debugTransactionGuard.getAddress())
     })
   })
 
@@ -112,12 +115,13 @@ describe('Safe guard manager', () => {
         const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const tx = safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+        const tx = safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
         await chai
           .expect(tx)
           .to.be.rejectedWith(
@@ -136,7 +140,7 @@ describe('Safe guard manager', () => {
         predictedSafe,
         contractNetworks
       })
-      const tx = safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+      const tx = safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
       await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
     })
 
@@ -144,9 +148,10 @@ describe('Safe guard manager', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const tx = safeSdk.createEnableGuardTx('0x123')
@@ -159,9 +164,10 @@ describe('Safe guard manager', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const tx = safeSdk.createEnableGuardTx(ZERO_ADDRESS)
@@ -173,15 +179,16 @@ describe('Safe guard manager', () => {
       const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const tx1 = await safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+      const tx1 = await safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
       const txResponse = await safeSdk.executeTransaction(tx1)
       await waitSafeTxReceipt(txResponse)
-      const tx2 = safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+      const tx2 = safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
       await chai.expect(tx2).to.be.rejectedWith('Guard provided is already enabled')
     })
 
@@ -191,26 +198,30 @@ describe('Safe guard manager', () => {
         const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const options: SafeTransactionOptionalProps = {
-          baseGas: 111,
-          gasPrice: 222,
+          baseGas: '111',
+          gasPrice: '222',
           gasToken: '0x333',
           refundReceiver: '0x444',
           nonce: 555,
-          safeTxGas: 666
+          safeTxGas: '666'
         }
-        const tx = await safeSdk.createEnableGuardTx(debugTransactionGuard.address, options)
-        chai.expect(tx.data.baseGas).to.be.eq(111)
-        chai.expect(tx.data.gasPrice).to.be.eq(222)
+        const tx = await safeSdk.createEnableGuardTx(
+          await debugTransactionGuard.getAddress(),
+          options
+        )
+        chai.expect(tx.data.baseGas).to.be.eq('111')
+        chai.expect(tx.data.gasPrice).to.be.eq('222')
         chai.expect(tx.data.gasToken).to.be.eq('0x333')
         chai.expect(tx.data.refundReceiver).to.be.eq('0x444')
         chai.expect(tx.data.nonce).to.be.eq(555)
-        chai.expect(tx.data.safeTxGas).to.be.eq(666)
+        chai.expect(tx.data.safeTxGas).to.be.eq('666')
       }
     )
 
@@ -218,16 +229,17 @@ describe('Safe guard manager', () => {
       const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       chai.expect(await safeSdk.getGuard()).to.be.eq(ZERO_ADDRESS)
-      const tx = await safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+      const tx = await safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.getGuard()).to.be.eq(debugTransactionGuard.address)
+      chai.expect(await safeSdk.getGuard()).to.be.eq(await debugTransactionGuard.getAddress())
     })
   })
 
@@ -239,9 +251,10 @@ describe('Safe guard manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const tx = safeSdk.createDisableGuardTx()
@@ -270,9 +283,10 @@ describe('Safe guard manager', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const tx = safeSdk.createDisableGuardTx()
@@ -285,31 +299,32 @@ describe('Safe guard manager', () => {
         const { accounts, contractNetworks, debugTransactionGuard } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const tx1 = await safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+        const tx1 = await safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
         const txResponse1 = await safeSdk.executeTransaction(tx1)
         await waitSafeTxReceipt(txResponse1)
-        chai.expect(await safeSdk.getGuard()).to.be.eq(debugTransactionGuard.address)
+        chai.expect(await safeSdk.getGuard()).to.be.eq(await debugTransactionGuard.getAddress())
         const options: SafeTransactionOptionalProps = {
-          baseGas: 111,
-          gasPrice: 222,
+          baseGas: '111',
+          gasPrice: '222',
           gasToken: '0x333',
           refundReceiver: '0x444',
           nonce: 555,
-          safeTxGas: 666
+          safeTxGas: '666'
         }
         const tx2 = await safeSdk.createDisableGuardTx(options)
-        chai.expect(tx2.data.baseGas).to.be.eq(111)
-        chai.expect(tx2.data.gasPrice).to.be.eq(222)
+        chai.expect(tx2.data.baseGas).to.be.eq('111')
+        chai.expect(tx2.data.gasPrice).to.be.eq('222')
         chai.expect(tx2.data.gasToken).to.be.eq('0x333')
         chai.expect(tx2.data.refundReceiver).to.be.eq('0x444')
         chai.expect(tx2.data.nonce).to.be.eq(555)
-        chai.expect(tx2.data.safeTxGas).to.be.eq(666)
+        chai.expect(tx2.data.safeTxGas).to.be.eq('666')
       }
     )
 
@@ -317,17 +332,18 @@ describe('Safe guard manager', () => {
       const { accounts, contractNetworks, debugTransactionGuard } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
 
-      const tx = await safeSdk.createEnableGuardTx(debugTransactionGuard.address)
+      const tx = await safeSdk.createEnableGuardTx(await debugTransactionGuard.getAddress())
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.getGuard()).to.be.eq(debugTransactionGuard.address)
+      chai.expect(await safeSdk.getGuard()).to.be.eq(await debugTransactionGuard.getAddress())
 
       const tx1 = await safeSdk.createDisableGuardTx()
       const txResponse1 = await safeSdk.executeTransaction(tx1)

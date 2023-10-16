@@ -3,9 +3,9 @@ import {
   EthersAdapter,
   EthersAdapterConfig,
   Web3Adapter,
-  Web3AdapterConfig
+  Web3AdapterConfig,
+  isSignerCompatible
 } from '@safe-global/protocol-kit/index'
-import { isSignerCompatible } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import dotenv from 'dotenv'
 import { ethers, web3 } from 'hardhat'
@@ -21,11 +21,12 @@ export async function getEthAdapter(
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
     case 'web3':
-      const signerAddress = isSignerCompatible(signerOrProvider)
+      const signerAddress = isSignerCompatible(signerOrProvider as Signer | Provider)
         ? await (signerOrProvider as Signer).getAddress()
         : undefined
-      const web3Instance = signerOrProvider instanceof Web3 ? signerOrProvider : (web3 as any)
-      const web3AdapterConfig: Web3AdapterConfig = { web3: web3Instance, signerAddress }
+      const web3Instance =
+        signerOrProvider instanceof Web3 ? signerOrProvider : (web3 as Signer | Provider)
+      const web3AdapterConfig: Web3AdapterConfig = { web3: web3Instance as web3, signerAddress }
       ethAdapter = new Web3Adapter(web3AdapterConfig)
       break
     case 'ethers':
@@ -62,7 +63,7 @@ export function getNetworkProvider(network: Network): Provider | Web3 {
       provider = new Web3(rpcUrl)
       break
     case 'ethers':
-      provider = new ethers.providers.JsonRpcProvider(rpcUrl)
+      provider = new ethers.JsonRpcProvider(rpcUrl)
       break
     default:
       throw new Error('Ethereum library not supported')

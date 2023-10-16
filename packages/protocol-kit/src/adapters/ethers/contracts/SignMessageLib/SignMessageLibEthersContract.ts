@@ -24,7 +24,7 @@ abstract class SignMessageLibEthersContract implements SignMessageLibContract {
     if (options && !options.gasLimit) {
       options.gasLimit = await this.estimateGas('signMessage', [data], { ...options })
     }
-    const txResponse = await this.contract.signMessage(data)
+    const txResponse = await this.contract.signMessage(data, { ...options })
     return toTxResult(txResponse, options)
   }
 
@@ -46,7 +46,7 @@ abstract class SignMessageLibEthersContract implements SignMessageLibContract {
   ): Promise<string> {
     const method = this.contract.getFunction(methodName)
 
-    return method.estimateGas(...params, options).toString()
+    return (await method.estimateGas(...params, options)).toString()
   }
 }
 

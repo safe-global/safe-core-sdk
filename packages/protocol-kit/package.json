@@ -71,7 +71,6 @@
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.1",
     "dotenv": "^16.3.1",
-    "ethereum-waffle": "^4.0.10",
     "hardhat": "^2.17.3",
     "hardhat-deploy": "^0.11.37",
     "hardhat-deploy-ethers": "^0.4.1",
@@ -83,9 +82,9 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "ethers": "^6.7.1",
     "@safe-global/safe-deployments": "^1.27.0",
     "ethereumjs-util": "^7.1.5",
+    "ethers": "^6.7.1",
     "semver": "^7.5.4",
     "web3": "^1.8.1",
     "web3-core": "^1.8.1",

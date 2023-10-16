@@ -50,7 +50,7 @@ class SafeProxyFactoryEthersContract implements SafeProxyFactoryContract {
       )
     }
     const proxyAddress = this.contract
-      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce)
+      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce, { ...options })
       .then(async (txResponse) => {
         if (callback) {
           callback(txResponse.hash)
@@ -78,7 +78,7 @@ class SafeProxyFactoryEthersContract implements SafeProxyFactoryContract {
   ): Promise<string> {
     const method = this.contract.getFunction(methodName)
 
-    return method.estimateGas(...params, options).toString()
+    return (await method.estimateGas(...params, options)).toString()
   }
 }
 

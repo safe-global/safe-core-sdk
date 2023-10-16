@@ -43,7 +43,8 @@ class SafeContract_V1_0_0_Ethers extends SafeContractEthers {
       data,
       paymentToken,
       payment,
-      paymentReceiver
+      paymentReceiver,
+      { ...options }
     )
 
     return toTxResult(txResponse, options)

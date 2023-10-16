@@ -79,7 +79,7 @@ abstract class SafeContractEthers implements SafeContract {
     if (options && !options.gasLimit) {
       options.gasLimit = await this.estimateGas('approveHash', [hash], { ...options })
     }
-    const txResponse = await this.contract.approveHash(hash)
+    const txResponse = await this.contract.approveHash(hash, { ...options })
     return toTxResult(txResponse, options)
   }
 
@@ -123,7 +123,8 @@ abstract class SafeContractEthers implements SafeContract {
         safeTransaction.data.gasPrice,
         safeTransaction.data.gasToken,
         safeTransaction.data.refundReceiver,
-        safeTransaction.encodedSignatures()
+        safeTransaction.encodedSignatures(),
+        { ...options }
       )
     } catch {}
     return isTxValid
@@ -163,7 +164,8 @@ abstract class SafeContractEthers implements SafeContract {
       safeTransaction.data.gasPrice,
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
-      safeTransaction.encodedSignatures()
+      safeTransaction.encodedSignatures(),
+      { ...options }
     )
     return toTxResult(txResponse, options)
   }
@@ -177,7 +179,9 @@ abstract class SafeContractEthers implements SafeContract {
     params: any[],
     options: EthersTransactionOptions
   ): Promise<string> {
-    return (await (this.contract as any)[methodName].estimateGas(...params, options)).toString()
+    const method = this.contract.getFunction(methodName)
+
+    return (await method.estimateGas(...params, options)).toString()
   }
 }
 

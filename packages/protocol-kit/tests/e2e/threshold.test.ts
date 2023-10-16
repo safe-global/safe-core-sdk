@@ -5,7 +5,7 @@ import Safe, {
 } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -15,10 +15,10 @@ import { waitSafeTxReceipt } from './utils/transactions'
 chai.use(chaiAsPromised)
 
 describe('Safe Threshold', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -56,7 +56,7 @@ describe('Safe Threshold', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: await safe.getAddress(),
         contractNetworks
       })
       chai.expect(await safeSdk.getThreshold()).to.be.eq(1)
@@ -85,7 +85,7 @@ describe('Safe Threshold', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: await safe.getAddress(),
         contractNetworks
       })
       const newThreshold = 2
@@ -102,7 +102,7 @@ describe('Safe Threshold', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: await safe.getAddress(),
         contractNetworks
       })
       const newThreshold = 0
@@ -118,7 +118,7 @@ describe('Safe Threshold', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: await safe.getAddress(),
         contractNetworks
       })
       const newThreshold = 2
@@ -147,7 +147,7 @@ describe('Safe Threshold', () => {
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: await safe.getAddress(),
         contractNetworks
       })
       const newThreshold = 2

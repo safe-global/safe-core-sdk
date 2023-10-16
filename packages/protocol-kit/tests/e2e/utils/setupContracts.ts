@@ -1,4 +1,4 @@
-import { ZeroAddress } from '@ethers'
+import { ZeroAddress } from 'ethers'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -93,13 +93,14 @@ export const getSafeTemplate = async (): Promise<
   const randomSaltNonce = Math.floor(Math.random() * 1000000000) + 1
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
-  const template = factory.createProxyWithNonce.staticCall(
-    await singleton.getAddress(),
+  const singletonAddress = await singleton.getAddress()
+  const template = await factory.createProxyWithNonce.staticCall(
+    singletonAddress,
     '0x',
     randomSaltNonce
   )
   await factory
-    .createProxyWithNonce(singleton.address, '0x', randomSaltNonce)
+    .createProxyWithNonce(singletonAddress, '0x', randomSaltNonce)
     .then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory(safeDeployed.name)
   return Safe.attach(template) as

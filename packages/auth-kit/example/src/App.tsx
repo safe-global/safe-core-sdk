@@ -24,17 +24,18 @@ function App() {
         showWidgetButton: false,
         chainConfig: {
           blockExplorerUrl: 'https://goerli.etherscan.io',
-          chainId: '0x1',
+          chainId: '0x5',
           displayName: 'Goerli Test Network',
           logo: 'eth.svg',
           rpcTarget: 'https://ethereum-goerli.publicnode.com',
           ticker: 'ETH',
-          tickerName: 'Ethereum'
+          tickerName: 'Ethereum',
+          isTestnet: true
         }
       }
 
       const web3AuthPack = new Web3AuthPack({
-        txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
+        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
       await web3AuthPack.init(options)

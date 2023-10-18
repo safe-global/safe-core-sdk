@@ -6,6 +6,7 @@ import { TorusParams, UserInfo } from '@web3auth/ws-embed'
 import AppBar from './AppBar'
 import { AuthKitSignInData, Web3AuthPack } from '../../src/index'
 import { ethers } from 'ethers'
+import { TYPED_DATA, TYPED_DATA_V3, TYPED_DATA_V4 } from './typedData'
 
 function App() {
   const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthPack>()
@@ -24,19 +25,19 @@ function App() {
         enableLogging: true,
         showWidgetButton: false,
         chainConfig: {
-          logo: 'https://raw.githubusercontent.com/torusresearch/torus-assets/master/torus.png',
-          displayName: 'Ethereum Goerli',
           blockExplorerUrl: 'https://goerli.etherscan.io',
           chainId: '0x5',
+          displayName: 'Goerli Test Network',
+          logo: 'eth.svg',
           rpcTarget: 'https://ethereum-goerli.publicnode.com',
           ticker: 'ETH',
-          tickerName: 'Ether',
+          tickerName: 'Ethereum',
           isTestnet: true
         }
       }
 
       const web3AuthPack = new Web3AuthPack({
-        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
+        txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
       })
 
       await web3AuthPack.init(options)
@@ -84,34 +85,48 @@ function App() {
     setSafeAuthSignInResponse(null)
   }
 
-  const signMessage = async (message: string) => {
-    // TODO. Should allow to wrap using ethers or web3
-    await web3AuthPack?.torus.provider.sendAsync({
-      method: 'personal_sign',
-      params: {
-        data: message,
-        from: safeAuthSignInResponse?.eoa
-      }
+  const signMessage = async (data: any, method: string) => {
+    // const ethersProvider = new ethers.providers.Web3Provider(
+    //   web3AuthPack?.getProvider() as ethers.providers.ExternalProvider
+    // )
+    // const signer = ethersProvider.getSigner()
+    // const signedMessage = await signer.signMessage(message)
+
+    const params = {
+      data,
+      from: safeAuthSignInResponse?.eoa
+    }
+
+    if (method.startsWith('eth_signTypedData')) {
+      // @ts-expect-error TODO: fix this
+      params.version =
+        method === 'eth_signTypedData' ? 'V1' : method === 'eth_signTypedData_v3' ? 'V3' : 'V4'
+    }
+
+    const signedMessage = await web3AuthPack?.torus.provider.sendAsync({
+      method,
+      params
     })
+
+    console.log('signedMessage', signedMessage)
   }
 
   const sendTransaction = async () => {
-    const signer = provider?.getSigner()
-    const transaction = {
-      to: '0xD725e11588f040d86c4C49d8236E32A5868549F0', // replace with the receiver's ethereum address
-      value: ethers.utils.parseEther('0.01') // Sending 0.01 Ether
-    }
+    const tx = await web3AuthPack?.torus?.provider?.request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: safeAuthSignInResponse?.eoa,
+          to: safeAuthSignInResponse?.eoa,
+          value: ethers.utils.parseUnits('0.00001', 'ether').toString(),
+          gasLimit: 21000
+        }
+      ]
+    })
 
-    // Sending a transaction
-    signer
-      ?.sendTransaction(transaction)
-      .then((tx) => {
-        console.log(tx)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    console.log('tx', tx)
   }
+
   return (
     <>
       <AppBar
@@ -127,12 +142,7 @@ function App() {
               Owner account
             </Typography>
             <Divider sx={{ my: 3 }} />
-            <EthHashInfo
-              address={safeAuthSignInResponse.eoa}
-              showCopyButton
-              showPrefix
-              prefix="gor"
-            />
+            <EthHashInfo address={safeAuthSignInResponse.eoa} showCopyButton showPrefix={false} />
             <Divider sx={{ my: 2 }} />
             <Button
               variant="contained"
@@ -148,9 +158,50 @@ function App() {
               fullWidth
               color="primary"
               sx={{ my: 1 }}
-              onClick={() => signMessage('Hello World')}
+              onClick={() => signMessage('Hello World', 'personal_sign')}
             >
-              Sign
+              personal_sign
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() =>
+                signMessage(
+                  '0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad',
+                  'eth_sign'
+                )
+              }
+            >
+              eth_sign
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => signMessage(TYPED_DATA, 'eth_signTypedData')}
+            >
+              eth_signTypedData
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => signMessage(TYPED_DATA_V3, 'eth_signTypedData_v3')}
+            >
+              eth_signTypedData_v3
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => signMessage(TYPED_DATA_V4, 'eth_signTypedData_v4')}
+            >
+              eth_signTypedData_v4
             </Button>
             <Button
               variant="contained"

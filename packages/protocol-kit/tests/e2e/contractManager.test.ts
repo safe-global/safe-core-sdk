@@ -3,7 +3,7 @@ import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/p
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getCompatibilityFallbackHandler,
@@ -13,7 +13,8 @@ import {
   getMultiSendCallOnly,
   getSafeSingleton,
   getSafeWithOwners,
-  getSignMessageLib
+  getSignMessageLib,
+  getSimulateTxAccessor
 } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -108,7 +109,9 @@ describe('Safe contracts manager', () => {
           signMessageLibAddress: ZERO_ADDRESS,
           signMessageLibAbi: (await getSignMessageLib()).abi,
           createCallAddress: ZERO_ADDRESS,
-          createCallAbi: (await getCreateCall()).abi
+          createCallAbi: (await getCreateCall()).abi,
+          simulateTxAccessorAddress: ZERO_ADDRESS,
+          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi
         }
       }
       const [account1] = accounts

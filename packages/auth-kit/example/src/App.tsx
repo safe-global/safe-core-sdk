@@ -17,8 +17,6 @@ function App() {
   const [chainId, setChainId] = useState<string>()
   const [balance, setBalance] = useState<string>()
 
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
-
   useEffect(() => {
     ;(async () => {
       const options: TorusParams = {
@@ -26,13 +24,12 @@ function App() {
         showWidgetButton: false,
         chainConfig: {
           blockExplorerUrl: 'https://goerli.etherscan.io',
-          chainId: '0x5',
+          chainId: '0x1',
           displayName: 'Goerli Test Network',
           logo: 'eth.svg',
           rpcTarget: 'https://ethereum-goerli.publicnode.com',
           ticker: 'ETH',
-          tickerName: 'Ethereum',
-          isTestnet: true
+          tickerName: 'Ethereum'
         }
       }
 
@@ -68,7 +65,6 @@ function App() {
       const provider = new ethers.providers.Web3Provider(
         web3AuthPack.getProvider() as ethers.providers.ExternalProvider
       )
-      setProvider(provider)
       setChainId((await provider?.getNetwork()).chainId.toString())
       setBalance(
         ethers.utils.formatEther((await provider?.getSigner()?.getBalance()) as ethers.BigNumberish)
@@ -81,7 +77,6 @@ function App() {
 
     await web3AuthPack.signOut()
 
-    setProvider(undefined)
     setSafeAuthSignInResponse(null)
   }
 

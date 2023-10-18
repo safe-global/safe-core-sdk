@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 import { TorusParams, UserInfo } from '@web3auth/ws-embed'
-
+import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import AppBar from './AppBar'
 import { AuthKitSignInData, Web3AuthPack } from '../../src/index'
 import { ethers } from 'ethers'
@@ -22,20 +23,11 @@ function App() {
       const options: TorusParams = {
         enableLogging: true,
         showWidgetButton: false,
-        chainConfig: {
-          blockExplorerUrl: 'https://goerli.etherscan.io',
-          chainId: '0x5',
-          displayName: 'Goerli Test Network',
-          logo: 'eth.svg',
-          rpcTarget: 'https://ethereum-goerli.publicnode.com',
-          ticker: 'ETH',
-          tickerName: 'Ethereum',
-          isTestnet: true
-        }
+        chainConfig: SUPPORTED_NETWORKS['0x1']
       }
 
       const web3AuthPack = new Web3AuthPack({
-        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
+        txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
       })
 
       await web3AuthPack.init(options)
@@ -51,7 +43,9 @@ function App() {
   const login = async () => {
     if (!web3AuthPack) return
 
-    const signInInfo = await web3AuthPack.signIn()
+    const signInInfo = await web3AuthPack.signIn({
+      loginProvider: 'google'
+    })
     console.log('SIGN IN RESPONSE: ', signInInfo)
 
     const userInfo = await web3AuthPack.getUserInfo()
@@ -81,12 +75,53 @@ function App() {
     setSafeAuthSignInResponse(null)
   }
 
+  const getAccounts = async () => {
+    const accounts = await web3AuthPack?.torus.provider.sendAsync({
+      method: 'eth_accounts'
+    })
+
+    console.log('accounts', accounts)
+  }
+
+  const getChainId = async () => {
+    const chainId = await web3AuthPack?.torus.provider.sendAsync({
+      method: 'eth_chainId'
+    })
+
+    console.log('chainId', chainId)
+  }
+
+  const signSafeMessage = async () => {
+    const protocolKit = await Safe.create({
+      safeAddress: safeAuthSignInResponse?.safes?.[0] || '0x',
+      ethAdapter: new EthersAdapter({
+        ethers,
+        signerOrProvider: new ethers.providers.Web3Provider(
+          web3AuthPack?.getProvider() as ethers.providers.ExternalProvider
+        ).getSigner()
+      })
+    })
+
+    const tx = await protocolKit.createTransaction({
+      safeTransactionData: {
+        to: safeAuthSignInResponse?.eoa || '0x',
+        value: '0',
+        data: '0x',
+        operation: 0
+      }
+    })
+
+    const signedTx = await protocolKit.signTransaction(tx, 'eth_sign')
+
+    // await protocolKit.executeTransaction(signedTx)
+  }
+
   const signMessage = async (data: any, method: string) => {
     // const ethersProvider = new ethers.providers.Web3Provider(
     //   web3AuthPack?.getProvider() as ethers.providers.ExternalProvider
     // )
     // const signer = ethersProvider.getSigner()
-    // const signedMessage = await signer.signMessage(message)
+    // const signedMessage = await signer.signMessage(data)
 
     const params = {
       data,
@@ -148,6 +183,24 @@ function App() {
               onClick={() => web3AuthPack?.torus.showWalletUi()}
             >
               Show Wallet
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => getAccounts()}
+            >
+              eth_accounts
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => getChainId()}
+            >
+              eth_chainId
             </Button>
             <Button
               variant="contained"
@@ -224,9 +277,21 @@ function App() {
               <Divider sx={{ my: 3 }} />
               {safeAuthSignInResponse?.safes?.length ? (
                 safeAuthSignInResponse?.safes?.map((safe, index) => (
-                  <Box sx={{ my: 3 }} key={index}>
-                    <EthHashInfo address={safe} showCopyButton shortAddress={false} />
-                  </Box>
+                  <>
+                    <Box sx={{ my: 3 }} key={index}>
+                      <EthHashInfo address={safe} showCopyButton shortAddress={false} />
+                    </Box>
+                    <Divider sx={{ my: 3 }} />
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      color="primary"
+                      sx={{ my: 1 }}
+                      onClick={() => signSafeMessage()}
+                    >
+                      signMessage
+                    </Button>
+                  </>
                 ))
               ) : (
                 <Typography variant="body1" color="secondary" fontWeight={700}>

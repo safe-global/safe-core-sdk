@@ -2839,22 +2839,6 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@toruslabs/base-controllers@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-4.3.0.tgz#98b199aff0a16970c860eea810d23ec193f97d10"
-  integrity sha512-1y40CtsXemVmUsiDirYJSirQleghUcCo/1pJWCRSpnMQrsoeHDHMsaldghHl3zxEE211jWuGUqlfF+C/Gkx8Bw==
-  dependencies:
-    "@ethereumjs/util" "^9.0.0"
-    "@metamask/rpc-errors" "^6.0.0"
-    "@toruslabs/broadcast-channel" "^8.0.0"
-    "@toruslabs/http-helpers" "^5.0.0"
-    "@toruslabs/openlogin-jrpc" "^5.1.0"
-    async-mutex "^0.4.0"
-    bignumber.js "^9.1.2"
-    bowser "^2.11.0"
-    lodash "^4.17.21"
-    loglevel "^1.8.1"
-
 "@toruslabs/base-controllers@^2.7.0":
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-2.8.1.tgz#2f0c463ea852997da094215aed0a46f5226d8bda"
@@ -2872,10 +2856,10 @@
     lodash "^4.17.21"
     loglevel "^1.8.1"
 
-"@toruslabs/base-controllers@^4.3.0":
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-4.4.0.tgz#f358c7fd4c4b62a3b87d3fcaa50a1da5c8cd1d42"
-  integrity sha512-F7PUXv+UakKbuyf/Gil2Yek6Eoc9saOrboBA+jwg8Lx0dASWB0iK2lBpiS2i4HnK1waP0Gph0INVHGPBvAT9fQ==
+"@toruslabs/base-controllers@^4.4.0", "@toruslabs/base-controllers@^4.5.2":
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-4.5.2.tgz#ce0a475203990525ec352d3b3283eca5b1b19cbb"
+  integrity sha512-DEaeKREzY8OJ74k6nuOP1x2a8Z1HeCfV2uQE835QhLKuCDgqRomDwCwRcrCGT3rqxT/AVhWmBj+ykO/XS/4lZw==
   dependencies:
     "@ethereumjs/util" "^9.0.0"
     "@metamask/rpc-errors" "^6.0.0"
@@ -2901,20 +2885,6 @@
     loglevel "^1.8.1"
     oblivious-set "1.1.1"
     socket.io-client "^4.6.1"
-    unload "^2.4.1"
-
-"@toruslabs/broadcast-channel@^8.0.0":
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/broadcast-channel/-/broadcast-channel-8.0.0.tgz#904ee44fceeb861d16f282ca211d1e2adf16e2f8"
-  integrity sha512-qCyWsHVL4Xtx1J6k1+acD7TJKCelJWyUy5Q5zyiWMPxMGFxTv1XdRyqpzV+VgwbcslIqgFN0GewOry2l1jlUQQ==
-  dependencies:
-    "@babel/runtime" "^7.22.10"
-    "@toruslabs/eccrypto" "^4.0.0"
-    "@toruslabs/metadata-helpers" "^5.0.0"
-    bowser "^2.11.0"
-    loglevel "^1.8.1"
-    oblivious-set "1.1.1"
-    socket.io-client "^4.7.2"
     unload "^2.4.1"
 
 "@toruslabs/broadcast-channel@^9.0.0":
@@ -2950,17 +2920,17 @@
   dependencies:
     elliptic "^6.5.4"
 
-"@toruslabs/ethereum-controllers@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/ethereum-controllers/-/ethereum-controllers-4.3.0.tgz#7aa0538faca59a335b4d7dc0b5a2a9b09ab5b384"
-  integrity sha512-RIjUx+lcw86yJT6SyzXxnaoqOMb7/QbMA34Tx30aCw981HjKpBP6Awl79Oj3d2qfMXTittLzsKKmxbwI2TgzSg==
+"@toruslabs/ethereum-controllers@^4.5.1":
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/@toruslabs/ethereum-controllers/-/ethereum-controllers-4.5.2.tgz#2e2f83d2e7f46aeb0cac2a4b4c0db9873455813a"
+  integrity sha512-ixWG0M1/H2e6Kq6JqD5K03/CokaS5y1wGL2XLAbIKzJntNxTNKI50Y+c4IJA2Oi+2MyQV6P10GlL2J1OkjlijA==
   dependencies:
     "@ethereumjs/common" "^4.0.0"
     "@ethereumjs/tx" "^5.0.0"
     "@ethereumjs/util" "^9.0.0"
     "@metamask/eth-sig-util" "^7.0.0"
     "@metamask/rpc-errors" "^6.0.0"
-    "@toruslabs/base-controllers" "^4.3.0"
+    "@toruslabs/base-controllers" "^4.5.2"
     "@toruslabs/http-helpers" "^5.0.0"
     "@toruslabs/openlogin-jrpc" "^5.1.0"
     async-mutex "^0.4.0"
@@ -4197,8 +4167,8 @@
   version "0.0.0"
   dependencies:
     "@metamask/rpc-errors" "^5.1.1"
-    "@toruslabs/base-controllers" "4.3.0"
-    "@toruslabs/ethereum-controllers" "4.3.0"
+    "@toruslabs/base-controllers" "^4.4.0"
+    "@toruslabs/ethereum-controllers" "^4.5.1"
     "@toruslabs/openlogin-jrpc" "^4.7.0"
     fast-deep-equal "^3.1.3"
     loglevel "^1.8.1"

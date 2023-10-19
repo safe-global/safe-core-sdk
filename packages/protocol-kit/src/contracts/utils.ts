@@ -206,8 +206,7 @@ export async function predictSafeAddress({
   const chainId = await ethAdapter.getChainId()
   const from = await safeProxyFactoryContract.getAddress()
 
-  // zkSync Era counterfactual deployment address is calculated differently
-  // https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#create-create2
+  // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)
   if (isZkSyncEraChain) {
     const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, input)
@@ -239,6 +238,7 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
 
 /**
  * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
+ * see: https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#address-derivation
  *
  * @param {string} from - The sender's address.
  * @param {SafeVersion} safeVersion - The version of the safe.

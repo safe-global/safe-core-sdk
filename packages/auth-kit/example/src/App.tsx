@@ -3,11 +3,12 @@ import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 import { TorusParams, UserInfo } from '@web3auth/ws-embed'
 import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import Safe, { EthersAdapter, Web3Adapter } from '@safe-global/protocol-kit'
 import AppBar from './AppBar'
 import { AuthKitSignInData, Web3AuthPack } from '../../src/index'
 import { ethers } from 'ethers'
 import { TYPED_DATA, TYPED_DATA_V3, TYPED_DATA_V4 } from './typedData'
+import Web3 from 'web3'
 
 function App() {
   const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthPack>()
@@ -17,6 +18,8 @@ function App() {
   const [userInfo, setUserInfo] = useState<UserInfo>()
   const [chainId, setChainId] = useState<string>()
   const [balance, setBalance] = useState<string>()
+  const [consoleMessage, setConsoleMessage] = useState<string>('')
+  const [consoleTitle, setConsoleTitle] = useState<string>('')
 
   useEffect(() => {
     ;(async () => {
@@ -80,7 +83,7 @@ function App() {
       method: 'eth_accounts'
     })
 
-    console.log('accounts', accounts)
+    uiConsole('Accounts', accounts)
   }
 
   const getChainId = async () => {
@@ -88,10 +91,10 @@ function App() {
       method: 'eth_chainId'
     })
 
-    console.log('chainId', chainId)
+    uiConsole('ChainId', chainId)
   }
 
-  const signSafeMessage = async () => {
+  const signSafeTx = async () => {
     const protocolKit = await Safe.create({
       safeAddress: safeAuthSignInResponse?.safes?.[0] || '0x',
       ethAdapter: new EthersAdapter({
@@ -101,6 +104,14 @@ function App() {
         ).getSigner()
       })
     })
+
+    // const protocolKit = await Safe.create({
+    //   safeAddress: safeAuthSignInResponse?.safes?.[0] || '0x',
+    //   ethAdapter: new Web3Adapter({
+    //     web3: new Web3(web3AuthPack?.getProvider() as any) as any,
+    //     signerAddress: safeAuthSignInResponse?.eoa || '0x'
+    //   })
+    // })
 
     const tx = await protocolKit.createTransaction({
       safeTransactionData: {
@@ -139,7 +150,7 @@ function App() {
       params
     })
 
-    console.log('signedMessage', signedMessage)
+    uiConsole('Signed Message', signedMessage)
   }
 
   const sendTransaction = async () => {
@@ -155,7 +166,12 @@ function App() {
       ]
     })
 
-    console.log('tx', tx)
+    uiConsole('Transaction Response', tx)
+  }
+
+  const uiConsole = (title: string, message: unknown) => {
+    setConsoleTitle(title)
+    setConsoleMessage(typeof message === 'string' ? message : JSON.stringify(message, null, 2))
   }
 
   return (
@@ -269,12 +285,12 @@ function App() {
               Balance: {balance}
             </Typography>
           </Grid>
-          <Grid item md={8} p={4}>
+          <Grid item md={4} p={4}>
             <>
               <Typography variant="h3" color="secondary" fontWeight={700}>
                 Available Safes
               </Typography>
-              <Divider sx={{ my: 3 }} />
+              <Divider sx={{ my: 2 }} />
               {safeAuthSignInResponse?.safes?.length ? (
                 safeAuthSignInResponse?.safes?.map((safe, index) => (
                   <>
@@ -286,10 +302,9 @@ function App() {
                       variant="contained"
                       fullWidth
                       color="primary"
-                      sx={{ my: 1 }}
-                      onClick={() => signSafeMessage()}
+                      onClick={() => signSafeTx()}
                     >
-                      signMessage
+                      Sign Safe Transaction
                     </Button>
                   </>
                 ))
@@ -299,6 +314,22 @@ function App() {
                 </Typography>
               )}
             </>
+          </Grid>
+          <Grid item md={4} p={4}>
+            <Typography variant="h3" color="secondary" fontWeight={700}>
+              Console
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="body1" color="primary" fontWeight={700}>
+              {consoleTitle}:
+            </Typography>
+            <Typography
+              variant="body1"
+              color="secondary"
+              sx={{ mt: 2, overflowWrap: 'break-word' }}
+            >
+              {consoleMessage}
+            </Typography>
           </Grid>
         </Grid>
       )}

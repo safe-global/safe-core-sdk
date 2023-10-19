@@ -242,3 +242,65 @@ export type AllTransactionsListResponse = {
 export type ModulesResponse = {
   safes: string[]
 }
+
+export type SafeMessageConfirmation = {
+  readonly created: string
+  readonly modified: string
+  readonly owner: string
+  readonly signature: string
+  readonly signatureType: string
+}
+
+export type SafeMessage = {
+  readonly created: string
+  readonly modified: string
+  readonly safe: string
+  readonly messageHash: string
+  readonly message: string
+  readonly proposedBy: string
+  readonly safeAppId: null | string
+  readonly confirmations: Array<SafeMessageConfirmation>
+  readonly preparedSignature: string
+}
+
+export type SafeMessageListResponse = {
+  readonly count: number
+  readonly next?: string
+  readonly previous?: string
+  readonly results: SafeMessage[]
+}
+
+export type GetSafeMessageListProps = {
+  ordering?: string
+  limit?: string
+  offset?: string
+}
+
+interface TypedDataDomain {
+  name?: string
+  version?: string
+  chainId?: unknown // BigNumberish
+  verifyingContract?: string
+  salt?: ArrayLike<number> | string // BytesLike
+}
+
+interface TypedDataTypes {
+  name: string
+  type: string
+}
+
+type TypedMessageTypes = {
+  [key: string]: TypedDataTypes[]
+}
+
+export type EIP712TypedData = {
+  domain: TypedDataDomain
+  types: TypedMessageTypes
+  message: Record<string, unknown>
+}
+
+export type AddMessageProps = {
+  message: string | EIP712TypedData
+  safeAppId: number
+  signature: string
+}

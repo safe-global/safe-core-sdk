@@ -65,7 +65,6 @@ class Web3Adapter implements EthAdapter {
     const balance = defaultBlock
       ? await this.#web3.eth.getBalance(address, defaultBlock)
       : await this.#web3.eth.getBalance(address)
-    // FIXME Web3 Adapter is forced to return an Ethers type
     return BigInt(balance)
   }
 

@@ -78,7 +78,7 @@ class EthersAdapter implements EthAdapter {
   }
 
   async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
-    return BigInt(await this.#provider.getBalance(address, blockTag))
+    return this.#provider.getBalance(address, blockTag)
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {

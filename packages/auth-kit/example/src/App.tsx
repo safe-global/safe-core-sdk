@@ -46,9 +46,7 @@ function App() {
   const login = async () => {
     if (!web3AuthPack) return
 
-    const signInInfo = await web3AuthPack.signIn({
-      loginProvider: 'google'
-    })
+    const signInInfo = await web3AuthPack.signIn()
     console.log('SIGN IN RESPONSE: ', signInInfo)
 
     const userInfo = await web3AuthPack.getUserInfo()
@@ -321,7 +319,7 @@ function App() {
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Typography variant="body1" color="primary" fontWeight={700}>
-              {consoleTitle}:
+              {consoleTitle}
             </Typography>
             <Typography
               variant="body1"

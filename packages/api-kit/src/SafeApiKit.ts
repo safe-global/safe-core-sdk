@@ -659,7 +659,7 @@ class SafeApiKit {
 
   async addMessage(
     safeAddress: string,
-    { message, safeAppId, signature }: AddMessageProps
+    { message, safeAppId = 0, signature }: AddMessageProps
   ): Promise<void> {
     if (!safeAddress) {
       throw new Error('Invalid safeAddress')

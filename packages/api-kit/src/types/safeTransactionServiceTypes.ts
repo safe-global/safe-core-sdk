@@ -301,6 +301,6 @@ export type EIP712TypedData = {
 
 export type AddMessageProps = {
   message: string | EIP712TypedData
-  safeAppId: number
+  safeAppId?: number
   signature: string
 }

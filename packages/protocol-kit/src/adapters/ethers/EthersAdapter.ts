@@ -1,5 +1,4 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
-import { isSignerCompatible } from '@safe-global/protocol-kit/utils/types'
 import {
   Eip3770Address,
   EthAdapter,
@@ -26,7 +25,7 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
-import { isTypedDataSigner } from './utils'
+import { isTypedDataSigner, isSignerCompatible } from './utils'
 
 type Ethers = typeof ethers
 

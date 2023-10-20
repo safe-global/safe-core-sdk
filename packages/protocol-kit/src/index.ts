@@ -74,7 +74,6 @@ import {
   isGasTokenCompatibleWithHandlePayment,
   createERC20TokenTransferTransaction
 } from './utils/erc-20'
-import { isSignerCompatible } from './utils/types'
 
 export {
   AddOwnerTxParams,
@@ -82,7 +81,6 @@ export {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
-  isSignerCompatible,
   ConnectSafeConfig,
   ConnectSafeConfigWithPredictedSafe,
   ConnectSafeConfigWithSafeAddress,

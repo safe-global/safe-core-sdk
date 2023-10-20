@@ -1,4 +1,4 @@
-import { Signer, Provider, AbstractSigner } from 'ethers'
+import { Provider, AbstractSigner } from 'ethers'
 import {
   EthersAdapter,
   EthersAdapterConfig,
@@ -9,19 +9,23 @@ import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import dotenv from 'dotenv'
 import { ethers, web3 } from 'hardhat'
 import Web3 from 'web3'
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 
 dotenv.config()
 
 type Network = 'mainnet' | 'goerli' | 'gnosis' | 'zksync'
 
 export async function getEthAdapter(
-  signerOrProvider: Signer | Provider | Web3
+  signerOrProvider: AbstractSigner | Provider | Web3
 ): Promise<EthAdapter> {
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
     case 'web3':
       const signerAddress =
-        signerOrProvider instanceof AbstractSigner ? await signerOrProvider.getAddress() : undefined
+        signerOrProvider instanceof HardhatEthersSigner
+          ? await signerOrProvider.getAddress()
+          : undefined
+
       const web3Instance = signerOrProvider instanceof Web3 ? signerOrProvider : web3
       const web3AdapterConfig: Web3AdapterConfig = { web3: web3Instance, signerAddress }
       ethAdapter = new Web3Adapter(web3AdapterConfig)

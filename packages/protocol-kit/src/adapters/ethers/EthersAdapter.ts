@@ -6,7 +6,7 @@ import {
   GetContractProps,
   SafeTransactionEIP712Args
 } from '@safe-global/safe-core-sdk-types'
-import { ethers, TransactionResponse, Signer, Provider } from 'ethers'
+import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
@@ -33,12 +33,12 @@ export interface EthersAdapterConfig {
   /** ethers - Ethers v6 library */
   ethers: Ethers
   /** signerOrProvider - Ethers signer or provider */
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 }
 
 class EthersAdapter implements EthAdapter {
   #ethers: Ethers
-  #signer?: Signer
+  #signer?: AbstractSigner
   #provider: Provider
 
   constructor({ ethers, signerOrProvider }: EthersAdapterConfig) {
@@ -48,7 +48,7 @@ class EthersAdapter implements EthAdapter {
     this.#ethers = ethers
     const isSigner = isSignerCompatible(signerOrProvider)
     if (isSigner) {
-      const signer = signerOrProvider as Signer
+      const signer = signerOrProvider as AbstractSigner
       if (!signer.provider) {
         throw new Error('Signer must be connected to a provider')
       }
@@ -63,7 +63,7 @@ class EthersAdapter implements EthAdapter {
     return this.#provider
   }
 
-  getSigner(): Signer | undefined {
+  getSigner(): AbstractSigner | undefined {
     return this.#signer
   }
 

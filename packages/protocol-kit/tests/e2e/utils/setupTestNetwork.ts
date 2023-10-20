@@ -1,7 +1,7 @@
-import { Signer, Wallet } from 'ethers'
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 import { ethers, Web3 } from 'hardhat'
 interface Account {
-  signer: Signer
+  signer: HardhatEthersSigner
   address: string
 }
 
@@ -23,8 +23,8 @@ async function getHardhatAccounts(): Promise<Account[]> {
   const accounts: Account[] = []
 
   for (let i = 0; i < 10; i++) {
-    const wallet: Wallet = wallets[i]
-    const account: Account = { signer: wallet as Signer, address: wallet.address }
+    const wallet = wallets[i]
+    const account: Account = { signer: wallet, address: wallet.address }
     accounts.push(account)
   }
 

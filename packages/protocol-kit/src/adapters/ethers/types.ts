@@ -11,7 +11,6 @@ export interface EthersTransactionOptions {
 }
 
 export interface EthersTransactionResult extends BaseTransactionResult {
-  hash: string
   transactionResponse: ContractTransactionResponse
   options?: EthersTransactionOptions
 }

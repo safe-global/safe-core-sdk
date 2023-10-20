@@ -1,4 +1,4 @@
-import { ContractTransactionResponse, Signer, Provider } from 'ethers'
+import { ContractTransactionResponse, Provider, AbstractSigner } from 'ethers'
 import { EthersTransactionOptions, EthersTransactionResult } from '../types'
 
 export function sameString(str1: string, str2: string): boolean {
@@ -16,8 +16,8 @@ export function toTxResult(
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is Signer {
-  return (signer as unknown as Signer).signTypedData !== undefined
+export function isTypedDataSigner(signer: any): signer is AbstractSigner {
+  return (signer as unknown as AbstractSigner).signTypedData !== undefined
 }
 
 /**
@@ -25,8 +25,8 @@ export function isTypedDataSigner(signer: any): signer is Signer {
  * @param signerOrProvider - Signer or provider
  * @returns true if the parameter is compatible with `Signer`
  */
-export function isSignerCompatible(signerOrProvider: Signer | Provider): boolean {
-  const candidate = signerOrProvider as Signer
+export function isSignerCompatible(signerOrProvider: AbstractSigner | Provider): boolean {
+  const candidate = signerOrProvider as AbstractSigner
 
   const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
   const isSignMessageCompatible = typeof candidate.signMessage === 'function'

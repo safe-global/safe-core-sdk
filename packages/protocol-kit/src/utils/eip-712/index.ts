@@ -1,6 +1,5 @@
-import { TypedDataDomain } from 'ethers'
+import { ethers, TypedDataDomain } from 'ethers'
 import { _TypedDataEncoder } from 'ethers/lib/utils'
-import { soliditySha3, utf8ToHex } from 'web3-utils'
 import {
   EIP712MessageTypes,
   EIP712TxTypes,
@@ -67,7 +66,7 @@ export const hashTypedData = (typedData: EIP712TypedData): string => {
 }
 
 const hashMessage = (message: string): string => {
-  return soliditySha3(utf8ToHex(message)) || ''
+  return ethers.utils.hashMessage(message)
 }
 
 const hashSafeMessage = (message: string | EIP712TypedData): string => {

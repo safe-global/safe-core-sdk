@@ -648,7 +648,7 @@ class SafeApiKit {
 
   async getMessages(
     safeAddress: string,
-    { ordering, limit, offset }: GetSafeMessageListProps
+    { ordering, limit, offset }: GetSafeMessageListProps = {}
   ): Promise<SafeMessageListResponse> {
     if (!safeAddress) {
       throw new Error('Invalid safeAddress')

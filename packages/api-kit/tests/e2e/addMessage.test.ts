@@ -13,6 +13,20 @@ let signer: Signer
 
 const MESSAGE = 'I am the owner of this safe'
 
+export const calculateSafeMessageHash = (
+  safeAddress: string,
+  message: string,
+  chainId: number
+): string => {
+  return ethers.utils._TypedDataEncoder.hash(
+    { verifyingContract: safeAddress, chainId },
+    {
+      SafeMessage: [{ type: 'bytes', name: 'message' }]
+    },
+    { message }
+  )
+}
+
 describe.only('addMessage', () => {
   before(async () => {
     ;({ safeApiKit, signer } = await getServiceClient(
@@ -32,8 +46,14 @@ describe.only('addMessage', () => {
   })
 
   it('should allow to add an offchain message', async () => {
-    console.log(await signer.getAddress())
-    const signature = await signer.signMessage(MESSAGE)
+    const messageHash = ethers.utils.hashMessage(MESSAGE)
+    const safeMessageHash = calculateSafeMessageHash(
+      '0x9D1E7371852a9baF631Ea115b9815deb97cC3205',
+      messageHash,
+      await signer.getChainId()
+    )
+
+    const signature = await signer.signMessage(safeMessageHash)
 
     await chai.expect(
       safeApiKit.addMessage('0x9D1E7371852a9baF631Ea115b9815deb97cC3205', {

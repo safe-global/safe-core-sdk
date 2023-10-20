@@ -635,7 +635,7 @@ describe('Endpoint tests', () => {
         txServiceUrl
       ))
 
-      await chai.expect(safeApiKit.getServiceInfo())
+      await chai.expect(safeApiKit.getServiceInfo()).to.be.fulfilled
 
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceUrl}/v1/about`,

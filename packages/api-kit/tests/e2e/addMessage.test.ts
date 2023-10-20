@@ -20,7 +20,7 @@ const generateRandomUUID = (): string => {
 }
 
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
-const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 
 describe('addMessage', () => {
   before(async () => {
@@ -52,7 +52,7 @@ describe('addMessage', () => {
     const signature = await protocolKit.signHash(safeMessageHash)
 
     await chai.expect(
-      safeApiKit.addMessage('0x9D1E7371852a9baF631Ea115b9815deb97cC3205', {
+      safeApiKit.addMessage(safeAddress, {
         message: rawMessage,
         signature: signature.data
       })
@@ -64,7 +64,7 @@ describe('addMessage', () => {
     const signature = await protocolKit.signTypedData(rawMessage)
 
     await chai.expect(
-      safeApiKit.addMessage('0x9D1E7371852a9baF631Ea115b9815deb97cC3205', {
+      safeApiKit.addMessage(safeAddress, {
         message: rawMessage,
         signature: signature.data
       })

@@ -1,10 +1,12 @@
 import {
+  AddMessageProps,
   AddSafeDelegateProps,
   AllTransactionsListResponse,
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
   SafeSingletonResponse,
+  GetSafeMessageListProps,
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -12,6 +14,8 @@ import {
   SafeDelegateListResponse,
   SafeDelegateResponse,
   SafeInfoResponse,
+  SafeMessage,
+  SafeMessageListResponse,
   SafeModuleTransactionListResponse,
   SafeMultisigTransactionEstimate,
   SafeMultisigTransactionEstimateResponse,
@@ -614,6 +618,78 @@ class SafeApiKit {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/tokens/${address}/`,
       method: HttpMethod.Get
+    })
+  }
+
+  async getMessage(messageHash: string): Promise<SafeMessage> {
+    if (!messageHash) {
+      throw new Error('Invalid messageHash')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  async addMessageSignature(messageHash: string, signature: string): Promise<void> {
+    if (!messageHash || !signature) {
+      throw new Error('Invalid messageHash or signature')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/signatures/`,
+      method: HttpMethod.Post,
+      body: {
+        signature
+      }
+    })
+  }
+
+  async getMessages(
+    safeAddress: string,
+    { ordering, limit, offset }: GetSafeMessageListProps
+  ): Promise<SafeMessageListResponse> {
+    if (!safeAddress) {
+      throw new Error('Invalid safeAddress')
+    }
+
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
+
+    if (ordering) {
+      url.searchParams.set('ordering', ordering)
+    }
+
+    if (limit) {
+      url.searchParams.set('limit', limit)
+    }
+
+    if (offset) {
+      url.searchParams.set('offset', offset)
+    }
+
+    return sendRequest({
+      url: url.toString(),
+      method: HttpMethod.Get
+    })
+  }
+
+  async addMessage(
+    safeAddress: string,
+    { message, safeAppId = 0, signature }: AddMessageProps
+  ): Promise<void> {
+    if (!safeAddress) {
+      throw new Error('Invalid safeAddress')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+      method: HttpMethod.Post,
+      body: {
+        message,
+        safeAppId: safeAppId || 0,
+        signature
+      }
     })
   }
 }

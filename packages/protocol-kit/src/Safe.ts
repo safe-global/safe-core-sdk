@@ -635,7 +635,7 @@ class Safe {
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
       const approved = await this.#contractManager.safeContract.approvedHashes(owner, txHash)
-      if (BigInt(approved) > 0) {
+      if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
     }
@@ -1000,7 +1000,7 @@ class Safe {
     const value = BigInt(signedSafeTransaction.data.value)
     if (value !== 0n) {
       const balance = await this.getBalance()
-      if (value > BigInt(balance)) {
+      if (value > balance) {
         throw new Error('Not enough Ether funds')
       }
     }

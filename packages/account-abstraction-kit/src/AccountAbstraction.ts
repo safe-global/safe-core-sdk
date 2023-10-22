@@ -106,7 +106,8 @@ class AccountAbstraction {
 
     const response = await this.#relayPack.executeRelayTransaction(
       signedSafeTransaction,
-      this.#safeSdk
+      this.#safeSdk,
+      options
     )
 
     return response.taskId

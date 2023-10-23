@@ -120,7 +120,7 @@ describe.only('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xecd0e108a98e192af1d2c25055f4e3bed784b5c877204e73219a5203251feaab'
+          message: '0xaa05af77f274774b8bdc7b61d98bc40da523dc2821fdea555f4d6aa413199bcc'
         }
       })
     })
@@ -150,7 +150,7 @@ describe.only('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xecd0e108a98e192af1d2c25055f4e3bed784b5c877204e73219a5203251feaab'
+          message: '0xaa05af77f274774b8bdc7b61d98bc40da523dc2821fdea555f4d6aa413199bcc'
         }
       })
     })

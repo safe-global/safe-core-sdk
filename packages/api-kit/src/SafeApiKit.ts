@@ -621,6 +621,11 @@ class SafeApiKit {
     })
   }
 
+  /**
+   * Get a message by its safe message hash
+   * @param messageHash The Safe message hash
+   * @returns The message
+   */
   async getMessage(messageHash: string): Promise<SafeMessage> {
     if (!messageHash) {
       throw new Error('Invalid messageHash')
@@ -632,20 +637,12 @@ class SafeApiKit {
     })
   }
 
-  async addMessageSignature(messageHash: string, signature: string): Promise<void> {
-    if (!messageHash || !signature) {
-      throw new Error('Invalid messageHash or signature')
-    }
-
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/signatures/`,
-      method: HttpMethod.Post,
-      body: {
-        signature
-      }
-    })
-  }
-
+  /**
+   * Get the list of messages associated to a Safe account
+   * @param safeAddress The safe address
+   * @param options The options to filter the list of messages
+   * @returns The paginated list of messages
+   */
   async getMessages(
     safeAddress: string,
     { ordering, limit, offset }: GetSafeMessageListProps = {}
@@ -654,7 +651,9 @@ class SafeApiKit {
       throw new Error('Invalid safeAddress')
     }
 
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
+    const { address } = this.#getEip3770Address(safeAddress)
+
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/messages/`)
 
     if (ordering) {
       url.searchParams.set('ordering', ordering)
@@ -674,6 +673,12 @@ class SafeApiKit {
     })
   }
 
+  /**
+   * Creates a new message with an initial signature
+   * Add more signatures from other owners using addMessageSignature()
+   * @param safeAddress The safe address
+   * @param options The raw message to add, signature and safeAppId if any
+   */
   async addMessage(
     safeAddress: string,
     { message, safeAppId = 0, signature }: AddMessageProps
@@ -682,12 +687,33 @@ class SafeApiKit {
       throw new Error('Invalid safeAddress')
     }
 
+    const { address } = this.#getEip3770Address(safeAddress)
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/messages/`,
       method: HttpMethod.Post,
       body: {
         message,
         safeAppId: safeAppId || 0,
+        signature
+      }
+    })
+  }
+
+  /**
+   * Add a signature to an existing message
+   * @param messageHash The safe message hash
+   * @param signature The signature
+   */
+  async addMessageSignature(messageHash: string, signature: string): Promise<void> {
+    if (!messageHash || !signature) {
+      throw new Error('Invalid messageHash or signature')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/signatures/`,
+      method: HttpMethod.Post,
+      body: {
         signature
       }
     })

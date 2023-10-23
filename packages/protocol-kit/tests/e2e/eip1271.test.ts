@@ -61,7 +61,7 @@ export const calculateSafeMessageHash = (
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe.only('EIP1271', () => {
+describe('EIP1271', () => {
   describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
     const setupTests = deployments.createFixture(async ({ deployments }) => {
       await deployments.fixture()
@@ -262,7 +262,7 @@ describe.only('EIP1271', () => {
       }
     )
 
-    it.only('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
+    it('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
       const { safe, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafe } = await setupTests()
 
       const [account1] = accounts

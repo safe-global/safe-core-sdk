@@ -24,7 +24,7 @@ const generateRandomUUID = (): string => {
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 
-describe.only('addMessageSignature', () => {
+describe('addMessageSignature', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'

@@ -21,7 +21,7 @@ const safeTransactionData: SafeTransactionData = {
   nonce: 999
 }
 
-describe.only('EIP-712 sign typed data', () => {
+describe('EIP-712 sign typed data', () => {
   describe('getEip712TxTypes', async () => {
     it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.0.0', async () => {
       const { EIP712Domain } = getEip712TxTypes('1.0.0')
@@ -44,7 +44,7 @@ describe.only('EIP-712 sign typed data', () => {
     })
   })
 
-  describe.only('generateTypedData', async () => {
+  describe('generateTypedData', async () => {
     it('should generate the typed data for Safes == v1.0.0', async () => {
       const { domain } = generateTypedData({
         safeAddress,

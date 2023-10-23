@@ -15,8 +15,9 @@ describe('getMessages', () => {
     ))
   })
 
-  it('should fail if safeAddress is empty', async () => {
+  it('should fail if safeAddress is empty or invalid', async () => {
     await chai.expect(safeApiKit.getMessages('')).to.be.rejectedWith('Invalid safeAddress')
+    await chai.expect(safeApiKit.getMessages('0x123')).to.be.rejectedWith('Invalid safeAddress')
   })
 
   it('should get the messages list', async () => {

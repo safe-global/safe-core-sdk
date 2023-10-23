@@ -34,10 +34,18 @@ describe('addMessage', () => {
     })
   })
 
-  it('should fail if safeAddress is empty', async () => {
+  it('should fail if safeAddress is empty or invalid', async () => {
     await chai
       .expect(
         safeApiKit.addMessage('', {
+          message: generateMessage(),
+          signature: '0x'
+        })
+      )
+      .to.be.rejectedWith('Invalid safeAddress')
+    await chai
+      .expect(
+        safeApiKit.addMessage('0x123', {
           message: generateMessage(),
           signature: '0x'
         })

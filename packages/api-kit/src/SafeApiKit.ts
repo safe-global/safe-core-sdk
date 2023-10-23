@@ -34,6 +34,7 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
+import { validateEthereumAddress } from 'packages/protocol-kit/dist/src/utils'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -60,6 +61,15 @@ class SafeApiKit {
       }
 
       this.#txServiceBaseUrl = `${url}/api`
+    }
+  }
+
+  #isValidAddress(address: string) {
+    try {
+      validateEthereumAddress(address)
+      return true
+    } catch {
+      return false
     }
   }
 
@@ -647,13 +657,11 @@ class SafeApiKit {
     safeAddress: string,
     { ordering, limit, offset }: GetSafeMessageListProps = {}
   ): Promise<SafeMessageListResponse> {
-    if (!safeAddress) {
+    if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
     }
 
-    const { address } = this.#getEip3770Address(safeAddress)
-
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/messages/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
 
     if (ordering) {
       url.searchParams.set('ordering', ordering)
@@ -683,14 +691,12 @@ class SafeApiKit {
     safeAddress: string,
     { message, safeAppId = 0, signature }: AddMessageProps
   ): Promise<void> {
-    if (!safeAddress) {
+    if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
     }
 
-    const { address } = this.#getEip3770Address(safeAddress)
-
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/messages/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
       method: HttpMethod.Post,
       body: {
         message,

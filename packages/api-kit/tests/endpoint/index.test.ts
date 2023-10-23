@@ -578,7 +578,7 @@ describe('Endpoint tests', () => {
     })
 
     it('getMessages', async () => {
-      const safeAddress = 'safe-address'
+      const safeAddress = '0x6C465b1D7aBCcDC02Ed48bc32e289795603a5c79'
 
       await chai
         .expect(safeApiKit.getMessages(safeAddress))
@@ -590,7 +590,7 @@ describe('Endpoint tests', () => {
     })
 
     it('addMessage', async () => {
-      const safeAddress = 'safe-address'
+      const safeAddress = '0x6C465b1D7aBCcDC02Ed48bc32e289795603a5c79'
       const data = {
         message: 'message',
         signature: '0x'

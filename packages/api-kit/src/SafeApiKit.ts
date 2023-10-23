@@ -27,14 +27,13 @@ import {
   TransferListResponse
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
-import { validateEip3770Address } from '@safe-global/protocol-kit'
+import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
-import { validateEthereumAddress } from 'packages/protocol-kit/dist/src/utils'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */

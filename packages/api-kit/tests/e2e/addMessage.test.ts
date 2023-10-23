@@ -45,7 +45,7 @@ describe('addMessage', () => {
       .to.be.rejectedWith('Invalid safeAddress')
   })
 
-  it('should allow to add an offchain message with EIP-191', async () => {
+  it('should allow to create a new off-chain message signed with EIP-191', async () => {
     const rawMessage = generateMessage()
     const messageHash = await protocolKit.getHash(rawMessage)
     const safeMessageHash = await protocolKit.getSafeMessageHash(messageHash)
@@ -59,7 +59,7 @@ describe('addMessage', () => {
     ).to.be.fulfilled
   })
 
-  it('should allow to add an offchain message with EIP-712', async () => {
+  it('should allow to create a new off-chain message signed with EIP-712', async () => {
     const rawMessage = generateMessage()
     const signature = await protocolKit.signTypedData(rawMessage)
 

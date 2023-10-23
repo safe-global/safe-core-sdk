@@ -270,26 +270,32 @@ export type SafeMessageListResponse = {
   readonly results: SafeMessage[]
 }
 
+export type AddMessageProps = {
+  message: string | EIP712TypedData
+  safeAppId?: number
+  signature: string
+}
+
 export type GetSafeMessageListProps = {
   ordering?: string
   limit?: string
   offset?: string
 }
 
-interface TypedDataDomain {
+export type TypedDataDomain = {
   name?: string
   version?: string
-  chainId?: unknown // BigNumberish
+  chainId?: unknown
   verifyingContract?: string
-  salt?: ArrayLike<number> | string // BytesLike
+  salt?: ArrayLike<number> | string
 }
 
-interface TypedDataTypes {
+export type TypedDataTypes = {
   name: string
   type: string
 }
 
-type TypedMessageTypes = {
+export type TypedMessageTypes = {
   [key: string]: TypedDataTypes[]
 }
 
@@ -297,10 +303,4 @@ export type EIP712TypedData = {
   domain: TypedDataDomain
   types: TypedMessageTypes
   message: Record<string, unknown>
-}
-
-export type AddMessageProps = {
-  message: string | EIP712TypedData
-  safeAppId?: number
-  signature: string
 }

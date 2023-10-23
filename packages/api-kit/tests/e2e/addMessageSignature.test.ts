@@ -10,7 +10,6 @@ chai.use(chaiAsPromised)
 let safeApiKit1: SafeApiKit
 let ethAdapter1: EthAdapter
 let protocolKit1: Safe
-let safeApiKit2: SafeApiKit
 let ethAdapter2: EthAdapter
 let protocolKit2: Safe
 
@@ -30,7 +29,7 @@ describe.only('addMessageSignature', () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
     ))
-    ;({ safeApiKit: safeApiKit2, ethAdapter: ethAdapter2 } = await getServiceClient(
+    ;({ ethAdapter: ethAdapter2 } = await getServiceClient(
       '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1'
     ))
 
@@ -57,7 +56,7 @@ describe.only('addMessageSignature', () => {
       .to.be.rejectedWith('Invalid messageHash or signature')
   })
 
-  it('should allow to add a signature confirmation using a mix of EIP-191 and EIP-712', async () => {
+  it('should allow to add a confirmation signature using a mix of EIP-191 and EIP-712', async () => {
     const rawMessage = generateMessage()
     const messageHash = await protocolKit1.getHash(rawMessage)
     const safeMessageHash = await protocolKit1.getSafeMessageHash(messageHash)

@@ -14,8 +14,8 @@ import {
   Transaction
 } from '@safe-global/safe-core-sdk-types'
 import {
-  PREDETERMINED_SALT_NONCE,
   encodeSetupCallData,
+  getChainSpecificDefaultSaltNonce,
   predictSafeAddress
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
@@ -1161,7 +1161,10 @@ class Safe {
       customContracts
     })
 
-    const saltNonce = customSaltNonce || safeDeploymentConfig?.saltNonce || PREDETERMINED_SALT_NONCE
+    const saltNonce =
+      customSaltNonce ||
+      safeDeploymentConfig?.saltNonce ||
+      getChainSpecificDefaultSaltNonce(chainId)
 
     const safeDeployTransactionData = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...

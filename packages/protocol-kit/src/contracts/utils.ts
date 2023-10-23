@@ -152,6 +152,14 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
   }
 )
 
+/**
+ * Provides a default salt nonce with appended chainId to generate different addresses for the
+ * same Safe in different networks.
+ */
+export function getChainSpecificDefaultSaltNonce(chainId: number): string {
+  return `0x${keccak256(Buffer.from(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+}
+
 export async function predictSafeAddress({
   ethAdapter,
   safeAccountConfig,
@@ -162,8 +170,12 @@ export async function predictSafeAddress({
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
-  const { safeVersion = DEFAULT_SAFE_VERSION, saltNonce = PREDETERMINED_SALT_NONCE } =
-    safeDeploymentConfig
+  const chainId = await ethAdapter.getChainId()
+
+  const {
+    safeVersion = DEFAULT_SAFE_VERSION,
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+  } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     ethAdapter,
@@ -202,7 +214,6 @@ export async function predictSafeAddress({
 
   const input = ethAdapter.encodeParameters(['address'], [safeContract.getAddress()])
 
-  const chainId = await ethAdapter.getChainId()
   // zkSync Era counterfactual deployment is calculated differently
   // https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#create-create2
   if ([ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)) {

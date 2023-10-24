@@ -153,8 +153,11 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
 )
 
 /**
- * Provides a default salt nonce with appended chainId to generate different addresses for the
- * same Safe in different networks.
+ * Provides a chain-specific default salt nonce for generating unique addresses
+ * for the same Safe configuration across different chains.
+ *
+ * @param {number} chainId - The chain ID associated with the chain.
+ * @returns {string} The chain-specific salt nonce in hexadecimal format.
  */
 export function getChainSpecificDefaultSaltNonce(chainId: number): string {
   return `0x${keccak256(Buffer.from(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`

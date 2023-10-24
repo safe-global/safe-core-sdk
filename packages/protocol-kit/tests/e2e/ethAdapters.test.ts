@@ -72,12 +72,8 @@ describe('Safe contracts', () => {
       const ethAdapter = await getEthAdapter(getNetworkProvider('gnosis'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100
-      const isL1SafeMasterCopy = true
-      const singletonDeployment = getSafeContractDeployment(
-        safeVersion,
-        chainId,
-        isL1SafeMasterCopy
-      )
+      const isL1SafeSingleton = true
+      const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeSingleton)
       const safeContract = await ethAdapter.getSafeContract({
         safeVersion,
         singletonDeployment
@@ -95,8 +91,8 @@ describe('Safe contracts', () => {
       const customContract = contractNetworks[chainId]
       const safeContract = await ethAdapter.getSafeContract({
         safeVersion,
-        customContractAddress: customContract?.safeMasterCopyAddress,
-        customContractAbi: customContract?.safeMasterCopyAbi
+        customContractAddress: customContract?.safeSingletonAddress,
+        customContractAbi: customContract?.safeSingletonAbi
       })
       chai
         .expect(await safeContract.getAddress())

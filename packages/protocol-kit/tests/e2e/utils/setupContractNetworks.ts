@@ -13,8 +13,8 @@ import {
 export async function getContractNetworks(chainId: number): Promise<ContractNetworksConfig> {
   return {
     [chainId]: {
-      safeMasterCopyAddress: await (await getSafeSingleton()).contract.getAddress(),
-      safeMasterCopyAbi: (await getSafeSingleton()).abi,
+      safeSingletonAddress: await (await getSafeSingleton()).contract.getAddress(),
+      safeSingletonAbi: (await getSafeSingleton()).abi,
       safeProxyFactoryAddress: await (await getFactory()).contract.getAddress(),
       safeProxyFactoryAbi: (await getFactory()).abi,
       multiSendAddress: await (await getMultiSend()).contract.getAddress(),

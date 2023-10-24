@@ -1,7 +1,7 @@
 import { TransactionOptions } from '@safe-global/safe-core-sdk-types/types'
 
 export interface CreateProxyProps {
-  safeMasterCopyAddress: string
+  safeSingletonAddress: string
   initializer: string
   saltNonce: string
   options?: TransactionOptions

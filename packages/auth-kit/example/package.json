@@ -1,12 +1,11 @@
 {
   "name": "@safe-global/auth-kit-example",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "clean": "rm -rf node_modules/.vite",
+    "start": "yarn clean && vite"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",

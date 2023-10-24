@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { keccak256 } from 'ethereumjs-util'
 import { deployments, waffle } from 'hardhat'
+import { keccak_256 } from '@noble/hashes/sha3'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
   PREDETERMINED_SALT_NONCE,
@@ -209,7 +209,7 @@ describe('createSafeDeploymentTransaction', () => {
 
       const predeterminedSaltNonceEncoded = ethAdapter.encodeParameters(
         ['uint256'],
-        [`0x${keccak256(Buffer.from(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`]
+        [`0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`]
       )
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()

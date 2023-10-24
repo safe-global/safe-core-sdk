@@ -1,5 +1,6 @@
 import { isAddress } from '@ethersproject/address'
 import { BigNumber } from '@ethersproject/bignumber'
+import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
@@ -160,7 +161,7 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
  * @returns {string} The chain-specific salt nonce in hexadecimal format.
  */
 export function getChainSpecificDefaultSaltNonce(chainId: number): string {
-  return `0x${keccak256(Buffer.from(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+  return `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
 }
 
 export async function predictSafeAddress({

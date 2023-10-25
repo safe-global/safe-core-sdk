@@ -10,8 +10,8 @@ import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 abstract class SignMessageLibWeb3Contract implements SignMessageLibContract {
   constructor(public contract: SignMessageLib_V1_4_1 | SignMessageLib_V1_3_0) {}
 
-  getAddress(): string {
-    return this.contract.options.address
+  getAddress(): Promise<string> {
+    return Promise.resolve(this.contract.options.address)
   }
 
   async signMessage(

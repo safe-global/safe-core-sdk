@@ -105,7 +105,7 @@ class SafeFactory {
     return this.#safeVersion
   }
 
-  getAddress(): string {
+  getAddress(): Promise<string> {
     return this.#safeProxyFactoryContract.getAddress()
   }
 
@@ -158,7 +158,7 @@ class SafeFactory {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
-      safeSingletonAddress: this.#safeContract.getAddress(),
+      safeSingletonAddress: await this.#safeContract.getAddress(),
       initializer,
       saltNonce,
       options: {

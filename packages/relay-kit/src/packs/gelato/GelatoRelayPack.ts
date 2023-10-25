@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   CallWithSyncFeeRequest,
   GelatoRelay as GelatoNetworkRelay,
@@ -54,9 +53,9 @@ export class GelatoRelayPack extends RelayKitBasePack {
   async getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string> {
     const feeToken = this._getFeeToken(gasToken)
     const estimation = await this.#gelatoRelay.getEstimatedFee(
-      chainId,
+      BigInt(chainId),
       feeToken,
-      BigNumber.from(gasLimit),
+      BigInt(gasLimit),
       false
     )
     return estimation.toString()
@@ -307,7 +306,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       throw new Error('API key not defined')
     }
     const request: SponsoredCallRequest = {
-      chainId,
+      chainId: BigInt(chainId),
       target,
       data: encodedTransaction
     }
@@ -324,14 +323,14 @@ export class GelatoRelayPack extends RelayKitBasePack {
     const { gasLimit, gasToken } = options
     const feeToken = this._getFeeToken(gasToken)
     const request: CallWithSyncFeeRequest = {
-      chainId,
+      chainId: BigInt(chainId),
       target,
       data: encodedTransaction,
       feeToken,
       isRelayContext: false
     }
     const relayRequestOptions: RelayRequestOptions = {
-      gasLimit
+      gasLimit: gasLimit ? BigInt(gasLimit) : undefined
     }
     const response = await this.#gelatoRelay.callWithSyncFee(request, relayRequestOptions)
     return response

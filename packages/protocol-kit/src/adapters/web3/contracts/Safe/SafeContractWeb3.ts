@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   Web3TransactionOptions,
   Web3TransactionResult
@@ -31,8 +30,8 @@ abstract class SafeContractWeb3 implements SafeContract {
     return (await this.contract.methods.VERSION().call()) as SafeVersion
   }
 
-  getAddress(): string {
-    return this.contract.options.address
+  getAddress(): Promise<string> {
+    return Promise.resolve(this.contract.options.address)
   }
 
   async getNonce(): Promise<number> {
@@ -68,8 +67,8 @@ abstract class SafeContractWeb3 implements SafeContract {
       .call()
   }
 
-  async approvedHashes(ownerAddress: string, hash: string): Promise<BigNumber> {
-    return BigNumber.from(await this.contract.methods.approvedHashes(ownerAddress, hash).call())
+  async approvedHashes(ownerAddress: string, hash: string): Promise<bigint> {
+    return BigInt(await this.contract.methods.approvedHashes(ownerAddress, hash).call())
   }
 
   async approveHash(

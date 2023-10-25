@@ -15,7 +15,7 @@
     "@safe-global/safe-react-components": "^2.0.5",
     "@web3auth/modal": "^4.3.1",
     "@web3auth/openlogin-adapter": "^4.3.0",
-    "ethers": "^5.7.0",
+    "ethers": "^6.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0"

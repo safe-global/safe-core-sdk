@@ -1,4 +1,4 @@
 export interface MultiSendContract {
-  getAddress(): string
+  getAddress(): Promise<string>
   encode(methodName: any, params: any): string
 }

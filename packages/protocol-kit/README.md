@@ -52,7 +52,7 @@ The following steps show how to set up the Protocol Kit, deploy a new Safe, crea
 
 ### 1. Instantiate an EthAdapter
 
-First of all, we need to create an `EthAdapter`, which contains all the required utilities for the SDKs to interact with the blockchain. It acts as a wrapper for [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/) Ethereum libraries.
+First of all, we need to create an `EthAdapter`, which contains all the required utilities for the SDKs to interact with the blockchain. It acts as a wrapper for [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.org/v6/) Ethereum libraries.
 
 Depending on the library used by the Dapp, there are two options:
 

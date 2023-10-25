@@ -1,4 +1,4 @@
-import { hashMessage } from '@ethersproject/hash'
+import { hashMessage } from 'ethers'
 import { Currency, PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'

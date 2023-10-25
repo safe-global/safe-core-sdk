@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   SafeSetupConfig,
   SafeTransaction,
@@ -11,13 +10,13 @@ import {
 export interface SafeContract {
   setup(setupConfig: SafeSetupConfig, options?: TransactionOptions): Promise<TransactionResult>
   getVersion(): Promise<SafeVersion>
-  getAddress(): string
+  getAddress(): Promise<string>
   getNonce(): Promise<number>
   getThreshold(): Promise<number>
   getOwners(): Promise<string[]>
   isOwner(address: string): Promise<boolean>
   getTransactionHash(safeTransactionData: SafeTransactionData): Promise<string>
-  approvedHashes(ownerAddress: string, hash: string): Promise<BigNumber>
+  approvedHashes(ownerAddress: string, hash: string): Promise<bigint>
   approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult>
   getModules(): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>

@@ -1,4 +1,4 @@
-import { Interface } from '@ethersproject/abi'
+import { Interface } from 'ethers'
 
 // EIP-1271 magic values (https://eips.ethereum.org/EIPS/eip-1271)
 // The four-byte code is defined as follows:

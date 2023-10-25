@@ -3,7 +3,7 @@ import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/p
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getCompatibilityFallbackHandler,
@@ -13,7 +13,8 @@ import {
   getMultiSendCallOnly,
   getSafeSingleton,
   getSafeWithOwners,
-  getSignMessageLib
+  getSignMessageLib,
+  getSimulateTxAccessor
 } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -21,10 +22,10 @@ import { getAccounts } from './utils/setupTestNetwork'
 chai.use(chaiAsPromised)
 
 describe('Safe contracts manager', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     return {
       safe: await getSafeWithOwners([accounts[0].address]),
@@ -61,11 +62,12 @@ describe('Safe contracts manager', () => {
       const { safe, accounts } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       await chai
         .expect(
           Safe.create({
             ethAdapter,
-            safeAddress: safe.address
+            safeAddress
           })
         )
         .to.be.rejectedWith(
@@ -107,16 +109,19 @@ describe('Safe contracts manager', () => {
           signMessageLibAddress: ZERO_ADDRESS,
           signMessageLibAbi: (await getSignMessageLib()).abi,
           createCallAddress: ZERO_ADDRESS,
-          createCallAbi: (await getCreateCall()).abi
+          createCallAbi: (await getCreateCall()).abi,
+          simulateTxAccessorAddress: ZERO_ADDRESS,
+          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi
         }
       }
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       await chai
         .expect(
           Safe.create({
             ethAdapter,
-            safeAddress: safe.address,
+            safeAddress,
             contractNetworks: customContractNetworks
           })
         )
@@ -127,13 +132,14 @@ describe('Safe contracts manager', () => {
       const { safe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       chai
-        .expect(safeSdk.getMultiSendAddress())
+        .expect(await safeSdk.getMultiSendAddress())
         .to.be.eq(contractNetworks[chainId].multiSendAddress)
     })
   })

@@ -29,8 +29,7 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "dependencies": {
-    "@ethersproject/bignumber": "^5.7.0",
-    "@ethersproject/contracts": "^5.7.0",
+    "ethers": "^6.7.1",
     "@safe-global/safe-deployments": "^1.27.0",
     "web3-core": "^1.8.1",
     "web3-utils": "^1.8.1"

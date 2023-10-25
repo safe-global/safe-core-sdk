@@ -1,8 +1,7 @@
-import { Signer } from '@ethersproject/abstract-signer'
-import { Wallet } from '@ethersproject/wallet'
-import { ethers, waffle, Web3 } from 'hardhat'
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
+import { ethers, Web3 } from 'hardhat'
 interface Account {
-  signer: Signer
+  signer: HardhatEthersSigner
   address: string
 }
 
@@ -18,19 +17,22 @@ async function getGanacheAccounts(): Promise<Account[]> {
   return accounts
 }
 
-function getHardhatAccounts(): Account[] {
-  const wallets = waffle.provider.getWallets()
+async function getHardhatAccounts(): Promise<Account[]> {
+  const wallets = await ethers.getSigners()
+
   const accounts: Account[] = []
+
   for (let i = 0; i < 10; i++) {
-    const wallet: Wallet = wallets[i]
-    const account: Account = { signer: wallet as Signer, address: wallet.address }
+    const wallet = wallets[i]
+    const account: Account = { signer: wallet, address: wallet.address }
     accounts.push(account)
   }
+
   return accounts
 }
 
 export async function getAccounts(): Promise<Account[]> {
   const accounts =
-    process.env.TEST_NETWORK === 'ganache' ? await getGanacheAccounts() : getHardhatAccounts()
+    process.env.TEST_NETWORK === 'ganache' ? await getGanacheAccounts() : await getHardhatAccounts()
   return accounts
 }

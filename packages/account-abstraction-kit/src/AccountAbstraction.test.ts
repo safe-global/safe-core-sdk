@@ -80,25 +80,47 @@ describe('AccountAbstraction', () => {
     })
   })
 
-  const initAccountAbstraction = async () => {
-    const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
-    const relayPack = new GelatoRelayPack()
-    await accountAbstraction.init({ relayPack })
-    return accountAbstraction
-  }
+  describe('initialized', () => {
+    const safeInstanceMock = { getNonce: jest.fn() }
 
-  describe('getSignerAddress', () => {
+    const initAccountAbstraction = async () => {
+      const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
+      const relayPack = new GelatoRelayPack()
+      await accountAbstraction.init({ relayPack })
+      return accountAbstraction
+    }
+
     let accountAbstraction: AccountAbstraction
 
     beforeEach(async () => {
       accountAbstraction = await initAccountAbstraction()
       jest.clearAllMocks()
+      SafeMock.create = () => Promise.resolve(safeInstanceMock as unknown as Safe)
     })
 
-    it("should return the signer's address", async () => {
-      const result = await accountAbstraction.getSignerAddress()
-      expect(result).toBe(signerAddress)
-      expect(signer.getAddress).toHaveBeenCalledTimes(1)
+    describe('getSignerAddress', () => {
+      it("should return the signer's address", async () => {
+        const result = await accountAbstraction.getSignerAddress()
+        expect(result).toBe(signerAddress)
+        expect(signer.getAddress).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('getNonce', () => {
+      const nonceMock = 123
+      safeInstanceMock.getNonce.mockResolvedValueOnce(nonceMock)
+
+      it('should return the nonce received from Safe SDK', async () => {
+        const result = await accountAbstraction.getNonce()
+        expect(result).toBe(nonceMock)
+        expect(safeInstanceMock.getNonce).toHaveBeenCalledTimes(1)
+      })
+
+      it('should throw if Safe SDK is not initiallized', async () => {
+        const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
+        expect(accountAbstraction.getNonce()).rejects.toThrow('SDK not initialized')
+        expect(safeInstanceMock.getNonce).toHaveBeenCalledTimes(0)
+      })
     })
   })
 })

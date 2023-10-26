@@ -230,7 +230,7 @@ describe('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e'
+          message: '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
         }
       })
     })
@@ -305,7 +305,7 @@ describe('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e'
+          message: '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
         }
       })
     })

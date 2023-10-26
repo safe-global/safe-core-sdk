@@ -1,4 +1,4 @@
-import { ethers, TypedDataEncoder } from 'ethers'
+import { ethers, TypedDataDomain } from 'ethers'
 import {
   EIP712MessageTypes,
   EIP712TxTypes,
@@ -60,11 +60,8 @@ export function getEip712MessageTypes(safeVersion: string): EIP712MessageTypes {
 
 export const hashTypedData = (typedData: EIP712TypedData): string => {
   // `ethers` doesn't require `EIP712Domain` and otherwise throws
-  // FIXME check this is the correct Ethers v6 migration
-  // const { EIP712Domain: _, ...types } = typedData.types
-  const typedDataEncoder = new TypedDataEncoder(typedData.types)
-  // return typedDataEncoder.hash(typedData.domain as TypedDataDomain, types, typedData.message)
-  return typedDataEncoder.hash(typedData.message)
+  const { EIP712Domain: _, ...types } = typedData.types
+  return ethers.TypedDataEncoder.hash(typedData.domain as TypedDataDomain, types, typedData.message)
 }
 
 const hashMessage = (message: string): string => {

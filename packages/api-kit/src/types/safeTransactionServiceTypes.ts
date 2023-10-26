@@ -1,4 +1,4 @@
-import { Signer } from 'ethers'
+import { Signer, TypedDataDomain, TypedDataField } from 'ethers'
 import {
   SafeMultisigTransactionResponse,
   SafeTransactionData
@@ -282,25 +282,8 @@ export type GetSafeMessageListProps = {
   offset?: string
 }
 
-export type TypedDataDomain = {
-  name?: string
-  version?: string
-  chainId?: unknown
-  verifyingContract?: string
-  salt?: ArrayLike<number> | string
-}
-
-export type TypedDataTypes = {
-  name: string
-  type: string
-}
-
-export type TypedMessageTypes = {
-  [key: string]: TypedDataTypes[]
-}
-
 export type EIP712TypedData = {
   domain: TypedDataDomain
-  types: TypedMessageTypes
+  types: TypedDataField
   message: Record<string, unknown>
 }

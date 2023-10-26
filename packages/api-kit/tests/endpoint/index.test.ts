@@ -1,5 +1,6 @@
 import { getDefaultProvider, Wallet } from 'ethers'
 import SafeApiKit, {
+  AddMessageProps,
   AddSafeDelegateProps,
   DeleteSafeDelegateProps,
   SafeMultisigTransactionEstimate
@@ -590,21 +591,30 @@ describe('Endpoint tests', () => {
 
     it('addMessage', async () => {
       const safeAddress = '0x6C465b1D7aBCcDC02Ed48bc32e289795603a5c79'
-      const data = {
+
+      const body: AddMessageProps = {
         message: 'message',
         signature: '0x'
       }
 
       await chai
-        .expect(safeApiKit.addMessage(safeAddress, data))
+        .expect(safeApiKit.addMessage(safeAddress, body))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
         method: 'post',
-        body: {
-          ...data,
-          safeAppId: 0
-        }
+        body
+      })
+
+      body.safeAppId = 123
+
+      await chai
+        .expect(safeApiKit.addMessage(safeAddress, body))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+        method: 'post',
+        body
       })
     })
 

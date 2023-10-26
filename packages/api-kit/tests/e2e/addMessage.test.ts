@@ -74,6 +74,7 @@ describe('addMessage', () => {
     await chai.expect(
       safeApiKit.addMessage(safeAddress, {
         message: rawMessage,
+        safeAppId: 123,
         signature: signature.data
       })
     ).to.be.fulfilled

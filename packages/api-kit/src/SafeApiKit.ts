@@ -686,10 +686,7 @@ class SafeApiKit {
    * @param safeAddress The safe address
    * @param options The raw message to add, signature and safeAppId if any
    */
-  async addMessage(
-    safeAddress: string,
-    { message, safeAppId, signature }: AddMessageProps
-  ): Promise<void> {
+  async addMessage(safeAddress: string, addMessageProps: AddMessageProps): Promise<void> {
     if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
     }
@@ -697,11 +694,7 @@ class SafeApiKit {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
       method: HttpMethod.Post,
-      body: {
-        message,
-        safeAppId,
-        signature
-      }
+      body: addMessageProps
     })
   }
 

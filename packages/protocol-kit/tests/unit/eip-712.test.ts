@@ -44,7 +44,7 @@ describe('EIP-712 sign typed data', () => {
     })
   })
 
-  describe.only('generateTypedData', async () => {
+  describe('generateTypedData', async () => {
     it('should generate the typed data for Safes == v1.0.0', async () => {
       const { domain } = generateTypedData({
         safeAddress,
@@ -176,24 +176,6 @@ describe('EIP-712 sign typed data', () => {
         },
         primaryType: 'Mail',
         types: {
-          EIP712Domain: [
-            {
-              name: 'name',
-              type: 'string'
-            },
-            {
-              name: 'version',
-              type: 'string'
-            },
-            {
-              name: 'chainId',
-              type: 'uint256'
-            },
-            {
-              name: 'verifyingContract',
-              type: 'address'
-            }
-          ],
           Mail: [
             {
               name: 'from',
@@ -248,7 +230,7 @@ describe('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
+          message: '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e'
         }
       })
     })
@@ -274,24 +256,6 @@ describe('EIP-712 sign typed data', () => {
         },
         primaryType: 'Mail',
         types: {
-          EIP712Domain: [
-            {
-              name: 'name',
-              type: 'string'
-            },
-            {
-              name: 'version',
-              type: 'string'
-            },
-            {
-              name: 'chainId',
-              type: 'uint256'
-            },
-            {
-              name: 'verifyingContract',
-              type: 'address'
-            }
-          ],
           Mail: [
             {
               name: 'from',
@@ -341,7 +305,7 @@ describe('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2'
+          message: '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e'
         }
       })
     })

@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
   PredictedSafeProps,
@@ -12,7 +11,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
@@ -31,10 +30,10 @@ const BASE_OPTIONS: SafeTransactionOptionalProps = {
 }
 
 describe('Transactions creation', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -63,9 +62,10 @@ describe('Transactions creation', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const txDataPartial: SafeTransactionDataPartial = {
@@ -90,9 +90,10 @@ describe('Transactions creation', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const txDataPartial: SafeTransactionDataPartial = {
@@ -107,7 +108,7 @@ describe('Transactions creation', () => {
           tx: txDataPartial,
           contractNetworks
         })
-        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
+        chai.expect(BigInt(safeTxData.safeTxGas) > 0).to.be.true
       }
     )
 
@@ -118,9 +119,10 @@ describe('Transactions creation', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTxGas = BASE_OPTIONS.safeTxGas
@@ -147,9 +149,10 @@ describe('Transactions creation', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const txDataPartial: SafeTransactionDataPartial = {
@@ -163,7 +166,7 @@ describe('Transactions creation', () => {
           tx: txDataPartial,
           contractNetworks
         })
-        chai.expect(BigNumber.from(safeTxData.safeTxGas).gt(BigNumber.from(0))).to.be.true
+        chai.expect(BigInt(safeTxData.safeTxGas) > 0).to.be.true
       }
     )
 
@@ -174,9 +177,10 @@ describe('Transactions creation', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTxGas = '0'
@@ -203,9 +207,10 @@ describe('Transactions creation', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTxGas = BASE_OPTIONS.safeTxGas
@@ -252,9 +257,10 @@ describe('Transactions creation', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
@@ -280,9 +286,10 @@ describe('Transactions creation', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
@@ -308,9 +315,10 @@ describe('Transactions creation', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: MetaTransactionData[] = [
@@ -331,9 +339,10 @@ describe('Transactions creation', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: MetaTransactionData[] = [
@@ -361,9 +370,10 @@ describe('Transactions creation', () => {
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: MetaTransactionData[] = []
@@ -376,14 +386,15 @@ describe('Transactions creation', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: MetaTransactionData[] = [
         {
-          to: erc20Mintable.address,
+          to: await erc20Mintable.getAddress(),
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
@@ -391,7 +402,7 @@ describe('Transactions creation', () => {
           ])
         },
         {
-          to: erc20Mintable.address,
+          to: await erc20Mintable.getAddress(),
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
@@ -407,17 +418,18 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, erc20Mintable, chainId } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const options: SafeTransactionOptionalProps = BASE_OPTIONS
 
       const safeTransactionData: MetaTransactionData[] = [
         {
-          to: erc20Mintable.address,
+          to: await erc20Mintable.getAddress(),
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
@@ -425,7 +437,7 @@ describe('Transactions creation', () => {
           ])
         },
         {
-          to: erc20Mintable.address,
+          to: await erc20Mintable.getAddress(),
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
@@ -450,13 +462,14 @@ describe('Transactions creation', () => {
         const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
         const account = accounts[0]
         const ethAdapter = await getEthAdapter(account.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
           predictedSafe,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }

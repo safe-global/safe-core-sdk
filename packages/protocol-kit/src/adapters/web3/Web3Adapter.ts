@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import {
   Eip3770Address,
@@ -62,12 +61,11 @@ class Web3Adapter implements EthAdapter {
     return validateEip3770Address(fullAddress, chainId)
   }
 
-  async getBalance(address: string, defaultBlock?: string | number): Promise<BigNumber> {
+  async getBalance(address: string, defaultBlock?: string | number): Promise<bigint> {
     const balance = defaultBlock
       ? await this.#web3.eth.getBalance(address, defaultBlock)
       : await this.#web3.eth.getBalance(address)
-    // FIXME Web3 Adapter is forced to return an Ethers type
-    return BigNumber.from(balance)
+    return BigInt(balance)
   }
 
   async getNonce(address: string, defaultBlock?: string | number): Promise<number> {

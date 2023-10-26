@@ -6,7 +6,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
@@ -16,10 +16,10 @@ import { getAccounts } from './utils/setupTestNetwork'
 chai.use(chaiAsPromised)
 
 describe('Off-chain signatures', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -57,13 +57,14 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
@@ -86,9 +87,10 @@ describe('Off-chain signatures', () => {
           predictedSafe,
           contractNetworks
         })
+        const safeAddress = await safe.getAddress()
         const safeSdkExistingSafe = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
@@ -117,8 +119,9 @@ describe('Off-chain signatures', () => {
           predictedSafe,
           contractNetworks
         })
+        const safeAddress = await safe.getAddress()
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
@@ -134,13 +137,14 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
       const ethAdapter = await getEthAdapter(account3.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
@@ -154,13 +158,14 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
@@ -179,13 +184,14 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress: safeAddress,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
@@ -202,13 +208,14 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
@@ -226,13 +233,14 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
@@ -250,13 +258,14 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
@@ -273,13 +282,14 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
@@ -297,13 +307,14 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
@@ -318,13 +329,14 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
@@ -339,13 +351,14 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
@@ -360,9 +373,10 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeServiceTransaction: SafeMultisigTransactionResponse = {

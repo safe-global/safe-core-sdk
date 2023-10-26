@@ -8,7 +8,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 
 import { itif } from './utils/helpers'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -23,10 +23,10 @@ chai.use(chaiAsPromised)
 const ERC20_TOKEN_ADDRESS = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 
 describe('ERC-20 utils', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
 
     return {
@@ -42,6 +42,8 @@ describe('ERC-20 utils', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
 
+        const safeAddress = await safe.getAddress()
+
         const [account1] = accounts
 
         const ethAdapter = await getEthAdapter(account1.signer)
@@ -51,7 +53,7 @@ describe('ERC-20 utils', () => {
 
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 
@@ -65,6 +67,7 @@ describe('ERC-20 utils', () => {
       'should return the correct decimals for a non-standard ERC20 token',
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
+        const safeAddress = await safe.getAddress()
 
         const [account1] = accounts
 
@@ -75,7 +78,7 @@ describe('ERC-20 utils', () => {
 
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 
@@ -89,6 +92,7 @@ describe('ERC-20 utils', () => {
       'should throw an error if decimals() fn is not defined',
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
+        const safeAddress = await safe.getAddress()
 
         const [account1] = accounts
 
@@ -99,7 +103,7 @@ describe('ERC-20 utils', () => {
 
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 
@@ -115,6 +119,7 @@ describe('ERC-20 utils', () => {
       'should return true if it is the Native token',
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
+        const safeAddress = await safe.getAddress()
 
         const [account1] = accounts
 
@@ -122,7 +127,7 @@ describe('ERC-20 utils', () => {
 
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 
@@ -139,6 +144,7 @@ describe('ERC-20 utils', () => {
       'should return true if it is an standard ERC20 token',
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
+        const safeAddress = await safe.getAddress()
 
         const [account1] = accounts
 
@@ -149,7 +155,7 @@ describe('ERC-20 utils', () => {
 
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 
@@ -166,6 +172,7 @@ describe('ERC-20 utils', () => {
       'should return false for a non-standard ERC20 token',
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
+        const safeAddress = await safe.getAddress()
 
         const [account1] = accounts
 
@@ -176,7 +183,7 @@ describe('ERC-20 utils', () => {
 
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
 

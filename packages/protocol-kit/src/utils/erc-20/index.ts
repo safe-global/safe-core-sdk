@@ -1,4 +1,4 @@
-import { Interface } from '@ethersproject/abi'
+import { Interface } from 'ethers'
 import Safe from '@safe-global/protocol-kit/Safe'
 import { Transaction } from '@safe-global/safe-core-sdk-types'
 

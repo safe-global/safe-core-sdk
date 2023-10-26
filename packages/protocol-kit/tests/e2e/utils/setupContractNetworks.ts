@@ -13,21 +13,21 @@ import {
 export async function getContractNetworks(chainId: number): Promise<ContractNetworksConfig> {
   return {
     [chainId]: {
-      safeSingletonAddress: (await getSafeSingleton()).contract.address,
+      safeSingletonAddress: await (await getSafeSingleton()).contract.getAddress(),
       safeSingletonAbi: (await getSafeSingleton()).abi,
-      safeProxyFactoryAddress: (await getFactory()).contract.address,
+      safeProxyFactoryAddress: await (await getFactory()).contract.getAddress(),
       safeProxyFactoryAbi: (await getFactory()).abi,
-      multiSendAddress: (await getMultiSend()).contract.address,
+      multiSendAddress: await (await getMultiSend()).contract.getAddress(),
       multiSendAbi: (await getMultiSend()).abi,
-      multiSendCallOnlyAddress: (await getMultiSendCallOnly()).contract.address,
+      multiSendCallOnlyAddress: await (await getMultiSendCallOnly()).contract.getAddress(),
       multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
-      fallbackHandlerAddress: (await getCompatibilityFallbackHandler()).contract.address,
+      fallbackHandlerAddress: await (await getCompatibilityFallbackHandler()).contract.getAddress(),
       fallbackHandlerAbi: (await getCompatibilityFallbackHandler()).abi,
-      signMessageLibAddress: (await getSignMessageLib()).contract.address,
+      signMessageLibAddress: await (await getSignMessageLib()).contract.getAddress(),
       signMessageLibAbi: (await getSignMessageLib()).abi,
-      createCallAddress: (await getCreateCall()).contract.address,
+      createCallAddress: await (await getCreateCall()).contract.getAddress(),
       createCallAbi: (await getCreateCall()).abi,
-      simulateTxAccessorAddress: (await getSimulateTxAccessor()).contract.address,
+      simulateTxAccessorAddress: await (await getSimulateTxAccessor()).contract.getAddress(),
       simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi
     }
   }

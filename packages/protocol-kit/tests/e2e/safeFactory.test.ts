@@ -9,7 +9,7 @@ import {
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
@@ -20,7 +20,8 @@ import {
   getMultiSend,
   getMultiSendCallOnly,
   getSafeSingleton,
-  getSignMessageLib
+  getSignMessageLib,
+  getSimulateTxAccessor
 } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -28,14 +29,14 @@ import { getAccounts } from './utils/setupTestNetwork'
 chai.use(chaiAsPromised)
 
 describe('SafeProxyFactory', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
-      chainId: (await waffle.provider.getNetwork()).chainId,
+      chainId,
       accounts,
       contractNetworks
     }
@@ -70,7 +71,9 @@ describe('SafeProxyFactory', () => {
           signMessageLibAddress: ZERO_ADDRESS,
           signMessageLibAbi: (await getSignMessageLib()).abi,
           createCallAddress: ZERO_ADDRESS,
-          createCallAbi: (await getCreateCall()).abi
+          createCallAbi: (await getCreateCall()).abi,
+          simulateTxAccessorAddress: ZERO_ADDRESS,
+          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi
         }
       }
       chai
@@ -85,7 +88,7 @@ describe('SafeProxyFactory', () => {
       const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
       const networkId = await ethAdapter.getChainId()
       chai
-        .expect(safeFactory.getAddress())
+        .expect(await safeFactory.getAddress())
         .to.be.eq(contractNetworks[networkId].safeProxyFactoryAddress)
     })
   })
@@ -108,7 +111,7 @@ describe('SafeProxyFactory', () => {
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
-      chai.expect(await safeFactory.getChainId()).to.be.eq(chainId)
+      chai.expect(await safeFactory.getChainId()).to.be.eq(Number(chainId))
     })
   })
 
@@ -224,8 +227,9 @@ describe('SafeProxyFactory', () => {
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
         const safe = await safeFactory.deploySafe(deploySafeProps)
         chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
-        const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
-          .address
+        const compatibilityFallbackHandler = await (
+          await getCompatibilityFallbackHandler()
+        ).contract.getAddress()
         chai.expect(compatibilityFallbackHandler).to.be.eq(await safe.getFallbackHandler())
       }
     )
@@ -246,7 +250,7 @@ describe('SafeProxyFactory', () => {
         const safeAccountConfig: SafeAccountConfig = {
           owners,
           threshold,
-          fallbackHandler: defaultCallbackHandler.address
+          fallbackHandler: await defaultCallbackHandler.getAddress()
         }
         const saltNonce = '12345'
         const counterfactualSafeAddress = await safeFactory.predictSafeAddress(
@@ -256,7 +260,9 @@ describe('SafeProxyFactory', () => {
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
         const safe = await safeFactory.deploySafe(deploySafeProps)
         chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
-        chai.expect(defaultCallbackHandler.address).to.be.eq(await safe.getFallbackHandler())
+        chai
+          .expect(await defaultCallbackHandler.getAddress())
+          .to.be.eq(await safe.getFallbackHandler())
       }
     )
   })
@@ -339,7 +345,7 @@ describe('SafeProxyFactory', () => {
         const safeAccountConfig: SafeAccountConfig = {
           owners,
           threshold,
-          fallbackHandler: defaultCallbackHandler.address
+          fallbackHandler: await defaultCallbackHandler.getAddress()
         }
         const deploySafeProps: DeploySafeProps = { safeAccountConfig }
         const safe = await safeFactory.deploySafe(deploySafeProps)
@@ -348,7 +354,7 @@ describe('SafeProxyFactory', () => {
         const deployedSafeThreshold = await safe.getThreshold()
         chai.expect(deployedSafeThreshold).to.be.eq(threshold)
         const fallbackHandler = await safe.getFallbackHandler()
-        chai.expect(defaultCallbackHandler.address).to.be.eq(fallbackHandler)
+        chai.expect(await defaultCallbackHandler.getAddress()).to.be.eq(fallbackHandler)
       }
     )
 
@@ -369,8 +375,9 @@ describe('SafeProxyFactory', () => {
         const deploySafeProps: DeploySafeProps = { safeAccountConfig }
         const safe = await safeFactory.deploySafe(deploySafeProps)
         const fallbackHandler = await safe.getFallbackHandler()
-        const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
-          .address
+        const compatibilityFallbackHandler = await (
+          await getCompatibilityFallbackHandler()
+        ).contract.getAddress()
         chai.expect(compatibilityFallbackHandler).to.be.eq(fallbackHandler)
       }
     )

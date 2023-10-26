@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { ethers } from 'ethers'
 import {
   EthAdapter,
@@ -205,7 +204,7 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    return Promise.resolve(this.#contractManager.safeContract.getAddress())
+    return await this.#contractManager.safeContract.getAddress()
   }
 
   /**
@@ -231,8 +230,8 @@ class Safe {
    *
    * @returns The address of the MultiSend contract
    */
-  getMultiSendAddress(): string {
-    return this.#contractManager.multiSendContract.getAddress()
+  async getMultiSendAddress(): Promise<string> {
+    return await this.#contractManager.multiSendContract.getAddress()
   }
 
   /**
@@ -240,8 +239,8 @@ class Safe {
    *
    * @returns The address of the MultiSendCallOnly contract
    */
-  getMultiSendCallOnlyAddress(): string {
-    return this.#contractManager.multiSendCallOnlyContract.getAddress()
+  async getMultiSendCallOnlyAddress(): Promise<string> {
+    return await this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
   /**
@@ -325,7 +324,7 @@ class Safe {
    *
    * @returns The ETH balance of the Safe
    */
-  async getBalance(): Promise<BigNumber> {
+  async getBalance(): Promise<bigint> {
     return this.#ethAdapter.getBalance(await this.getAddress())
   }
 
@@ -420,7 +419,7 @@ class Safe {
 
       const multiSendTransaction = {
         ...options,
-        to: multiSendContract.getAddress(),
+        to: await multiSendContract.getAddress(),
         value: '0',
         data: multiSendContract.encode('multiSend', [multiSendData]),
         operation: OperationType.DelegateCall
@@ -501,7 +500,7 @@ class Safe {
     }
 
     if (typeof txOrMessage === 'string') {
-      return ethers.utils.hashMessage(txOrMessage) || ''
+      return ethers.hashMessage(txOrMessage) || ''
     }
 
     const safeTransactionData = txOrMessage.data
@@ -680,7 +679,7 @@ class Safe {
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
       const approved = await this.#contractManager.safeContract.approvedHashes(owner, txHash)
-      if (approved.gt(0)) {
+      if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
     }
@@ -1044,10 +1043,10 @@ class Safe {
       )
     }
 
-    const value = BigNumber.from(signedSafeTransaction.data.value)
-    if (!value.isZero()) {
+    const value = BigInt(signedSafeTransaction.data.value)
+    if (value !== 0n) {
       const balance = await this.getBalance()
-      if (value.gt(BigNumber.from(balance))) {
+      if (value > balance) {
         throw new Error('Not enough Ether funds')
       }
     }
@@ -1211,11 +1210,11 @@ class Safe {
 
     const safeDeployTransactionData = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: safeProxyFactoryContract.getAddress(),
+      to: await safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        safeSingletonContract.getAddress(),
+        await safeSingletonContract.getAddress(),
         initializer, // call to the setup method to set the threshold & owners of the new Safe
         saltNonce
       ])
@@ -1255,7 +1254,7 @@ class Safe {
 
     const transactionBatch = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: multiSendCallOnlyContract.getAddress(),
+      to: await multiSendCallOnlyContract.getAddress(),
       value: '0',
       data: batchData
     }

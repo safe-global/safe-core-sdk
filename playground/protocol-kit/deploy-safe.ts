@@ -1,5 +1,6 @@
 import { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
 import { EthersAdapter } from '@safe-global/protocol-kit'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK
@@ -11,21 +12,23 @@ interface Config {
     OWNERS: string[]
     THRESHOLD: number
     SALT_NONCE: string
+    SAFE_VERSION: string
   }
 }
 
 const config: Config = {
   RPC_URL: 'https://goerli.infura.io/v3/<INFURA_KEY>',
-  DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_PRIVATE_KEY>',
+  DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
-    OWNERS: ['<OWNER_ADDRESS_1>', '<OWNER_ADDRESS_2>'],
+    OWNERS: ['OWNER_ADDRESS'],
     THRESHOLD: 1, // <SAFE_THRESHOLD>
-    SALT_NONCE: '<SALT_NONCE_NUMBER>'
+    SALT_NONCE: '150000',
+    SAFE_VERSION: '1.3.0'
   }
 }
 
 async function main() {
-  const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
+  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
   const deployerSigner = new ethers.Wallet(config.DEPLOYER_ADDRESS_PRIVATE_KEY, provider)
 
   // Create EthAdapter instance
@@ -34,8 +37,12 @@ async function main() {
     signerOrProvider: deployerSigner
   })
 
+  const safeVersion = config.DEPLOY_SAFE.SAFE_VERSION as SafeVersion
+
+  console.log('safe config: ', config.DEPLOY_SAFE)
+
   // Create SafeFactory instance
-  const safeFactory = await SafeFactory.create({ ethAdapter })
+  const safeFactory = await SafeFactory.create({ ethAdapter, safeVersion })
 
   // Config of the deployed Safe
   const safeAccountConfig: SafeAccountConfig = {

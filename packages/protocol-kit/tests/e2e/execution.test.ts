@@ -10,8 +10,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { BigNumber } from 'ethers'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
@@ -22,10 +21,10 @@ import { waitSafeTxReceipt } from './utils/transactions'
 chai.use(chaiAsPromised)
 
 describe('Transactions execution', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     return {
       erc20Mintable: await getERC20Mintable(),
@@ -40,10 +39,11 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -52,8 +52,8 @@ describe('Transactions execution', () => {
         contractNetworks
       })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const safeTransactionData: SafeTransactionDataPartial = {
@@ -77,15 +77,16 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const safeTransactionData: SafeTransactionDataPartial = {
@@ -106,10 +107,11 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeInitialBalance = await safeSdk1.getBalance()
@@ -129,16 +131,17 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const ethAdapter2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
       const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
@@ -156,14 +159,15 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
@@ -177,10 +181,11 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -189,8 +194,8 @@ describe('Transactions execution', () => {
         contractNetworks
       })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
@@ -212,15 +217,16 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
@@ -238,15 +244,16 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
@@ -264,15 +271,16 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const safeTransactionData: SafeTransactionDataPartial = {
@@ -287,9 +295,7 @@ describe('Transactions execution', () => {
       chai.expect(initNumSignatures).to.be.eq(finalNumSignatures)
       await waitSafeTxReceipt(txResponse)
       const safeFinalBalance = await safeSdk1.getBalance()
-      chai
-        .expect(safeInitialBalance.toString())
-        .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+      chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
     })
 
     itif(process.env.ETH_LIB === 'web3' && safeVersionDeployed === '1.0.0')(
@@ -298,16 +304,17 @@ describe('Transactions execution', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2, account3] = accounts
         const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+        const safeAddress = await safe.getAddress()
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const ethAdapter1 = await getEthAdapter(account1.signer)
         const ethAdapter2 = await getEthAdapter(account2.signer)
         const ethAdapter3 = await getEthAdapter(account3.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter: ethAdapter1,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
@@ -334,9 +341,7 @@ describe('Transactions execution', () => {
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
         const safeFinalBalance = await safeSdk1.getBalance()
-        chai
-          .expect(safeInitialBalance.toString())
-          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+        chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
       }
     )
 
@@ -351,9 +356,10 @@ describe('Transactions execution', () => {
           account3.address,
           account4.address
         ])
+        const safeAddress = await safe.getAddress()
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const ethAdapter1 = await getEthAdapter(account1.signer)
         const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -361,7 +367,7 @@ describe('Transactions execution', () => {
         const ethAdapter4 = await getEthAdapter(account4.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter: ethAdapter1,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
@@ -392,9 +398,7 @@ describe('Transactions execution', () => {
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
         const safeFinalBalance = await safeSdk1.getBalance()
-        chai
-          .expect(safeInitialBalance.toString())
-          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+        chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
       }
     )
 
@@ -410,9 +414,10 @@ describe('Transactions execution', () => {
           account4.address,
           account5.address
         ])
+        const safeAddress = await safe.getAddress()
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const ethAdapter1 = await getEthAdapter(account1.signer)
         const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -421,7 +426,7 @@ describe('Transactions execution', () => {
         const ethAdapter5 = await getEthAdapter(account5.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter: ethAdapter1,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
@@ -456,9 +461,7 @@ describe('Transactions execution', () => {
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
         const safeFinalBalance = await safeSdk1.getBalance()
-        chai
-          .expect(safeInitialBalance.toString())
-          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+        chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
       }
     )
 
@@ -475,9 +478,10 @@ describe('Transactions execution', () => {
           account5.address,
           account6.address
         ])
+        const safeAddress = await safe.getAddress()
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const ethAdapter1 = await getEthAdapter(account1.signer)
         const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -487,7 +491,7 @@ describe('Transactions execution', () => {
         const ethAdapter6 = await getEthAdapter(account6.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter: ethAdapter1,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeSdk2 = await safeSdk1.connect({ ethAdapter: ethAdapter2 })
@@ -526,9 +530,7 @@ describe('Transactions execution', () => {
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
         const safeFinalBalance = await safeSdk1.getBalance()
-        chai
-          .expect(safeInitialBalance.toString())
-          .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+        chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
       }
     )
 
@@ -536,9 +538,10 @@ describe('Transactions execution', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
       const ethAdapter1 = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -546,8 +549,8 @@ describe('Transactions execution', () => {
       const ethAdapter3 = await getEthAdapter(account3.signer)
       const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       await account2.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const safeTransactionData: SafeTransactionDataPartial = {
@@ -563,9 +566,7 @@ describe('Transactions execution', () => {
       const txResponse2 = await safeSdk3.executeTransaction(signedTx)
       await waitSafeTxReceipt(txResponse2)
       const safeFinalBalance = await safeSdk1.getBalance()
-      chai
-        .expect(safeInitialBalance.toString())
-        .to.be.eq(safeFinalBalance.add(BigNumber.from(tx.data.value).toString()))
+      chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
     })
 
     itif(process.env.ETH_LIB === 'ethers')(
@@ -574,15 +575,16 @@ describe('Transactions execution', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const safeTransactionData: SafeTransactionDataPartial = {
           to: account2.address,
@@ -604,15 +606,16 @@ describe('Transactions execution', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const safeTransactionData: SafeTransactionDataPartial = {
           to: account2.address,
@@ -638,15 +641,16 @@ describe('Transactions execution', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const safeTransactionData: SafeTransactionDataPartial = {
           to: account2.address,
@@ -654,19 +658,17 @@ describe('Transactions execution', () => {
           data: '0x'
         }
         const tx = await safeSdk1.createTransaction({ safeTransactionData })
-        const execOptions: EthersTransactionOptions = {
-          maxFeePerGas: 200000000, //higher than hardhat's block baseFeePerGas
+        const execOptions = {
+          maxFeePerGas: 200_000_000, //higher than hardhat's block baseFeePerGas
           maxPriorityFeePerGas: 1
         }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
         const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
+        chai.expect(BigInt(execOptions.maxFeePerGas)).to.be.eq(txConfirmed.maxFeePerGas)
         chai
-          .expect(BigNumber.from(execOptions.maxFeePerGas))
-          .to.be.eq(BigNumber.from(txConfirmed.maxFeePerGas))
-        chai
-          .expect(BigNumber.from(execOptions.maxPriorityFeePerGas))
-          .to.be.eq(BigNumber.from(txConfirmed.maxPriorityFeePerGas))
+          .expect(BigInt(execOptions.maxPriorityFeePerGas))
+          .to.be.eq(txConfirmed.maxPriorityFeePerGas)
       }
     )
 
@@ -676,15 +678,16 @@ describe('Transactions execution', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const safeTransactionData: SafeTransactionDataPartial = {
           to: account2.address,
@@ -706,15 +709,16 @@ describe('Transactions execution', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const safeTransactionData: SafeTransactionDataPartial = {
           to: account2.address,
@@ -740,15 +744,16 @@ describe('Transactions execution', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
         const ethAdapter = await getEthAdapter(account1.signer)
         const safeSdk1 = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         await account1.signer.sendTransaction({
-          to: safe.address,
-          value: BigNumber.from('1000000000000000000') // 1 ETH
+          to: safeAddress,
+          value: 1_000_000_000_000_000_000n // 1 ETH
         })
         const safeTransactionData: SafeTransactionDataPartial = {
           to: account2.address,
@@ -756,19 +761,17 @@ describe('Transactions execution', () => {
           data: '0x'
         }
         const tx = await safeSdk1.createTransaction({ safeTransactionData })
-        const execOptions: Web3TransactionOptions = {
+        const execOptions = {
           maxFeePerGas: 200000000, //higher than hardhat's block baseFeePerGas
           maxPriorityFeePerGas: 1
         }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
         const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
+        chai.expect(BigInt(execOptions.maxFeePerGas)).to.be.eq(BigInt(txConfirmed.maxFeePerGas))
         chai
-          .expect(BigNumber.from(execOptions.maxFeePerGas))
-          .to.be.eq(BigNumber.from(txConfirmed.maxFeePerGas))
-        chai
-          .expect(BigNumber.from(execOptions.maxPriorityFeePerGas))
-          .to.be.eq(BigNumber.from(txConfirmed.maxPriorityFeePerGas))
+          .expect(BigInt(execOptions.maxPriorityFeePerGas))
+          .to.be.eq(BigInt(txConfirmed.maxPriorityFeePerGas))
       }
     )
 
@@ -776,15 +779,16 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
       const safeTransactionData: SafeTransactionDataPartial = {
         to: account2.address,
@@ -806,10 +810,11 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -817,8 +822,8 @@ describe('Transactions execution', () => {
       const ethAdapter3 = await getEthAdapter(account3.signer)
       const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: BigNumber.from('2000000000000000000') // 2 ETH
+        to: safeAddress,
+        value: 2_000_000_000_000_000_000n // 2 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
       const safeTransactionData: MetaTransactionData[] = [
@@ -842,12 +847,11 @@ describe('Transactions execution', () => {
       await waitSafeTxReceipt(txResponse2)
       const safeFinalBalance = await safeSdk1.getBalance()
       chai
-        .expect(safeInitialBalance.toString())
+        .expect(safeInitialBalance)
         .to.be.eq(
-          safeFinalBalance
-            .add(BigNumber.from(safeTransactionData[0].value))
-            .add(BigNumber.from(safeTransactionData[1].value))
-            .toString()
+          safeFinalBalance +
+            BigInt(safeTransactionData[0].value) +
+            BigInt(safeTransactionData[1].value)
         )
     })
 
@@ -855,10 +859,11 @@ describe('Transactions execution', () => {
       const { accounts, contractNetworks, erc20Mintable } = await setupTests()
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
+      const safeAddress = await safe.getAddress()
       const ethAdapter1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const ethAdapter2 = await getEthAdapter(account2.signer)
@@ -866,15 +871,15 @@ describe('Transactions execution', () => {
       const ethAdapter3 = await getEthAdapter(account3.signer)
       const safeSdk3 = await safeSdk1.connect({ ethAdapter: ethAdapter3 })
 
-      await erc20Mintable.mint(safe.address, '1200000000000000000') // 1.2 ERC20
-      const safeInitialERC20Balance = await erc20Mintable.balanceOf(safe.address)
+      await erc20Mintable.mint(safeAddress, '1200000000000000000') // 1.2 ERC20
+      const safeInitialERC20Balance = await erc20Mintable.balanceOf(safeAddress)
       chai.expect(safeInitialERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ERC20
       const accountInitialERC20Balance = await erc20Mintable.balanceOf(account2.address)
       chai.expect(accountInitialERC20Balance.toString()).to.be.eq('0') // 0 ERC20
 
       const safeTransactionData: MetaTransactionData[] = [
         {
-          to: erc20Mintable.address,
+          to: await erc20Mintable.getAddress(),
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
@@ -882,7 +887,7 @@ describe('Transactions execution', () => {
           ])
         },
         {
-          to: erc20Mintable.address,
+          to: await erc20Mintable.getAddress(),
           value: '0',
           data: erc20Mintable.interface.encodeFunctionData('transfer', [
             account2.address,
@@ -898,7 +903,7 @@ describe('Transactions execution', () => {
       const txResponse2 = await safeSdk3.executeTransaction(signedMultiSendTx)
       await waitSafeTxReceipt(txResponse2)
 
-      const safeFinalERC20Balance = await erc20Mintable.balanceOf(safe.address)
+      const safeFinalERC20Balance = await erc20Mintable.balanceOf(safeAddress)
       chai.expect(safeFinalERC20Balance.toString()).to.be.eq('0') // 0 ERC20
       const accountFinalERC20Balance = await erc20Mintable.balanceOf(account2.address)
       chai.expect(accountFinalERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ERC20

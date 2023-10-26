@@ -2,7 +2,7 @@ import Safe from '@safe-global/protocol-kit/index'
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import chai from 'chai'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
@@ -10,10 +10,10 @@ import { getAccounts } from './utils/setupTestNetwork'
 import { itif } from './utils/helpers'
 
 describe('getEncodedTransaction', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     return {
       accounts,
@@ -26,11 +26,12 @@ describe('getEncodedTransaction', () => {
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
+    const safeAddress = await safe.getAddress()
     const ethAdapter = await getEthAdapter(account1.signer)
 
     const safeSdk = await Safe.create({
       ethAdapter,
-      safeAddress: safe.address,
+      safeAddress,
       contractNetworks
     })
 
@@ -56,11 +57,12 @@ describe('getEncodedTransaction', () => {
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
+    const safeAddress = await safe.getAddress()
     const ethAdapter = await getEthAdapter(account1.signer)
 
     const safeSdk = await Safe.create({
       ethAdapter,
-      safeAddress: safe.address,
+      safeAddress,
       contractNetworks
     })
 
@@ -86,11 +88,12 @@ describe('getEncodedTransaction', () => {
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
+    const safeAddress = await safe.getAddress()
     const ethAdapter = await getEthAdapter(account1.signer)
 
     const safeSdk = await Safe.create({
       ethAdapter,
-      safeAddress: safe.address,
+      safeAddress,
       contractNetworks
     })
 

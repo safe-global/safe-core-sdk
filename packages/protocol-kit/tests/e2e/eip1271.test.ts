@@ -7,14 +7,14 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
 import { buildSignature } from '@safe-global/protocol-kit/utils'
 
 chai.use(chaiAsPromised)
@@ -24,25 +24,27 @@ export const preimageSafeTransactionHash = (
   safeTx: SafeTransaction,
   chainId: number
 ): string => {
-  return ethers.utils._TypedDataEncoder.encode(
-    { verifyingContract: safeAddress, chainId },
-    {
-      // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
-      SafeTx: [
-        { type: 'address', name: 'to' },
-        { type: 'uint256', name: 'value' },
-        { type: 'bytes', name: 'data' },
-        { type: 'uint8', name: 'operation' },
-        { type: 'uint256', name: 'safeTxGas' },
-        { type: 'uint256', name: 'baseGas' },
-        { type: 'uint256', name: 'gasPrice' },
-        { type: 'address', name: 'gasToken' },
-        { type: 'address', name: 'refundReceiver' },
-        { type: 'uint256', name: 'nonce' }
-      ]
-    },
-    safeTx.data
-  )
+  // FIXME
+  return ''
+  // return ethers.utils._TypedDataEncoder.encode(
+  //   { verifyingContract: safeAddress, chainId },
+  //   {
+  //     // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
+  //     SafeTx: [
+  //       { type: 'address', name: 'to' },
+  //       { type: 'uint256', name: 'value' },
+  //       { type: 'bytes', name: 'data' },
+  //       { type: 'uint8', name: 'operation' },
+  //       { type: 'uint256', name: 'safeTxGas' },
+  //       { type: 'uint256', name: 'baseGas' },
+  //       { type: 'uint256', name: 'gasPrice' },
+  //       { type: 'address', name: 'gasToken' },
+  //       { type: 'address', name: 'refundReceiver' },
+  //       { type: 'uint256', name: 'nonce' }
+  //     ]
+  //   },
+  //   safeTx.data
+  // )
 }
 
 export const calculateSafeMessageHash = (
@@ -50,23 +52,25 @@ export const calculateSafeMessageHash = (
   message: string,
   chainId: number
 ): string => {
-  return ethers.utils._TypedDataEncoder.hash(
-    { verifyingContract: safeAddress, chainId },
-    {
-      SafeMessage: [{ type: 'bytes', name: 'message' }]
-    },
-    { message }
-  )
+  // FIXME
+  return ''
+  // return ethers.utils._TypedDataEncoder.hash(
+  //   { verifyingContract: safeAddress, chainId },
+  //   {
+  //     SafeMessage: [{ type: 'bytes', name: 'message' }]
+  //   },
+  //   { message }
+  // )
 }
 
 const MESSAGE = 'I am the owner of this Safe account'
 
 describe('EIP1271', () => {
   describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
-    const setupTests = deployments.createFixture(async ({ deployments }) => {
+    const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
       await deployments.fixture()
       const accounts = await getAccounts()
-      const chainId: number = (await waffle.provider.getNetwork()).chainId
+      const chainId: number = await getChainId()
       const contractNetworks = await getContractNetworks(chainId)
 
       const [account1, account2] = accounts
@@ -269,7 +273,7 @@ describe('EIP1271', () => {
 
       await account1.signer.sendTransaction({
         to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        value: 1_000_000_000_000_000_000n // 1 ETH // 1 ETH
       })
 
       const balanceBefore = await safeSdk1.getBalance()

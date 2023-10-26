@@ -1,27 +1,26 @@
-import { Signer } from '@ethersproject/abstract-signer'
-import { Provider } from '@ethersproject/providers'
-import { Gnosis_safe__factory as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/factories/Gnosis_safe__factory'
-import { Proxy_factory__factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0/factories/Proxy_factory__factory'
-import { Gnosis_safe__factory as SafeSingleton_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Gnosis_safe__factory'
-import { Multi_send__factory as MultiSend_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Multi_send__factory'
-import { Proxy_factory__factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1/factories/Proxy_factory__factory'
-import { Gnosis_safe__factory as SafeSingleton_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0/factories/Gnosis_safe__factory'
-import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Compatibility_fallback_handler__factory'
-import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Create_call__factory'
-import { Gnosis_safe__factory as SafeSingleton_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Gnosis_safe__factory'
-import { Multi_send__factory as MultiSend_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send__factory'
-import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Multi_send_call_only__factory'
-import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Proxy_factory__factory'
-import { Sign_message_lib__factory as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Sign_message_lib__factory'
-import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/factories/Simulate_tx_accessor__factory'
-import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Compatibility_fallback_handler__factory'
-import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Create_call__factory'
-import { Multi_send__factory as MultiSend_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Multi_send__factory'
-import { Multi_send_call_only__factory as MultiSendCallOnly_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Multi_send_call_only__factory'
-import { Safe__factory as SafeSingleton_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Safe__factory'
-import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Safe_proxy_factory__factory'
-import { Sign_message_lib__factory as SignMessageLib_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Sign_message_lib__factory'
-import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/factories/Simulate_tx_accessor__factory'
+import { AbstractSigner, Provider } from 'ethers'
+import { Gnosis_safe__factory as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0/factories/Gnosis_safe__factory'
+import { Proxy_factory__factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0/factories/Proxy_factory__factory'
+import { Gnosis_safe__factory as SafeSingleton_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1/factories/Gnosis_safe__factory'
+import { Multi_send__factory as MultiSend_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1/factories/Multi_send__factory'
+import { Proxy_factory__factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1/factories/Proxy_factory__factory'
+import { Gnosis_safe__factory as SafeSingleton_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0/factories/Gnosis_safe__factory'
+import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Compatibility_fallback_handler__factory'
+import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Create_call__factory'
+import { Gnosis_safe__factory as SafeSingleton_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Gnosis_safe__factory'
+import { Multi_send__factory as MultiSend_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Multi_send__factory'
+import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Multi_send_call_only__factory'
+import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Proxy_factory__factory'
+import { Sign_message_lib__factory as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Sign_message_lib__factory'
+import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Simulate_tx_accessor__factory'
+import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Compatibility_fallback_handler__factory'
+import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Create_call__factory'
+import { Multi_send__factory as MultiSend_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Multi_send__factory'
+import { Multi_send_call_only__factory as MultiSendCallOnly_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Multi_send_call_only__factory'
+import { Safe__factory as SafeSingleton_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Safe__factory'
+import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Safe_proxy_factory__factory'
+import { Sign_message_lib__factory as SignMessageLib_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Sign_message_lib__factory'
+import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Simulate_tx_accessor__factory'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
 import CompatibilityFallbackHandler_V1_4_1_Ethers from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Ethers'
@@ -49,7 +48,7 @@ import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.
 export function getSafeContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ):
   | SafeContract_V1_4_1_Ethers
   | SafeContract_V1_3_0_Ethers
@@ -81,7 +80,7 @@ export function getSafeContractInstance(
 export function getCompatibilityFallbackHandlerContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ): CompatibilityFallbackHandler_V1_4_1_Ethers | CompatibilityFallbackHandler_V1_3_0_Ethers {
   let compatibilityFallbackHandlerContract
   switch (safeVersion) {
@@ -107,7 +106,7 @@ export function getCompatibilityFallbackHandlerContractInstance(
 export function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ):
   | MultiSendContract_V1_4_1_Ethers
   | MultiSendContract_V1_3_0_Ethers
@@ -133,7 +132,7 @@ export function getMultiSendContractInstance(
 export function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ): MultiSendCallOnlyContract_V1_4_1_Ethers | MultiSendCallOnlyContract_V1_3_0_Ethers {
   let multiSendCallOnlyContract
   switch (safeVersion) {
@@ -160,7 +159,7 @@ export function getMultiSendCallOnlyContractInstance(
 export function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ):
   | SafeProxyFactoryContract_V1_4_1_Ethers
   | SafeProxyFactoryContract_V1_3_0_Ethers
@@ -189,7 +188,7 @@ export function getSafeProxyFactoryContractInstance(
 export function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ): SignMessageLibContract_V1_4_1_Ethers | SignMessageLibContract_V1_3_0_Ethers {
   let signMessageLibContract
   switch (safeVersion) {
@@ -207,7 +206,7 @@ export function getSignMessageLibContractInstance(
 export function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ): CreateCallContract_V1_4_1_Ethers | CreateCallContract_V1_3_0_Ethers {
   let createCallContract
   switch (safeVersion) {
@@ -228,7 +227,7 @@ export function getCreateCallContractInstance(
 export function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 ): SimulateTxAccessorContract_V1_4_1_Ethers | SimulateTxAccessorContract_V1_3_0_Ethers {
   let simulateTxAccessorContract
   switch (safeVersion) {

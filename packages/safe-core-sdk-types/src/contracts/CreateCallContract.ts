@@ -1,7 +1,7 @@
 import { TransactionOptions, TransactionResult } from '@safe-global/safe-core-sdk-types/types'
 
 export interface CreateCallContract {
-  getAddress(): string
+  getAddress(): Promise<string>
   performCreate2(
     value: string,
     deploymentData: string,

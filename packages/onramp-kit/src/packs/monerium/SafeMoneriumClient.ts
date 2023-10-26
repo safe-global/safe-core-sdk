@@ -1,5 +1,5 @@
-import { hashMessage } from '@ethersproject/hash'
-import { arrayify } from '@ethersproject/bytes'
+import { hashMessage, getBytes } from 'ethers'
+
 import { Chain, IBAN, MoneriumClient, Networks, NewOrder, OrderKind } from '@monerium/sdk'
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
@@ -39,7 +39,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Safe address
    */
   async getSafeAddress(): Promise<string> {
-    return this.#safeSdk.getAddress()
+    return await this.#safeSdk.getAddress()
   }
 
   /**
@@ -118,7 +118,7 @@ export class SafeMoneriumClient extends MoneriumClient {
 
       const safeTransaction = await this.#safeSdk.createTransaction({
         safeTransactionData: {
-          to: signMessageContract.getAddress(),
+          to: await signMessageContract.getAddress(),
           value: '0',
           data: txData,
           operation: OperationType.DelegateCall
@@ -206,7 +206,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         messageHash,
         '0x'
       ])
-      const msgBytes = arrayify(messageHash)
+      const msgBytes = getBytes(messageHash)
 
       const eip1271BytesData = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
         msgBytes,

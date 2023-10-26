@@ -1,5 +1,5 @@
 import chai from 'chai'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
@@ -35,10 +35,10 @@ async function deploySafe(
 }
 
 describe('Contract utils', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
@@ -490,6 +490,7 @@ describe('Contract utils', () => {
         chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
       }
     )
+
     itif(safeVersionDeployed === '1.3.0')(
       'returns the predicted address for Safes deployed on zkSync Era',
       async () => {

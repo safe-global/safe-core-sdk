@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   CallWithSyncFeeRequest,
   GelatoRelay as GelatoNetworkRelay,
@@ -14,6 +13,7 @@ import Safe, {
   createERC20TokenTransferTransaction,
   isGasTokenCompatibleWithHandlePayment
 } from '@safe-global/protocol-kit'
+import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
   GELATO_FEE_COLLECTOR,
   GELATO_GAS_EXECUTION_OVERHEAD,
@@ -21,7 +21,7 @@ import {
   GELATO_TRANSFER_GAS_COST,
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
-import { RelayPack, CreateTransactionProps } from '@safe-global/relay-kit/types'
+import { RelayKitTransaction } from '@safe-global/relay-kit/types'
 import {
   MetaTransactionOptions,
   RelayTransaction,
@@ -29,12 +29,16 @@ import {
   Transaction
 } from '@safe-global/safe-core-sdk-types'
 
-export class GelatoRelayPack implements RelayPack {
+import { GelatoOptions } from './types'
+
+export class GelatoRelayPack extends RelayKitBasePack {
   #gelatoRelay: GelatoNetworkRelay
   #apiKey?: string
 
-  constructor(apiKey?: string) {
+  constructor({ apiKey, protocolKit }: GelatoOptions) {
+    super(protocolKit)
     this.#gelatoRelay = new GelatoNetworkRelay()
+
     this.#apiKey = apiKey
   }
 
@@ -49,9 +53,9 @@ export class GelatoRelayPack implements RelayPack {
   async getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string> {
     const feeToken = this._getFeeToken(gasToken)
     const estimation = await this.#gelatoRelay.getEstimatedFee(
-      chainId,
+      BigInt(chainId),
       feeToken,
-      BigNumber.from(gasLimit),
+      BigInt(gasLimit),
       false
     )
     return estimation.toString()
@@ -74,11 +78,10 @@ export class GelatoRelayPack implements RelayPack {
    *
    */
   private async createPaymentToGelato(
-    safe: Safe,
     gas: string,
     options: MetaTransactionOptions
   ): Promise<Transaction> {
-    const chainId = await safe.getChainId()
+    const chainId = await this.protocolKit.getChainId()
     const gelatoAddress = this.getFeeCollector()
     const gasToken = options.gasToken ?? ZERO_ADDRESS
 
@@ -97,21 +100,20 @@ export class GelatoRelayPack implements RelayPack {
   /**
    * Creates a Safe transaction designed to be executed using the Gelato Relayer.
    *
-   * @param {CreateTransactionProps} createTransactionProps - Properties required to create the transaction.
+   * @param {RelayKitTransaction} RelayKitTransaction - Properties required to create the transaction.
    * @returns {Promise<SafeTransaction>} Returns a Promise that resolves with a SafeTransaction object.
    */
   async createRelayedTransaction({
-    safe,
     transactions,
     onlyCalls = false,
     options = {}
-  }: CreateTransactionProps): Promise<SafeTransaction> {
+  }: RelayKitTransaction): Promise<SafeTransaction> {
     const { isSponsored = false } = options
 
     if (isSponsored) {
-      const nonce = await safe.getNonce()
+      const nonce = await this.protocolKit.getNonce()
 
-      const sponsoredTransaction = await safe.createTransaction({
+      const sponsoredTransaction = await this.protocolKit.createTransaction({
         safeTransactionData: transactions,
         onlyCalls,
         options: {
@@ -125,16 +127,19 @@ export class GelatoRelayPack implements RelayPack {
     // If the ERC20 gas token does not follow the standard 18 decimals, we cannot use handlePayment to pay Gelato fees.
 
     const gasToken = options.gasToken ?? ZERO_ADDRESS
-    const isGasTokenCompatible = await isGasTokenCompatibleWithHandlePayment(gasToken, safe)
+    const isGasTokenCompatible = await isGasTokenCompatibleWithHandlePayment(
+      gasToken,
+      this.protocolKit
+    )
 
     if (!isGasTokenCompatible) {
       // if the ERC20 gas token is not compatible (less than 18 decimals like USDC), a separate transfer is required to pay Gelato fees.
 
-      return this.createTransactionWithTransfer({ safe, transactions, onlyCalls, options })
+      return this.createTransactionWithTransfer({ transactions, onlyCalls, options })
     }
 
     // If the gas token is compatible (Native token or standard ERC20), we use handlePayment function present in the Safe contract to pay Gelato fees
-    return this.createTransactionWithHandlePayment({ safe, transactions, onlyCalls, options })
+    return this.createTransactionWithHandlePayment({ transactions, onlyCalls, options })
   }
 
   /**
@@ -144,21 +149,20 @@ export class GelatoRelayPack implements RelayPack {
    *
    * @async
    * @function createTransactionWithHandlePayment
-   * @param {CreateTransactionProps} createTransactionProps - Properties needed to create the transaction.
+   * @param {RelayKitTransaction} RelayKitTransaction - Properties needed to create the transaction.
    * @returns {Promise<SafeTransaction>} Returns a promise that resolves to the created SafeTransaction.
    * @private
    */
   private async createTransactionWithHandlePayment({
-    safe,
     transactions,
     onlyCalls = false,
     options = {}
-  }: CreateTransactionProps): Promise<SafeTransaction> {
+  }: RelayKitTransaction): Promise<SafeTransaction> {
     const { gasLimit } = options
-    const nonce = await safe.getNonce()
+    const nonce = await this.protocolKit.getNonce()
 
     // this transaction is only used for gas estimations
-    const transactionToEstimateGas = await safe.createTransaction({
+    const transactionToEstimateGas = await this.protocolKit.createTransaction({
       safeTransactionData: transactions,
       onlyCalls,
       options: {
@@ -168,16 +172,16 @@ export class GelatoRelayPack implements RelayPack {
 
     // as we set gasPrice to 1, safeTxGas is set to a non-zero value to prevent transaction failure due to out-of-gas errors. value see: https://github.com/safe-global/safe-contracts/blob/main/contracts/Safe.sol#L203
     const gasPrice = '1'
-    const safeTxGas = await estimateSafeTxGas(safe, transactionToEstimateGas)
+    const safeTxGas = await estimateSafeTxGas(this.protocolKit, transactionToEstimateGas)
     const gasToken = options.gasToken ?? ZERO_ADDRESS
     const refundReceiver = this.getFeeCollector()
-    const chainId = await safe.getChainId()
+    const chainId = await this.protocolKit.getChainId()
 
     // if a custom gasLimit is provided, we do not need to estimate the gas cost
     if (gasLimit) {
       const paymentToGelato = await this.getEstimateFee(chainId, gasLimit, gasToken)
 
-      const syncTransaction = await safe.createTransaction({
+      const syncTransaction = await this.protocolKit.createTransaction({
         safeTransactionData: transactions,
         onlyCalls,
         options: {
@@ -195,8 +199,8 @@ export class GelatoRelayPack implements RelayPack {
 
     // If gasLimit is not provided, we need to estimate the gas cost.
 
-    const baseGas = await estimateTxBaseGas(safe, transactionToEstimateGas)
-    const safeDeploymentGasCost = await estimateSafeDeploymentGas(safe)
+    const baseGas = await estimateTxBaseGas(this.protocolKit, transactionToEstimateGas)
+    const safeDeploymentGasCost = await estimateSafeDeploymentGas(this.protocolKit)
 
     const totalGas =
       Number(baseGas) + // baseGas
@@ -206,7 +210,7 @@ export class GelatoRelayPack implements RelayPack {
 
     const paymentToGelato = await this.getEstimateFee(chainId, String(totalGas), gasToken)
 
-    const syncTransaction = await safe.createTransaction({
+    const syncTransaction = await this.protocolKit.createTransaction({
       safeTransactionData: transactions,
       onlyCalls,
       options: {
@@ -228,25 +232,24 @@ export class GelatoRelayPack implements RelayPack {
    *
    * @async
    * @function createTransactionWithTransfer
-   * @param {CreateTransactionProps} createTransactionProps - Properties needed to create the transaction.
+   * @param {RelayKitTransaction} RelayKitTransaction - Properties needed to create the transaction.
    * @returns {Promise<SafeTransaction>} Returns a promise that resolves to the created SafeTransaction.
    * @private
    */
   private async createTransactionWithTransfer({
-    safe,
     transactions,
     onlyCalls = false,
     options = {}
-  }: CreateTransactionProps): Promise<SafeTransaction> {
+  }: RelayKitTransaction): Promise<SafeTransaction> {
     const { gasLimit } = options
-    const nonce = await safe.getNonce()
+    const nonce = await this.protocolKit.getNonce()
     const gasToken = options.gasToken ?? ZERO_ADDRESS
 
     // if a custom gasLimit is provided, we do not need to estimate the gas cost
     if (gasLimit) {
-      const transferToGelato = await this.createPaymentToGelato(safe, gasLimit, options)
+      const transferToGelato = await this.createPaymentToGelato(gasLimit, options)
 
-      const syncTransaction = await safe.createTransaction({
+      const syncTransaction = await this.protocolKit.createTransaction({
         safeTransactionData: [...transactions, transferToGelato],
         onlyCalls,
         options: {
@@ -261,7 +264,7 @@ export class GelatoRelayPack implements RelayPack {
     // If gasLimit is not provided, we need to estimate the gas cost.
 
     // this transaction is only used for gas estimations
-    const transactionToEstimateGas = await safe.createTransaction({
+    const transactionToEstimateGas = await this.protocolKit.createTransaction({
       safeTransactionData: transactions,
       onlyCalls,
       options: {
@@ -269,9 +272,9 @@ export class GelatoRelayPack implements RelayPack {
       }
     })
 
-    const safeTxGas = await estimateSafeTxGas(safe, transactionToEstimateGas)
-    const baseGas = await estimateTxBaseGas(safe, transactionToEstimateGas)
-    const safeDeploymentGasCost = await estimateSafeDeploymentGas(safe)
+    const safeTxGas = await estimateSafeTxGas(this.protocolKit, transactionToEstimateGas)
+    const baseGas = await estimateTxBaseGas(this.protocolKit, transactionToEstimateGas)
+    const safeDeploymentGasCost = await estimateSafeDeploymentGas(this.protocolKit)
 
     const totalGas =
       Number(baseGas) + // baseGas
@@ -280,9 +283,9 @@ export class GelatoRelayPack implements RelayPack {
       GELATO_TRANSFER_GAS_COST + // Gelato payment transfer
       GELATO_GAS_EXECUTION_OVERHEAD // Gelato execution overhead
 
-    const transferToGelato = await this.createPaymentToGelato(safe, String(totalGas), options)
+    const transferToGelato = await this.createPaymentToGelato(String(totalGas), options)
 
-    const syncTransaction = await safe.createTransaction({
+    const syncTransaction = await this.protocolKit.createTransaction({
       safeTransactionData: [...transactions, transferToGelato],
       onlyCalls,
       options: {
@@ -303,7 +306,7 @@ export class GelatoRelayPack implements RelayPack {
       throw new Error('API key not defined')
     }
     const request: SponsoredCallRequest = {
-      chainId,
+      chainId: BigInt(chainId),
       target,
       data: encodedTransaction
     }
@@ -320,14 +323,14 @@ export class GelatoRelayPack implements RelayPack {
     const { gasLimit, gasToken } = options
     const feeToken = this._getFeeToken(gasToken)
     const request: CallWithSyncFeeRequest = {
-      chainId,
+      chainId: BigInt(chainId),
       target,
       data: encodedTransaction,
       feeToken,
       isRelayContext: false
     }
     const relayRequestOptions: RelayRequestOptions = {
-      gasLimit
+      gasLimit: gasLimit ? BigInt(gasLimit) : undefined
     }
     const response = await this.#gelatoRelay.callWithSyncFee(request, relayRequestOptions)
     return response
@@ -350,18 +353,16 @@ export class GelatoRelayPack implements RelayPack {
    * If the Safe is not deployed, it creates a batch of transactions including the Safe deployment transaction.
    *
    * @param {SafeTransaction} safeTransaction - The Safe transaction to be executed.
-   * @param {Safe} safe - The Safe object related to the transaction.
    * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
    */
   async executeRelayTransaction(
     safeTransaction: SafeTransaction,
-    safe: Safe,
     options?: MetaTransactionOptions
   ): Promise<RelayResponse> {
-    const isSafeDeployed = await safe.isSafeDeployed()
-    const chainId = await safe.getChainId()
-    const safeAddress = await safe.getAddress()
-    const safeTransactionEncodedData = await safe.getEncodedTransaction(safeTransaction)
+    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
+    const chainId = await this.protocolKit.getChainId()
+    const safeAddress = await this.protocolKit.getAddress()
+    const safeTransactionEncodedData = await this.protocolKit.getEncodedTransaction(safeTransaction)
 
     const gasToken = options?.gasToken || safeTransaction.data.gasToken
 
@@ -380,7 +381,9 @@ export class GelatoRelayPack implements RelayPack {
     }
 
     // if the Safe is not deployed we create a batch with the Safe deployment transaction and the provided Safe transaction
-    const safeDeploymentBatch = await safe.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
+    const safeDeploymentBatch = await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(
+      safeTransaction
+    )
 
     const relayTransaction: RelayTransaction = {
       target: safeDeploymentBatch.to, // multiSend Contract address

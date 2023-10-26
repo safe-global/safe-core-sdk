@@ -44,7 +44,7 @@ describe('EIP-712 sign typed data', () => {
     })
   })
 
-  describe('generateTypedData', async () => {
+  describe.only('generateTypedData', async () => {
     it('should generate the typed data for Safes == v1.0.0', async () => {
       const { domain } = generateTypedData({
         safeAddress,

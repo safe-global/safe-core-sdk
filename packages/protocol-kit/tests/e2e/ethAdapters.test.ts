@@ -10,7 +10,7 @@ import {
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getCompatibilityFallbackHandler,
@@ -27,10 +27,10 @@ import { getAccounts } from './utils/setupTestNetwork'
 chai.use(chaiAsPromised)
 
 describe('Safe contracts', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId: number = await getChainId()
     const contractNetworks = await getContractNetworks(chainId)
     return {
       accounts,
@@ -96,7 +96,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await safeContract.getAddress())
-        .to.be.eq((await getSafeSingleton()).contract.address)
+        .to.be.eq(await (await getSafeSingleton()).contract.getAddress())
     })
   })
 
@@ -128,7 +128,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendContract.getAddress())
-        .to.be.eq((await getMultiSend()).contract.address)
+        .to.be.eq(await (await getMultiSend()).contract.getAddress())
     })
   })
 
@@ -160,7 +160,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendCallOnlyContract.getAddress())
-        .to.be.eq((await getMultiSendCallOnly()).contract.address)
+        .to.be.eq(await (await getMultiSendCallOnly()).contract.getAddress())
     })
   })
 
@@ -197,7 +197,7 @@ describe('Safe contracts', () => {
         })
       chai
         .expect(await compatibilityFallbackHandlerContract.getAddress())
-        .to.be.eq((await getCompatibilityFallbackHandler()).contract.address)
+        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.getAddress())
     })
   })
 
@@ -229,7 +229,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await factoryContract.getAddress())
-        .to.be.eq((await getFactory()).contract.address)
+        .to.be.eq(await (await getFactory()).contract.getAddress())
     })
   })
 
@@ -261,7 +261,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await signMessageLibContract.getAddress())
-        .to.be.eq((await getSignMessageLib()).contract.address)
+        .to.be.eq(await (await getSignMessageLib()).contract.getAddress())
     })
   })
 
@@ -293,7 +293,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await createCallContract.getAddress())
-        .to.be.eq((await getCreateCall()).contract.address)
+        .to.be.eq(await (await getCreateCall()).contract.getAddress())
     })
   })
 })

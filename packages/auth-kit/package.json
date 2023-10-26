@@ -46,6 +46,8 @@
     "@web3auth/base": "^4.3.0",
     "@web3auth/modal": "^4.3.1",
     "@web3auth/openlogin-adapter": "^4.3.0",
+    "@particle-network/auth": "^1.2.2",
+    "@particle-network/provider": "^1.2.1",
     "ethers": "^5.7.2"
   }
 }

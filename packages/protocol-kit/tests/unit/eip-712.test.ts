@@ -21,7 +21,7 @@ const safeTransactionData: SafeTransactionData = {
   nonce: 999
 }
 
-describe.only('EIP-712 sign typed data', () => {
+describe('EIP-712 sign typed data', () => {
   describe('getEip712TxTypes', async () => {
     it('should have the domain typed as EIP712_DOMAIN_BEFORE_V130 for Safes == v1.0.0', async () => {
       const { EIP712Domain } = getEip712TxTypes('1.0.0')
@@ -44,7 +44,7 @@ describe.only('EIP-712 sign typed data', () => {
     })
   })
 
-  describe.only('generateTypedData', async () => {
+  describe('generateTypedData', async () => {
     it('should generate the typed data for Safes == v1.0.0', async () => {
       const { domain } = generateTypedData({
         safeAddress,
@@ -120,7 +120,7 @@ describe.only('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xecd0e108a98e192af1d2c25055f4e3bed784b5c877204e73219a5203251feaab'
+          message: '0xaa05af77f274774b8bdc7b61d98bc40da523dc2821fdea555f4d6aa413199bcc'
         }
       })
     })
@@ -150,7 +150,7 @@ describe.only('EIP-712 sign typed data', () => {
         },
         primaryType: 'SafeMessage',
         message: {
-          message: '0xecd0e108a98e192af1d2c25055f4e3bed784b5c877204e73219a5203251feaab'
+          message: '0xaa05af77f274774b8bdc7b61d98bc40da523dc2821fdea555f4d6aa413199bcc'
         }
       })
     })
@@ -176,24 +176,6 @@ describe.only('EIP-712 sign typed data', () => {
         },
         primaryType: 'Mail',
         types: {
-          EIP712Domain: [
-            {
-              name: 'name',
-              type: 'string'
-            },
-            {
-              name: 'version',
-              type: 'string'
-            },
-            {
-              name: 'chainId',
-              type: 'uint256'
-            },
-            {
-              name: 'verifyingContract',
-              type: 'address'
-            }
-          ],
           Mail: [
             {
               name: 'from',
@@ -274,24 +256,6 @@ describe.only('EIP-712 sign typed data', () => {
         },
         primaryType: 'Mail',
         types: {
-          EIP712Domain: [
-            {
-              name: 'name',
-              type: 'string'
-            },
-            {
-              name: 'version',
-              type: 'string'
-            },
-            {
-              name: 'chainId',
-              type: 'uint256'
-            },
-            {
-              name: 'verifyingContract',
-              type: 'address'
-            }
-          ],
           Mail: [
             {
               name: 'from',

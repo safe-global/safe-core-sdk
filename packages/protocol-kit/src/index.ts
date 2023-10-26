@@ -66,6 +66,7 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  validateEthereumAddress,
   validateEip3770Address
 } from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -141,7 +142,8 @@ export {
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   standardizeSafeTransactionData,
-  validateEip3770Address
+  validateEip3770Address,
+  validateEthereumAddress
 }
 
 export default Safe

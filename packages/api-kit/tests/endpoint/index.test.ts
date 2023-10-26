@@ -1,5 +1,6 @@
 import { getDefaultProvider, Wallet } from 'ethers'
 import SafeApiKit, {
+  AddMessageProps,
   AddSafeDelegateProps,
   DeleteSafeDelegateProps,
   SafeMultisigTransactionEstimate
@@ -563,6 +564,75 @@ describe('Endpoint tests', () => {
         method: 'get'
       })
     })
+
+    it('getMessage', async () => {
+      const safeMessageHash = 'safe-tx-hash'
+
+      await chai
+        .expect(safeApiKit.getMessage(safeMessageHash))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/messages/${safeMessageHash}/`,
+        method: 'get'
+      })
+    })
+
+    it('getMessages', async () => {
+      const safeAddress = '0x6C465b1D7aBCcDC02Ed48bc32e289795603a5c79'
+
+      await chai
+        .expect(safeApiKit.getMessages(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+        method: 'get'
+      })
+    })
+
+    it('addMessage', async () => {
+      const safeAddress = '0x6C465b1D7aBCcDC02Ed48bc32e289795603a5c79'
+
+      const body: AddMessageProps = {
+        message: 'message',
+        signature: '0x'
+      }
+
+      await chai
+        .expect(safeApiKit.addMessage(safeAddress, body))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+        method: 'post',
+        body
+      })
+
+      body.safeAppId = 123
+
+      await chai
+        .expect(safeApiKit.addMessage(safeAddress, body))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+        method: 'post',
+        body
+      })
+    })
+
+    it('addMessageSignature', async () => {
+      const safeMessageHash = 'safe-message-hash'
+      const signature = '0xSignature'
+
+      await chai
+        .expect(safeApiKit.addMessageSignature(safeMessageHash, signature))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/messages/${safeMessageHash}/signatures/`,
+        method: 'post',
+        body: {
+          signature
+        }
+      })
+    })
   })
 
   describe('Custom endpoint', () => {
@@ -574,7 +644,7 @@ describe('Endpoint tests', () => {
         txServiceUrl
       ))
 
-      await chai.expect(safeApiKit.getServiceInfo())
+      await chai.expect(safeApiKit.getServiceInfo()).to.be.fulfilled
 
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceUrl}/v1/about`,

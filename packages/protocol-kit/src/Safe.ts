@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import {
   EthAdapter,
   OperationType,
@@ -15,7 +16,6 @@ import {
   CompatibilityFallbackHandlerContract,
   EIP712TypedData
 } from '@safe-global/safe-core-sdk-types'
-import { soliditySha3, utf8ToHex } from 'web3-utils'
 import {
   PREDETERMINED_SALT_NONCE,
   encodeSetupCallData,
@@ -500,7 +500,7 @@ class Safe {
     }
 
     if (typeof txOrMessage === 'string') {
-      return soliditySha3(utf8ToHex(txOrMessage)) || ''
+      return ethers.hashMessage(txOrMessage) || ''
     }
 
     const safeTransactionData = txOrMessage.data

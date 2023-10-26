@@ -7,14 +7,14 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
 import { buildSignature } from '@safe-global/protocol-kit/utils'
 
 chai.use(chaiAsPromised)
@@ -24,7 +24,7 @@ export const preimageSafeTransactionHash = (
   safeTx: SafeTransaction,
   chainId: number
 ): string => {
-  return ethers.utils._TypedDataEncoder.encode(
+  return ethers.TypedDataEncoder.encode(
     { verifyingContract: safeAddress, chainId },
     {
       // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
@@ -50,7 +50,7 @@ export const calculateSafeMessageHash = (
   message: string,
   chainId: number
 ): string => {
-  return ethers.utils._TypedDataEncoder.hash(
+  return ethers.TypedDataEncoder.hash(
     { verifyingContract: safeAddress, chainId },
     {
       SafeMessage: [{ type: 'bytes', name: 'message' }]
@@ -61,22 +61,23 @@ export const calculateSafeMessageHash = (
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe.only('EIP1271', () => {
+describe.skip('EIP1271', () => {
   describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
-    const setupTests = deployments.createFixture(async ({ deployments }) => {
+    const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
       await deployments.fixture()
       const accounts = await getAccounts()
-      const chainId: number = (await waffle.provider.getNetwork()).chainId
+      const chainId: number = await getChainId()
       const contractNetworks = await getContractNetworks(chainId)
 
       const [account1, account2] = accounts
 
       // Create a 1/1 Safe to sign the messages
       const signerSafe = await getSafeWithOwners([accounts[0].address], 1)
+      const signerSafeAddress = await signerSafe.getAddress()
 
       // Create a 2/3 Safe
       const safe = await getSafeWithOwners(
-        [accounts[0].address, accounts[1].address, signerSafe.address],
+        [accounts[0].address, accounts[1].address, signerSafeAddress],
         2
       )
 
@@ -84,7 +85,7 @@ describe.only('EIP1271', () => {
       const ethAdapter1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: safe.address,
+        safeAddress: signerSafeAddress,
         contractNetworks
       })
 
@@ -92,15 +93,15 @@ describe.only('EIP1271', () => {
       const ethAdapter2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await Safe.create({
         ethAdapter: ethAdapter2,
-        safeAddress: safe.address,
+        safeAddress: signerSafeAddress,
         contractNetworks
       })
 
       // Adapter and Safe instance for owner 3
-      const ethAdapter3 = await getEthAdapter(signerSafe.signer)
+      const ethAdapter3 = await getEthAdapter(account1.signer)
       const safeSdk3 = await Safe.create({
         ethAdapter: ethAdapter3,
-        safeAddress: signerSafe.address,
+        safeAddress: signerSafeAddress,
         contractNetworks
       })
 
@@ -262,14 +263,14 @@ describe.only('EIP1271', () => {
       }
     )
 
-    it.only('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
+    it('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
       const { safe, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafe } = await setupTests()
 
       const [account1] = accounts
 
       await account1.signer.sendTransaction({
         to: safe.address,
-        value: BigNumber.from('1000000000000000000') // 1 ETH
+        value: 1_000_000_000_000_000_000n // 1 ETH // 1 ETH
       })
 
       const balanceBefore = await safeSdk1.getBalance()

@@ -1,4 +1,4 @@
-import { Signer } from 'ethers'
+import { Signer, TypedDataDomain, TypedDataField } from 'ethers'
 import {
   SafeMultisigTransactionResponse,
   SafeTransactionData
@@ -241,4 +241,49 @@ export type AllTransactionsListResponse = {
 
 export type ModulesResponse = {
   safes: string[]
+}
+
+export type SafeMessageConfirmation = {
+  readonly created: string
+  readonly modified: string
+  readonly owner: string
+  readonly signature: string
+  readonly signatureType: string
+}
+
+export type SafeMessage = {
+  readonly created: string
+  readonly modified: string
+  readonly safe: string
+  readonly messageHash: string
+  readonly message: string | EIP712TypedData
+  readonly proposedBy: string
+  readonly safeAppId: null | string
+  readonly confirmations: Array<SafeMessageConfirmation>
+  readonly preparedSignature: string
+}
+
+export type SafeMessageListResponse = {
+  readonly count: number
+  readonly next?: string
+  readonly previous?: string
+  readonly results: SafeMessage[]
+}
+
+export type AddMessageProps = {
+  message: string | EIP712TypedData
+  safeAppId?: number
+  signature: string
+}
+
+export type GetSafeMessageListProps = {
+  ordering?: string
+  limit?: string
+  offset?: string
+}
+
+export type EIP712TypedData = {
+  domain: TypedDataDomain
+  types: TypedDataField
+  message: Record<string, unknown>
 }

@@ -256,7 +256,7 @@ export type SafeMessage = {
   readonly modified: string
   readonly safe: string
   readonly messageHash: string
-  readonly message: string
+  readonly message: string | EIP712TypedData
   readonly proposedBy: string
   readonly safeAppId: null | string
   readonly confirmations: Array<SafeMessageConfirmation>

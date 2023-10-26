@@ -688,7 +688,7 @@ class SafeApiKit {
    */
   async addMessage(
     safeAddress: string,
-    { message, safeAppId = 0, signature }: AddMessageProps
+    { message, safeAppId, signature }: AddMessageProps
   ): Promise<void> {
     if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
@@ -699,7 +699,7 @@ class SafeApiKit {
       method: HttpMethod.Post,
       body: {
         message,
-        safeAppId: safeAppId || 0,
+        safeAppId,
         signature
       }
     })

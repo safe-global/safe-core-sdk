@@ -20,7 +20,6 @@ describe('AccountAbstraction', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    // Safe.create = mockSafeCreate
     signer.getAddress.mockResolvedValueOnce(signerAddress)
     predictSafeAddressMock.mockResolvedValueOnce(predictSafeAddress)
   })
@@ -78,6 +77,28 @@ describe('AccountAbstraction', () => {
         ethAdapter: expect.any(EthersAdapterMock),
         predictedSafe: { safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 } }
       })
+    })
+  })
+
+  const initAccountAbstraction = async () => {
+    const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
+    const relayPack = new GelatoRelayPack()
+    await accountAbstraction.init({ relayPack })
+    return accountAbstraction
+  }
+
+  describe('getSignerAddress', () => {
+    let accountAbstraction: AccountAbstraction
+
+    beforeEach(async () => {
+      accountAbstraction = await initAccountAbstraction()
+      jest.clearAllMocks()
+    })
+
+    it("should return the signer's address", async () => {
+      const result = await accountAbstraction.getSignerAddress()
+      expect(result).toBe(signerAddress)
+      expect(signer.getAddress).toHaveBeenCalledTimes(1)
     })
   })
 })

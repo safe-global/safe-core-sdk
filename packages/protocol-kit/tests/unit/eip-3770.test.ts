@@ -71,14 +71,14 @@ describe('EIP-3770 chain-specific addresses', () => {
 
   describe('getEip3770NetworkPrefixFromChainId', async () => {
     it('should fail if chain prefix is not supported', async () => {
-      const currentChainId = 0
+      const currentChainId = 0n
       chai
         .expect(() => getEip3770NetworkPrefixFromChainId(currentChainId))
         .to.throw('No network prefix supported for the current chainId')
     })
 
     it('should return network short name from chainId', async () => {
-      const currentChainId = 100
+      const currentChainId = 100n
       const expectedPrefix = 'gno'
       chai.expect(getEip3770NetworkPrefixFromChainId(currentChainId)).to.be.equal(expectedPrefix)
     })
@@ -87,7 +87,7 @@ describe('EIP-3770 chain-specific addresses', () => {
   describe('validateEip3770NetworkPrefix', async () => {
     it('should fail if current chainId is not supported', async () => {
       const prefix = 'gno'
-      const currentChainId = 0
+      const currentChainId = 0n
       chai
         .expect(() => validateEip3770NetworkPrefix(prefix, currentChainId))
         .to.throw('No network prefix supported for the current chainId')
@@ -95,7 +95,7 @@ describe('EIP-3770 chain-specific addresses', () => {
 
     it('should fail if network prefix is not supported', async () => {
       const prefix = 'aaa'
-      const currentChainId = 100
+      const currentChainId = 100n
       chai
         .expect(() => validateEip3770NetworkPrefix(prefix, currentChainId))
         .to.throw('The network prefix must match the current network')
@@ -103,7 +103,7 @@ describe('EIP-3770 chain-specific addresses', () => {
 
     it("should fail if prefix doesn't match the current chainId", async () => {
       const prefix = 'gno'
-      const currentChainId = 1
+      const currentChainId = 1n
       chai
         .expect(() => validateEip3770NetworkPrefix(prefix, currentChainId))
         .to.throw('The network prefix must match the current network')
@@ -111,7 +111,7 @@ describe('EIP-3770 chain-specific addresses', () => {
 
     it('should pass if prefix and current chainId match', async () => {
       const prefix = 'gno'
-      const currentChainId = 100
+      const currentChainId = 100n
       validateEip3770NetworkPrefix(prefix, currentChainId)
     })
   })
@@ -139,7 +139,7 @@ describe('EIP-3770 chain-specific addresses', () => {
 
   describe('validateEip3770Address', async () => {
     it('should fail validating an empty full address', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testFullAddress = ''
       chai
         .expect(() => validateEip3770Address(testFullAddress, testChainId))
@@ -147,7 +147,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should fail validating a full address with empty prefix and empty address', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testPrefix = ''
       const testAddress = ''
       chai
@@ -156,7 +156,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should fail validating an invalid address', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testFullAddress = '0x123'
       chai
         .expect(() => validateEip3770Address(`${testFullAddress}`, testChainId))
@@ -164,7 +164,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should fail validating a full address with invalid prefix', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testPrefix = 'aaa'
       const testAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       chai
@@ -173,7 +173,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should fail validating a full address with invalid address', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testPrefix = 'gno'
       const testAddress = '0x123'
       chai
@@ -182,7 +182,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should fail validating a full address with address and prefix of different chainId', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testPrefix = 'gor'
       const testAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       chai
@@ -191,7 +191,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should fail validating a full address with prefix, address and invalid chainId', async () => {
-      const testChainId = 0
+      const testChainId = 0n
       const testPrefix = 'gno'
       const testAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       chai
@@ -200,7 +200,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should validate an address with no prefix', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testFullAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       const { prefix, address } = validateEip3770Address(`${testFullAddress}`, testChainId)
 
@@ -209,7 +209,7 @@ describe('EIP-3770 chain-specific addresses', () => {
     })
 
     it('should validate a full address with address and prefix of the current chainId', async () => {
-      const testChainId = 100
+      const testChainId = 100n
       const testPrefix = 'gno'
       const testAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
       const { prefix, address } = validateEip3770Address(

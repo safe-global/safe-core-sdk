@@ -70,5 +70,5 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
 }
 
 export const safeDeploymentsL1ChainIds = [
-  1 // Ethereum Mainnet
+  1n // Ethereum Mainnet
 ]

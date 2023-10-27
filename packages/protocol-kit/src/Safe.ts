@@ -187,7 +187,7 @@ class Safe {
       const chainId = await this.#ethAdapter.getChainId()
       return predictSafeAddress({
         ethAdapter: this.#ethAdapter,
-        customContracts: this.#contractManager.contractNetworks?.[chainId],
+        customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
         ...this.#predictedSafe
       })
     }
@@ -307,7 +307,7 @@ class Safe {
    *
    * @returns The chainId of the connected network
    */
-  async getChainId(): Promise<number> {
+  async getChainId(): Promise<bigint> {
     return this.#ethAdapter.getChainId()
   }
 
@@ -1029,7 +1029,7 @@ class Safe {
   async getEncodedTransaction(safeTransaction: SafeTransaction): Promise<string> {
     const safeVersion = await this.getContractVersion()
     const chainId = await this.getChainId()
-    const customContracts = this.#contractManager.contractNetworks?.[chainId]
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
     const safeSingletonContract = await getSafeContract({
@@ -1136,7 +1136,7 @@ class Safe {
     const ethAdapter = this.#ethAdapter
     const chainId = await ethAdapter.getChainId()
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
-    const customContracts = this.#contractManager.contractNetworks?.[chainId]
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
@@ -1198,7 +1198,7 @@ class Safe {
     const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
       ethAdapter: this.#ethAdapter,
       safeVersion: await this.getContractVersion(),
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
     })
 
     // multiSend method with the transactions encoded

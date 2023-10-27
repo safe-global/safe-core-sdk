@@ -39,7 +39,7 @@ async function main() {
 
   // SDK Initialization
 
-  const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
+  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
   const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
 
   const safeAccountAbstraction = new AccountAbstraction(
@@ -70,7 +70,7 @@ async function main() {
 
   const safeBalance = await provider.getBalance(predictedSafeAddress)
   console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
-  if (safeBalance.lt(txConfig.VALUE)) {
+  if (safeBalance < BigInt(txConfig.VALUE)) {
     const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,

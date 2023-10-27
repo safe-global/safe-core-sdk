@@ -156,15 +156,15 @@ export class SafeMoneriumClient extends MoneriumClient {
   async getChain(): Promise<Chain> {
     const chainId = await this.#safeSdk.getChainId()
 
-    switch (chainId) {
-      case 1:
-      case 5:
+    switch (chainId.toString()) {
+      case '1':
+      case '5':
         return 'ethereum'
-      case 100:
-      case 10200:
+      case '100':
+      case '10200':
         return 'gnosis'
-      case 137:
-      case 80001:
+      case '137':
+      case '80001':
         return 'polygon'
       default:
         throw new Error(`Chain not supported: ${chainId}`)
@@ -178,16 +178,16 @@ export class SafeMoneriumClient extends MoneriumClient {
   async getNetwork(): Promise<Networks> {
     const chainId = await this.#safeSdk.getChainId()
 
-    switch (chainId) {
-      case 1:
-      case 100:
-      case 137:
+    switch (chainId.toString()) {
+      case '1':
+      case '100':
+      case '137':
         return 'mainnet'
-      case 5:
+      case '5':
         return 'goerli'
-      case 10200:
+      case '10200':
         return 'chiado'
-      case 80001:
+      case '80001':
         return 'mumbai'
       default:
         throw new Error(`Network not supported: ${chainId}`)

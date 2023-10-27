@@ -72,7 +72,7 @@ export async function estimateGas(
   const simulateTxAccessorContract = await getSimulateTxAccessorContract({
     ethAdapter,
     safeVersion,
-    customContracts: customContracts?.[chainId]
+    customContracts: customContracts?.[chainId.toString()]
   })
 
   const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
@@ -206,7 +206,7 @@ export async function estimateTxBaseGas(
   const ethAdapter = safe.getEthAdapter()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
@@ -316,7 +316,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
   const ethAdapter = safe.getEthAdapter()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
@@ -411,7 +411,7 @@ async function estimateSafeTxGasWithSimulate(
   const safeVersion = await safe.getContractVersion()
   const ethAdapter = safe.getEthAdapter()
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
 
   const safeSingletonContract = await getSafeContract({

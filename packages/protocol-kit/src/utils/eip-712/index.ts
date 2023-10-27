@@ -67,7 +67,7 @@ export function generateTypedData({
     }
   }
   if (eip712WithChainId) {
-    typedData.domain.chainId = chainId
+    typedData.domain.chainId = chainId.toString()
   }
   return typedData
 }

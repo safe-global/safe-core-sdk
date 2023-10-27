@@ -20,7 +20,7 @@ enum TaskState {
   CheckPending = 'CheckPending'
 }
 
-const CHAIN_ID = 1
+const CHAIN_ID = 1n
 const ADDRESS = '0x...address'
 const GAS_TOKEN = '0x...gasToken'
 const SAFE_ADDRESS = '0x...safe-address'
@@ -31,7 +31,7 @@ const SAFETXGAS_ESTIMATION = '10000'
 const SAFE_DEPLOYMENT_GAS_ESTIMATION = '30000'
 const TASK_ID = 'task-id'
 const TASK_STATUS: TransactionStatusResponse = {
-  chainId: CHAIN_ID,
+  chainId: Number(CHAIN_ID),
   taskState: TaskState.CheckPending,
   taskId: TASK_ID,
   creationDate: Date.now().toString()
@@ -111,14 +111,14 @@ describe('GelatoRelayPack', () => {
   })
 
   it('should allow to get a fee estimation', async () => {
-    const chainId = 1
+    const chainId = 1n
     const gasLimit = '100000'
     const gasToken = '0x0000000000000000000000000000000000000000'
     const estimation = await gelatoRelayPack.getEstimateFee(chainId, gasLimit, gasToken)
 
     expect(estimation).toBe(FEE_ESTIMATION.toString())
     expect(mockGetEstimateFee).toHaveBeenCalledWith(
-      BigInt(chainId),
+      chainId,
       GELATO_NATIVE_TOKEN_ADDRESS,
       BigInt(gasLimit),
       false
@@ -140,7 +140,7 @@ describe('GelatoRelayPack', () => {
     expect(response).toBe(RELAY_RESPONSE)
     expect(mockSponsoredCall).toHaveBeenCalledWith(
       {
-        chainId: BigInt(CHAIN_ID),
+        chainId: CHAIN_ID,
         target: SAFE_ADDRESS,
         data: '0x'
       },
@@ -387,7 +387,7 @@ describe('GelatoRelayPack', () => {
     expect(response).toBe(RELAY_RESPONSE)
     expect(mockCallWithSyncFee).toHaveBeenCalledWith(
       {
-        chainId: BigInt(CHAIN_ID),
+        chainId: CHAIN_ID,
         target: SAFE_ADDRESS,
         data: '0x',
         feeToken: GELATO_NATIVE_TOKEN_ADDRESS,
@@ -413,7 +413,7 @@ describe('GelatoRelayPack', () => {
     expect(sponsoredResponse).toBe(RELAY_RESPONSE)
     expect(mockSponsoredCall).toHaveBeenCalledWith(
       {
-        chainId: BigInt(CHAIN_ID),
+        chainId: CHAIN_ID,
         target: SAFE_ADDRESS,
         data: '0x'
       },
@@ -433,7 +433,7 @@ describe('GelatoRelayPack', () => {
     expect(paidResponse).toBe(RELAY_RESPONSE)
     expect(mockCallWithSyncFee).toHaveBeenCalledWith(
       {
-        chainId: BigInt(CHAIN_ID),
+        chainId: CHAIN_ID,
         target: SAFE_ADDRESS,
         data: '0x',
         feeToken: GELATO_NATIVE_TOKEN_ADDRESS,
@@ -492,7 +492,7 @@ describe('GelatoRelayPack', () => {
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockSponsoredCall).toHaveBeenCalledWith(
           {
-            chainId: BigInt(CHAIN_ID),
+            chainId: CHAIN_ID,
             target: SAFE_ADDRESS,
             data: ENCODED_TRANSACTION_DATA
           },
@@ -525,7 +525,7 @@ describe('GelatoRelayPack', () => {
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockCallWithSyncFee).toHaveBeenCalledWith(
           {
-            chainId: BigInt(CHAIN_ID),
+            chainId: CHAIN_ID,
             target: SAFE_ADDRESS,
             data: ENCODED_TRANSACTION_DATA,
             feeToken: GAS_TOKEN,
@@ -564,7 +564,7 @@ describe('GelatoRelayPack', () => {
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockSponsoredCall).toHaveBeenCalledWith(
           {
-            chainId: BigInt(CHAIN_ID),
+            chainId: CHAIN_ID,
             target: MULTISEND_ADDRESS, // multiSend contract as a target address because a counterfactual deployment is present
             data: SAFE_DEPLOYMENT_BATCH.data
           },
@@ -600,7 +600,7 @@ describe('GelatoRelayPack', () => {
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockCallWithSyncFee).toHaveBeenCalledWith(
           {
-            chainId: BigInt(CHAIN_ID),
+            chainId: CHAIN_ID,
             target: MULTISEND_ADDRESS, // multiSend contract as a target address because a counterfactual deployment is present
             data: SAFE_DEPLOYMENT_BATCH.data,
             feeToken: GAS_TOKEN,

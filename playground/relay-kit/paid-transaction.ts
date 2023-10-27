@@ -64,7 +64,7 @@ async function main() {
 
   // Fake on-ramp to transfer enough funds to the Safe address
 
-  const chainId = Number((await provider.getNetwork()).chainId)
+  const chainId = (await provider.getNetwork()).chainId
   const relayFee = BigInt(
     await relayPack.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
   )

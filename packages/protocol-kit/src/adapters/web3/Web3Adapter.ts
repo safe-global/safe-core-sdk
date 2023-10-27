@@ -75,8 +75,8 @@ class Web3Adapter implements EthAdapter {
     return nonce
   }
 
-  async getChainId(): Promise<number> {
-    return this.#web3.eth.getChainId()
+  async getChainId(): Promise<bigint> {
+    return BigInt(await this.#web3.eth.getChainId())
   }
 
   getChecksummedAddress(address: string): string {
@@ -90,7 +90,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<SafeContractWeb3> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
     }
@@ -108,7 +109,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<SafeProxyFactoryWeb3Contract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
@@ -126,7 +128,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<MultiSendWeb3Contract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
     }
@@ -144,7 +147,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<MultiSendCallOnlyWeb3Contract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSendCallOnly contract address')
     }
@@ -162,7 +166,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<CompatibilityFallbackHandlerWeb3Contract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid Compatibility Fallback Handler contract address')
     }
@@ -180,7 +185,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<SignMessageLibWeb3Contract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
@@ -198,7 +204,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<CreateCallWeb3Contract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
     }
@@ -216,7 +223,8 @@ class Web3Adapter implements EthAdapter {
     customContractAbi
   }: GetContractProps): Promise<SimulateTxAccessorWeb3Contract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SimulateTxAccessor contract address')
     }

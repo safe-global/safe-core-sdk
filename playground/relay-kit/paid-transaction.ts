@@ -52,7 +52,7 @@ async function main() {
 
   // Calculate Safe address
 
-  const predictedSafeAddress = safeAccountAbstraction.getSafeAddress()
+  const predictedSafeAddress = await safeAccountAbstraction.getSafeAddress()
   console.log({ predictedSafeAddress })
 
   const isSafeDeployed = await safeAccountAbstraction.isSafeDeployed()

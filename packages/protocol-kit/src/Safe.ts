@@ -541,19 +541,13 @@ class Safe {
     methodVersion?: 'v3' | 'v4',
     isSmartContract = false
   ): Promise<SafeSignature> {
-    let data
-
-    if (eip712Data.hasOwnProperty('signatures')) {
-      data = (eip712Data as SafeTransaction).data
-    } else {
-      data = eip712Data as EIP712TypedData | string
-    }
-
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
       chainId: await this.getEthAdapter().getChainId(),
-      data
+      data: eip712Data.hasOwnProperty('signatures')
+        ? (eip712Data as SafeTransaction).data
+        : (eip712Data as EIP712TypedData | string)
     }
 
     const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)

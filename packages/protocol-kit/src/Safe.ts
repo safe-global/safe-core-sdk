@@ -1332,7 +1332,6 @@ class Safe {
 
       return isValidSignatureResponse.slice(0, 10).toLowerCase() === this.#MAGIC_VALUE
     } catch (error) {
-      console.error(error)
       return false
     }
   }

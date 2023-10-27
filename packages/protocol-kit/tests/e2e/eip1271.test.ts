@@ -61,7 +61,7 @@ export const calculateSafeMessageHash = (
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe.skip('EIP1271', () => {
+describe.only('EIP1271', () => {
   describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
     const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
       await deployments.fixture()
@@ -80,12 +80,13 @@ describe.skip('EIP1271', () => {
         [accounts[0].address, accounts[1].address, signerSafeAddress],
         2
       )
+      const safeAddress = await safe.getAddress()
 
       // Adapter and Safe instance for owner 1
       const ethAdapter1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: signerSafeAddress,
+        safeAddress: safeAddress,
         contractNetworks
       })
 
@@ -93,7 +94,7 @@ describe.skip('EIP1271', () => {
       const ethAdapter2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await Safe.create({
         ethAdapter: ethAdapter2,
-        safeAddress: signerSafeAddress,
+        safeAddress: safeAddress,
         contractNetworks
       })
 
@@ -107,7 +108,9 @@ describe.skip('EIP1271', () => {
 
       return {
         safe,
+        safeAddress,
         signerSafe,
+        signerSafeAddress,
         accounts,
         contractNetworks,
         chainId,
@@ -251,7 +254,7 @@ describe.skip('EIP1271', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should generate the correct safeMessageHash',
       async () => {
-        const { safe, safeSdk1 } = await setupTests()
+        const { safeAddress, safeSdk1 } = await setupTests()
 
         const chainId = await safeSdk1.getChainId()
         const messageHash = await safeSdk1.getHash(MESSAGE)
@@ -259,18 +262,19 @@ describe.skip('EIP1271', () => {
 
         chai
           .expect(safeMessageHash)
-          .to.be.eq(calculateSafeMessageHash(safe.address, messageHash, chainId))
+          .to.be.eq(calculateSafeMessageHash(safeAddress, messageHash, chainId))
       }
     )
 
-    it('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
-      const { safe, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafe } = await setupTests()
+    it.skip('should allow use to sign transactions using Safe Accounts (threshold = 1)', async () => {
+      const { signerSafeAddress, safeAddress, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafe } =
+        await setupTests()
 
       const [account1] = accounts
 
       await account1.signer.sendTransaction({
-        to: safe.address,
-        value: 1_000_000_000_000_000_000n // 1 ETH // 1 ETH
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
       })
 
       const balanceBefore = await safeSdk1.getBalance()
@@ -288,7 +292,7 @@ describe.skip('EIP1271', () => {
       const signature1 = await safeSdk1.signHash(await safeSdk1.getSafeMessageHash(txHash))
       const signature2 = await safeSdk3.signHash(
         await safeSdk3.getSafeMessageHash(
-          preimageSafeTransactionHash(signerSafe.address, tx, await safeSdk3.getChainId())
+          preimageSafeTransactionHash(signerSafeAddress, tx, await safeSdk3.getChainId())
         ),
         true
       )

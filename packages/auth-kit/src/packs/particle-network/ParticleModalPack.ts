@@ -28,7 +28,6 @@ export class ParticleModalPack extends AuthKitBasePack {
    * @throws Error when initialization fails
    */
   async init(config: ParticleConfig) {
-    config.txServiceUrl = this.#txServiceUrl;
     this.particle = new ParticleNetwork(config);
     this.#provider = new ParticleProvider(this.particle.auth);
   }

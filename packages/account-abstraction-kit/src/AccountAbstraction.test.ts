@@ -81,7 +81,11 @@ describe('AccountAbstraction', () => {
   })
 
   describe('initialized', () => {
-    const safeInstanceMock = { getNonce: jest.fn() }
+    const safeInstanceMock = {
+      getNonce: jest.fn(),
+      getAddress: jest.fn(),
+      isSafeDeployed: jest.fn()
+    }
 
     const initAccountAbstraction = async () => {
       const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
@@ -120,6 +124,38 @@ describe('AccountAbstraction', () => {
         const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
         expect(accountAbstraction.getNonce()).rejects.toThrow('SDK not initialized')
         expect(safeInstanceMock.getNonce).toHaveBeenCalledTimes(0)
+      })
+    })
+
+    describe('getSafeAddress', () => {
+      const safeAddressMock = '0xSafeAddress'
+      safeInstanceMock.getAddress.mockResolvedValueOnce(safeAddressMock)
+
+      it('should return the address received from Safe SDK', async () => {
+        const result = await accountAbstraction.getSafeAddress()
+        expect(result).toBe(safeAddressMock)
+        expect(safeInstanceMock.getAddress).toHaveBeenCalledTimes(1)
+      })
+
+      it('should throw if Safe SDK is not initiallized', async () => {
+        const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
+        expect(accountAbstraction.getSafeAddress()).rejects.toThrow('SDK not initialized')
+        expect(safeInstanceMock.getAddress).toHaveBeenCalledTimes(0)
+      })
+    })
+
+    describe('isSafeDeployed', () => {
+      it.each([true, false])('should return the value received from Safe SDK', async (expected) => {
+        safeInstanceMock.isSafeDeployed.mockResolvedValueOnce(expected)
+        const result = await accountAbstraction.isSafeDeployed()
+        expect(result).toBe(expected)
+        expect(safeInstanceMock.isSafeDeployed).toHaveBeenCalledTimes(1)
+      })
+
+      it('should throw if Safe SDK is not initiallized', async () => {
+        const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
+        expect(accountAbstraction.isSafeDeployed()).rejects.toThrow('SDK not initialized')
+        expect(safeInstanceMock.isSafeDeployed).toHaveBeenCalledTimes(0)
       })
     })
   })

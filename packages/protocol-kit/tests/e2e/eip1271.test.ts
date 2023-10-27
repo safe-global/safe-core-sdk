@@ -15,7 +15,7 @@ import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
 import { ethers } from 'ethers'
-import { buildSignature } from '@safe-global/protocol-kit/utils'
+import { buildSignature, hashSafeMessage } from '@safe-global/protocol-kit/utils'
 
 chai.use(chaiAsPromised)
 
@@ -139,7 +139,7 @@ describe.only('EIP1271', () => {
           customContractAbi: customContract.signMessageLibAbi
         })
 
-        const messageHash = await safeSdk1.getHash(MESSAGE)
+        const messageHash = safeSdk1.hashSafeMessage(MESSAGE)
 
         const txData = signMessageLibContract.encode('signMessage', [messageHash])
 
@@ -169,7 +169,7 @@ describe.only('EIP1271', () => {
       const { safeSdk1, safeSdk2 } = await setupTests()
 
       // Hash the message
-      const messageHash = await safeSdk1.getHash(MESSAGE)
+      const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
       const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
       // Sign the Safe message hash with the owners
@@ -201,7 +201,7 @@ describe.only('EIP1271', () => {
         const { safeSdk1, safeSdk2 } = await setupTests()
 
         // Hash the message
-        const messageHash = await safeSdk1.getHash(MESSAGE)
+        const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
         const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
         // Sign the Safe message with the owners
@@ -221,7 +221,7 @@ describe.only('EIP1271', () => {
         const { safeSdk1, safeSdk2, safeSdk3 } = await setupTests()
 
         // Hash the message
-        const messageHash = await safeSdk1.getHash(MESSAGE)
+        const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
         const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
         // Sign the Safe message with the owners
@@ -246,7 +246,10 @@ describe.only('EIP1271', () => {
     itif(safeVersionDeployed >= '1.3.0')('should revert when message is not signed', async () => {
       const { safeSdk1 } = await setupTests()
 
-      const response = await safeSdk1.isValidSignature(await safeSdk1.getHash(MESSAGE), '0x')
+      const response = await safeSdk1.isValidSignature(
+        await safeSdk1.hashSafeMessage(MESSAGE),
+        '0x'
+      )
 
       chai.expect(response).to.be.false
     })
@@ -257,7 +260,7 @@ describe.only('EIP1271', () => {
         const { safeAddress, safeSdk1 } = await setupTests()
 
         const chainId = await safeSdk1.getChainId()
-        const messageHash = await safeSdk1.getHash(MESSAGE)
+        const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
         const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
         chai
@@ -287,7 +290,7 @@ describe.only('EIP1271', () => {
       }
 
       const tx = await safeSdk1.createTransaction({ safeTransactionData })
-      const txHash = await safeSdk1.getHash(tx)
+      const txHash = await safeSdk1.getTransactionHash(tx)
 
       const signature1 = await safeSdk1.signHash(await safeSdk1.getSafeMessageHash(txHash))
       const signature2 = await safeSdk3.signHash(

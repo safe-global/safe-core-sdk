@@ -133,7 +133,7 @@ To connect `owner2` to the Safe we need to create a new instance of the class `E
 ```js
 const ethAdapterOwner2 = new EthersAdapter({ ethers, signerOrProvider: owner2 })
 const safeSdk2 = await safeSdk.connect({ ethAdapter: ethAdapterOwner2, safeAddress })
-const txHash = await safeSdk2.getHash(safeTransaction)
+const txHash = await safeSdk2.getTransactionHash(safeTransaction)
 const approveTxResponse = await safeSdk2.approveTransactionHash(txHash)
 await approveTxResponse.transactionResponse?.wait()
 ```
@@ -633,7 +633,7 @@ const safeTransaction1 = await safeSdk.createTransaction({ safeTransactionData }
 const safeTransaction2 = await copyTransaction(safeTransaction1)
 ```
 
-### getHash
+### getTransactionHash
 
 Returns the transaction hash of a Safe transaction.
 
@@ -642,7 +642,7 @@ const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
 const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-const txHash = await safeSdk.getHash(safeTransaction)
+const txHash = await safeSdk.getTransactionHash(safeTransaction)
 ```
 
 ### signHash
@@ -654,7 +654,7 @@ const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
 const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-const txHash = await safeSdk.getHash(safeTransaction)
+const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const signature = await safeSdk.signHash(txHash)
 ```
 
@@ -701,7 +701,7 @@ const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
 const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-const txHash = await safeSdk.getHash(safeTransaction)
+const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const txResponse = await safeSdk.approveTransactionHash(txHash)
 await txResponse.transactionResponse?.wait()
 ```
@@ -743,7 +743,7 @@ const safeTransactionData: SafeTransactionDataPartial = {
   // ...
 }
 const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-const txHash = await safeSdk.getHash(safeTransaction)
+const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const ownerAddresses = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
 

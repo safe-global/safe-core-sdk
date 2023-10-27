@@ -125,7 +125,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         }
       })
 
-      const safeTxHash = await this.#safeSdk.getHash(safeTransaction)
+      const safeTxHash = await this.#safeSdk.getTransactionHash(safeTransaction)
 
       const senderSignature = await this.#safeSdk.signHash(safeTxHash)
 

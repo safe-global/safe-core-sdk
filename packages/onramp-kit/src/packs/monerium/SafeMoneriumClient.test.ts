@@ -148,7 +148,7 @@ describe('SafeMoneriumClient', () => {
       data: txData
     })
 
-    safeSdk.getHash = jest.fn().mockResolvedValueOnce('0xTransactionHash')
+    safeSdk.getTransactionHash = jest.fn().mockResolvedValueOnce('0xTransactionHash')
     safeSdk.signHash = jest.fn().mockResolvedValueOnce('0xTransactionSignature')
 
     jest.spyOn(SafeApiKit.prototype, 'getTransaction').mockResolvedValueOnce({

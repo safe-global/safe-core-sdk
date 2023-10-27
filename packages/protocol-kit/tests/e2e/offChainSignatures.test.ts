@@ -69,7 +69,7 @@ describe('Off-chain signatures', () => {
         data: '0x'
       }
       const tx = await safeSdk.createTransaction({ safeTransactionData })
-      const txHash = await safeSdk.getHash(tx)
+      const txHash = await safeSdk.getTransactionHash(tx)
       const signature = await safeSdk.signHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
     })

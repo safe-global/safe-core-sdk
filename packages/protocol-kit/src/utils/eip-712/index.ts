@@ -68,7 +68,7 @@ const hashMessage = (message: string): string => {
   return ethers.hashMessage(message)
 }
 
-const hashSafeMessage = (message: string | EIP712TypedData): string => {
+export const hashSafeMessage = (message: string | EIP712TypedData): string => {
   return typeof message === 'string' ? hashMessage(message) : hashTypedData(message)
 }
 

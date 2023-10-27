@@ -45,7 +45,7 @@ async function main() {
 
   const MESSAGE_TO_SIGN = 'I am the owner of this Safe account'
 
-  const messageHash = await safeSdk1.getHash(MESSAGE_TO_SIGN)
+  const messageHash = safeSdk1.hashSafeMessage(MESSAGE_TO_SIGN)
   const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
   const ethSignSig = await safeSdk1.signHash(safeMessageHash)

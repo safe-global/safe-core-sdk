@@ -58,7 +58,7 @@ describe('addMessageSignature', () => {
 
   it('should allow to add a confirmation signature using a mix of EIP-191 and EIP-712', async () => {
     const rawMessage = generateMessage()
-    const messageHash = await protocolKit1.getHash(rawMessage)
+    const messageHash = await protocolKit1.hashSafeMessage(rawMessage)
     const safeMessageHash = await protocolKit1.getSafeMessageHash(messageHash)
     const ethSign = await protocolKit1.signHash(safeMessageHash)
 

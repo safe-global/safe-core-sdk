@@ -41,6 +41,7 @@ import {
   EthSafeSignature,
   SAFE_FEATURES,
   hasSafeFeature,
+  hashSafeMessage,
   isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
   sameString
@@ -491,19 +492,15 @@ class Safe {
   /**
    * Returns the transaction hash of a Safe transaction.
    *
-   * @param txOrMessage - The Safe transaction or a raw message
+   * @param safeTransaction - The Safe transaction or a raw message
    * @returns The hashed Safe transaction or message
    */
-  async getHash(txOrMessage: SafeTransaction | string): Promise<string> {
+  async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
     }
 
-    if (typeof txOrMessage === 'string') {
-      return ethers.hashMessage(txOrMessage) || ''
-    }
-
-    const safeTransactionData = txOrMessage.data
+    const safeTransactionData = safeTransaction.data
     const txHash = await this.#contractManager.safeContract.getTransactionHash(safeTransactionData)
 
     return txHash
@@ -527,6 +524,10 @@ class Safe {
     }
 
     return signature
+  }
+
+  hashSafeMessage(message: string | EIP712TypedData): string {
+    return hashSafeMessage(message)
   }
 
   /**
@@ -607,7 +608,7 @@ class Safe {
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
-      const txHash = await this.getHash(transaction)
+      const txHash = await this.getTransactionHash(transaction)
       signature = await this.signHash(txHash, isSmartContract)
     }
 
@@ -965,7 +966,7 @@ class Safe {
 
     const signedSafeTransaction = await this.copyTransaction(transaction)
 
-    const txHash = await this.getHash(signedSafeTransaction)
+    const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
@@ -1012,7 +1013,7 @@ class Safe {
 
     const signedSafeTransaction = await this.copyTransaction(transaction)
 
-    const txHash = await this.getHash(signedSafeTransaction)
+    const txHash = await this.getTransactionHash(signedSafeTransaction)
     const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))

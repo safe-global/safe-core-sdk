@@ -22,7 +22,7 @@ const generateRandomUUID = (): string => {
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 
-describe.only('addMessage', () => {
+describe('addMessage', () => {
   before(async () => {
     ;({ safeApiKit, ethAdapter } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
@@ -55,27 +55,27 @@ describe.only('addMessage', () => {
 
   it('should allow to create a new off-chain message signed with EIP-191', async () => {
     const rawMessage = generateMessage()
-    const messageHash = await protocolKit.hashSafeMessage(rawMessage)
-    const safeMessageHash = await protocolKit.getSafeMessageHash(messageHash)
-    const signature = await protocolKit.signHash(safeMessageHash)
+    const safeMessage = protocolKit.createMessage(rawMessage)
+    const signedMessage = await protocolKit.signMessage(safeMessage, 'eth_sign')
 
     await chai.expect(
       safeApiKit.addMessage(safeAddress, {
         message: rawMessage,
-        signature: signature.data
+        signature: signedMessage.encodedSignatures()
       })
     ).to.be.fulfilled
   })
 
   it('should allow to create a new off-chain message signed with EIP-712', async () => {
     const rawMessage = generateMessage()
-    const signature = await protocolKit.signTypedData(rawMessage)
+    const safeMessage = protocolKit.createMessage(rawMessage)
+    const signedMessage = await protocolKit.signMessage(safeMessage, 'eth_signTypedData_v4')
 
     await chai.expect(
       safeApiKit.addMessage(safeAddress, {
         message: rawMessage,
         safeAppId: 123,
-        signature: signature.data
+        signature: signedMessage.encodedSignatures()
       })
     ).to.be.fulfilled
   })

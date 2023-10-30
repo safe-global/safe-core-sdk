@@ -595,9 +595,7 @@ class Safe {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
       chainId: await this.getEthAdapter().getChainId(),
-      data: eip712Data.hasOwnProperty('signatures')
-        ? (eip712Data as SafeTransaction).data
-        : (eip712Data as EIP712TypedData | string)
+      data: eip712Data.data
     }
 
     const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)

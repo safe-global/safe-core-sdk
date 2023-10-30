@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter, SafeMessage } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -24,7 +24,7 @@ const generateRandomUUID = (): string => {
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 
-describe('addMessageSignature', () => {
+describe.only('addMessageSignature', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
@@ -58,21 +58,28 @@ describe('addMessageSignature', () => {
 
   it('should allow to add a confirmation signature using a mix of EIP-191 and EIP-712', async () => {
     const rawMessage = generateMessage()
-    const messageHash = await protocolKit1.hashSafeMessage(rawMessage)
-    const safeMessageHash = await protocolKit1.getSafeMessageHash(messageHash)
-    const ethSign = await protocolKit1.signHash(safeMessageHash)
+    const safeMessage = protocolKit1.createMessage(rawMessage)
+    const signedMessage1: SafeMessage = await protocolKit1.signMessage(safeMessage, 'eth_sign')
 
     await chai.expect(
       safeApiKit1.addMessage(safeAddress, {
         message: rawMessage,
-        signature: ethSign.data
+        signature: [...signedMessage1.signatures.values()][0].data
       })
     ).to.be.fulfilled
 
-    const typedDataSign = await protocolKit2.signTypedData(rawMessage)
+    const signedMessage2 = await protocolKit2.signMessage(signedMessage1, 'eth_signTypedData_v4')
 
-    await chai.expect(safeApiKit1.addMessageSignature(safeMessageHash, typedDataSign.data)).to.be
-      .fulfilled
+    const safeMessageHash = await protocolKit1.getSafeMessageHash(
+      protocolKit1.hashSafeMessage(rawMessage)
+    )
+
+    await chai.expect(
+      safeApiKit1.addMessageSignature(
+        safeMessageHash,
+        [...signedMessage2.signatures.values()][1].data
+      )
+    ).to.be.fulfilled
 
     const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
 

@@ -65,6 +65,7 @@ import {
   getProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
+import SafeMessage from './utils/messages/SafeMessage'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -529,6 +530,55 @@ class Safe {
     return hashSafeMessage(message)
   }
 
+  createMessage(message: string | EIP712TypedData): SafeMessage {
+    return new SafeMessage(message)
+  }
+
+  async signMessage(
+    message: SafeMessage,
+    signingMethod = 'eth_signTypedData_v4',
+    isSmartContract = false
+  ): Promise<SafeMessage> {
+    const owners = await this.getOwners()
+    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    if (!signerAddress) {
+      throw new Error('EthAdapter must be initialized with a signer to use this method')
+    }
+    const addressIsOwner = owners.some(
+      (owner: string) => signerAddress && sameString(owner, signerAddress)
+    )
+    if (!addressIsOwner) {
+      throw new Error('Transactions can only be signed by Safe owners')
+    }
+
+    let signature: SafeSignature
+    if (signingMethod === 'eth_signTypedData_v4') {
+      signature = await this.signTypedData(message, 'v4', isSmartContract)
+    } else if (signingMethod === 'eth_signTypedData_v3') {
+      signature = await this.signTypedData(message, 'v3', isSmartContract)
+    } else if (signingMethod === 'eth_signTypedData') {
+      signature = await this.signTypedData(message, undefined, isSmartContract)
+    } else {
+      const safeVersion = await this.getContractVersion()
+      if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
+        throw new Error('eth_sign is only supported by Safes >= v1.1.0')
+      }
+
+      const safeMessageHash = await this.getSafeMessageHash(this.hashSafeMessage(message.data))
+      signature = await this.signHash(safeMessageHash, isSmartContract)
+    }
+
+    const signedSafeMessage = this.createMessage(message.data)
+
+    message.signatures.forEach((signature: EthSafeSignature) => {
+      signedSafeMessage.addSignature(signature)
+    })
+
+    signedSafeMessage.addSignature(signature)
+
+    return signedSafeMessage
+  }
+
   /**
    * Signs a transaction according to the EIP-712 using the current signer account.
    *
@@ -537,7 +587,7 @@ class Safe {
    * @returns The Safe signature
    */
   async signTypedData(
-    eip712Data: SafeTransaction | EIP712TypedData | string,
+    eip712Data: SafeTransaction | SafeMessage,
     methodVersion?: 'v3' | 'v4',
     isSmartContract = false
   ): Promise<SafeSignature> {

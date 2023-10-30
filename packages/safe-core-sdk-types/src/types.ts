@@ -59,6 +59,13 @@ export interface SafeTransaction {
   encodedSignatures(): string
 }
 
+export interface SafeMessage {
+  readonly data: EIP712TypedData | string
+  readonly signatures: Map<string, SafeSignature>
+  addSignature(signature: SafeSignature): void
+  encodedSignatures(): string
+}
+
 export type Transaction = TransactionBase & TransactionOptions
 
 interface TransactionBase {

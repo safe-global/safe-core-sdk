@@ -1,5 +1,6 @@
 import { isAddress } from '@ethersproject/address'
 import { BigNumber } from '@ethersproject/bignumber'
+import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
@@ -152,6 +153,17 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
   }
 )
 
+/**
+ * Provides a chain-specific default salt nonce for generating unique addresses
+ * for the same Safe configuration across different chains.
+ *
+ * @param {number} chainId - The chain ID associated with the chain.
+ * @returns {string} The chain-specific salt nonce in hexadecimal format.
+ */
+export function getChainSpecificDefaultSaltNonce(chainId: number): string {
+  return `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+}
+
 export async function predictSafeAddress({
   ethAdapter,
   safeAccountConfig,
@@ -162,8 +174,12 @@ export async function predictSafeAddress({
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
-  const { safeVersion = DEFAULT_SAFE_VERSION, saltNonce = PREDETERMINED_SALT_NONCE } =
-    safeDeploymentConfig
+  const chainId = await ethAdapter.getChainId()
+
+  const {
+    safeVersion = DEFAULT_SAFE_VERSION,
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+  } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     ethAdapter,
@@ -202,7 +218,6 @@ export async function predictSafeAddress({
 
   const input = ethAdapter.encodeParameters(['address'], [safeContract.getAddress()])
 
-  const chainId = await ethAdapter.getChainId()
   // zkSync Era counterfactual deployment is calculated differently
   // https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#create-create2
   if ([ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)) {

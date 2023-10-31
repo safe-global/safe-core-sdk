@@ -1,9 +1,9 @@
 import { Signer } from '@ethersproject/abstract-signer'
-import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
 import Safe, { EthersAdapter, predictSafeAddress } from '@safe-global/protocol-kit'
 import { GelatoRelayPack, RelayPack } from '@safe-global/relay-kit'
 import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
+import AccountAbstraction from './AccountAbstraction'
 
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/relay-kit')

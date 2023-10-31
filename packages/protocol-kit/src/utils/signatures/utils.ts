@@ -1,4 +1,10 @@
-import { EthAdapter, SafeSignature, SafeEIP712Args } from '@safe-global/safe-core-sdk-types'
+import { ethers } from 'ethers'
+import {
+  EthAdapter,
+  SafeSignature,
+  SafeEIP712Args,
+  SafeTransaction
+} from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
@@ -159,4 +165,30 @@ export const buildSignature = (signatures: SafeSignature[]): string => {
   }
 
   return signatureBytes + dynamicBytes
+}
+
+export const preimageSafeTransactionHash = (
+  safeAddress: string,
+  safeTx: SafeTransaction,
+  chainId: number
+): string => {
+  return ethers.TypedDataEncoder.encode(
+    { verifyingContract: safeAddress, chainId },
+    {
+      // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
+      SafeTx: [
+        { type: 'address', name: 'to' },
+        { type: 'uint256', name: 'value' },
+        { type: 'bytes', name: 'data' },
+        { type: 'uint8', name: 'operation' },
+        { type: 'uint256', name: 'safeTxGas' },
+        { type: 'uint256', name: 'baseGas' },
+        { type: 'uint256', name: 'gasPrice' },
+        { type: 'address', name: 'gasToken' },
+        { type: 'address', name: 'refundReceiver' },
+        { type: 'uint256', name: 'nonce' }
+      ]
+    },
+    safeTx.data
+  )
 }

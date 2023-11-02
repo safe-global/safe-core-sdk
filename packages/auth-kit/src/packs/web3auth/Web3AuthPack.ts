@@ -1,13 +1,16 @@
 import { ExternalProvider } from '@ethersproject/providers'
-import Torus, {
-  LOGIN_PROVIDER_TYPE,
-  TorusInPageProvider,
-  TorusParams,
-  UserInfo
-} from '@web3auth/ws-embed'
+import Torus, { TorusInPageProvider } from '@web3auth/ws-embed'
 
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
-import { Web3AuthConfig, Web3AuthEvent, Web3AuthEventListener } from './types'
+import {
+  Web3AuthConfig,
+  Web3AuthEvent,
+  Web3AuthEventListener,
+  Web3AuthInitOptions,
+  Web3AuthSignInOptions,
+  Web3AuthSignOutOptions,
+  Web3AuthUserInfo
+} from './types'
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 
@@ -47,7 +50,7 @@ export class Web3AuthPack extends AuthKitBasePack {
    * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
    * @throws Error if there was an error initializing Web3Auth
    */
-  async init(options: TorusParams) {
+  async init(options: Web3AuthInitOptions) {
     try {
       this.torus = new Torus()
 
@@ -65,10 +68,7 @@ export class Web3AuthPack extends AuthKitBasePack {
    * Connect to the Web3Auth service provider
    * @returns The sign in data from the provider
    */
-  async signIn(options?: {
-    loginProvider?: LOGIN_PROVIDER_TYPE
-    login_hint?: string
-  }): Promise<AuthKitSignInData> {
+  async signIn(options?: Web3AuthSignInOptions): Promise<AuthKitSignInData> {
     if (!this.torus) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
@@ -97,7 +97,7 @@ export class Web3AuthPack extends AuthKitBasePack {
   /**
    * Disconnect from the Web3Auth service provider
    */
-  async signOut(options?: { reset: boolean }) {
+  async signOut(options?: Web3AuthSignOutOptions) {
     if (!this.torus) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
@@ -115,7 +115,7 @@ export class Web3AuthPack extends AuthKitBasePack {
    * Get authenticated user information
    * @returns The user info
    */
-  async getUserInfo(): Promise<UserInfo> {
+  async getUserInfo(): Promise<Web3AuthUserInfo> {
     if (!this.torus) {
       throw new Error(SDK_NOT_INITIALIZED)
     }

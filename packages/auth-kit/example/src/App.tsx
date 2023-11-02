@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
-import { TorusParams, UserInfo } from '@web3auth/ws-embed'
 import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
-import Safe, { EthersAdapter, Web3Adapter } from '@safe-global/protocol-kit'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import AppBar from './AppBar'
-import { AuthKitSignInData, Web3AuthPack } from '../../src/index'
+import {
+  AuthKitSignInData,
+  Web3AuthInitOptions,
+  Web3AuthPack,
+  Web3AuthUserInfo
+} from '../../src/index'
 import { ethers } from 'ethers'
 import { TYPED_DATA, TYPED_DATA_V3, TYPED_DATA_V4 } from './typedData'
-import Web3 from 'web3'
 
 function App() {
   const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthPack>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<UserInfo>()
+  const [userInfo, setUserInfo] = useState<Web3AuthUserInfo>()
   const [chainId, setChainId] = useState<string>()
   const [balance, setBalance] = useState<string>()
   const [consoleMessage, setConsoleMessage] = useState<string>('')
@@ -23,7 +26,7 @@ function App() {
 
   useEffect(() => {
     ;(async () => {
-      const options: TorusParams = {
+      const options: Web3AuthInitOptions = {
         enableLogging: true,
         showWidgetButton: false,
         chainConfig: SUPPORTED_NETWORKS['0x1']

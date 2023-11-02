@@ -29,11 +29,11 @@ function App() {
       const options: Web3AuthInitOptions = {
         enableLogging: true,
         showWidgetButton: false,
-        chainConfig: SUPPORTED_NETWORKS['0x1']
+        chainConfig: SUPPORTED_NETWORKS['0x64']
       }
 
       const web3AuthPack = new Web3AuthPack({
-        txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
+        txServiceUrl: 'https://safe-transaction-gnosis-chain.safe.global/api'
       })
 
       await web3AuthPack.init(options)

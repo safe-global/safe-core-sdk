@@ -23,6 +23,7 @@ function App() {
   const [balance, setBalance] = useState<string>()
   const [consoleMessage, setConsoleMessage] = useState<string>('')
   const [consoleTitle, setConsoleTitle] = useState<string>('')
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
 
   useEffect(() => {
     ;(async () => {
@@ -68,6 +69,7 @@ function App() {
       setBalance(
         ethers.utils.formatEther((await provider?.getSigner()?.getBalance()) as ethers.BigNumberish)
       )
+      setProvider(provider)
     }
   }
 
@@ -80,39 +82,31 @@ function App() {
   }
 
   const getAccounts = async () => {
-    const accounts = await web3AuthPack?.torus.provider.sendAsync({
-      method: 'eth_accounts'
-    })
+    const accounts = await provider?.send('eth_accounts', [])
 
     uiConsole('Accounts', accounts)
   }
 
   const getChainId = async () => {
-    const chainId = await web3AuthPack?.torus.provider.sendAsync({
-      method: 'eth_chainId'
-    })
+    const chainId = await provider?.send('eth_chainId', [])
 
     uiConsole('ChainId', chainId)
   }
 
   const signSafeTx = async () => {
-    const protocolKit = await Safe.create({
-      safeAddress: safeAuthSignInResponse?.safes?.[0] || '0x',
-      ethAdapter: new EthersAdapter({
-        ethers,
-        signerOrProvider: new ethers.providers.Web3Provider(
-          web3AuthPack?.getProvider() as ethers.providers.ExternalProvider
-        ).getSigner()
-      })
+    const safeAddress = safeAuthSignInResponse?.safes?.[0] || '0x'
+    const provider = new ethers.providers.Web3Provider(
+      web3AuthPack?.getProvider() as ethers.providers.ExternalProvider
+    )
+    const signer = provider.getSigner()
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signerOrProvider: signer
     })
-
-    // const protocolKit = await Safe.create({
-    //   safeAddress: safeAuthSignInResponse?.safes?.[0] || '0x',
-    //   ethAdapter: new Web3Adapter({
-    //     web3: new Web3(web3AuthPack?.getProvider() as any) as any,
-    //     signerAddress: safeAuthSignInResponse?.eoa || '0x'
-    //   })
-    // })
+    const protocolKit = await Safe.create({
+      safeAddress,
+      ethAdapter
+    })
 
     const tx = await protocolKit.createTransaction({
       safeTransactionData: {
@@ -125,15 +119,15 @@ function App() {
 
     const signedTx = await protocolKit.signTransaction(tx, 'eth_sign')
 
-    // await protocolKit.executeTransaction(signedTx)
+    uiConsole('Signed Safe Transaction', signedTx)
+
+    const txResult = await protocolKit.executeTransaction(signedTx)
+
+    uiConsole('Safe Transaction Result', txResult)
   }
 
   const signMessage = async (data: any, method: string) => {
-    // const ethersProvider = new ethers.providers.Web3Provider(
-    //   web3AuthPack?.getProvider() as ethers.providers.ExternalProvider
-    // )
-    // const signer = ethersProvider.getSigner()
-    // const signedMessage = await signer.signMessage(data)
+    let signedMessage
 
     const params = {
       data,
@@ -144,28 +138,24 @@ function App() {
       // @ts-expect-error TODO: fix this
       params.version =
         method === 'eth_signTypedData' ? 'V1' : method === 'eth_signTypedData_v3' ? 'V3' : 'V4'
-    }
 
-    const signedMessage = await web3AuthPack?.torus.provider.sendAsync({
-      method,
-      params
-    })
+      signedMessage = await provider?.send(method, [data, params.from])
+    } else {
+      signedMessage = await provider?.getSigner()?.signMessage(data)
+    }
 
     uiConsole('Signed Message', signedMessage)
   }
 
   const sendTransaction = async () => {
-    const tx = await web3AuthPack?.torus?.provider?.request({
-      method: 'eth_sendTransaction',
-      params: [
-        {
-          from: safeAuthSignInResponse?.eoa,
-          to: safeAuthSignInResponse?.eoa,
-          value: ethers.utils.parseUnits('0.00001', 'ether').toString(),
-          gasLimit: 21000
-        }
-      ]
-    })
+    const tx = await provider?.send('eth_sendTransaction', [
+      {
+        from: safeAuthSignInResponse?.eoa,
+        to: safeAuthSignInResponse?.eoa,
+        value: ethers.utils.parseUnits('0.00001', 'ether').toString(),
+        gasLimit: 21000
+      }
+    ])
 
     uiConsole('Transaction Response', tx)
   }

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
+import { ethers } from 'ethers'
+import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
-import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import AppBar from './AppBar'
 import {
@@ -10,7 +11,6 @@ import {
   SafeAuthPack,
   SafeAuthUserInfo
 } from '../../src/index'
-import { ethers } from 'ethers'
 import { TYPED_DATA, TYPED_DATA_V3, TYPED_DATA_V4 } from './typedData'
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<SafeAuthUserInfo>()
+  const [userInfo, setUserInfo] = useState<SafeAuthUserInfo | null>(null)
   const [chainId, setChainId] = useState<string>()
   const [balance, setBalance] = useState<string>()
   const [consoleMessage, setConsoleMessage] = useState<string>('')
@@ -51,15 +51,11 @@ function App() {
     if (!safeAuthPack) return
 
     const signInInfo = await safeAuthPack.signIn()
-    console.log('SIGN IN RESPONSE: ', signInInfo)
-
-    const userInfo = await safeAuthPack.getUserInfo()
-    console.log('USER INFO: ', userInfo)
-
-    setSafeAuthSignInResponse(signInInfo)
-    setUserInfo(userInfo || undefined)
-
     const web3Provider = safeAuthPack.getProvider()
+    const userInfo = await safeAuthPack.getUserInfo()
+
+    setUserInfo(userInfo)
+    setSafeAuthSignInResponse(signInInfo)
 
     if (web3Provider) {
       const provider = new ethers.providers.Web3Provider(
@@ -81,6 +77,12 @@ function App() {
     setSafeAuthSignInResponse(null)
   }
 
+  const getUserInfo = async () => {
+    const userInfo = await safeAuthPack?.getUserInfo()
+
+    uiConsole('User Info', userInfo)
+  }
+
   const getAccounts = async () => {
     const accounts = await provider?.send('eth_accounts', [])
 
@@ -93,7 +95,7 @@ function App() {
     uiConsole('ChainId', chainId)
   }
 
-  const signSafeTx = async () => {
+  const signAndExecuteSafeTx = async () => {
     const safeAddress = safeAuthSignInResponse?.safes?.[0] || '0x'
     const provider = new ethers.providers.Web3Provider(
       safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
@@ -170,133 +172,143 @@ function App() {
       <AppBar
         onLogin={login}
         onLogout={logout}
-        userInfo={userInfo}
+        userInfo={userInfo || undefined}
         isLoggedIn={!!safeAuthPack?.isAuthenticated}
       />
       {safeAuthSignInResponse?.eoa && (
         <Grid container>
           <Grid item md={4} p={4}>
             <Typography variant="h3" color="secondary" fontWeight={700}>
-              Owner account
+              Signer
             </Typography>
             <Divider sx={{ my: 3 }} />
             <EthHashInfo address={safeAuthSignInResponse.eoa} showCopyButton showPrefix={false} />
             <Divider sx={{ my: 2 }} />
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => safeAuthPack?.torus.showWalletUi()}
-            >
-              Show Wallet
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => getAccounts()}
-            >
-              eth_accounts
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => getChainId()}
-            >
-              eth_chainId
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => signMessage('Hello World', 'personal_sign')}
-            >
-              personal_sign
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() =>
-                signMessage(
-                  '0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad',
-                  'eth_sign'
-                )
-              }
-            >
-              eth_sign
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => signMessage(TYPED_DATA, 'eth_signTypedData')}
-            >
-              eth_signTypedData
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => signMessage(TYPED_DATA_V3, 'eth_signTypedData_v3')}
-            >
-              eth_signTypedData_v3
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => signMessage(TYPED_DATA_V4, 'eth_signTypedData_v4')}
-            >
-              eth_signTypedData_v4
-            </Button>
-            <Button
-              variant="contained"
-              fullWidth
-              color="primary"
-              sx={{ my: 1 }}
-              onClick={() => sendTransaction()}
-            >
-              Send Transaction
-            </Button>
+            <Box sx={{ my: 3 }} display="flex" justifyContent="space-between">
+              <Typography variant="h5" color="primary">
+                Chain{' '}
+                <Typography variant="h3" color="secondary" fontWeight="bold">
+                  {chainId}
+                </Typography>
+              </Typography>
+              <Typography variant="h5" color="primary">
+                Balance{' '}
+                <Typography variant="h3" color="secondary" fontWeight="bold">
+                  {balance}
+                </Typography>
+              </Typography>
+            </Box>
             <Divider sx={{ my: 2 }} />
-            <Typography variant="body1" sx={{ my: 1 }} color="secondary">
-              ChainId: {chainId}
-            </Typography>
-            <Typography variant="body1" sx={{ my: 1 }} color="secondary">
-              Balance: {balance}
-            </Typography>
+            <Button
+              variant="contained"
+              fullWidth
+              color="secondary"
+              sx={{ my: 1 }}
+              onClick={() => getUserInfo()}
+            >
+              getUserInfo
+            </Button>
+            <Box display="flex" flexWrap="wrap">
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() => getAccounts()}
+              >
+                eth_accounts
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() => getChainId()}
+              >
+                eth_chainId
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() => signMessage('Hello World', 'personal_sign')}
+              >
+                personal_sign
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() =>
+                  signMessage(
+                    '0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad',
+                    'eth_sign'
+                  )
+                }
+              >
+                eth_sign
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() => signMessage(TYPED_DATA, 'eth_signTypedData')}
+              >
+                eth_signTypedData
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() => signMessage(TYPED_DATA_V3, 'eth_signTypedData_v3')}
+              >
+                eth_signTypedData_v3
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() => signMessage(TYPED_DATA_V4, 'eth_signTypedData_v4')}
+              >
+                eth_signTypedData_v4
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ my: 1 }}
+                onClick={() => sendTransaction()}
+              >
+                eth_sendTransaction
+              </Button>
+            </Box>
           </Grid>
-          <Grid item md={4} p={4}>
+          <Grid item md={3} p={4}>
             <>
               <Typography variant="h3" color="secondary" fontWeight={700}>
-                Available Safes
+                Safe accounts
               </Typography>
               <Divider sx={{ my: 2 }} />
               {safeAuthSignInResponse?.safes?.length ? (
                 safeAuthSignInResponse?.safes?.map((safe, index) => (
                   <>
                     <Box sx={{ my: 3 }} key={index}>
-                      <EthHashInfo address={safe} showCopyButton shortAddress={false} />
+                      <EthHashInfo address={safe} showCopyButton shortAddress={true} />
                     </Box>
-                    <Divider sx={{ my: 3 }} />
                     <Button
                       variant="contained"
                       fullWidth
                       color="primary"
-                      onClick={() => signSafeTx()}
+                      onClick={() => signAndExecuteSafeTx()}
                     >
-                      Sign Safe Transaction
+                      Sign and execute
                     </Button>
+                    <Divider sx={{ my: 3 }} />
                   </>
                 ))
               ) : (
@@ -306,7 +318,7 @@ function App() {
               )}
             </>
           </Grid>
-          <Grid item md={4} p={4}>
+          <Grid item md={5} p={4}>
             <Typography variant="h3" color="secondary" fontWeight={700}>
               Console
             </Typography>

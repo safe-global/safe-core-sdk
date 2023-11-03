@@ -3,13 +3,13 @@ import Torus, { TorusInPageProvider } from '@web3auth/ws-embed'
 
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import {
-  Web3AuthConfig,
-  Web3AuthEvent,
-  Web3AuthEventListener,
-  Web3AuthInitOptions,
-  Web3AuthSignInOptions,
-  Web3AuthSignOutOptions,
-  Web3AuthUserInfo
+  SafeAuthConfig,
+  SafeAuthEvent,
+  SafeAuthEventListener,
+  SafeAuthInitOptions,
+  SafeAuthSignInOptions,
+  SafeAuthSignOutOptions,
+  SafeAuthUserInfo
 } from './types'
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
@@ -17,19 +17,19 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 const SDK_NOT_INITIALIZED = 'Web3Auth SDK is not initialized'
 
 /**
- * Web3AuthPack implements the SafeAuthClient interface for adapting the Web3Auth service provider
+ * SafeAuthPack adapts the Web3Auth services to work with Safe accounts
  * @class
  */
-export class Web3AuthPack extends AuthKitBasePack {
+export class SafeAuthPack extends AuthKitBasePack {
   #provider: ExternalProvider | null
-  #config: Web3AuthConfig
+  #config: SafeAuthConfig
   torus!: Torus
 
   /**
-   * Instantiate the Web3AuthPack
-   * @param config Web3Auth specific config
+   * Instantiate the SafeAuthPack
+   * @param config SafeAuth config
    */
-  constructor(config: Web3AuthConfig) {
+  constructor(config: SafeAuthConfig) {
     super()
 
     this.#config = config
@@ -37,20 +37,19 @@ export class Web3AuthPack extends AuthKitBasePack {
   }
 
   /**
-   * The user is authenticated when the provider is available
+   * Returns ig the user is already authenticated
+   * The user is authenticated when the communicationProvider is available
    */
   get isAuthenticated(): boolean {
     return this.torus.communicationProvider.isLoggedIn
   }
 
   /**
-   * Initialize the Web3Auth service provider
-   * @param options Web3Auth options {@link https://web3auth.io/docs/sdk/web/modal/initialize#arguments}
-   * @param adapters Web3Auth adapters {@link https://web3auth.io/docs/sdk/web/modal/initialize#configuring-adapters}
-   * @param modalConfig The modal configuration {@link https://web3auth.io/docs/sdk/web/modal/whitelabel#whitelabeling-while-modal-initialization}
-   * @throws Error if there was an error initializing Web3Auth
+   * Initialize the SafeAuthPack
+   * @param options The options to initialize the SafeAuthPack
+   * @throws Error if there was an error initializing the SafeAuthPack
    */
-  async init(options: Web3AuthInitOptions) {
+  async init(options: SafeAuthInitOptions) {
     try {
       this.torus = new Torus()
 
@@ -65,10 +64,11 @@ export class Web3AuthPack extends AuthKitBasePack {
   }
 
   /**
-   * Connect to the Web3Auth service provider
-   * @returns The sign in data from the provider
+   * Connect to the Web3Auth services and login
+   * @param options The options to connect to the Web3Auth services
+   * @returns An AuthKitSignInData object with the signer address and the associated safes
    */
-  async signIn(options?: Web3AuthSignInOptions): Promise<AuthKitSignInData> {
+  async signIn(options?: SafeAuthSignInOptions): Promise<AuthKitSignInData> {
     if (!this.torus) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
@@ -90,14 +90,19 @@ export class Web3AuthPack extends AuthKitBasePack {
     return signInData
   }
 
+  /**
+   * Get the provider if available
+   * @returns A EIP-1193 compatible provider
+   */
   getProvider(): ExternalProvider | null {
     return this.#provider
   }
 
   /**
-   * Disconnect from the Web3Auth service provider
+   * Disconnect from the Web3Auth services and logout
+   * @param options The options to disconnect from the Web3Auth services
    */
-  async signOut(options?: Web3AuthSignOutOptions) {
+  async signOut(options?: SafeAuthSignOutOptions) {
     if (!this.torus) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
@@ -112,10 +117,10 @@ export class Web3AuthPack extends AuthKitBasePack {
   }
 
   /**
-   * Get authenticated user information
-   * @returns The user info
+   * Get user information once authenticated
+   * @returns The specific SafeAuthUserInfo
    */
-  async getUserInfo(): Promise<Web3AuthUserInfo> {
+  async getUserInfo(): Promise<SafeAuthUserInfo> {
     if (!this.torus) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
@@ -126,22 +131,22 @@ export class Web3AuthPack extends AuthKitBasePack {
   }
 
   /**
-   * Allow to subscribe to the Web3Auth events
-   * @param event The event you want to subscribe to (https://web3auth.io/docs/sdk/web/modal/initialize#subscribing-the-lifecycle-events)
+   * Subscribe to the events
+   * @param event The event you want to subscribe to
    * @param handler The event handler
    */
-  subscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
+  subscribe(event: SafeAuthEvent, handler: SafeAuthEventListener): void {
     const provider = this.getProvider() as TorusInPageProvider
 
     provider.on(event, handler)
   }
 
   /**
-   * Allow to unsubscribe to the Web3Auth events
-   * @param event The event you want to unsubscribe to (https://web3auth.io/docs/sdk/web/modal/initialize#subscribing-the-lifecycle-events)
+   * Unsubscribe from events
+   * @param event The event you want to unsubscribe from
    * @param handler The event handler
    */
-  unsubscribe(event: Web3AuthEvent, handler: Web3AuthEventListener): void {
+  unsubscribe(event: SafeAuthEvent, handler: SafeAuthEventListener): void {
     const provider = this.getProvider() as TorusInPageProvider
 
     provider.off(event, handler)

@@ -6,19 +6,19 @@ import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import AppBar from './AppBar'
 import {
   AuthKitSignInData,
-  Web3AuthInitOptions,
-  Web3AuthPack,
-  Web3AuthUserInfo
+  SafeAuthInitOptions,
+  SafeAuthPack,
+  SafeAuthUserInfo
 } from '../../src/index'
 import { ethers } from 'ethers'
 import { TYPED_DATA, TYPED_DATA_V3, TYPED_DATA_V4 } from './typedData'
 
 function App() {
-  const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthPack>()
+  const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<Web3AuthUserInfo>()
+  const [userInfo, setUserInfo] = useState<SafeAuthUserInfo>()
   const [chainId, setChainId] = useState<string>()
   const [balance, setBalance] = useState<string>()
   const [consoleMessage, setConsoleMessage] = useState<string>('')
@@ -27,43 +27,43 @@ function App() {
 
   useEffect(() => {
     ;(async () => {
-      const options: Web3AuthInitOptions = {
+      const options: SafeAuthInitOptions = {
         enableLogging: true,
         showWidgetButton: false,
         chainConfig: SUPPORTED_NETWORKS['0x64']
       }
 
-      const web3AuthPack = new Web3AuthPack({
-        txServiceUrl: 'https://safe-transaction-gnosis-chain.safe.global/api'
+      const safeAuthPack = new SafeAuthPack({
+        txServiceUrl: 'https://safe-transaction-gnosis-chain.safe.global'
       })
 
-      await web3AuthPack.init(options)
+      await safeAuthPack.init(options)
 
-      web3AuthPack.subscribe('chainChanged', (result: any) =>
-        console.log('web3authpack:chainChanged', result)
+      safeAuthPack.subscribe('chainChanged', (result: any) =>
+        console.log('safeAuthPack:chainChanged', result)
       )
 
-      setWeb3AuthPack(web3AuthPack)
+      setSafeAuthPack(safeAuthPack)
     })()
   }, [])
 
   const login = async () => {
-    if (!web3AuthPack) return
+    if (!safeAuthPack) return
 
-    const signInInfo = await web3AuthPack.signIn()
+    const signInInfo = await safeAuthPack.signIn()
     console.log('SIGN IN RESPONSE: ', signInInfo)
 
-    const userInfo = await web3AuthPack.getUserInfo()
+    const userInfo = await safeAuthPack.getUserInfo()
     console.log('USER INFO: ', userInfo)
 
     setSafeAuthSignInResponse(signInInfo)
     setUserInfo(userInfo || undefined)
 
-    const web3Provider = web3AuthPack.getProvider()
+    const web3Provider = safeAuthPack.getProvider()
 
     if (web3Provider) {
       const provider = new ethers.providers.Web3Provider(
-        web3AuthPack.getProvider() as ethers.providers.ExternalProvider
+        safeAuthPack.getProvider() as ethers.providers.ExternalProvider
       )
       setChainId((await provider?.getNetwork()).chainId.toString())
       setBalance(
@@ -74,9 +74,9 @@ function App() {
   }
 
   const logout = async () => {
-    if (!web3AuthPack) return
+    if (!safeAuthPack) return
 
-    await web3AuthPack.signOut()
+    await safeAuthPack.signOut()
 
     setSafeAuthSignInResponse(null)
   }
@@ -96,7 +96,7 @@ function App() {
   const signSafeTx = async () => {
     const safeAddress = safeAuthSignInResponse?.safes?.[0] || '0x'
     const provider = new ethers.providers.Web3Provider(
-      web3AuthPack?.getProvider() as ethers.providers.ExternalProvider
+      safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
     )
     const signer = provider.getSigner()
     const ethAdapter = new EthersAdapter({
@@ -171,7 +171,7 @@ function App() {
         onLogin={login}
         onLogout={logout}
         userInfo={userInfo}
-        isLoggedIn={!!web3AuthPack?.isAuthenticated}
+        isLoggedIn={!!safeAuthPack?.isAuthenticated}
       />
       {safeAuthSignInResponse?.eoa && (
         <Grid container>
@@ -187,7 +187,7 @@ function App() {
               fullWidth
               color="primary"
               sx={{ my: 1 }}
-              onClick={() => web3AuthPack?.torus.showWalletUi()}
+              onClick={() => safeAuthPack?.torus.showWalletUi()}
             >
               Show Wallet
             </Button>

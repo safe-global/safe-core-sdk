@@ -1,6 +1,5 @@
 import { ExternalProvider } from '@ethersproject/providers'
-import Torus, { TorusInPageProvider } from '@web3auth/ws-embed'
-
+import Web3AuthSDK, { TorusInPageProvider } from '@web3auth/ws-embed'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import {
   SafeAuthConfig,
@@ -17,13 +16,13 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 const SDK_NOT_INITIALIZED = 'Web3Auth SDK is not initialized'
 
 /**
- * SafeAuthPack adapts the Web3Auth services to work with Safe accounts
+ * SafeAuthPack uses the Web3Auth services to get a signer address across different dApps
  * @class
  */
 export class SafeAuthPack extends AuthKitBasePack {
+  sdk!: Web3AuthSDK
   #provider: ExternalProvider | null
   #config: SafeAuthConfig
-  torus!: Torus
 
   /**
    * Instantiate the SafeAuthPack
@@ -41,7 +40,7 @@ export class SafeAuthPack extends AuthKitBasePack {
    * The user is authenticated when the communicationProvider is available
    */
   get isAuthenticated(): boolean {
-    return this.torus.communicationProvider.isLoggedIn
+    return this.sdk.communicationProvider.isLoggedIn
   }
 
   /**
@@ -51,13 +50,11 @@ export class SafeAuthPack extends AuthKitBasePack {
    */
   async init(options: SafeAuthInitOptions) {
     try {
-      this.torus = new Torus()
+      this.sdk = new Web3AuthSDK()
 
-      await this.torus.init(options)
+      await this.sdk.init(options)
 
-      if (this.torus.provider) {
-        this.#provider = this.torus.provider
-      }
+      this.#provider = this.sdk.provider
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -69,15 +66,11 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @returns An AuthKitSignInData object with the signer address and the associated safes
    */
   async signIn(options?: SafeAuthSignInOptions): Promise<AuthKitSignInData> {
-    if (!this.torus) {
+    if (!this.sdk) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
 
-    await this.torus.login(options)
-
-    if (this.torus.provider) {
-      this.#provider = this.torus.provider
-    }
+    await this.sdk.login(options)
 
     const eoa = await this.getAddress()
     const safes = await this.getSafes(this.#config?.txServiceUrl || '')
@@ -103,16 +96,16 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @param options The options to disconnect from the Web3Auth services
    */
   async signOut(options?: SafeAuthSignOutOptions) {
-    if (!this.torus) {
+    if (!this.sdk) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
 
     this.#provider = null
 
     if (options?.reset) {
-      await this.torus.cleanUp()
+      await this.sdk.cleanUp()
     } else {
-      await this.torus.logout()
+      await this.sdk.logout()
     }
   }
 
@@ -121,11 +114,11 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @returns The specific SafeAuthUserInfo
    */
   async getUserInfo(): Promise<SafeAuthUserInfo> {
-    if (!this.torus) {
+    if (!this.sdk) {
       throw new Error(SDK_NOT_INITIALIZED)
     }
 
-    const userInfo = this.torus.getUserInfo()
+    const userInfo = this.sdk.getUserInfo()
 
     return userInfo
   }

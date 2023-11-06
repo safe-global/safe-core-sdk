@@ -23,51 +23,51 @@ export const AuthContext = createContext<AuthContextType>({
 })
 
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
+  const [isAuthenticated, setIsAuthenticated] = useState(!!safeAuthPack?.isAuthenticated)
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData>()
   const [provider, setProvider] = useState<ethers.providers.ExternalProvider | undefined>()
   const [selectedSafe, setSelectedSafe] = useState('')
 
   useEffect(() => {
     ;(async () => {
-      const safeAuthPack = new SafeAuthPack({
+      const authPack = new SafeAuthPack({
         txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
       const options: SafeAuthInitOptions = {
         enableLogging: true,
         showWidgetButton: false,
-        chainConfig: SUPPORTED_NETWORKS['0x64']
+        chainConfig: SUPPORTED_NETWORKS['0x5']
       }
 
-      await safeAuthPack.init(options)
+      await authPack.init(options)
 
-      const provider = safeAuthPack.getProvider()
+      setSafeAuthPack(authPack)
 
-      if (provider) {
-        const response = await safeAuthPack.signIn()
-        setSafeAuthSignInResponse(response)
-        setSelectedSafe(response?.safes?.[0] || '')
-        setProvider(provider as ethers.providers.ExternalProvider)
+      // If the provider has an account the we can try to sign in the user
+      authPack.subscribe('accountsChanged', async (accounts: string[]) => {
+        if (accounts.length > 0) {
+          const signInInfo = await authPack?.signIn()
 
-        setIsLoggedIn(true)
-      }
-
-      setSafeAuthPack(safeAuthPack)
+          setSafeAuthSignInResponse(signInInfo)
+          setIsAuthenticated(true)
+        }
+      })
     })()
   }, [])
+
+  useEffect(() => {
+    if (!safeAuthPack || !isAuthenticated) return
+
+    setProvider(safeAuthPack.getProvider())
+  }, [isAuthenticated])
 
   const logIn = async () => {
     if (!safeAuthPack) return
 
     const response = await safeAuthPack.signIn()
     console.log('SIGN IN RESPONSE: ', response)
-
-    setSafeAuthSignInResponse(response)
-    setSelectedSafe(response?.safes?.[0] || '')
-    setProvider(safeAuthPack.getProvider() as ethers.providers.ExternalProvider)
-    setIsLoggedIn(true)
   }
 
   const logOut = async () => {
@@ -77,13 +77,13 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
 
     setProvider(undefined)
     setSafeAuthSignInResponse(undefined)
-    setIsLoggedIn(false)
+    setIsAuthenticated(false)
   }
 
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn,
+        isLoggedIn: isAuthenticated,
         provider,
         data: safeAuthSignInResponse,
         logIn,

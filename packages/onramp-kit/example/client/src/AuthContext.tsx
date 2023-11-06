@@ -52,6 +52,10 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
 
           setSafeAuthSignInResponse(signInInfo)
           setIsAuthenticated(true)
+
+          if (signInInfo?.safes?.length > 0) {
+            setSelectedSafe(signInInfo?.safes[0])
+          }
         }
       })
     })()
@@ -66,8 +70,13 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const logIn = async () => {
     if (!safeAuthPack) return
 
-    const response = await safeAuthPack.signIn()
-    console.log('SIGN IN RESPONSE: ', response)
+    const signInInfo = await safeAuthPack.signIn()
+    setSafeAuthSignInResponse(signInInfo)
+    setIsAuthenticated(true)
+
+    if (signInInfo?.safes?.length > 0) {
+      setSelectedSafe(signInInfo?.safes[0])
+    }
   }
 
   const logOut = async () => {

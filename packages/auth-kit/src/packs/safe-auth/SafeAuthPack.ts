@@ -124,6 +124,14 @@ export class SafeAuthPack extends AuthKitBasePack {
   }
 
   /**
+   * Remove the Web3Auth iframe from the DOM. Useful if you need to re-instantiate the pack
+   * with an alternative configuration
+   */
+  destroy() {
+    this.sdk.clearInit()
+  }
+
+  /**
    * Subscribe to events (accountsChanged, chainChanged)
    * You can use the accountsChanged event to check the accounts and
    * as an indicator that a first authentication happened, so if the page

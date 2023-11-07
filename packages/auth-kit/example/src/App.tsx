@@ -11,7 +11,7 @@ import {
   SafeAuthPack,
   SafeAuthUserInfo
 } from '../../src/index'
-import { TYPED_DATA, TYPED_DATA_V3, TYPED_DATA_V4 } from './typedData'
+import { getTypedData, getV3TypedData, getV4TypedData } from './typedData'
 
 function App() {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
@@ -151,9 +151,9 @@ function App() {
 
   const signMessage = async (data: any, method: string) => {
     let signedMessage
-
+    console.log(data)
     const params = {
-      data,
+      data: JSON.stringify(data),
       from: safeAuthSignInResponse?.eoa
     }
 
@@ -162,7 +162,7 @@ function App() {
       params.version =
         method === 'eth_signTypedData' ? 'V1' : method === 'eth_signTypedData_v3' ? 'V3' : 'V4'
 
-      signedMessage = await provider?.send(method, [data, params.from])
+      signedMessage = await provider?.send(method, [params.from, params.data])
     } else {
       signedMessage = await provider?.getSigner()?.signMessage(data)
     }
@@ -301,7 +301,7 @@ function App() {
               variant="contained"
               color="primary"
               sx={{ my: 1 }}
-              onClick={() => signMessage(TYPED_DATA, 'eth_signTypedData')}
+              onClick={() => signMessage(getTypedData(), 'eth_signTypedData')}
             >
               eth_signTypedData
             </Button>
@@ -310,7 +310,7 @@ function App() {
               variant="contained"
               color="primary"
               sx={{ my: 1 }}
-              onClick={() => signMessage(TYPED_DATA_V3, 'eth_signTypedData_v3')}
+              onClick={() => signMessage(getV3TypedData(chainId || ''), 'eth_signTypedData_v3')}
             >
               eth_signTypedData_v3
             </Button>
@@ -319,7 +319,7 @@ function App() {
               variant="contained"
               color="primary"
               sx={{ my: 1 }}
-              onClick={() => signMessage(TYPED_DATA_V4, 'eth_signTypedData_v4')}
+              onClick={() => signMessage(getV4TypedData(chainId || ''), 'eth_signTypedData_v4')}
             >
               eth_signTypedData_v4
             </Button>

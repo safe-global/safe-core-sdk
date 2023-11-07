@@ -1,4 +1,4 @@
-export const TYPED_DATA = [
+export const getTypedData = () => [
   {
     type: 'string',
     name: 'message',
@@ -11,7 +11,7 @@ export const TYPED_DATA = [
   }
 ]
 
-export const TYPED_DATA_V3 = {
+export const getV3TypedData = (chainId: string) => ({
   types: {
     EIP712Domain: [
       { name: 'name', type: 'string' },
@@ -33,58 +33,69 @@ export const TYPED_DATA_V3 = {
   domain: {
     name: 'Ether Mail',
     version: '1',
-    chainId: 1,
-    verifyingContract: '0xDbDdBdDBdDBDBDdBdBdbDDBdbDdBDdBddbdDBdBd'
+    chainId: Number(chainId),
+    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
   },
   message: {
     from: {
-      name: 'Alice',
+      name: 'Cow',
       wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
     },
     to: {
       name: 'Bob',
       wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
     },
-    contents: 'Hi, Bob!'
+    contents: 'Hello, Bob!'
   }
-}
+})
 
-export const TYPED_DATA_V4 = {
+export const getV4TypedData = (chainId: string) => ({
   types: {
     EIP712Domain: [
       { name: 'name', type: 'string' },
       { name: 'version', type: 'string' },
       { name: 'chainId', type: 'uint256' },
-      { name: 'verifyingContract', type: 'address' },
-      { name: 'salt', type: 'bytes32' }
+      { name: 'verifyingContract', type: 'address' }
     ],
     Person: [
       { name: 'name', type: 'string' },
-      { name: 'wallet', type: 'address' }
+      { name: 'wallets', type: 'address[]' }
     ],
     Mail: [
       { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
+      { name: 'to', type: 'Person[]' },
       { name: 'contents', type: 'string' }
+    ],
+    Group: [
+      { name: 'name', type: 'string' },
+      { name: 'members', type: 'Person[]' }
     ]
   },
   domain: {
     name: 'Ether Mail',
     version: '1',
-    chainId: 1,
-    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    salt: '0xf2d857f4a3edcb9b78b4d503bfe733db1e3f6cdc2b7971ee739626c97e86a557'
+    chainId: Number(chainId),
+    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
   },
   primaryType: 'Mail',
   message: {
     from: {
-      name: 'Alice',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
+      name: 'Cow',
+      wallets: [
+        '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'
+      ]
     },
-    to: {
-      name: 'Bob',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
-    },
-    contents: 'Hi, Bob!'
+    to: [
+      {
+        name: 'Bob',
+        wallets: [
+          '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+          '0xB0B0b0b0b0b0B000000000000000000000000000'
+        ]
+      }
+    ],
+    contents: 'Hello, Bob!'
   }
-}
+})

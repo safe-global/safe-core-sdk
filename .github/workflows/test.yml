@@ -39,6 +39,13 @@ jobs:
       - name: Test
         run: yarn test
 
+      - name: Account Abstraction Kit coverage
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: packages/account-abstraction-kit
+          file: packages/account-abstraction-kit/coverage/lcov.info
+
       - name: Auth Kit coverage
         uses: coverallsapp/github-action@v2
         with:

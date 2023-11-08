@@ -15,7 +15,7 @@
     "build": "yarn unbuild && tsc && tsc-alias",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
-    "test": "echo \"Error: no test specified\""
+    "test": "jest src --coverage"
   },
   "repository": {
     "type": "git",

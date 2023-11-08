@@ -1,5 +1,5 @@
 import { hashMessage } from '@ethersproject/hash'
-import { Currency, PaymentStandard } from '@monerium/sdk'
+import { PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit'
@@ -9,7 +9,6 @@ import { MAGIC_VALUE } from './signatures'
 
 const newOrder = {
   amount: '100',
-  currency: Currency.eur,
   counterpart: {
     identifier: {
       standard: 'iban' as PaymentStandard.iban,
@@ -68,7 +67,6 @@ describe('SafeMoneriumClient', () => {
         ...newOrder,
         address: '0xSafeAddress',
         chain: 'ethereum',
-        kind: 'redeem',
         message: expect.stringContaining('Send EUR 100 to iban at'),
         network: 'goerli',
         signature: '0x',

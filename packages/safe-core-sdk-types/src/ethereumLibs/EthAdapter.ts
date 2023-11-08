@@ -37,7 +37,7 @@ export interface EthAdapter {
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
   getBalance(address: string, defaultBlock?: string | number): Promise<bigint>
   getNonce(address: string, defaultBlock?: string | number): Promise<number>
-  getChainId(): Promise<number>
+  getChainId(): Promise<bigint>
   getChecksummedAddress(address: string): string
   getSafeContract({
     safeVersion,

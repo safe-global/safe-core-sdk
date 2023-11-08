@@ -18,7 +18,7 @@ describe('Safe Info', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = await getChainId()
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -284,7 +284,7 @@ describe('Safe Info', () => {
         predictedSafe,
         contractNetworks
       })
-      chai.expect(await safeSdk.getChainId()).to.be.eq(Number(chainId))
+      chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
     })
 
     it('should return the chainId of the current network', async () => {
@@ -297,7 +297,7 @@ describe('Safe Info', () => {
         safeAddress: safeAddress,
         contractNetworks
       })
-      chai.expect(await safeSdk.getChainId()).to.be.eq(Number(chainId))
+      chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
     })
   })
 

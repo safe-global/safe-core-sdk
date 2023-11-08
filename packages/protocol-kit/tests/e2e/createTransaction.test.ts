@@ -33,7 +33,7 @@ describe('Transactions creation', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = await getChainId()
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -411,7 +411,9 @@ describe('Transactions creation', () => {
         }
       ]
       const multiSendTx = await safeSdk.createTransaction({ safeTransactionData })
-      chai.expect(multiSendTx.data.to).to.be.eq(contractNetworks[chainId].multiSendAddress)
+      chai
+        .expect(multiSendTx.data.to)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
     })
 
     it('should create a MultiSend transaction with options', async () => {
@@ -446,7 +448,9 @@ describe('Transactions creation', () => {
         }
       ]
       const multiSendTx = await safeSdk.createTransaction({ safeTransactionData, options })
-      chai.expect(multiSendTx.data.to).to.be.eq(contractNetworks[chainId].multiSendAddress)
+      chai
+        .expect(multiSendTx.data.to)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
       chai.expect(multiSendTx.data.value).to.be.eq('0')
       chai.expect(multiSendTx.data.baseGas).to.be.eq(BASE_OPTIONS.baseGas)
       chai.expect(multiSendTx.data.gasPrice).to.be.eq(BASE_OPTIONS.gasPrice)

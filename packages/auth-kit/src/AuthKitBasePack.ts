@@ -54,7 +54,7 @@ export abstract class AuthKitBasePack {
    * @param txServiceUrl The URL of the Safe Transaction Service
    * @returns The list of Safe addresses owned by the user in the chain
    */
-  async getSafes(chainId: number, txServiceUrl?: string): Promise<string[]> {
+  async getSafes(chainId: bigint, txServiceUrl?: string): Promise<string[]> {
     const apiKit = this.#getApiKit(chainId, txServiceUrl)
 
     const address = await this.getAddress()
@@ -86,7 +86,7 @@ export abstract class AuthKitBasePack {
     return signer.getAddress()
   }
 
-  async getChainId(): Promise<number> {
+  async getChainId(): Promise<bigint> {
     const authKitProvider = this.getProvider()
 
     if (!authKitProvider) {
@@ -97,14 +97,14 @@ export abstract class AuthKitBasePack {
 
     const networkDetails = await ethersProvider.getNetwork()
 
-    return Number(networkDetails.chainId)
+    return networkDetails.chainId
   }
 
   /**
    * Get the SafeApiKit instance
    * @returns A SafeApiKit instance
    */
-  #getApiKit(chainId: number, txServiceUrl?: string): SafeApiKit {
+  #getApiKit(chainId: bigint, txServiceUrl?: string): SafeApiKit {
     if (!this.getProvider()) {
       throw new Error('Provider is not defined')
     }

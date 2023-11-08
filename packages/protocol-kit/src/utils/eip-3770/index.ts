@@ -9,7 +9,7 @@ export function parseEip3770Address(fullAddress: string): Eip3770Address {
   return { prefix, address }
 }
 
-export function getEip3770NetworkPrefixFromChainId(chainId: number): string {
+export function getEip3770NetworkPrefixFromChainId(chainId: bigint): string {
   const network = networks.find((network) => chainId === network.chainId)
   if (!network) {
     throw new Error('No network prefix supported for the current chainId')
@@ -21,7 +21,7 @@ export function isValidEip3770NetworkPrefix(prefix: string): boolean {
   return networks.some(({ shortName }) => shortName === prefix)
 }
 
-export function validateEip3770NetworkPrefix(prefix: string, currentChainId: number): void {
+export function validateEip3770NetworkPrefix(prefix: string, currentChainId: bigint): void {
   const isCurrentNetworkPrefix = prefix === getEip3770NetworkPrefixFromChainId(currentChainId)
   if (!isValidEip3770NetworkPrefix(prefix) || !isCurrentNetworkPrefix) {
     throw new Error('The network prefix must match the current network')
@@ -37,7 +37,7 @@ export function validateEthereumAddress(address: string): void {
 
 export function validateEip3770Address(
   fullAddress: string,
-  currentChainId: number
+  currentChainId: bigint
 ): Eip3770Address {
   const { address, prefix } = parseEip3770Address(fullAddress)
   validateEthereumAddress(address)

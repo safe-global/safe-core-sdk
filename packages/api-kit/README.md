@@ -53,7 +53,7 @@ npm run test
 import SafeApiKit from '@safe-global/api-kit'
 
 const safeService = new SafeApiKit({
-  chainId: 1,
+  chainId: 1n,
   // Optional. txServiceUrl must be used to set a custom service. For example on chains where Safe doesn't run services.
   txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
 })

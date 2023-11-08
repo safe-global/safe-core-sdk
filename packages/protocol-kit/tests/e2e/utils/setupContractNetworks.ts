@@ -10,9 +10,9 @@ import {
   getSimulateTxAccessor
 } from './setupContracts'
 
-export async function getContractNetworks(chainId: number): Promise<ContractNetworksConfig> {
+export async function getContractNetworks(chainId: bigint): Promise<ContractNetworksConfig> {
   return {
-    [chainId]: {
+    [chainId.toString()]: {
       safeSingletonAddress: await (await getSafeSingleton()).contract.getAddress(),
       safeSingletonAbi: (await getSafeSingleton()).abi,
       safeProxyFactoryAddress: await (await getFactory()).contract.getAddress(),

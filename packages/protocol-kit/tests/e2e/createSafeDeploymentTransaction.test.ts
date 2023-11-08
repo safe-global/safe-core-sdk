@@ -19,7 +19,7 @@ describe('createSafeDeploymentTransaction', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = await getChainId()
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
 
     const predictedSafe: PredictedSafeProps = {
@@ -174,7 +174,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const customContract = contractNetworks[chainId]
+    const customContract = contractNetworks[chainId.toString()]
     const safeContract = await ethAdapter.getSafeContract({
       safeVersion: safeVersionDeployed,
       customContractAddress: customContract?.safeSingletonAddress,
@@ -186,7 +186,7 @@ describe('createSafeDeploymentTransaction', () => {
       ethAdapter,
       safeContract,
       safeAccountConfig: predictedSafe.safeAccountConfig,
-      customContracts: contractNetworks[chainId]
+      customContracts: contractNetworks[chainId.toString()]
     })
 
     // should contain the initializer setup call in the deployment data

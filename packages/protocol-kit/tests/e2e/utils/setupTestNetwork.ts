@@ -7,7 +7,7 @@ interface Account {
 
 async function getGanacheAccounts(): Promise<Account[]> {
   const web3 = new Web3('http://localhost:8545')
-  const provider = new ethers.providers.Web3Provider(web3.currentProvider as any)
+  const provider = new ethers.BrowserProvider(web3.currentProvider as any)
   const accounts: Account[] = []
   for (let i = 0; i < 10; i++) {
     const signer = provider.getSigner(i)

@@ -22,8 +22,8 @@ import { ContractNetworkConfig, SafeAccountConfig, SafeDeploymentConfig } from '
 export const PREDETERMINED_SALT_NONCE =
   '0xb1073742015cbcf5a3a4d9d1ae33ecf619439710b89475f92e2abd2117e90f90'
 
-const ZKSYNC_MAINNET = 324
-const ZKSYNC_TESTNET = 280
+const ZKSYNC_MAINNET = 324n
+const ZKSYNC_TESTNET = 280n
 // For bundle size efficiency we store SafeProxy.sol/GnosisSafeProxy.sol zksync bytecode hash in hex.
 // To get the values below we need to:
 // 1. Compile Safe smart contracts for zksync
@@ -31,7 +31,7 @@ const ZKSYNC_TESTNET = 280
 // 3. Use zksync-web3 SDK to get the bytecode hash
 //    const bytecodeHash = zkSyncUtils.hashBytecode(${deployedBytecode})
 // 4. Use ethers to convert the array into hex
-//    const deployedBytecodeHash = ethers.utils.hexlify(bytecodeHash)
+//    const deployedBytecodeHash = ethers.hexlify(bytecodeHash)
 const ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE: {
   [version: string]: { deployedBytecodeHash: string }
 } = {

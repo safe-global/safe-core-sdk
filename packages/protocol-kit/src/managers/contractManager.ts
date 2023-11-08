@@ -30,7 +30,7 @@ class ContractManager {
     const { ethAdapter, isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
 
     const chainId = await ethAdapter.getChainId()
-    const customContracts = contractNetworks?.[chainId]
+    const customContracts = contractNetworks?.[chainId.toString()]
     this.#contractNetworks = contractNetworks
     this.#isL1SafeSingleton = isL1SafeSingleton
 

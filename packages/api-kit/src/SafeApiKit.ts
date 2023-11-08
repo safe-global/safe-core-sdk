@@ -33,13 +33,13 @@ import { TRANSACTION_SERVICE_URLS } from './utils/config'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
-  chainId: number
+  chainId: bigint
   /** txServiceUrl - Safe Transaction Service URL */
   txServiceUrl?: string
 }
 
 class SafeApiKit {
-  #chainId: number
+  #chainId: bigint
   #txServiceBaseUrl: string
 
   constructor({ chainId, txServiceUrl }: SafeApiKitConfig) {
@@ -48,7 +48,7 @@ class SafeApiKit {
     if (txServiceUrl) {
       this.#txServiceBaseUrl = txServiceUrl
     } else {
-      const url = TRANSACTION_SERVICE_URLS[chainId]
+      const url = TRANSACTION_SERVICE_URLS[chainId.toString()]
       if (!url) {
         throw new TypeError(
           `There is no transaction service available for chainId ${chainId}. Please set the txServiceUrl property to use a custom transaction service.`

@@ -32,7 +32,7 @@ describe('SafeProxyFactory', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = await getChainId()
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
@@ -57,7 +57,7 @@ describe('SafeProxyFactory', () => {
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const contractNetworks: ContractNetworksConfig = {
-        [chainId]: {
+        [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
           safeSingletonAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,
@@ -111,7 +111,7 @@ describe('SafeProxyFactory', () => {
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
-      chai.expect(await safeFactory.getChainId()).to.be.eq(Number(chainId))
+      chai.expect(await safeFactory.getChainId()).to.be.eq(chainId)
     })
   })
 

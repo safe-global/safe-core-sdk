@@ -83,7 +83,7 @@ class SafeFactory {
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
-    const customContracts = contractNetworks?.[chainId]
+    const customContracts = contractNetworks?.[chainId.toString()]
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter,
       safeVersion,
@@ -109,7 +109,7 @@ class SafeFactory {
     return this.#safeProxyFactoryContract.getAddress()
   }
 
-  async getChainId(): Promise<number> {
+  async getChainId(): Promise<bigint> {
     return this.#ethAdapter.getChainId()
   }
 
@@ -118,7 +118,7 @@ class SafeFactory {
     saltNonce = PREDETERMINED_SALT_NONCE
   ): Promise<string> {
     const chainId = await this.#ethAdapter.getChainId()
-    const customContracts = this.#contractNetworks?.[chainId]
+    const customContracts = this.#contractNetworks?.[chainId.toString()]
     const safeVersion = this.#safeVersion
     const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce, safeVersion }
 
@@ -146,7 +146,7 @@ class SafeFactory {
     }
 
     const chainId = await this.getChainId()
-    const customContracts = this.#contractNetworks?.[chainId]
+    const customContracts = this.#contractNetworks?.[chainId.toString()]
     const initializer = await encodeSetupCallData({
       ethAdapter: this.#ethAdapter,
       safeAccountConfig,

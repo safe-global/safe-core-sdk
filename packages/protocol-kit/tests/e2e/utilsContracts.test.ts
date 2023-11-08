@@ -38,7 +38,7 @@ describe('Contract utils', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = await getChainId()
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
@@ -58,7 +58,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -101,7 +101,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -144,7 +144,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -187,7 +187,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -220,7 +220,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -253,7 +253,7 @@ describe('Contract utils', () => {
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -285,7 +285,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(accounts[0].signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners: invalidOwners,
@@ -318,7 +318,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -405,7 +405,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -465,7 +465,7 @@ describe('Contract utils', () => {
         const owners = [owner1.address]
         const threshold = 1
         const ethAdapter = await getEthAdapter(owner1.signer)
-        const customContracts = contractNetworks[chainId]
+        const customContracts = contractNetworks[chainId.toString()]
 
         const safeAccountConfig: SafeAccountConfig = {
           owners,
@@ -500,7 +500,7 @@ describe('Contract utils', () => {
         // Create EthAdapter instance
         const ethAdapter = await getEthAdapter(getNetworkProvider('zksync'))
         const chainId = await ethAdapter.getChainId()
-        const customContracts = contractNetworks[chainId]
+        const customContracts = contractNetworks[chainId.toString()]
 
         // We check real deployments from zksync return the expected address.
 

@@ -116,8 +116,8 @@ function App() {
     uiConsole('ChainId', chainId)
   }
 
-  const signAndExecuteSafeTx = async () => {
-    const safeAddress = safeAuthSignInResponse?.safes?.[0] || '0x'
+  const signAndExecuteSafeTx = async (index: number) => {
+    const safeAddress = safeAuthSignInResponse?.safes?.[index] || '0x'
     const provider = new ethers.providers.Web3Provider(
       safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
     )
@@ -134,17 +134,12 @@ function App() {
     const tx = await protocolKit.createTransaction({
       safeTransactionData: {
         to: safeAuthSignInResponse?.eoa || '0x',
-        value: '0',
         data: '0x',
-        operation: 0
+        value: ethers.utils.parseUnits('0.0001', 'ether').toString()
       }
     })
 
-    const signedTx = await protocolKit.signTransaction(tx, 'eth_sign')
-
-    uiConsole('Signed Safe Transaction', signedTx)
-
-    const txResult = await protocolKit.executeTransaction(signedTx)
+    const txResult = await protocolKit.executeTransaction(tx)
 
     uiConsole('Safe Transaction Result', txResult)
   }
@@ -368,7 +363,7 @@ function App() {
                       variant="contained"
                       fullWidth
                       color="primary"
-                      onClick={() => signAndExecuteSafeTx()}
+                      onClick={() => signAndExecuteSafeTx(index)}
                     >
                       Sign and execute
                     </Button>

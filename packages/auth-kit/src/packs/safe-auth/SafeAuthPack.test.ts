@@ -1,23 +1,14 @@
+import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import { SafeAuthPack } from './SafeAuthPack'
 import { generateTestingUtils } from 'eth-testing'
-import EventEmitter from 'events'
 import { AuthKitBasePack } from '../../AuthKitBasePack'
 import { SafeAuthInitOptions } from './types'
-import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
+
 const testingUtils = generateTestingUtils({ providerType: 'MetaMask' })
 const mockProvider = testingUtils.getProvider()
 const mockInit = jest.fn()
 const mockLogin = jest.fn()
 const mockLogout = jest.fn()
-
-// const eventEmitter = new EventEmitter()
-// const mockConfigureAdapter = jest.fn()
-// const mockAddEventListener = jest
-//   .fn()
-//   .mockImplementation((event, listener) => eventEmitter.on(event, listener))
-// const mockRemoveEventListener = jest
-//   .fn()
-//   .mockImplementation((event, listener) => eventEmitter.off(event, listener))
 
 jest.mock('@safe-global/api-kit', () => {
   return jest.fn().mockImplementation(() => {

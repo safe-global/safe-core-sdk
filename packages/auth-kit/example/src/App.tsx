@@ -146,18 +146,16 @@ function App() {
 
   const signMessage = async (data: any, method: string) => {
     let signedMessage
-    console.log(data)
+
     const params = {
-      data: JSON.stringify(data),
+      data,
       from: safeAuthSignInResponse?.eoa
     }
 
-    if (method.startsWith('eth_signTypedData')) {
-      // @ts-expect-error TODO: fix this
-      params.version =
-        method === 'eth_signTypedData' ? 'V1' : method === 'eth_signTypedData_v3' ? 'V3' : 'V4'
-
-      signedMessage = await provider?.send(method, [params.from, params.data])
+    if (method === 'eth_signTypedData') {
+      signedMessage = await provider?.send(method, [params.data, params.from])
+    } else if (method === 'eth_signTypedData_v3' || method === 'eth_signTypedData_v4') {
+      signedMessage = await provider?.send(method, [params.from, JSON.stringify(params.data)])
     } else {
       signedMessage = await provider?.getSigner()?.signMessage(data)
     }

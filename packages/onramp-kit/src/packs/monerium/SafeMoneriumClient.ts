@@ -268,11 +268,9 @@ export class SafeMoneriumClient extends MoneriumClient {
    */
   async #createOrder(safeAddress: string, order: SafeMoneriumOrder): Promise<NewOrder> {
     return {
-      kind: OrderKind.redeem,
       amount: order.amount,
       signature: '0x',
       address: safeAddress,
-      currency: order.currency,
       counterpart: order.counterpart,
       memo: order.memo,
       message: this.#getSendMessage(order),
@@ -290,7 +288,7 @@ export class SafeMoneriumClient extends MoneriumClient {
   #getSendMessage(order: SafeMoneriumOrder): string {
     const currentDate = new Date().toISOString()
 
-    return `Send ${order.currency.toUpperCase()} ${order.amount} to ${
+    return `Send EUR ${order.amount} to ${
       (order.counterpart.identifier as IBAN).iban
     } at ${currentDate}`
   }

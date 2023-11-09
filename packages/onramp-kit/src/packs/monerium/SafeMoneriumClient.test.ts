@@ -80,6 +80,19 @@ describe('SafeMoneriumClient', () => {
     )
   })
 
+  it('should throw if signing message fails', async () => {
+    safeSdk.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
+    const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
+    const signMessageSpy = jest
+      .spyOn(safeMoneriumClient, 'signMessage')
+      .mockRejectedValueOnce(new Error('Failed to sign message'))
+
+    await expect(safeMoneriumClient.send({ ...newOrder })).rejects.toThrow('Failed to sign message')
+
+    expect(placeOrderSpy).toHaveBeenCalledTimes(1)
+    expect(signMessageSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('should allow to check if a message is signed in the smart contract', async () => {
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(
       '0xSafeAddress',

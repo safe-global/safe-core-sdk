@@ -31,6 +31,7 @@ function App() {
       const options: SafeAuthInitOptions = {
         enableLogging: true,
         showWidgetButton: false,
+        buildEnv: 'testing',
         chainConfig: SUPPORTED_NETWORKS['0x64']
       }
 
@@ -118,26 +119,80 @@ function App() {
 
   const signAndExecuteSafeTx = async (index: number) => {
     const safeAddress = safeAuthSignInResponse?.safes?.[index] || '0x'
+
+    // Web3Auth provider wrapped with ethers
+    // -------------------------------------
     const provider = new ethers.providers.Web3Provider(
       safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
     )
     const signer = provider.getSigner()
-    const ethAdapter = new EthersAdapter({
+    const ethersAdapter = new EthersAdapter({
       ethers,
       signerOrProvider: signer
     })
     const protocolKit = await Safe.create({
       safeAddress,
-      ethAdapter
+      ethAdapter: ethersAdapter
     })
+    // -------------------------------------
 
-    const tx = await protocolKit.createTransaction({
+    // ethers.Wallet as signer
+    // -------------------------------------
+    // const signer = new ethers.Wallet(
+    //   import.meta.env.VITE_PRIVATE_KEY,
+    //   new ethers.providers.JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
+    // )
+    // const ethersAdapter = new EthersAdapter({
+    //   ethers,
+    //   signerOrProvider: signer
+    // })
+    // const protocolKit = await Safe.create({
+    //   safeAddress,
+    //   ethAdapter: ethersAdapter
+    // })
+    // -------------------------------------
+
+    const chainId = await ethersAdapter.getChainId()
+    let tx = await protocolKit.createTransaction({
       safeTransactionData: {
         to: safeAuthSignInResponse?.eoa || '0x',
         data: '0x',
         value: ethers.utils.parseUnits('0.0001', 'ether').toString()
       }
     })
+
+    tx = await protocolKit.signTransaction(tx, 'eth_signTypedData_v4')
+    const signerAddress = (await ethersAdapter.getSignerAddress()).toLowerCase()
+    const signature = tx.signatures.get(signerAddress)
+    const verify = ethers.utils.verifyTypedData(
+      { verifyingContract: safeAddress, chainId },
+      {
+        SafeTx: [
+          { type: 'address', name: 'to' },
+          { type: 'uint256', name: 'value' },
+          { type: 'bytes', name: 'data' },
+          { type: 'uint8', name: 'operation' },
+          { type: 'uint256', name: 'safeTxGas' },
+          { type: 'uint256', name: 'baseGas' },
+          { type: 'uint256', name: 'gasPrice' },
+          { type: 'address', name: 'gasToken' },
+          { type: 'address', name: 'refundReceiver' },
+          { type: 'uint256', name: 'nonce' }
+        ]
+      },
+      {
+        ...tx.data,
+        value: tx.data.value,
+        safeTxGas: tx.data.safeTxGas,
+        baseGas: tx.data.baseGas,
+        gasPrice: tx.data.gasPrice,
+        nonce: tx.data.nonce
+      },
+      signature?.data || '0x'
+    )
+
+    console.log('Verify: Signer Address:', signerAddress.toLowerCase())
+    console.log('Verify: Result:', verify, verify.toLowerCase() === signerAddress.toLowerCase())
 
     const txResult = await protocolKit.executeTransaction(tx)
 

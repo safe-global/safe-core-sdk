@@ -1,5 +1,5 @@
 import { ExternalProvider } from '@ethersproject/providers'
-import Web3AuthSDK, { TorusInPageProvider } from '@web3auth/ws-embed'
+import WsEmbed, { TorusInPageProvider } from '@web3auth/ws-embed'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import {
   SafeAuthConfig,
@@ -13,14 +13,14 @@ import {
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 
-const SDK_NOT_INITIALIZED = 'Web3Auth SDK is not initialized'
+const WS_EMBED_NOT_INITIALIZED = 'WsEmbed SDK is not initialized'
 
 /**
  * SafeAuthPack uses the Web3Auth services to get a signer address across different dApps
  * @class
  */
 export class SafeAuthPack extends AuthKitBasePack {
-  sdk!: Web3AuthSDK
+  wsEmbed!: WsEmbed
   #provider: ExternalProvider | null
   #config: SafeAuthConfig
 
@@ -40,21 +40,21 @@ export class SafeAuthPack extends AuthKitBasePack {
    * Checking the communication provider for this information
    */
   get isAuthenticated(): boolean {
-    return this.sdk.communicationProvider.isLoggedIn
+    return this.wsEmbed.communicationProvider.isLoggedIn
   }
 
   /**
    * Initialize the SafeAuthPack
    * @param options The options to initialize the SafeAuthPack
-   * @throws Error if there was an error initializing the Web3Auth SDK
+   * @throws Error if there was an error initializing the Web3Auth WsEmbed
    */
   async init(options: SafeAuthInitOptions) {
     try {
-      this.sdk = new Web3AuthSDK()
+      this.wsEmbed = new WsEmbed()
 
-      await this.sdk.init(options)
+      await this.wsEmbed.init(options)
 
-      this.#provider = this.sdk.provider
+      this.#provider = this.wsEmbed.provider
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -67,11 +67,11 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @returns An AuthKitSignInData object with the signer address and the associated safes
    */
   async signIn(options?: SafeAuthSignInOptions): Promise<AuthKitSignInData> {
-    if (!this.sdk) {
-      throw new Error(SDK_NOT_INITIALIZED)
+    if (!this.wsEmbed) {
+      throw new Error(WS_EMBED_NOT_INITIALIZED)
     }
 
-    await this.sdk.login(options)
+    await this.wsEmbed.login(options)
 
     const eoa = await this.getAddress()
     const safes = await this.getSafes(this.#config?.txServiceUrl || '')
@@ -80,7 +80,7 @@ export class SafeAuthPack extends AuthKitBasePack {
   }
 
   /**
-   * Get the provider returned by the Web3Auth SDK
+   * Get the provider returned by the Web3Auth WsEmbed
    * @returns A EIP-1193 compatible provider. Can be wrapped with ethers or web3
    */
   getProvider(): ExternalProvider | null {
@@ -95,40 +95,40 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @param options The options to disconnect from the Web3Auth services
    */
   async signOut(options?: SafeAuthSignOutOptions) {
-    if (!this.sdk) {
-      throw new Error(SDK_NOT_INITIALIZED)
+    if (!this.wsEmbed) {
+      throw new Error(WS_EMBED_NOT_INITIALIZED)
     }
 
     this.#provider = null
 
     if (options?.reset) {
-      await this.sdk.cleanUp()
+      await this.wsEmbed.cleanUp()
     } else {
-      await this.sdk.logout()
+      await this.wsEmbed.logout()
     }
   }
 
   /**
    * Get user information. Use it after authentication
    * @returns The specific user information coming from the oAuth or email provider
-   * @throws Error if there was an error initializing the Web3Auth SDK
+   * @throws Error if there was an error initializing the Web3Auth WsEmbed
    */
   async getUserInfo(): Promise<SafeAuthUserInfo> {
-    if (!this.sdk) {
-      throw new Error(SDK_NOT_INITIALIZED)
+    if (!this.wsEmbed) {
+      throw new Error(WS_EMBED_NOT_INITIALIZED)
     }
 
-    const userInfo = this.sdk.getUserInfo()
+    const userInfo = this.wsEmbed.getUserInfo()
 
     return userInfo
   }
 
   /**
-   * Remove the Web3Auth iframe from the DOM. Useful if you need to re-instantiate the pack
+   * Remove the Web3Auth WsEmbed iframe from the DOM. Useful if you need to re-instantiate the pack
    * with an alternative configuration
    */
   destroy() {
-    this.sdk.clearInit()
+    this.wsEmbed.clearInit()
   }
 
   /**

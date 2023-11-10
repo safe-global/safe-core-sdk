@@ -12,6 +12,7 @@ import {
   SafeAuthUserInfo
 } from '../../src/index'
 import { getTypedData, getV3TypedData, getV4TypedData } from './typedData'
+import SafeApiKit from '@safe-global/api-kit'
 
 function App() {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
@@ -122,26 +123,10 @@ function App() {
 
     // Web3Auth provider wrapped with ethers
     // -------------------------------------
-    const provider = new ethers.providers.Web3Provider(
-      safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
-    )
-    const signer = provider.getSigner()
-    const ethersAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    })
-    const protocolKit = await Safe.create({
-      safeAddress,
-      ethAdapter: ethersAdapter
-    })
-    // -------------------------------------
-
-    // ethers.Wallet as signer
-    // -------------------------------------
-    // const signer = new ethers.Wallet(
-    //   import.meta.env.VITE_PRIVATE_KEY,
-    //   new ethers.providers.JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
+    // const provider = new ethers.providers.Web3Provider(
+    //   safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
     // )
+    // const signer = provider.getSigner()
     // const ethersAdapter = new EthersAdapter({
     //   ethers,
     //   signerOrProvider: signer
@@ -152,10 +137,26 @@ function App() {
     // })
     // -------------------------------------
 
+    // ethers.Wallet as signer
+    // -------------------------------------
+    const signer = new ethers.Wallet(
+      import.meta.env.VITE_PRIVATE_KEY,
+      new ethers.providers.JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
+    )
+    const ethersAdapter = new EthersAdapter({
+      ethers,
+      signerOrProvider: signer
+    })
+    const protocolKit = await Safe.create({
+      safeAddress,
+      ethAdapter: ethersAdapter
+    })
+    // -------------------------------------
+
     const chainId = await ethersAdapter.getChainId()
     let tx = await protocolKit.createTransaction({
       safeTransactionData: {
-        to: safeAuthSignInResponse?.eoa || '0x',
+        to: ethers.utils.getAddress(safeAuthSignInResponse?.eoa || '0x'),
         data: '0x',
         value: ethers.utils.parseUnits('0.0001', 'ether').toString()
       }
@@ -194,9 +195,25 @@ function App() {
     console.log('Verify: Signer Address:', signerAddress.toLowerCase())
     console.log('Verify: Result:', verify, verify.toLowerCase() === signerAddress.toLowerCase())
 
-    const txResult = await protocolKit.executeTransaction(tx)
+    // Propose transaction
+    // -------------------------------------
+    const safeApiKit = new SafeApiKit({
+      ethAdapter: ethersAdapter,
+      txServiceUrl: 'https://safe-transaction-gnosis-chain.safe.global'
+    })
+    const safeTxHash = await protocolKit.getTransactionHash(tx)
+    await safeApiKit.proposeTransaction({
+      safeAddress,
+      safeTransactionData: tx.data,
+      safeTxHash,
+      senderAddress: ethers.utils.getAddress(signerAddress),
+      senderSignature: signature.data
+    })
+    // -------------------------------------
 
-    uiConsole('Safe Transaction Result', txResult)
+    // const txResult = await protocolKit.executeTransaction(tx)
+
+    // uiConsole('Safe Transaction Result', txResult)
   }
 
   const signMessage = async (data: any, method: string) => {

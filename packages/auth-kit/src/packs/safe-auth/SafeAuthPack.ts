@@ -13,6 +13,7 @@ import {
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 import { WALLET_URLS } from './constants'
+import { Eip1193Provider } from 'ethers'
 
 const WS_EMBED_NOT_INITIALIZED = 'WsEmbed SDK is not initialized'
 const WS_EMBED_INVALID_PROVIDER = 'WsEmbed provider is not valid'
@@ -91,8 +92,8 @@ export class SafeAuthPack extends AuthKitBasePack {
    * Get the provider returned by the Web3Auth WsEmbed
    * @returns A EIP-1193 compatible provider. Can be wrapped with ethers or web3
    */
-  getProvider(): ExternalProvider | null {
-    return this.#provider
+  getProvider(): Eip1193Provider | null {
+    return this.#provider as Eip1193Provider
   }
 
   /**

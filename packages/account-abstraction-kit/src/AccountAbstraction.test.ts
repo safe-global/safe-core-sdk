@@ -1,9 +1,10 @@
-import { Signer } from '@ethersproject/abstract-signer'
 import Safe, { EthersAdapter, predictSafeAddress } from '@safe-global/protocol-kit'
-import { GelatoRelayPack, RelayPack } from '@safe-global/relay-kit'
+import { GelatoRelayPack } from '@safe-global/relay-kit'
 import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import AccountAbstraction from './AccountAbstraction'
+import { RelayKitBasePack } from 'packages/relay-kit/dist/src'
+import { EthAdapter } from 'packages/safe-core-sdk-types/dist/src'
 
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/relay-kit')
@@ -12,6 +13,12 @@ const EthersAdapterMock = EthersAdapter as jest.MockedClass<typeof EthersAdapter
 const GelatoRelayPackMock = GelatoRelayPack as jest.MockedClass<typeof GelatoRelayPack>
 const predictSafeAddressMock = predictSafeAddress as jest.MockedFunction<typeof predictSafeAddress>
 const SafeMock = Safe as jest.MockedClass<typeof Safe>
+
+const protocolKit = new Safe()
+const relayPack = new GelatoRelayPack({
+  apiKey: '0xApiKey',
+  protocolKit
+})
 
 describe('AccountAbstraction', () => {
   const signer = {
@@ -29,27 +36,26 @@ describe('AccountAbstraction', () => {
 
   describe('constructor', () => {
     it('should create a new EthersAdapter instance', () => {
-      new AccountAbstraction(signer as unknown as Signer)
+      new AccountAbstraction(signer as unknown as EthAdapter)
       expect(EthersAdapterMock).toHaveBeenCalledTimes(1)
       expect(EthersAdapterMock).toHaveBeenCalledWith({ ethers, signerOrProvider: signer })
     })
 
     it('should throw an error if signer is not connected to a provider', () => {
       expect(
-        () => new AccountAbstraction({ ...signer, provider: undefined } as unknown as Signer)
+        () => new AccountAbstraction({ ...signer, provider: undefined } as unknown as EthAdapter)
       ).toThrow('Signer must be connected to a provider')
       expect(EthersAdapterMock).not.toHaveBeenCalled()
     })
   })
 
   describe('init', () => {
-    const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
-    const relayPack = new GelatoRelayPack()
+    const accountAbstraction = new AccountAbstraction(signer as unknown as EthAdapter)
 
     it('should initialize a Safe instance with its address if contract is deployed already', async () => {
       EthersAdapterMock.prototype.isContractDeployed.mockResolvedValueOnce(true)
 
-      await accountAbstraction.init({ relayPack })
+      await accountAbstraction.init()
 
       expect(signer.getAddress).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledTimes(1)
@@ -67,7 +73,7 @@ describe('AccountAbstraction', () => {
     it('should initialize a Safe instance with a config if contract is NOT deployed yet', async () => {
       EthersAdapterMock.prototype.isContractDeployed.mockResolvedValueOnce(false)
 
-      await accountAbstraction.init({ relayPack })
+      await accountAbstraction.init()
 
       expect(signer.getAddress).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledTimes(1)
@@ -91,9 +97,10 @@ describe('AccountAbstraction', () => {
       signTransaction: jest.fn()
     }
 
-    const initAccountAbstraction = async (initOptions = { relayPack: new GelatoRelayPack() }) => {
-      const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
-      await accountAbstraction.init(initOptions)
+    const initAccountAbstraction = async () => {
+      const accountAbstraction = new AccountAbstraction(signer as unknown as EthAdapter)
+      await accountAbstraction.init()
+      accountAbstraction.setRelayKit(relayPack)
       return accountAbstraction
     }
 
@@ -107,7 +114,7 @@ describe('AccountAbstraction', () => {
 
     describe('getSignerAddress', () => {
       it("should return the signer's address", async () => {
-        const result = await accountAbstraction.getSignerAddress()
+        const result = await accountAbstraction.protocolKit.getEthAdapter().getSignerAddress()
         expect(result).toBe(signerAddress)
         expect(signer.getAddress).toHaveBeenCalledTimes(1)
       })
@@ -118,14 +125,14 @@ describe('AccountAbstraction', () => {
       safeInstanceMock.getNonce.mockResolvedValueOnce(nonceMock)
 
       it('should return the nonce received from Safe SDK', async () => {
-        const result = await accountAbstraction.getNonce()
+        const result = await accountAbstraction.protocolKit.getNonce()
         expect(result).toBe(nonceMock)
         expect(safeInstanceMock.getNonce).toHaveBeenCalledTimes(1)
       })
 
       it('should throw if Safe SDK is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
-        expect(accountAbstraction.getNonce()).rejects.toThrow('SDK not initialized')
+        const accountAbstraction = new AccountAbstraction(signer as unknown as EthAdapter)
+        expect(accountAbstraction.protocolKit.getNonce()).rejects.toThrow('SDK not initialized')
         expect(safeInstanceMock.getNonce).not.toHaveBeenCalled()
       })
     })
@@ -135,14 +142,14 @@ describe('AccountAbstraction', () => {
       safeInstanceMock.getAddress.mockResolvedValueOnce(safeAddressMock)
 
       it('should return the address received from Safe SDK', async () => {
-        const result = await accountAbstraction.getSafeAddress()
+        const result = await accountAbstraction.protocolKit.getAddress()
         expect(result).toBe(safeAddressMock)
         expect(safeInstanceMock.getAddress).toHaveBeenCalledTimes(1)
       })
 
       it('should throw if Safe SDK is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
-        expect(accountAbstraction.getSafeAddress()).rejects.toThrow('SDK not initialized')
+        const accountAbstraction = new AccountAbstraction(signer as unknown as EthAdapter)
+        expect(accountAbstraction.protocolKit.getAddress()).rejects.toThrow('SDK not initialized')
         expect(safeInstanceMock.getAddress).not.toHaveBeenCalled()
       })
     })
@@ -150,14 +157,16 @@ describe('AccountAbstraction', () => {
     describe('isSafeDeployed', () => {
       it.each([true, false])('should return the value received from Safe SDK', async (expected) => {
         safeInstanceMock.isSafeDeployed.mockResolvedValueOnce(expected)
-        const result = await accountAbstraction.isSafeDeployed()
+        const result = await accountAbstraction.protocolKit.isSafeDeployed()
         expect(result).toBe(expected)
         expect(safeInstanceMock.isSafeDeployed).toHaveBeenCalledTimes(1)
       })
 
       it('should throw if Safe SDK is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
-        expect(accountAbstraction.isSafeDeployed()).rejects.toThrow('SDK not initialized')
+        const accountAbstraction = new AccountAbstraction(signer as unknown as EthAdapter)
+        expect(accountAbstraction.protocolKit.isSafeDeployed()).rejects.toThrow(
+          'SDK not initialized'
+        )
         expect(safeInstanceMock.isSafeDeployed).not.toHaveBeenCalled()
       })
     })
@@ -199,8 +208,8 @@ describe('AccountAbstraction', () => {
       })
 
       it('should throw if Safe SDK is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(signer as unknown as Signer)
-        accountAbstraction.setRelayPack(new GelatoRelayPack())
+        const accountAbstraction = new AccountAbstraction(signer as unknown as EthAdapter)
+        accountAbstraction.setRelayKit(relayPack)
 
         expect(accountAbstraction.relayTransaction(transactionsMock, optionsMock)).rejects.toThrow(
           'SDK not initialized'
@@ -213,7 +222,7 @@ describe('AccountAbstraction', () => {
 
       it('should throw if Relay pack is not initialized', async () => {
         const accountAbstraction = await initAccountAbstraction()
-        accountAbstraction.setRelayPack(undefined as unknown as RelayPack)
+        accountAbstraction.setRelayKit(undefined as unknown as RelayKitBasePack)
 
         expect(accountAbstraction.relayTransaction(transactionsMock, optionsMock)).rejects.toThrow(
           'SDK not initialized'

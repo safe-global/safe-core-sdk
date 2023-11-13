@@ -60,7 +60,8 @@ export abstract class AuthKitBasePack {
    * @param txServiceUrl The URL of the Safe Transaction Service
    * @returns The list of Safe addresses owned by the user in the chain
    */
-  async getSafes(chainId: bigint, txServiceUrl?: string): Promise<string[]> {
+  async getSafes(txServiceUrl?: string): Promise<string[]> {
+    const chainId = await this.getChainId()
     const apiKit = this.#getApiKit(chainId, txServiceUrl)
 
     const address = await this.getAddress()

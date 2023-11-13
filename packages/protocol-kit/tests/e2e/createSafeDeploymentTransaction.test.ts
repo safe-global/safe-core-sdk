@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
@@ -17,10 +17,10 @@ import { itif } from './utils/helpers'
 chai.use(chaiAsPromised)
 
 describe('createSafeDeploymentTransaction', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
 
     const predictedSafe: PredictedSafeProps = {
@@ -55,7 +55,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -79,7 +79,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -103,7 +103,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -127,7 +127,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -151,7 +151,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -175,11 +175,11 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const customContract = contractNetworks[chainId]
+    const customContract = contractNetworks[chainId.toString()]
     const safeContract = await ethAdapter.getSafeContract({
       safeVersion: safeVersionDeployed,
-      customContractAddress: customContract?.safeMasterCopyAddress,
-      customContractAbi: customContract?.safeMasterCopyAbi
+      customContractAddress: customContract?.safeSingletonAddress,
+      customContractAbi: customContract?.safeSingletonAbi
     })
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe
@@ -187,7 +187,7 @@ describe('createSafeDeploymentTransaction', () => {
       ethAdapter,
       safeContract,
       safeAccountConfig: predictedSafe.safeAccountConfig,
-      customContracts: contractNetworks[chainId]
+      customContracts: contractNetworks[chainId.toString()]
     })
 
     // should contain the initializer setup call in the deployment data
@@ -277,10 +277,11 @@ describe('createSafeDeploymentTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const ethAdapter = await getEthAdapter(account1.signer)
+    const safeAddress = await safe.getAddress()
 
     const safeSdk = await Safe.create({
       ethAdapter,
-      safeAddress: safe.address,
+      safeAddress,
       contractNetworks
     })
 

@@ -1,12 +1,11 @@
-import '@nomiclabs/hardhat-ethers'
-import '@nomiclabs/hardhat-waffle'
+import '@nomicfoundation/hardhat-ethers'
+import 'hardhat-deploy'
+import 'hardhat-deploy-ethers'
+import 'tsconfig-paths/register'
 import '@nomiclabs/hardhat-web3'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import yargs from 'yargs'
-
-import 'hardhat-deploy'
-import 'tsconfig-paths/register'
 
 const argv = yargs
   .option('network', {

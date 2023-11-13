@@ -1,7 +1,3 @@
-import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { Signer } from '@ethersproject/abstract-signer'
-import { BigNumber } from '@ethersproject/bignumber'
-import { Provider } from '@ethersproject/providers'
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import {
   Eip3770Address,
@@ -10,7 +6,7 @@ import {
   GetContractProps,
   SafeTransactionEIP712Args
 } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
+import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
@@ -29,20 +25,20 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
-import { isSignerCompatible, isTypedDataSigner } from './utils'
+import { isTypedDataSigner, isSignerCompatible } from './utils'
 
 type Ethers = typeof ethers
 
 export interface EthersAdapterConfig {
-  /** ethers - Ethers v5 library */
+  /** ethers - Ethers v6 library */
   ethers: Ethers
   /** signerOrProvider - Ethers signer or provider */
-  signerOrProvider: Signer | Provider
+  signerOrProvider: AbstractSigner | Provider
 }
 
 class EthersAdapter implements EthAdapter {
   #ethers: Ethers
-  #signer?: Signer
+  #signer?: AbstractSigner
   #provider: Provider
 
   constructor({ ethers, signerOrProvider }: EthersAdapterConfig) {
@@ -52,7 +48,7 @@ class EthersAdapter implements EthAdapter {
     this.#ethers = ethers
     const isSigner = isSignerCompatible(signerOrProvider)
     if (isSigner) {
-      const signer = signerOrProvider as Signer
+      const signer = signerOrProvider as AbstractSigner
       if (!signer.provider) {
         throw new Error('Signer must be connected to a provider')
       }
@@ -67,12 +63,12 @@ class EthersAdapter implements EthAdapter {
     return this.#provider
   }
 
-  getSigner(): Signer | undefined {
+  getSigner(): AbstractSigner | undefined {
     return this.#signer
   }
 
   isAddress(address: string): boolean {
-    return this.#ethers.utils.isAddress(address)
+    return this.#ethers.isAddress(address)
   }
 
   async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
@@ -80,20 +76,20 @@ class EthersAdapter implements EthAdapter {
     return validateEip3770Address(fullAddress, chainId)
   }
 
-  async getBalance(address: string, blockTag?: string | number): Promise<BigNumber> {
-    return BigNumber.from(await this.#provider.getBalance(address, blockTag))
+  async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
+    return this.#provider.getBalance(address, blockTag)
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {
     return this.#provider.getTransactionCount(address, blockTag)
   }
 
-  async getChainId(): Promise<number> {
+  async getChainId(): Promise<bigint> {
     return (await this.#provider.getNetwork()).chainId
   }
 
   getChecksummedAddress(address: string): string {
-    return this.#ethers.utils.getAddress(address)
+    return this.#ethers.getAddress(address)
   }
 
   async getSafeContract({
@@ -102,7 +98,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<SafeContractEthers> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
     }
@@ -116,7 +113,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<SafeProxyFactoryEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
@@ -130,7 +128,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<MultiSendEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
     }
@@ -144,7 +143,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<MultiSendCallOnlyEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSendCallOnly contract address')
     }
@@ -158,7 +158,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<CompatibilityFallbackHandlerContractEthers> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid CompatibilityFallbackHandler contract address')
     }
@@ -176,7 +177,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<SignMessageLibEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
@@ -190,7 +192,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<CreateCallEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
     }
@@ -204,7 +207,8 @@ class EthersAdapter implements EthAdapter {
     customContractAddress
   }: GetContractProps): Promise<SimulateTxAccessorEthersContract> {
     const chainId = await this.getChainId()
-    const contractAddress = customContractAddress ?? singletonDeployment?.networkAddresses[chainId]
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SimulateTxAccessor contract address')
     }
@@ -222,13 +226,13 @@ class EthersAdapter implements EthAdapter {
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {
-    const content = await this.#provider.getStorageAt(address, position)
+    const content = await this.#provider.getStorage(address, position)
     const decodedContent = this.decodeParameters(['address'], content)
     return decodedContent[0]
   }
 
   async getTransaction(transactionHash: string): Promise<TransactionResponse> {
-    return this.#provider.getTransaction(transactionHash)
+    return this.#provider.getTransaction(transactionHash) as Promise<TransactionResponse>
   }
 
   async getSignerAddress(): Promise<string | undefined> {
@@ -239,7 +243,7 @@ class EthersAdapter implements EthAdapter {
     if (!this.#signer) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    const messageArray = this.#ethers.utils.arrayify(message)
+    const messageArray = this.#ethers.getBytes(message)
     return this.#signer.signMessage(messageArray)
   }
 
@@ -249,7 +253,7 @@ class EthersAdapter implements EthAdapter {
     }
     if (isTypedDataSigner(this.#signer)) {
       const typedData = generateTypedData(safeTransactionEIP712Args)
-      const signature = await this.#signer._signTypedData(
+      const signature = await this.#signer.signTypedData(
         typedData.domain,
         { SafeTx: typedData.types.SafeTx },
         typedData.message
@@ -264,15 +268,15 @@ class EthersAdapter implements EthAdapter {
   }
 
   call(transaction: EthAdapterTransaction, blockTag?: string | number): Promise<string> {
-    return this.#provider.call(transaction, blockTag)
+    return this.#provider.call({ ...transaction, blockTag })
   }
 
   encodeParameters(types: string[], values: any[]): string {
-    return new this.#ethers.utils.AbiCoder().encode(types, values)
+    return new this.#ethers.AbiCoder().encode(types, values)
   }
 
   decodeParameters(types: string[], values: string): { [key: string]: any } {
-    return new this.#ethers.utils.AbiCoder().decode(types, values)
+    return new this.#ethers.AbiCoder().decode(types, values)
   }
 }
 

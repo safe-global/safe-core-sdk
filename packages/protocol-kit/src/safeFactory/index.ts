@@ -36,8 +36,8 @@ export interface SafeFactoryConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
-  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeMasterCopy?: boolean
+  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
+  isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
@@ -47,15 +47,15 @@ interface SafeFactoryInitConfig {
   ethAdapter: EthAdapter
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion
-  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeMasterCopy?: boolean
+  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
+  isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
 
 class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
-  #isL1SafeMasterCopy?: boolean
+  #isL1SafeSingleton?: boolean
   #safeVersion!: SafeVersion
   #ethAdapter!: EthAdapter
   #safeProxyFactoryContract!: SafeProxyFactoryContract
@@ -64,26 +64,26 @@ class SafeFactory {
   static async create({
     ethAdapter,
     safeVersion = DEFAULT_SAFE_VERSION,
-    isL1SafeMasterCopy = false,
+    isL1SafeSingleton = false,
     contractNetworks
   }: SafeFactoryConfig): Promise<SafeFactory> {
     const safeFactorySdk = new SafeFactory()
-    await safeFactorySdk.init({ ethAdapter, safeVersion, isL1SafeMasterCopy, contractNetworks })
+    await safeFactorySdk.init({ ethAdapter, safeVersion, isL1SafeSingleton, contractNetworks })
     return safeFactorySdk
   }
 
   private async init({
     ethAdapter,
     safeVersion,
-    isL1SafeMasterCopy,
+    isL1SafeSingleton,
     contractNetworks
   }: SafeFactoryInitConfig): Promise<void> {
     this.#ethAdapter = ethAdapter
     this.#safeVersion = safeVersion
-    this.#isL1SafeMasterCopy = isL1SafeMasterCopy
+    this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
-    const customContracts = contractNetworks?.[chainId]
+    const customContracts = contractNetworks?.[chainId.toString()]
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
       ethAdapter,
       safeVersion,
@@ -92,7 +92,7 @@ class SafeFactory {
     this.#safeContract = await getSafeContract({
       ethAdapter,
       safeVersion,
-      isL1SafeMasterCopy,
+      isL1SafeSingleton,
       customContracts
     })
   }
@@ -105,11 +105,11 @@ class SafeFactory {
     return this.#safeVersion
   }
 
-  getAddress(): string {
+  getAddress(): Promise<string> {
     return this.#safeProxyFactoryContract.getAddress()
   }
 
-  async getChainId(): Promise<number> {
+  async getChainId(): Promise<bigint> {
     return this.#ethAdapter.getChainId()
   }
 
@@ -118,7 +118,7 @@ class SafeFactory {
     saltNonce?: string
   ): Promise<string> {
     const chainId = await this.#ethAdapter.getChainId()
-    const customContracts = this.#contractNetworks?.[chainId]
+    const customContracts = this.#contractNetworks?.[chainId.toString()]
     const safeVersion = this.#safeVersion
 
     const safeDeploymentConfig: SafeDeploymentConfig = {
@@ -130,7 +130,7 @@ class SafeFactory {
       ethAdapter: this.#ethAdapter,
       safeAccountConfig,
       safeDeploymentConfig,
-      isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
+      isL1SafeSingleton: this.#isL1SafeSingleton,
       customContracts
     })
   }
@@ -150,7 +150,7 @@ class SafeFactory {
     }
 
     const chainId = await this.getChainId()
-    const customContracts = this.#contractNetworks?.[chainId]
+    const customContracts = this.#contractNetworks?.[chainId.toString()]
     const initializer = await encodeSetupCallData({
       ethAdapter: this.#ethAdapter,
       safeAccountConfig,
@@ -162,7 +162,7 @@ class SafeFactory {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
-      safeMasterCopyAddress: this.#safeContract.getAddress(),
+      safeSingletonAddress: await this.#safeContract.getAddress(),
       initializer,
       saltNonce: saltNonce || getChainSpecificDefaultSaltNonce(chainId),
       options: {
@@ -178,7 +178,7 @@ class SafeFactory {
     const safe = await Safe.create({
       ethAdapter: this.#ethAdapter,
       safeAddress,
-      isL1SafeMasterCopy: this.#isL1SafeMasterCopy,
+      isL1SafeSingleton: this.#isL1SafeSingleton,
       contractNetworks: this.#contractNetworks
     })
     return safe

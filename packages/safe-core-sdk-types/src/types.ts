@@ -1,4 +1,4 @@
-import { ContractTransaction } from '@ethersproject/contracts'
+import { ContractTransactionResponse } from 'ethers'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
 export type SafeVersion = '1.4.1' | '1.3.0' | '1.2.0' | '1.1.1' | '1.0.0'
@@ -82,7 +82,7 @@ export interface BaseTransactionResult {
 
 export interface TransactionResult extends BaseTransactionResult {
   promiEvent?: PromiEvent<TransactionReceipt>
-  transactionResponse?: ContractTransaction
+  transactionResponse?: ContractTransactionResponse
   options?: TransactionOptions
 }
 
@@ -94,7 +94,7 @@ export interface Eip3770Address {
 export interface SafeTransactionEIP712Args {
   safeAddress: string
   safeVersion: string
-  chainId: number
+  chainId: bigint
   safeTransactionData: SafeTransactionData
 }
 
@@ -112,7 +112,7 @@ export interface Eip712MessageTypes {
 export interface GenerateTypedData {
   types: Eip712MessageTypes
   domain: {
-    chainId?: number
+    chainId?: string
     verifyingContract: string
   }
   primaryType: string
@@ -181,7 +181,7 @@ export type SafeMultisigTransactionResponse = {
 export interface RelayTransaction {
   target: string
   encodedTransaction: string
-  chainId: number
+  chainId: bigint
   options?: MetaTransactionOptions
 }
 

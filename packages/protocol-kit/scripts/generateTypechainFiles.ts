@@ -165,5 +165,5 @@ function generateTypes(typechainTarget: string) {
   )
 }
 
-generateTypes('ethers-v5')
 generateTypes('web3-v1')
+generateTypes('ethers-v6')

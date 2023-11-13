@@ -1,4 +1,4 @@
-import { AddressZero } from '@ethersproject/constants'
+import { ZeroAddress } from 'ethers'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -13,13 +13,13 @@ import {
 import {
   Proxy_factory as SafeProxyFactory_V1_0_0,
   Gnosis_safe as Safe_V1_0_0
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.0.0'
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0'
 import {
   Multi_send as MultiSend_V1_1_1,
   Proxy_factory as SafeProxyFactory_V1_1_1,
   Gnosis_safe as Safe_V1_1_1
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.1.1'
-import { Gnosis_safe as Safe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0'
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1'
+import { Gnosis_safe as Safe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0'
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
   Create_call as CreateCall_V1_3_0,
@@ -29,7 +29,7 @@ import {
   Gnosis_safe as Safe_V1_3_0,
   Sign_message_lib as SignMessageLib_V1_3_0,
   Simulate_tx_accessor as SimulateTxAccessor_V1_3_0
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0'
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0'
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1,
   Create_call as CreateCall_V1_4_1,
@@ -39,13 +39,13 @@ import {
   Safe as Safe_V1_4_1,
   Sign_message_lib as SignMessageLib_V1_4_1,
   Simulate_tx_accessor as SimulateTxAccessor_V1_4_1
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1'
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1'
 import {
   DailyLimitModule,
   ERC20Mintable,
   SocialRecoveryModule
-} from '@safe-global/protocol-kit/typechain/tests/ethers-v5/v1.2.0'
-import { DebugTransactionGuard } from '@safe-global/protocol-kit/typechain/tests/ethers-v5/v1.3.0'
+} from '@safe-global/protocol-kit/typechain/tests/ethers-v6/v1.2.0'
+import { DebugTransactionGuard } from '@safe-global/protocol-kit/typechain/tests/ethers-v6/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { AbiItem } from 'web3-utils'
@@ -93,13 +93,14 @@ export const getSafeTemplate = async (): Promise<
   const randomSaltNonce = Math.floor(Math.random() * 1000000000) + 1
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
-  const template = await factory.callStatic.createProxyWithNonce(
-    singleton.address,
+  const singletonAddress = await singleton.getAddress()
+  const template = await factory.createProxyWithNonce.staticCall(
+    singletonAddress,
     '0x',
     randomSaltNonce
   )
   await factory
-    .createProxyWithNonce(singleton.address, '0x', randomSaltNonce)
+    .createProxyWithNonce(singletonAddress, '0x', randomSaltNonce)
     .then((tx: any) => tx.wait())
   const Safe = await ethers.getContractFactory(safeDeployed.name)
   return Safe.attach(template) as
@@ -120,22 +121,22 @@ export const getSafeWithOwners = async (
     await (template as Safe_V1_0_0).setup(
       owners,
       threshold || owners.length,
-      AddressZero,
+      ZeroAddress,
       '0x',
-      AddressZero,
+      ZeroAddress,
       0,
-      AddressZero
+      ZeroAddress
     )
   } else {
     await (template as Safe_V1_4_1 | Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1).setup(
       owners,
       threshold || owners.length,
-      AddressZero,
+      ZeroAddress,
       '0x',
-      fallbackHandler || (await getCompatibilityFallbackHandler()).contract.address,
-      AddressZero,
+      fallbackHandler || (await (await getCompatibilityFallbackHandler()).contract.getAddress()),
+      ZeroAddress,
       0,
-      AddressZero
+      ZeroAddress
     )
   }
   return template as Safe_V1_4_1 | Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1 | Safe_V1_0_0

@@ -13,7 +13,7 @@ function Stripe() {
   const stripeRootRef = useRef<HTMLDivElement>(null)
 
   const handleCreateSession = async () => {
-    if (!isSessionValid(sessionId) && !ethers.utils.isAddress(walletAddress)) return
+    if (!isSessionValid(sessionId) && !ethers.isAddress(walletAddress)) return
 
     if (stripeRootRef.current) {
       stripeRootRef.current.innerHTML = ''

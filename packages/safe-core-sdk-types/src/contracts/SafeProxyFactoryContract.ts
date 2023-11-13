@@ -1,7 +1,7 @@
 import { TransactionOptions } from '@safe-global/safe-core-sdk-types/types'
 
 export interface CreateProxyProps {
-  safeMasterCopyAddress: string
+  safeSingletonAddress: string
   initializer: string
   saltNonce: string
   options?: TransactionOptions
@@ -9,7 +9,7 @@ export interface CreateProxyProps {
 }
 
 export interface SafeProxyFactoryContract {
-  getAddress(): string
+  getAddress(): Promise<string>
   proxyCreationCode(): Promise<string>
   createProxy(options: CreateProxyProps): Promise<string>
   encode(methodName: string, params: any[]): string

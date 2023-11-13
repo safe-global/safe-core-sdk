@@ -49,7 +49,7 @@ describe('EIP-712 sign typed data', () => {
       const { domain } = generateTypedData({
         safeAddress,
         safeVersion: '1.0.0',
-        chainId: 4,
+        chainId: 4n,
         safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
@@ -60,7 +60,7 @@ describe('EIP-712 sign typed data', () => {
       const { domain } = generateTypedData({
         safeAddress,
         safeVersion: '1.1.1',
-        chainId: 4,
+        chainId: 4n,
         safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
@@ -71,7 +71,7 @@ describe('EIP-712 sign typed data', () => {
       const { domain } = generateTypedData({
         safeAddress,
         safeVersion: '1.2.0',
-        chainId: 4,
+        chainId: 4n,
         safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
@@ -79,7 +79,7 @@ describe('EIP-712 sign typed data', () => {
     })
 
     it('should generate the typed data for for Safes >= v1.3.0', async () => {
-      const chainId = 4
+      const chainId = 4n
       const { domain } = generateTypedData({
         safeAddress,
         safeVersion: '1.3.0',
@@ -87,7 +87,7 @@ describe('EIP-712 sign typed data', () => {
         safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
-      chai.expect(domain.chainId).to.be.eq(chainId)
+      chai.expect(domain.chainId).to.be.eq(chainId.toString())
     })
   })
 })

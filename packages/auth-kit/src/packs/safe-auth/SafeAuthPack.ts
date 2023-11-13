@@ -15,6 +15,7 @@ import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
 import { WALLET_URLS } from './constants'
 
 const WS_EMBED_NOT_INITIALIZED = 'WsEmbed SDK is not initialized'
+const WS_EMBED_INVALID_PROVIDER = 'WsEmbed provider is not valid'
 
 /**
  * SafeAuthPack uses the Web3Auth services to get a signer address across different dApps
@@ -55,6 +56,10 @@ export class SafeAuthPack extends AuthKitBasePack {
 
       await this.wsEmbed.init({ ...options, walletUrls: WALLET_URLS })
 
+      if (!this.wsEmbed.communicationProvider.isWeb3Auth) {
+        throw new Error(WS_EMBED_INVALID_PROVIDER)
+      }
+
       this.#provider = this.wsEmbed.provider
     } catch (e) {
       throw new Error(getErrorMessage(e))
@@ -73,6 +78,8 @@ export class SafeAuthPack extends AuthKitBasePack {
     }
 
     await this.wsEmbed.login(options)
+
+    this.#provider = this.wsEmbed.provider
 
     const eoa = await this.getAddress()
     const safes = await this.getSafes(this.#config?.txServiceUrl || '')

@@ -30,30 +30,22 @@ function App() {
   useEffect(() => {
     ;(async () => {
       const options: SafeAuthInitOptions = {
-        enableLogging: true,
+        enableLogging: false,
         showWidgetButton: false,
         buildEnv: 'testing',
-        chainConfig: SUPPORTED_NETWORKS['0x64']
+        chainConfig: SUPPORTED_NETWORKS['0x5']
       }
 
       const authPack = new SafeAuthPack({
-        txServiceUrl: 'https://safe-transaction-gnosis-chain.safe.global'
+        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
       })
 
       await authPack.init(options)
-
+      console.log('safeAuthPack:wsEmbed', authPack.wsEmbed)
       setSafeAuthPack(authPack)
 
-      // If the provider has an account the we can try to sign in the user
       authPack.subscribe('accountsChanged', async (accounts) => {
         console.log('safeAuthPack:accountsChanged', accounts, authPack.isAuthenticated)
-
-        if (accounts.length > 0) {
-          const signInInfo = await authPack?.signIn()
-
-          setSafeAuthSignInResponse(signInInfo)
-          setIsAuthenticated(true)
-        }
       })
 
       authPack.subscribe('chainChanged', (eventData) =>
@@ -90,6 +82,7 @@ function App() {
 
     const signInInfo = await safeAuthPack?.signIn()
     setSafeAuthSignInResponse(signInInfo)
+    setIsAuthenticated(true)
   }
 
   const logout = async () => {
@@ -123,26 +116,10 @@ function App() {
 
     // Web3Auth provider wrapped with ethers
     // -------------------------------------
-    // const provider = new ethers.providers.Web3Provider(
-    //   safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
-    // )
-    // const signer = provider.getSigner()
-    // const ethersAdapter = new EthersAdapter({
-    //   ethers,
-    //   signerOrProvider: signer
-    // })
-    // const protocolKit = await Safe.create({
-    //   safeAddress,
-    //   ethAdapter: ethersAdapter
-    // })
-    // -------------------------------------
-
-    // ethers.Wallet as signer
-    // -------------------------------------
-    const signer = new ethers.Wallet(
-      import.meta.env.VITE_PRIVATE_KEY,
-      new ethers.providers.JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
+    const provider = new ethers.providers.Web3Provider(
+      safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
     )
+    const signer = provider.getSigner()
     const ethersAdapter = new EthersAdapter({
       ethers,
       signerOrProvider: signer
@@ -151,6 +128,22 @@ function App() {
       safeAddress,
       ethAdapter: ethersAdapter
     })
+    // -------------------------------------
+
+    // ethers.Wallet as signer
+    // -------------------------------------
+    // const signer = new ethers.Wallet(
+    //   import.meta.env.VITE_PRIVATE_KEY,
+    //   new ethers.providers.JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
+    // )
+    // const ethersAdapter = new EthersAdapter({
+    //   ethers,
+    //   signerOrProvider: signer
+    // })
+    // const protocolKit = await Safe.create({
+    //   safeAddress,
+    //   ethAdapter: ethersAdapter
+    // })
     // -------------------------------------
 
     const chainId = await ethersAdapter.getChainId()
@@ -199,7 +192,7 @@ function App() {
     // -------------------------------------
     const safeApiKit = new SafeApiKit({
       ethAdapter: ethersAdapter,
-      txServiceUrl: 'https://safe-transaction-gnosis-chain.safe.global'
+      txServiceUrl: 'https://safe-transaction-goerli.safe.global'
     })
     const safeTxHash = await protocolKit.getTransactionHash(tx)
     await safeApiKit.proposeTransaction({

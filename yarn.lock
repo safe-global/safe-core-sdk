@@ -2877,10 +2877,10 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@toruslabs/base-controllers@^4.6.0", "@toruslabs/base-controllers@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-4.7.0.tgz#8a586b5cd27d1331e6859e30425f77f36d989245"
-  integrity sha512-64SMRr+iG2E/8Ytz+NW45yTMuVtRumrQbY5huxPv6/muB2VqzojCCMZHL5uC3ZEoybSvhu9DTMaz/sQ7j/dTAg==
+"@toruslabs/base-controllers@^4.8.0":
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-4.8.0.tgz#8784a91c885ffc2f3dea05ecdc6960f87d6b3e25"
+  integrity sha512-FfmbR44NEMBCptrKnUrUHs1VdC59g3GbuALScTnuv4DN+ilW7YmSGixQzYfri1OJsSns3WV1KfhyBItseGNMVA==
   dependencies:
     "@ethereumjs/util" "^9.0.1"
     "@metamask/rpc-errors" "^6.1.0"
@@ -2919,17 +2919,17 @@
   dependencies:
     elliptic "^6.5.4"
 
-"@toruslabs/ethereum-controllers@^4.6.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/ethereum-controllers/-/ethereum-controllers-4.7.0.tgz#6d8bf3aa98b00e2d2b42ce3dd421759a18577a53"
-  integrity sha512-eUvM7x5jzavOFNno71AjBMAzMI6nn9j6y7ct3J0GB3FpSYt3lsgRDzjahQjTYdL51i9tmWYPcL1dcLsDiR76Uw==
+"@toruslabs/ethereum-controllers@^4.9.0":
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/@toruslabs/ethereum-controllers/-/ethereum-controllers-4.9.0.tgz#fc812a32efddb983519bb88b54277b56c3c8c993"
+  integrity sha512-rgqwWB2i6cd/9ICxNBFk/oimhqV7Qk/XI21eliKqkdnL6SnjceGCxDjoSH2LQL1wbczF6oV6sZpRZcO7sd1EYg==
   dependencies:
     "@ethereumjs/common" "^4.1.0"
     "@ethereumjs/tx" "^5.1.0"
     "@ethereumjs/util" "^9.0.1"
     "@metamask/eth-sig-util" "^7.0.0"
     "@metamask/rpc-errors" "^6.1.0"
-    "@toruslabs/base-controllers" "^4.7.0"
+    "@toruslabs/base-controllers" "^4.8.0"
     "@toruslabs/http-helpers" "^5.0.0"
     "@toruslabs/openlogin-jrpc" "^6.0.0"
     async-mutex "^0.4.0"
@@ -2960,20 +2960,6 @@
     ethereum-cryptography "^2.1.2"
     json-stable-stringify "^1.0.2"
 
-"@toruslabs/openlogin-jrpc@^4.7.0":
-  version "4.7.2"
-  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin-jrpc/-/openlogin-jrpc-4.7.2.tgz#e04dd6945da92d790f713a58aaa1657c57b330c8"
-  integrity sha512-9Eb0cPc0lPuS6v2YkQlgzfbRnZ6fLez9Ike5wznoHSFA2/JVu1onwuI56EV1HwswdDrOWPPQEyzI1j9NriZ0ew==
-  dependencies:
-    "@metamask/rpc-errors" "^5.1.1"
-    "@toruslabs/openlogin-utils" "^4.7.0"
-    end-of-stream "^1.4.4"
-    events "^3.3.0"
-    fast-safe-stringify "^2.1.1"
-    once "^1.4.0"
-    pump "^3.0.0"
-    readable-stream "^4.4.2"
-
 "@toruslabs/openlogin-jrpc@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@toruslabs/openlogin-jrpc/-/openlogin-jrpc-6.0.0.tgz#3f96a51f4975d9800e775084e572aeccee514e31"
@@ -2987,13 +2973,6 @@
     once "^1.4.0"
     pump "^3.0.0"
     readable-stream "^4.4.2"
-
-"@toruslabs/openlogin-utils@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin-utils/-/openlogin-utils-4.7.0.tgz#741d6ba1c0754b59a182b1c6dd8d0263695ed980"
-  integrity sha512-w6XkHs4WKuufsf/zzteBzs4EJuOknrUmJ+iv5FZ8HzIpMQeL/984CP8HYaFSEYkbGCP4ydAnhY4Uh0QAhpDbPg==
-  dependencies:
-    base64url "^3.0.1"
 
 "@toruslabs/openlogin-utils@^6.0.0":
   version "6.0.0"
@@ -3883,9 +3862,9 @@
   version "0.0.0"
   dependencies:
     "@metamask/rpc-errors" "^5.1.1"
-    "@toruslabs/base-controllers" "^4.6.0"
-    "@toruslabs/ethereum-controllers" "^4.6.0"
-    "@toruslabs/openlogin-jrpc" "^4.7.0"
+    "@toruslabs/base-controllers" "^4.8.0"
+    "@toruslabs/ethereum-controllers" "^4.9.0"
+    "@toruslabs/openlogin-jrpc" "^6.0.0"
     fast-deep-equal "^3.1.3"
     loglevel "^1.8.1"
     pump "^3.0.0"

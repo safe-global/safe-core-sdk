@@ -5,8 +5,8 @@ import {
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import {
-  PREDETERMINED_SALT_NONCE,
   encodeSetupCallData,
+  getChainSpecificDefaultSaltNonce,
   predictSafeAddress,
   validateSafeAccountConfig,
   validateSafeDeploymentConfig
@@ -115,12 +115,16 @@ class SafeFactory {
 
   async predictSafeAddress(
     safeAccountConfig: SafeAccountConfig,
-    saltNonce = PREDETERMINED_SALT_NONCE
+    saltNonce?: string
   ): Promise<string> {
     const chainId = await this.#ethAdapter.getChainId()
     const customContracts = this.#contractNetworks?.[chainId.toString()]
     const safeVersion = this.#safeVersion
-    const safeDeploymentConfig: SafeDeploymentConfig = { saltNonce, safeVersion }
+
+    const safeDeploymentConfig: SafeDeploymentConfig = {
+      saltNonce: saltNonce || getChainSpecificDefaultSaltNonce(chainId),
+      safeVersion
+    }
 
     return predictSafeAddress({
       ethAdapter: this.#ethAdapter,
@@ -133,7 +137,7 @@ class SafeFactory {
 
   async deploySafe({
     safeAccountConfig,
-    saltNonce = PREDETERMINED_SALT_NONCE,
+    saltNonce,
     options,
     callback
   }: DeploySafeProps): Promise<Safe> {
@@ -160,7 +164,7 @@ class SafeFactory {
     const safeAddress = await this.#safeProxyFactoryContract.createProxy({
       safeSingletonAddress: await this.#safeContract.getAddress(),
       initializer,
-      saltNonce,
+      saltNonce: saltNonce || getChainSpecificDefaultSaltNonce(chainId),
       options: {
         from: signerAddress,
         ...options

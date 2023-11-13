@@ -1,4 +1,4 @@
-import { OrderMetadata, Fee, OrderState, Currency, Counterpart } from '@monerium/sdk'
+import { OrderMetadata, Fee, OrderState, Counterpart } from '@monerium/sdk'
 import Safe from '@safe-global/protocol-kit'
 
 export interface MoneriumProviderConfig {
@@ -18,7 +18,6 @@ export interface MoneriumOpenOptions {
 
 export interface SafeMoneriumOrder {
   amount: string
-  currency: Currency
   counterpart: Counterpart
   memo: string
 }

@@ -12,6 +12,7 @@ import {
 } from './types'
 import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
+import { WALLET_URLS } from './constants'
 
 const WS_EMBED_NOT_INITIALIZED = 'WsEmbed SDK is not initialized'
 
@@ -52,7 +53,7 @@ export class SafeAuthPack extends AuthKitBasePack {
     try {
       this.wsEmbed = new WsEmbed()
 
-      await this.wsEmbed.init(options)
+      await this.wsEmbed.init({ ...options, walletUrls: WALLET_URLS })
 
       this.#provider = this.wsEmbed.provider
     } catch (e) {

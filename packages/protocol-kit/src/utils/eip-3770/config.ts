@@ -49,6 +49,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 324, shortName: 'zksync' },
   { chainId: 336, shortName: 'sdn' },
   { chainId: 338, shortName: 'tcro' },
+  { chainId: 369, shortName: 'pls' },
   { chainId: 420, shortName: 'ogor' },
   { chainId: 570, shortName: 'sys-rollux' },
   { chainId: 588, shortName: 'metis-stardust' },

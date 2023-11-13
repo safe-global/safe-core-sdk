@@ -97,7 +97,7 @@ class AccountAbstraction {
 
     const signedSafeTransaction = await this.protocolKit.signTransaction(relayedTransaction)
 
-    return await this.relayKit.executeRelayTransaction(signedSafeTransaction)
+    return await this.relayKit.executeRelayTransaction(signedSafeTransaction, options)
   }
 }
 

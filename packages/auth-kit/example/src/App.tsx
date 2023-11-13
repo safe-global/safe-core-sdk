@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { ethers } from 'ethers'
+import { BrowserProvider, Eip1193Provider, ethers } from 'ethers'
 import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import SafeApiKit from '@safe-global/api-kit'
 import AppBar from './AppBar'
 import {
   AuthKitSignInData,
@@ -12,7 +13,6 @@ import {
   SafeAuthUserInfo
 } from '../../src/index'
 import { getTypedData, getV3TypedData, getV4TypedData } from './typedData'
-import SafeApiKit from '@safe-global/api-kit'
 
 function App() {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
@@ -25,7 +25,7 @@ function App() {
   const [balance, setBalance] = useState<string>()
   const [consoleMessage, setConsoleMessage] = useState<string>('')
   const [consoleTitle, setConsoleTitle] = useState<string>('')
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
+  const [provider, setProvider] = useState<BrowserProvider>()
 
   useEffect(() => {
     ;(async () => {
@@ -36,12 +36,12 @@ function App() {
         chainConfig: SUPPORTED_NETWORKS['0x5']
       }
 
-      const authPack = new SafeAuthPack({
-        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
-      })
+      const authPack = new SafeAuthPack()
 
       await authPack.init(options)
+
       console.log('safeAuthPack:wsEmbed', authPack.wsEmbed)
+
       setSafeAuthPack(authPack)
 
       authPack.subscribe('accountsChanged', async (accounts) => {
@@ -63,14 +63,13 @@ function App() {
       setUserInfo(userInfo)
 
       if (web3Provider) {
-        const provider = new ethers.providers.Web3Provider(
-          safeAuthPack.getProvider() as ethers.providers.ExternalProvider
-        )
+        const provider = new BrowserProvider(safeAuthPack.getProvider() as Eip1193Provider)
+        const signer = await provider.getSigner()
+        const signerAddress = await signer.getAddress()
+
         setChainId((await provider?.getNetwork()).chainId.toString())
         setBalance(
-          ethers.utils.formatEther(
-            (await provider?.getSigner()?.getBalance()) as ethers.BigNumberish
-          )
+          ethers.formatEther((await provider.getBalance(signerAddress)) as ethers.BigNumberish)
         )
         setProvider(provider)
       }
@@ -78,17 +77,14 @@ function App() {
   }, [isAuthenticated])
 
   const login = async () => {
-    if (!safeAuthPack) return
-
     const signInInfo = await safeAuthPack?.signIn()
+
     setSafeAuthSignInResponse(signInInfo)
     setIsAuthenticated(true)
   }
 
   const logout = async () => {
-    if (!safeAuthPack) return
-
-    await safeAuthPack.signOut()
+    await safeAuthPack?.signOut()
 
     setSafeAuthSignInResponse(null)
   }
@@ -116,10 +112,8 @@ function App() {
 
     // Web3Auth provider wrapped with ethers
     // -------------------------------------
-    const provider = new ethers.providers.Web3Provider(
-      safeAuthPack?.getProvider() as ethers.providers.ExternalProvider
-    )
-    const signer = provider.getSigner()
+    const provider = new BrowserProvider(safeAuthPack?.getProvider() as Eip1193Provider)
+    const signer = await provider.getSigner()
     const ethersAdapter = new EthersAdapter({
       ethers,
       signerOrProvider: signer
@@ -149,16 +143,16 @@ function App() {
     const chainId = await ethersAdapter.getChainId()
     let tx = await protocolKit.createTransaction({
       safeTransactionData: {
-        to: ethers.utils.getAddress(safeAuthSignInResponse?.eoa || '0x'),
+        to: ethers.getAddress(safeAuthSignInResponse?.eoa || '0x'),
         data: '0x',
-        value: ethers.utils.parseUnits('0.0001', 'ether').toString()
+        value: ethers.parseUnits('0.0001', 'ether').toString()
       }
     })
 
     tx = await protocolKit.signTransaction(tx, 'eth_signTypedData_v4')
-    const signerAddress = (await ethersAdapter.getSignerAddress()).toLowerCase()
-    const signature = tx.signatures.get(signerAddress)
-    const verify = ethers.utils.verifyTypedData(
+    const signerAddress = (await ethersAdapter.getSignerAddress())?.toLowerCase()
+    const signature = tx.signatures.get(signerAddress || '')
+    const verify = ethers.verifyTypedData(
       { verifyingContract: safeAddress, chainId },
       {
         SafeTx: [
@@ -185,22 +179,21 @@ function App() {
       signature?.data || '0x'
     )
 
-    console.log('Verify: Signer Address:', signerAddress.toLowerCase())
-    console.log('Verify: Result:', verify, verify.toLowerCase() === signerAddress.toLowerCase())
+    console.log('Verify: Signer Address:', signerAddress?.toLowerCase())
+    console.log('Verify: Result:', verify, verify.toLowerCase() === signerAddress?.toLowerCase())
 
     // Propose transaction
     // -------------------------------------
     const safeApiKit = new SafeApiKit({
-      ethAdapter: ethersAdapter,
-      txServiceUrl: 'https://safe-transaction-goerli.safe.global'
+      chainId: 5n
     })
     const safeTxHash = await protocolKit.getTransactionHash(tx)
     await safeApiKit.proposeTransaction({
       safeAddress,
       safeTransactionData: tx.data,
       safeTxHash,
-      senderAddress: ethers.utils.getAddress(signerAddress),
-      senderSignature: signature.data
+      senderAddress: ethers.getAddress(signerAddress || ''),
+      senderSignature: signature?.data || ''
     })
     // -------------------------------------
 
@@ -224,7 +217,7 @@ function App() {
     } else if (method === 'eth_signTypedData_v3' || method === 'eth_signTypedData_v4') {
       signedMessage = await provider?.send(method, [params.from, JSON.stringify(params.data)])
     } else {
-      signedMessage = await provider?.getSigner()?.signMessage(data)
+      signedMessage = await (await provider?.getSigner())?.signMessage(data)
     }
 
     uiConsole('Signed Message', signedMessage)
@@ -235,7 +228,7 @@ function App() {
       {
         from: safeAuthSignInResponse?.eoa,
         to: safeAuthSignInResponse?.eoa,
-        value: ethers.utils.parseUnits('0.00001', 'ether').toString(),
+        value: ethers.parseUnits('0.00001', 'ether').toString(),
         gasLimit: 21000
       }
     ])
@@ -293,15 +286,15 @@ function App() {
             <Divider sx={{ my: 3 }} />
             <EthHashInfo address={safeAuthSignInResponse.eoa} showCopyButton showPrefix={false} />
             <Divider sx={{ my: 2 }} />
-            <Typography variant="h5" color="primary">
+            <Typography variant="h4" color="primary" fontWeight="bold">
               Chain{' '}
-              <Typography variant="h3" color="secondary" fontWeight="bold">
+              <Typography component="span" color="secondary" fontSize="1.45rem">
                 {chainId}
               </Typography>
             </Typography>
-            <Typography variant="h5" color="primary" sx={{ my: 1 }}>
+            <Typography variant="h4" color="primary" sx={{ my: 1 }} fontWeight="bold">
               Balance{' '}
-              <Typography variant="h3" color="secondary" fontWeight="bold">
+              <Typography component="span" color="secondary" fontSize="1.45rem">
                 {balance}
               </Typography>
             </Typography>

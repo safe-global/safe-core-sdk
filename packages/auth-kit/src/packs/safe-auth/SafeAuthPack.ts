@@ -25,13 +25,13 @@ const WS_EMBED_INVALID_PROVIDER = 'WsEmbed provider is not valid'
 export class SafeAuthPack extends AuthKitBasePack {
   wsEmbed!: WsEmbed
   #provider: ExternalProvider | null
-  #config: SafeAuthConfig
+  #config?: SafeAuthConfig
 
   /**
    * Instantiate the SafeAuthPack
    * @param config SafeAuth config
    */
-  constructor(config: SafeAuthConfig) {
+  constructor(config?: SafeAuthConfig) {
     super()
 
     this.#config = config
@@ -83,7 +83,7 @@ export class SafeAuthPack extends AuthKitBasePack {
     this.#provider = this.wsEmbed.provider
 
     const eoa = await this.getAddress()
-    const safes = await this.getSafes(this.#config?.txServiceUrl || '')
+    const safes = await this.getSafes(this.#config?.txServiceUrl)
 
     return { eoa, safes }
   }

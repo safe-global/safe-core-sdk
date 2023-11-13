@@ -204,9 +204,11 @@ function App() {
     })
     // -------------------------------------
 
+    // Execute transaction
+    // -------------------------------------
     // const txResult = await protocolKit.executeTransaction(tx)
-
     // uiConsole('Safe Transaction Result', txResult)
+    //-------------------------------------
   }
 
   const signMessage = async (data: any, method: string) => {

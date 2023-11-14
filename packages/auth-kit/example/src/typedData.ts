@@ -49,6 +49,80 @@ export const getV3TypedData = (chainId: string) => ({
   }
 })
 
+export const getSafeTxV4TypedData = (chainId: string) => ({
+  types: {
+    SafeTx: [
+      {
+        type: 'address',
+        name: 'to'
+      },
+      {
+        type: 'uint256',
+        name: 'value'
+      },
+      {
+        type: 'bytes',
+        name: 'data'
+      },
+      {
+        type: 'uint8',
+        name: 'operation'
+      },
+      {
+        type: 'uint256',
+        name: 'safeTxGas'
+      },
+      {
+        type: 'uint256',
+        name: 'baseGas'
+      },
+      {
+        type: 'uint256',
+        name: 'gasPrice'
+      },
+      {
+        type: 'address',
+        name: 'gasToken'
+      },
+      {
+        type: 'address',
+        name: 'refundReceiver'
+      },
+      {
+        type: 'uint256',
+        name: 'nonce'
+      }
+    ],
+    EIP712Domain: [
+      {
+        name: 'chainId',
+        type: 'uint256'
+      },
+      {
+        name: 'verifyingContract',
+        type: 'address'
+      }
+    ]
+  },
+  domain: {
+    chainId: Number(chainId),
+    verifyingContract: '0x93B148791c4d93420f421D59705C365DACAcF4C7'
+  },
+  primaryType: 'SafeTx',
+  message: {
+    to: '0x03cd3e862972746b9bf9a2ba56308566fd270562',
+    value: '100000000000000',
+    data: '0x',
+    operation: '0',
+    safeTxGas: '0',
+    baseGas: '0',
+    gasPrice: '0',
+    gasToken: '0x0000000000000000000000000000000000000000',
+    refundReceiver: '0x0000000000000000000000000000000000000000',
+    nonce: '19'
+  }
+})
+
 export const getV4TypedData = (chainId: string) => ({
   types: {
     EIP712Domain: [

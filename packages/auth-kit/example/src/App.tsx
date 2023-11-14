@@ -12,7 +12,7 @@ import {
   SafeAuthPack,
   SafeAuthUserInfo
 } from '../../src/index'
-import { getTypedData, getV3TypedData, getV4TypedData } from './typedData'
+import { getSafeTxV4TypedData, getTypedData, getV3TypedData } from './typedData'
 
 function App() {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
@@ -377,7 +377,9 @@ function App() {
               variant="contained"
               color="primary"
               sx={{ my: 1 }}
-              onClick={() => signMessage(getV4TypedData(chainId || ''), 'eth_signTypedData_v4')}
+              onClick={() =>
+                signMessage(getSafeTxV4TypedData(chainId || ''), 'eth_signTypedData_v4')
+              }
             >
               eth_signTypedData_v4
             </Button>

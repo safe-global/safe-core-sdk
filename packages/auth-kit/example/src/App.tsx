@@ -30,9 +30,8 @@ function App() {
   useEffect(() => {
     ;(async () => {
       const options: SafeAuthInitOptions = {
-        enableLogging: false,
-        showWidgetButton: false,
-        buildEnv: 'testing',
+        enableLogging: true,
+        buildEnv: 'production',
         chainConfig: SUPPORTED_NETWORKS['0x5']
       }
 
@@ -40,12 +39,18 @@ function App() {
 
       await authPack.init(options)
 
-      console.log('safeAuthPack:wsEmbed', authPack.wsEmbed)
+      console.log('safeAuthPack:safeEmbed', authPack.safeEmbed)
 
       setSafeAuthPack(authPack)
 
       authPack.subscribe('accountsChanged', async (accounts) => {
         console.log('safeAuthPack:accountsChanged', accounts, authPack.isAuthenticated)
+        if (authPack.isAuthenticated) {
+          const signInInfo = await authPack?.signIn()
+
+          setSafeAuthSignInResponse(signInInfo)
+          setIsAuthenticated(true)
+        }
       })
 
       authPack.subscribe('chainChanged', (eventData) =>
@@ -149,7 +154,7 @@ function App() {
       }
     })
 
-    tx = await protocolKit.signTransaction(tx, 'eth_signTypedData_v4')
+    tx = await protocolKit.signTransaction(tx)
     const signerAddress = (await ethersAdapter.getSignerAddress())?.toLowerCase()
     const signature = tx.signatures.get(signerAddress || '')
     const verify = ethers.verifyTypedData(

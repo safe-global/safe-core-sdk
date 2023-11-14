@@ -670,7 +670,7 @@
     "@ethereumjs/common" "^2.6.4"
     ethereumjs-util "^7.1.5"
 
-"@ethereumjs/tx@^4.1.2", "@ethereumjs/tx@^4.2.0":
+"@ethereumjs/tx@^4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@ethereumjs/tx/-/tx-4.2.0.tgz#5988ae15daf5a3b3c815493bc6b495e76009e853"
   integrity sha512-1nc6VO4jtFd172BbSnTnDQVr9IYBFl1y4xPzZdtkrkKIncBCkdbgfdRV+MiTkJYAtTxvV12GRZLqBFT1PNK6Yw==
@@ -1604,14 +1604,6 @@
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
 
-"@metamask/rpc-errors@^5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@metamask/rpc-errors/-/rpc-errors-5.1.1.tgz#f82732ad0952d34d219eca42699c0c74bee95a9e"
-  integrity sha512-JjZnDi2y2CfvbohhBl+FOQRzmFlJpybcQlIk37zEX8B96eVSPbH/T8S0p7cSF8IE33IWx6JkD8Ycsd+2TXFxCw==
-  dependencies:
-    "@metamask/utils" "^5.0.0"
-    fast-safe-stringify "^2.0.6"
-
 "@metamask/rpc-errors@^6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@metamask/rpc-errors/-/rpc-errors-6.1.0.tgz#dfdef7cba4b9ad01ca3f99e990b5980575b89b4f"
@@ -1619,17 +1611,6 @@
   dependencies:
     "@metamask/utils" "^8.1.0"
     fast-safe-stringify "^2.0.6"
-
-"@metamask/utils@^5.0.0":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@metamask/utils/-/utils-5.0.2.tgz#140ba5061d90d9dac0280c19cab101bc18c8857c"
-  integrity sha512-yfmE79bRQtnMzarnKfX7AEJBwFTxvTyw3nBQlu/5rmGXrjAeAMltoGxO62TFurxrQAFMNa/fEjIHNvungZp0+g==
-  dependencies:
-    "@ethereumjs/tx" "^4.1.2"
-    "@types/debug" "^4.1.7"
-    debug "^4.3.4"
-    semver "^7.3.8"
-    superstruct "^1.0.3"
 
 "@metamask/utils@^8.0.0", "@metamask/utils@^8.1.0":
   version "8.2.0"
@@ -3620,10 +3601,19 @@
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.2.0.tgz#756641adb587851b5ccb3e095daf27ae581c8406"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
-"@web3auth/ws-embed@file:packages/auth-kit/.yalc/@web3auth/ws-embed":
+"@web3auth/safe-embed@^0.0.0":
   version "0.0.0"
+  resolved "https://registry.yarnpkg.com/@web3auth/safe-embed/-/safe-embed-0.0.0.tgz#481b128d0f8cd7dba65c73bcce86858b01331cf7"
+  integrity sha512-c6kKhrMU7jI7iW7MWhGt3Yf1KdeO9ZSk7Kf2presv25DAzW8XYx2vIQ6VWtFEDeE0U2vPAM5i9l2uyoLgwsQKA==
   dependencies:
-    "@metamask/rpc-errors" "^5.1.1"
+    "@web3auth/ws-embed" "^0.0.0"
+
+"@web3auth/ws-embed@^0.0.0":
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/@web3auth/ws-embed/-/ws-embed-0.0.0.tgz#cf31c512a72dc3e2ede69fac3e28e780a7bf6406"
+  integrity sha512-FZtpuXN1oiOex3O5jPMTZI6SjDY95Gz/zqBX+6Fdyv1CBV024z3bljrkkO40fcDbX/Xn3BI9Rr9cxANpTgxMkA==
+  dependencies:
+    "@metamask/rpc-errors" "^6.1.0"
     "@toruslabs/base-controllers" "^4.8.0"
     "@toruslabs/ethereum-controllers" "^4.9.0"
     "@toruslabs/openlogin-jrpc" "^6.0.0"

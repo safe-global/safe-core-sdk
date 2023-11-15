@@ -1,6 +1,6 @@
 import { hashMessage, getBytes } from 'ethers'
 
-import { Chain, IBAN, MoneriumClient, Networks, NewOrder, OrderKind } from '@monerium/sdk'
+import { Chain, IBAN, MoneriumClient, Networks, NewOrder } from '@monerium/sdk'
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'

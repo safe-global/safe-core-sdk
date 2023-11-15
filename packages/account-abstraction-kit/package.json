@@ -36,8 +36,6 @@
   "dependencies": {
     "@safe-global/protocol-kit": "^2.0.0-alpha.0",
     "@safe-global/relay-kit": "^2.0.0-alpha.0",
-    "@safe-global/safe-core-sdk-types": "^3.0.0-alpha.0",
-    "ethereumjs-util": "^7.1.5",
-    "ethers": "^6.7.1"
+    "@safe-global/safe-core-sdk-types": "^3.0.0-alpha.0"
   }
 }

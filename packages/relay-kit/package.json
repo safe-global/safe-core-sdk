@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/relay-kit",
-  "version": "1.3.0",
+  "version": "2.0.0-alpha.0",
   "description": "Safe Relay Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^5.5.0",
-    "@safe-global/protocol-kit": "^1.3.0",
-    "@safe-global/safe-core-sdk-types": "^2.3.0",
+    "@safe-global/protocol-kit": "^2.0.0-alpha.0",
+    "@safe-global/safe-core-sdk-types": "^3.0.0-alpha.0",
     "ethers": "^6.7.1"
   }
 }

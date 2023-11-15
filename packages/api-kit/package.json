@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "1.3.1",
+  "version": "2.0.0-alpha.0",
   "description": "Safe API Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -55,9 +55,9 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
+    "@safe-global/protocol-kit": "^2.0.0-alpha.0",
+    "@safe-global/safe-core-sdk-types": "^3.0.0-alpha.0",
     "ethers": "^6.7.1",
-    "@safe-global/protocol-kit": "^1.3.0",
-    "@safe-global/safe-core-sdk-types": "^2.3.0",
     "node-fetch": "^2.7.0"
   }
 }

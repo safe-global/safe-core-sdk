@@ -3601,10 +3601,10 @@
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.2.0.tgz#756641adb587851b5ccb3e095daf27ae581c8406"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
-"@web3auth/safe-embed@^0.0.0":
+"@web3auth/safeauth-embed@^0.0.0":
   version "0.0.0"
-  resolved "https://registry.yarnpkg.com/@web3auth/safe-embed/-/safe-embed-0.0.0.tgz#481b128d0f8cd7dba65c73bcce86858b01331cf7"
-  integrity sha512-c6kKhrMU7jI7iW7MWhGt3Yf1KdeO9ZSk7Kf2presv25DAzW8XYx2vIQ6VWtFEDeE0U2vPAM5i9l2uyoLgwsQKA==
+  resolved "https://registry.yarnpkg.com/@web3auth/safeauth-embed/-/safeauth-embed-0.0.0.tgz#781210a5b02acbcbe26e2dcf5dd0f8730fde1edd"
+  integrity sha512-bTWjyf/ywHJ0P1nvemQZk5ebQaeExpqEOfSayL4GbUplcWlve43NRQSF7k/44gawiQ8uibYyLgElpiovUpqm4w==
   dependencies:
     "@web3auth/ws-embed" "^0.0.0"
 

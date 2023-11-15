@@ -1,5 +1,6 @@
 import { ExternalProvider } from '@ethersproject/providers'
-import SafeEmbed, { TorusInPageProvider } from '@web3auth/ws-embed'
+import SafeAuthEmbed from '@web3auth/safeauth-embed'
+import { TorusInPageProvider } from '@web3auth/ws-embed'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
 import {
   SafeAuthConfig,
@@ -21,7 +22,7 @@ const WS_EMBED_NOT_INITIALIZED = 'SafeEmbed SDK is not initialized'
  * @class
  */
 export class SafeAuthPack extends AuthKitBasePack {
-  safeEmbed!: SafeEmbed
+  safeAuthEmbed!: SafeAuthEmbed
   #provider: ExternalProvider | null
   #config?: SafeAuthConfig
 
@@ -41,7 +42,7 @@ export class SafeAuthPack extends AuthKitBasePack {
    * Checking the communication provider for this information
    */
   get isAuthenticated(): boolean {
-    return this.safeEmbed.communicationProvider.isLoggedIn
+    return this.safeAuthEmbed.communicationProvider.isLoggedIn
   }
 
   /**
@@ -51,16 +52,16 @@ export class SafeAuthPack extends AuthKitBasePack {
    */
   async init(options: SafeAuthInitOptions) {
     try {
-      this.safeEmbed = new SafeEmbed()
+      this.safeAuthEmbed = new SafeAuthEmbed()
 
-      await this.safeEmbed.init({
+      await this.safeAuthEmbed.init({
         ...options,
         walletUrls: {
           production: { url: 'https://safe.web3auth.com', logLevel: 'error' }
         }
       })
 
-      this.#provider = this.safeEmbed.provider
+      this.#provider = this.safeAuthEmbed.provider
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -73,13 +74,13 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @returns An AuthKitSignInData object with the signer address and the associated safes
    */
   async signIn(options?: SafeAuthSignInOptions): Promise<AuthKitSignInData> {
-    if (!this.safeEmbed) {
+    if (!this.safeAuthEmbed) {
       throw new Error(WS_EMBED_NOT_INITIALIZED)
     }
 
-    await this.safeEmbed.login(options)
+    await this.safeAuthEmbed.login(options)
 
-    this.#provider = this.safeEmbed.provider
+    this.#provider = this.safeAuthEmbed.provider
 
     const eoa = await this.getAddress()
     const safes = await this.getSafes(this.#config?.txServiceUrl)
@@ -103,16 +104,16 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @param options The options to disconnect from the Web3Auth services
    */
   async signOut(options?: SafeAuthSignOutOptions) {
-    if (!this.safeEmbed) {
+    if (!this.safeAuthEmbed) {
       throw new Error(WS_EMBED_NOT_INITIALIZED)
     }
 
     this.#provider = null
 
     if (options?.reset) {
-      await this.safeEmbed.cleanUp()
+      await this.safeAuthEmbed.cleanUp()
     } else {
-      await this.safeEmbed.logout()
+      await this.safeAuthEmbed.logout()
     }
   }
 
@@ -122,11 +123,11 @@ export class SafeAuthPack extends AuthKitBasePack {
    * @throws Error if there was an error initializing the Web3Auth WsEmbed
    */
   async getUserInfo(): Promise<SafeAuthUserInfo> {
-    if (!this.safeEmbed) {
+    if (!this.safeAuthEmbed) {
       throw new Error(WS_EMBED_NOT_INITIALIZED)
     }
 
-    const userInfo = this.safeEmbed.getUserInfo()
+    const userInfo = this.safeAuthEmbed.getUserInfo()
 
     return userInfo
   }
@@ -136,7 +137,7 @@ export class SafeAuthPack extends AuthKitBasePack {
    * with an alternative configuration
    */
   destroy() {
-    this.safeEmbed.clearInit()
+    this.safeAuthEmbed.clearInit()
   }
 
   /**

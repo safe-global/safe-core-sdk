@@ -39,7 +39,7 @@ function App() {
 
       await authPack.init(options)
 
-      console.log('safeAuthPack:safeEmbed', authPack.safeEmbed)
+      console.log('safeAuthPack:safeEmbed', authPack.safeAuthEmbed)
 
       setSafeAuthPack(authPack)
 

@@ -211,7 +211,7 @@ function App() {
           ]
         },
         primaryType: 'SafeTx',
-        domain: { verifyingContract: safeAddress, chainId: 100 },
+        domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
         message: {
           ...tx.data,
           value: tx.data.value,

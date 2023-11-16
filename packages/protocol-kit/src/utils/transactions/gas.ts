@@ -96,7 +96,7 @@ export async function estimateGas(
   try {
     const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
-    return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+    return decodeSafeTxGas(encodedResponse)
   } catch (error: any) {
     return parseSafeTxGasErrorResponse(error)
   }
@@ -377,18 +377,39 @@ function decodeSafeTxGas(encodedSafeTxGas: string): string {
   return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
 }
 
-function parseSafeTxGasErrorResponse(error: any) {
+type ProviderEstimationError = Error & { data: string }
+
+/**
+ * Parses the SafeTxGas estimation response from several providers.
+ * This function supports error handling for different providers like Ethers v6, Web3 v1 with unknown provider, and Web3 v1 with HDWalletProvider.
+ * It extracts and decodes the SafeTxGas value from the error object.
+ *
+ * @param {ProviderEstimationError} error - The estimation object with the estimation data.
+ * @returns {string} The SafeTxGas value.
+ * @throws It Will throw an error if the SafeTxGas cannot be parsed.
+ */
+function parseSafeTxGasErrorResponse(error: ProviderEstimationError) {
   // Ethers v6
-  const Ethersv6RevertData = error?.info?.error?.data
-  if (Ethersv6RevertData) {
-    return decodeSafeTxGas(Ethersv6RevertData?.originalError?.data || Ethersv6RevertData)
+  const ethersData = error?.data
+  if (ethersData) {
+    return decodeSafeTxGas(ethersData)
   }
 
-  // Web3 v1
-  const [, encodedResponse] = error.message.split('return data: ')
-  const safeTxGas = decodeSafeTxGas(encodedResponse)
+  // Web3 v1 unknown provider
+  const [, web3UnknownProviderData] = error?.message?.split('return data: ')
 
-  return safeTxGas
+  if (web3UnknownProviderData) {
+    return decodeSafeTxGas(web3UnknownProviderData)
+  }
+
+  // Web3 v1 HDWalletProvider
+  const [, Web3HDWalletProviderData] = error?.message?.split('execution reverted\n')
+
+  if (Web3HDWalletProviderData) {
+    return decodeSafeTxGas(Web3HDWalletProviderData)
+  }
+
+  throw new Error('Could not parse SafeTxGas from Estimation response')
 }
 
 /**

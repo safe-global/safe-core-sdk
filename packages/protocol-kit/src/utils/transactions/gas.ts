@@ -381,7 +381,7 @@ function parseSafeTxGasErrorResponse(error: any) {
   // Ethers v6
   const Ethersv6RevertData = error?.info?.error?.data
   if (Ethersv6RevertData) {
-    return decodeSafeTxGas(Ethersv6RevertData)
+    return decodeSafeTxGas(Ethersv6RevertData?.originalError?.data || Ethersv6RevertData)
   }
 
   // Web3 v1

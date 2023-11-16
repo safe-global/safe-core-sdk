@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserProvider, Eip1193Provider, ethers } from 'ethers'
+import { BrowserProvider, Eip1193Provider, JsonRpcProvider, ethers } from 'ethers'
 import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
@@ -134,7 +134,7 @@ function App() {
     // -------------------------------------
     // const signer = new ethers.Wallet(
     //   import.meta.env.VITE_PRIVATE_KEY,
-    //   new ethers.providers.JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
+    //   new JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
     // )
     // const ethersAdapter = new EthersAdapter({
     //   ethers,

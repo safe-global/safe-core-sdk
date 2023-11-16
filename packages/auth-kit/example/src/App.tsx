@@ -13,6 +13,7 @@ import {
   SafeAuthUserInfo
 } from '../../src/index'
 import { getSafeTxV4TypedData, getTypedData, getV3TypedData } from './typedData'
+import { SignTypedDataVersion, recoverTypedSignature } from '@metamask/eth-sig-util'
 
 function App() {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
@@ -32,7 +33,7 @@ function App() {
       const options: SafeAuthInitOptions = {
         enableLogging: true,
         buildEnv: 'production',
-        chainConfig: SUPPORTED_NETWORKS['0x5']
+        chainConfig: SUPPORTED_NETWORKS['0x64']
       }
 
       const authPack = new SafeAuthPack()
@@ -183,14 +184,63 @@ function App() {
       },
       signature?.data || '0x'
     )
+    const verifyTypedData = recoverTypedSignature({
+      data: {
+        types: {
+          EIP712Domain: [
+            {
+              name: 'chainId',
+              type: 'uint256'
+            },
+            {
+              name: 'verifyingContract',
+              type: 'address'
+            }
+          ],
+          SafeTx: [
+            { type: 'address', name: 'to' },
+            { type: 'uint256', name: 'value' },
+            { type: 'bytes', name: 'data' },
+            { type: 'uint8', name: 'operation' },
+            { type: 'uint256', name: 'safeTxGas' },
+            { type: 'uint256', name: 'baseGas' },
+            { type: 'uint256', name: 'gasPrice' },
+            { type: 'address', name: 'gasToken' },
+            { type: 'address', name: 'refundReceiver' },
+            { type: 'uint256', name: 'nonce' }
+          ]
+        },
+        primaryType: 'SafeTx',
+        domain: { verifyingContract: safeAddress, chainId: 100 },
+        message: {
+          ...tx.data,
+          value: tx.data.value,
+          safeTxGas: tx.data.safeTxGas,
+          baseGas: tx.data.baseGas,
+          gasPrice: tx.data.gasPrice,
+          nonce: tx.data.nonce
+        }
+      },
+      signature: signature?.data || '0x',
+      version: SignTypedDataVersion.V4
+    })
 
     console.log('Verify: Signer Address:', signerAddress?.toLowerCase())
-    console.log('Verify: Result:', verify, verify.toLowerCase() === signerAddress?.toLowerCase())
+    console.log(
+      'Ethers Verify: Result:',
+      verify,
+      verify.toLowerCase() === signerAddress?.toLowerCase()
+    )
+    console.log(
+      'Metamash Verify: Result:',
+      verifyTypedData,
+      verifyTypedData.toLowerCase() === signerAddress?.toLowerCase()
+    )
 
     // Propose transaction
     // -------------------------------------
     const safeApiKit = new SafeApiKit({
-      chainId: 5n
+      chainId: 100n
     })
     const safeTxHash = await protocolKit.getTransactionHash(tx)
     await safeApiKit.proposeTransaction({

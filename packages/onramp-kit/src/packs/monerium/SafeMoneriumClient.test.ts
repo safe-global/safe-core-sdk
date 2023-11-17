@@ -38,7 +38,10 @@ describe('SafeMoneriumClient', () => {
       call: jest.fn().mockImplementation(async () => MAGIC_VALUE),
       getSignerAddress: jest.fn().mockResolvedValue('0xSignerAddress')
     })
-    safeMoneriumClient = new SafeMoneriumClient('sandbox', safeSdk)
+    safeMoneriumClient = new SafeMoneriumClient(
+      { environment: 'sandbox', clientId: 'mockClientId', redirectUrl: 'http://mockUrl' },
+      safeSdk
+    )
   })
 
   it('should create a SafeMoneriumClient instance', () => {

@@ -11,8 +11,6 @@ import DeploySafe from './DeploySafe'
 import LoginWithMonerium from './LoginWithMonerium'
 import Connected from './Connected'
 
-const MONERIUM_TOKEN = 'monerium_token'
-
 function Monerium() {
   const [authContext, setAuthContext] = useState<AuthContext>()
   const [safeThreshold, setSafeThreshold] = useState<string>()
@@ -38,6 +36,7 @@ function Monerium() {
 
       const pack = new MoneriumPack({
         clientId: import.meta.env.VITE_MONERIUM_CLIENT_ID,
+        redirectUrl: 'http://localhost:3000/monerium',
         environment: 'sandbox'
       })
 
@@ -76,45 +75,37 @@ function Monerium() {
   }, [authProvider, selectedSafe])
 
   useEffect(() => {
-    const authCode = new URLSearchParams(window.location.search).get('code') || undefined
-    const refreshToken = localStorage.getItem(MONERIUM_TOKEN) || undefined
-
-    if (authCode || refreshToken) startMoneriumFlow(authCode, refreshToken)
+    startMoneriumFlow()
   }, [moneriumPack])
 
-  const startMoneriumFlow = async (authCode?: string, refreshToken?: string) => {
+  const startMoneriumFlow = async (options?: { initiateAuthFlow?: boolean }) => {
     if (!moneriumPack) return
 
-    const moneriumClient = await moneriumPack.open({
-      redirectUrl: 'http://localhost:3000/monerium',
-      authCode,
-      refreshToken
-    })
+    if (options?.initiateAuthFlow) {
+      await moneriumPack.open({ initiateAuthFlow: true })
+    } else {
+      const moneriumClient = await moneriumPack.open()
 
-    const authContext = await moneriumClient.getAuthContext()
-    const profile = await moneriumClient.getProfile(authContext.defaultProfile)
-    const balances = await moneriumClient.getBalances()
-    const orders = await moneriumClient.getOrders()
+      const authContext = await moneriumClient.getAuthContext()
+      const profile = await moneriumClient.getProfile(authContext.defaultProfile)
+      const balances = await moneriumClient.getBalances()
+      const orders = await moneriumClient.getOrders()
 
-    console.group('Monerium data')
-    console.log('AuthContext', authContext)
-    console.log('Profile', profile)
-    console.log('Balances', balances)
-    console.log('Orders', orders)
-    console.log('Bearer Profile', moneriumClient.bearerProfile)
-    console.groupEnd()
+      console.group('Monerium data')
+      console.log('AuthContext', authContext)
+      console.log('Profile', profile)
+      console.log('Balances', balances)
+      console.log('Orders', orders)
+      console.log('Bearer Profile', moneriumClient.bearerProfile)
+      console.groupEnd()
 
-    if (moneriumClient.bearerProfile) {
-      localStorage.setItem(MONERIUM_TOKEN, moneriumClient.bearerProfile.refresh_token)
+      setMoneriumClient(moneriumClient)
+      setAuthContext(authContext)
     }
-
-    setMoneriumClient(moneriumClient)
-    setAuthContext(authContext)
   }
 
   const closeMoneriumFlow = async () => {
     moneriumPack?.close()
-    localStorage.removeItem(MONERIUM_TOKEN)
     setAuthContext(undefined)
   }
 
@@ -159,7 +150,7 @@ function Monerium() {
             <LoginWithMonerium
               safe={selectedSafe}
               threshold={safeThreshold || ''}
-              onLogin={() => startMoneriumFlow()}
+              onLogin={() => startMoneriumFlow({ initiateAuthFlow: true })}
             />
           )}
         </>

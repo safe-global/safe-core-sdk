@@ -981,10 +981,12 @@
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
-"@monerium/sdk@^2.5.2":
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.5.2.tgz#65b727a5ab4d243838cfb420cc0bb3e185fd2aa2"
-  integrity sha512-bUnKiZHXpGLFpENLUXMSrBpj162idGQHTxBa2aNFrBHGZdw1A/sikC0xpkARHeGJHDjZiZxmeB/G1VsOFtAf5w==
+"@monerium/sdk@^2.7.2":
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.7.2.tgz#c166cdb85eea66d236f79896fd35c4ad8f3163cd"
+  integrity sha512-yvg2RluO2mB8wZRHErMAKZ6sGZx/DP80jHoVWQGNsZgDXb7wGojNvyj17rN3WP78OGaPzM/Y60PgYyEXlmneZA==
+  dependencies:
+    crypto-js "^4.2.0"
 
 "@mui/base@5.0.0-beta.7":
   version "5.0.0-beta.7"
@@ -2486,6 +2488,11 @@ cross-fetch@^3.1.4:
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
   dependencies:
     node-fetch "2.6.7"
+
+crypto-js@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
 
 csstype@^3.0.2:
   version "3.1.1"

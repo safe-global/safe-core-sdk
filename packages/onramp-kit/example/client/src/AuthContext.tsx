@@ -22,13 +22,15 @@ export const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   selectedSafe: ''
 })
-
+const STORED_SAFE = 'selected_safe'
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthModalPack>()
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData>()
   const [provider, setProvider] = useState<SafeEventEmitterProvider | undefined>()
   const [selectedSafe, setSelectedSafe] = useState('')
+
+  const storedSafe = sessionStorage.getItem(STORED_SAFE)
 
   useEffect(() => {
     ;(async () => {
@@ -81,7 +83,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
       if (provider) {
         const response = await web3AuthPack.signIn()
         setSafeAuthSignInResponse(response)
-        setSelectedSafe(response?.safes?.[0] || '')
+        setSelectedSafe(storedSafe || response?.safes?.[0] || '')
         setProvider(provider as SafeEventEmitterProvider)
 
         setIsLoggedIn(true)
@@ -98,7 +100,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
     console.log('SIGN IN RESPONSE: ', response)
 
     setSafeAuthSignInResponse(response)
-    setSelectedSafe(response?.safes?.[0] || '')
+    setSelectedSafe(storedSafe || response?.safes?.[0] || '')
     setProvider(web3AuthPack.getProvider() as SafeEventEmitterProvider)
     setIsLoggedIn(true)
   }
@@ -122,7 +124,10 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         logIn,
         logOut,
         selectedSafe,
-        setSelectedSafe
+        setSelectedSafe: (safe) => {
+          sessionStorage.setItem(STORED_SAFE, safe)
+          setSelectedSafe(safe)
+        }
       }}
     >
       {children}

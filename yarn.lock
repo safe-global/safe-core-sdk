@@ -1682,10 +1682,12 @@
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
-"@monerium/sdk@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.3.0.tgz#0e7eab2179eb8cbd45f6f75fe085e11fe3d44750"
-  integrity sha512-gTcPFN9oYdm+yzBpsJuvsQR67GRBIu21wx+gPKxejwdttO+BSeFsRbO8Nd8R0WU3KdSTqghpfDhgn7uktKofRw==
+"@monerium/sdk@^2.7.2":
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.7.2.tgz#c166cdb85eea66d236f79896fd35c4ad8f3163cd"
+  integrity sha512-yvg2RluO2mB8wZRHErMAKZ6sGZx/DP80jHoVWQGNsZgDXb7wGojNvyj17rN3WP78OGaPzM/Y60PgYyEXlmneZA==
+  dependencies:
+    crypto-js "^4.2.0"
 
 "@morgan-stanley/ts-mocking-bird@^0.6.2":
   version "0.6.4"
@@ -5998,6 +6000,11 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
     which "^2.0.1"
+
+crypto-js@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
 
 crypto-random-string@^2.0.0:
   version "2.0.0"

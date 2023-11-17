@@ -386,6 +386,7 @@ describe('Endpoint tests', () => {
         method: 'post',
         body: {
           ...safeTransactionData,
+          ...options,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,
@@ -434,6 +435,7 @@ describe('Endpoint tests', () => {
         method: 'post',
         body: {
           ...safeTransactionData,
+          ...options,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,

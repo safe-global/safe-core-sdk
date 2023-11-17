@@ -822,7 +822,7 @@ describe('Transactions execution', () => {
         value: 2_000_000_000_000_000_000n // 2 ETH
       })
       const safeInitialBalance = await safeSdk1.getBalance()
-      const safeTransactionData: MetaTransactionData[] = [
+      const transactions: MetaTransactionData[] = [
         {
           to: account2.address,
           value: '1100000000000000000', // 1.1 ETH
@@ -834,7 +834,7 @@ describe('Transactions execution', () => {
           data: '0x'
         }
       ]
-      const multiSendTx = await safeSdk1.createTransaction({ safeTransactionData })
+      const multiSendTx = await safeSdk1.createTransaction({ transactions })
       const signedMultiSendTx = await safeSdk1.signTransaction(multiSendTx)
       const txHash = await safeSdk2.getTransactionHash(multiSendTx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)
@@ -844,11 +844,7 @@ describe('Transactions execution', () => {
       const safeFinalBalance = await safeSdk1.getBalance()
       chai
         .expect(safeInitialBalance)
-        .to.be.eq(
-          safeFinalBalance +
-            BigInt(safeTransactionData[0].value) +
-            BigInt(safeTransactionData[1].value)
-        )
+        .to.be.eq(safeFinalBalance + BigInt(transactions[0].value) + BigInt(transactions[1].value))
     })
 
     it('should execute a batch transaction with contract calls and threshold >1', async () => {
@@ -873,7 +869,7 @@ describe('Transactions execution', () => {
       const accountInitialERC20Balance = await erc20Mintable.balanceOf(account2.address)
       chai.expect(accountInitialERC20Balance.toString()).to.be.eq('0') // 0 ERC20
 
-      const safeTransactionData: MetaTransactionData[] = [
+      const transactions: MetaTransactionData[] = [
         {
           to: await erc20Mintable.getAddress(),
           value: '0',
@@ -891,7 +887,7 @@ describe('Transactions execution', () => {
           ])
         }
       ]
-      const multiSendTx = await safeSdk1.createTransaction({ safeTransactionData })
+      const multiSendTx = await safeSdk1.createTransaction({ transactions })
       const signedMultiSendTx = await safeSdk1.signTransaction(multiSendTx)
       const txHash = await safeSdk2.getTransactionHash(multiSendTx)
       const txResponse1 = await safeSdk2.approveTransactionHash(txHash)

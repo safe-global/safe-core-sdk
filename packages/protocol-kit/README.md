@@ -102,9 +102,9 @@ Check the `create` method in the [API Reference](#sdk-api) for more details on a
 ### 3. Create a Safe transaction
 
 ```js
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
-const safeTransactionData: SafeTransactionDataPartial = {
+const safeTransactionData: MetaTransactionData = {
   to: '0x<address>',
   value: '<eth_value_in_wei>',
   data: '0x<data>'

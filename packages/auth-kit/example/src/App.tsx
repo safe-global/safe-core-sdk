@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { BrowserProvider, Eip1193Provider, JsonRpcProvider, ethers } from 'ethers'
+import { BrowserProvider, Eip1193Provider, ethers } from 'ethers'
 import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
-import SafeApiKit from '@safe-global/api-kit'
 import AppBar from './AppBar'
 import {
   AuthKitSignInData,
@@ -13,7 +12,6 @@ import {
   SafeAuthUserInfo
 } from '../../src/index'
 import { getSafeTxV4TypedData, getTypedData, getV3TypedData } from './typedData'
-import { SignTypedDataVersion, recoverTypedSignature } from '@metamask/eth-sig-util'
 
 function App() {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
@@ -116,8 +114,7 @@ function App() {
   const signAndExecuteSafeTx = async (index: number) => {
     const safeAddress = safeAuthSignInResponse?.safes?.[index] || '0x'
 
-    // Web3Auth provider wrapped with ethers
-    // -------------------------------------
+    // Wrap Web3Auth provider with ethers
     const provider = new BrowserProvider(safeAuthPack?.getProvider() as Eip1193Provider)
     const signer = await provider.getSigner()
     const ethersAdapter = new EthersAdapter({
@@ -128,25 +125,8 @@ function App() {
       safeAddress,
       ethAdapter: ethersAdapter
     })
-    // -------------------------------------
 
-    // ethers.Wallet as signer
-    // -------------------------------------
-    // const signer = new ethers.Wallet(
-    //   import.meta.env.VITE_PRIVATE_KEY,
-    //   new JsonRpcProvider(SUPPORTED_NETWORKS['0x64'].rpcTarget)
-    // )
-    // const ethersAdapter = new EthersAdapter({
-    //   ethers,
-    //   signerOrProvider: signer
-    // })
-    // const protocolKit = await Safe.create({
-    //   safeAddress,
-    //   ethAdapter: ethersAdapter
-    // })
-    // -------------------------------------
-
-    const chainId = await ethersAdapter.getChainId()
+    // Create transaction
     let tx = await protocolKit.createTransaction({
       safeTransactionData: {
         to: ethers.getAddress(safeAuthSignInResponse?.eoa || '0x'),
@@ -155,108 +135,12 @@ function App() {
       }
     })
 
+    // Sign transaction
     tx = await protocolKit.signTransaction(tx)
-    const signerAddress = (await ethersAdapter.getSignerAddress())?.toLowerCase()
-    const signature = tx.signatures.get(signerAddress || '')
-    const verify = ethers.verifyTypedData(
-      { verifyingContract: safeAddress, chainId },
-      {
-        SafeTx: [
-          { type: 'address', name: 'to' },
-          { type: 'uint256', name: 'value' },
-          { type: 'bytes', name: 'data' },
-          { type: 'uint8', name: 'operation' },
-          { type: 'uint256', name: 'safeTxGas' },
-          { type: 'uint256', name: 'baseGas' },
-          { type: 'uint256', name: 'gasPrice' },
-          { type: 'address', name: 'gasToken' },
-          { type: 'address', name: 'refundReceiver' },
-          { type: 'uint256', name: 'nonce' }
-        ]
-      },
-      {
-        ...tx.data,
-        value: tx.data.value,
-        safeTxGas: tx.data.safeTxGas,
-        baseGas: tx.data.baseGas,
-        gasPrice: tx.data.gasPrice,
-        nonce: tx.data.nonce
-      },
-      signature?.data || '0x'
-    )
-    const verifyTypedData = recoverTypedSignature({
-      data: {
-        types: {
-          EIP712Domain: [
-            {
-              name: 'chainId',
-              type: 'uint256'
-            },
-            {
-              name: 'verifyingContract',
-              type: 'address'
-            }
-          ],
-          SafeTx: [
-            { type: 'address', name: 'to' },
-            { type: 'uint256', name: 'value' },
-            { type: 'bytes', name: 'data' },
-            { type: 'uint8', name: 'operation' },
-            { type: 'uint256', name: 'safeTxGas' },
-            { type: 'uint256', name: 'baseGas' },
-            { type: 'uint256', name: 'gasPrice' },
-            { type: 'address', name: 'gasToken' },
-            { type: 'address', name: 'refundReceiver' },
-            { type: 'uint256', name: 'nonce' }
-          ]
-        },
-        primaryType: 'SafeTx',
-        domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
-        message: {
-          ...tx.data,
-          value: tx.data.value,
-          safeTxGas: tx.data.safeTxGas,
-          baseGas: tx.data.baseGas,
-          gasPrice: tx.data.gasPrice,
-          nonce: tx.data.nonce
-        }
-      },
-      signature: signature?.data || '0x',
-      version: SignTypedDataVersion.V4
-    })
-
-    console.log('Verify: Signer Address:', signerAddress?.toLowerCase())
-    console.log(
-      'Ethers Verify: Result:',
-      verify,
-      verify.toLowerCase() === signerAddress?.toLowerCase()
-    )
-    console.log(
-      'Metamash Verify: Result:',
-      verifyTypedData,
-      verifyTypedData.toLowerCase() === signerAddress?.toLowerCase()
-    )
-
-    // Propose transaction
-    // -------------------------------------
-    const safeApiKit = new SafeApiKit({
-      chainId: 100n
-    })
-    const safeTxHash = await protocolKit.getTransactionHash(tx)
-    await safeApiKit.proposeTransaction({
-      safeAddress,
-      safeTransactionData: tx.data,
-      safeTxHash,
-      senderAddress: ethers.getAddress(signerAddress || ''),
-      senderSignature: signature?.data || ''
-    })
-    // -------------------------------------
 
     // Execute transaction
-    // -------------------------------------
-    // const txResult = await protocolKit.executeTransaction(tx)
-    // uiConsole('Safe Transaction Result', txResult)
-    //-------------------------------------
+    const txResult = await protocolKit.executeTransaction(tx)
+    uiConsole('Safe Transaction Result', txResult)
   }
 
   const signMessage = async (data: any, method: string) => {

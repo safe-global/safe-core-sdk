@@ -377,7 +377,7 @@ function decodeSafeTxGas(encodedSafeTxGas: string): string {
   return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
 }
 
-type GnosisChainEstimationError = { info: { error: { data: string } } }
+type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
 type EthersEstimationError = { data: string }
 type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
 
@@ -400,7 +400,10 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   const gnosisChainProviderData = error?.info?.error?.data
 
   if (gnosisChainProviderData) {
-    return decodeSafeTxGas(gnosisChainProviderData)
+    const isString = typeof gnosisChainProviderData === 'string'
+
+    const encodedDataResponse = isString ? gnosisChainProviderData : gnosisChainProviderData.data
+    return decodeSafeTxGas(encodedDataResponse)
   }
 
   // Error message

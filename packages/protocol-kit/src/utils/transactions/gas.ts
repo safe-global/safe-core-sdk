@@ -96,7 +96,7 @@ export async function estimateGas(
   try {
     const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
-    return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+    return decodeSafeTxGas(encodedResponse)
   } catch (error: any) {
     return parseSafeTxGasErrorResponse(error)
   }
@@ -377,18 +377,40 @@ function decodeSafeTxGas(encodedSafeTxGas: string): string {
   return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
 }
 
-function parseSafeTxGasErrorResponse(error: any) {
+type GnosisChainEstimationError = { info: { error: { data: string } } }
+type EthersEstimationError = { data: string }
+type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
+
+/**
+ * Parses the SafeTxGas estimation response from different providers.
+ * It extracts and decodes the SafeTxGas value from the Error object.
+ *
+ * @param {ProviderEstimationError} error - The estimation object with the estimation data.
+ * @returns {string} The SafeTxGas value.
+ * @throws It Will throw an error if the SafeTxGas cannot be parsed.
+ */
+function parseSafeTxGasErrorResponse(error: EstimationError) {
   // Ethers v6
-  const Ethersv6RevertData = error?.info?.error?.data
-  if (Ethersv6RevertData) {
-    return decodeSafeTxGas(Ethersv6RevertData?.originalError?.data || Ethersv6RevertData)
+  const ethersData = error?.data
+  if (ethersData) {
+    return decodeSafeTxGas(ethersData)
   }
 
-  // Web3 v1
-  const [, encodedResponse] = error.message.split('return data: ')
-  const safeTxGas = decodeSafeTxGas(encodedResponse)
+  // gnosis-chain
+  const gnosisChainProviderData = error?.info?.error?.data
 
-  return safeTxGas
+  if (gnosisChainProviderData) {
+    return decodeSafeTxGas(gnosisChainProviderData)
+  }
+
+  // Error message
+  const [, encodedDataResponse] = error?.message?.split('0x')
+
+  if (encodedDataResponse) {
+    return decodeSafeTxGas('0x' + encodedDataResponse)
+  }
+
+  throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)
 }
 
 /**

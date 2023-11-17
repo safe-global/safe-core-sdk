@@ -1,5 +1,4 @@
 import Safe from '@safe-global/protocol-kit/index'
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import chai from 'chai'
 import { deployments } from 'hardhat'
@@ -35,13 +34,13 @@ describe('getEncodedTransaction', () => {
       contractNetworks
     })
 
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: account2.address,
       value: '500000000000000000', // 0.5 ETH
       data: '0x'
     }
 
-    const transaction = await safeSdk.createTransaction({ safeTransactionData })
+    const transaction = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
 
     const encodedTransaction = await safeSdk.getEncodedTransaction(transaction)
 
@@ -66,13 +65,13 @@ describe('getEncodedTransaction', () => {
       contractNetworks
     })
 
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: account2.address,
       value: '500000000000000000', // 0.5 ETH
       data: '0x'
     }
 
-    const transaction = await safeSdk.createTransaction({ safeTransactionData })
+    const transaction = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
 
     const encodedTransaction = await safeSdk.getEncodedTransaction(transaction)
 
@@ -97,13 +96,13 @@ describe('getEncodedTransaction', () => {
       contractNetworks
     })
 
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: account2.address,
       value: '500000000000000000', // 0.5 ETH
       data: '0x'
     }
 
-    const transaction = await safeSdk.createTransaction({ safeTransactionData })
+    const transaction = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
 
     const signedTransaction = await safeSdk.signTransaction(transaction)
 

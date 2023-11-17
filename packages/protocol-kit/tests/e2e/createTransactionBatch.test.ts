@@ -1,4 +1,3 @@
-import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -64,7 +63,7 @@ describe('createTransactionBatch', () => {
       operation: OperationType.Call
     }
 
-    const transactions: MetaTransactionData[] = [dumpTransfer, dumpTransfer]
+    const transactions = [dumpTransfer, dumpTransfer]
 
     const batchTransaction = await safeSdk.createTransactionBatch(transactions)
 

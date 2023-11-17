@@ -377,39 +377,40 @@ function decodeSafeTxGas(encodedSafeTxGas: string): string {
   return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
 }
 
-type ProviderEstimationError = Error & { data: string }
+type GnosisChainEstimationError = { info: { error: { data: string } } }
+type EthersEstimationError = { data: string }
+type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
 
 /**
- * Parses the SafeTxGas estimation response from several providers.
- * This function supports error handling for different providers like Ethers v6, Web3 v1 with unknown provider, and Web3 v1 with HDWalletProvider.
- * It extracts and decodes the SafeTxGas value from the error object.
+ * Parses the SafeTxGas estimation response from different providers.
+ * It extracts and decodes the SafeTxGas value from the Error object.
  *
  * @param {ProviderEstimationError} error - The estimation object with the estimation data.
  * @returns {string} The SafeTxGas value.
  * @throws It Will throw an error if the SafeTxGas cannot be parsed.
  */
-function parseSafeTxGasErrorResponse(error: ProviderEstimationError) {
+function parseSafeTxGasErrorResponse(error: EstimationError) {
   // Ethers v6
   const ethersData = error?.data
   if (ethersData) {
     return decodeSafeTxGas(ethersData)
   }
 
-  // Web3 v1 unknown provider
-  const [, web3UnknownProviderData] = error?.message?.split('return data: ')
+  // gnosis-chain
+  const gnosisChainProviderData = error?.info?.error?.data
 
-  if (web3UnknownProviderData) {
-    return decodeSafeTxGas(web3UnknownProviderData)
+  if (gnosisChainProviderData) {
+    return decodeSafeTxGas(gnosisChainProviderData)
   }
 
-  // Web3 v1 HDWalletProvider
-  const [, Web3HDWalletProviderData] = error?.message?.split('execution reverted\n')
+  // Error message
+  const [, encodedDataResponse] = error?.message?.split('0x')
 
-  if (Web3HDWalletProviderData) {
-    return decodeSafeTxGas(Web3HDWalletProviderData)
+  if (encodedDataResponse) {
+    return decodeSafeTxGas('0x' + encodedDataResponse)
   }
 
-  throw new Error('Could not parse SafeTxGas from Estimation response')
+  throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)
 }
 
 /**

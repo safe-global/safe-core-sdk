@@ -135,7 +135,8 @@ function App() {
       }
     })
 
-    // Sign transaction
+    // Sign transaction. Not necessary to execute the transaction if the threshold is one
+    // but kept to test the sign transaction modal
     tx = await protocolKit.signTransaction(tx)
 
     // Execute transaction

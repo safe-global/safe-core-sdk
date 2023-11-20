@@ -147,7 +147,7 @@ export class MoneriumPack extends OnRampKitBasePack {
    * Close the flow and clean up
    */
   async close() {
-    this.client?.disconnect()
+    this.client?.revokeAccess()
   }
 
   /**

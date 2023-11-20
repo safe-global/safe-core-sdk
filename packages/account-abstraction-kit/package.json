@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/account-abstraction-kit-poc",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0-alpha.4",
   "description": "Safe Account Abstraction Kit PoC",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -34,8 +34,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^2.0.0-alpha.3",
-    "@safe-global/relay-kit": "^2.0.0-alpha.2",
-    "@safe-global/safe-core-sdk-types": "^3.0.0-alpha.0"
+    "@safe-global/protocol-kit": "^2.0.0-alpha.4",
+    "@safe-global/relay-kit": "^2.0.0-alpha.4",
+    "@safe-global/safe-core-sdk-types": "^3.0.0-alpha.1"
   }
 }

@@ -373,7 +373,9 @@ async function estimateSafeTxGasWithRequiredTxGas(
   )
   const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
   */
-function decodeSafeTxGas(encodedSafeTxGas: string): string {
+function decodeSafeTxGas(encodedDataResponse: string): string {
+  const [, encodedSafeTxGas] = encodedDataResponse.split('0x')
+
   return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
 }
 
@@ -407,10 +409,10 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   }
 
   // Error message
-  const [, encodedDataResponse] = error?.message?.split('0x')
+  const isEncodedDataPresent = error?.message?.includes('0x')
 
-  if (encodedDataResponse) {
-    return decodeSafeTxGas('0x' + encodedDataResponse)
+  if (isEncodedDataPresent) {
+    return decodeSafeTxGas(error?.message)
   }
 
   throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)

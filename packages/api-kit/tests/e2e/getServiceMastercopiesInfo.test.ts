@@ -15,7 +15,7 @@ describe('getServiceSingletonsInfo', () => {
     const singletonsResponse = await safeApiKit.getServiceSingletonsInfo()
     chai.expect(singletonsResponse.length).to.be.greaterThan(1)
     singletonsResponse.map((singleton) => {
-      chai.expect(singleton.deployer).to.be.equal('Gnosis')
+      chai.expect(singleton.deployer).to.be.equal('Safe')
     })
   })
 })

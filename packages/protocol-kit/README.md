@@ -102,14 +102,14 @@ Check the `create` method in the [API Reference](#sdk-api) for more details on a
 ### 3. Create a Safe transaction
 
 ```js
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
-const safeTransactionData: SafeTransactionDataPartial = {
+const safeTransactionData: MetaTransactionData = {
   to: '0x<address>',
   value: '<eth_value_in_wei>',
   data: '0x<data>'
 }
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
 ```
 
 Check the `createTransaction` method in the [API Reference](#sdk-api) for additional details on creating MultiSend transactions.
@@ -515,90 +515,68 @@ const isOwner = await safeSdk.isOwner(address)
 
 Returns a Safe transaction ready to be signed by the owners and executed. The Protocol Kit supports the creation of single Safe transactions but also MultiSend transactions.
 
-- **Single transactions**
+This method takes an array of `MetaTransactionData` objects that represent the individual transactions we want to include in our MultiSend transaction.
 
-  This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
+When the array contains only one transaction, it is not wrapped in the MultiSend.
 
-  ```js
-  import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
-
-  const safeTransactionData: SafeTransactionDataPartial = {
+```js
+const transactions: MetaTransactionData[] = [
+  {
     to,
     data,
     value,
-    operation, // Optional
-    safeTxGas, // Optional
-    baseGas, // Optional
-    gasPrice, // Optional
-    gasToken, // Optional
-    refundReceiver, // Optional
-    nonce // Optional
+    operation // Optional
+  },
+  {
+    to,
+    data,
+    value,
+    operation // Optional
   }
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-  ```
+  // ...
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
+```
 
-- **MultiSend transactions**
+This method can also receive the `options` parameter to set the optional properties in the MultiSend transaction:
 
-  This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the `createTransaction` method with the `SafeTransactionOptionalProps` object.
-
-  ```js
-  const safeTransactionData: MetaTransactionData[] = [
-    {
-      to,
-      data,
-      value,
-      operation // Optional
-    },
-    {
-      to,
-      data,
-      value,
-      operation // Optional
-    }
-    // ...
-  ]
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-  ```
-
-  This method can also receive the `options` parameter to set the optional properties in the MultiSend transaction:
-
-  ```js
-  const safeTransactionData: MetaTransactionData[] = [
-    {
-      to,
-      data,
-      value,
-      operation // Optional
-    },
-    {
-      to,
-      data,
-      value,
-      operation // Optional
-    }
-    // ...
-  ]
-  const options: SafeTransactionOptionalProps = {
-    safeTxGas, // Optional
-    baseGas, // Optional
-    gasPrice, // Optional
-    gasToken, // Optional
-    refundReceiver, // Optional
-    nonce // Optional
+```js
+const transactions: MetaTransactionData[] = [
+  {
+    to,
+    data,
+    value,
+    operation // Optional
+  },
+  {
+    to,
+    data,
+    value,
+    operation // Optional
   }
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
-  ```
+  // ...
+]
+const options: SafeTransactionOptionalProps = {
+  safeTxGas, // Optional
+  baseGas, // Optional
+  gasPrice, // Optional
+  gasToken, // Optional
+  refundReceiver, // Optional
+  nonce // Optional
+}
+const safeTransaction = await safeSdk.createTransaction({ transactions, options })
+```
 
-  In addition, the optional `callsOnly` parameter, which is `false` by default, allows to force the use of the `MultiSendCallOnly` instead of the `MultiSend` contract when sending a batch transaction:
+In addition, the optional `callsOnly` parameter, which is `false` by default, allows to force the use of the `MultiSendCallOnly` instead of the `MultiSend` contract when sending a batch transaction:
 
-  ```js
-  const callsOnly = true
-  const safeTransaction = await safeSdk.createTransaction({
-    safeTransactionData,
-    options,
-    callsOnly
-  })
-  ```
+```js
+const callsOnly = true
+const safeTransaction = await safeSdk.createTransaction({
+  transactions,
+  options,
+  callsOnly
+})
+```
 
 If the optional properties are not manually set, the Safe transaction returned will have the default value for each one:
 
@@ -617,10 +595,12 @@ Read more about [create transactions from a Safe](https://docs.safe.global/safe-
 Returns a Safe transaction ready to be signed by the owners that invalidates the pending Safe transaction/s with a specific nonce.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransaction.data.nonce)
 ```
 
@@ -629,7 +609,7 @@ const rejectionTransaction = await safeSdk.createRejectionTransaction(safeTransa
 Copies a Safe transaction.
 
 ```js
-const safeTransaction1 = await safeSdk.createTransaction({ safeTransactionData })
+const safeTransaction1 = await safeSdk.createTransaction({ transactions })
 const safeTransaction2 = await copyTransaction(safeTransaction1)
 ```
 
@@ -638,10 +618,12 @@ const safeTransaction2 = await copyTransaction(safeTransaction1)
 Returns the transaction hash of a Safe transaction.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 ```
 
@@ -650,10 +632,12 @@ const txHash = await safeSdk.getTransactionHash(safeTransaction)
 Signs a hash using the current owner account.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const signature = await safeSdk.signTransactionHash(txHash)
 ```
@@ -663,10 +647,12 @@ const signature = await safeSdk.signTransactionHash(txHash)
 Signs a transaction according to the EIP-712 using the current signer account.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const signature = await safeSdk.signTypedData(safeTransaction)
 ```
 
@@ -675,10 +661,12 @@ const signature = await safeSdk.signTypedData(safeTransaction)
 Returns a new `SafeTransaction` object that includes the signature of the current owner. `eth_sign` will be used by default to generate the signature.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction)
 ```
 
@@ -697,10 +685,12 @@ const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction, 'et
 Approves a hash on-chain using the current owner account.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const txResponse = await safeSdk.approveTransactionHash(txHash)
 await txResponse.transactionResponse?.wait()
@@ -739,10 +729,12 @@ const txResponse = await safeSdk.approveTransactionHash(txHash, options)
 Returns a list of owners who have approved a specific Safe transaction.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 const ownerAddresses = await safeSdk.getOwnersWhoApprovedTx(txHash)
 ```
@@ -948,10 +940,12 @@ const safeTransaction = await safeSdk.createChangeThresholdTx(newThreshold, opti
 Checks if a Safe transaction can be executed successfully with no errors.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const isValidTx = await safeSdk.isValidTransaction(safeTransaction)
 ```
 
@@ -988,10 +982,12 @@ const isValidTx = await safeSdk.isValidTransaction(safeTransaction, options)
 Executes a Safe transaction.
 
 ```js
-const safeTransactionData: SafeTransactionDataPartial = {
-  // ...
-}
-const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+const transactions: MetaTransactionData[] = [
+  {
+    // ...
+  }
+]
+const safeTransaction = await safeSdk.createTransaction({ transactions })
 const txResponse = await safeSdk.executeTransaction(safeTransaction)
 await txResponse.transactionResponse?.wait()
 ```

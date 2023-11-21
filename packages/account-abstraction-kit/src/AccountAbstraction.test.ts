@@ -90,16 +90,16 @@ describe('AccountAbstraction', () => {
     let accountAbstraction: AccountAbstraction
 
     beforeEach(async () => {
-      accountAbstraction = await initAccountAbstraction()
       jest.clearAllMocks()
       SafeMock.create = () => Promise.resolve(safeInstanceMock as unknown as Safe)
+      accountAbstraction = await initAccountAbstraction()
     })
 
     describe('getNonce', () => {
       const nonceMock = 123
       safeInstanceMock.getNonce.mockResolvedValueOnce(nonceMock)
 
-      it.skip('should return the nonce from the protocol-kit', async () => {
+      it('should return the nonce from the protocol-kit', async () => {
         const result = await accountAbstraction.protocolKit.getNonce()
         expect(result).toBe(nonceMock)
         expect(safeInstanceMock.getNonce).toHaveBeenCalledTimes(1)

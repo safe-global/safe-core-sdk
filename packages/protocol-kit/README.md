@@ -517,7 +517,7 @@ Returns a Safe transaction ready to be signed by the owners and executed. The Pr
 
 This method takes an array of `MetaTransactionData` objects that represent the individual transactions we want to include in our MultiSend transaction.
 
-When the array contains only one transaction is not wrapped in the MultiSend.
+When the array contains only one transaction, it is not wrapped in the MultiSend.
 
 ```js
 const transactions: MetaTransactionData[] = [

@@ -4,11 +4,7 @@ import Safe, {
   SafeTransactionOptionalProps,
   standardizeSafeTransactionData
 } from '@safe-global/protocol-kit/index'
-import {
-  MetaTransactionData,
-  SafeContract,
-  SafeTransactionDataPartial
-} from '@safe-global/safe-core-sdk-types'
+import { SafeContract, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -68,7 +64,7 @@ describe('Transactions creation', () => {
           safeAddress,
           contractNetworks
         })
-        const txDataPartial: MetaTransactionData = {
+        const txDataPartial: SafeTransactionDataPartial = {
           to: account2.address,
           value: '0',
           data: '0x'
@@ -265,7 +261,7 @@ describe('Transactions creation', () => {
         safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x'
@@ -296,7 +292,7 @@ describe('Transactions creation', () => {
         safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x'

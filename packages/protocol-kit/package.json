@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "2.0.0-alpha.4",
+  "version": "2.0.0-alpha.5",
   "description": "SDK to interact with Safe smart contracts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

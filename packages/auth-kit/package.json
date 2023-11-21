@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/auth-kit",
-  "version": "2.0.0-alpha.4",
+  "version": "2.0.0-alpha.5",
   "description": "Authentication library for web2 logins",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -40,8 +40,8 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@safe-global/api-kit": "^2.0.0-alpha.3",
-    "@safe-global/protocol-kit": "^2.0.0-alpha.4",
+    "@safe-global/api-kit": "^2.0.0-alpha.4",
+    "@safe-global/protocol-kit": "^2.0.0-alpha.5",
     "@walletconnect/client": "^1.8.0",
     "@web3auth/base": "^4.3.0",
     "@web3auth/modal": "^4.3.1",

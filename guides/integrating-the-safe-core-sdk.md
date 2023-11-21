@@ -138,7 +138,7 @@ The Protocol Kit supports the execution of single Safe transactions but also Mul
 
 This method takes an array of `MetaTransactionData` objects that represent the individual transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
-When the array contains only one transaction is not wrapped in the MultiSend.
+When the array contains only one transaction, it is not wrapped in the MultiSend.
 
   ```js
   import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'

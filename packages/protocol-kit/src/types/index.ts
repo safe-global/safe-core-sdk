@@ -128,7 +128,7 @@ export type ConnectSafeConfig =
   | ConnectSafeConfigWithPredictedSafe
 
 export interface CreateTransactionProps {
-  /** safeTransactionData - The transaction array to process */
+  /** transactions - The transaction array to process */
   transactions: MetaTransactionData[]
   /** options - The transaction array optional properties */
   options?: SafeTransactionOptionalProps

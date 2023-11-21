@@ -373,8 +373,11 @@ async function estimateSafeTxGasWithRequiredTxGas(
   )
   const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
   */
-function decodeSafeTxGas(encodedSafeTxGas: string): string {
-  return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
+function decodeSafeTxGas(encodedDataResponse: string): string {
+  const [, encodedSafeTxGas] = encodedDataResponse.split('0x')
+  const data = '0x' + encodedSafeTxGas
+
+  return Number('0x' + data.slice(184).slice(0, 10)).toString()
 }
 
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
@@ -407,10 +410,10 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   }
 
   // Error message
-  const [, encodedDataResponse] = error?.message?.split('0x')
+  const isEncodedDataPresent = error?.message?.includes('0x')
 
-  if (encodedDataResponse) {
-    return decodeSafeTxGas('0x' + encodedDataResponse)
+  if (isEncodedDataPresent) {
+    return decodeSafeTxGas(error?.message)
   }
 
   throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)

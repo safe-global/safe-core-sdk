@@ -3,7 +3,11 @@ import { hashMessage, getBytes } from 'ethers'
 import { Chain, IBAN, MoneriumClient, Networks, NewOrder } from '@monerium/sdk'
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
+import {
+  decodeSignatureData,
+  getErrorMessage,
+  parseIsValidSignatureErrorResponse
+} from '@safe-global/onramp-kit/lib/errors'
 import {
   EthAdapter,
   OperationType,
@@ -227,13 +231,23 @@ export class SafeMoneriumClient extends MoneriumClient {
         })
       ]
 
-      const response = await Promise.all(checks)
+      const responses = await Promise.allSettled(checks)
 
-      return (
-        !!response.length &&
-        (response[0].slice(0, 10).toLowerCase() === MAGIC_VALUE ||
-          response[1].slice(0, 10).toLowerCase() === MAGIC_VALUE_BYTES)
-      )
+      return responses.reduce((prev, response) => {
+        if (response.status === 'fulfilled') {
+          return (
+            prev ||
+            decodeSignatureData(response.value) === MAGIC_VALUE ||
+            decodeSignatureData(response.value) === MAGIC_VALUE_BYTES
+          )
+        }
+
+        return (
+          prev ||
+          parseIsValidSignatureErrorResponse(response.reason) === MAGIC_VALUE ||
+          parseIsValidSignatureErrorResponse(response.reason) === MAGIC_VALUE_BYTES
+        )
+      }, false)
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }

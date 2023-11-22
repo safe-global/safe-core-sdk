@@ -26,19 +26,19 @@ function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message
 }
-type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
-type EthersEstimationError = { data: string }
-type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
+type GnosisChainSignatureError = { info: { error: { data: string | { data: string } } } }
+type EthersSignatureError = { data: string }
+type SignatureError = Error & EthersSignatureError & GnosisChainSignatureError
 
 /**
  * Parses the isValidSignature call response from different providers.
  * It extracts and decodes the signature value from the Error object.
  *
- * @param {ProviderEstimationError} error - The estimation object with the estimation data.
+ * @param {ProviderSignatureError} error - The error object with the signature data.
  * @returns {string} The signature value.
  * @throws It Will throw an error if the signature cannot be parsed.
  */
-export function parseIsValidSignatureErrorResponse(error: EstimationError): string {
+export function parseIsValidSignatureErrorResponse(error: SignatureError): string {
   // Ethers v6
   const ethersData = error?.data
   if (ethersData) {

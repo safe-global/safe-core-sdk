@@ -53,8 +53,7 @@
     "sinon-chai": "^3.7.0",
     "ts-generator": "^0.1.1",
     "tsconfig-paths": "^4.2.0",
-    "yargs": "^17.7.2",
-    "@types/node-fetch": "^2.6.9"
+    "yargs": "^17.7.2"
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^2.0.0-alpha.5",

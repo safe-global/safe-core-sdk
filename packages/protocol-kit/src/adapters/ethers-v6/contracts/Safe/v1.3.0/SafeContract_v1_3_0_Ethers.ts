@@ -233,6 +233,20 @@ class SafeContract_v1_3_0_Ethers
     const [modules] = await this.contract.getModulesPaginated(SENTINEL_ADDRESS, 10)
     return modules
   }
+
+  async approveHash(
+    hash: string,
+    options?: EthersTransactionOptions
+  ): Promise<EthersTransactionResult> {
+    const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
+    const txResponse = await this.contract.approveHash(hash, { ...options, gasLimit })
+
+    return toTxResult(txResponse, options)
+  }
+
+  getAddress(): Promise<string> {
+    return this.contract.getAddress()
+  }
 }
 
 export default SafeContract_v1_3_0_Ethers

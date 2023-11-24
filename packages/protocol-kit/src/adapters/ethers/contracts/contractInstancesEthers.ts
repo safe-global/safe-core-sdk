@@ -8,7 +8,6 @@ import { Proxy_factory__factory as SafeProxyFactory_V1_1_1 } from '@safe-global/
 import { Gnosis_safe__factory as SafeSingleton_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0/factories/Gnosis_safe__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Create_call__factory'
-import { Gnosis_safe__factory as SafeSingleton_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Gnosis_safe__factory'
 import { Multi_send__factory as MultiSend_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Multi_send__factory'
 import { Multi_send_call_only__factory as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Multi_send_call_only__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Proxy_factory__factory'
@@ -35,7 +34,6 @@ import MultiSendCallOnlyContract_V1_4_1_Ethers from './MultiSendCallOnly/v1.4.1/
 import SafeContract_V1_0_0_Ethers from './Safe/v1.0.0/SafeContract_V1_0_0_Ethers'
 import SafeContract_V1_1_1_Ethers from './Safe/v1.1.1/SafeContract_V1_1_1_Ethers'
 import SafeContract_V1_2_0_Ethers from './Safe/v1.2.0/SafeContract_V1_2_0_Ethers'
-import SafeContract_V1_3_0_Ethers from './Safe/v1.3.0/SafeContract_V1_3_0_Ethers'
 import SafeContract_V1_4_1_Ethers from './Safe/v1.4.1/SafeContract_V1_4_1_Ethers'
 import SafeProxyFactoryContract_V1_0_0_Ethers from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_V1_0_0_Ethers'
 import SafeProxyFactoryContract_V1_1_1_Ethers from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_V1_1_1_Ethers'
@@ -46,7 +44,6 @@ import SignMessageLibContract_V1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMe
 import SimulateTxAccessorContract_V1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Ethers'
 import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Ethers'
 import SafeContract_v1_3_0_Ethers from '../../ethers-v6/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
-import { Gnosis_safe as Safe } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/Gnosis_safe'
 import EthersAdapter from '../EthersAdapter'
 import { SafeTransactionData } from 'packages/safe-core-sdk-types/dist/src'
 import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeContract_v1_3_0'
@@ -60,7 +57,6 @@ export async function getSafeContractInstance(
   isL1SafeSingleton?: boolean
 ): Promise<
   | SafeContract_V1_4_1_Ethers
-  | SafeContract_V1_3_0_Ethers
   | SafeContract_V1_2_0_Ethers
   | SafeContract_V1_1_1_Ethers
   | SafeContract_V1_0_0_Ethers
@@ -267,16 +263,22 @@ export function getSimulateTxAccessorContractInstance(
 }
 
 // TODO: remove this mapper after remove Typechain
-function mapToTypechainContract(
-  abiTypeContract: SafeContract_v1_3_0_Ethers
-): SafeContract_V1_3_0_Ethers {
+function mapToTypechainContract(abiTypeContract: SafeContract_v1_3_0_Ethers): any {
   return {
-    contract: abiTypeContract.contract as unknown as Safe,
+    contract: abiTypeContract.contract as any,
 
     setup: (): any => {
       // setup function is not present in the v1.3.0 contract
       return
     },
+
+    approveHash: abiTypeContract.approveHash,
+
+    isValidTransaction: abiTypeContract.isValidTransaction,
+
+    execTransaction: abiTypeContract.execTransaction,
+
+    getAddress: abiTypeContract.getAddress,
 
     getModules: abiTypeContract.getModules,
 
@@ -284,8 +286,6 @@ function mapToTypechainContract(
       (await abiTypeContract.isModuleEnabled([moduleAddress]))[0],
 
     getVersion: async () => (await abiTypeContract.VERSION())[0] as SafeVersion,
-
-    getAddress: () => Promise.resolve(abiTypeContract.contractAddress),
 
     getNonce: async () => Number((await abiTypeContract.nonce())[0]),
 
@@ -314,17 +314,6 @@ function mapToTypechainContract(
 
     approvedHashes: async (ownerAddress: string, hash: string) =>
       (await abiTypeContract.approvedHashes([ownerAddress, hash]))[0],
-
-    approveHash: new SafeContract_V1_3_0_Ethers(
-      SafeSingleton_V1_3_0.connect(
-        abiTypeContract.contractAddress,
-        abiTypeContract.adapter.getSigner()
-      )
-    ).approveHash,
-
-    isValidTransaction: abiTypeContract.isValidTransaction,
-
-    execTransaction: abiTypeContract.execTransaction,
 
     encode: abiTypeContract.encode as any,
 

@@ -39,6 +39,9 @@ export type Safe_v1_3_0_Write_Functions = ExtractAbiFunctionNames<
 
 // TODO: create a SafeContract generic interface
 
+// TODO: all methods can be estimated
+// TODO: all methods can be encoded
+
 export type EncodeSafeFunction<SafeFunction extends Safe_v1_3_0_Write_Functions> = (
   functionToEncode: SafeFunction,
   args: AbiParametersToPrimitiveTypes<

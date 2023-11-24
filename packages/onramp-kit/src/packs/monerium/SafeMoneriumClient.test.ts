@@ -37,6 +37,7 @@ describe('SafeMoneriumClient', () => {
       call: jest.fn().mockImplementation(async () => MAGIC_VALUE),
       getSignerAddress: jest.fn().mockResolvedValue('0xSignerAddress')
     })
+    safeSdk.getEthAdapter.call = jest.fn().mockImplementation(async () => MAGIC_VALUE)
     safeMoneriumClient = new SafeMoneriumClient('sandbox', safeSdk)
   })
 
@@ -93,13 +94,73 @@ describe('SafeMoneriumClient', () => {
     expect(signMessageSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should allow to check if a message is signed in the smart contract', async () => {
+  it('should allow to check if a message is signed in the smart contract if the promise is fulfilled', async () => {
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(
       '0xSafeAddress',
       'message to sign'
     )
 
     expect(isMessageSigned).toBe(true)
+  })
+
+  it('should allow to check if a message is NOT signed in the smart contract if the promise is fulfilled', async () => {
+    // Promise fullfilled without signature
+    safeSdk.getEthAdapter().call = jest.fn().mockImplementation(async () => '0x')
+
+    const isMessageSigned = await safeMoneriumClient.isMessageSigned(
+      '0xSafeAddress',
+      'message to sign'
+    )
+
+    expect(isMessageSigned).toBe(false)
+  })
+
+  it('should allow to check if a message is signed in the smart contract and the promise is rejected', async () => {
+    class EthersError extends Error {
+      data: string
+      constructor(message: string, data: string) {
+        super(message)
+        this.data = data
+      }
+    }
+
+    // promise is rejected with the signature
+    safeSdk.getEthAdapter().call = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.reject(new EthersError('execution reverted: "Hash not approved"', MAGIC_VALUE))
+      )
+
+    const isMessageSigned = await safeMoneriumClient.isMessageSigned(
+      '0xSafeAddress',
+      'message to sign'
+    )
+
+    expect(isMessageSigned).toBe(true)
+  })
+
+  it('should allow to check if a message is NOT signed in the smart contract and the promise is rejected', async () => {
+    class EthersError extends Error {
+      data: string
+      constructor(message: string, data: string) {
+        super(message)
+        this.data = data
+      }
+    }
+
+    // promise is rejected without a signature
+    safeSdk.getEthAdapter().call = jest
+      .fn()
+      .mockImplementation(() =>
+        Promise.reject(new EthersError('execution reverted: "Hash not approved"', '0x'))
+      )
+
+    const isMessageSigned = await safeMoneriumClient.isMessageSigned(
+      '0xSafeAddress',
+      'message to sign'
+    )
+
+    expect(isMessageSigned).toBe(false)
   })
 
   it('should allow to check if a message is pending in the safe transaction queue', async () => {

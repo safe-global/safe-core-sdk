@@ -1,7 +1,6 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -262,12 +261,13 @@ describe('Safe Info', () => {
         contractNetworks
       })
       chai.expect(await safeSdk.getNonce()).to.be.eq(0)
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: account2.address,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getNonce()).to.be.eq(1)

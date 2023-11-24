@@ -58,13 +58,12 @@ const testContracts_V1_3_0 = [
   `${safeContractsTestV1_3_0Path}/examples/guards/DebugTransactionGuard.sol/DebugTransactionGuard.json`,
   `${safeContractsTestV1_3_0Path}/examples/guards/DefaultCallbackHandler.sol/DefaultCallbackHandler.json`
 ].join(' ')
-const safeContractsTestV1_2_0Path =
-  '../../node_modules/@gnosis.pm/safe-contracts-v1.2.0/build/contracts'
-const openZeppelinContractsPath = '../../node_modules/openzeppelin-solidity/build/contracts'
+const safeContractsTestV1_2_0Path = './artifacts/contracts/safe_V1_2_0'
+const openZeppelinContractsPath = './artifacts/@openzeppelin/contracts'
 const testContracts_V1_2_0 = [
-  `${safeContractsTestV1_2_0Path}/DailyLimitModule.json`,
-  `${safeContractsTestV1_2_0Path}/SocialRecoveryModule.json`,
-  `${openZeppelinContractsPath}/ERC20Mintable.json`
+  `${safeContractsTestV1_2_0Path}/modules/DailiLimitModule.sol/DailyLimitModule.json`,
+  `${safeContractsTestV1_2_0Path}/modules/SocialRecoveryModule.sol/SocialRecoveryModule.json`,
+  `${openZeppelinContractsPath}/token/ERC20/ERC20Mintable.sol/ERC20Mintable.json`
 ].join(' ')
 
 // Remove existing Typechain files

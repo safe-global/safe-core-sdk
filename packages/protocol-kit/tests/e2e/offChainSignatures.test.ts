@@ -1,9 +1,6 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
-import {
-  SafeMultisigTransactionResponse,
-  SafeTransactionDataPartial
-} from '@safe-global/safe-core-sdk-types'
+import { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -63,12 +60,12 @@ describe('Off-chain signatures', () => {
         safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       const txHash = await safeSdk.getTransactionHash(tx)
       const signature = await safeSdk.signTransactionHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
@@ -93,12 +90,14 @@ describe('Off-chain signatures', () => {
           safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: await safeSdkExistingSafe.getAddress(),
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdkExistingSafe.createTransaction({ safeTransactionData })
+        const tx = await safeSdkExistingSafe.createTransaction({
+          transactions: [safeTransactionData]
+        })
         const signedTx = safeSdk.signTransaction(tx)
         await chai
           .expect(signedTx)
@@ -120,12 +119,12 @@ describe('Off-chain signatures', () => {
           contractNetworks
         })
         const safeAddress = await safe.getAddress()
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx)
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -143,12 +142,12 @@ describe('Off-chain signatures', () => {
         safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       await chai
         .expect(safeSdk.signTransaction(tx))
         .to.be.rejectedWith('Transactions can only be signed by Safe owners')
@@ -164,12 +163,12 @@ describe('Off-chain signatures', () => {
         safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx1 = await safeSdk.signTransaction(tx)
       chai.expect(signedTx1.signatures.size).to.be.eq(1)
@@ -190,12 +189,12 @@ describe('Off-chain signatures', () => {
           safeAddress: safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
           .expect(safeSdk.signTransaction(tx, 'eth_sign'))
           .to.be.rejectedWith('eth_sign is only supported by Safes >= v1.1.0')
@@ -214,12 +213,12 @@ describe('Off-chain signatures', () => {
           safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx, 'eth_sign')
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -239,12 +238,12 @@ describe('Off-chain signatures', () => {
           safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData')
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -264,12 +263,12 @@ describe('Off-chain signatures', () => {
           safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
           .expect(safeSdk.signTransaction(tx, 'eth_signTypedData'))
           .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
@@ -288,12 +287,12 @@ describe('Off-chain signatures', () => {
           safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData_v3')
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -313,12 +312,12 @@ describe('Off-chain signatures', () => {
           safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
           .expect(safeSdk.signTransaction(tx, 'eth_signTypedData_v3'))
           .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
@@ -335,12 +334,12 @@ describe('Off-chain signatures', () => {
         safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData_v4')
       chai.expect(tx.signatures.size).to.be.eq(0)
@@ -357,12 +356,12 @@ describe('Off-chain signatures', () => {
         safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx = await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(0)

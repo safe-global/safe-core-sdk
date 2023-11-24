@@ -49,7 +49,7 @@ async function main() {
     data: '0x',
     operation: OperationType.Call
   }
-  const safeTransaction = await safe.createTransaction({ safeTransactionData })
+  const safeTransaction = await safe.createTransaction({ transactions: [safeTransactionData] })
 
   const senderAddress = await signer.getAddress()
   const safeTxHash = await safe.getTransactionHash(safeTransaction)

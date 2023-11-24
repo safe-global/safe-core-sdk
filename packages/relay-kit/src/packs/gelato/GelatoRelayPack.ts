@@ -113,7 +113,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       const nonce = await this.protocolKit.getNonce()
 
       const sponsoredTransaction = await this.protocolKit.createTransaction({
-        safeTransactionData: transactions,
+        transactions,
         onlyCalls,
         options: {
           nonce
@@ -162,7 +162,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
 
     // this transaction is only used for gas estimations
     const transactionToEstimateGas = await this.protocolKit.createTransaction({
-      safeTransactionData: transactions,
+      transactions,
       onlyCalls,
       options: {
         nonce
@@ -181,7 +181,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       const paymentToGelato = await this.getEstimateFee(chainId, gasLimit, gasToken)
 
       const syncTransaction = await this.protocolKit.createTransaction({
-        safeTransactionData: transactions,
+        transactions,
         onlyCalls,
         options: {
           baseGas: paymentToGelato,
@@ -210,7 +210,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     const paymentToGelato = await this.getEstimateFee(chainId, String(totalGas), gasToken)
 
     const syncTransaction = await this.protocolKit.createTransaction({
-      safeTransactionData: transactions,
+      transactions,
       onlyCalls,
       options: {
         baseGas: paymentToGelato, // payment to Gelato
@@ -249,7 +249,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       const transferToGelato = await this.createPaymentToGelato(gasLimit, options)
 
       const syncTransaction = await this.protocolKit.createTransaction({
-        safeTransactionData: [...transactions, transferToGelato],
+        transactions: [...transactions, transferToGelato],
         onlyCalls,
         options: {
           nonce,
@@ -264,7 +264,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
 
     // this transaction is only used for gas estimations
     const transactionToEstimateGas = await this.protocolKit.createTransaction({
-      safeTransactionData: transactions,
+      transactions,
       onlyCalls,
       options: {
         nonce
@@ -285,7 +285,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     const transferToGelato = await this.createPaymentToGelato(String(totalGas), options)
 
     const syncTransaction = await this.protocolKit.createTransaction({
-      safeTransactionData: [...transactions, transferToGelato],
+      transactions: [...transactions, transferToGelato],
       onlyCalls,
       options: {
         nonce,

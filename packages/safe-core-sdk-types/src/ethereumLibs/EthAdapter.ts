@@ -30,6 +30,7 @@ export interface GetContractProps {
   singletonDeployment?: SingletonDeployment
   customContractAddress?: string
   customContractAbi?: AbiItem | AbiItem[]
+  isL1SafeSingleton?: boolean
 }
 
 export interface EthAdapter {

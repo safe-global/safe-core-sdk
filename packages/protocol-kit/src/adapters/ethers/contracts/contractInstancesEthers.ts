@@ -43,10 +43,10 @@ import SignMessageLibContract_V1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMe
 import SignMessageLibContract_V1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Ethers'
 import SimulateTxAccessorContract_V1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Ethers'
 import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Ethers'
-import SafeContract_v1_3_0_Ethers from '../../ethers-v6/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
+import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
 import EthersAdapter from '../EthersAdapter'
 import { SafeTransactionData } from 'packages/safe-core-sdk-types/dist/src'
-import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeContract_v1_3_0'
+import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -69,12 +69,12 @@ export async function getSafeContractInstance(
     case '1.3.0':
       const chainId = await ethersAdapter.getChainId()
       safeContract = new SafeContract_v1_3_0_Ethers(
-        ethersAdapter,
         chainId,
+        ethersAdapter,
+        isL1SafeSingleton,
         contractAddress,
-        // TODO: improve this
-        customContractAbi as unknown as SafeContract_v1_3_0_Abi,
-        isL1SafeSingleton
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeContract_v1_3_0_Abi
       )
       return mapToTypechainContract(safeContract) // remove this mapper after remove typechain
     case '1.2.0':

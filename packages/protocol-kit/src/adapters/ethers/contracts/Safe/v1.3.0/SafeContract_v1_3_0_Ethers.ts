@@ -1,59 +1,73 @@
-import { Contract } from 'ethers'
-import SafeBaseContractEthersv6 from '@safe-global/protocol-kit/adapters/ethers-v6/contracts/SafeBaseContractEthersv6'
+import SafeBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/SafeBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import {
   EthersTransactionOptions,
   EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers/types'
 import SafeContract_v1_3_0_Contract, {
-  EncodeSafeFunction,
-  EstimateSafeFunction,
-  SafeContract_v1_3_0_Abi,
-  Safe_v1_3_0_Write_Functions
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeContract_v1_3_0'
+  SafeContract_v1_3_0_Abi
+} from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
 import { SafeTransaction } from 'packages/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import safe_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.3.0/gnosis_safe_l2'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/ethers/utils/constants'
+import { SafeVersion } from 'packages/safe-core-sdk-types'
+import {
+  EncodeSafeFunction,
+  EstimateGasSafeFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
 
-// TODO: add docs (see safe.sol methods)
-// TODO: create address type?
-
+/**
+ * SafeContract_v1_3_0_Ethers is the implementation specific to the Safe contract version 1.3.0.
+ *
+ * This class specializes in handling interactions with the Safe contract version 1.3.0 using Ethers.js v6.
+ *
+ * @extends SafeBaseContractEthers<SafeContract_v1_3_0_Abi> - Inherits from SafeBaseContractEthers with ABI specific to Safe contract version 1.3.0.
+ * @implements SafeContract_v1_3_0_Contract - Implements the interface specific to Safe contract version 1.3.0.
+ */
 class SafeContract_v1_3_0_Ethers
-  extends SafeBaseContractEthersv6<SafeContract_v1_3_0_Abi>
+  extends SafeBaseContractEthers<SafeContract_v1_3_0_Abi>
   implements SafeContract_v1_3_0_Contract
 {
-  contract: Contract
-  adapter: EthersAdapter
-  // TODO: define contractVersion (only for safe contract?)
-  // TODO: define contractName
-  // TODO: contract version detection based on the address ???
+  safeVersion: SafeVersion
 
+  /**
+   * Constructs an instance of SafeContract_v1_3_0_Ethers
+   *
+   * @param chainId - The chain ID where the contract resides.
+   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
+   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
+   */
   constructor(
-    ethersAdapter: EthersAdapter,
     chainId: bigint,
-    // TODO: create safeAddress ???
-    // TODO: create customContractAddress ???
-    customAddress?: string, // returns the Safe Singleton instance if is empty
-    customAbi?: SafeContract_v1_3_0_Abi,
-    isL1SafeSingleton = false
+    ethersAdapter: EthersAdapter,
+    isL1SafeSingleton = false,
+    customContractAddress?: string,
+    customContractAbi?: SafeContract_v1_3_0_Abi
   ) {
-    super(chainId, '1.3.0', customAddress, customAbi, isL1SafeSingleton)
+    const safeVersion = '1.3.0'
+    const defaultAbi = safe_1_3_0_ContractArtifacts.abi
 
-    // if no customAbi and no abi is present in the safe-deployments we our the hardcoded abi
-    this.contractAbi = this.contractAbi || safe_1_3_0_ContractArtifacts.abi
+    super(
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      isL1SafeSingleton,
+      customContractAddress,
+      customContractAbi
+    )
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(this.contractAddress, this.contractAbi, ethersAdapter.getSigner())
+    this.safeVersion = safeVersion
   }
 
-  // TODO: move this to SafeBaseContractEthersv6 ???
-  encode: EncodeSafeFunction<Safe_v1_3_0_Write_Functions> = (functionToEncode, args) => {
+  encode: EncodeSafeFunction<SafeContract_v1_3_0_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  // TODO: move this to SafeBaseContractEthersv6 ???
-  estimateGas: EstimateSafeFunction<Safe_v1_3_0_Write_Functions> = (
+  estimateGas: EstimateGasSafeFunction<SafeContract_v1_3_0_Abi> = (
     functionToEstimate,
     args,
     options = {}

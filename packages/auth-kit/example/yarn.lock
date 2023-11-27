@@ -991,17 +991,7 @@
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
 
-"@safe-global/api-kit@^2.0.0-alpha.4":
-  version "2.0.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/@safe-global/api-kit/-/api-kit-2.0.0-alpha.4.tgz#9b24f30599f22547837e93d0bf53d9a4c294f34a"
-  integrity sha512-tp2tr9DFSsMkIkRTN9ZOmEZZQGr1KAebvnZWJ1wBBvbmBlgOt2PXUuct++vjRbf8QUM6ugg5iSOIZxDIhU6nrQ==
-  dependencies:
-    "@safe-global/protocol-kit" "^2.0.0-alpha.5"
-    "@safe-global/safe-core-sdk-types" "^3.0.0-alpha.1"
-    ethers "^6.7.1"
-    node-fetch "^2.7.0"
-
-"@safe-global/api-kit@file:../../api-kit":
+"@safe-global/api-kit@^2.0.0-alpha.4", "@safe-global/api-kit@file:../../api-kit":
   version "2.0.0-alpha.4"
   dependencies:
     "@safe-global/protocol-kit" "^2.0.0-alpha.5"
@@ -1031,10 +1021,30 @@
     web3-core "^1.10.3"
     web3-utils "^1.10.3"
 
+"@safe-global/protocol-kit@file:../../protocol-kit":
+  version "2.0.0-alpha.5"
+  dependencies:
+    "@noble/hashes" "^1.3.2"
+    "@safe-global/safe-deployments" "^1.28.0"
+    ethereumjs-util "^7.1.5"
+    ethers "^6.7.1"
+    semver "^7.5.4"
+    web3 "^1.10.3"
+    web3-core "^1.10.3"
+    web3-utils "^1.10.3"
+
 "@safe-global/safe-core-sdk-types@^3.0.0-alpha.1":
   version "3.0.0-alpha.1"
   resolved "https://registry.yarnpkg.com/@safe-global/safe-core-sdk-types/-/safe-core-sdk-types-3.0.0-alpha.1.tgz#b33dfc64e9760dc0ad486cd11acfca978e0c7c1c"
   integrity sha512-g00jh36jEpDv/j7C9sThckGvu/Ey413oag/mjHJz7Wq65SmTHU0wx0G83HxL8EEyxU3+z9s0uCGQGieXmNGmtQ==
+  dependencies:
+    "@safe-global/safe-deployments" "^1.28.0"
+    ethers "^6.7.1"
+    web3-core "^1.10.3"
+    web3-utils "^1.10.3"
+
+"@safe-global/safe-core-sdk-types@file:../../safe-core-sdk-types":
+  version "3.0.0-alpha.1"
   dependencies:
     "@safe-global/safe-deployments" "^1.28.0"
     ethers "^6.7.1"

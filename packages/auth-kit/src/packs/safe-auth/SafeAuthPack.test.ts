@@ -70,7 +70,22 @@ describe('SafeAuthPack', () => {
 
     it('should call torus init()', async () => {
       await safeAuthPack.init(safeAuthInitOptions)
-      expect(mockInit).toHaveBeenCalledWith(expect.objectContaining(safeAuthInitOptions))
+      expect(mockInit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          chainConfig: {
+            blockExplorerUrl: 'https://blockscout.com/poa/xdai',
+            chainId: '0x64',
+            displayName: 'xDai',
+            logo: 'xdai.svg',
+            rpcTarget: 'https://rpc.xdaichain.com',
+            ticker: 'DAI',
+            tickerName: 'xDai Network Token'
+          },
+          enableLogging: true,
+          showWidgetButton: false,
+          walletUrls: { production: { logLevel: 'error', url: 'https://safe.web3auth.com' } }
+        })
+      )
     })
 
     it('should initialize the provider', async () => {

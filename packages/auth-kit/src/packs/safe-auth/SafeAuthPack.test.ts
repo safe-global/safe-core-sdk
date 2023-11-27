@@ -20,7 +20,7 @@ jest.mock('@safe-global/api-kit', () => {
   })
 })
 
-jest.mock('@web3auth/ws-embed', () => {
+jest.mock('@web3auth/safeauth-embed', () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
@@ -70,7 +70,6 @@ describe('SafeAuthPacl', () => {
 
     it('should call torus init()', async () => {
       await safeAuthPack.init(safeAuthInitOptions)
-      console.log(safeAuthPack)
       expect(mockInit).toHaveBeenCalledWith(expect.objectContaining(safeAuthInitOptions))
     })
 
@@ -84,6 +83,7 @@ describe('SafeAuthPacl', () => {
   describe('signIn()', () => {
     it('should call the login() method', async () => {
       testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
+      testingUtils.mockChainId('0x1')
 
       const authKitSignInData = await safeAuthPack.signIn()
 

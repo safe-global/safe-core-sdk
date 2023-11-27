@@ -52,12 +52,14 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       contractNetworks
     })
 
+    const safeTransactionData = {
+      to: account2.address,
+      value: AMOUNT_TO_TRANSFER,
+      data: '0x'
+    }
+
     const safeTransaction = await safeSdk.createTransaction({
-      safeTransactionData: {
-        to: account2.address,
-        value: AMOUNT_TO_TRANSFER,
-        data: '0x'
-      }
+      transactions: [safeTransactionData]
     })
 
     await chai
@@ -79,12 +81,14 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         contractNetworks
       })
 
+      const safeTransactionData = {
+        to: account2.address,
+        value: AMOUNT_TO_TRANSFER,
+        data: '0x'
+      }
+
       const safeTransaction = await safeSdk.createTransaction({
-        safeTransactionData: {
-          to: account2.address,
-          value: AMOUNT_TO_TRANSFER,
-          data: '0x'
-        }
+        transactions: [safeTransactionData]
       })
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
@@ -113,12 +117,14 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         contractNetworks
       })
 
+      const safeTransactionData = {
+        to: account2.address,
+        value: AMOUNT_TO_TRANSFER,
+        data: '0x'
+      }
+
       const safeTransaction = await safeSdk.createTransaction({
-        safeTransactionData: {
-          to: account2.address,
-          value: AMOUNT_TO_TRANSFER,
-          data: '0x'
-        }
+        transactions: [safeTransactionData]
       })
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
@@ -147,12 +153,14 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         contractNetworks
       })
 
+      const safeTransactionData = {
+        to: account2.address,
+        value: AMOUNT_TO_TRANSFER,
+        data: '0x'
+      }
+
       const safeTransaction = await safeSdk.createTransaction({
-        safeTransactionData: {
-          to: account2.address,
-          value: AMOUNT_TO_TRANSFER,
-          data: '0x'
-        }
+        transactions: [safeTransactionData]
       })
 
       const customSaltNonce = '123456789'

@@ -150,12 +150,6 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
   return txs
 }
 
-export function isMetaTransactionArray(
-  safeTransactions: SafeTransactionDataPartial | MetaTransactionData[]
-): safeTransactions is MetaTransactionData[] {
-  return (safeTransactions as MetaTransactionData[])?.length !== undefined
-}
-
 export function isSafeMultisigTransactionResponse(
   safeTransaction: SafeTransaction | SafeMultisigTransactionResponse
 ): safeTransaction is SafeMultisigTransactionResponse {

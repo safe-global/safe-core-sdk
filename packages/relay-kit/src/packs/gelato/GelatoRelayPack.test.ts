@@ -185,7 +185,7 @@ describe('GelatoRelayPack', () => {
         await relayPack.createRelayedTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
-          safeTransactionData: transactions,
+          transactions,
           onlyCalls: false,
           options: {
             nonce: 0
@@ -200,7 +200,7 @@ describe('GelatoRelayPack', () => {
         })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
-          safeTransactionData: transactions,
+          transactions,
           onlyCalls: false,
           options: {
             baseGas: FEE_ESTIMATION.toString(),
@@ -220,7 +220,7 @@ describe('GelatoRelayPack', () => {
         })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
-          safeTransactionData: transactions,
+          transactions,
           onlyCalls: false,
           options: {
             baseGas: FEE_ESTIMATION.toString(),
@@ -254,7 +254,7 @@ describe('GelatoRelayPack', () => {
         await relayPack.createRelayedTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
-          safeTransactionData: [...transactions, transferToGelato], // the transfer to Gelato is prensent
+          transactions: [...transactions, transferToGelato], // the transfer to Gelato is prensent
           onlyCalls: false,
           options: {
             gasToken: GAS_TOKEN, // non standard ERC20 gas token
@@ -292,7 +292,7 @@ describe('GelatoRelayPack', () => {
         await relayPack.createRelayedTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
-          safeTransactionData: transactions,
+          transactions,
           onlyCalls: false,
           options: {
             nonce: 0
@@ -310,7 +310,7 @@ describe('GelatoRelayPack', () => {
           await relayPack.createRelayedTransaction({ transactions })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
-            safeTransactionData: transactions,
+            transactions,
             onlyCalls: false,
             options: {
               baseGas: FEE_ESTIMATION.toString(),
@@ -331,7 +331,7 @@ describe('GelatoRelayPack', () => {
           await relayPack.createRelayedTransaction({ transactions, options })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
-            safeTransactionData: transactions,
+            transactions,
             onlyCalls: false,
             options: {
               baseGas: FEE_ESTIMATION.toString(),
@@ -367,7 +367,7 @@ describe('GelatoRelayPack', () => {
           await relayPack.createRelayedTransaction({ transactions, options })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
-            safeTransactionData: [...transactions, transferToGelato], // the transfer to Gelato is prensent
+            transactions: [...transactions, transferToGelato], // the transfer to Gelato is prensent
             onlyCalls: false,
             options: {
               gasToken: GAS_TOKEN, // non standard ERC20 gas token

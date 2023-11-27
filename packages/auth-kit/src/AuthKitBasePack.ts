@@ -61,12 +61,13 @@ export abstract class AuthKitBasePack {
    * @returns The list of Safe addresses owned by the user in the chain
    */
   async getSafes(txServiceUrl?: string): Promise<string[]> {
-    const chainId = await this.getChainId()
-    const apiKit = this.#getApiKit(chainId, txServiceUrl)
-
-    const address = await this.getAddress()
-
     try {
+      const chainId = await this.getChainId()
+
+      const apiKit = this.#getApiKit(chainId, txServiceUrl)
+
+      const address = await this.getAddress()
+
       const safesByOwner = await apiKit.getSafesByOwner(address)
 
       return safesByOwner.safes

@@ -7,7 +7,7 @@ import {
   decodeSignatureData,
   getErrorMessage,
   parseIsValidSignatureErrorResponse
-} from '../../lib/errors'
+} from '@safe-global/onramp-kit/lib/errors'
 import {
   EthAdapter,
   OperationType,

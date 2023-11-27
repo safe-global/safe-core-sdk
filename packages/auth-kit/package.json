@@ -40,8 +40,8 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@safe-global/api-kit": "^2.0.0-alpha.4",
-    "@safe-global/protocol-kit": "^2.0.0-alpha.5",
+    "@safe-global/api-kit": "^2.0.0",
+    "@safe-global/protocol-kit": "^2.0.0",
     "@walletconnect/client": "^1.8.0",
     "@web3auth/base": "^4.3.0",
     "@web3auth/modal": "^4.3.1",

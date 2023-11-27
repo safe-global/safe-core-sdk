@@ -39,7 +39,7 @@ interface GetSafeContractInstanceProps extends GetContractInstanceProps {
 
 export function getSafeContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number,
+  chainId: bigint,
   isL1SafeSingleton = false
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeSingletonVersion
@@ -52,7 +52,7 @@ export function getSafeContractDeployment(
 
 export function getCompatibilityFallbackHandlerContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].compatibilityFallbackHandler
   return getCompatibilityFallbackHandlerDeployment({
@@ -64,7 +64,7 @@ export function getCompatibilityFallbackHandlerContractDeployment(
 
 export function getMultiSendCallOnlyContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].multiSendCallOnlyVersion
   return getMultiSendCallOnlyDeployment({ version, network: chainId.toString(), released: true })
@@ -72,7 +72,7 @@ export function getMultiSendCallOnlyContractDeployment(
 
 export function getMultiSendContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].multiSendVersion
   return getMultiSendDeployment({ version, network: chainId.toString(), released: true })
@@ -80,7 +80,7 @@ export function getMultiSendContractDeployment(
 
 export function getSafeProxyFactoryContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeProxyFactoryVersion
   return getProxyFactoryDeployment({ version, network: chainId.toString(), released: true })
@@ -88,7 +88,7 @@ export function getSafeProxyFactoryContractDeployment(
 
 export function getSignMessageLibContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].signMessageLibVersion
   return getSignMessageLibDeployment({ version, network: chainId.toString(), released: true })
@@ -96,7 +96,7 @@ export function getSignMessageLibContractDeployment(
 
 export function getCreateCallContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].createCallVersion
   return getCreateCallDeployment({ version, network: chainId.toString(), released: true })
@@ -104,7 +104,7 @@ export function getCreateCallContractDeployment(
 
 export function getSimulateTxAccessorContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].createCallVersion
   return getSimulateTxAccessorDeployment({ version, network: chainId.toString(), released: true })

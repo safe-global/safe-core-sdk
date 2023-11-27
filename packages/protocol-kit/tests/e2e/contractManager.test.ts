@@ -25,7 +25,7 @@ describe('Safe contracts manager', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = await getChainId()
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     return {
       safe: await getSafeWithOwners([accounts[0].address]),
@@ -95,7 +95,7 @@ describe('Safe contracts manager', () => {
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
       const { safe, accounts, chainId } = await setupTests()
       const customContractNetworks: ContractNetworksConfig = {
-        [chainId]: {
+        [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
           safeSingletonAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,
@@ -140,7 +140,7 @@ describe('Safe contracts manager', () => {
       })
       chai
         .expect(await safeSdk.getMultiSendAddress())
-        .to.be.eq(contractNetworks[chainId].multiSendAddress)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
     })
   })
 })

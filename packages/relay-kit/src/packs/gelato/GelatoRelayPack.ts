@@ -6,7 +6,7 @@ import {
   SponsoredCallRequest,
   TransactionStatusResponse
 } from '@gelatonetwork/relay-sdk'
-import Safe, {
+import {
   estimateTxBaseGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
@@ -50,10 +50,10 @@ export class GelatoRelayPack extends RelayKitBasePack {
     return GELATO_FEE_COLLECTOR
   }
 
-  async getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string> {
+  async getEstimateFee(chainId: bigint, gasLimit: string, gasToken?: string): Promise<string> {
     const feeToken = this._getFeeToken(gasToken)
     const estimation = await this.#gelatoRelay.getEstimatedFee(
-      BigInt(chainId),
+      chainId,
       feeToken,
       BigInt(gasLimit),
       false
@@ -71,7 +71,6 @@ export class GelatoRelayPack extends RelayKitBasePack {
    * @private
    * @async
    * @function
-   * @param {Safe} safe - The Safe object
    * @param {string} gas - The gas amount for the payment.
    * @param {MetaTransactionOptions} options - Options for the meta transaction.
    * @returns {Promise<Transaction>} Promise object representing the created payment transaction.
@@ -114,7 +113,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       const nonce = await this.protocolKit.getNonce()
 
       const sponsoredTransaction = await this.protocolKit.createTransaction({
-        safeTransactionData: transactions,
+        transactions,
         onlyCalls,
         options: {
           nonce
@@ -163,7 +162,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
 
     // this transaction is only used for gas estimations
     const transactionToEstimateGas = await this.protocolKit.createTransaction({
-      safeTransactionData: transactions,
+      transactions,
       onlyCalls,
       options: {
         nonce
@@ -182,7 +181,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       const paymentToGelato = await this.getEstimateFee(chainId, gasLimit, gasToken)
 
       const syncTransaction = await this.protocolKit.createTransaction({
-        safeTransactionData: transactions,
+        transactions,
         onlyCalls,
         options: {
           baseGas: paymentToGelato,
@@ -211,7 +210,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     const paymentToGelato = await this.getEstimateFee(chainId, String(totalGas), gasToken)
 
     const syncTransaction = await this.protocolKit.createTransaction({
-      safeTransactionData: transactions,
+      transactions,
       onlyCalls,
       options: {
         baseGas: paymentToGelato, // payment to Gelato
@@ -250,7 +249,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       const transferToGelato = await this.createPaymentToGelato(gasLimit, options)
 
       const syncTransaction = await this.protocolKit.createTransaction({
-        safeTransactionData: [...transactions, transferToGelato],
+        transactions: [...transactions, transferToGelato],
         onlyCalls,
         options: {
           nonce,
@@ -265,7 +264,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
 
     // this transaction is only used for gas estimations
     const transactionToEstimateGas = await this.protocolKit.createTransaction({
-      safeTransactionData: transactions,
+      transactions,
       onlyCalls,
       options: {
         nonce
@@ -286,7 +285,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     const transferToGelato = await this.createPaymentToGelato(String(totalGas), options)
 
     const syncTransaction = await this.protocolKit.createTransaction({
-      safeTransactionData: [...transactions, transferToGelato],
+      transactions: [...transactions, transferToGelato],
       onlyCalls,
       options: {
         nonce,
@@ -300,13 +299,13 @@ export class GelatoRelayPack extends RelayKitBasePack {
   async sendSponsorTransaction(
     target: string,
     encodedTransaction: string,
-    chainId: number
+    chainId: bigint
   ): Promise<RelayResponse> {
     if (!this.#apiKey) {
       throw new Error('API key not defined')
     }
     const request: SponsoredCallRequest = {
-      chainId: BigInt(chainId),
+      chainId,
       target,
       data: encodedTransaction
     }
@@ -317,13 +316,13 @@ export class GelatoRelayPack extends RelayKitBasePack {
   async sendSyncTransaction(
     target: string,
     encodedTransaction: string,
-    chainId: number,
+    chainId: bigint,
     options: MetaTransactionOptions
   ): Promise<RelayResponse> {
     const { gasLimit, gasToken } = options
     const feeToken = this._getFeeToken(gasToken)
     const request: CallWithSyncFeeRequest = {
-      chainId: BigInt(chainId),
+      chainId,
       target,
       data: encodedTransaction,
       feeToken,

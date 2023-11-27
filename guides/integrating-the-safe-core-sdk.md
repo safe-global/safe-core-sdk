@@ -136,38 +136,15 @@ Calling the method `deploySafe` will deploy the desired Safe and return a Protoc
 
 The Protocol Kit supports the execution of single Safe transactions but also MultiSend transactions. We can create a transaction object by calling the method `createTransaction` in our `Safe` instance.
 
-- **Create a single transaction**
+This method takes an array of `MetaTransactionData` objects that represent the individual transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
-  This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
-
-  ```js
-  import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
-
-  const safeTransactionData: SafeTransactionDataPartial = {
-    to,
-    data,
-    value,
-    operation, // Optional
-    safeTxGas, // Optional
-    baseGas, // Optional
-    gasPrice, // Optional
-    gasToken, // Optional
-    refundReceiver, // Optional
-    nonce // Optional
-  }
-
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-  ```
-
-- **Create a MultiSend transaction**
-
-  This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
+When the array contains only one transaction, it is not wrapped in the MultiSend.
 
   ```js
   import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'
   import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
-  const safeTransactionData: MetaTransactionData[] = [
+  const transactions: MetaTransactionData[] = [
     {
       to,
       data,
@@ -192,7 +169,7 @@ The Protocol Kit supports the execution of single Safe transactions but also Mul
     nonce // Optional
   }
 
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
+  const safeTransaction = await safeSdk.createTransaction({ transactions, options })
   ```
 
 We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe API Kit instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.

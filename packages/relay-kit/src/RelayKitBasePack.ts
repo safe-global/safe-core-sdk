@@ -21,7 +21,7 @@ export abstract class RelayKitBasePack {
    * @param gasLimit Max amount of gas willing to consume
    * @param gasToken Token address (or 0 if ETH) that is used for the payment
    */
-  abstract getEstimateFee(chainId: number, gasLimit: string, gasToken?: string): Promise<string>
+  abstract getEstimateFee(chainId: bigint, gasLimit: string, gasToken?: string): Promise<string>
 
   /**
    * Creates a Safe transaction designed to be executed using the relayer.

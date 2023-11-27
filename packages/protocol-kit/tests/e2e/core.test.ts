@@ -1,7 +1,6 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -18,7 +17,7 @@ describe('Safe Info', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = await getChainId()
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -262,12 +261,13 @@ describe('Safe Info', () => {
         contractNetworks
       })
       chai.expect(await safeSdk.getNonce()).to.be.eq(0)
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: account2.address,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getNonce()).to.be.eq(1)
@@ -284,7 +284,7 @@ describe('Safe Info', () => {
         predictedSafe,
         contractNetworks
       })
-      chai.expect(await safeSdk.getChainId()).to.be.eq(Number(chainId))
+      chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
     })
 
     it('should return the chainId of the current network', async () => {
@@ -297,7 +297,7 @@ describe('Safe Info', () => {
         safeAddress: safeAddress,
         contractNetworks
       })
-      chai.expect(await safeSdk.getChainId()).to.be.eq(Number(chainId))
+      chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
     })
   })
 

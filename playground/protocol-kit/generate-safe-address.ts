@@ -57,7 +57,7 @@ async function generateSafeAddresses() {
   }
 }
 
-const provider = new ethers.providers.JsonRpcProvider(config.rpcUrl)
+const provider = new ethers.JsonRpcProvider(config.rpcUrl)
 
 const ethAdapter = new EthersAdapter({
   ethers,

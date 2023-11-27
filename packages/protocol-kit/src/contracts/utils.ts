@@ -1,4 +1,5 @@
 import { isAddress, zeroPadValue } from 'ethers'
+import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
@@ -22,8 +23,8 @@ import { ContractNetworkConfig, SafeAccountConfig, SafeDeploymentConfig } from '
 export const PREDETERMINED_SALT_NONCE =
   '0xb1073742015cbcf5a3a4d9d1ae33ecf619439710b89475f92e2abd2117e90f90'
 
-const ZKSYNC_MAINNET = 324
-const ZKSYNC_TESTNET = 280
+const ZKSYNC_MAINNET = 324n
+const ZKSYNC_TESTNET = 280n
 // For bundle size efficiency we store SafeProxy.sol/GnosisSafeProxy.sol zksync bytecode hash in hex.
 // To get the values below we need to:
 // 1. Compile Safe smart contracts for zksync
@@ -31,7 +32,7 @@ const ZKSYNC_TESTNET = 280
 // 3. Use zksync-web3 SDK to get the bytecode hash
 //    const bytecodeHash = zkSyncUtils.hashBytecode(${deployedBytecode})
 // 4. Use ethers to convert the array into hex
-//    const deployedBytecodeHash = ethers.utils.hexlify(bytecodeHash)
+//    const deployedBytecodeHash = ethers.hexlify(bytecodeHash)
 const ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE: {
   [version: string]: { deployedBytecodeHash: string }
 } = {
@@ -153,6 +154,17 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
   }
 )
 
+/**
+ * Provides a chain-specific default salt nonce for generating unique addresses
+ * for the same Safe configuration across different chains.
+ *
+ * @param {bigint} chainId - The chain ID associated with the chain.
+ * @returns {string} The chain-specific salt nonce in hexadecimal format.
+ */
+export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
+  return `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+}
+
 export async function predictSafeAddress({
   ethAdapter,
   safeAccountConfig,
@@ -163,8 +175,12 @@ export async function predictSafeAddress({
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
-  const { safeVersion = DEFAULT_SAFE_VERSION, saltNonce = PREDETERMINED_SALT_NONCE } =
-    safeDeploymentConfig
+  const chainId = await ethAdapter.getChainId()
+
+  const {
+    safeVersion = DEFAULT_SAFE_VERSION,
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+  } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     ethAdapter,
@@ -203,7 +219,6 @@ export async function predictSafeAddress({
 
   const input = ethAdapter.encodeParameters(['address'], [await safeContract.getAddress()])
 
-  const chainId = await ethAdapter.getChainId()
   const from = await safeProxyFactoryContract.getAddress()
 
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently

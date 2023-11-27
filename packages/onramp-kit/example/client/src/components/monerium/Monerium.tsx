@@ -25,9 +25,9 @@ function Monerium() {
     ;(async () => {
       if (!authProvider || !selectedSafe) return
 
-      const provider = new ethers.providers.Web3Provider(authProvider)
+      const provider = new ethers.BrowserProvider(authProvider)
 
-      const safeOwner = provider.getSigner()
+      const safeOwner = await provider.getSigner()
       const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: safeOwner })
 
       const safeSdk = await Safe.create({

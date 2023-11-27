@@ -7,7 +7,7 @@ import SafeApiKit, {
 } from '@safe-global/api-kit/index'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
-import { EthAdapter, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
@@ -348,11 +348,13 @@ describe('Endpoint tests', () => {
     })
 
     it('proposeTransaction', async () => {
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: safeAddress,
         data: '0x',
         value: '123456789',
-        operation: 1,
+        operation: 1
+      }
+      const options = {
         safeTxGas: '0',
         baseGas: '0',
         gasPrice: '0',
@@ -363,7 +365,10 @@ describe('Endpoint tests', () => {
       const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
-      const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+      const safeTransaction = await safeSdk.createTransaction({
+        transactions: [safeTransactionData],
+        options
+      })
       const senderSignature = await safeSdk.signHash(safeTxHash)
       await chai
         .expect(
@@ -382,6 +387,7 @@ describe('Endpoint tests', () => {
         method: 'post',
         body: {
           ...safeTransactionData,
+          ...options,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,
@@ -391,11 +397,13 @@ describe('Endpoint tests', () => {
     })
 
     it('proposeTransaction EIP-3770', async () => {
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: safeAddress,
         data: '0x',
         value: '123456789',
-        operation: 1,
+        operation: 1
+      }
+      const options = {
         safeTxGas: '0',
         baseGas: '0',
         gasPrice: '0',
@@ -406,7 +414,10 @@ describe('Endpoint tests', () => {
       const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
       const safeSdk = await Safe.create({ ethAdapter, safeAddress })
-      const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
+      const safeTransaction = await safeSdk.createTransaction({
+        transactions: [safeTransactionData],
+        options
+      })
       const senderSignature = await safeSdk.signHash(safeTxHash)
       await chai
         .expect(
@@ -425,6 +436,7 @@ describe('Endpoint tests', () => {
         method: 'post',
         body: {
           ...safeTransactionData,
+          ...options,
           contractTransactionHash: safeTxHash,
           sender: signerAddress,
           signature: senderSignature.data,

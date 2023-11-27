@@ -72,7 +72,7 @@ export async function estimateGas(
   const simulateTxAccessorContract = await getSimulateTxAccessorContract({
     ethAdapter,
     safeVersion,
-    customContracts: customContracts?.[chainId]
+    customContracts: customContracts?.[chainId.toString()]
   })
 
   const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
@@ -96,7 +96,7 @@ export async function estimateGas(
   try {
     const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
-    return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+    return decodeSafeTxGas(encodedResponse)
   } catch (error: any) {
     return parseSafeTxGasErrorResponse(error)
   }
@@ -206,7 +206,7 @@ export async function estimateTxBaseGas(
   const ethAdapter = safe.getEthAdapter()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
@@ -316,7 +316,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
   const ethAdapter = safe.getEthAdapter()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
@@ -373,22 +373,50 @@ async function estimateSafeTxGasWithRequiredTxGas(
   )
   const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
   */
-function decodeSafeTxGas(encodedSafeTxGas: string): string {
-  return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
+function decodeSafeTxGas(encodedDataResponse: string): string {
+  const [, encodedSafeTxGas] = encodedDataResponse.split('0x')
+  const data = '0x' + encodedSafeTxGas
+
+  return Number('0x' + data.slice(184).slice(0, 10)).toString()
 }
 
-function parseSafeTxGasErrorResponse(error: any) {
+type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
+type EthersEstimationError = { data: string }
+type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
+
+/**
+ * Parses the SafeTxGas estimation response from different providers.
+ * It extracts and decodes the SafeTxGas value from the Error object.
+ *
+ * @param {ProviderEstimationError} error - The estimation object with the estimation data.
+ * @returns {string} The SafeTxGas value.
+ * @throws It Will throw an error if the SafeTxGas cannot be parsed.
+ */
+function parseSafeTxGasErrorResponse(error: EstimationError) {
   // Ethers v6
-  const Ethersv6RevertData = error?.info?.error?.data
-  if (Ethersv6RevertData) {
-    return decodeSafeTxGas(Ethersv6RevertData)
+  const ethersData = error?.data
+  if (ethersData) {
+    return decodeSafeTxGas(ethersData)
   }
 
-  // Web3 v1
-  const [, encodedResponse] = error.message.split('return data: ')
-  const safeTxGas = decodeSafeTxGas(encodedResponse)
+  // gnosis-chain
+  const gnosisChainProviderData = error?.info?.error?.data
 
-  return safeTxGas
+  if (gnosisChainProviderData) {
+    const isString = typeof gnosisChainProviderData === 'string'
+
+    const encodedDataResponse = isString ? gnosisChainProviderData : gnosisChainProviderData.data
+    return decodeSafeTxGas(encodedDataResponse)
+  }
+
+  // Error message
+  const isEncodedDataPresent = error?.message?.includes('0x')
+
+  if (isEncodedDataPresent) {
+    return decodeSafeTxGas(error?.message)
+  }
+
+  throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)
 }
 
 /**
@@ -411,7 +439,7 @@ async function estimateSafeTxGasWithSimulate(
   const safeVersion = await safe.getContractVersion()
   const ethAdapter = safe.getEthAdapter()
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
 
   const safeSingletonContract = await getSafeContract({

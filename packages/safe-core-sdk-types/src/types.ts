@@ -102,7 +102,7 @@ export interface Eip3770Address {
 export interface SafeEIP712Args {
   safeAddress: string
   safeVersion: string
-  chainId: number
+  chainId: bigint
   data: SafeTransactionData | EIP712TypedData | string
 }
 
@@ -135,7 +135,7 @@ export type EIP712Types = EIP712TxTypes | EIP712MessageTypes
 export interface EIP712TypedDataTx {
   types: EIP712TxTypes
   domain: {
-    chainId?: number
+    chainId?: string
     verifyingContract: string
   }
   primaryType: 'SafeTx'
@@ -240,7 +240,7 @@ export type SafeMultisigTransactionResponse = {
 export interface RelayTransaction {
   target: string
   encodedTransaction: string
-  chainId: number
+  chainId: bigint
   options?: MetaTransactionOptions
 }
 

@@ -1,7 +1,8 @@
-import { ExternalProvider } from '@ethersproject/providers'
+import { Eip1193Provider } from 'ethers'
 import SafeAuthEmbed from '@web3auth/safeauth-embed'
-import { TorusInPageProvider } from '@web3auth/ws-embed'
+import { TorusInPageProvider, WsEmbedParams } from '@web3auth/ws-embed'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
+import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
 import {
   SafeAuthConfig,
   SafeAuthEvent,
@@ -11,10 +12,11 @@ import {
   SafeAuthSignOutOptions,
   SafeAuthUserInfo
 } from './types'
-import { AuthKitBasePack } from '@safe-global/auth-kit/AuthKitBasePack'
-import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
-import { Eip1193Provider } from 'ethers'
 
+import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
+import { CHAIN_CONFIG } from './constants'
+
+const SAFE_WALLET_SERVICES_URL = 'https://safe.web3auth.com'
 const WS_EMBED_NOT_INITIALIZED = 'SafeEmbed SDK is not initialized'
 
 /**
@@ -23,7 +25,7 @@ const WS_EMBED_NOT_INITIALIZED = 'SafeEmbed SDK is not initialized'
  */
 export class SafeAuthPack extends AuthKitBasePack {
   safeAuthEmbed!: SafeAuthEmbed
-  #provider: ExternalProvider | null
+  #provider: Eip1193Provider | null
   #config?: SafeAuthConfig
 
   /**
@@ -56,8 +58,15 @@ export class SafeAuthPack extends AuthKitBasePack {
 
       await this.safeAuthEmbed.init({
         ...options,
+        chainConfig:
+          options.chainConfig &&
+          ({
+            ...CHAIN_CONFIG[options.chainConfig.chainId],
+            chainId: options.chainConfig?.chainId,
+            rpcTarget: options.chainConfig?.rpcTarget
+          } as WsEmbedParams['chainConfig']),
         walletUrls: {
-          production: { url: 'https://safe.web3auth.com', logLevel: 'error' }
+          production: { url: SAFE_WALLET_SERVICES_URL, logLevel: 'error' }
         }
       })
 

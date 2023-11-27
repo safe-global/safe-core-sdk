@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { BrowserProvider, Eip1193Provider, ethers } from 'ethers'
-import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
@@ -31,7 +30,10 @@ function App() {
       const options: SafeAuthInitOptions = {
         enableLogging: true,
         buildEnv: 'production',
-        chainConfig: SUPPORTED_NETWORKS['0x64']
+        chainConfig: {
+          chainId: '0x5',
+          rpcTarget: 'https://gnosis.drpc.org'
+        }
       }
 
       const authPack = new SafeAuthPack()

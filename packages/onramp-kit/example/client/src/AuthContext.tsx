@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react'
 import { ethers } from 'ethers'
-import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
-import { SafeAuthPack, AuthKitSignInData } from '@safe-global/auth-kit'
+import { SafeAuthPack, AuthKitSignInData, SafeAuthInitOptions } from '@safe-global/auth-kit'
 
 type AuthContextProviderProps = {
   children: React.ReactNode
@@ -9,7 +8,7 @@ type AuthContextProviderProps = {
 
 type AuthContextType = {
   isLoggedIn: boolean
-  provider?: ethers.providers.ExternalProvider
+  provider: ethers.Eip1193Provider | null
   data?: AuthKitSignInData
   selectedSafe: string
   setSelectedSafe?: (safe: string) => void
@@ -19,14 +18,15 @@ type AuthContextType = {
 
 export const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
-  selectedSafe: ''
+  selectedSafe: '',
+  provider: null
 })
 
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
   const [isAuthenticated, setIsAuthenticated] = useState(!!safeAuthPack?.isAuthenticated)
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData>()
-  const [provider, setProvider] = useState<ethers.providers.ExternalProvider | undefined>()
+  const [provider, setProvider] = useState<ethers.Eip1193Provider | null>()
   const [selectedSafe, setSelectedSafe] = useState('')
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
       const options: SafeAuthInitOptions = {
         enableLogging: true,
         showWidgetButton: false,
-        chainConfig: SUPPORTED_NETWORKS['0x5']
+        chainConfig: { chainId: '0x5', rpcTarget: 'https://ethereum-goerli.publicnode.com' }
       }
 
       await authPack.init(options)
@@ -51,7 +51,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
           setSafeAuthSignInResponse(signInInfo)
           setIsAuthenticated(true)
 
-          if (signInInfo?.safes?.length > 0) {
+          if (signInInfo.safes && signInInfo.safes.length > 0) {
             setSelectedSafe(signInInfo?.safes[0])
           }
         }
@@ -72,7 +72,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
     setSafeAuthSignInResponse(signInInfo)
     setIsAuthenticated(true)
 
-    if (signInInfo?.safes?.length > 0) {
+    if (signInInfo?.safes && signInInfo.safes.length > 0) {
       setSelectedSafe(signInInfo?.safes[0])
     }
   }
@@ -91,7 +91,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
     <AuthContext.Provider
       value={{
         isLoggedIn: isAuthenticated,
-        provider,
+        provider: provider || null,
         data: safeAuthSignInResponse,
         logIn,
         logOut,

@@ -1,8 +1,8 @@
-import { SUPPORTED_NETWORKS } from '@toruslabs/ethereum-controllers'
 import { SafeAuthPack } from './SafeAuthPack'
 import { generateTestingUtils } from 'eth-testing'
 import { AuthKitBasePack } from '../../AuthKitBasePack'
 import { SafeAuthInitOptions } from './types'
+import { CHAIN_CONFIG } from './constants'
 
 const testingUtils = generateTestingUtils({ providerType: 'MetaMask' })
 const mockProvider = testingUtils.getProvider()
@@ -40,10 +40,10 @@ jest.mock('@web3auth/safeauth-embed', () => {
 const safeAuthInitOptions: SafeAuthInitOptions = {
   enableLogging: true,
   showWidgetButton: false,
-  chainConfig: SUPPORTED_NETWORKS['0x64']
+  chainConfig: { rpcTarget: 'https://rpc.xdaichain.com', chainId: '0x64' }
 }
 
-describe('SafeAuthPacl', () => {
+describe('SafeAuthPack', () => {
   let safeAuthPack: SafeAuthPack
 
   beforeAll(async () => {

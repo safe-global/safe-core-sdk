@@ -782,19 +782,6 @@
     "@metamask/utils" "^8.0.0"
     superstruct "^1.0.3"
 
-"@metamask/eth-sig-util@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@metamask/eth-sig-util/-/eth-sig-util-7.0.0.tgz#b035a2b826018578a5d463668bb64828271376d8"
-  integrity sha512-8KeXZB4SKx3EfNS5ahbjUMegyGvDQYk6Nk3hmM658sXpfAQR5ZlIXBgj+9RF+ZROqsU6EuNVgKt7Fr10re60PQ==
-  dependencies:
-    "@ethereumjs/util" "^8.1.0"
-    "@metamask/abi-utils" "^2.0.2"
-    "@metamask/utils" "^8.1.0"
-    ethereum-cryptography "^2.1.2"
-    ethjs-util "^0.1.6"
-    tweetnacl "^1.0.3"
-    tweetnacl-util "^0.15.1"
-
 "@metamask/eth-sig-util@^7.0.1":
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/@metamask/eth-sig-util/-/eth-sig-util-7.0.1.tgz#ad3227d6120f15f9293478de7dd9685a5c329586"
@@ -1125,22 +1112,6 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@toruslabs/base-controllers@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-4.7.0.tgz#8a586b5cd27d1331e6859e30425f77f36d989245"
-  integrity sha512-64SMRr+iG2E/8Ytz+NW45yTMuVtRumrQbY5huxPv6/muB2VqzojCCMZHL5uC3ZEoybSvhu9DTMaz/sQ7j/dTAg==
-  dependencies:
-    "@ethereumjs/util" "^9.0.1"
-    "@metamask/rpc-errors" "^6.1.0"
-    "@toruslabs/broadcast-channel" "^9.0.1"
-    "@toruslabs/http-helpers" "^5.0.0"
-    "@toruslabs/openlogin-jrpc" "^6.0.0"
-    async-mutex "^0.4.0"
-    bignumber.js "^9.1.2"
-    bowser "^2.11.0"
-    lodash "^4.17.21"
-    loglevel "^1.8.1"
-
 "@toruslabs/base-controllers@^4.8.0", "@toruslabs/base-controllers@^4.9.1":
   version "4.9.1"
   resolved "https://registry.yarnpkg.com/@toruslabs/base-controllers/-/base-controllers-4.9.1.tgz#18bb60751405b33aee07c42483368e30a360ba1b"
@@ -1187,28 +1158,6 @@
   integrity sha512-Z3EINkbsgJx1t6jCDVIJjLSUEGUtNIeDjhMWmeDGOWcP/+v/yQ1hEvd1wfxEz4q5WqIHhevacmPiVxiJ4DljGQ==
   dependencies:
     elliptic "^6.5.4"
-
-"@toruslabs/ethereum-controllers@^4.5.2":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/ethereum-controllers/-/ethereum-controllers-4.7.0.tgz#6d8bf3aa98b00e2d2b42ce3dd421759a18577a53"
-  integrity sha512-eUvM7x5jzavOFNno71AjBMAzMI6nn9j6y7ct3J0GB3FpSYt3lsgRDzjahQjTYdL51i9tmWYPcL1dcLsDiR76Uw==
-  dependencies:
-    "@ethereumjs/common" "^4.1.0"
-    "@ethereumjs/tx" "^5.1.0"
-    "@ethereumjs/util" "^9.0.1"
-    "@metamask/eth-sig-util" "^7.0.0"
-    "@metamask/rpc-errors" "^6.1.0"
-    "@toruslabs/base-controllers" "^4.7.0"
-    "@toruslabs/http-helpers" "^5.0.0"
-    "@toruslabs/openlogin-jrpc" "^6.0.0"
-    async-mutex "^0.4.0"
-    bignumber.js "^9.1.2"
-    bn.js "^5.2.1"
-    ethers "^6.8.1"
-    fast-json-patch "^3.1.1"
-    jsonschema "^1.4.1"
-    lodash "^4.17.21"
-    loglevel "^1.8.1"
 
 "@toruslabs/ethereum-controllers@^4.9.0":
   version "4.9.1"
@@ -2323,14 +2272,6 @@ ethjs-unit@0.1.6:
   dependencies:
     bn.js "4.11.6"
     number-to-bn "1.7.0"
-
-ethjs-util@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/ethjs-util/-/ethjs-util-0.1.6.tgz#f308b62f185f9fe6237132fb2a9818866a5cd536"
-  integrity sha512-CUnVOQq7gSpDHZVVrQW8ExxUETWrnrvXYvYz55wOU8Uj4VCgw56XC2B/fVqQN+f7gmrnRHSLVnFAwsCuNwji8w==
-  dependencies:
-    is-hex-prefixed "1.0.0"
-    strip-hex-prefix "1.0.0"
 
 event-target-shim@^5.0.0:
   version "5.0.1"

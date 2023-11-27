@@ -1,5 +1,5 @@
 import { AppBar as MuiAppBar, Typography, styled, Box, Button } from '@mui/material'
-import { SafeAuthUserInfo } from '../../src'
+import { SafeAuthUserInfo } from '@safe-global/auth-kit'
 
 type AppBarProps = {
   isLoggedIn: boolean

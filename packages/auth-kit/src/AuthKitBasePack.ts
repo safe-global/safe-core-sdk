@@ -62,9 +62,7 @@ export abstract class AuthKitBasePack {
    */
   async getSafes(txServiceUrl?: string): Promise<string[]> {
     try {
-      const chainId = await this.getChainId()
-
-      const apiKit = this.#getApiKit(chainId, txServiceUrl)
+      const apiKit = await this.#getApiKit(txServiceUrl)
 
       const address = await this.getAddress()
 
@@ -112,10 +110,12 @@ export abstract class AuthKitBasePack {
    * Get the SafeApiKit instance
    * @returns A SafeApiKit instance
    */
-  #getApiKit(chainId: bigint, txServiceUrl?: string): SafeApiKit {
+  async #getApiKit(txServiceUrl?: string): Promise<SafeApiKit> {
     if (!this.getProvider()) {
       throw new Error('Provider is not defined')
     }
+
+    const chainId = await this.getChainId()
 
     return new SafeApiKit({
       chainId,

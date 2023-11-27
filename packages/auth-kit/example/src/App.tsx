@@ -10,7 +10,7 @@ import {
   SafeAuthInitOptions,
   SafeAuthPack,
   SafeAuthUserInfo
-} from '../../src/index'
+} from '@safe-global/auth-kit'
 import { getSafeTxV4TypedData, getTypedData, getV3TypedData } from './typedData'
 
 function App() {
@@ -117,22 +117,24 @@ function App() {
     // Wrap Web3Auth provider with ethers
     const provider = new BrowserProvider(safeAuthPack?.getProvider() as Eip1193Provider)
     const signer = await provider.getSigner()
-    const ethersAdapter = new EthersAdapter({
+    const ethAdapter = new EthersAdapter({
       ethers,
       signerOrProvider: signer
     })
     const protocolKit = await Safe.create({
       safeAddress,
-      ethAdapter: ethersAdapter
+      ethAdapter
     })
 
     // Create transaction
     let tx = await protocolKit.createTransaction({
-      safeTransactionData: {
-        to: ethers.getAddress(safeAuthSignInResponse?.eoa || '0x'),
-        data: '0x',
-        value: ethers.parseUnits('0.0001', 'ether').toString()
-      }
+      transactions: [
+        {
+          to: ethers.getAddress(safeAuthSignInResponse?.eoa || '0x'),
+          data: '0x',
+          value: ethers.parseUnits('0.0001', 'ether').toString()
+        }
+      ]
     })
 
     // Sign transaction. Not necessary to execute the transaction if the threshold is one

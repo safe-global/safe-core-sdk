@@ -31,9 +31,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
 
   useEffect(() => {
     ;(async () => {
-      const authPack = new SafeAuthPack({
-        txServiceUrl: 'https://safe-transaction-goerli.safe.global'
-      })
+      const authPack = new SafeAuthPack()
 
       const options: SafeAuthInitOptions = {
         enableLogging: true,

@@ -31,7 +31,7 @@ function App() {
         enableLogging: true,
         buildEnv: 'production',
         chainConfig: {
-          chainId: '0x5',
+          chainId: '0x64',
           rpcTarget: 'https://gnosis.drpc.org'
         }
       }

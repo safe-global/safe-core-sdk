@@ -56,15 +56,17 @@ export class SafeAuthPack extends AuthKitBasePack {
     try {
       this.safeAuthEmbed = new SafeAuthEmbed()
 
+      const chainConfig =
+        options.chainConfig &&
+        ({
+          ...CHAIN_CONFIG[options.chainConfig.chainId],
+          chainId: options.chainConfig?.chainId,
+          rpcTarget: options.chainConfig?.rpcTarget
+        } as WsEmbedParams['chainConfig'])
+
       await this.safeAuthEmbed.init({
         ...options,
-        chainConfig:
-          options.chainConfig &&
-          ({
-            ...CHAIN_CONFIG[options.chainConfig.chainId],
-            chainId: options.chainConfig?.chainId,
-            rpcTarget: options.chainConfig?.rpcTarget
-          } as WsEmbedParams['chainConfig']),
+        chainConfig,
         walletUrls: {
           production: { url: SAFE_WALLET_SERVICES_URL, logLevel: 'error' }
         }

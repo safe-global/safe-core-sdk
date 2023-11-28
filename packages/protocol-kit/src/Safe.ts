@@ -1346,7 +1346,7 @@ class Safe {
     const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
     })
 
     return compatibilityFallbackHandlerContract

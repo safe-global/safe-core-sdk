@@ -96,7 +96,7 @@ describe('EIP-712 sign typed data', () => {
       const safeMessage = generateTypedData({
         safeAddress,
         safeVersion: '1.3.0',
-        chainId: 1,
+        chainId: 1n,
         data: message
       })
 
@@ -115,7 +115,7 @@ describe('EIP-712 sign typed data', () => {
           SafeMessage: [{ name: 'message', type: 'bytes' }]
         },
         domain: {
-          chainId: 1,
+          chainId: '1',
           verifyingContract: safeAddress
         },
         primaryType: 'SafeMessage',
@@ -131,7 +131,7 @@ describe('EIP-712 sign typed data', () => {
       const safeMessage = generateTypedData({
         safeAddress,
         safeVersion: '1.1.1',
-        chainId: 1,
+        chainId: 1n,
         data: message
       })
 
@@ -158,7 +158,7 @@ describe('EIP-712 sign typed data', () => {
     it('should generate the correct types for an EIP-712 message for >=1.3.0 Safes', () => {
       const message = {
         domain: {
-          chainId: 1,
+          chainId: '1',
           name: 'Ether Mail',
           verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
           version: '1'
@@ -206,7 +206,7 @@ describe('EIP-712 sign typed data', () => {
       const safeMessage = generateTypedData({
         safeAddress,
         safeVersion: '1.3.0',
-        chainId: 1,
+        chainId: 1n,
         data: message
       })
 
@@ -225,7 +225,7 @@ describe('EIP-712 sign typed data', () => {
           SafeMessage: [{ name: 'message', type: 'bytes' }]
         },
         domain: {
-          chainId: 1,
+          chainId: '1',
           verifyingContract: safeAddress
         },
         primaryType: 'SafeMessage',
@@ -238,7 +238,7 @@ describe('EIP-712 sign typed data', () => {
     it('should generate the correct types for an EIP-712 message for <1.3.0 Safes', () => {
       const message = {
         domain: {
-          chainId: 1,
+          chainId: 1n,
           name: 'Ether Mail',
           verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
           version: '1'
@@ -286,7 +286,7 @@ describe('EIP-712 sign typed data', () => {
       const safeMessage = generateTypedData({
         safeAddress,
         safeVersion: '1.1.1',
-        chainId: 1,
+        chainId: 1n,
         data: message
       })
 

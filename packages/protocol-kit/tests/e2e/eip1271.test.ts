@@ -41,8 +41,8 @@ describe.only('EIP1271', () => {
     const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
       await deployments.fixture()
       const accounts = await getAccounts()
-      const chainId: number = await getChainId()
-      const contractNetworks = await getContractNetworks(chainId)
+      const chainId = await getChainId()
+      const contractNetworks = await getContractNetworks(BigInt(chainId))
 
       const [account1, account2] = accounts
 
@@ -103,10 +103,10 @@ describe.only('EIP1271', () => {
       async () => {
         const { contractNetworks, safeSdk1, safeSdk2, ethAdapter1 } = await setupTests()
 
-        const chainId: number = await safeSdk1.getChainId()
+        const chainId = await safeSdk1.getChainId()
         const safeVersion = await safeSdk1.getContractVersion()
 
-        const customContract = contractNetworks[chainId]
+        const customContract = contractNetworks[chainId.toString()]
 
         const signMessageLibContract = await ethAdapter1.getSignMessageLibContract({
           safeVersion,
@@ -125,7 +125,7 @@ describe.only('EIP1271', () => {
           operation: OperationType.DelegateCall
         }
 
-        const tx = await safeSdk1.createTransaction({ safeTransactionData })
+        const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
         const signedTx = await safeSdk1.signTransaction(tx)
         const signedTx2 = await safeSdk2.signTransaction(signedTx)
         const execResponse = await safeSdk1.executeTransaction(signedTx2)
@@ -244,7 +244,7 @@ describe.only('EIP1271', () => {
           data: '0x'
         }
 
-        const tx = await safeSdk1.createTransaction({ safeTransactionData })
+        const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
         const txHash = await safeSdk1.getTransactionHash(tx)
         const safeMessageHash = await safeSdk1.getSafeMessageHash(txHash)
 
@@ -280,7 +280,7 @@ describe.only('EIP1271', () => {
 
           chai
             .expect(safeMessageHash)
-            .to.be.eq(calculateSafeMessageHash(safeAddress, messageHash, chainId))
+            .to.be.eq(calculateSafeMessageHash(safeAddress, messageHash, Number(chainId)))
         }
       )
     })
@@ -372,7 +372,7 @@ describe.only('EIP1271', () => {
 
           chai
             .expect(safeMessageHash)
-            .to.be.eq(calculateSafeMessageHash(safeAddress, messageHash, chainId))
+            .to.be.eq(calculateSafeMessageHash(safeAddress, messageHash, Number(chainId)))
         }
       )
     })
@@ -397,7 +397,7 @@ describe.only('EIP1271', () => {
         data: '0x'
       }
 
-      const tx = await safeSdk1.createTransaction({ safeTransactionData })
+      const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
 
       const signedTx1 = await safeSdk1.signTransaction(tx)
       const signedTx2 = await safeSdk3.signTransaction(signedTx1, 'eth_sign', true)

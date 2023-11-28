@@ -26,12 +26,16 @@ function App() {
   const [provider, setProvider] = useState<BrowserProvider>()
 
   useEffect(() => {
+    // @ts-expect-error - Missing globals
+    const params = new URL(window.document.location).searchParams
+    const chainId = params.get('chainId')
+
     ;(async () => {
       const options: SafeAuthInitOptions = {
         enableLogging: true,
         buildEnv: 'production',
         chainConfig: {
-          chainId: '0x64',
+          chainId: chainId || '0x64',
           rpcTarget: 'https://gnosis.drpc.org'
         }
       }

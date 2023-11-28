@@ -63,3 +63,5 @@ openapi/
 
 .yalc
 yalc.lock
+# Local Netlify folder
+.netlify

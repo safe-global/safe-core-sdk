@@ -73,13 +73,8 @@ describe('SafeAuthPack', () => {
       expect(mockInit).toHaveBeenCalledWith(
         expect.objectContaining({
           chainConfig: {
-            blockExplorerUrl: 'https://blockscout.com/poa/xdai',
-            chainId: '0x64',
-            displayName: 'xDai',
-            logo: 'xdai.svg',
-            rpcTarget: 'https://rpc.xdaichain.com',
-            ticker: 'DAI',
-            tickerName: 'xDai Network Token'
+            ...CHAIN_CONFIG['0x64'],
+            rpcTarget: 'https://rpc.xdaichain.com'
           },
           enableLogging: true,
           showWidgetButton: false,

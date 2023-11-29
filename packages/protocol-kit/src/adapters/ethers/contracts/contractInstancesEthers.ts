@@ -44,9 +44,11 @@ import SignMessageLibContract_V1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMe
 import SimulateTxAccessorContract_V1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Ethers'
 import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Ethers'
 import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
+import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Ethers'
 import EthersAdapter from '../EthersAdapter'
 import { SafeTransactionData } from 'packages/safe-core-sdk-types/dist/src'
 import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
+import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -55,19 +57,21 @@ export async function getSafeContractInstance(
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined,
   isL1SafeSingleton?: boolean
-): Promise<
-  | SafeContract_V1_4_1_Ethers
-  | SafeContract_V1_2_0_Ethers
-  | SafeContract_V1_1_1_Ethers
-  | SafeContract_V1_0_0_Ethers
-> {
+): Promise<SafeContract_V1_2_0_Ethers | SafeContract_V1_1_1_Ethers | SafeContract_V1_0_0_Ethers> {
+  const chainId = await ethersAdapter.getChainId()
   let safeContract
   switch (safeVersion) {
     case '1.4.1':
-      safeContract = SafeSingleton_V1_4_1.connect(contractAddress, signerOrProvider)
-      return new SafeContract_V1_4_1_Ethers(safeContract)
+      safeContract = new SafeContract_v1_4_1_Ethers(
+        chainId,
+        ethersAdapter,
+        isL1SafeSingleton,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeContract_v1_4_1_Abi
+      )
+      return mapToTypechainContract(safeContract) // remove this mapper after remove typechain
     case '1.3.0':
-      const chainId = await ethersAdapter.getChainId()
       safeContract = new SafeContract_v1_3_0_Ethers(
         chainId,
         ethersAdapter,
@@ -263,7 +267,9 @@ export function getSimulateTxAccessorContractInstance(
 }
 
 // TODO: remove this mapper after remove Typechain
-function mapToTypechainContract(abiTypeContract: SafeContract_v1_3_0_Ethers): any {
+function mapToTypechainContract(
+  abiTypeContract: SafeContract_v1_3_0_Ethers | SafeContract_v1_4_1_Ethers
+): any {
   return {
     contract: abiTypeContract.contract as any,
 

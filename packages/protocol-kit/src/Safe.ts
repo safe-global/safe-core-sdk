@@ -39,6 +39,7 @@ import {
 import {
   EthSafeSignature,
   SAFE_FEATURES,
+  getEip712TxTypes,
   hasSafeFeature,
   hashSafeMessage,
   isSafeMultisigTransactionResponse,
@@ -65,6 +66,7 @@ import {
   getSafeContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
+import { ethers } from 'ethers'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -501,9 +503,29 @@ class Safe {
    * @param safeTransaction - The Safe transaction or a raw message
    * @returns The hashed Safe transaction or message
    */
-  async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
+  async getTransactionHash(
+    safeTransaction: SafeTransaction,
+    preimageSafeTransactionHash = false
+  ): Promise<string> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
+    }
+
+    // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
+    // we need to use the pre-image of the transaction hash to calculate the message hash
+    // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
+    if (preimageSafeTransactionHash) {
+      const safeAddress = await this.getAddress()
+      const chainId = await this.getChainId()
+      const safeVersion = await this.getContractVersion()
+      const safeTxTypes = getEip712TxTypes(safeVersion)
+
+      // Preimage the hash
+      return ethers.TypedDataEncoder.encode(
+        { verifyingContract: safeAddress, chainId },
+        { SafeTx: safeTxTypes.SafeTx },
+        safeTransaction.data
+      )
     }
 
     const safeTransactionData = safeTransaction.data

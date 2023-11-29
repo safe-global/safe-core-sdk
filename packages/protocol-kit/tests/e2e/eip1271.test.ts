@@ -3,7 +3,6 @@ import Safe from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import {
   OperationType,
-  SafeTransaction,
   SafeTransactionData,
   SafeTransactionDataPartial
 } from '@safe-global/safe-core-sdk-types'
@@ -20,34 +19,6 @@ import { buildSignature } from '@safe-global/protocol-kit/utils'
 import SafeMessage from '../../src/utils/messages/SafeMessage'
 
 chai.use(chaiAsPromised)
-
-export const EIP712_SAFE_TX_TYPE = {
-  // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
-  SafeTx: [
-    { type: 'address', name: 'to' },
-    { type: 'uint256', name: 'value' },
-    { type: 'bytes', name: 'data' },
-    { type: 'uint8', name: 'operation' },
-    { type: 'uint256', name: 'safeTxGas' },
-    { type: 'uint256', name: 'baseGas' },
-    { type: 'uint256', name: 'gasPrice' },
-    { type: 'address', name: 'gasToken' },
-    { type: 'address', name: 'refundReceiver' },
-    { type: 'uint256', name: 'nonce' }
-  ]
-}
-
-export const preimageSafeTransactionHash = (
-  safeAddress: string,
-  safeTx: SafeTransactionData,
-  chainId: number
-): string => {
-  return ethers.TypedDataEncoder.encode(
-    { verifyingContract: safeAddress, chainId },
-    EIP712_SAFE_TX_TYPE,
-    safeTx
-  )
-}
 
 export const calculateSafeMessageHash = (
   safeAddress: string,
@@ -399,13 +370,6 @@ describe.only('EIP1271', () => {
 
       const [account1] = accounts
 
-      console.log(
-        'SIGNERS',
-        await safeSdk1.getOwners(),
-        await safeSdk3.getOwners(),
-        signerSafeAddress
-      )
-
       const safeTransactionData: SafeTransactionDataPartial = {
         to: account1.address,
         value: '100000000000000000', // 0.01 ETH
@@ -420,29 +384,19 @@ describe.only('EIP1271', () => {
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
 
       const txHash = await safeSdk1.getTransactionHash(tx)
-      const safeMessageHash = await safeSdk1.getSafeMessageHash(txHash)
-      const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(
-        preimageSafeTransactionHash(safeAddress, tx.data, Number(await safeSdk3.getChainId()))
-      )
+      const txHashData = await safeSdk1.getTransactionHash(tx, true)
+
+      const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHashData)
 
       const signature1 = await safeSdk1.signHash(txHash)
       const signature2 = await safeSdk3.signHash(signerSafeMessageHash, true)
 
-      console.log(
-        'isValidSignature',
-        await safeSdk1.isValidSignature(txHash, [signature1, signature2])
-      )
-
-      // const safeMessageHash = calculateSafeMessageHash(signerSafeAddress, txHash, await chainId());
-      // const signerSafeOwnerSignature = await signHash(user5, safeMessageHash);
-      // const signerSafeSig = buildContractSignature(signerSafeAddress, signerSafeOwnerSignature.data);
-
-      console.log('EXECUTE TX')
       tx.addSignature(signature1)
       tx.addSignature(signature2)
-      console.log('TRANSACTION', tx)
+
       const execResponse = await safeSdk1.executeTransaction(tx)
       const receipt = await waitSafeTxReceipt(execResponse)
+
       console.log('RECEIPT:', receipt)
       chai.expect(receipt?.status).to.be.eq(1)
     })

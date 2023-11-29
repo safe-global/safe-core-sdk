@@ -1,11 +1,7 @@
 import { ethers } from 'ethers'
 import Safe from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import {
-  OperationType,
-  SafeTransaction,
-  SafeTransactionDataPartial
-} from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -43,17 +39,18 @@ describe.only('EIP1271', () => {
       const accounts = await getAccounts()
       const chainId = await getChainId()
       const contractNetworks = await getContractNetworks(BigInt(chainId))
-
+      const fallbackHandlerAddress = contractNetworks[chainId].fallbackHandlerAddress
       const [account1, account2] = accounts
 
       // Create a 1/1 Safe to sign the messages
-      const signerSafe = await getSafeWithOwners([accounts[0].address], 1)
+      const signerSafe = await getSafeWithOwners([accounts[0].address], 1, fallbackHandlerAddress)
       const signerSafeAddress = await signerSafe.getAddress()
 
       // Create a 2/3 Safe
       const safe = await getSafeWithOwners(
         [accounts[0].address, accounts[1].address, signerSafeAddress],
-        2
+        2,
+        fallbackHandlerAddress
       )
       const safeAddress = await safe.getAddress()
 
@@ -61,7 +58,7 @@ describe.only('EIP1271', () => {
       const ethAdapter1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
         ethAdapter: ethAdapter1,
-        safeAddress: safeAddress,
+        safeAddress,
         contractNetworks
       })
 
@@ -69,14 +66,13 @@ describe.only('EIP1271', () => {
       const ethAdapter2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await Safe.create({
         ethAdapter: ethAdapter2,
-        safeAddress: safeAddress,
+        safeAddress,
         contractNetworks
       })
 
       // Adapter and Safe instance for owner 3
-      const ethAdapter3 = await getEthAdapter(account1.signer)
       const safeSdk3 = await Safe.create({
-        ethAdapter: ethAdapter3,
+        ethAdapter: ethAdapter1,
         safeAddress: signerSafeAddress,
         contractNetworks
       })
@@ -91,7 +87,6 @@ describe.only('EIP1271', () => {
         chainId,
         ethAdapter1,
         ethAdapter2,
-        ethAdapter3,
         safeSdk1,
         safeSdk2,
         safeSdk3
@@ -234,7 +229,7 @@ describe.only('EIP1271', () => {
       )
 
       it('should allow to validate transaction hashes using smart contracts as signers', async () => {
-        const { safeAddress, accounts, safeSdk1, safeSdk3 } = await setupTests()
+        const { accounts, safeSdk1, safeSdk3 } = await setupTests()
 
         const [account1] = accounts
 
@@ -247,26 +242,13 @@ describe.only('EIP1271', () => {
         const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
         const txHash = await safeSdk1.getTransactionHash(tx)
         const safeMessageHash = await safeSdk1.getSafeMessageHash(txHash)
+        const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHash)
 
         const signature1 = await safeSdk1.signHash(safeMessageHash)
-        const signature2 = await safeSdk3.signHash(await safeSdk3.getSafeMessageHash(txHash), true)
+        const signature2 = await safeSdk3.signHash(signerSafeMessageHash, true)
 
         const isValidSignature = await safeSdk1.isValidSignature(txHash, [signature1, signature2])
         chai.expect(isValidSignature).to.be.true
-
-        await account1.signer.sendTransaction({
-          to: safeAddress,
-          value: 1_000_000_000_000_000_000n // 1 ETH
-        })
-
-        // FIXME: From this test we should be able to send a transaction but it fails. Ask to someone in the protocol team
-        // ------
-        // tx.addSignature(signature1)
-        // tx.addSignature(signature2)
-        // const execResponse = await safeSdk1.executeTransaction(tx, { gasLimit: 1000000 })
-        // const receipt = await waitSafeTxReceipt(execResponse)
-        // console.log('RECEIPT:', receipt)
-        // chai.expect(receipt?.status).to.be.eq(1)
       })
 
       itif(safeVersionDeployed >= '1.3.0')(
@@ -275,7 +257,7 @@ describe.only('EIP1271', () => {
           const { safeAddress, safeSdk1 } = await setupTests()
 
           const chainId = await safeSdk1.getChainId()
-          const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
+          const messageHash = safeSdk1.hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           chai
@@ -378,18 +360,18 @@ describe.only('EIP1271', () => {
     })
 
     // FIXME: Cannot execute transaction
-    it.skip('should allow to sign transactions using other Safe Accounts (threshold = 1)', async () => {
-      const { safeAddress, accounts, safeSdk1, safeSdk3 } = await setupTests()
+    it.only('should allow to sign transactions using other Safe Accounts (threshold = 1)', async () => {
+      const { safeAddress, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafeAddress } =
+        await setupTests()
 
       const [account1] = accounts
 
-      await account1.signer.sendTransaction({
-        to: safeAddress,
-        value: 1_000_000_000_000_000_000n // 1 ETH
-      })
-
-      const balanceBefore = await safeSdk1.getBalance()
-      console.log('BALANCE BEFORE: ', balanceBefore.toString())
+      console.log(
+        'SIGNERS',
+        await safeSdk1.getOwners(),
+        await safeSdk3.getOwners(),
+        signerSafeAddress
+      )
 
       const safeTransactionData: SafeTransactionDataPartial = {
         to: account1.address,
@@ -397,12 +379,33 @@ describe.only('EIP1271', () => {
         data: '0x'
       }
 
+      await account1.signer.sendTransaction({
+        to: safeAddress,
+        value: 1_000_000_000_000_000_000n // 1 ETH
+      })
+
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
 
-      const signedTx1 = await safeSdk1.signTransaction(tx)
-      const signedTx2 = await safeSdk3.signTransaction(signedTx1, 'eth_sign', true)
+      const txHash = await safeSdk1.getTransactionHash(tx)
+      const signerSafeTxHash = await safeSdk3.getSafeMessageHash(txHash)
 
-      const execResponse = await safeSdk1.executeTransaction(signedTx2, { gasLimit: 1000000 })
+      const signature1 = await safeSdk1.signHash(txHash)
+      const signature2 = await safeSdk3.signHash(signerSafeTxHash, true)
+
+      console.log(
+        'isValidSignature',
+        await safeSdk1.isValidSignature(txHash, [signature1, signature2])
+      )
+
+      // const safeMessageHash = calculateSafeMessageHash(signerSafeAddress, txHash, await chainId());
+      // const signerSafeOwnerSignature = await signHash(user5, safeMessageHash);
+      // const signerSafeSig = buildContractSignature(signerSafeAddress, signerSafeOwnerSignature.data);
+
+      console.log('EXECUTE TX')
+      tx.addSignature(signature1)
+      tx.addSignature(signature2)
+      console.log('TRANSACTION', tx)
+      const execResponse = await safeSdk1.executeTransaction(tx)
       const receipt = await waitSafeTxReceipt(execResponse)
       console.log('RECEIPT:', receipt)
       chai.expect(receipt?.status).to.be.eq(1)

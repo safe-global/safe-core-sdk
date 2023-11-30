@@ -119,7 +119,10 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.2.0`,
-    safeContracts_V1_2_0
+    // removed Safe Contract v1.2.0 for ethers-v6
+    typechainTarget === 'ethers-v6'
+      ? safeContracts_V1_2_0.replace(`${safeContractsPath}/v1.2.0/gnosis_safe.json `, '')
+      : safeContracts_V1_2_0
   )
   generateTypechainFiles(
     typechainTarget,

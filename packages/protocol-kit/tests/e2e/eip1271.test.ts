@@ -364,7 +364,7 @@ describe.only('EIP1271', () => {
     })
 
     // FIXME: Cannot execute transaction
-    it('should allow to sign transactions using other Safe Accounts (threshold = 1)', async () => {
+    it.only('should allow to sign transactions using other Safe Accounts (threshold = 1)', async () => {
       const { safeAddress, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafeAddress } =
         await setupTests()
 
@@ -383,12 +383,13 @@ describe.only('EIP1271', () => {
 
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
 
+      // Normal signature
       const txHash = await safeSdk1.getTransactionHash(tx)
-      const txHashData = await safeSdk1.getTransactionHash(tx, true)
-
-      const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHashData)
-
       const signature1 = await safeSdk1.signHash(txHash)
+
+      // Smart contract signature
+      const txHashData = await safeSdk1.getTransactionHash(tx, true)
+      const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHashData)
       const signature2 = await safeSdk3.signHash(signerSafeMessageHash, true)
 
       tx.addSignature(signature1)

@@ -400,16 +400,9 @@ describe.only('EIP1271', () => {
 
       // Normal signature
       tx = await safeSdk1.signTransaction(tx)
-      // const txHash = await safeSdk1.getTransactionHash(tx)
-      // const signature1 = await safeSdk1.signHash(txHash)
 
       // Smart contract signature
       tx = await safeSdk3.signTransaction(tx)
-      // const txHashData = await safeSdk1.getTransactionHash(tx, true)
-      // const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHashData)
-      // const signature2 = await safeSdk3.signHash(signerSafeMessageHash)
-      // tx.addSignature(signature1)
-      // tx.addSignature(signature2)
 
       const execResponse = await safeSdk1.executeTransaction(tx)
       const receipt = await waitSafeTxReceipt(execResponse)

@@ -3,11 +3,14 @@ import {
   EthAdapter,
   SafeSignature,
   SafeEIP712Args,
-  SafeTransaction
+  SafeTransaction,
+  SafeTransactionData
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
+import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
+import { predictSafeAddress } from '../..'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -169,26 +172,30 @@ export const buildSignature = (signatures: SafeSignature[]): string => {
 
 export const preimageSafeTransactionHash = (
   safeAddress: string,
-  safeTx: SafeTransaction,
-  chainId: number
+  safeTx: SafeTransactionData,
+  safeVersion: string,
+  chainId: bigint
 ): string => {
+  const safeTxTypes = getEip712TxTypes(safeVersion)
+
   return ethers.TypedDataEncoder.encode(
     { verifyingContract: safeAddress, chainId },
-    {
-      // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
-      SafeTx: [
-        { type: 'address', name: 'to' },
-        { type: 'uint256', name: 'value' },
-        { type: 'bytes', name: 'data' },
-        { type: 'uint8', name: 'operation' },
-        { type: 'uint256', name: 'safeTxGas' },
-        { type: 'uint256', name: 'baseGas' },
-        { type: 'uint256', name: 'gasPrice' },
-        { type: 'address', name: 'gasToken' },
-        { type: 'address', name: 'refundReceiver' },
-        { type: 'uint256', name: 'nonce' }
-      ]
-    },
-    safeTx.data
+    { SafeTx: safeTxTypes.SafeTx },
+    safeTx
+  )
+}
+
+export const preimageSafeMessageHash = (
+  safeAddress: string,
+  message: string,
+  safeVersion: string,
+  chainId: bigint
+): string => {
+  const safeMessageTypes = getEip712MessageTypes(safeVersion)
+
+  return ethers.TypedDataEncoder.encode(
+    { verifyingContract: safeAddress, chainId },
+    { SafeMessage: safeMessageTypes.SafeMessage },
+    { message }
   )
 }

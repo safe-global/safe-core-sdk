@@ -15,8 +15,13 @@ import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import { buildSignature } from '@safe-global/protocol-kit/utils'
+import {
+  buildSignature,
+  preimageSafeMessageHash,
+  preimageSafeTransactionHash
+} from '@safe-global/protocol-kit/utils'
 import SafeMessage from '../../src/utils/messages/SafeMessage'
+import semverSatisfies from 'semver/functions/satisfies'
 
 chai.use(chaiAsPromised)
 
@@ -78,7 +83,8 @@ describe.only('EIP1271', () => {
       const safeSdk3 = await Safe.create({
         ethAdapter: ethAdapter1,
         safeAddress: signerSafeAddress,
-        contractNetworks
+        contractNetworks,
+        parentSafe: safeSdk1
       })
 
       return {
@@ -93,7 +99,8 @@ describe.only('EIP1271', () => {
         ethAdapter2,
         safeSdk1,
         safeSdk2,
-        safeSdk3
+        safeSdk3,
+        fallbackHandlerAddress
       }
     })
 
@@ -207,10 +214,9 @@ describe.only('EIP1271', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should validate Smart contracts as signers (threshold = 1)',
         async () => {
-          const { safeSdk1, safeSdk2, safeSdk3 } = await setupTests()
-
+          const { safeSdk1, safeSdk2, safeSdk3, safeAddress, contractNetworks } = await setupTests()
           // Hash the message
-          const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
+          const messageHash = safeSdk1.hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           // Sign the Safe message with the owners
@@ -218,14 +224,26 @@ describe.only('EIP1271', () => {
           const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE))
 
           // Sign with the Smart contract
-          const safeSignerMessageHash = await safeSdk3.getSafeMessageHash(messageHash)
-          const signerSafeSig = await safeSdk3.signHash(safeSignerMessageHash, true)
+          const shouldPreimageMessage = semverSatisfies(
+            await safeSdk1.getContractVersion(),
+            '>=1.4.1'
+          )
+          const messageHashData = preimageSafeMessageHash(
+            safeAddress,
+            messageHash,
+            await safeSdk1.getContractVersion(),
+            await safeSdk1.getChainId()
+          )
+          const safeSignerMessageHash = await safeSdk3.getSafeMessageHash(
+            shouldPreimageMessage ? messageHashData : messageHash
+          )
+          const signerSafeSig = await safeSdk3.signHash(safeSignerMessageHash)
 
           // Validate the signature sending the Safe message hash and the concatenated signatures
           const isValid = await safeSdk1.isValidSignature(messageHash, [
-            signerSafeSig,
             ethSignSig,
-            typedDataSig
+            typedDataSig,
+            signerSafeSig
           ])
 
           chai.expect(isValid).to.be.true
@@ -233,7 +251,7 @@ describe.only('EIP1271', () => {
       )
 
       it('should allow to validate transaction hashes using smart contracts as signers', async () => {
-        const { accounts, safeSdk1, safeSdk3 } = await setupTests()
+        const { accounts, safeSdk1, safeSdk3, safeAddress } = await setupTests()
 
         const [account1] = accounts
 
@@ -246,10 +264,20 @@ describe.only('EIP1271', () => {
         const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
         const txHash = await safeSdk1.getTransactionHash(tx)
         const safeMessageHash = await safeSdk1.getSafeMessageHash(txHash)
-        const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHash)
-
         const signature1 = await safeSdk1.signHash(safeMessageHash)
-        const signature2 = await safeSdk3.signHash(signerSafeMessageHash, true)
+
+        const shouldPreimageTxHash = semverSatisfies(await safeSdk1.getContractVersion(), '>=1.4.1')
+        const txHashData = preimageSafeMessageHash(
+          safeAddress,
+          txHash,
+          await safeSdk1.getContractVersion(),
+          await safeSdk1.getChainId()
+        )
+
+        const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(
+          shouldPreimageTxHash ? txHashData : txHash
+        )
+        const signature2 = await safeSdk3.signHash(signerSafeMessageHash)
 
         const isValidSignature = await safeSdk1.isValidSignature(txHash, [signature1, signature2])
         chai.expect(isValidSignature).to.be.true
@@ -330,12 +358,8 @@ describe.only('EIP1271', () => {
           // Sign the Safe message with owners
           const safeMessage = safeSdk1.createMessage(MESSAGE)
 
-          const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage, 'eth_sign')
-          const signedMessage2: SafeMessage = await safeSdk3.signMessage(
-            signedMessage1,
-            'eth_sign',
-            true
-          )
+          const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage)
+          const signedMessage2: SafeMessage = await safeSdk3.signMessage(signedMessage1)
 
           // Validate the signature
           chai.expect(
@@ -363,8 +387,7 @@ describe.only('EIP1271', () => {
       )
     })
 
-    // FIXME: Cannot execute transaction
-    it.only('should allow to sign transactions using other Safe Accounts (threshold = 1)', async () => {
+    it('should allow to sign transactions using other Safe Accounts (threshold = 1)', async () => {
       const { safeAddress, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafeAddress } =
         await setupTests()
 
@@ -381,24 +404,24 @@ describe.only('EIP1271', () => {
         value: 1_000_000_000_000_000_000n // 1 ETH
       })
 
-      const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
+      let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
 
       // Normal signature
-      const txHash = await safeSdk1.getTransactionHash(tx)
-      const signature1 = await safeSdk1.signHash(txHash)
+      tx = await safeSdk1.signTransaction(tx)
+      // const txHash = await safeSdk1.getTransactionHash(tx)
+      // const signature1 = await safeSdk1.signHash(txHash)
 
       // Smart contract signature
-      const txHashData = await safeSdk1.getTransactionHash(tx, true)
-      const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHashData)
-      const signature2 = await safeSdk3.signHash(signerSafeMessageHash, true)
-
-      tx.addSignature(signature1)
-      tx.addSignature(signature2)
+      tx = await safeSdk3.signTransaction(tx)
+      // const txHashData = await safeSdk1.getTransactionHash(tx, true)
+      // const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHashData)
+      // const signature2 = await safeSdk3.signHash(signerSafeMessageHash)
+      // tx.addSignature(signature1)
+      // tx.addSignature(signature2)
 
       const execResponse = await safeSdk1.executeTransaction(tx)
       const receipt = await waitSafeTxReceipt(execResponse)
 
-      console.log('RECEIPT:', receipt)
       chai.expect(receipt?.status).to.be.eq(1)
     })
   })

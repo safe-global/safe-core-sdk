@@ -7,6 +7,7 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { AbiItem } from 'web3-utils'
+import Safe from '../Safe'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -90,6 +91,7 @@ export type SafeConfigProps = {
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
+  parentSafe?: Safe
 }
 
 export type SafeConfigWithSafeAddress = SafeConfigProps & SafeConfigWithSafeAddressProps

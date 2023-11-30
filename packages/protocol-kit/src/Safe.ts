@@ -13,7 +13,8 @@ import {
   MetaTransactionData,
   Transaction,
   CompatibilityFallbackHandlerContract,
-  EIP712TypedData
+  EIP712TypedData,
+  SafeTransactionData
 } from '@safe-global/safe-core-sdk-types'
 import {
   encodeSetupCallData,
@@ -49,7 +50,9 @@ import {
   buildSignature,
   generateEIP712Signature,
   generatePreValidatedSignature,
-  generateSignature
+  generateSignature,
+  preimageSafeMessageHash,
+  preimageSafeTransactionHash
 } from './utils/signatures/utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -66,7 +69,9 @@ import {
   getSafeContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
-import { ethers } from 'ethers'
+import semverSatisfies from 'semver/functions/satisfies'
+
+const EQ_OR_GT_1_4_1 = '>=1.4.1'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -76,6 +81,7 @@ class Safe {
   #moduleManager!: ModuleManager
   #guardManager!: GuardManager
   #fallbackHandlerManager!: FallbackHandlerManager
+  #parentSafe?: Safe
 
   #MAGIC_VALUE = '0x1626ba7e'
 
@@ -103,9 +109,10 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeSingleton, contractNetworks } = config
+    const { ethAdapter, isL1SafeSingleton, contractNetworks, parentSafe } = config
 
     this.#ethAdapter = ethAdapter
+    this.#parentSafe = parentSafe
 
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
@@ -503,29 +510,9 @@ class Safe {
    * @param safeTransaction - The Safe transaction or a raw message
    * @returns The hashed Safe transaction or message
    */
-  async getTransactionHash(
-    safeTransaction: SafeTransaction,
-    preimageSafeTransactionHash = false
-  ): Promise<string> {
+  async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
-    }
-
-    // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
-    // we need to use the pre-image of the transaction hash to calculate the message hash
-    // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
-    if (preimageSafeTransactionHash) {
-      const safeAddress = await this.getAddress()
-      const chainId = await this.getChainId()
-      const safeVersion = await this.getContractVersion()
-      const safeTxTypes = getEip712TxTypes(safeVersion)
-
-      // Preimage the hash
-      return ethers.TypedDataEncoder.encode(
-        { verifyingContract: safeAddress, chainId },
-        { SafeTx: safeTxTypes.SafeTx },
-        safeTransaction.data
-      )
     }
 
     const safeTransactionData = safeTransaction.data
@@ -538,17 +525,16 @@ class Safe {
    * Signs a hash using the current signer account.
    *
    * @param hash - The hash to sign
-   * @param isSmartContract - If the signature is a Smart Contract signature following EIP-1271. Optional. Default value is false
    * @returns The Safe signature
    */
-  async signHash(hash: string, isSmartContract = false): Promise<SafeSignature> {
+  async signHash(hash: string): Promise<SafeSignature> {
     const signature = await generateSignature(this.#ethAdapter, hash)
 
     // If is a Smart Contract signature the signer is the Safe and not the signer account
-    if (isSmartContract) {
+    if (this.#parentSafe) {
       const safeAddress = await this.getAddress()
 
-      return new EthSafeSignature(safeAddress, signature.data, isSmartContract)
+      return new EthSafeSignature(safeAddress, signature.data, true)
     }
 
     return signature
@@ -564,8 +550,7 @@ class Safe {
 
   async signMessage(
     message: SafeMessage,
-    signingMethod = 'eth_signTypedData_v4',
-    isSmartContract = false
+    signingMethod = 'eth_signTypedData_v4'
   ): Promise<SafeMessage> {
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
@@ -579,21 +564,38 @@ class Safe {
       throw new Error('Transactions can only be signed by Safe owners')
     }
 
+    const method = this.#parentSafe ? 'eth_sign' : signingMethod
     let signature: SafeSignature
-    if (signingMethod === 'eth_signTypedData_v4') {
-      signature = await this.signTypedData(message, 'v4', isSmartContract)
-    } else if (signingMethod === 'eth_signTypedData_v3') {
-      signature = await this.signTypedData(message, 'v3', isSmartContract)
-    } else if (signingMethod === 'eth_signTypedData') {
-      signature = await this.signTypedData(message, undefined, isSmartContract)
+    if (method === 'eth_signTypedData_v4') {
+      signature = await this.signTypedData(message, 'v4')
+    } else if (method === 'eth_signTypedData_v3') {
+      signature = await this.signTypedData(message, 'v3')
+    } else if (method === 'eth_signTypedData') {
+      signature = await this.signTypedData(message, undefined)
     } else {
       const safeVersion = await this.getContractVersion()
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
 
-      const safeMessageHash = await this.getSafeMessageHash(this.hashSafeMessage(message.data))
-      signature = await this.signHash(safeMessageHash, isSmartContract)
+      // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
+      // we need to use the pre-image of the transaction hash to calculate the message hash
+      // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
+      if (this.#parentSafe && semverSatisfies(safeVersion, EQ_OR_GT_1_4_1)) {
+        // Preimage the hash
+        const messageHashData = preimageSafeMessageHash(
+          await this.#parentSafe.getAddress(),
+          this.#parentSafe.hashSafeMessage(message.data),
+          await this.#parentSafe.getContractVersion(),
+          await this.#parentSafe.getChainId()
+        )
+
+        const signerSafeMessageHash = await this.getSafeMessageHash(messageHashData)
+        signature = await this.signHash(signerSafeMessageHash)
+      } else {
+        const safeMessageHash = await this.getSafeMessageHash(this.hashSafeMessage(message.data))
+        signature = await this.signHash(safeMessageHash)
+      }
     }
 
     const signedSafeMessage = this.createMessage(message.data)
@@ -616,8 +618,7 @@ class Safe {
    */
   async signTypedData(
     eip712Data: SafeTransaction | SafeMessage,
-    methodVersion?: 'v3' | 'v4',
-    isSmartContract = false
+    methodVersion?: 'v3' | 'v4'
   ): Promise<SafeSignature> {
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
@@ -629,10 +630,10 @@ class Safe {
     const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
 
     // If is a Smart Contract signature the signer is the Safe and not the signer account
-    if (isSmartContract) {
+    if (this.#parentSafe) {
       const safeAddress = await this.getAddress()
 
-      return new EthSafeSignature(safeAddress, signature.data, isSmartContract)
+      return new EthSafeSignature(safeAddress, signature.data, true)
     }
 
     return signature
@@ -652,8 +653,7 @@ class Safe {
       | 'eth_sign'
       | 'eth_signTypedData'
       | 'eth_signTypedData_v3'
-      | 'eth_signTypedData_v4' = 'eth_signTypedData_v4',
-    isSmartContract = false
+      | 'eth_signTypedData_v4' = 'eth_signTypedData_v4'
   ): Promise<SafeTransaction> {
     const transaction = isSafeMultisigTransactionResponse(safeTransaction)
       ? await this.toSafeTransactionType(safeTransaction)
@@ -670,21 +670,38 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-
+    const method = this.#parentSafe ? 'eth_sign' : signingMethod
     let signature: SafeSignature
-    if (signingMethod === 'eth_signTypedData_v4') {
-      signature = await this.signTypedData(transaction, 'v4', isSmartContract)
-    } else if (signingMethod === 'eth_signTypedData_v3') {
-      signature = await this.signTypedData(transaction, 'v3', isSmartContract)
-    } else if (signingMethod === 'eth_signTypedData') {
-      signature = await this.signTypedData(transaction, undefined, isSmartContract)
+    if (method === 'eth_signTypedData_v4') {
+      signature = await this.signTypedData(transaction, 'v4')
+    } else if (method === 'eth_signTypedData_v3') {
+      signature = await this.signTypedData(transaction, 'v3')
+    } else if (method === 'eth_signTypedData') {
+      signature = await this.signTypedData(transaction, undefined)
     } else {
       const safeVersion = await this.getContractVersion()
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
-      const txHash = await this.getTransactionHash(transaction)
-      signature = await this.signHash(txHash, isSmartContract)
+
+      // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
+      // we need to use the pre-image of the transaction hash to calculate the message hash
+      // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
+      if (this.#parentSafe) {
+        // Preimage the hash
+        const txHashData = preimageSafeTransactionHash(
+          await this.#parentSafe.getAddress(),
+          safeTransaction.data as SafeTransactionData,
+          await this.#parentSafe.getContractVersion(),
+          await this.#parentSafe.getChainId()
+        )
+
+        const signerSafeMessageHash = await this.getSafeMessageHash(txHashData)
+        signature = await this.signHash(signerSafeMessageHash)
+      } else {
+        const txHash = await this.getTransactionHash(transaction)
+        signature = await this.signHash(txHash)
+      }
     }
 
     const signedSafeTransaction = await this.copyTransaction(transaction)
@@ -1411,7 +1428,6 @@ class Safe {
   ): Promise<boolean> => {
     const safeAddress = await this.getAddress()
     const fallbackHandler = await this.getFallbackHandlerContract()
-
     const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
       messageHash,
       signature && Array.isArray(signature) ? buildSignature(signature) : signature

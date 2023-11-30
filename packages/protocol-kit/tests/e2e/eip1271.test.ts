@@ -1,11 +1,7 @@
 import { ethers } from 'ethers'
 import Safe from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import {
-  OperationType,
-  SafeTransactionData,
-  SafeTransactionDataPartial
-} from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -15,11 +11,7 @@ import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import {
-  buildSignature,
-  preimageSafeMessageHash,
-  preimageSafeTransactionHash
-} from '@safe-global/protocol-kit/utils'
+import { buildSignature, preimageSafeMessageHash } from '@safe-global/protocol-kit/utils'
 import SafeMessage from '../../src/utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 

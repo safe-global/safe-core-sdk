@@ -63,12 +63,12 @@ const AppBar = () => {
             )}
 
             <Button variant="contained" color="error" onClick={logOut} sx={{ ml: 2 }}>
-              Disconnect
+              Sign out
             </Button>
           </>
         ) : (
           <Button variant="contained" onClick={logIn}>
-            Connect
+            Sign in
           </Button>
         )}
       </Box>

@@ -5,7 +5,7 @@ import { Box } from '@mui/material'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
 import { useAuth } from '../../AuthContext'
-import { MoneriumPack, SafeMoneriumClient } from '../../../../../src'
+import { MoneriumPack, SafeMoneriumClient } from '@safe-global/onramp-kit'
 import Disconnected from './Disconnected'
 import DeploySafe from './DeploySafe'
 import LoginWithMonerium from './LoginWithMonerium'

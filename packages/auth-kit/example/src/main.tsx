@@ -8,14 +8,12 @@ import App from './App'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <SafeThemeProvider mode="dark">
-      {(safeTheme) => (
-        <ThemeProvider theme={safeTheme}>
-          <CssBaseline />
-          <App />
-        </ThemeProvider>
-      )}
-    </SafeThemeProvider>
-  </React.StrictMode>
+  <SafeThemeProvider mode="dark">
+    {(safeTheme) => (
+      <ThemeProvider theme={safeTheme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    )}
+  </SafeThemeProvider>
 )

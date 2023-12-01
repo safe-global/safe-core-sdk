@@ -7,6 +7,12 @@ export abstract class AuthKitBasePack {
   safeAuthData?: AuthKitSignInData
 
   /**
+   * Get the authentication status
+   * The derived classes should provide a mechanism to identify the authentication status
+   */
+  abstract get isAuthenticated(): boolean
+
+  /**
    * Initialize the pack
    * @param options The provider specific options
    */
@@ -16,12 +22,12 @@ export abstract class AuthKitBasePack {
    * Start the sign in flow in the pack
    * @returns The sign in data from the provider
    */
-  abstract signIn(): Promise<AuthKitSignInData>
+  abstract signIn(options?: unknown): Promise<AuthKitSignInData>
 
   /**
    * Start the sign out flow in the pack
    */
-  abstract signOut(): Promise<void>
+  abstract signOut(options?: unknown): Promise<void>
 
   /**
    * Get the provider instance based on the pack
@@ -54,9 +60,9 @@ export abstract class AuthKitBasePack {
    * @param txServiceUrl The URL of the Safe Transaction Service
    * @returns The list of Safe addresses owned by the user in the chain
    */
-  async getSafes(chainId: bigint, txServiceUrl?: string): Promise<string[]> {
+  async getSafes(txServiceUrl?: string): Promise<string[]> {
     try {
-      const apiKit = this.#getApiKit(chainId, txServiceUrl)
+      const apiKit = await this.#getApiKit(txServiceUrl)
 
       const address = await this.getAddress()
 
@@ -104,10 +110,12 @@ export abstract class AuthKitBasePack {
    * Get the SafeApiKit instance
    * @returns A SafeApiKit instance
    */
-  #getApiKit(chainId: bigint, txServiceUrl?: string): SafeApiKit {
+  async #getApiKit(txServiceUrl?: string): Promise<SafeApiKit> {
     if (!this.getProvider()) {
       throw new Error('Provider is not defined')
     }
+
+    const chainId = await this.getChainId()
 
     return new SafeApiKit({
       chainId,

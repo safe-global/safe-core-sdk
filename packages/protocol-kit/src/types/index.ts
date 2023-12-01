@@ -92,6 +92,7 @@ export type SafeConfigProps = {
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
   parentSafe?: Safe
+  buildSmartContractSignature?: boolean
 }
 
 export type SafeConfigWithSafeAddress = SafeConfigProps & SafeConfigWithSafeAddressProps

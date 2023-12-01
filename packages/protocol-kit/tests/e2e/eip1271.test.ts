@@ -11,7 +11,11 @@ import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import { buildSignature, preimageSafeMessageHash } from '@safe-global/protocol-kit/utils'
+import {
+  EthSafeSignature,
+  buildSignature,
+  preimageSafeMessageHash
+} from '@safe-global/protocol-kit/utils'
 import SafeMessage from '../../src/utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 
@@ -33,7 +37,7 @@ export const calculateSafeMessageHash = (
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe('EIP1271', () => {
+describe.only('EIP1271', () => {
   describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
     const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
       await deployments.fixture()
@@ -44,12 +48,16 @@ describe('EIP1271', () => {
       const [account1, account2] = accounts
 
       // Create a 1/1 Safe to sign the messages
-      const signerSafe = await getSafeWithOwners([accounts[0].address], 1, fallbackHandlerAddress)
+      const signerSafe = await getSafeWithOwners(
+        [account1.address, account2.address],
+        1,
+        fallbackHandlerAddress
+      )
       const signerSafeAddress = await signerSafe.getAddress()
 
       // Create a 2/3 Safe
       const safe = await getSafeWithOwners(
-        [accounts[0].address, accounts[1].address, signerSafeAddress],
+        [account1.address, account2.address, signerSafeAddress],
         2,
         fallbackHandlerAddress
       )
@@ -76,7 +84,8 @@ describe('EIP1271', () => {
         ethAdapter: ethAdapter1,
         safeAddress: signerSafeAddress,
         contractNetworks,
-        parentSafe: safeSdk1
+        parentSafe: safeSdk1,
+        buildSmartContractSignature: true
       })
 
       return {
@@ -385,38 +394,96 @@ describe('EIP1271', () => {
       )
     })
 
-    itif(safeVersionDeployed >= '1.3.0')(
-      'should allow to sign transactions using other Safe Accounts (threshold = 1)',
-      async () => {
-        const { safeAddress, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafeAddress } =
-          await setupTests()
+    describe('signTransaction()', () => {
+      itif(safeVersionDeployed >= '1.3.0')(
+        'should allow to sign transactions using other Safe Accounts (threshold = 1)',
+        async () => {
+          const { safeAddress, accounts, safeSdk1, safeSdk2, safeSdk3, signerSafeAddress } =
+            await setupTests()
 
-        const [account1] = accounts
+          const [account1] = accounts
 
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: account1.address,
-          value: '100000000000000000', // 0.01 ETH
-          data: '0x'
+          const safeTransactionData: SafeTransactionDataPartial = {
+            to: account1.address,
+            value: '100000000000000000', // 0.01 ETH
+            data: '0x'
+          }
+
+          await account1.signer.sendTransaction({
+            to: safeAddress,
+            value: 1_000_000_000_000_000_000n // 1 ETH
+          })
+
+          let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
+
+          // Normal signature
+          tx = await safeSdk1.signTransaction(tx)
+
+          // Smart contract signature
+          tx = await safeSdk3.signTransaction(tx)
+
+          const execResponse = await safeSdk1.executeTransaction(tx)
+          const receipt = await waitSafeTxReceipt(execResponse)
+
+          chai.expect(receipt?.status).to.be.eq(1)
         }
+      )
 
-        await account1.signer.sendTransaction({
-          to: safeAddress,
-          value: 1_000_000_000_000_000_000n // 1 ETH
-        })
+      itif(safeVersionDeployed >= '1.3.0')(
+        'should allow to sign transactions using other Safe Accounts (threshold = 2)',
+        async () => {
+          const {
+            safeAddress,
+            accounts,
+            safeSdk1,
+            signerSafeAddress,
+            ethAdapter1,
+            ethAdapter2,
+            contractNetworks
+          } = await setupTests()
 
-        let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
+          const [account1] = accounts
 
-        // Normal signature
-        tx = await safeSdk1.signTransaction(tx)
+          const safeTransactionData: SafeTransactionDataPartial = {
+            to: account1.address,
+            value: '100000000000000000', // 0.01 ETH
+            data: '0x'
+          }
 
-        // Smart contract signature
-        tx = await safeSdk3.signTransaction(tx)
+          await account1.signer.sendTransaction({
+            to: safeAddress,
+            value: 1_000_000_000_000_000_000n // 1 ETH
+          })
 
-        const execResponse = await safeSdk1.executeTransaction(tx)
-        const receipt = await waitSafeTxReceipt(execResponse)
+          let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
+          let signerSafeTx = await safeSdk1.copyTransaction(tx)
 
-        chai.expect(receipt?.status).to.be.eq(1)
-      }
-    )
+          // Normal signature
+          tx = await safeSdk1.signTransaction(tx)
+
+          // Smart contract signature
+          let signerSafeSdk = await Safe.create({
+            ethAdapter: ethAdapter1,
+            safeAddress: signerSafeAddress,
+            contractNetworks,
+            parentSafe: safeSdk1,
+            buildSmartContractSignature: false // We don't need to build the signature for the signer Safe, is the parent Safe the one doing it
+          })
+
+          signerSafeTx = await signerSafeSdk.signTransaction(signerSafeTx)
+          signerSafeSdk = await signerSafeSdk.connect({ ethAdapter: ethAdapter2 })
+          signerSafeTx = await signerSafeSdk.signTransaction(signerSafeTx)
+
+          tx.addSignature(
+            new EthSafeSignature(signerSafeAddress, signerSafeTx.encodedSignatures(), true)
+          )
+
+          const execResponse = await safeSdk1.executeTransaction(tx)
+          const receipt = await waitSafeTxReceipt(execResponse)
+
+          chai.expect(receipt?.status).to.be.eq(1)
+        }
+      )
+    })
   })
 })

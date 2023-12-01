@@ -81,6 +81,7 @@ class Safe {
   #guardManager!: GuardManager
   #fallbackHandlerManager!: FallbackHandlerManager
   #parentSafe?: Safe
+  #buildSmartContractSignature?: boolean
 
   #MAGIC_VALUE = '0x1626ba7e'
 
@@ -108,10 +109,17 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeSingleton, contractNetworks, parentSafe } = config
+    const {
+      ethAdapter,
+      isL1SafeSingleton,
+      contractNetworks,
+      parentSafe,
+      buildSmartContractSignature
+    } = config
 
     this.#ethAdapter = ethAdapter
     this.#parentSafe = parentSafe
+    this.#buildSmartContractSignature = !!buildSmartContractSignature
 
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
@@ -530,7 +538,7 @@ class Safe {
     const signature = await generateSignature(this.#ethAdapter, hash)
 
     // If is a Smart Contract signature the signer is the Safe and not the signer account
-    if (this.#parentSafe) {
+    if (this.#buildSmartContractSignature) {
       const safeAddress = await this.getAddress()
 
       return new EthSafeSignature(safeAddress, signature.data, true)
@@ -631,7 +639,7 @@ class Safe {
     const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
 
     // If is a Smart Contract signature the signer is the Safe and not the signer account
-    if (this.#parentSafe) {
+    if (this.#buildSmartContractSignature) {
       const safeAddress = await this.getAddress()
 
       return new EthSafeSignature(safeAddress, signature.data, true)

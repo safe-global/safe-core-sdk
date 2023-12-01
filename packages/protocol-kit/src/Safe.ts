@@ -40,7 +40,6 @@ import {
 import {
   EthSafeSignature,
   SAFE_FEATURES,
-  getEip712TxTypes,
   hasSafeFeature,
   hashSafeMessage,
   isSafeMultisigTransactionResponse,
@@ -578,6 +577,8 @@ class Safe {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
 
+      let safeMessageHash: string
+
       // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
       // we need to use the pre-image of the transaction hash to calculate the message hash
       // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
@@ -590,12 +591,12 @@ class Safe {
           await this.#parentSafe.getChainId()
         )
 
-        const signerSafeMessageHash = await this.getSafeMessageHash(messageHashData)
-        signature = await this.signHash(signerSafeMessageHash)
+        safeMessageHash = await this.getSafeMessageHash(messageHashData)
       } else {
-        const safeMessageHash = await this.getSafeMessageHash(this.hashSafeMessage(message.data))
-        signature = await this.signHash(safeMessageHash)
+        safeMessageHash = await this.getSafeMessageHash(this.hashSafeMessage(message.data))
       }
+
+      signature = await this.signHash(safeMessageHash)
     }
 
     const signedSafeMessage = this.createMessage(message.data)
@@ -684,11 +685,12 @@ class Safe {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
 
+      let txHash: string
+
       // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
       // we need to use the pre-image of the transaction hash to calculate the message hash
       // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
       if (this.#parentSafe) {
-        // Preimage the hash
         const txHashData = preimageSafeTransactionHash(
           await this.#parentSafe.getAddress(),
           safeTransaction.data as SafeTransactionData,
@@ -696,12 +698,11 @@ class Safe {
           await this.#parentSafe.getChainId()
         )
 
-        const signerSafeMessageHash = await this.getSafeMessageHash(txHashData)
-        signature = await this.signHash(signerSafeMessageHash)
+        txHash = await this.getSafeMessageHash(txHashData)
       } else {
-        const txHash = await this.getTransactionHash(transaction)
-        signature = await this.signHash(txHash)
+        txHash = await this.getTransactionHash(transaction)
       }
+      signature = await this.signHash(txHash)
     }
 
     const signedSafeTransaction = await this.copyTransaction(transaction)

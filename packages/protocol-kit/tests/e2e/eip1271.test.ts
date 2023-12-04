@@ -433,17 +433,8 @@ describe.only('EIP1271', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should allow to sign transactions using other Safe Accounts (threshold = 2)',
         async () => {
-          const {
-            safeAddress,
-            accounts,
-            safeSdk1,
-            safeSdk2,
-            safeSdk3,
-            signerSafeAddress,
-            ethAdapter1,
-            ethAdapter2,
-            contractNetworks
-          } = await setupTests()
+          const { safeAddress, accounts, safeSdk1, safeSdk3, ethAdapter1, ethAdapter2 } =
+            await setupTests()
 
           const [account1] = accounts
 
@@ -459,12 +450,14 @@ describe.only('EIP1271', () => {
           })
 
           let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-          let signerSafeTx = await safeSdk1.copyTransaction(tx)
 
           // Normal signature
           tx = await safeSdk1.signTransaction(tx)
 
           // Smart contract signature
+          let signerSafeTx = await safeSdk3.createTransaction({
+            transactions: [safeTransactionData]
+          })
           signerSafeTx = await safeSdk3.signTransaction(
             signerSafeTx,
             SigningMethod.ETH_SIGN,
@@ -473,14 +466,14 @@ describe.only('EIP1271', () => {
           const safeSdk4 = await safeSdk3.connect({ ethAdapter: ethAdapter2 })
           signerSafeTx = await safeSdk4.signTransaction(
             signerSafeTx,
-            SigningMethod.ETH_SIGN,
+            SigningMethod.ETH_SIGN_TYPED_DATA_V4,
             safeAddress
           )
 
           const signerSafeSig = await safeSdk4.buildSmartContractSignature(
             signerSafeTx.encodedSignatures()
           )
-          console.log(signerSafeSig)
+
           tx.addSignature(signerSafeSig)
 
           const execResponse = await safeSdk1.executeTransaction(tx)

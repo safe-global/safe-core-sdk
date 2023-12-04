@@ -3,7 +3,7 @@ import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 export class EthSafeSignature implements SafeSignature {
   signer: string
   data: string
-  isSmartContractSignature: boolean
+  isContractSignature: boolean
 
   /**
    * Creates an instance of a Safe signature.
@@ -12,10 +12,10 @@ export class EthSafeSignature implements SafeSignature {
    * @param signature - The Safe signature
    * @returns The Safe signature instance
    */
-  constructor(signer: string, signature: string, isSmartContractSignature = false) {
+  constructor(signer: string, signature: string, isContractSignature = false) {
     this.signer = signer
     this.data = signature
-    this.isSmartContractSignature = isSmartContractSignature
+    this.isContractSignature = isContractSignature
   }
 
   /**
@@ -24,7 +24,7 @@ export class EthSafeSignature implements SafeSignature {
    * @returns The static part of the Safe signature
    */
   staticPart(dynamicOffset?: string) {
-    if (this.isSmartContractSignature) {
+    if (this.isContractSignature) {
       return `${this.signer.slice(2).padStart(64, '0')}${dynamicOffset || ''}00`
     }
 
@@ -37,7 +37,7 @@ export class EthSafeSignature implements SafeSignature {
    * @returns The dynamic part of the Safe signature
    */
   dynamicPart() {
-    if (this.isSmartContractSignature) {
+    if (this.isContractSignature) {
       const dynamicPartLength = (this.data.slice(2).length / 2).toString(16).padStart(64, '0')
       return `${dynamicPartLength}${this.data.slice(2)}`
     }

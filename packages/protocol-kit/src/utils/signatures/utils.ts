@@ -141,8 +141,8 @@ export const buildSignature = (signatures: SafeSignature[]): string => {
   let signatureBytes = '0x'
   let dynamicBytes = ''
 
-  for (const sig of signatures) {
-    if (sig.isSmartContractSignature) {
+  for (const signature of signatures) {
+    if (signature.isContractSignature) {
       /* 
         A contract signature has a static part of 65 bytes and the dynamic part that needs to be appended 
         at the end of signature bytes.
@@ -160,10 +160,10 @@ export const buildSignature = (signatures: SafeSignature[]): string => {
         .toString(16)
         .padStart(64, '0')
 
-      signatureBytes += sig.staticPart(dynamicPartPosition)
-      dynamicBytes += sig.dynamicPart()
+      signatureBytes += signature.staticPart(dynamicPartPosition)
+      dynamicBytes += signature.dynamicPart()
     } else {
-      signatureBytes += sig.data.slice(2)
+      signatureBytes += signature.data.slice(2)
     }
   }
 

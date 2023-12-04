@@ -524,13 +524,13 @@ class Safe {
    * Signs a hash using the current signer account.
    *
    * @param hash - The hash to sign
-   * @param isSmartContractSignature - If the signature is going to be used for a Smart Contract signature
+   * @param isContractSignature - If the signature is going to be used for a Smart Contract signature
    * @returns The Safe signature
    */
-  async signHash(hash: string, isSmartContractSignature = false): Promise<SafeSignature> {
+  async signHash(hash: string, isContractSignature = false): Promise<SafeSignature> {
     const signature = await generateSignature(this.#ethAdapter, hash)
 
-    if (isSmartContractSignature) {
+    if (isContractSignature) {
       const smartContractSignature = await this.buildContractSignature(signature.data)
 
       return smartContractSignature
@@ -563,8 +563,8 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-    const isSmartContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
-    const method = isSmartContractSignature ? 'eth_sign' : signingMethod
+    const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
+    const method = isContractSignature ? 'eth_sign' : signingMethod
     let signature: SafeSignature
     if (method === 'eth_signTypedData_v4') {
       signature = await this.signTypedData(message, 'v4')
@@ -585,7 +585,7 @@ class Safe {
       // we need to use the pre-image of the transaction hash to calculate the message hash
       // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
       if (
-        (isSmartContractSignature || preimageSafeAddress) &&
+        (isContractSignature || preimageSafeAddress) &&
         semverSatisfies(safeVersion, EQ_OR_GT_1_4_1)
       ) {
         if (!preimageSafeAddress) {
@@ -605,7 +605,7 @@ class Safe {
         safeMessageHash = await this.getSafeMessageHash(this.hashSafeMessage(message.data))
       }
 
-      signature = await this.signHash(safeMessageHash, isSmartContractSignature)
+      signature = await this.signHash(safeMessageHash, isContractSignature)
     }
 
     const signedSafeMessage = this.createMessage(message.data)
@@ -679,8 +679,8 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-    const isSmartContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
-    const method = isSmartContractSignature ? 'eth_sign' : signingMethod
+    const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
+    const method = isContractSignature ? 'eth_sign' : signingMethod
     let signature: SafeSignature
     if (method === 'eth_signTypedData_v4') {
       signature = await this.signTypedData(transaction, 'v4')
@@ -700,7 +700,7 @@ class Safe {
       // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
       // we need to use the pre-image of the transaction hash to calculate the message hash
       // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
-      if (isSmartContractSignature || preimageSafeAddress) {
+      if (isContractSignature || preimageSafeAddress) {
         if (!preimageSafeAddress) {
           throw new Error(
             "The preimage safe address must be specified if it's a Smart Contract signature"
@@ -718,7 +718,7 @@ class Safe {
       } else {
         txHash = await this.getTransactionHash(transaction)
       }
-      signature = await this.signHash(txHash, isSmartContractSignature)
+      signature = await this.signHash(txHash, isContractSignature)
     }
 
     const signedSafeTransaction = await this.copyTransaction(transaction)

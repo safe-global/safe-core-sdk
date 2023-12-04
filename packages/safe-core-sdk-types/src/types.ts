@@ -47,7 +47,7 @@ export interface SafeTransactionDataPartial extends MetaTransactionData {
 export interface SafeSignature {
   readonly signer: string
   readonly data: string
-  readonly isSmartContractSignature: boolean
+  readonly isContractSignature: boolean
   staticPart(dynamicOffset?: string): string
   dynamicPart(): string
 }

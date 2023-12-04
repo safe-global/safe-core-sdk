@@ -524,13 +524,14 @@ class Safe {
    * Signs a hash using the current signer account.
    *
    * @param hash - The hash to sign
+   * @param isSmartContractSignature - If the signature is going to be used for a Smart Contract signature
    * @returns The Safe signature
    */
   async signHash(hash: string, isSmartContractSignature = false): Promise<SafeSignature> {
     const signature = await generateSignature(this.#ethAdapter, hash)
 
     if (isSmartContractSignature) {
-      const smartContractSignature = await this.buildSmartContractSignature(signature.data)
+      const smartContractSignature = await this.buildContractSignature(signature.data)
 
       return smartContractSignature
     }
@@ -641,13 +642,13 @@ class Safe {
     return signature
   }
 
-  async buildSmartContractSignature(
-    hash: string,
+  async buildContractSignature(
+    signatures: string,
     signerSafeAddress?: string
   ): Promise<SafeSignature> {
     const safeAddress = await this.getAddress()
 
-    return new EthSafeSignature(signerSafeAddress || safeAddress || '0x', hash, true)
+    return new EthSafeSignature(signerSafeAddress || safeAddress || '0x', signatures, true)
   }
 
   /**

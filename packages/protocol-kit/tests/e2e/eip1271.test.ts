@@ -470,7 +470,7 @@ describe.only('EIP1271', () => {
             safeAddress
           )
 
-          const signerSafeSig = await safeSdk4.buildSmartContractSignature(
+          const signerSafeSig = await safeSdk4.buildContractSignature(
             signerSafeTx.encodedSignatures()
           )
 

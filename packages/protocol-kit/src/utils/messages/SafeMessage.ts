@@ -9,6 +9,10 @@ class EthSafeMessage implements SafeMessage {
     this.data = data
   }
 
+  getSignature(signer: string): SafeSignature | undefined {
+    return this.signatures.get(signer.toLowerCase())
+  }
+
   addSignature(signature: SafeSignature): void {
     this.signatures.set(signature.signer.toLowerCase(), signature)
   }

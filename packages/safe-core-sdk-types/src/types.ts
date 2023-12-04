@@ -55,6 +55,7 @@ export interface SafeSignature {
 export interface SafeTransaction {
   readonly data: SafeTransactionData
   readonly signatures: Map<string, SafeSignature>
+  getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
 }
@@ -62,6 +63,7 @@ export interface SafeTransaction {
 export interface SafeMessage {
   readonly data: EIP712TypedData | string
   readonly signatures: Map<string, SafeSignature>
+  getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
 }

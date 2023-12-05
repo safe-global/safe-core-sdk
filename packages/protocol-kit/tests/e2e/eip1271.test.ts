@@ -471,7 +471,7 @@ describe.only('EIP1271', () => {
           )
 
           const signerSafeSig = await safeSdk4.buildContractSignature(
-            signerSafeTx.encodedSignatures()
+            Array.from(signerSafeTx.signatures.values())
           )
 
           tx.addSignature(signerSafeSig)

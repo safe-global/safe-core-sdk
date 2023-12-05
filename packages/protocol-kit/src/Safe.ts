@@ -531,7 +531,7 @@ class Safe {
     const signature = await generateSignature(this.#ethAdapter, hash)
 
     if (isContractSignature) {
-      const smartContractSignature = await this.buildContractSignature(signature.data)
+      const smartContractSignature = await this.buildContractSignature([signature])
 
       return smartContractSignature
     }
@@ -643,12 +643,18 @@ class Safe {
   }
 
   async buildContractSignature(
-    signatures: string,
+    signatures: SafeSignature[],
     signerSafeAddress?: string
   ): Promise<SafeSignature> {
     const safeAddress = await this.getAddress()
 
-    return new EthSafeSignature(signerSafeAddress || safeAddress || '0x', signatures, true)
+    const contractSignature = new EthSafeSignature(
+      signerSafeAddress || safeAddress || '0x',
+      buildSignature(signatures),
+      true
+    )
+
+    return contractSignature
   }
 
   /**

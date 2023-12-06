@@ -293,7 +293,7 @@ class SafeContract_v1_3_0_Web3
       contract: this.contract as any,
 
       setup: (): any => {
-        // setup function is labelled as `external` on the contract, but not present on the abiTypeContract
+        // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_3_0_Contract
         return
       },
 

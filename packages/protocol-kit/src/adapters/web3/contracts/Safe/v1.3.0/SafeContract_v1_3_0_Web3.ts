@@ -286,6 +286,65 @@ class SafeContract_v1_3_0_Web3
     const txResponse = this.contract.methods.approveHash(hash).send(options)
     return toTxResult(txResponse, options)
   }
+
+  // TODO: Remove this mapper after remove Typechain
+  mapToTypechainContract(): any {
+    return {
+      contract: this.contract as any,
+
+      setup: (): any => {
+        // setup function is labelled as `external` on the contract, but not present on the abiTypeContract
+        return
+      },
+
+      approveHash: this.approveHash,
+
+      isValidTransaction: this.isValidTransaction,
+
+      execTransaction: this.execTransaction,
+
+      getAddress: this.getAddress,
+
+      getModules: this.getModules,
+
+      isModuleEnabled: async (moduleAddress: string) =>
+        (await this.isModuleEnabled([moduleAddress]))[0],
+
+      getVersion: async () => (await this.VERSION())[0] as SafeVersion,
+
+      getNonce: async () => Number((await this.nonce())[0]),
+
+      getThreshold: async () => Number((await this.getThreshold())[0]),
+
+      getOwners: async () => (await this.getOwners())[0],
+
+      isOwner: async (address: string) => (await this.isOwner([address]))[0],
+
+      getTransactionHash: async (safeTransactionData: SafeTransactionData) => {
+        return (
+          await this.getTransactionHash([
+            safeTransactionData.to,
+            BigInt(safeTransactionData.value),
+            safeTransactionData.data,
+            safeTransactionData.operation,
+            BigInt(safeTransactionData.safeTxGas),
+            BigInt(safeTransactionData.baseGas),
+            BigInt(safeTransactionData.gasPrice),
+            safeTransactionData.gasToken,
+            safeTransactionData.refundReceiver,
+            BigInt(safeTransactionData.nonce)
+          ])
+        )[0]
+      },
+
+      approvedHashes: async (ownerAddress: string, hash: string) =>
+        (await this.approvedHashes([ownerAddress, hash]))[0],
+
+      encode: this.encode as any,
+
+      estimateGas: this.estimateGas as any
+    }
+  }
 }
 
 export default SafeContract_v1_3_0_Web3

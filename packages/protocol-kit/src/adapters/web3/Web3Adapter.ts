@@ -87,7 +87,8 @@ class Web3Adapter implements EthAdapter {
     safeVersion,
     singletonDeployment,
     customContractAddress,
-    customContractAbi
+    customContractAbi,
+    isL1SafeSingleton
   }: GetContractProps): Promise<SafeContractWeb3> {
     const chainId = await this.getChainId()
     const contractAddress =
@@ -95,11 +96,18 @@ class Web3Adapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
     }
-    const safeContract = this.getContract(
+    const safeSingletonContract = this.getContract(
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
-    return getSafeContractInstance(safeVersion, safeContract)
+    return getSafeContractInstance(
+      safeVersion,
+      safeSingletonContract,
+      contractAddress,
+      this,
+      customContractAbi,
+      isL1SafeSingleton
+    )
   }
 
   async getSafeProxyFactoryContract({

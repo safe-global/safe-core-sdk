@@ -44,7 +44,8 @@ export interface EthAdapter {
     safeVersion,
     singletonDeployment,
     customContractAddress,
-    customContractAbi
+    customContractAbi,
+    isL1SafeSingleton
   }: GetContractProps): Promise<SafeContract>
   getMultiSendContract({
     safeVersion,

@@ -26,7 +26,7 @@ const safeContracts_V1_4_1 = [
   `${safeContractsPath}/v1.4.1/simulate_tx_accessor.json`
 ].join(' ')
 const safeContracts_V1_3_0 = [
-  `${safeContractsPath}/v1.3.0/gnosis_safe.json`,
+  // `${safeContractsPath}/v1.3.0/gnosis_safe.json`, // Remove contract 1.3.0 from typechain as it's migrated to Abitype
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
   `${safeContractsPath}/v1.3.0/multi_send.json`,
   `${safeContractsPath}/v1.3.0/multi_send_call_only.json`,
@@ -108,10 +108,7 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.3.0`,
-    // removed Safe Contract v1.3.0 for ethers-v6
-    typechainTarget === 'ethers-v6'
-      ? safeContracts_V1_3_0.replace(`${safeContractsPath}/v1.3.0/gnosis_safe.json `, '')
-      : safeContracts_V1_3_0
+    safeContracts_V1_3_0
   )
   generateTypechainFiles(
     typechainTarget,

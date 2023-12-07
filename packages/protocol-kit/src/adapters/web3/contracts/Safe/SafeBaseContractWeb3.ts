@@ -60,7 +60,7 @@ abstract class SafeBaseContractWeb3<
     )
 
     this.adapter = web3Adapter
-    this.contract = new Contract(this.contractAbi, this.contractAddress)
+    this.contract = web3Adapter.getContract(this.contractAddress, this.contractAbi)
   }
 }
 

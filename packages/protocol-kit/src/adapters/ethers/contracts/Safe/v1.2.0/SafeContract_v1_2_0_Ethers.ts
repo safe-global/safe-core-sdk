@@ -63,6 +63,95 @@ class SafeContract_v1_2_0_Ethers
     this.safeVersion = safeVersion
   }
 
+  async NAME(): Promise<[string]> {
+    return [await this.contract.NAME()]
+  }
+
+  async VERSION(): Promise<[string]> {
+    return [await this.contract.VERSION()]
+  }
+
+  async approvedHashes([owner, txHash]: readonly [string, string]): Promise<[bigint]> {
+    return [await this.contract.approvedHashes(owner, txHash)]
+  }
+
+  async domainSeparator(): Promise<[string]> {
+    return [await this.contract.domainSeparator()]
+  }
+
+  async getModules(): Promise<[string[]]> {
+    const [modules] = await this.contract.getModulesPaginated(SENTINEL_ADDRESS, 10)
+    return modules
+  }
+
+  getModulesPaginated(
+    args: readonly [start: string, pageSize: bigint]
+  ): Promise<[modules: string[], next: string]> {
+    return this.contract.getModulesPaginated(...args)
+  }
+
+  async getOwners(): Promise<[string[]]> {
+    return [await this.contract.getOwners()]
+  }
+
+  async getThreshold(): Promise<[bigint]> {
+    return [await this.contract.getThreshold()]
+  }
+
+  async isModuleEnabled(args: readonly [moduleAddress: string]): Promise<[boolean]> {
+    return [await this.contract.isModuleEnabled(...args)]
+  }
+
+  async isOwner(args: readonly [address: string]): Promise<[boolean]> {
+    return [await this.contract.isOwner(...args)]
+  }
+
+  async nonce(): Promise<[bigint]> {
+    return [await this.contract.nonce()]
+  }
+
+  async signedMessages(args: readonly [messageHash: string]): Promise<[bigint]> {
+    return [await this.contract.signedMessages(...args)]
+  }
+
+  async getMessageHash(args: readonly [message: string]): Promise<[string]> {
+    return this.contract.getMessageHash(...args)
+  }
+
+  async encodeTransactionData(
+    args: readonly [
+      to: string,
+      value: bigint,
+      data: string,
+      operation: number,
+      safeTxGas: bigint,
+      baseGas: bigint,
+      gasPrice: bigint,
+      gasToken: string,
+      refundReceiver: string,
+      _nonce: bigint
+    ]
+  ): Promise<[string]> {
+    return [await this.contract.encodeTransactionData(...args)]
+  }
+
+  async getTransactionHash(
+    args: readonly [
+      to: string,
+      value: bigint,
+      data: string,
+      operation: number,
+      safeTxGas: bigint,
+      baseGas: bigint,
+      gasPrice: bigint,
+      gasToken: string,
+      refundReceiver: string,
+      _nonce: bigint
+    ]
+  ): Promise<[string]> {
+    return [await this.contract.getTransactionHash(...args)]
+  }
+
   encode: EncodeSafeFunction<SafeContract_v1_2_0_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
@@ -72,150 +161,21 @@ class SafeContract_v1_2_0_Ethers
     args,
     options = {}
   ) => {
-    const contractMethodToStimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToStimate.estimateGas(...args, options)
+    return this.contract.getFunction(functionToEstimate).estimateGas(...args, options)
   }
 
-  async VERSION(): Promise<[string]> {
-    return [await this.contract.VERSION()]
+  // Custom method (not defined in the Safe Contract)
+  async approveHash(
+    hash: string,
+    options?: EthersTransactionOptions
+  ): Promise<EthersTransactionResult> {
+    const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
+    const txResponse = await this.contract.approveHash(hash, { ...options, gasLimit })
+
+    return toTxResult(txResponse, options)
   }
 
-  async NAME(): Promise<[string]> {
-    return [await this.contract.NAME()]
-  }
-
-  async approvedHashes([owner, txHash]: readonly [string, string]): Promise<[bigint]> {
-    return [await this.contract.approvedHashes(owner, txHash)]
-  }
-
-  // TODO: rename the args
-  async checkNSignatures(args: readonly [string, string, string, bigint]): Promise<[]> {
-    // this method just checks whether the signature provided is valid for the provided data and hash. Reverts otherwise.
-    await this.contract.checkNSignatures(...args)
-    return []
-  }
-
-  // TODO: rename the args
-  async checkSignatures(args: readonly [string, string, string]): Promise<[]> {
-    await this.contract.checkSignatures(...args)
-    return []
-  }
-
-  async domainSeparator(): Promise<[string]> {
-    return [await this.contract.domainSeparator()]
-  }
-
-  // TODO: rename the args
-  async encodeTransactionData(
-    args: readonly [string, bigint, string, number, bigint, bigint, bigint, string, string, bigint]
-  ): Promise<[string]> {
-    return [await this.contract.encodeTransactionData(...args)]
-  }
-
-  // TODO: rename the args
-  async getAddress(): Promise<string> {
-    return this.contract.getAddress()
-  }
-
-  async getChainId(): Promise<[bigint]> {
-    return [await this.contract.getChainId()]
-  }
-
-  // TODO: rename the args
-  async getMessageHash(args: readonly [string]): Promise<readonly [string]> {
-    return this.contract.getMessageHash(...args)
-  }
-
-  // TODO: rename the args
-  getModulesPaginated(
-    args: readonly [start: string, pageSize: bigint]
-  ): Promise<[modules: string[], next: string]> {
-    return this.contract.getModulesPaginated(...args)
-  }
-
-  async getOwners(): Promise<readonly [string[]]> {
-    return [await this.contract.getOwners()]
-  }
-
-  // TODO: rename the args
-  async getStorageAt(args: readonly [bigint, bigint]): Promise<[string]> {
-    return [await this.contract.getStorageAt(...args)]
-  }
-
-  async getThreshold(): Promise<[bigint]> {
-    return [await this.contract.getThreshold()]
-  }
-
-  // TODO: rename the args
-  async getTransactionHash(
-    args: readonly [string, bigint, string, number, bigint, bigint, bigint, string, string, bigint]
-  ): Promise<[string]> {
-    return [await this.contract.getTransactionHash(...args)]
-  }
-
-  // TODO: rename the args
-  async isModuleEnabled(args: readonly [string]): Promise<[boolean]> {
-    return [await this.contract.isModuleEnabled(...args)]
-  }
-
-  // TODO: rename the args
-  async isOwner(args: readonly [string]): Promise<[boolean]> {
-    return [await this.contract.isOwner(...args)]
-  }
-
-  async nonce(): Promise<[bigint]> {
-    return [await this.contract.nonce()]
-  }
-
-  // TODO: rename the args
-  async signedMessages(args: readonly [string]): Promise<[bigint]> {
-    return [await this.contract.signedMessages(...args)]
-  }
-
-  // custom methods (not defined in the Safe Contract)
-  async isValidTransaction(
-    safeTransaction: SafeTransaction,
-    options: EthersTransactionOptions = {}
-  ) {
-    try {
-      const gasLimit =
-        options?.gasLimit ||
-        (await this.estimateGas(
-          'execTransaction',
-          [
-            safeTransaction.data.to,
-            BigInt(safeTransaction.data.value),
-            safeTransaction.data.data,
-            safeTransaction.data.operation,
-            BigInt(safeTransaction.data.safeTxGas),
-            BigInt(safeTransaction.data.baseGas),
-            BigInt(safeTransaction.data.gasPrice),
-            safeTransaction.data.gasToken,
-            safeTransaction.data.refundReceiver,
-            safeTransaction.encodedSignatures()
-          ],
-          options
-        ))
-
-      return await this.contract.execTransaction.staticCall(
-        safeTransaction.data.to,
-        BigInt(safeTransaction.data.value),
-        safeTransaction.data.data,
-        safeTransaction.data.operation,
-        BigInt(safeTransaction.data.safeTxGas),
-        BigInt(safeTransaction.data.baseGas),
-        BigInt(safeTransaction.data.gasPrice),
-        safeTransaction.data.gasToken,
-        safeTransaction.data.refundReceiver,
-        safeTransaction.encodedSignatures(),
-        { ...options, gasLimit }
-      )
-    } catch (error) {
-      return false
-    }
-  }
-
+  // Custom method (not defined in the Safe Contract)
   async execTransaction(
     safeTransaction: SafeTransaction,
     options?: EthersTransactionOptions
@@ -256,20 +216,57 @@ class SafeContract_v1_2_0_Ethers
     return toTxResult(txResponse, options)
   }
 
-  // TODO: review this custom method
-  async getModules(): Promise<readonly [string[]]> {
-    const [modules] = await this.contract.getModulesPaginated(SENTINEL_ADDRESS, 10)
-    return modules
+  // Custom method (not defined in the Safe Contract)
+  async getAddress(): Promise<string> {
+    return this.contract.getAddress()
   }
 
-  async approveHash(
-    hash: string,
-    options?: EthersTransactionOptions
-  ): Promise<EthersTransactionResult> {
-    const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
-    const txResponse = await this.contract.approveHash(hash, { ...options, gasLimit })
+  // Custom method (not defined in the Safe Contract)
+  async getChainId(): Promise<[bigint]> {
+    return [await this.contract.getChainId()]
+  }
 
-    return toTxResult(txResponse, options)
+  // Custom method (not defined in the Safe Contract)
+  async isValidTransaction(
+    safeTransaction: SafeTransaction,
+    options: EthersTransactionOptions = {}
+  ) {
+    try {
+      const gasLimit =
+        options?.gasLimit ||
+        (await this.estimateGas(
+          'execTransaction',
+          [
+            safeTransaction.data.to,
+            BigInt(safeTransaction.data.value),
+            safeTransaction.data.data,
+            safeTransaction.data.operation,
+            BigInt(safeTransaction.data.safeTxGas),
+            BigInt(safeTransaction.data.baseGas),
+            BigInt(safeTransaction.data.gasPrice),
+            safeTransaction.data.gasToken,
+            safeTransaction.data.refundReceiver,
+            safeTransaction.encodedSignatures()
+          ],
+          options
+        ))
+
+      return await this.contract.execTransaction.staticCall(
+        safeTransaction.data.to,
+        BigInt(safeTransaction.data.value),
+        safeTransaction.data.data,
+        safeTransaction.data.operation,
+        BigInt(safeTransaction.data.safeTxGas),
+        BigInt(safeTransaction.data.baseGas),
+        BigInt(safeTransaction.data.gasPrice),
+        safeTransaction.data.gasToken,
+        safeTransaction.data.refundReceiver,
+        safeTransaction.encodedSignatures(),
+        { ...options, gasLimit }
+      )
+    } catch (error) {
+      return false
+    }
   }
 }
 

@@ -3,14 +3,12 @@ import {
   EthAdapter,
   SafeSignature,
   SafeEIP712Args,
-  SafeTransaction,
   SafeTransactionData
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
-import { predictSafeAddress } from '../..'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =

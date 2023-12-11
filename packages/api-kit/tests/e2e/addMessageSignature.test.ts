@@ -1,4 +1,4 @@
-import Safe from '@safe-global/protocol-kit'
+import Safe, { hashSafeMessage } from '@safe-global/protocol-kit'
 import { EthAdapter, SafeMessage } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
@@ -70,9 +70,7 @@ describe('addMessageSignature', () => {
 
     const signedMessage2 = await protocolKit2.signMessage(signedMessage1, 'eth_signTypedData_v4')
 
-    const safeMessageHash = await protocolKit1.getSafeMessageHash(
-      protocolKit1.hashSafeMessage(rawMessage)
-    )
+    const safeMessageHash = await protocolKit1.getSafeMessageHash(hashSafeMessage(rawMessage))
 
     await chai.expect(
       safeApiKit1.addMessageSignature(

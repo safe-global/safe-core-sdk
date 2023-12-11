@@ -541,10 +541,6 @@ class Safe {
     return signature
   }
 
-  hashSafeMessage(message: string | EIP712TypedData): string {
-    return hashSafeMessage(message)
-  }
-
   createMessage(message: string | EIP712TypedData): SafeMessage {
     return new SafeMessage(message)
   }
@@ -597,14 +593,14 @@ class Safe {
         }
         const messageHashData = preimageSafeMessageHash(
           preimageSafeAddress,
-          this.hashSafeMessage(message.data),
+          hashSafeMessage(message.data),
           safeVersion,
           chainId
         )
 
         safeMessageHash = await this.getSafeMessageHash(messageHashData)
       } else {
-        safeMessageHash = await this.getSafeMessageHash(this.hashSafeMessage(message.data))
+        safeMessageHash = await this.getSafeMessageHash(hashSafeMessage(message.data))
       }
 
       signature = await this.signHash(safeMessageHash, isContractSignature)

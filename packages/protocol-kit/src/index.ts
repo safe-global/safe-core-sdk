@@ -77,6 +77,22 @@ import {
   createERC20TokenTransferTransaction
 } from './utils/erc-20'
 
+import {
+  generateSignature,
+  generateEIP712Signature,
+  buildContractSignature,
+  buildSignature,
+  preimageSafeTransactionHash,
+  preimageSafeMessageHash
+} from './utils/signatures/utils'
+
+import {
+  getEip712TxTypes,
+  getEip712MessageTypes,
+  hashSafeMessage,
+  generateTypedData
+} from './utils/eip-712'
+
 export {
   AddOwnerTxParams,
   estimateTxBaseGas,
@@ -143,7 +159,17 @@ export {
   predictSafeAddress,
   standardizeSafeTransactionData,
   validateEip3770Address,
-  validateEthereumAddress
+  validateEthereumAddress,
+  generateSignature,
+  generateEIP712Signature,
+  buildContractSignature,
+  buildSignature,
+  preimageSafeTransactionHash,
+  preimageSafeMessageHash,
+  getEip712TxTypes,
+  getEip712MessageTypes,
+  hashSafeMessage,
+  generateTypedData
 }
 
 export default Safe

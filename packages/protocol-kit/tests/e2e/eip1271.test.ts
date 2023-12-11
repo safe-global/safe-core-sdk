@@ -1,5 +1,10 @@
 import { ethers } from 'ethers'
-import Safe from '@safe-global/protocol-kit/index'
+import Safe, {
+  hashSafeMessage,
+  buildContractSignature,
+  buildSignature,
+  preimageSafeMessageHash
+} from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
@@ -11,12 +16,6 @@ import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import {
-  EthSafeSignature,
-  buildContractSignature,
-  buildSignature,
-  preimageSafeMessageHash
-} from '@safe-global/protocol-kit/utils'
 import SafeMessage from '../../src/utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
@@ -121,7 +120,7 @@ describe.only('EIP1271', () => {
           customContractAbi: customContract.signMessageLibAbi
         })
 
-        const messageHash = safeSdk1.hashSafeMessage(MESSAGE)
+        const messageHash = hashSafeMessage(MESSAGE)
 
         const txData = signMessageLibContract.encode('signMessage', [messageHash])
 
@@ -150,10 +149,7 @@ describe.only('EIP1271', () => {
     itif(safeVersionDeployed >= '1.3.0')('should revert when message is not signed', async () => {
       const { safeSdk1 } = await setupTests()
 
-      const response = await safeSdk1.isValidSignature(
-        await safeSdk1.hashSafeMessage(MESSAGE),
-        '0x'
-      )
+      const response = await safeSdk1.isValidSignature(await hashSafeMessage(MESSAGE), '0x')
 
       chai.expect(response).to.be.false
     })
@@ -165,7 +161,7 @@ describe.only('EIP1271', () => {
           const { safeSdk1, safeSdk2 } = await setupTests()
 
           // Hash the message
-          const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
+          const messageHash = await hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           // Sign the Safe message hash with the owners
@@ -198,7 +194,7 @@ describe.only('EIP1271', () => {
           const { safeSdk1, safeSdk2 } = await setupTests()
 
           // Hash the message
-          const messageHash = await safeSdk1.hashSafeMessage(MESSAGE)
+          const messageHash = await hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           // Sign the Safe message with the owners
@@ -217,7 +213,7 @@ describe.only('EIP1271', () => {
         async () => {
           const { safeSdk1, safeSdk2, safeSdk3, safeAddress } = await setupTests()
           // Hash the message
-          const messageHash = safeSdk1.hashSafeMessage(MESSAGE)
+          const messageHash = hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           // Sign the Safe message with the owners
@@ -295,7 +291,7 @@ describe.only('EIP1271', () => {
           const { safeAddress, safeSdk1 } = await setupTests()
 
           const chainId = await safeSdk1.getChainId()
-          const messageHash = safeSdk1.hashSafeMessage(MESSAGE)
+          const messageHash = hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           chai
@@ -318,7 +314,7 @@ describe.only('EIP1271', () => {
         // Validate the signature
         chai.expect(
           await safeSdk1.isValidSignature(
-            safeSdk1.hashSafeMessage(MESSAGE),
+            hashSafeMessage(MESSAGE),
             signedMessage2.encodedSignatures()
           )
         ).to.be.true
@@ -326,7 +322,7 @@ describe.only('EIP1271', () => {
         // Validate the signature is not valid when not enough signers has signed
         chai.expect(
           await safeSdk1.isValidSignature(
-            safeSdk1.hashSafeMessage(MESSAGE),
+            hashSafeMessage(MESSAGE),
             signedMessage1.encodedSignatures()
           )
         ).to.be.false
@@ -349,7 +345,7 @@ describe.only('EIP1271', () => {
           // Validate the signature
           chai.expect(
             await safeSdk1.isValidSignature(
-              safeSdk1.hashSafeMessage(MESSAGE),
+              hashSafeMessage(MESSAGE),
               signedMessage2.encodedSignatures()
             )
           ).to.be.true
@@ -374,7 +370,7 @@ describe.only('EIP1271', () => {
           // Validate the signature
           chai.expect(
             await safeSdk1.isValidSignature(
-              safeSdk1.hashSafeMessage(MESSAGE),
+              hashSafeMessage(MESSAGE),
               signedMessage2.encodedSignatures()
             )
           ).to.be.true
@@ -387,7 +383,7 @@ describe.only('EIP1271', () => {
           const { safeAddress, safeSdk1 } = await setupTests()
 
           const chainId = await safeSdk1.getChainId()
-          const messageHash = safeSdk1.hashSafeMessage(MESSAGE)
+          const messageHash = hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           chai

@@ -127,7 +127,7 @@ describe('MoneriumPack', () => {
     it('should call disconnect', async () => {
       const disconnectSpy = jest.spyOn(
         safeMoneriumClient.SafeMoneriumClient.prototype,
-        'disconnect'
+        'revokeAccess'
       )
       const safeSdk = new Safe()
 

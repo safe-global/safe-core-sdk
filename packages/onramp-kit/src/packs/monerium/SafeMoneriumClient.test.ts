@@ -22,7 +22,15 @@ const newOrder = {
   memo: 'memo'
 }
 
-jest.mock('@monerium/sdk')
+jest.mock('@monerium/sdk', () => {
+  const actualSdk = jest.requireActual('@monerium/sdk')
+  return {
+    ...(jest.genMockFromModule('@monerium/sdk') as any),
+    getChain: actualSdk.getChain,
+    getNetwork: actualSdk.getNetwork,
+    placeOrderMessage: actualSdk.placeOrderMessage
+  }
+})
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/api-kit')
 

@@ -168,7 +168,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Chain Id
    */
   async getChainId(): Promise<number> {
-    return await this.#safeSdk.getChainId()
+    return Number(BigInt(await this.#safeSdk.getChainId()))
   }
 
   /**
@@ -176,9 +176,9 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Chain
    */
   async getChain(): Promise<Chain> {
-    const chainId = await this.#safeSdk.getChainId()
+    const chainId = BigInt(await this.#safeSdk.getChainId())
 
-    return getMoneriumChain(chainId)
+    return getMoneriumChain(Number(chainId))
   }
 
   /**
@@ -186,9 +186,9 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Network
    */
   async getNetwork(): Promise<Networks> {
-    const chainId = await this.#safeSdk.getChainId()
+    const chainId = BigInt(await this.#safeSdk.getChainId())
 
-    return getMoneriumNetwork(chainId)
+    return getMoneriumNetwork(Number(chainId))
   }
 
   /**

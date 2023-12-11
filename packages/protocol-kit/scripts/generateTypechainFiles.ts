@@ -103,7 +103,10 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.4.1`,
-    safeContracts_V1_4_1
+    // Remove Safe Contract v1.4.1 for web3-v1
+    typechainTarget === 'web3-v1'
+      ? safeContracts_V1_4_1.replace(`${safeContractsPath}/v1.4.1/safe.json `, '')
+      : safeContracts_V1_4_1
   )
   generateTypechainFiles(
     typechainTarget,

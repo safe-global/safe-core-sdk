@@ -1,5 +1,6 @@
 import SafeBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/SafeBaseContractWeb3'
 import {
+  DeepWriteable,
   Web3TransactionOptions,
   Web3TransactionResult
 } from '@safe-global/protocol-kit/adapters/web3/types'
@@ -12,11 +13,12 @@ import {
   EstimateGasSafeFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
 import SafeContract_v1_4_1_Contract, {
-  SafeContract_v1_4_1_Abi
+  SafeContract_v1_4_1_Abi as SafeContract_v1_4_1_Abi_Readonly
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
 import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
-type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> }
+// Remove all nested `readonly` modifiers from the ABI type
+type SafeContract_v1_4_1_Abi = DeepWriteable<SafeContract_v1_4_1_Abi_Readonly>
 
 /**
  * SafeContract_v1_4_1_Web3 is the implementation specific to the Safe contract version 1.4.1.
@@ -27,7 +29,7 @@ type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> }
  * @implements SafeContract_v1_4_1_Contract - Implements the interface specific to Safe contract version 1.4.1.
  */
 class SafeContract_v1_4_1_Web3
-  extends SafeBaseContractWeb3<DeepWriteable<SafeContract_v1_4_1_Abi>>
+  extends SafeBaseContractWeb3<SafeContract_v1_4_1_Abi>
   implements SafeContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
@@ -46,10 +48,10 @@ class SafeContract_v1_4_1_Web3
     web3Adapter: Web3Adapter,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContract_v1_4_1_Abi
+    customContractAbi?: SafeContract_v1_4_1_Abi_Readonly
   ) {
     const safeVersion = '1.4.1'
-    const defaultAbi = safe_1_4_1_ContractArtifacts.abi as DeepWriteable<SafeContract_v1_4_1_Abi>
+    const defaultAbi = safe_1_4_1_ContractArtifacts.abi as SafeContract_v1_4_1_Abi
 
     super(
       chainId,
@@ -58,7 +60,7 @@ class SafeContract_v1_4_1_Web3
       safeVersion,
       isL1SafeSingleton,
       customContractAddress,
-      customContractAbi as DeepWriteable<SafeContract_v1_4_1_Abi>
+      customContractAbi as SafeContract_v1_4_1_Abi
     )
 
     this.safeVersion = safeVersion
@@ -165,11 +167,11 @@ class SafeContract_v1_4_1_Web3
     return [await this.contract.methods.signedMessages(...args).call()]
   }
 
-  encode: EncodeSafeFunction<SafeContract_v1_4_1_Abi> = (functionToEncode, args) => {
+  encode: EncodeSafeFunction<SafeContract_v1_4_1_Abi_Readonly> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 
-  estimateGas: EstimateGasSafeFunction<SafeContract_v1_4_1_Abi, Web3TransactionOptions> = (
+  estimateGas: EstimateGasSafeFunction<SafeContract_v1_4_1_Abi_Readonly, Web3TransactionOptions> = (
     functionToEstimate,
     args,
     options = {}

@@ -1,5 +1,6 @@
 import SafeBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/SafeBaseContractWeb3'
 import {
+  DeepWriteable,
   Web3TransactionOptions,
   Web3TransactionResult
 } from '@safe-global/protocol-kit/adapters/web3/types'
@@ -12,11 +13,12 @@ import {
   EstimateGasSafeFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
 import SafeContract_v1_3_0_Contract, {
-  SafeContract_v1_3_0_Abi
+  SafeContract_v1_3_0_Abi as SafeContract_v1_3_0_Abi_Readonly
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
 import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
-type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> }
+// Remove all nested `readonly` modifiers from the ABI type
+type SafeContract_v1_3_0_Abi = DeepWriteable<SafeContract_v1_3_0_Abi_Readonly>
 
 /**
  * SafeContract_v1_3_0_Web3 is the implementation specific to the Safe contract version 1.3.0.
@@ -46,7 +48,7 @@ class SafeContract_v1_3_0_Web3
     web3Adapter: Web3Adapter,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContract_v1_3_0_Abi
+    customContractAbi?: SafeContract_v1_3_0_Abi_Readonly
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = safe_1_3_0_ContractArtifacts.abi as DeepWriteable<SafeContract_v1_3_0_Abi>
@@ -165,11 +167,11 @@ class SafeContract_v1_3_0_Web3
     return [await this.contract.methods.signedMessages(...args).call()]
   }
 
-  encode: EncodeSafeFunction<SafeContract_v1_3_0_Abi> = (functionToEncode, args) => {
+  encode: EncodeSafeFunction<SafeContract_v1_3_0_Abi_Readonly> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 
-  estimateGas: EstimateGasSafeFunction<SafeContract_v1_3_0_Abi, Web3TransactionOptions> = (
+  estimateGas: EstimateGasSafeFunction<SafeContract_v1_3_0_Abi_Readonly, Web3TransactionOptions> = (
     functionToEstimate,
     args,
     options = {}

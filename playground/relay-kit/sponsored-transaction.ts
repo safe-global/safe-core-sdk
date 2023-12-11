@@ -1,6 +1,5 @@
-import AccountAbstraction, {
-  AccountAbstractionConfig
-} from '@safe-global/account-abstraction-kit-poc'
+import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
+import { EthersAdapter } from '@safe-global/protocol-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
@@ -40,40 +39,48 @@ async function main() {
 
   // SDK Initialization
 
-  const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
+  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
   const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
 
-  const relayPack = new GelatoRelayPack(config.RELAY_API_KEY)
+  const safeAccountAbstraction = new AccountAbstraction(
+    new EthersAdapter({
+      ethers,
+      signerOrProvider: signer
+    })
+  )
 
-  const safeAccountAbstraction = new AccountAbstraction(signer)
-  const sdkConfig: AccountAbstractionConfig = {
-    relayPack
-  }
-  await safeAccountAbstraction.init(sdkConfig)
+  await safeAccountAbstraction.init()
+
+  safeAccountAbstraction.setRelayKit(
+    new GelatoRelayPack({
+      apiKey: config.RELAY_API_KEY,
+      protocolKit: safeAccountAbstraction.protocolKit
+    })
+  )
 
   // Calculate Safe address
 
-  const predictedSafeAddress = safeAccountAbstraction.getSafeAddress()
+  const predictedSafeAddress = await safeAccountAbstraction.protocolKit.getAddress()
   console.log({ predictedSafeAddress })
 
-  const isSafeDeployed = await safeAccountAbstraction.isSafeDeployed()
+  const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
   // Fake on-ramp to fund the Safe
 
   const safeBalance = await provider.getBalance(predictedSafeAddress)
-  console.log({ safeBalance: ethers.utils.formatEther(safeBalance.toString()) })
-  if (safeBalance.lt(txConfig.VALUE)) {
+  console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
+  if (safeBalance < BigInt(txConfig.VALUE)) {
     const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,
       value: txConfig.VALUE
     })
-    console.log(`Funding the Safe with ${ethers.utils.formatEther(txConfig.VALUE.toString())} ETH`)
+    console.log(`Funding the Safe with ${ethers.formatEther(txConfig.VALUE.toString())} ETH`)
     await onRampResponse.wait()
 
     const safeBalanceAfter = await provider.getBalance(predictedSafeAddress)
-    console.log({ safeBalance: ethers.utils.formatEther(safeBalanceAfter.toString()) })
+    console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
   }
 
   // Relay the transaction

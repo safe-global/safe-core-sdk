@@ -1,11 +1,16 @@
-import { ethers } from 'ethers'
+import { ethers, Eip1193Provider } from 'ethers'
 import SafeApiKit from '@safe-global/api-kit'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 
 import type { AuthKitSignInData } from './types'
 
 export abstract class AuthKitBasePack {
   safeAuthData?: AuthKitSignInData
+
+  /**
+   * Get the authentication status
+   * The derived classes should provide a mechanism to identify the authentication status
+   */
+  abstract get isAuthenticated(): boolean
 
   /**
    * Initialize the pack
@@ -17,18 +22,18 @@ export abstract class AuthKitBasePack {
    * Start the sign in flow in the pack
    * @returns The sign in data from the provider
    */
-  abstract signIn(): Promise<AuthKitSignInData>
+  abstract signIn(options?: unknown): Promise<AuthKitSignInData>
 
   /**
    * Start the sign out flow in the pack
    */
-  abstract signOut(): Promise<void>
+  abstract signOut(options?: unknown): Promise<void>
 
   /**
    * Get the provider instance based on the pack
    * @returns The provider instance
    */
-  abstract getProvider(): ethers.providers.ExternalProvider | null
+  abstract getProvider(): Eip1193Provider | null
 
   /**
    * Get the user info from the provider
@@ -55,12 +60,12 @@ export abstract class AuthKitBasePack {
    * @param txServiceUrl The URL of the Safe Transaction Service
    * @returns The list of Safe addresses owned by the user in the chain
    */
-  async getSafes(txServiceUrl: string): Promise<string[]> {
-    const apiKit = this.#getApiKit(txServiceUrl)
-
-    const address = await this.getAddress()
-
+  async getSafes(txServiceUrl?: string): Promise<string[]> {
     try {
+      const apiKit = await this.#getApiKit(txServiceUrl)
+
+      const address = await this.getAddress()
+
       const safesByOwner = await apiKit.getSafesByOwner(address)
 
       return safesByOwner.safes
@@ -74,43 +79,47 @@ export abstract class AuthKitBasePack {
    * @returns The signer address
    */
   async getAddress(): Promise<string> {
-    if (!this.getProvider()) {
+    const authKitProvider = this.getProvider()
+
+    if (!authKitProvider) {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
+    const ethersProvider = new ethers.BrowserProvider(authKitProvider)
 
-    const signer = ethersProvider.getSigner()
+    const signer = await ethersProvider.getSigner()
 
-    const address = await signer.getAddress()
+    return signer.getAddress()
+  }
 
-    return address
+  async getChainId(): Promise<bigint> {
+    const authKitProvider = this.getProvider()
+
+    if (!authKitProvider) {
+      throw new Error('Provider is not defined')
+    }
+
+    const ethersProvider = new ethers.BrowserProvider(authKitProvider)
+
+    const networkDetails = await ethersProvider.getNetwork()
+
+    return networkDetails.chainId
   }
 
   /**
    * Get the SafeApiKit instance
    * @returns A SafeApiKit instance
    */
-  #getApiKit(txServiceUrl: string): SafeApiKit {
+  async #getApiKit(txServiceUrl?: string): Promise<SafeApiKit> {
     if (!this.getProvider()) {
       throw new Error('Provider is not defined')
     }
 
-    const provider = new ethers.providers.Web3Provider(
-      this.getProvider() as ethers.providers.ExternalProvider
-    )
-    const safeOwner = provider.getSigner(0)
-
-    const adapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: safeOwner
-    })
+    const chainId = await this.getChainId()
 
     return new SafeApiKit({
-      txServiceUrl,
-      ethAdapter: adapter
+      chainId,
+      txServiceUrl
     })
   }
 }

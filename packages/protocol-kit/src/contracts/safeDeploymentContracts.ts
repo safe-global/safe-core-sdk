@@ -33,18 +33,18 @@ interface GetContractInstanceProps {
 }
 
 interface GetSafeContractInstanceProps extends GetContractInstanceProps {
-  isL1SafeMasterCopy?: boolean
+  isL1SafeSingleton?: boolean
   customSafeAddress?: string
 }
 
 export function getSafeContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number,
-  isL1SafeMasterCopy = false
+  chainId: bigint,
+  isL1SafeSingleton = false
 ): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].safeMasterCopyVersion
+  const version = safeDeploymentsVersions[safeVersion].safeSingletonVersion
   const filters: DeploymentFilter = { version, network: chainId.toString(), released: true }
-  if (safeDeploymentsL1ChainIds.includes(chainId) || isL1SafeMasterCopy) {
+  if (safeDeploymentsL1ChainIds.includes(chainId) || isL1SafeSingleton) {
     return getSafeSingletonDeployment(filters)
   }
   return getSafeL2SingletonDeployment(filters)
@@ -52,7 +52,7 @@ export function getSafeContractDeployment(
 
 export function getCompatibilityFallbackHandlerContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].compatibilityFallbackHandler
   return getCompatibilityFallbackHandlerDeployment({
@@ -64,7 +64,7 @@ export function getCompatibilityFallbackHandlerContractDeployment(
 
 export function getMultiSendCallOnlyContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].multiSendCallOnlyVersion
   return getMultiSendCallOnlyDeployment({ version, network: chainId.toString(), released: true })
@@ -72,7 +72,7 @@ export function getMultiSendCallOnlyContractDeployment(
 
 export function getMultiSendContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].multiSendVersion
   return getMultiSendDeployment({ version, network: chainId.toString(), released: true })
@@ -80,7 +80,7 @@ export function getMultiSendContractDeployment(
 
 export function getSafeProxyFactoryContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].safeProxyFactoryVersion
   return getProxyFactoryDeployment({ version, network: chainId.toString(), released: true })
@@ -88,7 +88,7 @@ export function getSafeProxyFactoryContractDeployment(
 
 export function getSignMessageLibContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].signMessageLibVersion
   return getSignMessageLibDeployment({ version, network: chainId.toString(), released: true })
@@ -96,7 +96,7 @@ export function getSignMessageLibContractDeployment(
 
 export function getCreateCallContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].createCallVersion
   return getCreateCallDeployment({ version, network: chainId.toString(), released: true })
@@ -104,7 +104,7 @@ export function getCreateCallContractDeployment(
 
 export function getSimulateTxAccessorContractDeployment(
   safeVersion: SafeVersion,
-  chainId: number
+  chainId: bigint
 ): SingletonDeployment | undefined {
   const version = safeDeploymentsVersions[safeVersion].createCallVersion
   return getSimulateTxAccessorDeployment({ version, network: chainId.toString(), released: true })
@@ -114,18 +114,18 @@ export async function getSafeContract({
   ethAdapter,
   safeVersion,
   customSafeAddress,
-  isL1SafeMasterCopy,
+  isL1SafeSingleton,
   customContracts
 }: GetSafeContractInstanceProps): Promise<SafeContract> {
   const chainId = await ethAdapter.getChainId()
-  const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeMasterCopy)
+  const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeSingleton)
   const safeContract = await ethAdapter.getSafeContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress: customSafeAddress ?? customContracts?.safeMasterCopyAddress,
-    customContractAbi: customContracts?.safeMasterCopyAbi
+    customContractAddress: customSafeAddress ?? customContracts?.safeSingletonAddress,
+    customContractAbi: customContracts?.safeSingletonAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(safeContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(await safeContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('SafeProxy contract is not deployed on the current network')
   }
@@ -146,7 +146,7 @@ export async function getProxyFactoryContract({
     customContractAbi: customContracts?.safeProxyFactoryAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    safeProxyFactoryContract.getAddress()
+    await safeProxyFactoryContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('SafeProxyFactory contract is not deployed on the current network')
@@ -171,7 +171,7 @@ export async function getCompatibilityFallbackHandlerContract({
     customContractAbi: customContracts?.fallbackHandlerAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    fallbackHandlerContract.getAddress()
+    await fallbackHandlerContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('CompatibilityFallbackHandler contract is not deployed on the current network')
@@ -192,7 +192,9 @@ export async function getMultiSendContract({
     customContractAddress: customContracts?.multiSendAddress,
     customContractAbi: customContracts?.multiSendAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(multiSendContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(
+    await multiSendContract.getAddress()
+  )
   if (!isContractDeployed) {
     throw new Error('MultiSend contract is not deployed on the current network')
   }
@@ -213,7 +215,7 @@ export async function getMultiSendCallOnlyContract({
     customContractAbi: customContracts?.multiSendCallOnlyAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    multiSendCallOnlyContract.getAddress()
+    await multiSendCallOnlyContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('MultiSendCallOnly contract is not deployed on the current network')
@@ -235,7 +237,7 @@ export async function getSignMessageLibContract({
     customContractAbi: customContracts?.signMessageLibAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    signMessageLibContract.getAddress()
+    await signMessageLibContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('SignMessageLib contract is not deployed on the current network')
@@ -256,7 +258,9 @@ export async function getCreateCallContract({
     customContractAddress: customContracts?.createCallAddress,
     customContractAbi: customContracts?.createCallAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(createCallContract.getAddress())
+  const isContractDeployed = await ethAdapter.isContractDeployed(
+    await createCallContract.getAddress()
+  )
   if (!isContractDeployed) {
     throw new Error('CreateCall contract is not deployed on the current network')
   }
@@ -277,7 +281,7 @@ export async function getSimulateTxAccessorContract({
     customContractAbi: customContracts?.simulateTxAccessorAbi
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(
-    simulateTxAccessorContract.getAddress()
+    await simulateTxAccessorContract.getAddress()
   )
   if (!isContractDeployed) {
     throw new Error('SimulateTxAccessor contract is not deployed on the current network')

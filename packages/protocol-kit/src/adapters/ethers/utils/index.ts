@@ -1,15 +1,12 @@
-import { TypedDataSigner } from '@ethersproject/abstract-signer'
-import { ContractTransaction } from '@ethersproject/contracts'
+import { ContractTransactionResponse, Provider, AbstractSigner } from 'ethers'
 import { EthersTransactionOptions, EthersTransactionResult } from '../types'
-import { Signer } from '@ethersproject/abstract-signer'
-import { Provider } from '@ethersproject/providers'
 
 export function sameString(str1: string, str2: string): boolean {
   return str1.toLowerCase() === str2.toLowerCase()
 }
 
 export function toTxResult(
-  transactionResponse: ContractTransaction,
+  transactionResponse: ContractTransactionResponse,
   options?: EthersTransactionOptions
 ): EthersTransactionResult {
   return {
@@ -19,8 +16,8 @@ export function toTxResult(
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is TypedDataSigner {
-  return (signer as unknown as TypedDataSigner)._signTypedData !== undefined
+export function isTypedDataSigner(signer: any): signer is AbstractSigner {
+  return (signer as unknown as AbstractSigner).signTypedData !== undefined
 }
 
 /**
@@ -28,14 +25,12 @@ export function isTypedDataSigner(signer: any): signer is TypedDataSigner {
  * @param signerOrProvider - Signer or provider
  * @returns true if the parameter is compatible with `Signer`
  */
-export function isSignerCompatible(
-  signerOrProvider: Signer | Provider
-): signerOrProvider is Signer {
-  const candidate = signerOrProvider as Signer
-  return (
-    (typeof candidate.signMessage === 'function' &&
-      typeof candidate.signTransaction === 'function' &&
-      candidate._isSigner) ||
-    candidate instanceof Signer
-  )
+export function isSignerCompatible(signerOrProvider: AbstractSigner | Provider): boolean {
+  const candidate = signerOrProvider as AbstractSigner
+
+  const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
+  const isSignMessageCompatible = typeof candidate.signMessage === 'function'
+  const isGetAddressCompatible = typeof candidate.getAddress === 'function'
+
+  return isSigntransactionCompatible && isSignMessageCompatible && isGetAddressCompatible
 }

@@ -6,15 +6,15 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import {
   Create_call as CreateCall_V1_3_0,
   Create_callInterface as CreateCallContractInterface
-} from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.3.0/Create_call'
-import { Create_call as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.4.1/Create_call'
+} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/Create_call'
+import { Create_call as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/Create_call'
 import { CreateCallContract } from '@safe-global/safe-core-sdk-types'
 
 abstract class CreateCallEthersContract implements CreateCallContract {
   constructor(public contract: CreateCall_V1_4_1 | CreateCall_V1_3_0) {}
 
-  getAddress(): string {
-    return this.contract.address
+  getAddress(): Promise<string> {
+    return this.contract.getAddress()
   }
 
   async performCreate2(
@@ -28,7 +28,7 @@ abstract class CreateCallEthersContract implements CreateCallContract {
         ...options
       })
     }
-    const txResponse = await this.contract.performCreate2(value, deploymentData, salt, options)
+    const txResponse = await this.contract.performCreate2(value, deploymentData, salt)
     return toTxResult(txResponse, options)
   }
 
@@ -42,7 +42,7 @@ abstract class CreateCallEthersContract implements CreateCallContract {
         ...options
       })
     }
-    const txResponse = await this.contract.performCreate(value, deploymentData, options)
+    const txResponse = await this.contract.performCreate(value, deploymentData, { ...options })
     return toTxResult(txResponse, options)
   }
 
@@ -58,7 +58,9 @@ abstract class CreateCallEthersContract implements CreateCallContract {
     params: any[],
     options: EthersTransactionOptions
   ): Promise<string> {
-    return (await (this.contract.estimateGas as any)[methodName](...params, options)).toString()
+    const method = this.contract.getFunction(methodName)
+
+    return (await method.estimateGas(...params, options)).toString()
   }
 }
 

@@ -1,11 +1,9 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { BigNumber } from 'ethers'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
@@ -16,10 +14,10 @@ import { waitSafeTxReceipt } from './utils/transactions'
 chai.use(chaiAsPromised)
 
 describe('Safe Info', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -31,7 +29,7 @@ describe('Safe Info', () => {
       }
     }
     return {
-      chainId: (await waffle.provider.getNetwork()).chainId,
+      chainId,
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       predictedSafe,
       accounts,
@@ -46,9 +44,10 @@ describe('Safe Info', () => {
         const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeSdk2 = safeSdk.connect({ predictedSafe })
@@ -66,9 +65,10 @@ describe('Safe Info', () => {
         const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
         const safeSdk2 = await safeSdk.connect({ predictedSafe })
@@ -82,12 +82,13 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      chai.expect(await safeSdk.getAddress()).to.be.eq(safe.address)
+      chai.expect(await safeSdk.getAddress()).to.be.eq(safeAddress)
       chai
         .expect(await safeSdk.getEthAdapter().getSignerAddress())
         .to.be.eq(await account1.signer.getAddress())
@@ -97,14 +98,15 @@ describe('Safe Info', () => {
         ethAdapter: ethAdapter2,
         contractNetworks
       })
-      chai.expect(await safeSdk2.getAddress()).to.be.eq(safe.address)
+      chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)
       chai
         .expect(await safeSdk2.getEthAdapter().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
 
       const safe2 = await getSafeWithOwners([accounts[2].address])
-      const safeSdk3 = await safeSdk2.connect({ safeAddress: safe2.address })
-      chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2.address)
+      const safe2Address = await safe2.getAddress()
+      const safeSdk3 = await safeSdk2.connect({ safeAddress: safe2Address })
+      chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2Address)
       chai
         .expect(await safeSdk3.getEthAdapter().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
@@ -146,9 +148,10 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const contractVersion = await safeSdk.getContractVersion()
@@ -206,12 +209,13 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      chai.expect(await safeSdk.getAddress()).to.be.eq(safe.address)
+      chai.expect(await safeSdk.getAddress()).to.be.eq(safeAddress)
     })
   })
 
@@ -220,9 +224,10 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: safeAddress,
         contractNetworks
       })
       chai
@@ -249,18 +254,20 @@ describe('Safe Info', () => {
       const [account1, account2] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
       const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: safeAddress,
         contractNetworks
       })
       chai.expect(await safeSdk.getNonce()).to.be.eq(0)
-      const safeTransactionData: SafeTransactionDataPartial = {
+      const safeTransactionData = {
         to: account2.address,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect(await safeSdk.getNonce()).to.be.eq(1)
@@ -284,9 +291,10 @@ describe('Safe Info', () => {
       const { safe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress: safeAddress,
         contractNetworks
       })
       chai.expect(await safeSdk.getChainId()).to.be.eq(chainId)
@@ -324,12 +332,12 @@ describe('Safe Info', () => {
           predictedSafe,
           contractNetworks
         })
-        chai.expect(await safeSdk.getBalance()).to.be.eq(0)
+        chai.expect(await safeSdk.getBalance()).to.be.eq(0n)
         await account1.signer.sendTransaction({
           to: await safeSdk.getAddress(),
-          value: BigNumber.from(`${1e18}`).toHexString()
+          value: BigInt(`${1e18}`)
         })
-        chai.expect(await safeSdk.getBalance()).to.be.eq(BigNumber.from(`${1e18}`))
+        chai.expect(await safeSdk.getBalance()).to.be.eq(BigInt(`${1e18}`))
       }
     )
 
@@ -337,17 +345,18 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      chai.expect(await safeSdk.getBalance()).to.be.eq(0)
+      chai.expect(await safeSdk.getBalance()).to.be.eq(0n)
       await account1.signer.sendTransaction({
         to: await safeSdk.getAddress(),
-        value: BigNumber.from(`${1e18}`).toHexString()
+        value: BigInt(`${1e18}`)
       })
-      chai.expect(await safeSdk.getBalance()).to.be.eq(BigNumber.from(`${1e18}`))
+      chai.expect(await safeSdk.getBalance()).to.be.eq(BigInt(`${1e18}`))
     })
   })
 })

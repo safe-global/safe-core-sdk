@@ -26,7 +26,7 @@ To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) i
 
 ### Instantiate an EthAdapter
 
-First of all, we need to create an `EthAdapter`, which contains all the required utilities for the SDKs to interact with the blockchain. It acts as a wrapper for [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.io/v5/) Ethereum libraries.
+First of all, we need to create an `EthAdapter`, which contains all the required utilities for the SDKs to interact with the blockchain. It acts as a wrapper for [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.org/v6/) Ethereum libraries.
 
 Depending on the library used by the Dapp, there are two options:
 
@@ -42,8 +42,16 @@ As stated in the introduction, the [Safe API Kit](https://github.com/safe-global
 ```js
 import SafeApiKit from '@safe-global/api-kit'
 
-const txServiceUrl = 'https://safe-transaction-mainnet.safe.global'
-const safeService = new SafeApiKit({ txServiceUrl, ethAdapter })
+const safeService = new SafeApiKit({ chainId })
+```
+
+Using the `chainId` is enough for chains where Safe runs a Transaction Service. For those chains where Safe doesn't run a service, use the `txServiceUrl` parameter to set the custom service endpoint.
+
+```js
+const safeService = new SafeApiKit({
+  chainId,
+  txServiceUrl: 'https://txServiceUrl.com'
+})
 ```
 
 ### Initialize the Protocol Kit
@@ -58,12 +66,12 @@ const safeSdk = await Safe.create({ ethAdapter, safeAddress })
 
 There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
 
-By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeMasterCopy` to force the use of the `Safe.sol` contract.
+By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeSingleton` to force the use of the `Safe.sol` contract.
 
 ```js
-const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeMasterCopy: true })
+const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeSingleton: true })
 
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeMasterCopy: true })
+const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeSingleton: true })
 ```
 
 If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
@@ -74,7 +82,7 @@ import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 const chainId = await ethAdapter.getChainId()
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
-    safeMasterCopyAddress: '<MASTER_COPY_ADDRESS>',
+    safeSingletonAddress: '<SINGLETON_ADDRESS>',
     safeProxyFactoryAddress: '<PROXY_FACTORY_ADDRESS>',
     multiSendAddress: '<MULTI_SEND_ADDRESS>',
     multiSendCallOnlyAddress: '<MULTI_SEND_CALL_ONLY_ADDRESS>',
@@ -82,7 +90,7 @@ const contractNetworks: ContractNetworksConfig = {
     signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
     createCallAddress: '<CREATE_CALL_ADDRESS>',
     simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
-    safeMasterCopyAbi: '<MASTER_COPY_ABI>', // Optional. Only needed with web3.js
+    safeSingletonAbi: '<SINGLETON_ABI>', // Optional. Only needed with web3.js
     safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
     multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
     multiSendCallOnlyAbi: '<MULTI_SEND_CALL_ONLY_ABI>', // Optional. Only needed with web3.js
@@ -128,38 +136,15 @@ Calling the method `deploySafe` will deploy the desired Safe and return a Protoc
 
 The Protocol Kit supports the execution of single Safe transactions but also MultiSend transactions. We can create a transaction object by calling the method `createTransaction` in our `Safe` instance.
 
-- **Create a single transaction**
+This method takes an array of `MetaTransactionData` objects that represent the individual transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
 
-  This method can take an object of type `SafeTransactionDataPartial` that represents the transaction we want to execute (once the signatures are collected). It accepts some optional properties as follows.
-
-  ```js
-  import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
-
-  const safeTransactionData: SafeTransactionDataPartial = {
-    to,
-    data,
-    value,
-    operation, // Optional
-    safeTxGas, // Optional
-    baseGas, // Optional
-    gasPrice, // Optional
-    gasToken, // Optional
-    refundReceiver, // Optional
-    nonce // Optional
-  }
-
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData })
-  ```
-
-- **Create a MultiSend transaction**
-
-  This method can take an array of `MetaTransactionData` objects that represent the multiple transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
+When the array contains only one transaction, it is not wrapped in the MultiSend.
 
   ```js
   import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'
   import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
-  const safeTransactionData: MetaTransactionData[] = [
+  const transactions: MetaTransactionData[] = [
     {
       to,
       data,
@@ -184,7 +169,7 @@ The Protocol Kit supports the execution of single Safe transactions but also Mul
     nonce // Optional
   }
 
-  const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options })
+  const safeTransaction = await safeSdk.createTransaction({ transactions, options })
   ```
 
 We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe API Kit instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.

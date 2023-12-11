@@ -1,4 +1,4 @@
-import { Signer } from '@ethersproject/abstract-signer'
+import { Signer } from 'ethers'
 import SafeApiKit, { AddSafeDelegateProps } from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'

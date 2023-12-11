@@ -1,12 +1,9 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
-import {
-  SafeMultisigTransactionResponse,
-  SafeTransactionDataPartial
-} from '@safe-global/safe-core-sdk-types'
+import { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
@@ -16,10 +13,10 @@ import { getAccounts } from './utils/setupTestNetwork'
 chai.use(chaiAsPromised)
 
 describe('Off-chain signatures', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
@@ -57,17 +54,18 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+      const safeTransactionData = {
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       const txHash = await safeSdk.getTransactionHash(tx)
       const signature = await safeSdk.signTransactionHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
@@ -86,17 +84,20 @@ describe('Off-chain signatures', () => {
           predictedSafe,
           contractNetworks
         })
+        const safeAddress = await safe.getAddress()
         const safeSdkExistingSafe = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
+        const safeTransactionData = {
           to: await safeSdkExistingSafe.getAddress(),
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdkExistingSafe.createTransaction({ safeTransactionData })
+        const tx = await safeSdkExistingSafe.createTransaction({
+          transactions: [safeTransactionData]
+        })
         const signedTx = safeSdk.signTransaction(tx)
         await chai
           .expect(signedTx)
@@ -117,12 +118,13 @@ describe('Off-chain signatures', () => {
           predictedSafe,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+        const safeAddress = await safe.getAddress()
+        const safeTransactionData = {
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx)
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -134,17 +136,18 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
       const ethAdapter = await getEthAdapter(account3.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+      const safeTransactionData = {
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       await chai
         .expect(safeSdk.signTransaction(tx))
         .to.be.rejectedWith('Transactions can only be signed by Safe owners')
@@ -154,17 +157,18 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+      const safeTransactionData = {
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx1 = await safeSdk.signTransaction(tx)
       chai.expect(signedTx1.signatures.size).to.be.eq(1)
@@ -179,17 +183,18 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress: safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+        const safeTransactionData = {
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
           .expect(safeSdk.signTransaction(tx, 'eth_sign'))
           .to.be.rejectedWith('eth_sign is only supported by Safes >= v1.1.0')
@@ -202,17 +207,18 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+        const safeTransactionData = {
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx, 'eth_sign')
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -226,17 +232,18 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+        const safeTransactionData = {
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData')
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -250,17 +257,18 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+        const safeTransactionData = {
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
           .expect(safeSdk.signTransaction(tx, 'eth_signTypedData'))
           .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
@@ -273,17 +281,18 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+        const safeTransactionData = {
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
         const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData_v3')
         chai.expect(tx.signatures.size).to.be.eq(0)
@@ -297,17 +306,18 @@ describe('Off-chain signatures', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const ethAdapter = await getEthAdapter(account1.signer)
+        const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           ethAdapter,
-          safeAddress: safe.address,
+          safeAddress,
           contractNetworks
         })
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: safe.address,
+        const safeTransactionData = {
+          to: safeAddress,
           value: '0',
           data: '0x'
         }
-        const tx = await safeSdk.createTransaction({ safeTransactionData })
+        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
           .expect(safeSdk.signTransaction(tx, 'eth_signTypedData_v3'))
           .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
@@ -318,17 +328,18 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+      const safeTransactionData = {
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData_v4')
       chai.expect(tx.signatures.size).to.be.eq(0)
@@ -339,17 +350,18 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: safe.address,
+      const safeTransactionData = {
+        to: safeAddress,
         value: '0',
         data: '0x'
       }
-      const tx = await safeSdk.createTransaction({ safeTransactionData })
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx = await safeSdk.signTransaction(tx)
       chai.expect(tx.signatures.size).to.be.eq(0)
@@ -360,9 +372,10 @@ describe('Off-chain signatures', () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const ethAdapter = await getEthAdapter(account1.signer)
+      const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         ethAdapter,
-        safeAddress: safe.address,
+        safeAddress,
         contractNetworks
       })
       const safeServiceTransaction: SafeMultisigTransactionResponse = {

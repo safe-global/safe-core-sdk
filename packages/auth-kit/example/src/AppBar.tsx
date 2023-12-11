@@ -1,11 +1,11 @@
 import { AppBar as MuiAppBar, Typography, styled, Box, Button } from '@mui/material'
-import { SafeGetUserInfoResponse, Web3AuthModalPack } from '../../src'
+import { SafeAuthUserInfo } from '@safe-global/auth-kit'
 
 type AppBarProps = {
   isLoggedIn: boolean
   onLogin: () => void
   onLogout: () => void
-  userInfo?: SafeGetUserInfoResponse<Web3AuthModalPack>
+  userInfo?: SafeAuthUserInfo
 }
 
 const AppBar = ({ isLoggedIn, onLogin, onLogout, userInfo }: AppBarProps) => {

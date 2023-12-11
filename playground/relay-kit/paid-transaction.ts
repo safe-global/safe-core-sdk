@@ -1,13 +1,12 @@
-import AccountAbstraction, {
-  AccountAbstractionConfig
-} from '@safe-global/account-abstraction-kit-poc'
+import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
   MetaTransactionOptions,
   OperationType
 } from '@safe-global/safe-core-sdk-types'
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
+import { EthersAdapter } from '@safe-global/protocol-kit'
 
 // Check the status of a transaction after it is relayed:
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
@@ -31,7 +30,7 @@ const txConfig = {
   VALUE: '<VALUE>',
   // Options:
   GAS_LIMIT: '<GAS_LIMIT>',
-  GAS_TOKEN: ethers.constants.AddressZero
+  GAS_TOKEN: ethers.ZeroAddress
 }
 
 async function main() {
@@ -39,47 +38,52 @@ async function main() {
 
   // SDK Initialization
 
-  const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
+  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
   const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
 
-  const relayPack = new GelatoRelayPack()
+  const safeAccountAbstraction = new AccountAbstraction(
+    new EthersAdapter({
+      ethers,
+      signerOrProvider: signer
+    })
+  )
 
-  const safeAccountAbstraction = new AccountAbstraction(signer)
-  const sdkConfig: AccountAbstractionConfig = {
-    relayPack
-  }
-  await safeAccountAbstraction.init(sdkConfig)
+  await safeAccountAbstraction.init()
+
+  const relayPack = new GelatoRelayPack({ protocolKit: safeAccountAbstraction.protocolKit })
+
+  safeAccountAbstraction.setRelayKit(relayPack)
 
   // Calculate Safe address
 
-  const predictedSafeAddress = safeAccountAbstraction.getSafeAddress()
+  const predictedSafeAddress = await safeAccountAbstraction.protocolKit.getAddress()
   console.log({ predictedSafeAddress })
 
-  const isSafeDeployed = await safeAccountAbstraction.isSafeDeployed()
+  const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
   // Fake on-ramp to transfer enough funds to the Safe address
 
-  const chainId = (await signer.provider.getNetwork()).chainId
-  const relayFee = await relayPack.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
+  const chainId = (await provider.getNetwork()).chainId
+  const relayFee = BigInt(
+    await relayPack.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
+  )
   const safeBalance = await provider.getBalance(predictedSafeAddress)
-  console.log({ minSafeBalance: ethers.utils.formatEther(relayFee.toString()) })
-  console.log({ safeBalance: ethers.utils.formatEther(safeBalance.toString()) })
+  console.log({ minSafeBalance: ethers.formatEther(relayFee.toString()) })
+  console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
 
-  if (safeBalance.lt(relayFee)) {
+  if (safeBalance < relayFee) {
     const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
-    const fundingAmount = safeBalance.lt(relayFee)
-      ? BigNumber.from(relayFee).sub(safeBalance)
-      : safeBalance.sub(relayFee)
+    const fundingAmount = safeBalance < relayFee ? relayFee - safeBalance : safeBalance - relayFee
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,
       value: fundingAmount
     })
-    console.log(`Funding the Safe with ${ethers.utils.formatEther(fundingAmount.toString())} ETH`)
+    console.log(`Funding the Safe with ${ethers.formatEther(fundingAmount.toString())} ETH`)
     await onRampResponse.wait()
 
     const safeBalanceAfter = await provider.getBalance(predictedSafeAddress)
-    console.log({ safeBalance: ethers.utils.formatEther(safeBalanceAfter.toString()) })
+    console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
   }
 
   // Relay the transaction

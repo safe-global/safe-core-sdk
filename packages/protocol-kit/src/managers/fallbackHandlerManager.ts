@@ -46,7 +46,7 @@ class FallbackHandlerManager {
     }
     const safeVersion = await this.#safeContract.getVersion()
     if (hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
-      return this.#ethAdapter.getStorageAt(this.#safeContract.getAddress(), this.#slot)
+      return this.#ethAdapter.getStorageAt(await this.#safeContract.getAddress(), this.#slot)
     } else {
       throw new Error(
         'Current version of the Safe does not support the fallback handler functionality'

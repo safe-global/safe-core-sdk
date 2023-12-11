@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   EthAdapter,
   OperationType,
@@ -14,8 +13,8 @@ import {
   Transaction
 } from '@safe-global/safe-core-sdk-types'
 import {
-  PREDETERMINED_SALT_NONCE,
   encodeSetupCallData,
+  getChainSpecificDefaultSaltNonce,
   predictSafeAddress
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
@@ -38,7 +37,6 @@ import {
   EthSafeSignature,
   SAFE_FEATURES,
   hasSafeFeature,
-  isMetaTransactionArray,
   isSafeMultisigTransactionResponse,
   sameString
 } from './utils'
@@ -94,7 +92,7 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeMasterCopy, contractNetworks } = config
+    const { ethAdapter, isL1SafeSingleton, contractNetworks } = config
 
     this.#ethAdapter = ethAdapter
 
@@ -103,14 +101,14 @@ class Safe {
       this.#contractManager = await ContractManager.create({
         ethAdapter: this.#ethAdapter,
         predictedSafe: this.#predictedSafe,
-        isL1SafeMasterCopy,
+        isL1SafeSingleton,
         contractNetworks
       })
     } else {
       this.#contractManager = await ContractManager.create({
         ethAdapter: this.#ethAdapter,
         safeAddress: config.safeAddress,
-        isL1SafeMasterCopy,
+        isL1SafeSingleton,
         contractNetworks
       })
     }
@@ -133,10 +131,10 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect(config: ConnectSafeConfig): Promise<Safe> {
-    const { ethAdapter, safeAddress, predictedSafe, isL1SafeMasterCopy, contractNetworks } = config
+    const { ethAdapter, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } = config
     const configProps: SafeConfigProps = {
       ethAdapter: ethAdapter || this.#ethAdapter,
-      isL1SafeMasterCopy: isL1SafeMasterCopy || this.#contractManager.isL1SafeMasterCopy,
+      isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     }
 
@@ -188,7 +186,7 @@ class Safe {
       const chainId = await this.#ethAdapter.getChainId()
       return predictSafeAddress({
         ethAdapter: this.#ethAdapter,
-        customContracts: this.#contractManager.contractNetworks?.[chainId],
+        customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
         ...this.#predictedSafe
       })
     }
@@ -197,7 +195,7 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    return Promise.resolve(this.#contractManager.safeContract.getAddress())
+    return await this.#contractManager.safeContract.getAddress()
   }
 
   /**
@@ -223,8 +221,8 @@ class Safe {
    *
    * @returns The address of the MultiSend contract
    */
-  getMultiSendAddress(): string {
-    return this.#contractManager.multiSendContract.getAddress()
+  async getMultiSendAddress(): Promise<string> {
+    return await this.#contractManager.multiSendContract.getAddress()
   }
 
   /**
@@ -232,8 +230,8 @@ class Safe {
    *
    * @returns The address of the MultiSendCallOnly contract
    */
-  getMultiSendCallOnlyAddress(): string {
-    return this.#contractManager.multiSendCallOnlyContract.getAddress()
+  async getMultiSendCallOnlyAddress(): Promise<string> {
+    return await this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
   /**
@@ -248,9 +246,9 @@ class Safe {
   }
 
   /**
-   * Returns the Safe Master Copy contract version.
+   * Returns the Safe Singleton contract version.
    *
-   * @returns The Safe Master Copy contract version
+   * @returns The Safe Singleton contract version
    */
   async getContractVersion(): Promise<SafeVersion> {
     if (this.#contractManager.safeContract) {
@@ -308,7 +306,7 @@ class Safe {
    *
    * @returns The chainId of the connected network
    */
-  async getChainId(): Promise<number> {
+  async getChainId(): Promise<bigint> {
     return this.#ethAdapter.getChainId()
   }
 
@@ -317,7 +315,7 @@ class Safe {
    *
    * @returns The ETH balance of the Safe
    */
-  async getBalance(): Promise<BigNumber> {
+  async getBalance(): Promise<bigint> {
     return this.#ethAdapter.getBalance(await this.getAddress())
   }
 
@@ -385,7 +383,7 @@ class Safe {
    * @throws "Invalid empty array of transactions"
    */
   async createTransaction({
-    safeTransactionData,
+    transactions,
     onlyCalls = false,
     options
   }: CreateTransactionProps): Promise<SafeTransaction> {
@@ -396,32 +394,28 @@ class Safe {
       )
     }
 
-    if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length === 0) {
+    if (transactions.length === 0) {
       throw new Error('Invalid empty array of transactions')
     }
 
     let newTransaction: SafeTransactionDataPartial
-    if (isMetaTransactionArray(safeTransactionData) && safeTransactionData.length > 1) {
+    if (transactions.length > 1) {
       const multiSendContract = onlyCalls
         ? this.#contractManager.multiSendCallOnlyContract
         : this.#contractManager.multiSendContract
 
-      const multiSendData = encodeMultiSendData(
-        safeTransactionData.map(standardizeMetaTransactionData)
-      )
+      const multiSendData = encodeMultiSendData(transactions.map(standardizeMetaTransactionData))
 
       const multiSendTransaction = {
         ...options,
-        to: multiSendContract.getAddress(),
+        to: await multiSendContract.getAddress(),
         value: '0',
         data: multiSendContract.encode('multiSend', [multiSendData]),
         operation: OperationType.DelegateCall
       }
       newTransaction = multiSendTransaction
     } else {
-      newTransaction = isMetaTransactionArray(safeTransactionData)
-        ? { ...options, ...safeTransactionData[0] }
-        : safeTransactionData
+      newTransaction = { ...options, ...transactions[0] }
     }
 
     if (this.#predictedSafe) {
@@ -455,14 +449,17 @@ class Safe {
    * @returns The Safe transaction that invalidates the pending Safe transaction/s
    */
   async createRejectionTransaction(nonce: number): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
-      nonce,
       value: '0',
-      data: '0x',
+      data: '0x'
+    }
+    const options = {
+      nonce,
       safeTxGas: '0'
     }
-    return this.createTransaction({ safeTransactionData })
+
+    return this.createTransaction({ transactions: [safeTransactionData], options })
   }
 
   /**
@@ -472,8 +469,16 @@ class Safe {
    * @returns The new Safe transaction
    */
   async copyTransaction(safeTransaction: SafeTransaction): Promise<SafeTransaction> {
+    const { to, value, data, operation, ...options } = safeTransaction.data
+    const safeTransactionData = {
+      to,
+      value,
+      data,
+      operation
+    }
     const signedSafeTransaction = await this.createTransaction({
-      safeTransactionData: safeTransaction.data
+      transactions: [safeTransactionData],
+      options
     })
     safeTransaction.signatures.forEach((signature) => {
       signedSafeTransaction.addSignature(signature)
@@ -574,13 +579,9 @@ class Safe {
       signature = await this.signTransactionHash(txHash)
     }
 
-    const signedSafeTransaction = await this.createTransaction({
-      safeTransactionData: transaction.data
-    })
-    transaction.signatures.forEach((signature) => {
-      signedSafeTransaction.addSignature(signature)
-    })
+    const signedSafeTransaction = await this.copyTransaction(transaction)
     signedSafeTransaction.addSignature(signature)
+
     return signedSafeTransaction
   }
 
@@ -636,7 +637,7 @@ class Safe {
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
       const approved = await this.#contractManager.safeContract.approvedHashes(owner, txHash)
-      if (approved.gt(0)) {
+      if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
     }
@@ -657,15 +658,17 @@ class Safe {
     fallbackHandlerAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
       data: await this.#fallbackHandlerManager.encodeEnableFallbackHandlerData(
         fallbackHandlerAddress
-      ),
-      ...options
+      )
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -680,13 +683,15 @@ class Safe {
   async createDisableFallbackHandlerTx(
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#fallbackHandlerManager.encodeDisableFallbackHandlerData(),
-      ...options
+      data: await this.#fallbackHandlerManager.encodeDisableFallbackHandlerData()
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -704,13 +709,15 @@ class Safe {
     guardAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#guardManager.encodeEnableGuardData(guardAddress),
-      ...options
+      data: await this.#guardManager.encodeEnableGuardData(guardAddress)
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -723,13 +730,15 @@ class Safe {
    * @throws "Current version of the Safe does not support Safe transaction guards functionality"
    */
   async createDisableGuardTx(options?: SafeTransactionOptionalProps): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#guardManager.encodeDisableGuardData(),
-      ...options
+      data: await this.#guardManager.encodeDisableGuardData()
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -746,13 +755,15 @@ class Safe {
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#moduleManager.encodeEnableModuleData(moduleAddress),
-      ...options
+      data: await this.#moduleManager.encodeEnableModuleData(moduleAddress)
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -769,13 +780,15 @@ class Safe {
     moduleAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#moduleManager.encodeDisableModuleData(moduleAddress),
-      ...options
+      data: await this.#moduleManager.encodeDisableModuleData(moduleAddress)
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -794,13 +807,15 @@ class Safe {
     { ownerAddress, threshold }: AddOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold),
-      ...options
+      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -819,13 +834,15 @@ class Safe {
     { ownerAddress, threshold }: RemoveOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold),
-      ...options
+      data: await this.#ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -844,13 +861,15 @@ class Safe {
     { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress),
-      ...options
+      data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -867,13 +886,15 @@ class Safe {
     threshold: number,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData: MetaTransactionData = {
       to: await this.getAddress(),
       value: '0',
-      data: await this.#ownerManager.encodeChangeThresholdData(threshold),
-      ...options
+      data: await this.#ownerManager.encodeChangeThresholdData(threshold)
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     return safeTransaction
   }
 
@@ -886,11 +907,13 @@ class Safe {
   async toSafeTransactionType(
     serviceTransactionResponse: SafeMultisigTransactionResponse
   ): Promise<SafeTransaction> {
-    const safeTransactionData: SafeTransactionDataPartial = {
+    const safeTransactionData = {
       to: serviceTransactionResponse.to,
       value: serviceTransactionResponse.value,
       data: serviceTransactionResponse.data || '0x',
-      operation: serviceTransactionResponse.operation,
+      operation: serviceTransactionResponse.operation
+    }
+    const options = {
       safeTxGas: serviceTransactionResponse.safeTxGas.toString(),
       baseGas: serviceTransactionResponse.baseGas.toString(),
       gasPrice: serviceTransactionResponse.gasPrice,
@@ -898,7 +921,10 @@ class Safe {
       refundReceiver: serviceTransactionResponse.refundReceiver,
       nonce: serviceTransactionResponse.nonce
     }
-    const safeTransaction = await this.createTransaction({ safeTransactionData })
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
     serviceTransactionResponse.confirmations?.map((confirmation) => {
       const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
       safeTransaction.addSignature(signature)
@@ -998,10 +1024,10 @@ class Safe {
       )
     }
 
-    const value = BigNumber.from(signedSafeTransaction.data.value)
-    if (!value.isZero()) {
+    const value = BigInt(signedSafeTransaction.data.value)
+    if (value !== 0n) {
       const balance = await this.getBalance()
-      if (value.gt(BigNumber.from(balance))) {
+      if (value > balance) {
         throw new Error('Not enough Ether funds')
       }
     }
@@ -1030,13 +1056,13 @@ class Safe {
   async getEncodedTransaction(safeTransaction: SafeTransaction): Promise<string> {
     const safeVersion = await this.getContractVersion()
     const chainId = await this.getChainId()
-    const customContracts = this.#contractManager.contractNetworks?.[chainId]
-    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+    const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion: safeVersion,
-      isL1SafeMasterCopy,
+      isL1SafeSingleton,
       customContracts
     })
 
@@ -1136,13 +1162,13 @@ class Safe {
     const safeVersion = await this.getContractVersion()
     const ethAdapter = this.#ethAdapter
     const chainId = await ethAdapter.getChainId()
-    const isL1SafeMasterCopy = this.#contractManager.isL1SafeMasterCopy
-    const customContracts = this.#contractManager.contractNetworks?.[chainId]
+    const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
     const safeSingletonContract = await getSafeContract({
       ethAdapter: this.#ethAdapter,
       safeVersion,
-      isL1SafeMasterCopy,
+      isL1SafeSingleton,
       customContracts
     })
 
@@ -1161,15 +1187,18 @@ class Safe {
       customContracts
     })
 
-    const saltNonce = customSaltNonce || safeDeploymentConfig?.saltNonce || PREDETERMINED_SALT_NONCE
+    const saltNonce =
+      customSaltNonce ||
+      safeDeploymentConfig?.saltNonce ||
+      getChainSpecificDefaultSaltNonce(chainId)
 
     const safeDeployTransactionData = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: safeProxyFactoryContract.getAddress(),
+      to: await safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        safeSingletonContract.getAddress(),
+        await safeSingletonContract.getAddress(),
         initializer, // call to the setup method to set the threshold & owners of the new Safe
         saltNonce
       ])
@@ -1199,7 +1228,7 @@ class Safe {
     const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
       ethAdapter: this.#ethAdapter,
       safeVersion: await this.getContractVersion(),
-      customContracts: this.#contractManager.contractNetworks?.[chainId]
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
     })
 
     // multiSend method with the transactions encoded
@@ -1209,7 +1238,7 @@ class Safe {
 
     const transactionBatch = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: multiSendCallOnlyContract.getAddress(),
+      to: await multiSendCallOnlyContract.getAddress(),
       value: '0',
       data: batchData
     }

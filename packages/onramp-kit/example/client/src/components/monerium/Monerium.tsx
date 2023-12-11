@@ -5,7 +5,7 @@ import { Box } from '@mui/material'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
 import { useAuth } from '../../AuthContext'
-import { MoneriumPack, SafeMoneriumClient } from '../../../../../src'
+import { MoneriumPack, SafeMoneriumClient } from '@safe-global/onramp-kit'
 import Disconnected from './Disconnected'
 import DeploySafe from './DeploySafe'
 import LoginWithMonerium from './LoginWithMonerium'
@@ -23,15 +23,15 @@ function Monerium() {
     ;(async () => {
       if (!authProvider || !selectedSafe) return
 
-      const provider = new ethers.providers.Web3Provider(authProvider)
+      const provider = new ethers.BrowserProvider(authProvider)
 
-      const safeOwner = provider.getSigner()
+      const safeOwner = await provider.getSigner()
       const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: safeOwner })
 
       const safeSdk = await Safe.create({
         ethAdapter: ethAdapter,
         safeAddress: selectedSafe,
-        isL1SafeMasterCopy: true
+        isL1SafeSingleton: true
       })
 
       const pack = new MoneriumPack({

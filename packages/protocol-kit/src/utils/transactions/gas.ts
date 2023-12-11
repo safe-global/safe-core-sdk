@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import {
   EthAdapter,
   SafeContract,
@@ -73,7 +72,7 @@ export async function estimateGas(
   const simulateTxAccessorContract = await getSimulateTxAccessorContract({
     ethAdapter,
     safeVersion,
-    customContracts: customContracts?.[chainId]
+    customContracts: customContracts?.[chainId.toString()]
   })
 
   const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
@@ -86,7 +85,7 @@ export async function estimateGas(
     await simulateTxAccessorContract.getAddress(),
     transactionDataToEstimate
   ])
-  const safeAddress = safeContract.getAddress()
+  const safeAddress = await safeContract.getAddress()
   const transactionToEstimateGas = {
     to: safeAddress,
     value: '0',
@@ -97,7 +96,7 @@ export async function estimateGas(
   try {
     const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
 
-    return Number('0x' + encodedResponse.slice(184).slice(0, 10)).toString()
+    return decodeSafeTxGas(encodedResponse)
   } catch (error: any) {
     return parseSafeTxGasErrorResponse(error)
   }
@@ -111,8 +110,8 @@ export async function estimateTxGas(
   data: string,
   operation: OperationType
 ): Promise<string> {
-  let txGasEstimation = BigNumber.from(0)
-  const safeAddress = safeContract.getAddress()
+  let txGasEstimation = 0
+  const safeAddress = await safeContract.getAddress()
 
   const estimateData: string = safeContract.encode('requiredTxGas', [
     to,
@@ -126,10 +125,10 @@ export async function estimateTxGas(
       from: safeAddress,
       data: estimateData
     })
-    txGasEstimation = BigNumber.from('0x' + estimateResponse.substring(138)).add(10000)
+    txGasEstimation = Number('0x' + estimateResponse.substring(138)) + 10000
   } catch (error) {}
 
-  if (txGasEstimation.gt(0)) {
+  if (txGasEstimation > 0) {
     const dataGasEstimation = estimateDataGasCosts(estimateData)
     let additionalGas = 10000
     for (let i = 0; i < 10; i++) {
@@ -139,16 +138,16 @@ export async function estimateTxGas(
           from: safeAddress,
           data: estimateData,
           gasPrice: '0',
-          gasLimit: txGasEstimation.add(dataGasEstimation).add(additionalGas).toString()
+          gasLimit: (txGasEstimation + dataGasEstimation + additionalGas).toString()
         })
         if (estimateResponse !== '0x') {
           break
         }
       } catch (error) {}
-      txGasEstimation = txGasEstimation.add(additionalGas)
+      txGasEstimation = txGasEstimation + additionalGas
       additionalGas *= 2
     }
-    return txGasEstimation.add(additionalGas).toString()
+    return (txGasEstimation + additionalGas).toString()
   }
 
   try {
@@ -205,14 +204,14 @@ export async function estimateTxBaseGas(
 
   const safeVersion = await safe.getContractVersion()
   const ethAdapter = safe.getEthAdapter()
-  const isL1SafeMasterCopy = safe.getContractManager().isL1SafeMasterCopy
+  const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
     safeVersion,
-    isL1SafeMasterCopy,
+    isL1SafeSingleton,
     customContracts
   })
 
@@ -315,14 +314,14 @@ async function estimateSafeTxGasWithRequiredTxGas(
   const safeAddress = await safe.getAddress()
   const safeVersion = await safe.getContractVersion()
   const ethAdapter = safe.getEthAdapter()
-  const isL1SafeMasterCopy = safe.getContractManager().isL1SafeMasterCopy
+  const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
     safeVersion,
-    isL1SafeMasterCopy,
+    isL1SafeSingleton,
     customContracts
   })
 
@@ -333,7 +332,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     safeTransaction.data.operation
   ])
 
-  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
 
   const transactionToEstimateGas = {
     to,
@@ -351,7 +350,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     // if the call throws an error we try to parse the returned value
   } catch (error: any) {
     try {
-      const revertData = JSON.parse(error.error.body).error.data
+      const revertData = error?.info?.error?.data
 
       if (revertData && revertData.startsWith('Reverted ')) {
         const [, safeTxGas] = revertData.split('Reverted ')
@@ -374,27 +373,50 @@ async function estimateSafeTxGasWithRequiredTxGas(
   )
   const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
   */
-function decodeSafeTxGas(encodedSafeTxGas: string): string {
-  return Number('0x' + encodedSafeTxGas.slice(184).slice(0, 10)).toString()
+function decodeSafeTxGas(encodedDataResponse: string): string {
+  const [, encodedSafeTxGas] = encodedDataResponse.split('0x')
+  const data = '0x' + encodedSafeTxGas
+
+  return Number('0x' + data.slice(184).slice(0, 10)).toString()
 }
 
-function parseSafeTxGasErrorResponse(error: any) {
-  // Ethers
-  if (error?.error?.body) {
-    const revertData = JSON.parse(error.error.body).error.data
-    if (revertData && revertData.startsWith('Reverted ')) {
-      const [, encodedResponse] = revertData.split('Reverted ')
-      const safeTxGas = decodeSafeTxGas(encodedResponse)
+type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
+type EthersEstimationError = { data: string }
+type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
 
-      return safeTxGas
-    }
+/**
+ * Parses the SafeTxGas estimation response from different providers.
+ * It extracts and decodes the SafeTxGas value from the Error object.
+ *
+ * @param {ProviderEstimationError} error - The estimation object with the estimation data.
+ * @returns {string} The SafeTxGas value.
+ * @throws It Will throw an error if the SafeTxGas cannot be parsed.
+ */
+function parseSafeTxGasErrorResponse(error: EstimationError) {
+  // Ethers v6
+  const ethersData = error?.data
+  if (ethersData) {
+    return decodeSafeTxGas(ethersData)
   }
 
-  // Web3
-  const [, encodedResponse] = error.message.split('return data: ')
-  const safeTxGas = decodeSafeTxGas(encodedResponse)
+  // gnosis-chain
+  const gnosisChainProviderData = error?.info?.error?.data
 
-  return safeTxGas
+  if (gnosisChainProviderData) {
+    const isString = typeof gnosisChainProviderData === 'string'
+
+    const encodedDataResponse = isString ? gnosisChainProviderData : gnosisChainProviderData.data
+    return decodeSafeTxGas(encodedDataResponse)
+  }
+
+  // Error message
+  const isEncodedDataPresent = error?.message?.includes('0x')
+
+  if (isEncodedDataPresent) {
+    return decodeSafeTxGas(error?.message)
+  }
+
+  throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)
 }
 
 /**
@@ -417,13 +439,13 @@ async function estimateSafeTxGasWithSimulate(
   const safeVersion = await safe.getContractVersion()
   const ethAdapter = safe.getEthAdapter()
   const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId]
-  const isL1SafeMasterCopy = safe.getContractManager().isL1SafeMasterCopy
+  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
+  const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
 
   const safeSingletonContract = await getSafeContract({
     ethAdapter,
     safeVersion,
-    isL1SafeMasterCopy,
+    isL1SafeSingleton,
     customContracts
   })
 
@@ -442,7 +464,7 @@ async function estimateSafeTxGasWithSimulate(
   ])
 
   // if the Safe is not deployed we can use the singleton address to simulate
-  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
 
   const safeFunctionToEstimate: string = safeSingletonContract.encode('simulateAndRevert', [
     await simulateTxAccessorContract.getAddress(),

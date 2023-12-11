@@ -1,4 +1,4 @@
-import { Currency, Counterpart, MoneriumEvent, MoneriumEventListener } from '@monerium/sdk'
+import { Counterpart, MoneriumEvent, MoneriumEventListener } from '@monerium/sdk'
 import Safe from '@safe-global/protocol-kit'
 
 export interface MoneriumProviderConfig {
@@ -13,7 +13,6 @@ export interface MoneriumInitOptions {
 
 export interface SafeMoneriumOrder {
   amount: string
-  currency: Currency
   counterpart: Counterpart
   memo: string
 }

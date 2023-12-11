@@ -1,4 +1,4 @@
-import { ContractTransaction } from '@ethersproject/contracts'
+import { ContractTransactionResponse } from 'ethers'
 import { BaseTransactionResult } from '@safe-global/safe-core-sdk-types'
 
 export interface EthersTransactionOptions {
@@ -11,6 +11,6 @@ export interface EthersTransactionOptions {
 }
 
 export interface EthersTransactionResult extends BaseTransactionResult {
-  transactionResponse: ContractTransaction
+  transactionResponse: ContractTransactionResponse
   options?: EthersTransactionOptions
 }

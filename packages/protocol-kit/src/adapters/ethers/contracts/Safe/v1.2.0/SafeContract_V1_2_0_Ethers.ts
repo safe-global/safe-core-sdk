@@ -4,7 +4,7 @@ import {
 } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/adapters/ethers/utils/constants'
-import { Gnosis_safe as Safe } from '@safe-global/protocol-kit/typechain/src/ethers-v5/v1.2.0/Gnosis_safe'
+import { Gnosis_safe as Safe } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0/Gnosis_safe'
 import { SafeSetupConfig } from '@safe-global/safe-core-sdk-types'
 import SafeContractEthers from '../SafeContractEthers'
 
@@ -46,7 +46,7 @@ class SafeContract_V1_2_0_Ethers extends SafeContractEthers {
       paymentToken,
       payment,
       paymentReceiver,
-      options
+      { ...options }
     )
 
     return toTxResult(txResponse, options)

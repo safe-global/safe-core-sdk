@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Proxy_factory'
@@ -9,7 +8,7 @@ import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 
 export interface CreateProxyProps {
-  safeMasterCopyAddress: string
+  safeSingletonAddress: string
   initializer: string
   saltNonce: string
   options?: Web3TransactionOptions
@@ -25,8 +24,8 @@ class SafeProxyFactoryWeb3Contract implements SafeProxyFactoryContract {
       | SafeProxyFactory_V1_0_0
   ) {}
 
-  getAddress(): string {
-    return this.contract.options.address
+  getAddress(): Promise<string> {
+    return Promise.resolve(this.contract.options.address)
   }
 
   async proxyCreationCode(): Promise<string> {
@@ -34,25 +33,24 @@ class SafeProxyFactoryWeb3Contract implements SafeProxyFactoryContract {
   }
 
   async createProxy({
-    safeMasterCopyAddress,
+    safeSingletonAddress,
     initializer,
     saltNonce,
     options,
     callback
   }: CreateProxyProps): Promise<string> {
-    if (BigNumber.from(saltNonce).lt(0))
-      throw new Error('saltNonce must be greater than or equal to 0')
+    if (BigInt(saltNonce) < 0) throw new Error('saltNonce must be greater than or equal to 0')
     if (options && !options.gas) {
       options.gas = await this.estimateGas(
         'createProxyWithNonce',
-        [safeMasterCopyAddress, initializer, saltNonce],
+        [safeSingletonAddress, initializer, saltNonce],
         {
           ...options
         }
       )
     }
     const txResponse = this.contract.methods
-      .createProxyWithNonce(safeMasterCopyAddress, initializer, saltNonce)
+      .createProxyWithNonce(safeSingletonAddress, initializer, saltNonce)
       .send(options)
 
     if (callback) {

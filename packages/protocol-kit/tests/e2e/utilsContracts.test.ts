@@ -1,5 +1,5 @@
 import chai from 'chai'
-import { deployments, waffle } from 'hardhat'
+import { deployments } from 'hardhat'
 
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
@@ -35,10 +35,10 @@ async function deploySafe(
 }
 
 describe('Contract utils', () => {
-  const setupTests = deployments.createFixture(async ({ deployments }) => {
+  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
-    const chainId: number = (await waffle.provider.getNetwork()).chainId
+    const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
@@ -58,7 +58,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -101,7 +101,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -144,7 +144,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -187,7 +187,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -220,7 +220,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -253,7 +253,7 @@ describe('Contract utils', () => {
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -285,7 +285,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(accounts[0].signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners: invalidOwners,
@@ -318,7 +318,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -405,7 +405,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const ethAdapter = await getEthAdapter(owner1.signer)
-      const customContracts = contractNetworks[chainId]
+      const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
         owners,
@@ -465,7 +465,7 @@ describe('Contract utils', () => {
         const owners = [owner1.address]
         const threshold = 1
         const ethAdapter = await getEthAdapter(owner1.signer)
-        const customContracts = contractNetworks[chainId]
+        const customContracts = contractNetworks[chainId.toString()]
 
         const safeAccountConfig: SafeAccountConfig = {
           owners,
@@ -490,6 +490,7 @@ describe('Contract utils', () => {
         chai.expect(predictedSafeAddress).to.be.equal(expectedSafeAddress)
       }
     )
+
     itif(safeVersionDeployed === '1.3.0')(
       'returns the predicted address for Safes deployed on zkSync Era',
       async () => {
@@ -499,7 +500,7 @@ describe('Contract utils', () => {
         // Create EthAdapter instance
         const ethAdapter = await getEthAdapter(getNetworkProvider('zksync'))
         const chainId = await ethAdapter.getChainId()
-        const customContracts = contractNetworks[chainId]
+        const customContracts = contractNetworks[chainId.toString()]
 
         // We check real deployments from zksync return the expected address.
 

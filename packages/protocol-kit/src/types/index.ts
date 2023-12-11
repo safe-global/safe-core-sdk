@@ -30,10 +30,10 @@ export interface PredictedSafeProps {
 }
 
 export interface ContractNetworkConfig {
-  /** safeMasterCopyAddress - Address of the Safe Master Copy contract deployed on a specific network */
-  safeMasterCopyAddress: string
-  /** safeMasterCopyAbi - Abi of the Safe Master Copy contract deployed on a specific network */
-  safeMasterCopyAbi?: AbiItem | AbiItem[]
+  /** safeSingletonAddress - Address of the Safe Singleton contract deployed on a specific network */
+  safeSingletonAddress: string
+  /** safeSingletonAbi - Abi of the Safe Singleton contract deployed on a specific network */
+  safeSingletonAbi?: AbiItem | AbiItem[]
   /** safeProxyFactoryAddress - Address of the SafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAddress: string
   /** safeProxyFactoryAbi - Abi of the SafeProxyFactory contract deployed on a specific network */
@@ -86,8 +86,8 @@ type SafeConfigWithPredictedSafeProps = {
 export type SafeConfigProps = {
   /** ethAdapter - Ethereum adapter */
   ethAdapter: EthAdapter
-  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeMasterCopy?: boolean
+  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
+  isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
@@ -113,8 +113,8 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 type ConnectSafeConfigProps = {
   /** ethAdapter - Ethereum adapter */
   ethAdapter?: EthAdapter
-  /** isL1SafeMasterCopy - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeMasterCopy?: boolean
+  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
+  isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
 }
@@ -128,8 +128,8 @@ export type ConnectSafeConfig =
   | ConnectSafeConfigWithPredictedSafe
 
 export interface CreateTransactionProps {
-  /** safeTransactionData - The transaction or transaction array to process */
-  safeTransactionData: SafeTransactionDataPartial | MetaTransactionData[]
+  /** transactions - The transaction array to process */
+  transactions: MetaTransactionData[]
   /** options - The transaction array optional properties */
   options?: SafeTransactionOptionalProps
   /** onlyCalls - Forces the execution of the transaction array with MultiSendCallOnly contract */

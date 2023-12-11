@@ -42,6 +42,7 @@ import {
 import {
   EthSafeSignature,
   SAFE_FEATURES,
+  buildContractSignature,
   hasSafeFeature,
   hashSafeMessage,
   isSafeMultisigTransactionResponse,
@@ -506,8 +507,8 @@ class Safe {
   /**
    * Returns the transaction hash of a Safe transaction.
    *
-   * @param safeTransaction - The Safe transaction or a raw message
-   * @returns The hashed Safe transaction or message
+   * @param safeTransaction - The Safe transaction
+   * @returns The hash of the Safe transaction
    */
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     if (!this.#contractManager.safeContract) {
@@ -524,16 +525,17 @@ class Safe {
    * Signs a hash using the current signer account.
    *
    * @param hash - The hash to sign
-   * @param isContractSignature - If the signature is going to be used for a Smart Contract signature
+   * @param isContractSignature - If the Signature class to build is a contract signature
    * @returns The Safe signature
    */
   async signHash(hash: string, isContractSignature = false): Promise<SafeSignature> {
     const signature = await generateSignature(this.#ethAdapter, hash)
 
     if (isContractSignature) {
-      const smartContractSignature = await this.buildContractSignature([signature])
+      const safeAddress = await this.getAddress()
+      const contractSignature = await buildContractSignature([signature], safeAddress)
 
-      return smartContractSignature
+      return contractSignature
     }
 
     return signature
@@ -640,21 +642,6 @@ class Safe {
     const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
 
     return signature
-  }
-
-  async buildContractSignature(
-    signatures: SafeSignature[],
-    signerSafeAddress?: string
-  ): Promise<SafeSignature> {
-    const safeAddress = await this.getAddress()
-
-    const contractSignature = new EthSafeSignature(
-      signerSafeAddress || safeAddress || '0x',
-      buildSignature(signatures),
-      true
-    )
-
-    return contractSignature
   }
 
   /**

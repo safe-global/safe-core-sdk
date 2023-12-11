@@ -131,6 +131,19 @@ export async function generateEIP712Signature(
   return new EthSafeSignature(signerAddress, signature)
 }
 
+export const buildContractSignature = async (
+  signatures: SafeSignature[],
+  signerSafeAddress: string
+): Promise<SafeSignature> => {
+  const contractSignature = new EthSafeSignature(
+    signerSafeAddress,
+    buildSignature(signatures),
+    true
+  )
+
+  return contractSignature
+}
+
 export const buildSignature = (signatures: SafeSignature[]): string => {
   const SIGNATURE_LENGTH_BYTES = 65
 

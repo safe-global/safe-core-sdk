@@ -13,6 +13,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
 import {
   EthSafeSignature,
+  buildContractSignature,
   buildSignature,
   preimageSafeMessageHash
 } from '@safe-global/protocol-kit/utils'
@@ -470,8 +471,10 @@ describe.only('EIP1271', () => {
             safeAddress
           )
 
-          const signerSafeSig = await safeSdk4.buildContractSignature(
-            Array.from(signerSafeTx.signatures.values())
+          const signerSafeAddress = await safeSdk4.getAddress()
+          const signerSafeSig = await buildContractSignature(
+            Array.from(signerSafeTx.signatures.values()),
+            signerSafeAddress
           )
 
           tx.addSignature(signerSafeSig)

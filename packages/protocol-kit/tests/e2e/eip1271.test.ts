@@ -38,7 +38,7 @@ export const calculateSafeMessageHash = (
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe.only('EIP1271', () => {
+describe('EIP1271', () => {
   describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
     const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
       await deployments.fixture()

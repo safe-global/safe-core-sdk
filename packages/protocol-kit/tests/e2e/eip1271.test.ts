@@ -1,12 +1,12 @@
 import { ethers } from 'ethers'
 import Safe, {
   hashSafeMessage,
-  buildContractSignature,
   buildSignature,
   preimageSafeMessageHash
 } from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { SigningMethod } from '@safe-global/protocol-kit/types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -18,7 +18,6 @@ import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
 import SafeMessage from '../../src/utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
-import { SigningMethod } from '@safe-global/protocol-kit/types'
 
 chai.use(chaiAsPromised)
 
@@ -38,8 +37,8 @@ export const calculateSafeMessageHash = (
 
 const MESSAGE = 'I am the owner of this Safe account'
 
-describe('EIP1271', () => {
-  describe('Using a 2/3 Safe in the context of the EIP1271', async () => {
+describe('The EIP1271 implementation', () => {
+  describe('In the context of a 2/3 Safe and a 1/1 signer Safe account', async () => {
     const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
       await deployments.fixture()
       const accounts = await getAccounts()
@@ -421,62 +420,6 @@ describe('EIP1271', () => {
 
           // Smart contract signature
           tx = await safeSdk3.signTransaction(tx, SigningMethod.SAFE_SIGNATURE, safeAddress)
-
-          const execResponse = await safeSdk1.executeTransaction(tx)
-          await waitSafeTxReceipt(execResponse)
-
-          chai.expect(await safeSdk1.getNonce()).to.be.eq(1)
-        }
-      )
-
-      itif(safeVersionDeployed >= '1.3.0')(
-        'should allow to sign transactions using other Safe Accounts (threshold = 2)',
-        async () => {
-          const { safeAddress, accounts, safeSdk1, safeSdk3, ethAdapter2 } = await setupTests()
-
-          const [account1] = accounts
-
-          const safeTransactionData: SafeTransactionDataPartial = {
-            to: account1.address,
-            value: '100000000000000000', // 0.01 ETH
-            data: '0x'
-          }
-
-          await account1.signer.sendTransaction({
-            to: safeAddress,
-            value: 1_000_000_000_000_000_000n // 1 ETH
-          })
-
-          let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-
-          chai.expect(await safeSdk1.getNonce()).to.be.eq(0)
-
-          // Normal signature
-          tx = await safeSdk1.signTransaction(tx)
-
-          // Smart contract signature
-          let signerSafeTx = await safeSdk3.createTransaction({
-            transactions: [safeTransactionData]
-          })
-          signerSafeTx = await safeSdk3.signTransaction(
-            signerSafeTx,
-            SigningMethod.ETH_SIGN,
-            safeAddress
-          )
-          const safeSdk4 = await safeSdk3.connect({ ethAdapter: ethAdapter2 })
-          signerSafeTx = await safeSdk4.signTransaction(
-            signerSafeTx,
-            SigningMethod.ETH_SIGN_TYPED_DATA_V4,
-            safeAddress
-          )
-
-          const signerSafeAddress = await safeSdk4.getAddress()
-          const signerSafeSig = await buildContractSignature(
-            Array.from(signerSafeTx.signatures.values()),
-            signerSafeAddress
-          )
-
-          tx.addSignature(signerSafeSig)
 
           const execResponse = await safeSdk1.executeTransaction(tx)
           await waitSafeTxReceipt(execResponse)

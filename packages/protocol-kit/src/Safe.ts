@@ -541,10 +541,24 @@ class Safe {
     return signature
   }
 
+  /**
+   * Returns a Safe message ready to be signed by the owners.
+   *
+   * @param message - The message
+   * @returns The Safe message
+   */
   createMessage(message: string | EIP712TypedData): SafeMessage {
     return new SafeMessage(message)
   }
 
+  /**
+   * Returns the Safe message with a new signature
+   *
+   * @param message The message to be signed
+   * @param signingMethod The signature type
+   * @param preimageSafeAddress If the preimage is required, the address of the Safe that will be used to calculate the preimage
+   * @returns The signed Safe message
+   */
   async signMessage(
     message: SafeMessage,
     signingMethod: SigningMethodType = SigningMethod.ETH_SIGN_TYPED_DATA_V4,
@@ -559,11 +573,12 @@ class Safe {
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
-      throw new Error('Transactions can only be signed by Safe owners')
+      throw new Error('Messages can only be signed by Safe owners')
     }
     const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
     const method = isContractSignature ? 'eth_sign' : signingMethod
     let signature: SafeSignature
+
     if (method === 'eth_signTypedData_v4') {
       signature = await this.signTypedData(message, 'v4')
     } else if (method === 'eth_signTypedData_v3') {
@@ -580,7 +595,7 @@ class Safe {
       let safeMessageHash: string
 
       // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
-      // we need to use the pre-image of the transaction hash to calculate the message hash
+      // we need to use the pre-image of the message to calculate the message hash
       // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
       if (
         (isContractSignature || preimageSafeAddress) &&
@@ -635,9 +650,7 @@ class Safe {
       data: eip712Data.data
     }
 
-    const signature = await generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
-
-    return signature
+    return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
   }
 
   /**

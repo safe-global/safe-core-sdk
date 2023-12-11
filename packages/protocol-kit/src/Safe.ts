@@ -649,7 +649,6 @@ class Safe {
       chainId: await this.getEthAdapter().getChainId(),
       data: eip712Data.data
     }
-
     return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
   }
 
@@ -684,6 +683,7 @@ class Safe {
     const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
     const method = isContractSignature ? 'eth_sign' : signingMethod
     let signature: SafeSignature
+
     if (method === 'eth_signTypedData_v4') {
       signature = await this.signTypedData(transaction, 'v4')
     } else if (method === 'eth_signTypedData_v3') {
@@ -1392,6 +1392,11 @@ class Safe {
     return transactionBatch
   }
 
+  /**
+   * Get the fallback handler contract
+   *
+   * @returns The fallback Handler contract
+   */
   private async getFallbackHandlerContract(): Promise<CompatibilityFallbackHandlerContract> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
@@ -1412,6 +1417,7 @@ class Safe {
 
   /**
    * Call the CompatibilityFallbackHandler getMessageHash method
+   *
    * @param messageHash The hash of the message
    * @returns Returns the Safe message hash to be signed
    * @link https://github.com/safe-global/safe-contracts/blob/8ffae95faa815acf86ec8b50021ebe9f96abde10/contracts/handler/CompatibilityFallbackHandler.sol#L26-L28
@@ -1433,6 +1439,7 @@ class Safe {
 
   /**
    * Call the CompatibilityFallbackHandler isValidSignature method
+   *
    * @param messageHash The hash of the message
    * @param signature The signature to be validated or '0x'. You can send as signature one of the following:
    *  1) An array of SafeSignature. In this case the signatures are concatenated for validation (buildSignature())

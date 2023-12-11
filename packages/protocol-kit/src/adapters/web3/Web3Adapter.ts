@@ -306,6 +306,7 @@ class Web3Adapter implements EthAdapter {
           reject(err)
           return
         }
+
         if (val?.result == null) {
           reject(new Error("EIP-712 is not supported by user's wallet"))
           return

@@ -199,7 +199,7 @@ describe.only('EIP1271', () => {
 
           // Sign the Safe message with the owners
           const ethSignSig = await safeSdk1.signHash(safeMessageHash)
-          const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE))
+          const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE), 'v4')
 
           // Validate the signature sending the Safe message hash and the concatenated signatures
           const isValid = await safeSdk1.isValidSignature(messageHash, [ethSignSig, typedDataSig])
@@ -218,7 +218,7 @@ describe.only('EIP1271', () => {
 
           // Sign the Safe message with the owners
           const ethSignSig = await safeSdk1.signHash(safeMessageHash)
-          const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE))
+          const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE), 'v4')
 
           // Sign with the Smart contract
           const shouldPreimageMessage = semverSatisfies(
@@ -412,6 +412,8 @@ describe.only('EIP1271', () => {
             value: 1_000_000_000_000_000_000n // 1 ETH
           })
 
+          chai.expect(await safeSdk1.getNonce()).to.be.eq(0)
+
           let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
 
           // Normal signature
@@ -421,17 +423,16 @@ describe.only('EIP1271', () => {
           tx = await safeSdk3.signTransaction(tx, SigningMethod.SAFE_SIGNATURE, safeAddress)
 
           const execResponse = await safeSdk1.executeTransaction(tx)
-          const receipt = await waitSafeTxReceipt(execResponse)
+          await waitSafeTxReceipt(execResponse)
 
-          chai.expect(receipt?.status).to.be.eq(1)
+          chai.expect(await safeSdk1.getNonce()).to.be.eq(1)
         }
       )
 
       itif(safeVersionDeployed >= '1.3.0')(
         'should allow to sign transactions using other Safe Accounts (threshold = 2)',
         async () => {
-          const { safeAddress, accounts, safeSdk1, safeSdk3, ethAdapter1, ethAdapter2 } =
-            await setupTests()
+          const { safeAddress, accounts, safeSdk1, safeSdk3, ethAdapter2 } = await setupTests()
 
           const [account1] = accounts
 
@@ -447,6 +448,8 @@ describe.only('EIP1271', () => {
           })
 
           let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
+
+          chai.expect(await safeSdk1.getNonce()).to.be.eq(0)
 
           // Normal signature
           tx = await safeSdk1.signTransaction(tx)
@@ -476,9 +479,9 @@ describe.only('EIP1271', () => {
           tx.addSignature(signerSafeSig)
 
           const execResponse = await safeSdk1.executeTransaction(tx)
-          const receipt = await waitSafeTxReceipt(execResponse)
+          await waitSafeTxReceipt(execResponse)
 
-          chai.expect(receipt?.status).to.be.eq(1)
+          chai.expect(await safeSdk1.getNonce()).to.be.eq(1)
         }
       )
     })

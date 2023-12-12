@@ -1,6 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
 import { EthersAdapter, hashSafeMessage } from '@safe-global/protocol-kit'
-import { SafeMessage } from '@safe-global/safe-core-sdk-types'
 import { ethers, JsonRpcProvider } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK
@@ -50,7 +49,7 @@ async function main() {
   const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
   const ethSignSig = await safeSdk1.signHash(safeMessageHash)
-  const typedDataSig = await safeSdk2.signTypedData(messageHash)
+  const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE_TO_SIGN), 'v4')
 
   // Validate the signature sending the Safe message hash and the concatenated signatures
   const isValid = await safeSdk1.isValidSignature(messageHash, [typedDataSig, ethSignSig])

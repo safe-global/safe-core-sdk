@@ -37,7 +37,7 @@ export class SafeMoneriumClient extends MoneriumClient {
 
   /**
    * Constructor where the Monerium environment and the Protocol kit instance are set
-   * @param environment The Monerium environment
+   * @param moneriumOptions The Monerium options object
    * @param safeSdk The Protocol kit instance
    */
   constructor(moneriumOptions: ClassOptions, safeSdk: Safe) {
@@ -176,7 +176,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Chain
    */
   async getChain(): Promise<Chain> {
-    const chainId = BigInt(await this.#safeSdk.getChainId())
+    const chainId = await this.#safeSdk.getChainId()
 
     return getMoneriumChain(Number(chainId))
   }
@@ -186,7 +186,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Network
    */
   async getNetwork(): Promise<Networks> {
-    const chainId = BigInt(await this.#safeSdk.getChainId())
+    const chainId = await this.#safeSdk.getChainId()
 
     return getMoneriumNetwork(Number(chainId))
   }

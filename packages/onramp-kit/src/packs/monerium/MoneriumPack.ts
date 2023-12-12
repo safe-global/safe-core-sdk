@@ -48,6 +48,7 @@ export class MoneriumPack extends OnRampKitBasePack {
   /**
    * This method initialize the flow with Monerium in order to gain access to the resources
    * using the access_token. Return a initialized {@link SafeMoneriumClient}
+   * @param {MoneriumOpenOptions} [options] The MoneriumOpenOptions object
    * @returns A {@link SafeMoneriumClient} instance
    */
   async open(options?: MoneriumOpenOptions): Promise<SafeMoneriumClient> {

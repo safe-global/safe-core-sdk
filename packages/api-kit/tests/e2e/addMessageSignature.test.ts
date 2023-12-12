@@ -1,17 +1,17 @@
-import Safe, { hashSafeMessage } from '@safe-global/protocol-kit'
+import Safe, { EthSafeSignature, buildSignature, hashSafeMessage } from '@safe-global/protocol-kit'
 import { EthAdapter, SafeMessage } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getServiceClient } from '../utils/setupServiceClient'
+import { buildContractSignature } from 'packages/protocol-kit/dist/src'
 
 chai.use(chaiAsPromised)
 
 let safeApiKit1: SafeApiKit
+let protocolKit: Safe
 let ethAdapter1: EthAdapter
-let protocolKit1: Safe
 let ethAdapter2: EthAdapter
-let protocolKit2: Safe
 
 const generateRandomUUID = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -23,6 +23,7 @@ const generateRandomUUID = (): string => {
 
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
+const signerSafeAddress = '0x83aB93f078A8fbbe6a677b1C488819e0ae981128'
 
 describe('addMessageSignature', () => {
   before(async () => {
@@ -33,13 +34,8 @@ describe('addMessageSignature', () => {
       '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1'
     ))
 
-    protocolKit1 = await Safe.create({
+    protocolKit = await Safe.create({
       ethAdapter: ethAdapter1,
-      safeAddress
-    })
-
-    protocolKit2 = await Safe.create({
-      ethAdapter: ethAdapter2,
       safeAddress
     })
   })
@@ -56,31 +52,91 @@ describe('addMessageSignature', () => {
       .to.be.rejectedWith('Invalid messageHash or signature')
   })
 
-  it('should allow to add a confirmation signature using a mix of EIP-191 and EIP-712', async () => {
-    const rawMessage = generateMessage()
-    const safeMessage = protocolKit1.createMessage(rawMessage)
-    const signedMessage1: SafeMessage = await protocolKit1.signMessage(safeMessage, 'eth_sign')
+  describe('when adding a new message', () => {
+    it('should allow to add a confirmation signature using the EIP-712', async () => {
+      const rawMessage: string = generateMessage()
+      let safeMessage: SafeMessage = protocolKit.createMessage(rawMessage)
+      safeMessage = await protocolKit.signMessage(safeMessage, 'eth_sign')
 
-    await chai.expect(
-      safeApiKit1.addMessage(safeAddress, {
-        message: rawMessage,
-        signature: [...signedMessage1.signatures.values()][0].data
+      let signerAddress = (await ethAdapter1.getSignerAddress()) || '0x'
+
+      await chai.expect(
+        safeApiKit1.addMessage(safeAddress, {
+          message: rawMessage,
+          signature: safeMessage.getSignature(signerAddress)?.data || '0x'
+        })
+      ).to.be.fulfilled
+
+      protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter2 })
+      safeMessage = await protocolKit.signMessage(safeMessage, 'eth_signTypedData_v4')
+
+      const safeMessageHash = await protocolKit.getSafeMessageHash(hashSafeMessage(rawMessage))
+      signerAddress = (await ethAdapter2.getSignerAddress()) || '0x'
+
+      await chai.expect(
+        safeApiKit1.addMessageSignature(
+          safeMessageHash,
+          safeMessage.getSignature(signerAddress)?.data || '0x'
+        )
+      ).to.be.fulfilled
+
+      const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
+
+      chai.expect(confirmedMessage.confirmations.length).to.eq(2)
+    })
+
+    it('should allow to add a confirmation signature using a Safe signer', async () => {
+      const rawMessage: string = generateMessage()
+      const safeMessageHash = await protocolKit.getSafeMessageHash(hashSafeMessage(rawMessage))
+      let safeMessage: SafeMessage = protocolKit.createMessage(rawMessage)
+      safeMessage = await protocolKit.signMessage(safeMessage, 'eth_sign')
+
+      const signerAddress = (await ethAdapter1.getSignerAddress()) || '0x'
+      const ethSig = safeMessage.getSignature(signerAddress) as EthSafeSignature
+
+      await chai.expect(
+        safeApiKit1.addMessage(safeAddress, {
+          message: rawMessage,
+          signature: ethSig?.data || '0x'
+        })
+      ).to.be.fulfilled
+
+      protocolKit = await protocolKit.connect({
+        ethAdapter: ethAdapter1,
+        safeAddress: signerSafeAddress
       })
-    ).to.be.fulfilled
+      let signerSafeMessage = protocolKit.createMessage(rawMessage)
+      signerSafeMessage = await protocolKit.signMessage(signerSafeMessage, 'eth_sign', safeAddress)
 
-    const signedMessage2 = await protocolKit2.signMessage(signedMessage1, 'eth_signTypedData_v4')
+      protocolKit = await protocolKit.connect({
+        ethAdapter: ethAdapter2,
+        safeAddress: signerSafeAddress
+      })
+      signerSafeMessage = await protocolKit.signMessage(signerSafeMessage, 'eth_sign', safeAddress)
 
-    const safeMessageHash = await protocolKit1.getSafeMessageHash(hashSafeMessage(rawMessage))
-
-    await chai.expect(
-      safeApiKit1.addMessageSignature(
-        safeMessageHash,
-        [...signedMessage2.signatures.values()][1].data
+      const signerSafeSig = await buildContractSignature(
+        Array.from(signerSafeMessage.signatures.values()),
+        signerSafeAddress
       )
-    ).to.be.fulfilled
 
-    const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
+      console.log(signerSafeSig)
+      console.log(buildSignature([signerSafeSig]))
 
-    chai.expect(confirmedMessage.confirmations.length).to.eq(2)
+      protocolKit = await protocolKit.connect({
+        ethAdapter: ethAdapter1,
+        safeAddress
+      })
+
+      chai.expect(
+        await protocolKit.isValidSignature(hashSafeMessage(rawMessage), [signerSafeSig, ethSig])
+      ).to.be.true
+
+      await chai.expect(
+        safeApiKit1.addMessageSignature(safeMessageHash, buildSignature([signerSafeSig]))
+      ).to.be.fulfilled
+
+      const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
+      chai.expect(confirmedMessage.confirmations.length).to.eq(2)
+    })
   })
 })

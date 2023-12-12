@@ -143,122 +143,125 @@ describe('The EIP1271 implementation', () => {
       }
     )
 
-    itif(safeVersionDeployed >= '1.3.0')('should allow to sign valid messages', async () => {
-      const { safeAddress, accounts, signerSafeAddress, contractNetworks, chainId } =
-        await setupTests()
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should allow to sign and validate typed messages',
+      async () => {
+        const { safeAddress, accounts, signerSafeAddress, contractNetworks, chainId } =
+          await setupTests()
 
-      const MESSAGE = {
-        types: {
-          EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' }
-          ],
-          Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallets', type: 'address[]' }
-          ],
-          Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person[]' },
-            { name: 'contents', type: 'string' }
-          ]
-        },
-        domain: {
-          name: 'Ether Mail',
-          version: '1',
-          chainId: Number(chainId),
-          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
-        },
-        primaryType: 'Mail',
-        message: {
-          from: {
-            name: 'Cow',
-            wallets: [
-              '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-              '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'
+        const MESSAGE = {
+          types: {
+            EIP712Domain: [
+              { name: 'name', type: 'string' },
+              { name: 'version', type: 'string' },
+              { name: 'chainId', type: 'uint256' },
+              { name: 'verifyingContract', type: 'address' }
+            ],
+            Person: [
+              { name: 'name', type: 'string' },
+              { name: 'wallets', type: 'address[]' }
+            ],
+            Mail: [
+              { name: 'from', type: 'Person' },
+              { name: 'to', type: 'Person[]' },
+              { name: 'contents', type: 'string' }
             ]
           },
-          to: [
-            {
-              name: 'Bob',
+          domain: {
+            name: 'Ether Mail',
+            version: '1',
+            chainId: Number(chainId),
+            verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+          },
+          primaryType: 'Mail',
+          message: {
+            from: {
+              name: 'Cow',
               wallets: [
-                '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-                '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-                '0xB0B0b0b0b0b0B000000000000000000000000000'
+                '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+                '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'
               ]
-            }
-          ],
-          contents: 'Hello, Bob!'
+            },
+            to: [
+              {
+                name: 'Bob',
+                wallets: [
+                  '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+                  '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+                  '0xB0B0b0b0b0b0B000000000000000000000000000'
+                ]
+              }
+            ],
+            contents: 'Hello, Bob!'
+          }
         }
+
+        // Create adapters and the protocol kit instance
+        const [account1, account2, account3, account4, account5] = accounts
+
+        const ethAdapter1 = await getEthAdapter(account1.signer)
+        const ethAdapter2 = await getEthAdapter(account2.signer)
+        const ethAdapter3 = await getEthAdapter(account3.signer)
+        const ethAdapter4 = await getEthAdapter(account4.signer)
+        const ethAdapter5 = await getEthAdapter(account5.signer)
+
+        let protocolKit = await Safe.create({
+          ethAdapter: ethAdapter1,
+          safeAddress,
+          contractNetworks
+        })
+
+        let message = protocolKit.createMessage(MESSAGE)
+
+        // Produce normal signatures
+        message = await protocolKit.signMessage(message) // Owner 1 signature
+        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter2 }) // Connect another owner
+        message = await protocolKit.signMessage(message) // Owner 2 signature
+
+        // Smart contract signature (Connect owners and sign)
+        protocolKit = await protocolKit.connect({
+          ethAdapter: ethAdapter2,
+          safeAddress: signerSafeAddress
+        })
+        let signerSafeMessage = protocolKit.createMessage(MESSAGE)
+        signerSafeMessage = await protocolKit.signMessage(
+          signerSafeMessage,
+          SigningMethod.ETH_SIGN,
+          safeAddress
+        )
+        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter3 })
+        signerSafeMessage = await protocolKit.signMessage(
+          signerSafeMessage,
+          SigningMethod.ETH_SIGN,
+          safeAddress
+        )
+        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter4 })
+        signerSafeMessage = await protocolKit.signMessage(
+          signerSafeMessage,
+          SigningMethod.ETH_SIGN,
+          safeAddress
+        )
+        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
+        signerSafeMessage = await protocolKit.signMessage(
+          signerSafeMessage,
+          SigningMethod.ETH_SIGN,
+          safeAddress
+        )
+
+        const signerSafeSig = await buildContractSignature(
+          Array.from(signerSafeMessage.signatures.values()),
+          signerSafeAddress
+        )
+
+        // Add the signer Safe signature to the original Safe transaction
+        message.addSignature(signerSafeSig)
+
+        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter1, safeAddress })
+
+        chai.expect(
+          await protocolKit.isValidSignature(hashSafeMessage(MESSAGE), message.encodedSignatures())
+        ).to.be.true
       }
-
-      // Create adapters and the protocol kit instance
-      const [account1, account2, account3, account4, account5] = accounts
-
-      const ethAdapter1 = await getEthAdapter(account1.signer)
-      const ethAdapter2 = await getEthAdapter(account2.signer)
-      const ethAdapter3 = await getEthAdapter(account3.signer)
-      const ethAdapter4 = await getEthAdapter(account4.signer)
-      const ethAdapter5 = await getEthAdapter(account5.signer)
-
-      let protocolKit = await Safe.create({
-        ethAdapter: ethAdapter1,
-        safeAddress,
-        contractNetworks
-      })
-
-      let message = protocolKit.createMessage(MESSAGE)
-
-      // Produce normal signatures
-      message = await protocolKit.signMessage(message) // Owner 1 signature
-      protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter2 }) // Connect another owner
-      message = await protocolKit.signMessage(message) // Owner 2 signature
-
-      // Smart contract signature (Connect owners and sign)
-      protocolKit = await protocolKit.connect({
-        ethAdapter: ethAdapter2,
-        safeAddress: signerSafeAddress
-      })
-      let signerSafeMessage = protocolKit.createMessage(MESSAGE)
-      signerSafeMessage = await protocolKit.signMessage(
-        signerSafeMessage,
-        SigningMethod.ETH_SIGN,
-        safeAddress
-      )
-      protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter3 })
-      signerSafeMessage = await protocolKit.signMessage(
-        signerSafeMessage,
-        SigningMethod.ETH_SIGN,
-        safeAddress
-      )
-      protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter4 })
-      signerSafeMessage = await protocolKit.signMessage(
-        signerSafeMessage,
-        SigningMethod.ETH_SIGN,
-        safeAddress
-      )
-      protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
-      signerSafeMessage = await protocolKit.signMessage(
-        signerSafeMessage,
-        SigningMethod.ETH_SIGN,
-        safeAddress
-      )
-
-      const signerSafeSig = await buildContractSignature(
-        Array.from(signerSafeMessage.signatures.values()),
-        signerSafeAddress
-      )
-
-      // Add the signer Safe signature to the original Safe transaction
-      message.addSignature(signerSafeSig)
-
-      protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter1, safeAddress })
-
-      chai.expect(
-        await protocolKit.isValidSignature(hashSafeMessage(MESSAGE), message.encodedSignatures())
-      ).to.be.true
-    })
+    )
   })
 })

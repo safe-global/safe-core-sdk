@@ -16,7 +16,7 @@ const outDirTests = 'typechain/tests/'
 const safeContractsPath = '../../node_modules/@safe-global/safe-deployments/dist/assets'
 
 const safeContracts_V1_4_1 = [
-  `${safeContractsPath}/v1.4.1/safe.json`,
+  // `${safeContractsPath}/v1.4.1/safe.json`, // Remove contract 1.4.1 from typechain as it's migrated to Abitype
   `${safeContractsPath}/v1.4.1/safe_proxy_factory.json`,
   `${safeContractsPath}/v1.4.1/multi_send.json`,
   `${safeContractsPath}/v1.4.1/multi_send_call_only.json`,
@@ -103,10 +103,7 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.4.1`,
-    // Remove Safe Contract v1.4.1 for web3-v1
-    typechainTarget === 'web3-v1'
-      ? safeContracts_V1_4_1.replace(`${safeContractsPath}/v1.4.1/safe.json `, '')
-      : safeContracts_V1_4_1
+    safeContracts_V1_4_1
   )
   generateTypechainFiles(
     typechainTarget,
@@ -116,7 +113,10 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.2.0`,
-    safeContracts_V1_2_0
+    // removed Safe Contract v1.2.0 for ethers-v6
+    typechainTarget === 'ethers-v6'
+      ? safeContracts_V1_2_0.replace(`${safeContractsPath}/v1.2.0/gnosis_safe.json `, '')
+      : safeContracts_V1_2_0
   )
   generateTypechainFiles(
     typechainTarget,

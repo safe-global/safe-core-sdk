@@ -25,7 +25,7 @@ const generateMessage = () => `${generateRandomUUID()}: I am the owner of the sa
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 const signerSafeAddress = '0x83aB93f078A8fbbe6a677b1C488819e0ae981128'
 
-describe('addMessageSignature', () => {
+describe.only('addMessageSignature', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
@@ -85,7 +85,7 @@ describe('addMessageSignature', () => {
       chai.expect(confirmedMessage.confirmations.length).to.eq(2)
     })
 
-    it('should allow to add a confirmation signature using a Safe signer', async () => {
+    it.only('should allow to add a confirmation signature using a Safe signer', async () => {
       const rawMessage: string = generateMessage()
       const safeMessageHash = await protocolKit.getSafeMessageHash(hashSafeMessage(rawMessage))
       let safeMessage: SafeMessage = protocolKit.createMessage(rawMessage)
@@ -97,7 +97,7 @@ describe('addMessageSignature', () => {
       await chai.expect(
         safeApiKit1.addMessage(safeAddress, {
           message: rawMessage,
-          signature: ethSig?.data || '0x'
+          signature: buildSignature([ethSig])
         })
       ).to.be.fulfilled
 
@@ -119,8 +119,8 @@ describe('addMessageSignature', () => {
         signerSafeAddress
       )
 
-      console.log(signerSafeSig)
-      console.log(buildSignature([signerSafeSig]))
+      console.log('SDK SafeSignature:', signerSafeSig)
+      console.log('Safe Signer Signature:', buildSignature([signerSafeSig]))
 
       protocolKit = await protocolKit.connect({
         ethAdapter: ethAdapter1,

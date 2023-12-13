@@ -1,148 +1,382 @@
 import { useEffect, useState } from 'react'
-import {
-  ADAPTER_EVENTS,
-  CHAIN_NAMESPACES,
-  SafeEventEmitterProvider,
-  UserInfo,
-  WALLET_ADAPTERS
-} from '@web3auth/base'
-import { Box, Divider, Grid, Typography } from '@mui/material'
-import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
-import { Web3AuthOptions } from '@web3auth/modal'
+import { BrowserProvider, Eip1193Provider, ethers } from 'ethers'
+import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
-
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import AppBar from './AppBar'
-import { AuthKitSignInData, Web3AuthModalPack, Web3AuthEventListener } from '../../src/index'
-
-const connectedHandler: Web3AuthEventListener = (data) => console.log('CONNECTED', data)
-const disconnectedHandler: Web3AuthEventListener = (data) => console.log('DISCONNECTED', data)
+import {
+  AuthKitSignInData,
+  SafeAuthInitOptions,
+  SafeAuthPack,
+  SafeAuthUserInfo
+} from '@safe-global/auth-kit'
+import { getSafeTxV4TypedData, getTypedData, getV3TypedData } from './typedData'
 
 function App() {
-  const [web3AuthModalPack, setWeb3AuthModalPack] = useState<Web3AuthModalPack>()
+  const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
+  const [isAuthenticated, setIsAuthenticated] = useState(!!safeAuthPack?.isAuthenticated)
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null>(
     null
   )
-  const [userInfo, setUserInfo] = useState<Partial<UserInfo>>()
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
+  const [userInfo, setUserInfo] = useState<SafeAuthUserInfo | null>(null)
+  const [chainId, setChainId] = useState<string>()
+  const [balance, setBalance] = useState<string>()
+  const [consoleMessage, setConsoleMessage] = useState<string>('')
+  const [consoleTitle, setConsoleTitle] = useState<string>('')
+  const [provider, setProvider] = useState<BrowserProvider>()
 
   useEffect(() => {
+    // @ts-expect-error - Missing globals
+    const params = new URL(window.document.location).searchParams
+    const chainId = params.get('chainId')
+
     ;(async () => {
-      const rpcUrl = `https://goerli.infura.io/v3/${import.meta.env.VITE_INFURA_KEY}`
-
-      const options: Web3AuthOptions = {
-        clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
-        web3AuthNetwork: 'testnet',
+      const options: SafeAuthInitOptions = {
+        enableLogging: true,
+        buildEnv: 'production',
         chainConfig: {
-          chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: '0x5',
-          rpcTarget: rpcUrl
-        },
-        uiConfig: {
-          theme: 'dark',
-          loginMethodsOrder: ['google', 'facebook']
+          chainId: chainId || '0x64',
+          rpcTarget: 'https://gnosis.drpc.org'
         }
       }
 
-      const modalConfig = {
-        [WALLET_ADAPTERS.TORUS_EVM]: {
-          label: 'torus',
-          showOnModal: false
-        },
-        [WALLET_ADAPTERS.METAMASK]: {
-          label: 'metamask',
-          showOnDesktop: true,
-          showOnMobile: false
-        }
-      }
+      const authPack = new SafeAuthPack()
 
-      const openloginAdapter = new OpenloginAdapter({
-        loginSettings: {
-          mfaLevel: 'mandatory'
-        },
-        adapterSettings: {
-          uxMode: 'popup',
-          whiteLabel: {
-            name: 'Safe'
-          }
+      await authPack.init(options)
+
+      console.log('safeAuthPack:safeEmbed', authPack.safeAuthEmbed)
+
+      setSafeAuthPack(authPack)
+
+      authPack.subscribe('accountsChanged', async (accounts) => {
+        console.log('safeAuthPack:accountsChanged', accounts, authPack.isAuthenticated)
+        if (authPack.isAuthenticated) {
+          const signInInfo = await authPack?.signIn()
+
+          setSafeAuthSignInResponse(signInInfo)
+          setIsAuthenticated(true)
         }
       })
 
-      const web3AuthModalPack = new Web3AuthModalPack()
-
-      await web3AuthModalPack.init({ options, adapters: [openloginAdapter], modalConfig })
-
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
-
-      web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
-
-      setWeb3AuthModalPack(web3AuthModalPack)
-
-      return () => {
-        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler)
-        web3AuthModalPack.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler)
-      }
+      authPack.subscribe('chainChanged', (eventData) =>
+        console.log('safeAuthPack:chainChanged', eventData)
+      )
     })()
   }, [])
 
   useEffect(() => {
-    if (web3AuthModalPack && web3AuthModalPack.getProvider()) {
-      ;(async () => {
-        await login()
-      })()
-    }
-  }, [web3AuthModalPack])
+    if (!safeAuthPack || !isAuthenticated) return
+    ;(async () => {
+      const web3Provider = safeAuthPack.getProvider()
+      const userInfo = await safeAuthPack.getUserInfo()
+
+      setUserInfo(userInfo)
+
+      if (web3Provider) {
+        const provider = new BrowserProvider(safeAuthPack.getProvider() as Eip1193Provider)
+        const signer = await provider.getSigner()
+        const signerAddress = await signer.getAddress()
+
+        setChainId((await provider?.getNetwork()).chainId.toString())
+        setBalance(
+          ethers.formatEther((await provider.getBalance(signerAddress)) as ethers.BigNumberish)
+        )
+        setProvider(provider)
+      }
+    })()
+  }, [isAuthenticated])
 
   const login = async () => {
-    if (!web3AuthModalPack) return
-
-    const signInInfo = await web3AuthModalPack.signIn()
-    console.log('SIGN IN RESPONSE: ', signInInfo)
-
-    const userInfo = await web3AuthModalPack.getUserInfo()
-    console.log('USER INFO: ', userInfo)
+    const signInInfo = await safeAuthPack?.signIn()
 
     setSafeAuthSignInResponse(signInInfo)
-    setUserInfo(userInfo || undefined)
-    setProvider(web3AuthModalPack.getProvider() as SafeEventEmitterProvider)
+    setIsAuthenticated(true)
   }
 
   const logout = async () => {
-    if (!web3AuthModalPack) return
+    await safeAuthPack?.signOut()
 
-    await web3AuthModalPack.signOut()
-
-    setProvider(null)
     setSafeAuthSignInResponse(null)
+  }
+
+  const getUserInfo = async () => {
+    const userInfo = await safeAuthPack?.getUserInfo()
+
+    uiConsole('User Info', userInfo)
+  }
+
+  const getAccounts = async () => {
+    const accounts = await provider?.send('eth_accounts', [])
+
+    uiConsole('Accounts', accounts)
+  }
+
+  const getChainId = async () => {
+    const chainId = await provider?.send('eth_chainId', [])
+
+    uiConsole('ChainId', chainId)
+  }
+
+  const signAndExecuteSafeTx = async (index: number) => {
+    const safeAddress = safeAuthSignInResponse?.safes?.[index] || '0x'
+
+    // Wrap Web3Auth provider with ethers
+    const provider = new BrowserProvider(safeAuthPack?.getProvider() as Eip1193Provider)
+    const signer = await provider.getSigner()
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signerOrProvider: signer
+    })
+    const protocolKit = await Safe.create({
+      safeAddress,
+      ethAdapter
+    })
+
+    // Create transaction
+    let tx = await protocolKit.createTransaction({
+      transactions: [
+        {
+          to: ethers.getAddress(safeAuthSignInResponse?.eoa || '0x'),
+          data: '0x',
+          value: ethers.parseUnits('0.0001', 'ether').toString()
+        }
+      ]
+    })
+
+    // Sign transaction. Not necessary to execute the transaction if the threshold is one
+    // but kept to test the sign transaction modal
+    tx = await protocolKit.signTransaction(tx)
+
+    // Execute transaction
+    const txResult = await protocolKit.executeTransaction(tx)
+    uiConsole('Safe Transaction Result', txResult)
+  }
+
+  const signMessage = async (data: any, method: string) => {
+    let signedMessage
+
+    const params = {
+      data,
+      from: safeAuthSignInResponse?.eoa
+    }
+
+    if (method === 'eth_signTypedData') {
+      signedMessage = await provider?.send(method, [params.data, params.from])
+    } else if (method === 'eth_signTypedData_v3' || method === 'eth_signTypedData_v4') {
+      signedMessage = await provider?.send(method, [params.from, JSON.stringify(params.data)])
+    } else {
+      signedMessage = await (await provider?.getSigner())?.signMessage(data)
+    }
+
+    uiConsole('Signed Message', signedMessage)
+  }
+
+  const sendTransaction = async () => {
+    const tx = await provider?.send('eth_sendTransaction', [
+      {
+        from: safeAuthSignInResponse?.eoa,
+        to: safeAuthSignInResponse?.eoa,
+        value: ethers.parseUnits('0.00001', 'ether').toString(),
+        gasLimit: 21000
+      }
+    ])
+
+    uiConsole('Transaction Response', tx)
+  }
+
+  const switchChain = async () => {
+    const result = await provider?.send('wallet_switchEthereumChain', [
+      {
+        chainId: '0x1'
+      }
+    ])
+
+    uiConsole('Switch Chain', result)
+  }
+
+  const addChain = async () => {
+    const result = await provider?.send('wallet_addEthereumChain', [
+      {
+        chainId: '0x2105',
+        chainName: 'Base',
+        nativeCurrency: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        rpcUrls: ['https://base.publicnode.com'],
+        blockExplorerUrls: ['https://basescan.org/']
+      }
+    ])
+
+    uiConsole(`Add chain`, result)
+  }
+
+  const uiConsole = (title: string, message: unknown) => {
+    setConsoleTitle(title)
+    setConsoleMessage(typeof message === 'string' ? message : JSON.stringify(message, null, 2))
   }
 
   return (
     <>
-      <AppBar onLogin={login} onLogout={logout} userInfo={userInfo} isLoggedIn={!!provider} />
+      <AppBar
+        onLogin={login}
+        onLogout={logout}
+        userInfo={userInfo || undefined}
+        isLoggedIn={!!safeAuthPack?.isAuthenticated}
+      />
       {safeAuthSignInResponse?.eoa && (
         <Grid container>
           <Grid item md={4} p={4}>
             <Typography variant="h3" color="secondary" fontWeight={700}>
-              Owner account
+              Signer
             </Typography>
             <Divider sx={{ my: 3 }} />
-            <EthHashInfo
-              address={safeAuthSignInResponse.eoa}
-              showCopyButton
-              showPrefix
-              prefix={getPrefix('0x5')}
-            />
+            <EthHashInfo address={safeAuthSignInResponse.eoa} showCopyButton showPrefix={false} />
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="h4" color="primary" fontWeight="bold">
+              Chain{' '}
+              <Typography component="span" color="secondary" fontSize="1.45rem">
+                {chainId}
+              </Typography>
+            </Typography>
+            <Typography variant="h4" color="primary" sx={{ my: 1 }} fontWeight="bold">
+              Balance{' '}
+              <Typography component="span" color="secondary" fontSize="1.45rem">
+                {balance}
+              </Typography>
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Button
+              variant="contained"
+              fullWidth
+              color="secondary"
+              sx={{ my: 1 }}
+              onClick={() => getUserInfo()}
+            >
+              getUserInfo
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => getAccounts()}
+            >
+              eth_accounts
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => getChainId()}
+            >
+              eth_chainId
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => signMessage('Hello World', 'personal_sign')}
+            >
+              personal_sign
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() =>
+                signMessage(
+                  '0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad',
+                  'eth_sign'
+                )
+              }
+            >
+              eth_sign
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => signMessage(getTypedData(), 'eth_signTypedData')}
+            >
+              eth_signTypedData
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => signMessage(getV3TypedData(chainId || ''), 'eth_signTypedData_v3')}
+            >
+              eth_signTypedData_v3
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() =>
+                signMessage(getSafeTxV4TypedData(chainId || ''), 'eth_signTypedData_v4')
+              }
+            >
+              eth_signTypedData_v4
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ my: 1 }}
+              onClick={() => sendTransaction()}
+            >
+              eth_sendTransaction
+            </Button>
+            <Divider sx={{ my: 2 }} />
+            <Button
+              variant="outlined"
+              fullWidth
+              color="secondary"
+              sx={{ my: 1 }}
+              onClick={() => switchChain()}
+            >
+              wallet_switchEthereumChain
+            </Button>{' '}
+            <Button
+              variant="outlined"
+              fullWidth
+              color="secondary"
+              sx={{ my: 1 }}
+              onClick={() => addChain()}
+            >
+              wallet_addEthereumChain
+            </Button>
           </Grid>
-          <Grid item md={8} p={4}>
+          <Grid item md={3} p={4}>
             <>
               <Typography variant="h3" color="secondary" fontWeight={700}>
-                Available Safes
+                Safe accounts
               </Typography>
-              <Divider sx={{ my: 3 }} />
+              <Divider sx={{ my: 2 }} />
               {safeAuthSignInResponse?.safes?.length ? (
                 safeAuthSignInResponse?.safes?.map((safe, index) => (
-                  <Box sx={{ my: 3 }} key={index}>
-                    <EthHashInfo address={safe} showCopyButton shortAddress={false} />
-                  </Box>
+                  <>
+                    <Box sx={{ my: 3 }} key={index}>
+                      <EthHashInfo address={safe} showCopyButton shortAddress={true} />
+                    </Box>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      color="primary"
+                      onClick={() => signAndExecuteSafeTx(index)}
+                    >
+                      Sign and execute
+                    </Button>
+                    <Divider sx={{ my: 3 }} />
+                  </>
                 ))
               ) : (
                 <Typography variant="body1" color="secondary" fontWeight={700}>
@@ -151,25 +385,26 @@ function App() {
               )}
             </>
           </Grid>
+          <Grid item md={5} p={4}>
+            <Typography variant="h3" color="secondary" fontWeight={700}>
+              Console
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="body1" color="primary" fontWeight={700}>
+              {consoleTitle}
+            </Typography>
+            <Typography
+              variant="body1"
+              color="secondary"
+              sx={{ mt: 2, overflowWrap: 'break-word' }}
+            >
+              {consoleMessage}
+            </Typography>
+          </Grid>
         </Grid>
       )}
     </>
   )
-}
-
-const getPrefix = (chainId: string) => {
-  switch (chainId) {
-    case '0x1':
-      return 'eth'
-    case '0x5':
-      return 'gor'
-    case '0x100':
-      return 'gno'
-    case '0x137':
-      return 'matic'
-    default:
-      return 'eth'
-  }
 }
 
 export default App

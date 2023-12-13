@@ -1,8 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react'
-import { Web3AuthOptions } from '@web3auth/modal'
-import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS } from '@web3auth/base'
-import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
-import { Web3AuthModalPack, AuthKitSignInData } from '@safe-global/auth-kit'
+import { ethers } from 'ethers'
+import { SafeAuthPack, AuthKitSignInData, SafeAuthInitOptions } from '@safe-global/auth-kit'
 
 type AuthContextProviderProps = {
   children: React.ReactNode
@@ -10,7 +8,7 @@ type AuthContextProviderProps = {
 
 type AuthContextType = {
   isLoggedIn: boolean
-  provider?: SafeEventEmitterProvider
+  provider: ethers.Eip1193Provider | null
   data?: AuthKitSignInData
   selectedSafe: string
   setSelectedSafe?: (safe: string) => void
@@ -20,102 +18,80 @@ type AuthContextType = {
 
 export const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
-  selectedSafe: ''
+  selectedSafe: '',
+  provider: null
 })
 
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [web3AuthPack, setWeb3AuthPack] = useState<Web3AuthModalPack>()
+  const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
+  const [isAuthenticated, setIsAuthenticated] = useState(!!safeAuthPack?.isAuthenticated)
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData>()
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | undefined>()
+  const [provider, setProvider] = useState<ethers.Eip1193Provider | null>()
   const [selectedSafe, setSelectedSafe] = useState('')
 
   useEffect(() => {
     ;(async () => {
-      const options: Web3AuthOptions = {
-        clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID || '',
-        web3AuthNetwork: 'testnet',
-        chainConfig: {
-          chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: '0x5',
-          rpcTarget: 'https://rpc.ankr.com/eth_goerli'
-        },
-        uiConfig: {
-          theme: 'dark',
-          loginMethodsOrder: ['google', 'facebook']
-        }
+      const authPack = new SafeAuthPack()
+
+      const options: SafeAuthInitOptions = {
+        enableLogging: true,
+        showWidgetButton: false,
+        chainConfig: { chainId: '0x5', rpcTarget: 'https://ethereum-goerli.publicnode.com' }
       }
 
-      const modalConfig = {
-        [WALLET_ADAPTERS.TORUS_EVM]: {
-          label: 'torus',
-          showOnModal: false
-        },
-        [WALLET_ADAPTERS.METAMASK]: {
-          label: 'metamask',
-          showOnDesktop: true,
-          showOnMobile: false
-        }
-      }
+      await authPack.init(options)
 
-      const openloginAdapter = new OpenloginAdapter({
-        loginSettings: {
-          mfaLevel: 'mandatory'
-        },
-        adapterSettings: {
-          uxMode: 'popup',
-          whiteLabel: {
-            name: 'Safe'
+      setSafeAuthPack(authPack)
+
+      // If the provider has an account the we can try to sign in the user
+      authPack.subscribe('accountsChanged', async (accounts: string[]) => {
+        if (accounts.length > 0) {
+          const signInInfo = await authPack?.signIn()
+
+          setSafeAuthSignInResponse(signInInfo)
+          setIsAuthenticated(true)
+
+          if (signInInfo.safes && signInInfo.safes.length > 0) {
+            setSelectedSafe(signInInfo?.safes[0])
           }
         }
       })
-
-      const web3AuthPack = new Web3AuthModalPack()
-
-      await web3AuthPack.init({ options, adapters: [openloginAdapter], modalConfig })
-
-      const provider = web3AuthPack.getProvider()
-
-      if (provider) {
-        const response = await web3AuthPack.signIn()
-        setSafeAuthSignInResponse(response)
-        setSelectedSafe(response?.safes?.[0] || '')
-        setProvider(provider as SafeEventEmitterProvider)
-
-        setIsLoggedIn(true)
-      }
-
-      setWeb3AuthPack(web3AuthPack)
     })()
   }, [])
 
+  useEffect(() => {
+    if (!safeAuthPack || !isAuthenticated) return
+
+    setProvider(safeAuthPack.getProvider())
+  }, [isAuthenticated])
+
   const logIn = async () => {
-    if (!web3AuthPack) return
+    if (!safeAuthPack) return
 
-    const response = await web3AuthPack.signIn()
-    console.log('SIGN IN RESPONSE: ', response)
+    const signInInfo = await safeAuthPack.signIn()
+    setSafeAuthSignInResponse(signInInfo)
+    setIsAuthenticated(true)
 
-    setSafeAuthSignInResponse(response)
-    setSelectedSafe(response?.safes?.[0] || '')
-    setProvider(web3AuthPack.getProvider() as SafeEventEmitterProvider)
-    setIsLoggedIn(true)
+    if (signInInfo?.safes && signInInfo.safes.length > 0) {
+      setSelectedSafe(signInInfo?.safes[0])
+    }
   }
 
   const logOut = async () => {
-    if (!web3AuthPack) return
+    if (!safeAuthPack) return
 
-    await web3AuthPack.signOut()
+    await safeAuthPack.signOut()
 
     setProvider(undefined)
     setSafeAuthSignInResponse(undefined)
-    setIsLoggedIn(false)
+    setIsAuthenticated(false)
   }
 
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn,
-        provider,
+        isLoggedIn: isAuthenticated,
+        provider: provider || null,
         data: safeAuthSignInResponse,
         logIn,
         logOut,

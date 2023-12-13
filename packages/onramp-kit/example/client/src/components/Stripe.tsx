@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { ethers } from 'ethers'
 import { Grid, TextField, Button } from '@mui/material'
 
-import { StripeSession, StripePack } from '../../../../src'
+import { StripeSession, StripePack } from '@safe-global/onramp-kit'
 
 const isSessionValid = (sessionId: string) => sessionId.length === 28
 

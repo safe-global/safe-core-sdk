@@ -166,7 +166,7 @@ class SafeContract_v1_4_1_Ethers
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  estimateGas: EstimateGasSafeFunction<SafeContract_v1_4_1_Abi> = (
+  estimateGas: EstimateGasSafeFunction<SafeContract_v1_4_1_Abi, EthersTransactionOptions> = (
     functionToEstimate,
     args,
     options = {}

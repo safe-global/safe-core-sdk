@@ -165,6 +165,7 @@ export type SafeMultisigTransactionResponse = {
   readonly transactionHash: string
   readonly safeTxHash: string
   readonly executor?: string
+  readonly proposer: string
   readonly isExecuted: boolean
   readonly isSuccessful?: boolean
   readonly ethGasPrice?: string

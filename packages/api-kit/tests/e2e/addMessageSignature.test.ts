@@ -130,8 +130,12 @@ describe('addMessageSignature', () => {
       const signature = buildSignature([signerSafeSig, ethSig])
       console.log('Signature', signature)
 
-      chai.expect(await protocolKit.isValidSignature(hashSafeMessage(rawMessage), signature)).to.be
-        .true
+      const isValidSignature = await protocolKit.isValidSignature(
+        hashSafeMessage(rawMessage),
+        signature
+      )
+      console.log('isValidSignature', isValidSignature)
+      chai.expect(isValidSignature).to.be.true
 
       // await chai.expect(safeApiKit1.addMessageSignature(safeMessageHash, signature)).to.be.fulfilled
 

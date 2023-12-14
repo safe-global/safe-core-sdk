@@ -576,14 +576,14 @@ class Safe {
       throw new Error('Messages can only be signed by Safe owners')
     }
     const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
-    const method = isContractSignature ? 'eth_sign' : signingMethod
+    const method = isContractSignature ? SigningMethod.ETH_SIGN : signingMethod
     let signature: SafeSignature
 
-    if (method === 'eth_signTypedData_v4') {
+    if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(message, 'v4')
-    } else if (method === 'eth_signTypedData_v3') {
+    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(message, 'v3')
-    } else if (method === 'eth_signTypedData') {
+    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA) {
       signature = await this.signTypedData(message, undefined)
     } else {
       const safeVersion = await this.getContractVersion()
@@ -681,14 +681,14 @@ class Safe {
       throw new Error('Transactions can only be signed by Safe owners')
     }
     const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
-    const method = isContractSignature ? 'eth_sign' : signingMethod
+    const method = isContractSignature ? SigningMethod.ETH_SIGN : signingMethod
     let signature: SafeSignature
 
-    if (method === 'eth_signTypedData_v4') {
+    if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(transaction, 'v4')
-    } else if (method === 'eth_signTypedData_v3') {
+    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(transaction, 'v3')
-    } else if (method === 'eth_signTypedData') {
+    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA) {
       signature = await this.signTypedData(transaction, undefined)
     } else {
       const safeVersion = await this.getContractVersion()

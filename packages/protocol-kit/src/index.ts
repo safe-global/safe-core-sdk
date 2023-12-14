@@ -58,7 +58,8 @@ import {
   SafeConfigWithSafeAddress,
   SafeDeploymentConfig,
   StandardizeSafeTransactionDataProps,
-  SwapOwnerTxParams
+  SwapOwnerTxParams,
+  SigningMethod
 } from './types'
 import {
   EthSafeSignature,
@@ -140,6 +141,7 @@ export {
   SignMessageLibWeb3Contract,
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams,
+  SigningMethod,
   Web3Adapter,
   Web3AdapterConfig,
   Web3TransactionOptions,

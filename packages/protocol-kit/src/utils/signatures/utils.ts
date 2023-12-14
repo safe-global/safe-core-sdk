@@ -9,6 +9,7 @@ import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
+import { SigningMethod } from '../..'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -47,12 +48,17 @@ export function isTxHashSignedWithPrefix(
 }
 
 type AdjustVOverload = {
-  (signingMethod: 'eth_signTypedData', signature: string): string
-  (signingMethod: 'eth_sign', signature: string, safeTxHash: string, sender: string): string
+  (signingMethod: SigningMethod.ETH_SIGN_TYPED_DATA, signature: string): string
+  (
+    signingMethod: SigningMethod.ETH_SIGN,
+    signature: string,
+    safeTxHash: string,
+    sender: string
+  ): string
 }
 
 export const adjustVInSignature: AdjustVOverload = (
-  signingMethod: 'eth_sign' | 'eth_signTypedData',
+  signingMethod: SigningMethod.ETH_SIGN | SigningMethod.ETH_SIGN_TYPED_DATA,
   signature: string,
   safeTxHash?: string,
   signerAddress?: string
@@ -63,7 +69,7 @@ export const adjustVInSignature: AdjustVOverload = (
   if (!ETHEREUM_V_VALUES.includes(signatureV)) {
     throw new Error('Invalid signature')
   }
-  if (signingMethod === 'eth_sign') {
+  if (signingMethod === SigningMethod.ETH_SIGN) {
     /*
       The Safe's expected V value for ECDSA signature is:
       - 27 or 28
@@ -88,7 +94,7 @@ export const adjustVInSignature: AdjustVOverload = (
       signatureV += 4
     }
   }
-  if (signingMethod === 'eth_signTypedData') {
+  if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA) {
     // Metamask with ledger returns V=0/1 here too, we need to adjust it to be ethereum's valid value (27 or 28)
     if (signatureV < MIN_VALID_V_VALUE_FOR_SAFE_ECDSA) {
       signatureV += MIN_VALID_V_VALUE_FOR_SAFE_ECDSA
@@ -109,7 +115,7 @@ export async function generateSignature(
 
   let signature = await ethAdapter.signMessage(hash)
 
-  signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
+  signature = adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
   return new EthSafeSignature(signerAddress, signature)
 }
 
@@ -125,7 +131,7 @@ export async function generateEIP712Signature(
 
   let signature = await ethAdapter.signTypedData(safeEIP712Args, methodVersion)
 
-  signature = adjustVInSignature('eth_signTypedData', signature)
+  signature = adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
   return new EthSafeSignature(signerAddress, signature)
 }
 

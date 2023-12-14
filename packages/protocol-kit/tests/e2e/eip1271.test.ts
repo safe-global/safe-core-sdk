@@ -307,8 +307,14 @@ describe('The EIP1271 implementation', () => {
         // EIP191 sign the Safe message with owners
         const safeMessage = safeSdk1.createMessage(MESSAGE)
 
-        const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage, 'eth_sign')
-        const signedMessage2: SafeMessage = await safeSdk2.signMessage(signedMessage1, 'eth_sign')
+        const signedMessage1: SafeMessage = await safeSdk1.signMessage(
+          safeMessage,
+          SigningMethod.ETH_SIGN
+        )
+        const signedMessage2: SafeMessage = await safeSdk2.signMessage(
+          signedMessage1,
+          SigningMethod.ETH_SIGN
+        )
 
         // Validate the signature
         chai.expect(
@@ -335,10 +341,13 @@ describe('The EIP1271 implementation', () => {
           // EIP191 and EIP712 sign the Safe message with owners
           const safeMessage = safeSdk1.createMessage(MESSAGE)
 
-          const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage, 'eth_sign')
+          const signedMessage1: SafeMessage = await safeSdk1.signMessage(
+            safeMessage,
+            SigningMethod.ETH_SIGN
+          )
           const signedMessage2: SafeMessage = await safeSdk2.signMessage(
             signedMessage1,
-            'eth_signTypedData_v4'
+            SigningMethod.ETH_SIGN_TYPED_DATA_V4
           )
 
           // Validate the signature

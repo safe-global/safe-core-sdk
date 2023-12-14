@@ -32,6 +32,7 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesWeb3'
+import { SigningMethod } from '../..'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -280,11 +281,11 @@ class Web3Adapter implements EthAdapter {
       throw new Error('This method requires a signer')
     }
     const typedData = generateTypedData(safeEIP712Args)
-    let method = 'eth_signTypedData_v3'
+    let method = SigningMethod.ETH_SIGN_TYPED_DATA_V3
     if (methodVersion === 'v4') {
-      method = 'eth_signTypedData_v4'
+      method = SigningMethod.ETH_SIGN_TYPED_DATA_V4
     } else if (!methodVersion) {
-      method = 'eth_signTypedData'
+      method = SigningMethod.ETH_SIGN_TYPED_DATA
     }
     const jsonTypedData = JSON.stringify(typedData)
     const signedTypedData = {

@@ -8,7 +8,6 @@ import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/Abi
 import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
 import { Gnosis_safe as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
 import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Proxy_factory'
-import { Gnosis_safe as SafeSingleton_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Gnosis_safe'
 import { Multi_send as MultiSend_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Multi_send'
 import { Proxy_factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Proxy_factory'
 import { Gnosis_safe as SafeSingleton_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.2.0/Gnosis_safe'
@@ -49,7 +48,7 @@ import SimulateTxAccessorContract_V1_4_1_Web3 from './SimulateTxAccessor/v1.4.1/
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
-  safeSingletonContract: SafeSingleton_V1_2_0 | SafeSingleton_V1_1_1 | SafeSingleton_V1_0_0,
+  safeSingletonContract: SafeSingleton_V1_2_0 | SafeSingleton_V1_0_0,
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined,

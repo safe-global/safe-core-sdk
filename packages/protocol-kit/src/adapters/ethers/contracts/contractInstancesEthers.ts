@@ -30,7 +30,7 @@ import MultiSendContract_V1_4_1_Ethers from './MultiSend/v1.4.1/MultiSendContrac
 import MultiSendCallOnlyContract_V1_3_0_Ethers from './MultiSendCallOnly/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Ethers'
 import MultiSendCallOnlyContract_V1_4_1_Ethers from './MultiSendCallOnly/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Ethers'
 import SafeContract_V1_0_0_Ethers from './Safe/v1.0.0/SafeContract_V1_0_0_Ethers'
-import SafeContract_V1_1_1_Ethers from './Safe/v1.1.1/SafeContract_V1_1_1_Ethers'
+import SafeContract_V1_1_1_Ethers from './Safe/v1.1.1/SafeContract_V1_1_1_Ethers_OLD'
 import SafeProxyFactoryContract_V1_0_0_Ethers from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_V1_0_0_Ethers'
 import SafeProxyFactoryContract_V1_1_1_Ethers from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_V1_1_1_Ethers'
 import SafeProxyFactoryContract_V1_3_0_Ethers from './SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_V1_3_0_Ethers'

@@ -14,6 +14,7 @@ import {
 import SafeContract_v1_1_1_Contract, {
   SafeContract_v1_1_1_Abi as SafeContract_v1_1_1_Abi_Readonly
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
+import { sameString } from '@safe-global/protocol-kit/utils'
 import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 // Remove all nested `readonly` modifiers from the ABI type
@@ -85,7 +86,6 @@ class SafeContract_v1_1_1_Web3
     return [await this.contract.methods.getModules().call()]
   }
 
-  // TODO test this method
   getModulesPaginated(
     args: readonly [start: string, pageSize: bigint]
   ): Promise<[modules: string[], next: string]> {
@@ -213,6 +213,15 @@ class SafeContract_v1_1_1_Web3
   }
 
   // Custom method (not defined in the Safe Contract)
+  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+    const [modules] = await this.getModules()
+    const isModuleEnabled = modules.some((enabledModuleAddress: string) =>
+      sameString(enabledModuleAddress, moduleAddress)
+    )
+    return isModuleEnabled
+  }
+
+  // Custom method (not defined in the Safe Contract)
   async isValidTransaction(
     safeTransaction: SafeTransaction,
     options?: Web3TransactionOptions
@@ -279,17 +288,13 @@ class SafeContract_v1_1_1_Web3
         return
       },
 
-      approveHash: this.approveHash,
+      getModules: async () => (await this.getModules())[0],
 
-      isValidTransaction: this.isValidTransaction,
+      isModuleEnabled: this.isModuleEnabled,
 
-      execTransaction: this.execTransaction,
+      getVersion: async () => (await this.VERSION())[0],
 
       getAddress: this.getAddress,
-
-      getModules: this.getModules,
-
-      getVersion: async () => (await this.VERSION())[0] as SafeVersion,
 
       getNonce: async () => Number((await this.nonce())[0]),
 
@@ -318,6 +323,12 @@ class SafeContract_v1_1_1_Web3
 
       approvedHashes: async (ownerAddress: string, hash: string) =>
         (await this.approvedHashes([ownerAddress, hash]))[0],
+
+      approveHash: this.approveHash,
+
+      isValidTransaction: this.isValidTransaction,
+
+      execTransaction: this.execTransaction,
 
       encode: this.encode as any,
 

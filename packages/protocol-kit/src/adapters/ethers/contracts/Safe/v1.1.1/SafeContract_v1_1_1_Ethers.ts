@@ -7,15 +7,14 @@ import {
 import SafeContract_v1_1_1_Contract, {
   SafeContract_v1_1_1_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
-import { SafeTransaction } from 'packages/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import safe_1_1_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.1.1/gnosis_safe'
-import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/ethers/utils/constants'
-import { SafeVersion } from 'packages/safe-core-sdk-types'
 import {
   EncodeSafeFunction,
   EstimateGasSafeFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
+import { sameString } from '@safe-global/protocol-kit/utils'
+import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeContract_v1_1_1_Ethers is the implementation specific to the Safe contract version 1.1.1.
@@ -80,11 +79,9 @@ class SafeContract_v1_1_1_Ethers
   }
 
   async getModules(): Promise<[string[]]> {
-    const [modules] = await this.contract.getModulesPaginated(SENTINEL_ADDRESS, 10)
-    return [modules]
+    return [await this.contract.getModules()]
   }
 
-  // TODO test this method
   getModulesPaginated(
     args: readonly [start: string, pageSize: bigint]
   ): Promise<[modules: string[], next: string]> {
@@ -173,6 +170,11 @@ class SafeContract_v1_1_1_Ethers
   }
 
   // Custom method (not defined in the Safe Contract)
+  getAddress(): Promise<string> {
+    return this.contract.getAddress()
+  }
+
+  // Custom method (not defined in the Safe Contract)
   async execTransaction(
     safeTransaction: SafeTransaction,
     options?: EthersTransactionOptions
@@ -214,10 +216,19 @@ class SafeContract_v1_1_1_Ethers
   }
 
   // Custom method (not defined in the Safe Contract)
+  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+    const [modules] = await this.getModules()
+    const isModuleEnabled = modules.some((enabledModuleAddress: string) =>
+      sameString(enabledModuleAddress, moduleAddress)
+    )
+    return isModuleEnabled
+  }
+
+  // Custom method (not defined in the Safe Contract)
   async isValidTransaction(
     safeTransaction: SafeTransaction,
     options: EthersTransactionOptions = {}
-  ) {
+  ): Promise<boolean> {
     try {
       const gasLimit =
         options?.gasLimit ||
@@ -253,6 +264,64 @@ class SafeContract_v1_1_1_Ethers
       )
     } catch (error) {
       return false
+    }
+  }
+
+  // TODO: Remove this mapper after remove Typechain
+  mapToTypechainContract(): any {
+    return {
+      contract: this.contract as any,
+
+      setup: (): any => {
+        // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_1_1_Contract
+        return
+      },
+
+      getModules: async () => (await this.getModules())[0],
+
+      isModuleEnabled: this.isModuleEnabled,
+
+      getVersion: async () => (await this.VERSION())[0],
+
+      getAddress: this.getAddress,
+
+      getNonce: async () => Number((await this.nonce())[0]),
+
+      getThreshold: async () => Number((await this.getThreshold())[0]),
+
+      getOwners: async () => (await this.getOwners())[0],
+
+      isOwner: async (address: string) => (await this.isOwner([address]))[0],
+
+      getTransactionHash: async (safeTransactionData: SafeTransactionData) => {
+        return (
+          await this.getTransactionHash([
+            safeTransactionData.to,
+            BigInt(safeTransactionData.value),
+            safeTransactionData.data,
+            safeTransactionData.operation,
+            BigInt(safeTransactionData.safeTxGas),
+            BigInt(safeTransactionData.baseGas),
+            BigInt(safeTransactionData.gasPrice),
+            safeTransactionData.gasToken,
+            safeTransactionData.refundReceiver,
+            BigInt(safeTransactionData.nonce)
+          ])
+        )[0]
+      },
+
+      approvedHashes: async (ownerAddress: string, hash: string) =>
+        (await this.approvedHashes([ownerAddress, hash]))[0],
+
+      approveHash: this.approveHash,
+
+      isValidTransaction: this.isValidTransaction,
+
+      execTransaction: this.execTransaction,
+
+      encode: this.encode as any,
+
+      estimateGas: this.estimateGas as any
     }
   }
 }

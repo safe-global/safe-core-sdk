@@ -186,6 +186,7 @@ class Safe {
       const chainId = await this.#ethAdapter.getChainId()
       return predictSafeAddress({
         ethAdapter: this.#ethAdapter,
+        chainId,
         customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
         ...this.#predictedSafe
       })

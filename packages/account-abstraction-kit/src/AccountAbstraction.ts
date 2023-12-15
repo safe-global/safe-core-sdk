@@ -40,6 +40,7 @@ class AccountAbstraction {
 
     const safeAddress = await predictSafeAddress({
       ethAdapter: this.#ethAdapter,
+      chainId: await this.#ethAdapter.getChainId(),
       safeAccountConfig
     })
 

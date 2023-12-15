@@ -48,6 +48,7 @@ const ZKSYNC_CREATE2_PREFIX = '0x2020dba91b30cc0006188af794c2fb30dd8520db7e2c088
 
 export interface PredictSafeAddressProps {
   ethAdapter: EthAdapter
+  chainId: bigint // required for performance
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig?: SafeDeploymentConfig
   isL1SafeSingleton?: boolean
@@ -184,6 +185,7 @@ export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
 
 export async function predictSafeAddress({
   ethAdapter,
+  chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
   isL1SafeSingleton = false,
@@ -191,8 +193,6 @@ export async function predictSafeAddress({
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
-
-  const chainId = await ethAdapter.getChainId()
 
   const {
     safeVersion = DEFAULT_SAFE_VERSION,

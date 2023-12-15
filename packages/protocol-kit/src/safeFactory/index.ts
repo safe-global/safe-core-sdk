@@ -128,6 +128,7 @@ class SafeFactory {
 
     return predictSafeAddress({
       ethAdapter: this.#ethAdapter,
+      chainId,
       safeAccountConfig,
       safeDeploymentConfig,
       isL1SafeSingleton: this.#isL1SafeSingleton,

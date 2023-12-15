@@ -14,6 +14,7 @@ import semverSatisfies from 'semver/functions/satisfies'
 
 import {
   GetContractInstanceProps,
+  GetSafeContractInstanceProps,
   getCompatibilityFallbackHandlerContract,
   getProxyFactoryContract,
   getSafeContract
@@ -134,20 +135,21 @@ export async function encodeSetupCallData({
 }
 
 // we need to include the chainId as string to prevent memoization issues see: https://github.com/safe-global/safe-core-sdk/issues/598
-type MemoizedGetProxyFactoryContract = GetContractInstanceProps & { chainId: string }
+type MemoizedGetProxyFactoryContractProps = GetContractInstanceProps & { chainId: string }
+type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & { chainId: string }
 
 const memoizedGetProxyFactoryContract = createMemoizedFunction(
-  ({ ethAdapter, safeVersion, customContracts }: MemoizedGetProxyFactoryContract) =>
+  ({ ethAdapter, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
     getProxyFactoryContract({ ethAdapter, safeVersion, customContracts })
 )
-const memoizedGetSafeContract = createMemoizedFunction(getSafeContract)
+
 const memoizedGetProxyCreationCode = createMemoizedFunction(
   async ({
     ethAdapter,
     safeVersion,
     customContracts,
     chainId
-  }: MemoizedGetProxyFactoryContract) => {
+  }: MemoizedGetProxyFactoryContractProps) => {
     const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
       ethAdapter,
       safeVersion,
@@ -157,6 +159,16 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
 
     return safeProxyFactoryContract.proxyCreationCode()
   }
+)
+
+const memoizedGetSafeContract = createMemoizedFunction(
+  ({
+    ethAdapter,
+    safeVersion,
+    isL1SafeSingleton,
+    customContracts
+  }: MemoizedGetSafeContractInstanceProps) =>
+    getSafeContract({ ethAdapter, safeVersion, isL1SafeSingleton, customContracts })
 )
 
 /**
@@ -205,7 +217,8 @@ export async function predictSafeAddress({
     ethAdapter,
     safeVersion,
     isL1SafeSingleton,
-    customContracts
+    customContracts,
+    chainId: chainId.toString()
   })
 
   const initializer = await encodeSetupCallData({

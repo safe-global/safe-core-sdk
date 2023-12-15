@@ -583,6 +583,7 @@ describe('Contract utils', () => {
         const gnosisEthAdapter = await getEthAdapter(getNetworkProvider('gnosis'))
         const zkSyncEthAdapter = await getEthAdapter(getNetworkProvider('zksync'))
         const sepoliaEthAdapter = await getEthAdapter(getNetworkProvider('sepolia'))
+        const mainnetEthAdapter = await getEthAdapter(getNetworkProvider('mainnet'))
 
         // 1/1 Safe
         const safeAccountConfig: SafeAccountConfig = {
@@ -612,14 +613,22 @@ describe('Contract utils', () => {
           safeDeploymentConfig: safeDeploymentConfig
         })
 
-        const expectedGnosisSafeAddress = '0x2A6de77f748950a6Dc370562a07d81fEd6718dFc'
+        const mainnetPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: mainnetEthAdapter,
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const expectedGnosisSafeAddress = '0x30421B2bE26942448CD6C690f21F551BF6C8A45F'
         const expectedSkSyncSafeAddress = '0x4680B7AC23A98d5D68c21e3d6F8cBC9576A5920A'
-        const expectedSepoliaSafeAddress = '0x316aaa781b3c0E313161739F998fF0D4629BAB0B'
+        const expectedSepoliaSafeAddress = '0x7f44E49C9E4C7D19fA2A704c2E66527Bd4688f99'
+        const expectedMainnetSafeAddress = '0x9C1C8c37a68242cEC6d68Ab091583c81FBF479C0'
 
         // returns the correct predicted address for each chain
         chai.expect(gnosisPredictedSafeAddress).to.be.equal(expectedGnosisSafeAddress)
         chai.expect(zkSyncPredictedSafeAddress).to.be.equal(expectedSkSyncSafeAddress)
         chai.expect(sepoliaPredictedSafeAddress).to.be.equal(expectedSepoliaSafeAddress)
+        chai.expect(mainnetPredictedSafeAddress).to.be.equal(expectedMainnetSafeAddress)
       }
     )
   })

@@ -32,7 +32,7 @@ export interface GetContractInstanceProps {
   customContracts?: ContractNetworkConfig
 }
 
-interface GetSafeContractInstanceProps extends GetContractInstanceProps {
+export interface GetSafeContractInstanceProps extends GetContractInstanceProps {
   isL1SafeSingleton?: boolean
   customSafeAddress?: string
 }

@@ -35,7 +35,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@monerium/sdk": "^2.8.3",
+    "@monerium/sdk": "^2.9.0",
     "@safe-global/api-kit": "^2.0.0",
     "@safe-global/protocol-kit": "^2.0.0",
     "@safe-global/safe-core-sdk-types": "^3.0.0",

@@ -2,7 +2,6 @@ import { OrderState } from '@monerium/sdk'
 import Safe from '@safe-global/protocol-kit'
 import { MoneriumPack } from './MoneriumPack'
 import * as safeMoneriumClient from './SafeMoneriumClient'
-import * as sockets from './sockets'
 import { OnRampKitBasePack } from '../../OnRampKitBasePack'
 
 Object.defineProperty(window, 'location', {
@@ -24,14 +23,13 @@ Object.defineProperty(safeMoneriumClient.SafeMoneriumClient.prototype, 'bearerPr
   }))
 })
 
+const REDIRECT_URL = 'http://localhost:3000'
 const config = {
   clientId: 'monerium-client-id',
+  redirectUrl: REDIRECT_URL,
   environment: 'sandbox' as const
 }
 
-const REDIRECT_URL = 'http://localhost:3000'
-
-jest.mock('./sockets.ts')
 jest.mock('@monerium/sdk')
 jest.mock('@safe-global/protocol-kit')
 jest.mock('./SafeMoneriumClient')
@@ -55,7 +53,14 @@ describe('MoneriumPack', () => {
 
       await moneriumPack.init({ safeSdk })
 
-      expect(safeMoneriumClient.SafeMoneriumClient).toHaveBeenCalledWith('sandbox', safeSdk)
+      expect(safeMoneriumClient.SafeMoneriumClient).toHaveBeenCalledWith(
+        {
+          clientId: 'monerium-client-id',
+          environment: 'sandbox',
+          redirectUrl: 'http://localhost:3000'
+        },
+        safeSdk
+      )
     })
 
     it('should throw an exception if no instance of the protocol kit is passed as parameter', async () => {
@@ -73,51 +78,26 @@ describe('MoneriumPack', () => {
       await moneriumPack.init({ safeSdk })
     })
 
-    it('should start the authorization code flow if the authCode is provided', async () => {
-      const getAuthSpy = jest.spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'auth')
-
-      await moneriumPack.open({ redirectUrl: REDIRECT_URL, authCode: 'auth-code' })
-
-      expect(getAuthSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          client_id: 'monerium-client-id',
-          code: 'auth-code',
-          code_verifier: '',
-          redirect_uri: REDIRECT_URL
-        })
+    it('should call order socket', async () => {
+      const getConnectSocketSpy = jest.spyOn(
+        safeMoneriumClient.SafeMoneriumClient.prototype,
+        'connectOrderSocket'
       )
+
+      await moneriumPack.open()
+
+      expect(getConnectSocketSpy).toHaveBeenCalledWith()
     })
 
-    it('should start the refresh token flow if the refreshToken is provided', async () => {
-      const getAuthSpy = jest.spyOn(safeMoneriumClient.SafeMoneriumClient.prototype, 'auth')
-
-      await moneriumPack.open({
-        redirectUrl: REDIRECT_URL,
-        refreshToken: 'refresh-token'
-      })
-
-      expect(getAuthSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ client_id: 'monerium-client-id', refresh_token: 'refresh-token' })
-      )
-    })
-
-    it('should start the Login with Monerium flow when no authCode or refreshToken are provided', async () => {
+    it('should call getAccess', async () => {
       const getAuthFlowSpy = jest.spyOn(
         safeMoneriumClient.SafeMoneriumClient.prototype,
-        'getAuthFlowURI'
+        'getAccess'
       )
 
-      await moneriumPack.open({
-        redirectUrl: REDIRECT_URL
-      })
+      await moneriumPack.open()
 
-      expect(getAuthFlowSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          client_id: 'monerium-client-id',
-          redirect_uri: REDIRECT_URL,
-          signature: '0x'
-        })
-      )
+      expect(getAuthFlowSpy).toHaveBeenCalledWith()
     })
 
     it('should check if the message is in the pending safe transactions queue when not signed', async () => {
@@ -134,9 +114,7 @@ describe('MoneriumPack', () => {
         'isSignMessagePending'
       )
 
-      await moneriumPack.open({
-        redirectUrl: REDIRECT_URL
-      })
+      await moneriumPack.open({ initiateAuthFlow: true })
 
       expect(isMessagePendingSpy).toHaveBeenCalledWith(
         '0xSafeAddress',
@@ -145,52 +123,21 @@ describe('MoneriumPack', () => {
     })
   })
 
-  describe('subscribe() / unsubscribe()', () => {
-    it('should try to subscribe to order notifications after authentication finished and subscriptions placed', async () => {
-      const safeSdk = new Safe()
-
-      await moneriumPack.init({ safeSdk })
-
-      const socket = { close: jest.fn() }
-
-      // @ts-expect-error - Mocking the socket
-      jest.spyOn(sockets, 'connectToOrderNotifications').mockReturnValue(socket)
-
-      moneriumPack.subscribe(OrderState.placed, jest.fn())
-      moneriumPack.subscribe(OrderState.processed, jest.fn())
-
-      await moneriumPack.open({
-        redirectUrl: REDIRECT_URL
-      })
-
-      expect(sockets.connectToOrderNotifications).toHaveBeenCalledWith({
-        accessToken: 'access-token',
-        profile: 'profile',
-        env: 'sandbox',
-        subscriptions: new Map([
-          [OrderState.placed, expect.any(Function)],
-          [OrderState.processed, expect.any(Function)]
-        ])
-      })
-
-      moneriumPack.unsubscribe(OrderState.placed)
-      moneriumPack.unsubscribe(OrderState.processed)
-
-      expect(socket.close).toHaveBeenCalled()
-    })
-  })
-
   describe('close()', () => {
-    it('should remove the codeVerifier from the storage', async () => {
-      const localStorageSpy = jest.spyOn(window.localStorage.__proto__, 'removeItem')
-
+    it('should call disconnect', async () => {
+      const disconnectSpy = jest.spyOn(
+        safeMoneriumClient.SafeMoneriumClient.prototype,
+        'revokeAccess'
+      )
       const safeSdk = new Safe()
 
       await moneriumPack.init({ safeSdk })
 
       await moneriumPack.close()
 
-      expect(localStorageSpy).toHaveBeenCalledWith('OnRampKit__monerium_code_verifier')
+      await moneriumPack.open()
+
+      expect(disconnectSpy).toHaveBeenCalledWith()
     })
   })
 })

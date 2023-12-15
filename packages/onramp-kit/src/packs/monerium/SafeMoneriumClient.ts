@@ -1,6 +1,15 @@
 import { hashMessage, getBytes } from 'ethers'
-
-import { Chain, IBAN, MoneriumClient, Networks, NewOrder } from '@monerium/sdk'
+import {
+  getChain as getMoneriumChain,
+  getNetwork as getMoneriumNetwork,
+  Chain,
+  IBAN,
+  MoneriumClient,
+  Networks,
+  NewOrder,
+  placeOrderMessage,
+  ClassOptions
+} from '@monerium/sdk'
 import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import {
@@ -28,11 +37,11 @@ export class SafeMoneriumClient extends MoneriumClient {
 
   /**
    * Constructor where the Monerium environment and the Protocol kit instance are set
-   * @param environment The Monerium environment
+   * @param moneriumOptions The Monerium options object
    * @param safeSdk The Protocol kit instance
    */
-  constructor(environment: 'production' | 'sandbox', safeSdk: Safe) {
-    super(environment)
+  constructor(moneriumOptions: ClassOptions, safeSdk: Safe) {
+    super(moneriumOptions)
 
     this.#safeSdk = safeSdk
     this.#ethAdapter = safeSdk.getEthAdapter()
@@ -155,25 +164,21 @@ export class SafeMoneriumClient extends MoneriumClient {
   }
 
   /**
+   * Get the current chain id
+   * @returns The Chain Id
+   */
+  async getChainId(): Promise<number> {
+    return Number(BigInt(await this.#safeSdk.getChainId()))
+  }
+
+  /**
    * Get the corresponding Monerium SDK Chain from the current chain id
    * @returns The Chain
    */
   async getChain(): Promise<Chain> {
     const chainId = await this.#safeSdk.getChainId()
 
-    switch (chainId.toString()) {
-      case '1':
-      case '5':
-        return 'ethereum'
-      case '100':
-      case '10200':
-        return 'gnosis'
-      case '137':
-      case '80001':
-        return 'polygon'
-      default:
-        throw new Error(`Chain not supported: ${chainId}`)
-    }
+    return getMoneriumChain(Number(chainId))
   }
 
   /**
@@ -183,20 +188,7 @@ export class SafeMoneriumClient extends MoneriumClient {
   async getNetwork(): Promise<Networks> {
     const chainId = await this.#safeSdk.getChainId()
 
-    switch (chainId.toString()) {
-      case '1':
-      case '100':
-      case '137':
-        return 'mainnet'
-      case '5':
-        return 'goerli'
-      case '10200':
-        return 'chiado'
-      case '80001':
-        return 'mumbai'
-      default:
-        throw new Error(`Network not supported: ${chainId}`)
-    }
+    return getMoneriumNetwork(Number(chainId))
   }
 
   /**
@@ -263,25 +255,13 @@ export class SafeMoneriumClient extends MoneriumClient {
       amount: order.amount,
       signature: '0x',
       address: safeAddress,
+      // currency: order.currency,
       counterpart: order.counterpart,
       memo: order.memo,
-      message: this.#getSendMessage(order),
+      message: placeOrderMessage(order.amount, (order.counterpart.identifier as IBAN).iban),
       chain: await this.getChain(),
       network: await this.getNetwork(),
       supportingDocumentId: ''
     }
-  }
-
-  /**
-   * Format a valid message to be signed for executing a transaction
-   * @param order The created order
-   * @returns The message to be signed containing the order details
-   */
-  #getSendMessage(order: SafeMoneriumOrder): string {
-    const currentDate = new Date().toISOString()
-
-    return `Send EUR ${order.amount} to ${
-      (order.counterpart.identifier as IBAN).iban
-    } at ${currentDate}`
   }
 }

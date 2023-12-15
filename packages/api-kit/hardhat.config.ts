@@ -15,7 +15,7 @@ const argv = yargs
   .version(false).argv
 
 dotenv.config()
-const { INFURA_KEY, MNEMONIC, PK, TESTS_PATH } = process.env
+const { MNEMONIC, PK, TESTS_PATH } = process.env
 const DEFAULT_MNEMONIC =
   'myth like bonus scare over problem client lizard pioneer submit female collect'
 
@@ -26,10 +26,6 @@ if (PK) {
   sharedNetworkConfig.accounts = {
     mnemonic: MNEMONIC || DEFAULT_MNEMONIC
   }
-}
-
-if (['goerli'].includes(argv.network) && INFURA_KEY === undefined) {
-  throw new Error(`Could not find Infura key in env, unable to connect to network ${argv.network}`)
 }
 
 const config: HardhatUserConfig = {
@@ -45,7 +41,7 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       ...sharedNetworkConfig,
-      url: `https://goerli.infura.io/v3/${INFURA_KEY}`
+      url: 'https://rpc.ankr.com/eth_goerli'
     }
   },
   //@ts-expect-error Type not found

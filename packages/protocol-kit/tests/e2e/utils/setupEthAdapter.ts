@@ -53,9 +53,14 @@ export function getNetworkProvider(network: Network): Provider | Web3 {
     case 'gnosis':
       rpcUrl = 'https://rpc.gnosischain.com'
       break
-    default:
-      rpcUrl = `https://${network}.infura.io/v3/${process.env.INFURA_KEY}`
+    case 'goerli':
+      rpcUrl = 'https://rpc.ankr.com/eth_goerli'
       break
+    case 'mainnet':
+      rpcUrl = 'https://rpc.ankr.com/eth'
+      break
+    default:
+      throw new Error('Chain not supported')
   }
 
   let provider

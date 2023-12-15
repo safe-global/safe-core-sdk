@@ -168,7 +168,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Chain Id
    */
   async getChainId(): Promise<number> {
-    return Number(BigInt(await this.#safeSdk.getChainId()))
+    return Number(await this.#safeSdk.getChainId())
   }
 
   /**

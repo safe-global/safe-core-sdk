@@ -112,7 +112,6 @@ function Monerium() {
   const transfer = async (iban: string, amount: string) => {
     const tx = await moneriumClient?.send({
       amount,
-      currency: Currency.eur,
       counterpart: {
         identifier: {
           standard: 'iban' as PaymentStandard.iban,

@@ -1270,10 +1270,12 @@
     semver "^7.5.4"
     superstruct "^1.0.3"
 
-"@monerium/sdk@2.6.5":
-  version "2.6.5"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.6.5.tgz#ccb84ef96420f008e6e67bd146d710ba204a0b8f"
-  integrity sha512-fEAJk2gNuirzub2IacICQ2khONeHpUD1LbEtq1RXBDPRusCmftDYufQRnv6oQBSw+prTHGnvzo2gU/0q4HszEw==
+"@monerium/sdk@^2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.8.3.tgz#929495009f208e980a5815778acc9b98daf31987"
+  integrity sha512-RSy8JPG2W8jFFCjD78SIZTnEttXsoNuNw6mG83CVhIrfN63op3ejSF5NWNA3OVDsE3SwV9VQzwnPY1hP2pvBWQ==
+  dependencies:
+    crypto-js "^4.2.0"
 
 "@morgan-stanley/ts-mocking-bird@^0.6.2":
   version "0.6.4"
@@ -4263,6 +4265,11 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
+crypto-js@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
+
 crypto-random-string@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-2.0.0.tgz"
@@ -4544,11 +4551,6 @@ dot-prop@^5.1.0:
   integrity sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==
   dependencies:
     is-obj "^2.0.0"
-
-dotenv@^16.3.1:
-  version "16.3.1"
-  resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.3.1.tgz"
-  integrity sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==
 
 dotenv@~10.0.0:
   version "10.0.0"

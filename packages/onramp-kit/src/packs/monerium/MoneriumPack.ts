@@ -1,19 +1,11 @@
-import { Currency, OrderState } from '@monerium/sdk'
+import { Currency, constants, MoneriumEvent, MoneriumEventListener } from '@monerium/sdk'
 import { getErrorMessage } from '@safe-global/onramp-kit/lib/errors'
 import { OnRampKitBasePack } from '@safe-global/onramp-kit/OnRampKitBasePack'
 
 import { SafeMoneriumClient } from './SafeMoneriumClient'
-import {
-  MoneriumEvent,
-  MoneriumEventListener,
-  MoneriumInitOptions,
-  MoneriumOpenOptions,
-  MoneriumProviderConfig
-} from './types'
-import { connectToOrderNotifications } from './sockets'
+import { MoneriumInitOptions, MoneriumOpenOptions, MoneriumProviderConfig } from './types'
 
-const MONERIUM_CODE_VERIFIER = 'OnRampKit__monerium_code_verifier'
-const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
+const SIGNATURE_MESSAGE = constants.LINK_MESSAGE
 
 /**
  * This class extends the OnRampKitBasePack to work with the Monerium platform
@@ -22,8 +14,6 @@ const SIGNATURE_MESSAGE = 'I hereby declare that I am the address owner.'
 export class MoneriumPack extends OnRampKitBasePack {
   #config: MoneriumProviderConfig
   client?: SafeMoneriumClient
-  #socket?: WebSocket
-  #subscriptions: Map<MoneriumEvent, MoneriumEventListener> = new Map()
 
   /**
    * The constructor of the MoneriumPack
@@ -45,43 +35,40 @@ export class MoneriumPack extends OnRampKitBasePack {
       throw new Error('You need to provide an instance of the protocol kit')
     }
 
-    this.client = new SafeMoneriumClient(this.#config.environment, options.safeSdk)
+    this.client = new SafeMoneriumClient(
+      {
+        environment: this.#config.environment,
+        clientId: this.#config.clientId,
+        redirectUrl: this.#config.redirectUrl
+      },
+      options.safeSdk
+    )
   }
 
   /**
    * This method initialize the flow with Monerium in order to gain access to the resources
    * using the access_token. Return a initialized {@link SafeMoneriumClient}
-   * @param options The MoneriumOpenOptions object
+   * @param {MoneriumOpenOptions} [options] The MoneriumOpenOptions object
    * @returns A {@link SafeMoneriumClient} instance
    */
-  async open(options: MoneriumOpenOptions): Promise<SafeMoneriumClient> {
+  async open(options?: MoneriumOpenOptions): Promise<SafeMoneriumClient> {
     if (!this.client) {
       throw new Error('Monerium client not initialized')
     }
 
     try {
       const safeAddress = await this.client.getSafeAddress()
+      const isAuthorized = await this.client.getAccess()
 
-      if (options.authCode) {
-        await this.#startAuthCodeFlow(options.authCode, safeAddress, options.redirectUrl || '')
-      } else {
-        if (options.refreshToken) {
-          await this.#startRefreshTokenFlow(safeAddress, options.refreshToken)
-        } else {
-          await this.#startAuthFlow(safeAddress, options.redirectUrl || '')
-        }
+      if (isAuthorized) {
+        await this.#addAccountIfNotLinked(safeAddress)
+      } else if (options?.initiateAuthFlow) {
+        await this.#startAuthFlow(safeAddress)
       }
 
       // When the user is authenticated, we connect to the order notifications socket in case
       // the user has subscribed to any event
-      if (this.client.bearerProfile?.access_token && this.#subscriptions.size > 0) {
-        this.#socket = connectToOrderNotifications({
-          profile: this.client.bearerProfile?.profile,
-          env: this.#config.environment,
-          accessToken: this.client.bearerProfile?.access_token,
-          subscriptions: this.#subscriptions
-        })
-      }
+      await this.client.connectOrderSocket()
 
       return this.client
     } catch (error) {
@@ -90,55 +77,12 @@ export class MoneriumPack extends OnRampKitBasePack {
   }
 
   /**
-   * This method authorize the user to access the resources using an access code
-   * {@link https://monerium.dev/docs/getting-started/auth-flow#initiate}
-   * @param codeParam The code param from the query string
-   * @param safeAddress The address of the Safe
-   * @param redirectUrl The redirect url from the Monerium UI
-   */
-  async #startAuthCodeFlow(codeParam: string, safeAddress: string, redirectUrl: string) {
-    if (!this.client) return
-
-    const codeVerifier = sessionStorage.getItem(MONERIUM_CODE_VERIFIER) || ''
-
-    await this.client.auth({
-      client_id: this.#config.clientId,
-      code: codeParam,
-      code_verifier: codeVerifier,
-      redirect_uri: redirectUrl
-    })
-
-    await this.#addAccountIfNotLinked(safeAddress)
-
-    this.#cleanQueryString()
-
-    localStorage.removeItem(MONERIUM_CODE_VERIFIER)
-  }
-
-  /**
-   * This method starts the refresh token flow if the refresh token is provided in the MoneriumOpenOptions
-   * {@link https://monerium.dev/docs/getting-started/client-credentials#get-access-token}
-   * @param safeAddress The address od the Safe
-   * @param refreshToken The refresh token
-   */
-  async #startRefreshTokenFlow(safeAddress: string, refreshToken: string) {
-    if (!this.client) return
-
-    await this.client.auth({
-      client_id: this.#config.clientId,
-      refresh_token: refreshToken
-    })
-
-    this.#addAccountIfNotLinked(safeAddress)
-  }
-
-  /**
    * This private method starts the authorization code flow
    * {@link https://monerium.dev/docs/getting-started/auth-flow}
    * @param safeAddress The address of the Safe
    * @param redirectUrl The redirect url from the Monerium UI
    */
-  async #startAuthFlow(safeAddress: string, redirectUrl: string) {
+  async #startAuthFlow(safeAddress: string) {
     if (!this.client) return
 
     // Check if the user has already signed the message
@@ -156,18 +100,11 @@ export class MoneriumPack extends OnRampKitBasePack {
       }
     }
 
-    const authFlowUrl = this.client.getAuthFlowURI({
-      client_id: this.#config.clientId,
-      redirect_uri: redirectUrl,
+    await this.client.authorize({
       address: safeAddress,
       signature: '0x',
-      chain: await this.client.getChain(),
-      network: await this.client.getNetwork()
+      chainId: await this.client.getChainId()
     })
-
-    sessionStorage.setItem(MONERIUM_CODE_VERIFIER, this.client.codeVerifier || '')
-
-    window.location.replace(authFlowUrl)
   }
 
   /**
@@ -185,7 +122,7 @@ export class MoneriumPack extends OnRampKitBasePack {
 
     if (profile) {
       const isSafeAddressLinked = profile.accounts.some(
-        (account) => account.address === safeAddress
+        (account) => account.address.toLowerCase() === safeAddress.toLowerCase()
       )
 
       if (!isSafeAddressLinked) {
@@ -211,9 +148,7 @@ export class MoneriumPack extends OnRampKitBasePack {
    * Close the flow and clean up
    */
   async close() {
-    localStorage.removeItem(MONERIUM_CODE_VERIFIER)
-    this.#subscriptions.clear()
-    this.#socket?.close()
+    this.client?.revokeAccess()
   }
 
   /**
@@ -224,7 +159,7 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @param handler The handler to be called when the event is triggered
    */
   subscribe(event: MoneriumEvent, handler: MoneriumEventListener): void {
-    this.#subscriptions.set(event as OrderState, handler)
+    this.client?.subscribeOrders(event, handler)
   }
 
   /**
@@ -232,24 +167,6 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @param event The event to unsubscribe from
    */
   unsubscribe(event: MoneriumEvent): void {
-    this.#subscriptions.delete(event as OrderState)
-
-    if (this.#subscriptions.size === 0) {
-      this.#socket?.close()
-      this.#socket = undefined
-    }
-  }
-
-  /**
-   * Clean the query string from the URL
-   */
-  #cleanQueryString() {
-    const url = window.location.href
-    const [baseUrl, queryString] = url.split('?')
-
-    // Check if there is a query string
-    if (queryString) {
-      window.history.replaceState(null, '', baseUrl)
-    }
+    this.client?.unsubscribeOrders(event)
   }
 }

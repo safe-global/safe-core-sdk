@@ -86,10 +86,11 @@ class SafeContract_v1_1_1_Web3
     return [await this.contract.methods.getModules().call()]
   }
 
-  getModulesPaginated(
+  async getModulesPaginated(
     args: readonly [start: string, pageSize: bigint]
   ): Promise<[modules: string[], next: string]> {
-    return this.contract.methods.getModulesPaginated(...args).call()
+    const res = await this.contract.methods.getModulesPaginated(...args).call()
+    return [res.array, res.next]
   }
 
   async getOwners(): Promise<readonly [string[]]> {

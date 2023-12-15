@@ -82,10 +82,11 @@ class SafeContract_v1_1_1_Ethers
     return [await this.contract.getModules()]
   }
 
-  getModulesPaginated(
+  async getModulesPaginated(
     args: readonly [start: string, pageSize: bigint]
   ): Promise<[modules: string[], next: string]> {
-    return this.contract.getModulesPaginated(...args)
+    const res = await this.contract.getModulesPaginated(...args)
+    return [res.array, res.next]
   }
 
   async getOwners(): Promise<[string[]]> {

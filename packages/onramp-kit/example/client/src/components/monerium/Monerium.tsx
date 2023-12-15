@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
-import { AuthContext, Currency, OrderState, PaymentStandard } from '@monerium/sdk'
+import { AuthContext, OrderState, PaymentStandard } from '@monerium/sdk'
 import { Box } from '@mui/material'
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 
@@ -112,7 +112,6 @@ function Monerium() {
   const transfer = async (iban: string, amount: string) => {
     const tx = await moneriumClient?.send({
       amount,
-      currency: Currency.eur,
       counterpart: {
         identifier: {
           standard: 'iban' as PaymentStandard.iban,

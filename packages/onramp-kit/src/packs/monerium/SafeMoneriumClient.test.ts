@@ -22,7 +22,15 @@ const newOrder = {
   memo: 'memo'
 }
 
-jest.mock('@monerium/sdk')
+jest.mock('@monerium/sdk', () => {
+  const actualSdk = jest.requireActual('@monerium/sdk')
+  return {
+    ...(jest.genMockFromModule('@monerium/sdk') as any),
+    getChain: actualSdk.getChain,
+    getNetwork: actualSdk.getNetwork,
+    placeOrderMessage: actualSdk.placeOrderMessage
+  }
+})
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/api-kit')
 
@@ -37,8 +45,12 @@ describe('SafeMoneriumClient', () => {
       call: jest.fn().mockImplementation(async () => MAGIC_VALUE),
       getSignerAddress: jest.fn().mockResolvedValue('0xSignerAddress')
     })
+
     safeSdk.getEthAdapter.call = jest.fn().mockImplementation(async () => MAGIC_VALUE)
-    safeMoneriumClient = new SafeMoneriumClient('sandbox', safeSdk)
+    safeMoneriumClient = new SafeMoneriumClient(
+      { environment: 'sandbox', clientId: 'mockClientId', redirectUrl: 'http://mockUrl' },
+      safeSdk
+    )
   })
 
   it('should create a SafeMoneriumClient instance', () => {

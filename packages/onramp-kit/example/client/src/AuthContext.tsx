@@ -21,13 +21,15 @@ export const AuthContext = createContext<AuthContextType>({
   selectedSafe: '',
   provider: null
 })
-
+const STORED_SAFE = 'selected_safe'
 const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
   const [isAuthenticated, setIsAuthenticated] = useState(!!safeAuthPack?.isAuthenticated)
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData>()
   const [provider, setProvider] = useState<ethers.Eip1193Provider | null>()
   const [selectedSafe, setSelectedSafe] = useState('')
+
+  const storedSafe = sessionStorage.getItem(STORED_SAFE)
 
   useEffect(() => {
     ;(async () => {
@@ -96,7 +98,10 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
         logIn,
         logOut,
         selectedSafe,
-        setSelectedSafe
+        setSelectedSafe: (safe) => {
+          sessionStorage.setItem(STORED_SAFE, safe)
+          setSelectedSafe(safe)
+        }
       }}
     >
       {children}

@@ -3,31 +3,16 @@ import 'hardhat-deploy'
 import 'hardhat-deploy-ethers'
 import 'tsconfig-paths/register'
 import '@nomiclabs/hardhat-web3'
-import dotenv from 'dotenv'
-import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
+import { HardhatUserConfig } from 'hardhat/types'
 import yargs from 'yargs'
 
-const argv = yargs
+yargs
   .option('network', {
     type: 'string',
     default: 'hardhat'
   })
   .help(false)
   .version(false).argv
-
-dotenv.config()
-const { MNEMONIC, PK } = process.env
-const DEFAULT_MNEMONIC =
-  'myth like bonus scare over problem client lizard pioneer submit female collect'
-
-const sharedNetworkConfig: HttpNetworkUserConfig = {}
-if (PK) {
-  sharedNetworkConfig.accounts = [PK]
-} else {
-  sharedNetworkConfig.accounts = {
-    mnemonic: MNEMONIC || DEFAULT_MNEMONIC
-  }
-}
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
@@ -91,10 +76,6 @@ const config: HardhatUserConfig = {
           privateKey: '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
         }
       ]
-    },
-    goerli: {
-      ...sharedNetworkConfig,
-      url: 'https://rpc.ankr.com/eth_goerli'
     }
   },
   //@ts-expect-error Type not found

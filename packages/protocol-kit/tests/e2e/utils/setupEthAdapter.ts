@@ -6,14 +6,11 @@ import {
   Web3AdapterConfig
 } from '@safe-global/protocol-kit/index'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
-import dotenv from 'dotenv'
 import { ethers, web3 } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 
-dotenv.config()
-
-type Network = 'mainnet' | 'goerli' | 'gnosis' | 'zksync'
+type Network = 'mainnet' | 'gnosis' | 'zksync' | 'sepolia'
 
 export async function getEthAdapter(
   signerOrProvider: AbstractSigner | Provider | Web3
@@ -53,8 +50,8 @@ export function getNetworkProvider(network: Network): Provider | Web3 {
     case 'gnosis':
       rpcUrl = 'https://rpc.gnosischain.com'
       break
-    case 'goerli':
-      rpcUrl = 'https://rpc.ankr.com/eth_goerli'
+    case 'sepolia':
+      rpcUrl = 'https://rpc.ankr.com/eth_sepolia'
       break
     case 'mainnet':
       rpcUrl = 'https://rpc.ankr.com/eth'

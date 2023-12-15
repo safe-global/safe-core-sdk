@@ -571,5 +571,56 @@ describe('Contract utils', () => {
         chai.expect(thirdPredictedSafeAddress).to.be.equal(expectedSafeAddress3)
       }
     )
+
+    itif(safeVersionDeployed === '1.3.0')(
+      // see: https://github.com/safe-global/safe-core-sdk/issues/598
+      'returns the correct predicted address for each chain',
+      async () => {
+        const { accounts } = await setupTests()
+        const [owner] = accounts
+        const safeVersion = safeVersionDeployed
+
+        const gnosisEthAdapter = await getEthAdapter(getNetworkProvider('gnosis'))
+        const zkSyncEthAdapter = await getEthAdapter(getNetworkProvider('zksync'))
+        const sepoliaEthAdapter = await getEthAdapter(getNetworkProvider('sepolia'))
+
+        // 1/1 Safe
+        const safeAccountConfig: SafeAccountConfig = {
+          owners: [owner.address],
+          threshold: 1
+        }
+        const safeDeploymentConfig: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1691490995332'
+        }
+
+        const gnosisPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: gnosisEthAdapter,
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const zkSyncPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: zkSyncEthAdapter,
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const sepoliaPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: sepoliaEthAdapter,
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const expectedGnosisSafeAddress = '0x2A6de77f748950a6Dc370562a07d81fEd6718dFc'
+        const expectedSkSyncSafeAddress = '0x4680B7AC23A98d5D68c21e3d6F8cBC9576A5920A'
+        const expectedSepoliaSafeAddress = '0x316aaa781b3c0E313161739F998fF0D4629BAB0B'
+
+        // returns the correct predicted address for each chain
+        chai.expect(gnosisPredictedSafeAddress).to.be.equal(expectedGnosisSafeAddress)
+        chai.expect(zkSyncPredictedSafeAddress).to.be.equal(expectedSkSyncSafeAddress)
+        chai.expect(sepoliaPredictedSafeAddress).to.be.equal(expectedSepoliaSafeAddress)
+      }
+    )
   })
 })

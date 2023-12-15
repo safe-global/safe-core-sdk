@@ -13,7 +13,7 @@ import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 
 dotenv.config()
 
-type Network = 'mainnet' | 'goerli' | 'gnosis' | 'zksync'
+type Network = 'mainnet' | 'goerli' | 'gnosis' | 'zksync' | 'sepolia'
 
 export async function getEthAdapter(
   signerOrProvider: AbstractSigner | Provider | Web3

@@ -13,6 +13,7 @@ import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 
 import {
+  GetContractInstanceProps,
   getCompatibilityFallbackHandlerContract,
   getProxyFactoryContract,
   getSafeContract
@@ -132,22 +133,26 @@ export async function encodeSetupCallData({
   ])
 }
 
-const memoizedGetProxyFactoryContract = createMemoizedFunction(getProxyFactoryContract)
+// we need to include the chainId as string to prevent memoization issues see: https://github.com/safe-global/safe-core-sdk/issues/598
+type MemoizedGetProxyFactoryContract = GetContractInstanceProps & { chainId: string }
+
+const memoizedGetProxyFactoryContract = createMemoizedFunction(
+  ({ ethAdapter, safeVersion, customContracts }: MemoizedGetProxyFactoryContract) =>
+    getProxyFactoryContract({ ethAdapter, safeVersion, customContracts })
+)
 const memoizedGetSafeContract = createMemoizedFunction(getSafeContract)
 const memoizedGetProxyCreationCode = createMemoizedFunction(
   async ({
     ethAdapter,
     safeVersion,
-    customContracts
-  }: {
-    ethAdapter: EthAdapter
-    safeVersion: SafeVersion
-    customContracts?: ContractNetworkConfig
-  }) => {
+    customContracts,
+    chainId
+  }: MemoizedGetProxyFactoryContract) => {
     const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
       ethAdapter,
       safeVersion,
-      customContracts
+      customContracts,
+      chainId
     })
 
     return safeProxyFactoryContract.proxyCreationCode()
@@ -185,13 +190,15 @@ export async function predictSafeAddress({
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     ethAdapter,
     safeVersion,
-    customContracts
+    customContracts,
+    chainId: chainId.toString()
   })
 
   const proxyCreationCode = await memoizedGetProxyCreationCode({
     ethAdapter,
     safeVersion,
-    customContracts
+    customContracts,
+    chainId: chainId.toString()
   })
 
   const safeContract = await memoizedGetSafeContract({

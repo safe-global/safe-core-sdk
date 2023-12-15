@@ -26,7 +26,7 @@ import {
 } from '@safe-global/safe-deployments'
 import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
 
-interface GetContractInstanceProps {
+export interface GetContractInstanceProps {
   ethAdapter: EthAdapter
   safeVersion: SafeVersion
   customContracts?: ContractNetworkConfig

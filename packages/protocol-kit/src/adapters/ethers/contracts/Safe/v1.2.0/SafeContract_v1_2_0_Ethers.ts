@@ -113,7 +113,7 @@ class SafeContract_v1_2_0_Ethers
   }
 
   async getMessageHash(args: readonly [message: string]): Promise<[string]> {
-    return this.contract.getMessageHash(...args)
+    return [await this.contract.getMessageHash(...args)]
   }
 
   async encodeTransactionData(

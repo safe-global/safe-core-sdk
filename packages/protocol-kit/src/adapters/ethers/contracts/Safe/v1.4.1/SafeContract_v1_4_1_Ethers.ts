@@ -7,11 +7,10 @@ import {
 import SafeContract_v1_4_1_Contract, {
   SafeContract_v1_4_1_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
-import { SafeTransaction } from 'packages/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import safe_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.4.1/safe_l2'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/ethers/utils/constants'
-import { SafeVersion } from 'packages/safe-core-sdk-types'
+import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
   EncodeSafeFunction,
   EstimateGasSafeFunction

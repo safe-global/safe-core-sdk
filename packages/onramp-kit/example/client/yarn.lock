@@ -808,10 +808,10 @@
     semver "^7.5.4"
     superstruct "^1.0.3"
 
-"@monerium/sdk@^2.8.3", "@monerium/sdk@^2.8.3.":
-  version "2.8.3"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.8.3.tgz#929495009f208e980a5815778acc9b98daf31987"
-  integrity sha512-RSy8JPG2W8jFFCjD78SIZTnEttXsoNuNw6mG83CVhIrfN63op3ejSF5NWNA3OVDsE3SwV9VQzwnPY1hP2pvBWQ==
+"@monerium/sdk@^2.9.0":
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.9.0.tgz#ec7296623853acd0b7477b1b088f8c8fae42f197"
+  integrity sha512-6tr1fWau5tca2xjgIB/7NLJQFoVLcRvGQh6gqzgPJZCS9kRIVlupGk1MaejFdGWOmoEqJSFVUzi0TGhEJK+VcA==
   dependencies:
     crypto-js "^4.2.0"
 
@@ -984,7 +984,7 @@
 "@safe-global/onramp-kit@file:../..":
   version "2.0.0"
   dependencies:
-    "@monerium/sdk" "^2.8.3"
+    "@monerium/sdk" "^2.9.0"
     "@safe-global/api-kit" "^2.0.0"
     "@safe-global/protocol-kit" "^2.0.0"
     "@safe-global/safe-core-sdk-types" "^3.0.0"

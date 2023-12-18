@@ -10,7 +10,7 @@ import { ethers, web3 } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 
-type Network = 'mainnet' | 'gnosis' | 'zksync' | 'sepolia'
+type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
 export async function getEthAdapter(
   signerOrProvider: AbstractSigner | Provider | Web3
@@ -49,6 +49,9 @@ export function getNetworkProvider(network: Network): Provider | Web3 {
       break
     case 'gnosis':
       rpcUrl = 'https://rpc.gnosischain.com'
+      break
+    case 'goerli':
+      rpcUrl = 'https://rpc.ankr.com/eth_goerli'
       break
     case 'sepolia':
       rpcUrl = 'https://rpc.ankr.com/eth_sepolia'

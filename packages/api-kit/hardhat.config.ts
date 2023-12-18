@@ -6,7 +6,7 @@ import yargs from 'yargs'
 
 import 'tsconfig-paths/register'
 
-const argv = yargs
+yargs
   .option('network', {
     type: 'string',
     default: 'hardhat'
@@ -26,10 +26,6 @@ if (PK) {
   sharedNetworkConfig.accounts = {
     mnemonic: MNEMONIC || DEFAULT_MNEMONIC
   }
-}
-
-if (['goerli'].includes(argv.network) && INFURA_KEY === undefined) {
-  throw new Error(`Could not find Infura key in env, unable to connect to network ${argv.network}`)
 }
 
 const config: HardhatUserConfig = {

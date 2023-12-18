@@ -232,9 +232,8 @@ class SafeContract_v1_4_1_Ethers
   }
 
   // Custom method (not defined in the Safe Contract)
-  // TODO: review this custom method
   async getModules(): Promise<string[]> {
-    const [modules] = await this.contract.getModulesPaginated(SENTINEL_ADDRESS, 10)
+    const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
     return modules
   }
 

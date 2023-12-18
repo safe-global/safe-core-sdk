@@ -183,10 +183,9 @@ class SafeContract_v1_3_0_Web3
   }
 
   // Custom method (not defined in the Safe Contract)
-  // TODO: review this custom method
   async getModules(): Promise<string[]> {
-    const { array } = await this.contract.methods.getModulesPaginated(SENTINEL_ADDRESS, 10).call()
-    return array
+    const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
+    return modules
   }
 
   // Custom method (not defined in the Safe Contract)

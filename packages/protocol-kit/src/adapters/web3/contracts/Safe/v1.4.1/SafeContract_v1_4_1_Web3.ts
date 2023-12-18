@@ -296,22 +296,22 @@ class SafeContract_v1_4_1_Web3
   // TODO: Remove this mapper after remove Typechain
   mapToTypechainContract(): any {
     return {
-      contract: this.contract as any,
+      contract: this.contract,
 
       setup: (): any => {
         // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_4_1_Contract
         return
       },
 
-      approveHash: this.approveHash,
+      approveHash: this.approveHash.bind(this),
 
-      isValidTransaction: this.isValidTransaction,
+      isValidTransaction: this.isValidTransaction.bind(this),
 
-      execTransaction: this.execTransaction,
+      execTransaction: this.execTransaction.bind(this),
 
-      getAddress: this.getAddress,
+      getAddress: this.getAddress.bind(this),
 
-      getModules: this.getModules,
+      getModules: this.getModules.bind(this),
 
       isModuleEnabled: async (moduleAddress: string) =>
         (await this.isModuleEnabled([moduleAddress]))[0],
@@ -346,9 +346,9 @@ class SafeContract_v1_4_1_Web3
       approvedHashes: async (ownerAddress: string, hash: string) =>
         (await this.approvedHashes([ownerAddress, hash]))[0],
 
-      encode: this.encode as any,
+      encode: this.encode.bind(this),
 
-      estimateGas: this.estimateGas as any
+      estimateGas: this.estimateGas.bind(this)
     }
   }
 }

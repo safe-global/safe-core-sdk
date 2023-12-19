@@ -25,7 +25,7 @@ const generateMessage = () => `${generateRandomUUID()}: I am the owner of the sa
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 const signerSafeAddress = '0x83aB93f078A8fbbe6a677b1C488819e0ae981128'
 
-describe.only('addMessageSignature', () => {
+describe('addMessageSignature', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'

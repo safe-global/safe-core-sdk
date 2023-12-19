@@ -715,10 +715,12 @@ class Safe {
           safeVersion,
           chainId
         )
-
+        console.log('- protocol-kit(1):preimageSafeTransactionHash: ', txHashData)
         txHash = await this.getSafeMessageHash(txHashData)
+        console.log('- protocol-kit(1):safeMessageHash: ', txHash)
       } else {
         txHash = await this.getTransactionHash(transaction)
+        console.log('- protocol-kit(2):safeMessageHash: ', txHash)
       }
       signature = await this.signHash(txHash, isContractSignature)
     }

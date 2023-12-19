@@ -28,7 +28,8 @@ const signerSafeAddress = '0x83aB93f078A8fbbe6a677b1C488819e0ae981128'
 describe('addMessageSignature', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
+      'https://safe-transaction-goerli.staging.5afe.dev/api'
     ))
     ;({ ethAdapter: ethAdapter2 } = await getServiceClient(
       '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1'

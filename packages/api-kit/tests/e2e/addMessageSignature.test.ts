@@ -25,7 +25,7 @@ const generateMessage = () => `${generateRandomUUID()}: I am the owner of the sa
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 const signerSafeAddress = '0x83aB93f078A8fbbe6a677b1C488819e0ae981128'
 
-describe('addMessageSignature', () => {
+describe.only('addMessageSignature', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
@@ -33,11 +33,6 @@ describe('addMessageSignature', () => {
     ;({ ethAdapter: ethAdapter2 } = await getServiceClient(
       '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1'
     ))
-
-    protocolKit = await Safe.create({
-      ethAdapter: ethAdapter1,
-      safeAddress
-    })
   })
 
   it('should fail if safeAddress is empty', async () => {
@@ -53,6 +48,13 @@ describe('addMessageSignature', () => {
   })
 
   describe('when adding a new message', () => {
+    beforeEach(async () => {
+      protocolKit = await Safe.create({
+        ethAdapter: ethAdapter1,
+        safeAddress
+      })
+    })
+
     it('should allow to add a confirmation signature using the EIP-712', async () => {
       const rawMessage: string = generateMessage()
       let safeMessage: SafeMessage = protocolKit.createMessage(rawMessage)
@@ -86,8 +88,14 @@ describe('addMessageSignature', () => {
     })
 
     it('should allow to add a confirmation signature using a Safe signer', async () => {
+      protocolKit = await protocolKit.connect({
+        ethAdapter: ethAdapter1,
+        safeAddress
+      })
+
       const rawMessage: string = generateMessage()
       const safeMessageHash = await protocolKit.getSafeMessageHash(hashSafeMessage(rawMessage))
+
       let safeMessage: SafeMessage = protocolKit.createMessage(rawMessage)
       safeMessage = await protocolKit.signMessage(safeMessage, 'eth_sign')
 
@@ -119,28 +127,27 @@ describe('addMessageSignature', () => {
         signerSafeAddress
       )
 
-      console.log('SDK SafeSignature:', signerSafeSig)
-      console.log('Safe Signer Signature:', buildSignature([signerSafeSig]))
-
       protocolKit = await protocolKit.connect({
         ethAdapter: ethAdapter1,
         safeAddress
       })
 
       const signature = buildSignature([signerSafeSig, ethSig])
-      console.log('Signature', signature)
 
       const isValidSignature = await protocolKit.isValidSignature(
         hashSafeMessage(rawMessage),
         signature
       )
-      console.log('isValidSignature', isValidSignature)
+
       chai.expect(isValidSignature).to.be.true
 
-      // await chai.expect(safeApiKit1.addMessageSignature(safeMessageHash, signature)).to.be.fulfilled
+      const contractSig = buildSignature([signerSafeSig])
 
-      // const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
-      // chai.expect(confirmedMessage.confirmations.length).to.eq(2)
+      await chai.expect(safeApiKit1.addMessageSignature(safeMessageHash, contractSig)).to.be
+        .fulfilled
+
+      const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
+      chai.expect(confirmedMessage.confirmations.length).to.eq(2)
     })
   })
 })

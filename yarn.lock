@@ -1475,10 +1475,10 @@
     mcl-wasm "^0.7.1"
     rustbn.js "~0.2.0"
 
-"@nomicfoundation/hardhat-ethers@^3.0.4 ":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@nomicfoundation/hardhat-ethers/-/hardhat-ethers-3.0.4.tgz#6f0df2424e687e26d6574610de7a36bd69485cc1"
-  integrity sha512-k9qbLoY7qn6C6Y1LI0gk2kyHXil2Tauj4kGzQ8pgxYXIGw8lWn8tuuL72E11CrlKaXRUvOgF0EXrv/msPI2SbA==
+"@nomicfoundation/hardhat-ethers@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@nomicfoundation/hardhat-ethers/-/hardhat-ethers-3.0.5.tgz#0422c2123dec7c42e7fb2be8e1691f1d9708db56"
+  integrity sha512-RNFe8OtbZK6Ila9kIlHp0+S80/0Bu/3p41HUpaRIoHLm6X3WekTd83vob3rE54Duufu1edCiBDxspBzi2rxHHw==
   dependencies:
     debug "^4.1.1"
     lodash.isequal "^4.5.0"
@@ -1855,10 +1855,10 @@
   resolved "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
 
-"@safe-global/safe-deployments@^1.28.0":
-  version "1.28.0"
-  resolved "https://registry.npmjs.org/@safe-global/safe-deployments/-/safe-deployments-1.28.0.tgz"
-  integrity sha512-zWn55unMucN3i3awjDA0XxH9BzGNHyC/qCbuISBh0GMZP/q+VCxERAOEO4OqwyGaxk6sSAzP4usGdmgz2y2svg==
+"@safe-global/safe-deployments@^1.29.0":
+  version "1.29.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.29.0.tgz#72091773dccdea67d4a0066eeaaa816613b43cca"
+  integrity sha512-rXTktZblfklQyPe2JLK7GtXW/jH8htE6oP9MQHpVU5K/98OLkR4ApLAzlJscQEcyCaK+XOQunOk/gQYK1M2IpQ==
   dependencies:
     semver "^7.3.7"
 
@@ -2542,10 +2542,10 @@
   resolved "https://registry.npmjs.org/@types/yargs-parser/-/yargs-parser-21.0.0.tgz"
   integrity sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==
 
-"@types/yargs@^16.0.7":
-  version "16.0.8"
-  resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-16.0.8.tgz#0d57a5a491d85ae75d372a32e657b1779b86c65d"
-  integrity sha512-1GwLEkmFafeb/HbE6pC7tFlgYSQ4Iqh2qlWCq8xN+Qfaiaxr2PcLfuhfRFRYqI6XJyeFoLYyKnhFbNsst9FMtQ==
+"@types/yargs@^17.0.32":
+  version "17.0.32"
+  resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-17.0.32.tgz#030774723a2f7faafebf645f4e5a48371dca6229"
+  integrity sha512-xQ67Yc/laOG5uMfX/093MRlGGCIBzZMarVa+gfNKJxWAIgykYpVGkBdbqEzGDDfCrVUj6Hiff4mTZ5BA6TmAog==
   dependencies:
     "@types/yargs-parser" "*"
 
@@ -5788,10 +5788,10 @@ hardhat-deploy-ethers@^0.4.1:
   resolved "https://registry.yarnpkg.com/hardhat-deploy-ethers/-/hardhat-deploy-ethers-0.4.1.tgz#dd70b0cc413ed99e98994047b383a004cf1c14f8"
   integrity sha512-RM6JUcD0dOCjemxnKLtK7XQQI7NWn+LxF5qicGYax0PtWayEUXAewOb4WIHZ/yearhj+s2t6dL0MnHyLTENwJg==
 
-hardhat-deploy@^0.11.43:
-  version "0.11.43"
-  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.43.tgz#b22ff15b3ea201b72ba0f17f4b2e182cc950e73e"
-  integrity sha512-D760CjDtinwjOCpKOvdyRtIJYLQIYXmhfgkFe+AkxlYM9bPZ/T4tZ/xIB2tR89ZT+z0hF1YuZFBXIL3/G/9T5g==
+hardhat-deploy@^0.11.45:
+  version "0.11.45"
+  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.45.tgz#bed86118175a38a03bb58aba2ce1ed5e80a20bc8"
+  integrity sha512-aC8UNaq3JcORnEUIwV945iJuvBwi65tjHVDU3v6mOcqik7WAzHVCJ7cwmkkipsHrWysrB5YvGF1q9S1vIph83w==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-signer" "^5.7.0"
@@ -5818,10 +5818,10 @@ hardhat-deploy@^0.11.43:
     qs "^6.9.4"
     zksync-web3 "^0.14.3"
 
-hardhat@^2.19.0:
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.19.0.tgz#1e08658863550ba351788ea128e544ff80584a31"
-  integrity sha512-kMpwovOEfrFRQXEopCP+JTcKVwSYVj8rnXE0LynxDqnh06yvyKCQknmXL6IVYTHQL6Csysc/yNbCHQbjSeJGpA==
+hardhat@^2.19.3:
+  version "2.19.3"
+  resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.19.3.tgz#fe3b28b889e34a074ea5b740c227e3c8d4ce56e8"
+  integrity sha512-zUvfILiu1O7W1a+t5E1nCJ6z1danRLNizQkSEQCCgDYcRx13AGXtH1MVZajKmdLmXIjKAPReTp/8JQQ4ZHaX3g==
   dependencies:
     "@ethersproject/abi" "^5.1.2"
     "@metamask/eth-sig-util" "^4.0.0"

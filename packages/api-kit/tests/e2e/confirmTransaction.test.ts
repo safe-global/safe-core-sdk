@@ -45,7 +45,8 @@ describe('proposeTransaction', () => {
     let tx = await protocolKit.createTransaction({ transactions: [safeTransactionData] })
     const txHash = await protocolKit.getTransactionHash(tx)
 
-    tx = await protocolKit.signTransaction(tx, 'eth_sign') // Owner 1 signature
+    // EOA signature
+    tx = await protocolKit.signTransaction(tx, 'eth_sign')
 
     const signerAddress = (await ethAdapter1.getSignerAddress()) || '0x'
     const ethSig = tx.getSignature(signerAddress) as EthSafeSignature
@@ -61,6 +62,7 @@ describe('proposeTransaction', () => {
       })
     ).to.be.fulfilled
 
+    // Signer Safe signature
     protocolKit = await protocolKit.connect({
       ethAdapter: ethAdapter1,
       safeAddress: signerSafeAddress

@@ -72,6 +72,7 @@ describe('Contract utils', () => {
 
       const predictedSafeAddress = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -115,6 +116,7 @@ describe('Contract utils', () => {
 
       const predictedSafeAddress = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -158,6 +160,7 @@ describe('Contract utils', () => {
 
       const predictedSafeAddress = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -201,6 +204,7 @@ describe('Contract utils', () => {
 
       const predictSafeAddressWithInvalidThreshold = {
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -234,6 +238,7 @@ describe('Contract utils', () => {
 
       const predictSafeAddressWithInvalidThreshold = {
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -267,6 +272,7 @@ describe('Contract utils', () => {
 
       const predictSafeAddressWithInvalidThreshold = {
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -299,6 +305,7 @@ describe('Contract utils', () => {
 
       const predictSafeAddressWithInvalidThreshold = {
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -331,6 +338,7 @@ describe('Contract utils', () => {
 
       const predictedSafeAddress1 = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
           safeVersion,
@@ -353,6 +361,7 @@ describe('Contract utils', () => {
 
       const predictedSafeAddress2 = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
           safeVersion,
@@ -375,6 +384,7 @@ describe('Contract utils', () => {
 
       const predictedSafeAddress3 = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
           safeVersion,
@@ -429,6 +439,7 @@ describe('Contract utils', () => {
 
       const firstPredictedSafeAddress = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -436,6 +447,7 @@ describe('Contract utils', () => {
 
       const secondPredictedSafeAddress = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -443,6 +455,7 @@ describe('Contract utils', () => {
 
       const thirdPredictedSafeAddress = await predictSafeAddress({
         ethAdapter,
+        chainId,
         safeAccountConfig,
         safeDeploymentConfig,
         customContracts
@@ -474,6 +487,7 @@ describe('Contract utils', () => {
 
         const predictedSafeAddress = await predictSafeAddress({
           ethAdapter,
+          chainId,
           safeAccountConfig,
           customContracts
         })
@@ -517,6 +531,7 @@ describe('Contract utils', () => {
 
         const firstPredictedSafeAddress = await predictSafeAddress({
           ethAdapter,
+          chainId,
           safeAccountConfig: safeAccountConfig1,
           safeDeploymentConfig: safeDeploymentConfig1,
           customContracts
@@ -538,6 +553,7 @@ describe('Contract utils', () => {
 
         const secondPredictedSafeAddress = await predictSafeAddress({
           ethAdapter,
+          chainId,
           safeAccountConfig: safeAccountConfig2,
           safeDeploymentConfig: safeDeploymentConfig2,
           customContracts
@@ -560,6 +576,7 @@ describe('Contract utils', () => {
 
         const thirdPredictedSafeAddress = await predictSafeAddress({
           ethAdapter,
+          chainId,
           safeAccountConfig: safeAccountConfig3,
           safeDeploymentConfig: safeDeploymentConfig3,
           customContracts
@@ -569,6 +586,70 @@ describe('Contract utils', () => {
         chai.expect(firstPredictedSafeAddress).to.be.equal(expectedSafeAddress1)
         chai.expect(secondPredictedSafeAddress).to.be.equal(expectedSafeAddress2)
         chai.expect(thirdPredictedSafeAddress).to.be.equal(expectedSafeAddress3)
+      }
+    )
+
+    itif(safeVersionDeployed === '1.3.0')(
+      // see: https://github.com/safe-global/safe-core-sdk/issues/598
+      'returns the correct predicted address for each chain',
+      async () => {
+        const { accounts } = await setupTests()
+        const [owner] = accounts
+        const safeVersion = safeVersionDeployed
+
+        const gnosisEthAdapter = await getEthAdapter(getNetworkProvider('gnosis'))
+        const zkSyncEthAdapter = await getEthAdapter(getNetworkProvider('zksync'))
+        const sepoliaEthAdapter = await getEthAdapter(getNetworkProvider('sepolia'))
+        const mainnetEthAdapter = await getEthAdapter(getNetworkProvider('mainnet'))
+
+        // 1/1 Safe
+        const safeAccountConfig: SafeAccountConfig = {
+          owners: [owner.address],
+          threshold: 1
+        }
+        const safeDeploymentConfig: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1691490995332'
+        }
+
+        const gnosisPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: gnosisEthAdapter,
+          chainId: await gnosisEthAdapter.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const zkSyncPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: zkSyncEthAdapter,
+          chainId: await zkSyncEthAdapter.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const sepoliaPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: sepoliaEthAdapter,
+          chainId: await sepoliaEthAdapter.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const mainnetPredictedSafeAddress = await predictSafeAddress({
+          ethAdapter: mainnetEthAdapter,
+          chainId: await mainnetEthAdapter.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
+
+        const expectedGnosisSafeAddress = '0x30421B2bE26942448CD6C690f21F551BF6C8A45F'
+        const expectedSkSyncSafeAddress = '0x4680B7AC23A98d5D68c21e3d6F8cBC9576A5920A'
+        const expectedSepoliaSafeAddress = '0x7f44E49C9E4C7D19fA2A704c2E66527Bd4688f99'
+        const expectedMainnetSafeAddress = '0x9C1C8c37a68242cEC6d68Ab091583c81FBF479C0'
+
+        // returns the correct predicted address for each chain
+        chai.expect(gnosisPredictedSafeAddress).to.be.equal(expectedGnosisSafeAddress)
+        chai.expect(zkSyncPredictedSafeAddress).to.be.equal(expectedSkSyncSafeAddress)
+        chai.expect(sepoliaPredictedSafeAddress).to.be.equal(expectedSepoliaSafeAddress)
+        chai.expect(mainnetPredictedSafeAddress).to.be.equal(expectedMainnetSafeAddress)
       }
     )
   })

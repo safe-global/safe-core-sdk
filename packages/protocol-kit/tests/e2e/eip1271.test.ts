@@ -162,7 +162,7 @@ describe('The EIP1271 implementation', () => {
           const { safeSdk1, safeSdk2 } = await setupTests()
 
           // Hash the message
-          const messageHash = await hashSafeMessage(MESSAGE)
+          const messageHash = hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
           // Sign the Safe message hash with the owners

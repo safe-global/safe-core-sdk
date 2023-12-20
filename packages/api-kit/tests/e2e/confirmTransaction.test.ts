@@ -1,10 +1,14 @@
-import Safe, { EthSafeSignature, buildSignature } from '@safe-global/protocol-kit'
+import Safe, {
+  EthSafeSignature,
+  buildSignature,
+  SigningMethod,
+  buildContractSignature
+} from '@safe-global/protocol-kit'
 import { EthAdapter, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getServiceClient } from '../utils/setupServiceClient'
-import { SigningMethod, buildContractSignature } from 'packages/protocol-kit/dist/src'
 
 chai.use(chaiAsPromised)
 
@@ -16,7 +20,7 @@ let ethAdapter2: EthAdapter
 const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 const signerSafeAddress = '0x83aB93f078A8fbbe6a677b1C488819e0ae981128'
 
-describe.skip('proposeTransaction', () => {
+describe('proposeTransaction', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
@@ -59,7 +63,6 @@ describe.skip('proposeTransaction', () => {
       senderSignature: buildSignature([ethSig])
     }
 
-    console.log('- proposeTransaction(options)', txOptions)
     await chai.expect(safeApiKit1.proposeTransaction(txOptions)).to.be.fulfilled
 
     // Signer Safe signature
@@ -68,7 +71,9 @@ describe.skip('proposeTransaction', () => {
       safeAddress: signerSafeAddress
     })
 
-    let signerSafeTx = await protocolKit.createTransaction({ transactions: [safeTransactionData] })
+    let signerSafeTx = await protocolKit.createTransaction({
+      transactions: [tx.data]
+    })
     signerSafeTx = await protocolKit.signTransaction(
       signerSafeTx,
       SigningMethod.SAFE_SIGNATURE,
@@ -95,15 +100,11 @@ describe.skip('proposeTransaction', () => {
       safeAddress
     })
 
-    const signature = buildSignature([signerSafeSig, ethSig])
-    console.log('- isValidSignature(txHash, signature)', txHash, ':', signature)
-
-    const isValidSignature = await protocolKit.isValidSignature(txHash, signature)
+    const isValidSignature = await protocolKit.isValidSignature(txHash, [ethSig, signerSafeSig])
     console.log('- isValidSignature(txHash, signature) = ', isValidSignature)
     // chai.expect(isValidSignature).to.be.true
 
     const contractSig = buildSignature([signerSafeSig])
-    console.log('- confirmTransaction(hash, sig)):', txHash, ':', contractSig)
     await chai.expect(safeApiKit1.confirmTransaction(txHash, contractSig)).to.be.fulfilled
 
     const confirmedMessage = await safeApiKit1.getTransaction(txHash)

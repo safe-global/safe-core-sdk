@@ -85,6 +85,7 @@ class Safe {
   #fallbackHandlerManager!: FallbackHandlerManager
 
   #MAGIC_VALUE = '0x1626ba7e'
+  #MAGIC_VALUE_BYTES = '0x20c13b0b'
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -721,12 +722,10 @@ class Safe {
           safeVersion,
           chainId
         )
-        console.log('- protocol-kit(1):preimageSafeTransactionHash: ', txHashData)
+
         txHash = await this.getSafeMessageHash(txHashData)
-        console.log('- protocol-kit(1):safeMessageHash: ', txHash)
       } else {
         txHash = await this.getTransactionHash(transaction)
-        console.log('- protocol-kit(2):safeMessageHash: ', txHash)
       }
       signature = await this.signHash(txHash)
     }
@@ -1455,19 +1454,39 @@ class Safe {
   ): Promise<boolean> => {
     const safeAddress = await this.getAddress()
     const fallbackHandler = await this.getFallbackHandlerContract()
+
+    const signatureToCheck =
+      signature && Array.isArray(signature) ? buildSignature(signature) : signature
+
     const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
       messageHash,
-      signature && Array.isArray(signature) ? buildSignature(signature) : signature
+      signatureToCheck
+    ])
+
+    const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
+      messageHash,
+      signatureToCheck
     ])
 
     try {
-      const isValidSignatureResponse = await this.#ethAdapter.call({
-        from: safeAddress,
-        to: safeAddress,
-        data: data || '0x'
-      })
+      const isValidSignatureResponse = await Promise.all([
+        this.#ethAdapter.call({
+          from: safeAddress,
+          to: safeAddress,
+          data: data
+        }),
+        this.#ethAdapter.call({
+          from: safeAddress,
+          to: safeAddress,
+          data: bytesData
+        })
+      ])
 
-      return isValidSignatureResponse.slice(0, 10).toLowerCase() === this.#MAGIC_VALUE
+      return (
+        !!isValidSignatureResponse.length &&
+        (isValidSignatureResponse[0].slice(0, 10).toLowerCase() === this.#MAGIC_VALUE ||
+          isValidSignatureResponse[1].slice(0, 10).toLowerCase() === this.#MAGIC_VALUE_BYTES)
+      )
     } catch (error) {
       return false
     }

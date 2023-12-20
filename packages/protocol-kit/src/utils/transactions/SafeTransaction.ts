@@ -18,7 +18,7 @@ class EthSafeTransaction implements SafeTransaction {
 
   encodedSignatures(): string {
     const signers = Array.from(this.signatures.keys()).sort()
-    const baseOffset = signers.length * 65
+    // const baseOffset = signers.length * 65
     let staticParts = ''
     let dynamicParts = ''
     signers.forEach((signerAddress) => {

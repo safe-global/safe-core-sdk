@@ -54,7 +54,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
           setIsAuthenticated(true)
 
           if (signInInfo.safes && signInInfo.safes.length > 0) {
-            setSelectedSafe(signInInfo?.safes[0])
+            setSelectedSafe(storedSafe || signInInfo?.safes[0])
           }
         }
       })
@@ -75,7 +75,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
     setIsAuthenticated(true)
 
     if (signInInfo?.safes && signInInfo.safes.length > 0) {
-      setSelectedSafe(signInInfo?.safes[0])
+      setSelectedSafe(storedSafe || signInInfo?.safes[0])
     }
   }
 

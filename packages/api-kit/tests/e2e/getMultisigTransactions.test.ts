@@ -31,18 +31,16 @@ describe('getMultisigTransactions', () => {
 
   it('should return an empty list if there are no multisig transactions', async () => {
     const safeAddress = '0x3e04a375aC5847C690A7f2fF54b45c59f7eeD6f0' // Safe without multisig transactions
-    const safeMultisigTransactionListResponse = await safeApiKit.getMultisigTransactions(
-      safeAddress
-    )
+    const safeMultisigTransactionListResponse =
+      await safeApiKit.getMultisigTransactions(safeAddress)
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(0)
     chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(0)
   })
 
   it('should return the list of multisig transactions', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with multisig transactions
-    const safeMultisigTransactionListResponse = await safeApiKit.getMultisigTransactions(
-      safeAddress
-    )
+    const safeMultisigTransactionListResponse =
+      await safeApiKit.getMultisigTransactions(safeAddress)
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(12)
     chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(12)
     safeMultisigTransactionListResponse.results.map((transaction) => {
@@ -53,9 +51,8 @@ describe('getMultisigTransactions', () => {
   it('should return the list of multisig transactions EIP-3770', async () => {
     const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with multisig transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const safeMultisigTransactionListResponse = await safeApiKit.getMultisigTransactions(
-      eip3770SafeAddress
-    )
+    const safeMultisigTransactionListResponse =
+      await safeApiKit.getMultisigTransactions(eip3770SafeAddress)
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(12)
     chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(12)
     safeMultisigTransactionListResponse.results.map((transaction) => {

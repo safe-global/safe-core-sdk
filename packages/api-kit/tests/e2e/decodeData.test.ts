@@ -23,7 +23,7 @@ describe('decodeData', () => {
     const data = '0x1'
     await chai
       .expect(safeApiKit.decodeData(data))
-      .to.be.rejectedWith('Ensure this field has at least 1 hexadecimal chars (not counting 0x).')
+      .to.be.rejectedWith('Ensure this field has at least 4 hexadecimal chars (not counting 0x).')
   })
 
   it('should fail if the function selector is not found', async () => {

@@ -6,6 +6,7 @@ import {
   SafeTransactionData
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
+import semverSatisfies from 'semver/functions/satisfies'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
@@ -211,6 +212,42 @@ export const preimageSafeMessageHash = (
   const safeMessageTypes = getEip712MessageTypes(safeVersion)
 
   return ethers.TypedDataEncoder.encode(
+    { verifyingContract: safeAddress, chainId },
+    { SafeMessage: safeMessageTypes.SafeMessage },
+    { message }
+  )
+}
+
+const GT_1_1_1 = '>1.1.1'
+
+export const calculateSafeTransactionHash = (
+  safeAddress: string,
+  safeTx: SafeTransactionData,
+  safeVersion: string,
+  chainId: bigint
+): string => {
+  const safeTxTypes = getEip712TxTypes(safeVersion)
+  const domain: {
+    chainId?: bigint
+    verifyingContract: string
+  } = { verifyingContract: safeAddress }
+
+  if (semverSatisfies(safeVersion, GT_1_1_1)) {
+    domain.chainId = chainId
+  }
+
+  return ethers.TypedDataEncoder.hash(domain, { SafeTx: safeTxTypes.SafeTx }, safeTx)
+}
+
+export const calculateSafeMessageHash = (
+  safeAddress: string,
+  message: string,
+  safeVersion: string,
+  chainId: bigint
+): string => {
+  const safeMessageTypes = getEip712MessageTypes(safeVersion)
+
+  return ethers.TypedDataEncoder.hash(
     { verifyingContract: safeAddress, chainId },
     { SafeMessage: safeMessageTypes.SafeMessage },
     { message }

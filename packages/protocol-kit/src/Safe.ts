@@ -42,20 +42,19 @@ import {
 import {
   EthSafeSignature,
   SAFE_FEATURES,
-  buildContractSignature,
+  calculateSafeMessageHash,
+  calculateSafeTransactionHash,
   hasSafeFeature,
   hashSafeMessage,
   isSafeMultisigTransactionResponse,
-  sameString
-} from './utils'
-import {
+  sameString,
   buildSignature,
   generateEIP712Signature,
   generatePreValidatedSignature,
   generateSignature,
   preimageSafeMessageHash,
   preimageSafeTransactionHash
-} from './utils/signatures/utils'
+} from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
@@ -512,14 +511,11 @@ class Safe {
    * @returns The hash of the Safe transaction
    */
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
-    if (!this.#contractManager.safeContract) {
-      throw new Error('Safe is not deployed')
-    }
+    const safeAddress = await this.getAddress()
+    const safeVersion = await this.getContractVersion()
+    const chainId = await this.getChainId()
 
-    const safeTransactionData = safeTransaction.data
-    const txHash = await this.#contractManager.safeContract.getTransactionHash(safeTransactionData)
-
-    return txHash
+    return calculateSafeTransactionHash(safeAddress, safeTransaction.data, safeVersion, chainId)
   }
 
   /**
@@ -1435,17 +1431,10 @@ class Safe {
    */
   getSafeMessageHash = async (messageHash: string): Promise<string> => {
     const safeAddress = await this.getAddress()
-    const fallbackHandler = await this.getFallbackHandlerContract()
+    const safeVersion = await this.getContractVersion()
+    const chainId = await this.getChainId()
 
-    const data = fallbackHandler.encode('getMessageHash', [messageHash])
-
-    const safeMessageHash = await this.#ethAdapter.call({
-      from: safeAddress,
-      to: safeAddress,
-      data: data || '0x'
-    })
-
-    return safeMessageHash
+    return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)
   }
 
   /**

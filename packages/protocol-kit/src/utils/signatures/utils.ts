@@ -218,7 +218,7 @@ export const preimageSafeMessageHash = (
   )
 }
 
-const GT_1_1_1 = '>1.1.1'
+const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
 export const calculateSafeTransactionHash = (
   safeAddress: string,
@@ -232,7 +232,7 @@ export const calculateSafeTransactionHash = (
     verifyingContract: string
   } = { verifyingContract: safeAddress }
 
-  if (semverSatisfies(safeVersion, GT_1_1_1)) {
+  if (semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)) {
     domain.chainId = chainId
   }
 

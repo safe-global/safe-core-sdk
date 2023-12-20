@@ -17,7 +17,7 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: 'https://goerli.infura.io/v3/<INFURA_KEY>',
+  RPC_URL: 'https://rpc.ankr.com/eth_goerli',
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
     OWNERS: ['OWNER_ADDRESS'],

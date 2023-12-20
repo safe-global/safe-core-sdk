@@ -1,4 +1,3 @@
-import { OrderState } from '@monerium/sdk'
 import Safe from '@safe-global/protocol-kit'
 import { MoneriumPack } from './MoneriumPack'
 import * as safeMoneriumClient from './SafeMoneriumClient'

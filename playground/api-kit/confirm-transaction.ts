@@ -15,7 +15,7 @@ interface Config {
 
 const config: Config = {
   CHAIN_ID: 5n,
-  RPC_URL: 'https://goerli.infura.io/v3/<INFURA_KEY>',
+  RPC_URL: 'https://rpc.ankr.com/eth_goerli',
   SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
   SAFE_ADDRESS: '<SAFE_ADDRESS>',
   TX_SERVICE_URL: 'https://safe-transaction-goerli.safe.global/', // Check https://docs.safe.global/safe-core-api/available-services

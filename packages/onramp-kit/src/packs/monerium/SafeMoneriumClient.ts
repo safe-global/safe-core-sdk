@@ -259,8 +259,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       counterpart: order.counterpart,
       memo: order.memo,
       message: placeOrderMessage(order.amount, (order.counterpart.identifier as IBAN).iban),
-      chain: await this.getChain(),
-      network: await this.getNetwork(),
+      chainId: await this.getChainId(),
       supportingDocumentId: ''
     }
   }

@@ -130,12 +130,10 @@ export class MoneriumPack extends OnRampKitBasePack {
           address: safeAddress,
           message: SIGNATURE_MESSAGE,
           signature: '0x',
-          network: await this.client.getNetwork(),
-          chain: await this.client.getChain(),
+          chainId: await this.client.getChainId(),
           accounts: [
             {
-              network: await this.client.getNetwork(),
-              chain: await this.client.getChain(),
+              chainId: await this.client.getChainId(),
               currency: Currency.eur
             }
           ]

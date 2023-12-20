@@ -79,9 +79,8 @@ describe('SafeMoneriumClient', () => {
       expect.objectContaining({
         ...newOrder,
         address: '0xSafeAddress',
-        chain: 'ethereum',
         message: expect.stringContaining('Send EUR 100 to iban at'),
-        network: 'goerli',
+        chainId: 5,
         signature: '0x',
         supportingDocumentId: ''
       })

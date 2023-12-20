@@ -13,7 +13,8 @@ const SafeMock = Safe as jest.MockedClass<typeof Safe>
 describe('AccountAbstraction', () => {
   const ethersAdapter = {
     getSignerAddress: jest.fn(),
-    isContractDeployed: jest.fn()
+    isContractDeployed: jest.fn(),
+    getChainId: jest.fn()
   }
   const signerAddress = '0xSignerAddress'
   const predictSafeAddress = '0xPredictSafeAddressMock'

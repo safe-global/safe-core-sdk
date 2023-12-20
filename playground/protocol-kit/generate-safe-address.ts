@@ -29,6 +29,8 @@ async function generateSafeAddresses() {
     threshold: config.threshold
   }
 
+  const chainId = await ethAdapter.getChainId()
+
   // infinite loop to search a valid Safe addresses
   for (saltNonce; true; saltNonce++ && iteractions++) {
     // we updete the Deployment config with the current saltNonce
@@ -40,6 +42,7 @@ async function generateSafeAddresses() {
     // we predict the Safe address using the current saltNonce
     const predictedSafeAddress = await predictSafeAddress({
       ethAdapter,
+      chainId,
       safeAccountConfig,
       safeDeploymentConfig
     })

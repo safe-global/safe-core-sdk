@@ -1,10 +1,15 @@
-import Safe, { EthSafeSignature, buildSignature, hashSafeMessage } from '@safe-global/protocol-kit'
+import Safe, {
+  EthSafeSignature,
+  buildSignature,
+  hashSafeMessage,
+  SigningMethod,
+  buildContractSignature
+} from '@safe-global/protocol-kit'
 import { EthAdapter, SafeMessage } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getServiceClient } from '../utils/setupServiceClient'
-import { buildContractSignature } from 'packages/protocol-kit/dist/src'
 
 chai.use(chaiAsPromised)
 
@@ -115,13 +120,21 @@ describe('addMessageSignature', () => {
         safeAddress: signerSafeAddress
       })
       let signerSafeMessage = protocolKit.createMessage(rawMessage)
-      signerSafeMessage = await protocolKit.signMessage(signerSafeMessage, 'eth_sign', safeAddress)
+      signerSafeMessage = await protocolKit.signMessage(
+        signerSafeMessage,
+        SigningMethod.SAFE_SIGNATURE,
+        safeAddress
+      )
 
       protocolKit = await protocolKit.connect({
         ethAdapter: ethAdapter2,
         safeAddress: signerSafeAddress
       })
-      signerSafeMessage = await protocolKit.signMessage(signerSafeMessage, 'eth_sign', safeAddress)
+      signerSafeMessage = await protocolKit.signMessage(
+        signerSafeMessage,
+        SigningMethod.SAFE_SIGNATURE,
+        safeAddress
+      )
 
       const signerSafeSig = await buildContractSignature(
         Array.from(signerSafeMessage.signatures.values()),

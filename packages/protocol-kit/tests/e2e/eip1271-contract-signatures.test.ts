@@ -98,25 +98,25 @@ describe('The EIP1271 implementation', () => {
         })
         signerSafeTx = await protocolKit.signTransaction(
           signerSafeTx,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter3 })
         signerSafeTx = await protocolKit.signTransaction(
           signerSafeTx,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter4 })
         signerSafeTx = await protocolKit.signTransaction(
           signerSafeTx,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
         signerSafeTx = await protocolKit.signTransaction(
           signerSafeTx,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
 
@@ -226,25 +226,25 @@ describe('The EIP1271 implementation', () => {
         let signerSafeMessage = protocolKit.createMessage(MESSAGE)
         signerSafeMessage = await protocolKit.signMessage(
           signerSafeMessage,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter3 })
         signerSafeMessage = await protocolKit.signMessage(
           signerSafeMessage,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter4 })
         signerSafeMessage = await protocolKit.signMessage(
           signerSafeMessage,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
         signerSafeMessage = await protocolKit.signMessage(
           signerSafeMessage,
-          SigningMethod.ETH_SIGN,
+          SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
 

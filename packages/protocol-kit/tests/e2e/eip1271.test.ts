@@ -2,7 +2,9 @@ import { ethers } from 'ethers'
 import Safe, {
   hashSafeMessage,
   buildSignature,
-  preimageSafeMessageHash
+  preimageSafeMessageHash,
+  buildContractSignature,
+  EthSafeSignature
 } from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
@@ -210,7 +212,8 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should validate Smart contracts as signers (threshold = 1)',
         async () => {
-          const { safeSdk1, safeSdk2, safeSdk3, safeAddress } = await setupTests()
+          const { safeSdk1, safeSdk2, safeSdk3, safeAddress, signerSafeAddress } =
+            await setupTests()
           // Hash the message
           const messageHash = hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
@@ -233,7 +236,11 @@ describe('The EIP1271 implementation', () => {
           const safeSignerMessageHash = await safeSdk3.getSafeMessageHash(
             shouldPreimageMessage ? messageHashData : messageHash
           )
-          const signerSafeSig = await safeSdk3.signHash(safeSignerMessageHash, true)
+
+          const signerSafeSig = await buildContractSignature(
+            [await safeSdk3.signHash(safeSignerMessageHash)],
+            signerSafeAddress
+          )
           // Validate the signature sending the Safe message hash and the concatenated signatures
           const isValid = await safeSdk1.isValidSignature(messageHash, [
             ethSignSig,
@@ -248,7 +255,8 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should allow to validate transaction hashes using smart contracts as signers',
         async () => {
-          const { accounts, safeSdk1, safeSdk3, safeAddress } = await setupTests()
+          const { accounts, safeSdk1, safeSdk3, safeAddress, signerSafeAddress } =
+            await setupTests()
 
           const [account1] = accounts
 
@@ -277,7 +285,11 @@ describe('The EIP1271 implementation', () => {
           const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(
             shouldPreimageTxHash ? txHashData : txHash
           )
-          const signature2 = await safeSdk3.signHash(signerSafeMessageHash, true)
+
+          const signature2 = await buildContractSignature(
+            [await safeSdk3.signHash(signerSafeMessageHash)],
+            signerSafeAddress
+          )
 
           const isValidSignature = await safeSdk1.isValidSignature(txHash, [signature1, signature2])
           chai.expect(isValidSignature).to.be.true
@@ -363,23 +375,32 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should validate Smart contracts as signers (threshold = 1)',
         async () => {
-          const { safeSdk1, safeSdk3, safeAddress } = await setupTests()
+          const { safeSdk1, safeSdk3, safeAddress, signerSafeAddress } = await setupTests()
 
-          // Sign the Safe message with owners
-          const safeMessage = safeSdk1.createMessage(MESSAGE)
+          // EOA sign
+          const safeMessage1 = safeSdk1.createMessage(MESSAGE)
+          const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage1)
+          const signerAddress1 = (await safeSdk1.getEthAdapter().getSignerAddress()) as string
+          const ethSig = signedMessage1.getSignature(signerAddress1) as EthSafeSignature
 
-          const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage)
+          // Signer Safe sign
+          const safeMessage2 = safeSdk3.createMessage(MESSAGE)
           const signedMessage2: SafeMessage = await safeSdk3.signMessage(
-            signedMessage1,
+            safeMessage2,
             SigningMethod.SAFE_SIGNATURE,
             safeAddress
+          )
+          const signerAddress2 = (await safeSdk3.getEthAdapter().getSignerAddress()) as string
+          const safeSignerSig = await buildContractSignature(
+            [signedMessage2.getSignature(signerAddress2) as EthSafeSignature],
+            signerSafeAddress
           )
 
           // Validate the signature
           chai.expect(
             await safeSdk1.isValidSignature(
               hashSafeMessage(MESSAGE),
-              signedMessage2.encodedSignatures()
+              buildSignature([ethSig, safeSignerSig])
             )
           ).to.be.true
         }
@@ -405,7 +426,8 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should allow to sign transactions using other Safe Accounts (threshold = 1)',
         async () => {
-          const { safeAddress, accounts, safeSdk1, safeSdk3 } = await setupTests()
+          const { safeAddress, accounts, safeSdk1, safeSdk3, signerSafeAddress } =
+            await setupTests()
 
           const [account1] = accounts
 
@@ -422,13 +444,25 @@ describe('The EIP1271 implementation', () => {
 
           chai.expect(await safeSdk1.getNonce()).to.be.eq(0)
 
+          // EOA signature
           let tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-
-          // Normal signature
           tx = await safeSdk1.signTransaction(tx)
 
           // Smart contract signature
-          tx = await safeSdk3.signTransaction(tx, SigningMethod.SAFE_SIGNATURE, safeAddress)
+          let signerSafeTx = await safeSdk1.createTransaction({
+            transactions: [safeTransactionData]
+          })
+          signerSafeTx = await safeSdk3.signTransaction(
+            tx,
+            SigningMethod.SAFE_SIGNATURE,
+            safeAddress
+          )
+          const signerSafeSig = await buildContractSignature(
+            Array.from(signerSafeTx.signatures.values()),
+            signerSafeAddress
+          )
+
+          tx.addSignature(signerSafeSig)
 
           const execResponse = await safeSdk1.executeTransaction(tx)
           await waitSafeTxReceipt(execResponse)

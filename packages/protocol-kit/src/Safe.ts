@@ -74,6 +74,7 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
+const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
@@ -475,7 +476,7 @@ class Safe {
     const options = {
       nonce,
       safeTxGas: '0'
-    }
+    } as SafeTransactionOptionalProps
 
     return this.createTransaction({ transactions: [safeTransactionData], options })
   }
@@ -525,18 +526,10 @@ class Safe {
    * Signs a hash using the current signer account.
    *
    * @param hash - The hash to sign
-   * @param isContractSignature - If the Signature class to build is a contract signature
    * @returns The Safe signature
    */
-  async signHash(hash: string, isContractSignature = false): Promise<SafeSignature> {
+  async signHash(hash: string): Promise<SafeSignature> {
     const signature = await generateSignature(this.#ethAdapter, hash)
-
-    if (isContractSignature) {
-      const safeAddress = await this.getAddress()
-      const contractSignature = await buildContractSignature([signature], safeAddress)
-
-      return contractSignature
-    }
 
     return signature
   }
@@ -556,7 +549,10 @@ class Safe {
    *
    * @param message The message to be signed
    * @param signingMethod The signature type
-   * @param preimageSafeAddress If the preimage is required, the address of the Safe that will be used to calculate the preimage
+   * @param preimageSafeAddress If the preimage is required, the address of the Safe that will be used to calculate the preimage.
+   * This field is mandatory for 1.4.1 contract versions Because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
+   * we need to use the pre-image of the message to calculate the message hash
+   * https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
    * @returns The signed Safe message
    */
   async signMessage(
@@ -569,24 +565,32 @@ class Safe {
     if (!signerAddress) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
+
     const addressIsOwner = owners.some(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
       throw new Error('Messages can only be signed by Safe owners')
     }
-    const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
-    const method = isContractSignature ? SigningMethod.ETH_SIGN : signingMethod
+
+    const safeVersion = await this.getContractVersion()
+    if (
+      signingMethod === SigningMethod.SAFE_SIGNATURE &&
+      semverSatisfies(safeVersion, EQ_OR_GT_1_4_1) &&
+      !preimageSafeAddress
+    ) {
+      throw new Error('The parent Safe account address is mandatory for contract signatures')
+    }
+
     let signature: SafeSignature
 
-    if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+    if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(message, 'v4')
-    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(message, 'v3')
-    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA) {
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA) {
       signature = await this.signTypedData(message, undefined)
     } else {
-      const safeVersion = await this.getContractVersion()
       const chainId = await this.getChainId()
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
@@ -594,18 +598,11 @@ class Safe {
 
       let safeMessageHash: string
 
-      // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
-      // we need to use the pre-image of the message to calculate the message hash
-      // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
       if (
-        (isContractSignature || preimageSafeAddress) &&
+        signingMethod === SigningMethod.SAFE_SIGNATURE &&
+        preimageSafeAddress &&
         semverSatisfies(safeVersion, EQ_OR_GT_1_4_1)
       ) {
-        if (!preimageSafeAddress) {
-          throw new Error(
-            "The preimage safe address must be specified if it's a Smart Contract signature"
-          )
-        }
         const messageHashData = preimageSafeMessageHash(
           preimageSafeAddress,
           hashSafeMessage(message.data),
@@ -618,7 +615,7 @@ class Safe {
         safeMessageHash = await this.getSafeMessageHash(hashSafeMessage(message.data))
       }
 
-      signature = await this.signHash(safeMessageHash, isContractSignature)
+      signature = await this.signHash(safeMessageHash)
     }
 
     const signedSafeMessage = this.createMessage(message.data)
@@ -649,6 +646,7 @@ class Safe {
       chainId: await this.getEthAdapter().getChainId(),
       data: eip712Data.data
     }
+
     return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
   }
 
@@ -657,6 +655,10 @@ class Safe {
    *
    * @param safeTransaction - The Safe transaction to be signed
    * @param signingMethod - Method followed to sign a transaction. Optional. Default value is "eth_sign"
+   * @param preimageSafeAddress - If the preimage is required, the address of the Safe that will be used to calculate the preimage
+   * This field is mandatory for 1.3.0 and 1.4.1 contract versions Because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
+   * we need to use the pre-image of the message to calculate the message hash
+   * https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
    * @returns The signed Safe transaction
    * @throws "Transactions can only be signed by Safe owners"
    */
@@ -674,21 +676,30 @@ class Safe {
     if (!signerAddress) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
+
     const addressIsOwner = owners.some(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
     )
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
-    const isContractSignature = signingMethod === SigningMethod.SAFE_SIGNATURE
-    const method = isContractSignature ? SigningMethod.ETH_SIGN : signingMethod
+
+    const safeVersion = await this.getContractVersion()
+    if (
+      signingMethod === SigningMethod.SAFE_SIGNATURE &&
+      semverSatisfies(safeVersion, EQ_OR_GT_1_3_0) &&
+      !preimageSafeAddress
+    ) {
+      throw new Error('The parent Safe account address is mandatory for contract signatures')
+    }
+
     let signature: SafeSignature
 
-    if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+    if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(transaction, 'v4')
-    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(transaction, 'v3')
-    } else if (method === SigningMethod.ETH_SIGN_TYPED_DATA) {
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA) {
       signature = await this.signTypedData(transaction, undefined)
     } else {
       const safeVersion = await this.getContractVersion()
@@ -702,13 +713,11 @@ class Safe {
       // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
       // we need to use the pre-image of the transaction hash to calculate the message hash
       // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
-      if (isContractSignature || preimageSafeAddress) {
-        if (!preimageSafeAddress) {
-          throw new Error(
-            "The preimage safe address must be specified if it's a Smart Contract signature"
-          )
-        }
-
+      if (
+        signingMethod === SigningMethod.SAFE_SIGNATURE &&
+        semverSatisfies(safeVersion, EQ_OR_GT_1_3_0) &&
+        preimageSafeAddress
+      ) {
         const txHashData = preimageSafeTransactionHash(
           preimageSafeAddress,
           safeTransaction.data as SafeTransactionData,
@@ -722,7 +731,7 @@ class Safe {
         txHash = await this.getTransactionHash(transaction)
         console.log('- protocol-kit(2):safeMessageHash: ', txHash)
       }
-      signature = await this.signHash(txHash, isContractSignature)
+      signature = await this.signHash(txHash)
     }
 
     const signedSafeTransaction = await this.copyTransaction(transaction)

@@ -1,6 +1,6 @@
 import Safe, { EthSafeSignature, buildSignature } from '@safe-global/protocol-kit'
 import { EthAdapter, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
-import SafeApiKit, { ProposeTransactionProps } from '@safe-global/api-kit/index'
+import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getServiceClient } from '../utils/setupServiceClient'

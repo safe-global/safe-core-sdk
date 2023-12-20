@@ -60,6 +60,7 @@ export function getEip712MessageTypes(safeVersion: string): EIP712MessageTypes {
 
 export const hashTypedData = (typedData: EIP712TypedData): string => {
   // `ethers` doesn't require `EIP712Domain` and otherwise throws
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { EIP712Domain: _, ...types } = typedData.types
   return ethers.TypedDataEncoder.hash(typedData.domain as TypedDataDomain, types, typedData.message)
 }

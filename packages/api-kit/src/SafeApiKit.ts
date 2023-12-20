@@ -534,6 +534,7 @@ class SafeApiKit {
     }
     const { address } = this.#getEip3770Address(safeAddress)
     const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
+
     return sendRequest({
       url: `${
         this.#txServiceBaseUrl

@@ -536,9 +536,7 @@ class SafeApiKit {
     const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
 
     return sendRequest({
-      url: `${
-        this.#txServiceBaseUrl
-      }/v1/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
       method: HttpMethod.Get
     })
   }

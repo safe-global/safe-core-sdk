@@ -380,9 +380,8 @@ export class GelatoRelayPack extends RelayKitBasePack {
     }
 
     // if the Safe is not deployed we create a batch with the Safe deployment transaction and the provided Safe transaction
-    const safeDeploymentBatch = await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(
-      safeTransaction
-    )
+    const safeDeploymentBatch =
+      await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
     const relayTransaction: RelayTransaction = {
       target: safeDeploymentBatch.to, // multiSend Contract address

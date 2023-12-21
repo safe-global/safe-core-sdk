@@ -142,14 +142,14 @@ export const buildContractSignature = async (
 ): Promise<SafeSignature> => {
   const contractSignature = new EthSafeSignature(
     signerSafeAddress,
-    buildSignature(signatures),
+    buildSignatureBytes(signatures),
     true
   )
 
   return contractSignature
 }
 
-export const buildSignature = (signatures: SafeSignature[]): string => {
+export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
   const SIGNATURE_LENGTH_BYTES = 65
 
   signatures.sort((left, right) =>

@@ -82,7 +82,7 @@ import {
   generateSignature,
   generateEIP712Signature,
   buildContractSignature,
-  buildSignature,
+  buildSignatureBytes,
   preimageSafeTransactionHash,
   preimageSafeMessageHash
 } from './utils/signatures/utils'
@@ -165,7 +165,7 @@ export {
   generateSignature,
   generateEIP712Signature,
   buildContractSignature,
-  buildSignature,
+  buildSignatureBytes,
   preimageSafeTransactionHash,
   preimageSafeMessageHash,
   getEip712TxTypes,

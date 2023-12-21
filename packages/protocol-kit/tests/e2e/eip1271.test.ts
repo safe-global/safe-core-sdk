@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import Safe, {
   hashSafeMessage,
-  buildSignature,
+  buildSignatureBytes,
   preimageSafeMessageHash,
   buildContractSignature,
   EthSafeSignature
@@ -172,7 +172,7 @@ describe('The EIP1271 implementation', () => {
           // Validate the signature sending the Safe message hash and the concatenated signatures
           const isValid1 = await safeSdk1.isValidSignature(
             messageHash,
-            buildSignature([ethSignSig1, ethSignSig2])
+            buildSignatureBytes([ethSignSig1, ethSignSig2])
           )
 
           chai.expect(isValid1).to.be.true
@@ -400,7 +400,7 @@ describe('The EIP1271 implementation', () => {
           chai.expect(
             await safeSdk1.isValidSignature(
               hashSafeMessage(MESSAGE),
-              buildSignature([ethSig, safeSignerSig])
+              buildSignatureBytes([ethSig, safeSignerSig])
             )
           ).to.be.true
         }

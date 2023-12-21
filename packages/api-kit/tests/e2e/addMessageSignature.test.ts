@@ -1,6 +1,6 @@
 import Safe, {
   EthSafeSignature,
-  buildSignature,
+  buildSignatureBytes,
   hashSafeMessage,
   SigningMethod,
   buildContractSignature
@@ -111,7 +111,7 @@ describe('addMessageSignature', () => {
       await chai.expect(
         safeApiKit1.addMessage(safeAddress, {
           message: rawMessage,
-          signature: buildSignature([ethSig])
+          signature: buildSignatureBytes([ethSig])
         })
       ).to.be.fulfilled
 
@@ -146,7 +146,7 @@ describe('addMessageSignature', () => {
         safeAddress
       })
 
-      const signature = buildSignature([signerSafeSig, ethSig])
+      const signature = buildSignatureBytes([signerSafeSig, ethSig])
 
       const isValidSignature = await protocolKit.isValidSignature(
         hashSafeMessage(rawMessage),
@@ -155,7 +155,7 @@ describe('addMessageSignature', () => {
 
       chai.expect(isValidSignature).to.be.true
 
-      const contractSig = buildSignature([signerSafeSig])
+      const contractSig = buildSignatureBytes([signerSafeSig])
 
       await chai.expect(safeApiKit1.addMessageSignature(safeMessageHash, contractSig)).to.be
         .fulfilled

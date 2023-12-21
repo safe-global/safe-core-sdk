@@ -1,5 +1,5 @@
 import { EIP712TypedData, SafeMessage, SafeSignature } from '@safe-global/safe-core-sdk-types'
-import { buildSignature } from '../signatures'
+import { buildSignatureBytes } from '../signatures'
 
 class EthSafeMessage implements SafeMessage {
   data: EIP712TypedData | string
@@ -18,7 +18,7 @@ class EthSafeMessage implements SafeMessage {
   }
 
   encodedSignatures(): string {
-    return buildSignature(Array.from(this.signatures.values()))
+    return buildSignatureBytes(Array.from(this.signatures.values()))
   }
 }
 

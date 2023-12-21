@@ -48,7 +48,7 @@ import {
   hashSafeMessage,
   isSafeMultisigTransactionResponse,
   sameString,
-  buildSignature,
+  buildSignatureBytes,
   generateEIP712Signature,
   generatePreValidatedSignature,
   generateSignature,
@@ -1442,7 +1442,7 @@ class Safe {
    *
    * @param messageHash The hash of the message
    * @param signature The signature to be validated or '0x'. You can send as signature one of the following:
-   *  1) An array of SafeSignature. In this case the signatures are concatenated for validation (buildSignature())
+   *  1) An array of SafeSignature. In this case the signatures are concatenated for validation (buildSignatureBytes())
    *  2) The concatenated signatures as string
    *  3) '0x' if you want to validate an onchain message (Approved hash)
    * @returns A boolean indicating if the signature is valid
@@ -1456,7 +1456,7 @@ class Safe {
     const fallbackHandler = await this.getFallbackHandlerContract()
 
     const signatureToCheck =
-      signature && Array.isArray(signature) ? buildSignature(signature) : signature
+      signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
     const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
       messageHash,

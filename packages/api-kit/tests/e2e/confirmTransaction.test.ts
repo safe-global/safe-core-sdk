@@ -1,6 +1,6 @@
 import Safe, {
   EthSafeSignature,
-  buildSignature,
+  buildSignatureBytes,
   SigningMethod,
   buildContractSignature
 } from '@safe-global/protocol-kit'
@@ -60,7 +60,7 @@ describe('proposeTransaction', () => {
       safeTransactionData: tx.data,
       safeTxHash: txHash,
       senderAddress: signerAddress,
-      senderSignature: buildSignature([ethSig])
+      senderSignature: buildSignatureBytes([ethSig])
     }
 
     await chai.expect(safeApiKit1.proposeTransaction(txOptions)).to.be.fulfilled
@@ -104,7 +104,7 @@ describe('proposeTransaction', () => {
     console.log('- isValidSignature(txHash, signature) = ', isValidSignature)
     // chai.expect(isValidSignature).to.be.true
 
-    const contractSig = buildSignature([signerSafeSig])
+    const contractSig = buildSignatureBytes([signerSafeSig])
     await chai.expect(safeApiKit1.confirmTransaction(txHash, contractSig)).to.be.fulfilled
 
     const confirmedMessage = await safeApiKit1.getTransaction(txHash)

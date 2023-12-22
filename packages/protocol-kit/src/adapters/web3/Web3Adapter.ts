@@ -32,7 +32,7 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesWeb3'
-import { SigningMethod } from '../..'
+import { SigningMethod } from '@safe-global/protocol-kit/types'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */

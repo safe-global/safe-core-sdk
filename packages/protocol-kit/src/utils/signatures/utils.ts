@@ -10,7 +10,7 @@ import semverSatisfies from 'semver/functions/satisfies'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
-import { SigningMethod } from '../..'
+import { SigningMethod } from '@safe-global/protocol-kit/types'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =

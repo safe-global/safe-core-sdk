@@ -75,7 +75,6 @@
     "hardhat-deploy-ethers": "^0.4.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "ts-generator": "^0.1.1",
     "tsconfig-paths": "^4.2.0",
     "typechain": "^8.3.2",
     "yargs": "^17.7.2"

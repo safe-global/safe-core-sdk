@@ -1,7 +1,7 @@
 import Safe from '@safe-global/protocol-kit'
 import { MoneriumPack } from './MoneriumPack'
 import * as safeMoneriumClient from './SafeMoneriumClient'
-import { OnRampKitBasePack } from '../../OnRampKitBasePack'
+import { OnRampKitBasePack } from '@safe-global/onramp-kit/index'
 
 Object.defineProperty(window, 'location', {
   writable: true,

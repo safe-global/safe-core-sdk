@@ -32,8 +32,12 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages
-          # file: packages/account-abstraction-kit/coverage/lcov.info
+          files: packages/account-abstraction-kit/coverage/lcov.info
+            packages/api-kit/coverage/lcov.info
+            packages/auth-kit/coverage/lcov.info
+            packages/onramp-kit/coverage/lcov.info
+            packages/relay-kit/coverage/lcov.info
+
 
       # - name: Auth Kit coverage
       #   uses: coverallsapp/github-action@v2

@@ -69,7 +69,6 @@
     "@types/yargs": "^17.0.32",
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.1.1",
     "dotenv": "^16.3.1",
     "hardhat": "^2.19.3",
     "hardhat-deploy": "^0.11.45",

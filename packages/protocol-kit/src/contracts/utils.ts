@@ -13,6 +13,8 @@ import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 
 import {
+  GetContractInstanceProps,
+  GetSafeContractInstanceProps,
   getCompatibilityFallbackHandlerContract,
   getProxyFactoryContract,
   getSafeContract
@@ -46,6 +48,7 @@ const ZKSYNC_CREATE2_PREFIX = '0x2020dba91b30cc0006188af794c2fb30dd8520db7e2c088
 
 export interface PredictSafeAddressProps {
   ethAdapter: EthAdapter
+  chainId: bigint // required for performance
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig?: SafeDeploymentConfig
   isL1SafeSingleton?: boolean
@@ -132,26 +135,41 @@ export async function encodeSetupCallData({
   ])
 }
 
-const memoizedGetProxyFactoryContract = createMemoizedFunction(getProxyFactoryContract)
-const memoizedGetSafeContract = createMemoizedFunction(getSafeContract)
+// we need to include the chainId as string to prevent memoization issues see: https://github.com/safe-global/safe-core-sdk/issues/598
+type MemoizedGetProxyFactoryContractProps = GetContractInstanceProps & { chainId: string }
+type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & { chainId: string }
+
+const memoizedGetProxyFactoryContract = createMemoizedFunction(
+  ({ ethAdapter, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
+    getProxyFactoryContract({ ethAdapter, safeVersion, customContracts })
+)
+
 const memoizedGetProxyCreationCode = createMemoizedFunction(
   async ({
     ethAdapter,
     safeVersion,
-    customContracts
-  }: {
-    ethAdapter: EthAdapter
-    safeVersion: SafeVersion
-    customContracts?: ContractNetworkConfig
-  }) => {
+    customContracts,
+    chainId
+  }: MemoizedGetProxyFactoryContractProps) => {
     const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
       ethAdapter,
       safeVersion,
-      customContracts
+      customContracts,
+      chainId
     })
 
     return safeProxyFactoryContract.proxyCreationCode()
   }
+)
+
+const memoizedGetSafeContract = createMemoizedFunction(
+  ({
+    ethAdapter,
+    safeVersion,
+    isL1SafeSingleton,
+    customContracts
+  }: MemoizedGetSafeContractInstanceProps) =>
+    getSafeContract({ ethAdapter, safeVersion, isL1SafeSingleton, customContracts })
 )
 
 /**
@@ -167,6 +185,7 @@ export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
 
 export async function predictSafeAddress({
   ethAdapter,
+  chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
   isL1SafeSingleton = false,
@@ -174,8 +193,6 @@ export async function predictSafeAddress({
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
-
-  const chainId = await ethAdapter.getChainId()
 
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
@@ -185,20 +202,23 @@ export async function predictSafeAddress({
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     ethAdapter,
     safeVersion,
-    customContracts
+    customContracts,
+    chainId: chainId.toString()
   })
 
   const proxyCreationCode = await memoizedGetProxyCreationCode({
     ethAdapter,
     safeVersion,
-    customContracts
+    customContracts,
+    chainId: chainId.toString()
   })
 
   const safeContract = await memoizedGetSafeContract({
     ethAdapter,
     safeVersion,
     isL1SafeSingleton,
-    customContracts
+    customContracts,
+    chainId: chainId.toString()
   })
 
   const initializer = await encodeSetupCallData({

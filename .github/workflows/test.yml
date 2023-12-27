@@ -28,37 +28,12 @@ jobs:
       - name: Test
         run: yarn test
 
-      - name: Account Abstraction Kit coverage
+      - name: Upload coverage report
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/account-abstraction-kit
-          file: packages/account-abstraction-kit/coverage/lcov.info
-
-      - name: Auth Kit coverage
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/auth-kit
-          file: packages/auth-kit/coverage/lcov.info
-
-      - name: OnRamp Kit coverage
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/onramp-kit
-          file: packages/onramp-kit/coverage/lcov.info
-
-      - name: Relay Kit coverage
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/relay-kit
-          file: packages/relay-kit/coverage/lcov.info
-
-      - name: Api Kit coverage
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: packages/api-kit
-          file: packages/api-kit/coverage/lcov.info
+          files: packages/account-abstraction-kit/coverage/lcov.info
+            packages/api-kit/coverage/lcov.info
+            packages/auth-kit/coverage/lcov.info
+            packages/onramp-kit/coverage/lcov.info
+            packages/relay-kit/coverage/lcov.info

@@ -3,6 +3,7 @@ import {
   adjustVInSignature,
   isTxHashSignedWithPrefix
 } from '@safe-global/protocol-kit/utils/signatures'
+import { SigningMethod } from '@safe-global/protocol-kit/index'
 
 const safeTxHash = '0x4de27e660bd23052b71c854b0188ef1c5b325b10075c70f27afe2343e5c287f5'
 const signerAddress = '0xbc2BB26a6d821e69A38016f3858561a1D80d4182'
@@ -31,7 +32,7 @@ describe('Signature utils', () => {
       const signature = `0x4d44abdcc39e259238870493c29d26fbe14b0564afe2b25326311ddc397cff8d4014e09a2a296efb2dc0231c622289e015d0cbd469ae67d509675e6112bd0b06${hex27}`
       const adjustedSignature = `0x4d44abdcc39e259238870493c29d26fbe14b0564afe2b25326311ddc397cff8d4014e09a2a296efb2dc0231c622289e015d0cbd469ae67d509675e6112bd0b06${hex31}`
       chai
-        .expect(adjustVInSignature('eth_sign', signature, safeTxHash, signerAddress))
+        .expect(adjustVInSignature(SigningMethod.ETH_SIGN, signature, safeTxHash, signerAddress))
         .to.be.eq(adjustedSignature)
     })
 
@@ -41,7 +42,7 @@ describe('Signature utils', () => {
       const signature = `0x4d44abdcc39e259238870493c29d26fbe14b0564afe2b25326311ddc397cff8d4014e09a2a296efb2dc0231c622289e015d0cbd469ae67d509675e6112bd0b06${hex01}`
       const adjustedSignature = `0x4d44abdcc39e259238870493c29d26fbe14b0564afe2b25326311ddc397cff8d4014e09a2a296efb2dc0231c622289e015d0cbd469ae67d509675e6112bd0b06${hex32}`
       chai
-        .expect(adjustVInSignature('eth_sign', signature, safeTxHash, signerAddress))
+        .expect(adjustVInSignature(SigningMethod.ETH_SIGN, signature, safeTxHash, signerAddress))
         .to.be.eq(adjustedSignature)
     })
 
@@ -49,7 +50,7 @@ describe('Signature utils', () => {
       const hex27 = '1b'
       const signature = `0x12f8d73b47a0a664294caac0bd6ccf03a0d1d3d1943bdd138a9757f993cb4f7c432f029873af8ad898d3f83a8a42f765628f36d39a01c90708ce5bd6d77a269d${hex27}`
       chai
-        .expect(adjustVInSignature('eth_sign', signature, safeTxHash, signerAddress))
+        .expect(adjustVInSignature(SigningMethod.ETH_SIGN, signature, safeTxHash, signerAddress))
         .to.be.eq(signature)
     })
   })

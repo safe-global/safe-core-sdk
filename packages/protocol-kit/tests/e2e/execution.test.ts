@@ -1,6 +1,7 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, {
   EthersTransactionOptions,
+  SigningMethod,
   Web3TransactionOptions
 } from '@safe-global/protocol-kit/index'
 import { MetaTransactionData, TransactionOptions } from '@safe-global/safe-core-sdk-types'
@@ -332,7 +333,7 @@ describe('Transactions execution', () => {
         let signedTx = await safeSdk2.signTransaction(tx)
 
         // Signature: eth_signTypedData_v4
-        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData_v4')
+        signedTx = await safeSdk3.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA_V4)
 
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
@@ -386,10 +387,10 @@ describe('Transactions execution', () => {
         let signedTx = await safeSdk2.signTransaction(tx)
 
         // Signature: eth_signTypedData_v4
-        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData_v4')
+        signedTx = await safeSdk3.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA_V4)
 
         // Signature: eth_sign
-        signedTx = await safeSdk4.signTransaction(signedTx, 'eth_sign')
+        signedTx = await safeSdk4.signTransaction(signedTx, SigningMethod.ETH_SIGN)
 
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
@@ -446,13 +447,13 @@ describe('Transactions execution', () => {
         let signedTx = await safeSdk2.signTransaction(tx)
 
         // Signature: eth_signTypedData
-        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData')
+        signedTx = await safeSdk3.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA)
 
         // Signature: eth_signTypedData_v3
-        signedTx = await safeSdk4.signTransaction(signedTx, 'eth_signTypedData_v3')
+        signedTx = await safeSdk4.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA_V3)
 
         // Signature: eth_signTypedData_v4
-        signedTx = await safeSdk5.signTransaction(signedTx, 'eth_signTypedData_v4')
+        signedTx = await safeSdk5.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA_V4)
 
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
@@ -512,16 +513,16 @@ describe('Transactions execution', () => {
         let signedTx = await safeSdk2.signTransaction(tx)
 
         // Signature: eth_signTypedData
-        signedTx = await safeSdk3.signTransaction(signedTx, 'eth_signTypedData')
+        signedTx = await safeSdk3.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA)
 
         // Signature: eth_signTypedData_v3
-        signedTx = await safeSdk4.signTransaction(signedTx, 'eth_signTypedData_v3')
+        signedTx = await safeSdk4.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA_V3)
 
         // Signature: eth_signTypedData_v4
-        signedTx = await safeSdk5.signTransaction(signedTx, 'eth_signTypedData_v4')
+        signedTx = await safeSdk5.signTransaction(signedTx, SigningMethod.ETH_SIGN_TYPED_DATA_V4)
 
         // Signature: eth_sign
-        signedTx = await safeSdk6.signTransaction(signedTx, 'eth_sign')
+        signedTx = await safeSdk6.signTransaction(signedTx, SigningMethod.ETH_SIGN)
 
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)

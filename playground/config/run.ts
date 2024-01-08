@@ -4,7 +4,8 @@ const playInput = process.argv[2]
 
 const playgroundProtocolKitPaths = {
   'deploy-safe': 'protocol-kit/deploy-safe',
-  'generate-safe-address': 'protocol-kit/generate-safe-address'
+  'generate-safe-address': 'protocol-kit/generate-safe-address',
+  eip1271: 'protocol-kit/eip1271'
 }
 const playgroundApiKitPaths = {
   'propose-transaction': 'api-kit/propose-transaction',

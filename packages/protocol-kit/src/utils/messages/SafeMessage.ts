@@ -1,15 +1,11 @@
-import {
-  SafeSignature,
-  SafeTransaction,
-  SafeTransactionData
-} from '@safe-global/safe-core-sdk-types'
+import { EIP712TypedData, SafeMessage, SafeSignature } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '../signatures'
 
-class EthSafeTransaction implements SafeTransaction {
-  data: SafeTransactionData
+class EthSafeMessage implements SafeMessage {
+  data: EIP712TypedData | string
   signatures: Map<string, SafeSignature> = new Map()
 
-  constructor(data: SafeTransactionData) {
+  constructor(data: EIP712TypedData | string) {
     this.data = data
   }
 
@@ -26,4 +22,4 @@ class EthSafeTransaction implements SafeTransaction {
   }
 }
 
-export default EthSafeTransaction
+export default EthSafeMessage

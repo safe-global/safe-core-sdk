@@ -47,13 +47,23 @@ export interface SafeTransactionDataPartial extends MetaTransactionData {
 export interface SafeSignature {
   readonly signer: string
   readonly data: string
-  staticPart(): string
+  readonly isContractSignature: boolean
+  staticPart(dynamicOffset?: string): string
   dynamicPart(): string
 }
 
 export interface SafeTransaction {
   readonly data: SafeTransactionData
   readonly signatures: Map<string, SafeSignature>
+  getSignature(signer: string): SafeSignature | undefined
+  addSignature(signature: SafeSignature): void
+  encodedSignatures(): string
+}
+
+export interface SafeMessage {
+  readonly data: EIP712TypedData | string
+  readonly signatures: Map<string, SafeSignature>
+  getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
 }
@@ -91,14 +101,14 @@ export interface Eip3770Address {
   address: string
 }
 
-export interface SafeTransactionEIP712Args {
+export interface SafeEIP712Args {
   safeAddress: string
   safeVersion: string
   chainId: bigint
-  safeTransactionData: SafeTransactionData
+  data: SafeTransactionData | EIP712TypedData | string
 }
 
-export interface Eip712MessageTypes {
+export interface EIP712TxTypes {
   EIP712Domain: {
     type: string
     name: string
@@ -109,13 +119,28 @@ export interface Eip712MessageTypes {
   }[]
 }
 
-export interface GenerateTypedData {
-  types: Eip712MessageTypes
+export interface EIP712MessageTypes {
+  EIP712Domain: {
+    type: string
+    name: string
+  }[]
+  SafeMessage: [
+    {
+      type: 'bytes'
+      name: 'message'
+    }
+  ]
+}
+
+export type EIP712Types = EIP712TxTypes | EIP712MessageTypes
+
+export interface EIP712TypedDataTx {
+  types: EIP712TxTypes
   domain: {
     chainId?: string
     verifyingContract: string
   }
-  primaryType: string
+  primaryType: 'SafeTx'
   message: {
     to: string
     value: string
@@ -128,6 +153,42 @@ export interface GenerateTypedData {
     refundReceiver: string
     nonce: number
   }
+}
+
+export interface EIP712TypedDataMessage {
+  types: EIP712MessageTypes
+  domain: {
+    chainId?: number
+    verifyingContract: string
+  }
+  primaryType: 'SafeMessage'
+  message: {
+    message: string
+  }
+}
+
+interface TypedDataDomain {
+  name?: string
+  version?: string
+  chainId?: unknown
+  verifyingContract?: string
+  salt?: ArrayLike<number> | string
+}
+
+interface TypedDataTypes {
+  name: string
+  type: string
+}
+
+type TypedMessageTypes = {
+  [key: string]: TypedDataTypes[]
+}
+
+export interface EIP712TypedData {
+  domain: TypedDataDomain
+  types: TypedMessageTypes
+  message: Record<string, unknown>
+  primaryType?: string
 }
 
 export type SafeMultisigConfirmationResponse = {

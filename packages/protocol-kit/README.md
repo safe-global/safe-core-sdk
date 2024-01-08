@@ -627,7 +627,7 @@ const safeTransaction = await safeSdk.createTransaction({ transactions })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
 ```
 
-### signTransactionHash
+### signHash
 
 Signs a hash using the current owner account.
 
@@ -639,7 +639,7 @@ const transactions: MetaTransactionData[] = [
 ]
 const safeTransaction = await safeSdk.createTransaction({ transactions })
 const txHash = await safeSdk.getTransactionHash(safeTransaction)
-const signature = await safeSdk.signTransactionHash(txHash)
+const signature = await safeSdk.signHash(txHash)
 ```
 
 ### signTypedData
@@ -673,11 +673,14 @@ const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction)
 Optionally, an additional parameter can be passed to specify a different way of signing:
 
 ```js
-const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction, 'eth_signTypedData')
+const signedSafeTransaction = await safeSdk.signTransaction(
+  safeTransaction,
+  SigningMethod.ETH_SIGN_TYPED_DATA
+)
 ```
 
 ```js
-const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction, 'eth_sign') // default option.
+const signedSafeTransaction = await safeSdk.signTransaction(safeTransaction, SigningMethod.ETH_SIGN) // default option.
 ```
 
 ### approveTransactionHash

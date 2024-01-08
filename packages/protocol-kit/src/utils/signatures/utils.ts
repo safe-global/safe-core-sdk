@@ -1,11 +1,16 @@
+import { ethers } from 'ethers'
 import {
   EthAdapter,
   SafeSignature,
-  SafeTransactionEIP712Args
+  SafeEIP712Args,
+  SafeTransactionData
 } from '@safe-global/safe-core-sdk-types'
 import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
+import semverSatisfies from 'semver/functions/satisfies'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
+import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
+import { SigningMethod } from '@safe-global/protocol-kit/types'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -44,12 +49,17 @@ export function isTxHashSignedWithPrefix(
 }
 
 type AdjustVOverload = {
-  (signingMethod: 'eth_signTypedData', signature: string): string
-  (signingMethod: 'eth_sign', signature: string, safeTxHash: string, sender: string): string
+  (signingMethod: SigningMethod.ETH_SIGN_TYPED_DATA, signature: string): string
+  (
+    signingMethod: SigningMethod.ETH_SIGN,
+    signature: string,
+    safeTxHash: string,
+    sender: string
+  ): string
 }
 
 export const adjustVInSignature: AdjustVOverload = (
-  signingMethod: 'eth_sign' | 'eth_signTypedData',
+  signingMethod: SigningMethod.ETH_SIGN | SigningMethod.ETH_SIGN_TYPED_DATA,
   signature: string,
   safeTxHash?: string,
   signerAddress?: string
@@ -60,7 +70,7 @@ export const adjustVInSignature: AdjustVOverload = (
   if (!ETHEREUM_V_VALUES.includes(signatureV)) {
     throw new Error('Invalid signature')
   }
-  if (signingMethod === 'eth_sign') {
+  if (signingMethod === SigningMethod.ETH_SIGN) {
     /*
       The Safe's expected V value for ECDSA signature is:
       - 27 or 28
@@ -85,7 +95,7 @@ export const adjustVInSignature: AdjustVOverload = (
       signatureV += 4
     }
   }
-  if (signingMethod === 'eth_signTypedData') {
+  if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA) {
     // Metamask with ledger returns V=0/1 here too, we need to adjust it to be ethereum's valid value (27 or 28)
     if (signatureV < MIN_VALID_V_VALUE_FOR_SAFE_ECDSA) {
       signatureV += MIN_VALID_V_VALUE_FOR_SAFE_ECDSA
@@ -103,21 +113,143 @@ export async function generateSignature(
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
+
   let signature = await ethAdapter.signMessage(hash)
-  signature = adjustVInSignature('eth_sign', signature, hash, signerAddress)
+
+  signature = adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
   return new EthSafeSignature(signerAddress, signature)
 }
 
 export async function generateEIP712Signature(
   ethAdapter: EthAdapter,
-  safeTransactionEIP712Args: SafeTransactionEIP712Args,
+  safeEIP712Args: SafeEIP712Args,
   methodVersion?: 'v3' | 'v4'
 ): Promise<SafeSignature> {
   const signerAddress = await ethAdapter.getSignerAddress()
   if (!signerAddress) {
     throw new Error('EthAdapter must be initialized with a signer to use this method')
   }
-  let signature = await ethAdapter.signTypedData(safeTransactionEIP712Args, methodVersion)
-  signature = adjustVInSignature('eth_signTypedData', signature)
+
+  let signature = await ethAdapter.signTypedData(safeEIP712Args, methodVersion)
+
+  signature = adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
   return new EthSafeSignature(signerAddress, signature)
+}
+
+export const buildContractSignature = async (
+  signatures: SafeSignature[],
+  signerSafeAddress: string
+): Promise<SafeSignature> => {
+  const contractSignature = new EthSafeSignature(
+    signerSafeAddress,
+    buildSignatureBytes(signatures),
+    true
+  )
+
+  return contractSignature
+}
+
+export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
+  const SIGNATURE_LENGTH_BYTES = 65
+
+  signatures.sort((left, right) =>
+    left.signer.toLowerCase().localeCompare(right.signer.toLowerCase())
+  )
+
+  let signatureBytes = '0x'
+  let dynamicBytes = ''
+
+  for (const signature of signatures) {
+    if (signature.isContractSignature) {
+      /* 
+        A contract signature has a static part of 65 bytes and the dynamic part that needs to be appended 
+        at the end of signature bytes.
+        The signature format is
+        Signature type == 0
+        Constant part: 65 bytes
+        {32-bytes signature verifier}{32-bytes dynamic data position}{1-byte signature type}
+        Dynamic part (solidity bytes): 32 bytes + signature data length
+        {32-bytes signature length}{bytes signature data}
+      */
+      const dynamicPartPosition = (
+        signatures.length * SIGNATURE_LENGTH_BYTES +
+        dynamicBytes.length / 2
+      )
+        .toString(16)
+        .padStart(64, '0')
+
+      signatureBytes += signature.staticPart(dynamicPartPosition)
+      dynamicBytes += signature.dynamicPart()
+    } else {
+      signatureBytes += signature.data.slice(2)
+    }
+  }
+
+  return signatureBytes + dynamicBytes
+}
+
+export const preimageSafeTransactionHash = (
+  safeAddress: string,
+  safeTx: SafeTransactionData,
+  safeVersion: string,
+  chainId: bigint
+): string => {
+  const safeTxTypes = getEip712TxTypes(safeVersion)
+
+  return ethers.TypedDataEncoder.encode(
+    { verifyingContract: safeAddress, chainId },
+    { SafeTx: safeTxTypes.SafeTx },
+    safeTx
+  )
+}
+
+export const preimageSafeMessageHash = (
+  safeAddress: string,
+  message: string,
+  safeVersion: string,
+  chainId: bigint
+): string => {
+  const safeMessageTypes = getEip712MessageTypes(safeVersion)
+
+  return ethers.TypedDataEncoder.encode(
+    { verifyingContract: safeAddress, chainId },
+    { SafeMessage: safeMessageTypes.SafeMessage },
+    { message }
+  )
+}
+
+const EQ_OR_GT_1_3_0 = '>=1.3.0'
+
+export const calculateSafeTransactionHash = (
+  safeAddress: string,
+  safeTx: SafeTransactionData,
+  safeVersion: string,
+  chainId: bigint
+): string => {
+  const safeTxTypes = getEip712TxTypes(safeVersion)
+  const domain: {
+    chainId?: bigint
+    verifyingContract: string
+  } = { verifyingContract: safeAddress }
+
+  if (semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)) {
+    domain.chainId = chainId
+  }
+
+  return ethers.TypedDataEncoder.hash(domain, { SafeTx: safeTxTypes.SafeTx }, safeTx)
+}
+
+export const calculateSafeMessageHash = (
+  safeAddress: string,
+  message: string,
+  safeVersion: string,
+  chainId: bigint
+): string => {
+  const safeMessageTypes = getEip712MessageTypes(safeVersion)
+
+  return ethers.TypedDataEncoder.hash(
+    { verifyingContract: safeAddress, chainId },
+    { SafeMessage: safeMessageTypes.SafeMessage },
+    { message }
+  )
 }

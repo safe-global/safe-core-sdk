@@ -191,7 +191,7 @@ Once we have the Safe transaction object we can share it with the other owners o
 
 ```js
 const safeTxHash = await safeSdk.getTransactionHash(safeTransaction)
-const senderSignature = await safeSdk.signTransactionHash(safeTxHash)
+const senderSignature = await safeSdk.signHash(safeTxHash)
 await safeService.proposeTransaction({
   safeAddress,
   safeTransactionData: safeTransaction.data,
@@ -265,13 +265,13 @@ type SafeMultisigTransactionResponse = {
 
 ## <a name="confirm-transaction">7. Confirm/reject the transaction</a>
 
-The owners of the Safe can now sign the transaction obtained from the Safe Transaction Service by calling the method `signTransactionHash` from the Protocol Kit to generate the signature and by calling the method `confirmTransaction` from the Safe API Kit to add the signature to the service.
+The owners of the Safe can now sign the transaction obtained from the Safe Transaction Service by calling the method `signHash` from the Protocol Kit to generate the signature and by calling the method `confirmTransaction` from the Safe API Kit to add the signature to the service.
 
 ```js
 // transaction: SafeMultisigTransactionResponse
 
 const hash = transaction.safeTxHash
-let signature = await safeSdk.signTransactionHash(hash)
+let signature = await safeSdk.signHash(hash)
 await safeService.confirmTransaction(hash, signature.data)
 ```
 

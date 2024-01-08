@@ -1,10 +1,12 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import {
+  EIP712TypedDataMessage,
+  EIP712TypedDataTx,
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeTransactionEIP712Args
+  SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
@@ -247,19 +249,22 @@ class EthersAdapter implements EthAdapter {
     return this.#signer.signMessage(messageArray)
   }
 
-  async signTypedData(safeTransactionEIP712Args: SafeTransactionEIP712Args): Promise<string> {
+  async signTypedData(safeEIP712Args: SafeEIP712Args): Promise<string> {
     if (!this.#signer) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
     if (isTypedDataSigner(this.#signer)) {
-      const typedData = generateTypedData(safeTransactionEIP712Args)
+      const typedData = generateTypedData(safeEIP712Args)
       const signature = await this.#signer.signTypedData(
         typedData.domain,
-        { SafeTx: typedData.types.SafeTx },
+        typedData.primaryType === 'SafeMessage'
+          ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
+          : { SafeTx: (typedData as EIP712TypedDataTx).types.SafeTx },
         typedData.message
       )
       return signature
     }
+
     throw new Error('The current signer does not implement EIP-712 to sign typed data')
   }
 

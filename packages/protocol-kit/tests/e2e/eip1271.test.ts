@@ -49,7 +49,7 @@ describe('The EIP1271 implementation', () => {
       const fallbackHandlerAddress = contractNetworks[chainId].fallbackHandlerAddress
       const [account1, account2] = accounts
 
-      // Create a 1/1 Safe to sign the messages
+      // Create a 1/2 Safe to sign the messages
       const signerSafe = await getSafeWithOwners(
         [account1.address, account2.address],
         1,
@@ -150,7 +150,7 @@ describe('The EIP1271 implementation', () => {
     itif(safeVersionDeployed >= '1.3.0')('should revert when message is not signed', async () => {
       const { safeSdk1 } = await setupTests()
 
-      const response = await safeSdk1.isValidSignature(await hashSafeMessage(MESSAGE), '0x')
+      const response = await safeSdk1.isValidSignature(hashSafeMessage(MESSAGE), '0x')
 
       chai.expect(response).to.be.false
     })

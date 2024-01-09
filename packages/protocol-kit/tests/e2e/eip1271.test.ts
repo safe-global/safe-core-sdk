@@ -437,10 +437,10 @@ describe('The EIP1271 implementation', () => {
             data: '0x'
           }
 
-          await account1.signer.sendTransaction({
-            to: safeAddress,
-            value: 1_000_000_000_000_000_000n // 1 ETH
-          })
+          // await account1.signer.sendTransaction({
+          //   to: safeAddress,
+          //   value: 1_000_000_000_000_000_000n // 1 ETH
+          // })
 
           chai.expect(await safeSdk1.getNonce()).to.be.eq(0)
 
@@ -464,7 +464,9 @@ describe('The EIP1271 implementation', () => {
 
           tx.addSignature(signerSafeSig)
 
-          const execResponse = await safeSdk1.executeTransaction(tx)
+          const execResponse = await safeSdk1.executeTransaction(tx, {
+            value: '100000000000000000'
+          })
           await waitSafeTxReceipt(execResponse)
 
           chai.expect(await safeSdk1.getNonce()).to.be.eq(1)

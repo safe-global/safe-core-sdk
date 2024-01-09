@@ -78,6 +78,7 @@ interface TransactionBase {
 
 export interface TransactionOptions {
   from?: string
+  value?: string
   gas?: number | string
   gasLimit?: number | string
   gasPrice?: number | string

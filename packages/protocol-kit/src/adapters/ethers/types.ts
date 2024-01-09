@@ -3,6 +3,7 @@ import { BaseTransactionResult } from '@safe-global/safe-core-sdk-types'
 
 export interface EthersTransactionOptions {
   from?: string
+  value?: string
   gasLimit?: number | string
   gasPrice?: number | string
   maxFeePerGas?: number | string

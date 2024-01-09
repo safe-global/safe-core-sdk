@@ -800,6 +800,34 @@ describe('Transactions execution', () => {
       const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
       chai.expect(execOptions.nonce).to.be.eq(txConfirmed.nonce)
     })
+
+    it('should execute a transaction with options: { value }', async () => {
+      const { accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+
+      const safe = await getSafeWithOwners([account1.address])
+      const safeAddress = await safe.getAddress()
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk1 = await Safe.create({
+        ethAdapter,
+        safeAddress,
+        contractNetworks
+      })
+      const safeTransactionData = {
+        to: account2.address,
+        value: '100000000000000000', // Transferring 0.1 ETH
+        data: '0x'
+      }
+      const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
+      const execOptions: EthersTransactionOptions = {
+        value: '300000000000000000' // Transferring 0.3 ETH from signer to Safe
+      }
+      const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
+      await waitSafeTxReceipt(txResponse)
+      const txConfirmed = await ethAdapter.getTransaction(txResponse.hash)
+      chai.expect(BigInt(execOptions.value)).to.be.eq(txConfirmed.value)
+      chai.expect(await safeSdk1.getBalance()).to.be.eq(200000000000000000n)
+    })
   })
 
   describe('executeTransaction (MultiSend)', async () => {

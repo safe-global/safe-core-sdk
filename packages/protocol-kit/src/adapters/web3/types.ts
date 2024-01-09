@@ -3,6 +3,7 @@ import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
 export interface Web3TransactionOptions {
   from?: string
+  value?: string
   gas?: number | string
   gasPrice?: number | string
   maxFeePerGas?: number | string

@@ -1179,8 +1179,11 @@ class Safe {
 
     const value = BigInt(signedSafeTransaction.data.value)
     if (value !== 0n) {
+      const signerValue = BigInt(options?.value || 0)
       const balance = await this.getBalance()
-      if (value > balance) {
+      const totalBalance = signerValue + balance
+
+      if (value > totalBalance) {
         throw new Error('Not enough Ether funds')
       }
     }

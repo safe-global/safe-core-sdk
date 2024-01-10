@@ -132,6 +132,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 54211n, shortName: 'islmt' },
   { chainId: 56288n, shortName: 'boba-bnb' },
   { chainId: 57000n, shortName: 'tsys-rollux' },
+  { chainId: 58008n, shortName: 'sepPGN' },
   { chainId: 59140n, shortName: 'linea-testnet' },
   { chainId: 59144n, shortName: 'linea' },
   { chainId: 71401n, shortName: 'gw-testnet-v1' },

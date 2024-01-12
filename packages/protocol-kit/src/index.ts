@@ -7,7 +7,6 @@ import {
   EthersTransactionOptions,
   EthersTransactionResult,
   MultiSendCallOnlyEthersContract,
-  MultiSendEthersContract,
   SafeContractEthers,
   SafeProxyFactoryEthersContract,
   SignMessageLibEthersContract
@@ -102,7 +101,6 @@ export {
   EthersTransactionResult,
   MultiSendCallOnlyEthersContract,
   MultiSendCallOnlyWeb3Contract,
-  MultiSendEthersContract,
   MultiSendWeb3Contract,
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,

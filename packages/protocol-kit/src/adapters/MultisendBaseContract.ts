@@ -2,19 +2,19 @@ import { contractName, getContractDeployment } from '@safe-global/protocol-kit/c
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 /**
- * Abstract class MultisendBaseContract serves as a base for creating a MultisendBaseContract contract for a specific adapter (Ethers.js, Web3.js, or viem.js)
- * This class is designed to be extended by adapter-specific abstract classes, such as MultisendBaseContractEthers, MultisendBaseContractWeb3, and MultisendBaseContractViem.
- * It includes the core logic for selecting the appropriate ABI and the address from Multisend deployments.
+ * Abstract class MultiSendBaseContract serves as a base for creating a MultiSendBaseContract contract for a specific adapter (Ethers.js, Web3.js, or viem.js)
+ * This class is designed to be extended by adapter-specific abstract classes, such as MultiSendBaseContractEthers, MultiSendBaseContractWeb3, and MultiSendBaseContractViem.
+ * It includes the core logic for selecting the appropriate ABI and the address from MultiSend deployments.
  *
- * @template MultisendContractAbiType - The ABI associated with the Multisend contract.
+ * @template MultiSendContractAbiType - The ABI associated with the MultiSend contract.
  *
  * Example subclasses extending this base class:
- * - MultisendBaseContractEthers<MultisendContract_v1_3_0_Abi> extends MultisendBaseContract<MultisendContract_v1_3_0_Abi>
- * - MultisendBaseContractWeb3<MultisendContract_v1_3_0_Abi> extends MultisendBaseContract<MultisendContract_v1_3_0_Abi>
- * - MultisendBaseContractViem<MultisendContract_v1_3_0_Abi> extends MultisendBaseContract<MultisendContract_v1_3_0_Abi>
+ * - MultiSendBaseContractEthers<MultiSendContract_v1_3_0_Abi> extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
+ * - MultiSendBaseContractWeb3<MultiSendContract_v1_3_0_Abi> extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
+ * - MultiSendBaseContractViem<MultiSendContract_v1_3_0_Abi> extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
  */
-abstract class MultisendBaseContract<MultisendContractAbiType> {
-  contractAbi: MultisendContractAbiType
+abstract class MultiSendBaseContract<MultiSendContractAbiType> {
+  contractAbi: MultiSendContractAbiType
   contractAddress: string
 
   contractName: contractName
@@ -24,24 +24,23 @@ abstract class MultisendBaseContract<MultisendContractAbiType> {
   abstract adapter: unknown // This needs to be implemented for each adapter.
 
   /**
-   * Constructs a new MultisendBaseContract instance.
+   * Constructs a new MultiSendBaseContract instance.
    *
    * @param chainId - The chain ID of the contract.
-   * @param defaultAbi - The hardcoded ABI of the Multisend contract.
-   * @param safeVersion - The version of the Multisend contract.
+   * @param defaultAbi - The hardcoded ABI of the MultiSend contract.
+   * @param safeVersion - The version of the MultiSend contract.
    * @param customContractAddress - Optional custom address for the contract.
    * @param customContractAbi - Optional custom ABI for the contract.
    * @throws Will throw an error if the contract address is invalid.
    */
   constructor(
     chainId: bigint,
-    defaultAbi: MultisendContractAbiType,
+    defaultAbi: MultiSendContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: MultisendContractAbiType,
-    onlyCalls: boolean = false
+    customContractAbi?: MultiSendContractAbiType
   ) {
-    this.contractName = onlyCalls ? 'multiSendCallOnlyVersion' : 'multiSendVersion'
+    this.contractName = 'multiSendVersion'
 
     const deployment = getContractDeployment(safeVersion, chainId, this.contractName)
 
@@ -54,9 +53,9 @@ abstract class MultisendBaseContract<MultisendContractAbiType> {
     this.contractAddress = contractAddress
     this.contractAbi =
       customContractAbi ||
-      (deployment?.abi as MultisendContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
+      (deployment?.abi as MultiSendContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
       defaultAbi // if no customAbi and no abi is present in the safe-deployments we use our hardcoded abi
   }
 }
 
-export default MultisendBaseContract
+export default MultiSendBaseContract

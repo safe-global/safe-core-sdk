@@ -2,7 +2,7 @@ import { Contract, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from 'packages/safe-core-sdk-types'
-import MultisendBaseContract from '@safe-global/protocol-kit/adapters/MultisendBaseContract'
+import MultisendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendBaseContract'
 
 /**
  * Abstract class SafeBaseContractEthers extends MultisendBaseContract to specifically integrate with the Ethers.js v6 library.
@@ -35,7 +35,6 @@ abstract class MultiSendBaseContractEthers<
    * @param safeVersion - The version of the Multisend contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Multisend deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Multisend deployments or the defaultAbi is used.
-   * @param onlyCalls - Optional flag to indicate if the contract is only used for calls.
    */
   constructor(
     chainId: bigint,
@@ -43,10 +42,9 @@ abstract class MultiSendBaseContractEthers<
     defaultAbi: MultiSendContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: MultiSendContractAbiType,
-    onlyCalls = false
+    customContractAbi?: MultiSendContractAbiType
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi, onlyCalls)
+    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.adapter = ethersAdapter
     this.contract = new Contract(this.contractAddress, this.contractAbi, this.adapter.getSigner())

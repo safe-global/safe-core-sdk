@@ -1,19 +1,19 @@
 import { Contract, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import { SafeVersion } from 'packages/safe-core-sdk-types'
-import MultisendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendBaseContract'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import MultiSendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendBaseContract'
 
 /**
- * Abstract class SafeBaseContractEthers extends MultisendBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class SafeBaseContractEthers extends MultiSendBaseContract to specifically integrate with the Ethers.js v6 library.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
- * This abstract class sets up the Ethers v6 Contract object that interacts with a Multisend contract version.
+ * This abstract class sets up the Ethers v6 Contract object that interacts with a MultiSend contract version.
  *
- * Subclasses of MultiSendBaseContractEthers are expected to represent specific versions of the Multisend contract.
+ * Subclasses of MultiSendBaseContractEthers are expected to represent specific versions of the MultiSend contract.
  *
- * @template MultiSendContractAbiType - The ABI type specific to the version of the Multisend contract, extending InterfaceAbi from Ethers.
- * @extends MultisendBaseContract<MultiSendContractAbiType> - Extends the generic MultisendBaseContract with Ethers-specific implementation.
+ * @template MultiSendContractAbiType - The ABI type specific to the version of the MultiSend contract, extending InterfaceAbi from Ethers.
+ * @extends MultiSendBaseContract<MultiSendContractAbiType> - Extends the generic MultiSendBaseContract with Ethers-specific implementation.
  *
  * Example subclasses:
  * - MultiSendContract_v1_4_1_Ethers extends MultiSendBaseContractEthers<MultiSendContract_v1_4_1_Abi>
@@ -21,7 +21,7 @@ import MultisendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendB
  */
 abstract class MultiSendBaseContractEthers<
   MultiSendContractAbiType extends InterfaceAbi
-> extends MultisendBaseContract<MultiSendContractAbiType> {
+> extends MultiSendBaseContract<MultiSendContractAbiType> {
   contract: Contract
   adapter: EthersAdapter
 
@@ -31,10 +31,10 @@ abstract class MultiSendBaseContractEthers<
    *
    * @param chainId - The chain ID of the contract.
    * @param ethersAdapter - An instance of EthersAdapter.
-   * @param defaultAbi - The default ABI for the Multisend contract. It should be compatible with the specific version of the Multisend contract.
-   * @param safeVersion - The version of the Multisend contract.
-   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Multisend deployments based on the chainId and safeVersion.
-   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Multisend deployments or the defaultAbi is used.
+   * @param defaultAbi - The default ABI for the MultiSend contract. It should be compatible with the specific version of the MultiSend contract.
+   * @param safeVersion - The version of the MultiSend contract.
+   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the MultiSend deployments or the defaultAbi is used.
    */
   constructor(
     chainId: bigint,

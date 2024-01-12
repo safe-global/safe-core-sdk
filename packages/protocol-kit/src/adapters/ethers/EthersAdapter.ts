@@ -9,8 +9,8 @@ import {
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
-import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
-import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
+import MultiSendBaseContractEthers from './contracts/MultiSend/MultiSendBaseContractEthers'
+import MultiSendCallOnlyBaseContractEthers from './contracts/MultiSend/MultiSendCallOnlyBaseContractEthers'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import SafeProxyFactoryEthersContract from './contracts/SafeProxyFactory/SafeProxyFactoryEthersContract'
 import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
@@ -134,23 +134,24 @@ class EthersAdapter implements EthAdapter {
   async getMultiSendContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<MultiSendEthersContract> {
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<MultiSendBaseContractEthers> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
-    return getMultiSendContractInstance(safeVersion, contractAddress, signerOrProvider)
+
+    return getMultiSendContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getMultiSendCallOnlyContract({
     safeVersion,
     singletonDeployment,
     customContractAddress
-  }: GetContractProps): Promise<MultiSendCallOnlyEthersContract> {
+  }: GetContractProps): Promise<MultiSendCallOnlyBaseContractEthers> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]

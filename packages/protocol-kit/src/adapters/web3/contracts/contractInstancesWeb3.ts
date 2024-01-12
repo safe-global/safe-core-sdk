@@ -7,20 +7,15 @@ import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/Abi
 import { Gnosis_safe as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
 import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Proxy_factory'
 import { Gnosis_safe as SafeSingleton_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Gnosis_safe'
-import { Multi_send as MultiSend_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Multi_send'
 import { Proxy_factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Proxy_factory'
 import { Gnosis_safe as SafeSingleton_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.2.0/Gnosis_safe'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Create_call'
-import { Multi_send as MultiSend_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Multi_send'
-import { Multi_send_call_only as MultiSendCallOnly_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Multi_send_call_only'
 import { Proxy_factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Proxy_factory'
 import { Sign_message_lib as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Sign_message_lib'
 import { Simulate_tx_accessor as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Simulate_tx_accessor'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Create_call'
-import { Multi_send as MultiSend_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Multi_send'
-import { Multi_send_call_only as MultiSendCallOnly_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Multi_send_call_only'
 import { Safe_proxy_factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Safe_proxy_factory'
 import { Sign_message_lib as SignMessageLib_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Sign_message_lib'
 import { Simulate_tx_accessor as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Simulate_tx_accessor'
@@ -32,8 +27,8 @@ import CreateCallContract_V1_4_1_Web3 from './CreateCall/v1.4.1/CreateCallEthers
 import MultiSendContract_V1_1_1_Web3 from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
 import MultiSendContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
 import MultiSendContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendContract_V1_4_1_Web3'
-import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSendCallOnly/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
-import MultiSendCallOnlyContract_V1_4_1_Web3 from './MultiSendCallOnly/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
+import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
+import MultiSendCallOnlyContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
 import SafeContract_V1_0_0_Web3 from './Safe/v1.0.0/SafeContract_V1_0_0_Web3'
 import SafeContract_V1_1_1_Web3 from './Safe/v1.1.1/SafeContract_V1_1_1_Web3'
 import SafeContract_V1_2_0_Web3 from './Safe/v1.2.0/SafeContract_V1_2_0_Web3'
@@ -45,6 +40,20 @@ import SignMessageLibContract_V1_3_0_Web3 from './SignMessageLib/v1.3.0/SignMess
 import SignMessageLibContract_V1_4_1_Web3 from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Web3'
 import SimulateTxAccessorContract_V1_3_0_Web3 from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Web3'
 import SimulateTxAccessorContract_V1_4_1_Web3 from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Web3'
+import { MultiSendContract_v1_4_1_Abi as MultiSendContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
+import { MultiSendContract_v1_3_0_Abi as MultiSendContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
+import { MultiSendContract_v1_1_1_Abi as MultiSendContract_v1_1_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
+import { MultiSendCallOnlyContract_v1_3_0_Abi as MultiSendCallOnlyContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
+import { MultiSendCallOnlyContract_v1_4_1_Abi as MultiSendCallOnlyContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
+import { DeepWriteable } from '../types'
+
+type MultiSendContract_v1_1_1_Abi = DeepWriteable<MultiSendContract_v1_1_1_Abi_Readonly>
+type MultiSendContract_v1_3_0_Abi = DeepWriteable<MultiSendContract_v1_3_0_Abi_Readonly>
+type MultiSendContract_v1_4_1_Abi = DeepWriteable<MultiSendContract_v1_4_1_Abi_Readonly>
+type MultiSendCallOnlyContract_v1_3_0_Abi =
+  DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi_Readonly>
+type MultiSendCallOnlyContract_v1_4_1_Abi =
+  DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi_Readonly>
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -112,39 +121,68 @@ export function getCompatibilityFallbackHandlerContractInstance(
   }
 }
 
-export function getMultiSendContractInstance(
+export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
-  multiSendContract: MultiSend_V1_4_1 | MultiSend_V1_3_0 | MultiSend_V1_1_1
-): MultiSendContract_V1_4_1_Web3 | MultiSendContract_V1_3_0_Web3 | MultiSendContract_V1_1_1_Web3 {
+  contractAddress: string,
+  web3Adapter: Web3Adapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+): Promise<
+  MultiSendContract_V1_4_1_Web3 | MultiSendContract_V1_3_0_Web3 | MultiSendContract_V1_1_1_Web3
+> {
+  const chainId = await web3Adapter.getChainId()
   switch (safeVersion) {
     case '1.4.1':
-      return new MultiSendContract_V1_4_1_Web3(multiSendContract as MultiSend_V1_4_1)
+      return new MultiSendContract_V1_4_1_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as MultiSendContract_v1_4_1_Abi
+      )
     case '1.3.0':
-      return new MultiSendContract_V1_3_0_Web3(multiSendContract as MultiSend_V1_3_0)
+      return new MultiSendContract_V1_3_0_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as MultiSendContract_v1_3_0_Abi
+      )
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new MultiSendContract_V1_1_1_Web3(multiSendContract as MultiSend_V1_1_1)
+      return new MultiSendContract_V1_1_1_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as MultiSendContract_v1_1_1_Abi
+      )
     default:
       throw new Error('Invalid Safe version')
   }
 }
 
-export function getMultiSendCallOnlyContractInstance(
+export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
-  multiSendCallOnlyContract: MultiSendCallOnly_V1_4_1 | MultiSendCallOnly_V1_3_0
-): MultiSendCallOnlyContract_V1_4_1_Web3 | MultiSendCallOnlyContract_V1_3_0_Web3 {
+  contractAddress: string,
+  web3Adapter: Web3Adapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+): Promise<MultiSendCallOnlyContract_V1_4_1_Web3 | MultiSendCallOnlyContract_V1_3_0_Web3> {
+  const chainId = await web3Adapter.getChainId()
   switch (safeVersion) {
     case '1.4.1':
       return new MultiSendCallOnlyContract_V1_4_1_Web3(
-        multiSendCallOnlyContract as MultiSendCallOnly_V1_4_1
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as MultiSendCallOnlyContract_v1_4_1_Abi
       )
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
       return new MultiSendCallOnlyContract_V1_3_0_Web3(
-        multiSendCallOnlyContract as MultiSendCallOnly_V1_3_0
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as MultiSendCallOnlyContract_v1_3_0_Abi
       )
     default:
       throw new Error('Invalid Safe version')

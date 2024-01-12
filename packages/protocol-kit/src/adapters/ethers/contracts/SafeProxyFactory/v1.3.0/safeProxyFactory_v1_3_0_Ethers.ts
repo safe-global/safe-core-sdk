@@ -1,4 +1,4 @@
-import { EventLog } from 'ethers'
+import { ContractRunner, EventLog } from 'ethers'
 import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/safeProxyFactoryBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
@@ -38,12 +38,21 @@ class SafeProxyFactory_v1_3_0_Ethers
     chainId: bigint,
     ethersAdapter: EthersAdapter,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi
+    customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi,
+    runner?: ContractRunner | null
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = safeProxyFactory_1_3_0_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      runner
+    )
 
     this.safeVersion = safeVersion
   }

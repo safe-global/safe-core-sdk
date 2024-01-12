@@ -228,7 +228,8 @@ export async function getSafeProxyFactoryContractInstance(
         ethersAdapter,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_3_0_Abi
+        customContractAbi as unknown as SafeProxyFactoryContract_v1_3_0_Abi,
+        signerOrProvider
       )
       return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
     case '1.2.0':

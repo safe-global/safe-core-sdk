@@ -1,4 +1,4 @@
-import { Contract, InterfaceAbi } from 'ethers'
+import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/adapters/safeProxyFactoryBaseContract'
@@ -45,12 +45,17 @@ abstract class SafeProxyFactoryBaseContractEthers<
     defaultAbi: SafeProxyFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContractAbiType
+    customContractAbi?: SafeProxyFactoryContractAbiType,
+    runner?: ContractRunner | null
   ) {
     super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.adapter = ethersAdapter
-    this.contract = new Contract(this.contractAddress, this.contractAbi, this.adapter.getSigner())
+    this.contract = new Contract(
+      this.contractAddress,
+      this.contractAbi,
+      runner || this.adapter.getSigner()
+    )
   }
 }
 

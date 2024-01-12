@@ -1945,9 +1945,9 @@
   resolved "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
 
-"@safe-global/safe-deployments@^1.28.0":
+"@safe-global/safe-deployments@^1.30.0":
   version "1.28.0"
-  resolved "https://registry.npmjs.org/@safe-global/safe-deployments/-/safe-deployments-1.28.0.tgz"
+  resolved "https://registry.npmjs.org/@safe-global/safe-deployments/-/safe-deployments-1.30.0.tgz"
   integrity sha512-zWn55unMucN3i3awjDA0XxH9BzGNHyC/qCbuISBh0GMZP/q+VCxERAOEO4OqwyGaxk6sSAzP4usGdmgz2y2svg==
   dependencies:
     semver "^7.3.7"

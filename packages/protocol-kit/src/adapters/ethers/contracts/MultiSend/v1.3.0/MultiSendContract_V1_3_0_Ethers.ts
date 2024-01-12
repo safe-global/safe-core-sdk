@@ -2,13 +2,13 @@ import MultiSendBaseContractEthers from '@safe-global/protocol-kit/adapters/ethe
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import MultisendContract_v1_3_0_Contract, {
   MultisendContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/v1.3.0/MultisendContract_v1_3_0'
-import multisend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Multisend/v1.3.0/multi_send'
+} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/v1.3.0/MultiSendContract_v1_3_0'
+import multisend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.3.0/multi_send'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
   EncodeMultiSendFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/MultisendBaseContract'
+  GetAddressMultisendFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/MultiSendBaseContract'
 
 /**
  * MultiSendContract_v1_3_0_Ethers is the implementation specific to the Safe contract version 1.3.0.
@@ -56,7 +56,7 @@ class MultiSendContract_v1_3_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressFunction = () => {
+  getAddress: GetAddressMultisendFunction = () => {
     return this.contract.getAddress()
   }
 

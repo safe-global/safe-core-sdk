@@ -1,7 +1,6 @@
 import { EventLog } from 'ethers'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0/Proxy_factory'
-import { Proxy_factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1/Proxy_factory'
 import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types'
 
 export interface CreateProxyProps {
@@ -13,7 +12,7 @@ export interface CreateProxyProps {
 }
 
 class SafeProxyFactoryEthersContract implements SafeProxyFactoryContract {
-  constructor(public contract: SafeProxyFactory_V1_1_1 | SafeProxyFactory_V1_0_0) {}
+  constructor(public contract: SafeProxyFactory_V1_0_0) {}
 
   getAddress(): Promise<string> {
     return this.contract.getAddress()

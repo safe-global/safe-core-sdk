@@ -96,7 +96,10 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.4.1`,
-    safeContracts_V1_4_1
+    // removed Safe Proxy Factory Contract v1.4.1 for ethers-v6
+    typechainTarget === 'ethers-v6'
+      ? safeContracts_V1_4_1.replace(`${safeContractsPath}/v1.4.1/safe_proxy_factory.json`, '')
+      : safeContracts_V1_4_1
   )
   generateTypechainFiles(
     typechainTarget,

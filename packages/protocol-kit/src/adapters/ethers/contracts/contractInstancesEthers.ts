@@ -8,7 +8,6 @@ import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Simulate_tx_accessor__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Create_call__factory'
-import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Safe_proxy_factory__factory'
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Simulate_tx_accessor__factory'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
@@ -23,7 +22,6 @@ import MultiSendCallOnlyContract_V1_4_1_Ethers from './MultiSend/v1.4.1/MultiSen
 import SafeContract_V1_0_0_Ethers from './Safe/v1.0.0/SafeContract_V1_0_0_Ethers'
 import SafeProxyFactoryContract_V1_0_0_Ethers from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_V1_0_0_Ethers'
 import SafeProxyFactoryContract_V1_1_1_Ethers from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_V1_1_1_Ethers'
-import SafeProxyFactoryContract_V1_4_1_Ethers from './SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_V1_4_1_Ethers'
 import SignMessageLibContract_V1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Ethers'
 import SignMessageLibContract_V1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Ethers'
 import SimulateTxAccessorContract_V1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Ethers'
@@ -32,6 +30,7 @@ import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ether
 import SafeContract_v1_2_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Ethers'
 import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
 import SafeProxyFactory_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.3.0/safeProxyFactory_v1_3_0_Ethers'
+import SafeProxyFactory_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.4.1/safeProxyFactory_v1_4_1_Ethers'
 import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Ethers'
 import EthersAdapter from '../EthersAdapter'
 import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
@@ -46,6 +45,7 @@ import { MultiSendCallOnlyContract_v1_4_1_Abi } from '@safe-global/protocol-kit/
 import { SignMessageLibContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import { SignMessageLibContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -211,17 +211,21 @@ export async function getSafeProxyFactoryContractInstance(
   signerOrProvider: AbstractSigner | Provider,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<
-  | SafeProxyFactoryContract_V1_4_1_Ethers
-  | SafeProxyFactoryContract_V1_1_1_Ethers
-  | SafeProxyFactoryContract_V1_0_0_Ethers
-> {
+): Promise<SafeProxyFactoryContract_V1_1_1_Ethers | SafeProxyFactoryContract_V1_0_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()
   let safeProxyFactoryContract
   switch (safeVersion) {
     case '1.4.1':
-      safeProxyFactoryContract = SafeProxyFactory_V1_4_1.connect(contractAddress, signerOrProvider)
-      return new SafeProxyFactoryContract_V1_4_1_Ethers(safeProxyFactoryContract)
+      safeProxyFactoryContract = new SafeProxyFactory_v1_4_1_Ethers(
+        chainId,
+        ethersAdapter,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeProxyFactoryContract_v1_4_1_Abi,
+        signerOrProvider
+      )
+      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     case '1.3.0':
       safeProxyFactoryContract = new SafeProxyFactory_v1_3_0_Ethers(
         chainId,

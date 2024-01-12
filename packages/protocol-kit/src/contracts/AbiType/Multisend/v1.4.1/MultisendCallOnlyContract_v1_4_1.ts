@@ -15,7 +15,7 @@ export type MultiSendCallOnlyContract_v1_4_1_Abi = typeof multiSendCallOnlyContr
 
 /**
  * Represents the contract type for a MultiSendCallOnly contract version 1.4.1 defining read and write methods.
- * Utilizes the generic MultisendBaseContract with the ABI specific to version 1.4.1.
+ * Utilizes the generic MultiSendBaseContract with the ABI specific to version 1.4.1.
  *
  * @type {MultiSendCallOnlyContract_v1_4_1_Contract}
  */

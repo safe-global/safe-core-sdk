@@ -13,7 +13,7 @@ export type MultiSendContract_v1_1_1_Abi = typeof multiSendContract_v1_1_1_AbiTy
 
 /**
  * Represents the contract type for a MultiSend contract version 1.1.1 defining read and write methods.
- * Utilizes the generic MultisendBaseContract with the ABI specific to version 1.1.1.
+ * Utilizes the generic MultiSendBaseContract with the ABI specific to version 1.1.1.
  *
  * @type {MultiSendContract_v1_1_1_Contract}
  */

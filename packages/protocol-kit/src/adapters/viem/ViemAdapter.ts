@@ -45,6 +45,7 @@ import { Hex } from 'viem'
 import { KeyedClient } from './types'
 import { ViemContractBaseArgs } from './ViemContract'
 import { toBigInt } from './utils'
+import { generateTypedData } from '@safe-global/protocol-kit/utils'
 
 export class ViemAdapter<
   TTransport extends Transport,
@@ -196,9 +197,19 @@ export class ViemAdapter<
 
   signTypedData(
     safeTransactionEIP712Args: SafeTransactionEIP712Args,
-    signTypedDataVersion?: string | undefined
-  ): Promise<string> {
-    throw new Error('Method not implemented.')
+    signTypedDataVersion?: string
+  ): Promise<Hex> {
+    const typedData = generateTypedData(safeTransactionEIP712Args)
+    return this.walletClient.signTypedData({
+      account: this.walletClient.account,
+      primaryType: 'SafeTx',
+      domain: {
+        chainId: typedData.domain.chainId == null ? undefined : Number(typedData.domain.chainId),
+        version: signTypedDataVersion
+      },
+      types: { SafeTx: typedData.types.SafeTx },
+      message: typedData.message
+    })
   }
 
   async estimateGas(transaction: EthAdapterTransaction) {

@@ -16,7 +16,7 @@ import {
   parseAbiParameter,
   parseAbiParameters
 } from 'viem'
-import { validateEip3770Address } from '../..'
+import { getMultiSendContract, validateEip3770Address } from '../..'
 import {
   CreateCallContract,
   Eip3770Address,
@@ -34,7 +34,8 @@ import {
 import {
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
-  getCompatibilityFallbackHandlerContractInstance
+  getCompatibilityFallbackHandlerContractInstance,
+  getMultiSendContractInstance
 } from './contracts/contractInstancesViem'
 import { Hex } from 'viem'
 import { KeyedClient } from './types'
@@ -107,16 +108,11 @@ export class ViemAdapter<
     return getSafeContractInstance(config.safeVersion, await this.getViemContractArgs(config))
   }
 
-  getMultiSendContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps): Promise<MultiSendContract> {
-    throw new Error('Method not implemented.')
+  async getMultiSendContract(config: GetContractProps): Promise<MultiSendContract> {
+    return getMultiSendContractInstance(config.safeVersion, await this.getViemContractArgs(config))
   }
 
-  getMultiSendCallOnlyContract({
+  async getMultiSendCallOnlyContract({
     safeVersion,
     singletonDeployment,
     customContractAddress,

@@ -11,6 +11,9 @@ import SafeProxyFactoryContract_V1_0_0_Viem from './SafeProxyFactory/v1.0.0/Safe
 import CompatibilityFallbackHandler_V1_4_1_Viem from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Viem'
 import CompatibilityFallbackHandler_V1_3_0_Viem from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Viem'
 import { ViemContractBaseArgs } from '../ViemContract'
+import MultiSendContract_V1_4_1_Viem from './MultiSend/v1.4.1/MultiSendContract_V1_4_1_ViemContract'
+import MultiSendContract_V1_3_0_Viem from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_ViemContract'
+import MultiSendContract_V1_1_1_Viem from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_ViemContract'
 
 export function getSafeContractInstance(safeVersion: SafeVersion, args: ViemContractBaseArgs) {
   switch (safeVersion) {
@@ -61,5 +64,19 @@ export function getCompatibilityFallbackHandlerContractInstance(
       return new CompatibilityFallbackHandler_V1_3_0_Viem(args)
     default:
       throw new Error('Invalid CompatibilityFallbackHandler version')
+  }
+}
+
+export function getMultiSendContractInstance(safeVersion: SafeVersion, args: ViemContractBaseArgs) {
+  switch (safeVersion) {
+    case '1.4.1':
+      return new MultiSendContract_V1_4_1_Viem(args)
+    case '1.3.0':
+      return new MultiSendContract_V1_3_0_Viem(args)
+    case '1.2.0':
+    case '1.1.1':
+      return new MultiSendContract_V1_1_1_Viem(args)
+    default:
+      throw new Error('Invalid MultiSend version')
   }
 }

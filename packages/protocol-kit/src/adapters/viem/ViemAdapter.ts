@@ -36,7 +36,8 @@ import {
   getSafeProxyFactoryContractInstance,
   getCompatibilityFallbackHandlerContractInstance,
   getMultiSendContractInstance,
-  getMultiSendCallOnlyContractInstance
+  getMultiSendCallOnlyContractInstance,
+  getCreateCallContractInstance
 } from './contracts/contractInstancesViem'
 import { Hex } from 'viem'
 import { KeyedClient } from './types'
@@ -143,13 +144,8 @@ export class ViemAdapter<
     throw new Error('Method not implemented.')
   }
 
-  getCreateCallContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps): Promise<CreateCallContract> {
-    throw new Error('Method not implemented.')
+  async getCreateCallContract(config: GetContractProps): Promise<CreateCallContract> {
+    return getCreateCallContractInstance(config.safeVersion, await this.getViemContractArgs(config))
   }
 
   getSimulateTxAccessorContract({

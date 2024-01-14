@@ -1,5 +1,4 @@
 import {
-  AbiParameter,
   Address,
   BlockTag,
   Hash,
@@ -12,7 +11,6 @@ import {
 } from 'viem'
 import { validateEip3770Address } from '../..'
 import {
-  CompatibilityFallbackHandlerContract,
   CreateCallContract,
   Eip3770Address,
   EthAdapter,
@@ -28,7 +26,8 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import {
   getSafeContractInstance,
-  getSafeProxyFactoryContractInstance
+  getSafeProxyFactoryContractInstance,
+  getCompatibilityFallbackHandlerContractInstance
 } from './contracts/contractInstancesViem'
 import { ClientPair } from './types'
 import { Hex } from 'viem'
@@ -99,14 +98,24 @@ export class ViemAdapter implements EthAdapter {
     throw new Error('Method not implemented.')
   }
 
-  getCompatibilityFallbackHandlerContract({
+  async getCompatibilityFallbackHandlerContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps): Promise<CompatibilityFallbackHandlerContract> {
-    throw new Error('Method not implemented.')
+    customContractAddress
+  }: GetContractProps) {
+    const chainId = await this.getChainId()
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
+    if (contractAddress == null) {
+      throw new Error('Invalid CompatibilityFallbackHandler contract address')
+    }
+    return getCompatibilityFallbackHandlerContractInstance(
+      safeVersion,
+      contractAddress as Address,
+      this.client
+    )
   }
+
   async getSafeProxyFactoryContract({
     safeVersion,
     singletonDeployment,

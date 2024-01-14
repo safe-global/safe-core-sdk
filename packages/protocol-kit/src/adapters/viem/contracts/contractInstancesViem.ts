@@ -10,6 +10,8 @@ import SafeProxyFactoryContract_V1_3_0_Viem from './SafeProxyFactory/v1.3.0/Safe
 import SafeProxyFactoryContract_V1_4_1_Viem from './SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_V1_4_1_Viem'
 import SafeProxyFactoryContract_V1_1_1_Viem from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_V1_1_1_Ethers'
 import SafeProxyFactoryContract_V1_0_0_Viem from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_V1_0_0_Ethers'
+import CompatibilityFallbackHandler_V1_4_1_Viem from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Viem'
+import CompatibilityFallbackHandler_V1_3_0_Viem from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Viem'
 
 export function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -51,6 +53,23 @@ export function getSafeProxyFactoryContractInstance(
       return new SafeProxyFactoryContract_V1_1_1_Viem({ address, client })
     case '1.0.0':
       return new SafeProxyFactoryContract_V1_0_0_Viem({ address, client })
+    default:
+      throw new Error('Invalid Safe version')
+  }
+}
+
+export function getCompatibilityFallbackHandlerContractInstance(
+  safeVersion: SafeVersion,
+  address: Address,
+  client: ClientPair
+) {
+  switch (safeVersion) {
+    case '1.4.1':
+      return new CompatibilityFallbackHandler_V1_4_1_Viem({ address, client })
+    case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
+      return new CompatibilityFallbackHandler_V1_3_0_Viem({ address, client })
     default:
       throw new Error('Invalid Safe version')
   }

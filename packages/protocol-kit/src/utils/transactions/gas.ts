@@ -382,7 +382,11 @@ function decodeSafeTxGas(encodedDataResponse: string): string {
 
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
 type EthersEstimationError = { data: string }
-type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
+type ViemEstimationError = { cause?: { cause?: { data?: string } } }
+type EstimationError = Error &
+  EthersEstimationError &
+  GnosisChainEstimationError &
+  ViemEstimationError
 
 /**
  * Parses the SafeTxGas estimation response from different providers.
@@ -393,6 +397,11 @@ type EstimationError = Error & EthersEstimationError & GnosisChainEstimationErro
  * @throws It Will throw an error if the SafeTxGas cannot be parsed.
  */
 function parseSafeTxGasErrorResponse(error: EstimationError) {
+  // viem
+  if (error.cause?.cause?.data) {
+    return decodeSafeTxGas(error.cause.cause.data)
+  }
+
   // Ethers v6
   const ethersData = error?.data
   if (ethersData) {
@@ -489,8 +498,6 @@ async function estimateSafeTxGasWithSimulate(
   } catch (error: any) {
     return parseSafeTxGasErrorResponse(error)
   }
-
-  return '0'
 }
 
 /**

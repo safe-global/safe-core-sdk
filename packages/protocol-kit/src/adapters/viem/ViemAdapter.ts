@@ -38,7 +38,8 @@ import {
   getMultiSendContractInstance,
   getMultiSendCallOnlyContractInstance,
   getCreateCallContractInstance,
-  getSignMessageLibContractInstance
+  getSignMessageLibContractInstance,
+  getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesViem'
 import { Hex } from 'viem'
 import { KeyedClient } from './types'
@@ -147,13 +148,13 @@ export class ViemAdapter<
     return getCreateCallContractInstance(config.safeVersion, await this.getViemContractArgs(config))
   }
 
-  getSimulateTxAccessorContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps): Promise<SimulateTxAccessorContract> {
-    throw new Error('Method not implemented.')
+  async getSimulateTxAccessorContract(
+    config: GetContractProps
+  ): Promise<SimulateTxAccessorContract> {
+    return getSimulateTxAccessorContractInstance(
+      config.safeVersion,
+      await this.getViemContractArgs(config)
+    )
   }
 
   async getContractCode(address: string, defaultBlock?: string | number | undefined): Promise<Hex> {

@@ -20,6 +20,8 @@ import CreateCallContract_V1_3_0_Viem from './CreateCall/v1.3.0/CreateCallContra
 import CreateCallContract_V1_4_1_Viem from './CreateCall/v1.4.1/CreateCallContract_V1_4_1_Viem'
 import SignMessageLibContract_V1_4_1_Viem from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Viem'
 import SignMessageLibContract_V1_3_0_Viem from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Viem'
+import SimulateTxAccessorContract_V1_4_1_Viem from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Viem'
+import SimulateTxAccessorContract_V1_3_0_Viem from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Viem'
 
 export function getSafeContractInstance(safeVersion: SafeVersion, args: ViemContractBaseArgs) {
   switch (safeVersion) {
@@ -126,5 +128,19 @@ export function getSignMessageLibContractInstance(
       return new SignMessageLibContract_V1_3_0_Viem(args)
     default:
       throw new Error('Invalid SignMessageLib version')
+  }
+}
+
+export function getSimulateTxAccessorContractInstance(
+  safeVersion: SafeVersion,
+  args: ViemContractBaseArgs
+) {
+  switch (safeVersion) {
+    case '1.4.1':
+      return new SimulateTxAccessorContract_V1_4_1_Viem(args)
+    case '1.3.0':
+      return new SimulateTxAccessorContract_V1_3_0_Viem(args)
+    default:
+      throw new Error('Invalid SimulateTxAccessor version')
   }
 }

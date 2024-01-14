@@ -163,8 +163,8 @@ export class ViemAdapter implements EthAdapter {
     })
   }
 
-  getSignerAddress(): Promise<string | undefined> {
-    throw new Error('Method not implemented.')
+  async getSignerAddress() {
+    return this.client.wallet.account.address
   }
 
   signMessage(message: string): Promise<string> {

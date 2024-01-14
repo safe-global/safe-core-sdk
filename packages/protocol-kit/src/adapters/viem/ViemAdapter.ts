@@ -193,11 +193,21 @@ export class ViemAdapter implements EthAdapter {
       .then(String)
   }
 
-  call(
+  async call(
     transaction: EthAdapterTransaction,
     defaultBlock?: string | number | undefined
   ): Promise<string> {
-    throw new Error('Method not implemented.')
+    return this.client.public
+      .call({
+        to: transaction.to as Address,
+        account: transaction.from as Address,
+        data: transaction.data as Hex,
+        value: transaction.value == null ? undefined : BigInt(transaction.value),
+        gasPrice: transaction.gasPrice == null ? undefined : BigInt(transaction.gasPrice),
+        gas: transaction.gasLimit == null ? undefined : BigInt(transaction.gasLimit),
+        blockNumber: defaultBlock == null ? undefined : BigInt(defaultBlock)
+      })
+      .then((res) => res.data ?? '0x')
   }
 
   encodeParameters(types: string[], values: any[]): string {

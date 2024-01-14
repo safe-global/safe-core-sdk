@@ -1,4 +1,4 @@
-import { Address, BlockTag, getAddress, isAddress } from 'viem'
+import { Address, BlockTag, Hash, getAddress, isAddress } from 'viem'
 import { validateEip3770Address } from '../..'
 import {
   CompatibilityFallbackHandlerContract,
@@ -157,8 +157,10 @@ export class ViemAdapter implements EthAdapter {
     throw new Error('Method not implemented.')
   }
 
-  getTransaction(transactionHash: string): Promise<any> {
-    throw new Error('Method not implemented.')
+  getTransaction(transactionHash: string) {
+    return this.client.public.getTransaction({
+      hash: transactionHash as Hash
+    })
   }
 
   getSignerAddress(): Promise<string | undefined> {

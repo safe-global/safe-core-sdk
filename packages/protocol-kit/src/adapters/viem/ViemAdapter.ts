@@ -1,4 +1,4 @@
-import { Account, Address, BlockTag, PublicClient, getAddress, isAddress } from 'viem'
+import { Address, BlockTag, getAddress, isAddress } from 'viem'
 import { validateEip3770Address } from '../..'
 import {
   CompatibilityFallbackHandlerContract,
@@ -15,7 +15,10 @@ import {
   SignMessageLibContract,
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
-import { getSafeContractInstance } from './contracts/contractInstancesViem'
+import {
+  getSafeContractInstance,
+  getSafeProxyFactoryContractInstance
+} from './contracts/contractInstancesViem'
 import { ClientPair } from './types'
 
 export class ViemAdapter implements EthAdapter {
@@ -92,13 +95,18 @@ export class ViemAdapter implements EthAdapter {
   }: GetContractProps): Promise<CompatibilityFallbackHandlerContract> {
     throw new Error('Method not implemented.')
   }
-  getSafeProxyFactoryContract({
+  async getSafeProxyFactoryContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress,
-    customContractAbi
+    customContractAddress
   }: GetContractProps): Promise<SafeProxyFactoryContract> {
-    throw new Error('Method not implemented.')
+    const chainId = await this.getChainId()
+    const contractAddress =
+      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
+    if (contractAddress == null) {
+      throw new Error('Invalid SafeProxyFactory contract address')
+    }
+    return getSafeProxyFactoryContractInstance(safeVersion, contractAddress as Address, this.client)
   }
 
   getSignMessageLibContract({

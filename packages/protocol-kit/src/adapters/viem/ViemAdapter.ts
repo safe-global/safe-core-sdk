@@ -35,7 +35,8 @@ import {
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
   getCompatibilityFallbackHandlerContractInstance,
-  getMultiSendContractInstance
+  getMultiSendContractInstance,
+  getMultiSendCallOnlyContractInstance
 } from './contracts/contractInstancesViem'
 import { Hex } from 'viem'
 import { KeyedClient } from './types'
@@ -112,13 +113,11 @@ export class ViemAdapter<
     return getMultiSendContractInstance(config.safeVersion, await this.getViemContractArgs(config))
   }
 
-  async getMultiSendCallOnlyContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps): Promise<MultiSendCallOnlyContract> {
-    throw new Error('Method not implemented.')
+  async getMultiSendCallOnlyContract(config: GetContractProps): Promise<MultiSendCallOnlyContract> {
+    return getMultiSendCallOnlyContractInstance(
+      config.safeVersion,
+      await this.getViemContractArgs(config)
+    )
   }
 
   async getCompatibilityFallbackHandlerContract(config: GetContractProps) {

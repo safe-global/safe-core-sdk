@@ -14,6 +14,8 @@ import { ViemContractBaseArgs } from '../ViemContract'
 import MultiSendContract_V1_4_1_Viem from './MultiSend/v1.4.1/MultiSendContract_V1_4_1_ViemContract'
 import MultiSendContract_V1_3_0_Viem from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_ViemContract'
 import MultiSendContract_V1_1_1_Viem from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_ViemContract'
+import MultiSendCallOnlyContract_V1_4_1_Viem from './MultiSendCallOnly/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Viem'
+import MultiSendCallOnlyContract_V1_3_0_Viem from './MultiSendCallOnly/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Viem'
 
 export function getSafeContractInstance(safeVersion: SafeVersion, args: ViemContractBaseArgs) {
   switch (safeVersion) {
@@ -78,5 +80,19 @@ export function getMultiSendContractInstance(safeVersion: SafeVersion, args: Vie
       return new MultiSendContract_V1_1_1_Viem(args)
     default:
       throw new Error('Invalid MultiSend version')
+  }
+}
+
+export function getMultiSendCallOnlyContractInstance(
+  safeVersion: SafeVersion,
+  args: ViemContractBaseArgs
+) {
+  switch (safeVersion) {
+    case '1.4.1':
+      return new MultiSendCallOnlyContract_V1_4_1_Viem(args)
+    case '1.3.0':
+      return new MultiSendCallOnlyContract_V1_3_0_Viem(args)
+    default:
+      throw new Error('Invalid MultiSendCallOnly version')
   }
 }

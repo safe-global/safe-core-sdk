@@ -174,8 +174,13 @@ export class ViemAdapter<
     return this.getContractCode(address, defaultBlock).then((code) => code !== '0x')
   }
 
-  getStorageAt(address: string, position: string): Promise<string> {
-    throw new Error('Method not implemented.')
+  async getStorageAt(address: string, position: string): Promise<Hex> {
+    const content = await this.publicClient.getStorageAt({
+      address: address as Address,
+      slot: position as Hex
+    })
+    const decodedContent = this.decodeParameters(['address'], content ?? '0x')
+    return decodedContent[0]
   }
 
   getTransaction(transactionHash: string) {

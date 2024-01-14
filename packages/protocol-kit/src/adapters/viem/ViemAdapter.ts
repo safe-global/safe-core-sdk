@@ -16,7 +16,7 @@ import {
   parseAbiParameter,
   parseAbiParameters
 } from 'viem'
-import { getMultiSendContract, validateEip3770Address } from '../..'
+import { validateEip3770Address } from '../..'
 import {
   CreateCallContract,
   Eip3770Address,

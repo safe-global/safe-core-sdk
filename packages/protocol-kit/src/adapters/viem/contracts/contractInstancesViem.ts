@@ -55,7 +55,7 @@ export function getSafeProxyFactoryContractInstance(
     case '1.0.0':
       return new SafeProxyFactoryContract_V1_0_0_Viem(args)
     default:
-      throw new Error('Invalid SafeProxyFactory version')
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -71,7 +71,7 @@ export function getCompatibilityFallbackHandlerContractInstance(
     case '1.1.1':
       return new CompatibilityFallbackHandler_V1_3_0_Viem(args)
     default:
-      throw new Error('Invalid CompatibilityFallbackHandler version')
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -83,9 +83,10 @@ export function getMultiSendContractInstance(safeVersion: SafeVersion, args: Vie
       return new MultiSendContract_V1_3_0_Viem(args)
     case '1.2.0':
     case '1.1.1':
+    case '1.0.0':
       return new MultiSendContract_V1_1_1_Viem(args)
     default:
-      throw new Error('Invalid MultiSend version')
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -97,9 +98,12 @@ export function getMultiSendCallOnlyContractInstance(
     case '1.4.1':
       return new MultiSendCallOnlyContract_V1_4_1_Viem(args)
     case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
+    case '1.0.0':
       return new MultiSendCallOnlyContract_V1_3_0_Viem(args)
     default:
-      throw new Error('Invalid MultiSendCallOnly version')
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -111,9 +115,12 @@ export function getCreateCallContractInstance(
     case '1.4.1':
       return new CreateCallContract_V1_4_1_Viem(args)
     case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
+    case '1.0.0':
       return new CreateCallContract_V1_3_0_Viem(args)
     default:
-      throw new Error('Invalid CreateCall version')
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -127,7 +134,7 @@ export function getSignMessageLibContractInstance(
     case '1.3.0':
       return new SignMessageLibContract_V1_3_0_Viem(args)
     default:
-      throw new Error('Invalid SignMessageLib version')
+      throw new Error('Invalid Safe version')
   }
 }
 
@@ -141,6 +148,6 @@ export function getSimulateTxAccessorContractInstance(
     case '1.3.0':
       return new SimulateTxAccessorContract_V1_3_0_Viem(args)
     default:
-      throw new Error('Invalid SimulateTxAccessor version')
+      throw new Error('Invalid Safe version')
   }
 }

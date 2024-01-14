@@ -9,11 +9,12 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import SafeContractViem, { SafeContractViemBaseArgs } from '../SafeContractViem'
+import SafeContractViem from '../SafeContractViem'
 import { Address, Hash } from 'viem'
+import { ViemContractBaseArgs } from '../../../ViemContract'
 
 class SafeContract_V1_4_1_Viem extends SafeContractViem {
-  constructor(args: SafeContractViemBaseArgs) {
+  constructor(args: ViemContractBaseArgs) {
     super({ ...args, abi: Safe__factory.abi })
   }
 
@@ -32,7 +33,8 @@ class SafeContract_V1_4_1_Viem extends SafeContractViem {
       paymentReceiver = ZERO_ADDRESS
     } = setupConfig
 
-    const txHash = await this.contract.write.setup(
+    return this.writeContract(
+      'setup',
       [
         owners as Address[],
         BigInt(threshold),
@@ -43,19 +45,17 @@ class SafeContract_V1_4_1_Viem extends SafeContractViem {
         BigInt(payment),
         paymentReceiver as Address
       ],
-      this.formatViemTransactionOptions(options ?? {})
+      options
     )
-
-    return this.formatTransactionResult(txHash, options)
   }
 
-  async getModules(): Promise<string[]> {
-    const [array] = await this.contract.read.getModulesPaginated([SENTINEL_ADDRESS, 10n])
-    return array as string[]
+  async getModules(): Promise<Address[]> {
+    const [array] = await this.readContract('getModulesPaginated', [SENTINEL_ADDRESS, 10n])
+    return array as Address[]
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.contract.read.isModuleEnabled([moduleAddress as Address])
+    return this.readContract('isModuleEnabled', [moduleAddress as Address])
   }
 }
 

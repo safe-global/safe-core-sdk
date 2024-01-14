@@ -1,6 +1,11 @@
 import { SafeTransactionData } from '@safe-global/safe-core-sdk-types'
 import { Address, Hash } from 'viem'
 
+export function toBigInt(value: string | number | bigint | null | undefined) {
+  if (value == null) return undefined
+  return BigInt(value)
+}
+
 export function formatViemSafeTransactionData(data: SafeTransactionData) {
   return {
     to: data.to as Address,

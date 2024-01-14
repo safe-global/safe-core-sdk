@@ -1,7 +1,14 @@
 import {
+  Account,
   Address,
   BlockTag,
+  Chain,
+  Client,
+  EstimateGasParameters,
   Hash,
+  PublicClient,
+  Transport,
+  WalletClient,
   decodeAbiParameters,
   encodeAbiParameters,
   getAddress,
@@ -29,14 +36,44 @@ import {
   getSafeProxyFactoryContractInstance,
   getCompatibilityFallbackHandlerContractInstance
 } from './contracts/contractInstancesViem'
-import { ClientPair } from './types'
 import { Hex } from 'viem'
+import { KeyedClient } from './types'
+import { ViemContractBaseArgs } from './ViemContract'
+import { toBigInt } from './utils'
 
-export class ViemAdapter implements EthAdapter {
-  constructor(public readonly config: { client: ClientPair }) {}
+export class ViemAdapter<
+  TTransport extends Transport,
+  TChain extends Chain,
+  TAccount extends Account,
+  const TClient extends
+    | Client<TTransport, TChain, TAccount>
+    | KeyedClient<TTransport, TChain, TAccount> = Client<TTransport, TChain, TAccount>
+> implements EthAdapter
+{
+  private readonly _publicClient: PublicClient<TTransport, TChain> | undefined
+  private readonly _walletClient: WalletClient<TTransport, TChain, TAccount> | undefined
 
-  get client() {
-    return this.config.client
+  constructor(public readonly config: { client: TClient }) {
+    const [publicClient, walletClient] = (() => {
+      const { client } = config
+      if ('public' in client && 'wallet' in client) return [client.public, client.wallet]
+      if ('public' in client) return [client.public, undefined]
+      if ('wallet' in client) return [undefined, client.wallet]
+      return [client, client]
+    })()
+
+    this._publicClient = publicClient as PublicClient<TTransport, TChain>
+    this._walletClient = walletClient as WalletClient<TTransport, TChain, TAccount>
+  }
+
+  get publicClient() {
+    if (!this._publicClient) throw new Error('PublicClient is not configured')
+    return this._publicClient
+  }
+
+  get walletClient() {
+    if (!this._walletClient) throw new Error('WalletClient is not configured')
+    return this._walletClient
   }
 
   isAddress = isAddress
@@ -47,37 +84,27 @@ export class ViemAdapter implements EthAdapter {
   }
 
   getBalance(address: Address, defaultBlock?: BlockTag | undefined): Promise<bigint> {
-    return this.client.public.getBalance({
+    return this.publicClient.getBalance({
       address,
       blockTag: defaultBlock
     })
   }
 
   getNonce(address: Address, defaultBlock?: BlockTag | undefined): Promise<number> {
-    return this.client.public.getTransactionCount({
+    return this.publicClient.getTransactionCount({
       address,
       blockTag: defaultBlock
     })
   }
 
   getChainId(): Promise<bigint> {
-    return this.client.public.getChainId().then(BigInt)
+    return this.publicClient.getChainId().then(BigInt)
   }
 
   getChecksummedAddress = getAddress
 
-  async getSafeContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<SafeContract> {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (contractAddress == null) {
-      throw new Error('Invalid SafeProxy contract address')
-    }
-    return getSafeContractInstance(safeVersion, contractAddress as Address, this.client)
+  async getSafeContract(config: GetContractProps): Promise<SafeContract> {
+    return getSafeContractInstance(config.safeVersion, await this.getViemContractArgs(config))
   }
 
   getMultiSendContract({
@@ -98,36 +125,18 @@ export class ViemAdapter implements EthAdapter {
     throw new Error('Method not implemented.')
   }
 
-  async getCompatibilityFallbackHandlerContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress
-  }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (contractAddress == null) {
-      throw new Error('Invalid CompatibilityFallbackHandler contract address')
-    }
+  async getCompatibilityFallbackHandlerContract(config: GetContractProps) {
     return getCompatibilityFallbackHandlerContractInstance(
-      safeVersion,
-      contractAddress as Address,
-      this.client
+      config.safeVersion,
+      await this.getViemContractArgs(config)
     )
   }
 
-  async getSafeProxyFactoryContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<SafeProxyFactoryContract> {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (contractAddress == null) {
-      throw new Error('Invalid SafeProxyFactory contract address')
-    }
-    return getSafeProxyFactoryContractInstance(safeVersion, contractAddress as Address, this.client)
+  async getSafeProxyFactoryContract(config: GetContractProps): Promise<SafeProxyFactoryContract> {
+    return getSafeProxyFactoryContractInstance(
+      config.safeVersion,
+      await this.getViemContractArgs(config)
+    )
   }
 
   getSignMessageLibContract({
@@ -158,7 +167,7 @@ export class ViemAdapter implements EthAdapter {
   }
 
   async getContractCode(address: string, defaultBlock?: string | number | undefined): Promise<Hex> {
-    return this.client.public
+    return this.publicClient
       .getBytecode({
         address: address as Address,
         blockNumber: defaultBlock == null ? undefined : BigInt(defaultBlock)
@@ -178,17 +187,18 @@ export class ViemAdapter implements EthAdapter {
   }
 
   getTransaction(transactionHash: string) {
-    return this.client.public.getTransaction({
+    return this.publicClient.getTransaction({
       hash: transactionHash as Hash
     })
   }
 
   async getSignerAddress() {
-    return this.client.wallet.account.address
+    return this.walletClient.account.address
   }
 
-  signMessage(message: string): Promise<string> {
-    return this.client.wallet.signMessage({
+  signMessage(message: string): Promise<Hash> {
+    return this.walletClient.signMessage({
+      account: this.walletClient.account,
       message: message
     })
   }
@@ -201,15 +211,17 @@ export class ViemAdapter implements EthAdapter {
   }
 
   async estimateGas(transaction: EthAdapterTransaction) {
-    return this.client.public
+    return this.publicClient
       .estimateGas({
-        to: transaction.to as Address,
         account: transaction.from as Address,
+        to: transaction.to as Address,
         data: transaction.data as Hex,
-        value: transaction.value == null ? undefined : BigInt(transaction.value),
-        gasPrice: transaction.gasPrice == null ? undefined : BigInt(transaction.gasPrice),
-        gas: transaction.gasLimit == null ? undefined : BigInt(transaction.gasLimit)
-      })
+        value: toBigInt(transaction.value),
+        gasPrice: toBigInt(transaction.gasPrice),
+        gas: toBigInt(transaction.gasLimit),
+        maxFeePerGas: toBigInt(transaction.maxFeePerGas),
+        maxPriorityFeePerGas: toBigInt(transaction.maxPriorityFeePerGas)
+      } as EstimateGasParameters)
       .then(String)
   }
 
@@ -217,15 +229,15 @@ export class ViemAdapter implements EthAdapter {
     transaction: EthAdapterTransaction,
     defaultBlock?: string | number | undefined
   ): Promise<string> {
-    return this.client.public
+    return this.publicClient
       .call({
         to: transaction.to as Address,
         account: transaction.from as Address,
         data: transaction.data as Hex,
-        value: transaction.value == null ? undefined : BigInt(transaction.value),
-        gasPrice: transaction.gasPrice == null ? undefined : BigInt(transaction.gasPrice),
-        gas: transaction.gasLimit == null ? undefined : BigInt(transaction.gasLimit),
-        blockNumber: defaultBlock == null ? undefined : BigInt(defaultBlock)
+        value: toBigInt(transaction.value),
+        gasPrice: toBigInt(transaction.gasPrice),
+        gas: toBigInt(transaction.gasLimit),
+        blockNumber: toBigInt(defaultBlock)
       })
       .then((res) => res.data ?? '0x')
   }
@@ -236,6 +248,17 @@ export class ViemAdapter implements EthAdapter {
 
   decodeParameters(types: any[], values: string): { [key: string]: any } {
     return decodeAbiParameters(formatAbi(types), values as Hex)
+  }
+
+  private async getViemContractArgs(config: GetContractProps): Promise<ViemContractBaseArgs> {
+    const chainId = await this.getChainId()
+    const address =
+      config.customContractAddress ??
+      config.singletonDeployment?.networkAddresses[chainId.toString()]
+    if (address == null || !isAddress(address)) {
+      throw new Error(`Invalid contract address`)
+    }
+    return { address, client: this.config.client } as ViemContractBaseArgs
   }
 }
 

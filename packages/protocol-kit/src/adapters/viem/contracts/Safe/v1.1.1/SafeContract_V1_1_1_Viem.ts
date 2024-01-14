@@ -5,11 +5,12 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import SafeContractViem, { SafeContractViemBaseArgs } from '../SafeContractViem'
+import SafeContractViem from '../SafeContractViem'
 import { Address, Hash, isAddressEqual } from 'viem'
+import { ViemContractBaseArgs } from '../../../ViemContract'
 
 class SafeContract_V1_1_1_Viem extends SafeContractViem {
-  constructor(args: SafeContractViemBaseArgs) {
+  constructor(args: ViemContractBaseArgs) {
     super({ ...args, abi: Safe__factory.abi })
   }
 
@@ -28,7 +29,8 @@ class SafeContract_V1_1_1_Viem extends SafeContractViem {
       paymentReceiver = ZERO_ADDRESS
     } = setupConfig
 
-    const txHash = await this.contract.write.setup(
+    return this.writeContract(
+      'setup',
       [
         owners as Address[],
         BigInt(threshold),
@@ -39,14 +41,12 @@ class SafeContract_V1_1_1_Viem extends SafeContractViem {
         BigInt(payment),
         paymentReceiver as Address
       ],
-      this.formatViemTransactionOptions(options ?? {})
+      options
     )
-
-    return this.formatTransactionResult(txHash, options)
   }
 
-  async getModules() {
-    return this.contract.read.getModules().then((res) => res as Address[])
+  async getModules(): Promise<Address[]> {
+    return this.readContract('getModules').then((res) => res as Address[])
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {

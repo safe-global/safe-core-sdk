@@ -28,7 +28,8 @@ class SafeContract_V1_2_0_Viem extends SafeContractViem {
       paymentReceiver = ZERO_ADDRESS
     } = setupConfig
 
-    const txHash = await this.contract.write.setup(
+    return this.writeContract(
+      'setup',
       [
         owners as Address[],
         BigInt(threshold),
@@ -39,18 +40,16 @@ class SafeContract_V1_2_0_Viem extends SafeContractViem {
         BigInt(payment),
         paymentReceiver as Address
       ],
-      this.formatViemTransactionOptions(options ?? {})
+      options
     )
-
-    return this.formatTransactionResult(txHash, options)
   }
 
-  async getModules(): Promise<string[]> {
-    return this.contract.read.getModules().then((res) => res as string[])
+  async getModules(): Promise<Address[]> {
+    return this.readContract('getModules').then((res) => res as Address[])
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
-    return this.contract.read.isModuleEnabled([moduleAddress as Address])
+    return this.readContract('isModuleEnabled', [moduleAddress as Address])
   }
 }
 

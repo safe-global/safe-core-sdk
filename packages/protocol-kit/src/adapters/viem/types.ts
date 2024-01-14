@@ -1,6 +1,10 @@
-import { Account, Chain, PublicClient, Transport, WalletClient } from 'viem'
+import { Account, Chain, Client, Transport } from 'viem'
 
-export type ClientPair = {
-  public: PublicClient<Transport, Chain>
-  wallet: WalletClient<Transport, Chain, Account>
-}
+export type KeyedClient<
+  TTransport extends Transport,
+  TChain extends Chain,
+  TAccount extends Account
+> =
+  | { public: Client<TTransport, TChain>; wallet: Client<TTransport, TChain, TAccount> }
+  | { public: Client<TTransport, TChain> }
+  | { wallet: Client<TTransport, TChain, TAccount> }

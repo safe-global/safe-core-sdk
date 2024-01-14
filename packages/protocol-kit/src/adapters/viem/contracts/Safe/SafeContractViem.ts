@@ -12,30 +12,9 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import { ContractTransactionReceipt as EthersTransactionReceipt } from 'ethers'
-import {
-  Account,
-  Address,
-  Chain,
-  GetContractReturnType,
-  Hash,
-  PublicClient,
-  Transport,
-  WalletClient,
-  getContract,
-  encodeFunctionData,
-  Abi,
-  TransactionReceipt as ViemTransactionReceipt
-} from 'viem'
-import { type WriteContractParameters } from 'viem/actions/wallet/writeContract'
-import { type UnionOmit } from 'viem/_types/types/utils'
+import { Address, Hash } from 'viem'
 import { formatViemSafeTransactionData } from '../../utils'
-import { ClientPair } from '../../types'
-
-type ViemTransactionOptions = UnionOmit<
-  WriteContractParameters,
-  'abi' | 'address' | 'args' | 'functionName'
->
+import { ViemContract, ViemContractBaseArgs } from '../../ViemContract'
 
 type SafeAbi =
   | typeof Safe_V1_4_1__factory.abi
@@ -44,22 +23,9 @@ type SafeAbi =
   | typeof Safe_V1_1_1__factory.abi
   | typeof Safe_V1_0_0__factory.abi
 
-export type SafeContractViemBaseArgs = {
-  address: Address
-  client: ClientPair
-}
-
-abstract class SafeContractViem implements SafeContract {
-  public readonly contract: GetContractReturnType<SafeAbi, PublicClient<Transport, Chain>, Address>
-  public readonly client: ClientPair
-
-  constructor(args: SafeContractViemBaseArgs & { abi: SafeAbi }) {
-    this.client = args.client
-    this.contract = getContract({
-      abi: args.abi,
-      address: args.address,
-      client: args.client
-    })
+abstract class SafeContractViem extends ViemContract<SafeAbi> implements SafeContract {
+  constructor(args: ViemContractBaseArgs & { abi: SafeAbi }) {
+    super(args)
   }
 
   abstract setup(
@@ -68,32 +34,28 @@ abstract class SafeContractViem implements SafeContract {
   ): Promise<TransactionResult>
 
   async getVersion(): Promise<SafeVersion> {
-    return this.contract.read.VERSION().then((res) => res as SafeVersion)
-  }
-
-  async getAddress(): Promise<string> {
-    return this.contract.address
+    return this.readContract('VERSION').then((res) => res as SafeVersion)
   }
 
   async getNonce(): Promise<number> {
-    return this.contract.read.nonce().then(Number)
+    return this.readContract('nonce').then(Number)
   }
 
   async getThreshold(): Promise<number> {
-    return this.contract.read.getThreshold().then(Number)
+    return this.readContract('getThreshold').then(Number)
   }
 
-  async getOwners(): Promise<string[]> {
-    return this.contract.read.getOwners().then((res) => res as string[])
+  async getOwners(): Promise<Address[]> {
+    return this.readContract('getOwners').then((res) => res as Address[])
   }
 
-  async isOwner(address: Address): Promise<boolean> {
-    return this.contract.read.isOwner([address])
+  async isOwner(address: string): Promise<boolean> {
+    return this.readContract('isOwner', [address as Address])
   }
 
-  async getTransactionHash(safeTransactionData: SafeTransactionData): Promise<string> {
+  async getTransactionHash(safeTransactionData: SafeTransactionData): Promise<Hash> {
     const data = formatViemSafeTransactionData(safeTransactionData)
-    return this.contract.read.getTransactionHash([
+    return this.readContract('getTransactionHash', [
       data.to,
       data.value,
       data.data,
@@ -107,16 +69,12 @@ abstract class SafeContractViem implements SafeContract {
     ])
   }
 
-  async approvedHashes(ownerAddress: Address, hash: Hash): Promise<bigint> {
-    return this.contract.read.approvedHashes([ownerAddress, hash])
+  async approvedHashes(ownerAddress: string, hash: string): Promise<bigint> {
+    return this.readContract('approvedHashes', [ownerAddress as Address, hash as Hash])
   }
 
-  async approveHash(hash: string, options?: TransactionOptions) {
-    const txHash = await this.contract.write.approveHash(
-      [hash as Hash],
-      this.formatViemTransactionOptions(options ?? {})
-    )
-    return this.formatTransactionResult(txHash, options)
+  async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
+    return this.writeContract('approveHash', [hash as Hash], options)
   }
 
   abstract getModules(): Promise<string[]>
@@ -130,8 +88,11 @@ abstract class SafeContractViem implements SafeContract {
     let isTxValid = false
     try {
       const data = formatViemSafeTransactionData(safeTransaction.data)
-      const { result } = await this.contract.simulate.execTransaction(
-        [
+      const { result } = await this.publicClient.simulateContract({
+        abi: this.abi,
+        address: this.address,
+        functionName: 'execTransaction',
+        args: [
           data.to,
           data.value,
           data.data,
@@ -143,8 +104,8 @@ abstract class SafeContractViem implements SafeContract {
           data.refundReceiver,
           safeTransaction.encodedSignatures() as Hash
         ],
-        this.formatViemTransactionOptions(options ?? {})
-      )
+        ...this.formatViemTransactionOptions(options ?? {})
+      })
       isTxValid = result
     } catch {}
     return isTxValid
@@ -155,8 +116,8 @@ abstract class SafeContractViem implements SafeContract {
     options?: TransactionOptions
   ): Promise<TransactionResult> {
     const data = formatViemSafeTransactionData(safeTransaction.data)
-
-    const txHash = await this.contract.write.execTransaction(
+    return this.writeContract(
+      'execTransaction',
       [
         data.to,
         data.value,
@@ -169,57 +130,8 @@ abstract class SafeContractViem implements SafeContract {
         data.refundReceiver,
         safeTransaction.encodedSignatures() as Hash
       ],
-      this.formatViemTransactionOptions(options ?? {})
+      options
     )
-
-    return this.formatTransactionResult(txHash, options)
-  }
-
-  encode(methodName: string, params: unknown[]) {
-    return encodeFunctionData({
-      abi: this.contract.abi,
-      functionName: methodName as any,
-      args: params as any
-    })
-  }
-
-  async estimateGas(
-    methodName: string,
-    params: any[],
-    options: TransactionOptions
-  ): Promise<string> {
-    return this.client.public
-      .estimateGas({
-        to: this.contract.address,
-        data: this.encode(methodName, params),
-        ...this.formatViemTransactionOptions(options)
-      })
-      .then((r) => String(r))
-  }
-
-  protected formatTransactionResult(hash: Hash, options?: TransactionOptions): TransactionResult {
-    return {
-      hash,
-      options,
-      wait: async (confirmations) =>
-        this.client.public.waitForTransactionReceipt({
-          hash,
-          confirmations
-        })
-    }
-  }
-
-  protected formatViemTransactionOptions(txOptions: TransactionOptions) {
-    return {
-      account: this.client.wallet.account.address,
-      gas: txOptions.gas == null ? undefined : BigInt(txOptions.gas),
-      maxFeePerGas: txOptions.maxFeePerGas == null ? undefined : BigInt(txOptions.maxFeePerGas),
-      maxPriorityFeePerGas:
-        txOptions.maxPriorityFeePerGas == null ? undefined : BigInt(txOptions.maxPriorityFeePerGas),
-      nonce: txOptions.nonce,
-      chain: undefined,
-      value: undefined
-    } satisfies ViemTransactionOptions
   }
 }
 

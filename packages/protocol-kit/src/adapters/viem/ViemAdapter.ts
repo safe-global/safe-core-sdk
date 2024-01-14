@@ -110,43 +110,52 @@ export class ViemAdapter<
   getChecksummedAddress = getAddress
 
   async getSafeContract(config: GetContractProps): Promise<SafeContract> {
-    return getSafeContractInstance(config.safeVersion, await this.getViemContractArgs(config))
+    return getSafeContractInstance(
+      config.safeVersion,
+      await this.getViemContractArgs('Safe', config)
+    )
   }
 
   async getMultiSendContract(config: GetContractProps): Promise<MultiSendContract> {
-    return getMultiSendContractInstance(config.safeVersion, await this.getViemContractArgs(config))
+    return getMultiSendContractInstance(
+      config.safeVersion,
+      await this.getViemContractArgs('MultiSend', config)
+    )
   }
 
   async getMultiSendCallOnlyContract(config: GetContractProps): Promise<MultiSendCallOnlyContract> {
     return getMultiSendCallOnlyContractInstance(
       config.safeVersion,
-      await this.getViemContractArgs(config)
+      await this.getViemContractArgs('MultiSendcallOnly', config)
     )
   }
 
   async getCompatibilityFallbackHandlerContract(config: GetContractProps) {
     return getCompatibilityFallbackHandlerContractInstance(
       config.safeVersion,
-      await this.getViemContractArgs(config)
+      await this.getViemContractArgs('CompatibilityFallbackHandler', config)
     )
   }
 
   async getSafeProxyFactoryContract(config: GetContractProps): Promise<SafeProxyFactoryContract> {
     return getSafeProxyFactoryContractInstance(
       config.safeVersion,
-      await this.getViemContractArgs(config)
+      await this.getViemContractArgs('SafeProxyFactory', config)
     )
   }
 
   async getSignMessageLibContract(config: GetContractProps): Promise<SignMessageLibContract> {
     return getSignMessageLibContractInstance(
       config.safeVersion,
-      await this.getViemContractArgs(config)
+      await this.getViemContractArgs('SignMessageLib', config)
     )
   }
 
   async getCreateCallContract(config: GetContractProps): Promise<CreateCallContract> {
-    return getCreateCallContractInstance(config.safeVersion, await this.getViemContractArgs(config))
+    return getCreateCallContractInstance(
+      config.safeVersion,
+      await this.getViemContractArgs('CreateCall', config)
+    )
   }
 
   async getSimulateTxAccessorContract(
@@ -154,7 +163,7 @@ export class ViemAdapter<
   ): Promise<SimulateTxAccessorContract> {
     return getSimulateTxAccessorContractInstance(
       config.safeVersion,
-      await this.getViemContractArgs(config)
+      await this.getViemContractArgs('SimulateTxAccesssor', config)
     )
   }
 
@@ -257,13 +266,16 @@ export class ViemAdapter<
     return decodeAbiParameters(formatAbi(types), values as Hex)
   }
 
-  private async getViemContractArgs(config: GetContractProps): Promise<ViemContractBaseArgs> {
+  private async getViemContractArgs(
+    contractName: string,
+    config: GetContractProps
+  ): Promise<ViemContractBaseArgs> {
     const chainId = await this.getChainId()
     const address =
       config.customContractAddress ??
       config.singletonDeployment?.networkAddresses[chainId.toString()]
     if (address == null || !isAddress(address)) {
-      throw new Error(`Invalid contract address`)
+      throw new Error(`Invalid ${contractName} contract address`)
     }
     return { address, client: this.config.client } as ViemContractBaseArgs
   }

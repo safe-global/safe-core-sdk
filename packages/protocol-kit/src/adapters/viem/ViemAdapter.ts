@@ -180,11 +180,17 @@ export class ViemAdapter implements EthAdapter {
     throw new Error('Method not implemented.')
   }
 
-  estimateGas(
-    transaction: EthAdapterTransaction,
-    callback?: ((error: Error, gas: number) => void) | undefined
-  ): Promise<string> {
-    throw new Error('Method not implemented.')
+  async estimateGas(transaction: EthAdapterTransaction) {
+    return this.client.public
+      .estimateGas({
+        to: transaction.to as Address,
+        account: transaction.from as Address,
+        data: transaction.data as Hex,
+        value: transaction.value == null ? undefined : BigInt(transaction.value),
+        gasPrice: transaction.gasPrice == null ? undefined : BigInt(transaction.gasPrice),
+        gas: transaction.gasLimit == null ? undefined : BigInt(transaction.gasLimit)
+      })
+      .then(String)
   }
 
   call(

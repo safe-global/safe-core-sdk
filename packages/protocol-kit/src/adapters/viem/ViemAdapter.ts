@@ -37,7 +37,8 @@ import {
   getCompatibilityFallbackHandlerContractInstance,
   getMultiSendContractInstance,
   getMultiSendCallOnlyContractInstance,
-  getCreateCallContractInstance
+  getCreateCallContractInstance,
+  getSignMessageLibContractInstance
 } from './contracts/contractInstancesViem'
 import { Hex } from 'viem'
 import { KeyedClient } from './types'
@@ -135,13 +136,11 @@ export class ViemAdapter<
     )
   }
 
-  getSignMessageLibContract({
-    safeVersion,
-    singletonDeployment,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps): Promise<SignMessageLibContract> {
-    throw new Error('Method not implemented.')
+  async getSignMessageLibContract(config: GetContractProps): Promise<SignMessageLibContract> {
+    return getSignMessageLibContractInstance(
+      config.safeVersion,
+      await this.getViemContractArgs(config)
+    )
   }
 
   async getCreateCallContract(config: GetContractProps): Promise<CreateCallContract> {

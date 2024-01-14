@@ -18,6 +18,8 @@ import MultiSendCallOnlyContract_V1_4_1_Viem from './MultiSendCallOnly/v1.4.1/Mu
 import MultiSendCallOnlyContract_V1_3_0_Viem from './MultiSendCallOnly/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Viem'
 import CreateCallContract_V1_3_0_Viem from './CreateCall/v1.3.0/CreateCallContract_V1_3_0_Viem'
 import CreateCallContract_V1_4_1_Viem from './CreateCall/v1.4.1/CreateCallContract_V1_4_1_Viem'
+import SignMessageLibContract_V1_4_1_Viem from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Viem'
+import SignMessageLibContract_V1_3_0_Viem from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Viem'
 
 export function getSafeContractInstance(safeVersion: SafeVersion, args: ViemContractBaseArgs) {
   switch (safeVersion) {
@@ -110,5 +112,19 @@ export function getCreateCallContractInstance(
       return new CreateCallContract_V1_3_0_Viem(args)
     default:
       throw new Error('Invalid CreateCall version')
+  }
+}
+
+export function getSignMessageLibContractInstance(
+  safeVersion: SafeVersion,
+  args: ViemContractBaseArgs
+) {
+  switch (safeVersion) {
+    case '1.4.1':
+      return new SignMessageLibContract_V1_4_1_Viem(args)
+    case '1.3.0':
+      return new SignMessageLibContract_V1_3_0_Viem(args)
+    default:
+      throw new Error('Invalid SignMessageLib version')
   }
 }

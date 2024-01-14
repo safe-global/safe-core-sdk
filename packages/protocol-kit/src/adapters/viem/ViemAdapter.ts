@@ -1,4 +1,15 @@
-import { Address, BlockTag, Hash, getAddress, isAddress } from 'viem'
+import {
+  AbiParameter,
+  Address,
+  BlockTag,
+  Hash,
+  decodeAbiParameters,
+  encodeAbiParameters,
+  getAddress,
+  isAddress,
+  parseAbiParameter,
+  parseAbiParameters
+} from 'viem'
 import { validateEip3770Address } from '../..'
 import {
   CompatibilityFallbackHandlerContract,
@@ -211,10 +222,15 @@ export class ViemAdapter implements EthAdapter {
   }
 
   encodeParameters(types: string[], values: any[]): string {
-    throw new Error('Method not implemented.')
+    return encodeAbiParameters(formatAbi(types), values)
   }
 
   decodeParameters(types: any[], values: string): { [key: string]: any } {
-    throw new Error('Method not implemented.')
+    return decodeAbiParameters(formatAbi(types), values as Hex)
   }
+}
+
+function formatAbi(types: string[]) {
+  if (types.length === 1) return [parseAbiParameter(types[0])]
+  return parseAbiParameters(types.join(', '))
 }

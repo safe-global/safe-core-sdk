@@ -21,13 +21,9 @@ import { WalletClient } from 'viem'
 dotenv.config()
 
 type Network = 'mainnet' | 'goerli' | 'gnosis' | 'zksync'
-type Client = {
-  public: PublicClient<HttpTransport, Chain>
-  wallet: WalletClient<HttpTransport, Chain, Account>
-}
 
 export async function getEthAdapter(
-  signerOrProvider: AbstractSigner | Provider | Web3 | Client
+  signerOrProvider: AbstractSigner | Provider | Web3
 ): Promise<EthAdapter> {
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
@@ -74,7 +70,7 @@ export async function getEthAdapter(
   return ethAdapter
 }
 
-export function getNetworkProvider(network: Network): Provider | Web3 | Client {
+export function getNetworkProvider(network: Network): Provider | Web3 {
   let rpcUrl: string
   switch (network) {
     case 'zksync':

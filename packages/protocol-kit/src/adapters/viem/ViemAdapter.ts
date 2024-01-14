@@ -16,19 +16,10 @@ import {
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import { getSafeContractInstance } from './contracts/contractInstancesViem'
-import { WalletClient } from 'viem'
-import { Chain } from 'viem'
-import { Transport } from 'viem'
+import { ClientPair } from './types'
 
 export class ViemAdapter implements EthAdapter {
-  constructor(
-    public readonly config: {
-      client: {
-        public: PublicClient<Transport, Chain>
-        wallet: WalletClient<Transport, Chain, Account>
-      }
-    }
-  ) {}
+  constructor(public readonly config: { client: ClientPair }) {}
 
   get client() {
     return this.config.client

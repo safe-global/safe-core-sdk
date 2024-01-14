@@ -30,6 +30,7 @@ import {
 import { type WriteContractParameters } from 'viem/actions/wallet/writeContract'
 import { type UnionOmit } from 'viem/_types/types/utils'
 import { formatViemSafeTransactionData } from '../../utils'
+import { ClientPair } from '../../types'
 
 type ViemTransactionOptions = UnionOmit<
   WriteContractParameters,
@@ -45,18 +46,12 @@ type SafeAbi =
 
 export type SafeContractViemBaseArgs = {
   address: Address
-  client: {
-    public: PublicClient<Transport, Chain>
-    wallet: WalletClient<Transport, Chain, Account>
-  }
+  client: ClientPair
 }
 
 abstract class SafeContractViem implements SafeContract {
   public readonly contract: GetContractReturnType<SafeAbi, PublicClient<Transport, Chain>, Address>
-  public readonly client: {
-    public: PublicClient<Transport, Chain>
-    wallet: WalletClient<Transport, Chain, Account>
-  }
+  public readonly client: ClientPair
 
   constructor(args: SafeContractViemBaseArgs & { abi: SafeAbi }) {
     this.client = args.client

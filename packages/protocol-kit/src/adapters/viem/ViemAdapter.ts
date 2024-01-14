@@ -20,6 +20,7 @@ import {
   getSafeProxyFactoryContractInstance
 } from './contracts/contractInstancesViem'
 import { ClientPair } from './types'
+import { Hex } from 'viem'
 
 export class ViemAdapter implements EthAdapter {
   constructor(public readonly config: { client: ClientPair }) {}
@@ -136,15 +137,20 @@ export class ViemAdapter implements EthAdapter {
     throw new Error('Method not implemented.')
   }
 
-  getContractCode(address: string, defaultBlock?: string | number | undefined): Promise<string> {
-    throw new Error('Method not implemented.')
+  async getContractCode(address: string, defaultBlock?: string | number | undefined): Promise<Hex> {
+    return this.client.public
+      .getBytecode({
+        address: address as Address,
+        blockNumber: defaultBlock == null ? undefined : BigInt(defaultBlock)
+      })
+      .then((res) => res ?? '0x')
   }
 
-  isContractDeployed(
+  async isContractDeployed(
     address: string,
     defaultBlock?: string | number | undefined
   ): Promise<boolean> {
-    throw new Error('Method not implemented.')
+    return this.getContractCode(address, defaultBlock).then((code) => code !== '0x')
   }
 
   getStorageAt(address: string, position: string): Promise<string> {

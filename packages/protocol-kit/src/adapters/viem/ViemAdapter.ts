@@ -168,7 +168,9 @@ export class ViemAdapter implements EthAdapter {
   }
 
   signMessage(message: string): Promise<string> {
-    throw new Error('Method not implemented.')
+    return this.client.wallet.signMessage({
+      message: message
+    })
   }
 
   signTypedData(

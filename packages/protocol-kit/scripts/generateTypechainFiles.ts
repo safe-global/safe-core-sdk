@@ -33,8 +33,9 @@ const safeContracts_V1_3_0 = [
 ].join(' ')
 const safeContracts_V1_2_0 = [`${safeContractsPath}/v1.2.0/gnosis_safe.json`].join(' ')
 const safeContracts_V1_1_1 = [
-  `${safeContractsPath}/v1.1.1/gnosis_safe.json`,
-  `${safeContractsPath}/v1.1.1/proxy_factory.json`
+  // `${safeContractsPath}/v1.1.1/gnosis_safe.json`, // Remove contract 1.1.1 from typechain as it's migrated to Abitype,
+  `${safeContractsPath}/v1.1.1/proxy_factory.json`,
+  `${safeContractsPath}/v1.1.1/multi_send.json`
 ].join(' ')
 const safeContracts_V1_0_0 = [
   `${safeContractsPath}/v1.0.0/gnosis_safe.json`,

@@ -1,7 +1,6 @@
 import Safe from './Safe'
 import {
   CreateCallEthersContract,
-  CreateProxyProps as CreateEthersProxyProps,
   EthersAdapter,
   EthersAdapterConfig,
   EthersTransactionOptions,
@@ -9,7 +8,7 @@ import {
   MultiSendBaseContractEthers,
   MultiSendCallOnlyBaseContractEthers,
   SafeContractEthers,
-  SafeProxyFactoryEthersContract,
+  SafeProxyFactoryBaseContractEthers,
   SignMessageLibBaseContractEthers
 } from './adapters/ethers'
 import {
@@ -90,7 +89,6 @@ export {
   CreateCallEthersContract,
   CreateCallWeb3Contract,
   createERC20TokenTransferTransaction,
-  CreateEthersProxyProps,
   CreateTransactionProps,
   CreateWeb3ProxyProps,
   DEFAULT_SAFE_VERSION,
@@ -116,7 +114,7 @@ export {
   SafeDeploymentConfig,
   SafeFactory,
   SafeFactoryConfig,
-  SafeProxyFactoryEthersContract,
+  SafeProxyFactoryBaseContractEthers,
   SafeProxyFactoryWeb3Contract,
   SafeTransactionOptionalProps,
   SignMessageLibBaseContractEthers,

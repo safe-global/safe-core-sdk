@@ -11,7 +11,6 @@ import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
-import SafeProxyFactoryEthersContract from './contracts/SafeProxyFactory/SafeProxyFactoryEthersContract'
 import SimulateTxAccessorEthersContract from './contracts/SimulateTxAccessor/SimulateTxAccessorEthersContract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -124,7 +123,7 @@ class EthersAdapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SafeProxyFactoryEthersContract> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]

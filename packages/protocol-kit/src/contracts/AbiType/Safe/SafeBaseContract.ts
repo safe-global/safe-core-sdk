@@ -54,7 +54,8 @@ export type SafeContractWriteFunctions<SafeContractAbi extends Abi> = ExtractAbi
  */
 export type EncodeSafeFunction<
   SafeContractAbi extends Abi, // Abi of the Safe Contract,
-  SafeFunction extends ExtractAbiFunctionNames<SafeContractAbi> = ExtractAbiFunctionNames<SafeContractAbi>
+  SafeFunction extends
+    ExtractAbiFunctionNames<SafeContractAbi> = ExtractAbiFunctionNames<SafeContractAbi>
 > = (
   functionToEncode: SafeFunction,
   args: AbiParametersToPrimitiveTypes<
@@ -72,7 +73,8 @@ export type EncodeSafeFunction<
 export type EstimateGasSafeFunction<
   SafeContractAbi extends Abi, // Abi of the Safe Contract,
   TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions,
-  SafeFunction extends ExtractAbiFunctionNames<SafeContractAbi> = ExtractAbiFunctionNames<SafeContractAbi>
+  SafeFunction extends
+    ExtractAbiFunctionNames<SafeContractAbi> = ExtractAbiFunctionNames<SafeContractAbi>
 > = (
   functionToEncode: SafeFunction,
   args: AbiParametersToPrimitiveTypes<

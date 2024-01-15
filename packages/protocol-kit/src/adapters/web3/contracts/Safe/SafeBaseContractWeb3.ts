@@ -2,7 +2,7 @@ import Contract from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import { SafeVersion } from 'packages/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import SafeBaseContract from '@safe-global/protocol-kit/adapters/SafeBaseContract'
 
 /**

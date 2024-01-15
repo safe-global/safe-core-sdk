@@ -10,7 +10,7 @@ import {
   MultiSendContract,
   SafeContract
 } from '@safe-global/safe-core-sdk-types'
-import { SafeVersion } from 'packages/safe-core-sdk-types/dist/src/types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types/dist/src/types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 
 class ContractManager {

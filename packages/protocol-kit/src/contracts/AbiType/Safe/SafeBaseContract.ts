@@ -6,7 +6,7 @@ import {
   ExtractAbiFunction,
   ExtractAbiFunctionNames
 } from 'abitype'
-import { SafeVersion } from 'packages/safe-core-sdk-types/dist/src'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types/dist/src'
 
 // see docs: https://abitype.dev/config
 declare module 'abitype' {

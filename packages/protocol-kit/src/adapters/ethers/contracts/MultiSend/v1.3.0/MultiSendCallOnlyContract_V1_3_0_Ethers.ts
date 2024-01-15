@@ -2,7 +2,7 @@ import MultiSendCallOnlyBaseContractEthers from '@safe-global/protocol-kit/adapt
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import MultiSendCallOnlyContract_v1_3_0_Contract, {
   MultiSendCallOnlyContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
+} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import multiSendCallOnly_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.3.0/multi_send_call_only'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {

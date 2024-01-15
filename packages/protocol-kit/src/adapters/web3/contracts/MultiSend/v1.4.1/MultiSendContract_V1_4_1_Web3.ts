@@ -3,13 +3,13 @@ import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import MultiSendContract_v1_4_1_Contract, {
   MultiSendContract_v1_4_1_Abi as MultiSendContract_v1_4_1_Abi_Readonly
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
+} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/v1.4.1/MultiSendContract_v1_4_1'
 import multiSend_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.4.1/multi_send'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
   EncodeMultiSendFunction,
   GetAddressMultiSendFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendBaseContract'
+} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/MultiSendBaseContract'
 
 // Remove all nested `readonly` modifiers from the ABI type
 type MultiSendContract_v1_4_1_Abi = DeepWriteable<MultiSendContract_v1_4_1_Abi_Readonly>

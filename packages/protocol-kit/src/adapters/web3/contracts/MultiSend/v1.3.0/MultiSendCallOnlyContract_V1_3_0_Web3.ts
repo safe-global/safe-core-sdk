@@ -3,7 +3,7 @@ import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import MultiSendCallOnlyContract_v1_3_0_Contract, {
   MultiSendCallOnlyContract_v1_3_0_Abi as MultiSendCallOnlyContract_v1_3_0_Abi_Readonly
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
+} from '@safe-global/protocol-kit/contracts/AbiType/Multisend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import multiSend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.3.0/multi_send_call_only'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {

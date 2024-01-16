@@ -119,6 +119,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 17000n, shortName: 'holesky' },
   { chainId: 23294n, shortName: 'sapphire' },
   { chainId: 23295n, shortName: 'sapphire-testnet' },
+  { chainId: 34443n, shortName: 'mode' },
   { chainId: 42161n, shortName: 'arb1' },
   { chainId: 42170n, shortName: 'arb-nova' },
   { chainId: 42220n, shortName: 'celo' },

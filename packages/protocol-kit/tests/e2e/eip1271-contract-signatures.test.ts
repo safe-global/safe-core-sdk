@@ -24,27 +24,38 @@ describe('The EIP1271 implementation', () => {
       const fallbackHandlerAddress = contractNetworks[chainId].fallbackHandlerAddress
       const [account1, account2, account3, account4, account5] = accounts
 
-      // Create a 4/4 signer Safe
-      const signerSafe = await getSafeWithOwners(
-        [account2.address, account3.address, account4.address, account5.address],
+      // Create a 1/1 signer Safe
+      const signerSafe1_1 = await getSafeWithOwners(
+        [account3.address],
+        1, // Require 1 signatures
+        fallbackHandlerAddress
+      )
+      const signerSafeAddress1_1 = await signerSafe1_1.getAddress()
+
+      // Create a 2/3 signer Safe
+      const signerSafe2_3 = await getSafeWithOwners(
+        [account4.address, account5.address],
+        2, // Require 2 signatures
+        fallbackHandlerAddress
+      )
+      const signerSafeAddress2_3 = await signerSafe2_3.getAddress()
+
+      // Create a 3/4 Safe with the signer Safe as owner
+      const safe = await getSafeWithOwners(
+        [account1.address, account2.address, signerSafeAddress1_1, signerSafeAddress2_3],
         4, // Require 4 signatures
         fallbackHandlerAddress
       )
-      const signerSafeAddress = await signerSafe.getAddress()
 
-      // Create a 3/3 Safe with the signer Safe as owner
-      const safe = await getSafeWithOwners(
-        [account1.address, account2.address, signerSafeAddress],
-        3, // Require 3 signatures
-        fallbackHandlerAddress
-      )
       const safeAddress = await safe.getAddress()
 
       return {
         safe,
         safeAddress,
-        signerSafe,
-        signerSafeAddress,
+        signerSafe1_1,
+        signerSafeAddress1_1,
+        signerSafe2_3,
+        signerSafeAddress2_3,
         accounts,
         contractNetworks,
         chainId,
@@ -55,7 +66,13 @@ describe('The EIP1271 implementation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should allow to sign and execute transactions',
       async () => {
-        const { safeAddress, accounts, signerSafeAddress, contractNetworks } = await setupTests()
+        const {
+          safeAddress,
+          accounts,
+          signerSafeAddress1_1,
+          signerSafeAddress2_3,
+          contractNetworks
+        } = await setupTests()
 
         // Create adapters and the protocol kit instance
         const [account1, account2, account3, account4, account5] = accounts
@@ -83,50 +100,54 @@ describe('The EIP1271 implementation', () => {
 
         chai.expect(await protocolKit.getNonce()).to.be.eq(0)
 
-        // Produce normal signatures
+        // EOA signatures
         tx = await protocolKit.signTransaction(tx) // Owner 1 signature
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter2 }) // Connect another owner
         tx = await protocolKit.signTransaction(tx) // Owner 2 signature
 
-        // Smart contract signature (Connect owners and sign)
+        // 1/1 Signer Safe signature
         protocolKit = await protocolKit.connect({
-          ethAdapter: ethAdapter2,
-          safeAddress: signerSafeAddress
+          ethAdapter: ethAdapter3,
+          safeAddress: signerSafeAddress1_1
         })
-        let signerSafeTx = await protocolKit.createTransaction({
+        let signerSafeTx1_1 = await protocolKit.createTransaction({
           transactions: [safeTransactionData]
         })
-        signerSafeTx = await protocolKit.signTransaction(
-          signerSafeTx,
+        signerSafeTx1_1 = await protocolKit.signTransaction(
+          signerSafeTx1_1,
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter3 })
-        signerSafeTx = await protocolKit.signTransaction(
-          signerSafeTx,
-          SigningMethod.SAFE_SIGNATURE,
-          safeAddress
+        const signerSafeSig1_1 = await buildContractSignature(
+          Array.from(signerSafeTx1_1.signatures.values()),
+          signerSafeAddress1_1
         )
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter4 })
-        signerSafeTx = await protocolKit.signTransaction(
-          signerSafeTx,
+        tx.addSignature(signerSafeSig1_1)
+
+        // 2/3 Signer Safe signature
+        protocolKit = await protocolKit.connect({
+          ethAdapter: ethAdapter4,
+          safeAddress: signerSafeAddress2_3
+        })
+        let signerSafeTx2_3 = await protocolKit.createTransaction({
+          transactions: [safeTransactionData]
+        })
+        signerSafeTx2_3 = await protocolKit.signTransaction(
+          signerSafeTx2_3,
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
-        signerSafeTx = await protocolKit.signTransaction(
-          signerSafeTx,
+        signerSafeTx2_3 = await protocolKit.signTransaction(
+          signerSafeTx2_3,
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
-
-        const signerSafeSig = await buildContractSignature(
-          Array.from(signerSafeTx.signatures.values()),
-          signerSafeAddress
+        const signerSafeSig2_3 = await buildContractSignature(
+          Array.from(signerSafeTx2_3.signatures.values()),
+          signerSafeAddress2_3
         )
-
-        // Add the signer Safe signature to the original Safe transaction
-        tx.addSignature(signerSafeSig)
+        tx.addSignature(signerSafeSig2_3)
 
         // Connect the original Safe, send some funds and execute the transaction
         await account1.signer.sendTransaction({
@@ -146,8 +167,14 @@ describe('The EIP1271 implementation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should allow to sign and validate typed messages',
       async () => {
-        const { safeAddress, accounts, signerSafeAddress, contractNetworks, chainId } =
-          await setupTests()
+        const {
+          safeAddress,
+          accounts,
+          signerSafeAddress1_1,
+          signerSafeAddress2_3,
+          contractNetworks,
+          chainId
+        } = await setupTests()
 
         const MESSAGE = {
           types: {
@@ -213,49 +240,52 @@ describe('The EIP1271 implementation', () => {
 
         let message = protocolKit.createMessage(MESSAGE)
 
-        // Produce normal signatures
+        // EOA signatures
         message = await protocolKit.signMessage(message) // Owner 1 signature
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter2 }) // Connect another owner
         message = await protocolKit.signMessage(message) // Owner 2 signature
 
-        // Smart contract signature (Connect owners and sign)
+        // 1/1 Signer Safe signature
         protocolKit = await protocolKit.connect({
-          ethAdapter: ethAdapter2,
-          safeAddress: signerSafeAddress
+          ethAdapter: ethAdapter3,
+          safeAddress: signerSafeAddress1_1
         })
-        let signerSafeMessage = protocolKit.createMessage(MESSAGE)
-        signerSafeMessage = await protocolKit.signMessage(
-          signerSafeMessage,
+        let signerSafeMessage1_1 = protocolKit.createMessage(MESSAGE)
+        signerSafeMessage1_1 = await protocolKit.signMessage(
+          signerSafeMessage1_1,
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter3 })
-        signerSafeMessage = await protocolKit.signMessage(
-          signerSafeMessage,
-          SigningMethod.SAFE_SIGNATURE,
-          safeAddress
+        const signerSafeSig1_1 = await buildContractSignature(
+          Array.from(signerSafeMessage1_1.signatures.values()),
+          signerSafeAddress1_1
         )
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter4 })
-        signerSafeMessage = await protocolKit.signMessage(
-          signerSafeMessage,
+        message.addSignature(signerSafeSig1_1)
+
+        // 2/3 Signer Safe signature
+        protocolKit = await protocolKit.connect({
+          ethAdapter: ethAdapter4,
+          safeAddress: signerSafeAddress2_3
+        })
+        let signerSafeMessage2_3 = protocolKit.createMessage(MESSAGE)
+        signerSafeMessage2_3 = await protocolKit.signMessage(
+          signerSafeMessage2_3,
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
-        signerSafeMessage = await protocolKit.signMessage(
-          signerSafeMessage,
+        signerSafeMessage2_3 = await protocolKit.signMessage(
+          signerSafeMessage2_3,
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
-
-        const signerSafeSig = await buildContractSignature(
-          Array.from(signerSafeMessage.signatures.values()),
-          signerSafeAddress
+        const signerSafeSig2_3 = await buildContractSignature(
+          Array.from(signerSafeMessage2_3.signatures.values()),
+          signerSafeAddress2_3
         )
+        message.addSignature(signerSafeSig2_3)
 
-        // Add the signer Safe signature to the original Safe transaction
-        message.addSignature(signerSafeSig)
-
+        // Connect the original Safe
         protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter1, safeAddress })
 
         chai.expect(

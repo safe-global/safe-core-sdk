@@ -25,7 +25,7 @@ class MultiSendContract_v1_1_1_Ethers
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeContract_v1_1_1_Ethers
+   * Constructs an instance of MultiSendContract_v1_1_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
    * @param ethersAdapter - An instance of EthersAdapter.

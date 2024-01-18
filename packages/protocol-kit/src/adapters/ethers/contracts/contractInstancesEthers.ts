@@ -13,7 +13,7 @@ import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol
 import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Safe_proxy_factory__factory'
 import { Sign_message_lib__factory as SignMessageLib_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Sign_message_lib__factory'
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Simulate_tx_accessor__factory'
-import { SafeVersion, SafeTransactionData } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
 import CompatibilityFallbackHandler_V1_4_1_Ethers from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Ethers'
 import CreateCallContract_V1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Ethers'
@@ -67,7 +67,8 @@ export async function getSafeContractInstance(
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeContract_v1_4_1_Abi
       )
-      return mapToTypechainContract(safeContract) // remove this mapper after remove typechain
+      // TODO: Remove this mapper after remove typechain
+      return safeContract.mapToTypechainContract()
     case '1.3.0':
       safeContract = new SafeContract_v1_3_0_Ethers(
         chainId,
@@ -77,7 +78,8 @@ export async function getSafeContractInstance(
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeContract_v1_3_0_Abi
       )
-      return mapToTypechainContract(safeContract) // remove this mapper after remove typechain
+      // TODO: Remove this mapper after remove typechain
+      return safeContract.mapToTypechainContract()
     case '1.2.0':
       safeContract = new SafeContract_v1_2_0_Ethers(
         chainId,
@@ -87,7 +89,8 @@ export async function getSafeContractInstance(
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeContract_v1_2_0_Abi
       )
-      return mapToTypechainContract(safeContract) // remove this mapper after remove typechain
+      // TODO: Remove this mapper after remove typechain
+      return safeContract.mapToTypechainContract()
     case '1.1.1':
       safeContract = new SafeContract_v1_1_1_Ethers(
         chainId,
@@ -291,69 +294,5 @@ export function getSimulateTxAccessorContractInstance(
       return new SimulateTxAccessorContract_V1_3_0_Ethers(simulateTxAccessorContract)
     default:
       throw new Error('Invalid Safe version')
-  }
-}
-
-// TODO: remove this mapper after remove Typechain
-function mapToTypechainContract(
-  abiTypeContract:
-    | SafeContract_v1_2_0_Ethers
-    | SafeContract_v1_3_0_Ethers
-    | SafeContract_v1_4_1_Ethers
-): any {
-  return {
-    contract: abiTypeContract.contract as any,
-
-    setup: (): any => {
-      // setup function is not present in the v1.3.0 contract
-      return
-    },
-
-    approveHash: abiTypeContract.approveHash,
-
-    isValidTransaction: abiTypeContract.isValidTransaction,
-
-    execTransaction: abiTypeContract.execTransaction,
-
-    getAddress: abiTypeContract.getAddress,
-
-    getModules: abiTypeContract.getModules,
-
-    isModuleEnabled: async (moduleAddress: string) =>
-      (await abiTypeContract.isModuleEnabled([moduleAddress]))[0],
-
-    getVersion: async () => (await abiTypeContract.VERSION())[0] as SafeVersion,
-
-    getNonce: async () => Number((await abiTypeContract.nonce())[0]),
-
-    getThreshold: async () => Number((await abiTypeContract.getThreshold())[0]),
-
-    getOwners: async () => (await abiTypeContract.getOwners())[0],
-
-    isOwner: async (address: string) => (await abiTypeContract.isOwner([address]))[0],
-
-    getTransactionHash: async (safeTransactionData: SafeTransactionData) => {
-      return (
-        await abiTypeContract.getTransactionHash([
-          safeTransactionData.to,
-          BigInt(safeTransactionData.value),
-          safeTransactionData.data,
-          safeTransactionData.operation,
-          BigInt(safeTransactionData.safeTxGas),
-          BigInt(safeTransactionData.baseGas),
-          BigInt(safeTransactionData.gasPrice),
-          safeTransactionData.gasToken,
-          safeTransactionData.refundReceiver,
-          BigInt(safeTransactionData.nonce)
-        ])
-      )[0]
-    },
-
-    approvedHashes: async (ownerAddress: string, hash: string) =>
-      (await abiTypeContract.approvedHashes([ownerAddress, hash]))[0],
-
-    encode: abiTypeContract.encode as any,
-
-    estimateGas: abiTypeContract.estimateGas as any
   }
 }

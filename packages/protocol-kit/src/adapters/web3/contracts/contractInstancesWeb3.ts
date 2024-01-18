@@ -1,15 +1,16 @@
 import { AbiItem } from 'web3-utils'
 import SafeContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Web3'
+import SafeContract_v1_2_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Web3'
 import SafeContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Web3'
 import SafeContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Web3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
+import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
 import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
 import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
 import { Gnosis_safe as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
 import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Proxy_factory'
 import { Proxy_factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Proxy_factory'
-import { Gnosis_safe as SafeSingleton_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.2.0/Gnosis_safe'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Create_call'
 import { Proxy_factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Proxy_factory'
@@ -31,7 +32,6 @@ import MultiSendContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendContract_
 import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
 import MultiSendCallOnlyContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
 import SafeContract_V1_0_0_Web3 from './Safe/v1.0.0/SafeContract_V1_0_0_Web3'
-import SafeContract_V1_2_0_Web3 from './Safe/v1.2.0/SafeContract_V1_2_0_Web3'
 import SafeProxyFactoryContract_V1_0_0_Web3 from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_V1_0_0_Web3'
 import SafeProxyFactoryContract_V1_1_1_Web3 from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_V1_1_1_Web3'
 import SafeProxyFactoryContract_V1_3_0_Web3 from './SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_V1_3_0_Web3'
@@ -57,12 +57,12 @@ type MultiSendCallOnlyContract_v1_4_1_Abi =
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
-  safeSingletonContract: SafeSingleton_V1_2_0 | SafeSingleton_V1_0_0,
+  safeSingletonContract: SafeSingleton_V1_0_0,
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined,
   isL1SafeSingleton?: boolean
-): Promise<SafeContract_V1_2_0_Web3 | SafeContract_V1_0_0_Web3> {
+): Promise<SafeContract_V1_0_0_Web3> {
   const chainId = await web3Adapter.getChainId()
   let safeContract
   switch (safeVersion) {
@@ -89,7 +89,16 @@ export async function getSafeContractInstance(
       // TODO: Remove this mapper after remove typechain
       return safeContract.mapToTypechainContract()
     case '1.2.0':
-      return new SafeContract_V1_2_0_Web3(safeSingletonContract as SafeSingleton_V1_2_0)
+      safeContract = new SafeContract_v1_2_0_Web3(
+        chainId,
+        web3Adapter,
+        isL1SafeSingleton,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeContract_v1_2_0_Abi
+      )
+      // TODO: Remove this mapper after remove typechain
+      return safeContract.mapToTypechainContract()
     case '1.1.1':
       safeContract = new SafeContract_v1_1_1_Web3(
         chainId,

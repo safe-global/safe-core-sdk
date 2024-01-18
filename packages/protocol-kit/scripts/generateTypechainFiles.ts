@@ -31,7 +31,6 @@ const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/create_call.json`,
   `${safeContractsPath}/v1.3.0/simulate_tx_accessor.json`
 ].join(' ')
-const safeContracts_V1_2_0 = [`${safeContractsPath}/v1.2.0/gnosis_safe.json`].join(' ')
 const safeContracts_V1_1_1 = [
   // `${safeContractsPath}/v1.1.1/gnosis_safe.json`, // Remove contract 1.1.1 from typechain as it's migrated to Abitype,
   `${safeContractsPath}/v1.1.1/proxy_factory.json`
@@ -93,6 +92,7 @@ function moveTypechainFiles(inDir: string, outDir: string): void {
   })
 }
 
+// Contract 1.2.0 is migrated to Abitype already, so it's not included in here
 function generateTypes(typechainTarget: string) {
   // Src
   generateTypechainFiles(
@@ -104,14 +104,6 @@ function generateTypes(typechainTarget: string) {
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.3.0`,
     safeContracts_V1_3_0
-  )
-  generateTypechainFiles(
-    typechainTarget,
-    `${outDirSrc}${typechainTarget}/v1.2.0`,
-    // removed Safe Contract v1.2.0 for ethers-v6
-    typechainTarget === 'ethers-v6'
-      ? safeContracts_V1_2_0.replace(`${safeContractsPath}/v1.2.0/gnosis_safe.json `, '')
-      : safeContracts_V1_2_0
   )
   generateTypechainFiles(
     typechainTarget,
@@ -130,10 +122,6 @@ function generateTypes(typechainTarget: string) {
   moveTypechainFiles(
     `${typeChainDirectorySrcPath}${typechainTarget}/v1.3.0`,
     `${typeChainDirectoryBuildPath}${typechainTarget}/v1.3.0`
-  )
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${typechainTarget}/v1.2.0`,
-    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.2.0`
   )
   moveTypechainFiles(
     `${typeChainDirectorySrcPath}${typechainTarget}/v1.1.1`,

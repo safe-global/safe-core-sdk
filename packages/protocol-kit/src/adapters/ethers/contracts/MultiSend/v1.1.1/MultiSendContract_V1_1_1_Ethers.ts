@@ -13,10 +13,10 @@ import {
 /**
  * MultiSendContract_v1_1_1_Ethers is the implementation specific to the MultiSend contract version 1.1.1.
  *
- * This class specializes in handling interactions with the Safe contract version 1.1.1 using Ethers.js v6.
+ * This class specializes in handling interactions with the MultiSend contract version 1.1.1 using Ethers.js v6.
  *
- * @extends MultiSendBaseContractEthers<MultiSendContract_v1_1_1_Abi> - Inherits from SafeBaseContractEthers with ABI specific to Safe contract version 1.1.1.
- * @implements SafeContract_v1_1_1_Contract - Implements the interface specific to Safe contract version 1.1.1.
+ * @extends MultiSendBaseContractEthers<MultiSendContract_v1_1_1_Abi> - Inherits from MultiSendBaseContractEthers with ABI specific to Safe contract version 1.1.1.
+ * @implements MultiSendContract_v1_1_1_Contract - Implements the interface specific to Safe contract version 1.1.1.
  */
 class MultiSendContract_v1_1_1_Ethers
   extends MultiSendBaseContractEthers<MultiSendContract_v1_1_1_Abi>

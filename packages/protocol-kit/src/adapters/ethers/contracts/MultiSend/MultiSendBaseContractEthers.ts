@@ -5,7 +5,7 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import MultiSendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendBaseContract'
 
 /**
- * Abstract class SafeBaseContractEthers extends MultiSendBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class MultiSendBaseContractEthers extends MultiSendBaseContract to specifically integrate with the Ethers.js v6 library.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
  * This abstract class sets up the Ethers v6 Contract object that interacts with a MultiSend contract version.
@@ -27,7 +27,7 @@ abstract class MultiSendBaseContractEthers<
 
   /**
    * @constructor
-   * Constructs an instance of SafeBaseContractEthers.
+   * Constructs an instance of MultiSendBaseContractEthers.
    *
    * @param chainId - The chain ID of the contract.
    * @param ethersAdapter - An instance of EthersAdapter.

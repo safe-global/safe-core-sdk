@@ -6,7 +6,7 @@ import MultiSendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendB
 
 /**
  * Abstract class MultiSendBaseContractEthers extends MultiSendBaseContract to specifically integrate with the Ethers.js v6 library.
- * It is designed to be instantiated for different versions of the Safe contract.
+ * It is designed to be instantiated for different versions of the MultiSend contract.
  *
  * This abstract class sets up the Ethers v6 Contract object that interacts with a MultiSend contract version.
  *

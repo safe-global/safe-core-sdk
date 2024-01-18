@@ -13,7 +13,7 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
  * @template MultiSendFunction - The function to encode, derived from the ABI.
  */
 export type EncodeMultiSendFunction<
-  MultiSendContractAbi extends Abi, // Abi of the Safe Contract,
+  MultiSendContractAbi extends Abi, // Abi of the MultiSend Contract,
   MultiSendFunction extends
     ExtractAbiFunctionNames<MultiSendContractAbi> = ExtractAbiFunctionNames<MultiSendContractAbi>
 > = (

@@ -6,8 +6,8 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import MultiSendCallOnlyBaseContract from '@safe-global/protocol-kit/adapters/MultiSendCallOnlyBaseContract'
 
 /**
- * Abstract class SafeBaseContractWeb3 extends MultiSendCallOnlyBaseContract to specifically integrate with the Web3.js v6 library.
- * It is designed to be instantiated for different versions of the Safe contract.
+ * Abstract class MultiSendBaseContractWeb3 extends MultiSendCallOnlyBaseContract to specifically integrate with the Web3.js v6 library.
+ * It is designed to be instantiated for different versions of the MultiSendCallOnly contract.
  *
  * This abstract class sets up the Web3 v6 Contract object that interacts with a MultiSendCallOnly contract version.
  *
@@ -28,7 +28,7 @@ abstract class MultiSendCallOnlyBaseContractWeb3<
 
   /**
    * @constructor
-   * Constructs an instance of SafeBaseContractWeb3.
+   * Constructs an instance of MultiSendCallOnlyBaseContractWeb3.
    *
    * @param chainId - The chain ID of the contract.
    * @param web3Adapter - An instance of Web3Adapter.

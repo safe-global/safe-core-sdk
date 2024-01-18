@@ -13,7 +13,7 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
  * @template MultiSendCallOnlyFunction - The function to encode, derived from the ABI.
  */
 export type EncodeMultiSendCallOnlyFunction<
-  MultiSendCallOnlyContractAbi extends Abi, // Abi of the Safe Contract,
+  MultiSendCallOnlyContractAbi extends Abi, // Abi of the MultiSendCallOnly Contract,
   MultiSendCallOnlyFunction extends
     ExtractAbiFunctionNames<MultiSendCallOnlyContractAbi> = ExtractAbiFunctionNames<MultiSendCallOnlyContractAbi>
 > = (

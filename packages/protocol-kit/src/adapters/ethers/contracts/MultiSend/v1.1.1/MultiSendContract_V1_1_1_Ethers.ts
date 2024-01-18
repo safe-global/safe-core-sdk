@@ -15,8 +15,8 @@ import {
  *
  * This class specializes in handling interactions with the MultiSend contract version 1.1.1 using Ethers.js v6.
  *
- * @extends MultiSendBaseContractEthers<MultiSendContract_v1_1_1_Abi> - Inherits from MultiSendBaseContractEthers with ABI specific to Safe contract version 1.1.1.
- * @implements MultiSendContract_v1_1_1_Contract - Implements the interface specific to Safe contract version 1.1.1.
+ * @extends MultiSendBaseContractEthers<MultiSendContract_v1_1_1_Abi> - Inherits from MultiSendBaseContractEthers with ABI specific to MultiSend contract version 1.1.1.
+ * @implements MultiSendContract_v1_1_1_Contract - Implements the interface specific to MultiSend contract version 1.1.1.
  */
 class MultiSendContract_v1_1_1_Ethers
   extends MultiSendBaseContractEthers<MultiSendContract_v1_1_1_Abi>
@@ -29,8 +29,7 @@ class MultiSendContract_v1_1_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
    * @param ethersAdapter - An instance of EthersAdapter.
-   * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
-   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.1.1 is used.
    */
   constructor(

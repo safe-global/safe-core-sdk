@@ -15,12 +15,12 @@ import {
 type MultiSendContract_v1_3_0_Abi = DeepWriteable<MultiSendContract_v1_3_0_Abi_Readonly>
 
 /**
- * MultiSendContract_v1_3_0_Web3 is the implementation specific to the Safe contract version 1.3.0.
+ * MultiSendContract_v1_3_0_Web3 is the implementation specific to the MultiSend contract version 1.3.0.
  *
- * This class specializes in handling interactions with the Safe contract version 1.3.0 using Web3.js v6.
+ * This class specializes in handling interactions with the MultiSend contract version 1.3.0 using Web3.js v6.
  *
- * @extends MultiSendBaseContractWeb3<MultiSendContract_v1_3_0_Abi> - Inherits from SafeBaseContractWeb3 with ABI specific to Safe contract version 1.3.0.
- * @implements SafeContract_v1_3_0_Contract - Implements the interface specific to Safe contract version 1.3.0.
+ * @extends MultiSendBaseContractWeb3<MultiSendContract_v1_3_0_Abi> - Inherits from MultiSendBaseContractWeb3 with ABI specific to MultiSend contract version 1.3.0.
+ * @implements MultiSendContract_v1_3_0_Contract - Implements the interface specific to MultiSend contract version 1.3.0.
  */
 class MultiSendContract_v1_3_0_Web3
   extends MultiSendBaseContractWeb3<MultiSendContract_v1_3_0_Abi>
@@ -29,12 +29,11 @@ class MultiSendContract_v1_3_0_Web3
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeContract_v1_3_0_Web3
+   * Constructs an instance of MultiSendContract_v1_3_0_Web3
    *
    * @param chainId - The chain ID where the contract resides.
    * @param web3Adapter - An instance of Web3Adapter.
-   * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
-   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
    */
   constructor(

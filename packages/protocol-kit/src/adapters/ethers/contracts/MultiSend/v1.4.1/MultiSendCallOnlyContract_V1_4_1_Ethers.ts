@@ -11,12 +11,12 @@ import {
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendCallOnlyBaseContract'
 
 /**
- * MultiSendCallOnlyContract_v1_4_1_Ethers is the implementation specific to the Safe contract version 1.4.1.
+ * MultiSendCallOnlyContract_v1_4_1_Ethers is the implementation specific to the MultiSend contract version 1.4.1.
  *
- * This class specializes in handling interactions with the Safe contract version 1.4.1 using Ethers.js v6.
+ * This class specializes in handling interactions with the MultiSendCallOnly contract version 1.4.1 using Ethers.js v6.
  *
- * @extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi> - Inherits from SafeBaseContractEthers with ABI specific to Safe contract version 1.4.1.
- * @implements SafeContract_v1_4_1_Contract - Implements the interface specific to Safe contract version 1.4.1.
+ * @extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi> - Inherits from MultiSendBaseContractEthers with ABI specific to MultiSendCallOnly contract version 1.4.1.
+ * @implements MultiSendCallOnlyContract_v1_4_1_Contract - Implements the interface specific to MultiSendCallOnly contract version 1.4.1.
  */
 class MultiSendCallOnlyContract_v1_4_1_Ethers
   extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi>
@@ -25,12 +25,11 @@ class MultiSendCallOnlyContract_v1_4_1_Ethers
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeContract_v1_4_1_Ethers
+   * Constructs an instance of MultiSendCallOnlyContract_v1_4_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
    * @param ethersAdapter - An instance of EthersAdapter.
-   * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
-   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSendCallOnly deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.4.1 is used.
    */
   constructor(

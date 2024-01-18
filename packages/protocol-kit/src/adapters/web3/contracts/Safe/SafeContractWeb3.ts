@@ -4,7 +4,6 @@ import {
 } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import { Gnosis_safe as Safe_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
-import { Gnosis_safe as Safe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.2.0/Gnosis_safe'
 import {
   SafeContract,
   SafeSetupConfig,
@@ -14,7 +13,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 abstract class SafeContractWeb3 implements SafeContract {
-  constructor(public contract: Safe_V1_2_0 | Safe_V1_0_0) {}
+  constructor(public contract: Safe_V1_0_0) {}
 
   abstract setup(
     setupConfig: SafeSetupConfig,

@@ -116,10 +116,11 @@ class SafeContract_v1_3_0_Web3
     return [await this.contract.methods.getChainId().call()]
   }
 
-  getModulesPaginated(
+  async getModulesPaginated(
     args: readonly [start: string, pageSize: bigint]
   ): Promise<[modules: string[], next: string]> {
-    return this.contract.methods.getModulesPaginated(...args).call()
+    const res = await this.contract.methods.getModulesPaginated(...args).call()
+    return [res.array, res.next]
   }
 
   async getOwners(): Promise<readonly [string[]]> {
@@ -182,10 +183,9 @@ class SafeContract_v1_3_0_Web3
   }
 
   // Custom method (not defined in the Safe Contract)
-  // TODO: review this custom method
   async getModules(): Promise<string[]> {
-    const { array } = await this.contract.methods.getModulesPaginated(SENTINEL_ADDRESS, 10).call()
-    return array
+    const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
+    return modules
   }
 
   // Custom method (not defined in the Safe Contract)
@@ -296,22 +296,22 @@ class SafeContract_v1_3_0_Web3
   // TODO: Remove this mapper after remove Typechain
   mapToTypechainContract(): any {
     return {
-      contract: this.contract as any,
+      contract: this.contract,
 
       setup: (): any => {
         // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_3_0_Contract
         return
       },
 
-      approveHash: this.approveHash,
+      approveHash: this.approveHash.bind(this),
 
-      isValidTransaction: this.isValidTransaction,
+      isValidTransaction: this.isValidTransaction.bind(this),
 
-      execTransaction: this.execTransaction,
+      execTransaction: this.execTransaction.bind(this),
 
-      getAddress: this.getAddress,
+      getAddress: this.getAddress.bind(this),
 
-      getModules: this.getModules,
+      getModules: this.getModules.bind(this),
 
       isModuleEnabled: async (moduleAddress: string) =>
         (await this.isModuleEnabled([moduleAddress]))[0],
@@ -346,9 +346,9 @@ class SafeContract_v1_3_0_Web3
       approvedHashes: async (ownerAddress: string, hash: string) =>
         (await this.approvedHashes([ownerAddress, hash]))[0],
 
-      encode: this.encode as any,
+      encode: this.encode.bind(this),
 
-      estimateGas: this.estimateGas as any
+      estimateGas: this.estimateGas.bind(this)
     }
   }
 }

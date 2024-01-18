@@ -11,7 +11,7 @@ import {
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendBaseContract'
 
 /**
- * MultiSendContract_v1_1_1_Ethers is the implementation specific to the Safe contract version 1.1.1.
+ * MultiSendContract_v1_1_1_Ethers is the implementation specific to the MultiSend contract version 1.1.1.
  *
  * This class specializes in handling interactions with the Safe contract version 1.1.1 using Ethers.js v6.
  *

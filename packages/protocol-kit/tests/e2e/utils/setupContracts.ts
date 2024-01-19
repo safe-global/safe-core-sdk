@@ -15,7 +15,6 @@ import {
   Gnosis_safe as Safe_V1_0_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0'
 import {
-  Multi_send as MultiSend_V1_1_1,
   Proxy_factory as SafeProxyFactory_V1_1_1,
   Gnosis_safe as Safe_V1_1_1
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1'
@@ -23,8 +22,6 @@ import { Gnosis_safe as Safe_V1_2_0 } from '@safe-global/protocol-kit/typechain/
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0,
   Create_call as CreateCall_V1_3_0,
-  Multi_send_call_only as MultiSendCallOnly_V1_3_0,
-  Multi_send as MultiSend_V1_3_0,
   Proxy_factory as SafeProxyFactory_V1_3_0,
   Gnosis_safe as Safe_V1_3_0,
   Sign_message_lib as SignMessageLib_V1_3_0,
@@ -33,13 +30,16 @@ import {
 import {
   Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1,
   Create_call as CreateCall_V1_4_1,
-  Multi_send_call_only as MultiSendCallOnly_V1_4_1,
-  Multi_send as MultiSend_V1_4_1,
   Safe_proxy_factory as SafeProxyFactory_V1_4_1,
   Safe as Safe_V1_4_1,
   Sign_message_lib as SignMessageLib_V1_4_1,
   Simulate_tx_accessor as SimulateTxAccessor_V1_4_1
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1'
+import MultiSend_V1_1_1 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
+import MultiSend_V1_3_0 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
+import MultiSend_V1_4_1 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
+import MultiSendCallOnly_V1_3_0 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
+import MultiSendCallOnly_V1_4_1 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
 import {
   DailyLimitModule,
   ERC20Mintable,
@@ -167,7 +167,7 @@ export const getMultiSend = async (): Promise<{
   const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
   const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)
   return {
-    contract: MultiSend.attach(MultiSendDeployment.address) as
+    contract: MultiSend.attach(MultiSendDeployment.address) as unknown as
       | MultiSend_V1_4_1
       | MultiSend_V1_3_0
       | MultiSend_V1_1_1,
@@ -182,7 +182,7 @@ export const getMultiSendCallOnly = async (): Promise<{
   const MultiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
   const MultiSendCallOnly = await ethers.getContractFactory(multiSendCallOnlyDeployed.name)
   return {
-    contract: MultiSendCallOnly.attach(MultiSendCallOnlyDeployment.address) as
+    contract: MultiSendCallOnly.attach(MultiSendCallOnlyDeployment.address) as unknown as
       | MultiSendCallOnly_V1_4_1
       | MultiSendCallOnly_V1_3_0,
     abi: MultiSendCallOnlyDeployment.abi

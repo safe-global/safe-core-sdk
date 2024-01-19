@@ -18,8 +18,6 @@ const safeContractsPath = '../../node_modules/@safe-global/safe-deployments/dist
 const safeContracts_V1_4_1 = [
   // `${safeContractsPath}/v1.4.1/safe.json`, // Remove contract 1.4.1 from typechain as it's migrated to Abitype
   `${safeContractsPath}/v1.4.1/safe_proxy_factory.json`,
-  `${safeContractsPath}/v1.4.1/multi_send.json`,
-  `${safeContractsPath}/v1.4.1/multi_send_call_only.json`,
   `${safeContractsPath}/v1.4.1/compatibility_fallback_handler.json`,
   `${safeContractsPath}/v1.4.1/sign_message_lib.json`,
   `${safeContractsPath}/v1.4.1/create_call.json`,
@@ -28,8 +26,6 @@ const safeContracts_V1_4_1 = [
 const safeContracts_V1_3_0 = [
   // `${safeContractsPath}/v1.3.0/gnosis_safe.json`, // Remove contract 1.3.0 from typechain as it's migrated to Abitype
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
-  `${safeContractsPath}/v1.3.0/multi_send.json`,
-  `${safeContractsPath}/v1.3.0/multi_send_call_only.json`,
   `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`,
   `${safeContractsPath}/v1.3.0/sign_message_lib.json`,
   `${safeContractsPath}/v1.3.0/create_call.json`,
@@ -37,8 +33,7 @@ const safeContracts_V1_3_0 = [
 ].join(' ')
 const safeContracts_V1_1_1 = [
   // `${safeContractsPath}/v1.1.1/gnosis_safe.json`, // Remove contract 1.1.1 from typechain as it's migrated to Abitype,
-  `${safeContractsPath}/v1.1.1/proxy_factory.json`,
-  `${safeContractsPath}/v1.1.1/multi_send.json`
+  `${safeContractsPath}/v1.1.1/proxy_factory.json`
 ].join(' ')
 const safeContracts_V1_0_0 = [
   `${safeContractsPath}/v1.0.0/gnosis_safe.json`,

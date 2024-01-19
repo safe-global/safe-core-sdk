@@ -3,7 +3,7 @@ import {
   safeDeploymentsL1ChainIds,
   getContractDeployment
 } from '@safe-global/protocol-kit/contracts/config'
-import { SafeVersion } from 'packages/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 /**
  * Abstract class SafeBaseContract serves as a base for creating a Safe contract for a specific adapter (Ethers.js, Web3.js, or viem.js)

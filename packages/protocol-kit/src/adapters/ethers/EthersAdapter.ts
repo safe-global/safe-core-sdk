@@ -9,8 +9,6 @@ import {
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
-import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
-import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import SafeProxyFactoryEthersContract from './contracts/SafeProxyFactory/SafeProxyFactoryEthersContract'
 import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
@@ -26,6 +24,11 @@ import {
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
 import { isTypedDataSigner, isSignerCompatible } from './utils'
+import MultiSendCallOnlyContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Ethers'
+import MultiSendCallOnlyContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Ethers'
+import MultiSendContract_v1_1_1_Ethers from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
+import MultiSendContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
+import MultiSendContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
 
 type Ethers = typeof ethers
 
@@ -134,31 +137,43 @@ class EthersAdapter implements EthAdapter {
   async getMultiSendContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<MultiSendEthersContract> {
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<
+    | MultiSendContract_v1_4_1_Ethers
+    | MultiSendContract_v1_3_0_Ethers
+    | MultiSendContract_v1_1_1_Ethers
+  > {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
-    return getMultiSendContractInstance(safeVersion, contractAddress, signerOrProvider)
+
+    return getMultiSendContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getMultiSendCallOnlyContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<MultiSendCallOnlyEthersContract> {
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<
+    MultiSendCallOnlyContract_v1_4_1_Ethers | MultiSendCallOnlyContract_v1_3_0_Ethers
+  > {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSendCallOnly contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
-    return getMultiSendCallOnlyContractInstance(safeVersion, contractAddress, signerOrProvider)
+    return getMultiSendCallOnlyContractInstance(
+      safeVersion,
+      contractAddress,
+      this,
+      customContractAbi
+    )
   }
 
   async getCompatibilityFallbackHandlerContract({

@@ -1,7 +1,7 @@
 import EthersAdapter, { EthersAdapterConfig } from './EthersAdapter'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
-import MultiSendEthersContract from './contracts/MultiSend/MultiSendEthersContract'
-import MultiSendCallOnlyEthersContract from './contracts/MultiSendCallOnly/MultiSendCallOnlyEthersContract'
+import MultiSendBaseContractEthers from './contracts/MultiSend/MultiSendBaseContractEthers'
+import MultiSendCallOnlyBaseContractEthers from './contracts/MultiSend/MultiSendCallOnlyBaseContractEthers'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import SafeProxyFactoryEthersContract, {
   CreateProxyProps
@@ -16,8 +16,8 @@ export {
   EthersAdapterConfig,
   EthersTransactionOptions,
   EthersTransactionResult,
-  MultiSendCallOnlyEthersContract,
-  MultiSendEthersContract,
+  MultiSendCallOnlyBaseContractEthers,
+  MultiSendBaseContractEthers,
   SafeContractEthers,
   SafeProxyFactoryEthersContract,
   SignMessageLibEthersContract

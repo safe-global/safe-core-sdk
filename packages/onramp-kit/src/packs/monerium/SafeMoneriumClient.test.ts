@@ -1,6 +1,6 @@
 import { hashMessage } from 'ethers'
 import { PaymentStandard } from '@monerium/sdk'
-import Safe, * as protocolKit from '@safe-global/protocol-kit'
+import Safe, * as protocolKitPackage from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit'
 
@@ -35,21 +35,21 @@ jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/api-kit')
 
 describe('SafeMoneriumClient', () => {
-  const safeSdk = new Safe()
+  const protocolKit = new Safe()
   let safeMoneriumClient: SafeMoneriumClient
 
   beforeEach(() => {
     jest.clearAllMocks()
-    safeSdk.getChainId = jest.fn().mockResolvedValue(5)
-    safeSdk.getEthAdapter = jest.fn().mockReturnValue({
+    protocolKit.getChainId = jest.fn().mockResolvedValue(5)
+    protocolKit.getEthAdapter = jest.fn().mockReturnValue({
       call: jest.fn().mockImplementation(async () => MAGIC_VALUE),
       getSignerAddress: jest.fn().mockResolvedValue('0xSignerAddress')
     })
 
-    safeSdk.getEthAdapter.call = jest.fn().mockImplementation(async () => MAGIC_VALUE)
+    protocolKit.getEthAdapter.call = jest.fn().mockImplementation(async () => MAGIC_VALUE)
     safeMoneriumClient = new SafeMoneriumClient(
       { environment: 'sandbox', clientId: 'mockClientId', redirectUrl: 'http://mockUrl' },
-      safeSdk
+      protocolKit
     )
   })
 
@@ -58,12 +58,12 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should allow to get the Safe address', async () => {
-    safeSdk.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
+    protocolKit.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
     expect(await safeMoneriumClient.getSafeAddress()).toBe('0xSafeAddress')
   })
 
   it('should allow to send tokens from then Safe to any IBAN', async () => {
-    safeSdk.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
+    protocolKit.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
     const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
     //@ts-expect-error - Not all values are mocked
     const signMessageSpy = jest.spyOn(safeMoneriumClient, 'signMessage').mockResolvedValueOnce({
@@ -93,7 +93,7 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should throw if signing message fails', async () => {
-    safeSdk.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
+    protocolKit.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
     const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
     const signMessageSpy = jest
       .spyOn(safeMoneriumClient, 'signMessage')
@@ -116,7 +116,7 @@ describe('SafeMoneriumClient', () => {
 
   it('should allow to check if a message is NOT signed in the smart contract if the promise is fulfilled', async () => {
     // Promise fullfilled without signature
-    safeSdk.getEthAdapter().call = jest.fn().mockImplementation(async () => '0x')
+    protocolKit.getEthAdapter().call = jest.fn().mockImplementation(async () => '0x')
 
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(
       '0xSafeAddress',
@@ -136,7 +136,7 @@ describe('SafeMoneriumClient', () => {
     }
 
     // promise is rejected with the signature
-    safeSdk.getEthAdapter().call = jest
+    protocolKit.getEthAdapter().call = jest
       .fn()
       .mockImplementation(() =>
         Promise.reject(new EthersError('execution reverted: "Hash not approved"', MAGIC_VALUE))
@@ -160,7 +160,7 @@ describe('SafeMoneriumClient', () => {
     }
 
     // promise is rejected without a signature
-    safeSdk.getEthAdapter().call = jest
+    protocolKit.getEthAdapter().call = jest
       .fn()
       .mockImplementation(() =>
         Promise.reject(new EthersError('execution reverted: "Hash not approved"', '0x'))
@@ -219,7 +219,7 @@ describe('SafeMoneriumClient', () => {
       nonce: 0
     }
 
-    jest.spyOn(protocolKit, 'getSignMessageLibContract').mockResolvedValueOnce({
+    jest.spyOn(protocolKitPackage, 'getSignMessageLibContract').mockResolvedValueOnce({
       encode: jest.fn(),
       getAddress: jest.fn(),
       getMessageHash: jest.fn(),
@@ -227,12 +227,12 @@ describe('SafeMoneriumClient', () => {
       estimateGas: jest.fn()
     })
 
-    safeSdk.createTransaction = jest.fn().mockResolvedValueOnce({
+    protocolKit.createTransaction = jest.fn().mockResolvedValueOnce({
       data: txData
     })
 
-    safeSdk.getTransactionHash = jest.fn().mockResolvedValueOnce('0xTransactionHash')
-    safeSdk.signHash = jest.fn().mockResolvedValueOnce('0xTransactionSignature')
+    protocolKit.getTransactionHash = jest.fn().mockResolvedValueOnce('0xTransactionHash')
+    protocolKit.signHash = jest.fn().mockResolvedValueOnce('0xTransactionSignature')
 
     jest.spyOn(SafeApiKit.prototype, 'getTransaction').mockResolvedValueOnce({
       confirmationsRequired: 1,
@@ -241,7 +241,7 @@ describe('SafeMoneriumClient', () => {
     })
 
     const proposeTransactionSpy = jest.spyOn(SafeApiKit.prototype, 'proposeTransaction')
-    safeSdk.executeTransaction = jest.fn()
+    protocolKit.executeTransaction = jest.fn()
     await safeMoneriumClient.signMessage('0xSafeAddress', 'message to sign')
 
     expect(proposeTransactionSpy).toHaveBeenCalledWith(
@@ -256,36 +256,36 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should map the protocol kit chainId to the Monerium Chain types', async () => {
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(1n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(1n)
     expect(await safeMoneriumClient.getChain()).toBe('ethereum')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(5n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(5n)
     expect(await safeMoneriumClient.getChain()).toBe('ethereum')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(100n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(100n)
     expect(await safeMoneriumClient.getChain()).toBe('gnosis')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(10200n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(10200n)
     expect(await safeMoneriumClient.getChain()).toBe('gnosis')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(137n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(137n)
     expect(await safeMoneriumClient.getChain()).toBe('polygon')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(80001n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(80001n)
     expect(await safeMoneriumClient.getChain()).toBe('polygon')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(300n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(300n)
     expect(safeMoneriumClient.getChain()).rejects.toThrowError('Chain not supported: 300')
   })
 
   it('should map the protocol kit chainId to the Monerium Network types', async () => {
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(1n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(1n)
     expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(5n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(5n)
     expect(await safeMoneriumClient.getNetwork()).toBe('goerli')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(100n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(100n)
     expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(10200n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(10200n)
     expect(await safeMoneriumClient.getNetwork()).toBe('chiado')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(137n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(137n)
     expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(80001n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(80001n)
     expect(await safeMoneriumClient.getNetwork()).toBe('mumbai')
-    safeSdk.getChainId = jest.fn().mockResolvedValueOnce(300n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(300n)
     expect(safeMoneriumClient.getNetwork()).rejects.toThrowError('Network not supported: 300')
   })
 })

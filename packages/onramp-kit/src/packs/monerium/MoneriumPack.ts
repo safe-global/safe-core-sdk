@@ -31,7 +31,7 @@ export class MoneriumPack extends OnRampKitBasePack {
    * @throws {Error} If the Monerium client is not initialized
    */
   async init(options: MoneriumInitOptions) {
-    if (!options?.safeSdk) {
+    if (!options?.protocolKit) {
       throw new Error('You need to provide an instance of the protocol kit')
     }
 
@@ -41,7 +41,7 @@ export class MoneriumPack extends OnRampKitBasePack {
         clientId: this.#config.clientId,
         redirectUrl: this.#config.redirectUrl
       },
-      options.safeSdk
+      options.protocolKit
     )
   }
 

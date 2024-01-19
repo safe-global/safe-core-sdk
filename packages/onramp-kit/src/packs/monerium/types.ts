@@ -8,7 +8,7 @@ export interface MoneriumProviderConfig {
 }
 
 export interface MoneriumInitOptions {
-  safeSdk: Safe
+  protocolKit: Safe
 }
 
 export interface SafeMoneriumOrder {

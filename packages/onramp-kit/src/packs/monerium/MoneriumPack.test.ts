@@ -48,9 +48,9 @@ describe('MoneriumPack', () => {
     })
 
     it('should initialize the pack', async () => {
-      const safeSdk = new Safe()
+      const protocolKit = new Safe()
 
-      await moneriumPack.init({ safeSdk })
+      await moneriumPack.init({ protocolKit })
 
       expect(safeMoneriumClient.SafeMoneriumClient).toHaveBeenCalledWith(
         {
@@ -58,7 +58,7 @@ describe('MoneriumPack', () => {
           environment: 'sandbox',
           redirectUrl: 'http://localhost:3000'
         },
-        safeSdk
+        protocolKit
       )
     })
 
@@ -72,9 +72,9 @@ describe('MoneriumPack', () => {
 
   describe('open()', () => {
     beforeEach(async () => {
-      const safeSdk = new Safe()
+      const protocolKit = new Safe()
 
-      await moneriumPack.init({ safeSdk })
+      await moneriumPack.init({ protocolKit })
     })
 
     it('should call order socket', async () => {
@@ -128,9 +128,9 @@ describe('MoneriumPack', () => {
         safeMoneriumClient.SafeMoneriumClient.prototype,
         'revokeAccess'
       )
-      const safeSdk = new Safe()
+      const protocolKit = new Safe()
 
-      await moneriumPack.init({ safeSdk })
+      await moneriumPack.init({ protocolKit })
 
       await moneriumPack.close()
 

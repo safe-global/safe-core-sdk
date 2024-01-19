@@ -32,19 +32,19 @@ import {
 import { SafeMoneriumOrder } from './types'
 
 export class SafeMoneriumClient extends MoneriumClient {
-  #safeSdk: Safe
+  #protocolKit: Safe
   #ethAdapter: EthAdapter
 
   /**
    * Constructor where the Monerium environment and the Protocol kit instance are set
    * @param moneriumOptions The Monerium options object
-   * @param safeSdk The Protocol kit instance
+   * @param protocolKit The Protocol kit instance
    */
-  constructor(moneriumOptions: ClassOptions, safeSdk: Safe) {
+  constructor(moneriumOptions: ClassOptions, protocolKit: Safe) {
     super(moneriumOptions)
 
-    this.#safeSdk = safeSdk
-    this.#ethAdapter = safeSdk.getEthAdapter()
+    this.#protocolKit = protocolKit
+    this.#ethAdapter = protocolKit.getEthAdapter()
   }
 
   /**
@@ -52,7 +52,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Safe address
    */
   async getSafeAddress(): Promise<string> {
-    return await this.#safeSdk.getAddress()
+    return await this.#protocolKit.getAddress()
   }
 
   /**
@@ -94,7 +94,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns A boolean indicating if the message is signed
    */
   async isSignMessagePending(safeAddress: string, message: string): Promise<boolean> {
-    const chainId = await this.#safeSdk.getChainId()
+    const chainId = await this.#protocolKit.getChainId()
 
     const apiKit = new SafeApiKit({ chainId })
 
@@ -120,7 +120,7 @@ export class SafeMoneriumClient extends MoneriumClient {
     message: string
   ): Promise<SafeMultisigTransactionResponse> {
     try {
-      const safeVersion = await this.#safeSdk.getContractVersion()
+      const safeVersion = await this.#protocolKit.getContractVersion()
 
       const signMessageContract = await getSignMessageLibContract({
         ethAdapter: this.#ethAdapter,
@@ -135,15 +135,15 @@ export class SafeMoneriumClient extends MoneriumClient {
         data: txData,
         operation: OperationType.DelegateCall
       }
-      const safeTransaction = await this.#safeSdk.createTransaction({
+      const safeTransaction = await this.#protocolKit.createTransaction({
         transactions: [safeTransactionData]
       })
 
-      const safeTxHash = await this.#safeSdk.getTransactionHash(safeTransaction)
+      const safeTxHash = await this.#protocolKit.getTransactionHash(safeTransaction)
 
-      const senderSignature = await this.#safeSdk.signHash(safeTxHash)
+      const senderSignature = await this.#protocolKit.signHash(safeTxHash)
 
-      const chainId = await this.#safeSdk.getChainId()
+      const chainId = await this.#protocolKit.getChainId()
 
       const apiKit = new SafeApiKit({ chainId })
 
@@ -168,7 +168,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Chain Id
    */
   async getChainId(): Promise<number> {
-    return Number(await this.#safeSdk.getChainId())
+    return Number(await this.#protocolKit.getChainId())
   }
 
   /**
@@ -176,7 +176,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Chain
    */
   async getChain(): Promise<Chain> {
-    const chainId = await this.#safeSdk.getChainId()
+    const chainId = await this.#protocolKit.getChainId()
 
     return getMoneriumChain(Number(chainId))
   }
@@ -186,7 +186,7 @@ export class SafeMoneriumClient extends MoneriumClient {
    * @returns The Network
    */
   async getNetwork(): Promise<Networks> {
-    const chainId = await this.#safeSdk.getChainId()
+    const chainId = await this.#protocolKit.getChainId()
 
     return getMoneriumNetwork(Number(chainId))
   }

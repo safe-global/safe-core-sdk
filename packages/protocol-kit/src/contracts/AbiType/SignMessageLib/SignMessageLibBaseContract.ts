@@ -1,4 +1,7 @@
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers'
+import {
+  EthersTransactionOptions,
+  EthersTransactionResult
+} from '@safe-global/protocol-kit/adapters/ethers'
 import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3'
 import {
   Abi,
@@ -45,24 +48,39 @@ export type EncodeSignMessageLibFunction<
 ) => string
 
 /**
- * Estimates the gas required for a function call on a Safe contract.
+ * Estimates the gas required for a function call on a SignMessageLib contract.
  *
- * @template SafeContractAbi - The ABI of the Safe contract.
- * @template SafeFunction - The function for which gas is being estimated, derived from the ABI.
+ * @template SignMessageLibContractAbi - The ABI of the SignMessageLib contract.
+ * @template SignMessageLibFunction - The function for which gas is being estimated, derived from the ABI.
  */
-export type EstimateGasSafeFunction<
-  SignMessageLibContractAbi extends Abi, // Abi of the Safe Contract,
+export type EstimateGasSignMessageLibFunction<
+  SignMessageLibContractAbi extends Abi, // Abi of the SignMessageLib Contract,
   TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions,
-  SafeFunction extends
+  SignMessageLibFunction extends
     ExtractAbiFunctionNames<SignMessageLibContractAbi> = ExtractAbiFunctionNames<SignMessageLibContractAbi>
 > = (
-  functionToEncode: SafeFunction,
+  functionToEncode: SignMessageLibFunction,
   args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<SignMessageLibContractAbi, SafeFunction>['inputs'],
+    ExtractAbiFunction<SignMessageLibContractAbi, SignMessageLibFunction>['inputs'],
     'inputs'
   >,
   options?: TransactionOptions
 ) => Promise<bigint>
+
+/**
+ * Estimates the gas required for a function call on a SignMessageLib contract.
+ *
+ * @template SignMessageLibContractAbi - The ABI of the SignMessageLib contract.
+ */
+export type SignMessageFunction<
+  SignMessageLibContractAbi extends Abi, // Abi of the SignMessageLib Contract,
+  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions
+> = (
+  args: AbiParametersToPrimitiveTypes<
+    ExtractAbiFunction<SignMessageLibContractAbi, 'signMessage'>['inputs']
+  >,
+  options?: TransactionOptions
+) => Promise<EthersTransactionResult>
 
 export type GetAddressSignMessageLibFunction = () => Promise<string>
 
@@ -82,25 +100,14 @@ type SignMessageLibBaseContract<SignMessageLibContractAbi extends Abi> = {
     >
   >
 } & {
-  // Write functions
-  [SafeFunction in SignMessageLibContractWriteFunctions<SignMessageLibContractAbi>]: (
-    // parameters
-    args: AbiParametersToPrimitiveTypes<
-      ExtractAbiFunction<SignMessageLibContractAbi, SafeFunction>['inputs'],
-      'inputs'
-    >
-    // returned values as a Promise
-  ) => Promise<
-    AbiParametersToPrimitiveTypes<
-      ExtractAbiFunction<SignMessageLibContractAbi, SafeFunction>['outputs'],
-      'outputs'
-    >
-  >
-} & {
   safeVersion: SafeVersion
   encode: EncodeSignMessageLibFunction<SignMessageLibContractAbi>
   getAddress: GetAddressSignMessageLibFunction
-  estimateGas: EstimateGasSafeFunction<
+  estimateGas: EstimateGasSignMessageLibFunction<
+    SignMessageLibContractAbi,
+    EthersTransactionOptions | Web3TransactionOptions
+  >
+  signMessage: SignMessageFunction<
     SignMessageLibContractAbi,
     EthersTransactionOptions | Web3TransactionOptions
   >

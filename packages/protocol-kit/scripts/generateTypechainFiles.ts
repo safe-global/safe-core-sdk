@@ -19,7 +19,6 @@ const safeContracts_V1_4_1 = [
   // `${safeContractsPath}/v1.4.1/safe.json`, // Remove contract 1.4.1 from typechain as it's migrated to Abitype
   `${safeContractsPath}/v1.4.1/safe_proxy_factory.json`,
   `${safeContractsPath}/v1.4.1/compatibility_fallback_handler.json`,
-  `${safeContractsPath}/v1.4.1/sign_message_lib.json`,
   `${safeContractsPath}/v1.4.1/create_call.json`,
   `${safeContractsPath}/v1.4.1/simulate_tx_accessor.json`
 ].join(' ')
@@ -27,7 +26,6 @@ const safeContracts_V1_3_0 = [
   // `${safeContractsPath}/v1.3.0/gnosis_safe.json`, // Remove contract 1.3.0 from typechain as it's migrated to Abitype
   `${safeContractsPath}/v1.3.0/proxy_factory.json`,
   `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`,
-  `${safeContractsPath}/v1.3.0/sign_message_lib.json`,
   `${safeContractsPath}/v1.3.0/create_call.json`,
   `${safeContractsPath}/v1.3.0/simulate_tx_accessor.json`
 ].join(' ')

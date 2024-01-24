@@ -7,7 +7,7 @@ import {
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/web3/utils/constants'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import safe_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.3.0/gnosis_safe_l2'
+import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
 import {
   EncodeSafeFunction,
   EstimateGasSafeFunction
@@ -51,7 +51,8 @@ class SafeContract_v1_3_0_Web3
     customContractAbi?: SafeContract_v1_3_0_Abi_Readonly
   ) {
     const safeVersion = '1.3.0'
-    const defaultAbi = safe_1_3_0_ContractArtifacts.abi as DeepWriteable<SafeContract_v1_3_0_Abi>
+    const defaultAbi =
+      signMessageLib_1_3_0_ContractArtifacts.abi as DeepWriteable<SignMessageLibContract_v1_3_0_Abi>
 
     super(
       chainId,

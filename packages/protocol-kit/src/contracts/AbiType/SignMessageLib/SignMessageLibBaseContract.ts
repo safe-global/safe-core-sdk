@@ -2,7 +2,10 @@ import {
   EthersTransactionOptions,
   EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers'
-import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3'
+import {
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from '@safe-global/protocol-kit/adapters/web3'
 import {
   Abi,
   AbiParametersToPrimitiveTypes,
@@ -80,7 +83,7 @@ export type SignMessageFunction<
     ExtractAbiFunction<SignMessageLibContractAbi, 'signMessage'>['inputs']
   >,
   options?: TransactionOptions
-) => Promise<EthersTransactionResult>
+) => Promise<EthersTransactionResult | Web3TransactionResult>
 
 export type GetAddressSignMessageLibFunction = () => Promise<string>
 

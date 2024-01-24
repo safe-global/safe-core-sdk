@@ -24,7 +24,6 @@ import {
   Create_call as CreateCall_V1_3_0,
   Proxy_factory as SafeProxyFactory_V1_3_0,
   Gnosis_safe as Safe_V1_3_0,
-  Sign_message_lib as SignMessageLib_V1_3_0,
   Simulate_tx_accessor as SimulateTxAccessor_V1_3_0
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0'
 import {
@@ -32,7 +31,6 @@ import {
   Create_call as CreateCall_V1_4_1,
   Safe_proxy_factory as SafeProxyFactory_V1_4_1,
   Safe as Safe_V1_4_1,
-  Sign_message_lib as SignMessageLib_V1_4_1,
   Simulate_tx_accessor as SimulateTxAccessor_V1_4_1
 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1'
 import MultiSend_V1_1_1 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
@@ -40,6 +38,8 @@ import MultiSend_V1_3_0 from '@safe-global/protocol-kit/src/contracts/AbiType/Mu
 import MultiSend_V1_4_1 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
 import MultiSendCallOnly_V1_3_0 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import MultiSendCallOnly_V1_4_1 from '@safe-global/protocol-kit/src/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
+import SignMessageLib_V1_3_0 from '@safe-global/protocol-kit/src/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
+import SignMessageLib_V1_4_1 from '@safe-global/protocol-kit/src/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import {
   DailyLimitModule,
   ERC20Mintable,
@@ -196,7 +196,7 @@ export const getSignMessageLib = async (): Promise<{
   const SignMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
   const SignMessageLib = await ethers.getContractFactory(signMessageLibDeployed.name)
   return {
-    contract: SignMessageLib.attach(SignMessageLibDeployment.address) as
+    contract: SignMessageLib.attach(SignMessageLibDeployment.address) as unknown as
       | SignMessageLib_V1_4_1
       | SignMessageLib_V1_3_0,
     abi: SignMessageLibDeployment.abi

@@ -18,7 +18,6 @@ import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityF
 import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
 import SafeProxyFactoryWeb3Contract from './contracts/SafeProxyFactory/SafeProxyFactoryWeb3Contract'
-import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
 import SimulateTxAccessorWeb3Contract from './contracts/SimulateTxAccessor/SimulateTxAccessorWeb3Contract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -35,6 +34,8 @@ import MultiSendContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSen
 import MultiSendContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Web3'
 import MultiSendCallOnlyContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
 import MultiSendCallOnlyContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
+import SignMessageLibContract_v1_3_0_Web3 from './contracts/SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Web3'
+import SignMessageLibContract_v1_4_1_Web3 from './contracts/SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Web3'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -195,18 +196,16 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SignMessageLibWeb3Contract> {
+  }: GetContractProps): Promise<
+    SignMessageLibContract_v1_3_0_Web3 | SignMessageLibContract_v1_4_1_Web3
+  > {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
-    const signMessageLibContract = this.getContract(
-      contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
-    return getSignMessageLibContractInstance(safeVersion, signMessageLibContract)
+    return getSignMessageLibContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getCreateCallContract({

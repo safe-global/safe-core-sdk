@@ -11,7 +11,6 @@ import CompatibilityFallbackHandlerContractEthers from './contracts/Compatibilit
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import SafeProxyFactoryEthersContract from './contracts/SafeProxyFactory/SafeProxyFactoryEthersContract'
-import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
 import SimulateTxAccessorEthersContract from './contracts/SimulateTxAccessor/SimulateTxAccessorEthersContract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -29,6 +28,8 @@ import MultiSendCallOnlyContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.
 import MultiSendContract_v1_1_1_Ethers from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
 import MultiSendContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
 import MultiSendContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
+import SignMessageLibContract_v1_3_0_Ethers from './contracts/SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Ethers'
+import SignMessageLibContract_v1_4_1_Ethers from './contracts/SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Ethers'
 
 type Ethers = typeof ethers
 
@@ -198,16 +199,19 @@ class EthersAdapter implements EthAdapter {
   async getSignMessageLibContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<SignMessageLibEthersContract> {
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<
+    SignMessageLibContract_v1_3_0_Ethers | SignMessageLibContract_v1_4_1_Ethers
+  > {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
-    return getSignMessageLibContractInstance(safeVersion, contractAddress, signerOrProvider)
+
+    return getSignMessageLibContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getCreateCallContract({

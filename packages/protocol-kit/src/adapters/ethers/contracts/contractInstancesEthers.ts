@@ -6,12 +6,10 @@ import { Proxy_factory__factory as SafeProxyFactory_V1_1_1 } from '@safe-global/
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Create_call__factory'
 import { Proxy_factory__factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Proxy_factory__factory'
-import { Sign_message_lib__factory as SignMessageLib_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Sign_message_lib__factory'
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Simulate_tx_accessor__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Create_call__factory'
 import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Safe_proxy_factory__factory'
-import { Sign_message_lib__factory as SignMessageLib_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Sign_message_lib__factory'
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Simulate_tx_accessor__factory'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
@@ -46,6 +44,8 @@ import { MultiSendContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contract
 import { MultiSendContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
 import { MultiSendCallOnlyContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import { MultiSendCallOnlyContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
+import { SignMessageLibContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
+import { SignMessageLibContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -234,19 +234,28 @@ export function getSafeProxyFactoryContractInstance(
   }
 }
 
-export function getSignMessageLibContractInstance(
+export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: AbstractSigner | Provider
-): SignMessageLibContract_V1_4_1_Ethers | SignMessageLibContract_V1_3_0_Ethers {
-  let signMessageLibContract
+  ethersAdapter: EthersAdapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+): Promise<SignMessageLibContract_V1_4_1_Ethers | SignMessageLibContract_V1_3_0_Ethers> {
+  const chainId = await ethersAdapter.getChainId()
   switch (safeVersion) {
     case '1.4.1':
-      signMessageLibContract = SignMessageLib_V1_4_1.connect(contractAddress, signerOrProvider)
-      return new SignMessageLibContract_V1_4_1_Ethers(signMessageLibContract)
+      return new SignMessageLibContract_V1_4_1_Ethers(
+        chainId,
+        ethersAdapter,
+        contractAddress,
+        customContractAbi as unknown as SignMessageLibContract_v1_4_1_Abi
+      )
     case '1.3.0':
-      signMessageLibContract = SignMessageLib_V1_3_0.connect(contractAddress, signerOrProvider)
-      return new SignMessageLibContract_V1_3_0_Ethers(signMessageLibContract)
+      return new SignMessageLibContract_V1_3_0_Ethers(
+        chainId,
+        ethersAdapter,
+        contractAddress,
+        customContractAbi as unknown as SignMessageLibContract_v1_3_0_Abi
+      )
     default:
       throw new Error('Invalid Safe version')
   }

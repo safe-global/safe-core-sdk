@@ -10,7 +10,7 @@ import {
   MultiSendCallOnlyBaseContractEthers,
   SafeContractEthers,
   SafeProxyFactoryEthersContract,
-  SignMessageLibEthersContract
+  SignMessageLibBaseContractEthers
 } from './adapters/ethers'
 import {
   CreateCallWeb3Contract,
@@ -19,7 +19,7 @@ import {
   MultiSendCallOnlyBaseContractWeb3,
   SafeContractWeb3,
   SafeProxyFactoryWeb3Contract,
-  SignMessageLibWeb3Contract,
+  SignMessageLibBaseContractWeb3,
   Web3Adapter,
   Web3AdapterConfig,
   Web3TransactionOptions,
@@ -119,8 +119,8 @@ export {
   SafeProxyFactoryEthersContract,
   SafeProxyFactoryWeb3Contract,
   SafeTransactionOptionalProps,
-  SignMessageLibEthersContract,
-  SignMessageLibWeb3Contract,
+  SignMessageLibBaseContractEthers,
+  SignMessageLibBaseContractWeb3,
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams,
   Web3Adapter,

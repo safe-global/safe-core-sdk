@@ -202,7 +202,7 @@ class EthersAdapter implements EthAdapter {
     customContractAddress,
     customContractAbi
   }: GetContractProps): Promise<
-    SignMessageLibContract_v1_3_0_Ethers | SignMessageLibContract_v1_4_1_Ethers
+    SignMessageLibContract_v1_4_1_Ethers | SignMessageLibContract_v1_3_0_Ethers
   > {
     const chainId = await this.getChainId()
     const contractAddress =

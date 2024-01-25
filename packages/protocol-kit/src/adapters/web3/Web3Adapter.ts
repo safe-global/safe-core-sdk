@@ -4,7 +4,8 @@ import {
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeTransactionEIP712Args
+  SafeTransactionEIP712Args,
+  SignMessageLibContract
 } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
@@ -34,8 +35,6 @@ import MultiSendContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSen
 import MultiSendContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Web3'
 import MultiSendCallOnlyContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
 import MultiSendCallOnlyContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
-import SignMessageLibContract_v1_3_0_Web3 from './contracts/SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Web3'
-import SignMessageLibContract_v1_4_1_Web3 from './contracts/SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Web3'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -196,15 +195,14 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<
-    SignMessageLibContract_v1_3_0_Web3 | SignMessageLibContract_v1_4_1_Web3
-  > {
+  }: GetContractProps): Promise<SignMessageLibContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
+
     return getSignMessageLibContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 

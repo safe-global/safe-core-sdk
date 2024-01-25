@@ -9,7 +9,7 @@ import SignMessageLibContract_v1_3_0_Contract, {
   SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   EncodeSignMessageLibFunction,
   EstimateGasSignMessageLibFunction,
@@ -92,6 +92,27 @@ class SignMessageLibContract_v1_3_0_Web3
     const txResponse = this.contract.methods.signMessage(data).send(options)
 
     return toTxResult(txResponse, options)
+  }
+
+  // TODO: Remove this mapper after remove Typechain
+  mapToTypechainContract(): SignMessageLibContract {
+    return {
+      encode: this.encode.bind(this),
+
+      estimateGas: async (methodName: string, params: any[], options: Web3TransactionOptions) => {
+        const gas = await this.estimateGas(methodName as 'signMessage', params as [string], options)
+
+        return gas.toString()
+      },
+
+      getAddress: this.getAddress.bind(this),
+
+      getMessageHash: async (message: string) => (await this.getMessageHash([message]))[0],
+
+      signMessage: async (data: string, options?: Web3TransactionOptions) => {
+        return this.signMessage([data], options)
+      }
+    }
   }
 }
 

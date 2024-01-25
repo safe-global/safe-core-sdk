@@ -4,7 +4,8 @@ import {
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeTransactionEIP712Args
+  SafeTransactionEIP712Args,
+  SignMessageLibContract
 } from '@safe-global/safe-core-sdk-types'
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
@@ -28,8 +29,6 @@ import MultiSendCallOnlyContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.
 import MultiSendContract_v1_1_1_Ethers from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
 import MultiSendContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
 import MultiSendContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
-import SignMessageLibContract_v1_3_0_Ethers from './contracts/SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Ethers'
-import SignMessageLibContract_v1_4_1_Ethers from './contracts/SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Ethers'
 
 type Ethers = typeof ethers
 
@@ -201,9 +200,7 @@ class EthersAdapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<
-    SignMessageLibContract_v1_4_1_Ethers | SignMessageLibContract_v1_3_0_Ethers
-  > {
+  }: GetContractProps): Promise<SignMessageLibContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]

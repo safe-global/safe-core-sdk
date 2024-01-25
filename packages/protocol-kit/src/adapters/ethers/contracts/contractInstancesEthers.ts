@@ -11,7 +11,7 @@ import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler
 import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Create_call__factory'
 import { Safe_proxy_factory__factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Safe_proxy_factory__factory'
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Simulate_tx_accessor__factory'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
 import CompatibilityFallbackHandler_V1_4_1_Ethers from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Ethers'
 import CreateCallContract_V1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Ethers'
@@ -239,23 +239,31 @@ export async function getSignMessageLibContractInstance(
   contractAddress: string,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<SignMessageLibContract_V1_4_1_Ethers | SignMessageLibContract_V1_3_0_Ethers> {
+): Promise<SignMessageLibContract> {
   const chainId = await ethersAdapter.getChainId()
+  let signMessageLibContract
+
   switch (safeVersion) {
     case '1.4.1':
-      return new SignMessageLibContract_V1_4_1_Ethers(
+      signMessageLibContract = new SignMessageLibContract_V1_4_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_4_1_Abi
       )
+
+      // TODO: Remove this mapper after remove typechain
+      return signMessageLibContract.mapToTypechainContract()
     case '1.3.0':
-      return new SignMessageLibContract_V1_3_0_Ethers(
+      signMessageLibContract = new SignMessageLibContract_V1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_3_0_Abi
       )
+
+      // TODO: Remove this mapper after remove typechain
+      return signMessageLibContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }

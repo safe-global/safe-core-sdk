@@ -6,7 +6,7 @@ import SignMessageLibContract_v1_4_1_Contract, {
   SignMessageLibContract_v1_4_1_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import multisend_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.4.1/sign_message_lib'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   EncodeSignMessageLibFunction,
   EstimateGasSignMessageLibFunction,
@@ -84,6 +84,27 @@ class SignMessageLibContract_v1_4_1_Ethers
 
       return toTxResult(txResponse, options)
     }
+
+  // TODO: Remove this mapper after remove Typechain
+  mapToTypechainContract(): SignMessageLibContract {
+    return {
+      encode: this.encode.bind(this),
+
+      estimateGas: async (methodName: string, params: any[], options: EthersTransactionOptions) => {
+        const gas = await this.estimateGas(methodName as 'signMessage', params as [string], options)
+
+        return gas.toString()
+      },
+
+      getAddress: this.getAddress.bind(this),
+
+      getMessageHash: async (message: string) => (await this.getMessageHash([message]))[0],
+
+      signMessage: async (data: string, options?: EthersTransactionOptions) => {
+        return this.signMessage([data], options)
+      }
+    }
+  }
 }
 
 export default SignMessageLibContract_v1_4_1_Ethers

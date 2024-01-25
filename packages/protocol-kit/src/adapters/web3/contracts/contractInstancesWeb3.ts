@@ -19,7 +19,7 @@ import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1 }
 import { Create_call as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Create_call'
 import { Safe_proxy_factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Safe_proxy_factory'
 import { Simulate_tx_accessor as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Simulate_tx_accessor'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Web3 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Web3'
 import CompatibilityFallbackHandler_V1_4_1_Web3 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Web3'
 import CreateCallContract_V1_3_0_Web3 from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Web3'
@@ -249,23 +249,31 @@ export async function getSignMessageLibContractInstance(
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<SignMessageLibContract_v1_4_1_Web3 | SignMessageLibContract_v1_3_0_Web3> {
+): Promise<SignMessageLibContract> {
   const chainId = await web3Adapter.getChainId()
+  let signMessageLibContract
+
   switch (safeVersion) {
     case '1.4.1':
-      return new SignMessageLibContract_v1_4_1_Web3(
+      signMessageLibContract = new SignMessageLibContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_4_1_Abi
       )
+
+      // TODO: Remove this mapper after remove typechain
+      return signMessageLibContract.mapToTypechainContract()
     case '1.3.0':
-      return new SignMessageLibContract_v1_3_0_Web3(
+      signMessageLibContract = new SignMessageLibContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_3_0_Abi
       )
+
+      // TODO: Remove this mapper after remove typechain
+      return signMessageLibContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }

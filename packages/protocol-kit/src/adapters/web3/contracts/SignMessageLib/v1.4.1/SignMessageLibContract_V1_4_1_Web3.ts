@@ -78,7 +78,7 @@ class SignMessageLibContract_v1_4_1_Web3
   }
 
   async getMessageHash(args: readonly [string]): Promise<readonly [string]> {
-    return [await this.contract.methods.getMessageHash(...args)]
+    return [await this.contract.methods.getMessageHash(...args).call()]
   }
 
   signMessage: SignMessageFunction<

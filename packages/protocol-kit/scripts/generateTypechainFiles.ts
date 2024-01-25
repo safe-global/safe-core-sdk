@@ -31,7 +31,7 @@ const safeContracts_V1_3_0 = [
 ].join(' ')
 const safeContracts_V1_1_1 = [
   // `${safeContractsPath}/v1.1.1/gnosis_safe.json`, // Remove contract 1.1.1 from typechain as it's migrated to Abitype,
-  `${safeContractsPath}/v1.1.1/proxy_factory.json`
+  // `${safeContractsPath}/v1.1.1/proxy_factory.json`, // Remove contract 1.1.1 from typechain as it's migrated to Abitype,
 ].join(' ')
 const safeContracts_V1_0_0 = [
   `${safeContractsPath}/v1.0.0/gnosis_safe.json`,
@@ -106,10 +106,7 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.1.1`,
-    // removed Safe Proxy Factory Contract v1.1.1 for ethers-v6
-    typechainTarget === 'ethers-v6'
-      ? safeContracts_V1_1_1.replace(`${safeContractsPath}/v1.1.1/proxy_factory.json`, '')
-      : safeContracts_V1_1_1
+    safeContracts_V1_1_1
   )
   generateTypechainFiles(
     typechainTarget,

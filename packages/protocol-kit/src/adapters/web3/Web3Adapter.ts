@@ -129,7 +129,13 @@ class Web3Adapter implements EthAdapter {
       contractAddress,
       customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
     )
-    return getSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
+    return getSafeProxyFactoryContractInstance(
+      safeVersion,
+      proxyFactoryContract,
+      contractAddress,
+      this,
+      customContractAbi
+    )
   }
 
   async getMultiSendContract({

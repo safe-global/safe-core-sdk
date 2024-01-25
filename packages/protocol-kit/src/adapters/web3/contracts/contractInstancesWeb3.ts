@@ -211,7 +211,6 @@ export async function getMultiSendCallOnlyContractInstance(
 
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
-  safeProxyFactoryContract_: any,
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined

@@ -124,13 +124,8 @@ class Web3Adapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
-    const proxyFactoryContract = this.getContract(
-      contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
     return getSafeProxyFactoryContractInstance(
       safeVersion,
-      proxyFactoryContract,
       contractAddress,
       this,
       customContractAbi

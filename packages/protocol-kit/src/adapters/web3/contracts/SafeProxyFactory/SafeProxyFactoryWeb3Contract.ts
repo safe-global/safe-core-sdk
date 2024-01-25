@@ -1,6 +1,5 @@
 import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Proxy_factory'
 import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 
@@ -13,7 +12,7 @@ export interface CreateProxyProps {
 }
 
 class SafeProxyFactoryWeb3Contract implements SafeProxyFactoryContract {
-  constructor(public contract: SafeProxyFactory_V1_0_0) {}
+  constructor(public contract: any) {}
 
   getAddress(): Promise<string> {
     return Promise.resolve(this.contract.options.address)

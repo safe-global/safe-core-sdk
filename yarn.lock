@@ -1855,10 +1855,10 @@
   resolved "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
 
-"@safe-global/safe-deployments@^1.31.0":
-  version "1.31.0"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.31.0.tgz#42a4d6acb9af5d0c2d9e60c48bf5d82789c31f23"
-  integrity sha512-s7JtIjf4t94ye1LEbAt9h+NlYtJl4gqNqkY385+CnBcJKW1+e8oADW8rINqGqi2/el/bMg80wh2QFOHJTp8H+A==
+"@safe-global/safe-deployments@^1.32.0":
+  version "1.32.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.32.0.tgz#3632194d883aa07bd446a6e530e825ba022c9b76"
+  integrity sha512-7RXmnBrUzJ9+Iat74yx3Gel0kygmsaWjJhqr+0Fy8mkP5ly/6dTZ/2ize1pv3j9Yal04NTOqXbaJG4JnbTANQw==
   dependencies:
     semver "^7.3.7"
 

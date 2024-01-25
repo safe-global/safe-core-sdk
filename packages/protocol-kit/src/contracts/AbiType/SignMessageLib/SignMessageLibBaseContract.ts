@@ -103,25 +103,14 @@ type SignMessageLibBaseContract<SignMessageLibContractAbi extends Abi> = {
     >
   >
 } & {
-  // Write functions
-  [SafeFunction in SignMessageLibContractWriteFunctions<SignMessageLibContractAbi>]: (
-    // parameters
-    args: AbiParametersToPrimitiveTypes<
-      ExtractAbiFunction<SignMessageLibContractAbi, SafeFunction>['inputs'],
-      'inputs'
-    >
-    // returned values as a Promise
-  ) => Promise<
-    AbiParametersToPrimitiveTypes<
-      ExtractAbiFunction<SignMessageLibContractAbi, SafeFunction>['outputs'],
-      'outputs'
-    >
-  >
-} & {
   safeVersion: SafeVersion
   encode: EncodeSignMessageLibFunction<SignMessageLibContractAbi>
   getAddress: GetAddressSignMessageLibFunction
   estimateGas: EstimateGasSignMessageLibFunction<
+    SignMessageLibContractAbi,
+    EthersTransactionOptions | Web3TransactionOptions
+  >
+  signMessage: SignMessageFunction<
     SignMessageLibContractAbi,
     EthersTransactionOptions | Web3TransactionOptions
   >

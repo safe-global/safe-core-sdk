@@ -17,7 +17,7 @@ const safeContractsPath = '../../node_modules/@safe-global/safe-deployments/dist
 
 const safeContracts_V1_4_1 = [
   // `${safeContractsPath}/v1.4.1/safe.json`, // Remove contract 1.4.1 from typechain as it's migrated to Abitype
-  `${safeContractsPath}/v1.4.1/safe_proxy_factory.json`,
+  // `${safeContractsPath}/v1.4.1/safe_proxy_factory.json`, // Remove contract 1.4.1 from typechain as it's migrated to Abitype
   `${safeContractsPath}/v1.4.1/compatibility_fallback_handler.json`,
   `${safeContractsPath}/v1.4.1/create_call.json`,
   `${safeContractsPath}/v1.4.1/simulate_tx_accessor.json`
@@ -96,10 +96,7 @@ function generateTypes(typechainTarget: string) {
   generateTypechainFiles(
     typechainTarget,
     `${outDirSrc}${typechainTarget}/v1.4.1`,
-    // removed Safe Proxy Factory Contract v1.4.1 for ethers-v6
-    typechainTarget === 'ethers-v6'
-      ? safeContracts_V1_4_1.replace(`${safeContractsPath}/v1.4.1/safe_proxy_factory.json`, '')
-      : safeContracts_V1_4_1
+    safeContracts_V1_4_1
   )
   generateTypechainFiles(
     typechainTarget,

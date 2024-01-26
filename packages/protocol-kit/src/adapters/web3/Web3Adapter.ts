@@ -4,7 +4,8 @@ import {
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeTransactionEIP712Args
+  SafeTransactionEIP712Args,
+  SignMessageLibContract
 } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
@@ -18,7 +19,6 @@ import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityF
 import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
 import SafeProxyFactoryWeb3Contract from './contracts/SafeProxyFactory/SafeProxyFactoryWeb3Contract'
-import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
 import SimulateTxAccessorWeb3Contract from './contracts/SimulateTxAccessor/SimulateTxAccessorWeb3Contract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -195,18 +195,15 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SignMessageLibWeb3Contract> {
+  }: GetContractProps): Promise<SignMessageLibContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
-    const signMessageLibContract = this.getContract(
-      contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
-    return getSignMessageLibContractInstance(safeVersion, signMessageLibContract)
+
+    return getSignMessageLibContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getCreateCallContract({

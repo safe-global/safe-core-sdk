@@ -6,7 +6,7 @@ import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import SafeProxyFactoryEthersContract, {
   CreateProxyProps
 } from './contracts/SafeProxyFactory/SafeProxyFactoryEthersContract'
-import SignMessageLibEthersContract from './contracts/SignMessageLib/SignMessageLibEthersContract'
+import SignMessageLibBaseContractEthers from './contracts/SignMessageLib/SignMessageLibBaseContractEthers'
 import { EthersTransactionOptions, EthersTransactionResult } from './types'
 
 export {
@@ -20,5 +20,5 @@ export {
   MultiSendBaseContractEthers,
   SafeContractEthers,
   SafeProxyFactoryEthersContract,
-  SignMessageLibEthersContract
+  SignMessageLibBaseContractEthers
 }

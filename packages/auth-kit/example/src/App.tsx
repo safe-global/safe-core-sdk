@@ -30,67 +30,70 @@ function App() {
     const params = new URL(window.document.location).searchParams
     const chainId = params.get('chainId')
 
-    ;(async () => {
-      const options: SafeAuthInitOptions = {
-        enableLogging: true,
-        buildEnv: 'production',
-        chainConfig: {
-          chainId: chainId || '0x64',
-          rpcTarget: 'https://gnosis.drpc.org'
+      ;(async () => {
+        const options: SafeAuthInitOptions = {
+          enableLogging: true,
+          buildEnv: 'production',
+          chainConfig: {
+            chainId: chainId || '0x64',
+            rpcTarget: 'https://gnosis.drpc.org'
+          }
         }
-      }
 
-      const authPack = new SafeAuthPack()
+        const authPack = new SafeAuthPack()
 
-      await authPack.init(options)
+        await authPack.init(options)
 
-      console.log('safeAuthPack:safeEmbed', authPack.safeAuthEmbed)
+        console.log('safeAuthPack:safeEmbed', authPack.safeAuthEmbed)
 
-      setSafeAuthPack(authPack)
+        setSafeAuthPack(authPack)
 
-      authPack.subscribe('accountsChanged', async (accounts) => {
-        console.log('safeAuthPack:accountsChanged', accounts, authPack.isAuthenticated)
-        if (authPack.isAuthenticated) {
-          const signInInfo = await authPack?.signIn()
+        authPack.subscribe('accountsChanged', async (accounts) => {
+          console.log('safeAuthPack:accountsChanged', accounts, authPack.isAuthenticated)
+          if (authPack.isAuthenticated) {
+            const signInInfo = await authPack?.signIn()
 
-          setSafeAuthSignInResponse(signInInfo)
-          setIsAuthenticated(true)
-        }
-      })
+            setSafeAuthSignInResponse(signInInfo)
+            setIsAuthenticated(true)
+          }
+        })
 
-      authPack.subscribe('chainChanged', (eventData) =>
-        console.log('safeAuthPack:chainChanged', eventData)
-      )
-    })()
+        authPack.subscribe('chainChanged', (eventData) =>
+          console.log('safeAuthPack:chainChanged', eventData)
+        )
+      })()
   }, [])
 
   useEffect(() => {
     if (!safeAuthPack || !isAuthenticated) return
-    ;(async () => {
-      const web3Provider = safeAuthPack.getProvider()
-      const userInfo = await safeAuthPack.getUserInfo()
+      ;(async () => {
+        const web3Provider = safeAuthPack.getProvider()
+        const userInfo = await safeAuthPack.getUserInfo()
 
-      setUserInfo(userInfo)
+        setUserInfo(userInfo)
 
-      if (web3Provider) {
-        const provider = new BrowserProvider(safeAuthPack.getProvider() as Eip1193Provider)
-        const signer = await provider.getSigner()
-        const signerAddress = await signer.getAddress()
+        if (web3Provider) {
+          const provider = new BrowserProvider(safeAuthPack.getProvider() as Eip1193Provider)
+          const signer = await provider.getSigner()
+          const signerAddress = await signer.getAddress()
 
-        setChainId((await provider?.getNetwork()).chainId.toString())
-        setBalance(
-          ethers.formatEther((await provider.getBalance(signerAddress)) as ethers.BigNumberish)
-        )
-        setProvider(provider)
-      }
-    })()
+          setChainId((await provider?.getNetwork()).chainId.toString())
+          setBalance(
+            ethers.formatEther((await provider.getBalance(signerAddress)) as ethers.BigNumberish)
+          )
+          setProvider(provider)
+        }
+      })()
   }, [isAuthenticated])
 
   const login = async () => {
-    const signInInfo = await safeAuthPack?.signIn()
+    const signInInfo: AuthKitSignInData | undefined = await safeAuthPack?.signIn()
 
-    setSafeAuthSignInResponse(signInInfo)
-    setIsAuthenticated(true)
+    if (signInInfo) {
+      setSafeAuthSignInResponse(signInInfo)
+      setIsAuthenticated(true)
+    }
+
   }
 
   const logout = async () => {

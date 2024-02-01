@@ -68,9 +68,9 @@ export type EstimateGasSafeProxyFactoryFunction<
  * Represents the base contract type for a Safe Proxy Factory contract.
  *
  * @template SafeProxyFactoryContractAbi - The ABI of the Safe Proxy factory contract.
- * @type {SafeBaseProxyFactoryContract}
+ * @type {SafeProxyFactoryBaseContract}
  */
-type SafeBaseProxyFactoryContract<SafeProxyFactoryContractAbi extends Abi> = {
+type SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbi extends Abi> = {
   [ProxyFactoryFunction in
     | SafeProxyFactoryContractReadFunctions<SafeProxyFactoryContractAbi>
     | SafeProxyFactoryContractWriteFunctions<SafeProxyFactoryContractAbi>]: (
@@ -95,4 +95,4 @@ type SafeBaseProxyFactoryContract<SafeProxyFactoryContractAbi extends Abi> = {
   >
 }
 
-export default SafeBaseProxyFactoryContract
+export default SafeProxyFactoryBaseContract

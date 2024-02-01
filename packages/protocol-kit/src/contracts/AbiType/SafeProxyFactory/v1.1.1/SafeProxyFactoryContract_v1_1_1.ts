@@ -1,9 +1,9 @@
 import { narrow } from 'abitype'
 import safeProxyFactory_1_1_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.1.1/proxy_factory'
-import SafeBaseProxyFactoryContract, {
+import SafeProxyFactoryBaseContract, {
   SafeProxyFactoryContractReadFunctions,
   SafeProxyFactoryContractWriteFunctions
-} from '../SafeProxyFactoryContract'
+} from '../SafeProxyFactoryBaseContract'
 
 const safeProxyFactoryContract_v1_1_1_AbiTypes = narrow(
   safeProxyFactory_1_1_1_ContractArtifacts.abi
@@ -34,11 +34,11 @@ export type SafeProxyFactory_v1_1_1_Write_Functions =
 
 /**
  * Represents the contract type for a Safe Proxy Factory contract version 1.1.1, defining read and write methods.
- * Utilizes the generic SafeBaseProxyFactoryContract with the ABI specific to version 1.1.1.
+ * Utilizes the generic SafeProxyFactoryBaseContract with the ABI specific to version 1.1.1.
  *
  * @type {SafeProxyFactoryContract_v1_1_1_Contract}
  */
 type SafeProxyFactoryContract_v1_1_1_Contract =
-  SafeBaseProxyFactoryContract<SafeProxyFactoryContract_v1_1_1_Abi>
+  SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_1_1_Abi>
 
 export default SafeProxyFactoryContract_v1_1_1_Contract

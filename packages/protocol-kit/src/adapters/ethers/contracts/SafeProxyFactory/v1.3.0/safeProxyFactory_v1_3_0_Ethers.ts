@@ -6,7 +6,7 @@ import safeProxyFactory_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/
 import {
   EncodeSafeProxyFactoryFunction,
   EstimateGasSafeProxyFactoryFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryContract'
+} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProxyFactoryContract_v1_3_0_Contract, {
   SafeProxyFactoryContract_v1_3_0_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'

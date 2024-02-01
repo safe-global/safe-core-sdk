@@ -1,19 +1,19 @@
 import { TransactionReceipt } from 'web3-core/types'
-import SafeProxyFactoryBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/safeProxyFactoryBaseContractWeb3'
+import SafeProxyFactoryBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import {
   DeepWriteable,
   Web3TransactionOptions
 } from '@safe-global/protocol-kit/adapters/web3/types'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import safeProxyFactory_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.3.0/proxy_factory'
+import safeProxyFactory_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.0.0/proxy_factory'
 import {
   EncodeSafeProxyFactoryFunction,
   EstimateGasSafeProxyFactoryFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryBaseContract'
-import SafeProxyFactoryContract_v1_3_0_Contract, {
-  SafeProxyFactoryContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import SafeProxyFactoryContract_v1_0_0_Contract, {
+  SafeProxyFactoryContract_v1_0_0_Abi
+} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
 import {
   CreateProxyProps as CreateProxyPropsGeneral,
   SafeVersion
@@ -24,36 +24,36 @@ export interface CreateProxyProps extends CreateProxyPropsGeneral {
 }
 
 /**
- * SafeProxyFactory_v1_3_0_Web3 is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
+ * SafeProxyFactory_v1_0_0_Web3 is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
  *
- * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.3.0 using Web3.js.
+ * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.0.0 using Web3.js.
  *
- * @extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_3_0_Abi> - Inherits from SafeProxyFactoryBaseContractWeb3 with ABI specific to Safe Proxy Factory contract version 1.3.0.
- * @implements SafeProxyFactoryContract_v1_3_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.3.0.
+ * @extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_0_0_Abi> - Inherits from SafeProxyFactoryBaseContractWeb3 with ABI specific to Safe Proxy Factory contract version 1.0.0.
+ * @implements SafeProxyFactoryContract_v1_0_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.0.0.
  */
-class SafeProxyFactory_v1_3_0_Web3
-  extends SafeProxyFactoryBaseContractWeb3<DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>>
-  implements SafeProxyFactoryContract_v1_3_0_Contract
+class SafeProxyFactory_v1_0_0_Web3
+  extends SafeProxyFactoryBaseContractWeb3<DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>>
+  implements SafeProxyFactoryContract_v1_0_0_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeProxyFactory_v1_3_0_Web3
+   * Constructs an instance of SafeProxyFactory_v1_0_0_Web3
    *
    * @param chainId - The chain ID where the contract resides.
    * @param web3Adapter - An instance of Web3Adapter.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
-   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.0.0 is used.
    */
   constructor(
     chainId: bigint,
     web3Adapter: Web3Adapter,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi
+    customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi
   ) {
-    const safeVersion = '1.3.0'
+    const safeVersion = '1.0.0'
     const defaultAbi =
-      safeProxyFactory_1_3_0_ContractArtifacts.abi as DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>
+      safeProxyFactory_1_0_0_ContractArtifacts.abi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>
 
     super(
       chainId,
@@ -61,13 +61,13 @@ class SafeProxyFactory_v1_3_0_Web3
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>
+      customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>
     )
 
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContract_v1_3_0_Abi> = (
+  encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContract_v1_0_0_Abi> = (
     functionToEncode,
     args
   ) => {
@@ -75,7 +75,7 @@ class SafeProxyFactory_v1_3_0_Web3
   }
 
   estimateGas: EstimateGasSafeProxyFactoryFunction<
-    SafeProxyFactoryContract_v1_3_0_Abi,
+    SafeProxyFactoryContract_v1_0_0_Abi,
     Web3TransactionOptions
   > = async (functionToEstimate, args, options = {}) => {
     return await this.contract.methods[functionToEstimate](...args).estimateGas(options)
@@ -93,24 +93,12 @@ class SafeProxyFactory_v1_3_0_Web3
     return [await this.contract.methods.proxyRuntimeCode().call()]
   }
 
-  async calculateCreateProxyWithNonceAddress(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
-    return [await this.contract.methods.calculateCreateProxyWithNonceAddress(...args).call()]
-  }
-
-  async createProxy(args: readonly [singleton: string, data: string]): Promise<[string]> {
+  async createProxy(args: readonly [masterCopy: string, data: string]): Promise<[string]> {
     return [await this.contract.methods.createProxy(...args).call()]
   }
 
-  async createProxyWithCallback(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint, callback: string]
-  ): Promise<[string]> {
-    return [await this.contract.methods.createProxyWithCallback(...args).call()]
-  }
-
   async createProxyWithNonce(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint]
+    args: readonly [masterCopy: string, initializer: string, saltNonce: bigint]
   ): Promise<[string]> {
     return [await this.contract.methods.createProxyWithNonce(...args).call()]
   }
@@ -175,4 +163,4 @@ class SafeProxyFactory_v1_3_0_Web3
   }
 }
 
-export default SafeProxyFactory_v1_3_0_Web3
+export default SafeProxyFactory_v1_0_0_Web3

@@ -3,7 +3,7 @@ import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contrac
 import MultiSendBaseContractWeb3 from './contracts/MultiSend/MultiSendBaseContractWeb3'
 import MultiSendCallOnlyBaseContractWeb3 from './contracts/MultiSend/MultiSendCallOnlyBaseContractWeb3'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
-import SafeProxyFactoryBaseContractWeb3 from './contracts/SafeProxyFactory/safeProxyFactoryBaseContractWeb3'
+import SafeProxyFactoryBaseContractWeb3 from './contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
 import SignMessageLibBaseContractWeb3 from './contracts/SignMessageLib/SignMessageLibBaseContractWeb3'
 import { Web3TransactionOptions, Web3TransactionResult } from './types'
 

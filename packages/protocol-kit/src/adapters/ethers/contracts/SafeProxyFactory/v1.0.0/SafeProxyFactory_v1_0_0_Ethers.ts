@@ -1,48 +1,48 @@
 import { ContractRunner, EventLog } from 'ethers'
-import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/safeProxyFactoryBaseContractEthers'
+import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
-import safeProxyFactory_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.3.0/proxy_factory'
+import safeProxyFactory_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.0.0/proxy_factory'
 import {
   EncodeSafeProxyFactoryFunction,
   EstimateGasSafeProxyFactoryFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryBaseContract'
-import SafeProxyFactoryContract_v1_3_0_Contract, {
-  SafeProxyFactoryContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import SafeProxyFactoryContract_v1_0_0_Contract, {
+  SafeProxyFactoryContract_v1_0_0_Abi
+} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 /**
- * SafeProxyFactory_v1_3_0_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
+ * SafeProxyFactory_v1_0_0_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
  *
- * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.3.0 using Ethers.js v6.
+ * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.0.0 using Ethers.js v6.
  *
- * @extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi> - Inherits from SafeProxyFactoryBaseContractEthers with ABI specific to Safe Proxy Factory contract version 1.3.0.
- * @implements SafeProxyFactoryContract_v1_3_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.3.0.
+ * @extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi> - Inherits from SafeProxyFactoryBaseContractEthers with ABI specific to Safe Proxy Factory contract version 1.0.0.
+ * @implements SafeProxyFactoryContract_v1_0_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.0.0.
  */
-class SafeProxyFactory_v1_3_0_Ethers
-  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi>
-  implements SafeProxyFactoryContract_v1_3_0_Contract
+class SafeProxyFactory_v1_0_0_Ethers
+  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
+  implements SafeProxyFactoryContract_v1_0_0_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeProxyFactory_v1_3_0_Ethers
+   * Constructs an instance of SafeProxyFactory_v1_0_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
    * @param ethersAdapter - An instance of EthersAdapter.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
-   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.0.0 is used.
    */
   constructor(
     chainId: bigint,
     ethersAdapter: EthersAdapter,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi,
+    customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi,
     runner?: ContractRunner | null
   ) {
-    const safeVersion = '1.3.0'
-    const defaultAbi = safeProxyFactory_1_3_0_ContractArtifacts.abi
+    const safeVersion = '1.0.0'
+    const defaultAbi = safeProxyFactory_1_0_0_ContractArtifacts.abi
 
     super(
       chainId,
@@ -57,7 +57,7 @@ class SafeProxyFactory_v1_3_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContract_v1_3_0_Abi> = (
+  encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContract_v1_0_0_Abi> = (
     functionToEncode,
     args
   ) => {
@@ -65,7 +65,7 @@ class SafeProxyFactory_v1_3_0_Ethers
   }
 
   estimateGas: EstimateGasSafeProxyFactoryFunction<
-    SafeProxyFactoryContract_v1_3_0_Abi,
+    SafeProxyFactoryContract_v1_0_0_Abi,
     EthersTransactionOptions
   > = (functionToEstimate, args, options = {}) => {
     const contractMethodToStimate = this.contract.getFunction(functionToEstimate)
@@ -85,24 +85,12 @@ class SafeProxyFactory_v1_3_0_Ethers
     return [await this.contract.proxyRuntimeCode()]
   }
 
-  async calculateCreateProxyWithNonceAddress(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
-    return [await this.contract.calculateCreateProxyWithNonceAddress(...args)]
-  }
-
-  async createProxy(args: readonly [singleton: string, data: string]): Promise<[string]> {
+  async createProxy(args: readonly [masterCopy: string, data: string]): Promise<[string]> {
     return [await this.contract.createProxy(...args)]
   }
 
-  async createProxyWithCallback(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint, callback: string]
-  ): Promise<[string]> {
-    return [await this.contract.createProxyWithCallback(...args)]
-  }
-
   async createProxyWithNonce(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint]
+    args: readonly [masterCopy: string, initializer: string, saltNonce: bigint]
   ): Promise<[string]> {
     return [await this.contract.createProxyWithNonce(...args)]
   }
@@ -171,4 +159,4 @@ class SafeProxyFactory_v1_3_0_Ethers
   }
 }
 
-export default SafeProxyFactory_v1_3_0_Ethers
+export default SafeProxyFactory_v1_0_0_Ethers

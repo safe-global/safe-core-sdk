@@ -3,7 +3,7 @@ import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersCon
 import MultiSendBaseContractEthers from './contracts/MultiSend/MultiSendBaseContractEthers'
 import MultiSendCallOnlyBaseContractEthers from './contracts/MultiSend/MultiSendCallOnlyBaseContractEthers'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
-import SafeProxyFactoryBaseContractEthers from './contracts/SafeProxyFactory/safeProxyFactoryBaseContractEthers'
+import SafeProxyFactoryBaseContractEthers from './contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import SignMessageLibBaseContractEthers from './contracts/SignMessageLib/SignMessageLibBaseContractEthers'
 import { EthersTransactionOptions, EthersTransactionResult } from './types'
 

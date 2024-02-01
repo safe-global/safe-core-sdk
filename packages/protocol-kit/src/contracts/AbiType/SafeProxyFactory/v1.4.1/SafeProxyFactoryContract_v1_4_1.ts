@@ -1,8 +1,8 @@
 import { narrow } from 'abitype'
 import safeProxyFactory_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.4.1/safe_proxy_factory'
 import SafeBaseProxyFactoryContract, {
-  ProxyFactoryContractReadFunctions,
-  ProxyFactoryContractWriteFunctions
+  SafeProxyFactoryContractReadFunctions,
+  SafeProxyFactoryContractWriteFunctions
 } from '../SafeProxyFactoryContract'
 
 const safeProxyFactoryContract_v1_4_1_AbiTypes = narrow(
@@ -19,10 +19,10 @@ export type SafeProxyFactoryContract_v1_4_1_Abi = typeof safeProxyFactoryContrac
 /**
  * Extracts the names of read-only functions (view or pure) specific to the Safe Proxy Factory contract version 1.4.1.
  *
- * @type {ProxyFactory_v1_4_1_Read_Functions}
+ * @type {SafeProxyFactory_v1_4_1_Read_Functions}
  */
-export type ProxyFactory_v1_4_1_Read_Functions =
-  ProxyFactoryContractReadFunctions<SafeProxyFactoryContract_v1_4_1_Abi>
+export type SafeProxyFactory_v1_4_1_Read_Functions =
+  SafeProxyFactoryContractReadFunctions<SafeProxyFactoryContract_v1_4_1_Abi>
 
 /**
  * Extracts the names of write functions (nonpayable or payable) specific to the Safe Proxy Factory contract version 1.4.1.
@@ -30,7 +30,7 @@ export type ProxyFactory_v1_4_1_Read_Functions =
  * @type {SafeProxyFactory_v1_4_1_Write_Functions}
  */
 export type SafeProxyFactory_v1_4_1_Write_Functions =
-  ProxyFactoryContractWriteFunctions<SafeProxyFactoryContract_v1_4_1_Abi>
+  SafeProxyFactoryContractWriteFunctions<SafeProxyFactoryContract_v1_4_1_Abi>
 
 /**
  * Represents the contract type for a Safe Proxy Factory contract version 1.4.1, defining read and write methods.

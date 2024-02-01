@@ -12,18 +12,18 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
  * Extracts the names of read-only functions (view or pure) from a given Safe Proxy Factory contract ABI.
  *
  * @template SafeProxyFactoryContractAbi - The ABI of the Safe Proxy factory contract.
- * @type {ProxyFactoryContractReadFunctions}
+ * @type {SafeProxyFactoryContractReadFunctions}
  */
-export type ProxyFactoryContractReadFunctions<SafeProxyFactoryContractAbi extends Abi> =
+export type SafeProxyFactoryContractReadFunctions<SafeProxyFactoryContractAbi extends Abi> =
   ExtractAbiFunctionNames<SafeProxyFactoryContractAbi, 'view' | 'pure'>
 
 /**
  * Extracts the names of write functions (nonpayable or payable) from a given Safe Proxy Factory contract ABI.
  *
  * @template SafeProxyFactoryContractAbi - The ABI of the Safe Proxy Factory contract.
- * @type {ProxyFactoryContractWriteFunctions}
+ * @type {SafeProxyFactoryContractWriteFunctions}
  */
-export type ProxyFactoryContractWriteFunctions<SafeProxyFactoryContractAbi extends Abi> =
+export type SafeProxyFactoryContractWriteFunctions<SafeProxyFactoryContractAbi extends Abi> =
   ExtractAbiFunctionNames<SafeProxyFactoryContractAbi, 'nonpayable' | 'payable'>
 
 /**
@@ -72,8 +72,8 @@ export type EstimateGasSafeProxyFactoryFunction<
  */
 type SafeBaseProxyFactoryContract<SafeProxyFactoryContractAbi extends Abi> = {
   [ProxyFactoryFunction in
-    | ProxyFactoryContractReadFunctions<SafeProxyFactoryContractAbi>
-    | ProxyFactoryContractWriteFunctions<SafeProxyFactoryContractAbi>]: (
+    | SafeProxyFactoryContractReadFunctions<SafeProxyFactoryContractAbi>
+    | SafeProxyFactoryContractWriteFunctions<SafeProxyFactoryContractAbi>]: (
     // parameters
     args: AbiParametersToPrimitiveTypes<
       ExtractAbiFunction<SafeProxyFactoryContractAbi, ProxyFactoryFunction>['inputs'],

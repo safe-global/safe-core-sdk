@@ -3,7 +3,7 @@ import safeProxyFactory_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/
 import SafeBaseProxyFactoryContract, {
   ProxyFactoryContractReadFunctions,
   ProxyFactoryContractWriteFunctions
-} from '../safeProxyFactoryContract'
+} from '../SafeProxyFactoryContract'
 
 const safeProxyFactoryContract_v1_3_0_AbiTypes = narrow(
   safeProxyFactory_1_3_0_ContractArtifacts.abi

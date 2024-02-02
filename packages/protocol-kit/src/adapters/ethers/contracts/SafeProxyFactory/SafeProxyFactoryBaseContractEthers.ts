@@ -1,7 +1,7 @@
 import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/adapters/safeProxyFactoryBaseContract'
+import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/adapters/SafeProxyFactoryBaseContract'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 /**

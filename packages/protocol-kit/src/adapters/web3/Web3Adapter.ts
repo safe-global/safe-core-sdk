@@ -18,7 +18,6 @@ import type { JsonRPCResponse, Provider } from 'web3/providers'
 import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
 import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
-import SafeProxyFactoryWeb3Contract from './contracts/SafeProxyFactory/SafeProxyFactoryWeb3Contract'
 import SimulateTxAccessorWeb3Contract from './contracts/SimulateTxAccessor/SimulateTxAccessorWeb3Contract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -118,18 +117,19 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SafeProxyFactoryWeb3Contract> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
-    const proxyFactoryContract = this.getContract(
+    return getSafeProxyFactoryContractInstance(
+      safeVersion,
       contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+      this,
+      customContractAbi
     )
-    return getSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
   async getMultiSendContract({

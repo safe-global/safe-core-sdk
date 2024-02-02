@@ -3,21 +3,25 @@ import SafeContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/co
 import SafeContract_v1_2_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Web3'
 import SafeContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Web3'
 import SafeContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Web3'
+import SafeProxyFactoryContract_v1_0_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0_Web3'
+import SafeProxyFactoryContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1_Web3'
+import SafeProxyFactoryContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0_Web3'
+import SafeProxyFactoryContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Web3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
 import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
 import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
 import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
+import { SafeProxyFactoryContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
+import { SafeProxyFactoryContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
+import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
 import { Gnosis_safe as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
-import { Proxy_factory as SafeProxyFactory_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Proxy_factory'
-import { Proxy_factory as SafeProxyFactory_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.1.1/Proxy_factory'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Create_call'
-import { Proxy_factory as SafeProxyFactory_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Proxy_factory'
 import { Simulate_tx_accessor as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Simulate_tx_accessor'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Create_call'
-import { Safe_proxy_factory as SafeProxyFactory_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Safe_proxy_factory'
 import { Simulate_tx_accessor as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Simulate_tx_accessor'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Web3 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Web3'
@@ -30,10 +34,6 @@ import MultiSendContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendContract_
 import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
 import MultiSendCallOnlyContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
 import SafeContract_V1_0_0_Web3 from './Safe/v1.0.0/SafeContract_V1_0_0_Web3'
-import SafeProxyFactoryContract_V1_0_0_Web3 from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_V1_0_0_Web3'
-import SafeProxyFactoryContract_V1_1_1_Web3 from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_V1_1_1_Web3'
-import SafeProxyFactoryContract_V1_3_0_Web3 from './SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_V1_3_0_Web3'
-import SafeProxyFactoryContract_V1_4_1_Web3 from './SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_V1_4_1_Web3'
 import SignMessageLibContract_v1_3_0_Web3 from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Web3'
 import SignMessageLibContract_v1_4_1_Web3 from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Web3'
 import SimulateTxAccessorContract_V1_3_0_Web3 from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Web3'
@@ -209,36 +209,53 @@ export async function getMultiSendCallOnlyContractInstance(
   }
 }
 
-export function getSafeProxyFactoryContractInstance(
+export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
-  safeProxyFactoryContract:
-    | SafeProxyFactory_V1_4_1
-    | SafeProxyFactory_V1_3_0
-    | SafeProxyFactory_V1_1_1
-    | SafeProxyFactory_V1_0_0
-):
-  | SafeProxyFactoryContract_V1_4_1_Web3
-  | SafeProxyFactoryContract_V1_3_0_Web3
-  | SafeProxyFactoryContract_V1_1_1_Web3
-  | SafeProxyFactoryContract_V1_0_0_Web3 {
+  contractAddress: string,
+  web3Adapter: Web3Adapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+) {
+  const chainId = await web3Adapter.getChainId()
+  let safeProxyFactoryContract
+
   switch (safeVersion) {
     case '1.4.1':
-      return new SafeProxyFactoryContract_V1_4_1_Web3(
-        safeProxyFactoryContract as SafeProxyFactory_V1_4_1
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_4_1_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeProxyFactoryContract_v1_4_1_Abi
       )
+      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
     case '1.3.0':
-      return new SafeProxyFactoryContract_V1_3_0_Web3(
-        safeProxyFactoryContract as SafeProxyFactory_V1_3_0
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_3_0_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeProxyFactoryContract_v1_3_0_Abi
       )
+      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
     case '1.2.0':
     case '1.1.1':
-      return new SafeProxyFactoryContract_V1_1_1_Web3(
-        safeProxyFactoryContract as SafeProxyFactory_V1_1_1
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_1_1_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeProxyFactoryContract_v1_1_1_Abi
       )
+      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
     case '1.0.0':
-      return new SafeProxyFactoryContract_V1_0_0_Web3(
-        safeProxyFactoryContract as SafeProxyFactory_V1_0_0
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_0_0_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeProxyFactoryContract_v1_0_0_Abi
       )
+      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
     default:
       throw new Error('Invalid Safe version')
   }

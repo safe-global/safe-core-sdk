@@ -17,11 +17,11 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
  * @extends SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbiType> - Extends the generic SafeProxyFactoryBaseContract with Web3.js-specific implementation.
  *
  * Example subclasses:
- * - SafeProxyFactory_v1_4_1_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_4_1_Abi>
- * - SafeProxyFactory_v1_3_0_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_3_0_Abi>
- * - SafeProxyFactory_v1_2_0_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_2_0_Abi>
- * - SafeProxyFactory_v1_1_1_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_1_1_Abi>
- * - SafeProxyFactory_v1_0_0_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_0_0_Abi>
+ * - SafeProxyFactoryContract_v1_4_1_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_4_1_Abi>
+ * - SafeProxyFactoryContract_v1_3_0_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_3_0_Abi>
+ * - SafeProxyFactoryContract_v1_2_0_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_2_0_Abi>
+ * - SafeProxyFactoryContract_v1_1_1_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_1_1_Abi>
+ * - SafeProxyFactoryContract_v1_0_0_Web3 extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_0_0_Abi>
  */
 abstract class SafeProxyFactoryBaseContractWeb3<
   SafeProxyFactoryContractAbiType extends AbiItem[]

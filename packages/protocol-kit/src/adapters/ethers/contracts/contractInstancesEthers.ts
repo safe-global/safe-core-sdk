@@ -25,10 +25,10 @@ import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.
 import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Ethers'
 import SafeContract_v1_2_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Ethers'
 import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
-import SafeProxyFactory_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.0.0/SafeProxyFactory_v1_0_0_Ethers'
-import SafeProxyFactory_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactory_v1_1_1_Ethers'
-import SafeProxyFactory_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactory_v1_3_0_Ethers'
-import SafeProxyFactory_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactory_v1_4_1_Ethers'
+import SafeProxyFactoryContract_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0_Ethers'
+import SafeProxyFactoryContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1_Ethers'
+import SafeProxyFactoryContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0_Ethers'
+import SafeProxyFactoryContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Ethers'
 import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Ethers'
 import EthersAdapter from '../EthersAdapter'
 import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
@@ -216,7 +216,7 @@ export async function getSafeProxyFactoryContractInstance(
   let safeProxyFactoryContract
   switch (safeVersion) {
     case '1.4.1':
-      safeProxyFactoryContract = new SafeProxyFactory_v1_4_1_Ethers(
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_4_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
@@ -227,7 +227,7 @@ export async function getSafeProxyFactoryContractInstance(
       return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
 
     case '1.3.0':
-      safeProxyFactoryContract = new SafeProxyFactory_v1_3_0_Ethers(
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
@@ -238,7 +238,7 @@ export async function getSafeProxyFactoryContractInstance(
       return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
     case '1.2.0':
     case '1.1.1':
-      safeProxyFactoryContract = new SafeProxyFactory_v1_1_1_Ethers(
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_1_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
@@ -248,7 +248,7 @@ export async function getSafeProxyFactoryContractInstance(
       )
       return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
     case '1.0.0':
-      safeProxyFactoryContract = new SafeProxyFactory_v1_0_0_Ethers(
+      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_0_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,

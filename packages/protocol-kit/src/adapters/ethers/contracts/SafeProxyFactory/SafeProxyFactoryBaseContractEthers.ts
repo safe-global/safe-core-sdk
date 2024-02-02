@@ -16,11 +16,11 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
  * @extends SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbiType> - Extends the generic SafeProxyFactoryBaseContract with Ethers-specific implementation.
  *
  * Example subclasses:
- * - SafeProxyFactory_v1_4_1_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_4_1_Abi>
- * - SafeProxyFactory_v1_3_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi>
- * - SafeProxyFactory_v1_2_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_2_0_Abi>
- * - SafeProxyFactory_v1_1_1_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_1_1_Abi>
- * - SafeProxyFactory_v1_0_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
+ * - SafeProxyFactoryContract_v1_4_1_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_4_1_Abi>
+ * - SafeProxyFactoryContract_v1_3_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi>
+ * - SafeProxyFactoryContract_v1_2_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_2_0_Abi>
+ * - SafeProxyFactoryContract_v1_1_1_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_1_1_Abi>
+ * - SafeProxyFactoryContract_v1_0_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
  */
 abstract class SafeProxyFactoryBaseContractEthers<
   SafeProxyFactoryContractAbiType extends InterfaceAbi

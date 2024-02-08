@@ -37,6 +37,8 @@
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^5.5.0",
     "@safe-global/protocol-kit": "^3.0.0",
-    "@safe-global/safe-core-sdk-types": "^4.0.0"
+    "@safe-global/safe-core-sdk-types": "^4.0.0",
+    "permissionless": "^0.0.35",
+    "viem": "^2.7.6"
   }
 }

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { execSync } from 'child_process'
 
 const playInput = process.argv[2]
@@ -14,7 +16,8 @@ const playgroundApiKitPaths = {
 }
 const playgroundRelayKitPaths = {
   'relay-paid-transaction': 'relay-kit/paid-transaction',
-  'relay-sponsored-transaction': 'relay-kit/sponsored-transaction'
+  'relay-sponsored-transaction': 'relay-kit/sponsored-transaction',
+  'deploy-4337-safe': 'relay-kit/deploy-4337-safe'
 }
 
 const path =
@@ -22,7 +25,7 @@ const path =
   playgroundApiKitPaths[playInput] ||
   playgroundRelayKitPaths[playInput]
 
-function printPlaygrounds(playgroundPaths) {
+function printPlaygrounds(playgroundPaths: Record<string, string>) {
   const playgroundKits = Object.keys(playgroundPaths)
   playgroundKits.forEach((name) => {
     console.log(`> yarn play ${name}`)

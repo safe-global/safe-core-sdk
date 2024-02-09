@@ -1,11 +1,16 @@
 import { ethers } from 'ethers'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
-import { Safe4337Options, SafeOperation, SafeUserOperation } from './types'
-import { SafeSignature, SafeTransaction } from '@safe-global/safe-core-sdk-types'
-import { EthSafeSignature, EthersAdapter } from 'packages/protocol-kit/dist/src'
+import { Safe4337Options, SafeOperation, SafeUserOperation, UserOperation } from './types'
+import { SafeSignature } from '@safe-global/safe-core-sdk-types'
+import {
+  EthSafeSignature,
+  EthersAdapter,
+  encodeMultiSendData,
+  SigningMethod
+} from '@safe-global/protocol-kit'
 import EthSafeOperation from './EthSafeOperation'
-import { SigningMethod, SigningMethodType } from 'packages/protocol-kit/dist/src/types'
 import { EIP712_SAFE_OPERATION_TYPE, SAFE_ADDRESSES_MAP } from './constants'
+import { RelayKitTransaction } from '../..'
 
 export class Safe4337Pack extends RelayKitBasePack {
   #bundlerUrl: string
@@ -24,12 +29,36 @@ export class Safe4337Pack extends RelayKitBasePack {
     throw new Error('Method not implemented.')
   }
 
-  async createRelayedTransaction(): Promise<SafeTransaction> {
-    throw new Error('Method not implemented')
+  async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<EthSafeOperation> {
+    const nonce = await this.protocolKit.getNonce()
+
+    const safeOperation = this.createSafeUserOperation({
+      safe: await this.protocolKit.getAddress(),
+      nonce: BigInt(nonce),
+      initCode: '0x',
+      callData: encodeMultiSendData(transactions),
+      callGasLimit: 1n,
+      verificationGasLimit: 1n,
+      preVerificationGas: 1n,
+      maxFeePerGas: 1n,
+      maxPriorityFeePerGas: 1n,
+      paymasterAndData: '',
+      validAfter: 0n,
+      validUntil: 0n,
+      entryPoint: ''
+    })
+
+    // TODO: Gas estimations using the bundler
+    return safeOperation
   }
 
-  async executeRelayTransaction(): Promise<unknown> {
-    throw new Error('Method not implemented')
+  async executeRelayTransaction(safeOperation: EthSafeOperation): Promise<string> {
+    const userOperation = this.buildUserOperationFromSafeUserOperation(
+      safeOperation.data,
+      safeOperation.encodedSignatures()
+    )
+
+    return this.sendUserOperation(userOperation, SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS)
   }
 
   createSafeUserOperation(safeUserOperation: SafeUserOperation): SafeOperation {
@@ -49,7 +78,7 @@ export class Safe4337Pack extends RelayKitBasePack {
 
   async signSafeUserOperation(
     safeOperation: EthSafeOperation,
-    signingMethod: SigningMethodType = SigningMethod.ETH_SIGN_TYPED_DATA_V4
+    signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
   ): Promise<EthSafeOperation> {
     const owners = await this.protocolKit.getOwners()
     const signerAddress = await this.protocolKit.getEthAdapter().getSignerAddress()
@@ -114,6 +143,28 @@ export class Safe4337Pack extends RelayKitBasePack {
     return new EthSafeSignature(signerAddress, signature)
   }
 
+  buildUserOperationFromSafeUserOperation(
+    safeOperation: SafeUserOperation,
+    signature: string
+  ): UserOperation {
+    return {
+      sender: safeOperation.safe,
+      nonce: ethers.toBeHex(safeOperation.nonce),
+      initCode: safeOperation.initCode,
+      callData: safeOperation.callData,
+      callGasLimit: safeOperation.callGasLimit,
+      verificationGasLimit: safeOperation.verificationGasLimit,
+      preVerificationGas: safeOperation.preVerificationGas,
+      maxFeePerGas: safeOperation.maxFeePerGas,
+      maxPriorityFeePerGas: safeOperation.maxPriorityFeePerGas,
+      paymasterAndData: safeOperation.paymasterAndData,
+      signature: ethers.solidityPacked(
+        ['uint48', 'uint48', 'bytes'],
+        [safeOperation.validAfter, safeOperation.validUntil, signature]
+      )
+    }
+  }
+
   getEip4337BundlerProvider(): ethers.JsonRpcProvider {
     const provider = new ethers.JsonRpcProvider(this.#bundlerUrl, undefined, {
       batchMaxCount: 1
@@ -122,7 +173,7 @@ export class Safe4337Pack extends RelayKitBasePack {
     return provider
   }
 
-  async sendUserOperation(userOpWithSignature: SafeOperation, entryPoint: string): Promise<string> {
+  async sendUserOperation(userOpWithSignature: UserOperation, entryPoint: string): Promise<string> {
     return await this.getEip4337BundlerProvider().send('eth_sendUserOperation', [
       userOpWithSignature,
       entryPoint

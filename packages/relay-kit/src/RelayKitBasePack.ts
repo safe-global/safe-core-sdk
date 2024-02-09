@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import { MetaTransactionOptions, SafeTransaction } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
 
 import { RelayKitTransaction } from './types'
 
@@ -32,7 +32,7 @@ export abstract class RelayKitBasePack {
     transactions,
     options,
     onlyCalls
-  }: RelayKitTransaction): Promise<SafeTransaction>
+  }: RelayKitTransaction): Promise<unknown>
 
   /**
    * Sends the Safe transaction to the relayer for execution.
@@ -42,7 +42,7 @@ export abstract class RelayKitBasePack {
    * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
    */
   abstract executeRelayTransaction(
-    safeTransaction: SafeTransaction,
+    safeTxOrOp: unknown,
     options?: MetaTransactionOptions
   ): Promise<unknown>
 }

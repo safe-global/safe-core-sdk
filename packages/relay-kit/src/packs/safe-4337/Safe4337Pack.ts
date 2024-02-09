@@ -3,7 +3,6 @@ import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
   EstimateUserOperationGas,
   Safe4337Options,
-  SafeOperation,
   SafeUserOperation,
   UserOperation
 } from './types'
@@ -20,7 +19,7 @@ import { RelayKitTransaction } from '../..'
 
 export class Safe4337Pack extends RelayKitBasePack {
   #bundlerUrl: string
-  #paymasterUrl: string
+  #paymasterUrl: string // TODO: Paymasters feature
   #rpcUrl: string
 
   constructor({ protocolKit, bundlerUrl, paymasterUrl, rpcUrl }: Safe4337Options) {
@@ -38,51 +37,34 @@ export class Safe4337Pack extends RelayKitBasePack {
   async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    const nonce = await this.getAccountNonce(safeAddress, SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS)
+    const nonce = await this.getAccountNonce(safeAddress)
 
-    const safeOperation = this.createSafeUserOperation({
-      safe: await this.protocolKit.getAddress(),
-      nonce: BigInt(nonce),
-      initCode: '0x',
+    const userOperation: UserOperation = {
+      sender: safeAddress,
+      nonce: nonce,
+      initCode: '0x', // TODO: conterfactual deploment feature
       callData: encodeMultiSendData(transactions),
       callGasLimit: 1n,
       verificationGasLimit: 1n,
       preVerificationGas: 1n,
       maxFeePerGas: 1n,
       maxPriorityFeePerGas: 1n,
-      paymasterAndData: '',
-      validAfter: 0n,
-      validUntil: 0n,
-      entryPoint: ''
-    })
-
-    const userOperation = this.buildUserOperationFromSafeUserOperation(
-      safeOperation.data,
-      safeOperation.encodedSignatures()
-    )
-
-    const gasEstimations = await this.estimateUserOperation(
-      userOperation,
-      SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
-    )
-
-    return {
-      ...safeOperation,
-      ...gasEstimations
+      paymasterAndData: '0x', // TODO: Paymasters feature
+      signature: '0x'
     }
+
+    const gasEstimations = await this.estimateUserOperation(userOperation)
+
+    return new EthSafeOperation({
+      ...userOperation,
+      ...gasEstimations
+    })
   }
 
   async executeRelayTransaction(safeOperation: EthSafeOperation): Promise<string> {
-    const userOperation = this.buildUserOperationFromSafeUserOperation(
-      safeOperation.data,
-      safeOperation.encodedSignatures()
-    )
+    const userOperation = safeOperation.toUserOperation()
 
-    return this.sendUserOperation(userOperation, SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS)
-  }
-
-  createSafeUserOperation(safeUserOperation: SafeUserOperation): SafeOperation {
-    return new EthSafeOperation(safeUserOperation)
+    return this.sendUserOperation(userOperation)
   }
 
   getSafeUserOperationHash(safeUserOperation: SafeUserOperation, chainId: bigint) {
@@ -129,7 +111,7 @@ export class Safe4337Pack extends RelayKitBasePack {
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
-    const signedSafeOperation = this.createSafeUserOperation(safeOperation.data)
+    const signedSafeOperation = new EthSafeOperation(safeOperation.toUserOperation())
 
     signedSafeOperation.signatures.forEach((signature: SafeSignature) => {
       signedSafeOperation.addSignature(signature)
@@ -163,28 +145,6 @@ export class Safe4337Pack extends RelayKitBasePack {
     return new EthSafeSignature(signerAddress, signature)
   }
 
-  buildUserOperationFromSafeUserOperation(
-    safeOperation: SafeUserOperation,
-    signature: string
-  ): UserOperation {
-    return {
-      sender: safeOperation.safe,
-      nonce: ethers.toBeHex(safeOperation.nonce),
-      initCode: safeOperation.initCode,
-      callData: safeOperation.callData,
-      callGasLimit: safeOperation.callGasLimit,
-      verificationGasLimit: safeOperation.verificationGasLimit,
-      preVerificationGas: safeOperation.preVerificationGas,
-      maxFeePerGas: safeOperation.maxFeePerGas,
-      maxPriorityFeePerGas: safeOperation.maxPriorityFeePerGas,
-      paymasterAndData: safeOperation.paymasterAndData,
-      signature: ethers.solidityPacked(
-        ['uint48', 'uint48', 'bytes'],
-        [safeOperation.validAfter, safeOperation.validUntil, signature]
-      )
-    }
-  }
-
   getEip4337BundlerProvider(): ethers.JsonRpcProvider {
     const provider = new ethers.JsonRpcProvider(this.#bundlerUrl, undefined, {
       batchMaxCount: 1
@@ -193,14 +153,14 @@ export class Safe4337Pack extends RelayKitBasePack {
     return provider
   }
 
-  async sendUserOperation(userOpWithSignature: UserOperation, entryPoint: string): Promise<string> {
+  async sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
     return await this.getEip4337BundlerProvider().send('eth_sendUserOperation', [
       userOpWithSignature,
-      entryPoint
+      SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
     ])
   }
 
-  async getAccountNonce(sender: string, entryPoint: string, key = BigInt(0)) {
+  async getAccountNonce(sender: string, key = BigInt(0)) {
     const provider = new ethers.JsonRpcProvider(this.#rpcUrl)
 
     const abi = [
@@ -216,18 +176,15 @@ export class Safe4337Pack extends RelayKitBasePack {
       }
     ]
 
-    const contract = new ethers.Contract(entryPoint, abi, provider)
+    const contract = new ethers.Contract(SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS, abi, provider)
 
     return await contract.getNonce(sender, key)
   }
 
-  async estimateUserOperation(
-    userOperation: UserOperation,
-    entryPoint: string
-  ): Promise<EstimateUserOperationGas> {
+  async estimateUserOperation(userOperation: UserOperation): Promise<EstimateUserOperationGas> {
     const gasEstimate = await this.getEip4337BundlerProvider().send(
       'eth_estimateUserOperationGas',
-      [userOperation, entryPoint]
+      [userOperation, SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS]
     )
 
     return gasEstimate

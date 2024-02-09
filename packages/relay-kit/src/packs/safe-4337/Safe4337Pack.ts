@@ -113,4 +113,19 @@ export class Safe4337Pack extends RelayKitBasePack {
     })
     return new EthSafeSignature(signerAddress, signature)
   }
+
+  getEip4337BundlerProvider(): ethers.JsonRpcProvider {
+    const provider = new ethers.JsonRpcProvider(this.#bundlerUrl, undefined, {
+      batchMaxCount: 1
+    })
+
+    return provider
+  }
+
+  async sendUserOperation(userOpWithSignature: SafeOperation, entryPoint: string): Promise<string> {
+    return await this.getEip4337BundlerProvider().send('eth_sendUserOperation', [
+      userOpWithSignature,
+      entryPoint
+    ])
+  }
 }

@@ -1,9 +1,11 @@
+import { ethers } from 'ethers'
 import { getAccountNonce } from 'permissionless'
 import { UserOperation, bundlerActions } from 'permissionless'
 import { setTimeout } from 'timers/promises'
 import { pimlicoBundlerActions, pimlicoPaymasterActions } from 'permissionless/actions/pimlico'
-import { Address, Hash, createClient, createPublicClient, createWalletClient, http } from 'viem'
+import { Address, createClient, createPublicClient, createWalletClient, http } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
+
 import { sepolia } from 'viem/chains'
 import {
   EIP712_SAFE_OPERATION_TYPE,
@@ -18,6 +20,12 @@ import {
   getERC20Decimals,
   transferERC20Token
 } from './utils/erc20'
+import Safe, {
+  EthersAdapter,
+  SafeAccountConfig,
+  predictSafeAddress
+} from '@safe-global/protocol-kit'
+import { Safe4337Pack } from '@safe-global/relay-kit'
 
 const PRIVATE_KEY = ''
 const PIMLICO_API_KEY = ''
@@ -25,26 +33,55 @@ const USE_PAYMASTER = true
 const CHAIN_ID = 11155111
 const CHAIN = 'sepolia'
 const ENTRY_POINT_ADDRESS = '0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789'
+const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
+
+const getProtocolKitInstance = async (rpcUrl: string, privateKey: string): Promise<Safe> => {
+  // Counterfactual Safe and Relay initialization
+  const provider = new ethers.JsonRpcProvider(rpcUrl)
+  const signer = new ethers.Wallet(privateKey, provider)
+  const ethersAdapter = new EthersAdapter({
+    ethers,
+    signerOrProvider: signer
+  })
+
+  const signerAddress = await ethersAdapter.getSignerAddress()
+
+  const owners = [signerAddress || '0x']
+  const threshold = 1
+
+  const safeAccountConfig: SafeAccountConfig = {
+    owners,
+    threshold
+  }
+
+  const safeAddress = await predictSafeAddress({
+    ethAdapter: ethersAdapter,
+    chainId: await ethersAdapter.getChainId(),
+    safeAccountConfig
+  })
+
+  const isSafeDeployed = await ethersAdapter.isContractDeployed(safeAddress)
+
+  let protocolKit: Safe
+
+  if (isSafeDeployed) {
+    protocolKit = await Safe.create({ ethAdapter: ethersAdapter, safeAddress })
+  } else {
+    protocolKit = await Safe.create({
+      ethAdapter: ethersAdapter,
+      predictedSafe: { safeAccountConfig }
+    })
+  }
+
+  return protocolKit
+}
 
 async function main() {
-  if (ENTRY_POINT_ADDRESS === undefined) {
-    throw new Error(
-      'Please replace the `entryPoint` env variable with your Pimlico entry point address'
-    )
-  }
+  const protocolKit: Safe = await getProtocolKitInstance(RPC_URL, PRIVATE_KEY)
+  const signerAddress = (await protocolKit.getEthAdapter().getSignerAddress()) as `0x${string}`
+  const safe4337Pack = new Safe4337Pack({ protocolKit })
 
-  if (PIMLICO_API_KEY === undefined) {
-    throw new Error('Please replace the `apiKey` env variable with your Pimlico API key')
-  }
-
-  if (PRIVATE_KEY.match(/GENERATED_PRIVATE_KEY/)) {
-    throw new Error(
-      'Please replace the `privateKey` variable with a newly generated private key. You can use `generatePrivateKey()` for this'
-    )
-  }
-
-  const signer = privateKeyToAccount(PRIVATE_KEY as Hash)
-
+  // Clients initialization
   const bundlerClient = createClient({
     transport: http(`https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`),
     chain: sepolia
@@ -53,7 +90,7 @@ async function main() {
     .extend(pimlicoBundlerActions)
 
   const publicClient = createPublicClient({
-    transport: http('https://eth-sepolia.public.blastapi.io'),
+    transport: http(RPC_URL),
     chain: sepolia
   })
 
@@ -63,7 +100,7 @@ async function main() {
   }).extend(pimlicoPaymasterActions)
 
   const walletClient = createWalletClient({
-    account: signer,
+    account: signerAddress,
     chain: sepolia,
     transport: http(`https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`)
   })
@@ -98,7 +135,7 @@ async function main() {
   const multiSendAddress = '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526'
 
   const initCode = await getAccountInitCode({
-    owner: signer.address,
+    owner: signerAddress,
     addModuleLibAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].ADD_MODULES_LIB_ADDRESS,
     safe4337ModuleAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_4337_MODULE_ADDRESS,
     safeProxyFactoryAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_PROXY_FACTORY_ADDRESS,
@@ -111,7 +148,7 @@ async function main() {
 
   const senderAddress = await getAccountAddress({
     client: publicClient,
-    owner: signer.address,
+    owner: signerAddress,
     addModuleLibAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].ADD_MODULES_LIB_ADDRESS,
     safe4337ModuleAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_4337_MODULE_ADDRESS,
     safeProxyFactoryAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_PROXY_FACTORY_ADDRESS,
@@ -148,10 +185,12 @@ async function main() {
     sender: senderAddress
   })
 
+  const signer = privateKeyToAccount(PRIVATE_KEY)
+
   const signUserOperation = async (userOperation: UserOperation) => {
     const signatures = [
       {
-        signer: signer.address,
+        signer: signerAddress,
         data: await signer.signTypedData({
           domain: {
             chainId: CHAIN_ID,
@@ -251,7 +290,7 @@ async function main() {
       await transferERC20Token(
         usdcTokenAddress,
         publicClient,
-        signer,
+        signerAddress,
         senderAddress,
         BigInt(1) * usdcAmount,
         walletClient
@@ -270,7 +309,7 @@ async function main() {
 
   console.log('User Operation', sponsoredUserOperation)
 
-  await submitUserOperation(sponsoredUserOperation)
+  // await submitUserOperation(sponsoredUserOperation)
 }
 
 main()

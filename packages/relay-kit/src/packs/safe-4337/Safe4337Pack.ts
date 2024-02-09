@@ -1,6 +1,12 @@
 import { ethers } from 'ethers'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
-import { Safe4337Options, SafeOperation, SafeUserOperation, UserOperation } from './types'
+import {
+  EstimateUserOperationGas,
+  Safe4337Options,
+  SafeOperation,
+  SafeUserOperation,
+  UserOperation
+} from './types'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 import {
   EthSafeSignature,
@@ -50,8 +56,20 @@ export class Safe4337Pack extends RelayKitBasePack {
       entryPoint: ''
     })
 
-    // TODO: Gas estimations using the bundler
-    return safeOperation
+    const userOperation = this.buildUserOperationFromSafeUserOperation(
+      safeOperation.data,
+      safeOperation.encodedSignatures()
+    )
+
+    const gasEstimations = await this.estimateUserOperation(
+      userOperation,
+      SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
+    )
+
+    return {
+      ...safeOperation,
+      ...gasEstimations
+    }
   }
 
   async executeRelayTransaction(safeOperation: EthSafeOperation): Promise<string> {
@@ -201,5 +219,17 @@ export class Safe4337Pack extends RelayKitBasePack {
     const contract = new ethers.Contract(entryPoint, abi, provider)
 
     return await contract.getNonce(sender, key)
+  }
+
+  async estimateUserOperation(
+    userOperation: UserOperation,
+    entryPoint: string
+  ): Promise<EstimateUserOperationGas> {
+    const gasEstimate = await this.getEip4337BundlerProvider().send(
+      'eth_estimateUserOperationGas',
+      [userOperation, entryPoint]
+    )
+
+    return gasEstimate
   }
 }

@@ -45,3 +45,9 @@ export type UserOperation = {
   paymasterAndData: string
   signature: string
 }
+
+export type EstimateUserOperationGas = {
+  preVerificationGas: bigint
+  verificationGasLimit: bigint
+  callGasLimit: bigint
+}

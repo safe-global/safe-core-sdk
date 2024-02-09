@@ -30,7 +30,9 @@ export class Safe4337Pack extends RelayKitBasePack {
   }
 
   async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<EthSafeOperation> {
-    const nonce = await this.protocolKit.getNonce()
+    const safeAddress = await this.protocolKit.getAddress()
+
+    const nonce = await this.getAccountNonce(safeAddress, SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS)
 
     const safeOperation = this.createSafeUserOperation({
       safe: await this.protocolKit.getAddress(),
@@ -178,5 +180,26 @@ export class Safe4337Pack extends RelayKitBasePack {
       userOpWithSignature,
       entryPoint
     ])
+  }
+
+  async getAccountNonce(sender: string, entryPoint: string, key = BigInt(0)) {
+    const provider = new ethers.JsonRpcProvider(this.#rpcUrl)
+
+    const abi = [
+      {
+        inputs: [
+          { name: 'sender', type: 'address' },
+          { name: 'key', type: 'uint192' }
+        ],
+        name: 'getNonce',
+        outputs: [{ name: 'nonce', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function'
+      }
+    ]
+
+    const contract = new ethers.Contract(entryPoint, abi, provider)
+
+    return await contract.getNonce(sender, key)
   }
 }

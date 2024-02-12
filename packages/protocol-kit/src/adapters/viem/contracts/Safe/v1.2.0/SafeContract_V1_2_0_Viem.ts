@@ -5,11 +5,12 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import SafeContractViem, { SafeContractViemBaseArgs } from '../SafeContractViem'
+import SafeContractViem from '../SafeContractViem'
 import { Address, Hash } from 'viem'
+import type { ViemContractBaseArgs } from '../../../ViemContract'
 
 class SafeContract_V1_2_0_Viem extends SafeContractViem {
-  constructor(args: SafeContractViemBaseArgs) {
+  constructor(args: ViemContractBaseArgs) {
     super({ ...args, abi: Safe__factory.abi })
   }
 

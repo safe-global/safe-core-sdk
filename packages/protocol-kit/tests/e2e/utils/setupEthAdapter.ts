@@ -10,24 +10,14 @@ import { ethers, web3, network as hhNetwork } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 import { ViemAdapter } from '@safe-global/protocol-kit/adapters/viem/ViemAdapter'
-import {
-  Account,
-  Address,
-  Chain,
-  Client,
-  Transport,
-  createPublicClient,
-  createWalletClient,
-  http
-} from 'viem'
+import { Address, Chain, Client, Transport, createClient, http } from 'viem'
 import { gnosis, goerli, hardhat, mainnet, sepolia, zkSync } from 'viem/chains'
 import { custom } from 'viem'
-import { KeyedClient } from '@safe-global/protocol-kit/adapters/viem/types'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
 export async function getEthAdapter(
-  signerOrProvider: AbstractSigner | Provider | Web3 | Client
+  signerOrProvider: AbstractSigner | Provider | Web3 | Client<Transport, Chain>
 ): Promise<EthAdapter> {
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
@@ -52,18 +42,12 @@ export async function getEthAdapter(
       ethAdapter = new ViemAdapter({
         client:
           signerOrProvider instanceof HardhatEthersSigner
-            ? {
-                wallet: createWalletClient({
-                  chain: hardhat,
-                  transport: custom(hhNetwork.provider),
-                  account: signerOrProvider.address as Address
-                }),
-                public: createPublicClient({
-                  chain: hardhat,
-                  transport: custom(hhNetwork.provider)
-                })
-              }
-            : (signerOrProvider as Client<Transport, Chain, Account>)
+            ? createClient({
+                chain: hardhat,
+                transport: custom(hhNetwork.provider),
+                account: signerOrProvider.address as Address
+              })
+            : (signerOrProvider as Client<Transport, Chain>)
       })
       break
     default:
@@ -73,7 +57,7 @@ export async function getEthAdapter(
   return ethAdapter
 }
 
-export function getNetworkProvider(network: Network): Provider | Web3 | KeyedClient {
+export function getNetworkProvider(network: Network): Provider | Web3 | Client<Transport, Chain> {
   let rpcUrl: string
   switch (network) {
     case 'zksync':
@@ -104,9 +88,7 @@ export function getNetworkProvider(network: Network): Provider | Web3 | KeyedCli
       provider = new ethers.JsonRpcProvider(rpcUrl)
       break
     case 'viem':
-      provider = {
-        public: createPublicClient({ chain: getViemChain(network), transport: http(rpcUrl) })
-      }
+      provider = createClient({ chain: getViemChain(network), transport: http(rpcUrl) })
       break
     default:
       throw new Error('Ethereum library not supported')

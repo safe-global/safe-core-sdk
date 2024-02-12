@@ -6,6 +6,7 @@ import { SafeProxyFactoryContract, TransactionOptions } from '@safe-global/safe-
 import { Address, Hash, Hex, decodeEventLog } from 'viem'
 import { TransactionReceipt } from 'viem'
 import { ViemContract, ViemContractBaseArgs } from '../../ViemContract'
+import { waitForTransactionReceipt, writeContract } from 'viem/actions'
 
 export interface CreateProxyProps {
   safeSingletonAddress: string
@@ -43,35 +44,33 @@ class SafeProxyFactoryContractViem
     const bnSaltNonce = BigInt(saltNonce)
     if (bnSaltNonce < 0n) throw new Error('saltNonce must be greater than or equal to 0')
 
-    const proxyAddress = this.walletClient
-      .writeContract({
-        abi: this.abi,
-        address: this.address,
-        functionName: 'createProxyWithNonce',
-        args: [safeSingletonAddress as Address, initializer as Hash, bnSaltNonce],
-        ...this.formatViemTransactionOptions(options ?? {})
+    const proxyAddress = writeContract(this.client, {
+      abi: this.abi,
+      address: this.address,
+      functionName: 'createProxyWithNonce',
+      args: [safeSingletonAddress as Address, initializer as Hash, bnSaltNonce],
+      ...this.formatViemTransactionOptions(options ?? {})
+    }).then(async (hash) => {
+      if (callback) {
+        callback(hash)
+      }
+      const txReceipt: TransactionReceipt = await waitForTransactionReceipt(this.client, {
+        hash
       })
-      .then(async (hash) => {
-        if (callback) {
-          callback(hash)
-        }
-        const txReceipt: TransactionReceipt = await this.publicClient.waitForTransactionReceipt({
-          hash
-        })
 
-        const events = txReceipt.logs.flatMap((log) => {
-          try {
-            return decodeEventLog({ abi: this.abi, ...log })
-          } catch {
-            return []
-          }
-        })
-        const proxyCreationEvent = events.find((e) => e.eventName === 'ProxyCreation')
-        if (!proxyCreationEvent) {
-          throw new Error('SafeProxy was not deployed correctly')
+      const events = txReceipt.logs.flatMap((log) => {
+        try {
+          return decodeEventLog({ abi: this.abi, ...log })
+        } catch {
+          return []
         }
-        return proxyCreationEvent.args.proxy
       })
+      const proxyCreationEvent = events.find((e) => e.eventName === 'ProxyCreation')
+      if (!proxyCreationEvent) {
+        throw new Error('SafeProxy was not deployed correctly')
+      }
+      return proxyCreationEvent.args.proxy
+    })
     return proxyAddress
   }
 }

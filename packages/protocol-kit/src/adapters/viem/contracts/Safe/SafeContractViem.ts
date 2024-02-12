@@ -15,6 +15,7 @@ import {
 import { Address, Hash } from 'viem'
 import { formatViemSafeTransactionData } from '../../utils'
 import { ViemContract, ViemContractBaseArgs } from '../../ViemContract'
+import { simulateContract } from 'viem/actions'
 
 type SafeAbi =
   | typeof Safe_V1_4_1__factory.abi
@@ -88,7 +89,7 @@ abstract class SafeContractViem extends ViemContract<SafeAbi> implements SafeCon
     let isTxValid = false
     try {
       const data = formatViemSafeTransactionData(safeTransaction.data)
-      const { result } = await this.publicClient.simulateContract({
+      const { result } = await simulateContract(this.client, {
         abi: this.abi,
         address: this.address,
         functionName: 'execTransaction',

@@ -20,7 +20,7 @@ import {
   createWalletClient,
   http
 } from 'viem'
-import { gnosis, goerli, hardhat, mainnet, zkSync } from 'viem/chains'
+import { gnosis, goerli, hardhat, mainnet, sepolia, zkSync } from 'viem/chains'
 import { custom } from 'viem'
 import { KeyedClient } from '@safe-global/protocol-kit/adapters/viem/types'
 
@@ -125,5 +125,7 @@ function getViemChain(network: Network) {
       return gnosis
     case 'zksync':
       return zkSync
+    case 'sepolia':
+      return sepolia
   }
 }

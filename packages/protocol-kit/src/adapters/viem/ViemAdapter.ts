@@ -27,9 +27,11 @@ import {
   MultiSendContract,
   SafeContract,
   SafeProxyFactoryContract,
-  SafeTransactionEIP712Args,
   SignMessageLibContract,
-  SimulateTxAccessorContract
+  SimulateTxAccessorContract,
+  type SafeEIP712Args,
+  type EIP712TypedDataMessage,
+  type EIP712TypedDataTx
 } from '@safe-global/safe-core-sdk-types'
 import {
   getSafeContractInstance,
@@ -210,7 +212,7 @@ export class ViemAdapter<
   }
 
   signTypedData(
-    safeTransactionEIP712Args: SafeTransactionEIP712Args,
+    safeTransactionEIP712Args: SafeEIP712Args,
     signTypedDataVersion?: string
   ): Promise<Hex> {
     const typedData = generateTypedData(safeTransactionEIP712Args)
@@ -221,7 +223,10 @@ export class ViemAdapter<
         chainId: typedData.domain.chainId == null ? undefined : Number(typedData.domain.chainId),
         version: signTypedDataVersion
       },
-      types: { SafeTx: typedData.types.SafeTx },
+      types:
+        typedData.primaryType === 'SafeMessage'
+          ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
+          : { SafeTx: (typedData as EIP712TypedDataTx).types.SafeTx },
       message: typedData.message
     })
   }

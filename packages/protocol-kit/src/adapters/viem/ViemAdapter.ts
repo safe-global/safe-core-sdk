@@ -192,7 +192,7 @@ export class ViemAdapter<const TClient extends Client<Transport, Chain>> impleme
 
   signMessage(message: string): Promise<Hash> {
     return signMessage(this.walletClient, {
-      message: message
+      message: message.startsWith('0x') ? { raw: message as Hex } : message
     })
   }
 

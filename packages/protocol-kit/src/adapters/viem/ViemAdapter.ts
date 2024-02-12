@@ -196,16 +196,13 @@ export class ViemAdapter<const TClient extends Client<Transport, Chain>> impleme
     })
   }
 
-  signTypedData(
-    safeTransactionEIP712Args: SafeEIP712Args,
-    signTypedDataVersion?: string
-  ): Promise<Hex> {
+  signTypedData(safeTransactionEIP712Args: SafeEIP712Args): Promise<Hex> {
     const typedData = generateTypedData(safeTransactionEIP712Args)
     return signTypedData(this.walletClient, {
       primaryType: typedData.primaryType,
       domain: {
         chainId: typedData.domain.chainId == null ? undefined : Number(typedData.domain.chainId),
-        version: signTypedDataVersion
+        verifyingContract: typedData.domain.verifyingContract as Address
       },
       types:
         typedData.primaryType === 'SafeMessage'

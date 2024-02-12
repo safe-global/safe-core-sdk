@@ -110,7 +110,7 @@ export abstract class ViemContract<
 
   protected formatViemTransactionOptions(txOptions: TransactionOptions) {
     return {
-      account: this.client.account.address,
+      account: txOptions.from as Address,
       gas: toBigInt(txOptions.gas),
       maxFeePerGas: toBigInt(txOptions.maxFeePerGas),
       maxPriorityFeePerGas: toBigInt(txOptions.maxPriorityFeePerGas),

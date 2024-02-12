@@ -6,7 +6,6 @@ import {
   Web3AdapterConfig
 } from '@safe-global/protocol-kit/index'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
-import dotenv from 'dotenv'
 import { ethers, web3, network as hhNetwork } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
@@ -25,9 +24,7 @@ import { gnosis, goerli, hardhat, mainnet, zkSync } from 'viem/chains'
 import { custom } from 'viem'
 import { KeyedClient } from '@safe-global/protocol-kit/adapters/viem/types'
 
-dotenv.config()
-
-type Network = 'mainnet' | 'goerli' | 'gnosis' | 'zksync'
+type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
 export async function getEthAdapter(
   signerOrProvider: AbstractSigner | Provider | Web3 | Client
@@ -85,9 +82,17 @@ export function getNetworkProvider(network: Network): Provider | Web3 | KeyedCli
     case 'gnosis':
       rpcUrl = 'https://rpc.gnosischain.com'
       break
-    default:
-      rpcUrl = `https://${network}.infura.io/v3/${process.env.INFURA_KEY}`
+    case 'goerli':
+      rpcUrl = 'https://rpc.ankr.com/eth_goerli'
       break
+    case 'sepolia':
+      rpcUrl = 'https://rpc.ankr.com/eth_sepolia'
+      break
+    case 'mainnet':
+      rpcUrl = 'https://rpc.ankr.com/eth'
+      break
+    default:
+      throw new Error('Chain not supported')
   }
 
   let provider

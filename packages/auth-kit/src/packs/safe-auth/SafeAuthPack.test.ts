@@ -1,6 +1,6 @@
 import { SafeAuthPack } from './SafeAuthPack'
 import { generateTestingUtils } from 'eth-testing'
-import { AuthKitBasePack } from '../../AuthKitBasePack'
+import { AuthKitBasePack } from '@safe-global/auth-kit/index'
 import { SafeAuthInitOptions } from './types'
 import { CHAIN_CONFIG } from './constants'
 

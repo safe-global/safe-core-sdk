@@ -58,7 +58,8 @@ import {
   SafeConfigWithSafeAddress,
   SafeDeploymentConfig,
   StandardizeSafeTransactionDataProps,
-  SwapOwnerTxParams
+  SwapOwnerTxParams,
+  SigningMethod
 } from './types'
 import {
   EthSafeSignature,
@@ -66,6 +67,7 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  validateEthereumAddress,
   validateEip3770Address
 } from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -75,6 +77,22 @@ import {
   isGasTokenCompatibleWithHandlePayment,
   createERC20TokenTransferTransaction
 } from './utils/erc-20'
+
+import {
+  generateSignature,
+  generateEIP712Signature,
+  buildContractSignature,
+  buildSignatureBytes,
+  preimageSafeTransactionHash,
+  preimageSafeMessageHash
+} from './utils/signatures/utils'
+
+import {
+  getEip712TxTypes,
+  getEip712MessageTypes,
+  hashSafeMessage,
+  generateTypedData
+} from './utils/eip-712'
 
 export {
   AddOwnerTxParams,
@@ -123,6 +141,7 @@ export {
   SignMessageLibWeb3Contract,
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams,
+  SigningMethod,
   Web3Adapter,
   Web3AdapterConfig,
   Web3TransactionOptions,
@@ -141,7 +160,18 @@ export {
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   standardizeSafeTransactionData,
-  validateEip3770Address
+  validateEip3770Address,
+  validateEthereumAddress,
+  generateSignature,
+  generateEIP712Signature,
+  buildContractSignature,
+  buildSignatureBytes,
+  preimageSafeTransactionHash,
+  preimageSafeMessageHash,
+  getEip712TxTypes,
+  getEip712MessageTypes,
+  hashSafeMessage,
+  generateTypedData
 }
 
 export default Safe

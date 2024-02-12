@@ -1,7 +1,7 @@
-import { ethers, Eip1193Provider } from 'ethers'
+import { ethers } from 'ethers'
 import SafeApiKit from '@safe-global/api-kit'
 
-import type { AuthKitSignInData } from './types'
+import type { AuthKitEthereumProvider, AuthKitSignInData } from './types'
 
 export abstract class AuthKitBasePack {
   safeAuthData?: AuthKitSignInData
@@ -33,7 +33,7 @@ export abstract class AuthKitBasePack {
    * Get the provider instance based on the pack
    * @returns The provider instance
    */
-  abstract getProvider(): Eip1193Provider | null
+  abstract getProvider(): AuthKitEthereumProvider | null
 
   /**
    * Get the user info from the provider

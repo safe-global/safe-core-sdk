@@ -2,20 +2,30 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { DeploymentFilter, getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { networks } from '../src/utils/eip-3770/config'
 
-// TO-DO: The SDK needs to take into account all the networks where the different versions of the Safe contracts are deployed, not just the ones for v1.3.0 contracts
-const safeVersion: SafeVersion = '1.3.0'
+const compatibleSafeVersions: SafeVersion[] = ['1.0.0', '1.1.1', '1.2.0', '1.3.0', '1.4.1']
 
 function getSafeDeploymentNetworks(): string[] {
-  const filters: DeploymentFilter = { version: safeVersion, released: true }
-  const singletons = getSafeSingletonDeployment(filters)
-  if (!singletons) {
+  const allDeployedNetworks = compatibleSafeVersions.reduce((acc: string[], safeVersion) => {
+    const filters: DeploymentFilter = { version: safeVersion, released: true }
+    const singletons = getSafeSingletonDeployment(filters)
+
+    if (!singletons) {
+      return acc
+    }
+
+    return acc.concat(Object.keys(singletons.networkAddresses))
+  }, [])
+
+  const uniqueDeployedNetworks = [...new Set(allDeployedNetworks)]
+
+  if (!uniqueDeployedNetworks) {
     throw new Error('Empty Safe Deployments')
   }
-  return Object.keys(singletons.networkAddresses)
+  return uniqueDeployedNetworks
 }
 
 function getLocalNetworksConfig(): string[] {
-  return networks.map((network: any) => network.chainId.toString())
+  return networks.map((network) => network.chainId.toString())
 }
 
 function checkConfigDiff() {

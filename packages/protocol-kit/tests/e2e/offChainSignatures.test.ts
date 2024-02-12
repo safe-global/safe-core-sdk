@@ -1,5 +1,5 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
+import Safe, { PredictedSafeProps, SigningMethod } from '@safe-global/protocol-kit/index'
 import { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -35,7 +35,7 @@ describe('Off-chain signatures', () => {
     }
   })
 
-  describe('signTransactionHash', async () => {
+  describe('signHash', async () => {
     it('should sign a transaction hash with the current signer if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
@@ -46,7 +46,7 @@ describe('Off-chain signatures', () => {
         contractNetworks
       })
       const txHash = '0xcbf14050c5fcc9b71d4a3ab874cc728db101d19d4466d56fcdbb805117a28c64'
-      const signature = await safeSdk.signTransactionHash(txHash)
+      const signature = await safeSdk.signHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
     })
 
@@ -67,7 +67,7 @@ describe('Off-chain signatures', () => {
       }
       const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       const txHash = await safeSdk.getTransactionHash(tx)
-      const signature = await safeSdk.signTransactionHash(txHash)
+      const signature = await safeSdk.signHash(txHash)
       chai.expect(signature.staticPart().length).to.be.eq(132)
     })
   })
@@ -196,7 +196,7 @@ describe('Off-chain signatures', () => {
         }
         const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
-          .expect(safeSdk.signTransaction(tx, 'eth_sign'))
+          .expect(safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN))
           .to.be.rejectedWith('eth_sign is only supported by Safes >= v1.1.0')
       }
     )
@@ -220,7 +220,7 @@ describe('Off-chain signatures', () => {
         }
         const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
-        const signedTx = await safeSdk.signTransaction(tx, 'eth_sign')
+        const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN)
         chai.expect(tx.signatures.size).to.be.eq(0)
         chai.expect(signedTx.signatures.size).to.be.eq(1)
       }
@@ -245,7 +245,7 @@ describe('Off-chain signatures', () => {
         }
         const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
-        const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData')
+        const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA)
         chai.expect(tx.signatures.size).to.be.eq(0)
         chai.expect(signedTx.signatures.size).to.be.eq(1)
       }
@@ -270,7 +270,7 @@ describe('Off-chain signatures', () => {
         }
         const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
-          .expect(safeSdk.signTransaction(tx, 'eth_signTypedData'))
+          .expect(safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA))
           .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
       }
     )
@@ -294,7 +294,7 @@ describe('Off-chain signatures', () => {
         }
         const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         chai.expect(tx.signatures.size).to.be.eq(0)
-        const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData_v3')
+        const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA_V3)
         chai.expect(tx.signatures.size).to.be.eq(0)
         chai.expect(signedTx.signatures.size).to.be.eq(1)
       }
@@ -319,7 +319,7 @@ describe('Off-chain signatures', () => {
         }
         const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
         await chai
-          .expect(safeSdk.signTransaction(tx, 'eth_signTypedData_v3'))
+          .expect(safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA_V3))
           .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
       }
     )
@@ -341,7 +341,7 @@ describe('Off-chain signatures', () => {
       }
       const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
       chai.expect(tx.signatures.size).to.be.eq(0)
-      const signedTx = await safeSdk.signTransaction(tx, 'eth_signTypedData_v4')
+      const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA_V4)
       chai.expect(tx.signatures.size).to.be.eq(0)
       chai.expect(signedTx.signatures.size).to.be.eq(1)
     })

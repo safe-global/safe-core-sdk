@@ -3,7 +3,7 @@ import { StripePack } from './StripePack'
 import * as stripeApi from './stripeApi'
 
 import type { StripeOpenOptions, StripeSession } from './types'
-import { OnRampKitBasePack } from '../..'
+import { OnRampKitBasePack } from '@safe-global/onramp-kit/index'
 
 const openOptions: StripeOpenOptions = {
   element: '#root',

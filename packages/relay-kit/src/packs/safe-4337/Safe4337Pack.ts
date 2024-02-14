@@ -44,9 +44,9 @@ export class Safe4337Pack extends RelayKitBasePack {
     const batch = await this.protocolKit.createTransactionBatch(transactions)
     console.log('batch', batch)
     const callData = await this.encodeCallData({
-      to: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526', //TODO: This should be the multisend address
+      to: transactions[0].to,
       value: 0n,
-      data: batch.data as string
+      data: transactions[0].data
     })
     console.log('callData', callData)
     const userOperation: UserOperation = {
@@ -138,10 +138,10 @@ export class Safe4337Pack extends RelayKitBasePack {
     // - Allow to pass the data types (SafeOp, SafeMessage, SafeTx) to the signTypedData method and refactor the protocol-kit to allow any kind of data signing from outside (Currently only SafeTx and SafeMessage)
     const ethAdapter = this.protocolKit.getEthAdapter() as EthersAdapter
     const signer = ethAdapter.getSigner() as any
-
+    console.log('safeUserOperation', safeUserOperation)
     const chainId = await ethAdapter.getChainId()
     const signerAddress = await signer.getAddress()
-    const signature = await signer.signTypedData({
+    console.log('signTypedData', {
       domain: {
         chainId,
         verifyingContract: SAFE_ADDRESSES_MAP.SAFE_4337_MODULE_ADDRESS
@@ -149,9 +149,30 @@ export class Safe4337Pack extends RelayKitBasePack {
       types: EIP712_SAFE_OPERATION_TYPE,
       primaryType: 'SafeOp',
       message: {
-        ...safeUserOperation
+        ...safeUserOperation,
+        nonce: ethers.toBeHex(safeUserOperation.nonce),
+        validAfter: ethers.toBeHex(safeUserOperation.validAfter),
+        validUntil: ethers.toBeHex(safeUserOperation.validUntil),
+        maxFeePerGas: ethers.toBeHex(safeUserOperation.maxFeePerGas),
+        maxPriorityFeePerGas: ethers.toBeHex(safeUserOperation.maxPriorityFeePerGas)
       }
     })
+    const signature = await signer.signTypedData(
+      {
+        chainId,
+        verifyingContract: SAFE_ADDRESSES_MAP.SAFE_4337_MODULE_ADDRESS
+      },
+      EIP712_SAFE_OPERATION_TYPE,
+      {
+        ...safeUserOperation,
+        nonce: ethers.toBeHex(safeUserOperation.nonce),
+        validAfter: ethers.toBeHex(safeUserOperation.validAfter),
+        validUntil: ethers.toBeHex(safeUserOperation.validUntil),
+        maxFeePerGas: ethers.toBeHex(safeUserOperation.maxFeePerGas),
+        maxPriorityFeePerGas: ethers.toBeHex(safeUserOperation.maxPriorityFeePerGas)
+      }
+    )
+    console.log('signature', signature)
     return new EthSafeSignature(signerAddress, signature)
   }
 
@@ -164,8 +185,13 @@ export class Safe4337Pack extends RelayKitBasePack {
   }
 
   async sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
+    console.log('userOpWithSignature', userOpWithSignature)
     return await this.getEip4337BundlerProvider().send('eth_sendUserOperation', [
-      userOpWithSignature,
+      {
+        ...userOpWithSignature,
+        maxFeePerGas: ethers.toBeHex(userOpWithSignature.maxFeePerGas),
+        maxPriorityFeePerGas: ethers.toBeHex(userOpWithSignature.maxPriorityFeePerGas)
+      },
       SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
     ])
   }

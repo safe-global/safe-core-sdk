@@ -93,82 +93,14 @@ async function main() {
     bundlerUrl: `https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`
   })
 
-  // Clients initialization
-  const bundlerClient = createClient({
-    transport: http(`https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`),
-    chain: sepolia
-  })
-    .extend(bundlerActions)
-    .extend(pimlicoBundlerActions)
-
-  const publicClient = createPublicClient({
-    transport: http(RPC_URL),
-    chain: sepolia
-  })
-
-  const paymasterClient = createClient({
-    transport: http(`https://api.pimlico.io/v2/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`),
-    chain: sepolia
-  }).extend(pimlicoPaymasterActions)
-
-  const walletClient = createWalletClient({
-    account: signerAddress,
-    chain: sepolia,
-    transport: http(`https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`)
-  })
-
   const erc20PaymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f'
   const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
   // from safe-deployments
   const multiSendAddress = '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526'
 
-  const initCode = await getAccountInitCode({
-    owner: signerAddress,
-    addModuleLibAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].ADD_MODULES_LIB_ADDRESS,
-    safe4337ModuleAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_4337_MODULE_ADDRESS,
-    safeProxyFactoryAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_PROXY_FACTORY_ADDRESS,
-    safeSingletonAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_SINGLETON_ADDRESS,
-    saltNonce: 4n,
-    erc20TokenAddress: usdcTokenAddress,
-    multiSendAddress,
-    paymasterAddress: erc20PaymasterAddress
-  })
-
-  // const senderAddress = await getAccountAddress({
-  //   client: publicClient,
-  //   owner: signerAddress,
-  //   addModuleLibAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].ADD_MODULES_LIB_ADDRESS,
-  //   safe4337ModuleAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_4337_MODULE_ADDRESS,
-  //   safeProxyFactoryAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_PROXY_FACTORY_ADDRESS,
-  //   safeSingletonAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_SINGLETON_ADDRESS,
-  //   saltNonce: 4n,
-  //   erc20TokenAddress: usdcTokenAddress,
-  //   multiSendAddress,
-  //   paymasterAddress: erc20PaymasterAddress
-  // })
-
   const senderAddress = (await protocolKit.getAddress()) as `0x${string}`
 
   console.log('Counterfactual sender address:', senderAddress)
-
-  // Fetch USDC balance of sender
-
-  const senderUsdcBalance = await publicClient.readContract({
-    abi: [
-      {
-        inputs: [{ name: '_owner', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ name: 'balance', type: 'uint256' }],
-        type: 'function',
-        stateMutability: 'view'
-      }
-    ],
-    address: usdcTokenAddress,
-    functionName: 'balanceOf',
-    args: [senderAddress]
-  })
-
-  console.log('Smart Account USDC Balance:', Number(senderUsdcBalance / 1000000n))
 
   // const isSafeDeployed = await publicClient.getBytecode({ address: senderAddress })
   const isSafeDeployed = await protocolKit.isSafeDeployed()

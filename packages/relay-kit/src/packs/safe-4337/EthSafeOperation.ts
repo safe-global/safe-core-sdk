@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
 import { SafeUserOperation, SafeOperation, UserOperation } from './types'
+import { SAFE_ADDRESSES_MAP } from './constants'
 
 class EthSafeOperation implements SafeOperation {
   data: SafeUserOperation
@@ -21,7 +22,7 @@ class EthSafeOperation implements SafeOperation {
       paymasterAndData: userOperation.paymasterAndData,
       validAfter: 0n,
       validUntil: 0n,
-      entryPoint: ''
+      entryPoint: SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
     }
   }
 

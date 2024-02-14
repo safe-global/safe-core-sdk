@@ -7,19 +7,14 @@ import {
   UserOperation
 } from './types'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
-import {
-  EthSafeSignature,
-  EthersAdapter,
-  encodeMultiSendData,
-  SigningMethod
-} from '@safe-global/protocol-kit'
+import { EthSafeSignature, EthersAdapter, SigningMethod } from '@safe-global/protocol-kit'
 import EthSafeOperation from './EthSafeOperation'
 import { EIP712_SAFE_OPERATION_TYPE, SAFE_ADDRESSES_MAP } from './constants'
 import { RelayKitTransaction } from '../..'
 
 export class Safe4337Pack extends RelayKitBasePack {
   #bundlerUrl: string
-  #paymasterUrl: string // TODO: Paymasters feature
+  #paymasterUrl?: string // TODO: Paymasters feature
   #rpcUrl: string
 
   constructor({ protocolKit, bundlerUrl, paymasterUrl, rpcUrl }: Safe4337Options) {
@@ -34,16 +29,32 @@ export class Safe4337Pack extends RelayKitBasePack {
     throw new Error('Method not implemented.')
   }
 
+  async encodeCallData(params: { to: string; value: bigint; data: string }) {
+    const functionAbi =
+      'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)'
+
+    const iface = new ethers.Interface([functionAbi])
+
+    return iface.encodeFunctionData('executeUserOp', [params.to, params.value, params.data, 0])
+  }
+
   async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
-
     const nonce = await this.getAccountNonce(safeAddress)
+
+    const batch = await this.protocolKit.createTransactionBatch(transactions)
+
+    const callData = await this.encodeCallData({
+      to: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526', //TODO: This should be the multisend address
+      value: 0n,
+      data: batch.data as string
+    })
 
     const userOperation: UserOperation = {
       sender: safeAddress,
       nonce: nonce,
       initCode: '0x', // TODO: conterfactual deploment feature
-      callData: encodeMultiSendData(transactions),
+      callData,
       callGasLimit: 1n,
       verificationGasLimit: 1n,
       preVerificationGas: 1n,

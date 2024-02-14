@@ -4,7 +4,7 @@ import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 export type Safe4337Options = {
   protocolKit: Safe
   bundlerUrl: string
-  paymasterUrl: string
+  paymasterUrl?: string
   rpcUrl: string
 }
 

@@ -41,15 +41,14 @@ export class Safe4337Pack extends RelayKitBasePack {
   async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.getAccountNonce(safeAddress)
-
     const batch = await this.protocolKit.createTransactionBatch(transactions)
-
+    console.log('batch', batch)
     const callData = await this.encodeCallData({
       to: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526', //TODO: This should be the multisend address
       value: 0n,
       data: batch.data as string
     })
-
+    console.log('callData', callData)
     const userOperation: UserOperation = {
       sender: safeAddress,
       nonce: nonce,
@@ -63,9 +62,9 @@ export class Safe4337Pack extends RelayKitBasePack {
       paymasterAndData: '0x', // TODO: Paymasters feature
       signature: '0x'
     }
-
+    console.log('userOperation', userOperation)
     const gasEstimations = await this.estimateUserOperation(userOperation)
-
+    console.log('gasEstimations', gasEstimations)
     return new EthSafeOperation({
       ...userOperation,
       ...gasEstimations
@@ -195,7 +194,18 @@ export class Safe4337Pack extends RelayKitBasePack {
   async estimateUserOperation(userOperation: UserOperation): Promise<EstimateUserOperationGas> {
     const gasEstimate = await this.getEip4337BundlerProvider().send(
       'eth_estimateUserOperationGas',
-      [userOperation, SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS]
+      [
+        {
+          ...userOperation,
+          nonce: ethers.toBeHex(userOperation.nonce),
+          callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
+          verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
+          preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
+          maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
+          maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
+        },
+        SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
+      ]
     )
 
     return gasEstimate

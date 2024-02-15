@@ -6,8 +6,13 @@ import {
   SafeUserOperation,
   UserOperation
 } from './types'
-import { SafeSignature } from '@safe-global/safe-core-sdk-types'
-import { EthSafeSignature, EthersAdapter, SigningMethod } from '@safe-global/protocol-kit'
+import { OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
+import {
+  EthSafeSignature,
+  EthersAdapter,
+  SigningMethod,
+  encodeMultiSendData
+} from '@safe-global/protocol-kit'
 import EthSafeOperation from './EthSafeOperation'
 import { EIP712_SAFE_OPERATION_TYPE, SAFE_ADDRESSES_MAP } from './constants'
 import { RelayKitTransaction } from '../..'
@@ -41,13 +46,15 @@ export class Safe4337Pack extends RelayKitBasePack {
   async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.getAccountNonce(safeAddress)
-    const batch = await this.protocolKit.createTransactionBatch(transactions)
-    console.log('batch', batch)
+
     const callData = await this.encodeCallData({
-      to: transactions[0].to,
+      to: SAFE_ADDRESSES_MAP.MULTISENDCALLONLY_ADDRESS,
       value: 0n,
-      data: transactions[0].data
+      data: encodeMultiSendData(
+        transactions.map((tx) => ({ ...tx, operation: OperationType.Call }))
+      )
     })
+
     console.log('callData', callData)
     const userOperation: UserOperation = {
       sender: safeAddress,

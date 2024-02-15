@@ -51,3 +51,9 @@ export type EstimateUserOperationGas = {
   verificationGasLimit: bigint
   callGasLimit: bigint
 }
+
+export type FeeData = {
+  gasPrice: bigint
+  maxFeePerGas: bigint
+  maxPriorityFeePerGas: bigint
+}

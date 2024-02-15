@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
   EstimateUserOperationGas,
+  FeeData,
   Safe4337Options,
   SafeUserOperation,
   UserOperation
@@ -72,9 +73,13 @@ export class Safe4337Pack extends RelayKitBasePack {
     console.log('userOperation', userOperation)
     const gasEstimations = await this.estimateUserOperation(userOperation)
     console.log('gasEstimations', gasEstimations)
+    const feeEstimations = await this.estimateFeeData()
+    console.log('feeEstimations', feeEstimations)
     return new EthSafeOperation({
       ...userOperation,
-      ...gasEstimations
+      ...gasEstimations,
+      maxFeePerGas: feeEstimations.maxFeePerGas,
+      maxPriorityFeePerGas: feeEstimations.maxPriorityFeePerGas
     })
   }
 
@@ -191,6 +196,14 @@ export class Safe4337Pack extends RelayKitBasePack {
     return provider
   }
 
+  getEip1193Provider(): ethers.JsonRpcProvider {
+    const provider = new ethers.JsonRpcProvider(this.#rpcUrl, undefined, {
+      batchMaxCount: 1
+    })
+
+    return provider
+  }
+
   async sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
     console.log('userOpWithSignature', userOpWithSignature)
     return await this.getEip4337BundlerProvider().send('eth_sendUserOperation', [
@@ -222,6 +235,12 @@ export class Safe4337Pack extends RelayKitBasePack {
     const contract = new ethers.Contract(SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS, abi, provider)
 
     return await contract.getNonce(sender, key)
+  }
+
+  async estimateFeeData(): Promise<FeeData> {
+    const feeData = (await this.getEip1193Provider().getFeeData()) as FeeData
+
+    return feeData
   }
 
   async estimateUserOperation(userOperation: UserOperation): Promise<EstimateUserOperationGas> {

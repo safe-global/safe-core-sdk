@@ -7,7 +7,7 @@ import {
   SafeUserOperation,
   UserOperation
 } from './types'
-import { OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
 import {
   EthSafeSignature,
   EthersAdapter,
@@ -35,26 +35,51 @@ export class Safe4337Pack extends RelayKitBasePack {
     throw new Error('Method not implemented.')
   }
 
-  async encodeCallData(params: { to: string; value: bigint; data: string }) {
+  encondeMultiSendData(transactions: MetaTransactionData[]) {
+    const functionAbi = 'function multiSend(bytes memory transactions) public payable'
+
+    const iface = new ethers.Interface([functionAbi])
+
+    return iface.encodeFunctionData('multiSend', [
+      encodeMultiSendData(
+        transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
+      )
+    ])
+  }
+
+  async encodeCallData(params: {
+    to: string
+    value: string
+    data: string
+    operation?: OperationType
+  }) {
     const functionAbi =
       'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)'
 
     const iface = new ethers.Interface([functionAbi])
 
-    return iface.encodeFunctionData('executeUserOp', [params.to, params.value, params.data, 0])
+    return iface.encodeFunctionData('executeUserOp', [
+      params.to,
+      params.value,
+      params.data,
+      params.operation || OperationType.Call
+    ])
   }
 
   async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.getAccountNonce(safeAddress)
 
-    const callData = await this.encodeCallData({
-      to: SAFE_ADDRESSES_MAP.MULTISENDCALLONLY_ADDRESS,
-      value: 0n,
-      data: encodeMultiSendData(
-        transactions.map((tx) => ({ ...tx, operation: OperationType.Call }))
-      )
-    })
+    const isBatch = transactions.length > 1
+
+    const callData = isBatch
+      ? await this.encodeCallData({
+          to: SAFE_ADDRESSES_MAP.MULTISEND_ADDRESS,
+          value: '0',
+          data: this.encondeMultiSendData(transactions),
+          operation: OperationType.DelegateCall
+        })
+      : await this.encodeCallData(transactions[0])
 
     console.log('callData', callData)
     const userOperation: UserOperation = {
@@ -78,6 +103,10 @@ export class Safe4337Pack extends RelayKitBasePack {
     return new EthSafeOperation({
       ...userOperation,
       ...gasEstimations,
+      verificationGasLimit: this.addExtraSafetyGas(
+        gasEstimations.verificationGasLimit
+        // TODO: review this parse
+      ) as unknown as bigint,
       maxFeePerGas: feeEstimations.maxFeePerGas,
       maxPriorityFeePerGas: feeEstimations.maxPriorityFeePerGas
     })
@@ -238,9 +267,16 @@ export class Safe4337Pack extends RelayKitBasePack {
   }
 
   async estimateFeeData(): Promise<FeeData> {
-    const feeData = (await this.getEip1193Provider().getFeeData()) as FeeData
+    // TODO: review this
+    // const feeData = (await this.getEip1193Provider().getFeeData()) as FeeData
 
-    return feeData
+    // return feeData
+    const { fast } = await this.getEip4337BundlerProvider().send(
+      'pimlico_getUserOperationGasPrice',
+      []
+    )
+
+    return fast as FeeData
   }
 
   async estimateUserOperation(userOperation: UserOperation): Promise<EstimateUserOperationGas> {
@@ -261,5 +297,10 @@ export class Safe4337Pack extends RelayKitBasePack {
     )
 
     return gasEstimate
+  }
+
+  // Increase the gas limit by 50%, otherwise the user op will fail during simulation with "verification more than gas limit" error
+  addExtraSafetyGas(gasEstimationValue: bigint) {
+    return ethers.toBeHex((BigInt(gasEstimationValue) * 20n) / 10n)
   }
 }

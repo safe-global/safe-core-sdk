@@ -1,34 +1,17 @@
 import { ethers } from 'ethers'
-import { getAccountNonce } from 'permissionless'
-import { bundlerActions } from 'permissionless'
-import { setTimeout } from 'timers/promises'
-import { pimlicoBundlerActions, pimlicoPaymasterActions } from 'permissionless/actions/pimlico'
-import { Address, createClient, createPublicClient, createWalletClient, http, Hash } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
-
-import { sepolia } from 'viem/chains'
-import {
-  EIP712_SAFE_OPERATION_TYPE,
-  SAFE_ADDRESSES_MAP,
-  encodeCallData,
-  getAccountAddress,
-  getAccountInitCode
-} from './utils/safe'
-import { getERC20Balance, getERC20Decimals, transferERC20Token } from './utils/erc20'
-import Safe, {
-  EthersAdapter,
-  SafeAccountConfig,
-  predictSafeAddress
-} from '@safe-global/protocol-kit'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
 
+// Safe 4337 compatible
+const SAFE_ADDRESS = ''
+
+// safe owner PK
 const PRIVATE_KEY = ''
+
+// pimlico Api key see: https://docs.pimlico.io/permissionless/tutorial/tutorial-1#get-a-pimlico-api-key
 const PIMLICO_API_KEY = ''
-const USE_PAYMASTER = true
-const CHAIN_ID = 11155111
+
 const CHAIN = 'sepolia'
-const ENTRY_POINT_ADDRESS = '0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789'
 const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
 
 export const generateTransferCallData = (to: string, value: bigint) => {
@@ -41,7 +24,6 @@ export const generateTransferCallData = (to: string, value: bigint) => {
 
 // Current test Safe https://app.safe.global/balances?safe=sep:0xafBCFd223dD0Cb420E628Ceb1E438f9F5b6FB24b
 const getProtocolKitInstance = async (rpcUrl: string, privateKey: string): Promise<Safe> => {
-  // Counterfactual Safe and Relay initialization
   const provider = new ethers.JsonRpcProvider(rpcUrl)
   const signer = new ethers.Wallet(privateKey, provider)
   const ethersAdapter = new EthersAdapter({
@@ -49,84 +31,64 @@ const getProtocolKitInstance = async (rpcUrl: string, privateKey: string): Promi
     signerOrProvider: signer
   })
 
-  const signerAddress = await ethersAdapter.getSignerAddress()
-
-  const owners = [signerAddress || '0x']
-  const threshold = 1
-
-  const safeAccountConfig: SafeAccountConfig = {
-    owners,
-    threshold
-  }
-
-  const safeAddress = await predictSafeAddress({
-    ethAdapter: ethersAdapter,
-    chainId: await ethersAdapter.getChainId(),
-    safeAccountConfig
-  })
-
-  const isSafeDeployed = await ethersAdapter.isContractDeployed(safeAddress)
-
-  // let protocolKit: Safe
-
-  // if (isSafeDeployed) {
   const protocolKit = await Safe.create({
     ethAdapter: ethersAdapter,
-    safeAddress: '0xafBCFd223dD0Cb420E628Ceb1E438f9F5b6FB24b'
+    safeAddress: SAFE_ADDRESS
   })
-  // } else {
-  //   protocolKit = await Safe.create({
-  //     ethAdapter: ethersAdapter,
-  //     predictedSafe: { safeAccountConfig, safeDeploymentConfig: { saltNonce: '0x1' } }
-  //   })
-  // }
 
   return protocolKit
 }
 
 async function main() {
   const protocolKit: Safe = await getProtocolKitInstance(RPC_URL, PRIVATE_KEY)
-  const signerAddress = (await protocolKit.getEthAdapter().getSignerAddress()) as `0x${string}`
   const safe4337Pack = new Safe4337Pack({
     protocolKit,
     rpcUrl: RPC_URL,
     bundlerUrl: `https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`
   })
 
-  const erc20PaymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f'
-  const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
-  // from safe-deployments
-  const multiSendAddress = '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526'
+  // TODO: implement paymaster
+  // const erc20PaymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f'
 
   const senderAddress = (await protocolKit.getAddress()) as `0x${string}`
+  const signerAddress = (await protocolKit.getEthAdapter().getSignerAddress()) as `0x${string}`
 
-  console.log('Counterfactual sender address:', senderAddress)
+  console.log('Safe address:', senderAddress)
+  console.log('Owner address:', signerAddress)
 
-  // const isSafeDeployed = await publicClient.getBytecode({ address: senderAddress })
+  // TODO: implement counterfactual deployment
   const isSafeDeployed = await protocolKit.isSafeDeployed()
 
-  if (isSafeDeployed) {
-    console.log('The Safe is already deployed. Sending 1 USDC from the Safe to itself.')
-  } else {
-    console.log('Deploying a new Safe and transferring 1 USDC to itself in one tx')
+  if (!isSafeDeployed) {
+    console.log('Counterfactual deployment not implemented!!!')
+    process.exit(0)
   }
 
+  const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
+  const usdcAmount = 1000000n // 1 USDC
+
+  const transferUSDC = {
+    to: usdcTokenAddress,
+    data: generateTransferCallData(senderAddress, usdcAmount),
+    value: '0'
+  }
+
+  // 2 USDC transfers as a batch
+  const transactions = [transferUSDC, transferUSDC]
+
+  // we crate the 4337 relay transaction
   const sponsoredUserOperation = await safe4337Pack.createRelayedTransaction({
-    transactions: [
-      {
-        to: usdcTokenAddress,
-        data: generateTransferCallData(senderAddress, 1000000n),
-        value: '0',
-        operation: OperationType.DelegateCall
-      }
-    ]
+    transactions
   })
 
-  const signedSafeUserOperation = await safe4337Pack.signSafeUserOperation(sponsoredUserOperation)
-  const what = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
-  console.log(what)
-
   console.log('User Operation', sponsoredUserOperation)
+
+  // we sign the transaction with our owner
+  const signedSafeUserOperation = await safe4337Pack.signSafeUserOperation(sponsoredUserOperation)
+
+  const userOperationHash = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
+
+  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN}`)
 }
 
 main()

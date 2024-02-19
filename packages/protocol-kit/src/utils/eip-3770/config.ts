@@ -68,6 +68,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 599n, shortName: 'metis-goerli' },
   { chainId: 686n, shortName: 'kar' },
   { chainId: 787n, shortName: 'aca' },
+  { chainId: 919n, shortName: 'mode-testnet' },
   { chainId: 1001n, shortName: 'baobab' },
   { chainId: 1008n, shortName: 'eun' },
   { chainId: 1030n, shortName: 'cfx' },

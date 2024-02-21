@@ -9,7 +9,7 @@ import {
   SafeProxyFactoryContract,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
-import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
+import { bufferToHex, generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 
 import {
@@ -66,12 +66,13 @@ export interface encodeSetupCallDataProps {
 export function encodeCreateProxyWithNonce(
   safeProxyFactoryContract: SafeProxyFactoryContract,
   safeSingletonAddress: string,
-  initializer: string
+  initializer: string,
+  salt?: string
 ) {
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
     safeSingletonAddress,
     initializer,
-    PREDETERMINED_SALT_NONCE
+    salt || PREDETERMINED_SALT_NONCE
   ])
 }
 
@@ -183,6 +184,80 @@ export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
   return `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
 }
 
+export async function getInitCode({
+  ethAdapter,
+  chainId,
+  safeAccountConfig,
+  safeDeploymentConfig = {},
+  isL1SafeSingleton = false,
+  customContracts
+}: PredictSafeAddressProps): Promise<string> {
+  validateSafeAccountConfig(safeAccountConfig)
+  validateSafeDeploymentConfig(safeDeploymentConfig)
+  console.group('getInitCode')
+  const {
+    safeVersion = DEFAULT_SAFE_VERSION,
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+  } = safeDeploymentConfig
+  console.log('safeDeploymentConfig:', safeDeploymentConfig)
+  const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
+    ethAdapter,
+    safeVersion,
+    customContracts,
+    chainId: chainId.toString()
+  })
+
+  const safeContract = await memoizedGetSafeContract({
+    ethAdapter,
+    safeVersion,
+    isL1SafeSingleton,
+    customContracts,
+    chainId: chainId.toString()
+  })
+
+  const initializer = await encodeSetupCallData({
+    ethAdapter,
+    safeAccountConfig,
+    safeContract,
+    customContracts,
+    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+  })
+  console.log('initializer:', initializer, {
+    ethAdapter,
+    safeAccountConfig,
+    safeContract,
+    customContracts,
+    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+  })
+  const encodedNonce = toBuffer(ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(
+    'hex'
+  )
+  console.log('encodedNonce:', encodedNonce)
+  const salt = keccak256(
+    toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
+  )
+  console.log('salt:', bufferToHex(salt))
+  const safeSingletonAddress = await safeContract.getAddress()
+  console.log('safeSingletonAddress:', safeSingletonAddress)
+  const initCodeCallData = encodeCreateProxyWithNonce(
+    safeProxyFactoryContract,
+    safeSingletonAddress,
+    initializer,
+    '0x' + encodedNonce
+  )
+  console.log('initCodeCallData:', initCodeCallData)
+  const safeProxyFactoryAddress = await safeProxyFactoryContract.getAddress()
+  console.log('safeProxyFactoryAddress:', safeProxyFactoryAddress)
+  const initCode = `0x${[safeProxyFactoryAddress, initCodeCallData].reduce(
+    (acc, x) => acc + x.replace('0x', ''),
+    ''
+  )}`
+  console.log('initCode:', initCode)
+  console.groupEnd()
+
+  return initCode
+}
+
 export async function predictSafeAddress({
   ethAdapter,
   chainId,
@@ -194,11 +269,13 @@ export async function predictSafeAddress({
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
+  console.group('predictSafeAddress')
+
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
     saltNonce = getChainSpecificDefaultSaltNonce(chainId)
   } = safeDeploymentConfig
-
+  console.log('safeDeploymentConfig:', safeDeploymentConfig)
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     ethAdapter,
     safeVersion,
@@ -228,19 +305,25 @@ export async function predictSafeAddress({
     customContracts,
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
-
+  console.log('initializer:', initializer, {
+    ethAdapter,
+    safeAccountConfig,
+    safeContract,
+    customContracts,
+    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+  })
   const encodedNonce = toBuffer(ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(
     'hex'
   )
-
+  console.log('encodedNonce:', encodedNonce)
   const salt = keccak256(
     toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
   )
-
+  console.log('salt:', bufferToHex(salt))
   const input = ethAdapter.encodeParameters(['address'], [await safeContract.getAddress()])
-
+  console.log('input:', input)
   const from = await safeProxyFactoryContract.getAddress()
-
+  console.log('from:', from)
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)
   if (isZkSyncEraChain) {
@@ -250,13 +333,17 @@ export async function predictSafeAddress({
   }
 
   const constructorData = toBuffer(input).toString('hex')
-
+  console.log('constructorData:', constructorData)
   const initCode = proxyCreationCode + constructorData
-
+  console.log('initCode:', initCode)
   const proxyAddress =
     '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
+  console.log('proxyAddress:', proxyAddress)
+  const predictedAddress = ethAdapter.getChecksummedAddress(proxyAddress)
+  console.log('predictedAddress:', predictedAddress)
+  console.groupEnd()
 
-  return ethAdapter.getChecksummedAddress(proxyAddress)
+  return predictedAddress
 }
 
 export const validateSafeAccountConfig = ({ owners, threshold }: SafeAccountConfig): void => {

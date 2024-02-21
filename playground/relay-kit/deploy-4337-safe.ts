@@ -79,7 +79,6 @@ const getProtocolKitInstance = async (rpcUrl: string, privateKey: string): Promi
 async function main() {
   const protocolKit: Safe = await getProtocolKitInstance(RPC_URL, PRIVATE_KEY)
   const signerAddress = (await protocolKit.getEthAdapter().getSignerAddress()) as `0x${string}`
-  const safe4337Pack = new Safe4337Pack({ protocolKit })
 
   // Clients initialization
   const bundlerClient = createClient({
@@ -140,7 +139,7 @@ async function main() {
     safe4337ModuleAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_4337_MODULE_ADDRESS,
     safeProxyFactoryAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_PROXY_FACTORY_ADDRESS,
     safeSingletonAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_SINGLETON_ADDRESS,
-    saltNonce: 4n,
+    saltNonce: 'ad27de2a410652abce96ea0fdfc30c2f0fd35952b78f554667111999a28ff338',
     erc20TokenAddress: usdcTokenAddress,
     multiSendAddress,
     paymasterAddress: erc20PaymasterAddress
@@ -153,7 +152,7 @@ async function main() {
     safe4337ModuleAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_4337_MODULE_ADDRESS,
     safeProxyFactoryAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_PROXY_FACTORY_ADDRESS,
     safeSingletonAddress: SAFE_ADDRESSES_MAP['1.4.1'][CHAIN_ID].SAFE_SINGLETON_ADDRESS,
-    saltNonce: 4n,
+    saltNonce: 'ad27de2a410652abce96ea0fdfc30c2f0fd35952b78f554667111999a28ff338',
     erc20TokenAddress: usdcTokenAddress,
     multiSendAddress,
     paymasterAddress: erc20PaymasterAddress

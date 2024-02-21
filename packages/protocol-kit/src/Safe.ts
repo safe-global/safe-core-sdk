@@ -19,6 +19,7 @@ import {
 import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
+  getInitCode,
   predictSafeAddress
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
@@ -185,6 +186,29 @@ class Safe {
     return await Safe.create({
       safeAddress: await this.getAddress(),
       ...configProps
+    })
+  }
+
+  async getInitCode(): Promise<string> {
+    if (!this.#predictedSafe) {
+      throw new Error('The Safe already exists')
+    }
+
+    const safeVersion = await this.getContractVersion()
+
+    if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      throw new Error(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+      )
+    }
+
+    const chainId = await this.#ethAdapter.getChainId()
+
+    return getInitCode({
+      ethAdapter: this.#ethAdapter,
+      chainId,
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
+      ...this.#predictedSafe
     })
   }
 

@@ -1,5 +1,19 @@
 import Safe from '@safe-global/protocol-kit'
-import { SafeSignature } from '@safe-global/safe-core-sdk-types'
+import { SafeSignature, SafeVersion } from '@safe-global/safe-core-sdk-types'
+
+export type Safe4337InitOptions = {
+  bundlerUrl: string
+  paymasterUrl?: string
+  rpcUrl: string
+  privateKey: string
+  safeAddress?: string
+  safeOptions?: {
+    owners: string[]
+    threshold: number
+    safeVersion?: SafeVersion
+    saltNonce?: string
+  }
+}
 
 export type Safe4337Options = {
   protocolKit: Safe

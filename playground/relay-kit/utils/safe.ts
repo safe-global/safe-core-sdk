@@ -21,13 +21,7 @@ export const SAFE_ADDRESSES_MAP = {
       ADD_MODULES_LIB_ADDRESS: '0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb',
       SAFE_4337_MODULE_ADDRESS: '0xa581c4A4DB7175302464fF3C06380BC3270b4037',
       SAFE_PROXY_FACTORY_ADDRESS: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
-      SAFE_SINGLETON_ADDRESS: '0x41675C099F32341bf84BFc5382aF534df5C7461a'
-    },
-    '5': {
-      ADD_MODULES_LIB_ADDRESS: '0x191EFDC03615B575922289DC339F4c70aC5C30Af',
-      SAFE_4337_MODULE_ADDRESS: '0x39E54Bb2b3Aa444b4B39DEe15De3b7809c36Fc38',
-      SAFE_PROXY_FACTORY_ADDRESS: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
-      SAFE_SINGLETON_ADDRESS: '0x41675C099F32341bf84BFc5382aF534df5C7461a'
+      SAFE_SINGLETON_ADDRESS: '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762'
     }
   }
 } as const
@@ -47,6 +41,7 @@ const getInitializerCode = async ({
   erc20TokenAddress: Address
   paymasterAddress: Address
 }) => {
+  console.log(multiSendAddress)
   const setupTxs: InternalTx[] = [
     {
       to: addModuleLibAddress,
@@ -119,8 +114,8 @@ const getInitializerCode = async ({
     args: [
       [owner],
       1n,
-      multiSendAddress,
-      multiSendCallData,
+      addModuleLibAddress,
+      enableModuleCallData(safe4337ModuleAddress),
       safe4337ModuleAddress,
       zeroAddress,
       0n,
@@ -157,7 +152,7 @@ export const getAccountInitCode = async ({
   safe4337ModuleAddress,
   safeProxyFactoryAddress,
   safeSingletonAddress,
-  saltNonce = 0n,
+  saltNonce,
   erc20TokenAddress,
   multiSendAddress,
   paymasterAddress
@@ -167,7 +162,7 @@ export const getAccountInitCode = async ({
   safe4337ModuleAddress: Address
   safeProxyFactoryAddress: Address
   safeSingletonAddress: Address
-  saltNonce?: bigint
+  saltNonce: string
   erc20TokenAddress: Address
   multiSendAddress: Address
   paymasterAddress: Address
@@ -181,7 +176,7 @@ export const getAccountInitCode = async ({
     multiSendAddress,
     paymasterAddress
   })
-
+  console.log('salt', saltNonce, BigInt('0x' + saltNonce))
   const initCodeCallData = encodeFunctionData({
     abi: [
       {
@@ -215,9 +210,14 @@ export const getAccountInitCode = async ({
       }
     ],
     functionName: 'createProxyWithNonce',
-    args: [safeSingletonAddress, initializer, saltNonce]
+    args: [safeSingletonAddress, initializer, BigInt('0x' + saltNonce)]
   })
-
+  console.log(
+    'encodeCreateProxyWithNonce',
+    safeSingletonAddress,
+    initializer,
+    BigInt('0x' + saltNonce)
+  )
   console.log('CreateProxyWithNonce call data', initCodeCallData)
 
   return concatHex([safeProxyFactoryAddress, initCodeCallData])
@@ -285,7 +285,7 @@ export const getAccountAddress = async ({
   safe4337ModuleAddress,
   safeProxyFactoryAddress,
   safeSingletonAddress,
-  saltNonce = 0n,
+  saltNonce,
   erc20TokenAddress,
   multiSendAddress,
   paymasterAddress
@@ -296,7 +296,7 @@ export const getAccountAddress = async ({
   safe4337ModuleAddress: Address
   safeProxyFactoryAddress: Address
   safeSingletonAddress: Address
-  saltNonce?: bigint
+  saltNonce?: string
   erc20TokenAddress: Address
   multiSendAddress: Address
   paymasterAddress: Address
@@ -325,7 +325,7 @@ export const getAccountAddress = async ({
     ['bytes', 'uint256'],
     [proxyCreationCode, hexToBigInt(safeSingletonAddress)]
   )
-
+  console.log('deploymentCode', deploymentCode)
   const initializer = await getInitializerCode({
     owner,
     addModuleLibAddress,
@@ -334,14 +334,14 @@ export const getAccountAddress = async ({
     multiSendAddress,
     paymasterAddress
   })
-
+  console.log('initializer', initializer)
   const salt = keccak256(
     encodePacked(
       ['bytes32', 'uint256'],
-      [keccak256(encodePacked(['bytes'], [initializer])), saltNonce]
+      [keccak256(encodePacked(['bytes'], [initializer])), BigInt('0x' + saltNonce)]
     )
   )
-
+  console.log('salt', salt)
   return getContractAddress({
     from: safeProxyFactoryAddress,
     salt,

@@ -39,7 +39,8 @@ import {
   PREDETERMINED_SALT_NONCE,
   encodeCreateProxyWithNonce,
   encodeSetupCallData,
-  predictSafeAddress
+  predictSafeAddress,
+  getChainSpecificDefaultSaltNonce
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
@@ -171,7 +172,8 @@ export {
   getEip712TxTypes,
   getEip712MessageTypes,
   hashSafeMessage,
-  generateTypedData
+  generateTypedData,
+  getChainSpecificDefaultSaltNonce
 }
 
 export default Safe

@@ -50,7 +50,12 @@ export class GelatoRelayPack extends RelayKitBasePack {
     return GELATO_FEE_COLLECTOR
   }
 
-  async getEstimateFee(chainId: bigint, gasLimit: string, gasToken?: string): Promise<string> {
+  async getEstimateFee(options: {
+    chainId: bigint
+    gasLimit: string
+    gasToken?: string
+  }): Promise<string> {
+    const { chainId, gasLimit, gasToken } = options
     const feeToken = this._getFeeToken(gasToken)
     const estimation = await this.#gelatoRelay.getEstimatedFee(
       chainId,
@@ -58,6 +63,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
       BigInt(gasLimit),
       false
     )
+
     return estimation.toString()
   }
 
@@ -84,7 +90,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
     const gelatoAddress = this.getFeeCollector()
     const gasToken = options.gasToken ?? ZERO_ADDRESS
 
-    const paymentToGelato = await this.getEstimateFee(chainId, gas, gasToken)
+    const paymentToGelato = await this.getEstimateFee({ chainId, gasLimit: gas, gasToken })
 
     // The Gelato payment transaction
     const transferToGelato = createERC20TokenTransferTransaction(
@@ -178,7 +184,7 @@ export class GelatoRelayPack extends RelayKitBasePack {
 
     // if a custom gasLimit is provided, we do not need to estimate the gas cost
     if (gasLimit) {
-      const paymentToGelato = await this.getEstimateFee(chainId, gasLimit, gasToken)
+      const paymentToGelato = await this.getEstimateFee({ chainId, gasLimit, gasToken })
 
       const syncTransaction = await this.protocolKit.createTransaction({
         transactions,
@@ -207,7 +213,11 @@ export class GelatoRelayPack extends RelayKitBasePack {
       Number(safeDeploymentGasCost) + // Safe deploymet gas cost if it is required
       GELATO_GAS_EXECUTION_OVERHEAD // Gelato execution overhead
 
-    const paymentToGelato = await this.getEstimateFee(chainId, String(totalGas), gasToken)
+    const paymentToGelato = await this.getEstimateFee({
+      chainId,
+      gasLimit: String(totalGas),
+      gasToken
+    })
 
     const syncTransaction = await this.protocolKit.createTransaction({
       transactions,

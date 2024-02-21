@@ -1,18 +1,23 @@
-import Safe from '@safe-global/protocol-kit'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { SafeSignature, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
+type ExistingSafeOptions = {
+  safeAddress: string
+}
+
+type PredictedSafeOptions = {
+  owners: string[]
+  threshold: number
+  safeVersion?: SafeVersion
+  saltNonce?: string
+}
+
 export type Safe4337InitOptions = {
+  ethersAdapter: EthersAdapter
   bundlerUrl: string
   paymasterUrl?: string
   rpcUrl: string
-  privateKey: string
-  safeAddress?: string
-  safeOptions?: {
-    owners: string[]
-    threshold: number
-    safeVersion?: SafeVersion
-    saltNonce?: string
-  }
+  options: ExistingSafeOptions | PredictedSafeOptions
 }
 
 export type Safe4337Options = {

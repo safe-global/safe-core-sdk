@@ -1,3 +1,5 @@
+import { ethers } from 'ethers'
+
 export const EIP712_SAFE_OPERATION_TYPE = {
   SafeOp: [
     { type: 'address', name: 'safe' },
@@ -26,3 +28,9 @@ export const SAFE_ADDRESSES_MAP = {
   MULTISEND_ADDRESS: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
   MULTISENDCALLONLY_ADDRESS: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2'
 } as const
+
+export const INTERFACES = new ethers.Interface([
+  'function enableModules(address[])',
+  'function multiSend(bytes memory transactions) public payable',
+  'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)'
+])

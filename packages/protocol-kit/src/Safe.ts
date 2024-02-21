@@ -19,7 +19,7 @@ import {
 import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
-  getInitCode,
+  getPredictedSafeAddressInitCode,
   predictSafeAddress
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
@@ -189,22 +189,19 @@ class Safe {
     })
   }
 
+  /**
+   * Returns the initialization code to deploy a Safe account based on the predicted address.
+   *
+   * @returns The Safe configuration
+   */
   async getInitCode(): Promise<string> {
     if (!this.#predictedSafe) {
       throw new Error('The Safe already exists')
     }
 
-    const safeVersion = await this.getContractVersion()
-
-    if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
-      throw new Error(
-        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
-      )
-    }
-
     const chainId = await this.#ethAdapter.getChainId()
 
-    return getInitCode({
+    return getPredictedSafeAddressInitCode({
       ethAdapter: this.#ethAdapter,
       chainId,
       customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],

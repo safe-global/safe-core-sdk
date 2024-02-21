@@ -114,7 +114,7 @@ describe('GelatoRelayPack', () => {
     const chainId = 1n
     const gasLimit = '100000'
     const gasToken = '0x0000000000000000000000000000000000000000'
-    const estimation = await gelatoRelayPack.getEstimateFee(chainId, gasLimit, gasToken)
+    const estimation = await gelatoRelayPack.getEstimateFee({ chainId, gasLimit, gasToken })
 
     expect(estimation).toBe(FEE_ESTIMATION.toString())
     expect(mockGetEstimateFee).toHaveBeenCalledWith(

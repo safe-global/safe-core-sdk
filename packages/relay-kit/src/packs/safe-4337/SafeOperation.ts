@@ -1,10 +1,10 @@
 import { ethers } from 'ethers'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
-import { SafeUserOperation, SafeOperation, UserOperation } from './types'
+import { SafeUserOperation, UserOperation } from './types'
 import { SAFE_ADDRESSES_MAP } from './constants'
 
-class EthSafeOperation implements SafeOperation {
+class SafeOperation {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
 
@@ -58,4 +58,4 @@ class EthSafeOperation implements SafeOperation {
   }
 }
 
-export default EthSafeOperation
+export default SafeOperation

@@ -1,5 +1,5 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
-import { SafeSignature, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 type ExistingSafeOptions = {
   safeAddress: string
@@ -25,14 +25,6 @@ export type Safe4337Options = {
   bundlerUrl: string
   paymasterUrl?: string
   rpcUrl: string
-}
-
-export interface SafeOperation {
-  readonly data: SafeUserOperation
-  readonly signatures: Map<string, SafeSignature>
-  getSignature(signer: string): SafeSignature | undefined
-  addSignature(signature: SafeSignature): void
-  encodedSignatures(): string
 }
 
 export type SafeUserOperation = {

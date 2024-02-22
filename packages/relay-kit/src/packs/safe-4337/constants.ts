@@ -34,3 +34,8 @@ export const INTERFACES = new ethers.Interface([
   'function multiSend(bytes memory transactions) public payable',
   'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)'
 ])
+
+export const RPC_4337_CALLS = {
+  ESTIMATE_USER_OPERATION_GAS: 'eth_estimateUserOperationGas',
+  SEND_USER_OPERATION: 'eth_sendUserOperation'
+}

@@ -22,6 +22,7 @@ export const generateTransferCallData = (to: string, value: bigint) => {
 }
 
 async function main() {
+  // Instantiate EtherAdapter
   const provider = new ethers.JsonRpcProvider(RPC_URL)
   const signer = new ethers.Wallet(PRIVATE_KEY, provider)
   const ethersAdapter = new EthersAdapter({
@@ -29,6 +30,7 @@ async function main() {
     signerOrProvider: signer
   })
 
+  // Initialize pack
   const safe4337Pack = await Safe4337Pack.init({
     ethersAdapter,
     rpcUrl: RPC_URL,
@@ -39,42 +41,26 @@ async function main() {
     }
   })
 
-  // TODO: implement paymaster
-  // const erc20PaymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f'
-
+  // Create transaction batch to transfer 2 USDC
   const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
-
-  // TODO: implement counterfactual deployment
-  // const isSafeDeployed = await protocolKit.isSafeDeployed()
-
-  // if (!isSafeDeployed) {
-  //   console.log('Counterfactual deployment not implemented!!!')
-  //   process.exit(0)
-  // }
-
   const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
   const usdcAmount = 1000000n // 1 USDC
-
   const transferUSDC = {
     to: usdcTokenAddress,
     data: generateTransferCallData(senderAddress, usdcAmount),
     value: '0'
   }
-
-  // 2 USDC transfers as a batch
   const transactions = [transferUSDC, transferUSDC]
 
-  // we crate the 4337 relay transaction
+  // Create relayed transaction and send UserOperation to the bundler
   const sponsoredUserOperation = await safe4337Pack.createRelayedTransaction({
     transactions
   })
-
   const signedSafeUserOperation = await safe4337Pack.signSafeUserOperation(sponsoredUserOperation)
+  const userOperationHash = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
 
   console.log('Signed User Operation', signedSafeUserOperation)
-  // const userOperationHash = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
-
-  // console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN}`)
+  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN}`)
 }
 
 main()

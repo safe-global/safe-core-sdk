@@ -8,6 +8,10 @@ import Safe, {
 import { RelayKitTransaction } from '@safe-global/relay-kit/types'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
+import {
+  getAddModulesLibDeployment,
+  getSafe4337ModuleDeployment
+} from '@safe-global/safe-modules-deployments'
 
 import SafeOperation from './SafeOperation'
 import {
@@ -20,16 +24,11 @@ import {
   UserOperationReceipt,
   UserOperationWithPayload
 } from './types'
-import {
-  EIP712_SAFE_OPERATION_TYPE,
-  INTERFACES,
-  SAFE_ADDRESSES_MAP,
-  RPC_4337_CALLS
-} from './constants'
+import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
 
-const MINIMUM_SAFE_VERSION = '1.4.1'
-
+const SAFE_VERSION = '1.4.1'
+const SAFE_MODULES_VERSION = '0.1.0'
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
  * This class provides an implementation of the ERC-4337 that enables Safe accounts to wrk with UserOperations.
@@ -43,21 +42,34 @@ const MINIMUM_SAFE_VERSION = '1.4.1'
  * @link https://eips.ethereum.org/EIPS/eip-4337
  */
 export class Safe4337Pack extends RelayKitBasePack {
+  #ENTRYPOINT_ADDRESS: string
+  #ADD_MODULES_LIB_ADDRESS: string = '0x'
+  #SAFE_4337_MODULE_ADDRESS: string = '0x'
+
   #bundlerClient: ethers.JsonRpcProvider
   #publicClient: ethers.JsonRpcProvider
-  #entryPoint: string
 
   /**
    * Creates an instance of the Safe4337Pack.
    *
    * @param {Safe4337Options} params - The initialization parameters.
    */
-  constructor({ protocolKit, bundlerClient, publicClient, entryPoint }: Safe4337Options) {
+  constructor({
+    protocolKit,
+    bundlerClient,
+    publicClient,
+    entryPointAddress,
+    addModulesLibAddress,
+    safe4337ModuleAddress
+  }: Safe4337Options) {
     super(protocolKit)
 
     this.#bundlerClient = bundlerClient
     this.#publicClient = publicClient
-    this.#entryPoint = entryPoint
+
+    this.#ENTRYPOINT_ADDRESS = entryPointAddress
+    this.#ADD_MODULES_LIB_ADDRESS = addModulesLibAddress
+    this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
   }
 
   /**
@@ -73,6 +85,30 @@ export class Safe4337Pack extends RelayKitBasePack {
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
     const { ethersAdapter, options, bundlerUrl, rpcUrl, entryPoint } = initOptions
     let protocolKit: Safe
+    const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
+    const publicClient = getEip1193Provider(rpcUrl)
+    const chainId = await bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
+
+    const network = parseInt(chainId, 16).toString()
+    const addModulesDeployment = getAddModulesLibDeployment({
+      released: true,
+      version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
+      network
+    })
+    const addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
+
+    const safe4337ModuleDeployment = getSafe4337ModuleDeployment({
+      released: true,
+      version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
+      network
+    })
+    const safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
+
+    if (!addModulesLibAddress || !safe4337ModuleAddress) {
+      throw new Error(
+        `Safe4337Module and/or AddModulesLib not available for chain ${network} and modules version ${SAFE_MODULES_VERSION}`
+      )
+    }
 
     // Existing Safe
     if ('safeAddress' in options) {
@@ -90,17 +126,15 @@ export class Safe4337Pack extends RelayKitBasePack {
         ethAdapter: ethersAdapter,
         predictedSafe: {
           safeDeploymentConfig: {
-            safeVersion: options.safeVersion || MINIMUM_SAFE_VERSION,
+            safeVersion: options.safeVersion || SAFE_VERSION,
             saltNonce: options.saltNonce || undefined
           },
           safeAccountConfig: {
             owners: options.owners,
             threshold: options.threshold,
-            to: SAFE_ADDRESSES_MAP.ADD_MODULES_LIB_ADDRESS,
-            data: INTERFACES.encodeFunctionData('enableModules', [
-              [SAFE_ADDRESSES_MAP.SAFE_4337_MODULE_ADDRESS]
-            ]),
-            fallbackHandler: SAFE_ADDRESSES_MAP.SAFE_4337_MODULE_ADDRESS,
+            to: addModulesLibAddress,
+            data: INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]]),
+            fallbackHandler: safe4337ModuleAddress,
             paymentToken: ethers.ZeroAddress,
             payment: 0,
             paymentReceiver: ethers.ZeroAddress
@@ -109,8 +143,6 @@ export class Safe4337Pack extends RelayKitBasePack {
       })
     }
 
-    const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
-    const publicClient = getEip1193Provider(rpcUrl)
     let supportedEntryPoints
 
     if (!entryPoint) {
@@ -125,7 +157,9 @@ export class Safe4337Pack extends RelayKitBasePack {
       protocolKit,
       bundlerClient,
       publicClient,
-      entryPoint: entryPoint || supportedEntryPoints[0]
+      entryPointAddress: entryPoint || supportedEntryPoints[0],
+      addModulesLibAddress,
+      safe4337ModuleAddress
     })
   }
 
@@ -146,7 +180,7 @@ export class Safe4337Pack extends RelayKitBasePack {
         maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
         maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
       },
-      this.#entryPoint
+      this.#ENTRYPOINT_ADDRESS
     ])
 
     return gasEstimate
@@ -163,10 +197,11 @@ export class Safe4337Pack extends RelayKitBasePack {
     const nonce = await this.#getAccountNonce(safeAddress)
 
     const isBatch = transactions.length > 1
+    const multiSendAddress = await this.protocolKit.getMultiSendAddress()
 
     const callData = isBatch
       ? this.#encodeExecuteUserOpCallData({
-          to: SAFE_ADDRESSES_MAP.MULTISEND_ADDRESS,
+          to: multiSendAddress,
           value: '0',
           data: this.#encodeMultiSendCallData(transactions),
           operation: OperationType.DelegateCall
@@ -207,7 +242,7 @@ export class Safe4337Pack extends RelayKitBasePack {
         maxFeePerGas: feeEstimations.maxFeePerGas,
         maxPriorityFeePerGas: feeEstimations.maxPriorityFeePerGas
       },
-      this.#entryPoint
+      this.#ENTRYPOINT_ADDRESS
     )
   }
 
@@ -251,7 +286,10 @@ export class Safe4337Pack extends RelayKitBasePack {
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
-    const signedSafeOperation = new SafeOperation(safeOperation.toUserOperation(), this.#entryPoint)
+    const signedSafeOperation = new SafeOperation(
+      safeOperation.toUserOperation(),
+      this.#ENTRYPOINT_ADDRESS
+    )
 
     signedSafeOperation.signatures.forEach((signature: SafeSignature) => {
       signedSafeOperation.addSignature(signature)
@@ -341,7 +379,7 @@ export class Safe4337Pack extends RelayKitBasePack {
     return ethers.TypedDataEncoder.hash(
       {
         chainId,
-        verifyingContract: SAFE_ADDRESSES_MAP.SAFE_4337_MODULE_ADDRESS
+        verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
       },
       EIP712_SAFE_OPERATION_TYPE,
       safeUserOperation
@@ -361,7 +399,7 @@ export class Safe4337Pack extends RelayKitBasePack {
         maxFeePerGas: ethers.toBeHex(userOpWithSignature.maxFeePerGas),
         maxPriorityFeePerGas: ethers.toBeHex(userOpWithSignature.maxPriorityFeePerGas)
       },
-      this.#entryPoint
+      this.#ENTRYPOINT_ADDRESS
     ])
   }
 
@@ -382,7 +420,7 @@ export class Safe4337Pack extends RelayKitBasePack {
     const signature = await signer.signTypedData(
       {
         chainId,
-        verifyingContract: SAFE_ADDRESSES_MAP.SAFE_4337_MODULE_ADDRESS
+        verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
       },
       EIP712_SAFE_OPERATION_TYPE,
       {
@@ -417,7 +455,7 @@ export class Safe4337Pack extends RelayKitBasePack {
       }
     ]
 
-    const contract = new ethers.Contract(this.#entryPoint || '0x', abi, this.#publicClient)
+    const contract = new ethers.Contract(this.#ENTRYPOINT_ADDRESS || '0x', abi, this.#publicClient)
 
     const newNonce = await contract.getNonce(sender, BigInt(0))
 

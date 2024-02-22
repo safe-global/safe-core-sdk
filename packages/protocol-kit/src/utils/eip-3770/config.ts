@@ -101,6 +101,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 2358n, shortName: 'kroma-sepolia' },
   { chainId: 3737n, shortName: 'csb' },
   { chainId: 4002n, shortName: 'tftm' },
+  { chainId: 4202n, shortName: 'lisksep' },
   { chainId: 4337n, shortName: 'beam' },
   { chainId: 4460n, shortName: 'orderlyl2' },
   { chainId: 4689n, shortName: 'iotex-mainnet' },

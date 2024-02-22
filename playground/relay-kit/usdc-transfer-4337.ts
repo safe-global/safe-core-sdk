@@ -41,6 +41,10 @@ async function main() {
     }
   })
 
+  // Log supported entry points and chain id
+  console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
+  console.log('Chain Id', await safe4337Pack.getChainId())
+
   // Create transaction batch to transfer 2 USDC
   const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
   const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
@@ -61,6 +65,20 @@ async function main() {
 
   console.log('Signed User Operation', signedSafeUserOperation)
   console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN}`)
+
+  let userOperationReceipt = null
+  while (!userOperationReceipt) {
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    userOperationReceipt = await safe4337Pack.getUserOperationReceipt(userOperationHash)
+  }
+
+  console.group('User Operation Receipt and hash')
+  console.log('User Operation Receipt', userOperationReceipt)
+  console.log(
+    'User Operation By Hash',
+    await safe4337Pack.getUserOperationByHash(userOperationHash)
+  )
+  console.groupEnd()
 }
 
 main()

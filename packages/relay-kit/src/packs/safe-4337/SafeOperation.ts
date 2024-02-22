@@ -1,14 +1,14 @@
 import { ethers } from 'ethers'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
+
 import { SafeUserOperation, UserOperation } from './types'
-import { SAFE_ADDRESSES_MAP } from './constants'
 
 class SafeOperation {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
 
-  constructor(userOperation: UserOperation) {
+  constructor(userOperation: UserOperation, entryPoint: string) {
     this.data = {
       safe: userOperation.sender,
       nonce: BigInt(userOperation.nonce),
@@ -22,7 +22,7 @@ class SafeOperation {
       paymasterAndData: userOperation.paymasterAndData,
       validAfter: 0n,
       validUntil: 0n,
-      entryPoint: SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
+      entryPoint
     }
   }
 

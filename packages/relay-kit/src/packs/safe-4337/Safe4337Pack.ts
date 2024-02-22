@@ -16,7 +16,9 @@ import {
   Safe4337InitOptions,
   Safe4337Options,
   SafeUserOperation,
-  UserOperation
+  UserOperation,
+  UserOperationReceipt,
+  UserOperationWithPayload
 } from './types'
 import {
   EIP712_SAFE_OPERATION_TYPE,
@@ -24,6 +26,7 @@ import {
   SAFE_ADDRESSES_MAP,
   RPC_4337_CALLS
 } from './constants'
+import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
 
 const MINIMUM_SAFE_VERSION = '1.4.1'
 
@@ -40,21 +43,21 @@ const MINIMUM_SAFE_VERSION = '1.4.1'
  * @link https://eips.ethereum.org/EIPS/eip-4337
  */
 export class Safe4337Pack extends RelayKitBasePack {
-  #bundlerUrl: string
-  #paymasterUrl?: string // TODO: Paymasters feature
-  #rpcUrl: string
+  #bundlerClient: ethers.JsonRpcProvider
+  #publicClient: ethers.JsonRpcProvider
+  #entryPoint: string
 
   /**
    * Creates an instance of the Safe4337Pack.
    *
    * @param {Safe4337Options} params - The initialization parameters.
    */
-  constructor({ protocolKit, bundlerUrl, paymasterUrl, rpcUrl }: Safe4337Options) {
+  constructor({ protocolKit, bundlerClient, publicClient, entryPoint }: Safe4337Options) {
     super(protocolKit)
 
-    this.#bundlerUrl = bundlerUrl
-    this.#paymasterUrl = paymasterUrl
-    this.#rpcUrl = rpcUrl
+    this.#bundlerClient = bundlerClient
+    this.#publicClient = publicClient
+    this.#entryPoint = entryPoint
   }
 
   /**
@@ -68,7 +71,7 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { ethersAdapter, options, bundlerUrl, paymasterUrl, rpcUrl } = initOptions
+    const { ethersAdapter, options, bundlerUrl, rpcUrl, entryPoint } = initOptions
     let protocolKit: Safe
 
     // Existing Safe
@@ -106,11 +109,23 @@ export class Safe4337Pack extends RelayKitBasePack {
       })
     }
 
+    const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
+    const publicClient = getEip1193Provider(rpcUrl)
+    let supportedEntryPoints
+
+    if (!entryPoint) {
+      supportedEntryPoints = await bundlerClient.send(RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS, [])
+
+      if (!supportedEntryPoints.length) {
+        throw new Error('No entrypoint provided or available through the bundler')
+      }
+    }
+
     return new Safe4337Pack({
       protocolKit,
-      bundlerUrl,
-      paymasterUrl,
-      rpcUrl
+      bundlerClient,
+      publicClient,
+      entryPoint: entryPoint || supportedEntryPoints[0]
     })
   }
 
@@ -121,21 +136,18 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @return {Promise<EstimateUserOperationGas>} The Promise object that will be resolved into the gas estimation.
    */
   async getEstimateFee(userOperation: UserOperation): Promise<EstimateUserOperationGas> {
-    const gasEstimate = await this.#getEip4337BundlerProvider().send(
-      RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
-      [
-        {
-          ...userOperation,
-          nonce: ethers.toBeHex(userOperation.nonce),
-          callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
-          verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
-          preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
-          maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
-          maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
-        },
-        SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
-      ]
-    )
+    const gasEstimate = await this.#bundlerClient.send(RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS, [
+      {
+        ...userOperation,
+        nonce: ethers.toBeHex(userOperation.nonce),
+        callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
+        verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
+        preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
+        maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
+        maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
+      },
+      this.#entryPoint
+    ])
 
     return gasEstimate
   }
@@ -184,16 +196,19 @@ export class Safe4337Pack extends RelayKitBasePack {
     const gasEstimations = await this.getEstimateFee(userOperation)
     const feeEstimations = await this.#getFeeData()
 
-    return new SafeOperation({
-      ...userOperation,
-      ...gasEstimations,
-      verificationGasLimit: this.#addExtraSafetyGas(
-        gasEstimations.verificationGasLimit
-        // TODO: review this parse
-      ) as unknown as bigint,
-      maxFeePerGas: feeEstimations.maxFeePerGas,
-      maxPriorityFeePerGas: feeEstimations.maxPriorityFeePerGas
-    })
+    return new SafeOperation(
+      {
+        ...userOperation,
+        ...gasEstimations,
+        verificationGasLimit: this.#addExtraSafetyGas(
+          gasEstimations.verificationGasLimit
+          // TODO: review this parse
+        ) as unknown as bigint,
+        maxFeePerGas: feeEstimations.maxFeePerGas,
+        maxPriorityFeePerGas: feeEstimations.maxPriorityFeePerGas
+      },
+      this.#entryPoint
+    )
   }
 
   /**
@@ -236,7 +251,7 @@ export class Safe4337Pack extends RelayKitBasePack {
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
-    const signedSafeOperation = new SafeOperation(safeOperation.toUserOperation())
+    const signedSafeOperation = new SafeOperation(safeOperation.toUserOperation(), this.#entryPoint)
 
     signedSafeOperation.signatures.forEach((signature: SafeSignature) => {
       signedSafeOperation.addSignature(signature)
@@ -257,6 +272,62 @@ export class Safe4337Pack extends RelayKitBasePack {
     const userOperation = safeOperation.toUserOperation()
 
     return this.sendUserOperation(userOperation)
+  }
+
+  /**
+   * Return a UserOperation based on a hash (userOpHash) returned by eth_sendUserOperation
+   *
+   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the sendUserOperation method
+   * @returns {UserOperation} - null in case the UserOperation is not yet included in a block, or a full UserOperation, with the addition of entryPoint, blockNumber, blockHash and transactionHash
+   */
+  async getUserOperationByHash(userOpHash: string): Promise<UserOperationWithPayload> {
+    const userOperation = await this.#bundlerClient.send(
+      RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH,
+      [userOpHash]
+    )
+
+    return userOperation
+  }
+
+  /**
+   * Return a UserOperation receipt based on a hash (userOpHash) returned by eth_sendUserOperation
+   *
+   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the sendUserOperation method
+   * @returns {UserOperationReceipt} - null in case the UserOperation is not yet included in a block, or UserOperationReceipt object
+   */
+  async getUserOperationReceipt(userOpHash: string): Promise<UserOperationReceipt | null> {
+    const userOperationReceipt = await this.#bundlerClient.send(
+      RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT,
+      [userOpHash]
+    )
+
+    return userOperationReceipt
+  }
+
+  /**
+   * Returns an array of the entryPoint addresses supported by the client.
+   * The first element of the array SHOULD be the entryPoint addressed preferred by the client.
+   *
+   * @returns {string[]} - The supported entry points.
+   */
+  async getSupportedEntryPoints(): Promise<string[]> {
+    const supportedEntryPoints = await this.#bundlerClient.send(
+      RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS,
+      []
+    )
+
+    return supportedEntryPoints
+  }
+
+  /**
+   * Returns EIP-155 Chain ID.
+   *
+   * @returns {string} - The chain id.
+   */
+  async getChainId(): Promise<string> {
+    const chainId = await this.#bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
+
+    return chainId
   }
 
   /**
@@ -284,13 +355,13 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @return {Promise<string>} The hash.
    */
   async sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
-    return await this.#getEip4337BundlerProvider().send(RPC_4337_CALLS.SEND_USER_OPERATION, [
+    return await this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
       {
         ...userOpWithSignature,
         maxFeePerGas: ethers.toBeHex(userOpWithSignature.maxFeePerGas),
         maxPriorityFeePerGas: ethers.toBeHex(userOpWithSignature.maxPriorityFeePerGas)
       },
-      SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
+      this.#entryPoint
     ])
   }
 
@@ -327,40 +398,12 @@ export class Safe4337Pack extends RelayKitBasePack {
   }
 
   /**
-   * Gets the EIP-4337 bundler provider.
-   *
-   * @return {Provider} The EIP-4337 bundler provider.
-   */
-  #getEip4337BundlerProvider(): ethers.JsonRpcProvider {
-    const provider = new ethers.JsonRpcProvider(this.#bundlerUrl, undefined, {
-      batchMaxCount: 1
-    })
-
-    return provider
-  }
-
-  /**
-   * Gets the EIP-1193 provider from the bundler url.
-   *
-   * @return {Provider} The EIP-1193 provider.
-   */
-  #getEip1193Provider(): ethers.JsonRpcProvider {
-    const provider = new ethers.JsonRpcProvider(this.#rpcUrl, undefined, {
-      batchMaxCount: 1
-    })
-
-    return provider
-  }
-
-  /**
    * Gets account nonce from the bundler.
    *
    * @param {string} sender - Account address for which the nonce is to be fetched.
    * @returns {Promise<string>} The Promise object will resolve to the account nonce.
    */
   async #getAccountNonce(sender: string): Promise<string> {
-    const provider = new ethers.JsonRpcProvider(this.#rpcUrl)
-
     const abi = [
       {
         inputs: [
@@ -374,7 +417,7 @@ export class Safe4337Pack extends RelayKitBasePack {
       }
     ]
 
-    const contract = new ethers.Contract(SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS, abi, provider)
+    const contract = new ethers.Contract(this.#entryPoint || '0x', abi, this.#publicClient)
 
     const newNonce = await contract.getNonce(sender, BigInt(0))
 
@@ -390,10 +433,7 @@ export class Safe4337Pack extends RelayKitBasePack {
     // TODO: review this
     // const feeData = (await this.getEip1193Provider().getFeeData()) as FeeData
 
-    const { fast } = await this.#getEip4337BundlerProvider().send(
-      'pimlico_getUserOperationGasPrice',
-      []
-    )
+    const { fast } = await this.#bundlerClient.send('pimlico_getUserOperationGasPrice', [])
 
     return fast as FeeData
   }

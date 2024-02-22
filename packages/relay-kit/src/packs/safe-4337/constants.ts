@@ -20,7 +20,6 @@ export const EIP712_SAFE_OPERATION_TYPE = {
 
 // TODO: Use Safe modules deployments and Safe deployments
 export const SAFE_ADDRESSES_MAP = {
-  ENTRY_POINT_ADDRESS: '0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789',
   ADD_MODULES_LIB_ADDRESS: '0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb',
   SAFE_4337_MODULE_ADDRESS: '0xa581c4A4DB7175302464fF3C06380BC3270b4037',
   SAFE_PROXY_FACTORY_ADDRESS: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
@@ -37,5 +36,9 @@ export const INTERFACES = new ethers.Interface([
 
 export const RPC_4337_CALLS = {
   ESTIMATE_USER_OPERATION_GAS: 'eth_estimateUserOperationGas',
-  SEND_USER_OPERATION: 'eth_sendUserOperation'
+  SEND_USER_OPERATION: 'eth_sendUserOperation',
+  GET_USER_OPERATION_BY_HASH: 'eth_getUserOperationByHash',
+  GET_USER_OPERATION_RECEIPT: 'eth_getUserOperationReceipt',
+  SUPPORTED_ENTRY_POINTS: 'eth_supportedEntryPoints',
+  CHAIN_ID: 'eth_chainId'
 }

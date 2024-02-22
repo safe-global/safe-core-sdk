@@ -83,26 +83,33 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { ethersAdapter, options, bundlerUrl, rpcUrl, entryPoint } = initOptions
+    const { ethersAdapter, options, bundlerUrl, rpcUrl, customContracts } = initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
     const publicClient = getEip1193Provider(rpcUrl)
     const chainId = await bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
 
+    let addModulesLibAddress = customContracts?.addModulesLibAddress
     const network = parseInt(chainId, 16).toString()
-    const addModulesDeployment = getAddModulesLibDeployment({
-      released: true,
-      version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
-      network
-    })
-    const addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
 
-    const safe4337ModuleDeployment = getSafe4337ModuleDeployment({
-      released: true,
-      version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
-      network
-    })
-    const safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
+    if (!addModulesLibAddress) {
+      const addModulesDeployment = getAddModulesLibDeployment({
+        released: true,
+        version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
+        network
+      })
+      addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
+    }
+
+    let safe4337ModuleAddress = customContracts?.safe4337ModuleAddress
+    if (!safe4337ModuleAddress) {
+      const safe4337ModuleDeployment = getSafe4337ModuleDeployment({
+        released: true,
+        version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
+        network
+      })
+      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
+    }
 
     if (!addModulesLibAddress || !safe4337ModuleAddress) {
       throw new Error(
@@ -145,7 +152,7 @@ export class Safe4337Pack extends RelayKitBasePack {
 
     let supportedEntryPoints
 
-    if (!entryPoint) {
+    if (!customContracts?.entryPointAddress) {
       supportedEntryPoints = await bundlerClient.send(RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS, [])
 
       if (!supportedEntryPoints.length) {
@@ -157,7 +164,7 @@ export class Safe4337Pack extends RelayKitBasePack {
       protocolKit,
       bundlerClient,
       publicClient,
-      entryPointAddress: entryPoint || supportedEntryPoints[0],
+      entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
       addModulesLibAddress,
       safe4337ModuleAddress
     })

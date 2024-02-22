@@ -35,6 +35,11 @@ async function main() {
     ethersAdapter,
     rpcUrl: RPC_URL,
     bundlerUrl: `https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`,
+    // TODO: Use custom contract for 0.2.0 as it's not published
+    customContracts: {
+      safe4337ModuleAddress: '0xa581c4A4DB7175302464fF3C06380BC3270b4037',
+      addModulesLibAddress: '0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb'
+    },
     options: {
       owners: ['0xD725e11588f040d86c4C49d8236E32A5868549F0'],
       threshold: 1
@@ -61,9 +66,9 @@ async function main() {
     transactions
   })
   const signedSafeUserOperation = await safe4337Pack.signSafeUserOperation(sponsoredUserOperation)
-  const userOperationHash = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
-
   console.log('Signed User Operation', signedSafeUserOperation)
+
+  const userOperationHash = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
   console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN}`)
 
   let userOperationReceipt = null

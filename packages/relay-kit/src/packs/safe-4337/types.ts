@@ -18,8 +18,12 @@ export type Safe4337InitOptions = {
   bundlerUrl: string
   paymasterUrl?: string
   rpcUrl: string
-  entryPoint?: string
   safeModulesVersion?: string
+  customContracts?: {
+    entryPointAddress?: string
+    safe4337ModuleAddress?: string
+    addModulesLibAddress?: string
+  }
   options: ExistingSafeOptions | PredictedSafeOptions
 }
 

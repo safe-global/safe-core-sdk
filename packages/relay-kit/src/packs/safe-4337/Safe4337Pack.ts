@@ -26,6 +26,7 @@ import {
 } from './types'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
+import { getMaxFeePerGas, getMaxPriorityFeePerGas } from './alchemy'
 
 const SAFE_VERSION = '1.4.1'
 const SAFE_MODULES_VERSION = '0.1.0'
@@ -35,13 +36,13 @@ const SAFE_MODULES_VERSION = '0.1.0'
  * It allows to create, sign and execute transactions using the Safe 4337 Module.
  *
  * @class
- * @property {string} #bundlerUrl - Bundler URL.
- * @property {string} #paymasterUrl - Paymaster URL.
- * @property {string} #rpcUrl - RPC URL.
  * @link https://github.com/safe-global/safe-modules/blob/main/modules/4337/contracts/Safe4337Module.sol
  * @link https://eips.ethereum.org/EIPS/eip-4337
  */
 export class Safe4337Pack extends RelayKitBasePack {
+  #BUNDLER_URL: string
+  #RPC_URL: string
+
   #ENTRYPOINT_ADDRESS: string
   #ADD_MODULES_LIB_ADDRESS: string = '0x'
   #SAFE_4337_MODULE_ADDRESS: string = '0x'
@@ -58,11 +59,16 @@ export class Safe4337Pack extends RelayKitBasePack {
     protocolKit,
     bundlerClient,
     publicClient,
+    bundlerUrl,
+    rpcUrl,
     entryPointAddress,
     addModulesLibAddress,
     safe4337ModuleAddress
   }: Safe4337Options) {
     super(protocolKit)
+
+    this.#BUNDLER_URL = bundlerUrl
+    this.#RPC_URL = rpcUrl
 
     this.#bundlerClient = bundlerClient
     this.#publicClient = publicClient
@@ -164,6 +170,8 @@ export class Safe4337Pack extends RelayKitBasePack {
       protocolKit,
       bundlerClient,
       publicClient,
+      bundlerUrl,
+      rpcUrl,
       entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
       addModulesLibAddress,
       safe4337ModuleAddress
@@ -177,16 +185,18 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @return {Promise<EstimateUserOperationGas>} The Promise object that will be resolved into the gas estimation.
    */
   async getEstimateFee(userOperation: UserOperation): Promise<EstimateUserOperationGas> {
+    const userOperationWithHexValues = {
+      ...userOperation,
+      nonce: ethers.toBeHex(userOperation.nonce),
+      callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
+      verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
+      preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
+      maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
+      maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
+    }
+
     const gasEstimate = await this.#bundlerClient.send(RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS, [
-      {
-        ...userOperation,
-        nonce: ethers.toBeHex(userOperation.nonce),
-        callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
-        verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
-        preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
-        maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
-        maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
-      },
+      userOperationWithHexValues,
       this.#ENTRYPOINT_ADDRESS
     ])
 
@@ -235,8 +245,11 @@ export class Safe4337Pack extends RelayKitBasePack {
       userOperation.initCode = await this.protocolKit.getInitCode()
     }
 
-    const gasEstimations = await this.getEstimateFee(userOperation)
     const feeEstimations = await this.#getFeeData()
+    userOperation.maxFeePerGas = feeEstimations.maxFeePerGas
+    userOperation.maxPriorityFeePerGas = feeEstimations.maxPriorityFeePerGas
+
+    const gasEstimations = await this.getEstimateFee(userOperation)
 
     return new SafeOperation(
       {
@@ -245,9 +258,7 @@ export class Safe4337Pack extends RelayKitBasePack {
         verificationGasLimit: this.#addExtraSafetyGas(
           gasEstimations.verificationGasLimit
           // TODO: review this parse
-        ) as unknown as bigint,
-        maxFeePerGas: feeEstimations.maxFeePerGas,
-        maxPriorityFeePerGas: feeEstimations.maxPriorityFeePerGas
+        ) as unknown as bigint
       },
       this.#ENTRYPOINT_ADDRESS
     )
@@ -475,12 +486,24 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @returns {Promise<FeeData>} The estimations for the current gas fees.
    */
   async #getFeeData(): Promise<FeeData> {
-    // TODO: review this
-    // const feeData = (await this.getEip1193Provider().getFeeData()) as FeeData
+    if (this.#BUNDLER_URL.includes('pimlico')) {
+      const { fast } = await this.#bundlerClient.send('pimlico_getUserOperationGasPrice', [])
 
-    const { fast } = await this.#bundlerClient.send('pimlico_getUserOperationGasPrice', [])
+      return fast as FeeData
+    }
 
-    return fast as FeeData
+    if (this.#BUNDLER_URL.includes('alchemy')) {
+      const maxPriorityFeePerGas = await getMaxPriorityFeePerGas(this.#bundlerClient)
+      const maxFeePerGas = await getMaxFeePerGas(maxPriorityFeePerGas)
+
+      return {
+        gasPrice: 0n,
+        maxFeePerGas,
+        maxPriorityFeePerGas
+      }
+    }
+
+    throw new Error('Bundler not supported')
   }
 
   /**

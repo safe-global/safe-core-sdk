@@ -5,11 +5,10 @@ import { Safe4337Pack } from '@safe-global/relay-kit'
 // Safe owner PK
 const PRIVATE_KEY = ''
 
-// Pimlico Api key see: https://docs.pimlico.io/permissionless/tutorial/tutorial-1#get-a-pimlico-api-key
-const PIMLICO_API_KEY = ''
-
-// Chain name
-const CHAIN = 'sepolia'
+// Bundler URL
+const BUNDLER_URL =
+  'https://api.pimlico.io/v1/sepolia/rpc?apikey=30b296fa-8947-4775-b44a-b225336e2a66' // PIMLICO
+// const BUNDLER_URL = 'https://eth-sepolia.g.alchemy.com/v2/0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk' // ALCHEMY
 
 // RPC URL
 const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
@@ -34,7 +33,7 @@ async function main() {
   const safe4337Pack = await Safe4337Pack.init({
     ethersAdapter,
     rpcUrl: RPC_URL,
-    bundlerUrl: `https://api.pimlico.io/v1/${CHAIN}/rpc?apikey=${PIMLICO_API_KEY}`,
+    bundlerUrl: BUNDLER_URL,
     // TODO: Use custom contract for 0.2.0 as it's not published
     customContracts: {
       safe4337ModuleAddress: '0xa581c4A4DB7175302464fF3C06380BC3270b4037',
@@ -69,7 +68,7 @@ async function main() {
   console.log('Signed User Operation', signedSafeUserOperation)
 
   const userOperationHash = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
-  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN}`)
+  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=sepolia`)
 
   let userOperationReceipt = null
   while (!userOperationReceipt) {

@@ -172,7 +172,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 245022926n, shortName: 'neonevm-devnet' },
   { chainId: 245022934n, shortName: 'neonevm-mainnet' },
   { chainId: 333000333n, shortName: 'meld' },
-  { chainId: 999999999n, shortName: 'zora-testnet' },
+  { chainId: 999999999n, shortName: 'zsep' },
   { chainId: 1313161554n, shortName: 'aurora' },
   { chainId: 1313161555n, shortName: 'aurora-testnet' },
   { chainId: 1666600000n, shortName: 'hmy-s0' },

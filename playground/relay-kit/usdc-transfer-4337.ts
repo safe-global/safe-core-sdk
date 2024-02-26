@@ -1,6 +1,10 @@
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
-import { Safe4337Pack } from '@safe-global/relay-kit'
+import {
+  Safe4337Pack,
+  estimateGasDataWithPimlico as estimateFeeFn,
+  estimateGasDataWithAlchemy
+} from '@safe-global/relay-kit'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -29,16 +33,11 @@ async function main() {
     signerOrProvider: signer
   })
 
-  // Initialize pack
+  // 1) Initialize pack
   const safe4337Pack = await Safe4337Pack.init({
     ethersAdapter,
     rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
-    // TODO: Use custom contract for 0.2.0 as it's not published
-    customContracts: {
-      safe4337ModuleAddress: '0xa581c4A4DB7175302464fF3C06380BC3270b4037',
-      addModulesLibAddress: '0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb'
-    },
     options: {
       owners: ['0xD725e11588f040d86c4C49d8236E32A5868549F0'],
       threshold: 1
@@ -60,14 +59,28 @@ async function main() {
   }
   const transactions = [transferUSDC, transferUSDC]
 
-  // Create relayed transaction and send UserOperation to the bundler
-  const sponsoredUserOperation = await safe4337Pack.createRelayedTransaction({
+  // 2) Create transaction batch
+  const safeOperation = await safe4337Pack.createRelayedTransaction({
     transactions
   })
-  const signedSafeUserOperation = await safe4337Pack.signSafeUserOperation(sponsoredUserOperation)
-  console.log('Signed User Operation', signedSafeUserOperation)
 
-  const userOperationHash = await safe4337Pack.executeRelayTransaction(signedSafeUserOperation)
+  // 3) Estimate SafeOperation fee
+  const estimatedSafeOperation = await safe4337Pack.getEstimateFee({
+    safeOperation,
+    estimateFeeFn
+  })
+
+  // 4) Sign SafeOperation
+  const estimatedAndSignedSafeOperation =
+    await safe4337Pack.signSafeOperation(estimatedSafeOperation)
+
+  console.log('SafeOperation', estimatedAndSignedSafeOperation)
+
+  // 5) Execute SafeOperation
+  const userOperationHash = await safe4337Pack.executeRelayTransaction(
+    estimatedAndSignedSafeOperation
+  )
+
   console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=sepolia`)
 
   let userOperationReceipt = null

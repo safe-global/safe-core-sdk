@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
 
-import { SafeUserOperation, UserOperation } from './types'
+import { EstimateGasData, SafeUserOperation, UserOperation } from './types'
 
 class SafeOperation {
   data: SafeUserOperation
@@ -36,6 +36,14 @@ class SafeOperation {
 
   encodedSignatures(): string {
     return buildSignatureBytes(Array.from(this.signatures.values()))
+  }
+
+  addEstimations(estimations: EstimateGasData): void {
+    this.data.maxFeePerGas = estimations.maxFeePerGas
+    this.data.maxPriorityFeePerGas = estimations.maxPriorityFeePerGas
+    this.data.verificationGasLimit = estimations.verificationGasLimit
+    this.data.preVerificationGas = estimations.preVerificationGas
+    this.data.callGasLimit = estimations.callGasLimit
   }
 
   toUserOperation(): UserOperation {

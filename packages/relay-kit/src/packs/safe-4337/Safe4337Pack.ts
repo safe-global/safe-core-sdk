@@ -15,8 +15,7 @@ import {
 
 import SafeOperation from './SafeOperation'
 import {
-  EstimateUserOperationGas,
-  FeeData,
+  GetEstimateFeeParams,
   Safe4337InitOptions,
   Safe4337Options,
   SafeUserOperation,
@@ -26,10 +25,9 @@ import {
 } from './types'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
-import { getMaxFeePerGas, getMaxPriorityFeePerGas } from './alchemy'
 
 const SAFE_VERSION = '1.4.1'
-const SAFE_MODULES_VERSION = '0.1.0'
+const SAFE_MODULES_VERSION = '0.2.0'
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
  * This class provides an implementation of the ERC-4337 that enables Safe accounts to wrk with UserOperations.
@@ -179,28 +177,25 @@ export class Safe4337Pack extends RelayKitBasePack {
   }
 
   /**
-   * Estimates gas for an UserOperation.
+   * Estimates gas for the SafeOperation.
    *
-   * @param {UserOperation}userOperation - The user operation to estimate.
-   * @return {Promise<EstimateUserOperationGas>} The Promise object that will be resolved into the gas estimation.
+   * @param {GetEstimateFeeParams{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
+   * @param {GetEstimateFeeParams{GetEstimateFeeFn}} estimateFeeFn - The function to estimate the gas.
+   * @return {Promise<SafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
-  async getEstimateFee(userOperation: UserOperation): Promise<EstimateUserOperationGas> {
-    const userOperationWithHexValues = {
-      ...userOperation,
-      nonce: ethers.toBeHex(userOperation.nonce),
-      callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
-      verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
-      preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
-      maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
-      maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
-    }
+  async getEstimateFee({
+    safeOperation,
+    estimateFeeFn
+  }: GetEstimateFeeParams): Promise<SafeOperation> {
+    const gasEstimations = await estimateFeeFn({
+      bundlerUrl: this.#BUNDLER_URL,
+      entryPoint: this.#ENTRYPOINT_ADDRESS,
+      userOperation: safeOperation.toUserOperation()
+    })
 
-    const gasEstimate = await this.#bundlerClient.send(RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS, [
-      userOperationWithHexValues,
-      this.#ENTRYPOINT_ADDRESS
-    ])
+    safeOperation.addEstimations(gasEstimations)
 
-    return gasEstimate
+    return safeOperation
   }
 
   /**
@@ -245,23 +240,7 @@ export class Safe4337Pack extends RelayKitBasePack {
       userOperation.initCode = await this.protocolKit.getInitCode()
     }
 
-    const feeEstimations = await this.#getFeeData()
-    userOperation.maxFeePerGas = feeEstimations.maxFeePerGas
-    userOperation.maxPriorityFeePerGas = feeEstimations.maxPriorityFeePerGas
-
-    const gasEstimations = await this.getEstimateFee(userOperation)
-
-    return new SafeOperation(
-      {
-        ...userOperation,
-        ...gasEstimations,
-        verificationGasLimit: this.#addExtraSafetyGas(
-          gasEstimations.verificationGasLimit
-          // TODO: review this parse
-        ) as unknown as bigint
-      },
-      this.#ENTRYPOINT_ADDRESS
-    )
+    return new SafeOperation(userOperation, this.#ENTRYPOINT_ADDRESS)
   }
 
   /**
@@ -271,7 +250,7 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @param {SigningMethod} signingMethod - The signing method to use.
    * @return {Promise<SafeOperation>} The Promise object will resolve to the signed SafeOperation.
    */
-  async signSafeUserOperation(
+  async signSafeOperation(
     safeOperation: SafeOperation,
     signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
   ): Promise<SafeOperation> {
@@ -478,44 +457,6 @@ export class Safe4337Pack extends RelayKitBasePack {
     const newNonce = await contract.getNonce(sender, BigInt(0))
 
     return newNonce.toString()
-  }
-
-  /**
-   * Get the current gas fees for transactions
-   *
-   * @returns {Promise<FeeData>} The estimations for the current gas fees.
-   */
-  async #getFeeData(): Promise<FeeData> {
-    if (this.#BUNDLER_URL.includes('pimlico')) {
-      const { fast } = await this.#bundlerClient.send('pimlico_getUserOperationGasPrice', [])
-
-      return fast as FeeData
-    }
-
-    if (this.#BUNDLER_URL.includes('alchemy')) {
-      const maxPriorityFeePerGas = await getMaxPriorityFeePerGas(this.#bundlerClient)
-      const maxFeePerGas = await getMaxFeePerGas(maxPriorityFeePerGas)
-
-      return {
-        gasPrice: 0n,
-        maxFeePerGas,
-        maxPriorityFeePerGas
-      }
-    }
-
-    throw new Error('Bundler not supported')
-  }
-
-  /**
-   * Adds an extra amount of gas to the estimations for safety.
-   * TODO: Review this, Currently this increase the gas limit by 50%, otherwise the user op will fail during
-   * simulation with "verification more than gas limit" error
-   *
-   * @param {UserOperation} gasEstimationValue - The UserOperation to which extra gas is to be added.
-   * @return {string} The adjusted gal limit.
-   */
-  #addExtraSafetyGas(gasEstimationValue: bigint): string {
-    return ethers.toBeHex((BigInt(gasEstimationValue) * 20n) / 10n)
   }
 
   /**

@@ -1,6 +1,7 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
+import SafeOperation from './SafeOperation'
 
 type ExistingSafeOptions = {
   safeAddress: string
@@ -67,16 +68,12 @@ export type UserOperation = {
   signature: string
 }
 
-export type EstimateUserOperationGas = {
+export type EstimateGasData = {
+  maxFeePerGas: bigint
+  maxPriorityFeePerGas: bigint
   preVerificationGas: bigint
   verificationGasLimit: bigint
   callGasLimit: bigint
-}
-
-export type FeeData = {
-  gasPrice: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
 }
 
 type Log = {
@@ -123,4 +120,19 @@ export type UserOperationWithPayload = {
   transactionHash: string
   blockHash: string
   blockNumber: string
+}
+
+export type GetEstimateFeeFn = ({
+  userOperation,
+  bundlerUrl,
+  entryPoint
+}: {
+  userOperation: UserOperation
+  bundlerUrl: string
+  entryPoint: string
+}) => Promise<EstimateGasData>
+
+export type GetEstimateFeeParams = {
+  safeOperation: SafeOperation
+  estimateFeeFn: GetEstimateFeeFn
 }

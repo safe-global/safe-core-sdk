@@ -104,6 +104,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 4337n, shortName: 'beam' },
   { chainId: 4460n, shortName: 'orderlyl2' },
   { chainId: 4689n, shortName: 'iotex-mainnet' },
+  { chainId: 4690n, shortName: 'iotex-testnet' },
   { chainId: 4918n, shortName: 'txvm' },
   { chainId: 4919n, shortName: 'xvm' },
   { chainId: 5000n, shortName: 'mantle' },

@@ -29,7 +29,7 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "dependencies": {
-    "@safe-global/safe-deployments": "^1.32.0",
+    "@safe-global/safe-deployments": "^1.33.0",
     "ethers": "^6.7.1",
     "web3-core": "^1.10.3",
     "web3-utils": "^1.10.3"

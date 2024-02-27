@@ -26,8 +26,9 @@ import {
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
 
-const SAFE_VERSION = '1.4.1'
-const SAFE_MODULES_VERSION = '0.2.0'
+const DEFAULT_SAFE_VERSION = '1.4.1'
+const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
+
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
  * This class provides an implementation of the ERC-4337 that enables Safe accounts to wrk with UserOperations.
@@ -99,7 +100,7 @@ export class Safe4337Pack extends RelayKitBasePack {
     if (!addModulesLibAddress) {
       const addModulesDeployment = getAddModulesLibDeployment({
         released: true,
-        version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
+        version: initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION,
         network
       })
       addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
@@ -109,7 +110,7 @@ export class Safe4337Pack extends RelayKitBasePack {
     if (!safe4337ModuleAddress) {
       const safe4337ModuleDeployment = getSafe4337ModuleDeployment({
         released: true,
-        version: initOptions.safeModulesVersion || SAFE_MODULES_VERSION,
+        version: initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION,
         network
       })
       safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
@@ -117,7 +118,7 @@ export class Safe4337Pack extends RelayKitBasePack {
 
     if (!addModulesLibAddress || !safe4337ModuleAddress) {
       throw new Error(
-        `Safe4337Module and/or AddModulesLib not available for chain ${network} and modules version ${SAFE_MODULES_VERSION}`
+        `Safe4337Module and/or AddModulesLib not available for chain ${network} and modules version ${DEFAULT_SAFE_MODULES_VERSION}`
       )
     }
 
@@ -137,7 +138,7 @@ export class Safe4337Pack extends RelayKitBasePack {
         ethAdapter: ethersAdapter,
         predictedSafe: {
           safeDeploymentConfig: {
-            safeVersion: options.safeVersion || SAFE_VERSION,
+            safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
             saltNonce: options.saltNonce || undefined
           },
           safeAccountConfig: {

@@ -122,7 +122,7 @@ export type UserOperationWithPayload = {
   blockNumber: string
 }
 
-export type GetEstimateFeeFn = ({
+export type EstimateFeeFn = ({
   userOperation,
   bundlerUrl,
   entryPoint
@@ -132,7 +132,7 @@ export type GetEstimateFeeFn = ({
   entryPoint: string
 }) => Promise<EstimateGasData>
 
-export type GetEstimateFeeParams = {
+export type EstimateFeeOptions = {
   safeOperation: SafeOperation
-  estimateFeeFn: GetEstimateFeeFn
+  estimateFeeFn: EstimateFeeFn
 }

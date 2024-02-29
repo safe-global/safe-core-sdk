@@ -7,4 +7,3 @@ export * from './packs/safe-4337/providers/alchemy'
 export * from './packs/safe-4337/types'
 
 export * from './RelayKitBasePack'
-export * from './types'

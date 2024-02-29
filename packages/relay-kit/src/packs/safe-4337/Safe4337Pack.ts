@@ -5,7 +5,6 @@ import Safe, {
   SigningMethod,
   encodeMultiSendData
 } from '@safe-global/protocol-kit'
-import { RelayKitTransaction } from '@safe-global/relay-kit/types'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
 import {
@@ -15,7 +14,7 @@ import {
 
 import SafeOperation from './SafeOperation'
 import {
-  GetEstimateFeeParams,
+  EstimateFeeOptions,
   Safe4337InitOptions,
   Safe4337Options,
   SafeUserOperation,
@@ -38,7 +37,14 @@ const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
  * @link https://github.com/safe-global/safe-modules/blob/main/modules/4337/contracts/Safe4337Module.sol
  * @link https://eips.ethereum.org/EIPS/eip-4337
  */
-export class Safe4337Pack extends RelayKitBasePack {
+export class Safe4337Pack extends RelayKitBasePack<
+  EstimateFeeOptions,
+  SafeOperation,
+  undefined,
+  SafeOperation,
+  undefined,
+  string
+> {
   #BUNDLER_URL: string
   #RPC_URL: string
 
@@ -180,14 +186,14 @@ export class Safe4337Pack extends RelayKitBasePack {
   /**
    * Estimates gas for the SafeOperation.
    *
-   * @param {GetEstimateFeeParams{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
-   * @param {GetEstimateFeeParams{GetEstimateFeeFn}} estimateFeeFn - The function to estimate the gas.
+   * @param {EstimateFeeOptions{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
+   * @param {EstimateFeeOptions{EstimateFeeFn}} estimateFeeFn - The function to estimate the gas.
    * @return {Promise<SafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
   async getEstimateFee({
     safeOperation,
     estimateFeeFn
-  }: GetEstimateFeeParams): Promise<SafeOperation> {
+  }: EstimateFeeOptions): Promise<SafeOperation> {
     const gasEstimations = await estimateFeeFn({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -202,10 +208,10 @@ export class Safe4337Pack extends RelayKitBasePack {
   /**
    * Creates a relayed transaction based on the provided parameters.
    *
-   * @param {RelayKitTransaction} relayKitTransaction - The transaction object params required to create a relayed transaction.
+   * @param {MetaTransactionData[]} transactions - The transactions to batch in a SafeOperation.
    * @return {Promise<SafeOperation>} The Promise object will resolve a SafeOperation.
    */
-  async createRelayedTransaction({ transactions }: RelayKitTransaction): Promise<SafeOperation> {
+  async createTransaction(transactions: MetaTransactionData[]): Promise<SafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
 
@@ -304,7 +310,7 @@ export class Safe4337Pack extends RelayKitBasePack {
    * @param {SafeOperation} safeOperation - The SafeOperation to execute.
    * @return {Promise<string>} The user operation hash.
    */
-  async executeRelayTransaction(safeOperation: SafeOperation): Promise<string> {
+  async executeTransaction(safeOperation: SafeOperation): Promise<string> {
     const userOperation = safeOperation.toUserOperation()
 
     return this.sendUserOperation(userOperation)

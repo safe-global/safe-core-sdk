@@ -60,9 +60,7 @@ async function main() {
   const transactions = [transferUSDC, transferUSDC]
 
   // 2) Create transaction batch
-  const safeOperation = await safe4337Pack.createRelayedTransaction({
-    transactions
-  })
+  const safeOperation = await safe4337Pack.createTransaction(transactions)
 
   // 3) Estimate SafeOperation fee
   const estimatedSafeOperation = await safe4337Pack.getEstimateFee({
@@ -77,9 +75,7 @@ async function main() {
   console.log('SafeOperation', estimatedAndSignedSafeOperation)
 
   // 5) Execute SafeOperation
-  const userOperationHash = await safe4337Pack.executeRelayTransaction(
-    estimatedAndSignedSafeOperation
-  )
+  const userOperationHash = await safe4337Pack.executeTransaction(estimatedAndSignedSafeOperation)
 
   console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=sepolia`)
 

@@ -1,48 +1,68 @@
 import Safe from '@safe-global/protocol-kit'
-import { MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
-import { RelayKitTransaction } from './types'
-
-export abstract class RelayKitBasePack {
+/**
+ * Abstract class. The base class for all RelayKit packs.
+ * It provides the Safe SDK instance and the abstract methods to be implemented by the packs.
+ * @abstract
+ * @template TEstimateFeeOptions
+ * @template TEstimateFeeResult
+ * @template TCreateTransactionOptions
+ * @template TCreateTransactionResult,
+ * @template TExecuteTransactionOptions
+ * @template TExecuteTransactionResult
+ */
+export abstract class RelayKitBasePack<
+  TEstimateFeeOptions,
+  TEstimateFeeResult,
+  TCreateTransactionOptions,
+  TCreateTransactionResult,
+  TExecuteTransactionOptions,
+  TExecuteTransactionResult
+> {
+  /**
+   * @type {Safe}
+   */
   protocolKit: Safe
 
   /**
+   * Creates a new RelayKitBasePack instance.
    * The packs implemented using our SDK should extend this class and therefore provide a Safe SDK instance
-   * @constructor
-   * @param protocolKit The Safe SDK instance
+   * @param {Safe} protocolKit - The Safe SDK instance
    */
   constructor(protocolKit: Safe) {
     this.protocolKit = protocolKit
   }
 
   /**
-   * Get an estimation of the fee that will be paid for a transaction
-   * @param chainId The chain id
-   * @param gasLimit Max amount of gas willing to consume
-   * @param gasToken Token address (or 0 if ETH) that is used for the payment
+   * Abstract function to get an estimate of the fee that will be paid for a transaction.
+   * @abstract
+   * @param {TEstimateFeeOptions} options - The options for fee estimation.
+   * @returns Promise<TEstimateFeeResult> - The estimated fee result.
    */
-  abstract getEstimateFee(options: unknown): Promise<unknown>
+  abstract getEstimateFee(options: TEstimateFeeOptions): Promise<TEstimateFeeResult>
 
   /**
-   * Creates a Safe transaction designed to be executed using the relayer.
-   * @param {RelayKitTransaction} RelayKitTransaction - Properties required to create the transaction.
-   * @returns {Promise<SafeTransaction>} - Returns a Promise that resolves with a SafeTransaction object.
+   * Abstract function to create a Safe transaction, designed to be executed using the relayer.
+   * @abstract
+   * @param {Array<MetaTransactionData>} transactions - Transactions data.
+   * @param {TCreateTransactionOptions} options - The options for transaction creation.
+   * @returns Promise<TCreateTransactionResult> - The output of the created transaction.
    */
-  abstract createRelayedTransaction({
-    transactions,
-    options,
-    onlyCalls
-  }: RelayKitTransaction): Promise<unknown>
+  abstract createTransaction(
+    transactions: MetaTransactionData[],
+    options: TCreateTransactionOptions
+  ): Promise<TCreateTransactionResult>
 
   /**
-   * Sends the Safe transaction to the relayer for execution.
-   * If the Safe is not deployed, it creates a batch of transactions including the Safe deployment transaction.
-   * @param {SafeTransaction} safeTransaction - The Safe transaction to be executed
-   * @param {MetaTransactionOptions} options - The transaction options
-   * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
+   * Abstract function to execute a Safe transaction using a relayer.
+   * @abstract
+   * @param {TCreateTransactionResult} safeExecObject - The result of the created transaction. This can be for example a SafeTransaction object or SafeOperation.
+   * @param {TCreateTransactionOptions} options - The options for transaction execution.
+   * @returns {Promise<unknown>} - Relay's response after executing the transaction.
    */
-  abstract executeRelayTransaction(
-    safeTxOrOp: unknown,
-    options?: MetaTransactionOptions
-  ): Promise<unknown>
+  abstract executeTransaction(
+    safeExecObject: TCreateTransactionResult,
+    options: TExecuteTransactionOptions
+  ): Promise<TExecuteTransactionResult>
 }

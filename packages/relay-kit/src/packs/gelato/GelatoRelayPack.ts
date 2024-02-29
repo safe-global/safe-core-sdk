@@ -113,7 +113,10 @@ export class GelatoRelayPack extends RelayKitBasePack<
   /**
    * Creates a Safe transaction designed to be executed using the Gelato Relayer.
    *
-   * @param {RelayKitTransaction} RelayKitTransaction - Properties required to create the transaction.
+   * @param {MetaTransactionData[]} transactions - The transactions batch.
+   * @param {GelatoCreateTransactionOptions} options - Options for Gelato.
+   * @param {boolean} [options.onlyCalls=false] - If true, MultiSendCallOnly contract should be used. Remember to not use delegate calls in the batch.
+   * @param {MetaTransactionOptions} [options.options={}] - Gas Options for the transaction batch.
    * @returns {Promise<SafeTransaction>} Returns a Promise that resolves with a SafeTransaction object.
    */
   async createTransaction(
@@ -161,7 +164,10 @@ export class GelatoRelayPack extends RelayKitBasePack<
    *
    * @async
    * @function createTransactionWithHandlePayment
-   * @param {RelayKitTransaction} RelayKitTransaction - Properties needed to create the transaction.
+   * @param {MetaTransactionData[]} transactions - The transactions batch.
+   * @param {GelatoCreateTransactionOptions} options - Options for Gelato.
+   * @param {boolean} [options.onlyCalls=false] - If true, MultiSendCallOnly contract should be used. Remember to not use delegate calls in the batch.
+   * @param {MetaTransactionOptions} [options.options={}] - Gas Options for the transaction batch.
    * @returns {Promise<SafeTransaction>} Returns a promise that resolves to the created SafeTransaction.
    * @private
    */
@@ -247,7 +253,10 @@ export class GelatoRelayPack extends RelayKitBasePack<
    *
    * @async
    * @function createTransactionWithTransfer
-   * @param {RelayKitTransaction} RelayKitTransaction - Properties needed to create the transaction.
+   * @param {MetaTransactionData[]} transactions - The transactions batch.
+   * @param {GelatoCreateTransactionOptions} options - Options for Gelato.
+   * @param {boolean} [options.onlyCalls=false] - If true, MultiSendCallOnly contract should be used. Remember to not use delegate calls in the batch.
+   * @param {MetaTransactionOptions} [options.options={}] - Gas Options for the transaction batch.
    * @returns {Promise<SafeTransaction>} Returns a promise that resolves to the created SafeTransaction.
    * @private
    */
@@ -367,6 +376,7 @@ export class GelatoRelayPack extends RelayKitBasePack<
    * If the Safe is not deployed, it creates a batch of transactions including the Safe deployment transaction.
    *
    * @param {SafeTransaction} safeTransaction - The Safe transaction to be executed.
+   * @param {MetaTransactionOptions} [options] - Options for the transaction.
    * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
    */
   async executeTransaction(

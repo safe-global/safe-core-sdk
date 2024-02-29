@@ -203,7 +203,6 @@ export class Safe4337Pack extends RelayKitBasePack<
 
     if (prepareGasEstimationData) {
       safeOperation.addEstimations(prepareGasEstimationData)
-      console.log('prepareGasEstimationData', prepareGasEstimationData)
     }
 
     const userOperation = safeOperation.toUserOperation()
@@ -219,10 +218,7 @@ export class Safe4337Pack extends RelayKitBasePack<
         verificationGasLimit: BigInt(estimateUserOperationGas.verificationGasLimit),
         callGasLimit: BigInt(estimateUserOperationGas.callGasLimit)
       })
-      console.log('estimateUserOperationGas', estimateUserOperationGas)
     }
-
-    console.log('estimateUserOperationGas', safeOperation)
 
     const adjustGasEstimationData = await adjustGasEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
@@ -232,7 +228,6 @@ export class Safe4337Pack extends RelayKitBasePack<
 
     if (adjustGasEstimationData) {
       safeOperation.addEstimations(adjustGasEstimationData)
-      console.log('adjustGasEstimationData', adjustGasEstimationData)
     }
 
     return safeOperation

@@ -182,7 +182,7 @@ describe('GelatoRelayPack', () => {
       })
 
       it('should allow you to create a sponsored one', async () => {
-        await relayPack.createTransaction(transactions, { options })
+        await relayPack.createTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
           transactions,
@@ -194,7 +194,8 @@ describe('GelatoRelayPack', () => {
       })
 
       it('should allow to create a sync fee one', async () => {
-        await relayPack.createTransaction(transactions, {
+        await relayPack.createTransaction({
+          transactions,
           options: { ...options, isSponsored: false }
         })
 
@@ -213,7 +214,8 @@ describe('GelatoRelayPack', () => {
       })
 
       it('should return the correct gasToken when being sent through the options', async () => {
-        await relayPack.createTransaction(transactions, {
+        await relayPack.createTransaction({
+          transactions,
           options: { ...options, isSponsored: false, gasToken: GAS_TOKEN }
         })
 
@@ -249,7 +251,7 @@ describe('GelatoRelayPack', () => {
 
         mockCreateERC20TokenTransferTransaction.mockReturnValue(transferToGelato)
 
-        await relayPack.createTransaction(transactions, { options })
+        await relayPack.createTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
           transactions: [...transactions, transferToGelato], // the transfer to Gelato is prensent
@@ -287,7 +289,7 @@ describe('GelatoRelayPack', () => {
           isSponsored: true
         }
 
-        await relayPack.createTransaction(transactions, { options })
+        await relayPack.createTransaction({ transactions, options })
 
         expect(safe.createTransaction).toHaveBeenCalledWith({
           transactions,
@@ -305,7 +307,7 @@ describe('GelatoRelayPack', () => {
         })
 
         it('should allow you to create relay transaction using the native token to pay Gelato fees', async () => {
-          await relayPack.createTransaction(transactions, {})
+          await relayPack.createTransaction({ transactions })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
             transactions,
@@ -326,7 +328,7 @@ describe('GelatoRelayPack', () => {
             gasToken: GAS_TOKEN
           }
 
-          await relayPack.createTransaction(transactions, { options })
+          await relayPack.createTransaction({ transactions, options })
 
           expect(safe.createTransaction).toHaveBeenCalledWith({
             transactions,
@@ -362,9 +364,10 @@ describe('GelatoRelayPack', () => {
 
           mockCreateERC20TokenTransferTransaction.mockReturnValue(transferToGelato)
 
-          await relayPack.createTransaction(transactions, { options })
+          await relayPack.createTransaction({ transactions, options })
 
-          expect(safe.createTransaction).toHaveBeenCalledWith([...transactions, transferToGelato], {
+          expect(safe.createTransaction).toHaveBeenCalledWith({
+            transactions: [...transactions, transferToGelato], // the transfer to Gelato is prensent
             onlyCalls: false,
             options: {
               gasToken: GAS_TOKEN, // non standard ERC20 gas token

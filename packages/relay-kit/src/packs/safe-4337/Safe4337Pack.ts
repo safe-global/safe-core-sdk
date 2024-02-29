@@ -15,6 +15,7 @@ import {
 import SafeOperation from './SafeOperation'
 import {
   EstimateFeeOptions,
+  Safe4337CreateTransactionOptions,
   Safe4337InitOptions,
   Safe4337Options,
   SafeUserOperation,
@@ -40,7 +41,7 @@ const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
 export class Safe4337Pack extends RelayKitBasePack<
   EstimateFeeOptions,
   SafeOperation,
-  undefined,
+  Safe4337CreateTransactionOptions,
   SafeOperation,
   undefined,
   string
@@ -239,7 +240,9 @@ export class Safe4337Pack extends RelayKitBasePack<
    * @param {MetaTransactionData[]} transactions - The transactions to batch in a SafeOperation.
    * @return {Promise<SafeOperation>} The Promise object will resolve a SafeOperation.
    */
-  async createTransaction(transactions: MetaTransactionData[]): Promise<SafeOperation> {
+  async createTransaction({
+    transactions
+  }: Safe4337CreateTransactionOptions): Promise<SafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
 

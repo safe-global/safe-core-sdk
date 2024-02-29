@@ -1,5 +1,5 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import SafeOperation from './SafeOperation'
 
@@ -36,6 +36,10 @@ export type Safe4337Options = {
   entryPointAddress: string
   addModulesLibAddress: string
   safe4337ModuleAddress: string
+}
+
+export type Safe4337CreateTransactionOptions = {
+  transactions: MetaTransactionData[]
 }
 
 export type SafeUserOperation = {

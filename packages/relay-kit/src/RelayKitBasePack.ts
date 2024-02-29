@@ -1,5 +1,4 @@
 import Safe from '@safe-global/protocol-kit'
-import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
 /**
  * Abstract class. The base class for all RelayKit packs.
@@ -45,24 +44,20 @@ export abstract class RelayKitBasePack<
   /**
    * Abstract function to create a Safe transaction, designed to be executed using the relayer.
    * @abstract
-   * @param {Array<MetaTransactionData>} transactions - Transactions data.
    * @param {TCreateTransactionOptions} options - The options for transaction creation.
    * @returns Promise<TCreateTransactionResult> - The output of the created transaction.
    */
-  abstract createTransaction(
-    transactions: MetaTransactionData[],
-    options: TCreateTransactionOptions
-  ): Promise<TCreateTransactionResult>
+  abstract createTransaction(options: TCreateTransactionOptions): Promise<TCreateTransactionResult>
 
   /**
    * Abstract function to execute a Safe transaction using a relayer.
    * @abstract
-   * @param {TCreateTransactionResult} safeExecObject - The result of the created transaction. This can be for example a SafeTransaction object or SafeOperation.
+   * @param {TCreateTransactionResult} executable - The result of the created transaction. This can be for example a SafeTransaction object or SafeOperation.
    * @param {TCreateTransactionOptions} options - The options for transaction execution.
-   * @returns {Promise<unknown>} - Relay's response after executing the transaction.
+   * @returns {Promise<TExecuteTransactionResult>} - Relay's response after executing the transaction.
    */
   abstract executeTransaction(
-    safeExecObject: TCreateTransactionResult,
+    executable: TCreateTransactionResult,
     options: TExecuteTransactionOptions
   ): Promise<TExecuteTransactionResult>
 }

@@ -69,11 +69,11 @@ export type UserOperation = {
 }
 
 export type EstimateGasData = {
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
-  preVerificationGas: bigint
-  verificationGasLimit: bigint
-  callGasLimit: bigint
+  maxFeePerGas?: bigint
+  maxPriorityFeePerGas?: bigint
+  preVerificationGas?: bigint
+  verificationGasLimit?: bigint
+  callGasLimit?: bigint
 }
 
 type Log = {
@@ -122,17 +122,20 @@ export type UserOperationWithPayload = {
   blockNumber: string
 }
 
-export type EstimateFeeFn = ({
-  userOperation,
-  bundlerUrl,
-  entryPoint
-}: {
+export type EstimateFeeFunctionParams = {
   userOperation: UserOperation
   bundlerUrl: string
   entryPoint: string
-}) => Promise<EstimateGasData>
+}
+
+export type EstimateFeeFunction = ({
+  userOperation,
+  bundlerUrl,
+  entryPoint
+}: EstimateFeeFunctionParams) => Promise<EstimateGasData>
 
 export type EstimateFeeOptions = {
   safeOperation: SafeOperation
-  estimateFeeFn: EstimateFeeFn
+  prepareGasEstimation?: EstimateFeeFunction
+  adjustGasEstimation?: EstimateFeeFunction
 }

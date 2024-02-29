@@ -192,15 +192,48 @@ export class Safe4337Pack extends RelayKitBasePack<
    */
   async getEstimateFee({
     safeOperation,
-    estimateFeeFn
+    prepareGasEstimation,
+    adjustGasEstimation
   }: EstimateFeeOptions): Promise<SafeOperation> {
-    const gasEstimations = await estimateFeeFn({
+    const prepareGasEstimationData = await prepareGasEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.toUserOperation()
     })
 
-    safeOperation.addEstimations(gasEstimations)
+    if (prepareGasEstimationData) {
+      safeOperation.addEstimations(prepareGasEstimationData)
+      console.log('prepareGasEstimationData', prepareGasEstimationData)
+    }
+
+    const userOperation = safeOperation.toUserOperation()
+
+    const estimateUserOperationGas = await this.#bundlerClient.send(
+      RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
+      [this.#userOperationToHexValues(userOperation), this.#ENTRYPOINT_ADDRESS]
+    )
+
+    if (estimateUserOperationGas) {
+      safeOperation.addEstimations({
+        preVerificationGas: BigInt(estimateUserOperationGas.preVerificationGas),
+        verificationGasLimit: BigInt(estimateUserOperationGas.verificationGasLimit),
+        callGasLimit: BigInt(estimateUserOperationGas.callGasLimit)
+      })
+      console.log('estimateUserOperationGas', estimateUserOperationGas)
+    }
+
+    console.log('estimateUserOperationGas', safeOperation)
+
+    const adjustGasEstimationData = await adjustGasEstimation?.({
+      bundlerUrl: this.#BUNDLER_URL,
+      entryPoint: this.#ENTRYPOINT_ADDRESS,
+      userOperation: safeOperation.toUserOperation()
+    })
+
+    if (adjustGasEstimationData) {
+      safeOperation.addEstimations(adjustGasEstimationData)
+      console.log('adjustGasEstimationData', adjustGasEstimationData)
+    }
 
     return safeOperation
   }
@@ -398,11 +431,7 @@ export class Safe4337Pack extends RelayKitBasePack<
    */
   async sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
     return await this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
-      {
-        ...userOpWithSignature,
-        maxFeePerGas: ethers.toBeHex(userOpWithSignature.maxFeePerGas),
-        maxPriorityFeePerGas: ethers.toBeHex(userOpWithSignature.maxPriorityFeePerGas)
-      },
+      this.#userOperationToHexValues(userOpWithSignature),
       this.#ENTRYPOINT_ADDRESS
     ])
   }
@@ -493,5 +522,19 @@ export class Safe4337Pack extends RelayKitBasePack<
         transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
       )
     ])
+  }
+
+  #userOperationToHexValues(userOperation: UserOperation) {
+    const userOperationWithHexValues = {
+      ...userOperation,
+      nonce: ethers.toBeHex(userOperation.nonce),
+      callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
+      verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
+      preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
+      maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
+      maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
+    }
+
+    return userOperationWithHexValues
   }
 }

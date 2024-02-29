@@ -2,17 +2,19 @@ import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
 import {
   Safe4337Pack,
-  estimateGasDataWithPimlico as estimateFeeFn,
-  estimateGasDataWithAlchemy
+  pimlico_prepareGasEstimation,
+  pimlico_adjustGasEstimation,
+  alchemy_prepareGasEstimation as prepareGasEstimation,
+  alchemy_adjustGasEstimation as adjustGasEstimation
 } from '@safe-global/relay-kit'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
 
 // Bundler URL
-const BUNDLER_URL =
-  'https://api.pimlico.io/v1/sepolia/rpc?apikey=30b296fa-8947-4775-b44a-b225336e2a66' // PIMLICO
-// const BUNDLER_URL = 'https://eth-sepolia.g.alchemy.com/v2/0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk' // ALCHEMY
+// const BUNDLER_URL =
+//   'https://api.pimlico.io/v1/sepolia/rpc?apikey=30b296fa-8947-4775-b44a-b225336e2a66' // PIMLICO
+const BUNDLER_URL = 'https://eth-sepolia.g.alchemy.com/v2/0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk' // ALCHEMY
 
 // RPC URL
 const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
@@ -65,7 +67,8 @@ async function main() {
   // 3) Estimate SafeOperation fee
   const estimatedSafeOperation = await safe4337Pack.getEstimateFee({
     safeOperation,
-    estimateFeeFn
+    prepareGasEstimation,
+    adjustGasEstimation
   })
 
   // 4) Sign SafeOperation

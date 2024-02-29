@@ -138,8 +138,12 @@ export type EstimateFeeFunction = ({
   entryPoint
 }: EstimateFeeFunctionParams) => Promise<EstimateGasData>
 
-export type EstimateFeeOptions = {
-  safeOperation: SafeOperation
+export interface IFeeEstimator {
   prepareGasEstimation?: EstimateFeeFunction
   adjustGasEstimation?: EstimateFeeFunction
+}
+
+export type EstimateFeeOptions = {
+  safeOperation: SafeOperation
+  feeEstimator?: IFeeEstimator
 }

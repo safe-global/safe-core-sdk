@@ -193,10 +193,9 @@ export class Safe4337Pack extends RelayKitBasePack<
    */
   async getEstimateFee({
     safeOperation,
-    prepareGasEstimation,
-    adjustGasEstimation
+    feeEstimator
   }: EstimateFeeOptions): Promise<SafeOperation> {
-    const prepareGasEstimationData = await prepareGasEstimation?.({
+    const prepareGasEstimationData = await feeEstimator?.prepareGasEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.toUserOperation()
@@ -221,7 +220,7 @@ export class Safe4337Pack extends RelayKitBasePack<
       })
     }
 
-    const adjustGasEstimationData = await adjustGasEstimation?.({
+    const adjustGasEstimationData = await feeEstimator?.adjustGasEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.toUserOperation()

@@ -35,14 +35,14 @@ import {
   GelatoOptions
 } from './types'
 
-export class GelatoRelayPack extends RelayKitBasePack<
-  GelatoEstimateFeeOptions,
-  GelatoEstimateFeeOptionsResult,
-  GelatoCreateTransactionOptions,
-  SafeTransaction,
-  MetaTransactionOptions,
-  RelayResponse
-> {
+export class GelatoRelayPack extends RelayKitBasePack<{
+  EstimateFeeOptions: GelatoEstimateFeeOptions
+  EstimateFeeResult: GelatoEstimateFeeOptionsResult
+  CreateTransactionOptions: GelatoCreateTransactionOptions
+  CreateTransactionResult: SafeTransaction
+  ExecuteTransactionsOptions: MetaTransactionOptions
+  ExecuteTransactionsResult: RelayResponse
+}> {
   #gelatoRelay: GelatoNetworkRelay
   #apiKey?: string
 

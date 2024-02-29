@@ -38,14 +38,13 @@ const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
  * @link https://github.com/safe-global/safe-modules/blob/main/modules/4337/contracts/Safe4337Module.sol
  * @link https://eips.ethereum.org/EIPS/eip-4337
  */
-export class Safe4337Pack extends RelayKitBasePack<
-  EstimateFeeOptions,
-  SafeOperation,
-  Safe4337CreateTransactionOptions,
-  SafeOperation,
-  undefined,
-  string
-> {
+export class Safe4337Pack extends RelayKitBasePack<{
+  EstimateFeeOptions: EstimateFeeOptions
+  EstimateFeeResult: SafeOperation
+  CreateTransactionOptions: Safe4337CreateTransactionOptions
+  CreateTransactionResult: SafeOperation
+  ExecuteTransactionResult: string
+}> {
   #BUNDLER_URL: string
   #RPC_URL: string
 

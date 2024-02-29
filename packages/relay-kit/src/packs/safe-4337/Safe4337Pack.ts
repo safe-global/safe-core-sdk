@@ -195,14 +195,14 @@ export class Safe4337Pack extends RelayKitBasePack<
     safeOperation,
     feeEstimator
   }: EstimateFeeOptions): Promise<SafeOperation> {
-    const prepareGasEstimationData = await feeEstimator?.prepareGasEstimation?.({
+    const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.toUserOperation()
     })
 
-    if (prepareGasEstimationData) {
-      safeOperation.addEstimations(prepareGasEstimationData)
+    if (setupEstimationData) {
+      safeOperation.addEstimations(setupEstimationData)
     }
 
     const userOperation = safeOperation.toUserOperation()
@@ -220,14 +220,14 @@ export class Safe4337Pack extends RelayKitBasePack<
       })
     }
 
-    const adjustGasEstimationData = await feeEstimator?.adjustGasEstimation?.({
+    const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.toUserOperation()
     })
 
-    if (adjustGasEstimationData) {
-      safeOperation.addEstimations(adjustGasEstimationData)
+    if (adjustEstimationData) {
+      safeOperation.addEstimations(adjustEstimationData)
     }
 
     return safeOperation

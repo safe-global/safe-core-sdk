@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { EstimateFeeFunctionParams, EstimateGasData, IFeeEstimator } from '../types'
 
 export class PimlicoFeeEstimator implements IFeeEstimator {
-  async prepareGasEstimation({ bundlerUrl }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
+  async setupEstimation({ bundlerUrl }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
     const bundlerClient = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
       batchMaxCount: 1
     })
@@ -12,9 +12,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     return feeData
   }
 
-  async adjustGasEstimation({
-    userOperation
-  }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
+  async adjustEstimation({ userOperation }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
     return {
       verificationGasLimit:
         userOperation.verificationGasLimit + userOperation.verificationGasLimit / 2n

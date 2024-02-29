@@ -139,6 +139,17 @@ export class GelatoRelayPack extends RelayKitBasePack<{
   }
 
   /**
+   * @deprecated Use createTransaction instead
+   */
+  async createRelayedTransaction({
+    transactions,
+    onlyCalls = false,
+    options = {}
+  }: GelatoCreateTransactionOptions): Promise<SafeTransaction> {
+    return this.createTransaction({ transactions, onlyCalls, options })
+  }
+
+  /**
    * Creates a Safe transaction designed to be executed using the Gelato Relayer.
    *
    * @param {GelatoCreateTransactionOptions} options - Options for Gelato.
@@ -400,6 +411,16 @@ export class GelatoRelayPack extends RelayKitBasePack<{
       ? this.sendSponsorTransaction(target, encodedTransaction, chainId)
       : this.sendSyncTransaction(target, encodedTransaction, chainId, options)
     return response
+  }
+
+  /**
+   * @deprecated Use executeTransaction instead
+   */
+  async executeRelayTransaction(
+    safeTransaction: SafeTransaction,
+    options?: MetaTransactionOptions
+  ): Promise<RelayResponse> {
+    return this.executeTransaction(safeTransaction, options)
   }
 
   /**

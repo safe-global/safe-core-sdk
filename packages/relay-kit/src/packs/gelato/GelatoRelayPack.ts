@@ -40,7 +40,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
   EstimateFeeResult: GelatoEstimateFeeResult
   CreateTransactionProps: GelatoCreateTransactionProps
   CreateTransactionResult: SafeTransaction
-  ExecuteTransactionsOptions: MetaTransactionOptions
+  ExecuteTransactionsProps: MetaTransactionOptions
   ExecuteTransactionsResult: RelayResponse
 }> {
   #gelatoRelay: GelatoNetworkRelay

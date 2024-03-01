@@ -1,5 +1,12 @@
 import { ethers } from 'ethers'
-import { EstimateFeeFunctionProps, EstimateGasData, IFeeEstimator } from '../types'
+import {
+  EstimateFeeFunctionProps,
+  EstimateGasData,
+  EstimateSponsoredFeeFunctionProps,
+  EstimateSponsoredGasData,
+  IFeeEstimator
+} from '../types'
+import { userOperationToHexValues } from '../utils'
 
 export class PimlicoFeeEstimator implements IFeeEstimator {
   async setupEstimation({ bundlerUrl }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
@@ -17,6 +24,23 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       verificationGasLimit:
         userOperation.verificationGasLimit + userOperation.verificationGasLimit / 2n
     }
+  }
+
+  async getPaymasterEstimation({
+    userOperation,
+    paymasterUrl,
+    entryPoint
+  }: EstimateSponsoredFeeFunctionProps): Promise<EstimateSponsoredGasData> {
+    const paymasterClient = new ethers.JsonRpcProvider(paymasterUrl, undefined, {
+      batchMaxCount: 1
+    })
+
+    const gasEstimate = await paymasterClient.send('pm_sponsorUserOperation', [
+      userOperationToHexValues(userOperation),
+      entryPoint
+    ])
+
+    return gasEstimate
   }
 
   async #getFeeData(

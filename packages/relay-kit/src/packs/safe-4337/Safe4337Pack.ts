@@ -24,7 +24,7 @@ import {
   UserOperationWithPayload
 } from './types'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
-import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
+import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const DEFAULT_SAFE_VERSION = '1.4.1'
@@ -48,6 +48,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 }> {
   #BUNDLER_URL: string
   #RPC_URL: string
+  #PAYMASTER_URL?: string
 
   #ENTRYPOINT_ADDRESS: string
   #ADD_MODULES_LIB_ADDRESS: string = '0x'
@@ -66,6 +67,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     bundlerClient,
     publicClient,
     bundlerUrl,
+    paymasterUrl,
     rpcUrl,
     entryPointAddress,
     addModulesLibAddress,
@@ -74,6 +76,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     super(protocolKit)
 
     this.#BUNDLER_URL = bundlerUrl
+    this.#PAYMASTER_URL = paymasterUrl
     this.#RPC_URL = rpcUrl
 
     this.#bundlerClient = bundlerClient
@@ -95,7 +98,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { ethersAdapter, options, bundlerUrl, rpcUrl, customContracts } = initOptions
+    const { ethersAdapter, options, bundlerUrl, paymasterUrl, rpcUrl, customContracts } =
+      initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
     const publicClient = getEip1193Provider(rpcUrl)
@@ -176,6 +180,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       protocolKit,
       bundlerClient,
       publicClient,
+      paymasterUrl,
       bundlerUrl,
       rpcUrl,
       entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
@@ -209,7 +214,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const estimateUserOperationGas = await this.#bundlerClient.send(
       RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
-      [this.#userOperationToHexValues(userOperation), this.#ENTRYPOINT_ADDRESS]
+      [userOperationToHexValues(userOperation), this.#ENTRYPOINT_ADDRESS]
     )
 
     if (estimateUserOperationGas) {
@@ -220,14 +225,32 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
     }
 
-    const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
-      bundlerUrl: this.#BUNDLER_URL,
-      entryPoint: this.#ENTRYPOINT_ADDRESS,
-      userOperation: safeOperation.toUserOperation()
+    if (userOperation.paymasterAndData === '0x') {
+      const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
+        bundlerUrl: this.#BUNDLER_URL,
+        entryPoint: this.#ENTRYPOINT_ADDRESS,
+        userOperation: safeOperation.toUserOperation()
+      })
+
+      if (adjustEstimationData) {
+        safeOperation.addEstimations(adjustEstimationData)
+      }
+
+      return safeOperation
+    }
+
+    if (!this.#PAYMASTER_URL) {
+      throw new Error('No paymaster url provided')
+    }
+
+    const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
+      userOperation: safeOperation.toUserOperation(),
+      paymasterUrl: this.#PAYMASTER_URL,
+      entryPoint: this.#ENTRYPOINT_ADDRESS
     })
 
-    if (adjustEstimationData) {
-      safeOperation.addEstimations(adjustEstimationData)
+    if (paymasterEstimation) {
+      safeOperation.addEstimations(paymasterEstimation)
     }
 
     return safeOperation
@@ -240,10 +263,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<SafeOperation>} The Promise object will resolve a SafeOperation.
    */
   async createTransaction({
-    transactions
+    transactions,
+    options
   }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
+    const paymasterAddress = options?.paymasterAddress
+    const paymasterAndData = paymasterAddress || '0x'
 
     const isBatch = transactions.length > 1
     const multiSendAddress = await this.protocolKit.getMultiSendAddress()
@@ -267,7 +293,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       preVerificationGas: 1n,
       maxFeePerGas: 1n,
       maxPriorityFeePerGas: 1n,
-      paymasterAndData: '0x', // TODO: Paymasters feature
+      paymasterAndData,
       signature: '0x'
     }
 
@@ -428,7 +454,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    */
   async sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
     return await this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
-      this.#userOperationToHexValues(userOpWithSignature),
+      userOperationToHexValues(userOpWithSignature),
       this.#ENTRYPOINT_ADDRESS
     ])
   }
@@ -519,19 +545,5 @@ export class Safe4337Pack extends RelayKitBasePack<{
         transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
       )
     ])
-  }
-
-  #userOperationToHexValues(userOperation: UserOperation) {
-    const userOperationWithHexValues = {
-      ...userOperation,
-      nonce: ethers.toBeHex(userOperation.nonce),
-      callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
-      verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
-      preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
-      maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
-      maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
-    }
-
-    return userOperationWithHexValues
   }
 }

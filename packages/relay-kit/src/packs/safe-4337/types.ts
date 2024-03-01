@@ -18,6 +18,7 @@ export type Safe4337InitOptions = {
   ethersAdapter: EthersAdapter
   bundlerUrl: string
   rpcUrl: string
+  paymasterUrl?: string
   safeModulesVersion?: string
   customContracts?: {
     entryPointAddress?: string
@@ -31,6 +32,7 @@ export type Safe4337Options = {
   protocolKit: Safe
   bundlerUrl: string
   rpcUrl: string
+  paymasterUrl?: string
   bundlerClient: ethers.JsonRpcProvider
   publicClient: ethers.JsonRpcProvider
   entryPointAddress: string
@@ -40,6 +42,9 @@ export type Safe4337Options = {
 
 export type Safe4337CreateTransactionProps = {
   transactions: MetaTransactionData[]
+  options?: {
+    paymasterAddress: string
+  }
 }
 
 export type SafeUserOperation = {
@@ -79,6 +84,10 @@ export type EstimateGasData = {
   verificationGasLimit?: bigint
   callGasLimit?: bigint
 }
+
+export type EstimateSponsoredGasData = {
+  paymasterAndData: string
+} & EstimateGasData
 
 type Log = {
   logIndex: string
@@ -138,9 +147,22 @@ export type EstimateFeeFunction = ({
   entryPoint
 }: EstimateFeeFunctionProps) => Promise<EstimateGasData>
 
+export type EstimateSponsoredFeeFunctionProps = {
+  userOperation: UserOperation
+  paymasterUrl: string
+  entryPoint: string
+}
+
+export type EstimateSponsoredFeeFunction = ({
+  userOperation,
+  paymasterUrl,
+  entryPoint
+}: EstimateSponsoredFeeFunctionProps) => Promise<EstimateSponsoredGasData>
+
 export interface IFeeEstimator {
   setupEstimation?: EstimateFeeFunction
   adjustEstimation?: EstimateFeeFunction
+  getPaymasterEstimation?: EstimateSponsoredFeeFunction
 }
 
 export type EstimateFeeProps = {

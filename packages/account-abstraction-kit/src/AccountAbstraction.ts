@@ -5,7 +5,7 @@ import {
   MetaTransactionOptions,
   EthAdapter
 } from '@safe-global/safe-core-sdk-types'
-import { SafeTransaction } from 'packages/safe-core-sdk-types/dist/src'
+import { SafeTransaction } from 'packages/safe-core-sdk-types'
 
 /**
  * @class

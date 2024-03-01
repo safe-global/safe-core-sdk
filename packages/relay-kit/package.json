@@ -39,7 +39,6 @@
     "@safe-global/protocol-kit": "^3.0.0",
     "@safe-global/safe-core-sdk-types": "^4.0.0",
     "@safe-global/safe-modules-deployments": "^2.0.0",
-    "alchemy-sdk": "^3.1.2",
     "ethers": "^6.7.1"
   }
 }

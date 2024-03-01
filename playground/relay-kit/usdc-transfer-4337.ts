@@ -1,14 +1,13 @@
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
-import { Safe4337Pack, PimlicoFeeEstimator, AlchemyFeeEstimator } from '@safe-global/relay-kit'
-import { Alchemy, Network } from 'alchemy-sdk'
+import { Safe4337Pack, PimlicoFeeEstimator } from '@safe-global/relay-kit'
+
 // Safe owner PK
 const PRIVATE_KEY = ''
 
 // Bundler URL
 const BUNDLER_URL =
   'https://api.pimlico.io/v1/sepolia/rpc?apikey=30b296fa-8947-4775-b44a-b225336e2a66' // PIMLICO
-// const BUNDLER_URL = 'https://eth-sepolia.g.alchemy.com/v2/0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk' // ALCHEMY
 
 // RPC URL
 const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
@@ -36,7 +35,8 @@ async function main() {
     bundlerUrl: BUNDLER_URL,
     options: {
       owners: ['0xD725e11588f040d86c4C49d8236E32A5868549F0'],
-      threshold: 1
+      threshold: 1,
+      saltNonce: '1234'
     }
   })
 
@@ -59,14 +59,10 @@ async function main() {
   const safeOperation = await safe4337Pack.createTransaction({ transactions })
 
   // 3) Estimate SafeOperation fee
-  // const feeEstimator = new PimlicoFeeEstimator()
-  // const alchemySdk = new Alchemy({
-  //   apiKey: '0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk',
-  //   network: Network.ETH_SEPOLIA
-  // })
-  // const feeEstimator = new AlchemyFeeEstimator(alchemySdk)
+  const feeEstimator = new PimlicoFeeEstimator()
   const estimatedSafeOperation = await safe4337Pack.getEstimateFee({
-    safeOperation
+    safeOperation,
+    feeEstimator
   })
 
   // 4) Sign SafeOperation

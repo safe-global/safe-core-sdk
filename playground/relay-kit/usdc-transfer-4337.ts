@@ -35,8 +35,7 @@ async function main() {
     bundlerUrl: BUNDLER_URL,
     options: {
       owners: ['0xD725e11588f040d86c4C49d8236E32A5868549F0'],
-      threshold: 1,
-      saltNonce: '1234'
+      threshold: 1
     }
   })
 

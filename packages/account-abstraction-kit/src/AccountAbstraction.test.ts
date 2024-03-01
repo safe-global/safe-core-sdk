@@ -196,7 +196,8 @@ describe('AccountAbstraction', () => {
       })
 
       it('should throw if relay-kit is not initialized', async () => {
-        accountAbstraction.setRelayKit(undefined)
+        const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+        await accountAbstraction.init()
 
         expect(accountAbstraction.relayTransaction(transactionsMock, optionsMock)).rejects.toThrow(
           'relayKit not initialized. Call setRelayKit(pack) first'

@@ -70,7 +70,7 @@ class AccountAbstraction {
    * It's mandatory to set the instance before using the relayTransaction() method
    * @param relayPack The RelayPack instance to be used by the AccountAbstraction instance (e.g. GelatoRelayPack)
    */
-  setRelayKit(relayPack?: RelayKitBasePack) {
+  setRelayKit(relayPack: RelayKitBasePack) {
     this.relayKit = relayPack
   }
 

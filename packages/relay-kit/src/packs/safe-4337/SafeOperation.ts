@@ -39,17 +39,17 @@ class SafeOperation {
   }
 
   addEstimations(estimations: EstimateGasData): void {
-    this.data.maxFeePerGas = BigInt(estimations.maxFeePerGas || this.data.maxFeePerGas)
-    this.data.maxPriorityFeePerGas = BigInt(
-      estimations.maxPriorityFeePerGas || this.data.maxPriorityFeePerGas
-    )
-    this.data.verificationGasLimit = BigInt(
-      estimations.verificationGasLimit || this.data.verificationGasLimit
-    )
-    this.data.preVerificationGas = BigInt(
-      estimations.preVerificationGas || this.data.preVerificationGas
-    )
-    this.data.callGasLimit = BigInt(estimations.callGasLimit || this.data.callGasLimit)
+    const keys: (keyof EstimateGasData)[] = [
+      'maxFeePerGas',
+      'maxPriorityFeePerGas',
+      'verificationGasLimit',
+      'preVerificationGas',
+      'callGasLimit'
+    ]
+
+    for (const key of keys) {
+      this.data[key] = BigInt(estimations[key] || this.data[key])
+    }
   }
 
   toUserOperation(): UserOperation {

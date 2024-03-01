@@ -25,7 +25,7 @@ import {
 } from './types'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
-import { PimlicoFeeEstimator } from './estimators/pimlico'
+import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const DEFAULT_SAFE_VERSION = '1.4.1'
 const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
@@ -59,7 +59,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Creates an instance of the Safe4337Pack.
    *
-   * @param {Safe4337Options} params - The initialization parameters.
+   * @param {Safe4337Options} options - The initialization parameters.
    */
   constructor({
     protocolKit,

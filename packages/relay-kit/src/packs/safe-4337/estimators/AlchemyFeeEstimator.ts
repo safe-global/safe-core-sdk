@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { Alchemy } from 'alchemy-sdk'
-import { EstimateGasData, EstimateFeeFunctionParams, IFeeEstimator } from '../types'
+import { EstimateGasData, EstimateFeeFunctionProps, IFeeEstimator } from '../types'
 
 export class AlchemyFeeEstimator implements IFeeEstimator {
   #alchemySdk: Alchemy
@@ -9,7 +9,7 @@ export class AlchemyFeeEstimator implements IFeeEstimator {
     this.#alchemySdk = alchemySdk
   }
 
-  async setupEstimation({ bundlerUrl }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
+  async setupEstimation({ bundlerUrl }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     const bundlerClient = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
       batchMaxCount: 1
     })
@@ -23,7 +23,7 @@ export class AlchemyFeeEstimator implements IFeeEstimator {
     }
   }
 
-  async adjustEstimation({ userOperation }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
+  async adjustEstimation({ userOperation }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     return {
       verificationGasLimit:
         userOperation.verificationGasLimit + userOperation.verificationGasLimit / 2n

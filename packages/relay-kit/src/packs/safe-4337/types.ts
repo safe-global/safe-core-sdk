@@ -126,7 +126,7 @@ export type UserOperationWithPayload = {
   blockNumber: string
 }
 
-export type EstimateFeeFunctionParams = {
+export type EstimateFeeFunctionProps = {
   userOperation: UserOperation
   bundlerUrl: string
   entryPoint: string
@@ -136,7 +136,7 @@ export type EstimateFeeFunction = ({
   userOperation,
   bundlerUrl,
   entryPoint
-}: EstimateFeeFunctionParams) => Promise<EstimateGasData>
+}: EstimateFeeFunctionProps) => Promise<EstimateGasData>
 
 export interface IFeeEstimator {
   setupEstimation?: EstimateFeeFunction

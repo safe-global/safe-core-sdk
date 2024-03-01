@@ -31,13 +31,13 @@ import {
 import {
   GelatoCreateTransactionProps,
   GelatoEstimateFeeProps,
-  GelatoEstimateFeePropsResult,
+  GelatoEstimateFeeResult,
   GelatoOptions
 } from './types'
 
 export class GelatoRelayPack extends RelayKitBasePack<{
   EstimateFeeProps: GelatoEstimateFeeProps
-  EstimateFeeResult: GelatoEstimateFeePropsResult
+  EstimateFeeResult: GelatoEstimateFeeResult
   CreateTransactionProps: GelatoCreateTransactionProps
   CreateTransactionResult: SafeTransaction
   ExecuteTransactionsOptions: MetaTransactionOptions
@@ -64,9 +64,9 @@ export class GelatoRelayPack extends RelayKitBasePack<{
   /**
    * Estimates the fee for a transaction.
    * @param {GelatoEstimateFeeProps} props - Props for the fee estimation.
-   * @returns {Promise<GelatoEstimateFeePropsResult>} Returns a Promise that resolves with the estimated fee result.
+   * @returns {Promise<GelatoEstimateFeeResult>} Returns a Promise that resolves with the estimated fee result.
    */
-  async getEstimateFee(props: GelatoEstimateFeeProps): Promise<GelatoEstimateFeePropsResult>
+  async getEstimateFee(props: GelatoEstimateFeeProps): Promise<GelatoEstimateFeeResult>
   /**
    * @deprecated The method should not be used
    * @param chainId - The chain id.
@@ -76,9 +76,9 @@ export class GelatoRelayPack extends RelayKitBasePack<{
   async getEstimateFee(chainId: bigint, gasLimit: string, gasToken?: string): Promise<string>
   async getEstimateFee(
     propsOrChainId: GelatoEstimateFeeProps | bigint,
-    inputGasLimit: string,
+    inputGasLimit?: string,
     inputGasToken?: string
-  ): Promise<GelatoEstimateFeePropsResult | string> {
+  ): Promise<GelatoEstimateFeeResult | string> {
     let chainId: bigint
     let gasLimit: string
     let gasToken: string | undefined
@@ -87,7 +87,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
       ;({ chainId, gasLimit, gasToken } = propsOrChainId)
     } else {
       chainId = propsOrChainId
-      gasLimit = inputGasLimit
+      gasLimit = inputGasLimit as string
       gasToken = inputGasToken
     }
 

@@ -12,7 +12,7 @@ export type GelatoEstimateFeeProps = {
   gasToken?: string
 }
 
-export type GelatoEstimateFeePropsResult = string
+export type GelatoEstimateFeeResult = string
 
 export type GelatoCreateTransactionProps = {
   transactions: MetaTransactionData[]

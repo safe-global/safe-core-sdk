@@ -38,7 +38,7 @@ export type Safe4337Options = {
   safe4337ModuleAddress: string
 }
 
-export type Safe4337CreateTransactionOptions = {
+export type Safe4337CreateTransactionProps = {
   transactions: MetaTransactionData[]
 }
 
@@ -143,7 +143,7 @@ export interface IFeeEstimator {
   adjustEstimation?: EstimateFeeFunction
 }
 
-export type EstimateFeeOptions = {
+export type EstimateFeeProps = {
   safeOperation: SafeOperation
   feeEstimator?: IFeeEstimator
 }

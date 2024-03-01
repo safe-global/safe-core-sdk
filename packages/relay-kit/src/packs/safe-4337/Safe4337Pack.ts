@@ -14,8 +14,8 @@ import {
 
 import SafeOperation from './SafeOperation'
 import {
-  EstimateFeeOptions,
-  Safe4337CreateTransactionOptions,
+  EstimateFeeProps,
+  Safe4337CreateTransactionProps,
   Safe4337InitOptions,
   Safe4337Options,
   SafeUserOperation,
@@ -25,6 +25,7 @@ import {
 } from './types'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider } from './utils'
+import { PimlicoFeeEstimator } from './estimators/pimlico'
 
 const DEFAULT_SAFE_VERSION = '1.4.1'
 const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
@@ -39,9 +40,9 @@ const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
  * @link https://eips.ethereum.org/EIPS/eip-4337
  */
 export class Safe4337Pack extends RelayKitBasePack<{
-  EstimateFeeOptions: EstimateFeeOptions
+  EstimateFeeProps: EstimateFeeProps
   EstimateFeeResult: SafeOperation
-  CreateTransactionOptions: Safe4337CreateTransactionOptions
+  CreateTransactionProps: Safe4337CreateTransactionProps
   CreateTransactionResult: SafeOperation
   ExecuteTransactionResult: string
 }> {
@@ -186,14 +187,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Estimates gas for the SafeOperation.
    *
-   * @param {EstimateFeeOptions{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
-   * @param {EstimateFeeOptions{EstimateFeeFn}} estimateFeeFn - The function to estimate the gas.
+   * @param {EstimateFeeProps{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
+   * @param {EstimateFeeProps{EstimateFeeFn}} estimateFeeFn - The function to estimate the gas.
    * @return {Promise<SafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
   async getEstimateFee({
     safeOperation,
-    feeEstimator
-  }: EstimateFeeOptions): Promise<SafeOperation> {
+    feeEstimator = new PimlicoFeeEstimator()
+  }: EstimateFeeProps): Promise<SafeOperation> {
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -240,7 +241,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    */
   async createTransaction({
     transactions
-  }: Safe4337CreateTransactionOptions): Promise<SafeOperation> {
+  }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
 

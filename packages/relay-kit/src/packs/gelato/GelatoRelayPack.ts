@@ -29,16 +29,16 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 import {
-  GelatoCreateTransactionOptions,
-  GelatoEstimateFeeOptions,
-  GelatoEstimateFeeOptionsResult,
+  GelatoCreateTransactionProps,
+  GelatoEstimateFeeProps,
+  GelatoEstimateFeePropsResult,
   GelatoOptions
 } from './types'
 
 export class GelatoRelayPack extends RelayKitBasePack<{
-  EstimateFeeOptions: GelatoEstimateFeeOptions
-  EstimateFeeResult: GelatoEstimateFeeOptionsResult
-  CreateTransactionOptions: GelatoCreateTransactionOptions
+  EstimateFeeProps: GelatoEstimateFeeProps
+  EstimateFeeResult: GelatoEstimateFeePropsResult
+  CreateTransactionProps: GelatoCreateTransactionProps
   CreateTransactionResult: SafeTransaction
   ExecuteTransactionsOptions: MetaTransactionOptions
   ExecuteTransactionsResult: RelayResponse
@@ -65,7 +65,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
    * Estimates the fee for a transaction.
    * @param options - Options for the fee estimation.
    */
-  async getEstimateFee(options: GelatoEstimateFeeOptions): Promise<GelatoEstimateFeeOptionsResult>
+  async getEstimateFee(options: GelatoEstimateFeeProps): Promise<GelatoEstimateFeePropsResult>
   /**
    * @deprecated The method should not be used
    * @param chainId
@@ -74,10 +74,10 @@ export class GelatoRelayPack extends RelayKitBasePack<{
    */
   async getEstimateFee(chainId: bigint, gasLimit?: bigint, gasToken?: string): Promise<string>
   async getEstimateFee(
-    optionsOrChainId: GelatoEstimateFeeOptions | bigint,
+    optionsOrChainId: GelatoEstimateFeeProps | bigint,
     gasLimit?: bigint,
     gasToken?: string
-  ): Promise<GelatoEstimateFeeOptionsResult | string> {
+  ): Promise<GelatoEstimateFeePropsResult | string> {
     let estimateFeeChainId: bigint
     let estimateFeeGasLimit: bigint | undefined
     let estimateFeeGasToken: string | undefined
@@ -145,14 +145,14 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     transactions,
     onlyCalls = false,
     options = {}
-  }: GelatoCreateTransactionOptions): Promise<SafeTransaction> {
+  }: GelatoCreateTransactionProps): Promise<SafeTransaction> {
     return this.createTransaction({ transactions, onlyCalls, options })
   }
 
   /**
    * Creates a Safe transaction designed to be executed using the Gelato Relayer.
    *
-   * @param {GelatoCreateTransactionOptions} options - Options for Gelato.
+   * @param {GelatoCreateTransactionProps} options - Options for Gelato.
    * @param {MetaTransactionData[]} [options.transactions] - The transactions batch.
    * @param {boolean} [options.onlyCalls=false] - If true, MultiSendCallOnly contract should be used. Remember to not use delegate calls in the batch.
    * @param {MetaTransactionOptions} [options.options={}] - Gas Options for the transaction batch.
@@ -162,7 +162,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     transactions,
     onlyCalls = false,
     options = {}
-  }: GelatoCreateTransactionOptions): Promise<SafeTransaction> {
+  }: GelatoCreateTransactionProps): Promise<SafeTransaction> {
     const { isSponsored = false } = options
 
     if (isSponsored) {
@@ -204,7 +204,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
    *
    * @async
    * @function createTransactionWithHandlePayment
-   * @param {GelatoCreateTransactionOptions} options - Options for Gelato.
+   * @param {GelatoCreateTransactionProps} options - Options for Gelato.
    * @param {MetaTransactionData[]} [options.transactions] - The transactions batch.
    * @param {boolean} [options.onlyCalls=false] - If true, MultiSendCallOnly contract should be used. Remember to not use delegate calls in the batch.
    * @param {MetaTransactionOptions} [options.options={}] - Gas Options for the transaction batch.
@@ -215,7 +215,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     transactions,
     onlyCalls = false,
     options = {}
-  }: GelatoCreateTransactionOptions): Promise<SafeTransaction> {
+  }: GelatoCreateTransactionProps): Promise<SafeTransaction> {
     const { gasLimit } = options
     const nonce = await this.protocolKit.getNonce()
 
@@ -294,7 +294,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
    *
    * @async
    * @function createTransactionWithTransfer
-   * @param {GelatoCreateTransactionOptions} options - Options for Gelato.
+   * @param {GelatoCreateTransactionProps} options - Options for Gelato.
    * @param {MetaTransactionData[]} [options.transactions] - The transactions batch.
    * @param {boolean} [options.onlyCalls=false] - If true, MultiSendCallOnly contract should be used. Remember to not use delegate calls in the batch.
    * @param {MetaTransactionOptions} [options.options={}] - Gas Options for the transaction batch.
@@ -305,7 +305,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     transactions,
     onlyCalls = false,
     options = {}
-  }: GelatoCreateTransactionOptions): Promise<SafeTransaction> {
+  }: GelatoCreateTransactionProps): Promise<SafeTransaction> {
     const { gasLimit } = options
     const nonce = await this.protocolKit.getNonce()
     const gasToken = options.gasToken ?? ZERO_ADDRESS

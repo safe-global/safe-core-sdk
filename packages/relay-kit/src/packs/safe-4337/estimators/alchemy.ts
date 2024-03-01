@@ -9,7 +9,7 @@ export class AlchemyFeeEstimator implements IFeeEstimator {
     this.#alchemySdk = alchemySdk
   }
 
-  async prepareEstimation({ bundlerUrl }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
+  async setupEstimation({ bundlerUrl }: EstimateFeeFunctionParams): Promise<EstimateGasData> {
     const bundlerClient = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
       batchMaxCount: 1
     })

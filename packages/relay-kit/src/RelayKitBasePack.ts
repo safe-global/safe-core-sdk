@@ -1,11 +1,11 @@
 import Safe from '@safe-global/protocol-kit'
 
 type RelayKitBasePackTypes = {
-  EstimateFeeOptions?: unknown
+  EstimateFeeProps?: unknown
   EstimateFeeResult?: unknown
-  CreateTransactionOptions?: unknown
+  CreateTransactionProps?: unknown
   CreateTransactionResult?: unknown
-  ExecuteTransactionOptions?: unknown
+  ExecuteTransactionProps?: unknown
   ExecuteTransactionResult?: unknown
 }
 
@@ -13,11 +13,11 @@ type RelayKitBasePackTypes = {
  * Abstract class. The base class for all RelayKit packs.
  * It provides the Safe SDK instance and the abstract methods to be implemented by the packs.
  * @abstract
- * @template EstimateFeeOptions
+ * @template EstimateFeeProps
  * @template EstimateFeeResult
- * @template CreateTransactionOptions
+ * @template CreateTransactionProps
  * @template CreateTransactionResult,
- * @template ExecuteTransactionOptions
+ * @template ExecuteTransactionProps
  * @template ExecuteTransactionResult
  */
 export abstract class RelayKitBasePack<
@@ -40,30 +40,30 @@ export abstract class RelayKitBasePack<
   /**
    * Abstract function to get an estimate of the fee that will be paid for a transaction.
    * @abstract
-   * @param {EstimateFeeOptions} options - The options for fee estimation.
+   * @param {EstimateFeeProps} props - The props for fee estimation.
    * @returns Promise<EstimateFeeResult> - The estimated fee result.
    */
-  abstract getEstimateFee(options: T['EstimateFeeOptions']): Promise<T['EstimateFeeResult']>
+  abstract getEstimateFee(props: T['EstimateFeeProps']): Promise<T['EstimateFeeResult']>
 
   /**
    * Abstract function to create a Safe transaction, designed to be executed using the relayer.
    * @abstract
-   * @param {CreateTransactionOptions} options - The options for transaction creation.
+   * @param {CreateTransactionProps} props - The props for transaction creation.
    * @returns Promise<CreateTransactionResult> - The output of the created transaction.
    */
   abstract createTransaction(
-    options: T['CreateTransactionOptions']
+    props: T['CreateTransactionProps']
   ): Promise<T['CreateTransactionResult']>
 
   /**
    * Abstract function to execute a Safe transaction using a relayer.
    * @abstract
    * @param {CreateTransactionResult} executable - The result of the created transaction. This can be for example a SafeTransaction object or SafeOperation.
-   * @param {CreateTransactionOptions} options - The options for transaction execution.
+   * @param {CreateTransactionProps} props - The props for transaction execution.
    * @returns {Promise<ExecuteTransactionResult>} - Relay's response after executing the transaction.
    */
   abstract executeTransaction(
     executable: T['CreateTransactionResult'],
-    options: T['ExecuteTransactionOptions']
+    props: T['ExecuteTransactionProps']
   ): Promise<T['ExecuteTransactionResult']>
 }

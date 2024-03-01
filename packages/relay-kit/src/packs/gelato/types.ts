@@ -6,15 +6,15 @@ export type GelatoOptions = {
   protocolKit: Safe
 }
 
-export type GelatoEstimateFeeOptions = {
+export type GelatoEstimateFeeProps = {
   chainId: bigint
   gasLimit: string
   gasToken?: string
 }
 
-export type GelatoEstimateFeeOptionsResult = string
+export type GelatoEstimateFeePropsResult = string
 
-export type GelatoCreateTransactionOptions = {
+export type GelatoCreateTransactionProps = {
   transactions: MetaTransactionData[]
   /** options - The transaction array optional properties */
   options?: MetaTransactionOptions

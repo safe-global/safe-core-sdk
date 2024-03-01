@@ -63,40 +63,39 @@ export class GelatoRelayPack extends RelayKitBasePack<{
 
   /**
    * Estimates the fee for a transaction.
-   * @param options - Options for the fee estimation.
+   * @param {GelatoEstimateFeeProps} props - Props for the fee estimation.
+   * @returns {Promise<GelatoEstimateFeePropsResult>} Returns a Promise that resolves with the estimated fee result.
    */
-  async getEstimateFee(options: GelatoEstimateFeeProps): Promise<GelatoEstimateFeePropsResult>
+  async getEstimateFee(props: GelatoEstimateFeeProps): Promise<GelatoEstimateFeePropsResult>
   /**
    * @deprecated The method should not be used
-   * @param chainId
-   * @param gasLimit
-   * @param gasToken
+   * @param chainId - The chain id.
+   * @param gasLimit - The gas limit.
+   * @param gasToken - The gas token.
    */
-  async getEstimateFee(chainId: bigint, gasLimit?: bigint, gasToken?: string): Promise<string>
+  async getEstimateFee(chainId: bigint, gasLimit: string, gasToken?: string): Promise<string>
   async getEstimateFee(
-    optionsOrChainId: GelatoEstimateFeeProps | bigint,
-    gasLimit?: bigint,
-    gasToken?: string
+    propsOrChainId: GelatoEstimateFeeProps | bigint,
+    inputGasLimit: string,
+    inputGasToken?: string
   ): Promise<GelatoEstimateFeePropsResult | string> {
-    let estimateFeeChainId: bigint
-    let estimateFeeGasLimit: bigint | undefined
-    let estimateFeeGasToken: string | undefined
+    let chainId: bigint
+    let gasLimit: string
+    let gasToken: string | undefined
 
-    if (typeof optionsOrChainId === 'object') {
-      estimateFeeChainId = optionsOrChainId.chainId
-      estimateFeeGasLimit = BigInt(optionsOrChainId.gasLimit)
-      estimateFeeGasToken = optionsOrChainId.gasToken || ZERO_ADDRESS
+    if (typeof propsOrChainId === 'object') {
+      ;({ chainId, gasLimit, gasToken } = propsOrChainId)
     } else {
-      estimateFeeChainId = optionsOrChainId
-      estimateFeeGasLimit = gasLimit
-      estimateFeeGasToken = gasToken
+      chainId = propsOrChainId
+      gasLimit = inputGasLimit
+      gasToken = inputGasToken
     }
 
-    const feeToken = this._getFeeToken(estimateFeeGasToken)
+    const feeToken = this._getFeeToken(gasToken)
     const estimation = await this.#gelatoRelay.getEstimatedFee(
-      estimateFeeChainId,
+      chainId,
       feeToken,
-      estimateFeeGasLimit || 0n,
+      BigInt(gasLimit),
       false
     )
 

@@ -1,14 +1,14 @@
 import { ethers } from 'ethers'
 import { SafeSignature } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
-import { SafeUserOperation, SafeOperation, UserOperation } from './types'
-import { SAFE_ADDRESSES_MAP } from './constants'
 
-class EthSafeOperation implements SafeOperation {
+import { EstimateGasData, SafeUserOperation, UserOperation } from './types'
+
+class SafeOperation {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
 
-  constructor(userOperation: UserOperation) {
+  constructor(userOperation: UserOperation, entryPoint: string) {
     this.data = {
       safe: userOperation.sender,
       nonce: BigInt(userOperation.nonce),
@@ -22,7 +22,7 @@ class EthSafeOperation implements SafeOperation {
       paymasterAndData: userOperation.paymasterAndData,
       validAfter: 0n,
       validUntil: 0n,
-      entryPoint: SAFE_ADDRESSES_MAP.ENTRY_POINT_ADDRESS
+      entryPoint
     }
   }
 
@@ -36,6 +36,20 @@ class EthSafeOperation implements SafeOperation {
 
   encodedSignatures(): string {
     return buildSignatureBytes(Array.from(this.signatures.values()))
+  }
+
+  addEstimations(estimations: EstimateGasData): void {
+    const keys: (keyof EstimateGasData)[] = [
+      'maxFeePerGas',
+      'maxPriorityFeePerGas',
+      'verificationGasLimit',
+      'preVerificationGas',
+      'callGasLimit'
+    ]
+
+    for (const key of keys) {
+      this.data[key] = BigInt(estimations[key] || this.data[key])
+    }
   }
 
   toUserOperation(): UserOperation {
@@ -58,4 +72,4 @@ class EthSafeOperation implements SafeOperation {
   }
 }
 
-export default EthSafeOperation
+export default SafeOperation

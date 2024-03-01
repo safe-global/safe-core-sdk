@@ -1,19 +1,45 @@
-import Safe from '@safe-global/protocol-kit'
-import { SafeSignature } from '@safe-global/safe-core-sdk-types'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import { MetaTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { ethers } from 'ethers'
+import SafeOperation from './SafeOperation'
+
+type ExistingSafeOptions = {
+  safeAddress: string
+}
+
+type PredictedSafeOptions = {
+  owners: string[]
+  threshold: number
+  safeVersion?: SafeVersion
+  saltNonce?: string
+}
+
+export type Safe4337InitOptions = {
+  ethersAdapter: EthersAdapter
+  bundlerUrl: string
+  rpcUrl: string
+  safeModulesVersion?: string
+  customContracts?: {
+    entryPointAddress?: string
+    safe4337ModuleAddress?: string
+    addModulesLibAddress?: string
+  }
+  options: ExistingSafeOptions | PredictedSafeOptions
+}
 
 export type Safe4337Options = {
   protocolKit: Safe
   bundlerUrl: string
-  paymasterUrl?: string
   rpcUrl: string
+  bundlerClient: ethers.JsonRpcProvider
+  publicClient: ethers.JsonRpcProvider
+  entryPointAddress: string
+  addModulesLibAddress: string
+  safe4337ModuleAddress: string
 }
 
-export interface SafeOperation {
-  readonly data: SafeUserOperation
-  readonly signatures: Map<string, SafeSignature>
-  getSignature(signer: string): SafeSignature | undefined
-  addSignature(signature: SafeSignature): void
-  encodedSignatures(): string
+export type Safe4337CreateTransactionProps = {
+  transactions: MetaTransactionData[]
 }
 
 export type SafeUserOperation = {
@@ -46,14 +72,78 @@ export type UserOperation = {
   signature: string
 }
 
-export type EstimateUserOperationGas = {
-  preVerificationGas: bigint
-  verificationGasLimit: bigint
-  callGasLimit: bigint
+export type EstimateGasData = {
+  maxFeePerGas?: bigint
+  maxPriorityFeePerGas?: bigint
+  preVerificationGas?: bigint
+  verificationGasLimit?: bigint
+  callGasLimit?: bigint
 }
 
-export type FeeData = {
-  gasPrice: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
+type Log = {
+  logIndex: string
+  transactionIndex: string
+  transactionHash: string
+  blockHash: string
+  blockNumber: string
+  address: string
+  data: string
+  topics: string[]
+}
+
+type Receipt = {
+  transactionHash: string
+  transactionIndex: string
+  blockHash: string
+  blockNumber: string
+  from: string
+  to: string
+  cumulativeGasUsed: string
+  gasUsed: string
+  contractAddress: null
+  logs: Log[]
+  logsBloom: string
+  status: string
+  effectiveGasPrice: string
+}
+
+export type UserOperationReceipt = {
+  userOpHash: string
+  sender: string
+  nonce: string
+  actualGasUsed: string
+  actualGasCost: string
+  success: boolean
+  logs: Log[]
+  receipt: Receipt
+}
+
+export type UserOperationWithPayload = {
+  userOperation: UserOperation
+  entryPoint: string
+  transactionHash: string
+  blockHash: string
+  blockNumber: string
+}
+
+export type EstimateFeeFunctionProps = {
+  userOperation: UserOperation
+  bundlerUrl: string
+  entryPoint: string
+}
+
+export type EstimateFeeFunction = ({
+  userOperation,
+  bundlerUrl,
+  entryPoint
+}: EstimateFeeFunctionProps) => Promise<EstimateGasData>
+
+export interface IFeeEstimator {
+  setupEstimation?: EstimateFeeFunction
+  adjustEstimation?: EstimateFeeFunction
+}
+
+export type EstimateFeeProps = {
+  safeOperation: SafeOperation
+  feeEstimator?: IFeeEstimator
 }

@@ -3,9 +3,9 @@ import { RelayKitBasePack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
   MetaTransactionOptions,
-  EthAdapter
+  EthAdapter,
+  SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
-import { SafeTransaction } from 'packages/safe-core-sdk-types'
 
 /**
  * @class

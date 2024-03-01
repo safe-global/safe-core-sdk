@@ -6,9 +6,9 @@ import { Alchemy, Network } from 'alchemy-sdk'
 const PRIVATE_KEY = ''
 
 // Bundler URL
-// const BUNDLER_URL =
-//   'https://api.pimlico.io/v1/sepolia/rpc?apikey=30b296fa-8947-4775-b44a-b225336e2a66' // PIMLICO
-const BUNDLER_URL = 'https://eth-sepolia.g.alchemy.com/v2/0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk' // ALCHEMY
+const BUNDLER_URL =
+  'https://api.pimlico.io/v1/sepolia/rpc?apikey=30b296fa-8947-4775-b44a-b225336e2a66' // PIMLICO
+// const BUNDLER_URL = 'https://eth-sepolia.g.alchemy.com/v2/0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk' // ALCHEMY
 
 // RPC URL
 const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
@@ -59,15 +59,14 @@ async function main() {
   const safeOperation = await safe4337Pack.createTransaction({ transactions })
 
   // 3) Estimate SafeOperation fee
-  const feeEstimator = new PimlicoFeeEstimator()
+  // const feeEstimator = new PimlicoFeeEstimator()
   // const alchemySdk = new Alchemy({
   //   apiKey: '0_Uae8YJ3042uzuMXZ-5-BmJFy85qxKk',
   //   network: Network.ETH_SEPOLIA
   // })
   // const feeEstimator = new AlchemyFeeEstimator(alchemySdk)
   const estimatedSafeOperation = await safe4337Pack.getEstimateFee({
-    safeOperation,
-    feeEstimator
+    safeOperation
   })
 
   // 4) Sign SafeOperation

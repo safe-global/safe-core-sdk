@@ -484,10 +484,10 @@ describe('GelatoRelayPack', () => {
           }
         }
 
-        const gelatoResponse = await gelatoRelayPack.executeTransaction(
-          relayTransaction as SafeTransaction,
-          options
-        )
+        const gelatoResponse = await gelatoRelayPack.executeTransaction({
+          executable: relayTransaction as SafeTransaction,
+          ...options
+        })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockSponsoredCall).toHaveBeenCalledWith(
@@ -518,9 +518,9 @@ describe('GelatoRelayPack', () => {
           }
         }
 
-        const gelatoResponse = await gelatoRelayPack.executeTransaction(
-          relayTransaction as SafeTransaction
-        )
+        const gelatoResponse = await gelatoRelayPack.executeTransaction({
+          executable: relayTransaction as SafeTransaction
+        })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockCallWithSyncFee).toHaveBeenCalledWith(
@@ -556,10 +556,10 @@ describe('GelatoRelayPack', () => {
           }
         }
 
-        const gelatoResponse = await gelatoRelayPack.executeTransaction(
-          relayTransaction as SafeTransaction,
-          options
-        )
+        const gelatoResponse = await gelatoRelayPack.executeTransaction({
+          executable: relayTransaction as SafeTransaction,
+          ...options
+        })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockSponsoredCall).toHaveBeenCalledWith(
@@ -593,9 +593,9 @@ describe('GelatoRelayPack', () => {
           }
         }
 
-        const gelatoResponse = await gelatoRelayPack.executeTransaction(
-          relayTransaction as SafeTransaction
-        )
+        const gelatoResponse = await gelatoRelayPack.executeTransaction({
+          executable: relayTransaction as SafeTransaction
+        })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
         expect(mockCallWithSyncFee).toHaveBeenCalledWith(

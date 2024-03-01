@@ -32,6 +32,7 @@ import {
   GelatoCreateTransactionProps,
   GelatoEstimateFeeProps,
   GelatoEstimateFeeResult,
+  GelatoExecuteTransactionProps,
   GelatoOptions
 } from './types'
 
@@ -40,7 +41,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
   EstimateFeeResult: GelatoEstimateFeeResult
   CreateTransactionProps: GelatoCreateTransactionProps
   CreateTransactionResult: SafeTransaction
-  ExecuteTransactionsProps: MetaTransactionOptions
+  ExecuteTransactionProps: GelatoExecuteTransactionProps
   ExecuteTransactionsResult: RelayResponse
 }> {
   #gelatoRelay: GelatoNetworkRelay
@@ -419,7 +420,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     safeTransaction: SafeTransaction,
     options?: MetaTransactionOptions
   ): Promise<RelayResponse> {
-    return this.executeTransaction(safeTransaction, options)
+    return this.executeTransaction({ executable: safeTransaction, ...options })
   }
 
   /**
@@ -430,10 +431,10 @@ export class GelatoRelayPack extends RelayKitBasePack<{
    * @param {MetaTransactionOptions} [options] - Options for the transaction.
    * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
    */
-  async executeTransaction(
-    safeTransaction: SafeTransaction,
-    options?: MetaTransactionOptions
-  ): Promise<RelayResponse> {
+  async executeTransaction({
+    executable: safeTransaction,
+    ...options
+  }: GelatoExecuteTransactionProps): Promise<RelayResponse> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const chainId = await this.protocolKit.getChainId()
     const safeAddress = await this.protocolKit.getAddress()

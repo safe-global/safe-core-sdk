@@ -4,9 +4,20 @@ type RelayKitBasePackTypes = {
   EstimateFeeProps?: unknown
   EstimateFeeResult?: unknown
   CreateTransactionProps?: unknown
-  CreateTransactionResult?: unknown
-  ExecuteTransactionProps?: unknown
+  CreateTransactionResult: unknown
+  ExecuteTransactionProps: {
+    executable: RelayKitBasePackTypes['CreateTransactionResult']
+    [key: string]: unknown
+  }
   ExecuteTransactionResult?: unknown
+}
+
+type DefaultRelayKitBasePackTypes = {
+  CreateTransactionResult: unknown
+  ExecuteTransactionProps: {
+    executable: DefaultRelayKitBasePackTypes['CreateTransactionResult']
+    [key: string]: unknown
+  }
 }
 
 /**
@@ -21,7 +32,7 @@ type RelayKitBasePackTypes = {
  * @template ExecuteTransactionResult
  */
 export abstract class RelayKitBasePack<
-  T extends Partial<RelayKitBasePackTypes> = Record<string, unknown>
+  T extends RelayKitBasePackTypes = DefaultRelayKitBasePackTypes
 > {
   /**
    * @type {Safe}
@@ -63,7 +74,6 @@ export abstract class RelayKitBasePack<
    * @returns {Promise<ExecuteTransactionResult>} - Relay's response after executing the transaction.
    */
   abstract executeTransaction(
-    executable: T['CreateTransactionResult'],
     props: T['ExecuteTransactionProps']
   ): Promise<T['ExecuteTransactionResult']>
 }

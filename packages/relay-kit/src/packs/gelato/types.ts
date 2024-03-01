@@ -1,5 +1,9 @@
 import Safe from '@safe-global/protocol-kit'
-import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  SafeTransaction
+} from '@safe-global/safe-core-sdk-types'
 
 export type GelatoOptions = {
   apiKey?: string
@@ -21,3 +25,5 @@ export type GelatoCreateTransactionProps = {
   /** onlyCalls - Forces the execution of the transaction array with MultiSendCallOnly contract */
   onlyCalls?: boolean
 }
+
+export type GelatoExecuteTransactionProps = MetaTransactionOptions & { executable: SafeTransaction }

@@ -114,6 +114,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 5003n, shortName: 'mnt-sep' },
   { chainId: 5700n, shortName: 'tsys' },
   { chainId: 6102n, shortName: 'cascadia' },
+  { chainId: 7000n, shortName: 'zetachain-mainnet' },
   { chainId: 7001n, shortName: 'zetachain-athens' },
   { chainId: 7332n, shortName: 'EON' },
   { chainId: 7341n, shortName: 'shyft' },

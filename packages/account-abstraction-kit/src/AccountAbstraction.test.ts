@@ -174,10 +174,10 @@ describe('AccountAbstraction', () => {
         expect(safeInstanceMock.signTransaction).toHaveBeenCalledWith(safeTxMock)
 
         expect(GelatoRelayPackMock.prototype.executeTransaction).toHaveBeenCalledTimes(1)
-        expect(GelatoRelayPackMock.prototype.executeTransaction).toHaveBeenCalledWith(
-          signedSafeTxMock,
-          optionsMock
-        )
+        expect(GelatoRelayPackMock.prototype.executeTransaction).toHaveBeenCalledWith({
+          executable: signedSafeTxMock,
+          ...optionsMock
+        })
       })
 
       it('should throw if the protocol-kit is not initialized', async () => {

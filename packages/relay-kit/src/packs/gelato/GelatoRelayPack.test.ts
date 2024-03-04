@@ -471,10 +471,6 @@ describe('GelatoRelayPack', () => {
 
     describe('when the Safe is already deployed', () => {
       it('should execute a sponsored relay transaction', async () => {
-        const options = {
-          isSponsored: true
-        }
-
         const relayTransaction = {
           data: {
             nonce: 0,
@@ -486,7 +482,7 @@ describe('GelatoRelayPack', () => {
 
         const gelatoResponse = await gelatoRelayPack.executeTransaction({
           executable: relayTransaction as SafeTransaction,
-          ...options
+          isSponsored: true
         })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
@@ -543,10 +539,6 @@ describe('GelatoRelayPack', () => {
         // Safe is not deployed
         safe.isSafeDeployed = jest.fn().mockResolvedValue(false)
 
-        const options = {
-          isSponsored: true
-        }
-
         const relayTransaction = {
           data: {
             nonce: 0,
@@ -558,7 +550,7 @@ describe('GelatoRelayPack', () => {
 
         const gelatoResponse = await gelatoRelayPack.executeTransaction({
           executable: relayTransaction as SafeTransaction,
-          ...options
+          isSponsored: true
         })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)

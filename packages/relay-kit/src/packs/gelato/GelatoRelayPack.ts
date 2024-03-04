@@ -465,7 +465,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
       encodedTransaction: safeDeploymentBatch.data,
       chainId,
       options: {
-        ...options,
+        ...others,
         gasToken
       }
     }

@@ -7,7 +7,6 @@ type RelayKitBasePackTypes = {
   CreateTransactionResult: unknown
   ExecuteTransactionProps: {
     executable: RelayKitBasePackTypes['CreateTransactionResult']
-    [key: string]: unknown
   }
   ExecuteTransactionResult?: unknown
 }
@@ -16,7 +15,6 @@ type DefaultRelayKitBasePackTypes = {
   CreateTransactionResult: unknown
   ExecuteTransactionProps: {
     executable: DefaultRelayKitBasePackTypes['CreateTransactionResult']
-    [key: string]: unknown
   }
 }
 

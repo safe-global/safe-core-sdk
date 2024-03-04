@@ -433,14 +433,14 @@ export class GelatoRelayPack extends RelayKitBasePack<{
    */
   async executeTransaction({
     executable: safeTransaction,
-    ...options
+    ...others
   }: GelatoExecuteTransactionProps): Promise<RelayResponse> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const chainId = await this.protocolKit.getChainId()
     const safeAddress = await this.protocolKit.getAddress()
     const safeTransactionEncodedData = await this.protocolKit.getEncodedTransaction(safeTransaction)
 
-    const gasToken = options?.gasToken || safeTransaction.data.gasToken
+    const gasToken = others?.gasToken || safeTransaction.data.gasToken
 
     if (isSafeDeployed) {
       const relayTransaction: RelayTransaction = {
@@ -448,7 +448,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
         encodedTransaction: safeTransactionEncodedData,
         chainId,
         options: {
-          ...options,
+          ...others,
           gasToken
         }
       }

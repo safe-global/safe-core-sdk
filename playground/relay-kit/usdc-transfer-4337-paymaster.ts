@@ -13,8 +13,14 @@ const SAFE_ADDRESS = ''
 // Bundler URL
 const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
+// PAYMASTER URL
+const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+
 // RPC URL
 const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
+
+// PAYMASTER ADDRESS
+const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f'
 
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/
@@ -29,11 +35,17 @@ async function main() {
     signerOrProvider: signer
   })
 
-  // 1) Initialize pack
+  // 1) Initialize pack with the paymaster data
   const safe4337Pack = await Safe4337Pack.init({
     ethersAdapter,
     rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
+    paymasterOptions: {
+      paymasterUrl: PAYMASTER_URL,
+      erc20TokenAddress: usdcTokenAddress,
+      paymasterAddress
+      // amountToApprove?: bigint // optional value to set the paymaster approve amount on the deployment
+    },
     options: {
       safeAddress: SAFE_ADDRESS
     }
@@ -43,12 +55,11 @@ async function main() {
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
   console.log('Chain Id', await safe4337Pack.getChainId())
 
-  // Create transaction batch with 2 USDC transfers
+  // Create transaction batch to transfer 2 USDC
   const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
 
   const usdcAmount = 100_000n // 0.1 USDC
 
-  // we transfer the USDC to the Safe Account itself
   const transferUSDC = {
     to: usdcTokenAddress,
     data: generateTransferCallData(senderAddress, usdcAmount),
@@ -58,7 +69,11 @@ async function main() {
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
-    transactions
+    transactions,
+    options: {
+      // usePaymaster?: boolean // optional value to enable or disable paymaster (enabled by default if paymasterOptions is present in the pack initialization)
+      // amountToApprove?: bigint // optional value to update the paymaster approve amount
+    }
   })
 
   // 3) Estimate SafeOperation fee

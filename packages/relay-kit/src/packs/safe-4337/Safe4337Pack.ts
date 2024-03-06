@@ -328,7 +328,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    */
   async createTransaction({
     transactions,
-    options
+    options = {}
   }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
@@ -337,8 +337,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
       throw new Error('Paymaster address must be initialized')
     }
 
-    if (options?.amountToApprove && options?.erc20TokenAddress) {
-      const { amountToApprove, erc20TokenAddress } = options
+    if (options?.erc20TokenAddress) {
+      const { erc20TokenAddress } = options
+
+      const amountToApprove = options.amountToApprove ?? MAX_ERC20_AMOUNT_TO_APPROVE
 
       const approveToPaymasterTransaction = {
         to: erc20TokenAddress,

@@ -25,7 +25,6 @@ const safeContracts_V1_3_0 = [
   `${safeContractsPath}/v1.3.0/create_call.json`,
   `${safeContractsPath}/v1.3.0/simulate_tx_accessor.json`
 ].join(' ')
-const safeContracts_V1_0_0 = [`${safeContractsPath}/v1.0.0/gnosis_safe.json`].join(' ')
 
 // Won't be included in dist/ folder
 const safeContractsTestV1_4_1Path =
@@ -79,7 +78,7 @@ function moveTypechainFiles(inDir: string, outDir: string): void {
   })
 }
 
-// Contracts v1.1.1 + v1.2.0 are migrated to Abitype already, so they're not included in here
+// Contracts v1.0.0 + v1.1.1 + v1.2.0 are migrated to Abitype already, so they're not included in here
 function generateTypes(typechainTarget: string) {
   // Src
   generateTypechainFiles(
@@ -92,11 +91,6 @@ function generateTypes(typechainTarget: string) {
     `${outDirSrc}${typechainTarget}/v1.3.0`,
     safeContracts_V1_3_0
   )
-  generateTypechainFiles(
-    typechainTarget,
-    `${outDirSrc}${typechainTarget}/v1.0.0`,
-    safeContracts_V1_0_0
-  )
   moveTypechainFiles(
     `${typeChainDirectorySrcPath}${typechainTarget}/v1.4.1`,
     `${typeChainDirectoryBuildPath}${typechainTarget}/v1.4.1`
@@ -104,10 +98,6 @@ function generateTypes(typechainTarget: string) {
   moveTypechainFiles(
     `${typeChainDirectorySrcPath}${typechainTarget}/v1.3.0`,
     `${typeChainDirectoryBuildPath}${typechainTarget}/v1.3.0`
-  )
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${typechainTarget}/v1.0.0`,
-    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.0.0`
   )
 
   // Tests

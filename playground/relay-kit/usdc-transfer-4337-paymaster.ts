@@ -73,6 +73,7 @@ async function main() {
     options: {
       // usePaymaster?: boolean // optional value to enable or disable paymaster (enabled by default if paymasterOptions is present in the pack initialization)
       // amountToApprove?: bigint // optional value to update the paymaster approve amount
+      // erc20TokenAddress?: string // ERC20 token for the paymaster
     }
   })
 

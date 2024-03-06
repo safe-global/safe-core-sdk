@@ -337,6 +337,19 @@ export class Safe4337Pack extends RelayKitBasePack<{
       throw new Error('Paymaster address must be initialized')
     }
 
+    if (options?.amountToApprove && options?.erc20TokenAddress) {
+      const { amountToApprove, erc20TokenAddress } = options
+
+      const approveToPaymasterTransaction = {
+        to: erc20TokenAddress,
+        data: INTERFACES.encodeFunctionData('approve', [this.#paymasterAddress, amountToApprove]),
+        value: '0',
+        operation: OperationType.Call // Call for approve
+      }
+
+      transactions.push(approveToPaymasterTransaction)
+    }
+
     const usePaymaster = options?.usePaymaster !== false && !!this.#paymasterAddress
     const paymasterAddress = this.#paymasterAddress || '0x'
     const paymasterAndData = usePaymaster ? paymasterAddress : '0x'

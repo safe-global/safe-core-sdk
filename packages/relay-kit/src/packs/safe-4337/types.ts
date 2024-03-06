@@ -50,6 +50,8 @@ export type Safe4337CreateTransactionProps = {
   transactions: MetaTransactionData[]
   options?: {
     usePaymaster?: boolean
+    amountToApprove?: bigint
+    erc20TokenAddress?: string
   }
 }
 

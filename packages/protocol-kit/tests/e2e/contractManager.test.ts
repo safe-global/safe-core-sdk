@@ -49,7 +49,7 @@ describe('Safe contracts manager', () => {
           safeVersion: safeVersionDeployed
         }
       }
-      await chai.expect(
+      chai.expect(
         await Safe.create({
           ethAdapter,
           predictedSafe,
@@ -70,11 +70,7 @@ describe('Safe contracts manager', () => {
             safeAddress
           })
         )
-        .to.be.rejectedWith(
-          process.env.ETH_LIB === 'web3'
-            ? 'You must provide the json interface of the contract when instantiating a contract object'
-            : 'Invalid MultiSend contract address'
-        )
+        .to.be.rejectedWith('Invalid MultiSend contract address')
     })
 
     it('should fail if SafeProxy contract is not deployed on the current network', async () => {

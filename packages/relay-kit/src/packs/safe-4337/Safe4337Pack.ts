@@ -30,6 +30,9 @@ import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 const DEFAULT_SAFE_VERSION = '1.4.1'
 const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
 
+const MAX_ERC20_AMOUNT_TO_APPROVE =
+  0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
  * This class provides an implementation of the ERC-4337 that enables Safe accounts to wrk with UserOperations.
@@ -57,6 +60,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #bundlerClient: ethers.JsonRpcProvider
   #publicClient: ethers.JsonRpcProvider
 
+  #paymasterAddress?: string
+
   /**
    * Creates an instance of the Safe4337Pack.
    *
@@ -68,6 +73,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     publicClient,
     bundlerUrl,
     paymasterUrl,
+    paymasterAddress,
     rpcUrl,
     entryPointAddress,
     addModulesLibAddress,
@@ -81,6 +87,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     this.#bundlerClient = bundlerClient
     this.#publicClient = publicClient
+
+    this.#paymasterAddress = paymasterAddress
 
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#ADD_MODULES_LIB_ADDRESS = addModulesLibAddress
@@ -98,7 +106,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { ethersAdapter, options, bundlerUrl, paymasterUrl, rpcUrl, customContracts } =
+    const { ethersAdapter, options, bundlerUrl, rpcUrl, customContracts, paymasterOptions } =
       initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
@@ -164,6 +172,57 @@ export class Safe4337Pack extends RelayKitBasePack<{
           }
         }
       })
+
+      if (
+        paymasterOptions &&
+        paymasterOptions.paymasterAddress &&
+        paymasterOptions.erc20TokenAddress
+      ) {
+        const amountToApprove = paymasterOptions.amountToApprove || MAX_ERC20_AMOUNT_TO_APPROVE
+        const paymasterAddress = paymasterOptions.paymasterAddress
+
+        const enable4337ModulesTransaction = {
+          to: addModulesLibAddress,
+          value: '0',
+          data: INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]]),
+          operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
+        }
+
+        const approveToPaymasterTransaction = {
+          to: paymasterOptions.erc20TokenAddress,
+          data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+          value: '0',
+          operation: OperationType.Call // Call for approve
+        }
+
+        const setupBatch = [enable4337ModulesTransaction, approveToPaymasterTransaction]
+
+        const batchData = INTERFACES.encodeFunctionData('multiSend', [
+          encodeMultiSendData(setupBatch)
+        ])
+
+        const multiSendAddress = await protocolKit.getMultiSendAddress()
+
+        protocolKit = await Safe.create({
+          ethAdapter: ethersAdapter,
+          predictedSafe: {
+            safeDeploymentConfig: {
+              safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
+              saltNonce: options.saltNonce || undefined
+            },
+            safeAccountConfig: {
+              owners: options.owners,
+              threshold: options.threshold,
+              to: multiSendAddress,
+              data: batchData,
+              fallbackHandler: safe4337ModuleAddress,
+              paymentToken: ethers.ZeroAddress,
+              payment: 0,
+              paymentReceiver: ethers.ZeroAddress
+            }
+          }
+        })
+      }
     }
 
     let supportedEntryPoints
@@ -180,7 +239,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       protocolKit,
       bundlerClient,
       publicClient,
-      paymasterUrl,
+      paymasterUrl: paymasterOptions?.paymasterUrl,
+      paymasterAddress: paymasterOptions?.paymasterAddress,
       bundlerUrl,
       rpcUrl,
       entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
@@ -225,7 +285,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
     }
 
-    if (userOperation.paymasterAndData === '0x') {
+    const isPaymasterPresent = userOperation.paymasterAndData !== '0x'
+    const isDeplomentPresent = userOperation.initCode !== '0x'
+
+    // adjustment only needed for deployments without paymaster
+    if (!isPaymasterPresent && isDeplomentPresent) {
       const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
         bundlerUrl: this.#BUNDLER_URL,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -235,22 +299,22 @@ export class Safe4337Pack extends RelayKitBasePack<{
       if (adjustEstimationData) {
         safeOperation.addEstimations(adjustEstimationData)
       }
-
-      return safeOperation
     }
 
-    if (!this.#PAYMASTER_URL) {
-      throw new Error('No paymaster url provided')
-    }
+    if (isPaymasterPresent) {
+      if (!this.#PAYMASTER_URL) {
+        throw new Error('No paymaster url provided')
+      }
 
-    const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
-      userOperation: safeOperation.toUserOperation(),
-      paymasterUrl: this.#PAYMASTER_URL,
-      entryPoint: this.#ENTRYPOINT_ADDRESS
-    })
+      const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
+        userOperation: safeOperation.toUserOperation(),
+        paymasterUrl: this.#PAYMASTER_URL,
+        entryPoint: this.#ENTRYPOINT_ADDRESS
+      })
 
-    if (paymasterEstimation) {
-      safeOperation.addEstimations(paymasterEstimation)
+      if (paymasterEstimation) {
+        safeOperation.addEstimations(paymasterEstimation)
+      }
     }
 
     return safeOperation
@@ -268,8 +332,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
-    const paymasterAddress = options?.paymasterAddress
-    const paymasterAndData = paymasterAddress || '0x'
+
+    if (!this.#paymasterAddress && options?.usePaymaster) {
+      throw new Error('Paymaster address must be initialized')
+    }
+
+    const usePaymaster = options?.usePaymaster !== false && !!this.#paymasterAddress
+    const paymasterAddress = this.#paymasterAddress || '0x'
+    const paymasterAndData = usePaymaster ? paymasterAddress : '0x'
 
     const isBatch = transactions.length > 1
     const multiSendAddress = await this.protocolKit.getMultiSendAddress()

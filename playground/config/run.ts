@@ -17,7 +17,11 @@ const playgroundApiKitPaths = {
 const playgroundRelayKitPaths = {
   'relay-paid-transaction': 'relay-kit/paid-transaction',
   'relay-sponsored-transaction': 'relay-kit/sponsored-transaction',
-  'usdc-transfer-4337': 'relay-kit/usdc-transfer-4337'
+  'usdc-transfer-4337': 'relay-kit/usdc-transfer-4337',
+  'usdc-transfer-4337-paymaster': 'relay-kit/usdc-transfer-4337-paymaster',
+  'usdc-transfer-4337-counterfactual': 'relay-kit/usdc-transfer-4337-counterfactual',
+  'usdc-transfer-4337-counterfactual-paymaster':
+    'relay-kit/usdc-transfer-4337-counterfactual-paymaster'
 }
 
 const path =

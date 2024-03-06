@@ -18,7 +18,6 @@ export type Safe4337InitOptions = {
   ethersAdapter: EthersAdapter
   bundlerUrl: string
   rpcUrl: string
-  paymasterUrl?: string
   safeModulesVersion?: string
   customContracts?: {
     entryPointAddress?: string
@@ -26,6 +25,12 @@ export type Safe4337InitOptions = {
     addModulesLibAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions
+  paymasterOptions?: {
+    paymasterUrl: string
+    erc20TokenAddress?: string
+    amountToApprove?: bigint
+    paymasterAddress: string
+  }
 }
 
 export type Safe4337Options = {
@@ -33,6 +38,7 @@ export type Safe4337Options = {
   bundlerUrl: string
   rpcUrl: string
   paymasterUrl?: string
+  paymasterAddress?: string
   bundlerClient: ethers.JsonRpcProvider
   publicClient: ethers.JsonRpcProvider
   entryPointAddress: string
@@ -43,7 +49,7 @@ export type Safe4337Options = {
 export type Safe4337CreateTransactionProps = {
   transactions: MetaTransactionData[]
   options?: {
-    paymasterAddress: string
+    usePaymaster?: boolean
   }
 }
 

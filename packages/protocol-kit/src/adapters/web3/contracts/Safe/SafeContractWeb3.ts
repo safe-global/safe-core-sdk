@@ -3,7 +3,6 @@ import {
   Web3TransactionResult
 } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import { Gnosis_safe as Safe_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
 import {
   SafeContract,
   SafeSetupConfig,
@@ -12,8 +11,9 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 
+// TODO remove class when Typechain is removed
 abstract class SafeContractWeb3 implements SafeContract {
-  constructor(public contract: Safe_V1_0_0) {}
+  constructor(public contract: any) {}
 
   abstract setup(
     setupConfig: SafeSetupConfig,

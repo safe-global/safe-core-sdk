@@ -1,6 +1,5 @@
 import { AbstractSigner, Provider } from 'ethers'
 import { AbiItem } from 'web3-utils'
-import { Gnosis_safe__factory as SafeSingleton_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0/factories/Gnosis_safe__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Create_call__factory'
 import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Simulate_tx_accessor__factory'
@@ -17,20 +16,21 @@ import MultiSendContract_V1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendContrac
 import MultiSendContract_V1_4_1_Ethers from './MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
 import MultiSendCallOnlyContract_V1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Ethers'
 import MultiSendCallOnlyContract_V1_4_1_Ethers from './MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Ethers'
-import SafeContract_V1_0_0_Ethers from './Safe/v1.0.0/SafeContract_V1_0_0_Ethers'
 import SignMessageLibContract_V1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Ethers'
 import SignMessageLibContract_V1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Ethers'
 import SimulateTxAccessorContract_V1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Ethers'
 import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Ethers'
+import SafeContract_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Ethers'
 import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Ethers'
 import SafeContract_v1_2_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Ethers'
 import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
+import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Ethers'
 import SafeProxyFactoryContract_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0_Ethers'
 import SafeProxyFactoryContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1_Ethers'
 import SafeProxyFactoryContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0_Ethers'
 import SafeProxyFactoryContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Ethers'
-import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Ethers'
 import EthersAdapter from '../EthersAdapter'
+import { SafeContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
 import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
 import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
 import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
@@ -50,11 +50,11 @@ import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/c
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: AbstractSigner | Provider,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined,
   isL1SafeSingleton?: boolean
-): Promise<SafeContract_V1_0_0_Ethers> {
+  // TODO <any> return type used until Typechain is removed
+): Promise<any> {
   const chainId = await ethersAdapter.getChainId()
   let safeContract
   switch (safeVersion) {
@@ -100,10 +100,19 @@ export async function getSafeContractInstance(
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeContract_v1_1_1_Abi
       )
+      // TODO: Remove this mapper after remove typechain
       return safeContract.mapToTypechainContract()
     case '1.0.0':
-      safeContract = SafeSingleton_V1_0_0.connect(contractAddress, signerOrProvider)
-      return new SafeContract_V1_0_0_Ethers(safeContract)
+      safeContract = new SafeContract_v1_0_0_Ethers(
+        chainId,
+        ethersAdapter,
+        isL1SafeSingleton,
+        contractAddress,
+        // TODO: Remove this unknown after remove Typechain
+        customContractAbi as unknown as SafeContract_v1_0_0_Abi
+      )
+      // TODO: Remove this mapper after remove typechain
+      return safeContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }

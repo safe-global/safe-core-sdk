@@ -109,11 +109,9 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
     return getSafeContractInstance(
       safeVersion,
       contractAddress,
-      signerOrProvider,
       this,
       customContractAbi,
       isL1SafeSingleton

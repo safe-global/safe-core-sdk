@@ -28,7 +28,7 @@ function Monerium() {
       const safeOwner = await provider.getSigner()
       const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: safeOwner })
 
-      const safeSdk = await Safe.create({
+      const protocolKit = await Safe.create({
         ethAdapter: ethAdapter,
         safeAddress: selectedSafe,
         isL1SafeSingleton: true
@@ -41,7 +41,7 @@ function Monerium() {
       })
 
       await pack.init({
-        safeSdk
+        protocolKit
       })
 
       pack.subscribe(OrderState.pending, (notification) => {
@@ -66,8 +66,8 @@ function Monerium() {
         }, 5000)
       })
 
-      const threshold = await safeSdk.getThreshold()
-      const owners = await safeSdk.getOwners()
+      const threshold = await protocolKit.getThreshold()
+      const owners = await protocolKit.getOwners()
 
       setSafeThreshold(`${threshold}/${owners.length}`)
       setMoneriumPack(pack)

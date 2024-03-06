@@ -53,7 +53,7 @@ async function main() {
 
   const senderAddress = await signer.getAddress()
   const safeTxHash = await safe.getTransactionHash(safeTransaction)
-  const signature = await safe.signTransactionHash(safeTxHash)
+  const signature = await safe.signHash(safeTxHash)
 
   // Propose transaction to the service
   await service.proposeTransaction({

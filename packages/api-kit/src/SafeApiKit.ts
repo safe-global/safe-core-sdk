@@ -1,10 +1,12 @@
 import {
+  AddMessageProps,
   AddSafeDelegateProps,
   AllTransactionsListResponse,
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
   SafeSingletonResponse,
+  GetSafeMessageListProps,
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -12,6 +14,8 @@ import {
   SafeDelegateListResponse,
   SafeDelegateResponse,
   SafeInfoResponse,
+  SafeMessage,
+  SafeMessageListResponse,
   SafeModuleTransactionListResponse,
   SafeMultisigTransactionEstimate,
   SafeMultisigTransactionEstimateResponse,
@@ -23,7 +27,7 @@ import {
   TransferListResponse
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
-import { validateEip3770Address } from '@safe-global/protocol-kit'
+import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
   SafeMultisigConfirmationListResponse,
@@ -56,6 +60,15 @@ class SafeApiKit {
       }
 
       this.#txServiceBaseUrl = `${url}/api`
+    }
+  }
+
+  #isValidAddress(address: string) {
+    try {
+      validateEthereumAddress(address)
+      return true
+    } catch {
+      return false
     }
   }
 
@@ -521,6 +534,7 @@ class SafeApiKit {
     }
     const { address } = this.#getEip3770Address(safeAddress)
     const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
+
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
       method: HttpMethod.Get
@@ -612,6 +626,93 @@ class SafeApiKit {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/tokens/${address}/`,
       method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Get a message by its safe message hash
+   * @param messageHash The Safe message hash
+   * @returns The message
+   */
+  async getMessage(messageHash: string): Promise<SafeMessage> {
+    if (!messageHash) {
+      throw new Error('Invalid messageHash')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Get the list of messages associated to a Safe account
+   * @param safeAddress The safe address
+   * @param options The options to filter the list of messages
+   * @returns The paginated list of messages
+   */
+  async getMessages(
+    safeAddress: string,
+    { ordering, limit, offset }: GetSafeMessageListProps = {}
+  ): Promise<SafeMessageListResponse> {
+    if (!this.#isValidAddress(safeAddress)) {
+      throw new Error('Invalid safeAddress')
+    }
+
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
+
+    if (ordering) {
+      url.searchParams.set('ordering', ordering)
+    }
+
+    if (limit) {
+      url.searchParams.set('limit', limit)
+    }
+
+    if (offset) {
+      url.searchParams.set('offset', offset)
+    }
+
+    return sendRequest({
+      url: url.toString(),
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Creates a new message with an initial signature
+   * Add more signatures from other owners using addMessageSignature()
+   * @param safeAddress The safe address
+   * @param options The raw message to add, signature and safeAppId if any
+   */
+  async addMessage(safeAddress: string, addMessageProps: AddMessageProps): Promise<void> {
+    if (!this.#isValidAddress(safeAddress)) {
+      throw new Error('Invalid safeAddress')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+      method: HttpMethod.Post,
+      body: addMessageProps
+    })
+  }
+
+  /**
+   * Add a signature to an existing message
+   * @param messageHash The safe message hash
+   * @param signature The signature
+   */
+  async addMessageSignature(messageHash: string, signature: string): Promise<void> {
+    if (!messageHash || !signature) {
+      throw new Error('Invalid messageHash or signature')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/signatures/`,
+      method: HttpMethod.Post,
+      body: {
+        signature
+      }
     })
   }
 }

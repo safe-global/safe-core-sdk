@@ -1,10 +1,11 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import { SigningMethod } from '@safe-global/protocol-kit/types'
 import {
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeTransactionEIP712Args,
+  SafeEIP712Args,
   SignMessageLibContract
 } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
@@ -282,18 +283,18 @@ class Web3Adapter implements EthAdapter {
   }
 
   async signTypedData(
-    safeTransactionEIP712Args: SafeTransactionEIP712Args,
+    safeEIP712Args: SafeEIP712Args,
     methodVersion?: 'v3' | 'v4'
   ): Promise<string> {
     if (!this.#signerAddress) {
       throw new Error('This method requires a signer')
     }
-    const typedData = generateTypedData(safeTransactionEIP712Args)
-    let method = 'eth_signTypedData_v3'
+    const typedData = generateTypedData(safeEIP712Args)
+    let method = SigningMethod.ETH_SIGN_TYPED_DATA_V3
     if (methodVersion === 'v4') {
-      method = 'eth_signTypedData_v4'
+      method = SigningMethod.ETH_SIGN_TYPED_DATA_V4
     } else if (!methodVersion) {
-      method = 'eth_signTypedData'
+      method = SigningMethod.ETH_SIGN_TYPED_DATA
     }
     const jsonTypedData = JSON.stringify(typedData)
     const signedTypedData = {
@@ -315,6 +316,7 @@ class Web3Adapter implements EthAdapter {
           reject(err)
           return
         }
+
         if (val?.result == null) {
           reject(new Error("EIP-712 is not supported by user's wallet"))
           return

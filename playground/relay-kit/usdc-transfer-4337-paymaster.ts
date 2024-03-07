@@ -55,7 +55,7 @@ async function main() {
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
   console.log('Chain Id', await safe4337Pack.getChainId())
 
-  // Create transaction batch to transfer 2 USDC
+  // Create transaction batch with two 0.1 USDC transfers
   const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
 
   const usdcAmount = 100_000n // 0.1 USDC

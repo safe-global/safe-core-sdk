@@ -64,7 +64,7 @@ async function main() {
 
   await transfer(signer, usdcTokenAddress, senderAddress, 15_000_000n)
 
-  // Create transaction batch with 2 USDC transfers
+  // Create transaction batch with two 0.1 USDC transfers
 
   const usdcAmount = 100_000n // 0.1 USDC
 

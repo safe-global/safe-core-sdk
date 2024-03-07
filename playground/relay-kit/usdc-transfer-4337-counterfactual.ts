@@ -59,7 +59,7 @@ async function main() {
 
   await signer.sendTransaction(fundingSafe)
 
-  // Create transaction batch with 2 USDC transfers
+  // Create transaction batch with two 0.1 USDC transfers
 
   const usdcAmount = 100_000n // 0.1 USDC
 

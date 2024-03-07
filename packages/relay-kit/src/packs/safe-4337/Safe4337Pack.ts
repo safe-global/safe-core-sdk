@@ -3,7 +3,8 @@ import Safe, {
   EthSafeSignature,
   EthersAdapter,
   SigningMethod,
-  encodeMultiSendData
+  encodeMultiSendData,
+  getMultiSendContract
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
@@ -153,31 +154,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
         throw new Error('Owners and threshold are required to deploy a new Safe')
       }
 
-      protocolKit = await Safe.create({
-        ethAdapter: ethersAdapter,
-        predictedSafe: {
-          safeDeploymentConfig: {
-            safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
-            saltNonce: options.saltNonce || undefined
-          },
-          safeAccountConfig: {
-            owners: options.owners,
-            threshold: options.threshold,
-            to: addModulesLibAddress,
-            data: INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]]),
-            fallbackHandler: safe4337ModuleAddress,
-            paymentToken: ethers.ZeroAddress,
-            payment: 0,
-            paymentReceiver: ethers.ZeroAddress
-          }
-        }
-      })
+      const isPaymasterPresent =
+        paymasterOptions && paymasterOptions.paymasterAddress && paymasterOptions.erc20TokenAddress
 
-      if (
-        paymasterOptions &&
-        paymasterOptions.paymasterAddress &&
-        paymasterOptions.erc20TokenAddress
-      ) {
+      let deploymentTo = addModulesLibAddress
+      let deploymentData = INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]])
+
+      if (isPaymasterPresent) {
         const amountToApprove = paymasterOptions.amountToApprove || MAX_ERC20_AMOUNT_TO_APPROVE
         const paymasterAddress = paymasterOptions.paymasterAddress
 
@@ -189,7 +172,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         }
 
         const approveToPaymasterTransaction = {
-          to: paymasterOptions.erc20TokenAddress,
+          to: paymasterOptions.erc20TokenAddress as string,
           data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
           value: '0',
           operation: OperationType.Call // Call for approve
@@ -201,28 +184,34 @@ export class Safe4337Pack extends RelayKitBasePack<{
           encodeMultiSendData(setupBatch)
         ])
 
-        const multiSendAddress = await protocolKit.getMultiSendAddress()
-
-        protocolKit = await Safe.create({
+        const multiSendContract = await getMultiSendContract({
           ethAdapter: ethersAdapter,
-          predictedSafe: {
-            safeDeploymentConfig: {
-              safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
-              saltNonce: options.saltNonce || undefined
-            },
-            safeAccountConfig: {
-              owners: options.owners,
-              threshold: options.threshold,
-              to: multiSendAddress,
-              data: batchData,
-              fallbackHandler: safe4337ModuleAddress,
-              paymentToken: ethers.ZeroAddress,
-              payment: 0,
-              paymentReceiver: ethers.ZeroAddress
-            }
-          }
+          safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
         })
+
+        deploymentTo = await multiSendContract.getAddress()
+        deploymentData = batchData
       }
+
+      protocolKit = await Safe.create({
+        ethAdapter: ethersAdapter,
+        predictedSafe: {
+          safeDeploymentConfig: {
+            safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
+            saltNonce: options.saltNonce || undefined
+          },
+          safeAccountConfig: {
+            owners: options.owners,
+            threshold: options.threshold,
+            to: deploymentTo,
+            data: deploymentData,
+            fallbackHandler: safe4337ModuleAddress,
+            paymentToken: ethers.ZeroAddress,
+            payment: 0,
+            paymentReceiver: ethers.ZeroAddress
+          }
+        }
+      })
     }
 
     let supportedEntryPoints
@@ -285,11 +274,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
     }
 
-    const isPaymasterPresent = userOperation.paymasterAndData !== '0x'
-    const isDeplomentPresent = userOperation.initCode !== '0x'
+    const usePaymaster = userOperation.paymasterAndData !== '0x'
+    const hasSafeDeployment = userOperation.initCode !== '0x'
 
     // adjustment only needed for deployments without paymaster
-    if (!isPaymasterPresent && isDeplomentPresent) {
+    if (!usePaymaster && hasSafeDeployment) {
       const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
         bundlerUrl: this.#BUNDLER_URL,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -301,7 +290,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     }
 
-    if (isPaymasterPresent) {
+    if (usePaymaster) {
       if (!this.#PAYMASTER_URL) {
         throw new Error('No paymaster url provided')
       }
@@ -337,7 +326,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       throw new Error('Paymaster address must be initialized')
     }
 
-    if (options?.erc20TokenAddress) {
+    const usePaymaster = options?.usePaymaster !== false && !!this.#paymasterAddress
+    const paymasterAddress = this.#paymasterAddress || '0x'
+    const paymasterAndData = usePaymaster ? paymasterAddress : '0x'
+
+    if (options?.erc20TokenAddress && usePaymaster) {
       const { erc20TokenAddress } = options
 
       const amountToApprove = options.amountToApprove ?? MAX_ERC20_AMOUNT_TO_APPROVE
@@ -351,10 +344,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       transactions.push(approveToPaymasterTransaction)
     }
-
-    const usePaymaster = options?.usePaymaster !== false && !!this.#paymasterAddress
-    const paymasterAddress = this.#paymasterAddress || '0x'
-    const paymasterAndData = usePaymaster ? paymasterAddress : '0x'
 
     const isBatch = transactions.length > 1
     const multiSendAddress = await this.protocolKit.getMultiSendAddress()

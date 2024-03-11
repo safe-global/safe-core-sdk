@@ -1,12 +1,22 @@
 import Safe from '@safe-global/protocol-kit'
-
 type RelayKitBasePackTypes = {
   EstimateFeeProps?: unknown
   EstimateFeeResult?: unknown
   CreateTransactionProps?: unknown
-  CreateTransactionResult?: unknown
-  ExecuteTransactionProps?: unknown
+  CreateTransactionResult: unknown
+  ExecuteTransactionProps: {
+    executable: RelayKitBasePackTypes['CreateTransactionResult']
+    [key: string]: unknown
+  }
   ExecuteTransactionResult?: unknown
+}
+
+type DefaultRelayKitBasePackTypes = {
+  CreateTransactionResult: unknown
+  ExecuteTransactionProps: {
+    executable: DefaultRelayKitBasePackTypes['CreateTransactionResult']
+    [key: string]: unknown
+  }
 }
 
 /**
@@ -21,7 +31,7 @@ type RelayKitBasePackTypes = {
  * @template ExecuteTransactionResult
  */
 export abstract class RelayKitBasePack<
-  T extends Partial<RelayKitBasePackTypes> = Record<string, unknown>
+  T extends RelayKitBasePackTypes = DefaultRelayKitBasePackTypes
 > {
   /**
    * @type {Safe}
@@ -58,12 +68,10 @@ export abstract class RelayKitBasePack<
   /**
    * Abstract function to execute a Safe transaction using a relayer.
    * @abstract
-   * @param {CreateTransactionResult} executable - The result of the created transaction. This can be for example a SafeTransaction object or SafeOperation.
-   * @param {CreateTransactionProps} props - The props for transaction execution.
+   * @param {ExecuteTransactionProps} props - The props for transaction execution.
    * @returns {Promise<ExecuteTransactionResult>} - Relay's response after executing the transaction.
    */
   abstract executeTransaction(
-    executable: T['CreateTransactionResult'],
     props: T['ExecuteTransactionProps']
   ): Promise<T['ExecuteTransactionResult']>
 }

@@ -42,6 +42,10 @@ export type Safe4337CreateTransactionProps = {
   transactions: MetaTransactionData[]
 }
 
+export type Safe4337ExecutableProps = {
+  executable: SafeOperation
+}
+
 export type SafeUserOperation = {
   safe: string
   nonce: bigint

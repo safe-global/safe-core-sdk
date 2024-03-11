@@ -420,27 +420,28 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     safeTransaction: SafeTransaction,
     options?: MetaTransactionOptions
   ): Promise<RelayResponse> {
-    return this.executeTransaction({ executable: safeTransaction, ...options })
+    return this.executeTransaction({ executable: safeTransaction, options })
   }
 
   /**
    * Sends the Safe transaction to the Gelato Relayer for execution.
    * If the Safe is not deployed, it creates a batch of transactions including the Safe deployment transaction.
    *
-   * @param {SafeTransaction} safeTransaction - The Safe transaction to be executed.
-   * @param {MetaTransactionOptions} [options] - Options for the transaction.
+   * @param {GelatoExecuteTransactionProps} props - Execution props
+   * @param {SafeTransaction} props.executable - The Safe transaction to be executed.
+   * @param {MetaTransactionOptions} props.options - Options for the transaction.
    * @returns {Promise<RelayResponse>} Returns a Promise that resolves with a RelayResponse object.
    */
   async executeTransaction({
     executable: safeTransaction,
-    ...others
+    options
   }: GelatoExecuteTransactionProps): Promise<RelayResponse> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const chainId = await this.protocolKit.getChainId()
     const safeAddress = await this.protocolKit.getAddress()
     const safeTransactionEncodedData = await this.protocolKit.getEncodedTransaction(safeTransaction)
 
-    const gasToken = others?.gasToken || safeTransaction.data.gasToken
+    const gasToken = options?.gasToken || safeTransaction.data.gasToken
 
     if (isSafeDeployed) {
       const relayTransaction: RelayTransaction = {
@@ -448,7 +449,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
         encodedTransaction: safeTransactionEncodedData,
         chainId,
         options: {
-          ...others,
+          ...options,
           gasToken
         }
       }
@@ -465,7 +466,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
       encodedTransaction: safeDeploymentBatch.data,
       chainId,
       options: {
-        ...others,
+        ...options,
         gasToken
       }
     }

@@ -189,10 +189,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Estimates gas for the SafeOperation.
    *
-   * @param {EstimateFeeProps{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
-   * @param {EstimateFeeProps{EstimateFeeFn}} estimateFeeFn - The function to estimate the gas.
+   * @param {EstimateFeeProps} props - The parameters for the gas estimation.
+   * @param {SafeOperation} props.safeOperation - The SafeOperation to estimate the gas.
+   * @param {IFeeEstimator} props.feeEstimator - The function to estimate the gas.
    * @return {Promise<SafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
+
   async getEstimateFee({
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()

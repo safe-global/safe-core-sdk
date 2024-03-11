@@ -482,7 +482,9 @@ describe('GelatoRelayPack', () => {
 
         const gelatoResponse = await gelatoRelayPack.executeTransaction({
           executable: relayTransaction as SafeTransaction,
-          isSponsored: true
+          options: {
+            isSponsored: true
+          }
         })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)
@@ -550,7 +552,7 @@ describe('GelatoRelayPack', () => {
 
         const gelatoResponse = await gelatoRelayPack.executeTransaction({
           executable: relayTransaction as SafeTransaction,
-          isSponsored: true
+          options: { isSponsored: true }
         })
 
         expect(gelatoResponse).toBe(RELAY_RESPONSE)

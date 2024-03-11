@@ -26,4 +26,7 @@ export type GelatoCreateTransactionProps = {
   onlyCalls?: boolean
 }
 
-export type GelatoExecuteTransactionProps = MetaTransactionOptions & { executable: SafeTransaction }
+export type GelatoExecuteTransactionProps = {
+  executable: SafeTransaction
+  options?: MetaTransactionOptions
+}

@@ -176,7 +176,7 @@ describe('AccountAbstraction', () => {
         expect(GelatoRelayPackMock.prototype.executeTransaction).toHaveBeenCalledTimes(1)
         expect(GelatoRelayPackMock.prototype.executeTransaction).toHaveBeenCalledWith({
           executable: signedSafeTxMock,
-          ...optionsMock
+          options: optionsMock
         })
       })
 

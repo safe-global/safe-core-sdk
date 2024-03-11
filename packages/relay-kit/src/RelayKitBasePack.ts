@@ -1,5 +1,4 @@
 import Safe from '@safe-global/protocol-kit'
-
 type RelayKitBasePackTypes = {
   EstimateFeeProps?: unknown
   EstimateFeeResult?: unknown
@@ -7,6 +6,7 @@ type RelayKitBasePackTypes = {
   CreateTransactionResult: unknown
   ExecuteTransactionProps: {
     executable: RelayKitBasePackTypes['CreateTransactionResult']
+    [key: string]: unknown
   }
   ExecuteTransactionResult?: unknown
 }
@@ -15,6 +15,7 @@ type DefaultRelayKitBasePackTypes = {
   CreateTransactionResult: unknown
   ExecuteTransactionProps: {
     executable: DefaultRelayKitBasePackTypes['CreateTransactionResult']
+    [key: string]: unknown
   }
 }
 

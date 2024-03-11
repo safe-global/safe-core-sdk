@@ -22,7 +22,8 @@ import {
   SafeUserOperation,
   UserOperation,
   UserOperationReceipt,
-  UserOperationWithPayload
+  UserOperationWithPayload,
+  paymasterOptions
 } from './types'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
@@ -52,7 +53,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
 }> {
   #BUNDLER_URL: string
   #RPC_URL: string
-  #PAYMASTER_URL?: string
 
   #ENTRYPOINT_ADDRESS: string
   #ADD_MODULES_LIB_ADDRESS: string = '0x'
@@ -61,7 +61,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #bundlerClient: ethers.JsonRpcProvider
   #publicClient: ethers.JsonRpcProvider
 
-  #paymasterAddress?: string
+  #paymasterOptions?: paymasterOptions
 
   /**
    * Creates an instance of the Safe4337Pack.
@@ -73,8 +73,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     bundlerClient,
     publicClient,
     bundlerUrl,
-    paymasterUrl,
-    paymasterAddress,
+    paymasterOptions,
     rpcUrl,
     entryPointAddress,
     addModulesLibAddress,
@@ -83,13 +82,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
     super(protocolKit)
 
     this.#BUNDLER_URL = bundlerUrl
-    this.#PAYMASTER_URL = paymasterUrl
     this.#RPC_URL = rpcUrl
 
     this.#bundlerClient = bundlerClient
     this.#publicClient = publicClient
 
-    this.#paymasterAddress = paymasterAddress
+    this.#paymasterOptions = paymasterOptions
 
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#ADD_MODULES_LIB_ADDRESS = addModulesLibAddress
@@ -154,15 +152,25 @@ export class Safe4337Pack extends RelayKitBasePack<{
         throw new Error('Owners and threshold are required to deploy a new Safe')
       }
 
-      const isPaymasterPresent =
-        paymasterOptions && paymasterOptions.paymasterAddress && paymasterOptions.erc20TokenAddress
-
       let deploymentTo = addModulesLibAddress
       let deploymentData = INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]])
 
-      if (isPaymasterPresent) {
-        const amountToApprove = paymasterOptions.amountToApprove || MAX_ERC20_AMOUNT_TO_APPROVE
-        const paymasterAddress = paymasterOptions.paymasterAddress
+      const usePaymaster = !!paymasterOptions
+
+      if (usePaymaster) {
+        const {
+          paymasterAddress,
+          paymasterTokenAddress,
+          amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE
+        } = paymasterOptions
+
+        if (!paymasterAddress) {
+          throw new Error('No paymaster address provided')
+        }
+
+        if (!paymasterTokenAddress) {
+          throw new Error('No paymaster token provided')
+        }
 
         const enable4337ModulesTransaction = {
           to: addModulesLibAddress,
@@ -172,7 +180,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         }
 
         const approveToPaymasterTransaction = {
-          to: paymasterOptions.erc20TokenAddress as string,
+          to: paymasterTokenAddress,
           data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
           value: '0',
           operation: OperationType.Call // Call for approve
@@ -228,8 +236,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       protocolKit,
       bundlerClient,
       publicClient,
-      paymasterUrl: paymasterOptions?.paymasterUrl,
-      paymasterAddress: paymasterOptions?.paymasterAddress,
+      paymasterOptions,
       bundlerUrl,
       rpcUrl,
       entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
@@ -242,7 +249,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * Estimates gas for the SafeOperation.
    *
    * @param {EstimateFeeProps{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
-   * @param {EstimateFeeProps{EstimateFeeFn}} estimateFeeFn - The function to estimate the gas.
+   * @param {EstimateFeeProps{IFeeEstimator}} feeEstimator - The fee estimator for estimating the gas.
    * @return {Promise<SafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
   async getEstimateFee({
@@ -291,13 +298,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     if (usePaymaster) {
-      if (!this.#PAYMASTER_URL) {
-        throw new Error('No paymaster url provided')
-      }
-
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
         userOperation: safeOperation.toUserOperation(),
-        paymasterUrl: this.#PAYMASTER_URL,
+        bundlerUrl: this.#BUNDLER_URL,
         entryPoint: this.#ENTRYPOINT_ADDRESS
       })
 
@@ -313,36 +316,39 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * Creates a relayed transaction based on the provided parameters.
    *
    * @param {MetaTransactionData[]} transactions - The transactions to batch in a SafeOperation.
+   * @param options - Optional configuration options for the transaction creation.
    * @return {Promise<SafeOperation>} The Promise object will resolve a SafeOperation.
    */
   async createTransaction({
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
+    let paymasterAndData = '0x'
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
+    const { usePaymaster = !!this.#paymasterOptions?.paymasterAddress, amountToApprove } = options
 
-    if (!this.#paymasterAddress && options?.usePaymaster) {
-      throw new Error('Paymaster address must be initialized')
-    }
-
-    const usePaymaster = options?.usePaymaster !== false && !!this.#paymasterAddress
-    const paymasterAddress = this.#paymasterAddress || '0x'
-    const paymasterAndData = usePaymaster ? paymasterAddress : '0x'
-
-    if (options?.erc20TokenAddress && usePaymaster) {
-      const { erc20TokenAddress } = options
-
-      const amountToApprove = options.amountToApprove ?? MAX_ERC20_AMOUNT_TO_APPROVE
-
-      const approveToPaymasterTransaction = {
-        to: erc20TokenAddress,
-        data: INTERFACES.encodeFunctionData('approve', [this.#paymasterAddress, amountToApprove]),
-        value: '0',
-        operation: OperationType.Call // Call for approve
+    if (usePaymaster) {
+      if (!this.#paymasterOptions) {
+        throw new Error('Paymaster must be initialized')
       }
 
-      transactions.push(approveToPaymasterTransaction)
+      const paymasterAddress = this.#paymasterOptions.paymasterAddress
+      const paymasterTokenAddress = this.#paymasterOptions.paymasterTokenAddress
+      paymasterAndData = paymasterAddress
+
+      if (amountToApprove) {
+        const amountToApprove = options.amountToApprove ?? MAX_ERC20_AMOUNT_TO_APPROVE
+
+        const approveToPaymasterTransaction = {
+          to: paymasterTokenAddress,
+          data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+          value: '0',
+          operation: OperationType.Call // Call for approve
+        }
+
+        transactions.push(approveToPaymasterTransaction)
+      }
     }
 
     const isBatch = transactions.length > 1

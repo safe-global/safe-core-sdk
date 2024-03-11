@@ -14,6 +14,12 @@ type PredictedSafeOptions = {
   saltNonce?: string
 }
 
+export type paymasterOptions = {
+  paymasterAddress: string
+  paymasterTokenAddress: string
+  amountToApprove?: bigint
+}
+
 export type Safe4337InitOptions = {
   ethersAdapter: EthersAdapter
   bundlerUrl: string
@@ -25,20 +31,14 @@ export type Safe4337InitOptions = {
     addModulesLibAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions
-  paymasterOptions?: {
-    paymasterUrl: string
-    erc20TokenAddress?: string
-    amountToApprove?: bigint
-    paymasterAddress: string
-  }
+  paymasterOptions?: paymasterOptions
 }
 
 export type Safe4337Options = {
   protocolKit: Safe
   bundlerUrl: string
   rpcUrl: string
-  paymasterUrl?: string
-  paymasterAddress?: string
+  paymasterOptions?: paymasterOptions
   bundlerClient: ethers.JsonRpcProvider
   publicClient: ethers.JsonRpcProvider
   entryPointAddress: string
@@ -51,7 +51,6 @@ export type Safe4337CreateTransactionProps = {
   options?: {
     usePaymaster?: boolean
     amountToApprove?: bigint
-    erc20TokenAddress?: string
   }
 }
 
@@ -157,13 +156,13 @@ export type EstimateFeeFunction = ({
 
 export type EstimateSponsoredFeeFunctionProps = {
   userOperation: UserOperation
-  paymasterUrl: string
+  bundlerUrl: string
   entryPoint: string
 }
 
 export type EstimateSponsoredFeeFunction = ({
   userOperation,
-  paymasterUrl,
+  bundlerUrl,
   entryPoint
 }: EstimateSponsoredFeeFunctionProps) => Promise<EstimateSponsoredGasData>
 

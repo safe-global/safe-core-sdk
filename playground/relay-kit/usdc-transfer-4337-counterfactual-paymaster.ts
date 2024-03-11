@@ -8,10 +8,7 @@ const PRIVATE_KEY = ''
 const PIMLICO_API_KEY = ''
 
 // Bundler URL
-const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
-
-// PAYMASTER URL
-const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
 // RPC URL
 const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
@@ -38,8 +35,7 @@ async function main() {
     rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
     paymasterOptions: {
-      paymasterUrl: PAYMASTER_URL,
-      erc20TokenAddress: usdcTokenAddress,
+      paymasterTokenAddress: usdcTokenAddress,
       paymasterAddress
       // amountToApprove?: bigint // optional value to set the paymaster approve amount on the deployment
     },

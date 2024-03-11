@@ -86,6 +86,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 1442n, shortName: 'testnet-zkEVM-mango' },
   { chainId: 1559n, shortName: 'tenet' },
   { chainId: 1663n, shortName: 'Gobi' },
+  { chainId: 1729n, shortName: 'reya' },
   { chainId: 1807n, shortName: 'rana' },
   { chainId: 1890n, shortName: 'lightlink_phoenix' },
   { chainId: 1891n, shortName: 'lightlink_pegasus' },

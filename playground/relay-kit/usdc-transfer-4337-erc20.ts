@@ -56,6 +56,13 @@ async function main() {
 
   const usdcAmount = 100_000n // 0.1 USDC
 
+  console.log(`sending USDC...`)
+
+  // send 5 USDC to the Safe
+  await transfer(signer, usdcTokenAddress, senderAddress, usdcAmount * 50n)
+
+  console.log(`creating the Safe batch...`)
+
   const transferUSDC = {
     to: usdcTokenAddress,
     data: generateTransferCallData(senderAddress, usdcAmount),
@@ -65,12 +72,7 @@ async function main() {
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
-    transactions,
-    options: {
-      // usePaymaster?: boolean // optional value to enable or disable paymaster (enabled by default if paymasterOptions is present in the pack initialization)
-      // amountToApprove?: bigint // optional value to update the paymaster approve amount
-      // paymasterTokenAddress?: string // ERC20 token for the paymaster
-    }
+    transactions
   })
 
   // 3) Estimate SafeOperation fee
@@ -113,4 +115,16 @@ const generateTransferCallData = (to: string, value: bigint) => {
   const iface = new ethers.Interface([functionAbi])
 
   return iface.encodeFunctionData('transfer', [to, value])
+}
+
+async function transfer(signer: ethers.Wallet, tokenAddress: string, to: string, amount: bigint) {
+  const transferEC20 = {
+    to: tokenAddress,
+    data: generateTransferCallData(to, amount),
+    value: '0'
+  }
+
+  const transactionResponse = await signer.sendTransaction(transferEC20)
+
+  return await transactionResponse.wait()
 }

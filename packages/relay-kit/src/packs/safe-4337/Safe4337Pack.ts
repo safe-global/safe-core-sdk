@@ -155,9 +155,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       let deploymentTo = addModulesLibAddress
       let deploymentData = INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]])
 
-      const usePaymaster = !!paymasterOptions
+      const isApproveTransactionRequired = !paymasterOptions?.isSponsored && !!paymasterOptions
 
-      if (usePaymaster) {
+      if (isApproveTransactionRequired) {
         const {
           paymasterAddress,
           paymasterTokenAddress,
@@ -165,11 +165,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
         } = paymasterOptions
 
         if (!paymasterAddress) {
-          throw new Error('No paymaster address provided')
+          throw new Error('No paymaster address provided for a non-sponsored transaction')
         }
 
         if (!paymasterTokenAddress) {
-          throw new Error('No paymaster token provided')
+          throw new Error('No paymaster token provided for a non-sponsored transaction')
         }
 
         const enable4337ModulesTransaction = {
@@ -297,12 +297,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     }
 
-    if (usePaymaster) {
+    if (this.#paymasterOptions?.isSponsored) {
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
         userOperation: safeOperation.toUserOperation(),
         bundlerUrl: this.#BUNDLER_URL,
-        entryPoint: this.#ENTRYPOINT_ADDRESS
+        entryPoint: this.#ENTRYPOINT_ADDRESS,
+        sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId
       })
+
+      safeOperation.data.paymasterAndData =
+        paymasterEstimation?.paymasterAndData || safeOperation.data.paymasterAndData
 
       if (paymasterEstimation) {
         safeOperation.addEstimations(paymasterEstimation)
@@ -323,32 +327,26 @@ export class Safe4337Pack extends RelayKitBasePack<{
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
-    let paymasterAndData = '0x'
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
-    const { usePaymaster = !!this.#paymasterOptions?.paymasterAddress, amountToApprove } = options
+    const { amountToApprove } = options
 
-    if (usePaymaster) {
-      if (!this.#paymasterOptions) {
+    if (amountToApprove) {
+      if (!this.#paymasterOptions || !this.#paymasterOptions.paymasterTokenAddress) {
         throw new Error('Paymaster must be initialized')
       }
 
       const paymasterAddress = this.#paymasterOptions.paymasterAddress
       const paymasterTokenAddress = this.#paymasterOptions.paymasterTokenAddress
-      paymasterAndData = paymasterAddress
 
-      if (amountToApprove) {
-        const amountToApprove = options.amountToApprove ?? MAX_ERC20_AMOUNT_TO_APPROVE
-
-        const approveToPaymasterTransaction = {
-          to: paymasterTokenAddress,
-          data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
-          value: '0',
-          operation: OperationType.Call // Call for approve
-        }
-
-        transactions.push(approveToPaymasterTransaction)
+      const approveToPaymasterTransaction = {
+        to: paymasterTokenAddress,
+        data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+        value: '0',
+        operation: OperationType.Call // Call for approve
       }
+
+      transactions.push(approveToPaymasterTransaction)
     }
 
     const isBatch = transactions.length > 1
@@ -362,6 +360,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
           operation: OperationType.DelegateCall
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
+
+    const paymasterAndData = this.#paymasterOptions?.paymasterAddress || '0x'
 
     const userOperation: UserOperation = {
       sender: safeAddress,

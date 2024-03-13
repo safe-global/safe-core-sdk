@@ -15,8 +15,10 @@ type PredictedSafeOptions = {
 }
 
 export type paymasterOptions = {
-  paymasterAddress: string
-  paymasterTokenAddress: string
+  isSponsored?: boolean
+  sponsorshipPolicyId?: string
+  paymasterAddress?: string
+  paymasterTokenAddress?: string
   amountToApprove?: bigint
 }
 
@@ -49,7 +51,6 @@ export type Safe4337Options = {
 export type Safe4337CreateTransactionProps = {
   transactions: MetaTransactionData[]
   options?: {
-    usePaymaster?: boolean
     amountToApprove?: bigint
   }
 }
@@ -158,6 +159,7 @@ export type EstimateSponsoredFeeFunctionProps = {
   userOperation: UserOperation
   bundlerUrl: string
   entryPoint: string
+  sponsorshipPolicyId?: string
 }
 
 export type EstimateSponsoredFeeFunction = ({

@@ -14,7 +14,7 @@ const SAFE_ADDRESS = ''
 const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
 // RPC URL
-const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
+const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
 
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/

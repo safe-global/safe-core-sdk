@@ -169,9 +169,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       const safeFallbackhandler = await protocolKit.getFallbackHandler()
-      const is433FallbackhandlerPresent = safeFallbackhandler === safe4337ModuleAddress
+      const is4337FallbackhandlerPresent = safeFallbackhandler === safe4337ModuleAddress
 
-      if (!is433FallbackhandlerPresent) {
+      if (!is4337FallbackhandlerPresent) {
         throw new Error(
           `Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: ${safe4337ModuleAddress}) to ensure compatibility.`
         )

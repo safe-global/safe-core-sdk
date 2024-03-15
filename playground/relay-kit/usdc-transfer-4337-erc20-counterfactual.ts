@@ -97,7 +97,9 @@ async function main() {
   console.log('SafeOperation', estimatedAndSignedSafeOperation)
 
   // 5) Execute SafeOperation
-  const userOperationHash = await safe4337Pack.executeTransaction(estimatedAndSignedSafeOperation)
+  const userOperationHash = await safe4337Pack.executeTransaction({
+    executable: estimatedAndSignedSafeOperation
+  })
 
   console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN_NAME}`)
 

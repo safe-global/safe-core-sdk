@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
   EthersAdapter,
@@ -148,6 +149,33 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ethAdapter: ethersAdapter,
         safeAddress: options.safeAddress
       })
+
+      const safeVersion = await protocolKit.getContractVersion()
+      const isSafeVersion4337Compatible = semverSatisfies(safeVersion, '>=1.4.1')
+
+      if (!isSafeVersion4337Compatible) {
+        throw new Error(
+          `Incompatibility detected: The current Safe Account version (${safeVersion}) is not supported. EIP-4337 requires the Safe to use at least v1.4.1.`
+        )
+      }
+
+      const safeModules = (await protocolKit.getModules()) as string[]
+      const is4337ModulePresent = safeModules.some((module) => module === safe4337ModuleAddress)
+
+      if (!is4337ModulePresent) {
+        throw new Error(
+          `Incompatibility detected: The EIP-4337 module is not enabled in the provided Safe Account. Enable this module (address: ${safe4337ModuleAddress}) to add compatibility.`
+        )
+      }
+
+      const safeFallbackhandler = await protocolKit.getFallbackHandler()
+      const is4337FallbackhandlerPresent = safeFallbackhandler === safe4337ModuleAddress
+
+      if (!is4337FallbackhandlerPresent) {
+        throw new Error(
+          `Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: ${safe4337ModuleAddress}) to ensure compatibility.`
+        )
+      }
     } else {
       // New Safe will be created based on the provided configuration when bundling a new UserOperation
       if (!options.owners || !options.threshold) {

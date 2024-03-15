@@ -12,7 +12,7 @@ const CHAIN_NAME = 'sepolia'
 // const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://eth-sepolia.public.blastapi.io' // SEPOLIA
+const RPC_URL = 'https://rpc.ankr.com/eth_sepolia' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL

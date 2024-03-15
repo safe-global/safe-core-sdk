@@ -8,7 +8,7 @@ const PRIVATE_KEY = ''
 const PIMLICO_API_KEY = ''
 
 // RPC URL
-const RPC_URL = 'https://eth-sepolia.public.blastapi.io' // SEPOLIA
+const RPC_URL = 'https://rpc.ankr.com/eth_sepolia' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // CHAIN

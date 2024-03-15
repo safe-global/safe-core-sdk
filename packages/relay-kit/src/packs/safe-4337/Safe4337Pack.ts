@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
   EthersAdapter,
@@ -150,7 +151,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
 
       const safeVersion = await protocolKit.getContractVersion()
-      const isSafeVersion4337Compatible = safeVersion === DEFAULT_SAFE_VERSION
+      const isSafeVersion4337Compatible = semverSatisfies(safeVersion, '>=1.4.1')
 
       if (!isSafeVersion4337Compatible) {
         throw new Error(

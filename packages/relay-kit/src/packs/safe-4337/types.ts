@@ -56,6 +56,10 @@ export type Safe4337CreateTransactionProps = {
   }
 }
 
+export type Safe4337ExecutableProps = {
+  executable: SafeOperation
+}
+
 export type SafeUserOperation = {
   safe: string
   nonce: bigint

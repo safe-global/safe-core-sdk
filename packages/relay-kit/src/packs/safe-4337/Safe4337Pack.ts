@@ -17,6 +17,7 @@ import SafeOperation from './SafeOperation'
 import {
   EstimateFeeProps,
   Safe4337CreateTransactionProps,
+  Safe4337ExecutableProps,
   Safe4337InitOptions,
   Safe4337Options,
   SafeUserOperation,
@@ -49,6 +50,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   EstimateFeeResult: SafeOperation
   CreateTransactionProps: Safe4337CreateTransactionProps
   CreateTransactionResult: SafeOperation
+  ExecuteTransactionProps: Safe4337ExecutableProps
   ExecuteTransactionResult: string
 }> {
   #BUNDLER_URL: string
@@ -248,10 +250,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Estimates gas for the SafeOperation.
    *
-   * @param {EstimateFeeProps{SafeOperation}} safeOperation - The SafeOperation to estimate the gas.
-   * @param {EstimateFeeProps{IFeeEstimator}} feeEstimator - The fee estimator for estimating the gas.
+   * @param {EstimateFeeProps} props - The parameters for the gas estimation.
+   * @param {SafeOperation} props.safeOperation - The SafeOperation to estimate the gas.
+   * @param {IFeeEstimator} props.feeEstimator - The function to estimate the gas.
    * @return {Promise<SafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
+
   async getEstimateFee({
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()
@@ -450,7 +454,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {SafeOperation} safeOperation - The SafeOperation to execute.
    * @return {Promise<string>} The user operation hash.
    */
-  async executeTransaction(safeOperation: SafeOperation): Promise<string> {
+  async executeTransaction({
+    executable: safeOperation
+  }: Safe4337ExecutableProps): Promise<string> {
     const userOperation = safeOperation.toUserOperation()
 
     return this.sendUserOperation(userOperation)

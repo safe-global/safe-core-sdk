@@ -21,7 +21,8 @@ export const EIP712_SAFE_OPERATION_TYPE = {
 export const INTERFACES = new ethers.Interface([
   'function enableModules(address[])',
   'function multiSend(bytes memory transactions) public payable',
-  'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)'
+  'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)',
+  'function approve(address _spender, uint256 _value)'
 ])
 
 export const RPC_4337_CALLS = {
@@ -30,5 +31,6 @@ export const RPC_4337_CALLS = {
   GET_USER_OPERATION_BY_HASH: 'eth_getUserOperationByHash',
   GET_USER_OPERATION_RECEIPT: 'eth_getUserOperationReceipt',
   SUPPORTED_ENTRY_POINTS: 'eth_supportedEntryPoints',
-  CHAIN_ID: 'eth_chainId'
+  CHAIN_ID: 'eth_chainId',
+  SPONSOR_USER_OPERATION: 'pm_sponsorUserOperation'
 }

@@ -10,15 +10,25 @@ const PIMLICO_API_KEY = ''
 // Safe 4337 compatible
 const SAFE_ADDRESS = ''
 
-// Bundler URL
-const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+// CHAIN
+const CHAIN_NAME = 'sepolia'
+// const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
+const RPC_URL = 'https://rpc.ankr.com/eth_sepolia' // SEPOLIA
+// const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
+
+// Bundler URL
+const BUNDLER_URL = `https://api.pimlico.io/v1/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+
+// PAYMASTER ADDRESS
+const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
+// const paymasterAddress = '0x000000000034B78bfe02Be30AE4D324c8702803d' // GNOSIS
 
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/
-const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
+const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
+// const usdcTokenAddress = '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83' // GNOSIS
 
 async function main() {
   // Instantiate EtherAdapter
@@ -29,11 +39,16 @@ async function main() {
     signerOrProvider: signer
   })
 
-  // 1) Initialize pack
+  // 1) Initialize pack with the paymaster data
   const safe4337Pack = await Safe4337Pack.init({
     ethersAdapter,
     rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
+    paymasterOptions: {
+      paymasterTokenAddress: usdcTokenAddress,
+      paymasterAddress
+      // amountToApprove?: bigint // optional value to set the paymaster approve amount on the deployment
+    },
     options: {
       safeAddress: SAFE_ADDRESS
     }
@@ -48,7 +63,13 @@ async function main() {
 
   const usdcAmount = 100_000n // 0.1 USDC
 
-  // we transfer the USDC to the Safe Account itself
+  console.log(`sending USDC...`)
+
+  // send 5 USDC to the Safe
+  await transfer(signer, usdcTokenAddress, senderAddress, usdcAmount * 50n)
+
+  console.log(`creating the Safe batch...`)
+
   const transferUSDC = {
     to: usdcTokenAddress,
     data: generateTransferCallData(senderAddress, usdcAmount),
@@ -79,7 +100,7 @@ async function main() {
     executable: estimatedAndSignedSafeOperation
   })
 
-  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=sepolia`)
+  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN_NAME}`)
 
   let userOperationReceipt = null
   while (!userOperationReceipt) {
@@ -103,4 +124,16 @@ const generateTransferCallData = (to: string, value: bigint) => {
   const iface = new ethers.Interface([functionAbi])
 
   return iface.encodeFunctionData('transfer', [to, value])
+}
+
+async function transfer(signer: ethers.Wallet, tokenAddress: string, to: string, amount: bigint) {
+  const transferEC20 = {
+    to: tokenAddress,
+    data: generateTransferCallData(to, amount),
+    value: '0'
+  }
+
+  const transactionResponse = await signer.sendTransaction(transferEC20)
+
+  return await transactionResponse.wait()
 }

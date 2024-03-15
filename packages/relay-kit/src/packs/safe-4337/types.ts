@@ -15,9 +15,10 @@ type PredictedSafeOptions = {
 }
 
 export type paymasterOptions = {
+  paymasterUrl?: string
   isSponsored?: boolean
   sponsorshipPolicyId?: string
-  paymasterAddress?: string
+  paymasterAddress: string
   paymasterTokenAddress?: string
   amountToApprove?: bigint
 }
@@ -157,14 +158,14 @@ export type EstimateFeeFunction = ({
 
 export type EstimateSponsoredFeeFunctionProps = {
   userOperation: UserOperation
-  bundlerUrl: string
+  paymasterUrl: string
   entryPoint: string
   sponsorshipPolicyId?: string
 }
 
 export type EstimateSponsoredFeeFunction = ({
   userOperation,
-  bundlerUrl,
+  paymasterUrl,
   entryPoint
 }: EstimateSponsoredFeeFunctionProps) => Promise<EstimateSponsoredGasData>
 

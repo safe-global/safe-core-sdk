@@ -7,15 +7,21 @@ const PRIVATE_KEY = ''
 
 const PIMLICO_API_KEY = ''
 
-// Bundler URL
-const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
-
 // RPC URL
-const RPC_URL = 'https://eth-sepolia.public.blastapi.io'
+const RPC_URL = 'https://eth-sepolia.public.blastapi.io' // SEPOLIA
+// const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
+
+// CHAIN
+const CHAIN_NAME = 'sepolia'
+// const CHAIN_NAME = 'gnosis'
+
+// Bundler URL
+const BUNDLER_URL = `https://api.pimlico.io/v1/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/
-const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
+const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
+// const usdcTokenAddress = '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83' // GNOSIS
 
 async function main() {
   // Instantiate EtherAdapter
@@ -99,7 +105,7 @@ async function main() {
   // 5) Execute SafeOperation
   const userOperationHash = await safe4337Pack.executeTransaction(estimatedAndSignedSafeOperation)
 
-  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=sepolia`)
+  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN_NAME}`)
 
   let userOperationReceipt = null
   while (!userOperationReceipt) {

@@ -256,6 +256,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<SafeOperation> {
+    const userOperation = safeOperation.toUserOperation()
+
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -265,8 +267,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     if (setupEstimationData) {
       safeOperation.addEstimations(setupEstimationData)
     }
-
-    const userOperation = safeOperation.toUserOperation()
 
     const estimateUserOperationGas = await this.#bundlerClient.send(
       RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
@@ -298,9 +298,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     if (this.#paymasterOptions?.isSponsored) {
+      if (!this.#paymasterOptions.paymasterUrl) {
+        throw new Error('No paymaster url provided for a sponsored transaction')
+      }
+
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
         userOperation: safeOperation.toUserOperation(),
-        bundlerUrl: this.#BUNDLER_URL,
+        paymasterUrl: this.#paymasterOptions.paymasterUrl,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
         sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId
       })

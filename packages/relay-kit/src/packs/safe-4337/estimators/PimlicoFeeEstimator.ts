@@ -28,17 +28,17 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
 
   async getPaymasterEstimation({
     userOperation,
-    bundlerUrl,
+    paymasterUrl,
     entryPoint,
     sponsorshipPolicyId
   }: EstimateSponsoredFeeFunctionProps): Promise<EstimateSponsoredGasData> {
-    const bundlerClient = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
+    const paymasterClient = new ethers.JsonRpcProvider(paymasterUrl, undefined, {
       batchMaxCount: 1
     })
 
     const params = [userOperationToHexValues(userOperation), entryPoint]
 
-    const gasEstimate = await bundlerClient.send(
+    const gasEstimate = await paymasterClient.send(
       'pm_sponsorUserOperation',
       sponsorshipPolicyId ? [...params, { sponsorshipPolicyId }] : params
     )

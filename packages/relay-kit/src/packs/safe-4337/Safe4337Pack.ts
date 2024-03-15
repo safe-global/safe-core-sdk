@@ -164,7 +164,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       if (!is4337ModulePresent) {
         throw new Error(
-          `Incompatibility detected: The EIP-4337 module is not attached to the Safe Account. Attach this module (address: ${safe4337ModuleAddress}) to ensure compatibility.`
+          `Incompatibility detected: The EIP-4337 module is not enabled in the provided Safe Account. Enable this module (address: ${safe4337ModuleAddress}) to add compatibility.`
         )
       }
 

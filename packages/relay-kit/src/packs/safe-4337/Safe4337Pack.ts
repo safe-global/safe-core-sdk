@@ -159,7 +159,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
 
-      const isApproveTransactionRequired = paymasterOptions && !isSponsored && paymasterTokenAddress
+      const isApproveTransactionRequired =
+        !!paymasterOptions && !isSponsored && !!paymasterTokenAddress
 
       if (isApproveTransactionRequired) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions

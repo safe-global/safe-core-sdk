@@ -148,6 +148,33 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ethAdapter: ethersAdapter,
         safeAddress: options.safeAddress
       })
+
+      const safeVersion = await protocolKit.getContractVersion()
+      const isSafeVersion4337Compatible = safeVersion === DEFAULT_SAFE_VERSION
+
+      if (!isSafeVersion4337Compatible) {
+        throw new Error(
+          `Incompatibility detected: The current Safe Account version (${safeVersion}) is not supported. EIP-4337 requires version ${DEFAULT_SAFE_VERSION}.`
+        )
+      }
+
+      const safeModules = (await protocolKit.getModules()) as string[]
+      const is4337ModulePresent = safeModules.some((module) => module === safe4337ModuleAddress)
+
+      if (!is4337ModulePresent) {
+        throw new Error(
+          `Incompatibility detected: The EIP-4337 module is not attached to the Safe Account. Attach this module (address: ${safe4337ModuleAddress}) to ensure compatibility.`
+        )
+      }
+
+      const safeFallbackhandler = await protocolKit.getFallbackHandler()
+      const is433FallbackhandlerPresent = safeFallbackhandler === safe4337ModuleAddress
+
+      if (!is433FallbackhandlerPresent) {
+        throw new Error(
+          `Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: ${safe4337ModuleAddress}) to ensure compatibility.`
+        )
+      }
     } else {
       // New Safe will be created based on the provided configuration when bundling a new UserOperation
       if (!options.owners || !options.threshold) {

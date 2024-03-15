@@ -7,6 +7,7 @@ import {
   IFeeEstimator
 } from '../types'
 import { userOperationToHexValues } from '../utils'
+import { RPC_4337_CALLS } from '../constants'
 
 export class PimlicoFeeEstimator implements IFeeEstimator {
   async setupEstimation({ bundlerUrl }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
@@ -36,12 +37,11 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       batchMaxCount: 1
     })
 
-    const params = [userOperationToHexValues(userOperation), entryPoint]
+    const params = sponsorshipPolicyId
+      ? [userOperationToHexValues(userOperation), entryPoint, { sponsorshipPolicyId }]
+      : [userOperationToHexValues(userOperation), entryPoint]
 
-    const gasEstimate = await paymasterClient.send(
-      'pm_sponsorUserOperation',
-      sponsorshipPolicyId ? [...params, { sponsorshipPolicyId }] : params
-    )
+    const gasEstimate = await paymasterClient.send(RPC_4337_CALLS.SPONSOR_USER_OPERATION, params)
 
     return gasEstimate
   }

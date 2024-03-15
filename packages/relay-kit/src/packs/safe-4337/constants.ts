@@ -31,5 +31,6 @@ export const RPC_4337_CALLS = {
   GET_USER_OPERATION_BY_HASH: 'eth_getUserOperationByHash',
   GET_USER_OPERATION_RECEIPT: 'eth_getUserOperationReceipt',
   SUPPORTED_ENTRY_POINTS: 'eth_supportedEntryPoints',
-  CHAIN_ID: 'eth_chainId'
+  CHAIN_ID: 'eth_chainId',
+  SPONSOR_USER_OPERATION: 'pm_sponsorUserOperation'
 }

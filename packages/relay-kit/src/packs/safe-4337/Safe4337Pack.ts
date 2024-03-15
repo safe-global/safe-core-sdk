@@ -157,22 +157,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
       let deploymentTo = addModulesLibAddress
       let deploymentData = INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]])
 
-      const isApproveTransactionRequired = !paymasterOptions?.isSponsored && !!paymasterOptions
+      const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
+
+      const isApproveTransactionRequired = paymasterOptions && !isSponsored && paymasterTokenAddress
 
       if (isApproveTransactionRequired) {
-        const {
-          paymasterAddress,
-          paymasterTokenAddress,
-          amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE
-        } = paymasterOptions
-
-        if (!paymasterAddress) {
-          throw new Error('No paymaster address provided for a non-sponsored transaction')
-        }
-
-        if (!paymasterTokenAddress) {
-          throw new Error('No paymaster token provided for a non-sponsored transaction')
-        }
+        const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
 
         const enable4337ModulesTransaction = {
           to: addModulesLibAddress,

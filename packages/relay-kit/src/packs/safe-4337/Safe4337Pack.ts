@@ -155,7 +155,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       if (!isSafeVersion4337Compatible) {
         throw new Error(
-          `Incompatibility detected: The current Safe Account version (${safeVersion}) is not supported. EIP-4337 requires version ${DEFAULT_SAFE_VERSION}.`
+          `Incompatibility detected: The current Safe Account version (${safeVersion}) is not supported. EIP-4337 requires the Safe to use at least v1.4.1.`
         )
       }
 

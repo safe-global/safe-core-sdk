@@ -133,7 +133,6 @@ export const networks: NetworkShortName[] = [
   { chainId: 13337n, shortName: 'beam-testnet' },
   { chainId: 13371n, shortName: 'imx' },
   { chainId: 13473n, shortName: 'imx-testnet' },
-  { chainId: 15003n, shortName: 'imx-devnet' },
   { chainId: 17000n, shortName: 'holesky' },
   { chainId: 23294n, shortName: 'sapphire' },
   { chainId: 23295n, shortName: 'sapphire-testnet' },

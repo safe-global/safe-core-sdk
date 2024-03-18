@@ -135,6 +135,8 @@ export const networks: NetworkShortName[] = [
   { chainId: 11891n, shortName: 'Arianee' },
   { chainId: 12357n, shortName: 'rei-testnet' },
   { chainId: 13337n, shortName: 'beam-testnet' },
+  { chainId: 13371n, shortName: 'imx' },
+  { chainId: 13473n, shortName: 'imx-testnet' },
   { chainId: 17000n, shortName: 'holesky' },
   { chainId: 17172n, shortName: 'eclipse' },
   { chainId: 18231n, shortName: 'unreal' },

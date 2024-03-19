@@ -356,7 +356,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
-    const { amountToApprove } = options
+
+    const { amountToApprove, validUntil, validAfter } = options
 
     if (amountToApprove) {
       if (!this.#paymasterOptions || !this.#paymasterOptions.paymasterTokenAddress) {
@@ -410,7 +411,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation.initCode = await this.protocolKit.getInitCode()
     }
 
-    return new SafeOperation(userOperation, this.#ENTRYPOINT_ADDRESS)
+    return new SafeOperation(userOperation, {
+      entryPoint: this.#ENTRYPOINT_ADDRESS,
+      validUntil,
+      validAfter
+    })
   }
 
   /**
@@ -453,10 +458,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
-    const signedSafeOperation = new SafeOperation(
-      safeOperation.toUserOperation(),
-      this.#ENTRYPOINT_ADDRESS
-    )
+    const signedSafeOperation = new SafeOperation(safeOperation.toUserOperation(), {
+      entryPoint: this.#ENTRYPOINT_ADDRESS,
+      validUntil: safeOperation.data.validUntil,
+      validAfter: safeOperation.data.validAfter
+    })
 
     signedSafeOperation.signatures.forEach((signature: SafeSignature) => {
       signedSafeOperation.addSignature(signature)

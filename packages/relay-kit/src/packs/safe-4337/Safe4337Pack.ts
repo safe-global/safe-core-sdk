@@ -297,10 +297,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const usePaymaster = userOperation.paymasterAndData !== '0x'
-    const hasSafeDeployment = userOperation.initCode !== '0x'
 
-    // adjustment only needed for deployments without paymaster
-    if (!usePaymaster && hasSafeDeployment) {
+    // adjustment only needed if no paymaster is present
+    if (!usePaymaster) {
       const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
         bundlerUrl: this.#BUNDLER_URL,
         entryPoint: this.#ENTRYPOINT_ADDRESS,

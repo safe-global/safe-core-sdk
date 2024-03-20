@@ -29,7 +29,7 @@ if (PK) {
 }
 
 const config: HardhatUserConfig = {
-  defaultNetwork: 'goerli',
+  defaultNetwork: 'sepolia',
   paths: {
     tests: TESTS_PATH
   },
@@ -39,9 +39,9 @@ const config: HardhatUserConfig = {
       blockGasLimit: 100000000,
       gas: 100000000
     },
-    goerli: {
+    sepolia: {
       ...sharedNetworkConfig,
-      url: 'https://rpc.ankr.com/eth_goerli'
+      url: 'https://rpc.ankr.com/eth_sepolia'
     }
   },
   //@ts-expect-error Type not found

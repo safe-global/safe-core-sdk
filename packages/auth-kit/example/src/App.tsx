@@ -204,7 +204,7 @@ function App() {
           symbol: 'ETH',
           decimals: 18
         },
-        rpcUrls: ['https://base.publicnode.com'],
+        rpcUrls: ['https://rpc.ankr.com/base'],
         blockExplorerUrls: ['https://basescan.org/']
       }
     ])

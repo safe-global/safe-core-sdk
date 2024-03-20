@@ -83,10 +83,15 @@ async function main() {
   }
 
   const transactions = [transferUSDC, transferUSDC]
+  const timestamp = (await provider.getBlock('latest'))?.timestamp || 0
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
-    transactions
+    transactions,
+    options: {
+      validAfter: timestamp,
+      validUntil: timestamp + 60000
+    }
   })
 
   // 3) Estimate SafeOperation fee

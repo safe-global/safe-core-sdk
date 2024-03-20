@@ -4,11 +4,16 @@ import { buildSignatureBytes } from '@safe-global/protocol-kit'
 
 import { EstimateGasData, SafeUserOperation, UserOperation } from './types'
 
+type SafeOperationOptions = { entryPoint: string; validAfter?: number; validUntil?: number }
+
 class SafeOperation {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
 
-  constructor(userOperation: UserOperation, entryPoint: string) {
+  constructor(
+    userOperation: UserOperation,
+    { entryPoint, validAfter, validUntil }: SafeOperationOptions
+  ) {
     this.data = {
       safe: userOperation.sender,
       nonce: BigInt(userOperation.nonce),
@@ -20,8 +25,8 @@ class SafeOperation {
       maxFeePerGas: userOperation.maxFeePerGas,
       maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas,
       paymasterAndData: userOperation.paymasterAndData,
-      validAfter: 0n,
-      validUntil: 0n,
+      validAfter: validAfter || 0,
+      validUntil: validUntil || 0,
       entryPoint
     }
   }

@@ -51,6 +51,8 @@ export type Safe4337CreateTransactionProps = {
   transactions: MetaTransactionData[]
   options?: {
     amountToApprove?: bigint
+    validUntil?: number
+    validAfter?: number
   }
 }
 
@@ -69,8 +71,8 @@ export type SafeUserOperation = {
   maxFeePerGas: bigint
   maxPriorityFeePerGas: bigint
   paymasterAndData: string
-  validAfter: bigint
-  validUntil: bigint
+  validAfter: number
+  validUntil: number
   entryPoint: string
 }
 

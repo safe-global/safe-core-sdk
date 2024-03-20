@@ -38,7 +38,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
       const options: SafeAuthInitOptions = {
         enableLogging: true,
         showWidgetButton: false,
-        chainConfig: { chainId: '0x5', rpcTarget: 'https://ethereum-goerli.publicnode.com' }
+        chainConfig: { chainId: '0x5', rpcTarget: 'https://rpc.ankr.com/eth_goerli' }
       }
 
       await authPack.init(options)

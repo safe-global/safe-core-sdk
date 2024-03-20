@@ -68,8 +68,8 @@ async function main() {
 
   console.log(`sending USDC...`)
 
-  // send 5 USDC to the Safe
-  await transfer(signer, usdcTokenAddress, senderAddress, usdcAmount * 50n)
+  // send 15 USDC to the Safe
+  await transfer(signer, usdcTokenAddress, senderAddress, usdcAmount * 150n)
 
   console.log(`creating the Safe batch...`)
 
@@ -85,8 +85,8 @@ async function main() {
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp,
-      validUntil: timestamp + 60000
+      validAfter: timestamp - 60_000,
+      validUntil: timestamp + 60_000
     }
   })
 

@@ -61,8 +61,8 @@ async function main() {
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp,
-      validUntil: timestamp + 60000
+      validAfter: timestamp - 60_000,
+      validUntil: timestamp + 60_000
     }
   })
 

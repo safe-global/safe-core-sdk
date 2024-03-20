@@ -40,12 +40,10 @@ export type Safe4337InitOptions = {
 export type Safe4337Options = {
   protocolKit: Safe
   bundlerUrl: string
-  rpcUrl: string
   paymasterOptions?: paymasterOptions
   bundlerClient: ethers.JsonRpcProvider
   publicClient: ethers.JsonRpcProvider
   entryPointAddress: string
-  addModulesLibAddress: string
   safe4337ModuleAddress: string
 }
 

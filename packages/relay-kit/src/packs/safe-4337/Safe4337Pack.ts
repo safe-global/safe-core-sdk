@@ -55,10 +55,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
   ExecuteTransactionResult: string
 }> {
   #BUNDLER_URL: string
-  #RPC_URL: string
 
   #ENTRYPOINT_ADDRESS: string
-  #ADD_MODULES_LIB_ADDRESS: string = '0x'
   #SAFE_4337_MODULE_ADDRESS: string = '0x'
 
   #bundlerClient: ethers.JsonRpcProvider
@@ -77,15 +75,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
     publicClient,
     bundlerUrl,
     paymasterOptions,
-    rpcUrl,
     entryPointAddress,
-    addModulesLibAddress,
     safe4337ModuleAddress
   }: Safe4337Options) {
     super(protocolKit)
 
     this.#BUNDLER_URL = bundlerUrl
-    this.#RPC_URL = rpcUrl
 
     this.#bundlerClient = bundlerClient
     this.#publicClient = publicClient
@@ -93,7 +88,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#paymasterOptions = paymasterOptions
 
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
-    this.#ADD_MODULES_LIB_ADDRESS = addModulesLibAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
   }
 
@@ -259,9 +253,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       publicClient,
       paymasterOptions,
       bundlerUrl,
-      rpcUrl,
       entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
-      addModulesLibAddress,
       safe4337ModuleAddress
     })
   }
@@ -410,7 +402,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation.initCode = await this.protocolKit.getInitCode()
     }
 
-    return new SafeOperation(userOperation, this.#ENTRYPOINT_ADDRESS)
+    const safeOperation = new SafeOperation(userOperation, this.#ENTRYPOINT_ADDRESS)
+
+    return await this.getEstimateFee({
+      safeOperation
+    })
   }
 
   /**

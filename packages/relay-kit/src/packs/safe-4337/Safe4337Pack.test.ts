@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { EthersAdapter } from '@safe-global/protocol-kit'
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
 import { Safe4337Pack } from './Safe4337Pack'
 import dotenv from 'dotenv'
 
@@ -46,31 +46,38 @@ describe('Safe4337Pack', () => {
     jest.clearAllMocks()
   })
 
-  it('should be able to instantiate the pack using a existing Safe', async () => {
-    const safe4337Pack = await Safe4337Pack.init({
-      ethersAdapter,
-      rpcUrl: RPC_URL,
-      bundlerUrl: BUNDLER_URL,
-      options: {
-        safeAddress: SAFE_ADDRESS_v1_4_1
-      }
+  describe('When using Safe Accounts with version lesser than 1.4.1', () => {
+    it('should throw an error if the Safe account version is not greater than 1.4.1', async () => {
+      await expect(
+        Safe4337Pack.init({
+          ethersAdapter,
+          rpcUrl: RPC_URL,
+          bundlerUrl: BUNDLER_URL,
+          options: {
+            safeAddress: SAFE_ADDRESS_v1_3_0
+          }
+        })
+      ).rejects.toThrow(
+        'Incompatibility detected: The current Safe Account version (1.3.0) is not supported. EIP-4337 requires the Safe to use at least v1.4.1.'
+      )
     })
-
-    expect(safe4337Pack).toBeInstanceOf(Safe4337Pack)
   })
 
-  it('should throw an error if the Safe account version is not greater than 1.4.1', async () => {
-    await expect(
-      Safe4337Pack.init({
+  describe('When using Safe Accounts with version 1.4.1 or greater', () => {
+    it('should be able to instantiate the pack using a existing Safe', async () => {
+      const safe4337Pack = await Safe4337Pack.init({
         ethersAdapter,
         rpcUrl: RPC_URL,
         bundlerUrl: BUNDLER_URL,
         options: {
-          safeAddress: SAFE_ADDRESS_v1_3_0
+          safeAddress: SAFE_ADDRESS_v1_4_1
         }
       })
-    ).rejects.toThrow(
-      'Incompatibility detected: The current Safe Account version (1.3.0) is not supported. EIP-4337 requires the Safe to use at least v1.4.1.'
-    )
+
+      expect(safe4337Pack).toBeInstanceOf(Safe4337Pack)
+      expect(safe4337Pack.protocolKit).toBeInstanceOf(Safe)
+      expect(await safe4337Pack.protocolKit.getAddress()).toBe(SAFE_ADDRESS_v1_4_1)
+      expect(await safe4337Pack.getChainId()).toBe('0xaa36a7')
+    })
   })
 })

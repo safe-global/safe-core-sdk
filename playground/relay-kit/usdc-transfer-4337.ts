@@ -1,6 +1,6 @@
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
-import { Safe4337Pack, PimlicoFeeEstimator } from '@safe-global/relay-kit'
+import { Safe4337Pack } from '@safe-global/relay-kit'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -61,22 +61,14 @@ async function main() {
     transactions
   })
 
-  // 3) Estimate SafeOperation fee
-  const feeEstimator = new PimlicoFeeEstimator()
-  const estimatedSafeOperation = await safe4337Pack.getEstimateFee({
-    safeOperation,
-    feeEstimator
-  })
+  // 3) Sign SafeOperation
+  const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
-  // 4) Sign SafeOperation
-  const estimatedAndSignedSafeOperation =
-    await safe4337Pack.signSafeOperation(estimatedSafeOperation)
+  console.log('SafeOperation', signedSafeOperation)
 
-  console.log('SafeOperation', estimatedAndSignedSafeOperation)
-
-  // 5) Execute SafeOperation
+  // 4) Execute SafeOperation
   const userOperationHash = await safe4337Pack.executeTransaction({
-    executable: estimatedAndSignedSafeOperation
+    executable: signedSafeOperation
   })
 
   console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=sepolia`)

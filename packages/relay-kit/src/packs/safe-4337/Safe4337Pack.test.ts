@@ -1,16 +1,17 @@
 import { ethers } from 'ethers'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
-import { Safe4337Pack } from './Safe4337Pack'
-import dotenv from 'dotenv'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
-import * as constants from './constants'
-import SafeOperation from './SafeOperation'
 import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
+import { Safe4337Pack } from './Safe4337Pack'
+import SafeOperation from './SafeOperation'
+import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
+
+import dotenv from 'dotenv'
 
 dotenv.config()
 
@@ -32,7 +33,7 @@ jest.mock('./utils', () => ({
           return fixtures.GAS_ESTIMATION
 
         case constants.RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH:
-          return fixtures.USER_OPERATION
+          return fixtures.USER_OPERATION_BY_HASH
 
         case constants.RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT:
           return fixtures.USER_OPERATION_RECEIPT

@@ -8,6 +8,8 @@ import {
 } from '@safe-global/safe-modules-deployments'
 import { Safe4337InitOptions } from './types'
 import * as constants from './constants'
+import SafeOperation from './SafeOperation'
+import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
 dotenv.config()
 
@@ -40,6 +42,13 @@ jest.mock('./utils', () => ({
     }
   })
 }))
+
+const generateTransferCallData = (to: string, value: bigint) => {
+  const functionAbi = 'function transfer(address _to, uint256 _value) returns (bool)'
+  const iface = new ethers.Interface([functionAbi])
+
+  return iface.encodeFunctionData('transfer', [to, value])
+}
 
 const createSafe4337Pack = async (
   initOptions: Partial<Safe4337InitOptions>
@@ -258,6 +267,136 @@ describe('Safe4337Pack', () => {
           }
         }
       })
+    })
+  })
+
+  describe('When creating a new SafeOperation', () => {
+    let safe4337Pack: Safe4337Pack
+    let transferUSDC: MetaTransactionData
+
+    beforeAll(async () => {
+      safe4337Pack = await createSafe4337Pack({
+        options: {
+          safeAddress: SAFE_ADDRESS_v1_4_1
+        }
+      })
+
+      transferUSDC = {
+        to: PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(SAFE_ADDRESS_v1_4_1, 100_000n),
+        value: '0',
+        operation: 0
+      }
+    })
+
+    it('should allow to use a transaction batch', async () => {
+      const transactions = [transferUSDC, transferUSDC]
+
+      const safeOperation = await safe4337Pack.createTransaction({
+        transactions
+      })
+
+      expect(safeOperation).toBeInstanceOf(SafeOperation)
+      expect(safeOperation.data).toMatchObject({
+        safe: SAFE_ADDRESS_v1_4_1,
+        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        initCode: '0x',
+        paymasterAndData: '0x',
+        callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
+          await safe4337Pack.protocolKit.getMultiSendAddress(),
+          '0',
+          constants.INTERFACES.encodeFunctionData('multiSend', [
+            protocolKit.encodeMultiSendData(transactions)
+          ]),
+          1
+        ]),
+        nonce: 1n,
+        callGasLimit: 1n,
+        validAfter: 0,
+        validUntil: 0,
+        maxFeePerGas: 1n,
+        maxPriorityFeePerGas: 1n,
+        verificationGasLimit: 1n,
+        preVerificationGas: 1n
+      })
+    })
+
+    it('should allow to use a single transaction', async () => {
+      const safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      expect(safeOperation).toBeInstanceOf(SafeOperation)
+      expect(safeOperation.data).toMatchObject({
+        safe: SAFE_ADDRESS_v1_4_1,
+        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        initCode: '0x',
+        paymasterAndData: '0x',
+        callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
+          transferUSDC.to,
+          transferUSDC.value,
+          transferUSDC.data,
+          0
+        ]),
+        nonce: 1n,
+        callGasLimit: 1n,
+        validAfter: 0,
+        validUntil: 0,
+        maxFeePerGas: 1n,
+        maxPriorityFeePerGas: 1n,
+        verificationGasLimit: 1n,
+        preVerificationGas: 1n
+      })
+    })
+
+    it('should fill the initCode property when the Safe does not exist', async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        options: {
+          owners: [OWNER_1],
+          threshold: 1
+        }
+      })
+
+      const getInitCodeSpy = jest.spyOn(safe4337Pack.protocolKit, 'getInitCode')
+
+      const safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      expect(getInitCodeSpy).toHaveBeenCalled()
+      expect(safeOperation.data.initCode).toBe(
+        '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec671688f0b900000000000000000000000029fcb43b46531bca003ddc8fcb67ffe91900c7620000000000000000000000000000000000000000000000000000000000000060ad27de2a410652abce96ea0fdfc30c2f0fd35952b78f554667111999a28ff33800000000000000000000000000000000000000000000000000000000000001e4b63e800d000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000010000000000000000000000008ecd4ec46d4d2a6b64fe960b3d64e8b94b2234eb0000000000000000000000000000000000000000000000000000000000000140000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ffac5578be8ac1b2b9d13b34caf4a074b96b8a1b00000000000000000000000000000000000000000000000000000000000000648d0dc49f00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+      )
+    })
+  })
+
+  it('should all to sign a SafeOperation', async () => {
+    const transferUSDC = {
+      to: PAYMASTER_TOKEN_ADDRESS,
+      data: generateTransferCallData(SAFE_ADDRESS_v1_4_1, 100_000n),
+      value: '0',
+      operation: 0
+    }
+
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: SAFE_ADDRESS_v1_4_1
+      }
+    })
+
+    const safeOperation = await safe4337Pack.createTransaction({
+      transactions: [transferUSDC]
+    })
+
+    expect(await safe4337Pack.signSafeOperation(safeOperation)).toMatchObject({
+      signatures: new Map().set(
+        OWNER_1.toLowerCase(),
+        new protocolKit.EthSafeSignature(
+          OWNER_1,
+          '0x1199e9efb83d194d6a94e6b3d2a392fb1f072c68e83092bbf2fa15e7632b3af836791575f96be6f5890220e6386a30c05c8d6597919942c014ef3cc87e165f061c',
+          false
+        )
+      )
     })
   })
 })

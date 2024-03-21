@@ -343,7 +343,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
 
-    const { amountToApprove, validUntil, validAfter } = options
+    const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
     if (amountToApprove) {
       if (!this.#paymasterOptions || !this.#paymasterOptions.paymasterTokenAddress) {
@@ -404,7 +404,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     })
 
     return await this.getEstimateFee({
-      safeOperation
+      safeOperation,
+      feeEstimator
     })
   }
 

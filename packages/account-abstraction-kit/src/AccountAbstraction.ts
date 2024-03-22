@@ -3,7 +3,8 @@ import { RelayKitBasePack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
   MetaTransactionOptions,
-  EthAdapter
+  EthAdapter,
+  SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -91,14 +92,14 @@ class AccountAbstraction {
       throw new Error('relayKit not initialized. Call setRelayKit(pack) first')
     }
 
-    const relayedTransaction = await this.relayKit.createRelayedTransaction({
+    const relayedTransaction = (await this.relayKit.createTransaction({
       transactions,
       options
-    })
+    })) as SafeTransaction
 
     const signedSafeTransaction = await this.protocolKit.signTransaction(relayedTransaction)
 
-    return await this.relayKit.executeRelayTransaction(signedSafeTransaction, options)
+    return this.relayKit.executeTransaction({ executable: signedSafeTransaction, options })
   }
 }
 

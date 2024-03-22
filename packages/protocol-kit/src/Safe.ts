@@ -19,6 +19,7 @@ import {
 import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
+  getPredictedSafeAddressInitCode,
   predictSafeAddress
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
@@ -185,6 +186,26 @@ class Safe {
     return await Safe.create({
       safeAddress: await this.getAddress(),
       ...configProps
+    })
+  }
+
+  /**
+   * Returns the initialization code to deploy a Safe account based on the predicted address.
+   *
+   * @returns The Safe configuration
+   */
+  async getInitCode(): Promise<string> {
+    if (!this.#predictedSafe) {
+      throw new Error('The Safe already exists')
+    }
+
+    const chainId = await this.#ethAdapter.getChainId()
+
+    return getPredictedSafeAddressInitCode({
+      ethAdapter: this.#ethAdapter,
+      chainId,
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
+      ...this.#predictedSafe
     })
   }
 

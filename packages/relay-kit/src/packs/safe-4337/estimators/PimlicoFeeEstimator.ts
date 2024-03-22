@@ -6,14 +6,12 @@ import {
   EstimateSponsoredGasData,
   IFeeEstimator
 } from '../types'
-import { userOperationToHexValues } from '../utils'
+import { getEip4337BundlerProvider, userOperationToHexValues } from '../utils'
 import { RPC_4337_CALLS } from '../constants'
 
 export class PimlicoFeeEstimator implements IFeeEstimator {
   async setupEstimation({ bundlerUrl }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    const bundlerClient = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
-      batchMaxCount: 1
-    })
+    const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
 
     const feeData = await this.#getFeeData(bundlerClient)
 
@@ -33,9 +31,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     entryPoint,
     sponsorshipPolicyId
   }: EstimateSponsoredFeeFunctionProps): Promise<EstimateSponsoredGasData> {
-    const paymasterClient = new ethers.JsonRpcProvider(paymasterUrl, undefined, {
-      batchMaxCount: 1
-    })
+    const paymasterClient = getEip4337BundlerProvider(paymasterUrl)
 
     const params = sponsorshipPolicyId
       ? [userOperationToHexValues(userOperation), entryPoint, { sponsorshipPolicyId }]

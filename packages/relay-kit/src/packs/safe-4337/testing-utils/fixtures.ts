@@ -6,7 +6,8 @@ export const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C72
 export const CHAIN_ID = '0xaa36a7'
 
 export const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
-export const BUNDLER_URL = 'https://rpc.ankr.com/eth_sepolia'
+export const BUNDLER_URL = 'https://bundler.url'
+export const PAYMASTER_URL = 'https://paymaster.url'
 
 export const USER_OPERATION_HASH =
   '0x3cb881d1969036174f38d636d22108d1d032145518b53104fc0b1e1296d2cc9c'
@@ -86,4 +87,13 @@ export const GAS_ESTIMATION = {
   verificationGasLimit: '0x186A0',
   preVerificationGas: '0x186A0',
   callGasLimit: '0x186A0'
+}
+
+export const SPONSORED_GAS_ESTIMATION = {
+  paymasterAndData: '0x1405B3659a11a16459fc27Fa1925b60388C38Ce1',
+  ...GAS_ESTIMATION
+}
+
+export const USER_OPERATION_GAS_PRICE = {
+  fast: { maxFeePerGas: '0x186A0', maxPriorityFeePerGas: '0x30D40' }
 }

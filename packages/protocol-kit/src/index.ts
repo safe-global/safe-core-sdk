@@ -12,7 +12,7 @@ import {
   SignMessageLibBaseContractEthers
 } from './adapters/ethers'
 import {
-  CreateCallWeb3Contract,
+  CreateCallBaseContractWeb3,
   MultiSendBaseContractWeb3,
   MultiSendCallOnlyBaseContractWeb3,
   SafeContractWeb3,
@@ -104,7 +104,7 @@ export {
   ContractManager,
   ContractNetworksConfig,
   CreateCallBaseContractEthers,
-  CreateCallWeb3Contract,
+  CreateCallBaseContractWeb3,
   createERC20TokenTransferTransaction,
   CreateTransactionProps,
   DEFAULT_SAFE_VERSION,

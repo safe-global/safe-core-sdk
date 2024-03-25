@@ -1,5 +1,5 @@
 import EthersAdapter, { EthersAdapterConfig } from './EthersAdapter'
-import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
+import CreateCallBaseContractEthers from './contracts/CreateCall/CreateCallBaseContractEthers'
 import MultiSendBaseContractEthers from './contracts/MultiSend/MultiSendBaseContractEthers'
 import MultiSendCallOnlyBaseContractEthers from './contracts/MultiSend/MultiSendCallOnlyBaseContractEthers'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
@@ -8,7 +8,7 @@ import SignMessageLibBaseContractEthers from './contracts/SignMessageLib/SignMes
 import { EthersTransactionOptions, EthersTransactionResult } from './types'
 
 export {
-  CreateCallEthersContract,
+  CreateCallBaseContractEthers,
   EthersAdapter,
   EthersAdapterConfig,
   EthersTransactionOptions,

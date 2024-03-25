@@ -1,6 +1,6 @@
 import Safe from './Safe'
 import {
-  CreateCallEthersContract,
+  CreateCallBaseContractEthers,
   EthersAdapter,
   EthersAdapterConfig,
   EthersTransactionOptions,
@@ -103,7 +103,7 @@ export {
   ConnectSafeConfigWithSafeAddress,
   ContractManager,
   ContractNetworksConfig,
-  CreateCallEthersContract,
+  CreateCallBaseContractEthers,
   CreateCallWeb3Contract,
   createERC20TokenTransferTransaction,
   CreateTransactionProps,

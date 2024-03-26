@@ -8,6 +8,8 @@ import SafeProxyFactoryContract_v1_0_0_Web3 from '@safe-global/protocol-kit/adap
 import SafeProxyFactoryContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1_Web3'
 import SafeProxyFactoryContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0_Web3'
 import SafeProxyFactoryContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Web3'
+import SimulateTxAccessorContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Web3'
+import SimulateTxAccessorContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Web3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
 import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
@@ -20,11 +22,13 @@ import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/c
 import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Create_call'
-import { Simulate_tx_accessor as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Simulate_tx_accessor'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Compatibility_fallback_handler'
 import { Create_call as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Create_call'
-import { Simulate_tx_accessor as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Simulate_tx_accessor'
-import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
+import {
+  SafeVersion,
+  SignMessageLibContract,
+  SimulateTxAccessorContract
+} from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Web3 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Web3'
 import CompatibilityFallbackHandler_V1_4_1_Web3 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Web3'
 import CreateCallContract_V1_3_0_Web3 from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Web3'
@@ -36,8 +40,6 @@ import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendC
 import MultiSendCallOnlyContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
 import SignMessageLibContract_v1_3_0_Web3 from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Web3'
 import SignMessageLibContract_v1_4_1_Web3 from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Web3'
-import SimulateTxAccessorContract_V1_3_0_Web3 from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Web3'
-import SimulateTxAccessorContract_V1_4_1_Web3 from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Web3'
 import { MultiSendContract_v1_4_1_Abi as MultiSendContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
 import { MultiSendContract_v1_3_0_Abi as MultiSendContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
 import { MultiSendContract_v1_1_1_Abi as MultiSendContract_v1_1_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
@@ -45,7 +47,9 @@ import { MultiSendCallOnlyContract_v1_3_0_Abi as MultiSendCallOnlyContract_v1_3_
 import { MultiSendCallOnlyContract_v1_4_1_Abi as MultiSendCallOnlyContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
 import { SignMessageLibContract_v1_4_1_Abi as SignMessageLibContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import { SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import { DeepWriteable } from '../types'
+import { SimulateTxAccessorContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
+import { SimulateTxAccessorContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 
 type MultiSendContract_v1_1_1_Abi = DeepWriteable<MultiSendContract_v1_1_1_Abi_Readonly>
 type MultiSendContract_v1_3_0_Abi = DeepWriteable<MultiSendContract_v1_3_0_Abi_Readonly>
@@ -322,19 +326,36 @@ export function getCreateCallContractInstance(
   }
 }
 
-export function getSimulateTxAccessorContractInstance(
+export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
-  simulateTxAccessorContract: SimulateTxAccessor_V1_4_1 | SimulateTxAccessor_V1_3_0
-): SimulateTxAccessorContract_V1_4_1_Web3 | SimulateTxAccessorContract_V1_3_0_Web3 {
+  contractAddress: string,
+  web3Adapter: Web3Adapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+): Promise<SimulateTxAccessorContract> {
+  const chainId = await web3Adapter.getChainId()
+  let simulateTxAccessorContract
+
   switch (safeVersion) {
     case '1.4.1':
-      return new SimulateTxAccessorContract_V1_4_1_Web3(
-        simulateTxAccessorContract as SimulateTxAccessor_V1_4_1
+      simulateTxAccessorContract = new SimulateTxAccessorContract_v1_4_1_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as SimulateTxAccessorContract_v1_4_1_Abi
       )
+
+      // TODO: Remove this mapper after remove typechain
+      return simulateTxAccessorContract.mapToTypechainContract()
     case '1.3.0':
-      return new SimulateTxAccessorContract_V1_3_0_Web3(
-        simulateTxAccessorContract as SimulateTxAccessor_V1_3_0
+      simulateTxAccessorContract = new SimulateTxAccessorContract_v1_3_0_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as SimulateTxAccessorContract_v1_3_0_Abi
       )
+
+      // TODO: Remove this mapper after remove typechain
+      return simulateTxAccessorContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }

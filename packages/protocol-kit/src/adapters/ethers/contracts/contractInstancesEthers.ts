@@ -2,11 +2,13 @@ import { AbstractSigner, Provider } from 'ethers'
 import { AbiItem } from 'web3-utils'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Create_call__factory'
-import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Simulate_tx_accessor__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Compatibility_fallback_handler__factory'
 import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Create_call__factory'
-import { Simulate_tx_accessor__factory as SimulateTxAccessor_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Simulate_tx_accessor__factory'
-import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
+import {
+  SafeVersion,
+  SignMessageLibContract,
+  SimulateTxAccessorContract
+} from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
 import CompatibilityFallbackHandler_V1_4_1_Ethers from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Ethers'
 import CreateCallContract_V1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Ethers'
@@ -18,8 +20,6 @@ import MultiSendCallOnlyContract_V1_3_0_Ethers from './MultiSend/v1.3.0/MultiSen
 import MultiSendCallOnlyContract_V1_4_1_Ethers from './MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Ethers'
 import SignMessageLibContract_V1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Ethers'
 import SignMessageLibContract_V1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Ethers'
-import SimulateTxAccessorContract_V1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_V1_3_0_Ethers'
-import SimulateTxAccessorContract_V1_4_1_Ethers from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_V1_4_1_Ethers'
 import SafeContract_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Ethers'
 import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Ethers'
 import SafeContract_v1_2_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Ethers'
@@ -29,6 +29,8 @@ import SafeProxyFactoryContract_v1_0_0_Ethers from '@safe-global/protocol-kit/ad
 import SafeProxyFactoryContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1_Ethers'
 import SafeProxyFactoryContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0_Ethers'
 import SafeProxyFactoryContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Ethers'
+import SimulateTxAccessorContract_V1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0_Ethers'
+import SimulateTxAccessorContract_V1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Ethers'
 import EthersAdapter from '../EthersAdapter'
 import { SafeContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
 import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
@@ -46,6 +48,8 @@ import { SafeProxyFactoryContract_v1_0_0_Abi } from '@safe-global/protocol-kit/c
 import { SafeProxyFactoryContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
 import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
 import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
+import { SimulateTxAccessorContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
+import { SimulateTxAccessorContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -327,25 +331,29 @@ export function getCreateCallContractInstance(
   }
 }
 
-export function getSimulateTxAccessorContractInstance(
+export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: AbstractSigner | Provider
-): SimulateTxAccessorContract_V1_4_1_Ethers | SimulateTxAccessorContract_V1_3_0_Ethers {
-  let simulateTxAccessorContract
+  ethersAdapter: EthersAdapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+): Promise<SimulateTxAccessorContract> {
+  const chainId = await ethersAdapter.getChainId()
+
   switch (safeVersion) {
     case '1.4.1':
-      simulateTxAccessorContract = SimulateTxAccessor_V1_4_1.connect(
+      return new SimulateTxAccessorContract_V1_4_1_Ethers(
+        chainId,
+        ethersAdapter,
         contractAddress,
-        signerOrProvider
+        customContractAbi as unknown as SimulateTxAccessorContract_v1_4_1_Abi
       )
-      return new SimulateTxAccessorContract_V1_4_1_Ethers(simulateTxAccessorContract)
     case '1.3.0':
-      simulateTxAccessorContract = SimulateTxAccessor_V1_3_0.connect(
+      return new SimulateTxAccessorContract_V1_3_0_Ethers(
+        chainId,
+        ethersAdapter,
         contractAddress,
-        signerOrProvider
+        customContractAbi as unknown as SimulateTxAccessorContract_v1_3_0_Abi
       )
-      return new SimulateTxAccessorContract_V1_3_0_Ethers(simulateTxAccessorContract)
     default:
       throw new Error('Invalid Safe version')
   }

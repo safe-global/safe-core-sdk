@@ -7,13 +7,13 @@ import {
   EthAdapterTransaction,
   GetContractProps,
   SafeEIP712Args,
-  SignMessageLibContract
+  SignMessageLibContract,
+  SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
-import SimulateTxAccessorEthersContract from './contracts/SimulateTxAccessor/SimulateTxAccessorEthersContract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -235,16 +235,21 @@ class EthersAdapter implements EthAdapter {
   async getSimulateTxAccessorContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<SimulateTxAccessorEthersContract> {
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<SimulateTxAccessorContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SimulateTxAccessor contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
-    return getSimulateTxAccessorContractInstance(safeVersion, contractAddress, signerOrProvider)
+    return getSimulateTxAccessorContractInstance(
+      safeVersion,
+      contractAddress,
+      this,
+      customContractAbi
+    )
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {

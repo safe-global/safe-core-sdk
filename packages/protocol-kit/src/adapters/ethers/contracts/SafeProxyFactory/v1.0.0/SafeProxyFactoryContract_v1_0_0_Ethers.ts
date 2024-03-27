@@ -4,9 +4,10 @@ import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapt
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import safeProxyFactory_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.0.0/proxy_factory'
 import {
-  EncodeSafeProxyFactoryFunction,
-  EstimateGasSafeProxyFactoryFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryBaseContract'
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 import SafeProxyFactoryContract_v1_0_0_Contract, {
   SafeProxyFactoryContract_v1_0_0_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
@@ -57,23 +58,18 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContract_v1_0_0_Abi> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<SafeProxyFactoryContract_v1_0_0_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  estimateGas: EstimateGasSafeProxyFactoryFunction<
-    SafeProxyFactoryContract_v1_0_0_Abi,
-    EthersTransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
-    const contractMethodToStimate = this.contract.getFunction(functionToEstimate)
+  estimateGas: EstimateGasFunction<SafeProxyFactoryContract_v1_0_0_Abi, EthersTransactionOptions> =
+    (functionToEstimate, args, options = {}) => {
+      const contractMethodToStimate = this.contract.getFunction(functionToEstimate)
 
-    return contractMethodToStimate.estimateGas(...args, options)
-  }
+      return contractMethodToStimate.estimateGas(...args, options)
+    }
 
-  getAddress(): Promise<string> {
+  getAddress: GetAddressFunction = () => {
     return this.contract.getAddress()
   }
 

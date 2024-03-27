@@ -338,29 +338,22 @@ export async function getSimulateTxAccessorContractInstance(
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<SimulateTxAccessorContract> {
   const chainId = await ethersAdapter.getChainId()
-  let simulateTxAccessorContract
 
   switch (safeVersion) {
     case '1.4.1':
-      simulateTxAccessorContract = new SimulateTxAccessorContract_V1_4_1_Ethers(
+      return new SimulateTxAccessorContract_V1_4_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
         customContractAbi as unknown as SimulateTxAccessorContract_v1_4_1_Abi
       )
-
-      // TODO: Remove this mapper after remove typechain
-      return simulateTxAccessorContract.mapToTypechainContract()
     case '1.3.0':
-      simulateTxAccessorContract = new SimulateTxAccessorContract_V1_3_0_Ethers(
+      return new SimulateTxAccessorContract_V1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
         customContractAbi as unknown as SimulateTxAccessorContract_v1_3_0_Abi
       )
-
-      // TODO: Remove this mapper after remove typechain
-      return simulateTxAccessorContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }

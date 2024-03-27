@@ -12,21 +12,21 @@ import {
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 
 /**
- * SimulateTxAccessorContract_V1_4_1_Web3 is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
+ * SimulateTxAccessorContract_v1_4_1_Web3 is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
  *
  * This class specializes in handling interactions with the SimulateTxAccessor contract version 1.4.1 using Web3.js.
  *
  * @extends SimulateTxAccessorBaseContractWeb3<SimulateTxAccessorContract_v1_4_1_Abi> - Inherits from SimulateTxAccessorBaseContractWeb3 with ABI specific to SimulateTxAccessor contract version 1.4.1.
  * @implements SimulateTxAccessorContract_v1_4_1_Contract - Implements the interface specific to SimulateTxAccessor contract version 1.4.1.
  */
-class SimulateTxAccessorContract_V1_4_1_Web3
+class SimulateTxAccessorContract_v1_4_1_Web3
   extends SimulateTxAccessorBaseContractWeb3<DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi>>
   implements SimulateTxAccessorContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SimulateTxAccessorContract_V1_4_1_Web3
+   * Constructs an instance of SimulateTxAccessorContract_v1_4_1_Web3
    *
    * @param chainId - The chain ID where the contract resides.
    * @param web3Adapter - An instance of Web3Adapter.
@@ -71,17 +71,6 @@ class SimulateTxAccessorContract_V1_4_1_Web3
   ) => {
     return this.contract.methods.simulate(...args).call()
   }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      getAddress: this.getAddress.bind(this),
-
-      encode: this.encode.bind(this)
-    }
-  }
 }
 
-export default SimulateTxAccessorContract_V1_4_1_Web3
+export default SimulateTxAccessorContract_v1_4_1_Web3

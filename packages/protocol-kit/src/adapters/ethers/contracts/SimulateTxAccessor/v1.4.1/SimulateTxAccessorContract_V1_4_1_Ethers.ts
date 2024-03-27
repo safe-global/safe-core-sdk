@@ -11,21 +11,21 @@ import {
 } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/SimulateTxAccessorBaseContract'
 
 /**
- * SimulateTxAccessorContract_V1_4_1_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
+ * SimulateTxAccessorContract_v1_4_1_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
  *
  * This class specializes in handling interactions with the SimulateTxAccessor contract version 1.4.1 using Ethers.js v6.
  *
  * @extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi> - Inherits from SimulateTxAccessorBaseContractEthers with ABI specific to SimulateTxAccessor contract version 1.4.1.
  * @implements SimulateTxAccessorContract_v1_4_1_Contract - Implements the interface specific to SimulateTxAccessor contract version 1.4.1.
  */
-class SimulateTxAccessorContract_V1_4_1_Ethers
+class SimulateTxAccessorContract_v1_4_1_Ethers
   extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi>
   implements SimulateTxAccessorContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SimulateTxAccessorContract_V1_4_1_Ethers
+   * Constructs an instance of SimulateTxAccessorContract_v1_4_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
    * @param ethersAdapter - An instance of EthersAdapter.
@@ -62,17 +62,6 @@ class SimulateTxAccessorContract_V1_4_1_Ethers
   ) => {
     return this.contract.simulate(...args)
   }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      getAddress: this.getAddress.bind(this),
-
-      encode: this.encode.bind(this)
-    }
-  }
 }
 
-export default SimulateTxAccessorContract_V1_4_1_Ethers
+export default SimulateTxAccessorContract_v1_4_1_Ethers

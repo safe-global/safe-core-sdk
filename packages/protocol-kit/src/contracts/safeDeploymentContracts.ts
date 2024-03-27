@@ -123,7 +123,8 @@ export async function getSafeContract({
     safeVersion,
     singletonDeployment,
     customContractAddress: customSafeAddress ?? customContracts?.safeSingletonAddress,
-    customContractAbi: customContracts?.safeSingletonAbi
+    customContractAbi: customContracts?.safeSingletonAbi,
+    isL1SafeSingleton
   })
   const isContractDeployed = await ethAdapter.isContractDeployed(await safeContract.getAddress())
   if (!isContractDeployed) {

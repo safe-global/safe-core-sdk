@@ -3,14 +3,6 @@ import {
   EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
-import { Gnosis_safe as Safe_V1_0_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.0.0/Gnosis_safe'
-import { Gnosis_safe as Safe_V1_1_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.1.1/Gnosis_safe'
-import { Gnosis_safe as Safe_V1_2_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.2.0/Gnosis_safe'
-import {
-  Gnosis_safeInterface as SafeInterface,
-  Gnosis_safe as Safe_V1_3_0
-} from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/Gnosis_safe'
-import { Safe as Safe_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/Safe'
 import {
   SafeContract,
   SafeSetupConfig,
@@ -19,10 +11,9 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 
+// TODO remove class when Typechain is removed
 abstract class SafeContractEthers implements SafeContract {
-  constructor(
-    public contract: Safe_V1_4_1 | Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1 | Safe_V1_0_0
-  ) {}
+  constructor(public contract: any) {}
 
   abstract setup(
     setupConfig: SafeSetupConfig,
@@ -170,7 +161,7 @@ abstract class SafeContractEthers implements SafeContract {
     return toTxResult(txResponse, options)
   }
 
-  encode: SafeInterface['encodeFunctionData'] = (methodName: any, params: any): string => {
+  encode = (methodName: any, params: any): string => {
     return this.contract.interface.encodeFunctionData(methodName, params)
   }
 

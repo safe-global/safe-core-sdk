@@ -1,20 +1,36 @@
+import {
+  DeploymentFilter,
+  SingletonDeployment,
+  getCompatibilityFallbackHandlerDeployment,
+  getCreateCallDeployment,
+  getMultiSendCallOnlyDeployment,
+  getMultiSendDeployment,
+  getProxyFactoryDeployment,
+  getSafeL2SingletonDeployment,
+  getSafeSingletonDeployment,
+  getSignMessageLibDeployment,
+  getSimulateTxAccessorDeployment
+} from '@safe-global/safe-deployments'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
 export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
 
-type SafeDeploymentsVersions = {
-  [version: string]: {
-    safeSingletonVersion: string
-    safeSingletonL2Version?: string
-    safeProxyFactoryVersion: string
-    compatibilityFallbackHandler: string
-    multiSendVersion: string
-    multiSendCallOnlyVersion?: string
-    signMessageLibVersion?: string
-    createCallVersion?: string
-  }
+type contractNames = {
+  safeSingletonVersion: string
+  safeSingletonL2Version?: string
+  safeProxyFactoryVersion: string
+  compatibilityFallbackHandler: string
+  multiSendVersion: string
+  multiSendCallOnlyVersion?: string
+  signMessageLibVersion?: string
+  createCallVersion?: string
+  simulateTxAccessorVersion?: string
 }
+
+type SafeDeploymentsVersions = Record<SafeVersion, contractNames>
+
+export type contractName = keyof contractNames
 
 export const safeDeploymentsVersions: SafeDeploymentsVersions = {
   '1.4.1': {
@@ -25,7 +41,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendVersion: '1.4.1',
     multiSendCallOnlyVersion: '1.4.1',
     signMessageLibVersion: '1.4.1',
-    createCallVersion: '1.4.1'
+    createCallVersion: '1.4.1',
+    simulateTxAccessorVersion: '1.4.1'
   },
   '1.3.0': {
     safeSingletonVersion: '1.3.0',
@@ -35,7 +52,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendVersion: '1.3.0',
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
-    createCallVersion: '1.3.0'
+    createCallVersion: '1.3.0',
+    simulateTxAccessorVersion: '1.3.0'
   },
   '1.2.0': {
     safeSingletonVersion: '1.2.0',
@@ -72,3 +90,36 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
 export const safeDeploymentsL1ChainIds = [
   1n // Ethereum Mainnet
 ]
+
+const contractFunctions: Record<
+  contractName,
+  (filter?: DeploymentFilter) => SingletonDeployment | undefined
+> = {
+  safeSingletonVersion: getSafeSingletonDeployment,
+  safeSingletonL2Version: getSafeL2SingletonDeployment,
+  safeProxyFactoryVersion: getProxyFactoryDeployment,
+  compatibilityFallbackHandler: getCompatibilityFallbackHandlerDeployment,
+  multiSendVersion: getMultiSendDeployment,
+  multiSendCallOnlyVersion: getMultiSendCallOnlyDeployment,
+  signMessageLibVersion: getSignMessageLibDeployment,
+  createCallVersion: getCreateCallDeployment,
+  simulateTxAccessorVersion: getSimulateTxAccessorDeployment
+}
+
+export function getContractDeployment(
+  safeVersion: SafeVersion,
+  chainId: bigint,
+  contractName: contractName
+) {
+  const contractVersion = safeDeploymentsVersions[safeVersion][contractName]
+
+  const filters: DeploymentFilter = {
+    version: contractVersion,
+    network: chainId.toString(),
+    released: true
+  }
+
+  const deployment = contractFunctions[contractName](filters)
+
+  return deployment
+}

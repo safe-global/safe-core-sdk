@@ -81,6 +81,7 @@ export async function estimateGas(
     data,
     operation
   ])
+
   const safeFunctionToEstimate = safeContract.encode('simulateAndRevert', [
     await simulateTxAccessorContract.getAddress(),
     transactionDataToEstimate

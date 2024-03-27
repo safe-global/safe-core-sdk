@@ -26,6 +26,7 @@ export interface GetContractProps {
   singletonDeployment?: SingletonDeployment
   customContractAddress?: string
   customContractAbi?: AbiItem | AbiItem[]
+  isL1SafeSingleton?: boolean
 }
 
 export interface EthAdapter {
@@ -39,7 +40,8 @@ export interface EthAdapter {
     safeVersion,
     singletonDeployment,
     customContractAddress,
-    customContractAbi
+    customContractAbi,
+    isL1SafeSingleton
   }: GetContractProps): Promise<SafeContract>
   getMultiSendContract({
     safeVersion,

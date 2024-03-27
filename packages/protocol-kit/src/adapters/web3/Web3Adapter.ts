@@ -1,10 +1,14 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import { SigningMethod } from '@safe-global/protocol-kit/types'
 import {
+  CreateCallContract,
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeEIP712Args
+  SafeEIP712Args,
+  SignMessageLibContract,
+  SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
@@ -15,13 +19,7 @@ import { AbiItem } from 'web3-utils'
 // Migration guide https://docs.web3js.org/docs/guides/web3_migration_guide#types
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
-import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
-import MultiSendWeb3Contract from './contracts/MultiSend/MultiSendWeb3Contract'
-import MultiSendCallOnlyWeb3Contract from './contracts/MultiSendCallOnly/MultiSendCallOnlyWeb3Contract'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
-import SafeProxyFactoryWeb3Contract from './contracts/SafeProxyFactory/SafeProxyFactoryWeb3Contract'
-import SignMessageLibWeb3Contract from './contracts/SignMessageLib/SignMessageLibWeb3Contract'
-import SimulateTxAccessorWeb3Contract from './contracts/SimulateTxAccessor/SimulateTxAccessorWeb3Contract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -32,7 +30,11 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesWeb3'
-import { SigningMethod } from '@safe-global/protocol-kit/types'
+import MultiSendContract_v1_1_1_Web3 from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
+import MultiSendContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
+import MultiSendContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Web3'
+import MultiSendCallOnlyContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
+import MultiSendCallOnlyContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -88,7 +90,8 @@ class Web3Adapter implements EthAdapter {
     safeVersion,
     singletonDeployment,
     customContractAddress,
-    customContractAbi
+    customContractAbi,
+    isL1SafeSingleton
   }: GetContractProps): Promise<SafeContractWeb3> {
     const chainId = await this.getChainId()
     const contractAddress =
@@ -96,11 +99,14 @@ class Web3Adapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxy contract address')
     }
-    const safeContract = this.getContract(
+
+    return getSafeContractInstance(
+      safeVersion,
       contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+      this,
+      customContractAbi,
+      isL1SafeSingleton
     )
-    return getSafeContractInstance(safeVersion, safeContract)
   }
 
   async getSafeProxyFactoryContract({
@@ -108,18 +114,19 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SafeProxyFactoryWeb3Contract> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
-    const proxyFactoryContract = this.getContract(
+    return getSafeProxyFactoryContractInstance(
+      safeVersion,
       contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+      this,
+      customContractAbi
     )
-    return getSafeProxyFactoryContractInstance(safeVersion, proxyFactoryContract)
   }
 
   async getMultiSendContract({
@@ -127,18 +134,16 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<MultiSendWeb3Contract> {
+  }: GetContractProps): Promise<
+    MultiSendContract_v1_4_1_Web3 | MultiSendContract_v1_3_0_Web3 | MultiSendContract_v1_1_1_Web3
+  > {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSend contract address')
     }
-    const multiSendContract = this.getContract(
-      contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
-    return getMultiSendContractInstance(safeVersion, multiSendContract)
+    return getMultiSendContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getMultiSendCallOnlyContract({
@@ -146,18 +151,21 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<MultiSendCallOnlyWeb3Contract> {
+  }: GetContractProps): Promise<
+    MultiSendCallOnlyContract_v1_4_1_Web3 | MultiSendCallOnlyContract_v1_3_0_Web3
+  > {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid MultiSendCallOnly contract address')
     }
-    const multiSendContract = this.getContract(
+    return getMultiSendCallOnlyContractInstance(
+      safeVersion,
       contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+      this,
+      customContractAbi
     )
-    return getMultiSendCallOnlyContractInstance(safeVersion, multiSendContract)
   }
 
   async getCompatibilityFallbackHandlerContract({
@@ -184,18 +192,15 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SignMessageLibWeb3Contract> {
+  }: GetContractProps): Promise<SignMessageLibContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SignMessageLib contract address')
     }
-    const signMessageLibContract = this.getContract(
-      contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
-    return getSignMessageLibContractInstance(safeVersion, signMessageLibContract)
+
+    return getSignMessageLibContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getCreateCallContract({
@@ -203,18 +208,14 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CreateCallWeb3Contract> {
+  }: GetContractProps): Promise<CreateCallContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
     }
-    const createCallContract = this.getContract(
-      contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
-    return getCreateCallContractInstance(safeVersion, createCallContract)
+    return getCreateCallContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getSimulateTxAccessorContract({
@@ -222,18 +223,19 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SimulateTxAccessorWeb3Contract> {
+  }: GetContractProps): Promise<SimulateTxAccessorContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SimulateTxAccessor contract address')
     }
-    const simulateTxAccessorContract = this.getContract(
+    return getSimulateTxAccessorContractInstance(
+      safeVersion,
       contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+      this,
+      customContractAbi
     )
-    return getSimulateTxAccessorContractInstance(safeVersion, simulateTxAccessorContract)
   }
 
   getContract(address: string, abi: AbiItem | AbiItem[], options?: ContractOptions): any {

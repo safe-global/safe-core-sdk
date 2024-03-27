@@ -7,7 +7,7 @@ import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
 import { getEthAdapter } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
-import { OperationType } from 'packages/safe-core-sdk-types/dist/src'
+import { OperationType } from '@safe-global/safe-core-sdk-types/dist/src'
 
 chai.use(chaiAsPromised)
 

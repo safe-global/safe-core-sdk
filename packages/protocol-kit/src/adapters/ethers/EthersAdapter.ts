@@ -1,5 +1,6 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import {
+  CreateCallContract,
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
@@ -12,7 +13,6 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
-import CreateCallEthersContract from './contracts/CreateCall/CreateCallEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -220,16 +220,16 @@ class EthersAdapter implements EthAdapter {
   async getCreateCallContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<CreateCallEthersContract> {
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<CreateCallContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
-    return getCreateCallContractInstance(safeVersion, contractAddress, signerOrProvider)
+    return getCreateCallContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getSimulateTxAccessorContract({

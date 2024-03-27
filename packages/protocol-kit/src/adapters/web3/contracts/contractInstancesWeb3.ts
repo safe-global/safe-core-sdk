@@ -21,18 +21,17 @@ import { SafeProxyFactoryContract_v1_1_1_Abi } from '@safe-global/protocol-kit/c
 import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
 import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Compatibility_fallback_handler'
-import { Create_call as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.3.0/Create_call'
 import { Compatibility_fallback_handler as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Compatibility_fallback_handler'
-import { Create_call as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.4.1/Create_call'
 import {
+  CreateCallContract,
   SafeVersion,
   SignMessageLibContract,
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Web3 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Web3'
 import CompatibilityFallbackHandler_V1_4_1_Web3 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Web3'
-import CreateCallContract_V1_3_0_Web3 from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Web3'
-import CreateCallContract_V1_4_1_Web3 from './CreateCall/v1.4.1/CreateCallEthersContract_V1_4_1_Web3'
+import CreateCallContract_V1_3_0_Web3 from './CreateCall/v1.3.0/CreateCallContract_v1_3_0_Web3'
+import CreateCallContract_V1_4_1_Web3 from './CreateCall/v1.4.1/CreateCallContract_v1_4_1_Web3'
 import MultiSendContract_V1_1_1_Web3 from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
 import MultiSendContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
 import MultiSendContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendContract_V1_4_1_Web3'
@@ -40,6 +39,8 @@ import MultiSendCallOnlyContract_V1_3_0_Web3 from './MultiSend/v1.3.0/MultiSendC
 import MultiSendCallOnlyContract_V1_4_1_Web3 from './MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
 import SignMessageLibContract_v1_3_0_Web3 from './SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Web3'
 import SignMessageLibContract_v1_4_1_Web3 from './SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Web3'
+import { CreateCallContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import { CreateCallContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import { MultiSendContract_v1_4_1_Abi as MultiSendContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
 import { MultiSendContract_v1_3_0_Abi as MultiSendContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
 import { MultiSendContract_v1_1_1_Abi as MultiSendContract_v1_1_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
@@ -309,18 +310,39 @@ export async function getSignMessageLibContractInstance(
   }
 }
 
-export function getCreateCallContractInstance(
+export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
-  createCallContract: CreateCall_V1_4_1 | CreateCall_V1_3_0
-): CreateCallContract_V1_4_1_Web3 | CreateCallContract_V1_3_0_Web3 {
+  contractAddress: string,
+  web3Adapter: Web3Adapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+): Promise<CreateCallContract> {
+  const chainId = await web3Adapter.getChainId()
+  let createCallContract
+
   switch (safeVersion) {
     case '1.4.1':
-      return new CreateCallContract_V1_4_1_Web3(createCallContract as CreateCall_V1_4_1)
+      createCallContract = new CreateCallContract_V1_4_1_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as CreateCallContract_v1_4_1_Abi
+      )
+
+      // TODO: Remove this mapper after remove typechain
+      return createCallContract.mapToTypechainContract()
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new CreateCallContract_V1_3_0_Web3(createCallContract as CreateCall_V1_3_0)
+      createCallContract = new CreateCallContract_V1_3_0_Web3(
+        chainId,
+        web3Adapter,
+        contractAddress,
+        customContractAbi as unknown as CreateCallContract_v1_3_0_Abi
+      )
+
+      // TODO: Remove this mapper after remove typechain
+      return createCallContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }

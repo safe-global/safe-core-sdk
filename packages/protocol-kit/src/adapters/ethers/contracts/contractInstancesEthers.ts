@@ -1,18 +1,17 @@
 import { AbstractSigner, Provider } from 'ethers'
 import { AbiItem } from 'web3-utils'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Compatibility_fallback_handler__factory'
-import { Create_call__factory as CreateCall_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Create_call__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Compatibility_fallback_handler__factory'
-import { Create_call__factory as CreateCall_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Create_call__factory'
 import {
+  CreateCallContract,
   SafeVersion,
   SignMessageLibContract,
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import CompatibilityFallbackHandler_V1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandler_V1_3_0_Ethers'
 import CompatibilityFallbackHandler_V1_4_1_Ethers from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandler_V1_4_1_Ethers'
-import CreateCallContract_V1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallEthersContract_V1_3_0_Ethers'
-import CreateCallContract_V1_4_1_Ethers from './CreateCall/v1.4.1/CreateCallEthersContract_V1_4_1_Ethers'
+import CreateCallContract_V1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallContract_v1_3_0_Ethers'
+import CreateCallContract_V1_4_1_Ethers from './CreateCall/v1.4.1/CreateCallContract_v1_4_1_Ethers'
 import MultiSendContract_V1_1_1_Ethers from './MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
 import MultiSendContract_V1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
 import MultiSendContract_V1_4_1_Ethers from './MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
@@ -32,16 +31,18 @@ import SafeProxyFactoryContract_v1_4_1_Ethers from '@safe-global/protocol-kit/ad
 import SimulateTxAccessorContract_V1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0_Ethers'
 import SimulateTxAccessorContract_V1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Ethers'
 import EthersAdapter from '../EthersAdapter'
-import { SafeContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
-import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
-import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
-import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
-import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
+import { CreateCallContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import { CreateCallContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import { MultiSendContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
 import { MultiSendContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
 import { MultiSendContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
 import { MultiSendCallOnlyContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import { MultiSendCallOnlyContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
+import { SafeContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
+import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
+import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
+import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
+import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
 import { SignMessageLibContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import { SignMessageLibContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 import { SafeProxyFactoryContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
@@ -310,22 +311,38 @@ export async function getSignMessageLibContractInstance(
   }
 }
 
-export function getCreateCallContractInstance(
+export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  signerOrProvider: AbstractSigner | Provider
-): CreateCallContract_V1_4_1_Ethers | CreateCallContract_V1_3_0_Ethers {
+  ethersAdapter: EthersAdapter,
+  customContractAbi?: AbiItem | AbiItem[] | undefined
+): Promise<CreateCallContract> {
+  const chainId = await ethersAdapter.getChainId()
   let createCallContract
   switch (safeVersion) {
     case '1.4.1':
-      createCallContract = CreateCall_V1_4_1.connect(contractAddress, signerOrProvider)
-      return new CreateCallContract_V1_4_1_Ethers(createCallContract)
+      createCallContract = new CreateCallContract_V1_4_1_Ethers(
+        chainId,
+        ethersAdapter,
+        contractAddress,
+        customContractAbi as unknown as CreateCallContract_v1_4_1_Abi
+      )
+
+      // TODO: Remove this mapper after remove typechain
+      return createCallContract.mapToTypechainContract()
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      createCallContract = CreateCall_V1_3_0.connect(contractAddress, signerOrProvider)
-      return new CreateCallContract_V1_3_0_Ethers(createCallContract)
+      createCallContract = new CreateCallContract_V1_3_0_Ethers(
+        chainId,
+        ethersAdapter,
+        contractAddress,
+        customContractAbi as unknown as CreateCallContract_v1_3_0_Abi
+      )
+
+      // TODO: Remove this mapper after remove typechain
+      return createCallContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }

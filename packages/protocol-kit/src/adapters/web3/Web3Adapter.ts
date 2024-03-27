@@ -1,13 +1,14 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import {
+  CreateCallContract,
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
   SafeEIP712Args,
   SignMessageLibContract,
-  CreateCallContract
+  SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
@@ -19,7 +20,6 @@ import { AbiItem } from 'web3-utils'
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
-import SimulateTxAccessorWeb3Contract from './contracts/SimulateTxAccessor/SimulateTxAccessorWeb3Contract'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -223,18 +223,19 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SimulateTxAccessorWeb3Contract> {
+  }: GetContractProps): Promise<SimulateTxAccessorContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid SimulateTxAccessor contract address')
     }
-    const simulateTxAccessorContract = this.getContract(
+    return getSimulateTxAccessorContractInstance(
+      safeVersion,
       contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+      this,
+      customContractAbi
     )
-    return getSimulateTxAccessorContractInstance(safeVersion, simulateTxAccessorContract)
   }
 
   getContract(address: string, abi: AbiItem | AbiItem[], options?: ContractOptions): any {

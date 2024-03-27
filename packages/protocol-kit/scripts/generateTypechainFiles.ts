@@ -16,12 +16,10 @@ const outDirTests = 'typechain/tests/'
 const safeContractsPath = '../../node_modules/@safe-global/safe-deployments/dist/assets'
 
 const safeContracts_V1_4_1 = [
-  `${safeContractsPath}/v1.4.1/compatibility_fallback_handler.json`,
-  `${safeContractsPath}/v1.4.1/simulate_tx_accessor.json`
+  `${safeContractsPath}/v1.4.1/compatibility_fallback_handler.json`
 ].join(' ')
 const safeContracts_V1_3_0 = [
-  `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`,
-  `${safeContractsPath}/v1.3.0/simulate_tx_accessor.json`
+  `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`
 ].join(' ')
 
 // Won't be included in dist/ folder

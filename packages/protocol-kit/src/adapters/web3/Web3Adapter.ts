@@ -1,6 +1,7 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import {
+  CreateCallContract,
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
@@ -18,7 +19,6 @@ import { AbiItem } from 'web3-utils'
 // Migration guide https://docs.web3js.org/docs/guides/web3_migration_guide#types
 import type { JsonRPCResponse, Provider } from 'web3/providers'
 import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
-import CreateCallWeb3Contract from './contracts/CreateCall/CreateCallWeb3Contract'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -208,18 +208,14 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CreateCallWeb3Contract> {
+  }: GetContractProps): Promise<CreateCallContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid CreateCall contract address')
     }
-    const createCallContract = this.getContract(
-      contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
-    )
-    return getCreateCallContractInstance(safeVersion, createCallContract)
+    return getCreateCallContractInstance(safeVersion, contractAddress, this, customContractAbi)
   }
 
   async getSimulateTxAccessorContract({

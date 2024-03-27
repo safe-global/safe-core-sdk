@@ -8,6 +8,6 @@ import BaseContract from '@safe-global/protocol-kit/contracts/AbiType/common/Bas
  * @type {CompatibilityFallbackHandlerBaseContract}
  */
 type CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContractAbi extends Abi> =
-  BaseContract<CompatibilityFallbackHandlerContractAbi>
+  BaseContract<CompatibilityFallbackHandlerContractAbi, never>
 
 export default CompatibilityFallbackHandlerBaseContract

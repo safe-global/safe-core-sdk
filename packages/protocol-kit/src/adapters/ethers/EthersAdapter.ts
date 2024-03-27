@@ -1,5 +1,6 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import {
+  CompatibilityFallbackHandlerContract,
   CreateCallContract,
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
@@ -12,7 +13,6 @@ import {
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
-import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -185,19 +185,20 @@ class EthersAdapter implements EthAdapter {
   async getCompatibilityFallbackHandlerContract({
     safeVersion,
     singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<CompatibilityFallbackHandlerContractEthers> {
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps): Promise<CompatibilityFallbackHandlerContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid CompatibilityFallbackHandler contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
     return getCompatibilityFallbackHandlerContractInstance(
       safeVersion,
       contractAddress,
-      signerOrProvider
+      this,
+      customContractAbi
     )
   }
 

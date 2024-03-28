@@ -11,11 +11,11 @@ import SignMessageLibContract_v1_3_0_Contract, {
 import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
-  EncodeSignMessageLibFunction,
-  EstimateGasSignMessageLibFunction,
-  GetAddressSignMessageLibFunction,
-  SignMessageFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/SignMessageLibBaseContract'
+  AdapterSepcificContractFunction,
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 // Remove all nested `readonly` modifiers from the ABI type
 type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1_3_0_Abi_Readonly>
@@ -30,7 +30,7 @@ type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1
  */
 class SignMessageLibContract_v1_3_0_Web3
   extends SignMessageLibBaseContractWeb3<SignMessageLibContract_v1_3_0_Abi>
-  implements SignMessageLibContract_v1_3_0_Contract
+  implements SignMessageLibContract_v1_3_0_Contract<Web3Adapter>
 {
   safeVersion: SafeVersion
 
@@ -57,14 +57,11 @@ class SignMessageLibContract_v1_3_0_Web3
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSignMessageLibFunction<SignMessageLibContract_v1_3_0_Abi_Readonly> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<SignMessageLibContract_v1_3_0_Abi_Readonly> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 
-  estimateGas: EstimateGasSignMessageLibFunction<
+  estimateGas: EstimateGasFunction<
     SignMessageLibContract_v1_3_0_Abi_Readonly,
     Web3TransactionOptions
   > = (functionToEstimate, args, options = {}) => {
@@ -73,7 +70,7 @@ class SignMessageLibContract_v1_3_0_Web3
       .then(BigInt)
   }
 
-  getAddress: GetAddressSignMessageLibFunction = () => {
+  getAddress: GetAddressFunction = () => {
     return Promise.resolve(this.contract.options.address)
   }
 
@@ -81,9 +78,10 @@ class SignMessageLibContract_v1_3_0_Web3
     return [await this.contract.methods.getMessageHash(...args).call()]
   }
 
-  signMessage: SignMessageFunction<
+  signMessage: AdapterSepcificContractFunction<
     SignMessageLibContract_v1_3_0_Abi_Readonly,
-    Web3TransactionOptions
+    Web3Adapter,
+    'signMessage'
   > = async (data, options) => {
     if (options && !options.gas) {
       options.gas = Number(await this.estimateGas('signMessage', data, { ...options }))

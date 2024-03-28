@@ -9,12 +9,12 @@ import CreateCallContract_v1_3_0_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCall_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CreateCall/v1.3.0/create_call'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeCreateCallFunction,
-  EstimateGasCreateCallFunction,
-  GetAddressCreateCallFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/CreateCallBaseContract'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
+import {
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * CreateCallContract_V1_3_0_Ethers is the implementation specific to the CreateCall contract version 1.3.0.
@@ -26,7 +26,7 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
  */
 class CreateCallContract_V1_3_0_Ethers
   extends CreateCallBaseContractEthers<CreateCallContract_v1_3_0_Abi>
-  implements CreateCallContract_v1_3_0_Contract
+  implements CreateCallContract_v1_3_0_Contract<EthersAdapter>
 {
   safeVersion: SafeVersion
 
@@ -52,18 +52,19 @@ class CreateCallContract_V1_3_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressCreateCallFunction = () => {
+  getAddress: GetAddressFunction = () => {
     return this.contract.getAddress()
   }
 
-  encode: EncodeCreateCallFunction<CreateCallContract_v1_3_0_Abi> = (functionToEncode, args) => {
+  encode: EncodeFunction<CreateCallContract_v1_3_0_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  estimateGas: EstimateGasCreateCallFunction<
-    CreateCallContract_v1_3_0_Abi,
-    EthersTransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
+  estimateGas: EstimateGasFunction<CreateCallContract_v1_3_0_Abi, EthersTransactionOptions> = (
+    functionToEstimate,
+    args,
+    options = {}
+  ) => {
     const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
 
     return contractMethodToEstimate.estimateGas(...args, options)

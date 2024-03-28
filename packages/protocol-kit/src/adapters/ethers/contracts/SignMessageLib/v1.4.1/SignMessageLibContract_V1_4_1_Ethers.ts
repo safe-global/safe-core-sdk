@@ -8,11 +8,11 @@ import SignMessageLibContract_v1_4_1_Contract, {
 import multisend_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.4.1/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
-  EncodeSignMessageLibFunction,
-  EstimateGasSignMessageLibFunction,
-  GetAddressSignMessageLibFunction,
-  SignMessageFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/SignMessageLibBaseContract'
+  AdapterSepcificContractFunction,
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SignMessageLibContract_v1_4_1_Ethers is the implementation specific to the SignMessageLib contract version 1.4.1.
@@ -24,7 +24,7 @@ import {
  */
 class SignMessageLibContract_v1_4_1_Ethers
   extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_4_1_Abi>
-  implements SignMessageLibContract_v1_4_1_Contract
+  implements SignMessageLibContract_v1_4_1_Contract<EthersAdapter>
 {
   safeVersion: SafeVersion
 
@@ -50,23 +50,21 @@ class SignMessageLibContract_v1_4_1_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSignMessageLibFunction<SignMessageLibContract_v1_4_1_Abi> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<SignMessageLibContract_v1_4_1_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  estimateGas: EstimateGasSignMessageLibFunction<
-    SignMessageLibContract_v1_4_1_Abi,
-    EthersTransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
+  estimateGas: EstimateGasFunction<SignMessageLibContract_v1_4_1_Abi, EthersTransactionOptions> = (
+    functionToEstimate,
+    args,
+    options = {}
+  ) => {
     const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
 
     return contractMethodToEstimate.estimateGas(...args, options)
   }
 
-  getAddress: GetAddressSignMessageLibFunction = () => {
+  getAddress: GetAddressFunction = () => {
     return this.contract.getAddress()
   }
 
@@ -74,16 +72,19 @@ class SignMessageLibContract_v1_4_1_Ethers
     return [await this.contract.getMessageHash(...args)]
   }
 
-  signMessage: SignMessageFunction<SignMessageLibContract_v1_4_1_Abi, EthersTransactionOptions> =
-    async (data, options) => {
-      if (options && !options.gasLimit) {
-        options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
-      }
-
-      const txResponse = await this.contract.signMessage(data, { ...options })
-
-      return toTxResult(txResponse, options)
+  signMessage: AdapterSepcificContractFunction<
+    SignMessageLibContract_v1_4_1_Abi,
+    EthersAdapter,
+    'signMessage'
+  > = async (data, options) => {
+    if (options && !options.gasLimit) {
+      options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
+
+    const txResponse = await this.contract.signMessage(data, { ...options })
+
+    return toTxResult(txResponse, options)
+  }
 
   // TODO: Remove this mapper after remove Typechain
   mapToTypechainContract(): SignMessageLibContract {

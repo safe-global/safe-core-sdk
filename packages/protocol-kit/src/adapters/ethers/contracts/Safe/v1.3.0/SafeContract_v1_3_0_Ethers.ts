@@ -12,9 +12,10 @@ import safe_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/Ab
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/ethers/utils/constants'
 import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
-  EncodeSafeFunction,
-  EstimateGasSafeFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SafeContract_v1_3_0_Ethers is the implementation specific to the Safe contract version 1.3.0.
@@ -62,11 +63,11 @@ class SafeContract_v1_3_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSafeFunction<SafeContract_v1_3_0_Abi> = (functionToEncode, args) => {
+  encode: EncodeFunction<SafeContract_v1_3_0_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  estimateGas: EstimateGasSafeFunction<SafeContract_v1_3_0_Abi, EthersTransactionOptions> = (
+  estimateGas: EstimateGasFunction<SafeContract_v1_3_0_Abi, EthersTransactionOptions> = (
     functionToEstimate,
     args,
     options = {}
@@ -256,7 +257,7 @@ class SafeContract_v1_3_0_Ethers
     return toTxResult(txResponse, options)
   }
 
-  getAddress(): Promise<string> {
+  getAddress: GetAddressFunction = () => {
     return this.contract.getAddress()
   }
 

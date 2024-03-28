@@ -1,35 +1,15 @@
-import {
-  Abi,
-  AbiParametersToPrimitiveTypes,
-  ExtractAbiFunction,
-  ExtractAbiFunctionNames
-} from 'abitype'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { Abi } from 'abitype'
+import BaseContract from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
- * Encodes a function call for a MultiSendCallOnly contract.
+ * Represents the base contract type for a MultiSendCallOnly contract.
  *
  * @template MultiSendCallOnlyContractAbi - The ABI of the MultiSendCallOnly contract.
- * @template MultiSendCallOnlyFunction - The function to encode, derived from the ABI.
+ * @type {MultiSendCallOnlyBaseContract}
  */
-export type EncodeMultiSendCallOnlyFunction<
-  MultiSendCallOnlyContractAbi extends Abi, // Abi of the MultiSendCallOnly Contract,
-  MultiSendCallOnlyFunction extends
-    ExtractAbiFunctionNames<MultiSendCallOnlyContractAbi> = ExtractAbiFunctionNames<MultiSendCallOnlyContractAbi>
-> = (
-  functionToEncode: MultiSendCallOnlyFunction,
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<MultiSendCallOnlyContractAbi, MultiSendCallOnlyFunction>['inputs'],
-    'inputs'
-  >
-) => string
-
-export type GetAddressMultiSendCallOnlyFunction = () => Promise<string>
-
-type MultiSendCallOnlyBaseContract<MultiSendCallOnlyContractAbi extends Abi> = {
-  safeVersion: SafeVersion
-  encode: EncodeMultiSendCallOnlyFunction<MultiSendCallOnlyContractAbi>
-  getAddress: GetAddressMultiSendCallOnlyFunction
-}
+type MultiSendCallOnlyBaseContract<MultiSendCallOnlyContractAbi extends Abi> = BaseContract<
+  MultiSendCallOnlyContractAbi,
+  never
+>
 
 export default MultiSendCallOnlyBaseContract

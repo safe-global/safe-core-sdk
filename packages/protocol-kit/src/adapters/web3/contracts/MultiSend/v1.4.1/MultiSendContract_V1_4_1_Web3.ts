@@ -7,9 +7,9 @@ import MultiSendContract_v1_4_1_Contract, {
 import multiSend_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.4.1/multi_send'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
-  EncodeMultiSendFunction,
-  GetAddressMultiSendFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendBaseContract'
+  EncodeFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 // Remove all nested `readonly` modifiers from the ABI type
 type MultiSendContract_v1_4_1_Abi = DeepWriteable<MultiSendContract_v1_4_1_Abi_Readonly>
@@ -50,14 +50,11 @@ class MultiSendContract_v1_4_1_Web3
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressMultiSendFunction = () => {
+  getAddress: GetAddressFunction = () => {
     return Promise.resolve(this.contract.options.address)
   }
 
-  encode: EncodeMultiSendFunction<MultiSendContract_v1_4_1_Abi_Readonly> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<MultiSendContract_v1_4_1_Abi_Readonly> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }

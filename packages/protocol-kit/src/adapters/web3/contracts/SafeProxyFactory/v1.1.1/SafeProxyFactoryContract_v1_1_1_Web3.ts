@@ -8,9 +8,10 @@ import {
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import safeProxyFactory_1_1_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.1.1/proxy_factory'
 import {
-  EncodeSafeProxyFactoryFunction,
-  EstimateGasSafeProxyFactoryFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryBaseContract'
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 import SafeProxyFactoryContract_v1_1_1_Contract, {
   SafeProxyFactoryContract_v1_1_1_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
@@ -67,21 +68,16 @@ class SafeProxyFactoryContract_v1_1_1_Web3
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContract_v1_1_1_Abi> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<SafeProxyFactoryContract_v1_1_1_Abi> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 
-  estimateGas: EstimateGasSafeProxyFactoryFunction<
-    SafeProxyFactoryContract_v1_1_1_Abi,
-    Web3TransactionOptions
-  > = async (functionToEstimate, args, options = {}) => {
-    return await this.contract.methods[functionToEstimate](...args).estimateGas(options)
-  }
+  estimateGas: EstimateGasFunction<SafeProxyFactoryContract_v1_1_1_Abi, Web3TransactionOptions> =
+    async (functionToEstimate, args, options = {}) => {
+      return await this.contract.methods[functionToEstimate](...args).estimateGas(options)
+    }
 
-  getAddress(): Promise<string> {
+  getAddress: GetAddressFunction = () => {
     return Promise.resolve(this.contract.options.address)
   }
 

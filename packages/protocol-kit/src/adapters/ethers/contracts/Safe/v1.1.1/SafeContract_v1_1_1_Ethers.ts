@@ -9,12 +9,13 @@ import SafeContract_v1_1_1_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import safe_1_1_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.1.1/gnosis_safe'
-import {
-  EncodeSafeFunction,
-  EstimateGasSafeFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
 import { sameString } from '@safe-global/protocol-kit/utils'
 import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SafeContract_v1_1_1_Ethers is the implementation specific to the Safe contract version 1.1.1.
@@ -147,11 +148,11 @@ class SafeContract_v1_1_1_Ethers
     return [await this.contract.getTransactionHash(...args)]
   }
 
-  encode: EncodeSafeFunction<SafeContract_v1_1_1_Abi> = (functionToEncode, args) => {
+  encode: EncodeFunction<SafeContract_v1_1_1_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  estimateGas: EstimateGasSafeFunction<SafeContract_v1_1_1_Abi, EthersTransactionOptions> = (
+  estimateGas: EstimateGasFunction<SafeContract_v1_1_1_Abi, EthersTransactionOptions> = (
     functionToEstimate,
     args,
     options = {}
@@ -171,7 +172,7 @@ class SafeContract_v1_1_1_Ethers
   }
 
   // Custom method (not defined in the Safe Contract)
-  getAddress(): Promise<string> {
+  getAddress: GetAddressFunction = () => {
     return this.contract.getAddress()
   }
 

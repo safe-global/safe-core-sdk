@@ -8,9 +8,10 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import safe_1_2_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.2.0/gnosis_safe'
 import {
-  EncodeSafeFunction,
-  EstimateGasSafeFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
+  EncodeFunction,
+  EstimateGasFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 import SafeContract_v1_2_0_Contract, {
   SafeContract_v1_2_0_Abi as SafeContract_v1_2_0_Abi_Readonly
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
@@ -154,11 +155,11 @@ class SafeContract_v1_2_0_Web3
     return [await this.contract.methods.getTransactionHash(...args).call()]
   }
 
-  encode: EncodeSafeFunction<SafeContract_v1_2_0_Abi_Readonly> = (functionToEncode, args) => {
+  encode: EncodeFunction<SafeContract_v1_2_0_Abi_Readonly> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 
-  estimateGas: EstimateGasSafeFunction<SafeContract_v1_2_0_Abi_Readonly, Web3TransactionOptions> = (
+  estimateGas: EstimateGasFunction<SafeContract_v1_2_0_Abi_Readonly, Web3TransactionOptions> = (
     functionToEstimate,
     args,
     options = {}
@@ -169,7 +170,7 @@ class SafeContract_v1_2_0_Web3
   }
 
   // Custom method (not defined in the Safe Contract)
-  getAddress(): Promise<string> {
+  getAddress: GetAddressFunction = () => {
     return Promise.resolve(this.contract.options.address)
   }
 

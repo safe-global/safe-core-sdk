@@ -1,6 +1,7 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import {
+  CompatibilityFallbackHandlerContract,
   CreateCallContract,
   Eip3770Address,
   EthAdapter,
@@ -18,7 +19,6 @@ import { AbiItem } from 'web3-utils'
 // Deprecated https://www.npmjs.com/package/@types/web3?activeTab=readme
 // Migration guide https://docs.web3js.org/docs/guides/web3_migration_guide#types
 import type { JsonRPCResponse, Provider } from 'web3/providers'
-import CompatibilityFallbackHandlerWeb3Contract from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerWeb3Contract'
 import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -173,18 +173,19 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CompatibilityFallbackHandlerWeb3Contract> {
+  }: GetContractProps): Promise<CompatibilityFallbackHandlerContract> {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
       throw new Error('Invalid Compatibility Fallback Handler contract address')
     }
-    const multiSendContract = this.getContract(
+    return getCompatibilityFallbackHandlerContractInstance(
+      safeVersion,
       contractAddress,
-      customContractAbi ?? (singletonDeployment?.abi as AbiItem[])
+      this,
+      customContractAbi
     )
-    return getCompatibilityFallbackHandlerContractInstance(safeVersion, multiSendContract)
   }
 
   async getSignMessageLibContract({

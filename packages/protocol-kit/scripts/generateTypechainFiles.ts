@@ -38,7 +38,6 @@ function generateTypechainFiles(
   console.log(`Generated typechain ${typechainVersion} at ${outDir}`)
 }
 
-// Contracts v1.0.0 + v1.1.1 + v1.2.0 are migrated to Abitype already, so they're not included in here
 function generateTypes(typechainTarget: string) {
   // Tests
   generateTypechainFiles(

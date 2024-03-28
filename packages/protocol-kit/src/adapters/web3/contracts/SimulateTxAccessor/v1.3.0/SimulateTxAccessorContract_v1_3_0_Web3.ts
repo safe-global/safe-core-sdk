@@ -5,11 +5,11 @@ import SimulateTxAccessorContract_v1_3_0_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
 import SimulateTxAccessor_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.3.0/simulate_tx_accessor'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeSimulateTxAccessorFunction,
-  GetAddressSimulateTxAccessorFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/SimulateTxAccessorBaseContract'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
+import {
+  EncodeFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SimulateTxAccessorContract_v1_3_0_Web3 is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
@@ -55,20 +55,15 @@ class SimulateTxAccessorContract_v1_3_0_Web3
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressSimulateTxAccessorFunction = () => {
+  getAddress: GetAddressFunction = () => {
     return Promise.resolve(this.contract.options.address)
   }
 
-  encode: EncodeSimulateTxAccessorFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 
-  simulate: SimulateTxAccessorContract_v1_3_0_Contract['simulate'] = (
-    args: readonly [to: string, value: bigint, data: string, operation: number]
-  ) => {
+  simulate = (args: readonly [to: string, value: bigint, data: string, operation: number]) => {
     return this.contract.methods.simulate(...args).call()
   }
 }

@@ -6,9 +6,9 @@ import SimulateTxAccessorContract_v1_3_0_Contract, {
 import SimulateTxAccessor_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.3.0/simulate_tx_accessor'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
-  EncodeSimulateTxAccessorFunction,
-  GetAddressSimulateTxAccessorFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/SimulateTxAccessorBaseContract'
+  EncodeFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SimulateTxAccessorContract_v1_3_0_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
@@ -46,20 +46,15 @@ class SimulateTxAccessorContract_v1_3_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressSimulateTxAccessorFunction = () => {
+  getAddress: GetAddressFunction = () => {
     return this.contract.getAddress()
   }
 
-  encode: EncodeSimulateTxAccessorFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  simulate: SimulateTxAccessorContract_v1_3_0_Contract['simulate'] = (
-    args: readonly [to: string, value: bigint, data: string, operation: number]
-  ) => {
+  simulate = (args: readonly [to: string, value: bigint, data: string, operation: number]) => {
     return this.contract.simulate(...args)
   }
 }

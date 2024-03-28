@@ -1,6 +1,7 @@
 import { narrow } from 'abitype'
 import createCall_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CreateCall/v1.3.0/create_call'
 import CreateCallBaseContract from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/CreateCallBaseContract'
+import { EthAdapter } from 'packages/safe-core-sdk-types'
 
 const createCallContract_v1_3_0_AbiTypes = narrow(createCall_1_3_0_ContractArtifacts.abi)
 
@@ -17,6 +18,9 @@ export type CreateCallContract_v1_3_0_Abi = typeof createCallContract_v1_3_0_Abi
  *
  * @type {CreateCallContract_v1_3_0_Contract}
  */
-type CreateCallContract_v1_3_0_Contract = CreateCallBaseContract<CreateCallContract_v1_3_0_Abi>
+type CreateCallContract_v1_3_0_Contract<Adapter extends EthAdapter> = CreateCallBaseContract<
+  CreateCallContract_v1_3_0_Abi,
+  Adapter
+>
 
 export default CreateCallContract_v1_3_0_Contract

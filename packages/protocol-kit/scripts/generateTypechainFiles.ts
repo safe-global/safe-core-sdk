@@ -1,26 +1,9 @@
 import { execSync } from 'child_process'
-import { existsSync, mkdirSync, readdir } from 'fs'
-import path from 'path'
 
 // Directories where the Typechain files will be generated
 const outDirSrc = 'typechain/src/'
-const typeChainDirectorySrcPath = path.join(__dirname, `../${outDirSrc}`)
-
-const outDirBuild = 'dist/typechain/src/'
-const typeChainDirectoryBuildPath = path.join(__dirname, `../${outDirBuild}`)
 
 const outDirTests = 'typechain/tests/'
-
-// Contract list for which the Typechain files will be generated
-// Will be included in dist/ folder
-const safeContractsPath = '../../node_modules/@safe-global/safe-deployments/dist/assets'
-
-const safeContracts_V1_4_1 = [
-  `${safeContractsPath}/v1.4.1/compatibility_fallback_handler.json`
-].join(' ')
-const safeContracts_V1_3_0 = [
-  `${safeContractsPath}/v1.3.0/compatibility_fallback_handler.json`
-].join(' ')
 
 // Won't be included in dist/ folder
 const safeContractsTestV1_4_1Path =
@@ -55,47 +38,8 @@ function generateTypechainFiles(
   console.log(`Generated typechain ${typechainVersion} at ${outDir}`)
 }
 
-// Copy Typechain files with the right extension (.d.ts -> .ts) allows them to be included in the build folder
-function moveTypechainFiles(inDir: string, outDir: string): void {
-  readdir(`${inDir}`, (error, files) => {
-    if (error) {
-      console.log(error)
-    }
-    if (!existsSync(`${outDir}`)) {
-      mkdirSync(`${outDir}`, { recursive: true })
-    }
-    files.forEach((file) => {
-      const pattern = /.d.ts/
-      if (!file.match(pattern)) {
-        return
-      }
-      execSync(`cp ${inDir}/${file} ${outDir}/${file}`)
-    })
-  })
-}
-
 // Contracts v1.0.0 + v1.1.1 + v1.2.0 are migrated to Abitype already, so they're not included in here
 function generateTypes(typechainTarget: string) {
-  // Src
-  generateTypechainFiles(
-    typechainTarget,
-    `${outDirSrc}${typechainTarget}/v1.4.1`,
-    safeContracts_V1_4_1
-  )
-  generateTypechainFiles(
-    typechainTarget,
-    `${outDirSrc}${typechainTarget}/v1.3.0`,
-    safeContracts_V1_3_0
-  )
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${typechainTarget}/v1.4.1`,
-    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.4.1`
-  )
-  moveTypechainFiles(
-    `${typeChainDirectorySrcPath}${typechainTarget}/v1.3.0`,
-    `${typeChainDirectoryBuildPath}${typechainTarget}/v1.3.0`
-  )
-
   // Tests
   generateTypechainFiles(
     typechainTarget,

@@ -4,9 +4,16 @@ import {
   ExtractAbiFunction,
   ExtractAbiFunctionNames
 } from 'abitype'
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers'
-import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  EthersAdapter,
+  EthersTransactionOptions,
+  EthersTransactionResult
+} from '@safe-global/protocol-kit/adapters/ethers'
+import {
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from '@safe-global/protocol-kit/adapters/web3'
+import { EthAdapter, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 /**
  * Extracts the names of read-only functions (view or pure) from a given contract ABI.
@@ -96,6 +103,33 @@ export type ContractFunction<
     'outputs'
   >
 >
+
+/**
+ * Defines an adapter-specific function type for a contract, derived by the given function name from a given contract ABI.
+ *
+ * @template ContractAbi - The ABI of the contract.
+ * @template Adapter - The EthAdapter type to use.
+ * @template ContractFunctionName - The function name, derived from the ABI.
+ * @template TransactionOptions - The transaction options type depending on the Adapter.
+ * @template TransactionResult - The transaction result type depending on the Adapter.
+ */
+export type AdapterSepcificContractFunction<
+  ContractAbi extends Abi,
+  Adapter extends EthAdapter,
+  ContractFunctionName extends
+    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>,
+  TransactionOptions = Adapter extends EthersAdapter
+    ? EthersTransactionOptions
+    : Web3TransactionOptions,
+  TransactionResult = Adapter extends EthersAdapter
+    ? EthersTransactionResult
+    : Web3TransactionResult
+> = (
+  args: AbiParametersToPrimitiveTypes<
+    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']
+  >,
+  options?: TransactionOptions
+) => Promise<TransactionResult>
 
 /**
  * Represents the base contract type for a contract.

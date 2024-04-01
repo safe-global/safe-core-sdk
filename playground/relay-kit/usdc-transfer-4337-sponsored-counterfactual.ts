@@ -1,6 +1,6 @@
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
-import { Safe4337Pack, PimlicoFeeEstimator } from '@safe-global/relay-kit'
+import { Safe4337Pack } from '@safe-global/relay-kit'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -56,7 +56,7 @@ async function main() {
     options: {
       owners: [await signer.getAddress()],
       threshold: 1,
-      saltNonce: '4337' + '17' // to update the address
+      saltNonce: '4337' + '1' // to update the address
     }
   })
 
@@ -68,6 +68,8 @@ async function main() {
   const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
 
   console.log('senderAddress: ', senderAddress)
+
+  console.log('is Safe Account deployed: ', await safe4337Pack.protocolKit.isSafeDeployed())
 
   const usdcAmount = 100_000n // 0.1 USDC
 
@@ -90,27 +92,19 @@ async function main() {
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp,
-      validUntil: timestamp + 60000
+      validAfter: timestamp - 60_000,
+      validUntil: timestamp + 60_000
     }
   })
 
-  // 3) Estimate SafeOperation fee
-  const feeEstimator = new PimlicoFeeEstimator()
-  const estimatedSafeOperation = await safe4337Pack.getEstimateFee({
-    safeOperation,
-    feeEstimator
-  })
+  // 3) Sign SafeOperation
+  const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
-  // 4) Sign SafeOperation
-  const estimatedAndSignedSafeOperation =
-    await safe4337Pack.signSafeOperation(estimatedSafeOperation)
+  console.log('SafeOperation', signedSafeOperation)
 
-  console.log('SafeOperation', estimatedAndSignedSafeOperation)
-
-  // 5) Execute SafeOperation
+  // 4) Execute SafeOperation
   const userOperationHash = await safe4337Pack.executeTransaction({
-    executable: estimatedAndSignedSafeOperation
+    executable: signedSafeOperation
   })
 
   console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN_NAME}`)

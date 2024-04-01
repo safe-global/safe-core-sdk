@@ -58,10 +58,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
   ExecuteTransactionResult: string
 }> {
   #BUNDLER_URL: string
-  #RPC_URL: string
 
   #ENTRYPOINT_ADDRESS: string
-  #ADD_MODULES_LIB_ADDRESS: string = '0x'
   #SAFE_4337_MODULE_ADDRESS: string = '0x'
 
   #bundlerClient: ethers.JsonRpcProvider
@@ -80,15 +78,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
     publicClient,
     bundlerUrl,
     paymasterOptions,
-    rpcUrl,
     entryPointAddress,
-    addModulesLibAddress,
     safe4337ModuleAddress
   }: Safe4337Options) {
     super(protocolKit)
 
     this.#BUNDLER_URL = bundlerUrl
-    this.#RPC_URL = rpcUrl
 
     this.#bundlerClient = bundlerClient
     this.#publicClient = publicClient
@@ -96,7 +91,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#paymasterOptions = paymasterOptions
 
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
-    this.#ADD_MODULES_LIB_ADDRESS = addModulesLibAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
   }
 
@@ -262,9 +256,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       publicClient,
       paymasterOptions,
       bundlerUrl,
-      rpcUrl,
       entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
-      addModulesLibAddress,
       safe4337ModuleAddress
     })
   }
@@ -307,20 +299,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
     }
 
-    const usePaymaster = userOperation.paymasterAndData !== '0x'
-    const hasSafeDeployment = userOperation.initCode !== '0x'
+    const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
+      bundlerUrl: this.#BUNDLER_URL,
+      entryPoint: this.#ENTRYPOINT_ADDRESS,
+      userOperation: safeOperation.toUserOperation()
+    })
 
-    // adjustment only needed for deployments without paymaster
-    if (!usePaymaster && hasSafeDeployment) {
-      const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
-        bundlerUrl: this.#BUNDLER_URL,
-        entryPoint: this.#ENTRYPOINT_ADDRESS,
-        userOperation: safeOperation.toUserOperation()
-      })
-
-      if (adjustEstimationData) {
-        safeOperation.addEstimations(adjustEstimationData)
-      }
+    if (adjustEstimationData) {
+      safeOperation.addEstimations(adjustEstimationData)
     }
 
     if (this.#paymasterOptions?.isSponsored) {
@@ -360,7 +346,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
 
-    const { amountToApprove, validUntil, validAfter } = options
+    const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
     if (amountToApprove) {
       if (!this.#paymasterOptions || !this.#paymasterOptions.paymasterTokenAddress) {
@@ -414,10 +400,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation.initCode = await this.protocolKit.getInitCode()
     }
 
-    return new SafeOperation(userOperation, {
+    const safeOperation = new SafeOperation(userOperation, {
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil,
       validAfter
+    })
+
+    return await this.getEstimateFee({
+      safeOperation,
+      feeEstimator
     })
   }
 

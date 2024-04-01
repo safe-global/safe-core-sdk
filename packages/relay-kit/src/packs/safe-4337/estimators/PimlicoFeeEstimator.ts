@@ -20,6 +20,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
 
   async adjustEstimation({ userOperation }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     return {
+      callGasLimit: userOperation.callGasLimit + userOperation.callGasLimit / 2n,
       verificationGasLimit:
         userOperation.verificationGasLimit + userOperation.verificationGasLimit / 2n
     }

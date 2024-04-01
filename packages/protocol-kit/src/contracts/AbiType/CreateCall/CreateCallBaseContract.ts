@@ -1,6 +1,6 @@
 import { Abi } from 'abitype'
 import BaseContract, {
-  AdapterSepcificContractFunction,
+  AdapterSpecificContractFunction,
   ContractReadFunctionNames,
   EstimateGasFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
@@ -18,8 +18,8 @@ export type CreateCallBaseContract<
   Adapter extends EthAdapter
 > = BaseContract<CreateCallContractAbi, ContractReadFunctionNames<CreateCallContractAbi>> & {
   estimateGas: EstimateGasFunction<CreateCallContractAbi>
-  performCreate: AdapterSepcificContractFunction<CreateCallContractAbi, Adapter, 'performCreate'>
-  performCreate2: AdapterSepcificContractFunction<CreateCallContractAbi, Adapter, 'performCreate2'>
+  performCreate: AdapterSpecificContractFunction<CreateCallContractAbi, Adapter, 'performCreate'>
+  performCreate2: AdapterSpecificContractFunction<CreateCallContractAbi, Adapter, 'performCreate2'>
 }
 
 export default CreateCallBaseContract

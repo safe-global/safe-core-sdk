@@ -1,6 +1,6 @@
 import { Abi } from 'abitype'
 import BaseContract, {
-  AdapterSepcificContractFunction,
+  AdapterSpecificContractFunction,
   ContractReadFunctionNames,
   EstimateGasFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
@@ -21,7 +21,7 @@ type SignMessageLibBaseContract<
   ContractReadFunctionNames<SignMessageLibContractAbi>
 > & {
   estimateGas: EstimateGasFunction<SignMessageLibContractAbi>
-  signMessage: AdapterSepcificContractFunction<SignMessageLibContractAbi, Adapter, 'signMessage'>
+  signMessage: AdapterSpecificContractFunction<SignMessageLibContractAbi, Adapter, 'signMessage'>
 }
 
 export default SignMessageLibBaseContract

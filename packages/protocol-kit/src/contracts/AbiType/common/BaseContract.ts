@@ -113,7 +113,7 @@ export type ContractFunction<
  * @template TransactionOptions - The transaction options type depending on the Adapter.
  * @template TransactionResult - The transaction result type depending on the Adapter.
  */
-export type AdapterSepcificContractFunction<
+export type AdapterSpecificContractFunction<
   ContractAbi extends Abi,
   Adapter extends EthAdapter,
   ContractFunctionName extends

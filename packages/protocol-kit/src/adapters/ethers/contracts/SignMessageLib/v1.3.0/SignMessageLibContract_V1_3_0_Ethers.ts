@@ -8,7 +8,7 @@ import SignMessageLibContract_v1_3_0_Contract, {
 import multisend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
-  AdapterSepcificContractFunction,
+  AdapterSpecificContractFunction,
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction
@@ -72,7 +72,7 @@ class SignMessageLibContract_v1_3_0_Ethers
     return [await this.contract.getMessageHash(...args)]
   }
 
-  signMessage: AdapterSepcificContractFunction<
+  signMessage: AdapterSpecificContractFunction<
     SignMessageLibContract_v1_3_0_Abi,
     EthersAdapter,
     'signMessage'

@@ -11,7 +11,7 @@ import SignMessageLibContract_v1_3_0_Contract, {
 import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
-  AdapterSepcificContractFunction,
+  AdapterSpecificContractFunction,
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction
@@ -78,7 +78,7 @@ class SignMessageLibContract_v1_3_0_Web3
     return [await this.contract.methods.getMessageHash(...args).call()]
   }
 
-  signMessage: AdapterSepcificContractFunction<
+  signMessage: AdapterSpecificContractFunction<
     SignMessageLibContract_v1_3_0_Abi_Readonly,
     Web3Adapter,
     'signMessage'

@@ -14,6 +14,7 @@ import {
   Web3TransactionResult
 } from '@safe-global/protocol-kit/adapters/web3'
 import { EthAdapter, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 
 /**
  * Extracts the names of read-only functions (view or pure) from a given contract ABI.
@@ -49,9 +50,11 @@ export type EncodeFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
-    'inputs'
+  args: DeepWriteable<
+    AbiParametersToPrimitiveTypes<
+      ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
+      'inputs'
+    >
   >
 ) => string
 
@@ -92,9 +95,11 @@ export type ContractFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   // parameters
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
-    'inputs'
+  args: DeepWriteable<
+    AbiParametersToPrimitiveTypes<
+      ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
+      'inputs'
+    >
   >
   // returned values as a Promise
 ) => Promise<

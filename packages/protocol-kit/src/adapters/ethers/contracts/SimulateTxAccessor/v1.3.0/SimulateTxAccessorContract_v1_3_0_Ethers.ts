@@ -5,10 +5,6 @@ import SimulateTxAccessorContract_v1_3_0_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
 import SimulateTxAccessor_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.3.0/simulate_tx_accessor'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  ContractFunction,
-  EncodeFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SimulateTxAccessorContract_v1_3_0_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
@@ -44,18 +40,6 @@ class SimulateTxAccessorContract_v1_3_0_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  encode: EncodeFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  /**
-   * @param args - Array[to, value, data, operation]
-   * @returns Array[estimate, success, returnData]
-   */
-  simulate: ContractFunction<SimulateTxAccessorContract_v1_3_0_Abi, 'simulate'> = (args) => {
-    return this.contract.simulate(...args)
   }
 }
 

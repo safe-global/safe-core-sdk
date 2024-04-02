@@ -1,10 +1,14 @@
+import { Abi } from 'abitype'
 import Contract from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { GetAddressFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+import {
+  EncodeFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 import BaseContract from '@safe-global/protocol-kit/adapters/BaseContract'
 
 /**
@@ -24,7 +28,7 @@ import BaseContract from '@safe-global/protocol-kit/adapters/BaseContract'
  * - SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContractAbiType> extends BaseContractWeb3<SafeProxyFactoryContractAbiType>
  */
 abstract class BaseContractWeb3<
-  ContractAbiType extends AbiItem[]
+  ContractAbiType extends AbiItem[] & Abi
 > extends BaseContract<ContractAbiType> {
   contract: Contract
   adapter: Web3Adapter
@@ -58,6 +62,10 @@ abstract class BaseContractWeb3<
 
   getAddress: GetAddressFunction = () => {
     return Promise.resolve(this.contract.options.address)
+  }
+
+  encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
+    return this.contract.methods[functionToEncode](...(args as Array<any>)).encodeABI()
   }
 }
 

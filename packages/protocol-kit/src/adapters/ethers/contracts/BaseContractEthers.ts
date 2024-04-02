@@ -1,10 +1,14 @@
+import { Abi } from 'abitype'
 import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
 
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 import BaseContract from '@safe-global/protocol-kit/adapters/BaseContract'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { GetAddressFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+import {
+  EncodeFunction,
+  GetAddressFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * Abstract class BaseContractEthers extends BaseContract to specifically integrate with the Ethers.js v6 library.
@@ -23,7 +27,7 @@ import { GetAddressFunction } from '@safe-global/protocol-kit/contracts/AbiType/
  * - SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContractAbiType> extends BaseContractEthers<SafeProxyFactoryContractAbiType>
  */
 abstract class BaseContractEthers<
-  ContractAbiType extends InterfaceAbi
+  ContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<ContractAbiType> {
   contract: Contract
   adapter: EthersAdapter
@@ -62,6 +66,10 @@ abstract class BaseContractEthers<
 
   getAddress: GetAddressFunction = () => {
     return this.contract.getAddress()
+  }
+
+  encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
+    return this.contract.interface.encodeFunctionData(functionToEncode, args as ReadonlyArray<any>)
   }
 }
 

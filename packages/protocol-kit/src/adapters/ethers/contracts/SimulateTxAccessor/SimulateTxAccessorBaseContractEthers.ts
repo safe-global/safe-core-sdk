@@ -1,9 +1,11 @@
+import { Abi } from 'abitype'
 import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
+import { ContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * Abstract class SimulateTxAccessorBaseContractEthers extends BaseContractEthers to specifically integrate with the SimulateTxAccessor contract.
@@ -19,7 +21,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - SimulateTxAccessorContract_v1_3_0_Ethers extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_3_0_Abi>
  */
 abstract class SimulateTxAccessorBaseContractEthers<
-  SimulateTxAccessorContractAbiType extends InterfaceAbi
+  SimulateTxAccessorContractAbiType extends InterfaceAbi & Abi
 > extends BaseContractEthers<SimulateTxAccessorContractAbiType> {
   contractName: contractName
 
@@ -57,6 +59,14 @@ abstract class SimulateTxAccessorBaseContractEthers<
     )
 
     this.contractName = contractName
+  }
+
+  /**
+   * @param args - Array[to, value, data, operation]
+   * @returns Array[estimate, success, returnData]
+   */
+  simulate: ContractFunction<SimulateTxAccessorContractAbiType, 'simulate'> = (args) => {
+    return this.contract.simulate(...(args as ReadonlyArray<any>))
   }
 }
 

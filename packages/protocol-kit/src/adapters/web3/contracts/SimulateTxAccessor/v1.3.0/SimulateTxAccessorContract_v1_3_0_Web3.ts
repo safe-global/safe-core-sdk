@@ -6,10 +6,6 @@ import SimulateTxAccessorContract_v1_3_0_Contract, {
 import SimulateTxAccessor_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.3.0/simulate_tx_accessor'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
-import {
-  ContractFunction,
-  EncodeFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SimulateTxAccessorContract_v1_3_0_Web3 is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
@@ -53,18 +49,6 @@ class SimulateTxAccessorContract_v1_3_0_Web3
     )
 
     this.safeVersion = safeVersion
-  }
-
-  encode: EncodeFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  /**
-   * @param args - Array[to, value, data, operation]
-   * @returns Array[estimate, success, returnData]
-   */
-  simulate: ContractFunction<SimulateTxAccessorContract_v1_3_0_Abi, 'simulate'> = (args) => {
-    return this.contract.methods.simulate(...args).call()
   }
 }
 

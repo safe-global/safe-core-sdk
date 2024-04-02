@@ -1,29 +1,28 @@
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
+import { Abi } from 'abitype'
+import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import CompatibilityFallbackHandlerBaseContract from '@safe-global/protocol-kit/adapters/CompatibilityFallbackHandlerBaseContract'
+import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class CompatibilityFallbackHandlerBaseContractEthers extends CompatibilityFallbackHandlerBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class CompatibilityFallbackHandlerBaseContractEthers extends BaseContractEthers to specifically integrate with the CompatibilityFallbackHandler contract.
  * It is designed to be instantiated for different versions of the Safe contract.
- *
- * This abstract class sets up the Ethers v6 Contract object that interacts with a CompatibilityFallbackHandler contract version.
  *
  * Subclasses of CompatibilityFallbackHandlerBaseContractEthers are expected to represent specific versions of the contract.
  *
  * @template CompatibilityFallbackHandlerContractAbiType - The ABI type specific to the version of the CompatibilityFallbackHandler contract, extending InterfaceAbi from Ethers.
- * @extends CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContractAbiType> - Extends the generic CompatibilityFallbackHandlerBaseContract with Ethers-specific implementation.
+ * @extends BaseContractEthers<CompatibilityFallbackHandlerContractAbiType> - Extends the generic BaseContractEthers.
  *
  * Example subclasses:
  * - CompatibilityFallbackHandlerContract_v1_4_1_Ethers extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
  * - CompatibilityFallbackHandlerContract_v1_3_0_Ethers extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
  */
 abstract class CompatibilityFallbackHandlerBaseContractEthers<
-  CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi
-> extends CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContractAbiType> {
-  contract: Contract
-  adapter: EthersAdapter
+  CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi & Abi
+> extends BaseContractEthers<CompatibilityFallbackHandlerContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -45,14 +44,20 @@ abstract class CompatibilityFallbackHandlerBaseContractEthers<
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
     runner?: ContractRunner | null
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'compatibilityFallbackHandler'
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      runner || this.adapter.getSigner()
+    super(
+      contractName,
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      runner
     )
+
+    this.contractName = contractName
   }
 }
 

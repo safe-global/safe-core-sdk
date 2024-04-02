@@ -1,30 +1,28 @@
-import Contract from 'web3-eth-contract'
+import { Abi } from 'abitype'
 import { AbiItem } from 'web3-utils'
 
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import MultiSendCallOnlyBaseContract from '@safe-global/protocol-kit/adapters/MultiSendCallOnlyBaseContract'
+import BaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/BaseContractWeb3'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class MultiSendBaseContractWeb3 extends MultiSendCallOnlyBaseContract to specifically integrate with the Web3.js v6 library.
+ * Abstract class MultiSendCallOnlyBaseContractWeb3 extends BaseContractWeb3 to specifically integrate with the MultiSendCallOnly contract.
  * It is designed to be instantiated for different versions of the MultiSendCallOnly contract.
- *
- * This abstract class sets up the Web3 v6 Contract object that interacts with a MultiSendCallOnly contract version.
  *
  * Subclasses of MultiSendCallOnlyBaseContractWeb3 are expected to represent specific versions of the MultiSendCallOnly contract.
  *
  * @template MultiSendCallOnlyContractAbiType - The ABI type specific to the version of the MultiSendCallOnly contract, extending InterfaceAbi from Web3.
- * @extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContractAbiType> - Extends the generic MultiSendCallOnlyBaseContract with Web3-specific implementation.
+ * @extends BaseContractWeb3<MultiSendCallOnlyContractAbiType> - Extends the generic BaseContractWeb3.
  *
  * Example subclasses:
  * - MultiSendCallOnlyContract_v1_4_1_Web3 extends MultiSendCallOnlyBaseContractWeb3<MultiSendCallOnlyContract_v1_4_1_Abi>
  * - MultiSendCallOnlyContract_v1_3_0_Web3 extends MultiSendCallOnlyBaseContractWeb3<MultiSendCallOnlyContract_v1_3_0_Abi>
  */
 abstract class MultiSendCallOnlyBaseContractWeb3<
-  MultiSendCallOnlyContractAbiType extends AbiItem[]
-> extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContractAbiType> {
-  contract: Contract
-  adapter: Web3Adapter
+  MultiSendCallOnlyContractAbiType extends AbiItem[] & Abi
+> extends BaseContractWeb3<MultiSendCallOnlyContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -45,10 +43,19 @@ abstract class MultiSendCallOnlyBaseContractWeb3<
     customContractAddress?: string,
     customContractAbi?: MultiSendCallOnlyContractAbiType
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'multiSendCallOnlyVersion'
 
-    this.adapter = web3Adapter
-    this.contract = web3Adapter.getContract(this.contractAddress, this.contractAbi)
+    super(
+      contractName,
+      chainId,
+      web3Adapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi
+    )
+
+    this.contractName = contractName
   }
 }
 

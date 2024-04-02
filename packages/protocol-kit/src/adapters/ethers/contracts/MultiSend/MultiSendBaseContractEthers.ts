@@ -1,29 +1,28 @@
-import { Contract, InterfaceAbi } from 'ethers'
+import { Abi } from 'abitype'
+import { InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import MultiSendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendBaseContract'
+import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class MultiSendBaseContractEthers extends MultiSendBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class MultiSendBaseContractEthers extends BaseContractEthers to specifically integrate with the MultiSend contract.
  * It is designed to be instantiated for different versions of the MultiSend contract.
- *
- * This abstract class sets up the Ethers v6 Contract object that interacts with a MultiSend contract version.
  *
  * Subclasses of MultiSendBaseContractEthers are expected to represent specific versions of the MultiSend contract.
  *
  * @template MultiSendContractAbiType - The ABI type specific to the version of the MultiSend contract, extending InterfaceAbi from Ethers.
- * @extends MultiSendBaseContract<MultiSendContractAbiType> - Extends the generic MultiSendBaseContract with Ethers-specific implementation.
+ * @extends BaseContractEthers<MultiSendContractAbiType> - Extends the generic BaseContractEthers.
  *
  * Example subclasses:
  * - MultiSendContract_v1_4_1_Ethers extends MultiSendBaseContractEthers<MultiSendContract_v1_4_1_Abi>
  * - MultiSendContract_v1_3_0_Ethers extends MultiSendBaseContractEthers<MultiSendContract_v1_3_0_Abi>
  */
 abstract class MultiSendBaseContractEthers<
-  MultiSendContractAbiType extends InterfaceAbi
-> extends MultiSendBaseContract<MultiSendContractAbiType> {
-  contract: Contract
-  adapter: EthersAdapter
+  MultiSendContractAbiType extends InterfaceAbi & Abi
+> extends BaseContractEthers<MultiSendContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -44,10 +43,19 @@ abstract class MultiSendBaseContractEthers<
     customContractAddress?: string,
     customContractAbi?: MultiSendContractAbiType
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'multiSendVersion'
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(this.contractAddress, this.contractAbi, this.adapter.getSigner())
+    super(
+      contractName,
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi
+    )
+
+    this.contractName = contractName
   }
 }
 

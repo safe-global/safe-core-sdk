@@ -7,8 +7,10 @@ import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapt
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
   EncodeFunction,
+  EstimateGasFunction,
   GetAddressFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 
 /**
  * Abstract class BaseContractEthers extends BaseContract to specifically integrate with the Ethers.js v6 library.
@@ -70,6 +72,15 @@ abstract class BaseContractEthers<
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
     return this.contract.interface.encodeFunctionData(functionToEncode, args as ReadonlyArray<any>)
+  }
+
+  estimateGas: EstimateGasFunction<ContractAbiType, EthersTransactionOptions> = (
+    functionToEstimate,
+    args,
+    options = {}
+  ) => {
+    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
+    return contractMethodToEstimate.estimateGas(...(args as ReadonlyArray<any>), options)
   }
 }
 

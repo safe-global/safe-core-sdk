@@ -12,10 +12,7 @@ import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/co
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   AdapterSpecificContractFunction,
-  ContractFunction,
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
+  ContractFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 // Remove all nested `readonly` modifiers from the ABI type
@@ -56,23 +53,6 @@ class SignMessageLibContract_v1_3_0_Web3
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  encode: EncodeFunction<SignMessageLibContract_v1_3_0_Abi_Readonly> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  estimateGas: EstimateGasFunction<
-    SignMessageLibContract_v1_3_0_Abi_Readonly,
-    Web3TransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
-    return this.contract.methods[functionToEstimate](...args)
-      .estimateGas(options)
-      .then(BigInt)
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
   }
 
   /**

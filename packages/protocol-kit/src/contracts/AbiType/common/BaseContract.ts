@@ -74,9 +74,11 @@ export type EstimateGasFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
-    'inputs'
+  args: DeepWriteable<
+    AbiParametersToPrimitiveTypes<
+      ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
+      'inputs'
+    >
   >,
   options?: TransactionOptions
 ) => Promise<bigint>
@@ -130,8 +132,8 @@ export type AdapterSpecificContractFunction<
     ? EthersTransactionResult
     : Web3TransactionResult
 > = (
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']
+  args: DeepWriteable<
+    AbiParametersToPrimitiveTypes<ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']>
   >,
   options?: TransactionOptions
 ) => Promise<TransactionResult>

@@ -9,10 +9,7 @@ import multisend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contrac
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   AdapterSpecificContractFunction,
-  ContractFunction,
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
+  ContractFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
@@ -49,24 +46,6 @@ class SignMessageLibContract_v1_3_0_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  encode: EncodeFunction<SignMessageLibContract_v1_3_0_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasFunction<SignMessageLibContract_v1_3_0_Abi, EthersTransactionOptions> = (
-    functionToEstimate,
-    args,
-    options = {}
-  ) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToEstimate.estimateGas(...args, options)
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
   }
 
   /**

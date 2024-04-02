@@ -6,6 +6,7 @@ import SimulateTxAccessorContract_v1_4_1_Contract, {
 import SimulateTxAccessor_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.4.1/simulate_tx_accessor'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
+  ContractFunction,
   EncodeFunction,
   GetAddressFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
@@ -54,7 +55,11 @@ class SimulateTxAccessorContract_v1_4_1_Ethers
     return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 
-  simulate = (args: readonly [to: string, value: bigint, data: string, operation: number]) => {
+  /**
+   * @param args - Array[to, value, data, operation]
+   * @returns Array[estimate, success, returnData]
+   */
+  simulate: ContractFunction<SimulateTxAccessorContract_v1_4_1_Abi, 'simulate'> = (args) => {
     return this.contract.simulate(...args)
   }
 }

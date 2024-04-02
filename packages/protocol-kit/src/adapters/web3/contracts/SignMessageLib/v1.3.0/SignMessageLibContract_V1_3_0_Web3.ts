@@ -12,6 +12,7 @@ import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/co
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   AdapterSpecificContractFunction,
+  ContractFunction,
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction
@@ -74,10 +75,17 @@ class SignMessageLibContract_v1_3_0_Web3
     return Promise.resolve(this.contract.options.address)
   }
 
-  async getMessageHash(args: readonly [string]): Promise<readonly [string]> {
-    return [await this.contract.methods.getMessageHash(...args).call()]
-  }
+  /**
+   * @param args - Array[message]
+   */
+  getMessageHash: ContractFunction<SignMessageLibContract_v1_3_0_Abi_Readonly, 'getMessageHash'> =
+    async (args) => {
+      return [await this.contract.methods.getMessageHash(...args).call()]
+    }
 
+  /**
+   * @param args - Array[data]
+   */
   signMessage: AdapterSpecificContractFunction<
     SignMessageLibContract_v1_3_0_Abi_Readonly,
     Web3Adapter,

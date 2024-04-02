@@ -9,6 +9,7 @@ import multisend_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contrac
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   AdapterSpecificContractFunction,
+  ContractFunction,
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction
@@ -68,10 +69,18 @@ class SignMessageLibContract_v1_4_1_Ethers
     return this.contract.getAddress()
   }
 
-  async getMessageHash(args: readonly [string]): Promise<readonly [string]> {
+  /**
+   * @param args - Array[message]
+   */
+  getMessageHash: ContractFunction<SignMessageLibContract_v1_4_1_Abi, 'getMessageHash'> = async (
+    args
+  ) => {
     return [await this.contract.getMessageHash(...args)]
   }
 
+  /**
+   * @param args - Array[data]
+   */
   signMessage: AdapterSpecificContractFunction<
     SignMessageLibContract_v1_4_1_Abi,
     EthersAdapter,

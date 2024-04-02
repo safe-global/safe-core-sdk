@@ -8,8 +8,7 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import {
   ContractFunction,
-  EncodeFunction,
-  GetAddressFunction
+  EncodeFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
@@ -54,10 +53,6 @@ class SimulateTxAccessorContract_v1_3_0_Web3
     )
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
   }
 
   encode: EncodeFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (functionToEncode, args) => {

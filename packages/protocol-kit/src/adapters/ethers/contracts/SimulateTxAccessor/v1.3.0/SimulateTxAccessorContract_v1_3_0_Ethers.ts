@@ -7,8 +7,7 @@ import SimulateTxAccessor_1_3_0_ContractArtifacts from '@safe-global/protocol-ki
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
   ContractFunction,
-  EncodeFunction,
-  GetAddressFunction
+  EncodeFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
@@ -45,10 +44,6 @@ class SimulateTxAccessorContract_v1_3_0_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
   }
 
   encode: EncodeFunction<SimulateTxAccessorContract_v1_3_0_Abi> = (functionToEncode, args) => {

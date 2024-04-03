@@ -25,7 +25,7 @@ import {
   UserOperation,
   UserOperationReceipt,
   UserOperationWithPayload,
-  paymasterOptions
+  PaymasterOptions
 } from './types'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
@@ -62,7 +62,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #bundlerClient: ethers.JsonRpcProvider
   #publicClient: ethers.JsonRpcProvider
 
-  #paymasterOptions?: paymasterOptions
+  #paymasterOptions?: PaymasterOptions
 
   /**
    * Creates an instance of the Safe4337Pack.
@@ -475,13 +475,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }: Safe4337ExecutableProps): Promise<string> {
     const userOperation = safeOperation.toUserOperation()
 
-    return this.sendUserOperation(userOperation)
+    return this.#sendUserOperation(userOperation)
   }
 
   /**
    * Return a UserOperation based on a hash (userOpHash) returned by eth_sendUserOperation
    *
-   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the sendUserOperation method
+   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
    * @returns {UserOperation} - null in case the UserOperation is not yet included in a block, or a full UserOperation, with the addition of entryPoint, blockNumber, blockHash and transactionHash
    */
   async getUserOperationByHash(userOpHash: string): Promise<UserOperationWithPayload> {
@@ -496,7 +496,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Return a UserOperation receipt based on a hash (userOpHash) returned by eth_sendUserOperation
    *
-   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the sendUserOperation method
+   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
    * @returns {UserOperationReceipt} - null in case the UserOperation is not yet included in a block, or UserOperationReceipt object
    */
   async getUserOperationReceipt(userOpHash: string): Promise<UserOperationReceipt | null> {
@@ -558,7 +558,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {UserOperation} userOpWithSignature - The signed UserOperation to send to the bundler.
    * @return {Promise<string>} The hash.
    */
-  async sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
+  async #sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
     return await this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
       userOperationToHexValues(userOpWithSignature),
       this.#ENTRYPOINT_ADDRESS

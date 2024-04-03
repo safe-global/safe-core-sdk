@@ -27,12 +27,15 @@ import {
   UserOperationWithPayload,
   paymasterOptions
 } from './types'
-import { EIP712_SAFE_OPERATION_TYPE, INTERFACES, RPC_4337_CALLS } from './constants'
+import {
+  DEFAULT_SAFE_VERSION,
+  DEFAULT_SAFE_MODULES_VERSION,
+  EIP712_SAFE_OPERATION_TYPE,
+  INTERFACES,
+  RPC_4337_CALLS
+} from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
-
-const DEFAULT_SAFE_VERSION = '1.4.1'
-const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn

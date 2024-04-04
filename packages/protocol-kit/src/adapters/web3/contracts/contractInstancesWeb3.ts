@@ -27,10 +27,10 @@ import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/Abi
 import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
 import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
 import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
-import { SafeProxyFactoryContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import { SafeProxyFactoryContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
-import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
-import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
+import { SafeProxyFactoryContract_v1_0_0_Abi as SafeProxyFactoryContract_v1_0_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
+import { SafeProxyFactoryContract_v1_1_1_Abi as SafeProxyFactoryContract_v1_1_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
+import { SafeProxyFactoryContract_v1_3_0_Abi as SafeProxyFactoryContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import { SafeProxyFactoryContract_v1_4_1_Abi as SafeProxyFactoryContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
 import {
   CompatibilityFallbackHandlerContract,
   CreateCallContract,
@@ -68,6 +68,14 @@ type SimulateTxAccessorContract_v1_3_0_Abi =
   DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi_Readonly>
 type SimulateTxAccessorContract_v1_4_1_Abi =
   DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi_Readonly>
+type SafeProxyFactoryContract_v1_0_0_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi_Readonly>
+type SafeProxyFactoryContract_v1_1_1_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi_Readonly>
+type SafeProxyFactoryContract_v1_3_0_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi_Readonly>
+type SafeProxyFactoryContract_v1_4_1_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi_Readonly>
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,

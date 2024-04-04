@@ -1,28 +1,20 @@
 import { TransactionReceipt } from 'web3-core/types'
-import SafeProxyFactoryBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
+import SafeProxyFactoryBaseContractWeb3, {
+  CreateProxyProps
+} from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import {
-  DeepWriteable,
-  Web3TransactionOptions
-} from '@safe-global/protocol-kit/adapters/web3/types'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import safeProxyFactory_1_1_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.1.1/proxy_factory'
-import {
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 import SafeProxyFactoryContract_v1_1_1_Contract, {
-  SafeProxyFactoryContract_v1_1_1_Abi
+  SafeProxyFactoryContract_v1_1_1_Abi as SafeProxyFactoryContract_v1_1_1_Abi_Readonly,
+  SafeProxyFactoryContract_v1_1_1_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
-import {
-  CreateProxyProps as CreateProxyPropsGeneral,
-  SafeVersion
-} from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
-export interface CreateProxyProps extends CreateProxyPropsGeneral {
-  options?: Web3TransactionOptions
-}
+// Remove all nested `readonly` modifiers from the ABI type
+type SafeProxyFactoryContract_v1_1_1_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi_Readonly>
 
 /**
  * SafeProxyFactoryContract_v1_1_1_Web3 is the implementation specific to the Safe Proxy Factory contract version 1.1.1.
@@ -33,7 +25,7 @@ export interface CreateProxyProps extends CreateProxyPropsGeneral {
  * @implements SafeProxyFactoryContract_v1_1_1_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.1.1.
  */
 class SafeProxyFactoryContract_v1_1_1_Web3
-  extends SafeProxyFactoryBaseContractWeb3<DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>>
+  extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_1_1_Abi>
   implements SafeProxyFactoryContract_v1_1_1_Contract
 {
   safeVersion: SafeVersion
@@ -54,7 +46,7 @@ class SafeProxyFactoryContract_v1_1_1_Web3
   ) {
     const safeVersion = '1.1.1'
     const defaultAbi =
-      safeProxyFactory_1_1_1_ContractArtifacts.abi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>
+      safeProxyFactory_1_1_1_ContractArtifacts.abi as SafeProxyFactoryContract_v1_1_1_Abi
 
     super(
       chainId,
@@ -62,55 +54,73 @@ class SafeProxyFactoryContract_v1_1_1_Web3
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>
+      customContractAbi as SafeProxyFactoryContract_v1_1_1_Abi
     )
 
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeFunction<SafeProxyFactoryContract_v1_1_1_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  estimateGas: EstimateGasFunction<SafeProxyFactoryContract_v1_1_1_Abi, Web3TransactionOptions> =
-    async (functionToEstimate, args, options = {}) => {
-      return await this.contract.methods[functionToEstimate](...args).estimateGas(options)
-    }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  async proxyCreationCode(): Promise<[string]> {
+  /**
+   * Allows to retrieve the creation code used for the Proxy deployment. With this it is easily possible to calculate predicted address.
+   * @returns Array[creationCode]
+   */
+  proxyCreationCode: SafeProxyFactoryContract_v1_1_1_Function<'proxyCreationCode'> = async () => {
     return [await this.contract.methods.proxyCreationCode().call()]
   }
 
-  async proxyRuntimeCode(): Promise<[string]> {
+  /**
+   * Allows to retrieve the runtime code of a deployed Proxy. This can be used to check that the expected Proxy was deployed.
+   * @returns Array[runtimeCode]
+   */
+  proxyRuntimeCode: SafeProxyFactoryContract_v1_1_1_Function<'proxyRuntimeCode'> = async () => {
     return [await this.contract.methods.proxyRuntimeCode().call()]
   }
 
-  async calculateCreateProxyWithNonceAddress(
-    args: readonly [masterCopy: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
-    return [await this.contract.methods.calculateCreateProxyWithNonceAddress(...args).call()]
-  }
+  /**
+   * Allows to get the address for a new proxy contact created via `createProxyWithNonce`.
+   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @returns Array[proxyAddress]
+   */
+  calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_1_1_Function<'calculateCreateProxyWithNonceAddress'> =
+    async (args) => {
+      return [await this.contract.methods.calculateCreateProxyWithNonceAddress(...args).call()]
+    }
 
-  async createProxy(args: readonly [masterCopy: string, data: string]): Promise<[string]> {
+  /**
+   * Allows to create new proxy contact and execute a message call to the new proxy within one transaction.
+   * @param args - Array[masterCopy, data]
+   * @returns Array[proxyAddress]
+   */
+  createProxy: SafeProxyFactoryContract_v1_1_1_Function<'createProxy'> = async (args) => {
     return [await this.contract.methods.createProxy(...args).call()]
   }
 
-  async createProxyWithCallback(
-    args: readonly [masterCopy: string, initializer: string, saltNonce: bigint, callback: string]
-  ): Promise<[string]> {
-    return [await this.contract.methods.createProxyWithCallback(...args).call()]
-  }
+  /**
+   * Allows to create new proxy contract, execute a message call to the new proxy and call a specified callback within one transaction.
+   * @param args - Array[masterCopy, initializer, saltNonce, callback]
+   * @returns Array[proxyAddress]
+   */
+  createProxyWithCallback: SafeProxyFactoryContract_v1_1_1_Function<'createProxyWithCallback'> =
+    async (args) => {
+      return [await this.contract.methods.createProxyWithCallback(...args).call()]
+    }
 
-  async createProxyWithNonce(
-    args: readonly [masterCopy: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
+  /**
+   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
+   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @returns Array[proxyAddress]
+   */
+  createProxyWithNonce: SafeProxyFactoryContract_v1_1_1_Function<'createProxyWithNonce'> = async (
+    args
+  ) => {
     return [await this.contract.methods.createProxyWithNonce(...args).call()]
   }
 
+  /**
+   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
+   * @param {CreateProxyProps} props - Properties for the new proxy contract.
+   * @returns The address of the new proxy contract.
+   */
   async createProxyWithOptions({
     safeSingletonAddress,
     initializer,

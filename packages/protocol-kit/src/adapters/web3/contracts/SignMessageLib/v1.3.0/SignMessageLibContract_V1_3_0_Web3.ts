@@ -6,14 +6,12 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import SignMessageLibBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SignMessageLib/SignMessageLibBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import SignMessageLibContract_v1_3_0_Contract, {
-  SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly
+  SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly,
+  SignMessageLibContract_v1_3_0_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
-import {
-  AdapterSpecificContractFunction,
-  ContractFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+import { AdapterSpecificContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 // Remove all nested `readonly` modifiers from the ABI type
 type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1_3_0_Abi_Readonly>
@@ -58,10 +56,9 @@ class SignMessageLibContract_v1_3_0_Web3
   /**
    * @param args - Array[message]
    */
-  getMessageHash: ContractFunction<SignMessageLibContract_v1_3_0_Abi_Readonly, 'getMessageHash'> =
-    async (args) => {
-      return [await this.contract.methods.getMessageHash(...args).call()]
-    }
+  getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
+    return [await this.contract.methods.getMessageHash(...args).call()]
+  }
 
   /**
    * @param args - Array[data]

@@ -5,7 +5,6 @@ import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contra
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * Abstract class SimulateTxAccessorBaseContractEthers extends BaseContractEthers to specifically integrate with the SimulateTxAccessor contract.
@@ -59,14 +58,6 @@ abstract class SimulateTxAccessorBaseContractEthers<
     )
 
     this.contractName = contractName
-  }
-
-  /**
-   * @param args - Array[to, value, data, operation]
-   * @returns Array[estimate, success, returnData]
-   */
-  simulate: ContractFunction<SimulateTxAccessorContractAbiType, 'simulate'> = (args) => {
-    return this.contract.simulate(...(args as ReadonlyArray<any>))
   }
 }
 

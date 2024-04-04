@@ -47,8 +47,8 @@ import { MultiSendCallOnlyContract_v1_3_0_Abi as MultiSendCallOnlyContract_v1_3_
 import { MultiSendCallOnlyContract_v1_4_1_Abi as MultiSendCallOnlyContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
 import { SignMessageLibContract_v1_4_1_Abi as SignMessageLibContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import { SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import { SimulateTxAccessorContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
-import { SimulateTxAccessorContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
+import { SimulateTxAccessorContract_v1_3_0_Abi as SimulateTxAccessorContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
+import { SimulateTxAccessorContract_v1_4_1_Abi as SimulateTxAccessorContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import { CompatibilityFallbackHandlerContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import { CompatibilityFallbackHandlerContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
@@ -64,6 +64,10 @@ type MultiSendCallOnlyContract_v1_4_1_Abi =
   DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi_Readonly>
 type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1_3_0_Abi_Readonly>
 type SignMessageLibContract_v1_4_1_Abi = DeepWriteable<SignMessageLibContract_v1_4_1_Abi_Readonly>
+type SimulateTxAccessorContract_v1_3_0_Abi =
+  DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi_Readonly>
+type SimulateTxAccessorContract_v1_4_1_Abi =
+  DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi_Readonly>
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,

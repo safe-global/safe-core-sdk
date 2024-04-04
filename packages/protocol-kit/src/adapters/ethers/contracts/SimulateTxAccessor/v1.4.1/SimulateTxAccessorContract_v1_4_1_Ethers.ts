@@ -1,7 +1,8 @@
 import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import SimulateTxAccessorContract_v1_4_1_Contract, {
-  SimulateTxAccessorContract_v1_4_1_Abi
+  SimulateTxAccessorContract_v1_4_1_Abi,
+  SimulateTxAccessorContract_v1_4_1_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 import SimulateTxAccessor_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.4.1/simulate_tx_accessor'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
@@ -40,6 +41,14 @@ class SimulateTxAccessorContract_v1_4_1_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
+  }
+
+  /**
+   * @param args - Array[to, value, data, operation]
+   * @returns Array[estimate, success, returnData]
+   */
+  simulate: SimulateTxAccessorContract_v1_4_1_Function<'simulate'> = (args) => {
+    return this.contract.simulate(...args)
   }
 }
 

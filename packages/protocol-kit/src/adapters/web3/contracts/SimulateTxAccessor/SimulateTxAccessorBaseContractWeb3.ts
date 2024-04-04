@@ -4,7 +4,6 @@ import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import BaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/BaseContractWeb3'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * Abstract class SimulateTxAccessorBaseContractWeb3 extends BaseContractWeb3 to specifically integrate with the SimulateTxAccessor contract.
@@ -56,14 +55,6 @@ abstract class SimulateTxAccessorBaseContractWeb3<
     )
 
     this.contractName = contractName
-  }
-
-  /**
-   * @param args - Array[to, value, data, operation]
-   * @returns Array[estimate, success, returnData]
-   */
-  simulate: ContractFunction<SimulateTxAccessorContractAbiType, 'simulate'> = (args) => {
-    return this.contract.methods.simulate(...(args as ReadonlyArray<any>)).call()
   }
 }
 

@@ -1,18 +1,14 @@
 import MultiSendBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/MultiSendBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
-import MultiSendContract_v1_4_1_Contract, {
-  MultiSendContract_v1_4_1_Abi as MultiSendContract_v1_4_1_Abi_Readonly
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
-import multiSend_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.4.1/multi_send'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
-  EncodeFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
-
-// Remove all nested `readonly` modifiers from the ABI type
-type MultiSendContract_v1_4_1_Abi = DeepWriteable<MultiSendContract_v1_4_1_Abi_Readonly>
+  SafeVersion,
+  MultiSendContract_v1_4_1_Abi,
+  MultiSendContract_v1_4_1_Contract,
+  multisend_1_4_1_ContractArtifacts,
+  GetAddressFunction,
+  EncodeFunction
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * MultiSendContract_v1_4_1_Web3 is the implementation specific to the MultiSend contract version 1.4.1.
@@ -23,7 +19,7 @@ type MultiSendContract_v1_4_1_Abi = DeepWriteable<MultiSendContract_v1_4_1_Abi_R
  * @implements MultiSendContract_v1_4_1_Contract - Implements the interface specific to MultiSend contract version 1.4.1.
  */
 class MultiSendContract_v1_4_1_Web3
-  extends MultiSendBaseContractWeb3<MultiSendContract_v1_4_1_Abi>
+  extends MultiSendBaseContractWeb3<DeepWriteable<MultiSendContract_v1_4_1_Abi>>
   implements MultiSendContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
@@ -40,10 +36,11 @@ class MultiSendContract_v1_4_1_Web3
     chainId: bigint,
     web3Adapter: Web3Adapter,
     customContractAddress?: string,
-    customContractAbi?: MultiSendContract_v1_4_1_Abi
+    customContractAbi?: DeepWriteable<MultiSendContract_v1_4_1_Abi>
   ) {
     const safeVersion = '1.4.1'
-    const defaultAbi = multiSend_1_4_1_ContractArtifacts.abi as MultiSendContract_v1_4_1_Abi
+    const defaultAbi =
+      multisend_1_4_1_ContractArtifacts.abi as DeepWriteable<MultiSendContract_v1_4_1_Abi>
 
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
@@ -54,7 +51,7 @@ class MultiSendContract_v1_4_1_Web3
     return Promise.resolve(this.contract.options.address)
   }
 
-  encode: EncodeFunction<MultiSendContract_v1_4_1_Abi_Readonly> = (functionToEncode, args) => {
+  encode: EncodeFunction<MultiSendContract_v1_4_1_Abi> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }

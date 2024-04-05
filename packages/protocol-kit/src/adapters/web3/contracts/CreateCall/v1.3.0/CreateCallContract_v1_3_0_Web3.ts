@@ -1,21 +1,18 @@
 import CreateCallBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/CreateCall/CreateCallBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import {
-  DeepWriteable,
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from '@safe-global/protocol-kit/adapters/web3/types'
-import CreateCallContract_v1_3_0_Contract, {
-  CreateCallContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
-import CreateCall_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CreateCall/v1.3.0/create_call'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import {
+  SafeVersion,
+  CreateCallContract_v1_3_0_Abi,
+  CreateCallContract_v1_3_0_Contract,
   EncodeFunction,
   EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+  GetAddressFunction,
+  Web3TransactionOptions,
+  Web3TransactionResult,
+  createCall_1_3_0_ContractArtifacts
+} from '@safe-global/safe-core-sdk-types'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 
 /**
  * CreateCallContract_V1_3_0_Web3 is the implementation specific to the CreateCall contract version 1.3.0.
@@ -27,7 +24,7 @@ import {
  */
 class CreateCallContract_V1_3_0_Web3
   extends CreateCallBaseContractWeb3<DeepWriteable<CreateCallContract_v1_3_0_Abi>>
-  implements CreateCallContract_v1_3_0_Contract<Web3Adapter>
+  implements CreateCallContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion
 
@@ -43,20 +40,13 @@ class CreateCallContract_V1_3_0_Web3
     chainId: bigint,
     web3Adapter: Web3Adapter,
     customContractAddress?: string,
-    customContractAbi?: CreateCallContract_v1_3_0_Abi
+    customContractAbi?: DeepWriteable<CreateCallContract_v1_3_0_Abi>
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi =
-      CreateCall_1_3_0_ContractArtifacts.abi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
+      createCall_1_3_0_ContractArtifacts.abi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
 
-    super(
-      chainId,
-      web3Adapter,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
-    )
+    super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }
@@ -99,33 +89,6 @@ class CreateCallContract_V1_3_0_Web3
     }
     const txResponse = this.contract.methods.performCreate2(...args).send(options)
     return toTxResult(txResponse, options)
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      getAddress: this.getAddress.bind(this),
-
-      encode: this.encode.bind(this),
-
-      estimateGas: async (...args: Parameters<typeof this.estimateGas>) =>
-        (await this.estimateGas(...args)).toString(),
-
-      performCreate: async (
-        value: string,
-        deploymentData: string,
-        options?: Web3TransactionOptions
-      ) => this.performCreate([BigInt(value), deploymentData], options),
-
-      performCreate2: async (
-        value: string,
-        deploymentData: string,
-        salt: string,
-        options?: Web3TransactionOptions
-      ) => this.performCreate2([BigInt(value), deploymentData, salt], options)
-    }
   }
 }
 

@@ -1,19 +1,14 @@
 import MultiSendCallOnlyBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/MultiSendCallOnlyBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
-import MultiSendCallOnlyContract_v1_3_0_Contract, {
-  MultiSendCallOnlyContract_v1_3_0_Abi as MultiSendCallOnlyContract_v1_3_0_Abi_Readonly
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
-import multiSend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.3.0/multi_send_call_only'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
-  EncodeFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
-
-// Remove all nested `readonly` modifiers from the ABI type
-type MultiSendCallOnlyContract_v1_3_0_Abi =
-  DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi_Readonly>
+  SafeVersion,
+  MultiSendCallOnlyContract_v1_3_0_Abi,
+  MultiSendCallOnlyContract_v1_3_0_Contract,
+  multiSendCallOnly_1_3_0_ContractArtifacts,
+  GetAddressFunction,
+  EncodeFunction
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * MultiSendCallOnlyContract_v1_3_0_Web3 is the implementation specific to the MultiSendCallOnly contract version 1.3.0.
@@ -24,7 +19,7 @@ type MultiSendCallOnlyContract_v1_3_0_Abi =
  * @implements MultiSendCallOnlyContract_v1_3_0_Contract - Implements the interface specific to MultiSendCallOnly contract version 1.3.0.
  */
 class MultiSendCallOnlyContract_v1_3_0_Web3
-  extends MultiSendCallOnlyBaseContractWeb3<MultiSendCallOnlyContract_v1_3_0_Abi>
+  extends MultiSendCallOnlyBaseContractWeb3<DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>>
   implements MultiSendCallOnlyContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion
@@ -41,10 +36,11 @@ class MultiSendCallOnlyContract_v1_3_0_Web3
     chainId: bigint,
     web3Adapter: Web3Adapter,
     customContractAddress?: string,
-    customContractAbi?: MultiSendCallOnlyContract_v1_3_0_Abi
+    customContractAbi?: DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>
   ) {
     const safeVersion = '1.3.0'
-    const defaultAbi = multiSend_1_3_0_ContractArtifacts.abi as MultiSendCallOnlyContract_v1_3_0_Abi
+    const defaultAbi =
+      multiSendCallOnly_1_3_0_ContractArtifacts.abi as DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>
 
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
@@ -55,10 +51,7 @@ class MultiSendCallOnlyContract_v1_3_0_Web3
     return Promise.resolve(this.contract.options.address)
   }
 
-  encode: EncodeFunction<MultiSendCallOnlyContract_v1_3_0_Abi_Readonly> = (
-    functionToEncode,
-    args
-  ) => {
+  encode: EncodeFunction<MultiSendCallOnlyContract_v1_3_0_Abi> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }

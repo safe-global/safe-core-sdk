@@ -1,14 +1,41 @@
-import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types/contracts/CompatibilityFallbackHandlerContract'
-import { CreateCallContract } from '@safe-global/safe-core-sdk-types/contracts/CreateCallContract'
-import { MultiSendCallOnlyContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendCallOnlyContract'
-import { MultiSendContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendContract'
-import { SafeContract } from '@safe-global/safe-core-sdk-types/contracts/SafeContract'
-import { SafeProxyFactoryContract } from '@safe-global/safe-core-sdk-types/contracts/SafeProxyFactoryContract'
-import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types/contracts/SignMessageLibContract'
-import { SimulateTxAccessorContract } from '@safe-global/safe-core-sdk-types/contracts/SimulateTxAccessorContract'
-import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-core-sdk-types/types'
-import { SingletonDeployment } from '@safe-global/safe-deployments'
 import { AbiItem } from 'web3-utils'
+import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-core-sdk-types/types'
+import {
+  SafeContract_v1_0_0_Contract,
+  SafeContract_v1_1_1_Contract,
+  SafeContract_v1_2_0_Contract,
+  SafeContract_v1_3_0_Contract,
+  SafeContract_v1_4_1_Contract
+} from '@safe-global/safe-core-sdk-types/contracts/Safe'
+import {
+  MultiSendCallOnlyContract_v1_3_0_Contract,
+  MultiSendCallOnlyContract_v1_4_1_Contract,
+  MultiSendContract_v1_1_1_Contract,
+  MultiSendContract_v1_3_0_Contract,
+  MultiSendContract_v1_4_1_Contract
+} from '../contracts/MultiSend'
+import {
+  CompatibilityFallbackHandlerContract_v1_3_0_Contract,
+  CompatibilityFallbackHandlerContract_v1_4_1_Contract
+} from '../contracts/CompatibilityFallbackHandler'
+import {
+  SafeProxyFactoryContract_v1_0_0_Contract,
+  SafeProxyFactoryContract_v1_1_1_Contract,
+  SafeProxyFactoryContract_v1_3_0_Contract,
+  SafeProxyFactoryContract_v1_4_1_Contract
+} from '../contracts/SafeProxyFactory'
+import {
+  SignMessageLibContract_v1_3_0_Contract,
+  SignMessageLibContract_v1_4_1_Contract
+} from '../contracts/SignMessageLib'
+import {
+  CreateCallContract_v1_3_0_Contract,
+  CreateCallContract_v1_4_1_Contract
+} from '../contracts/CreateCall'
+import {
+  SimulateTxAccessorContract_v1_3_0_Contract,
+  SimulateTxAccessorContract_v1_4_1_Contract
+} from '../contracts/SimulateTxAccessor'
 
 export interface EthAdapterTransaction {
   to: string
@@ -23,11 +50,48 @@ export interface EthAdapterTransaction {
 
 export interface GetContractProps {
   safeVersion: SafeVersion
-  singletonDeployment?: SingletonDeployment
   customContractAddress?: string
   customContractAbi?: AbiItem | AbiItem[]
   isL1SafeSingleton?: boolean
 }
+
+export type SafeContactType =
+  | SafeContract_v1_0_0_Contract
+  | SafeContract_v1_1_1_Contract
+  | SafeContract_v1_2_0_Contract
+  | SafeContract_v1_3_0_Contract
+  | SafeContract_v1_4_1_Contract
+
+export type MultiSendContractType =
+  | MultiSendContract_v1_1_1_Contract
+  | MultiSendContract_v1_3_0_Contract
+  | MultiSendContract_v1_4_1_Contract
+
+export type MultiSendCallOnlyContractType =
+  | MultiSendCallOnlyContract_v1_3_0_Contract
+  | MultiSendCallOnlyContract_v1_4_1_Contract
+
+export type CompatibilityFallbackHandlerContractType =
+  | CompatibilityFallbackHandlerContract_v1_3_0_Contract
+  | CompatibilityFallbackHandlerContract_v1_4_1_Contract
+
+export type SafeProxyFactoryContractType =
+  | SafeProxyFactoryContract_v1_0_0_Contract
+  | SafeProxyFactoryContract_v1_1_1_Contract
+  | SafeProxyFactoryContract_v1_3_0_Contract
+  | SafeProxyFactoryContract_v1_4_1_Contract
+
+export type SignMessageLibContractType =
+  | SignMessageLibContract_v1_3_0_Contract
+  | SignMessageLibContract_v1_4_1_Contract
+
+export type CreateCallContractType =
+  | CreateCallContract_v1_3_0_Contract
+  | CreateCallContract_v1_4_1_Contract
+
+export type SimulateTxAccessorContractType =
+  | SimulateTxAccessorContract_v1_3_0_Contract
+  | SimulateTxAccessorContract_v1_4_1_Contract
 
 export interface EthAdapter {
   isAddress(address: string): boolean
@@ -38,56 +102,49 @@ export interface EthAdapter {
   getChecksummedAddress(address: string): string
   getSafeContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi,
     isL1SafeSingleton
-  }: GetContractProps): Promise<SafeContract>
+  }: GetContractProps): Promise<SafeContactType>
   getMultiSendContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<MultiSendContract>
+  }: GetContractProps): Promise<MultiSendContractType>
   getMultiSendCallOnlyContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<MultiSendCallOnlyContract>
+  }: GetContractProps): Promise<MultiSendCallOnlyContractType>
   getCompatibilityFallbackHandlerContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CompatibilityFallbackHandlerContract>
+  }: GetContractProps): Promise<CompatibilityFallbackHandlerContractType>
   getSafeProxyFactoryContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SafeProxyFactoryContract>
+  }: GetContractProps): Promise<SafeProxyFactoryContractType>
   getSignMessageLibContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SignMessageLibContract>
+  }: GetContractProps): Promise<SignMessageLibContractType>
   getCreateCallContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CreateCallContract>
+  }: GetContractProps): Promise<CreateCallContractType>
   getSimulateTxAccessorContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SimulateTxAccessorContract>
+  }: GetContractProps): Promise<SimulateTxAccessorContractType>
   getContractCode(address: string, defaultBlock?: string | number): Promise<string>
   isContractDeployed(address: string, defaultBlock?: string | number): Promise<boolean>
   getStorageAt(address: string, position: string): Promise<string>
+  // TODO: review all any here
   getTransaction(transactionHash: string): Promise<any>
   getSignerAddress(): Promise<string | undefined>
   signMessage(message: string): Promise<string>

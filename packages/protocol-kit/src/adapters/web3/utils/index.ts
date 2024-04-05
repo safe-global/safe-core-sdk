@@ -1,8 +1,8 @@
-import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 import {
   Web3TransactionOptions,
   Web3TransactionResult
-} from '@safe-global/protocol-kit/adapters/web3/types'
+} from 'packages/safe-core-sdk-types/dist/src'
+import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
 export function sameString(str1: string, str2: string): boolean {
   return str1.toLowerCase() === str2.toLowerCase()

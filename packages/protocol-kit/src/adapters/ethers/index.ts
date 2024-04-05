@@ -5,14 +5,11 @@ import MultiSendCallOnlyBaseContractEthers from './contracts/MultiSend/MultiSend
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import SafeProxyFactoryBaseContractEthers from './contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import SignMessageLibBaseContractEthers from './contracts/SignMessageLib/SignMessageLibBaseContractEthers'
-import { EthersTransactionOptions, EthersTransactionResult } from './types'
 
 export {
   CreateCallBaseContractEthers,
   EthersAdapter,
   EthersAdapterConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
   MultiSendCallOnlyBaseContractEthers,
   MultiSendBaseContractEthers,
   SafeContractEthers,

@@ -1,28 +1,18 @@
 import { TransactionReceipt } from 'web3-core/types'
 import SafeProxyFactoryBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import {
-  DeepWriteable,
-  Web3TransactionOptions
-} from '@safe-global/protocol-kit/adapters/web3/types'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import safeProxyFactory_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.4.1/safe_proxy_factory'
 import {
+  SafeVersion,
+  SafeProxyFactoryContract_v1_4_1_Abi,
+  SafeProxyFactoryContract_v1_4_1_Contract,
+  safeProxyFactory_1_4_1_ContractArtifacts,
   EncodeFunction,
+  Web3TransactionOptions,
   EstimateGasFunction,
   GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
-import SafeProxyFactoryContract_v1_4_1_Contract, {
-  SafeProxyFactoryContract_v1_4_1_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
-import {
-  CreateProxyProps as CreateProxyPropsGeneral,
-  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
-
-export interface CreateProxyProps extends CreateProxyPropsGeneral {
-  options?: Web3TransactionOptions
-}
 
 /**
  * SafeProxyFactoryContract_v1_4_1_Web3 is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -50,20 +40,13 @@ class SafeProxyFactoryContract_v1_4_1_Web3
     chainId: bigint,
     web3Adapter: Web3Adapter,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi
+    customContractAbi?: DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi =
       safeProxyFactory_1_4_1_ContractArtifacts.abi as DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>
 
-    super(
-      chainId,
-      web3Adapter,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>
-    )
+    super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }
@@ -123,7 +106,13 @@ class SafeProxyFactoryContract_v1_4_1_Web3
     saltNonce,
     options,
     callback
-  }: CreateProxyProps): Promise<string> {
+  }: {
+    safeSingletonAddress: string
+    initializer: string
+    saltNonce: string
+    options?: Web3TransactionOptions
+    callback?: (txHash: string) => void
+  }): Promise<string> {
     const saltNonceBigInt = BigInt(saltNonce)
 
     if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')
@@ -156,24 +145,6 @@ class SafeProxyFactoryContract_v1_4_1_Web3
       throw new Error('SafeProxy was not deployed correctly')
     }
     return proxyAddress
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      encode: this.encode.bind(this),
-
-      estimateGas: async (...args: Parameters<typeof this.estimateGas>) =>
-        (await this.estimateGas(...args)).toString(),
-
-      createProxy: this.createProxy.bind(this),
-
-      getAddress: this.getAddress.bind(this),
-
-      proxyCreationCode: async () => (await this.proxyCreationCode())[0]
-    }
   }
 }
 

@@ -4,18 +4,18 @@ import {
   EthersTransactionOptions,
   EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers/types'
-import SafeContract_v1_0_0_Contract, {
-  SafeContract_v1_0_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
-import safe_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.0.0/gnosis_safe'
 import { sameString } from '@safe-global/protocol-kit/utils'
-import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
+  SafeVersion,
+  SafeContract_v1_0_0_Abi,
+  SafeTransaction,
+  SafeContract_v1_0_0_Contract,
+  safe_1_0_0_ContractArtifacts,
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeContract_v1_0_0_Ethers is the implementation specific to the Safe contract version 1.0.0.
@@ -281,64 +281,6 @@ class SafeContract_v1_0_0_Ethers
       )
     } catch (error) {
       return false
-    }
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      setup: (): any => {
-        // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_0_0_Contract
-        return
-      },
-
-      getModules: async () => (await this.getModules())[0],
-
-      isModuleEnabled: this.isModuleEnabled.bind(this),
-
-      getVersion: async () => (await this.VERSION())[0],
-
-      getAddress: this.getAddress.bind(this),
-
-      getNonce: async () => Number((await this.nonce())[0]),
-
-      getThreshold: async () => Number((await this.getThreshold())[0]),
-
-      getOwners: async () => (await this.getOwners())[0],
-
-      isOwner: async (address: string) => (await this.isOwner([address]))[0],
-
-      getTransactionHash: async (safeTransactionData: SafeTransactionData) => {
-        return (
-          await this.getTransactionHash([
-            safeTransactionData.to,
-            BigInt(safeTransactionData.value),
-            safeTransactionData.data,
-            safeTransactionData.operation,
-            BigInt(safeTransactionData.safeTxGas),
-            BigInt(safeTransactionData.baseGas),
-            BigInt(safeTransactionData.gasPrice),
-            safeTransactionData.gasToken,
-            safeTransactionData.refundReceiver,
-            BigInt(safeTransactionData.nonce)
-          ])
-        )[0]
-      },
-
-      approvedHashes: async (ownerAddress: string, hash: string) =>
-        (await this.approvedHashes([ownerAddress, hash]))[0],
-
-      approveHash: this.approveHash.bind(this),
-
-      isValidTransaction: this.isValidTransaction.bind(this),
-
-      execTransaction: this.execTransaction.bind(this),
-
-      encode: this.encode.bind(this),
-
-      estimateGas: this.estimateGas.bind(this)
     }
   }
 }

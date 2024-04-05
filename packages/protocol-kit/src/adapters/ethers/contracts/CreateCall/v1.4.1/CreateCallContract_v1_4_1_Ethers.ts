@@ -4,17 +4,16 @@ import {
   EthersTransactionOptions,
   EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers/types'
-import CreateCallContract_v1_4_1_Contract, {
-  CreateCallContract_v1_4_1_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
-import CreateCall_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CreateCall/v1.4.1/create_call'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import {
+  SafeVersion,
+  CreateCallContract_v1_4_1_Abi,
+  CreateCallContract_v1_4_1_Contract,
+  createCall_1_4_1_ContractArtifacts,
+  GetAddressFunction,
   EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+  EstimateGasFunction
+} from '@safe-global/safe-core-sdk-types'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 
 /**
  * CreateCallContract_V1_4_1_Ethers is the implementation specific to the CreateCall contract version 1.4.1.
@@ -26,7 +25,7 @@ import {
  */
 class CreateCallContract_V1_4_1_Ethers
   extends CreateCallBaseContractEthers<CreateCallContract_v1_4_1_Abi>
-  implements CreateCallContract_v1_4_1_Contract<EthersAdapter>
+  implements CreateCallContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
 
@@ -45,7 +44,7 @@ class CreateCallContract_V1_4_1_Ethers
     customContractAbi?: CreateCallContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
-    const defaultAbi = CreateCall_1_4_1_ContractArtifacts.abi
+    const defaultAbi = createCall_1_4_1_ContractArtifacts.abi
 
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
@@ -90,33 +89,6 @@ class CreateCallContract_V1_4_1_Ethers
     }
     const txResponse = await this.contract.performCreate2(...args)
     return toTxResult(txResponse, options)
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      getAddress: this.getAddress.bind(this),
-
-      encode: this.encode.bind(this),
-
-      estimateGas: async (...args: Parameters<typeof this.estimateGas>) =>
-        (await this.estimateGas(...args)).toString(),
-
-      performCreate: async (
-        value: string,
-        deploymentData: string,
-        options?: EthersTransactionOptions
-      ) => this.performCreate([BigInt(value), deploymentData], options),
-
-      performCreate2: async (
-        value: string,
-        deploymentData: string,
-        salt: string,
-        options?: EthersTransactionOptions
-      ) => this.performCreate2([BigInt(value), deploymentData, salt], options)
-    }
   }
 }
 

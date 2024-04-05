@@ -1,4 +1,30 @@
 import { AbiItem } from 'web3-utils'
+import {
+  SafeVersion,
+  CompatibilityFallbackHandlerContract_v1_3_0_Abi,
+  CompatibilityFallbackHandlerContract_v1_4_1_Abi,
+  CreateCallContract_v1_3_0_Abi,
+  CreateCallContract_v1_4_1_Abi,
+  MultiSendCallOnlyContract_v1_3_0_Abi,
+  MultiSendCallOnlyContract_v1_4_1_Abi,
+  MultiSendContract_v1_1_1_Abi,
+  MultiSendContract_v1_3_0_Abi,
+  MultiSendContract_v1_4_1_Abi,
+  SafeContract_v1_0_0_Abi,
+  SafeContract_v1_1_1_Abi,
+  SafeContract_v1_2_0_Abi,
+  SafeContract_v1_3_0_Abi,
+  SafeContract_v1_4_1_Abi,
+  SafeProxyFactoryContract_v1_0_0_Abi,
+  SafeProxyFactoryContract_v1_1_1_Abi,
+  SafeProxyFactoryContract_v1_3_0_Abi,
+  SafeProxyFactoryContract_v1_4_1_Abi,
+  SignMessageLibContract_v1_3_0_Abi,
+  SignMessageLibContract_v1_4_1_Abi,
+  SimulateTxAccessorContract_v1_3_0_Abi,
+  SimulateTxAccessorContract_v1_4_1_Abi
+} from '@safe-global/safe-core-sdk-types'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import SafeContract_v1_0_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Web3'
 import SafeContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Web3'
 import SafeContract_v1_2_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Web3'
@@ -22,46 +48,6 @@ import SignMessageLibContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapte
 import CompatibilityFallbackHandlerContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1_Web3'
 import CompatibilityFallbackHandlerContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0_Web3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import { SafeContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
-import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
-import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
-import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
-import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
-import { SafeProxyFactoryContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import { SafeProxyFactoryContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
-import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
-import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
-import {
-  CompatibilityFallbackHandlerContract,
-  CreateCallContract,
-  SafeVersion,
-  SignMessageLibContract,
-  SimulateTxAccessorContract
-} from '@safe-global/safe-core-sdk-types'
-import { CreateCallContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
-import { CreateCallContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
-import { MultiSendContract_v1_4_1_Abi as MultiSendContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
-import { MultiSendContract_v1_3_0_Abi as MultiSendContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
-import { MultiSendContract_v1_1_1_Abi as MultiSendContract_v1_1_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
-import { MultiSendCallOnlyContract_v1_3_0_Abi as MultiSendCallOnlyContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
-import { MultiSendCallOnlyContract_v1_4_1_Abi as MultiSendCallOnlyContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
-import { SignMessageLibContract_v1_4_1_Abi as SignMessageLibContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
-import { SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import { SimulateTxAccessorContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
-import { SimulateTxAccessorContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
-import { CompatibilityFallbackHandlerContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
-import { CompatibilityFallbackHandlerContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
-
-type MultiSendContract_v1_1_1_Abi = DeepWriteable<MultiSendContract_v1_1_1_Abi_Readonly>
-type MultiSendContract_v1_3_0_Abi = DeepWriteable<MultiSendContract_v1_3_0_Abi_Readonly>
-type MultiSendContract_v1_4_1_Abi = DeepWriteable<MultiSendContract_v1_4_1_Abi_Readonly>
-type MultiSendCallOnlyContract_v1_3_0_Abi =
-  DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi_Readonly>
-type MultiSendCallOnlyContract_v1_4_1_Abi =
-  DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi_Readonly>
-type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1_3_0_Abi_Readonly>
-type SignMessageLibContract_v1_4_1_Abi = DeepWriteable<SignMessageLibContract_v1_4_1_Abi_Readonly>
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -69,66 +55,61 @@ export async function getSafeContractInstance(
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined,
   isL1SafeSingleton?: boolean
-  // TODO <any> return type used until Typechain is removed
-): Promise<any> {
+): Promise<
+  | SafeContract_v1_4_1_Web3
+  | SafeContract_v1_3_0_Web3
+  | SafeContract_v1_2_0_Web3
+  | SafeContract_v1_1_1_Web3
+  | SafeContract_v1_0_0_Web3
+> {
   const chainId = await web3Adapter.getChainId()
-  let safeContract
+
   switch (safeVersion) {
     case '1.4.1':
-      safeContract = new SafeContract_v1_4_1_Web3(
+      return new SafeContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_4_1_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.3.0':
-      safeContract = new SafeContract_v1_3_0_Web3(
+      return new SafeContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_3_0_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.2.0':
-      safeContract = new SafeContract_v1_2_0_Web3(
+      return new SafeContract_v1_2_0_Web3(
         chainId,
         web3Adapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_2_0_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_2_0_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.1.1':
-      safeContract = new SafeContract_v1_1_1_Web3(
+      return new SafeContract_v1_1_1_Web3(
         chainId,
         web3Adapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_1_1_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_1_1_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.0.0':
-      safeContract = new SafeContract_v1_0_0_Web3(
+      return new SafeContract_v1_0_0_Web3(
         chainId,
         web3Adapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_0_0_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_0_0_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     default:
       throw new Error('Invalid Safe version')
   }
@@ -139,15 +120,19 @@ export async function getCompatibilityFallbackHandlerContractInstance(
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<CompatibilityFallbackHandlerContract> {
+): Promise<
+  | CompatibilityFallbackHandlerContract_v1_4_1_Web3
+  | CompatibilityFallbackHandlerContract_v1_3_0_Web3
+> {
   const chainId = await web3Adapter.getChainId()
+
   switch (safeVersion) {
     case '1.4.1':
       return new CompatibilityFallbackHandlerContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as CompatibilityFallbackHandlerContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
       )
     case '1.3.0':
     case '1.2.0':
@@ -156,7 +141,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as CompatibilityFallbackHandlerContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
       )
     default:
       throw new Error('Invalid Safe version')
@@ -172,20 +157,21 @@ export async function getMultiSendContractInstance(
   MultiSendContract_V1_4_1_Web3 | MultiSendContract_V1_3_0_Web3 | MultiSendContract_V1_1_1_Web3
 > {
   const chainId = await web3Adapter.getChainId()
+
   switch (safeVersion) {
     case '1.4.1':
       return new MultiSendContract_V1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<MultiSendContract_v1_4_1_Abi>
       )
     case '1.3.0':
       return new MultiSendContract_V1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<MultiSendContract_v1_3_0_Abi>
       )
     case '1.2.0':
     case '1.1.1':
@@ -194,7 +180,7 @@ export async function getMultiSendContractInstance(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendContract_v1_1_1_Abi
+        customContractAbi as DeepWriteable<MultiSendContract_v1_1_1_Abi>
       )
     default:
       throw new Error('Invalid Safe version')
@@ -208,13 +194,14 @@ export async function getMultiSendCallOnlyContractInstance(
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<MultiSendCallOnlyContract_V1_4_1_Web3 | MultiSendCallOnlyContract_V1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
+
   switch (safeVersion) {
     case '1.4.1':
       return new MultiSendCallOnlyContract_V1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendCallOnlyContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi>
       )
     case '1.3.0':
     case '1.2.0':
@@ -224,7 +211,7 @@ export async function getMultiSendCallOnlyContractInstance(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendCallOnlyContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>
       )
     default:
       throw new Error('Invalid Safe version')
@@ -238,46 +225,41 @@ export async function getSafeProxyFactoryContractInstance(
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ) {
   const chainId = await web3Adapter.getChainId()
-  let safeProxyFactoryContract
 
   switch (safeVersion) {
     case '1.4.1':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_4_1_Web3(
+      return new SafeProxyFactoryContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     case '1.3.0':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_3_0_Web3(
+      return new SafeProxyFactoryContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     case '1.2.0':
     case '1.1.1':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_1_1_Web3(
+      return new SafeProxyFactoryContract_v1_1_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_1_1_Abi
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     case '1.0.0':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_0_0_Web3(
+      return new SafeProxyFactoryContract_v1_0_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_0_0_Abi
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     default:
       throw new Error('Invalid Safe version')
   }
@@ -288,31 +270,26 @@ export async function getSignMessageLibContractInstance(
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<SignMessageLibContract> {
+): Promise<SignMessageLibContract_v1_4_1_Web3 | SignMessageLibContract_v1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
-  let signMessageLibContract
 
   switch (safeVersion) {
     case '1.4.1':
-      signMessageLibContract = new SignMessageLibContract_v1_4_1_Web3(
+      return new SignMessageLibContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as SignMessageLibContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<SignMessageLibContract_v1_4_1_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return signMessageLibContract.mapToTypechainContract()
     case '1.3.0':
-      signMessageLibContract = new SignMessageLibContract_v1_3_0_Web3(
+      return new SignMessageLibContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as SignMessageLibContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<SignMessageLibContract_v1_3_0_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return signMessageLibContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }
@@ -323,34 +300,29 @@ export async function getCreateCallContractInstance(
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<CreateCallContract> {
+): Promise<CreateCallContract_V1_4_1_Web3 | CreateCallContract_V1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
-  let createCallContract
 
   switch (safeVersion) {
     case '1.4.1':
-      createCallContract = new CreateCallContract_V1_4_1_Web3(
+      return new CreateCallContract_V1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as CreateCallContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<CreateCallContract_v1_4_1_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return createCallContract.mapToTypechainContract()
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      createCallContract = new CreateCallContract_V1_3_0_Web3(
+      return new CreateCallContract_V1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as CreateCallContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return createCallContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }
@@ -361,7 +333,7 @@ export async function getSimulateTxAccessorContractInstance(
   contractAddress: string,
   web3Adapter: Web3Adapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<SimulateTxAccessorContract> {
+): Promise<SimulateTxAccessorContract_v1_4_1_Web3 | SimulateTxAccessorContract_v1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
 
   switch (safeVersion) {
@@ -370,14 +342,14 @@ export async function getSimulateTxAccessorContractInstance(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as SimulateTxAccessorContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi>
       )
     case '1.3.0':
       return new SimulateTxAccessorContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
-        customContractAbi as unknown as SimulateTxAccessorContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi>
       )
     default:
       throw new Error('Invalid Safe version')

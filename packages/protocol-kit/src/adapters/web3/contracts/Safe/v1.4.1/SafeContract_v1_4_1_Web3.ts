@@ -1,25 +1,20 @@
 import SafeBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/SafeBaseContractWeb3'
-import {
-  DeepWriteable,
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from '@safe-global/protocol-kit/adapters/web3/types'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/web3/utils/constants'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import safe_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.4.1/safe_l2'
 import {
   EncodeFunction,
   EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
-import SafeContract_v1_4_1_Contract, {
-  SafeContract_v1_4_1_Abi as SafeContract_v1_4_1_Abi_Readonly
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
-import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
-
-// Remove all nested `readonly` modifiers from the ABI type
-type SafeContract_v1_4_1_Abi = DeepWriteable<SafeContract_v1_4_1_Abi_Readonly>
+  GetAddressFunction,
+  safe_1_4_1_ContractArtifacts,
+  SafeContract_v1_4_1_Abi,
+  SafeContract_v1_4_1_Contract,
+  SafeTransaction,
+  SafeVersion,
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeContract_v1_4_1_Web3 is the implementation specific to the Safe contract version 1.4.1.
@@ -30,7 +25,7 @@ type SafeContract_v1_4_1_Abi = DeepWriteable<SafeContract_v1_4_1_Abi_Readonly>
  * @implements SafeContract_v1_4_1_Contract - Implements the interface specific to Safe contract version 1.4.1.
  */
 class SafeContract_v1_4_1_Web3
-  extends SafeBaseContractWeb3<SafeContract_v1_4_1_Abi>
+  extends SafeBaseContractWeb3<DeepWriteable<SafeContract_v1_4_1_Abi>>
   implements SafeContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
@@ -49,10 +44,10 @@ class SafeContract_v1_4_1_Web3
     web3Adapter: Web3Adapter,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContract_v1_4_1_Abi_Readonly
+    customContractAbi?: DeepWriteable<SafeContract_v1_4_1_Abi>
   ) {
     const safeVersion = '1.4.1'
-    const defaultAbi = safe_1_4_1_ContractArtifacts.abi as SafeContract_v1_4_1_Abi
+    const defaultAbi = safe_1_4_1_ContractArtifacts.abi as DeepWriteable<SafeContract_v1_4_1_Abi>
 
     super(
       chainId,
@@ -61,7 +56,7 @@ class SafeContract_v1_4_1_Web3
       safeVersion,
       isL1SafeSingleton,
       customContractAddress,
-      customContractAbi as SafeContract_v1_4_1_Abi
+      customContractAbi
     )
 
     this.safeVersion = safeVersion
@@ -169,11 +164,11 @@ class SafeContract_v1_4_1_Web3
     return [await this.contract.methods.signedMessages(...args).call()]
   }
 
-  encode: EncodeFunction<SafeContract_v1_4_1_Abi_Readonly> = (functionToEncode, args) => {
+  encode: EncodeFunction<SafeContract_v1_4_1_Abi> = (functionToEncode, args) => {
     return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 
-  estimateGas: EstimateGasFunction<SafeContract_v1_4_1_Abi_Readonly, Web3TransactionOptions> = (
+  estimateGas: EstimateGasFunction<SafeContract_v1_4_1_Abi, Web3TransactionOptions> = (
     functionToEstimate,
     args,
     options = {}
@@ -292,65 +287,6 @@ class SafeContract_v1_4_1_Web3
     }
     const txResponse = this.contract.methods.approveHash(hash).send(options)
     return toTxResult(txResponse, options)
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      setup: (): any => {
-        // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_4_1_Contract
-        return
-      },
-
-      approveHash: this.approveHash.bind(this),
-
-      isValidTransaction: this.isValidTransaction.bind(this),
-
-      execTransaction: this.execTransaction.bind(this),
-
-      getAddress: this.getAddress.bind(this),
-
-      getModules: this.getModules.bind(this),
-
-      isModuleEnabled: async (moduleAddress: string) =>
-        (await this.isModuleEnabled([moduleAddress]))[0],
-
-      getVersion: async () => (await this.VERSION())[0] as SafeVersion,
-
-      getNonce: async () => Number((await this.nonce())[0]),
-
-      getThreshold: async () => Number((await this.getThreshold())[0]),
-
-      getOwners: async () => (await this.getOwners())[0],
-
-      isOwner: async (address: string) => (await this.isOwner([address]))[0],
-
-      getTransactionHash: async (safeTransactionData: SafeTransactionData) => {
-        return (
-          await this.getTransactionHash([
-            safeTransactionData.to,
-            BigInt(safeTransactionData.value),
-            safeTransactionData.data,
-            safeTransactionData.operation,
-            BigInt(safeTransactionData.safeTxGas),
-            BigInt(safeTransactionData.baseGas),
-            BigInt(safeTransactionData.gasPrice),
-            safeTransactionData.gasToken,
-            safeTransactionData.refundReceiver,
-            BigInt(safeTransactionData.nonce)
-          ])
-        )[0]
-      },
-
-      approvedHashes: async (ownerAddress: string, hash: string) =>
-        (await this.approvedHashes([ownerAddress, hash]))[0],
-
-      encode: this.encode.bind(this),
-
-      estimateGas: this.estimateGas.bind(this)
-    }
   }
 }
 

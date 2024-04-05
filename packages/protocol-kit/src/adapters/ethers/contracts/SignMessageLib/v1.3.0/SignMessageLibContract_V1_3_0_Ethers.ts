@@ -2,18 +2,17 @@ import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/eth
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import SignMessageLibContract_v1_3_0_Contract, {
-  SignMessageLibContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import multisend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
-import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
 import {
   AdapterSpecificContractFunction,
   ContractFunction,
   EncodeFunction,
   EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+  GetAddressFunction,
+  SafeVersion,
+  SignMessageLibContract_v1_3_0_Abi,
+  SignMessageLibContract_v1_3_0_Contract,
+  signMessageLib_1_3_0_ContractArtifacts
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SignMessageLibContract_v1_3_0_Ethers is the implementation specific to the SignMessageLib contract version 1.3.0.
@@ -25,7 +24,7 @@ import {
  */
 class SignMessageLibContract_v1_3_0_Ethers
   extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
-  implements SignMessageLibContract_v1_3_0_Contract<EthersAdapter>
+  implements SignMessageLibContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion
 
@@ -44,7 +43,7 @@ class SignMessageLibContract_v1_3_0_Ethers
     customContractAbi?: SignMessageLibContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
-    const defaultAbi = multisend_1_3_0_ContractArtifacts.abi
+    const defaultAbi = signMessageLib_1_3_0_ContractArtifacts.abi
 
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
@@ -81,40 +80,16 @@ class SignMessageLibContract_v1_3_0_Ethers
   /**
    * @param args - Array[data]
    */
-  signMessage: AdapterSpecificContractFunction<
-    SignMessageLibContract_v1_3_0_Abi,
-    EthersAdapter,
-    'signMessage'
-  > = async (data, options) => {
-    if (options && !options.gasLimit) {
-      options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
-    }
-
-    const txResponse = await this.contract.signMessage(data, { ...options })
-
-    return toTxResult(txResponse, options)
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): SignMessageLibContract {
-    return {
-      encode: this.encode.bind(this),
-
-      estimateGas: async (methodName: string, params: any[], options: EthersTransactionOptions) => {
-        const gas = await this.estimateGas(methodName as 'signMessage', params as [string], options)
-
-        return gas.toString()
-      },
-
-      getAddress: this.getAddress.bind(this),
-
-      getMessageHash: async (message: string) => (await this.getMessageHash([message]))[0],
-
-      signMessage: async (data: string, options?: EthersTransactionOptions) => {
-        return this.signMessage([data], options)
+  signMessage: AdapterSpecificContractFunction<SignMessageLibContract_v1_3_0_Abi, 'signMessage'> =
+    async (data, options?: EthersTransactionOptions) => {
+      if (options && !options.gasLimit) {
+        options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
       }
+
+      const txResponse = await this.contract.signMessage(data, { ...options })
+
+      return toTxResult(txResponse, options)
     }
-  }
 }
 
 export default SignMessageLibContract_v1_3_0_Ethers

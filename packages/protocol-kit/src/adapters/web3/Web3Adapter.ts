@@ -1,15 +1,11 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import {
-  CompatibilityFallbackHandlerContract,
-  CreateCallContract,
   Eip3770Address,
   EthAdapter,
   EthAdapterTransaction,
   GetContractProps,
-  SafeEIP712Args,
-  SignMessageLibContract,
-  SimulateTxAccessorContract
+  SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
@@ -19,7 +15,6 @@ import { AbiItem } from 'web3-utils'
 // Deprecated https://www.npmjs.com/package/@types/web3?activeTab=readme
 // Migration guide https://docs.web3js.org/docs/guides/web3_migration_guide#types
 import type { JsonRPCResponse, Provider } from 'web3/providers'
-import SafeContractWeb3 from './contracts/Safe/SafeContractWeb3'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -30,11 +25,6 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesWeb3'
-import MultiSendContract_v1_1_1_Web3 from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
-import MultiSendContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
-import MultiSendContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Web3'
-import MultiSendCallOnlyContract_v1_3_0_Web3 from './contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
-import MultiSendCallOnlyContract_v1_4_1_Web3 from './contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */
@@ -92,7 +82,7 @@ class Web3Adapter implements EthAdapter {
     customContractAddress,
     customContractAbi,
     isL1SafeSingleton
-  }: GetContractProps): Promise<SafeContractWeb3> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
@@ -134,9 +124,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<
-    MultiSendContract_v1_4_1_Web3 | MultiSendContract_v1_3_0_Web3 | MultiSendContract_v1_1_1_Web3
-  > {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
@@ -151,9 +139,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<
-    MultiSendCallOnlyContract_v1_4_1_Web3 | MultiSendCallOnlyContract_v1_3_0_Web3
-  > {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
@@ -173,7 +159,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CompatibilityFallbackHandlerContract> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
@@ -193,7 +179,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SignMessageLibContract> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
@@ -209,7 +195,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CreateCallContract> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
@@ -224,7 +210,7 @@ class Web3Adapter implements EthAdapter {
     singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SimulateTxAccessorContract> {
+  }: GetContractProps) {
     const chainId = await this.getChainId()
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
@@ -239,7 +225,7 @@ class Web3Adapter implements EthAdapter {
     )
   }
 
-  getContract(address: string, abi: AbiItem | AbiItem[], options?: ContractOptions): any {
+  getContract(address: string, abi: AbiItem[], options?: ContractOptions): any {
     return new this.#web3.eth.Contract(abi, address, options)
   }
 

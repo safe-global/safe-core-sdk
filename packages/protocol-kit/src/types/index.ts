@@ -2,7 +2,7 @@ import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/utils/tr
 import {
   EthAdapter,
   MetaTransactionData,
-  SafeContract,
+  SafeContactType,
   SafeTransactionDataPartial,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
@@ -159,7 +159,7 @@ export interface SwapOwnerTxParams {
 
 type StandardizeSafeTxDataWithSafeContractProps = {
   /** safeContract - The Safe contract to use */
-  safeContract: SafeContract
+  safeContract: SafeContactType
   /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe?: never
 }

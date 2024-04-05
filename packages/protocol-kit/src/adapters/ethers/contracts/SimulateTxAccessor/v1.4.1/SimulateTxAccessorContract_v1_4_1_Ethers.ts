@@ -1,16 +1,14 @@
 import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import SimulateTxAccessorContract_v1_4_1_Contract, {
-  SimulateTxAccessorContract_v1_4_1_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
-import SimulateTxAccessor_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.4.1/simulate_tx_accessor'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
+  SafeVersion,
   ContractFunction,
   EncodeFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
-
+  GetAddressFunction,
+  simulateTxAccessor_1_4_1_ContractArtifacts,
+  SimulateTxAccessorContract_v1_4_1_Abi,
+  SimulateTxAccessorContract_v1_4_1_Contract
+} from '@safe-global/safe-core-sdk-types'
 /**
  * SimulateTxAccessorContract_v1_4_1_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
  *
@@ -40,7 +38,7 @@ class SimulateTxAccessorContract_v1_4_1_Ethers
     customContractAbi?: SimulateTxAccessorContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
-    const defaultAbi = SimulateTxAccessor_1_4_1_ContractArtifacts.abi
+    const defaultAbi = simulateTxAccessor_1_4_1_ContractArtifacts.abi
 
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 

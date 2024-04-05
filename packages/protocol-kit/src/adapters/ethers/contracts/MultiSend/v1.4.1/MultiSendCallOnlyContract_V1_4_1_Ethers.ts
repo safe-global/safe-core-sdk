@@ -1,14 +1,13 @@
 import MultiSendCallOnlyBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/MultiSendCallOnlyBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import MultiSendCallOnlyContract_v1_4_1_Contract, {
-  MultiSendCallOnlyContract_v1_4_1_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
-import multiSendCallOnly_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.4.1/multi_send_call_only'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
+  SafeVersion,
   EncodeFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+  GetAddressFunction,
+  multiSendCallOnly_1_4_1_ContractArtifacts,
+  MultiSendCallOnlyContract_v1_4_1_Abi,
+  MultiSendCallOnlyContract_v1_4_1_Contract
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * MultiSendCallOnlyContract_v1_4_1_Ethers is the implementation specific to the MultiSend contract version 1.4.1.

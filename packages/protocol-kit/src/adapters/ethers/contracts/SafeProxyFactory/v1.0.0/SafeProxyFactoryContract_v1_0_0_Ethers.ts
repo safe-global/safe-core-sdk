@@ -2,16 +2,15 @@ import { ContractRunner, EventLog } from 'ethers'
 import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
-import safeProxyFactory_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.0.0/proxy_factory'
 import {
+  SafeVersion,
+  SafeProxyFactoryContract_v1_0_0_Abi,
+  SafeProxyFactoryContract_v1_0_0_Contract,
+  safeProxyFactory_1_0_0_ContractArtifacts,
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
-import SafeProxyFactoryContract_v1_0_0_Contract, {
-  SafeProxyFactoryContract_v1_0_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeProxyFactoryContract_v1_0_0_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
@@ -134,24 +133,6 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
         return proxyAddress
       })
     return proxyAddress
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      encode: this.encode.bind(this),
-
-      estimateGas: async (...args: Parameters<typeof this.estimateGas>) =>
-        (await this.estimateGas(...args)).toString(),
-
-      createProxy: this.createProxyWithOptions.bind(this),
-
-      getAddress: this.getAddress.bind(this),
-
-      proxyCreationCode: async () => (await this.proxyCreationCode())[0]
-    }
   }
 }
 

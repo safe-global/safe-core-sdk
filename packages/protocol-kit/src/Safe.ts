@@ -66,8 +66,7 @@ import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
-  getProxyFactoryContract,
-  getSafeContract
+  getProxyFactoryContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
@@ -1212,14 +1211,14 @@ class Safe {
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
-    const safeSingletonContract = await getSafeContract({
-      ethAdapter: this.#ethAdapter,
-      safeVersion: safeVersion,
+    const safeSingletonContract = await this.#ethAdapter.getSafeContract({
+      safeVersion,
       isL1SafeSingleton,
-      customContracts
+      customContractAbi: customContracts?.safeSingletonAbi,
+      customContractAddress: customContracts?.safeSingletonAddress
     })
 
-    const encodedTransaction: string = safeSingletonContract.encode('execTransaction', [
+    const encodedTransaction = safeSingletonContract.encode('execTransaction', [
       safeTransaction.data.to,
       safeTransaction.data.value,
       safeTransaction.data.data,
@@ -1230,7 +1229,7 @@ class Safe {
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
       safeTransaction.encodedSignatures()
-    ]) as string
+    ])
 
     return encodedTransaction
   }
@@ -1318,11 +1317,10 @@ class Safe {
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
-    const safeSingletonContract = await getSafeContract({
-      ethAdapter: this.#ethAdapter,
+    const safeSingletonContract = await ethAdapter.getSafeContract({
       safeVersion,
       isL1SafeSingleton,
-      customContracts
+      customContractAbi: customContracts?.safeSingletonAbi
     })
 
     // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol

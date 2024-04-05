@@ -1,12 +1,31 @@
 import { AbstractSigner, Provider } from 'ethers'
 import { AbiItem } from 'web3-utils'
 import {
-  CompatibilityFallbackHandlerContract,
-  CreateCallContract,
   SafeVersion,
-  SignMessageLibContract,
-  SimulateTxAccessorContract
+  SafeContract_v1_3_0_Abi,
+  SafeContract_v1_4_1_Abi,
+  SafeContract_v1_2_0_Abi,
+  SafeContract_v1_1_1_Abi,
+  SafeContract_v1_0_0_Abi,
+  CompatibilityFallbackHandlerContract_v1_4_1_Abi,
+  CompatibilityFallbackHandlerContract_v1_3_0_Abi,
+  MultiSendContract_v1_4_1_Abi,
+  MultiSendContract_v1_3_0_Abi,
+  MultiSendContract_v1_1_1_Abi,
+  MultiSendCallOnlyContract_v1_4_1_Abi,
+  MultiSendCallOnlyContract_v1_3_0_Abi,
+  SafeProxyFactoryContract_v1_4_1_Abi,
+  SafeProxyFactoryContract_v1_3_0_Abi,
+  SafeProxyFactoryContract_v1_1_1_Abi,
+  SafeProxyFactoryContract_v1_0_0_Abi,
+  SignMessageLibContract_v1_4_1_Abi,
+  SignMessageLibContract_v1_3_0_Abi,
+  CreateCallContract_v1_4_1_Abi,
+  CreateCallContract_v1_3_0_Abi,
+  SimulateTxAccessorContract_v1_4_1_Abi,
+  SimulateTxAccessorContract_v1_3_0_Abi
 } from '@safe-global/safe-core-sdk-types'
+import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import CreateCallContract_V1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Ethers'
 import CreateCallContract_V1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Ethers'
 import MultiSendContract_V1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
@@ -29,96 +48,70 @@ import SimulateTxAccessorContract_V1_3_0_Ethers from '@safe-global/protocol-kit/
 import SimulateTxAccessorContract_V1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Ethers'
 import CompatibilityFallbackHandlerContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0_Ethers'
 import CompatibilityFallbackHandlerContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1_Ethers'
-import { CreateCallContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
-import { CreateCallContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
-import { MultiSendContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
-import { MultiSendContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
-import { MultiSendContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
-import { MultiSendCallOnlyContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
-import { MultiSendCallOnlyContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
-import { SafeContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.0.0/SafeContract_v1_0_0'
-import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.1.1/SafeContract_v1_1_1'
-import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
-import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
-import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
-import { SignMessageLibContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
-import { SignMessageLibContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import { SafeProxyFactoryContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import { SafeProxyFactoryContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
-import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
-import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
-import { SimulateTxAccessorContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
-import { SimulateTxAccessorContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
-import { CompatibilityFallbackHandlerContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
-import { CompatibilityFallbackHandlerContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import EthersAdapter from '../EthersAdapter'
 
+// TODO: create a JSdoc for this function
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined,
   isL1SafeSingleton?: boolean
-  // TODO <any> return type used until Typechain is removed
-): Promise<any> {
+): Promise<
+  | SafeContract_v1_4_1_Ethers
+  | SafeContract_v1_3_0_Ethers
+  | SafeContract_v1_2_0_Ethers
+  | SafeContract_v1_1_1_Ethers
+  | SafeContract_v1_0_0_Ethers
+> {
   const chainId = await ethersAdapter.getChainId()
-  let safeContract
+
   switch (safeVersion) {
     case '1.4.1':
-      safeContract = new SafeContract_v1_4_1_Ethers(
+      return new SafeContract_v1_4_1_Ethers(
         chainId,
         ethersAdapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_4_1_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.3.0':
-      safeContract = new SafeContract_v1_3_0_Ethers(
+      return new SafeContract_v1_3_0_Ethers(
         chainId,
         ethersAdapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_3_0_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.2.0':
-      safeContract = new SafeContract_v1_2_0_Ethers(
+      return new SafeContract_v1_2_0_Ethers(
         chainId,
         ethersAdapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_2_0_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_2_0_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.1.1':
-      safeContract = new SafeContract_v1_1_1_Ethers(
+      return new SafeContract_v1_1_1_Ethers(
         chainId,
         ethersAdapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_1_1_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_1_1_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     case '1.0.0':
-      safeContract = new SafeContract_v1_0_0_Ethers(
+      return new SafeContract_v1_0_0_Ethers(
         chainId,
         ethersAdapter,
         isL1SafeSingleton,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeContract_v1_0_0_Abi
+        customContractAbi as DeepWriteable<SafeContract_v1_0_0_Abi>
       )
-      // TODO: Remove this mapper after remove typechain
-      return safeContract.mapToTypechainContract()
+
     default:
       throw new Error('Invalid Safe version')
   }
@@ -129,7 +122,10 @@ export async function getCompatibilityFallbackHandlerContractInstance(
   contractAddress: string,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<CompatibilityFallbackHandlerContract> {
+): Promise<
+  | CompatibilityFallbackHandlerContract_v1_4_1_Ethers
+  | CompatibilityFallbackHandlerContract_v1_3_0_Ethers
+> {
   const chainId = await ethersAdapter.getChainId()
   switch (safeVersion) {
     case '1.4.1':
@@ -137,8 +133,9 @@ export async function getCompatibilityFallbackHandlerContractInstance(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as CompatibilityFallbackHandlerContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
       )
+
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
@@ -146,8 +143,9 @@ export async function getCompatibilityFallbackHandlerContractInstance(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as CompatibilityFallbackHandlerContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
       )
+
     default:
       throw new Error('Invalid Safe version')
   }
@@ -170,15 +168,17 @@ export async function getMultiSendContractInstance(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<MultiSendContract_v1_4_1_Abi>
       )
+
     case '1.3.0':
       return new MultiSendContract_V1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<MultiSendContract_v1_3_0_Abi>
       )
+
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
@@ -186,8 +186,9 @@ export async function getMultiSendContractInstance(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendContract_v1_1_1_Abi
+        customContractAbi as DeepWriteable<MultiSendContract_v1_1_1_Abi>
       )
+
     default:
       throw new Error('Invalid Safe version')
   }
@@ -206,8 +207,9 @@ export async function getMultiSendCallOnlyContractInstance(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendCallOnlyContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi>
       )
+
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
@@ -216,7 +218,7 @@ export async function getMultiSendCallOnlyContractInstance(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as MultiSendCallOnlyContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>
       )
     default:
       throw new Error('Invalid Safe version')
@@ -226,55 +228,56 @@ export async function getMultiSendCallOnlyContractInstance(
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
+  // TODO: remove this ??
   signerOrProvider: AbstractSigner | Provider,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-) {
+): Promise<
+  | SafeProxyFactoryContract_v1_4_1_Ethers
+  | SafeProxyFactoryContract_v1_3_0_Ethers
+  | SafeProxyFactoryContract_v1_1_1_Ethers
+  | SafeProxyFactoryContract_v1_0_0_Ethers
+> {
   const chainId = await ethersAdapter.getChainId()
-  let safeProxyFactoryContract
+
   switch (safeVersion) {
     case '1.4.1':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_4_1_Ethers(
+      return new SafeProxyFactoryContract_v1_4_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_4_1_Abi,
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>,
         signerOrProvider
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
 
     case '1.3.0':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_3_0_Ethers(
+      return new SafeProxyFactoryContract_v1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_3_0_Abi,
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>,
         signerOrProvider
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     case '1.2.0':
     case '1.1.1':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_1_1_Ethers(
+      return new SafeProxyFactoryContract_v1_1_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_1_1_Abi,
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>,
         signerOrProvider
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     case '1.0.0':
-      safeProxyFactoryContract = new SafeProxyFactoryContract_v1_0_0_Ethers(
+      return new SafeProxyFactoryContract_v1_0_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        // TODO: Remove this unknown after remove Typechain
-        customContractAbi as unknown as SafeProxyFactoryContract_v1_0_0_Abi,
+        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>,
         signerOrProvider
       )
-      return safeProxyFactoryContract.mapToTypechainContract() // remove this mapper after remove typechain
+
     default:
       throw new Error('Invalid Safe version')
   }
@@ -285,31 +288,26 @@ export async function getSignMessageLibContractInstance(
   contractAddress: string,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<SignMessageLibContract> {
+): Promise<SignMessageLibContract_V1_4_1_Ethers | SignMessageLibContract_V1_3_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()
-  let signMessageLibContract
 
   switch (safeVersion) {
     case '1.4.1':
-      signMessageLibContract = new SignMessageLibContract_V1_4_1_Ethers(
+      return new SignMessageLibContract_V1_4_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as SignMessageLibContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<SignMessageLibContract_v1_4_1_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return signMessageLibContract.mapToTypechainContract()
     case '1.3.0':
-      signMessageLibContract = new SignMessageLibContract_V1_3_0_Ethers(
+      return new SignMessageLibContract_V1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as SignMessageLibContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<SignMessageLibContract_v1_3_0_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return signMessageLibContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }
@@ -320,33 +318,29 @@ export async function getCreateCallContractInstance(
   contractAddress: string,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<CreateCallContract> {
+): Promise<CreateCallContract_V1_4_1_Ethers | CreateCallContract_V1_3_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()
-  let createCallContract
+
   switch (safeVersion) {
     case '1.4.1':
-      createCallContract = new CreateCallContract_V1_4_1_Ethers(
+      return new CreateCallContract_V1_4_1_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as CreateCallContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<CreateCallContract_v1_4_1_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return createCallContract.mapToTypechainContract()
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      createCallContract = new CreateCallContract_V1_3_0_Ethers(
+      return new CreateCallContract_V1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as CreateCallContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
       )
 
-      // TODO: Remove this mapper after remove typechain
-      return createCallContract.mapToTypechainContract()
     default:
       throw new Error('Invalid Safe version')
   }
@@ -357,7 +351,7 @@ export async function getSimulateTxAccessorContractInstance(
   contractAddress: string,
   ethersAdapter: EthersAdapter,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<SimulateTxAccessorContract> {
+): Promise<SimulateTxAccessorContract_V1_4_1_Ethers | SimulateTxAccessorContract_V1_3_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()
 
   switch (safeVersion) {
@@ -366,14 +360,15 @@ export async function getSimulateTxAccessorContractInstance(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as SimulateTxAccessorContract_v1_4_1_Abi
+        customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi>
       )
+
     case '1.3.0':
       return new SimulateTxAccessorContract_V1_3_0_Ethers(
         chainId,
         ethersAdapter,
         contractAddress,
-        customContractAbi as unknown as SimulateTxAccessorContract_v1_3_0_Abi
+        customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi>
       )
     default:
       throw new Error('Invalid Safe version')

@@ -1,14 +1,13 @@
 import MultiSendBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/MultiSendBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import MultiSendContract_v1_3_0_Contract, {
-  MultiSendContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
-import multisend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.3.0/multi_send'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
+  SafeVersion,
   EncodeFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+  GetAddressFunction,
+  multisend_1_3_0_ContractArtifacts,
+  MultiSendContract_v1_3_0_Abi,
+  MultiSendContract_v1_3_0_Contract
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * MultiSendContract_v1_3_0_Ethers is the implementation specific to the MultiSend contract version 1.3.0.

@@ -1,29 +1,28 @@
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
+import { Abi } from 'abitype'
+import { ContractRunner, InterfaceAbi } from 'ethers'
 
+import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import SimulateTxAccessorBaseContract from '@safe-global/protocol-kit/adapters/SimulateTxAccessorBaseContract'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SimulateTxAccessorBaseContractEthers extends SimulateTxAccessorBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class SimulateTxAccessorBaseContractEthers extends BaseContractEthers to specifically integrate with the SimulateTxAccessor contract.
  * It is designed to be instantiated for different versions of the Safe contract.
- *
- * This abstract class sets up the Ethers v6 Contract object that interacts with a SimulateTxAccessor contract version.
  *
  * Subclasses of SimulateTxAccessorBaseContractEthers are expected to represent specific versions of the contract.
  *
  * @template SimulateTxAccessorContractAbiType - The ABI type specific to the version of the SimulateTxAccessor contract, extending InterfaceAbi from Ethers.
- * @extends SimulateTxAccessorBaseContract<SimulateTxAccessorContractAbiType> - Extends the generic SimulateTxAccessorBaseContract with Ethers-specific implementation.
+ * @extends BaseContractEthers<SimulateTxAccessorContractAbiType> - Extends the generic BaseContractEthers.
  *
  * Example subclasses:
  * - SimulateTxAccessorContract_v1_4_1_Ethers extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi>
  * - SimulateTxAccessorContract_v1_3_0_Ethers extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_3_0_Abi>
  */
 abstract class SimulateTxAccessorBaseContractEthers<
-  SimulateTxAccessorContractAbiType extends InterfaceAbi
-> extends SimulateTxAccessorBaseContract<SimulateTxAccessorContractAbiType> {
-  contract: Contract
-  adapter: EthersAdapter
+  SimulateTxAccessorContractAbiType extends InterfaceAbi & Abi
+> extends BaseContractEthers<SimulateTxAccessorContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -45,14 +44,20 @@ abstract class SimulateTxAccessorBaseContractEthers<
     customContractAbi?: SimulateTxAccessorContractAbiType,
     runner?: ContractRunner | null
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'simulateTxAccessorVersion'
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      runner || this.adapter.getSigner()
+    super(
+      contractName,
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      runner
     )
+
+    this.contractName = contractName
   }
 }
 

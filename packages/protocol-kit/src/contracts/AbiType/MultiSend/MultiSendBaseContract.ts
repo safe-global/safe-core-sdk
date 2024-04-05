@@ -1,35 +1,15 @@
-import {
-  Abi,
-  AbiParametersToPrimitiveTypes,
-  ExtractAbiFunction,
-  ExtractAbiFunctionNames
-} from 'abitype'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { Abi } from 'abitype'
+import BaseContract from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
- * Encodes a function call for a MultiSend contract.
+ * Represents the base contract type for a MultiSend contract.
  *
  * @template MultiSendContractAbi - The ABI of the MultiSend contract.
- * @template MultiSendFunction - The function to encode, derived from the ABI.
+ * @type {MultiSendBaseContract}
  */
-export type EncodeMultiSendFunction<
-  MultiSendContractAbi extends Abi, // Abi of the MultiSend Contract,
-  MultiSendFunction extends
-    ExtractAbiFunctionNames<MultiSendContractAbi> = ExtractAbiFunctionNames<MultiSendContractAbi>
-> = (
-  functionToEncode: MultiSendFunction,
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<MultiSendContractAbi, MultiSendFunction>['inputs'],
-    'inputs'
-  >
-) => string
-
-export type GetAddressMultiSendFunction = () => Promise<string>
-
-type MultiSendBaseContract<MultiSendContractAbi extends Abi> = {
-  safeVersion: SafeVersion
-  encode: EncodeMultiSendFunction<MultiSendContractAbi>
-  getAddress: GetAddressMultiSendFunction
-}
+type MultiSendBaseContract<MultiSendContractAbi extends Abi> = BaseContract<
+  MultiSendContractAbi,
+  never
+>
 
 export default MultiSendBaseContract

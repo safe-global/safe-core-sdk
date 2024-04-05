@@ -2,20 +2,18 @@ import CreateCallBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
   DeepWriteable,
-  Web3TransactionOptions,
-  Web3TransactionResult
+  Web3TransactionOptions
 } from '@safe-global/protocol-kit/adapters/web3/types'
 import CreateCallContract_v1_3_0_Contract, {
-  CreateCallContract_v1_3_0_Abi
+  CreateCallContract_v1_3_0_Abi as CreateCallContract_v1_3_0_Abi_Readonly
 } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCall_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CreateCall/v1.3.0/create_call'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeCreateCallFunction,
-  EstimateGasCreateCallFunction,
-  GetAddressCreateCallFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/CreateCallBaseContract'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
+import { AdapterSpecificContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+
+// Remove all nested `readonly` modifiers from the ABI type
+type CreateCallContract_v1_3_0_Abi = DeepWriteable<CreateCallContract_v1_3_0_Abi_Readonly>
 
 /**
  * CreateCallContract_V1_3_0_Web3 is the implementation specific to the CreateCall contract version 1.3.0.
@@ -26,8 +24,8 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
  * @implements CreateCallContract_v1_3_0_Contract - Implements the interface specific to CreateCall contract version 1.3.0.
  */
 class CreateCallContract_V1_3_0_Web3
-  extends CreateCallBaseContractWeb3<DeepWriteable<CreateCallContract_v1_3_0_Abi>>
-  implements CreateCallContract_v1_3_0_Contract
+  extends CreateCallBaseContractWeb3<CreateCallContract_v1_3_0_Abi>
+  implements CreateCallContract_v1_3_0_Contract<Web3Adapter>
 {
   safeVersion: SafeVersion
 
@@ -46,8 +44,7 @@ class CreateCallContract_V1_3_0_Web3
     customContractAbi?: CreateCallContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
-    const defaultAbi =
-      CreateCall_1_3_0_ContractArtifacts.abi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
+    const defaultAbi = CreateCall_1_3_0_ContractArtifacts.abi as CreateCallContract_v1_3_0_Abi
 
     super(
       chainId,
@@ -55,50 +52,43 @@ class CreateCallContract_V1_3_0_Web3
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
+      customContractAbi as CreateCallContract_v1_3_0_Abi
     )
 
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressCreateCallFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  encode: EncodeCreateCallFunction<CreateCallContract_v1_3_0_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  estimateGas: EstimateGasCreateCallFunction<
-    CreateCallContract_v1_3_0_Abi,
-    Web3TransactionOptions
-  > = async (functionToEstimate, args, options = {}) => {
-    return (
-      await this.contract.methods[functionToEstimate](...args).estimateGas(options)
-    ).toString()
-  }
-
-  async performCreate(
-    args: readonly [value: bigint, deploymentData: string],
-    options?: Web3TransactionOptions
-  ): Promise<Web3TransactionResult> {
-    if (options && !options.gas) {
-      options.gas = (await this.estimateGas('performCreate', args, { ...options })).toString()
+  /**
+   * @param args - Array[value, deploymentData]
+   * @param options - Web3TransactionOptions
+   * @returns Promise<Web3TransactionResult>
+   */
+  performCreate: AdapterSpecificContractFunction<CreateCallContract_v1_3_0_Abi, Web3Adapter> =
+    async (args, options) => {
+      if (options && !options.gas) {
+        options.gas = (
+          await this.estimateGas('performCreate', [...args], { ...options })
+        ).toString()
+      }
+      const txResponse = this.contract.methods.performCreate(...args).send(options)
+      return toTxResult(txResponse, options)
     }
-    const txResponse = this.contract.methods.performCreate(...args).send(options)
-    return toTxResult(txResponse, options)
-  }
 
-  async performCreate2(
-    args: readonly [value: bigint, deploymentData: string, salt: string],
-    options?: Web3TransactionOptions
-  ): Promise<Web3TransactionResult> {
-    if (options && !options.gas) {
-      options.gas = (await this.estimateGas('performCreate2', args, { ...options })).toString()
+  /**
+   * @param args - Array[value, deploymentData, salt]
+   * @param options - Web3TransactionOptions
+   * @returns Promise<Web3TransactionResult>
+   */
+  performCreate2: AdapterSpecificContractFunction<CreateCallContract_v1_3_0_Abi, Web3Adapter> =
+    async (args, options) => {
+      if (options && !options.gas) {
+        options.gas = (
+          await this.estimateGas('performCreate2', [...args], { ...options })
+        ).toString()
+      }
+      const txResponse = this.contract.methods.performCreate2(...args).send(options)
+      return toTxResult(txResponse, options)
     }
-    const txResponse = this.contract.methods.performCreate2(...args).send(options)
-    return toTxResult(txResponse, options)
-  }
 
   // TODO: Remove this mapper after remove Typechain
   mapToTypechainContract(): any {

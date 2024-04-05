@@ -3,16 +3,12 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import SignMessageLibContract_v1_3_0_Contract, {
-  SignMessageLibContract_v1_3_0_Abi
+  SignMessageLibContract_v1_3_0_Abi,
+  SignMessageLibContract_v1_3_0_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 import multisend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeSignMessageLibFunction,
-  EstimateGasSignMessageLibFunction,
-  GetAddressSignMessageLibFunction,
-  SignMessageFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/SignMessageLibBaseContract'
+import { AdapterSpecificContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SignMessageLibContract_v1_3_0_Ethers is the implementation specific to the SignMessageLib contract version 1.3.0.
@@ -24,7 +20,7 @@ import {
  */
 class SignMessageLibContract_v1_3_0_Ethers
   extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
-  implements SignMessageLibContract_v1_3_0_Contract
+  implements SignMessageLibContract_v1_3_0_Contract<EthersAdapter>
 {
   safeVersion: SafeVersion
 
@@ -50,40 +46,29 @@ class SignMessageLibContract_v1_3_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSignMessageLibFunction<SignMessageLibContract_v1_3_0_Abi> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasSignMessageLibFunction<
-    SignMessageLibContract_v1_3_0_Abi,
-    EthersTransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToEstimate.estimateGas(...args, options)
-  }
-
-  getAddress: GetAddressSignMessageLibFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  async getMessageHash(args: readonly [string]): Promise<readonly [string]> {
+  /**
+   * @param args - Array[message]
+   */
+  getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
     return [await this.contract.getMessageHash(...args)]
   }
 
-  signMessage: SignMessageFunction<SignMessageLibContract_v1_3_0_Abi, EthersTransactionOptions> =
-    async (data, options) => {
-      if (options && !options.gasLimit) {
-        options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
-      }
-
-      const txResponse = await this.contract.signMessage(data, { ...options })
-
-      return toTxResult(txResponse, options)
+  /**
+   * @param args - Array[data]
+   */
+  signMessage: AdapterSpecificContractFunction<
+    SignMessageLibContract_v1_3_0_Abi,
+    EthersAdapter,
+    'signMessage'
+  > = async (data, options) => {
+    if (options && !options.gasLimit) {
+      options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
+
+    const txResponse = await this.contract.signMessage(data, { ...options })
+
+    return toTxResult(txResponse, options)
+  }
 
   // TODO: Remove this mapper after remove Typechain
   mapToTypechainContract(): SignMessageLibContract {

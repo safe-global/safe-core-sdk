@@ -6,16 +6,12 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import SignMessageLibBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SignMessageLib/SignMessageLibBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import SignMessageLibContract_v1_3_0_Contract, {
-  SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly
+  SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly,
+  SignMessageLibContract_v1_3_0_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 import signMessageLib_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.3.0/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeSignMessageLibFunction,
-  EstimateGasSignMessageLibFunction,
-  GetAddressSignMessageLibFunction,
-  SignMessageFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/SignMessageLibBaseContract'
+import { AdapterSpecificContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 // Remove all nested `readonly` modifiers from the ABI type
 type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1_3_0_Abi_Readonly>
@@ -30,7 +26,7 @@ type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1
  */
 class SignMessageLibContract_v1_3_0_Web3
   extends SignMessageLibBaseContractWeb3<SignMessageLibContract_v1_3_0_Abi>
-  implements SignMessageLibContract_v1_3_0_Contract
+  implements SignMessageLibContract_v1_3_0_Contract<Web3Adapter>
 {
   safeVersion: SafeVersion
 
@@ -57,33 +53,20 @@ class SignMessageLibContract_v1_3_0_Web3
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSignMessageLibFunction<SignMessageLibContract_v1_3_0_Abi_Readonly> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  estimateGas: EstimateGasSignMessageLibFunction<
-    SignMessageLibContract_v1_3_0_Abi_Readonly,
-    Web3TransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
-    return this.contract.methods[functionToEstimate](...args)
-      .estimateGas(options)
-      .then(BigInt)
-  }
-
-  getAddress: GetAddressSignMessageLibFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  async getMessageHash(args: readonly [string]): Promise<readonly [string]> {
+  /**
+   * @param args - Array[message]
+   */
+  getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
     return [await this.contract.methods.getMessageHash(...args).call()]
   }
 
-  signMessage: SignMessageFunction<
+  /**
+   * @param args - Array[data]
+   */
+  signMessage: AdapterSpecificContractFunction<
     SignMessageLibContract_v1_3_0_Abi_Readonly,
-    Web3TransactionOptions
+    Web3Adapter,
+    'signMessage'
   > = async (data, options) => {
     if (options && !options.gas) {
       options.gas = Number(await this.estimateGas('signMessage', data, { ...options }))

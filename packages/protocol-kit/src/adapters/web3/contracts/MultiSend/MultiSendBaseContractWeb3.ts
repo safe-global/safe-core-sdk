@@ -1,30 +1,28 @@
-import Contract from 'web3-eth-contract'
+import { Abi } from 'abitype'
 import { AbiItem } from 'web3-utils'
 
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import MultiSendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendBaseContract'
+import BaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/BaseContractWeb3'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class MultiSendBaseContractWeb3 extends MultiSendBaseContract to specifically integrate with the Web3.js v6 library.
+ * Abstract class MultiSendBaseContractWeb3 extends BaseContractWeb3 to specifically integrate with the MultiSend contract.
  * It is designed to be instantiated for different versions of the MultiSend contract.
- *
- * This abstract class sets up the Web3 v6 Contract object that interacts with a MultiSend contract version.
  *
  * Subclasses of MultiSendBaseContractWeb3 are expected to represent specific versions of the MultiSend contract.
  *
  * @template MultiSendContractAbiType - The ABI type specific to the version of the MultiSend contract, extending InterfaceAbi from Web3.
- * @extends MultiSendBaseContract<MultiSendContractAbiType> - Extends the generic MultiSendBaseContract with Web3-specific implementation.
+ * @extends BaseContractWeb3<MultiSendContractAbiType> - Extends the generic BaseContractWeb3.
  *
  * Example subclasses:
  * - MultiSendContract_v1_4_1_Web3 extends MultiSendBaseContractWeb3<MultiSendContract_v1_4_1_Abi>
  * - MultiSendContract_v1_3_0_Web3 extends MultiSendBaseContractWeb3<MultiSendContract_v1_3_0_Abi>
  */
 abstract class MultiSendBaseContractWeb3<
-  MultiSendContractAbiType extends AbiItem[]
-> extends MultiSendBaseContract<MultiSendContractAbiType> {
-  contract: Contract
-  adapter: Web3Adapter
+  MultiSendContractAbiType extends AbiItem[] & Abi
+> extends BaseContractWeb3<MultiSendContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -45,10 +43,19 @@ abstract class MultiSendBaseContractWeb3<
     customContractAddress?: string,
     customContractAbi?: MultiSendContractAbiType
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'multiSendVersion'
 
-    this.adapter = web3Adapter
-    this.contract = web3Adapter.getContract(this.contractAddress, this.contractAbi)
+    super(
+      contractName,
+      chainId,
+      web3Adapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi
+    )
+
+    this.contractName = contractName
   }
 }
 

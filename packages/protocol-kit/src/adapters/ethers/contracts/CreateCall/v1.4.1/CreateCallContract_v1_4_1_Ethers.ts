@@ -1,20 +1,13 @@
 import CreateCallBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/CreateCallBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import {
-  EthersTransactionOptions,
-  EthersTransactionResult
-} from '@safe-global/protocol-kit/adapters/ethers/types'
+import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import CreateCallContract_v1_4_1_Contract, {
   CreateCallContract_v1_4_1_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
 import CreateCall_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CreateCall/v1.4.1/create_call'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeCreateCallFunction,
-  EstimateGasCreateCallFunction,
-  GetAddressCreateCallFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/CreateCallBaseContract'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
+import { AdapterSpecificContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * CreateCallContract_V1_4_1_Ethers is the implementation specific to the CreateCall contract version 1.4.1.
@@ -26,7 +19,7 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
  */
 class CreateCallContract_V1_4_1_Ethers
   extends CreateCallBaseContractEthers<CreateCallContract_v1_4_1_Abi>
-  implements CreateCallContract_v1_4_1_Contract
+  implements CreateCallContract_v1_4_1_Contract<EthersAdapter>
 {
   safeVersion: SafeVersion
 
@@ -52,44 +45,37 @@ class CreateCallContract_V1_4_1_Ethers
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressCreateCallFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeCreateCallFunction<CreateCallContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasCreateCallFunction<
-    CreateCallContract_v1_4_1_Abi,
-    EthersTransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToEstimate.estimateGas(...args, options)
-  }
-
-  async performCreate(
-    args: readonly [value: bigint, deploymentData: string],
-    options?: EthersTransactionOptions
-  ): Promise<EthersTransactionResult> {
-    if (options && !options.gasLimit) {
-      options.gasLimit = (await this.estimateGas('performCreate', args, { ...options })).toString()
+  /**
+   * @param args - Array[value, deploymentData]
+   * @param options - EthersTransactionOptions
+   * @returns Promise<EthersTransactionResult>
+   */
+  performCreate: AdapterSpecificContractFunction<CreateCallContract_v1_4_1_Abi, EthersAdapter> =
+    async (args, options) => {
+      if (options && !options.gasLimit) {
+        options.gasLimit = (
+          await this.estimateGas('performCreate', [...args], { ...options })
+        ).toString()
+      }
+      const txResponse = await this.contract.performCreate(...args, { ...options })
+      return toTxResult(txResponse, options)
     }
-    const txResponse = await this.contract.performCreate(...args, { ...options })
-    return toTxResult(txResponse, options)
-  }
 
-  async performCreate2(
-    args: readonly [value: bigint, deploymentData: string, salt: string],
-    options?: EthersTransactionOptions
-  ): Promise<EthersTransactionResult> {
-    if (options && !options.gasLimit) {
-      options.gasLimit = (await this.estimateGas('performCreate2', args, { ...options })).toString()
+  /**
+   * @param args - Array[value, deploymentData, salt]
+   * @param options - EthersTransactionOptions
+   * @returns Promise<EthersTransactionResult>
+   */
+  performCreate2: AdapterSpecificContractFunction<CreateCallContract_v1_4_1_Abi, EthersAdapter> =
+    async (args, options) => {
+      if (options && !options.gasLimit) {
+        options.gasLimit = (
+          await this.estimateGas('performCreate2', [...args], { ...options })
+        ).toString()
+      }
+      const txResponse = await this.contract.performCreate2(...args)
+      return toTxResult(txResponse, options)
     }
-    const txResponse = await this.contract.performCreate2(...args)
-    return toTxResult(txResponse, options)
-  }
 
   // TODO: Remove this mapper after remove Typechain
   mapToTypechainContract(): any {

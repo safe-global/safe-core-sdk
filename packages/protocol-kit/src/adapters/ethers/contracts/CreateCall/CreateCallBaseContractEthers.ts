@@ -1,29 +1,28 @@
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
+import { Abi } from 'abitype'
+import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import CreateCallBaseContract from '@safe-global/protocol-kit/adapters/CreateCallBaseContract'
+import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class CreateCallBaseContractEthers extends CreateCallBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class CreateCallBaseContractEthers extends BaseContractEthers to specifically integrate with the CreateCall contract.
  * It is designed to be instantiated for different versions of the Safe contract.
- *
- * This abstract class sets up the Ethers v6 Contract object that interacts with a CreateCall contract version.
  *
  * Subclasses of CreateCallBaseContractEthers are expected to represent specific versions of the contract.
  *
  * @template CreateCallContractAbiType - The ABI type specific to the version of the CreateCall contract, extending InterfaceAbi from Ethers.
- * @extends CreateCallBaseContract<CreateCallContractAbiType> - Extends the generic CreateCallBaseContract with Ethers-specific implementation.
+ * @extends BaseContractEthers<CreateCallContractAbiType> - Extends the generic BaseContractEthers.
  *
  * Example subclasses:
  * - CreateCallContract_v1_4_1_Ethers extends CreateCallBaseContractEthers<CreateCallContract_v1_4_1_Abi>
  * - CreateCallContract_v1_3_0_Ethers extends CreateCallBaseContractEthers<CreateCallContract_v1_3_0_Abi>
  */
 abstract class CreateCallBaseContractEthers<
-  CreateCallContractAbiType extends InterfaceAbi
-> extends CreateCallBaseContract<CreateCallContractAbiType> {
-  contract: Contract
-  adapter: EthersAdapter
+  CreateCallContractAbiType extends InterfaceAbi & Abi
+> extends BaseContractEthers<CreateCallContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -45,14 +44,20 @@ abstract class CreateCallBaseContractEthers<
     customContractAbi?: CreateCallContractAbiType,
     runner?: ContractRunner | null
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'createCallVersion'
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      runner || this.adapter.getSigner()
+    super(
+      contractName,
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      runner
     )
+
+    this.contractName = contractName
   }
 }
 

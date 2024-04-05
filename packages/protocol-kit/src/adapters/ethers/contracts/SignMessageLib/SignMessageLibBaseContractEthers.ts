@@ -1,29 +1,28 @@
-import { Contract, InterfaceAbi } from 'ethers'
+import { Abi } from 'abitype'
+import { InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import SignMessageLibBaseContract from '@safe-global/protocol-kit/adapters/SignMessageLibBaseContract'
+import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SignMessageLibBaseContractEthers extends SignMessageLibBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class SignMessageLibBaseContractEthers extends BaseContractEthers to specifically integrate with the SignMessageLib contract.
  * It is designed to be instantiated for different versions of the SignMessageLib contract.
- *
- * This abstract class sets up the Ethers v6 Contract object that interacts with a SignMessageLib contract version.
  *
  * Subclasses of SignMessageLibBaseContractEthers are expected to represent specific versions of the SignMessageLib contract.
  *
  * @template SignMessageLibContractAbiType - The ABI type specific to the version of the SignMessageLib contract, extending InterfaceAbi from Ethers.
- * @extends SignMessageLibBaseContract<SignMessageLibContractAbiType> - Extends the generic SignMessageLibBaseContract with Ethers-specific implementation.
+ * @extends BaseContractEthers<SignMessageLibContractAbiType> - Extends the generic BaseContractEthers.
  *
  * Example subclasses:
  * - SignMessageLibContract_v1_4_1_Ethers extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_4_1_Abi>
  * - SignMessageLibContract_v1_3_0_Ethers extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
  */
 abstract class SignMessageLibBaseContractEthers<
-  SignMessageLibContractAbiType extends InterfaceAbi
-> extends SignMessageLibBaseContract<SignMessageLibContractAbiType> {
-  contract: Contract
-  adapter: EthersAdapter
+  SignMessageLibContractAbiType extends InterfaceAbi & Abi
+> extends BaseContractEthers<SignMessageLibContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -44,10 +43,19 @@ abstract class SignMessageLibBaseContractEthers<
     customContractAddress?: string,
     customContractAbi?: SignMessageLibContractAbiType
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'signMessageLibVersion'
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(this.contractAddress, this.contractAbi, this.adapter.getSigner())
+    super(
+      contractName,
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi
+    )
+
+    this.contractName = contractName
   }
 }
 

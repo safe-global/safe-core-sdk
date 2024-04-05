@@ -1,128 +1,25 @@
-import {
-  Abi,
-  AbiParametersToPrimitiveTypes,
-  ExtractAbiFunction,
-  ExtractAbiFunctionNames
-} from 'abitype'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EthersTransactionOptions,
-  EthersTransactionResult
-} from '@safe-global/protocol-kit/adapters/ethers'
-import {
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from '@safe-global/protocol-kit/adapters/web3'
+import { Abi } from 'abitype'
+import BaseContract, {
+  AdapterSpecificContractFunction,
+  ContractReadFunctionNames,
+  EstimateGasFunction
+} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 
 /**
- * Encodes a function call for a CreateCall contract.
+ * Represents the base contract type for a CreateCall contract.
  *
  * @template CreateCallContractAbi - The ABI of the CreateCall contract.
- * @template CreateCallFunction - The function to encode, derived from the ABI.
+ * @template Adapter - The EthAdapter type to use.
+ * @type {CreateCallBaseContract}
  */
-export type EncodeCreateCallFunction<
-  CreateCallContractAbi extends Abi, // Abi of the CreateCall Contract,
-  CreateCallFunction extends
-    ExtractAbiFunctionNames<CreateCallContractAbi> = ExtractAbiFunctionNames<CreateCallContractAbi>
-> = (
-  functionToEncode: CreateCallFunction,
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<CreateCallContractAbi, CreateCallFunction>['inputs'],
-    'inputs'
-  >
-) => string
-
-export type GetAddressCreateCallFunction = () => Promise<string>
-
-/**
- * Estimates the gas required for a function call on a CreateCall contract.
- *
- * @template CreateCallContractAbi - The ABI of the CreateCall contract.
- * @template CreateCallFunction - The function for which gas is being estimated, derived from the ABI.
- */
-export type EstimateGasCreateCallFunction<
-  CreateCallContractAbi extends Abi, // Abi of the CreateCall Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions,
-  CreateCallFunction extends
-    ExtractAbiFunctionNames<CreateCallContractAbi> = ExtractAbiFunctionNames<CreateCallContractAbi>
-> = (
-  functionToEncode: CreateCallFunction,
-  params: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<CreateCallContractAbi, CreateCallFunction>['inputs'],
-    'inputs'
-  >,
-  options?: TransactionOptions
-) => Promise<bigint>
-
-/**
- * Extracts the names of read-only functions (view or pure) from a given CreateCall contract ABI.
- *
- * @template CreateCallContractAbi - The ABI of the CreateCall contract.
- * @type {CreateCallContractReadFunctions}
- */
-export type CreateCallContractReadFunctions<CreateCallContractAbi extends Abi> =
-  ExtractAbiFunctionNames<CreateCallContractAbi, 'view' | 'pure'>
-
-/**
- * Deploys a new contract using the create opcode.
- *
- * @template CreateCallContractAbi - The ABI of the CreateCall contract.
- */
-export type PerformCreateFunction<
-  CreateCallContractAbi extends Abi, // Abi of the CreateCall Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions
-> = (
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<CreateCallContractAbi, 'performCreate'>['inputs']
-  >,
-  options?: TransactionOptions
-) => Promise<EthersTransactionResult | Web3TransactionResult>
-
-/**
- * Deploys a new contract using the create2 opcode.
- *
- * @template CreateCallContractAbi - The ABI of the CreateCall contract.
- */
-export type PerformCreate2Function<
-  CreateCallContractAbi extends Abi, // Abi of the CreateCall Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions
-> = (
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<CreateCallContractAbi, 'performCreate2'>['inputs']
-  >,
-  options?: TransactionOptions
-) => Promise<EthersTransactionResult | Web3TransactionResult>
-
-type CreateCallBaseContract<CreateCallContractAbi extends Abi> = {
-  [ProxyFactoryFunction in CreateCallContractReadFunctions<CreateCallContractAbi>]: (
-    // parameters
-    args: AbiParametersToPrimitiveTypes<
-      ExtractAbiFunction<CreateCallContractAbi, ProxyFactoryFunction>['inputs'],
-      'inputs'
-    >
-    // returned values as a Promise
-  ) => Promise<
-    AbiParametersToPrimitiveTypes<
-      ExtractAbiFunction<CreateCallContractAbi, ProxyFactoryFunction>['outputs'],
-      'outputs'
-    >
-  >
-} & {
-  safeVersion: SafeVersion
-  encode: EncodeCreateCallFunction<CreateCallContractAbi>
-  getAddress: GetAddressCreateCallFunction
-  estimateGas: EstimateGasCreateCallFunction<
-    CreateCallContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
-  performCreate: PerformCreateFunction<
-    CreateCallContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
-  performCreate2: PerformCreate2Function<
-    CreateCallContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
+export type CreateCallBaseContract<
+  CreateCallContractAbi extends Abi,
+  Adapter extends EthAdapter
+> = BaseContract<CreateCallContractAbi, ContractReadFunctionNames<CreateCallContractAbi>> & {
+  estimateGas: EstimateGasFunction<CreateCallContractAbi>
+  performCreate: AdapterSpecificContractFunction<CreateCallContractAbi, Adapter, 'performCreate'>
+  performCreate2: AdapterSpecificContractFunction<CreateCallContractAbi, Adapter, 'performCreate2'>
 }
 
 export default CreateCallBaseContract

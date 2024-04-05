@@ -1,9 +1,7 @@
-import { narrow } from 'abitype'
+import { ExtractAbiFunctionNames, narrow } from 'abitype'
 import safe_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.0.0/gnosis_safe'
-import SafeBaseContract, {
-  SafeContractReadFunctions,
-  SafeContractWriteFunctions
-} from '../SafeBaseContract'
+import SafeBaseContract from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
+import { ContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 const safeContract_v1_0_0_AbiTypes = narrow(safe_1_0_0_ContractArtifacts.abi)
 
@@ -15,18 +13,14 @@ const safeContract_v1_0_0_AbiTypes = narrow(safe_1_0_0_ContractArtifacts.abi)
 export type SafeContract_v1_0_0_Abi = typeof safeContract_v1_0_0_AbiTypes
 
 /**
- * Extracts the names of read-only functions (view or pure) specific to the Safe contract version 1.0.0.
+ * Represents the function type derived by the given function name from the Safe contract version 1.0.0 ABI.
  *
- * @type {Safe_v1_0_0_Read_Functions}
+ * @template ContractFunctionName - The function name, derived from the ABI.
+ * @type {SafeContract_v1_0_0_Function}
  */
-export type Safe_v1_0_0_Read_Functions = SafeContractReadFunctions<SafeContract_v1_0_0_Abi>
-
-/**
- * Extracts the names of write functions (nonpayable or payable) specific to the Safe contract version 1.0.0.
- *
- * @type {Safe_v1_0_0_Write_Functions}
- */
-export type Safe_v1_0_0_Write_Functions = SafeContractWriteFunctions<SafeContract_v1_0_0_Abi>
+export type SafeContract_v1_0_0_Function<
+  ContractFunctionName extends ExtractAbiFunctionNames<SafeContract_v1_0_0_Abi>
+> = ContractFunction<SafeContract_v1_0_0_Abi, ContractFunctionName>
 
 /**
  * Represents the contract type for a Safe contract version 1.0.0, defining read and write methods.

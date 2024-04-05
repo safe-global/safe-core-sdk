@@ -5,10 +5,6 @@ import MultiSendCallOnlyContract_v1_3_0_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import multiSendCallOnly_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.3.0/multi_send_call_only'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeMultiSendCallOnlyFunction,
-  GetAddressMultiSendCallOnlyFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendCallOnlyBaseContract'
 
 /**
  * MultiSendCallOnlyContract_v1_3_0_Ethers is the implementation specific to the MultiSendCallOnly contract version 1.3.0.
@@ -44,17 +40,6 @@ class MultiSendCallOnlyContract_v1_3_0_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressMultiSendCallOnlyFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeMultiSendCallOnlyFunction<MultiSendCallOnlyContract_v1_3_0_Abi> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 }
 

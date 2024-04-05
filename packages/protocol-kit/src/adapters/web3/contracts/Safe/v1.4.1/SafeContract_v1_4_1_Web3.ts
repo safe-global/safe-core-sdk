@@ -8,12 +8,9 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/web3/utils/constants'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import safe_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.4.1/safe_l2'
-import {
-  EncodeSafeFunction,
-  EstimateGasSafeFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
 import SafeContract_v1_4_1_Contract, {
-  SafeContract_v1_4_1_Abi as SafeContract_v1_4_1_Abi_Readonly
+  SafeContract_v1_4_1_Abi as SafeContract_v1_4_1_Abi_Readonly,
+  SafeContract_v1_4_1_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
 import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
@@ -66,177 +63,144 @@ class SafeContract_v1_4_1_Web3
     this.safeVersion = safeVersion
   }
 
-  async VERSION(): Promise<[SafeVersion]> {
+  /**
+   * @returns Array[safeContractVersion]
+   */
+  VERSION: SafeContract_v1_4_1_Function<'VERSION'> = async () => {
     return [await this.contract.methods.VERSION().call()]
   }
 
-  async approvedHashes(args: readonly [owner: string, txHash: string]): Promise<[bigint]> {
+  /**
+   * @param args - Array[owner, txHash]
+   * @returns Array[approvedHashes]
+   */
+  approvedHashes: SafeContract_v1_4_1_Function<'approvedHashes'> = async (args) => {
     return [await this.contract.methods.approvedHashes(...args).call()]
   }
 
-  async checkNSignatures(
-    args: readonly [dataHash: string, data: string, signatures: string, requiredSignatures: bigint]
-  ): Promise<[]> {
-    // this method just checks whether the signature provided is valid for the provided data and hash. Reverts otherwise.
+  /**
+   * Checks whether the signature provided is valid for the provided data, hash and number of required signatures.
+   * Will revert otherwise.
+   * @param args - Array[dataHash, data, signatures, requiredSignatures]
+   * @returns Empty array
+   */
+  checkNSignatures: SafeContract_v1_4_1_Function<'checkNSignatures'> = async (args) => {
     if (this.contract.methods.checkNSignatures) {
       await this.contract.methods.checkNSignatures(...args).call()
     }
     return []
   }
 
-  async checkSignatures(
-    args: readonly [dataHash: string, data: string, signatures: string]
-  ): Promise<[]> {
+  /**
+   * Checks whether the signature provided is valid for the provided data and hash. Will revert otherwise.
+   * @param args - Array[dataHash, data, signatures]
+   * @returns Empty array
+   */
+  checkSignatures: SafeContract_v1_4_1_Function<'checkSignatures'> = async (args) => {
     await this.contract.methods.checkSignatures(...args).call()
     return []
   }
 
-  async domainSeparator(): Promise<[string]> {
+  /**
+   * @returns Array[domainSeparator]
+   */
+  domainSeparator: SafeContract_v1_4_1_Function<'domainSeparator'> = async () => {
     return [await this.contract.methods.domainSeparator().call()]
   }
 
-  async encodeTransactionData(
-    args: readonly [
-      to: string,
-      value: bigint,
-      data: string,
-      operation: number,
-      safeTxGas: bigint,
-      baseGas: bigint,
-      gasPrice: bigint,
-      gasToken: string,
-      refundReceiver: string,
-      _nonce: bigint
-    ]
-  ): Promise<[string]> {
+  /**
+   * Encodes the data for a transaction to the Safe contract.
+   * @param args - Array[to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, _nonce]
+   * @returns Array[encodedData]
+   */
+  encodeTransactionData: SafeContract_v1_4_1_Function<'encodeTransactionData'> = async (args) => {
     return [await this.contract.methods.encodeTransactionData(...args).call()]
   }
 
-  async getChainId(): Promise<[bigint]> {
-    return [await this.contract.methods.getChainId().call()]
-  }
-
-  async getModulesPaginated(
-    args: readonly [start: string, pageSize: bigint]
-  ): Promise<[modules: string[], next: string]> {
+  /**
+   * Returns array of modules.
+   * @param args - Array[start, pageSize]
+   * @returns Array[Array[modules], next]
+   */
+  getModulesPaginated: SafeContract_v1_4_1_Function<'getModulesPaginated'> = async (args) => {
     const res = await this.contract.methods.getModulesPaginated(...args).call()
     return [res.array, res.next]
   }
 
-  async getOwners(): Promise<readonly [string[]]> {
+  /**
+   * Returns the list of Safe owner accounts.
+   * @returns Array[Array[owners]]
+   */
+  getOwners: SafeContract_v1_4_1_Function<'getOwners'> = async () => {
     return [await this.contract.methods.getOwners().call()]
   }
 
-  async getStorageAt(args: readonly [offset: bigint, length: bigint]): Promise<[string]> {
+  /**
+   * Reads `length` bytes of storage in the currents contract
+   * @param args - Array[offset, length]
+   * @returns Array[storage]
+   */
+  getStorageAt: SafeContract_v1_4_1_Function<'getStorageAt'> = async (args) => {
     return [await this.contract.methods.getStorageAt(...args).call()]
   }
 
-  async getThreshold(): Promise<[bigint]> {
+  /**
+   * Returns the Safe threshold.
+   * @returns Array[threshold]
+   */
+  getThreshold: SafeContract_v1_4_1_Function<'getThreshold'> = async () => {
     return [await this.contract.methods.getThreshold().call()]
   }
 
-  async getTransactionHash(
-    args: readonly [
-      to: string,
-      value: bigint,
-      data: string,
-      operation: number,
-      safeTxGas: bigint,
-      baseGas: bigint,
-      gasPrice: bigint,
-      gasToken: string,
-      refundReceiver: string,
-      _nonce: bigint
-    ]
-  ): Promise<[string]> {
+  /**
+   * Returns hash to be signed by owners.
+   * @param args - Array[to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, _nonce]
+   * @returns Array[transactionHash]
+   */
+  getTransactionHash: SafeContract_v1_4_1_Function<'getTransactionHash'> = async (args) => {
     return [await this.contract.methods.getTransactionHash(...args).call()]
   }
 
-  async isModuleEnabled(args: readonly [moduleAddress: string]): Promise<[boolean]> {
+  /**
+   * Checks if a specific Safe module is enabled for the current Safe.
+   * @param args - Array[moduleAddress]
+   * @returns Array[isEnabled]
+   */
+  isModuleEnabled: SafeContract_v1_4_1_Function<'isModuleEnabled'> = async (args) => {
     return [await this.contract.methods.isModuleEnabled(...args).call()]
   }
 
-  async isOwner(args: readonly [address: string]): Promise<[boolean]> {
+  /**
+   * Checks if a specific address is an owner of the current Safe.
+   * @param args - Array[address]
+   * @returns Array[isOwner]
+   */
+  isOwner: SafeContract_v1_4_1_Function<'isOwner'> = async (args) => {
     return [await this.contract.methods.isOwner(...args).call()]
   }
 
-  async nonce(): Promise<[bigint]> {
+  /**
+   * Returns the Safe nonce.
+   * @returns Array[nonce]
+   */
+  nonce: SafeContract_v1_4_1_Function<'nonce'> = async () => {
     return [await this.contract.methods.nonce().call()]
   }
 
-  async signedMessages(args: readonly [messageHash: string]): Promise<[bigint]> {
+  /**
+   * @param args - Array[messageHash]
+   * @returns Array[signedMessages]
+   */
+  signedMessages: SafeContract_v1_4_1_Function<'signedMessages'> = async (args) => {
     return [await this.contract.methods.signedMessages(...args).call()]
   }
 
-  encode: EncodeSafeFunction<SafeContract_v1_4_1_Abi_Readonly> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  estimateGas: EstimateGasSafeFunction<SafeContract_v1_4_1_Abi_Readonly, Web3TransactionOptions> = (
-    functionToEstimate,
-    args,
-    options = {}
-  ) => {
-    return this.contract.methods[functionToEstimate](...args)
-      .estimateGas(options)
-      .then(BigInt)
-  }
-
-  // Custom method (not defined in the Safe Contract)
-  async getModules(): Promise<string[]> {
-    const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
-    return modules
-  }
-
-  // Custom method (not defined in the Safe Contract)
-  getAddress(): Promise<string> {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  // Custom method (not defined in the Safe Contract)
-  async execTransaction(
-    safeTransaction: SafeTransaction,
-    options?: Web3TransactionOptions
-  ): Promise<Web3TransactionResult> {
-    if (options && !options.gas) {
-      options.gas = (
-        await this.estimateGas(
-          'execTransaction',
-          [
-            safeTransaction.data.to,
-            BigInt(safeTransaction.data.value),
-            safeTransaction.data.data,
-            safeTransaction.data.operation,
-            BigInt(safeTransaction.data.safeTxGas),
-            BigInt(safeTransaction.data.baseGas),
-            BigInt(safeTransaction.data.gasPrice),
-            safeTransaction.data.gasToken,
-            safeTransaction.data.refundReceiver,
-            safeTransaction.encodedSignatures()
-          ],
-          options
-        )
-      ).toString()
-    }
-    const txResponse = this.contract.methods
-      .execTransaction(
-        safeTransaction.data.to,
-        BigInt(safeTransaction.data.value),
-        safeTransaction.data.data,
-        safeTransaction.data.operation,
-        BigInt(safeTransaction.data.safeTxGas),
-        BigInt(safeTransaction.data.baseGas),
-        BigInt(safeTransaction.data.gasPrice),
-        safeTransaction.data.gasToken,
-        safeTransaction.data.refundReceiver,
-        safeTransaction.encodedSignatures()
-      )
-      .send(options)
-
-    return toTxResult(txResponse, options)
-  }
-
-  // Custom method (not defined in the Safe Contract)
+  /**
+   * Checks whether a given Safe transaction can be executed successfully with no errors.
+   * @param safeTransaction - The Safe transaction to check.
+   * @param options - Optional transaction options.
+   * @returns True, if the given transactions is valid.
+   */
   async isValidTransaction(
     safeTransaction: SafeTransaction,
     options?: Web3TransactionOptions
@@ -281,7 +245,69 @@ class SafeContract_v1_4_1_Web3
     return isTxValid
   }
 
-  // Custom method (not defined in the Safe Contract)
+  /**
+   * Executes a transaction.
+   * @param safeTransaction - The Safe transaction to execute.
+   * @param options - Transaction options.
+   * @returns Transaction result.
+   */
+  async execTransaction(
+    safeTransaction: SafeTransaction,
+    options?: Web3TransactionOptions
+  ): Promise<Web3TransactionResult> {
+    if (options && !options.gas) {
+      options.gas = (
+        await this.estimateGas(
+          'execTransaction',
+          [
+            safeTransaction.data.to,
+            BigInt(safeTransaction.data.value),
+            safeTransaction.data.data,
+            safeTransaction.data.operation,
+            BigInt(safeTransaction.data.safeTxGas),
+            BigInt(safeTransaction.data.baseGas),
+            BigInt(safeTransaction.data.gasPrice),
+            safeTransaction.data.gasToken,
+            safeTransaction.data.refundReceiver,
+            safeTransaction.encodedSignatures()
+          ],
+          options
+        )
+      ).toString()
+    }
+    const txResponse = this.contract.methods
+      .execTransaction(
+        safeTransaction.data.to,
+        BigInt(safeTransaction.data.value),
+        safeTransaction.data.data,
+        safeTransaction.data.operation,
+        BigInt(safeTransaction.data.safeTxGas),
+        BigInt(safeTransaction.data.baseGas),
+        BigInt(safeTransaction.data.gasPrice),
+        safeTransaction.data.gasToken,
+        safeTransaction.data.refundReceiver,
+        safeTransaction.encodedSignatures()
+      )
+      .send(options)
+
+    return toTxResult(txResponse, options)
+  }
+
+  /**
+   * Returns array of first 10 modules.
+   * @returns Array[modules]
+   */
+  async getModules(): Promise<readonly string[]> {
+    const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
+    return modules
+  }
+
+  /**
+   * Marks a hash as approved. This can be used to validate a hash that is used by a signature.
+   * @param hash - The hash that should be marked as approved for signatures that are verified by this contract.
+   * @param options - Optional transaction options.
+   * @returns Transaction result.
+   */
   async approveHash(
     hash: string,
     options?: Web3TransactionOptions
@@ -291,6 +317,14 @@ class SafeContract_v1_4_1_Web3
     }
     const txResponse = this.contract.methods.approveHash(hash).send(options)
     return toTxResult(txResponse, options)
+  }
+
+  /**
+   * Returns the chain id of the Safe contract. (Custom method - not defined in the Safe Contract)
+   * @returns Array[chainId]
+   */
+  async getChainId(): Promise<[bigint]> {
+    return [await this.contract.methods.getChainId().call()]
   }
 
   // TODO: Remove this mapper after remove Typechain

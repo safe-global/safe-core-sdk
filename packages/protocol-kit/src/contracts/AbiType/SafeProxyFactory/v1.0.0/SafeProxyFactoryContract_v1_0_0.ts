@@ -1,9 +1,7 @@
-import { narrow } from 'abitype'
+import { ExtractAbiFunctionNames, narrow } from 'abitype'
 import safeProxyFactory_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.0.0/proxy_factory'
-import SafeProxyFactoryBaseContract, {
-  SafeProxyFactoryContractReadFunctions,
-  SafeProxyFactoryContractWriteFunctions
-} from '../SafeProxyFactoryBaseContract'
+import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryBaseContract'
+import { ContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 const safeProxyFactoryContract_v1_0_0_AbiTypes = narrow(
   safeProxyFactory_1_0_0_ContractArtifacts.abi
@@ -17,20 +15,14 @@ const safeProxyFactoryContract_v1_0_0_AbiTypes = narrow(
 export type SafeProxyFactoryContract_v1_0_0_Abi = typeof safeProxyFactoryContract_v1_0_0_AbiTypes
 
 /**
- * Extracts the names of read-only functions (view or pure) specific to the Safe Proxy Factory contract version 1.0.0.
+ * Represents the function type derived by the given function name from the SafeProxyFactory contract version 1.0.0 ABI.
  *
- * @type {SafeProxyFactory_v1_0_0_Read_Functions}
+ * @template ContractFunctionName - The function name, derived from the ABI.
+ * @type {SafeProxyFactoryContract_v1_0_0_Function}
  */
-export type SafeProxyFactory_v1_0_0_Read_Functions =
-  SafeProxyFactoryContractReadFunctions<SafeProxyFactoryContract_v1_0_0_Abi>
-
-/**
- * Extracts the names of write functions (nonpayable or payable) specific to the Safe Proxy Factory contract version 1.0.0.
- *
- * @type {SafeProxyFactory_v1_0_0_Write_Functions}
- */
-export type SafeProxyFactory_v1_0_0_Write_Functions =
-  SafeProxyFactoryContractWriteFunctions<SafeProxyFactoryContract_v1_0_0_Abi>
+export type SafeProxyFactoryContract_v1_0_0_Function<
+  ContractFunctionName extends ExtractAbiFunctionNames<SafeProxyFactoryContract_v1_0_0_Abi>
+> = ContractFunction<SafeProxyFactoryContract_v1_0_0_Abi, ContractFunctionName>
 
 /**
  * Represents the contract type for a Safe Proxy Factory contract version 1.0.0, defining read and write methods.

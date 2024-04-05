@@ -5,10 +5,6 @@ import MultiSendContract_v1_1_1_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
 import multisend_1_1_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.1.1/multi_send'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeMultiSendFunction,
-  GetAddressMultiSendFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendBaseContract'
 
 /**
  * MultiSendContract_v1_1_1_Ethers is the implementation specific to the MultiSend contract version 1.1.1.
@@ -44,14 +40,6 @@ class MultiSendContract_v1_1_1_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressMultiSendFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeMultiSendFunction<MultiSendContract_v1_1_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 }
 

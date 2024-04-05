@@ -1,6 +1,7 @@
-import { narrow } from 'abitype'
+import { ExtractAbiFunctionNames, narrow } from 'abitype'
 import simulateTxAccessor_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.4.1/simulate_tx_accessor'
 import SimulateTxAccessorBaseContract from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/SimulateTxAccessorBaseContract'
+import { ContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 const simulateTxAccessorContract_v1_4_1_AbiTypes = narrow(
   simulateTxAccessor_1_4_1_ContractArtifacts.abi
@@ -13,6 +14,16 @@ const simulateTxAccessorContract_v1_4_1_AbiTypes = narrow(
  */
 export type SimulateTxAccessorContract_v1_4_1_Abi =
   typeof simulateTxAccessorContract_v1_4_1_AbiTypes
+
+/**
+ * Represents the function type derived by the given function name from the SimulateTxAccessor contract version 1.4.1 ABI.
+ *
+ * @template ContractFunctionName - The function name, derived from the ABI.
+ * @type {SimulateTxAccessorContract_v1_4_1_Function}
+ */
+export type SimulateTxAccessorContract_v1_4_1_Function<
+  ContractFunctionName extends ExtractAbiFunctionNames<SimulateTxAccessorContract_v1_4_1_Abi>
+> = ContractFunction<SimulateTxAccessorContract_v1_4_1_Abi, ContractFunctionName>
 
 /**
  * Represents the contract type for a SimulateTxAccessor contract version 1.4.1 defining read and write methods.

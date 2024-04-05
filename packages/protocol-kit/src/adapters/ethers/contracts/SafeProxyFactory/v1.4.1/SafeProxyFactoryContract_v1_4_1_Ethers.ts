@@ -1,15 +1,12 @@
 import { ContractRunner, EventLog } from 'ethers'
-import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
+import SafeProxyFactoryBaseContractEthers, {
+  CreateProxyProps
+} from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import safeProxyFactory_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.4.1/safe_proxy_factory'
-import {
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 import SafeProxyFactoryContract_v1_4_1_Contract, {
-  SafeProxyFactoryContract_v1_4_1_Abi
+  SafeProxyFactoryContract_v1_4_1_Abi,
+  SafeProxyFactoryContract_v1_4_1_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
@@ -58,60 +55,66 @@ class SafeProxyFactoryContract_v1_4_1_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeFunction<SafeProxyFactoryContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasFunction<SafeProxyFactoryContract_v1_4_1_Abi, EthersTransactionOptions> =
-    (functionToEstimate, args, options = {}) => {
-      const contractMethodToStimate = this.contract.getFunction(functionToEstimate)
-
-      return contractMethodToStimate.estimateGas(...args, options)
-    }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  async getChainId(): Promise<[bigint]> {
+  /**
+   * Returns the ID of the chain the contract is currently deployed on.
+   * @returns Array[chainId]
+   */
+  getChainId: SafeProxyFactoryContract_v1_4_1_Function<'getChainId'> = async () => {
     return [await this.contract.getChainId()]
   }
 
-  async proxyCreationCode(): Promise<[string]> {
+  /**
+   * Allows to retrieve the creation code used for the Proxy deployment. With this it is easily possible to calculate predicted address.
+   * @returns Array[creationCode]
+   */
+  proxyCreationCode: SafeProxyFactoryContract_v1_4_1_Function<'proxyCreationCode'> = async () => {
     return [await this.contract.proxyCreationCode()]
   }
 
-  async createChainSpecificProxyWithNonce(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
-    return [await this.contract.createChainSpecificProxyWithNonce(...args)]
-  }
+  /**
+   * Deploys a new chain-specific proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
+   * @param args - Array[singleton, initializer, saltNonce]
+   * @returns Array[proxy]
+   */
+  createChainSpecificProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createChainSpecificProxyWithNonce'> =
+    async (args) => {
+      return [await this.contract.createChainSpecificProxyWithNonce(...args)]
+    }
 
-  async createProxyWithCallback(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint, callback: string]
-  ): Promise<[string]> {
-    return [await this.contract.createProxyWithCallback(...args)]
-  }
+  /**
+   * Deploy a new proxy with singleton and salt.
+   * Optionally executes an initializer call to a new proxy and calls a specified callback address.
+   * @param args - Array[singleton, initializer, saltNonce, callback]
+   * @returns Array[proxy]
+   */
+  createProxyWithCallback: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithCallback'> =
+    async (args) => {
+      return [await this.contract.createProxyWithCallback(...args)]
+    }
 
-  async createProxyWithNonce(
-    args: readonly [singleton: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
+  /**
+   * Deploys a new proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
+   * @param args - Array[singleton, initializer, saltNonce]
+   * @returns Array[proxy]
+   */
+  createProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithNonce'> = async (
+    args
+  ) => {
     return [await this.contract.createProxyWithNonce(...args)]
   }
 
+  /**
+   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
+   * @param {CreateProxyProps} props - Properties for the new proxy contract.
+   * @returns The address of the new proxy contract.
+   */
   async createProxy({
     safeSingletonAddress,
     initializer,
     saltNonce,
     options,
     callback
-  }: {
-    safeSingletonAddress: string
-    initializer: string
-    saltNonce: string
-    options?: EthersTransactionOptions
-    callback?: (txHash: string) => void
-  }): Promise<string> {
+  }: CreateProxyProps): Promise<string> {
     const saltNonceBigInt = BigInt(saltNonce)
 
     if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')

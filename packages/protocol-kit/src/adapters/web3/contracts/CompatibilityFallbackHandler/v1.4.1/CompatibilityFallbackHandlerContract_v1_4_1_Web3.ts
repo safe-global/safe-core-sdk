@@ -6,10 +6,6 @@ import CompatibilityFallbackHandlerContract_v1_4_1_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import CompatibilityFallbackHandler_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CompatibilityFallbackHandler/v1.4.1/compatibility_fallback_handler'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * CompatibilityFallbackHandlerContract_v1_4_1_Web3 is the implementation specific to the CompatibilityFallbackHandler contract version 1.4.1.
@@ -55,17 +51,6 @@ class CompatibilityFallbackHandlerContract_v1_4_1_Web3
     )
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  encode: EncodeFunction<CompatibilityFallbackHandlerContract_v1_4_1_Abi> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }
 

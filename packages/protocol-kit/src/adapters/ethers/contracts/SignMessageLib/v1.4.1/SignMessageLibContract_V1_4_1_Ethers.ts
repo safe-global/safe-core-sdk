@@ -3,17 +3,12 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import SignMessageLibContract_v1_4_1_Contract, {
-  SignMessageLibContract_v1_4_1_Abi
+  SignMessageLibContract_v1_4_1_Abi,
+  SignMessageLibContract_v1_4_1_Function
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import multisend_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SignMessageLib/v1.4.1/sign_message_lib'
 import { SafeVersion, SignMessageLibContract } from '@safe-global/safe-core-sdk-types'
-import {
-  AdapterSpecificContractFunction,
-  ContractFunction,
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+import { AdapterSpecificContractFunction } from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 /**
  * SignMessageLibContract_v1_4_1_Ethers is the implementation specific to the SignMessageLib contract version 1.4.1.
@@ -51,30 +46,10 @@ class SignMessageLibContract_v1_4_1_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeFunction<SignMessageLibContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasFunction<SignMessageLibContract_v1_4_1_Abi, EthersTransactionOptions> = (
-    functionToEstimate,
-    args,
-    options = {}
-  ) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToEstimate.estimateGas(...args, options)
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
   /**
    * @param args - Array[message]
    */
-  getMessageHash: ContractFunction<SignMessageLibContract_v1_4_1_Abi, 'getMessageHash'> = async (
-    args
-  ) => {
+  getMessageHash: SignMessageLibContract_v1_4_1_Function<'getMessageHash'> = async (args) => {
     return [await this.contract.getMessageHash(...args)]
   }
 

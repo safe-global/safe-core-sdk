@@ -6,10 +6,6 @@ import MultiSendCallOnlyContract_v1_3_0_Contract, {
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import multiSend_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/MultiSend/v1.3.0/multi_send_call_only'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import {
-  EncodeFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
 
 // Remove all nested `readonly` modifiers from the ABI type
 type MultiSendCallOnlyContract_v1_3_0_Abi =
@@ -49,17 +45,6 @@ class MultiSendCallOnlyContract_v1_3_0_Web3
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  encode: EncodeFunction<MultiSendCallOnlyContract_v1_3_0_Abi_Readonly> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }
 

@@ -1,30 +1,28 @@
-import Contract from 'web3-eth-contract'
+import { Abi } from 'abitype'
 import { AbiItem } from 'web3-utils'
 
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import CompatibilityFallbackHandlerBaseContract from '@safe-global/protocol-kit/adapters/CompatibilityFallbackHandlerBaseContract'
+import BaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/BaseContractWeb3'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class CompatibilityFallbackHandlerBaseContractWeb3 extends CompatibilityFallbackHandlerBaseContract to specifically integrate with the Web3.js v6 library.
+ * Abstract class CompatibilityFallbackHandlerBaseContractWeb3 extends BaseContractWeb3 to specifically integrate with the CompatibilityFallbackHandler contract.
  * It is designed to be instantiated for different versions of the Safe contract.
- *
- * This abstract class sets up the Web3 v6 Contract object that interacts with a CompatibilityFallbackHandler contract version.
  *
  * Subclasses of CompatibilityFallbackHandlerBaseContractWeb3 are expected to represent specific versions of the contract.
  *
  * @template CompatibilityFallbackHandlerContractAbiType - The ABI type specific to the version of the CompatibilityFallbackHandler contract, extending InterfaceAbi from Web3.
- * @extends CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContractAbiType> - Extends the generic CompatibilityFallbackHandlerBaseContract with Web3-specific implementation.
+ * @extends BaseContractWeb3<CompatibilityFallbackHandlerContractAbiType> - Extends the generic BaseContractWeb3.
  *
  * Example subclasses:
  * - CompatibilityFallbackHandlerContract_v1_4_1_Web3 extends CompatibilityFallbackHandlerBaseContractWeb3<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
  * - CompatibilityFallbackHandlerContract_v1_3_0_Web3 extends CompatibilityFallbackHandlerBaseContractWeb3<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
  */
 abstract class CompatibilityFallbackHandlerBaseContractWeb3<
-  CompatibilityFallbackHandlerContractAbiType extends AbiItem[]
-> extends CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContractAbiType> {
-  contract: Contract
-  adapter: Web3Adapter
+  CompatibilityFallbackHandlerContractAbiType extends AbiItem[] & Abi
+> extends BaseContractWeb3<CompatibilityFallbackHandlerContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -45,10 +43,19 @@ abstract class CompatibilityFallbackHandlerBaseContractWeb3<
     customContractAddress?: string,
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'compatibilityFallbackHandler'
 
-    this.adapter = web3Adapter
-    this.contract = web3Adapter.getContract(this.contractAddress, this.contractAbi)
+    super(
+      contractName,
+      chainId,
+      web3Adapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi
+    )
+
+    this.contractName = contractName
   }
 }
 

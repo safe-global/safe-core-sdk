@@ -27,10 +27,10 @@ import { SafeContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/Abi
 import { SafeContract_v1_2_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
 import { SafeContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
 import { SafeContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.4.1/SafeContract_v1_4_1'
-import { SafeProxyFactoryContract_v1_0_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import { SafeProxyFactoryContract_v1_1_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
-import { SafeProxyFactoryContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
-import { SafeProxyFactoryContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
+import { SafeProxyFactoryContract_v1_0_0_Abi as SafeProxyFactoryContract_v1_0_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
+import { SafeProxyFactoryContract_v1_1_1_Abi as SafeProxyFactoryContract_v1_1_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
+import { SafeProxyFactoryContract_v1_3_0_Abi as SafeProxyFactoryContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import { SafeProxyFactoryContract_v1_4_1_Abi as SafeProxyFactoryContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
 import {
   CompatibilityFallbackHandlerContract,
   CreateCallContract,
@@ -38,8 +38,8 @@ import {
   SignMessageLibContract,
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
-import { CreateCallContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
-import { CreateCallContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
+import { CreateCallContract_v1_4_1_Abi as CreateCallContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import { CreateCallContract_v1_3_0_Abi as CreateCallContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import { MultiSendContract_v1_4_1_Abi as MultiSendContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
 import { MultiSendContract_v1_3_0_Abi as MultiSendContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
 import { MultiSendContract_v1_1_1_Abi as MultiSendContract_v1_1_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
@@ -47,12 +47,14 @@ import { MultiSendCallOnlyContract_v1_3_0_Abi as MultiSendCallOnlyContract_v1_3_
 import { MultiSendCallOnlyContract_v1_4_1_Abi as MultiSendCallOnlyContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
 import { SignMessageLibContract_v1_4_1_Abi as SignMessageLibContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
 import { SignMessageLibContract_v1_3_0_Abi as SignMessageLibContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import { SimulateTxAccessorContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
-import { SimulateTxAccessorContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
+import { SimulateTxAccessorContract_v1_3_0_Abi as SimulateTxAccessorContract_v1_3_0_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
+import { SimulateTxAccessorContract_v1_4_1_Abi as SimulateTxAccessorContract_v1_4_1_Abi_Readonly } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import { CompatibilityFallbackHandlerContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import { CompatibilityFallbackHandlerContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
 
+type CreateCallContract_v1_3_0_Abi = DeepWriteable<CreateCallContract_v1_3_0_Abi_Readonly>
+type CreateCallContract_v1_4_1_Abi = DeepWriteable<CreateCallContract_v1_4_1_Abi_Readonly>
 type MultiSendContract_v1_1_1_Abi = DeepWriteable<MultiSendContract_v1_1_1_Abi_Readonly>
 type MultiSendContract_v1_3_0_Abi = DeepWriteable<MultiSendContract_v1_3_0_Abi_Readonly>
 type MultiSendContract_v1_4_1_Abi = DeepWriteable<MultiSendContract_v1_4_1_Abi_Readonly>
@@ -62,6 +64,18 @@ type MultiSendCallOnlyContract_v1_4_1_Abi =
   DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi_Readonly>
 type SignMessageLibContract_v1_3_0_Abi = DeepWriteable<SignMessageLibContract_v1_3_0_Abi_Readonly>
 type SignMessageLibContract_v1_4_1_Abi = DeepWriteable<SignMessageLibContract_v1_4_1_Abi_Readonly>
+type SimulateTxAccessorContract_v1_3_0_Abi =
+  DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi_Readonly>
+type SimulateTxAccessorContract_v1_4_1_Abi =
+  DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi_Readonly>
+type SafeProxyFactoryContract_v1_0_0_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi_Readonly>
+type SafeProxyFactoryContract_v1_1_1_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi_Readonly>
+type SafeProxyFactoryContract_v1_3_0_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi_Readonly>
+type SafeProxyFactoryContract_v1_4_1_Abi =
+  DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi_Readonly>
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,

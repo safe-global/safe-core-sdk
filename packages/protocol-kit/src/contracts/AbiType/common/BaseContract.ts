@@ -68,6 +68,7 @@ export type EncodeFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
+  // TODO: remove `DeepWriteable` here when web3 dependency is removed
   args: DeepWriteable<ExtractFunctionArgs<ContractAbi, ContractFunctionName>>
 ) => string
 
@@ -87,6 +88,7 @@ export type EstimateGasFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
+  // TODO: remove `DeepWriteable` here when web3 dependency is removed
   args: DeepWriteable<ExtractFunctionArgs<ContractAbi, ContractFunctionName>>,
   options?: TransactionOptions
 ) => Promise<bigint>
@@ -107,7 +109,8 @@ export type ContractFunction<
   // input parameters (only if function has inputs, otherwise no parameters)
   ...args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>['length'] extends 0
     ? []
-    : [DeepWriteable<ExtractFunctionArgs<ContractAbi, ContractFunctionName>>]
+    : // TODO: remove `DeepWriteable` here when web3 dependency is removed
+      [DeepWriteable<ExtractFunctionArgs<ContractAbi, ContractFunctionName>>]
   // returned values as a Promise
 ) => Promise<ExtractFunctionArgs<ContractAbi, ContractFunctionName, 'outputs'>>
 
@@ -132,6 +135,7 @@ export type AdapterSpecificContractFunction<
     ? EthersTransactionResult
     : Web3TransactionResult
 > = (
+  // TODO: remove `DeepWriteable` here when web3 dependency is removed
   args: DeepWriteable<
     AbiParametersToPrimitiveTypes<ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']>
   >,

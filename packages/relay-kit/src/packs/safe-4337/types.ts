@@ -14,7 +14,7 @@ type PredictedSafeOptions = {
   saltNonce?: string
 }
 
-export type paymasterOptions = {
+export type PaymasterOptions = {
   paymasterUrl?: string
   isSponsored?: boolean
   sponsorshipPolicyId?: string
@@ -34,13 +34,13 @@ export type Safe4337InitOptions = {
     addModulesLibAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions
-  paymasterOptions?: paymasterOptions
+  paymasterOptions?: PaymasterOptions
 }
 
 export type Safe4337Options = {
   protocolKit: Safe
   bundlerUrl: string
-  paymasterOptions?: paymasterOptions
+  paymasterOptions?: PaymasterOptions
   bundlerClient: ethers.JsonRpcProvider
   publicClient: ethers.JsonRpcProvider
   entryPointAddress: string

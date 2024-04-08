@@ -955,51 +955,39 @@
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
 
-"@safe-global/api-kit@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@safe-global/api-kit/-/api-kit-2.2.0.tgz#e86ca041d73829aa68dbf7635b9ee6dc602264b3"
-  integrity sha512-y9EetRZXIFs5HmIk1blmL38Rbzxlt79cEuYGDEdmQJNa6SQ7OJdO4Eoy2hMFleZIhTKhoOWVsyEfdZnRPtsq2g==
+"@safe-global/api-kit@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/api-kit/-/api-kit-2.3.0.tgz#fc7e741a25cb5983ce7e7ccf0f2fd2ef64bbe704"
+  integrity sha512-Mh9HH9+TK4dz5tiuPLn/GK42cOf1lKGvcmH/JQK8b7gD+YJugnXdrsirs3XahvwdG0rG7xfL9tf4mcW7zWzuXQ==
   dependencies:
-    "@safe-global/protocol-kit" "^3.0.1"
-    "@safe-global/safe-core-sdk-types" "^4.0.1"
+    "@safe-global/protocol-kit" "^3.0.2"
+    "@safe-global/safe-core-sdk-types" "^4.0.2"
     ethers "^6.7.1"
     node-fetch "^2.7.0"
 
 "@safe-global/auth-kit@file:../../../auth-kit":
-  version "2.0.2"
+  version "2.0.3"
   dependencies:
-    "@safe-global/api-kit" "^2.2.0"
-    "@safe-global/protocol-kit" "^3.0.1"
+    "@safe-global/api-kit" "^2.3.0"
+    "@safe-global/protocol-kit" "^3.0.2"
     "@web3auth/safeauth-embed" "^0.0.0"
     ethers "^6.7.1"
 
 "@safe-global/onramp-kit@file:../..":
-  version "3.0.1"
+  version "3.0.2"
   dependencies:
     "@monerium/sdk" "^2.9.0"
-    "@safe-global/api-kit" "^2.2.0"
-    "@safe-global/protocol-kit" "^3.0.1"
-    "@safe-global/safe-core-sdk-types" "^4.0.1"
+    "@safe-global/api-kit" "^2.3.0"
+    "@safe-global/protocol-kit" "^3.0.2"
+    "@safe-global/safe-core-sdk-types" "^4.0.2"
     "@stripe/crypto" "^0.0.4"
     "@stripe/stripe-js" "^1.54.2"
     ethers "^6.7.1"
 
-"@safe-global/protocol-kit@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/protocol-kit/-/protocol-kit-3.0.1.tgz#77793ca0f6ceb7e017230cd2f4b48e952145c4b5"
-  integrity sha512-7S2QCvIDw3NsErF0f8tIfiTBz32btCAkw7IYuQFPc+G7clLrvDNhDaZYSoDsa8F0EoEhn+605VA7XP//iL6AIg==
-  dependencies:
-    "@noble/hashes" "^1.3.3"
-    "@safe-global/safe-deployments" "^1.33.0"
-    ethereumjs-util "^7.1.5"
-    ethers "^6.7.1"
-    semver "^7.5.4"
-    web3 "^1.10.3"
-    web3-core "^1.10.3"
-    web3-utils "^1.10.3"
-
-"@safe-global/protocol-kit@file:../../../protocol-kit":
-  version "3.0.1"
+"@safe-global/protocol-kit@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@safe-global/protocol-kit/-/protocol-kit-3.0.2.tgz#cfa4c5e890c101aa89e11768d07b2bc5455f72fb"
+  integrity sha512-Jxvvfu4yqEdWeOuY3VWOOs/q5f27om3tctL2guOCDbAuSx3Vd1peaKRwLiREkvrrqKEW0tfmzUSsqtmlJExfBw==
   dependencies:
     "@noble/hashes" "^1.3.3"
     "@safe-global/safe-deployments" "^1.34.0"
@@ -1010,17 +998,29 @@
     web3-core "^1.10.3"
     web3-utils "^1.10.3"
 
-"@safe-global/safe-core-sdk-types@^4.0.1":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-core-sdk-types/-/safe-core-sdk-types-4.0.1.tgz#7fb87abc3e709eaf217423d582749e95b8d4d39f"
-  integrity sha512-cXW6petRWqUw1n04ZhVPgjzIL65FkAMqbPwkFAAlQ1lBxTt6xdxktLoAhgEDlqLNGibvncsNvKhxa1ib4T9MGg==
+"@safe-global/protocol-kit@file:../../../protocol-kit":
+  version "3.0.2"
   dependencies:
-    "@safe-global/safe-deployments" "^1.33.0"
+    "@noble/hashes" "^1.3.3"
+    "@safe-global/safe-deployments" "^1.34.0"
+    ethereumjs-util "^7.1.5"
+    ethers "^6.7.1"
+    semver "^7.5.4"
+    web3 "^1.10.3"
+    web3-core "^1.10.3"
+    web3-utils "^1.10.3"
+
+"@safe-global/safe-core-sdk-types@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-core-sdk-types/-/safe-core-sdk-types-4.0.2.tgz#70a99d8d61b83db458124c263391d86e5d6d5057"
+  integrity sha512-3I60xV/BLPiBtc3nGp2itgiDL+YbMI9OwaANvnJL2AwSS1kc2kH3/SsCwAW3s4Usr3b0lE08aO7I9ropyxFHhA==
+  dependencies:
+    "@safe-global/safe-deployments" "^1.34.0"
     ethers "^6.7.1"
     web3-core "^1.10.3"
     web3-utils "^1.10.3"
 
-"@safe-global/safe-deployments@^1.33.0", "@safe-global/safe-deployments@^1.34.0":
+"@safe-global/safe-deployments@^1.34.0":
   version "1.34.0"
   resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.34.0.tgz#5eef33012a4af55c4440036b1c0cfdb2245c6e49"
   integrity sha512-J55iHhB1tiNoPeVQ5s943zrfeKRYPqBtnz/EM7d878WzUmmDlTGKHN98qPYKBxkRKP1UjEWuQDrZxy80lx1rJw==
@@ -2159,13 +2159,14 @@ error-ex@^1.3.1:
   dependencies:
     is-arrayish "^0.2.1"
 
-es5-ext@^0.10.35, es5-ext@^0.10.50:
-  version "0.10.62"
-  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.62.tgz#5e6adc19a6da524bf3d1e02bbc8960e5eb49a9a5"
-  integrity sha512-BHLqn0klhEpnOKSrzn/Xsz2UIW8j+cGmo9JLzr8BiUapV8hPL9+FliFqjwr9ngW7jWdnxv6eO+/LqyhJVqgrjA==
+es5-ext@^0.10.35, es5-ext@^0.10.50, es5-ext@^0.10.62, es5-ext@~0.10.14:
+  version "0.10.64"
+  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.64.tgz#12e4ffb48f1ba2ea777f1fcdd1918ef73ea21714"
+  integrity sha512-p2snDhiLaXe6dahss1LddxqEm+SkuDvV8dnIQG0MWjyHpcMNfXKPE+/Cc0y+PhxJX3A4xGNeFCj5oc0BUh6deg==
   dependencies:
     es6-iterator "^2.0.3"
     es6-symbol "^3.1.3"
+    esniff "^2.0.1"
     next-tick "^1.1.0"
 
 es6-iterator@^2.0.3:
@@ -2237,6 +2238,16 @@ escape-string-regexp@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz#14ba83a5d373e3d311e5afca29cf5bfad965bf34"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
+
+esniff@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/esniff/-/esniff-2.0.1.tgz#a4d4b43a5c71c7ec51c51098c1d8a29081f9b308"
+  integrity sha512-kTUIGKQ/mDPFoJ0oVfcmyJn4iBDRptjNVIzwIFR7tqWXdVI9xfA2RMwY/gbSpJG3lkdWNEjLap/NqVHZiJsdfg==
+  dependencies:
+    d "^1.0.1"
+    es5-ext "^0.10.62"
+    event-emitter "^0.3.5"
+    type "^2.7.2"
 
 estree-walker@^2.0.2:
   version "2.0.2"
@@ -2353,6 +2364,14 @@ ethjs-unit@0.1.6:
   dependencies:
     bn.js "4.11.6"
     number-to-bn "1.7.0"
+
+event-emitter@^0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/event-emitter/-/event-emitter-0.3.5.tgz#df8c69eef1647923c7157b9ce83840610b02cc39"
+  integrity sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==
+  dependencies:
+    d "1"
+    es5-ext "~0.10.14"
 
 event-target-shim@^5.0.0:
   version "5.0.1"

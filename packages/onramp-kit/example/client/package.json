@@ -9,26 +9,26 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@monerium/sdk": "^2.9.0",
-    "@mui/material": "^5.14.17",
+    "@mui/material": "^5.15.15",
     "@safe-global/auth-kit": "file:../../../auth-kit",
     "@safe-global/onramp-kit": "file:../../",
     "@safe-global/protocol-kit": "file:../../../protocol-kit",
-    "@safe-global/safe-react-components": "^2.0.5",
-    "ethers": "^6.7.1",
+    "@safe-global/safe-react-components": "^2.0.6",
+    "ethers": "^6.11.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.18.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
-    "@types/react": "^18.2.36",
-    "@types/react-dom": "^18.2.14",
+    "@types/react": "^18.2.74",
+    "@types/react-dom": "^18.2.24",
     "@vitejs/plugin-react": "^3.1.0",
     "rollup-plugin-polyfill-node": "^0.12.0",
-    "typescript": "^4.9.5",
+    "typescript": "^5.4.4",
     "vite": "^4.5.3",
     "vite-plugin-node-polyfills": "^0.16.0"
   }

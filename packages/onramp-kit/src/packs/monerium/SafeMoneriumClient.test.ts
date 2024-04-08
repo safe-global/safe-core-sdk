@@ -115,7 +115,7 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should allow to check if a message is NOT signed in the smart contract if the promise is fulfilled', async () => {
-    // Promise fullfilled without signature
+    // Promise fulfilled without signature
     protocolKit.getEthAdapter().call = jest.fn().mockImplementation(async () => '0x')
 
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(

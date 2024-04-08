@@ -58,7 +58,7 @@
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
-    "@safe-global/safe-core-sdk-types": "^4.0.1",
+    "@safe-global/safe-core-sdk-types": "^4.0.2",
     "@typechain/ethers-v6": "^0.5.0",
     "@typechain/web3-v1": "^6.0.7",
     "@types/chai": "^4.3.11",

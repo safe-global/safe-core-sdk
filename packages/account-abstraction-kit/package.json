@@ -36,6 +36,6 @@
   "dependencies": {
     "@safe-global/protocol-kit": "^3.1.0-alpha.0",
     "@safe-global/relay-kit": "^2.1.0-alpha.0",
-    "@safe-global/safe-core-sdk-types": "^4.0.1"
+    "@safe-global/safe-core-sdk-types": "^4.0.2"
   }
 }

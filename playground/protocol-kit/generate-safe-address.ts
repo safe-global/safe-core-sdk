@@ -47,7 +47,7 @@ async function generateSafeAddresses() {
       safeDeploymentConfig
     })
 
-    // we print a message in the console with some data about the preformance
+    // we print a message in the console with some data about the performance
     printPerfomanceMessage(iteractions, saltNonce)
 
     // we check if its a valid address based on the provided pattern
@@ -102,7 +102,7 @@ function printFirstMessage(): void {
   console.log('------------------------------------------------------------')
 }
 
-// used to print the perfomance message
+// used to print the performance message
 function printPerfomanceMessage(addresses: number, saltNonce: number): void {
   const seconds = (Date.now() - start) / 1000
   const addressesPerSecond = (addresses / seconds).toFixed(8)

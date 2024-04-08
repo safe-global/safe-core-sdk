@@ -11,7 +11,7 @@ let safeApiKit: SafeApiKit
 describe('getPendingTransactions', () => {
   before(async () => {
     ;({ safeApiKit } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
@@ -23,31 +23,31 @@ describe('getPendingTransactions', () => {
   })
 
   it('should fail if safeAddress is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
     await chai
       .expect(safeApiKit.getPendingTransactions(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
   it('should return an empty list if there are no pending transactions', async () => {
-    const safeAddress = '0x72c346260a4887F0231af41178C1c818Ce34543f' // Safe without pending transaction
+    const safeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3' // Safe without pending transaction
     const transactionList = await safeApiKit.getPendingTransactions(safeAddress)
     chai.expect(transactionList.count).to.be.equal(0)
     chai.expect(transactionList.results.length).to.be.equal(0)
   })
 
   it('should return the the transaction list', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with pending transaction
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with pending transaction
     const transactionList = await safeApiKit.getPendingTransactions(safeAddress)
-    chai.expect(transactionList.count).to.be.equal(1)
-    chai.expect(transactionList.results.length).to.be.equal(1)
+    chai.expect(transactionList.count).to.be.equal(3)
+    chai.expect(transactionList.results.length).to.be.equal(3)
   })
 
   it('should return the the transaction list EIP-3770', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with pending transaction
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with pending transaction
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transactionList = await safeApiKit.getPendingTransactions(eip3770SafeAddress)
-    chai.expect(transactionList.count).to.be.equal(1)
-    chai.expect(transactionList.results.length).to.be.equal(1)
+    chai.expect(transactionList.count).to.be.equal(3)
+    chai.expect(transactionList.results.length).to.be.equal(3)
   })
 })

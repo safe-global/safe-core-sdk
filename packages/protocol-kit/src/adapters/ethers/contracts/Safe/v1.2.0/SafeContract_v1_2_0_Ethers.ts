@@ -14,6 +14,7 @@ import {
   EncodeSafeFunction,
   EstimateGasSafeFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
+import { AbstractSigner } from 'ethers'
 
 /**
  * SafeContract_v1_2_0_Ethers is the implementation specific to the Safe contract version 1.2.0.
@@ -40,7 +41,7 @@ class SafeContract_v1_2_0_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     isL1SafeSingleton = false,
     customContractAddress?: string,
     customContractAbi?: SafeContract_v1_2_0_Abi
@@ -50,7 +51,7 @@ class SafeContract_v1_2_0_Ethers
 
     super(
       chainId,
-      ethersAdapter,
+      signer,
       defaultAbi,
       safeVersion,
       isL1SafeSingleton,

@@ -1,4 +1,4 @@
-import { Contract, InterfaceAbi } from 'ethers'
+import { AbstractSigner, Contract, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
@@ -26,7 +26,6 @@ abstract class SafeBaseContractEthers<
   SafeContractAbiType extends InterfaceAbi
 > extends SafeBaseContract<SafeContractAbiType> {
   contract: Contract
-  adapter: EthersAdapter
 
   /**
    * @constructor
@@ -42,7 +41,7 @@ abstract class SafeBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     defaultAbi: SafeContractAbiType,
     safeVersion: SafeVersion,
     isL1SafeSingleton = false,
@@ -58,8 +57,7 @@ abstract class SafeBaseContractEthers<
       customContractAbi
     )
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(this.contractAddress, this.contractAbi, this.adapter.getSigner())
+    this.contract = new Contract(this.contractAddress, this.contractAbi, signer)
   }
 }
 

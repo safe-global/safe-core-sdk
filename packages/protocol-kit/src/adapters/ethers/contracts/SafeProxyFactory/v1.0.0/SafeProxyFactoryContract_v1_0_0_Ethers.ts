@@ -1,4 +1,4 @@
-import { ContractRunner, EventLog } from 'ethers'
+import { AbstractSigner, ContractRunner, EventLog } from 'ethers'
 import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
@@ -36,7 +36,7 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi,
     runner?: ContractRunner | null
@@ -46,7 +46,7 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
 
     super(
       chainId,
-      ethersAdapter,
+      signer,
       defaultAbi,
       safeVersion,
       customContractAddress,

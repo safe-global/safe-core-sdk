@@ -1,5 +1,4 @@
 import SafeBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/SafeBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import {
   EthersTransactionOptions,
   EthersTransactionResult
@@ -15,6 +14,7 @@ import {
 } from '@safe-global/protocol-kit/contracts/AbiType/Safe/SafeBaseContract'
 import { sameString } from '@safe-global/protocol-kit/utils'
 import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { AbstractSigner } from 'ethers'
 
 /**
  * SafeContract_v1_0_0_Ethers is the implementation specific to the Safe contract version 1.0.0.
@@ -41,7 +41,7 @@ class SafeContract_v1_0_0_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     isL1SafeSingleton = false,
     customContractAddress?: string,
     customContractAbi?: SafeContract_v1_0_0_Abi
@@ -51,7 +51,7 @@ class SafeContract_v1_0_0_Ethers
 
     super(
       chainId,
-      ethersAdapter,
+      signer,
       defaultAbi,
       safeVersion,
       isL1SafeSingleton,

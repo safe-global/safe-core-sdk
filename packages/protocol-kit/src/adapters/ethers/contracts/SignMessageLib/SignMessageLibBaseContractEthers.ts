@@ -1,4 +1,4 @@
-import { Contract, InterfaceAbi } from 'ethers'
+import { AbstractSigner, Contract, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
@@ -23,7 +23,6 @@ abstract class SignMessageLibBaseContractEthers<
   SignMessageLibContractAbiType extends InterfaceAbi
 > extends SignMessageLibBaseContract<SignMessageLibContractAbiType> {
   contract: Contract
-  adapter: EthersAdapter
 
   /**
    * @constructor
@@ -38,7 +37,7 @@ abstract class SignMessageLibBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     defaultAbi: SignMessageLibContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
@@ -46,8 +45,7 @@ abstract class SignMessageLibBaseContractEthers<
   ) {
     super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(this.contractAddress, this.contractAbi, this.adapter.getSigner())
+    this.contract = new Contract(this.contractAddress, this.contractAbi, signer)
   }
 }
 

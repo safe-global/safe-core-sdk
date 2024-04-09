@@ -1,6 +1,5 @@
 import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/utils/transactions'
 import {
-  EthAdapter,
   MetaTransactionData,
   SafeContract,
   SafeTransactionDataPartial,
@@ -83,9 +82,18 @@ type SafeConfigWithPredictedSafeProps = {
   predictedSafe: PredictedSafeProps
 }
 
+interface RequestArguments {
+  readonly method: string
+  readonly params?: readonly unknown[] | object
+}
+
+export interface Eip1193Provider {
+  request: (args: RequestArguments) => Promise<unknown>
+}
+
 export type SafeConfigProps = {
-  /** ethAdapter - Ethereum adapter */
-  ethAdapter: EthAdapter
+  /** provider - Compatible EIP-1193 provider */
+  provider: Eip1193Provider
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
@@ -111,8 +119,8 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 }
 
 type ConnectSafeConfigProps = {
-  /** ethAdapter - Ethereum adapter */
-  ethAdapter?: EthAdapter
+  /** provider - Compatible EIP-1193 provider */
+  provider?: Eip1193Provider
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
@@ -172,8 +180,8 @@ type StandardizeSafeTxDataWithPredictedSafeProps = {
 }
 
 interface StandardizeSafeTransactionData {
-  /** ethAdapter - Ethereum adapter */
-  ethAdapter: EthAdapter
+  /** provider - Compatible EIP-1193 provider */
+  provider: Eip1193Provider
   /** tx - Safe transaction */
   tx: SafeTransactionDataPartial
   /** contractNetworks - Contract network configuration */

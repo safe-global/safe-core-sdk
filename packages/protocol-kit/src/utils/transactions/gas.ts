@@ -490,8 +490,6 @@ async function estimateSafeTxGasWithSimulate(
   } catch (error: any) {
     return parseSafeTxGasErrorResponse(error)
   }
-
-  return '0'
 }
 
 /**

@@ -1,6 +1,5 @@
-import { Contract, InterfaceAbi } from 'ethers'
+import { AbstractSigner, Contract, InterfaceAbi } from 'ethers'
 
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import MultiSendBaseContract from '@safe-global/protocol-kit/adapters/MultiSendBaseContract'
 
@@ -23,7 +22,6 @@ abstract class MultiSendBaseContractEthers<
   MultiSendContractAbiType extends InterfaceAbi
 > extends MultiSendBaseContract<MultiSendContractAbiType> {
   contract: Contract
-  adapter: EthersAdapter
 
   /**
    * @constructor
@@ -38,7 +36,7 @@ abstract class MultiSendBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     defaultAbi: MultiSendContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
@@ -46,8 +44,7 @@ abstract class MultiSendBaseContractEthers<
   ) {
     super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(this.contractAddress, this.contractAbi, this.adapter.getSigner())
+    this.contract = new Contract(this.contractAddress, this.contractAbi, signer)
   }
 }
 

@@ -1,4 +1,4 @@
-import { Provider, AbstractSigner } from 'ethers'
+import { utils, Provider, AbstractSigner, BrowserProvider } from 'ethers'
 import {
   EthersAdapter,
   EthersAdapterConfig,
@@ -7,38 +7,24 @@ import {
 } from '@safe-global/protocol-kit/index'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import { ethers, web3 } from 'hardhat'
+import * as hre from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
+import { Eip1193Provider } from '@safe-global/protocol-kit/types'
+import { isSignerCompatible } from '@safe-global/protocol-kit/adapters/ethers/utils'
+import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
-export async function getEthAdapter(
-  signerOrProvider: AbstractSigner | Provider | Web3
-): Promise<EthAdapter> {
-  let ethAdapter: EthAdapter
-  switch (process.env.ETH_LIB) {
-    case 'web3':
-      const signerAddress =
-        signerOrProvider instanceof HardhatEthersSigner
-          ? await signerOrProvider.getAddress()
-          : undefined
+// EIP-1193 methods that require accounts
+const accountMethods = ['eth_accounts', 'eth_sign']
 
-      const web3Instance = signerOrProvider instanceof Web3 ? signerOrProvider : web3
-      const web3AdapterConfig: Web3AdapterConfig = { web3: web3Instance, signerAddress }
-      ethAdapter = new Web3Adapter(web3AdapterConfig)
-      break
-    case 'ethers':
-      const ethersAdapterConfig: EthersAdapterConfig = {
-        ethers,
-        signerOrProvider: signerOrProvider as Provider
-      }
-      ethAdapter = new EthersAdapter(ethersAdapterConfig)
-      break
-    default:
-      throw new Error('Ethereum library not supported')
+export async function getEthAdapter(signer: HardhatEthersSigner): Promise<Eip1193Provider> {
+  return {
+    request: async (request) => {
+      return signer.provider.send(request.method, request.params as any[])
+    }
   }
-
-  return ethAdapter
 }
 
 export function getNetworkProvider(network: Network): Provider | Web3 {

@@ -9,6 +9,7 @@ import {
   EncodeSimulateTxAccessorFunction,
   GetAddressSimulateTxAccessorFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/SimulateTxAccessorBaseContract'
+import { AbstractSigner } from 'ethers'
 
 /**
  * SimulateTxAccessorContract_v1_4_1_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
@@ -34,14 +35,14 @@ class SimulateTxAccessorContract_v1_4_1_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     customContractAddress?: string,
     customContractAbi?: SimulateTxAccessorContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = SimulateTxAccessor_1_4_1_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

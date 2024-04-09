@@ -9,6 +9,7 @@ import {
   EncodeMultiSendCallOnlyFunction,
   GetAddressMultiSendCallOnlyFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendCallOnlyBaseContract'
+import { AbstractSigner } from 'ethers'
 
 /**
  * MultiSendCallOnlyContract_v1_3_0_Ethers is the implementation specific to the MultiSendCallOnly contract version 1.3.0.
@@ -34,14 +35,14 @@ class MultiSendCallOnlyContract_v1_3_0_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     customContractAddress?: string,
     customContractAbi?: MultiSendCallOnlyContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = multiSendCallOnly_1_3_0_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

@@ -15,6 +15,7 @@ import {
 import semverSatisfies from 'semver/functions/satisfies'
 import { hexToNumber, hexToNumberString, toChecksumAddress } from 'web3-utils'
 import { estimateGas, estimateTxGas } from './gas'
+import { EthersAdapter } from '../..'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
@@ -29,7 +30,7 @@ export function standardizeMetaTransactionData(
 export async function standardizeSafeTransactionData({
   safeContract,
   predictedSafe,
-  ethAdapter,
+  provider,
   tx,
   contractNetworks
 }: StandardizeSafeTransactionDataProps): Promise<SafeTransactionData> {
@@ -78,6 +79,8 @@ export async function standardizeSafeTransactionData({
   }
 
   let safeTxGas
+
+  const ethAdapter = new EthersAdapter({ provider })
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     safeTxGas = await estimateGas(
       safeVersion,

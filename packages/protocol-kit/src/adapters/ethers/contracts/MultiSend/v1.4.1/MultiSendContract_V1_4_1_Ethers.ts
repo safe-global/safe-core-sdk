@@ -9,6 +9,7 @@ import {
   EncodeMultiSendFunction,
   GetAddressMultiSendFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendBaseContract'
+import { AbstractSigner } from 'ethers'
 
 /**
  * MultiSendContract_v1_4_1_Ethers is the implementation specific to the MultiSend contract version 1.4.1.
@@ -34,14 +35,14 @@ class MultiSendContract_v1_4_1_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     customContractAddress?: string,
     customContractAbi?: MultiSendContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = multisend_1_4_1_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

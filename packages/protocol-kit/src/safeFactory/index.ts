@@ -13,6 +13,7 @@ import {
 } from '@safe-global/protocol-kit/contracts/utils'
 import {
   ContractNetworksConfig,
+  Eip1193Provider,
   SafeAccountConfig,
   SafeDeploymentConfig
 } from '@safe-global/protocol-kit/types'
@@ -23,6 +24,7 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
+import { EthersAdapter } from '../adapters/ethers'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
@@ -33,7 +35,7 @@ export interface DeploySafeProps {
 
 export interface SafeFactoryConfig {
   /** ethAdapter - Ethereum adapter */
-  ethAdapter: EthAdapter
+  provider: Eip1193Provider
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
@@ -44,7 +46,7 @@ export interface SafeFactoryConfig {
 
 interface SafeFactoryInitConfig {
   /** ethAdapter - Ethereum adapter */
-  ethAdapter: EthAdapter
+  provider: Eip1193Provider
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
@@ -57,40 +59,42 @@ class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeSingleton?: boolean
   #safeVersion!: SafeVersion
+  #provider!: Eip1193Provider
   #ethAdapter!: EthAdapter
   #safeProxyFactoryContract!: SafeProxyFactoryContract
   #safeContract!: SafeContract
 
   static async create({
-    ethAdapter,
+    provider,
     safeVersion = DEFAULT_SAFE_VERSION,
     isL1SafeSingleton = false,
     contractNetworks
   }: SafeFactoryConfig): Promise<SafeFactory> {
     const safeFactorySdk = new SafeFactory()
-    await safeFactorySdk.init({ ethAdapter, safeVersion, isL1SafeSingleton, contractNetworks })
+    await safeFactorySdk.init({ provider, safeVersion, isL1SafeSingleton, contractNetworks })
     return safeFactorySdk
   }
 
   private async init({
-    ethAdapter,
+    provider,
     safeVersion,
     isL1SafeSingleton,
     contractNetworks
   }: SafeFactoryInitConfig): Promise<void> {
-    this.#ethAdapter = ethAdapter
+    this.#provider = provider
+    this.#ethAdapter = new EthersAdapter({ provider })
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks
     const chainId = await this.#ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId.toString()]
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
-      ethAdapter,
+      ethAdapter: this.#ethAdapter,
       safeVersion,
       customContracts
     })
     this.#safeContract = await getSafeContract({
-      ethAdapter,
+      ethAdapter: this.#ethAdapter,
       safeVersion,
       isL1SafeSingleton,
       customContracts
@@ -177,7 +181,7 @@ class SafeFactory {
       throw new Error('SafeProxy contract is not deployed on the current network')
     }
     const safe = await Safe.create({
-      ethAdapter: this.#ethAdapter,
+      provider: this.#provider,
       safeAddress,
       isL1SafeSingleton: this.#isL1SafeSingleton,
       contractNetworks: this.#contractNetworks

@@ -20,8 +20,7 @@ abstract class MultiSendCallOnlyBaseContract<MultiSendCallOnlyContractAbiType> {
   contractName: contractName
   abstract safeVersion: SafeVersion
 
-  abstract contract: unknown // This needs to be implemented for each adapter.
-  abstract adapter: unknown // This needs to be implemented for each adapter.
+  abstract contract: unknown // This needs to be implemented for each adapter
 
   /**
    * Constructs a new MultiSendCallOnlyBaseContract instance.

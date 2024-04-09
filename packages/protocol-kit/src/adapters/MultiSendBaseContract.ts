@@ -21,7 +21,6 @@ abstract class MultiSendBaseContract<MultiSendContractAbiType> {
   abstract safeVersion: SafeVersion
 
   abstract contract: unknown // This needs to be implemented for each adapter.
-  abstract adapter: unknown // This needs to be implemented for each adapter.
 
   /**
    * Constructs a new MultiSendBaseContract instance.

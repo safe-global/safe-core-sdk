@@ -1,5 +1,4 @@
 import MultiSendBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/MultiSendBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import MultiSendContract_v1_3_0_Contract, {
   MultiSendContract_v1_3_0_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
@@ -9,6 +8,7 @@ import {
   EncodeMultiSendFunction,
   GetAddressMultiSendFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/MultiSendBaseContract'
+import { AbstractSigner } from 'ethers'
 
 /**
  * MultiSendContract_v1_3_0_Ethers is the implementation specific to the MultiSend contract version 1.3.0.
@@ -34,14 +34,14 @@ class MultiSendContract_v1_3_0_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     customContractAddress?: string,
     customContractAbi?: MultiSendContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = multisend_1_3_0_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

@@ -1,4 +1,4 @@
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
+import { AbstractSigner, Contract, ContractRunner, InterfaceAbi } from 'ethers'
 
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import SimulateTxAccessorBaseContract from '@safe-global/protocol-kit/adapters/SimulateTxAccessorBaseContract'
@@ -23,7 +23,6 @@ abstract class SimulateTxAccessorBaseContractEthers<
   SimulateTxAccessorContractAbiType extends InterfaceAbi
 > extends SimulateTxAccessorBaseContract<SimulateTxAccessorContractAbiType> {
   contract: Contract
-  adapter: EthersAdapter
 
   /**
    * @constructor
@@ -38,7 +37,7 @@ abstract class SimulateTxAccessorBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     defaultAbi: SimulateTxAccessorContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
@@ -47,12 +46,7 @@ abstract class SimulateTxAccessorBaseContractEthers<
   ) {
     super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      runner || this.adapter.getSigner()
-    )
+    this.contract = new Contract(this.contractAddress, this.contractAbi, runner || signer)
   }
 }
 

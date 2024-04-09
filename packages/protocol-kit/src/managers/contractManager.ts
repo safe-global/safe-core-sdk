@@ -6,6 +6,7 @@ import {
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { ContractNetworksConfig, SafeConfig } from '@safe-global/protocol-kit/types'
 import {
+  EthAdapter,
   MultiSendCallOnlyContract,
   MultiSendContract,
   SafeContract
@@ -20,14 +21,14 @@ class ContractManager {
   #multiSendContract!: MultiSendContract
   #multiSendCallOnlyContract!: MultiSendCallOnlyContract
 
-  static async create(config: SafeConfig): Promise<ContractManager> {
+  static async create(config: SafeConfig, ethAdapter: EthAdapter): Promise<ContractManager> {
     const contractManager = new ContractManager()
-    await contractManager.init(config)
+    await contractManager.init(config, ethAdapter)
     return contractManager
   }
 
-  async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
+  async init(config: SafeConfig, ethAdapter: EthAdapter): Promise<void> {
+    const { isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
 
     const chainId = await ethAdapter.getChainId()
     const customContracts = contractNetworks?.[chainId.toString()]

@@ -57,10 +57,10 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -71,7 +71,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -85,10 +85,10 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -100,7 +100,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -114,10 +114,10 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -130,7 +130,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -144,10 +144,10 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -158,7 +158,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -172,10 +172,10 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -188,7 +188,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -202,10 +202,10 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -218,7 +218,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -231,9 +231,9 @@ describe('Transactions creation', () => {
     it('should create a single transaction with gasPrice=0', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -254,10 +254,10 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -285,10 +285,10 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -316,10 +316,10 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -338,10 +338,10 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -367,10 +367,10 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -382,10 +382,10 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, erc20Mintable, chainId } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -418,9 +418,9 @@ describe('Transactions creation', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -462,10 +462,10 @@ describe('Transactions creation', () => {
       async () => {
         const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
         const account = accounts[0]
-        const ethAdapter = await getEthAdapter(account.signer)
+        const provider = await getEthAdapter(account.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })

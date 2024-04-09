@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import {
   EthAdapter,
   OperationType,
@@ -31,6 +32,7 @@ import {
   AddOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
+  Eip1193Provider,
   PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeConfig,
@@ -71,12 +73,14 @@ import {
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
+import { EthersAdapter } from './adapters/ethers'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
+  #provider!: Eip1193Provider
   #ethAdapter!: EthAdapter
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
@@ -111,25 +115,33 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeSingleton, contractNetworks } = config
+    const { provider, isL1SafeSingleton, contractNetworks } = config
 
-    this.#ethAdapter = ethAdapter
-
+    this.#provider = provider
+    this.#ethAdapter = new EthersAdapter({
+      provider
+    })
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
-      this.#contractManager = await ContractManager.create({
-        ethAdapter: this.#ethAdapter,
-        predictedSafe: this.#predictedSafe,
-        isL1SafeSingleton,
-        contractNetworks
-      })
+      this.#contractManager = await ContractManager.create(
+        {
+          provider: this.#provider,
+          predictedSafe: this.#predictedSafe,
+          isL1SafeSingleton,
+          contractNetworks
+        },
+        this.#ethAdapter
+      )
     } else {
-      this.#contractManager = await ContractManager.create({
-        ethAdapter: this.#ethAdapter,
-        safeAddress: config.safeAddress,
-        isL1SafeSingleton,
-        contractNetworks
-      })
+      this.#contractManager = await ContractManager.create(
+        {
+          provider: this.#provider,
+          safeAddress: config.safeAddress,
+          isL1SafeSingleton,
+          contractNetworks
+        },
+        this.#ethAdapter
+      )
     }
 
     this.#ownerManager = new OwnerManager(this.#ethAdapter, this.#contractManager.safeContract)
@@ -150,9 +162,9 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect(config: ConnectSafeConfig): Promise<Safe> {
-    const { ethAdapter, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } = config
+    const { provider, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } = config
     const configProps: SafeConfigProps = {
-      ethAdapter: ethAdapter || this.#ethAdapter,
+      provider: provider || this.#provider,
       isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     }
@@ -442,7 +454,7 @@ class Safe {
       return new EthSafeTransaction(
         await standardizeSafeTransactionData({
           predictedSafe: this.#predictedSafe,
-          ethAdapter: this.#ethAdapter,
+          provider: this.#provider,
           tx: newTransaction,
           contractNetworks: this.#contractManager.contractNetworks
         })
@@ -455,7 +467,7 @@ class Safe {
     return new EthSafeTransaction(
       await standardizeSafeTransactionData({
         safeContract: this.#contractManager.safeContract,
-        ethAdapter: this.#ethAdapter,
+        provider: this.#provider,
         tx: newTransaction,
         contractNetworks: this.#contractManager.contractNetworks
       })

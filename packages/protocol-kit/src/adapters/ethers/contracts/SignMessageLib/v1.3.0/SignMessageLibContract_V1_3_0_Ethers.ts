@@ -13,6 +13,7 @@ import {
   GetAddressSignMessageLibFunction,
   SignMessageFunction
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/SignMessageLibBaseContract'
+import { AbstractSigner } from 'ethers'
 
 /**
  * SignMessageLibContract_v1_3_0_Ethers is the implementation specific to the SignMessageLib contract version 1.3.0.
@@ -38,14 +39,14 @@ class SignMessageLibContract_v1_3_0_Ethers
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     customContractAddress?: string,
     customContractAbi?: SignMessageLibContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = multisend_1_3_0_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

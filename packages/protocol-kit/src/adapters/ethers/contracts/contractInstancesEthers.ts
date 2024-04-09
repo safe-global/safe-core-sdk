@@ -66,7 +66,7 @@ export async function getSafeContractInstance(
     case '1.4.1':
       safeContract = new SafeContract_v1_4_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -77,7 +77,7 @@ export async function getSafeContractInstance(
     case '1.3.0':
       safeContract = new SafeContract_v1_3_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -88,7 +88,7 @@ export async function getSafeContractInstance(
     case '1.2.0':
       safeContract = new SafeContract_v1_2_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -99,7 +99,7 @@ export async function getSafeContractInstance(
     case '1.1.1':
       safeContract = new SafeContract_v1_1_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -110,7 +110,7 @@ export async function getSafeContractInstance(
     case '1.0.0':
       safeContract = new SafeContract_v1_0_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -164,14 +164,14 @@ export async function getMultiSendContractInstance(
     case '1.4.1':
       return new MultiSendContract_V1_4_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendContract_v1_4_1_Abi
       )
     case '1.3.0':
       return new MultiSendContract_V1_3_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendContract_v1_3_0_Abi
       )
@@ -180,7 +180,7 @@ export async function getMultiSendContractInstance(
     case '1.0.0':
       return new MultiSendContract_V1_1_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendContract_v1_1_1_Abi
       )
@@ -200,7 +200,7 @@ export async function getMultiSendCallOnlyContractInstance(
     case '1.4.1':
       return new MultiSendCallOnlyContract_V1_4_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendCallOnlyContract_v1_4_1_Abi
       )
@@ -210,7 +210,7 @@ export async function getMultiSendCallOnlyContractInstance(
     case '1.0.0':
       return new MultiSendCallOnlyContract_V1_3_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendCallOnlyContract_v1_3_0_Abi
       )
@@ -232,7 +232,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.4.1':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_4_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_4_1_Abi,
@@ -243,7 +243,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.3.0':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_3_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_3_0_Abi,
@@ -254,7 +254,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.1.1':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_1_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_1_1_Abi,
@@ -264,7 +264,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.0.0':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_0_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_0_0_Abi,
@@ -289,7 +289,7 @@ export async function getSignMessageLibContractInstance(
     case '1.4.1':
       signMessageLibContract = new SignMessageLibContract_V1_4_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_4_1_Abi
       )
@@ -299,7 +299,7 @@ export async function getSignMessageLibContractInstance(
     case '1.3.0':
       signMessageLibContract = new SignMessageLibContract_V1_3_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_3_0_Abi
       )
@@ -323,7 +323,7 @@ export async function getCreateCallContractInstance(
     case '1.4.1':
       createCallContract = new CreateCallContract_V1_4_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as CreateCallContract_v1_4_1_Abi
       )
@@ -336,7 +336,7 @@ export async function getCreateCallContractInstance(
     case '1.0.0':
       createCallContract = new CreateCallContract_V1_3_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as CreateCallContract_v1_3_0_Abi
       )
@@ -360,14 +360,14 @@ export async function getSimulateTxAccessorContractInstance(
     case '1.4.1':
       return new SimulateTxAccessorContract_V1_4_1_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SimulateTxAccessorContract_v1_4_1_Abi
       )
     case '1.3.0':
       return new SimulateTxAccessorContract_V1_3_0_Ethers(
         chainId,
-        ethersAdapter,
+        (await ethersAdapter.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SimulateTxAccessorContract_v1_3_0_Abi
       )

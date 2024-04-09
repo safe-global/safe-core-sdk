@@ -11,7 +11,7 @@ import {
   SignMessageLibContract,
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
-import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
+import { ethers, TransactionResponse, AbstractSigner, Provider, BrowserProvider } from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import {
@@ -24,55 +24,42 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
-import { isTypedDataSigner, isSignerCompatible } from './utils'
+import { isTypedDataSigner } from './utils'
 import MultiSendCallOnlyContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Ethers'
 import MultiSendCallOnlyContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Ethers'
 import MultiSendContract_v1_1_1_Ethers from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
 import MultiSendContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
 import MultiSendContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
-
-type Ethers = typeof ethers
+import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 export interface EthersAdapterConfig {
-  /** ethers - Ethers v6 library */
-  ethers: Ethers
   /** signerOrProvider - Ethers signer or provider */
-  signerOrProvider: AbstractSigner | Provider
+  provider: Eip1193Provider
 }
 
 class EthersAdapter implements EthAdapter {
-  #ethers: Ethers
-  #signer?: AbstractSigner
-  #provider: Provider
+  get #signer(): Promise<AbstractSigner | undefined> {
+    return this.#provider.getSigner()
+  }
 
-  constructor({ ethers, signerOrProvider }: EthersAdapterConfig) {
-    if (!ethers) {
-      throw new Error('ethers property missing from options')
-    }
-    this.#ethers = ethers
-    const isSigner = isSignerCompatible(signerOrProvider)
-    if (isSigner) {
-      const signer = signerOrProvider as AbstractSigner
-      if (!signer.provider) {
-        throw new Error('Signer must be connected to a provider')
-      }
-      this.#provider = signer.provider
-      this.#signer = signer
-    } else {
-      this.#provider = signerOrProvider as Provider
-    }
+  #provider: BrowserProvider
+  #eip1193Provider: Eip1193Provider
+
+  constructor({ provider }: EthersAdapterConfig) {
+    this.#provider = new BrowserProvider(provider)
+    this.#eip1193Provider = provider
   }
 
   getProvider(): Provider {
     return this.#provider
   }
 
-  getSigner(): AbstractSigner | undefined {
+  getSigner(): Promise<AbstractSigner | undefined> {
     return this.#signer
   }
 
   isAddress(address: string): boolean {
-    return this.#ethers.isAddress(address)
+    return ethers.isAddress(address)
   }
 
   async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
@@ -93,7 +80,7 @@ class EthersAdapter implements EthAdapter {
   }
 
   getChecksummedAddress(address: string): string {
-    return this.#ethers.getAddress(address)
+    return ethers.getAddress(address)
   }
 
   async getSafeContract({
@@ -130,7 +117,7 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
+    const signerOrProvider = (await this.#signer) || this.#provider
     return getSafeProxyFactoryContractInstance(
       safeVersion,
       contractAddress,
@@ -151,6 +138,7 @@ class EthersAdapter implements EthAdapter {
     | MultiSendContract_v1_1_1_Ethers
   > {
     const chainId = await this.getChainId()
+
     const contractAddress =
       customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
     if (!contractAddress) {
@@ -193,7 +181,7 @@ class EthersAdapter implements EthAdapter {
     if (!contractAddress) {
       throw new Error('Invalid CompatibilityFallbackHandler contract address')
     }
-    const signerOrProvider = this.#signer || this.#provider
+    const signerOrProvider = (await this.#signer) || this.#provider
     return getCompatibilityFallbackHandlerContractInstance(
       safeVersion,
       contractAddress,
@@ -272,24 +260,32 @@ class EthersAdapter implements EthAdapter {
   }
 
   async getSignerAddress(): Promise<string | undefined> {
-    return this.#signer?.getAddress()
+    const signer = await this.#signer
+
+    return signer?.getAddress()
   }
 
-  signMessage(message: string): Promise<string> {
-    if (!this.#signer) {
+  async signMessage(message: string): Promise<string> {
+    const signer = await this.#signer
+
+    if (!signer) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    const messageArray = this.#ethers.getBytes(message)
-    return this.#signer.signMessage(messageArray)
+    const messageArray = ethers.getBytes(message)
+
+    return signer.signMessage(messageArray)
   }
 
   async signTypedData(safeEIP712Args: SafeEIP712Args): Promise<string> {
-    if (!this.#signer) {
+    const signer = await this.#signer
+
+    if (!signer) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
-    if (isTypedDataSigner(this.#signer)) {
+
+    if (isTypedDataSigner(signer)) {
       const typedData = generateTypedData(safeEIP712Args)
-      const signature = await this.#signer.signTypedData(
+      const signature = await signer.signTypedData(
         typedData.domain,
         typedData.primaryType === 'SafeMessage'
           ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
@@ -311,11 +307,11 @@ class EthersAdapter implements EthAdapter {
   }
 
   encodeParameters(types: string[], values: any[]): string {
-    return new this.#ethers.AbiCoder().encode(types, values)
+    return new ethers.AbiCoder().encode(types, values)
   }
 
   decodeParameters(types: string[], values: string): { [key: string]: any } {
-    return new this.#ethers.AbiCoder().decode(types, values)
+    return new ethers.AbiCoder().decode(types, values)
   }
 }
 

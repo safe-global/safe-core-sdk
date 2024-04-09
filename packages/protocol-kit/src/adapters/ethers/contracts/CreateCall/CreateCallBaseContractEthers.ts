@@ -1,6 +1,4 @@
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
-
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import { AbstractSigner, Contract, ContractRunner, InterfaceAbi } from 'ethers'
 import CreateCallBaseContract from '@safe-global/protocol-kit/adapters/CreateCallBaseContract'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
@@ -23,8 +21,6 @@ abstract class CreateCallBaseContractEthers<
   CreateCallContractAbiType extends InterfaceAbi
 > extends CreateCallBaseContract<CreateCallContractAbiType> {
   contract: Contract
-  adapter: EthersAdapter
-
   /**
    * @constructor
    * Constructs an instance of CreateCallBaseContractEthers.
@@ -38,7 +34,7 @@ abstract class CreateCallBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    signer: AbstractSigner,
     defaultAbi: CreateCallContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
@@ -47,12 +43,7 @@ abstract class CreateCallBaseContractEthers<
   ) {
     super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      runner || this.adapter.getSigner()
-    )
+    this.contract = new Contract(this.contractAddress, this.contractAbi, runner || signer)
   }
 }
 

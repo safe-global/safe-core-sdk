@@ -12,39 +12,42 @@ import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
 
 import dotenv from 'dotenv'
+import * as utils from './utils'
 
 dotenv.config()
+
+const sendMock = jest.fn(async (method: string) => {
+  switch (method) {
+    case constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS:
+      return fixtures.ENTRYPOINTS
+
+    case constants.RPC_4337_CALLS.CHAIN_ID:
+      return fixtures.CHAIN_ID
+
+    case constants.RPC_4337_CALLS.SEND_USER_OPERATION:
+      return fixtures.USER_OPERATION_HASH
+
+    case constants.RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS:
+      return fixtures.GAS_ESTIMATION
+
+    case constants.RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH:
+      return fixtures.USER_OPERATION_BY_HASH
+
+    case constants.RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT:
+      return fixtures.USER_OPERATION_RECEIPT
+
+    case 'pimlico_getUserOperationGasPrice':
+      return fixtures.USER_OPERATION_GAS_PRICE
+
+    default:
+      return undefined
+  }
+})
 
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
   getEip4337BundlerProvider: () => ({
-    send: async (method: string) => {
-      switch (method) {
-        case constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS:
-          return fixtures.ENTRYPOINTS
-
-        case constants.RPC_4337_CALLS.CHAIN_ID:
-          return fixtures.CHAIN_ID
-
-        case constants.RPC_4337_CALLS.SEND_USER_OPERATION:
-          return fixtures.USER_OPERATION_HASH
-
-        case constants.RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS:
-          return fixtures.GAS_ESTIMATION
-
-        case constants.RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH:
-          return fixtures.USER_OPERATION_BY_HASH
-
-        case constants.RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT:
-          return fixtures.USER_OPERATION_RECEIPT
-
-        case 'pimlico_getUserOperationGasPrice':
-          return fixtures.USER_OPERATION_GAS_PRICE
-
-        default:
-          return undefined
-      }
-    }
+    send: sendMock
   })
 }))
 
@@ -540,11 +543,12 @@ describe('Safe4337Pack', () => {
     })
     safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
-    const sendUserOperationSpy = jest.spyOn(safe4337Pack, 'sendUserOperation')
-
     await safe4337Pack.executeTransaction({ executable: safeOperation })
 
-    expect(sendUserOperationSpy).toHaveBeenCalledWith(safeOperation.toUserOperation())
+    expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
+      utils.userOperationToHexValues(safeOperation.toUserOperation()),
+      fixtures.ENTRYPOINTS[0]
+    ])
   })
 
   it('should return a UserOperation based on a userOpHash', async () => {

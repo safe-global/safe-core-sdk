@@ -347,7 +347,6 @@ describe('Endpoint tests', () => {
       })
     })
 
-    // FIXME when tests are migrated to Sepolia
     it('proposeTransaction', async () => {
       const safeTransactionData = {
         to: safeAddress,
@@ -397,7 +396,6 @@ describe('Endpoint tests', () => {
       })
     })
 
-    // FIXME when tests are migrated to Sepolia
     it('proposeTransaction EIP-3770', async () => {
       const safeTransactionData = {
         to: safeAddress,

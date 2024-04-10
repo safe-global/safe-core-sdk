@@ -13,20 +13,20 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import {
   SafeDeploymentConfig,
   SafeAccountConfig,
-  ContractNetworksConfig
+  ContractNetworksConfig,
+  Eip1193Provider
 } from '@safe-global/protocol-kit/types'
 import Safe, { SafeFactory, DeploySafeProps } from '@safe-global/protocol-kit/index'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
 import { itif } from './utils/helpers'
 
 // test util funcion to deploy a safe (needed to check the expected Safe Address)
 async function deploySafe(
   deploySafeProps: DeploySafeProps,
-  ethAdapter: EthAdapter,
+  provider: Eip1193Provider,
   contractNetworks: ContractNetworksConfig
 ): Promise<Safe> {
   const safeFactory = await SafeFactory.create({
-    ethAdapter,
+    provider,
     safeVersion: safeVersionDeployed,
     contractNetworks
   })
@@ -57,7 +57,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -71,7 +71,7 @@ describe('Contract utils', () => {
       }
 
       const predictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -81,7 +81,7 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
+        provider,
         contractNetworks
       )
 
@@ -101,7 +101,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -115,7 +115,7 @@ describe('Contract utils', () => {
       }
 
       const predictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -125,7 +125,7 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
+        provider,
         contractNetworks
       )
 
@@ -145,7 +145,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -159,7 +159,7 @@ describe('Contract utils', () => {
       }
 
       const predictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -169,7 +169,7 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
+        provider,
         contractNetworks
       )
 
@@ -189,7 +189,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -203,7 +203,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -223,7 +223,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -237,7 +237,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -257,7 +257,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -271,7 +271,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -290,7 +290,7 @@ describe('Contract utils', () => {
       const invalidOwners: string[] = []
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(accounts[0].signer)
+      const provider = await getEthAdapter(accounts[0].signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -304,7 +304,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -324,7 +324,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -337,7 +337,7 @@ describe('Contract utils', () => {
       const thirdSaltNonce = '3'
 
       const predictedSafeAddress1 = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
@@ -350,7 +350,7 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const firstDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: firstSaltNonce },
-        ethAdapter,
+        provider,
         contractNetworks
       )
 
@@ -360,7 +360,7 @@ describe('Contract utils', () => {
       chai.expect(predictedSafeAddress1).to.be.equal(await firstDeployedSafe.getAddress())
 
       const predictedSafeAddress2 = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
@@ -373,7 +373,7 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const secondDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: secondSaltNonce },
-        ethAdapter,
+        provider,
         contractNetworks
       )
 
@@ -383,7 +383,7 @@ describe('Contract utils', () => {
       chai.expect(predictedSafeAddress2).to.be.equal(await secondDeployedSafe.getAddress())
 
       const predictedSafeAddress3 = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
@@ -396,7 +396,7 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const thirdDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: thirdSaltNonce },
-        ethAdapter,
+        provider,
         contractNetworks
       )
 
@@ -414,7 +414,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const provider = await getEthAdapter(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -430,7 +430,7 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
+        provider,
         contractNetworks
       )
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -438,7 +438,7 @@ describe('Contract utils', () => {
       const expectedSafeAddress = await deployedSafe.getAddress()
 
       const firstPredictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -446,7 +446,7 @@ describe('Contract utils', () => {
       })
 
       const secondPredictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -454,7 +454,7 @@ describe('Contract utils', () => {
       })
 
       const thirdPredictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        provider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -477,7 +477,7 @@ describe('Contract utils', () => {
         const [owner1] = accounts
         const owners = [owner1.address]
         const threshold = 1
-        const ethAdapter = await getEthAdapter(owner1.signer)
+        const provider = await getEthAdapter(owner1.signer)
         const customContracts = contractNetworks[chainId.toString()]
 
         const safeAccountConfig: SafeAccountConfig = {
@@ -486,14 +486,14 @@ describe('Contract utils', () => {
         }
 
         const predictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          provider,
           chainId,
           safeAccountConfig,
           customContracts
         })
 
         // we deploy the Safe by providing only the safeAccountConfig (owners & threshold)
-        const deployedSafe = await deploySafe({ safeAccountConfig }, ethAdapter, contractNetworks)
+        const deployedSafe = await deploySafe({ safeAccountConfig }, provider, contractNetworks)
 
         // We ensure the Safe is deployed
         const isSafeDeployed = await deployedSafe.isSafeDeployed()
@@ -512,8 +512,8 @@ describe('Contract utils', () => {
 
         const safeVersion = safeVersionDeployed
         // Create EthAdapter instance
-        const ethAdapter = await getEthAdapter(getNetworkProvider('zksync'))
-        const chainId = await ethAdapter.getChainId()
+        const provider = await getEthAdapter(getNetworkProvider('zksync'))
+        const chainId = await provider.getChainId()
         const customContracts = contractNetworks[chainId.toString()]
 
         // We check real deployments from zksync return the expected address.
@@ -530,7 +530,7 @@ describe('Contract utils', () => {
         const expectedSafeAddress1 = '0x4e19dA81a54eFbaBeb9AD50646f7643076475D65'
 
         const firstPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          provider,
           chainId,
           safeAccountConfig: safeAccountConfig1,
           safeDeploymentConfig: safeDeploymentConfig1,
@@ -552,7 +552,7 @@ describe('Contract utils', () => {
         const expectedSafeAddress2 = '0x60c7F13dE7C8Fb88b3845e58859658bdc44243F8'
 
         const secondPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          provider,
           chainId,
           safeAccountConfig: safeAccountConfig2,
           safeDeploymentConfig: safeDeploymentConfig2,
@@ -575,7 +575,7 @@ describe('Contract utils', () => {
         const expectedSafeAddress3 = '0xD971FAA20db3ad4d51D453047ca03Ce4ec164CE2'
 
         const thirdPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          provider,
           chainId,
           safeAccountConfig: safeAccountConfig3,
           safeDeploymentConfig: safeDeploymentConfig3,
@@ -613,28 +613,28 @@ describe('Contract utils', () => {
         }
 
         const gnosisPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: gnosisEthAdapter,
+          provider: gnosisEthAdapter,
           chainId: await gnosisEthAdapter.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const zkSyncPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: zkSyncEthAdapter,
+          provider: zkSyncEthAdapter,
           chainId: await zkSyncEthAdapter.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const sepoliaPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: sepoliaEthAdapter,
+          provider: sepoliaEthAdapter,
           chainId: await sepoliaEthAdapter.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const mainnetPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: mainnetEthAdapter,
+          provider: mainnetEthAdapter,
           chainId: await mainnetEthAdapter.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig

@@ -44,11 +44,11 @@ describe('createTransactionBatch', () => {
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const ethAdapter = await getEthAdapter(account1.signer)
+    const provider = await getEthAdapter(account1.signer)
     const safeAddress = await safe.getAddress()
 
     const safeSdk = await Safe.create({
-      ethAdapter,
+      provider,
       safeAddress,
       contractNetworks
     })

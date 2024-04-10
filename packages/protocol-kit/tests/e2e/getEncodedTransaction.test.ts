@@ -26,10 +26,10 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const ethAdapter = await getEthAdapter(account1.signer)
+    const provider = await getEthAdapter(account1.signer)
 
     const safeSdk = await Safe.create({
-      ethAdapter,
+      provider,
       safeAddress,
       contractNetworks
     })
@@ -57,10 +57,10 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const ethAdapter = await getEthAdapter(account1.signer)
+    const provider = await getEthAdapter(account1.signer)
 
     const safeSdk = await Safe.create({
-      ethAdapter,
+      provider,
       safeAddress,
       contractNetworks
     })
@@ -88,10 +88,10 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const ethAdapter = await getEthAdapter(account1.signer)
+    const provider = await getEthAdapter(account1.signer)
 
     const safeSdk = await Safe.create({
-      ethAdapter,
+      provider,
       safeAddress,
       contractNetworks
     })

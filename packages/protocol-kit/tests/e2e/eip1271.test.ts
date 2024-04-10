@@ -66,24 +66,24 @@ describe('The EIP1271 implementation', () => {
       const safeAddress = await safe.getAddress()
 
       // Adapter and Safe instance for owner 1
-      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
-        ethAdapter: ethAdapter1,
+        provider: provider1,
         safeAddress,
         contractNetworks
       })
 
       // Adapter and Safe instance for owner 2
-      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await Safe.create({
-        ethAdapter: ethAdapter2,
+        provider: provider2,
         safeAddress,
         contractNetworks
       })
 
       // Adapter and Safe instance for owner 3
       const safeSdk3 = await Safe.create({
-        ethAdapter: ethAdapter1,
+        provider: provider1,
         safeAddress: signerSafeAddress,
         contractNetworks
       })
@@ -96,8 +96,8 @@ describe('The EIP1271 implementation', () => {
         accounts,
         contractNetworks,
         chainId,
-        ethAdapter1,
-        ethAdapter2,
+        provider1,
+        provider2,
         safeSdk1,
         safeSdk2,
         safeSdk3,

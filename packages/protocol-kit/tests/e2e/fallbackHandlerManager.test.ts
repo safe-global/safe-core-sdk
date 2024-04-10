@@ -51,9 +51,9 @@ describe('Fallback handler manager', () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const safeAddress = await safe.getAddress()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -69,9 +69,9 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -81,10 +81,10 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')('should return the enabled fallback handler', async () => {
       const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -110,9 +110,9 @@ describe('Fallback handler manager', () => {
         const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
           await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
@@ -131,9 +131,9 @@ describe('Fallback handler manager', () => {
         const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
           await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
@@ -147,10 +147,10 @@ describe('Fallback handler manager', () => {
       async () => {
         const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -166,10 +166,10 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -182,10 +182,10 @@ describe('Fallback handler manager', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -197,10 +197,10 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is already enabled', async () => {
       const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -218,10 +218,10 @@ describe('Fallback handler manager', () => {
       async () => {
         const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -249,10 +249,10 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')('should enable a fallback handler', async () => {
       const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -277,9 +277,9 @@ describe('Fallback handler manager', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
@@ -298,9 +298,9 @@ describe('Fallback handler manager', () => {
         const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
           await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
@@ -316,9 +316,9 @@ describe('Fallback handler manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -336,10 +336,10 @@ describe('Fallback handler manager', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -361,9 +361,9 @@ describe('Fallback handler manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -399,9 +399,9 @@ describe('Fallback handler manager', () => {
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })

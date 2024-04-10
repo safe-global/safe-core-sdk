@@ -21,7 +21,7 @@ import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 
-describe.only('Safe contracts manager', () => {
+describe('Safe contracts manager', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()

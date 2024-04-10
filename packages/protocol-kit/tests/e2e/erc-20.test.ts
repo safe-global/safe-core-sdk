@@ -46,13 +46,13 @@ describe('ERC-20 utils', () => {
 
         const [account1] = accounts
 
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
 
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x12'))
+        sinon.stub(provider, 'call').returns(Promise.resolve('0x12'))
 
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -71,13 +71,13 @@ describe('ERC-20 utils', () => {
 
         const [account1] = accounts
 
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
 
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x06'))
+        sinon.stub(provider, 'call').returns(Promise.resolve('0x06'))
 
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -96,13 +96,13 @@ describe('ERC-20 utils', () => {
 
         const [account1] = accounts
 
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
 
         // mock decimals() call
         sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x'))
 
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -123,7 +123,7 @@ describe('ERC-20 utils', () => {
 
         const [account1] = accounts
 
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
 
         const safeSdk = await Safe.create({
           ethAdapter,
@@ -148,13 +148,13 @@ describe('ERC-20 utils', () => {
 
         const [account1] = accounts
 
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
 
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x12'))
+        sinon.stub(provider, 'call').returns(Promise.resolve('0x12'))
 
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -176,13 +176,13 @@ describe('ERC-20 utils', () => {
 
         const [account1] = accounts
 
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
 
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x06'))
+        sinon.stub(provider, 'call').returns(Promise.resolve('0x06'))
 
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })

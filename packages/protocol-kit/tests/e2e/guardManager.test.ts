@@ -46,10 +46,10 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -65,9 +65,9 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -79,10 +79,10 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -93,10 +93,10 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should return the enabled Safe guard', async () => {
       const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -114,10 +114,10 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -134,9 +134,9 @@ describe('Safe guard manager', () => {
       const { predictedSafe, accounts, debugTransactionGuard, contractNetworks } =
         await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -147,10 +147,10 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if address is invalid', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -163,10 +163,10 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -178,10 +178,10 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if address is already enabled', async () => {
       const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -197,10 +197,10 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -228,10 +228,10 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should enable a Safe guard', async () => {
       const { safe, accounts, contractNetworks, debugTransactionGuard } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -250,10 +250,10 @@ describe('Safe guard manager', () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -269,9 +269,9 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is not deployed', async () => {
       const { accounts, predictedSafe, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -282,10 +282,10 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if no Safe guard is enabled', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -300,9 +300,9 @@ describe('Safe guard manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -333,9 +333,9 @@ describe('Safe guard manager', () => {
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })

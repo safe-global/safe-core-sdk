@@ -44,10 +44,10 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const ethAdapter = await getEthAdapter(account1.signer)
+    const provider = await getEthAdapter(account1.signer)
 
     const safeSdk = await Safe.create({
-      ethAdapter,
+      provider,
       safeAddress,
       contractNetworks
     })
@@ -73,10 +73,10 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1, account2] = accounts
 
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
 
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -109,10 +109,10 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1, account2] = accounts
 
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
 
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -145,10 +145,10 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1, account2] = accounts
 
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
 
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -171,7 +171,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         customSaltNonce
       )
 
-      const customSaltNonceEncoded = ethAdapter.encodeParameters(['uint256'], [customSaltNonce])
+      const customSaltNonceEncoded = provider.encodeParameters(['uint256'], [customSaltNonce])
 
       // custom salt nonce included in the deployment data
       chai.expect(batchTransaction.data).to.contains(customSaltNonceEncoded.replace('0x', ''))

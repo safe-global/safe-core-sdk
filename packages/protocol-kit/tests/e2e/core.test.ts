@@ -43,10 +43,10 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -64,10 +64,10 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -81,10 +81,10 @@ describe('Safe Info', () => {
     it('should connect a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -93,9 +93,9 @@ describe('Safe Info', () => {
         .expect(await safeSdk.getEthAdapter().getSignerAddress())
         .to.be.eq(await account1.signer.getAddress())
 
-      const ethAdapter2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await safeSdk.connect({
-        ethAdapter: ethAdapter2,
+        provider: provider2,
         contractNetworks
       })
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)
@@ -117,9 +117,9 @@ describe('Safe Info', () => {
     it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -130,13 +130,13 @@ describe('Safe Info', () => {
     it('should return the contract version of a Safe that is not deployed with a default version configuration', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeConfig: PredictedSafeProps = {
         ...predictedSafe,
         safeDeploymentConfig: {}
       }
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe: safeConfig,
         contractNetworks
       })
@@ -147,10 +147,10 @@ describe('Safe Info', () => {
     it('should return the Safe contract version', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -165,9 +165,9 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
@@ -185,16 +185,16 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
         const safeAddress = await safeSdk.getAddress()
 
         const safeFactory = await SafeFactory.create({
-          ethAdapter,
+          provider,
           safeVersion: safeVersionDeployed,
           contractNetworks
         })
@@ -208,10 +208,10 @@ describe('Safe Info', () => {
     it('should return the address of a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -223,10 +223,10 @@ describe('Safe Info', () => {
     it('should return the connected EthAdapter', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress: safeAddress,
         contractNetworks
       })
@@ -240,9 +240,9 @@ describe('Safe Info', () => {
     it('should return the nonce of a Safe that is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -252,11 +252,11 @@ describe('Safe Info', () => {
     it('should return the Safe nonce', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress: safeAddress,
         contractNetworks
       })
@@ -278,9 +278,9 @@ describe('Safe Info', () => {
     it('should return the chainId of a Safe that is not deployed', async () => {
       const { predictedSafe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -290,10 +290,10 @@ describe('Safe Info', () => {
     it('should return the chainId of the current network', async () => {
       const { safe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress: safeAddress,
         contractNetworks
       })
@@ -307,9 +307,9 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
@@ -326,9 +326,9 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const ethAdapter = await getEthAdapter(account1.signer)
+        const provider = await getEthAdapter(account1.signer)
         const safeSdk = await Safe.create({
-          ethAdapter,
+          provider,
           predictedSafe,
           contractNetworks
         })
@@ -344,10 +344,10 @@ describe('Safe Info', () => {
     it('should return the balance of a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const provider = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
-        ethAdapter,
+        provider,
         safeAddress,
         contractNetworks
       })

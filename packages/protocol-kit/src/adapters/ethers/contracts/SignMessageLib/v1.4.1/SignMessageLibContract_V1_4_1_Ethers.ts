@@ -1,4 +1,3 @@
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
@@ -8,7 +7,8 @@ import {
   SignMessageLibContract_v1_4_1_Abi,
   SignMessageLibContract_v1_4_1_Contract,
   SignMessageLibContract_v1_4_1_Function,
-  signMessageLib_1_4_1_ContractArtifacts
+  signMessageLib_1_4_1_ContractArtifacts,
+  EthersTransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 
 /**

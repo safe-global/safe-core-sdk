@@ -1,15 +1,16 @@
 import { TransactionReceipt } from 'web3-core/types'
-import SafeProxyFactoryBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
+import SafeProxyFactoryBaseContractWeb3, {
+  CreateProxyProps
+} from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
+  DeepWriteable,
   SafeVersion,
   SafeProxyFactoryContract_v1_4_1_Abi,
   SafeProxyFactoryContract_v1_4_1_Contract,
   SafeProxyFactoryContract_v1_4_1_Function,
-  safeProxyFactory_1_4_1_ContractArtifacts,
-  Web3TransactionOptions
+  safeProxyFactory_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -108,13 +109,7 @@ class SafeProxyFactoryContract_v1_4_1_Web3
     saltNonce,
     options,
     callback
-  }: {
-    safeSingletonAddress: string
-    initializer: string
-    saltNonce: string
-    options?: Web3TransactionOptions
-    callback?: (txHash: string) => void
-  }): Promise<string> {
+  }: CreateProxyProps): Promise<string> {
     const saltNonceBigInt = BigInt(saltNonce)
 
     if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')

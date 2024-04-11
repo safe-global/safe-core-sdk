@@ -1,6 +1,7 @@
 import { AbstractSigner, Provider } from 'ethers'
 import { AbiItem } from 'web3-utils'
 import {
+  DeepWriteable,
   SafeVersion,
   SafeContract_v1_3_0_Abi,
   SafeContract_v1_4_1_Abi,
@@ -25,7 +26,6 @@ import {
   SimulateTxAccessorContract_v1_4_1_Abi,
   SimulateTxAccessorContract_v1_3_0_Abi
 } from '@safe-global/safe-core-sdk-types'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import CreateCallContract_V1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Ethers'
 import CreateCallContract_V1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Ethers'
 import MultiSendContract_V1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'

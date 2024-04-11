@@ -1,15 +1,16 @@
 import { TransactionReceipt } from 'web3-core/types'
-import SafeProxyFactoryBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
+import SafeProxyFactoryBaseContractWeb3, {
+  CreateProxyProps
+} from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractWeb3'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
+  DeepWriteable,
   SafeVersion,
   SafeProxyFactoryContract_v1_0_0_Abi,
   SafeProxyFactoryContract_v1_0_0_Contract,
   SafeProxyFactoryContract_v1_0_0_Function,
-  safeProxyFactory_1_0_0_ContractArtifacts,
-  Web3TransactionOptions
+  safeProxyFactory_1_0_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -21,7 +22,7 @@ import {
  * @implements SafeProxyFactoryContract_v1_0_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.0.0.
  */
 class SafeProxyFactoryContract_v1_0_0_Web3
-  extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_0_0_Abi>
+  extends SafeProxyFactoryBaseContractWeb3<DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>>
   implements SafeProxyFactoryContract_v1_0_0_Contract
 {
   safeVersion: SafeVersion
@@ -42,16 +43,9 @@ class SafeProxyFactoryContract_v1_0_0_Web3
   ) {
     const safeVersion = '1.0.0'
     const defaultAbi =
-      safeProxyFactory_1_0_0_ContractArtifacts.abi as SafeProxyFactoryContract_v1_0_0_Abi
+      safeProxyFactory_1_0_0_ContractArtifacts.abi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>
 
-    super(
-      chainId,
-      web3Adapter,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi as SafeProxyFactoryContract_v1_0_0_Abi
-    )
+    super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }
@@ -103,13 +97,7 @@ class SafeProxyFactoryContract_v1_0_0_Web3
     saltNonce,
     options,
     callback
-  }: {
-    safeSingletonAddress: string
-    initializer: string
-    saltNonce: string
-    options?: Web3TransactionOptions
-    callback?: (txHash: string) => void
-  }): Promise<string> {
+  }: CreateProxyProps): Promise<string> {
     const saltNonceBigInt = BigInt(saltNonce)
 
     if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')

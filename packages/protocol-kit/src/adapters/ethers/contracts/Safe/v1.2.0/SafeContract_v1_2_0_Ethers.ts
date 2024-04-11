@@ -1,9 +1,5 @@
 import SafeBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/SafeBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import {
-  EthersTransactionOptions,
-  EthersTransactionResult
-} from '@safe-global/protocol-kit/adapters/ethers/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import {
   SafeVersion,
@@ -11,7 +7,9 @@ import {
   SafeContract_v1_2_0_Contract,
   SafeContract_v1_2_0_Function,
   SafeTransaction,
-  safe_1_2_0_ContractArtifacts
+  safe_1_2_0_ContractArtifacts,
+  EthersTransactionOptions,
+  EthersTransactionResult
 } from '@safe-global/safe-core-sdk-types'
 
 /**

@@ -1,7 +1,7 @@
 import CreateCallBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/CreateCall/CreateCallBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import {
+  DeepWriteable,
   SafeVersion,
   CreateCallContract_v1_3_0_Abi,
   CreateCallContract_v1_3_0_Contract,

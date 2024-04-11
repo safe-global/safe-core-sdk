@@ -1,8 +1,8 @@
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import SignMessageLibBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SignMessageLib/SignMessageLibBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
+  DeepWriteable,
   SafeVersion,
   AdapterSpecificContractFunction,
   SignMessageLibContract_v1_4_1_Abi,

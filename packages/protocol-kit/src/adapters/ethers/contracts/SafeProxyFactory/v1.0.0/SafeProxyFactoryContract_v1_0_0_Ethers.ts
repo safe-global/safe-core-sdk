@@ -1,7 +1,8 @@
 import { ContractRunner, EventLog } from 'ethers'
-import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
+import SafeProxyFactoryBaseContractEthers, {
+  CreateProxyProps
+} from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import {
   SafeVersion,
   SafeProxyFactoryContract_v1_0_0_Abi,
@@ -102,13 +103,7 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
     saltNonce,
     options,
     callback
-  }: {
-    safeSingletonAddress: string
-    initializer: string
-    saltNonce: string
-    options?: EthersTransactionOptions
-    callback?: (txHash: string) => void
-  }): Promise<string> {
+  }: CreateProxyProps): Promise<string> {
     const saltNonceBigInt = BigInt(saltNonce)
 
     if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')

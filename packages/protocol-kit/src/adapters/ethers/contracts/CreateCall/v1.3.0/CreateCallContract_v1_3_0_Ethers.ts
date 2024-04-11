@@ -1,12 +1,12 @@
 import CreateCallBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/CreateCallBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import {
   SafeVersion,
   CreateCallContract_v1_3_0_Abi,
   CreateCallContract_v1_3_0_Contract,
   createCall_1_3_0_ContractArtifacts,
-  AdapterSpecificContractFunction
+  AdapterSpecificContractFunction,
+  EthersTransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 
@@ -57,7 +57,9 @@ class CreateCallContract_V1_3_0_Ethers
     EthersTransactionOptions
   > = async (args, options) => {
     if (options && !options.gasLimit) {
-      options.gasLimit = (await this.estimateGas('performCreate', args, options)).toString()
+      options.gasLimit = (
+        await this.estimateGas('performCreate', [...args], { ...options })
+      ).toString()
     }
     const txResponse = await this.contract.performCreate(...args, { ...options })
     return toTxResult(txResponse, options)

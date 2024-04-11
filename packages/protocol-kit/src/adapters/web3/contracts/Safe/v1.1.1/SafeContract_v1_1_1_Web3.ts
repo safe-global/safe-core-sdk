@@ -1,9 +1,9 @@
 import SafeBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/SafeBaseContractWeb3'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { sameString } from '@safe-global/protocol-kit/utils'
 import {
+  DeepWriteable,
   SafeVersion,
   SafeContract_v1_1_1_Abi,
   SafeContract_v1_1_1_Contract,

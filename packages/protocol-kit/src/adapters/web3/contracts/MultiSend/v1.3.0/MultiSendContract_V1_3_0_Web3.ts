@@ -1,7 +1,7 @@
 import MultiSendBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/MultiSendBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import {
+  DeepWriteable,
   SafeVersion,
   MultiSendContract_v1_3_0_Abi,
   MultiSendContract_v1_3_0_Contract,

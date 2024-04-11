@@ -1,12 +1,12 @@
 import CreateCallBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/CreateCallBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import {
   SafeVersion,
   CreateCallContract_v1_4_1_Abi,
   CreateCallContract_v1_4_1_Contract,
   createCall_1_4_1_ContractArtifacts,
-  AdapterSpecificContractFunction
+  AdapterSpecificContractFunction,
+  EthersTransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 

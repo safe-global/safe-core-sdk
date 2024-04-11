@@ -1,7 +1,7 @@
 import CompatibilityFallbackHandlerBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import {
+  DeepWriteable,
   SafeVersion,
   CompatibilityFallbackHandlerContract_v1_3_0_Abi,
   CompatibilityFallbackHandlerContract_v1_3_0_Contract,

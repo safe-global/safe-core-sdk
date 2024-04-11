@@ -1,5 +1,6 @@
 import { AbiItem } from 'web3-utils'
 import {
+  DeepWriteable,
   SafeVersion,
   CompatibilityFallbackHandlerContract_v1_3_0_Abi,
   CompatibilityFallbackHandlerContract_v1_4_1_Abi,
@@ -24,7 +25,6 @@ import {
   SimulateTxAccessorContract_v1_3_0_Abi,
   SimulateTxAccessorContract_v1_4_1_Abi
 } from '@safe-global/safe-core-sdk-types'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import SafeContract_v1_0_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Web3'
 import SafeContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Web3'
 import SafeContract_v1_2_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Web3'
@@ -49,10 +49,11 @@ import CompatibilityFallbackHandlerContract_v1_4_1_Web3 from '@safe-global/proto
 import CompatibilityFallbackHandlerContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0_Web3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 
+// TODO: create a JSdoc for this function
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined,
   isL1SafeSingleton?: boolean
 ): Promise<
@@ -117,8 +118,8 @@ export async function getSafeContractInstance(
 
 export async function getCompatibilityFallbackHandlerContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<
   | CompatibilityFallbackHandlerContract_v1_4_1_Web3
@@ -150,8 +151,8 @@ export async function getCompatibilityFallbackHandlerContractInstance(
 
 export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<
   MultiSendContract_V1_4_1_Web3 | MultiSendContract_V1_3_0_Web3 | MultiSendContract_V1_1_1_Web3
@@ -189,8 +190,8 @@ export async function getMultiSendContractInstance(
 
 export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<MultiSendCallOnlyContract_V1_4_1_Web3 | MultiSendCallOnlyContract_V1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
@@ -220,8 +221,8 @@ export async function getMultiSendCallOnlyContractInstance(
 
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ) {
   const chainId = await web3Adapter.getChainId()
@@ -267,8 +268,8 @@ export async function getSafeProxyFactoryContractInstance(
 
 export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<SignMessageLibContract_v1_4_1_Web3 | SignMessageLibContract_v1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
@@ -297,8 +298,8 @@ export async function getSignMessageLibContractInstance(
 
 export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<CreateCallContract_V1_4_1_Web3 | CreateCallContract_V1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
@@ -330,8 +331,8 @@ export async function getCreateCallContractInstance(
 
 export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   web3Adapter: Web3Adapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<SimulateTxAccessorContract_v1_4_1_Web3 | SimulateTxAccessorContract_v1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()

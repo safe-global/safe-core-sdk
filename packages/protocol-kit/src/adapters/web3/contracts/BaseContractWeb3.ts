@@ -67,7 +67,7 @@ abstract class BaseContractWeb3<
   }
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
+    return this.contract.methods[functionToEncode](...(args as Array<[]>)).encodeABI()
   }
 
   estimateGas: EstimateGasFunction<ContractAbiType, Web3TransactionOptions> = (
@@ -75,7 +75,7 @@ abstract class BaseContractWeb3<
     args,
     options = {}
   ) => {
-    return this.contract.methods[functionToEstimate](...args)
+    return this.contract.methods[functionToEstimate](...(args as Array<[]>))
       .estimateGas(options)
       .then(BigInt)
   }

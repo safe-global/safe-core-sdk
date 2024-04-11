@@ -1,9 +1,9 @@
 import SafeBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/SafeBaseContractWeb3'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/web3/utils/constants'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
+  DeepWriteable,
   SafeVersion,
   safe_1_3_0_ContractArtifacts,
   SafeContract_v1_3_0_Function,

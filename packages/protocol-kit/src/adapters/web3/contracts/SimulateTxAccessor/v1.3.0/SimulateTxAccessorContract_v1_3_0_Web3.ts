@@ -1,13 +1,13 @@
 import SimulateTxAccessorBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
+  DeepWriteable,
   SafeVersion,
   SimulateTxAccessorContract_v1_3_0_Abi,
   SimulateTxAccessorContract_v1_3_0_Contract,
   SimulateTxAccessorContract_v1_3_0_Function,
   simulateTxAccessor_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 
 /**
  * SimulateTxAccessorContract_v1_3_0_Web3 is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
@@ -18,7 +18,7 @@ import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
  * @implements SimulateTxAccessorContract_v1_3_0_Contract - Implements the interface specific to SimulateTxAccessor contract version 1.3.0.
  */
 class SimulateTxAccessorContract_v1_3_0_Web3
-  extends SimulateTxAccessorBaseContractWeb3<SimulateTxAccessorContract_v1_3_0_Abi>
+  extends SimulateTxAccessorBaseContractWeb3<DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi>>
   implements SimulateTxAccessorContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion

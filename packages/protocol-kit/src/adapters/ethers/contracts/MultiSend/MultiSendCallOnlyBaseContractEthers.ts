@@ -1,6 +1,6 @@
 import { AbstractSigner, Contract, InterfaceAbi } from 'ethers'
 
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import MultiSendCallOnlyBaseContract from '@safe-global/protocol-kit/adapters/MultiSendCallOnlyBaseContract'
 
@@ -28,7 +28,7 @@ abstract class MultiSendCallOnlyBaseContractEthers<
    * Constructs an instance of MultiSendCallOnlyBaseContractEthers.
    *
    * @param chainId - The chain ID of the contract.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param defaultAbi - The default ABI for the MultiSendCallOnly contract. It should be compatible with the specific version of the MultiSendCallOnly contract.
    * @param safeVersion - The version of the MultiSendCallOnly contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSendCallOnly deployments based on the chainId and safeVersion.

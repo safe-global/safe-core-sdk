@@ -6,7 +6,7 @@ import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { itif } from './utils/helpers'
 import { getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -44,7 +44,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -73,7 +73,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1, account2] = accounts
 
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
 
       const safeSdk = await Safe.create({
         provider,
@@ -109,7 +109,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1, account2] = accounts
 
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
 
       const safeSdk = await Safe.create({
         provider,
@@ -145,7 +145,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1, account2] = accounts
 
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
 
       const safeSdk = await Safe.create({
         provider,

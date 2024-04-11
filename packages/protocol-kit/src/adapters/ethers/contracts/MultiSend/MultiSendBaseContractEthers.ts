@@ -28,7 +28,7 @@ abstract class MultiSendBaseContractEthers<
    * Constructs an instance of MultiSendBaseContractEthers.
    *
    * @param chainId - The chain ID of the contract.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param defaultAbi - The default ABI for the MultiSend contract. It should be compatible with the specific version of the MultiSend contract.
    * @param safeVersion - The version of the MultiSend contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.

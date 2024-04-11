@@ -1,25 +1,12 @@
-import { utils, Provider, AbstractSigner, BrowserProvider } from 'ethers'
-import {
-  EthersAdapter,
-  EthersAdapterConfig,
-  Web3Adapter,
-  Web3AdapterConfig
-} from '@safe-global/protocol-kit/index'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { Provider } from 'ethers'
 import { ethers, web3 } from 'hardhat'
-import * as hre from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 import { Eip1193Provider } from '@safe-global/protocol-kit/types'
-import { isSignerCompatible } from '@safe-global/protocol-kit/adapters/ethers/utils'
-import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
-// EIP-1193 methods that require accounts
-const accountMethods = ['eth_accounts', 'eth_sign']
-
-export async function getEthAdapter(signer: HardhatEthersSigner): Promise<Eip1193Provider> {
+export async function getEip1193Provider(signer: HardhatEthersSigner): Promise<Eip1193Provider> {
   return {
     request: async (request) => {
       return signer.provider.send(request.method, [...((request.params as unknown[]) ?? [])])

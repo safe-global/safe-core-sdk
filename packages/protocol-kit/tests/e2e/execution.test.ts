@@ -11,7 +11,7 @@ import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 
@@ -37,13 +37,13 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress,
         contractNetworks
       })
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address,
@@ -76,7 +76,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
@@ -106,7 +106,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
@@ -130,13 +130,13 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
         contractNetworks
       })
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
@@ -161,7 +161,7 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
@@ -183,13 +183,13 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress,
         contractNetworks
       })
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address,
@@ -220,7 +220,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
@@ -247,7 +247,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
@@ -274,7 +274,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
@@ -311,9 +311,9 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const provider1 = await getEthAdapter(account1.signer)
-        const provider2 = await getEthAdapter(account2.signer)
-        const provider3 = await getEthAdapter(account3.signer)
+        const provider1 = await getEip1193Provider(account1.signer)
+        const provider2 = await getEip1193Provider(account2.signer)
+        const provider3 = await getEip1193Provider(account3.signer)
         const safeSdk1 = await Safe.create({
           provider: provider1,
           safeAddress,
@@ -369,10 +369,10 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const provider1 = await getEthAdapter(account1.signer)
-        const provider2 = await getEthAdapter(account2.signer)
-        const provider3 = await getEthAdapter(account3.signer)
-        const provider4 = await getEthAdapter(account4.signer)
+        const provider1 = await getEip1193Provider(account1.signer)
+        const provider2 = await getEip1193Provider(account2.signer)
+        const provider3 = await getEip1193Provider(account3.signer)
+        const provider4 = await getEip1193Provider(account4.signer)
         const safeSdk1 = await Safe.create({
           provider: provider1,
           safeAddress,
@@ -436,11 +436,11 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const provider1 = await getEthAdapter(account1.signer)
-        const provider2 = await getEthAdapter(account2.signer)
-        const provider3 = await getEthAdapter(account3.signer)
-        const provider4 = await getEthAdapter(account4.signer)
-        const provider5 = await getEthAdapter(account5.signer)
+        const provider1 = await getEip1193Provider(account1.signer)
+        const provider2 = await getEip1193Provider(account2.signer)
+        const provider3 = await getEip1193Provider(account3.signer)
+        const provider4 = await getEip1193Provider(account4.signer)
+        const provider5 = await getEip1193Provider(account5.signer)
         const safeSdk1 = await Safe.create({
           provider: provider1,
           safeAddress,
@@ -512,12 +512,12 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const provider1 = await getEthAdapter(account1.signer)
-        const provider2 = await getEthAdapter(account2.signer)
-        const provider3 = await getEthAdapter(account3.signer)
-        const provider4 = await getEthAdapter(account4.signer)
-        const provider5 = await getEthAdapter(account5.signer)
-        const provider6 = await getEthAdapter(account6.signer)
+        const provider1 = await getEip1193Provider(account1.signer)
+        const provider2 = await getEip1193Provider(account2.signer)
+        const provider3 = await getEip1193Provider(account3.signer)
+        const provider4 = await getEip1193Provider(account4.signer)
+        const provider5 = await getEip1193Provider(account5.signer)
+        const provider6 = await getEip1193Provider(account6.signer)
         const safeSdk1 = await Safe.create({
           provider: provider1,
           safeAddress,
@@ -581,19 +581,19 @@ describe('Transactions execution', () => {
     it('should execute a transaction when is not submitted by an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress,
         contractNetworks
       })
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
       })
-      const provider3 = await getEthAdapter(account3.signer)
+      const provider3 = await getEip1193Provider(account3.signer)
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
         signerAddress: account3.address
@@ -626,7 +626,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk1 = await Safe.create({
           provider,
           safeAddress,
@@ -657,7 +657,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk1 = await Safe.create({
           provider,
           safeAddress,
@@ -692,7 +692,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk1 = await Safe.create({
           provider,
           safeAddress,
@@ -729,7 +729,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk1 = await Safe.create({
           provider,
           safeAddress,
@@ -760,7 +760,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk1 = await Safe.create({
           provider,
           safeAddress,
@@ -795,7 +795,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk1 = await Safe.create({
           provider,
           safeAddress,
@@ -830,7 +830,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         safeAddress,
@@ -861,18 +861,18 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress,
         contractNetworks
       })
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
       })
-      const provider3 = await getEthAdapter(account3.signer)
+      const provider3 = await getEip1193Provider(account3.signer)
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
         signerAddress: account3.address
@@ -912,18 +912,18 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress,
         contractNetworks
       })
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
       })
-      const provider3 = await getEthAdapter(account3.signer)
+      const provider3 = await getEip1193Provider(account3.signer)
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
         signerAddress: account3.address

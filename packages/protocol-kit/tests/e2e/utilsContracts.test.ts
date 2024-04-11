@@ -4,7 +4,7 @@ import { deployments } from 'hardhat'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
-import { getEthAdapter, getNetworkProvider } from './utils/setupEthAdapter'
+import { getEip1193Provider, getNetworkProvider } from './utils/setupEthAdapter'
 import {
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
@@ -59,7 +59,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -104,7 +104,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -149,7 +149,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -194,7 +194,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -228,7 +228,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -262,7 +262,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -295,7 +295,7 @@ describe('Contract utils', () => {
       const invalidOwners: string[] = []
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(accounts[0].signer)
+      const provider = await getEip1193Provider(accounts[0].signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -329,7 +329,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -422,7 +422,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const provider = await getEthAdapter(owner1.signer)
+      const provider = await getEip1193Provider(owner1.signer)
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -486,7 +486,7 @@ describe('Contract utils', () => {
         const [owner1] = accounts
         const owners = [owner1.address]
         const threshold = 1
-        const provider = await getEthAdapter(owner1.signer)
+        const provider = await getEip1193Provider(owner1.signer)
         const customContracts = contractNetworks[chainId.toString()]
 
         const safeAccountConfig: SafeAccountConfig = {
@@ -525,8 +525,8 @@ describe('Contract utils', () => {
         const { contractNetworks } = await setupTests()
 
         const safeVersion = safeVersionDeployed
-        // Create EthAdapter instance
-        const provider = await getEthAdapter(getNetworkProvider('zksync'))
+        // Create ISafeProvider instance
+        const provider = await getEip1193Provider(getNetworkProvider('zksync'))
         const chainId = await provider.getChainId()
         const customContracts = contractNetworks[chainId.toString()]
 
@@ -611,10 +611,10 @@ describe('Contract utils', () => {
         const [owner] = accounts
         const safeVersion = safeVersionDeployed
 
-        const gnosisEthAdapter = await getEthAdapter(getNetworkProvider('gnosis'))
-        const zkSyncEthAdapter = await getEthAdapter(getNetworkProvider('zksync'))
-        const sepoliaEthAdapter = await getEthAdapter(getNetworkProvider('sepolia'))
-        const mainnetEthAdapter = await getEthAdapter(getNetworkProvider('mainnet'))
+        const gnosisEthAdapter = await getEip1193Provider(getNetworkProvider('gnosis'))
+        const zkSyncEthAdapter = await getEip1193Provider(getNetworkProvider('zksync'))
+        const sepoliaEthAdapter = await getEip1193Provider(getNetworkProvider('sepolia'))
+        const mainnetEthAdapter = await getEip1193Provider(getNetworkProvider('mainnet'))
 
         // 1/1 Safe
         const safeAccountConfig: SafeAccountConfig = {

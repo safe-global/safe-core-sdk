@@ -1,6 +1,6 @@
 import { AbstractSigner, ContractRunner, EventLog } from 'ethers'
 import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import safeProxyFactory_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.0.0/proxy_factory'
 import {
@@ -30,7 +30,7 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
    * Constructs an instance of SafeProxyFactoryContract_v1_0_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.0.0 is used.
    */

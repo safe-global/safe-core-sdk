@@ -1,7 +1,7 @@
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import SignMessageLibContract_v1_4_1_Contract, {
   SignMessageLibContract_v1_4_1_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
@@ -33,7 +33,7 @@ class SignMessageLibContract_v1_4_1_Ethers
    * Constructs an instance of SignMessageLibContract_v1_4_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SignMessageLib deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.4.1 is used.
    */

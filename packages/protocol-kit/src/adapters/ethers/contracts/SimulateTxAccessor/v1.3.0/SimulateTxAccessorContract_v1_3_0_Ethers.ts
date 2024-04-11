@@ -1,5 +1,5 @@
 import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import SimulateTxAccessorContract_v1_3_0_Contract, {
   SimulateTxAccessorContract_v1_3_0_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
@@ -29,7 +29,7 @@ class SimulateTxAccessorContract_v1_3_0_Ethers
    * Constructs an instance of SimulateTxAccessorContract_v1_3_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SimulateTxAccessor deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
    */

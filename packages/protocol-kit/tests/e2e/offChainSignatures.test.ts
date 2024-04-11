@@ -7,7 +7,7 @@ import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -39,7 +39,7 @@ describe('Off-chain signatures', () => {
     it('should sign a transaction hash with the current signer if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -53,7 +53,7 @@ describe('Off-chain signatures', () => {
     it('should sign a transaction hash with the current signer', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -78,7 +78,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
         const account = accounts[0]
-        const provider = await getEthAdapter(account.signer)
+        const provider = await getEip1193Provider(account.signer)
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -112,7 +112,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
         const account = accounts[0]
-        const provider = await getEthAdapter(account.signer)
+        const provider = await getEip1193Provider(account.signer)
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -135,7 +135,7 @@ describe('Off-chain signatures', () => {
     it('should fail if the signature is added by an account that is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
-      const provider = await getEthAdapter(account3.signer)
+      const provider = await getEip1193Provider(account3.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -157,7 +157,7 @@ describe('Off-chain signatures', () => {
     it('should ignore duplicated signatures', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -183,7 +183,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -207,7 +207,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -232,7 +232,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -257,7 +257,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -281,7 +281,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -306,7 +306,7 @@ describe('Off-chain signatures', () => {
       async () => {
         const { safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -328,7 +328,7 @@ describe('Off-chain signatures', () => {
     it('should add the signature of the current signer using eth_signTypedData_v4', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -350,7 +350,7 @@ describe('Off-chain signatures', () => {
     it('should add the signature of the current signer using eth_signTypedData_v4 by default', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -372,7 +372,7 @@ describe('Off-chain signatures', () => {
     it('should sign a transaction received from the Safe Transaction Service', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,

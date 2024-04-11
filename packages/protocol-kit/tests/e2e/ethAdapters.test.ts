@@ -21,7 +21,7 @@ import {
   getSafeSingleton,
   getSignMessageLib
 } from './utils/setupContracts'
-import { getEthAdapter, getNetworkProvider } from './utils/setupEthAdapter'
+import { getEip1193Provider, getNetworkProvider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -41,7 +41,7 @@ describe('Safe contracts', () => {
 
   describe('getSafeContract', async () => {
     it('should return an L1 Safe contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('mainnet'))
+      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
@@ -55,7 +55,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return an L2 Safe contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('gnosis'))
+      const provider = await getEip1193Provider(getNetworkProvider('gnosis'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100n
       const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
@@ -69,7 +69,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return an L1 Safe contract from safe-deployments using the L1 flag', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('gnosis'))
+      const provider = await getEip1193Provider(getNetworkProvider('gnosis'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100n
       const isL1SafeSingleton = true
@@ -86,7 +86,7 @@ describe('Safe contracts', () => {
     it('should return a Safe contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const safeContract = await provider.getSafeContract({
@@ -102,7 +102,7 @@ describe('Safe contracts', () => {
 
   describe('getMultiSendContract', async () => {
     it('should return a MultiSend contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('mainnet'))
+      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getMultiSendContractDeployment(safeVersion, chainId)
@@ -118,7 +118,7 @@ describe('Safe contracts', () => {
     it('should return a MultiSend contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const multiSendContract = await provider.getMultiSendContract({
@@ -134,7 +134,7 @@ describe('Safe contracts', () => {
 
   describe('getMultiSendCallOnlyContract', async () => {
     it('should return a MultiSendCallOnly contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('mainnet'))
+      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getMultiSendCallOnlyContractDeployment(safeVersion, chainId)
@@ -150,7 +150,7 @@ describe('Safe contracts', () => {
     it('should return a MultiSendCallOnly contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const multiSendCallOnlyContract = await provider.getMultiSendCallOnlyContract({
@@ -166,7 +166,7 @@ describe('Safe contracts', () => {
 
   describe('getCompatibilityFallbackHandlerContract', async () => {
     it('should return a CompatibilityFallbackHandler contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('mainnet'))
+      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getCompatibilityFallbackHandlerContractDeployment(
@@ -186,7 +186,7 @@ describe('Safe contracts', () => {
     it('should return a CompatibilityFallbackHandler contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const compatibilityFallbackHandlerContract =
@@ -203,7 +203,7 @@ describe('Safe contracts', () => {
 
   describe('getSafeProxyFactoryContract', async () => {
     it('should return a SafeProxyFactory contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('mainnet'))
+      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
@@ -219,7 +219,7 @@ describe('Safe contracts', () => {
     it('should return a SafeProxyFactory contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const factoryContract = await provider.getSafeProxyFactoryContract({
@@ -235,7 +235,7 @@ describe('Safe contracts', () => {
 
   describe('getSignMessageLibContract', async () => {
     it('should return a SignMessageLib contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('mainnet'))
+      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
@@ -251,7 +251,7 @@ describe('Safe contracts', () => {
     it('should return a SignMessageLib contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const signMessageLibContract = await provider.getSignMessageLibContract({
@@ -267,7 +267,7 @@ describe('Safe contracts', () => {
 
   describe('getCreateCallContract', async () => {
     it('should return a CreateCall contract from safe-deployments', async () => {
-      const provider = await getEthAdapter(getNetworkProvider('mainnet'))
+      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getCreateCallContractDeployment(safeVersion, chainId)
@@ -283,7 +283,7 @@ describe('Safe contracts', () => {
     it('should return a SafeProxyFactory contract from the custom addresses', async () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const createCallContract = await provider.getCreateCallContract({

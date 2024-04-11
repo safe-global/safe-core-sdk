@@ -5,21 +5,21 @@ import {
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { ISafeProvider, SafeContract } from '@safe-global/safe-core-sdk-types'
 
 class GuardManager {
-  #ethAdapter: EthAdapter
+  #safeProvider: ISafeProvider
   #safeContract?: SafeContract
   // keccak256("guard_manager.guard.address")
   #slot = '0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8'
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: ISafeProvider, safeContract?: SafeContract) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateGuardAddress(guardAddress: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(guardAddress)
+    const isValidAddress = this.#safeProvider.isAddress(guardAddress)
     if (!isValidAddress || isZeroAddress(guardAddress)) {
       throw new Error('Invalid guard address provided')
     }
@@ -43,7 +43,7 @@ class GuardManager {
     }
     const safeVersion = await this.#safeContract.getVersion()
     if (hasSafeFeature(SAFE_FEATURES.SAFE_TX_GUARDS, safeVersion)) {
-      return this.#ethAdapter.getStorageAt(await this.#safeContract.getAddress(), this.#slot)
+      return this.#safeProvider.getStorageAt(await this.#safeContract.getAddress(), this.#slot)
     } else {
       throw new Error(
         'Current version of the Safe does not support Safe transaction guards functionality'

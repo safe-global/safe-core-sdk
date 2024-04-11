@@ -1,4 +1,4 @@
-import EthersAdapter, { EthersAdapterConfig } from './EthersAdapter'
+import SafeProvider, { SafeProviderConfig } from './SafeProvider'
 import CreateCallBaseContractEthers from './contracts/CreateCall/CreateCallBaseContractEthers'
 import MultiSendBaseContractEthers from './contracts/MultiSend/MultiSendBaseContractEthers'
 import MultiSendCallOnlyBaseContractEthers from './contracts/MultiSend/MultiSendCallOnlyBaseContractEthers'
@@ -9,8 +9,8 @@ import { EthersTransactionOptions, EthersTransactionResult } from './types'
 
 export {
   CreateCallBaseContractEthers,
-  EthersAdapter,
-  EthersAdapterConfig,
+  SafeProvider,
+  SafeProviderConfig,
   EthersTransactionOptions,
   EthersTransactionResult,
   MultiSendCallOnlyBaseContractEthers,

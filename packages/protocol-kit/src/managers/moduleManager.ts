@@ -1,18 +1,18 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { ISafeProvider, SafeContract } from '@safe-global/safe-core-sdk-types'
 
 class ModuleManager {
-  #ethAdapter: EthAdapter
+  #safeProvider: ISafeProvider
   #safeContract?: SafeContract
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: ISafeProvider, safeContract?: SafeContract) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateModuleAddress(moduleAddress: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(moduleAddress)
+    const isValidAddress = this.#safeProvider.isAddress(moduleAddress)
     if (!isValidAddress || isRestrictedAddress(moduleAddress)) {
       throw new Error('Invalid module address provided')
     }

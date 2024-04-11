@@ -1,5 +1,5 @@
 import MultiSendBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/MultiSendBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import MultiSendContract_v1_1_1_Contract, {
   MultiSendContract_v1_1_1_Abi
 } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
@@ -29,7 +29,7 @@ class MultiSendContract_v1_1_1_Ethers
    * Constructs an instance of MultiSendContract_v1_1_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.1.1 is used.
    */

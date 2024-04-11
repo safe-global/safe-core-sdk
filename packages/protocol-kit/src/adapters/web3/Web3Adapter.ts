@@ -3,8 +3,8 @@ import { SigningMethod } from '@safe-global/protocol-kit/types'
 import {
   CreateCallContract,
   Eip3770Address,
-  EthAdapter,
-  EthAdapterTransaction,
+  ISafeProvider,
+  SafeProviderTransaction,
   GetContractProps,
   SafeEIP712Args,
   SignMessageLibContract,
@@ -43,7 +43,7 @@ export interface Web3AdapterConfig {
   signerAddress?: string
 }
 
-class Web3Adapter implements EthAdapter {
+class Web3Adapter implements ISafeProvider {
   #web3: Web3
   #signerAddress?: string
 
@@ -270,7 +270,7 @@ class Web3Adapter implements EthAdapter {
 
   signMessage(message: string): Promise<string> {
     if (!this.#signerAddress) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
     return this.#web3.eth.sign(message, this.#signerAddress)
   }
@@ -321,13 +321,13 @@ class Web3Adapter implements EthAdapter {
   }
 
   async estimateGas(
-    transaction: EthAdapterTransaction,
+    transaction: SafeProviderTransaction,
     callback?: (error: Error, gas: number) => void
   ): Promise<string> {
     return (await this.#web3.eth.estimateGas(transaction, callback)).toString()
   }
 
-  call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string> {
+  call(transaction: SafeProviderTransaction, defaultBlock?: string | number): Promise<string> {
     return this.#web3.eth.call(transaction, defaultBlock)
   }
 

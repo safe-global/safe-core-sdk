@@ -7,7 +7,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
@@ -77,11 +77,11 @@ describe('The EIP1271 implementation', () => {
         // Create adapters and the protocol kit instance
         const [account1, account2, account3, account4, account5] = accounts
 
-        const provider1 = await getEthAdapter(account1.signer)
-        const provider2 = await getEthAdapter(account2.signer)
-        const provider3 = await getEthAdapter(account3.signer)
-        const provider4 = await getEthAdapter(account4.signer)
-        const provider5 = await getEthAdapter(account5.signer)
+        const provider1 = await getEip1193Provider(account1.signer)
+        const provider2 = await getEip1193Provider(account2.signer)
+        const provider3 = await getEip1193Provider(account3.signer)
+        const provider4 = await getEip1193Provider(account4.signer)
+        const provider5 = await getEip1193Provider(account5.signer)
 
         let protocolKit = await Safe.create({
           provider: provider1,
@@ -238,11 +238,11 @@ describe('The EIP1271 implementation', () => {
         // Create adapters and the protocol kit instance
         const [account1, account2, account3, account4, account5] = accounts
 
-        const provider1 = await getEthAdapter(account1.signer)
-        const provider2 = await getEthAdapter(account2.signer)
-        const provider3 = await getEthAdapter(account3.signer)
-        const provider4 = await getEthAdapter(account4.signer)
-        const provider5 = await getEthAdapter(account5.signer)
+        const provider1 = await getEip1193Provider(account1.signer)
+        const provider2 = await getEip1193Provider(account2.signer)
+        const provider3 = await getEip1193Provider(account3.signer)
+        const provider4 = await getEip1193Provider(account4.signer)
+        const provider5 = await getEip1193Provider(account5.signer)
 
         let protocolKit = await Safe.create({
           provider: provider1,

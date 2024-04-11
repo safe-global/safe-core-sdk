@@ -4,7 +4,7 @@ import chai from 'chai'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { itif } from './utils/helpers'
 
@@ -26,7 +26,7 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -57,7 +57,7 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -88,7 +88,7 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,

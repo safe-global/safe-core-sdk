@@ -4,8 +4,8 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  EthAdapter,
-  EthAdapterTransaction,
+  ISafeProvider,
+  SafeProviderTransaction,
   GetContractProps,
   SafeEIP712Args,
   SignMessageLibContract,
@@ -32,13 +32,13 @@ import MultiSendContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiS
 import MultiSendContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
 import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
-export interface EthersAdapterConfig {
+export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */
   provider: Eip1193Provider
   signerAddress?: string
 }
 
-class EthersAdapter implements EthAdapter {
+class SafeProvider implements ISafeProvider {
   get #signer(): Promise<AbstractSigner | undefined> {
     return this.#provider.getSigner(this.#signerAddress)
   }
@@ -47,7 +47,7 @@ class EthersAdapter implements EthAdapter {
   #eip1193Provider: Eip1193Provider
   #signerAddress?: string
 
-  constructor({ provider, signerAddress }: EthersAdapterConfig) {
+  constructor({ provider, signerAddress }: SafeProviderConfig) {
     this.#provider = new BrowserProvider(provider)
     this.#eip1193Provider = provider
     this.#signerAddress = signerAddress
@@ -272,7 +272,7 @@ class EthersAdapter implements EthAdapter {
     const signer = await this.#signer
 
     if (!signer) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
     const messageArray = ethers.getBytes(message)
 
@@ -283,7 +283,7 @@ class EthersAdapter implements EthAdapter {
     const signer = await this.#signer
 
     if (!signer) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
     if (isTypedDataSigner(signer)) {
@@ -301,11 +301,11 @@ class EthersAdapter implements EthAdapter {
     throw new Error('The current signer does not implement EIP-712 to sign typed data')
   }
 
-  async estimateGas(transaction: EthAdapterTransaction): Promise<string> {
+  async estimateGas(transaction: SafeProviderTransaction): Promise<string> {
     return (await this.#provider.estimateGas(transaction)).toString()
   }
 
-  call(transaction: EthAdapterTransaction, blockTag?: string | number): Promise<string> {
+  call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
     return this.#provider.call({ ...transaction, blockTag })
   }
 
@@ -318,4 +318,4 @@ class EthersAdapter implements EthAdapter {
   }
 }
 
-export default EthersAdapter
+export default SafeProvider

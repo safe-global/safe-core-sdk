@@ -4,7 +4,7 @@ import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
 import {
-  EthAdapter,
+  ISafeProvider,
   SafeContract,
   SafeProxyFactoryContract,
   SafeVersion
@@ -47,7 +47,7 @@ const ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE: {
 const ZKSYNC_CREATE2_PREFIX = '0x2020dba91b30cc0006188af794c2fb30dd8520db7e2c088b7fc7c103c00ca494'
 
 export interface PredictSafeAddressProps {
-  ethAdapter: EthAdapter
+  safeProvider: ISafeProvider
   chainId: bigint // required for performance
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig?: SafeDeploymentConfig
@@ -56,7 +56,7 @@ export interface PredictSafeAddressProps {
 }
 
 export interface encodeSetupCallDataProps {
-  ethAdapter: EthAdapter
+  safeProvider: ISafeProvider
   safeAccountConfig: SafeAccountConfig
   safeContract: SafeContract
   customContracts?: ContractNetworkConfig
@@ -80,7 +80,7 @@ const memoizedGetCompatibilityFallbackHandlerContract = createMemoizedFunction(
 )
 
 export async function encodeSetupCallData({
-  ethAdapter,
+  safeProvider,
   safeAccountConfig,
   safeContract,
   customContracts,
@@ -115,7 +115,7 @@ export async function encodeSetupCallData({
   const isValidAddress = fallbackHandlerAddress !== undefined && isAddress(fallbackHandlerAddress)
   if (!isValidAddress) {
     const fallbackHandlerContract = await memoizedGetCompatibilityFallbackHandlerContract({
-      ethAdapter,
+      safeProvider,
       safeVersion,
       customContracts
     })
@@ -140,19 +140,19 @@ type MemoizedGetProxyFactoryContractProps = GetContractInstanceProps & { chainId
 type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & { chainId: string }
 
 const memoizedGetProxyFactoryContract = createMemoizedFunction(
-  ({ ethAdapter, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
-    getProxyFactoryContract({ ethAdapter, safeVersion, customContracts })
+  ({ safeProvider, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
+    getProxyFactoryContract({ safeProvider, safeVersion, customContracts })
 )
 
 const memoizedGetProxyCreationCode = createMemoizedFunction(
   async ({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     customContracts,
     chainId
   }: MemoizedGetProxyFactoryContractProps) => {
     const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
-      ethAdapter,
+      safeProvider,
       safeVersion,
       customContracts,
       chainId
@@ -164,12 +164,12 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
 
 const memoizedGetSafeContract = createMemoizedFunction(
   ({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     isL1SafeSingleton,
     customContracts
   }: MemoizedGetSafeContractInstanceProps) =>
-    getSafeContract({ ethAdapter, safeVersion, isL1SafeSingleton, customContracts })
+    getSafeContract({ safeProvider, safeVersion, isL1SafeSingleton, customContracts })
 )
 
 /**
@@ -184,7 +184,7 @@ export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
 }
 
 export async function predictSafeAddress({
-  ethAdapter,
+  safeProvider,
   chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
@@ -200,21 +200,21 @@ export async function predictSafeAddress({
   } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     customContracts,
     chainId: chainId.toString()
   })
 
   const proxyCreationCode = await memoizedGetProxyCreationCode({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     customContracts,
     chainId: chainId.toString()
   })
 
   const safeContract = await memoizedGetSafeContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     isL1SafeSingleton,
     customContracts,
@@ -222,14 +222,14 @@ export async function predictSafeAddress({
   })
 
   const initializer = await encodeSetupCallData({
-    ethAdapter,
+    safeProvider,
     safeAccountConfig,
     safeContract,
     customContracts,
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
-  const encodedNonce = toBuffer(ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(
+  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
     'hex'
   )
 
@@ -237,7 +237,7 @@ export async function predictSafeAddress({
     toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
   )
 
-  const input = ethAdapter.encodeParameters(['address'], [await safeContract.getAddress()])
+  const input = safeProvider.encodeParameters(['address'], [await safeContract.getAddress()])
 
   const from = await safeProxyFactoryContract.getAddress()
 
@@ -246,7 +246,7 @@ export async function predictSafeAddress({
   if (isZkSyncEraChain) {
     const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, input)
 
-    return ethAdapter.getChecksummedAddress(proxyAddress)
+    return safeProvider.getChecksummedAddress(proxyAddress)
   }
 
   const constructorData = toBuffer(input).toString('hex')
@@ -256,7 +256,7 @@ export async function predictSafeAddress({
   const proxyAddress =
     '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
 
-  return ethAdapter.getChecksummedAddress(proxyAddress)
+  return safeProvider.getChecksummedAddress(proxyAddress)
 }
 
 export const validateSafeAccountConfig = ({ owners, threshold }: SafeAccountConfig): void => {

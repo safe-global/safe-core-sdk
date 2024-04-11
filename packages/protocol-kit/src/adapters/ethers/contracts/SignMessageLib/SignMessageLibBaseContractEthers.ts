@@ -1,6 +1,6 @@
 import { AbstractSigner, Contract, InterfaceAbi } from 'ethers'
 
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import SignMessageLibBaseContract from '@safe-global/protocol-kit/adapters/SignMessageLibBaseContract'
 
@@ -29,7 +29,7 @@ abstract class SignMessageLibBaseContractEthers<
    * Constructs an instance of SignMessageLibBaseContractEthers.
    *
    * @param chainId - The chain ID of the contract.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param defaultAbi - The default ABI for the SignMessageLib contract. It should be compatible with the specific version of the SignMessageLib contract.
    * @param safeVersion - The version of the SignMessageLib contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SignMessageLib deployments based on the chainId and safeVersion.

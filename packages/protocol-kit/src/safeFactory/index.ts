@@ -18,13 +18,13 @@ import {
   SafeDeploymentConfig
 } from '@safe-global/protocol-kit/types'
 import {
-  EthAdapter,
+  ISafeProvider,
   SafeContract,
   SafeProxyFactoryContract,
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import { EthersAdapter } from '../adapters/ethers'
+import { SafeProvider } from '../adapters/ethers'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
@@ -34,7 +34,7 @@ export interface DeploySafeProps {
 }
 
 export interface SafeFactoryConfig {
-  /** ethAdapter - Ethereum adapter */
+  /** safeProvider - Ethereum adapter */
   provider: Eip1193Provider
   signerAddress?: string
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
@@ -46,7 +46,7 @@ export interface SafeFactoryConfig {
 }
 
 interface SafeFactoryInitConfig {
-  /** ethAdapter - Ethereum adapter */
+  /** safeProvider - Ethereum adapter */
   provider: Eip1193Provider
   signerAddress?: string
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
@@ -62,7 +62,7 @@ class SafeFactory {
   #isL1SafeSingleton?: boolean
   #safeVersion!: SafeVersion
   #provider!: Eip1193Provider
-  #ethAdapter!: EthAdapter
+  #safeProvider!: ISafeProvider
   #safeProxyFactoryContract!: SafeProxyFactoryContract
   #safeContract!: SafeContract
 
@@ -84,27 +84,27 @@ class SafeFactory {
     contractNetworks
   }: SafeFactoryInitConfig): Promise<void> {
     this.#provider = provider
-    this.#ethAdapter = new EthersAdapter({ provider })
+    this.#safeProvider = new SafeProvider({ provider })
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks
-    const chainId = await this.#ethAdapter.getChainId()
+    const chainId = await this.#safeProvider.getChainId()
     const customContracts = contractNetworks?.[chainId.toString()]
     this.#safeProxyFactoryContract = await getProxyFactoryContract({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       safeVersion,
       customContracts
     })
     this.#safeContract = await getSafeContract({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       safeVersion,
       isL1SafeSingleton,
       customContracts
     })
   }
 
-  getEthAdapter(): EthAdapter {
-    return this.#ethAdapter
+  getSafeProvider(): ISafeProvider {
+    return this.#safeProvider
   }
 
   getSafeVersion(): SafeVersion {
@@ -116,14 +116,14 @@ class SafeFactory {
   }
 
   async getChainId(): Promise<bigint> {
-    return this.#ethAdapter.getChainId()
+    return this.#safeProvider.getChainId()
   }
 
   async predictSafeAddress(
     safeAccountConfig: SafeAccountConfig,
     saltNonce?: string
   ): Promise<string> {
-    const chainId = await this.#ethAdapter.getChainId()
+    const chainId = await this.#safeProvider.getChainId()
     const customContracts = this.#contractNetworks?.[chainId.toString()]
     const safeVersion = this.#safeVersion
 
@@ -133,7 +133,7 @@ class SafeFactory {
     }
 
     return predictSafeAddress({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       chainId,
       safeAccountConfig,
       safeDeploymentConfig,
@@ -151,15 +151,15 @@ class SafeFactory {
     validateSafeAccountConfig(safeAccountConfig)
     validateSafeDeploymentConfig({ saltNonce })
 
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('ISafeProvider must be initialized with a signer to use this method')
     }
 
     const chainId = await this.getChainId()
     const customContracts = this.#contractNetworks?.[chainId.toString()]
     const initializer = await encodeSetupCallData({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       safeAccountConfig,
       safeContract: this.#safeContract,
       customContracts
@@ -178,7 +178,7 @@ class SafeFactory {
       },
       callback
     })
-    const isContractDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
+    const isContractDeployed = await this.#safeProvider.isContractDeployed(safeAddress)
     if (!isContractDeployed) {
       throw new Error('SafeProxy contract is not deployed on the current network')
     }

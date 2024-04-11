@@ -1,18 +1,18 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { ISafeProvider, SafeContract } from '@safe-global/safe-core-sdk-types'
 
 class OwnerManager {
-  #ethAdapter: EthAdapter
+  #safeProvider: ISafeProvider
   #safeContract?: SafeContract
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: ISafeProvider, safeContract?: SafeContract) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateOwnerAddress(ownerAddress: string, errorMessage?: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(ownerAddress)
+    const isValidAddress = this.#safeProvider.isAddress(ownerAddress)
     if (!isValidAddress || isRestrictedAddress(ownerAddress)) {
       throw new Error(errorMessage || 'Invalid owner address provided')
     }

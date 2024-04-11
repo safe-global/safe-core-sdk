@@ -14,7 +14,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
@@ -66,7 +66,7 @@ describe('The EIP1271 implementation', () => {
       const safeAddress = await safe.getAddress()
 
       // Adapter and Safe instance for owner 1
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress,
@@ -74,7 +74,7 @@ describe('The EIP1271 implementation', () => {
       })
 
       // Adapter and Safe instance for owner 2
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await Safe.create({
         provider: provider2,
         signerAddress: account2.address,
@@ -382,7 +382,7 @@ describe('The EIP1271 implementation', () => {
           // EOA sign
           const safeMessage1 = safeSdk1.createMessage(MESSAGE)
           const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage1)
-          const signerAddress1 = (await safeSdk1.getEthAdapter().getSignerAddress()) as string
+          const signerAddress1 = (await safeSdk1.getSafeProvider().getSignerAddress()) as string
           const ethSig = signedMessage1.getSignature(signerAddress1) as EthSafeSignature
 
           // Signer Safe sign
@@ -392,7 +392,7 @@ describe('The EIP1271 implementation', () => {
             SigningMethod.SAFE_SIGNATURE,
             safeAddress
           )
-          const signerAddress2 = (await safeSdk3.getEthAdapter().getSignerAddress()) as string
+          const signerAddress2 = (await safeSdk3.getSafeProvider().getSignerAddress()) as string
           const safeSignerSig = await buildContractSignature(
             [signedMessage2.getSignature(signerAddress2) as EthSafeSignature],
             signerSafeAddress

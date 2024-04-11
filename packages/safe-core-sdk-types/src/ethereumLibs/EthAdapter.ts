@@ -10,7 +10,7 @@ import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-c
 import { SingletonDeployment } from '@safe-global/safe-deployments'
 import { AbiItem } from 'web3-utils'
 
-export interface EthAdapterTransaction {
+export interface SafeProviderTransaction {
   to: string
   from: string
   data: string
@@ -29,7 +29,7 @@ export interface GetContractProps {
   isL1SafeSingleton?: boolean
 }
 
-export interface EthAdapter {
+export interface ISafeProvider {
   isAddress(address: string): boolean
   getEip3770Address(fullAddress: string): Promise<Eip3770Address>
   getBalance(address: string, defaultBlock?: string | number): Promise<bigint>
@@ -93,10 +93,10 @@ export interface EthAdapter {
   signMessage(message: string): Promise<string>
   signTypedData(safeEIP712Args: SafeEIP712Args, signTypedDataVersion?: string): Promise<string>
   estimateGas(
-    transaction: EthAdapterTransaction,
+    transaction: SafeProviderTransaction,
     callback?: (error: Error, gas: number) => void
   ): Promise<string>
-  call(transaction: EthAdapterTransaction, defaultBlock?: string | number): Promise<string>
+  call(transaction: SafeProviderTransaction, defaultBlock?: string | number): Promise<string>
   encodeParameters(types: string[], values: any[]): string
   decodeParameters(types: any[], values: string): { [key: string]: any }
 }

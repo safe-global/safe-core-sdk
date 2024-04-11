@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 
@@ -38,7 +38,7 @@ describe('On-chain signatures', () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider,
         predictedSafe,
@@ -53,7 +53,7 @@ describe('On-chain signatures', () => {
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
-      const provider = await getEthAdapter(account3.signer)
+      const provider = await getEip1193Provider(account3.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
@@ -76,7 +76,7 @@ describe('On-chain signatures', () => {
     it('should approve the transaction hash', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
@@ -98,7 +98,7 @@ describe('On-chain signatures', () => {
     it('should ignore a duplicated signatures', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
@@ -126,7 +126,7 @@ describe('On-chain signatures', () => {
     it('should fail if Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeSdk1 = await Safe.create({
         provider: provider1,
         predictedSafe,
@@ -140,14 +140,14 @@ describe('On-chain signatures', () => {
     it('should return the list of owners who approved a transaction hash', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress: safeAddress,
         contractNetworks
       })
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address

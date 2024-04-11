@@ -7,7 +7,7 @@ import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 
@@ -43,7 +43,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -64,7 +64,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -73,7 +73,7 @@ describe('Safe Info', () => {
         })
         const safeSdk2 = await safeSdk.connect({ predictedSafe })
         chai
-          .expect(await safeSdk2.getEthAdapter().getSignerAddress())
+          .expect(await safeSdk2.getSafeProvider().getSignerAddress())
           .to.be.eq(await account1.signer.getAddress())
       }
     )
@@ -81,7 +81,7 @@ describe('Safe Info', () => {
     it('should connect a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -90,10 +90,10 @@ describe('Safe Info', () => {
       })
       chai.expect(await safeSdk.getAddress()).to.be.eq(safeAddress)
       chai
-        .expect(await safeSdk.getEthAdapter().getSignerAddress())
+        .expect(await safeSdk.getSafeProvider().getSignerAddress())
         .to.be.eq(await account1.signer.getAddress())
 
-      const provider2 = await getEthAdapter(account2.signer)
+      const provider2 = await getEip1193Provider(account2.signer)
       const safeSdk2 = await safeSdk.connect({
         provider: provider2,
         signerAddress: account2.address,
@@ -101,7 +101,7 @@ describe('Safe Info', () => {
       })
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)
       chai
-        .expect(await safeSdk2.getEthAdapter().getSignerAddress())
+        .expect(await safeSdk2.getSafeProvider().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
 
       const safe2 = await getSafeWithOwners([accounts[2].address])
@@ -109,7 +109,7 @@ describe('Safe Info', () => {
       const safeSdk3 = await safeSdk2.connect({ safeAddress: safe2Address })
       chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2Address)
       chai
-        .expect(await safeSdk3.getEthAdapter().getSignerAddress())
+        .expect(await safeSdk3.getSafeProvider().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
     })
   })
@@ -118,7 +118,7 @@ describe('Safe Info', () => {
     it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -131,7 +131,7 @@ describe('Safe Info', () => {
     it('should return the contract version of a Safe that is not deployed with a default version configuration', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeConfig: PredictedSafeProps = {
         ...predictedSafe,
         safeDeploymentConfig: {}
@@ -148,7 +148,7 @@ describe('Safe Info', () => {
     it('should return the Safe contract version', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -166,7 +166,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -186,7 +186,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -209,7 +209,7 @@ describe('Safe Info', () => {
     it('should return the address of a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -220,11 +220,11 @@ describe('Safe Info', () => {
     })
   })
 
-  describe('getEthAdapter', async () => {
-    it('should return the connected EthAdapter', async () => {
+  describe('getEip1193Provider', async () => {
+    it('should return the connected ISafeProvider', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -232,7 +232,7 @@ describe('Safe Info', () => {
         contractNetworks
       })
       chai
-        .expect(await safeSdk.getEthAdapter().getSignerAddress())
+        .expect(await safeSdk.getSafeProvider().getSignerAddress())
         .to.be.eq(await account1.signer.getAddress())
     })
   })
@@ -241,7 +241,7 @@ describe('Safe Info', () => {
     it('should return the nonce of a Safe that is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -253,7 +253,7 @@ describe('Safe Info', () => {
     it('should return the Safe nonce', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
@@ -279,7 +279,7 @@ describe('Safe Info', () => {
     it('should return the chainId of a Safe that is not deployed', async () => {
       const { predictedSafe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -291,7 +291,7 @@ describe('Safe Info', () => {
     it('should return the chainId of the current network', async () => {
       const { safe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -308,7 +308,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -327,7 +327,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -345,7 +345,7 @@ describe('Safe Info', () => {
     it('should return the balance of a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,

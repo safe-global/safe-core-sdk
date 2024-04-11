@@ -5,21 +5,21 @@ import {
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { ISafeProvider, SafeContract } from '@safe-global/safe-core-sdk-types'
 
 class FallbackHandlerManager {
-  #ethAdapter: EthAdapter
+  #safeProvider: ISafeProvider
   #safeContract?: SafeContract
   // keccak256("fallback_manager.handler.address")
   #slot = '0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5'
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: ISafeProvider, safeContract?: SafeContract) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateFallbackHandlerAddress(fallbackHandlerAddress: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(fallbackHandlerAddress)
+    const isValidAddress = this.#safeProvider.isAddress(fallbackHandlerAddress)
     if (!isValidAddress || isZeroAddress(fallbackHandlerAddress)) {
       throw new Error('Invalid fallback handler address provided')
     }
@@ -46,7 +46,7 @@ class FallbackHandlerManager {
     }
     const safeVersion = await this.#safeContract.getVersion()
     if (hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
-      return this.#ethAdapter.getStorageAt(await this.#safeContract.getAddress(), this.#slot)
+      return this.#safeProvider.getStorageAt(await this.#safeContract.getAddress(), this.#slot)
     } else {
       throw new Error(
         'Current version of the Safe does not support the fallback handler functionality'

@@ -1,6 +1,6 @@
 import { AbstractSigner, Contract, InterfaceAbi } from 'ethers'
 
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import SafeBaseContract from '@safe-global/protocol-kit/adapters/SafeBaseContract'
 
@@ -32,7 +32,7 @@ abstract class SafeBaseContractEthers<
    * Constructs an instance of SafeBaseContractEthers.
    *
    * @param chainId - The chain ID of the contract.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param defaultAbi - The default ABI for the Safe contract. It should be compatible with the specific version of the Safe contract.
    * @param safeVersion - The version of the Safe contract.
    * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.

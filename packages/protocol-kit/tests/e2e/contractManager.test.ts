@@ -16,7 +16,7 @@ import {
   getSignMessageLib,
   getSimulateTxAccessor
 } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -39,7 +39,7 @@ describe('Safe contracts manager', () => {
     it('should initialize the SDK with a Safe that is not deployed', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const predictedSafe: PredictedSafeProps = {
         safeAccountConfig: {
           owners: [accounts[0].address],
@@ -61,7 +61,7 @@ describe('Safe contracts manager', () => {
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
       const { safe, accounts } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       await chai
         .expect(
@@ -76,7 +76,7 @@ describe('Safe contracts manager', () => {
     it('should fail if SafeProxy contract is not deployed on the current network', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       await chai
         .expect(
           Safe.create({
@@ -111,7 +111,7 @@ describe('Safe contracts manager', () => {
         }
       }
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       await chai
         .expect(
@@ -127,7 +127,7 @@ describe('Safe contracts manager', () => {
     it('should set the MultiSend contract available on the current network', async () => {
       const { safe, accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,

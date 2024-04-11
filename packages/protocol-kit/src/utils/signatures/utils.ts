@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import {
-  EthAdapter,
+  ISafeProvider,
   SafeSignature,
   SafeEIP712Args,
   SafeTransactionData
@@ -106,31 +106,31 @@ export const adjustVInSignature: AdjustVOverload = (
 }
 
 export async function generateSignature(
-  ethAdapter: EthAdapter,
+  safeProvider: ISafeProvider,
   hash: string
 ): Promise<SafeSignature> {
-  const signerAddress = await ethAdapter.getSignerAddress()
+  const signerAddress = await safeProvider.getSignerAddress()
   if (!signerAddress) {
-    throw new Error('EthAdapter must be initialized with a signer to use this method')
+    throw new Error('ISafeProvider must be initialized with a signer to use this method')
   }
 
-  let signature = await ethAdapter.signMessage(hash)
+  let signature = await safeProvider.signMessage(hash)
 
   signature = adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
   return new EthSafeSignature(signerAddress, signature)
 }
 
 export async function generateEIP712Signature(
-  ethAdapter: EthAdapter,
+  safeProvider: ISafeProvider,
   safeEIP712Args: SafeEIP712Args,
   methodVersion?: 'v3' | 'v4'
 ): Promise<SafeSignature> {
-  const signerAddress = await ethAdapter.getSignerAddress()
+  const signerAddress = await safeProvider.getSignerAddress()
   if (!signerAddress) {
-    throw new Error('EthAdapter must be initialized with a signer to use this method')
+    throw new Error('ISafeProvider must be initialized with a signer to use this method')
   }
 
-  let signature = await ethAdapter.signTypedData(safeEIP712Args, methodVersion)
+  let signature = await safeProvider.signTypedData(safeEIP712Args, methodVersion)
 
   signature = adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
   return new EthSafeSignature(signerAddress, signature)

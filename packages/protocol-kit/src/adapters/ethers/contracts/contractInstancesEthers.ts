@@ -30,7 +30,7 @@ import SafeProxyFactoryContract_v1_3_0_Ethers from '@safe-global/protocol-kit/ad
 import SafeProxyFactoryContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Ethers'
 import SimulateTxAccessorContract_V1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0_Ethers'
 import SimulateTxAccessorContract_V1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Ethers'
-import EthersAdapter from '../EthersAdapter'
+import SafeProvider from '../SafeProvider'
 import { CreateCallContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
 import { CreateCallContract_v1_3_0_Abi } from '@safe-global/protocol-kit/contracts/AbiType/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import { MultiSendContract_v1_4_1_Abi } from '@safe-global/protocol-kit/contracts/AbiType/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
@@ -55,18 +55,18 @@ import { SimulateTxAccessorContract_v1_4_1_Abi } from '@safe-global/protocol-kit
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  ethersAdapter: EthersAdapter,
+  safeProvider: SafeProvider,
   customContractAbi?: AbiItem | AbiItem[] | undefined,
   isL1SafeSingleton?: boolean
   // TODO <any> return type used until Typechain is removed
 ): Promise<any> {
-  const chainId = await ethersAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
   let safeContract
   switch (safeVersion) {
     case '1.4.1':
       safeContract = new SafeContract_v1_4_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -77,7 +77,7 @@ export async function getSafeContractInstance(
     case '1.3.0':
       safeContract = new SafeContract_v1_3_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -88,7 +88,7 @@ export async function getSafeContractInstance(
     case '1.2.0':
       safeContract = new SafeContract_v1_2_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -99,7 +99,7 @@ export async function getSafeContractInstance(
     case '1.1.1':
       safeContract = new SafeContract_v1_1_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -110,7 +110,7 @@ export async function getSafeContractInstance(
     case '1.0.0':
       safeContract = new SafeContract_v1_0_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         isL1SafeSingleton,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
@@ -152,26 +152,26 @@ export function getCompatibilityFallbackHandlerContractInstance(
 export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  ethersAdapter: EthersAdapter,
+  safeProvider: SafeProvider,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<
   | MultiSendContract_V1_4_1_Ethers
   | MultiSendContract_V1_3_0_Ethers
   | MultiSendContract_V1_1_1_Ethers
 > {
-  const chainId = await ethersAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
   switch (safeVersion) {
     case '1.4.1':
       return new MultiSendContract_V1_4_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendContract_v1_4_1_Abi
       )
     case '1.3.0':
       return new MultiSendContract_V1_3_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendContract_v1_3_0_Abi
       )
@@ -180,7 +180,7 @@ export async function getMultiSendContractInstance(
     case '1.0.0':
       return new MultiSendContract_V1_1_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendContract_v1_1_1_Abi
       )
@@ -192,15 +192,15 @@ export async function getMultiSendContractInstance(
 export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  ethersAdapter: EthersAdapter,
+  safeProvider: SafeProvider,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<MultiSendCallOnlyContract_V1_4_1_Ethers | MultiSendCallOnlyContract_V1_3_0_Ethers> {
-  const chainId = await ethersAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
   switch (safeVersion) {
     case '1.4.1':
       return new MultiSendCallOnlyContract_V1_4_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendCallOnlyContract_v1_4_1_Abi
       )
@@ -210,7 +210,7 @@ export async function getMultiSendCallOnlyContractInstance(
     case '1.0.0':
       return new MultiSendCallOnlyContract_V1_3_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as MultiSendCallOnlyContract_v1_3_0_Abi
       )
@@ -223,16 +223,16 @@ export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   signerOrProvider: AbstractSigner | Provider,
-  ethersAdapter: EthersAdapter,
+  safeProvider: SafeProvider,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ) {
-  const chainId = await ethersAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
   let safeProxyFactoryContract
   switch (safeVersion) {
     case '1.4.1':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_4_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_4_1_Abi,
@@ -243,7 +243,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.3.0':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_3_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_3_0_Abi,
@@ -254,7 +254,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.1.1':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_1_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_1_1_Abi,
@@ -264,7 +264,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.0.0':
       safeProxyFactoryContract = new SafeProxyFactoryContract_v1_0_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         // TODO: Remove this unknown after remove Typechain
         customContractAbi as unknown as SafeProxyFactoryContract_v1_0_0_Abi,
@@ -279,17 +279,17 @@ export async function getSafeProxyFactoryContractInstance(
 export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  ethersAdapter: EthersAdapter,
+  safeProvider: SafeProvider,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<SignMessageLibContract> {
-  const chainId = await ethersAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
   let signMessageLibContract
 
   switch (safeVersion) {
     case '1.4.1':
       signMessageLibContract = new SignMessageLibContract_V1_4_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_4_1_Abi
       )
@@ -299,7 +299,7 @@ export async function getSignMessageLibContractInstance(
     case '1.3.0':
       signMessageLibContract = new SignMessageLibContract_V1_3_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SignMessageLibContract_v1_3_0_Abi
       )
@@ -314,16 +314,16 @@ export async function getSignMessageLibContractInstance(
 export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  ethersAdapter: EthersAdapter,
+  safeProvider: SafeProvider,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<CreateCallContract> {
-  const chainId = await ethersAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
   let createCallContract
   switch (safeVersion) {
     case '1.4.1':
       createCallContract = new CreateCallContract_V1_4_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as CreateCallContract_v1_4_1_Abi
       )
@@ -336,7 +336,7 @@ export async function getCreateCallContractInstance(
     case '1.0.0':
       createCallContract = new CreateCallContract_V1_3_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as CreateCallContract_v1_3_0_Abi
       )
@@ -351,23 +351,23 @@ export async function getCreateCallContractInstance(
 export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
-  ethersAdapter: EthersAdapter,
+  safeProvider: SafeProvider,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<SimulateTxAccessorContract> {
-  const chainId = await ethersAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
 
   switch (safeVersion) {
     case '1.4.1':
       return new SimulateTxAccessorContract_V1_4_1_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SimulateTxAccessorContract_v1_4_1_Abi
       )
     case '1.3.0':
       return new SimulateTxAccessorContract_V1_3_0_Ethers(
         chainId,
-        (await ethersAdapter.getSigner()) as AbstractSigner,
+        (await safeProvider.getSigner()) as AbstractSigner,
         contractAddress,
         customContractAbi as unknown as SimulateTxAccessorContract_v1_3_0_Abi
       )

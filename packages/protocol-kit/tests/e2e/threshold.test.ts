@@ -8,7 +8,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 
@@ -41,7 +41,7 @@ describe('Safe Threshold', () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -53,7 +53,7 @@ describe('Safe Threshold', () => {
     it('should return the Safe threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -67,7 +67,7 @@ describe('Safe Threshold', () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -82,7 +82,7 @@ describe('Safe Threshold', () => {
     it('should fail if the threshold is bigger than the number of owners', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -99,7 +99,7 @@ describe('Safe Threshold', () => {
     it('should fail if the threshold is not bigger than 0', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -115,7 +115,7 @@ describe('Safe Threshold', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -144,7 +144,7 @@ describe('Safe Threshold', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),

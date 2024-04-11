@@ -10,7 +10,7 @@ import Safe, {
 } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners, getFactory } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 import { itif } from './utils/helpers'
 
@@ -45,7 +45,7 @@ describe('createSafeDeploymentTransaction', () => {
     const { accounts, contractNetworks, predictedSafe } = await setupTests()
     const [account1] = accounts
 
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -69,7 +69,7 @@ describe('createSafeDeploymentTransaction', () => {
     const { accounts, contractNetworks, predictedSafe } = await setupTests()
     const [account1] = accounts
 
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -93,7 +93,7 @@ describe('createSafeDeploymentTransaction', () => {
     const { accounts, contractNetworks, predictedSafe } = await setupTests()
     const [account1] = accounts
 
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -117,7 +117,7 @@ describe('createSafeDeploymentTransaction', () => {
     const { accounts, contractNetworks, predictedSafe } = await setupTests()
     const [account1] = accounts
 
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -141,7 +141,7 @@ describe('createSafeDeploymentTransaction', () => {
     const { accounts, contractNetworks, predictedSafe } = await setupTests()
     const [account1] = accounts
 
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -165,7 +165,7 @@ describe('createSafeDeploymentTransaction', () => {
     const { accounts, contractNetworks, predictedSafe, chainId } = await setupTests()
     const [account1] = accounts
 
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
 
     const safeSdk = await Safe.create({
       provider,
@@ -199,7 +199,7 @@ describe('createSafeDeploymentTransaction', () => {
       const { accounts, contractNetworks, predictedSafe, chainId } = await setupTests()
       const [account1] = accounts
 
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
 
       const safeSdk = await Safe.create({
         provider,
@@ -224,7 +224,7 @@ describe('createSafeDeploymentTransaction', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1] = accounts
 
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
 
       const safeSdk = await Safe.create({
         provider,
@@ -246,7 +246,7 @@ describe('createSafeDeploymentTransaction', () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [account1] = accounts
 
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
 
       const customSaltNonce = '123456789'
 
@@ -262,7 +262,7 @@ describe('createSafeDeploymentTransaction', () => {
         contractNetworks
       })
 
-      const saltNonceEncoded = ethAdapter.encodeParameters(['uint256'], [customSaltNonce])
+      const saltNonceEncoded = safeProvider.encodeParameters(['uint256'], [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 
@@ -276,7 +276,7 @@ describe('createSafeDeploymentTransaction', () => {
     const [account1] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const provider = await getEthAdapter(account1.signer)
+    const provider = await getEip1193Provider(account1.signer)
     const safeAddress = await safe.getAddress()
 
     const safeSdk = await Safe.create({

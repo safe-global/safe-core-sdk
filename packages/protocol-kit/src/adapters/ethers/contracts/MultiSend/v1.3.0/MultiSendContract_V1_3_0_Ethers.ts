@@ -28,7 +28,7 @@ class MultiSendContract_v1_3_0_Ethers
    * Constructs an instance of MultiSendContract_v1_3_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
    */

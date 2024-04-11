@@ -23,7 +23,7 @@ import {
   getSignMessageLib,
   getSimulateTxAccessor
 } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -46,7 +46,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
       const { accounts } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       chai
         .expect(SafeFactory.create({ provider }))
         .rejectedWith('Invalid SafeProxyFactory contract')
@@ -55,7 +55,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the contractNetworks provided are not deployed', async () => {
       const { accounts, chainId } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const contractNetworks: ContractNetworksConfig = {
         [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
@@ -84,7 +84,7 @@ describe('SafeProxyFactory', () => {
     it('should instantiate the SafeProxyFactory', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const networkId = await provider.getChainId()
       chai
@@ -93,14 +93,14 @@ describe('SafeProxyFactory', () => {
     })
   })
 
-  describe('getEthAdapter', async () => {
-    it('should return the connected EthAdapter', async () => {
+  describe('getEip1193Provider', async () => {
+    it('should return the connected ISafeProvider', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       chai
-        .expect(await safeFactory.getEthAdapter().getSignerAddress())
+        .expect(await safeFactory.getSafeProvider().getSignerAddress())
         .to.be.eq(await account1.signer.getAddress())
     })
   })
@@ -109,7 +109,7 @@ describe('SafeProxyFactory', () => {
     it('should return the chainId of the current network', async () => {
       const { accounts, chainId, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       chai.expect(await safeFactory.getChainId()).to.be.eq(chainId)
     })
@@ -119,7 +119,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if there are no owners', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners: string[] = []
       const threshold = 2
@@ -134,7 +134,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is lower than 0', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const invalidThreshold = 0
@@ -149,7 +149,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is higher than the threshold', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const invalidThreshold = 3
@@ -164,7 +164,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the saltNonce is lower than 0', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -183,7 +183,7 @@ describe('SafeProxyFactory', () => {
     it('should predict a new Safe with saltNonce', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -210,7 +210,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -239,7 +239,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1, account2] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -271,7 +271,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if there are no owners', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners: string[] = []
       const threshold = 2
@@ -285,7 +285,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is lower than 0', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const threshold = 0
@@ -299,7 +299,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is higher than the threshold', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const threshold = 3
@@ -313,7 +313,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the saltNonce is lower than 0', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -334,7 +334,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
         const [account1, account2] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -363,7 +363,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -385,7 +385,7 @@ describe('SafeProxyFactory', () => {
     it('should deploy a new Safe without saltNonce', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -405,7 +405,7 @@ describe('SafeProxyFactory', () => {
     it('should deploy a new Safe with saltNonce', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -430,7 +430,7 @@ describe('SafeProxyFactory', () => {
       const callback = (txHash: string) => {
         callbackResult = txHash
       }
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -452,7 +452,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
-        const provider = await getEthAdapter(account1.signer)
+        const provider = await getEip1193Provider(account1.signer)
         const safeFactory = await SafeFactory.create({ provider, contractNetworks })
         const owners = [account1.address, account2.address]
         const threshold = 2
@@ -467,7 +467,7 @@ describe('SafeProxyFactory', () => {
     it('should deploy a specific Safe version', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEthAdapter(account1.signer)
+      const provider = await getEip1193Provider(account1.signer)
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,

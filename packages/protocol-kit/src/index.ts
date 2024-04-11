@@ -1,8 +1,8 @@
 import Safe from './Safe'
 import {
   CreateCallBaseContractEthers,
-  EthersAdapter,
-  EthersAdapterConfig,
+  SafeProvider,
+  SafeProviderConfig,
   EthersTransactionOptions,
   EthersTransactionResult,
   MultiSendBaseContractEthers,
@@ -110,8 +110,8 @@ export {
   DEFAULT_SAFE_VERSION,
   DeploySafeProps,
   EthSafeSignature,
-  EthersAdapter,
-  EthersAdapterConfig,
+  SafeProvider,
+  SafeProviderConfig,
   EthersTransactionOptions,
   EthersTransactionResult,
   MultiSendCallOnlyBaseContractEthers,

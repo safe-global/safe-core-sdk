@@ -35,19 +35,22 @@ import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 export interface EthersAdapterConfig {
   /** signerOrProvider - Ethers signer or provider */
   provider: Eip1193Provider
+  signerAddress?: string
 }
 
 class EthersAdapter implements EthAdapter {
   get #signer(): Promise<AbstractSigner | undefined> {
-    return this.#provider.getSigner()
+    return this.#provider.getSigner(this.#signerAddress)
   }
 
   #provider: BrowserProvider
   #eip1193Provider: Eip1193Provider
+  #signerAddress?: string
 
-  constructor({ provider }: EthersAdapterConfig) {
+  constructor({ provider, signerAddress }: EthersAdapterConfig) {
     this.#provider = new BrowserProvider(provider)
     this.#eip1193Provider = provider
+    this.#signerAddress = signerAddress
   }
 
   getProvider(): Provider {

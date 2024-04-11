@@ -176,7 +176,7 @@ describe('createSafeDeploymentTransaction', () => {
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
     const customContract = contractNetworks[chainId.toString()]
-    const safeContract = await ethAdapter.getSafeContract({
+    const safeContract = await provider.getSafeContract({
       safeVersion: safeVersionDeployed,
       customContractAddress: customContract?.safeSingletonAddress,
       customContractAbi: customContract?.safeSingletonAbi
@@ -184,7 +184,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe
     const initializer = await encodeSetupCallData({
-      ethAdapter,
+      provider,
       safeContract,
       safeAccountConfig: predictedSafe.safeAccountConfig,
       customContracts: contractNetworks[chainId.toString()]
@@ -207,7 +207,7 @@ describe('createSafeDeploymentTransaction', () => {
         contractNetworks
       })
 
-      const predeterminedSaltNonceEncoded = ethAdapter.encodeParameters(
+      const predeterminedSaltNonceEncoded = provider.encodeParameters(
         ['uint256'],
         [`0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`]
       )
@@ -234,7 +234,7 @@ describe('createSafeDeploymentTransaction', () => {
 
       const customSaltNonce = '123456789'
 
-      const customSaltNonceEncoded = ethAdapter.encodeParameters(['uint256'], [customSaltNonce])
+      const customSaltNonceEncoded = provider.encodeParameters(['uint256'], [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 

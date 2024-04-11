@@ -140,6 +140,7 @@ describe('Off-chain signatures', () => {
       const safeSdk = await Safe.create({
         provider,
         safeAddress,
+        signerAddress: account3.address,
         contractNetworks
       })
       const safeTransactionData = {
@@ -429,7 +430,7 @@ describe('Off-chain signatures', () => {
       const signedTx = await safeSdk.signTransaction(safeServiceTransaction)
       chai.expect(safeServiceTransaction.confirmations?.length).to.be.eq(2)
       chai.expect(signedTx.signatures.size).to.be.eq(3)
-      const signerAddress = await provider.getSignerAddress()
+      const signerAddress = account1.address
       const signerSignature = signedTx.signatures.get(signerAddress!.toLowerCase())?.data
       chai
         .expect(signedTx.encodedSignatures())

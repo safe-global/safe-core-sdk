@@ -96,6 +96,7 @@ describe('Safe Info', () => {
       const provider2 = await getEthAdapter(account2.signer)
       const safeSdk2 = await safeSdk.connect({
         provider: provider2,
+        signerAddress: account2.address,
         contractNetworks
       })
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)

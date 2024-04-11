@@ -23,10 +23,12 @@ import { itif } from './utils/helpers'
 async function deploySafe(
   deploySafeProps: DeploySafeProps,
   provider: Eip1193Provider,
-  contractNetworks: ContractNetworksConfig
+  contractNetworks: ContractNetworksConfig,
+  signerAddress?: string
 ): Promise<Safe> {
   const safeFactory = await SafeFactory.create({
     provider,
+    signerAddress,
     safeVersion: safeVersionDeployed,
     contractNetworks
   })
@@ -82,7 +84,8 @@ describe('Contract utils', () => {
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
         provider,
-        contractNetworks
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -126,7 +129,8 @@ describe('Contract utils', () => {
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
         provider,
-        contractNetworks
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -170,7 +174,8 @@ describe('Contract utils', () => {
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
         provider,
-        contractNetworks
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -351,7 +356,8 @@ describe('Contract utils', () => {
       const firstDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: firstSaltNonce },
         provider,
-        contractNetworks
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -374,7 +380,8 @@ describe('Contract utils', () => {
       const secondDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: secondSaltNonce },
         provider,
-        contractNetworks
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -397,7 +404,8 @@ describe('Contract utils', () => {
       const thirdDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: thirdSaltNonce },
         provider,
-        contractNetworks
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -431,7 +439,8 @@ describe('Contract utils', () => {
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
         provider,
-        contractNetworks
+        contractNetworks,
+        owner1.address
       )
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
       const isSafeDeployed = await deployedSafe.isSafeDeployed()
@@ -493,7 +502,12 @@ describe('Contract utils', () => {
         })
 
         // we deploy the Safe by providing only the safeAccountConfig (owners & threshold)
-        const deployedSafe = await deploySafe({ safeAccountConfig }, provider, contractNetworks)
+        const deployedSafe = await deploySafe(
+          { safeAccountConfig },
+          provider,
+          contractNetworks,
+          owner1.address
+        )
 
         // We ensure the Safe is deployed
         const isSafeDeployed = await deployedSafe.isSafeDeployed()

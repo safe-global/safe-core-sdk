@@ -102,12 +102,16 @@ describe('The EIP1271 implementation', () => {
 
         // EOA signatures
         tx = await protocolKit.signTransaction(tx) // Owner 1 signature
-        protocolKit = await protocolKit.connect({ provider: provider2 }) // Connect another owner
+        protocolKit = await protocolKit.connect({
+          provider: provider2,
+          signerAddress: account2.address
+        }) // Connect another owner
         tx = await protocolKit.signTransaction(tx) // Owner 2 signature
 
         // 1/1 Signer Safe signature
         protocolKit = await protocolKit.connect({
           provider: provider3,
+          signerAddress: account3.address,
           safeAddress: signerSafeAddress1_1
         })
         let signerSafeTx1_1 = await protocolKit.createTransaction({
@@ -127,6 +131,7 @@ describe('The EIP1271 implementation', () => {
         // 2/3 Signer Safe signature
         protocolKit = await protocolKit.connect({
           provider: provider4,
+          signerAddress: account4.address,
           safeAddress: signerSafeAddress2_3
         })
         let signerSafeTx2_3 = await protocolKit.createTransaction({
@@ -137,7 +142,10 @@ describe('The EIP1271 implementation', () => {
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
-        protocolKit = await protocolKit.connect({ provider: provider5 })
+        protocolKit = await protocolKit.connect({
+          provider: provider5,
+          signerAddress: account5.address
+        })
         signerSafeTx2_3 = await protocolKit.signTransaction(
           signerSafeTx2_3,
           SigningMethod.SAFE_SIGNATURE,
@@ -154,7 +162,11 @@ describe('The EIP1271 implementation', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        protocolKit = await protocolKit.connect({ provider: provider1, safeAddress })
+        protocolKit = await protocolKit.connect({
+          provider: provider1,
+          signerAddress: account1.address,
+          safeAddress
+        })
         const execResponse = await protocolKit.executeTransaction(tx)
 
         await waitSafeTxReceipt(execResponse)

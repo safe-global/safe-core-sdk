@@ -36,6 +36,7 @@ export interface DeploySafeProps {
 export interface SafeFactoryConfig {
   /** ethAdapter - Ethereum adapter */
   provider: Eip1193Provider
+  signerAddress?: string
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
@@ -47,6 +48,7 @@ export interface SafeFactoryConfig {
 interface SafeFactoryInitConfig {
   /** ethAdapter - Ethereum adapter */
   provider: Eip1193Provider
+  signerAddress?: string
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */

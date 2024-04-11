@@ -57,6 +57,7 @@ describe('On-chain signatures', () => {
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
+        signerAddress: account3.address,
         safeAddress,
         contractNetworks
       })
@@ -125,9 +126,9 @@ describe('On-chain signatures', () => {
     it('should fail if Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEthAdapter(account1.signer)
       const safeSdk1 = await Safe.create({
-        provider: ethAdapter1,
+        provider: provider1,
         predictedSafe,
         contractNetworks
       })
@@ -139,15 +140,18 @@ describe('On-chain signatures', () => {
     it('should return the list of owners who approved a transaction hash', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const ethAdapter1 = await getEthAdapter(account1.signer)
+      const provider1 = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
-        provider: ethAdapter1,
+        provider: provider1,
         safeAddress: safeAddress,
         contractNetworks
       })
-      const ethAdapter2 = await getEthAdapter(account2.signer)
-      const safeSdk2 = await safeSdk1.connect({ provider: ethAdapter2 })
+      const provider2 = await getEthAdapter(account2.signer)
+      const safeSdk2 = await safeSdk1.connect({
+        provider: provider2,
+        signerAddress: account2.address
+      })
       const safeTransactionData = {
         to: safeAddress,
         value: '0',

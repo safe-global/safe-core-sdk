@@ -22,7 +22,7 @@ const accountMethods = ['eth_accounts', 'eth_sign']
 export async function getEthAdapter(signer: HardhatEthersSigner): Promise<Eip1193Provider> {
   return {
     request: async (request) => {
-      return signer.provider.send(request.method, request.params as any[])
+      return signer.provider.send(request.method, [...((request.params as unknown[]) ?? [])])
     }
   }
 }

@@ -115,11 +115,12 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { provider, isL1SafeSingleton, contractNetworks } = config
+    const { provider, signerAddress, isL1SafeSingleton, contractNetworks } = config
 
     this.#provider = provider
     this.#ethAdapter = new EthersAdapter({
-      provider
+      provider,
+      signerAddress
     })
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
@@ -162,9 +163,17 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect(config: ConnectSafeConfig): Promise<Safe> {
-    const { provider, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } = config
+    const {
+      provider,
+      signerAddress,
+      safeAddress,
+      predictedSafe,
+      isL1SafeSingleton,
+      contractNetworks
+    } = config
     const configProps: SafeConfigProps = {
       provider: provider || this.#provider,
+      signerAddress,
       isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     }
@@ -683,6 +692,7 @@ class Safe {
 
     const owners = await this.getOwners()
     const signerAddress = await this.#ethAdapter.getSignerAddress()
+    console.log('signerAddress', signerAddress)
     if (!signerAddress) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }

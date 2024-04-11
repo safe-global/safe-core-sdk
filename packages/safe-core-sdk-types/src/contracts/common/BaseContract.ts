@@ -37,6 +37,24 @@ export type ContractWriteFunctionNames<ContractAbi extends Abi> = ExtractAbiFunc
 >
 
 /**
+ * Extracts the function arguments from a given contract ABI and function name.
+ *
+ * @template ContractAbi - The ABI of the contract.
+ * @template ContractFunctionName - The function name to extract arguments from, derived from the ABI.
+ * @template ArgType - The type of arguments to extract, either 'inputs' or 'outputs'. (default: 'inputs')
+ * @type {ExtractFunctionArgs}
+ */
+type ExtractFunctionArgs<
+  ContractAbi extends Abi,
+  ContractFunctionName extends
+    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>,
+  ArgType extends 'inputs' | 'outputs' = 'inputs'
+> = AbiParametersToPrimitiveTypes<
+  ExtractAbiFunction<ContractAbi, ContractFunctionName>[ArgType],
+  ArgType
+>
+
+/**
  * Encodes a function call for a contract.
  *
  * @template ContractAbi - The ABI of the contract.
@@ -48,10 +66,7 @@ export type EncodeFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
-    'inputs'
-  >
+  args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>
 ) => string
 
 /**
@@ -70,10 +85,7 @@ export type EstimateGasFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
-    'inputs'
-  >,
+  args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>,
   options?: TransactionOptions
 ) => Promise<bigint>
 
@@ -90,18 +102,12 @@ export type ContractFunction<
   ContractFunctionName extends
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
-  // parameters
-  args: AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs'],
-    'inputs'
-  >
+  // input parameters (only if function has inputs, otherwise no parameters)
+  ...args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>['length'] extends 0
+    ? []
+    : [ExtractFunctionArgs<ContractAbi, ContractFunctionName>]
   // returned values as a Promise
-) => Promise<
-  AbiParametersToPrimitiveTypes<
-    ExtractAbiFunction<ContractAbi, ContractFunctionName>['outputs'],
-    'outputs'
-  >
->
+) => Promise<ExtractFunctionArgs<ContractAbi, ContractFunctionName, 'outputs'>>
 
 /**
  * Defines an adapter-specific function type for a contract, derived by the given function name from a given contract ABI.

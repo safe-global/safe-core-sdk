@@ -6,10 +6,8 @@ import {
   SafeVersion,
   SafeProxyFactoryContract_v1_0_0_Abi,
   SafeProxyFactoryContract_v1_0_0_Contract,
-  safeProxyFactory_1_0_0_ContractArtifacts,
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
+  SafeProxyFactoryContract_v1_0_0_Function,
+  safeProxyFactory_1_0_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -57,39 +55,47 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeFunction<SafeProxyFactoryContract_v1_0_0_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasFunction<SafeProxyFactoryContract_v1_0_0_Abi, EthersTransactionOptions> =
-    (functionToEstimate, args, options = {}) => {
-      const contractMethodToStimate = this.contract.getFunction(functionToEstimate)
-
-      return contractMethodToStimate.estimateGas(...args, options)
-    }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  async proxyCreationCode(): Promise<[string]> {
+  /**
+   * Allows to retrieve the creation code used for the Proxy deployment. With this it is easily possible to calculate predicted address.
+   * @returns Array[creationCode]
+   */
+  proxyCreationCode: SafeProxyFactoryContract_v1_0_0_Function<'proxyCreationCode'> = async () => {
     return [await this.contract.proxyCreationCode()]
   }
 
-  async proxyRuntimeCode(): Promise<[string]> {
+  /**
+   * Allows to retrieve the runtime code of a deployed Proxy. This can be used to check that the expected Proxy was deployed.
+   * @returns Array[runtimeCode]
+   */
+  proxyRuntimeCode: SafeProxyFactoryContract_v1_0_0_Function<'proxyRuntimeCode'> = async () => {
     return [await this.contract.proxyRuntimeCode()]
   }
 
-  async createProxy(args: readonly [masterCopy: string, data: string]): Promise<[string]> {
+  /**
+   * Allows to create new proxy contact and execute a message call to the new proxy within one transaction.
+   * @param args - Array[masterCopy, data]
+   * @returns Array[proxyAddress]
+   */
+  createProxy: SafeProxyFactoryContract_v1_0_0_Function<'createProxy'> = async (args) => {
     return [await this.contract.createProxy(...args)]
   }
 
-  async createProxyWithNonce(
-    args: readonly [masterCopy: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
+  /**
+   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
+   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @returns Array[proxyAddress]
+   */
+  createProxyWithNonce: SafeProxyFactoryContract_v1_0_0_Function<'createProxyWithNonce'> = async (
+    args
+  ) => {
     return [await this.contract.createProxyWithNonce(...args)]
   }
 
+  /**
+   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
+   * @param {CreateProxyProps} props - Properties for the new proxy contract.
+   * @returns The address of the new proxy contract.
+   */
   async createProxyWithOptions({
     safeSingletonAddress,
     initializer,

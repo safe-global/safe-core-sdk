@@ -119,8 +119,8 @@ export async function getSafeContractInstance(
 
 export async function getCompatibilityFallbackHandlerContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<
   | CompatibilityFallbackHandlerContract_v1_4_1_Ethers
@@ -153,8 +153,8 @@ export async function getCompatibilityFallbackHandlerContractInstance(
 
 export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<
   | MultiSendContract_V1_4_1_Ethers
@@ -196,8 +196,8 @@ export async function getMultiSendContractInstance(
 
 export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<MultiSendCallOnlyContract_V1_4_1_Ethers | MultiSendCallOnlyContract_V1_3_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()
@@ -227,10 +227,10 @@ export async function getMultiSendCallOnlyContractInstance(
 
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
+  ethersAdapter: EthersAdapter,
   // TODO: remove this ??
   signerOrProvider: AbstractSigner | Provider,
-  ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<
   | SafeProxyFactoryContract_v1_4_1_Ethers
@@ -285,8 +285,8 @@ export async function getSafeProxyFactoryContractInstance(
 
 export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<SignMessageLibContract_V1_4_1_Ethers | SignMessageLibContract_V1_3_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()
@@ -315,8 +315,8 @@ export async function getSignMessageLibContractInstance(
 
 export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<CreateCallContract_V1_4_1_Ethers | CreateCallContract_V1_3_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()
@@ -348,8 +348,8 @@ export async function getCreateCallContractInstance(
 
 export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
-  contractAddress: string,
   ethersAdapter: EthersAdapter,
+  contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<SimulateTxAccessorContract_V1_4_1_Ethers | SimulateTxAccessorContract_V1_3_0_Ethers> {
   const chainId = await ethersAdapter.getChainId()

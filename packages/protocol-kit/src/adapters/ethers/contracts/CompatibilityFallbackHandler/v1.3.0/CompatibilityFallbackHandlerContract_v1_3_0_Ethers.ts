@@ -4,9 +4,7 @@ import {
   SafeVersion,
   CompatibilityFallbackHandlerContract_v1_3_0_Abi,
   CompatibilityFallbackHandlerContract_v1_3_0_Contract,
-  compatibilityFallbackHandler_1_3_0_ContractArtifacts,
-  GetAddressFunction,
-  EncodeFunction
+  compatibilityFallbackHandler_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -43,17 +41,6 @@ class CompatibilityFallbackHandlerContract_v1_3_0_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeFunction<CompatibilityFallbackHandlerContract_v1_3_0_Abi> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 }
 

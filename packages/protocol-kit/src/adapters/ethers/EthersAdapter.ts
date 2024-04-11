@@ -103,129 +103,88 @@ class EthersAdapter implements EthAdapter {
 
   async getSafeProxyFactoryContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid SafeProxyFactory contract address')
-    }
     const signerOrProvider = this.#signer || this.#provider
     return getSafeProxyFactoryContractInstance(
       safeVersion,
-      contractAddress,
-      signerOrProvider,
       this,
+      signerOrProvider,
+      customContractAddress,
       customContractAbi
     )
   }
 
   async getMultiSendContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid MultiSend contract address')
-    }
-
-    return getMultiSendContractInstance(safeVersion, contractAddress, this, customContractAbi)
+    return getMultiSendContractInstance(safeVersion, this, customContractAddress, customContractAbi)
   }
 
   async getMultiSendCallOnlyContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid MultiSendCallOnly contract address')
-    }
     return getMultiSendCallOnlyContractInstance(
       safeVersion,
-      contractAddress,
       this,
+      customContractAddress,
       customContractAbi
     )
   }
 
   async getCompatibilityFallbackHandlerContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid CompatibilityFallbackHandler contract address')
-    }
     return getCompatibilityFallbackHandlerContractInstance(
       safeVersion,
-      contractAddress,
       this,
+      customContractAddress,
       customContractAbi
     )
   }
 
   async getSignMessageLibContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid SignMessageLib contract address')
-    }
-
-    return getSignMessageLibContractInstance(safeVersion, contractAddress, this, customContractAbi)
+    return getSignMessageLibContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
   }
 
   async getCreateCallContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid CreateCall contract address')
-    }
-    return getCreateCallContractInstance(safeVersion, contractAddress, this, customContractAbi)
+    return getCreateCallContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
   }
 
   async getSimulateTxAccessorContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid SimulateTxAccessor contract address')
-    }
     return getSimulateTxAccessorContractInstance(
       safeVersion,
-      contractAddress,
       this,
+      customContractAddress,
       customContractAbi
     )
   }

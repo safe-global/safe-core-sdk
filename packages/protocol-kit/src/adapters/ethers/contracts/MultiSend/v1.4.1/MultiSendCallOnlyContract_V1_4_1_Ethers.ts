@@ -2,8 +2,6 @@ import MultiSendCallOnlyBaseContractEthers from '@safe-global/protocol-kit/adapt
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import {
   SafeVersion,
-  EncodeFunction,
-  GetAddressFunction,
   multiSendCallOnly_1_4_1_ContractArtifacts,
   MultiSendCallOnlyContract_v1_4_1_Abi,
   MultiSendCallOnlyContract_v1_4_1_Contract
@@ -43,14 +41,6 @@ class MultiSendCallOnlyContract_v1_4_1_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeFunction<MultiSendCallOnlyContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 }
 

@@ -1,20 +1,19 @@
-import Contract from 'web3-eth-contract'
+import { Abi } from 'abitype'
 import { AbiItem } from 'web3-utils'
 
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import SafeBaseContract from '@safe-global/protocol-kit/adapters/SafeBaseContract'
+import BaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/BaseContractWeb3'
+import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SafeBaseContractWeb3 extends SafeBaseContract to specifically integrate with the Web3.js library.
+ * Abstract class SafeBaseContractWeb3 extends BaseContractWeb3 to specifically integrate with the Safe contract.
  * It is designed to be instantiated for different versions of the Safe contract.
- *
- * This abstract class sets up the Web3.js Contract object that interacts with a Safe contract version.
  *
  * Subclasses of SafeBaseContractWeb3 are expected to represent specific versions of the Safe contract.
  *
  * @template SafeContractAbiType - The ABI type specific to the version of the Safe contract, extending AbiItem.
- * @extends SafeBaseContract<SafeContractAbiType> - Extends the generic SafeBaseContract with Web3-specific implementation.
+ * @extends BaseContractWeb3<SafeContractAbiType> - Extends the generic BaseContractWeb3.
  *
  * Example subclasses:
  * - SafeContract_v1_4_1_Web3 extends SafeBaseContractWeb3<SafeContract_v1_4_1_Abi>
@@ -24,10 +23,9 @@ import SafeBaseContract from '@safe-global/protocol-kit/adapters/SafeBaseContrac
  * - SafeContract_v1_0_0_Web3 extends SafeBaseContractWeb3<SafeContract_v1_0_0_Abi>
  */
 abstract class SafeBaseContractWeb3<
-  SafeContractAbiType extends AbiItem[]
-> extends SafeBaseContract<SafeContractAbiType> {
-  contract: Contract
-  adapter: Web3Adapter
+  SafeContractAbiType extends AbiItem[] & Abi
+> extends BaseContractWeb3<SafeContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -50,17 +48,20 @@ abstract class SafeBaseContractWeb3<
     customContractAddress?: string,
     customContractAbi?: SafeContractAbiType
   ) {
+    const isL1Contract = safeDeploymentsL1ChainIds.includes(chainId) || isL1SafeSingleton
+    const contractName = isL1Contract ? 'safeSingletonVersion' : 'safeSingletonL2Version'
+
     super(
+      contractName,
       chainId,
+      web3Adapter,
       defaultAbi,
       safeVersion,
-      isL1SafeSingleton,
       customContractAddress,
       customContractAbi
     )
 
-    this.adapter = web3Adapter
-    this.contract = web3Adapter.getContract(this.contractAddress, this.contractAbi)
+    this.contractName = contractName
   }
 }
 

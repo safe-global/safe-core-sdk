@@ -3,14 +3,11 @@ import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import {
-  AdapterSpecificContractFunction,
-  ContractFunction,
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction,
   SafeVersion,
+  AdapterSpecificContractFunction,
   SignMessageLibContract_v1_4_1_Abi,
   SignMessageLibContract_v1_4_1_Contract,
+  SignMessageLibContract_v1_4_1_Function,
   signMessageLib_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
@@ -50,46 +47,29 @@ class SignMessageLibContract_v1_4_1_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeFunction<SignMessageLibContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasFunction<SignMessageLibContract_v1_4_1_Abi, EthersTransactionOptions> = (
-    functionToEstimate,
-    args,
-    options = {}
-  ) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToEstimate.estimateGas(...args, options)
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
   /**
    * @param args - Array[message]
    */
-  getMessageHash: ContractFunction<SignMessageLibContract_v1_4_1_Abi, 'getMessageHash'> = async (
-    args
-  ) => {
+  getMessageHash: SignMessageLibContract_v1_4_1_Function<'getMessageHash'> = async (args) => {
     return [await this.contract.getMessageHash(...args)]
   }
 
   /**
    * @param args - Array[data]
    */
-  signMessage: AdapterSpecificContractFunction<SignMessageLibContract_v1_4_1_Abi, 'signMessage'> =
-    async (data, options?: EthersTransactionOptions) => {
-      if (options && !options.gasLimit) {
-        options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
-      }
-
-      const txResponse = await this.contract.signMessage(data, { ...options })
-
-      return toTxResult(txResponse, options)
+  signMessage: AdapterSpecificContractFunction<
+    SignMessageLibContract_v1_4_1_Abi,
+    'signMessage',
+    EthersTransactionOptions
+  > = async (data, options) => {
+    if (options && !options.gasLimit) {
+      options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
+
+    const txResponse = await this.contract.signMessage(data, { ...options })
+
+    return toTxResult(txResponse, options)
+  }
 }
 
 export default SignMessageLibContract_v1_4_1_Ethers

@@ -2,12 +2,10 @@ import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/adap
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import {
   SafeVersion,
-  ContractFunction,
-  EncodeFunction,
-  GetAddressFunction,
   simulateTxAccessor_1_4_1_ContractArtifacts,
   SimulateTxAccessorContract_v1_4_1_Abi,
-  SimulateTxAccessorContract_v1_4_1_Contract
+  SimulateTxAccessorContract_v1_4_1_Contract,
+  SimulateTxAccessorContract_v1_4_1_Function
 } from '@safe-global/safe-core-sdk-types'
 /**
  * SimulateTxAccessorContract_v1_4_1_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
@@ -45,19 +43,11 @@ class SimulateTxAccessorContract_v1_4_1_Ethers
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeFunction<SimulateTxAccessorContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
   /**
    * @param args - Array[to, value, data, operation]
    * @returns Array[estimate, success, returnData]
    */
-  simulate: ContractFunction<SimulateTxAccessorContract_v1_4_1_Abi, 'simulate'> = (args) => {
+  simulate: SimulateTxAccessorContract_v1_4_1_Function<'simulate'> = (args) => {
     return this.contract.simulate(...args)
   }
 }

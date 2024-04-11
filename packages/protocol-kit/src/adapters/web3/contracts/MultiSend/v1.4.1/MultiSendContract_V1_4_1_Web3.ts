@@ -5,9 +5,7 @@ import {
   SafeVersion,
   MultiSendContract_v1_4_1_Abi,
   MultiSendContract_v1_4_1_Contract,
-  multisend_1_4_1_ContractArtifacts,
-  GetAddressFunction,
-  EncodeFunction
+  multisend_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -45,14 +43,6 @@ class MultiSendContract_v1_4_1_Web3
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  encode: EncodeFunction<MultiSendContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }
 

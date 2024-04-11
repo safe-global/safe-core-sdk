@@ -3,8 +3,6 @@ import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
 import {
   SafeVersion,
-  EncodeFunction,
-  GetAddressFunction,
   MultiSendCallOnlyContract_v1_4_1_Abi,
   MultiSendCallOnlyContract_v1_4_1_Contract,
   multiSendCallOnly_1_4_1_ContractArtifacts
@@ -45,14 +43,6 @@ class MultiSendCallOnlyContract_v1_4_1_Web3
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  encode: EncodeFunction<MultiSendCallOnlyContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }
 

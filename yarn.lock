@@ -2660,11 +2660,6 @@ abitype@^0.1.6:
   resolved "https://registry.npmjs.org/abitype/-/abitype-0.1.8.tgz"
   integrity sha512-2pde0KepTzdfu19ZrzYTYVIWo69+6UbBCY4B1RDiwWgo2XZtFSJhF6C+XThuRXbbZ823J0Rw1Y5cP0NXYVcCdQ==
 
-abitype@^0.10.3:
-  version "0.10.3"
-  resolved "https://registry.yarnpkg.com/abitype/-/abitype-0.10.3.tgz#27ce7a7cdb9a80ccd732a3f3cf1ce6ff05266fce"
-  integrity sha512-tRN+7XIa7J9xugdbRzFv/95ka5ivR/sRe01eiWvM0HWWjHuigSZEACgKa0sj4wGuekTDtghCx+5Izk/cOi78pQ==
-
 abitype@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-1.0.2.tgz#183c28f2f3b4278810ed1543941b555bb73f301d"

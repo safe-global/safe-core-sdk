@@ -1,30 +1,28 @@
-import Contract from 'web3-eth-contract'
+import { Abi } from 'abitype'
 import { AbiItem } from 'web3-utils'
 
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import CreateCallBaseContract from '@safe-global/protocol-kit/adapters/CreateCallBaseContract'
+import BaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/BaseContractWeb3'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class CreateCallBaseContractWeb3 extends CreateCallBaseContract to specifically integrate with the Web3.js v6 library.
+ * Abstract class CreateCallBaseContractWeb3 extends BaseContractWeb3 to specifically integrate with the CreateCall contract.
  * It is designed to be instantiated for different versions of the Safe contract.
- *
- * This abstract class sets up the Web3 v6 Contract object that interacts with a CreateCall contract version.
  *
  * Subclasses of CreateCallBaseContractWeb3 are expected to represent specific versions of the contract.
  *
  * @template CreateCallContractAbiType - The ABI type specific to the version of the CreateCall contract, extending InterfaceAbi from Web3.
- * @extends CreateCallBaseContract<CreateCallContractAbiType> - Extends the generic CreateCallBaseContract with Web3-specific implementation.
+ * @extends BaseContractWeb3<CreateCallContractAbiType> - Extends the generic BaseContractWeb3.
  *
  * Example subclasses:
  * - CreateCallContract_v1_4_1_Web3 extends CreateCallBaseContractWeb3<CreateCallContract_v1_4_1_Abi>
  * - CreateCallContract_v1_3_0_Web3 extends CreateCallBaseContractWeb3<CreateCallContract_v1_3_0_Abi>
  */
 abstract class CreateCallBaseContractWeb3<
-  CreateCallContractAbiType extends AbiItem[]
-> extends CreateCallBaseContract<CreateCallContractAbiType> {
-  contract: Contract
-  adapter: Web3Adapter
+  CreateCallContractAbiType extends AbiItem[] & Abi
+> extends BaseContractWeb3<CreateCallContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -45,10 +43,19 @@ abstract class CreateCallBaseContractWeb3<
     customContractAddress?: string,
     customContractAbi?: CreateCallContractAbiType
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'createCallVersion'
 
-    this.adapter = web3Adapter
-    this.contract = web3Adapter.getContract(this.contractAddress, this.contractAbi)
+    super(
+      contractName,
+      chainId,
+      web3Adapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi
+    )
+
+    this.contractName = contractName
   }
 }
 

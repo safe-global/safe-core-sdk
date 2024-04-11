@@ -1,19 +1,18 @@
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
-
+import { Abi } from 'abitype'
+import { ContractRunner, InterfaceAbi } from 'ethers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/adapters/SafeProxyFactoryBaseContract'
+import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SafeProxyFactoryBaseContractEthers extends SafeProxyFactoryBaseContract to specifically integrate with the Ethers.js v6 library.
+ * Abstract class SafeProxyFactoryBaseContractEthers extends BaseContractEthers to specifically integrate with the SafeProxyFactory contract.
  * It is designed to be instantiated for different versions of the Safe contract.
- *
- * This abstract class sets up the Ethers v6 Contract object that interacts with a Safe Proxy Factory contract version.
  *
  * Subclasses of SafeProxyFactoryBaseContractEthers are expected to represent specific versions of the contract.
  *
  * @template SafeProxyFactoryContractAbiType - The ABI type specific to the version of the Safe Proxy Factory contract, extending InterfaceAbi from Ethers.
- * @extends SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbiType> - Extends the generic SafeProxyFactoryBaseContract with Ethers-specific implementation.
+ * @extends BaseContractEthers<SafeProxyFactoryContractAbiType> - Extends the generic BaseContractEthers.
  *
  * Example subclasses:
  * - SafeProxyFactoryContract_v1_4_1_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_4_1_Abi>
@@ -23,10 +22,9 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
  * - SafeProxyFactoryContract_v1_0_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
  */
 abstract class SafeProxyFactoryBaseContractEthers<
-  SafeProxyFactoryContractAbiType extends InterfaceAbi
-> extends SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbiType> {
-  contract: Contract
-  adapter: EthersAdapter
+  SafeProxyFactoryContractAbiType extends InterfaceAbi & Abi
+> extends BaseContractEthers<SafeProxyFactoryContractAbiType> {
+  contractName: contractName
 
   /**
    * @constructor
@@ -48,14 +46,20 @@ abstract class SafeProxyFactoryBaseContractEthers<
     customContractAbi?: SafeProxyFactoryContractAbiType,
     runner?: ContractRunner | null
   ) {
-    super(chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    const contractName = 'safeProxyFactoryVersion'
 
-    this.adapter = ethersAdapter
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      runner || this.adapter.getSigner()
+    super(
+      contractName,
+      chainId,
+      ethersAdapter,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      runner
     )
+
+    this.contractName = contractName
   }
 }
 

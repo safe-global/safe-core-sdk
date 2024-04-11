@@ -1,17 +1,12 @@
 import CreateCallBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/CreateCall/CreateCallBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import {
-  EthersTransactionOptions,
-  EthersTransactionResult
-} from '@safe-global/protocol-kit/adapters/ethers/types'
+import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import {
   SafeVersion,
   CreateCallContract_v1_3_0_Abi,
   CreateCallContract_v1_3_0_Contract,
   createCall_1_3_0_ContractArtifacts,
-  GetAddressFunction,
-  EncodeFunction,
-  EstimateGasFunction
+  AdapterSpecificContractFunction
 } from '@safe-global/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 
@@ -51,41 +46,35 @@ class CreateCallContract_V1_3_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeFunction<CreateCallContract_v1_3_0_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasFunction<CreateCallContract_v1_3_0_Abi, EthersTransactionOptions> = (
-    functionToEstimate,
-    args,
-    options = {}
-  ) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToEstimate.estimateGas(...args, options)
-  }
-
-  async performCreate(
-    args: readonly [value: bigint, deploymentData: string],
-    options?: EthersTransactionOptions
-  ): Promise<EthersTransactionResult> {
+  /**
+   * @param args - Array[value, deploymentData]
+   * @param options - EthersTransactionOptions
+   * @returns Promise<EthersTransactionResult>
+   */
+  performCreate: AdapterSpecificContractFunction<
+    CreateCallContract_v1_3_0_Abi,
+    'performCreate',
+    EthersTransactionOptions
+  > = async (args, options) => {
     if (options && !options.gasLimit) {
-      options.gasLimit = (await this.estimateGas('performCreate', args, { ...options })).toString()
+      options.gasLimit = (await this.estimateGas('performCreate', args, options)).toString()
     }
     const txResponse = await this.contract.performCreate(...args, { ...options })
     return toTxResult(txResponse, options)
   }
 
-  async performCreate2(
-    args: readonly [value: bigint, deploymentData: string, salt: string],
-    options?: EthersTransactionOptions
-  ): Promise<EthersTransactionResult> {
+  /**
+   * @param args - Array[value, deploymentData, salt]
+   * @param options - EthersTransactionOptions
+   * @returns Promise<EthersTransactionResult>
+   */
+  performCreate2: AdapterSpecificContractFunction<
+    CreateCallContract_v1_3_0_Abi,
+    'performCreate2',
+    EthersTransactionOptions
+  > = async (args, options) => {
     if (options && !options.gasLimit) {
-      options.gasLimit = (await this.estimateGas('performCreate2', args, { ...options })).toString()
+      options.gasLimit = (await this.estimateGas('performCreate2', args, options)).toString()
     }
     const txResponse = await this.contract.performCreate2(...args)
     return toTxResult(txResponse, options)

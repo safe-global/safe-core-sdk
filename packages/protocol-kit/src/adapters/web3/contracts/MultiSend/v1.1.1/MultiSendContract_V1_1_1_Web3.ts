@@ -1,8 +1,6 @@
 import MultiSendBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/MultiSendBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
-  EncodeFunction,
-  GetAddressFunction,
   MultiSendContract_v1_1_1_Abi,
   MultiSendContract_v1_1_1_Contract,
   SafeVersion,
@@ -45,14 +43,6 @@ class MultiSendContract_v1_1_1_Web3
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  encode: EncodeFunction<MultiSendContract_v1_1_1_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
   }
 }
 

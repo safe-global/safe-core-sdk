@@ -4,13 +4,10 @@ import SignMessageLibBaseContractWeb3 from '@safe-global/protocol-kit/adapters/w
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import {
   AdapterSpecificContractFunction,
-  ContractFunction,
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction,
   SafeVersion,
   SignMessageLibContract_v1_3_0_Abi,
   SignMessageLibContract_v1_3_0_Contract,
+  SignMessageLibContract_v1_3_0_Function,
   Web3TransactionOptions,
   signMessageLib_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
@@ -52,30 +49,10 @@ class SignMessageLibContract_v1_3_0_Web3
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeFunction<SignMessageLibContract_v1_3_0_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  estimateGas: EstimateGasFunction<SignMessageLibContract_v1_3_0_Abi, Web3TransactionOptions> = (
-    functionToEstimate,
-    args,
-    options = {}
-  ) => {
-    return this.contract.methods[functionToEstimate](...args)
-      .estimateGas(options)
-      .then(BigInt)
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
   /**
    * @param args - Array[message]
    */
-  getMessageHash: ContractFunction<SignMessageLibContract_v1_3_0_Abi, 'getMessageHash'> = async (
-    args
-  ) => {
+  getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
     return [await this.contract.methods.getMessageHash(...args).call()]
   }
 

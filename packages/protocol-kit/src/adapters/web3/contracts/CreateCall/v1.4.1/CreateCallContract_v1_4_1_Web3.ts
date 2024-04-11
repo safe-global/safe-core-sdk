@@ -6,11 +6,8 @@ import {
   CreateCallContract_v1_4_1_Abi,
   CreateCallContract_v1_4_1_Contract,
   createCall_1_4_1_ContractArtifacts,
-  GetAddressFunction,
-  EncodeFunction,
-  EstimateGasFunction,
-  Web3TransactionOptions,
-  Web3TransactionResult
+  AdapterSpecificContractFunction,
+  Web3TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 
@@ -51,41 +48,35 @@ class CreateCallContract_V1_4_1_Web3
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.options.address)
-  }
-
-  encode: EncodeFunction<CreateCallContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...args).encodeABI()
-  }
-
-  estimateGas: EstimateGasFunction<CreateCallContract_v1_4_1_Abi> = async (
-    functionToEstimate,
-    args,
-    options: Web3TransactionOptions = {}
-  ) => {
-    return (
-      await this.contract.methods[functionToEstimate](...args).estimateGas(options)
-    ).toString()
-  }
-
-  async performCreate(
-    args: readonly [value: bigint, deploymentData: string],
-    options?: Web3TransactionOptions
-  ): Promise<Web3TransactionResult> {
+  /**
+   * @param args - Array[value, deploymentData]
+   * @param options - Web3TransactionOptions
+   * @returns Promise<Web3TransactionResult>
+   */
+  performCreate: AdapterSpecificContractFunction<
+    CreateCallContract_v1_4_1_Abi,
+    'performCreate',
+    Web3TransactionOptions
+  > = async (args, options) => {
     if (options && !options.gas) {
-      options.gas = (await this.estimateGas('performCreate', args, { ...options })).toString()
+      options.gas = (await this.estimateGas('performCreate', [...args], { ...options })).toString()
     }
     const txResponse = this.contract.methods.performCreate(...args).send(options)
     return toTxResult(txResponse, options)
   }
 
-  async performCreate2(
-    args: readonly [value: bigint, deploymentData: string, salt: string],
-    options?: Web3TransactionOptions
-  ): Promise<Web3TransactionResult> {
+  /**
+   * @param args - Array[value, deploymentData, salt]
+   * @param options - Web3TransactionOptions
+   * @returns Promise<Web3TransactionResult>
+   */
+  performCreate2: AdapterSpecificContractFunction<
+    CreateCallContract_v1_4_1_Abi,
+    'performCreate2',
+    Web3TransactionOptions
+  > = async (args, options) => {
     if (options && !options.gas) {
-      options.gas = (await this.estimateGas('performCreate2', args, { ...options })).toString()
+      options.gas = (await this.estimateGas('performCreate2', [...args], { ...options })).toString()
     }
     const txResponse = this.contract.methods.performCreate2(...args).send(options)
     return toTxResult(txResponse, options)

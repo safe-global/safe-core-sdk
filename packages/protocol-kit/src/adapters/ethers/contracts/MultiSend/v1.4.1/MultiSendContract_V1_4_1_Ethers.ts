@@ -4,9 +4,7 @@ import {
   SafeVersion,
   MultiSendContract_v1_4_1_Abi,
   MultiSendContract_v1_4_1_Contract,
-  multisend_1_4_1_ContractArtifacts,
-  GetAddressFunction,
-  EncodeFunction
+  multisend_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -43,14 +41,6 @@ class MultiSendContract_v1_4_1_Ethers
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
-  }
-
-  getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeFunction<MultiSendContract_v1_4_1_Abi> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
   }
 }
 

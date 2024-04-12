@@ -27,17 +27,16 @@ const generateRandomUUID = (): string => {
 }
 
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
-const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
-const signerSafeAddress = '0x83aB93f078A8fbbe6a677b1C488819e0ae981128'
+const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+const signerSafeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3'
 
 describe('addMessageSignature', () => {
   before(async () => {
     ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
-      'https://safe-transaction-goerli.staging.5afe.dev/api'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
     ;({ ethAdapter: ethAdapter2 } = await getServiceClient(
-      '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1'
+      '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'
     ))
   })
 

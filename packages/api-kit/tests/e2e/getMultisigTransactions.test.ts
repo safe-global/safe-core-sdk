@@ -11,7 +11,7 @@ let safeApiKit: SafeApiKit
 describe('getMultisigTransactions', () => {
   before(async () => {
     ;({ safeApiKit } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
@@ -23,7 +23,7 @@ describe('getMultisigTransactions', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
     await chai
       .expect(safeApiKit.getMultisigTransactions(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -38,23 +38,23 @@ describe('getMultisigTransactions', () => {
   })
 
   it('should return the list of multisig transactions', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with multisig transactions
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with multisig transactions
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(safeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(12)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(12)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(18)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(18)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })
   })
 
   it('should return the list of multisig transactions EIP-3770', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with multisig transactions
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with multisig transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(eip3770SafeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(12)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(12)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(18)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(18)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })

@@ -13,12 +13,12 @@ let signer: Signer
 describe('addSafeDelegate', () => {
   before(async () => {
     ;({ safeApiKit, signer } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
   it('should fail if Label is empty', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
@@ -46,7 +46,7 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is empty', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = ''
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
@@ -60,8 +60,8 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -76,8 +76,8 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe delegate address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'.toLowerCase()
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -92,8 +92,8 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = (await signer.getAddress()).toLowerCase()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -109,7 +109,7 @@ describe('addSafeDelegate', () => {
 
   it('should fail if Safe does not exist', async () => {
     const safeAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -127,8 +127,8 @@ describe('addSafeDelegate', () => {
     const { safeApiKit, signer } = await getServiceClient(
       '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
     )
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -145,8 +145,8 @@ describe('addSafeDelegate', () => {
   })
 
   it('should add a new delegate', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -169,7 +169,7 @@ describe('addSafeDelegate', () => {
   })
 
   it('should add a new delegate without specifying a Safe', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
@@ -196,9 +196,9 @@ describe('addSafeDelegate', () => {
   })
 
   it('should add a new delegate EIP-3770', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
     const delegatorAddress = await signer.getAddress()
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`

@@ -11,7 +11,7 @@ let safeApiKit: SafeApiKit
 describe('getIncomingTransactions', () => {
   before(async () => {
     ;({ safeApiKit } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
@@ -23,7 +23,7 @@ describe('getIncomingTransactions', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
     await chai
       .expect(safeApiKit.getIncomingTransactions(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -37,21 +37,21 @@ describe('getIncomingTransactions', () => {
   })
 
   it('should return the list of incoming transactions', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with incoming transactions
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with incoming transactions
     const transferListResponse = await safeApiKit.getIncomingTransactions(safeAddress)
-    chai.expect(transferListResponse.count).to.be.equal(5)
-    chai.expect(transferListResponse.results.length).to.be.equal(5)
+    chai.expect(transferListResponse.count).to.be.equal(6)
+    chai.expect(transferListResponse.results.length).to.be.equal(6)
     transferListResponse.results.map((transaction) => {
       chai.expect(transaction.to).to.be.equal(safeAddress)
     })
   })
 
   it('should return the list of incoming transactions EIP-3770', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205' // Safe with incoming transactions
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with incoming transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transferListResponse = await safeApiKit.getIncomingTransactions(eip3770SafeAddress)
-    chai.expect(transferListResponse.count).to.be.equal(5)
-    chai.expect(transferListResponse.results.length).to.be.equal(5)
+    chai.expect(transferListResponse.count).to.be.equal(6)
+    chai.expect(transferListResponse.results.length).to.be.equal(6)
     transferListResponse.results.map((transaction) => {
       chai.expect(transaction.to).to.be.equal(safeAddress)
     })

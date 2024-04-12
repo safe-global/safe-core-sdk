@@ -13,7 +13,7 @@ let signer: Signer
 describe('getSafeDelegates', () => {
   before(async () => {
     ;({ safeApiKit, signer } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
@@ -25,7 +25,7 @@ describe('getSafeDelegates', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'.toLowerCase()
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
     await chai
       .expect(safeApiKit.getSafeDelegates({ safeAddress }))
       .to.be.rejectedWith('Enter a valid checksummed Ethereum Address')
@@ -39,10 +39,10 @@ describe('getSafeDelegates', () => {
   })
 
   it('should return an array of delegates', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig1: DeleteSafeDelegateProps = {
-      delegateAddress: '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0',
+      delegateAddress: '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
       delegatorAddress,
       signer
     }
@@ -86,11 +86,11 @@ describe('getSafeDelegates', () => {
   })
 
   it('should return an array of delegates EIP-3770', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegatorAddress = await signer.getAddress()
     const delegateConfig1: DeleteSafeDelegateProps = {
-      delegateAddress: `${config.EIP_3770_PREFIX}:0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0`,
+      delegateAddress: `${config.EIP_3770_PREFIX}:0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B`,
       delegatorAddress,
       signer
     }
@@ -115,7 +115,7 @@ describe('getSafeDelegates', () => {
     const { results } = safeDelegateListResponse
     const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
     chai.expect(sortedResults.length).to.be.eq(2)
-    chai.expect(sortedResults[0].delegate).to.be.eq('0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0')
+    chai.expect(sortedResults[0].delegate).to.be.eq('0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B')
     chai.expect(sortedResults[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
     chai.expect(sortedResults[0].label).to.be.eq('Label1')
     chai.expect(sortedResults[1].delegate).to.be.eq('0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b')

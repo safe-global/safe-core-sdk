@@ -16,10 +16,10 @@ describe('getServiceSingletonsInfo', () => {
     const singletonsResponse = await safeApiKit.getServiceSingletonsInfo()
     chai.expect(singletonsResponse.length).to.be.greaterThan(1)
     singletonsResponse.map((singleton) => {
-      if (semverSatisfies(singleton.version, '<=1.3.0')) {
+      if (semverSatisfies(singleton.version, '<1.3.0')) {
         chai.expect(singleton.deployer).to.be.equal('Gnosis')
       }
-      if (semverSatisfies(singleton.version, '>1.3.0')) {
+      if (semverSatisfies(singleton.version, '>=1.3.0')) {
         chai.expect(singleton.deployer).to.be.equal('Safe')
       }
     })

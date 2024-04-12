@@ -80,7 +80,7 @@ export async function standardizeSafeTransactionData({
 
   let safeTxGas
 
-  const safeProvider = new SafeProvider({ provider })
+  const safeProvider = new SafeProvider({ providerOrUrl: provider })
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     safeTxGas = await estimateGas(
       safeVersion,

@@ -6,6 +6,7 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, {
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,
+  SafeProvider,
   encodeSetupCallData
 } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
@@ -166,17 +167,16 @@ describe('createSafeDeploymentTransaction', () => {
     const [account1] = accounts
 
     const provider = await getEip1193Provider(account1.signer)
-
     const safeSdk = await Safe.create({
       provider,
       predictedSafe,
       contractNetworks
     })
-
+    const safeProvider = safeSdk.getSafeProvider()
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
     const customContract = contractNetworks[chainId.toString()]
-    const safeContract = await provider.getSafeContract({
+    const safeContract = await safeProvider.getSafeContract({
       safeVersion: safeVersionDeployed,
       customContractAddress: customContract?.safeSingletonAddress,
       customContractAbi: customContract?.safeSingletonAbi
@@ -184,7 +184,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe
     const initializer = await encodeSetupCallData({
-      provider,
+      safeProvider,
       safeContract,
       safeAccountConfig: predictedSafe.safeAccountConfig,
       customContracts: contractNetworks[chainId.toString()]
@@ -200,14 +200,14 @@ describe('createSafeDeploymentTransaction', () => {
       const [account1] = accounts
 
       const provider = await getEip1193Provider(account1.signer)
-
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
         contractNetworks
       })
 
-      const predeterminedSaltNonceEncoded = provider.encodeParameters(
+      const predeterminedSaltNonceEncoded = safeProvider.encodeParameters(
         ['uint256'],
         [`0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`]
       )
@@ -225,7 +225,7 @@ describe('createSafeDeploymentTransaction', () => {
       const [account1] = accounts
 
       const provider = await getEip1193Provider(account1.signer)
-
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -234,7 +234,7 @@ describe('createSafeDeploymentTransaction', () => {
 
       const customSaltNonce = '123456789'
 
-      const customSaltNonceEncoded = provider.encodeParameters(['uint256'], [customSaltNonce])
+      const customSaltNonceEncoded = safeProvider.encodeParameters(['uint256'], [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 
@@ -262,7 +262,9 @@ describe('createSafeDeploymentTransaction', () => {
         contractNetworks
       })
 
-      const saltNonceEncoded = safeProvider.encodeParameters(['uint256'], [customSaltNonce])
+      const saltNonceEncoded = safeSdk
+        .getSafeProvider()
+        .encodeParameters(['uint256'], [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 

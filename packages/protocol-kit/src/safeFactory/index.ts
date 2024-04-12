@@ -84,7 +84,7 @@ class SafeFactory {
     contractNetworks
   }: SafeFactoryInitConfig): Promise<void> {
     this.#provider = provider
-    this.#safeProvider = new SafeProvider({ provider })
+    this.#safeProvider = new SafeProvider({ providerOrUrl: provider })
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks

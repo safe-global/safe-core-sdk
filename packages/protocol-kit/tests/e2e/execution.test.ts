@@ -645,7 +645,7 @@ describe('Transactions execution', () => {
         const execOptions: EthersTransactionOptions = { gasLimit: 123456 }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
-        const txConfirmed = await provider.getTransaction(txResponse.hash)
+        const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
         chai.expect(execOptions.gasLimit).to.be.eq(Number(txConfirmed.gasLimit))
       }
     )
@@ -679,7 +679,7 @@ describe('Transactions execution', () => {
         }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
-        const txConfirmed = await provider.getTransaction(txResponse.hash)
+        const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
         chai.expect(execOptions.gasPrice).to.be.eq(Number(txConfirmed.gasPrice))
         chai.expect(execOptions.gasLimit).to.be.eq(Number(txConfirmed.gasLimit))
       }
@@ -714,7 +714,7 @@ describe('Transactions execution', () => {
         }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
-        const txConfirmed = await provider.getTransaction(txResponse.hash)
+        const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
         chai.expect(BigInt(execOptions.maxFeePerGas)).to.be.eq(txConfirmed.maxFeePerGas)
         chai
           .expect(BigInt(execOptions.maxPriorityFeePerGas))
@@ -748,7 +748,7 @@ describe('Transactions execution', () => {
         const execOptions: Web3TransactionOptions = { gas: 123456 }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
-        const txConfirmed = await provider.getTransaction(txResponse.hash)
+        const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
         chai.expect(execOptions.gas).to.be.eq(txConfirmed.gas)
       }
     )
@@ -782,7 +782,7 @@ describe('Transactions execution', () => {
         }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
-        const txConfirmed = await provider.getTransaction(txResponse.hash)
+        const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
         chai.expect(execOptions.gasPrice).to.be.eq(Number(txConfirmed.gasPrice))
         chai.expect(execOptions.gas).to.be.eq(txConfirmed.gas)
       }
@@ -817,7 +817,7 @@ describe('Transactions execution', () => {
         }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
-        const txConfirmed = await provider.getTransaction(txResponse.hash)
+        const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
         chai.expect(BigInt(execOptions.maxFeePerGas)).to.be.eq(BigInt(txConfirmed.maxFeePerGas))
         chai
           .expect(BigInt(execOptions.maxPriorityFeePerGas))
@@ -845,12 +845,12 @@ describe('Transactions execution', () => {
         value: '500000000000000000', // 0.5 ETH
         data: '0x'
       }
-      const currentNonce = await provider.getNonce(account1.address, 'pending')
+      const currentNonce = await safeSdk1.getSafeProvider().getNonce(account1.address, 'pending')
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
       const execOptions: EthersTransactionOptions = { nonce: currentNonce }
       const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
       await waitSafeTxReceipt(txResponse)
-      const txConfirmed = await provider.getTransaction(txResponse.hash)
+      const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
       chai.expect(execOptions.nonce).to.be.eq(txConfirmed.nonce)
     })
   })

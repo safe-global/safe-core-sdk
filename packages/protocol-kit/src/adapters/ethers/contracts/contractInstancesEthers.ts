@@ -160,6 +160,7 @@ export async function getMultiSendContractInstance(
   | MultiSendContract_V1_1_1_Ethers
 > {
   const chainId = await safeProvider.getChainId()
+  console.log(chainId, await safeProvider.getSigner())
   switch (safeVersion) {
     case '1.4.1':
       return new MultiSendContract_V1_4_1_Ethers(

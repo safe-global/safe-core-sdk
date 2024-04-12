@@ -21,8 +21,9 @@ import {
   getSafeSingleton,
   getSignMessageLib
 } from './utils/setupContracts'
-import { getEip1193Provider, getNetworkProvider } from './utils/setupEthAdapter'
+import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupEthAdapter'
 import { getAccounts } from './utils/setupTestNetwork'
+import { SafeProvider } from '@safe-global/protocol-kit/index'
 
 chai.use(chaiAsPromised)
 
@@ -41,11 +42,11 @@ describe('Safe contracts', () => {
 
   describe('getSafeContract', async () => {
     it('should return an L1 Safe contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
+      const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
-      const safeContract = await provider.getSafeContract({
+      const safeContract = await safeProvider.getSafeContract({
         safeVersion,
         singletonDeployment
       })
@@ -55,11 +56,11 @@ describe('Safe contracts', () => {
     })
 
     it('should return an L2 Safe contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('gnosis'))
+      const safeProvider = getSafeProviderFromNetwork('gnosis')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100n
       const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
-      const safeContract = await provider.getSafeContract({
+      const safeContract = await safeProvider.getSafeContract({
         safeVersion,
         singletonDeployment
       })
@@ -69,12 +70,12 @@ describe('Safe contracts', () => {
     })
 
     it('should return an L1 Safe contract from safe-deployments using the L1 flag', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('gnosis'))
+      const safeProvider = getSafeProviderFromNetwork('gnosis')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 100n
       const isL1SafeSingleton = true
       const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeSingleton)
-      const safeContract = await provider.getSafeContract({
+      const safeContract = await safeProvider.getSafeContract({
         safeVersion,
         singletonDeployment
       })
@@ -87,9 +88,10 @@ describe('Safe contracts', () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
-      const safeContract = await provider.getSafeContract({
+      const safeContract = await safeProvider.getSafeContract({
         safeVersion,
         customContractAddress: customContract?.safeSingletonAddress,
         customContractAbi: customContract?.safeSingletonAbi
@@ -101,12 +103,13 @@ describe('Safe contracts', () => {
   })
 
   describe('getMultiSendContract', async () => {
-    it('should return a MultiSend contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
+    it.only('should return a MultiSend contract from safe-deployments', async () => {
+      const { accounts } = await setupTests()
+      const safeProvider = getSafeProviderFromNetwork('mainnet', accounts[0].signer)
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getMultiSendContractDeployment(safeVersion, chainId)
-      const multiSendContract = await provider.getMultiSendContract({
+      const multiSendContract = await safeProvider.getMultiSendContract({
         safeVersion,
         singletonDeployment
       })
@@ -119,9 +122,10 @@ describe('Safe contracts', () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
-      const multiSendContract = await provider.getMultiSendContract({
+      const multiSendContract = await safeProvider.getMultiSendContract({
         safeVersion,
         customContractAddress: customContract.multiSendAddress,
         customContractAbi: customContract.multiSendAbi
@@ -134,11 +138,11 @@ describe('Safe contracts', () => {
 
   describe('getMultiSendCallOnlyContract', async () => {
     it('should return a MultiSendCallOnly contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
+      const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getMultiSendCallOnlyContractDeployment(safeVersion, chainId)
-      const multiSendCallOnlyContract = await provider.getMultiSendCallOnlyContract({
+      const multiSendCallOnlyContract = await safeProvider.getMultiSendCallOnlyContract({
         safeVersion,
         singletonDeployment
       })
@@ -151,9 +155,10 @@ describe('Safe contracts', () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
-      const multiSendCallOnlyContract = await provider.getMultiSendCallOnlyContract({
+      const multiSendCallOnlyContract = await safeProvider.getMultiSendCallOnlyContract({
         safeVersion,
         customContractAddress: customContract.multiSendCallOnlyAddress,
         customContractAbi: customContract.multiSendCallOnlyAbi
@@ -166,7 +171,7 @@ describe('Safe contracts', () => {
 
   describe('getCompatibilityFallbackHandlerContract', async () => {
     it('should return a CompatibilityFallbackHandler contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
+      const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getCompatibilityFallbackHandlerContractDeployment(
@@ -174,7 +179,7 @@ describe('Safe contracts', () => {
         chainId
       )
       const compatibilityFallbackHandlerContract =
-        await provider.getCompatibilityFallbackHandlerContract({
+        await safeProvider.getCompatibilityFallbackHandlerContract({
           safeVersion,
           singletonDeployment
         })
@@ -187,10 +192,11 @@ describe('Safe contracts', () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
       const compatibilityFallbackHandlerContract =
-        await provider.getCompatibilityFallbackHandlerContract({
+        await safeProvider.getCompatibilityFallbackHandlerContract({
           safeVersion,
           customContractAddress: customContract.fallbackHandlerAddress,
           customContractAbi: customContract.fallbackHandlerAbi
@@ -203,11 +209,11 @@ describe('Safe contracts', () => {
 
   describe('getSafeProxyFactoryContract', async () => {
     it('should return a SafeProxyFactory contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
+      const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
-      const factoryContract = await provider.getSafeProxyFactoryContract({
+      const factoryContract = await safeProvider.getSafeProxyFactoryContract({
         safeVersion,
         singletonDeployment
       })
@@ -220,9 +226,10 @@ describe('Safe contracts', () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
-      const factoryContract = await provider.getSafeProxyFactoryContract({
+      const factoryContract = await safeProvider.getSafeProxyFactoryContract({
         safeVersion,
         customContractAddress: customContract.safeProxyFactoryAddress,
         customContractAbi: customContract.safeProxyFactoryAbi
@@ -235,11 +242,11 @@ describe('Safe contracts', () => {
 
   describe('getSignMessageLibContract', async () => {
     it('should return a SignMessageLib contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
+      const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
-      const signMessageLibContract = await provider.getSignMessageLibContract({
+      const signMessageLibContract = await safeProvider.getSignMessageLibContract({
         safeVersion,
         singletonDeployment
       })
@@ -252,9 +259,10 @@ describe('Safe contracts', () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
-      const signMessageLibContract = await provider.getSignMessageLibContract({
+      const signMessageLibContract = await safeProvider.getSignMessageLibContract({
         safeVersion,
         customContractAddress: customContract.signMessageLibAddress,
         customContractAbi: customContract.signMessageLibAbi
@@ -267,11 +275,11 @@ describe('Safe contracts', () => {
 
   describe('getCreateCallContract', async () => {
     it('should return a CreateCall contract from safe-deployments', async () => {
-      const provider = await getEip1193Provider(getNetworkProvider('mainnet'))
+      const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getCreateCallContractDeployment(safeVersion, chainId)
-      const createCallContract = await provider.getCreateCallContract({
+      const createCallContract = await safeProvider.getCreateCallContract({
         safeVersion,
         singletonDeployment
       })
@@ -284,9 +292,10 @@ describe('Safe contracts', () => {
       const { accounts, contractNetworks, chainId } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
-      const createCallContract = await provider.getCreateCallContract({
+      const createCallContract = await safeProvider.getCreateCallContract({
         safeVersion,
         customContractAddress: customContract.createCallAddress,
         customContractAbi: customContract.createCallAbi

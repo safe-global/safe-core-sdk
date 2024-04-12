@@ -3,6 +3,7 @@ import { ethers, web3 } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 import { Eip1193Provider } from '@safe-global/protocol-kit/types'
+import { SafeProvider } from '@safe-global/protocol-kit/index'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
@@ -14,7 +15,10 @@ export async function getEip1193Provider(signer: HardhatEthersSigner): Promise<E
   }
 }
 
-export function getNetworkProvider(network: Network): Provider | Web3 {
+export function getSafeProviderFromNetwork(
+  network: Network,
+  signer?: HardhatEthersSigner
+): SafeProvider {
   let rpcUrl: string
   switch (network) {
     case 'zksync':
@@ -36,17 +40,5 @@ export function getNetworkProvider(network: Network): Provider | Web3 {
       throw new Error('Chain not supported')
   }
 
-  let provider
-  switch (process.env.ETH_LIB) {
-    case 'web3':
-      provider = new Web3(rpcUrl)
-      break
-    case 'ethers':
-      provider = new ethers.JsonRpcProvider(rpcUrl)
-      break
-    default:
-      throw new Error('Ethereum library not supported')
-  }
-
-  return provider
+  return new SafeProvider({ providerOrUrl: rpcUrl, signerAddress: signer?.address })
 }

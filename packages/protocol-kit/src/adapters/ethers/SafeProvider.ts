@@ -11,7 +11,14 @@ import {
   SignMessageLibContract,
   SimulateTxAccessorContract
 } from '@safe-global/safe-core-sdk-types'
-import { ethers, TransactionResponse, AbstractSigner, Provider, BrowserProvider } from 'ethers'
+import {
+  ethers,
+  TransactionResponse,
+  AbstractSigner,
+  Provider,
+  BrowserProvider,
+  JsonRpcProvider
+} from 'ethers'
 import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
 import SafeContractEthers from './contracts/Safe/SafeContractEthers'
 import {
@@ -34,22 +41,26 @@ import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */
-  provider: Eip1193Provider
+  providerOrUrl: Eip1193Provider | string
   signerAddress?: string
 }
 
 class SafeProvider implements ISafeProvider {
   get #signer(): Promise<AbstractSigner | undefined> {
+    console.log(this.#signerAddress)
     return this.#provider.getSigner(this.#signerAddress)
   }
 
-  #provider: BrowserProvider
-  #eip1193Provider: Eip1193Provider
+  #provider: BrowserProvider | JsonRpcProvider
   #signerAddress?: string
 
-  constructor({ provider, signerAddress }: SafeProviderConfig) {
-    this.#provider = new BrowserProvider(provider)
-    this.#eip1193Provider = provider
+  constructor({ providerOrUrl, signerAddress }: SafeProviderConfig) {
+    if (typeof providerOrUrl === 'string') {
+      this.#provider = new JsonRpcProvider(providerOrUrl)
+    } else {
+      this.#provider = new BrowserProvider(providerOrUrl)
+    }
+
     this.#signerAddress = signerAddress
   }
 

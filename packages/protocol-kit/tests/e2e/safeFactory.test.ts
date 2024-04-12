@@ -4,7 +4,8 @@ import {
   ContractNetworksConfig,
   DeploySafeProps,
   SafeAccountConfig,
-  SafeFactory
+  SafeFactory,
+  SafeProvider
 } from '@safe-global/protocol-kit/index'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
@@ -85,11 +86,12 @@ describe('SafeProxyFactory', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const provider = await getEip1193Provider(account1.signer)
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
-      const networkId = await provider.getChainId()
+      const networkId = await safeProvider.getChainId()
       chai
         .expect(await safeFactory.getAddress())
-        .to.be.eq(contractNetworks[networkId].safeProxyFactoryAddress)
+        .to.be.eq(contractNetworks[networkId.toString()].safeProxyFactoryAddress)
     })
   })
 

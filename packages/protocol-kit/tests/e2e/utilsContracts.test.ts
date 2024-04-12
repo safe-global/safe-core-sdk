@@ -4,7 +4,7 @@ import { deployments } from 'hardhat'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
-import { getEip1193Provider, getNetworkProvider } from './utils/setupEthAdapter'
+import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupEthAdapter'
 import {
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
@@ -60,7 +60,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -106,7 +106,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -152,7 +152,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -198,7 +198,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -233,7 +233,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -268,7 +268,7 @@ describe('Contract utils', () => {
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -302,7 +302,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(accounts[0].signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -337,7 +337,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -431,7 +431,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const provider = await getEip1193Provider(owner1.signer)
-      const safeProvider = new SafeProvider({ provider })
+      const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -503,7 +503,7 @@ describe('Contract utils', () => {
           threshold
         }
 
-        const safeProvider = new SafeProvider({ provider })
+        const safeProvider = new SafeProvider({ providerOrUrl: provider })
 
         const predictedSafeAddress = await predictSafeAddress({
           safeProvider,
@@ -537,8 +537,7 @@ describe('Contract utils', () => {
 
         const safeVersion = safeVersionDeployed
         // Create ISafeProvider instance
-        const provider = await getEip1193Provider(getNetworkProvider('zksync'))
-        const safeProvider = new SafeProvider({ provider })
+        const safeProvider = getSafeProviderFromNetwork('zksync')
         const chainId = await safeProvider.getChainId()
         const customContracts = contractNetworks[chainId.toString()]
 
@@ -601,7 +600,7 @@ describe('Contract utils', () => {
         const expectedSafeAddress3 = '0xD971FAA20db3ad4d51D453047ca03Ce4ec164CE2'
 
         const thirdPredictedSafeAddress = await predictSafeAddress({
-          provider,
+          safeProvider,
           chainId,
           safeAccountConfig: safeAccountConfig3,
           safeDeploymentConfig: safeDeploymentConfig3,
@@ -623,10 +622,10 @@ describe('Contract utils', () => {
         const [owner] = accounts
         const safeVersion = safeVersionDeployed
 
-        const gnosisEthAdapter = await getEip1193Provider(getNetworkProvider('gnosis'))
-        const zkSyncEthAdapter = await getEip1193Provider(getNetworkProvider('zksync'))
-        const sepoliaEthAdapter = await getEip1193Provider(getNetworkProvider('sepolia'))
-        const mainnetEthAdapter = await getEip1193Provider(getNetworkProvider('mainnet'))
+        const gnosisSafeProvider = getSafeProviderFromNetwork('gnosis')
+        const zkSyncSafeProvider = getSafeProviderFromNetwork('zksync')
+        const sepoliaSafeProvider = getSafeProviderFromNetwork('sepolia')
+        const mainnetSafeProvider = getSafeProviderFromNetwork('mainnet')
 
         // 1/1 Safe
         const safeAccountConfig: SafeAccountConfig = {
@@ -639,29 +638,29 @@ describe('Contract utils', () => {
         }
 
         const gnosisPredictedSafeAddress = await predictSafeAddress({
-          provider: gnosisEthAdapter,
-          chainId: await gnosisEthAdapter.getChainId(),
+          safeProvider: gnosisSafeProvider,
+          chainId: await gnosisSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const zkSyncPredictedSafeAddress = await predictSafeAddress({
-          provider: zkSyncEthAdapter,
-          chainId: await zkSyncEthAdapter.getChainId(),
+          safeProvider: zkSyncSafeProvider,
+          chainId: await zkSyncSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const sepoliaPredictedSafeAddress = await predictSafeAddress({
-          provider: sepoliaEthAdapter,
-          chainId: await sepoliaEthAdapter.getChainId(),
+          safeProvider: sepoliaSafeProvider,
+          chainId: await sepoliaSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const mainnetPredictedSafeAddress = await predictSafeAddress({
-          provider: mainnetEthAdapter,
-          chainId: await mainnetEthAdapter.getChainId(),
+          safeProvider: mainnetSafeProvider,
+          chainId: await mainnetSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })

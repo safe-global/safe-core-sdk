@@ -5,7 +5,6 @@ import {
   ExtractAbiFunctionNames
 } from 'abitype'
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers'
-import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -52,7 +51,7 @@ export type EncodeSafeProxyFactoryFunction<
  */
 export type EstimateGasSafeProxyFactoryFunction<
   SafeProxyFactoryContractAbi extends Abi, // Abi of the Safe Proxy Factory Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions,
+  TransactionOptions extends EthersTransactionOptions,
   ProxyFactoryFunction extends
     ExtractAbiFunctionNames<SafeProxyFactoryContractAbi> = ExtractAbiFunctionNames<SafeProxyFactoryContractAbi>
 > = (
@@ -91,7 +90,7 @@ type SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbi extends Abi> = {
   encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContractAbi>
   estimateGas: EstimateGasSafeProxyFactoryFunction<
     SafeProxyFactoryContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
+    EthersTransactionOptions
   >
 }
 

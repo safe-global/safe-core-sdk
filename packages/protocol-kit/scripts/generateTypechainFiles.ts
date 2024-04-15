@@ -113,6 +113,4 @@ function generateTypes(typechainTarget: string) {
     testContracts_V1_2_0
   )
 }
-
-generateTypes('web3-v1')
 generateTypes('ethers-v6')

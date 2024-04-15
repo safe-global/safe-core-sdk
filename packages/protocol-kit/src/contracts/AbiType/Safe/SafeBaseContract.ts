@@ -1,5 +1,4 @@
 import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers'
-import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3'
 import {
   Abi,
   AbiParametersToPrimitiveTypes,
@@ -72,7 +71,7 @@ export type EncodeSafeFunction<
  */
 export type EstimateGasSafeFunction<
   SafeContractAbi extends Abi, // Abi of the Safe Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions,
+  TransactionOptions extends EthersTransactionOptions,
   SafeFunction extends
     ExtractAbiFunctionNames<SafeContractAbi> = ExtractAbiFunctionNames<SafeContractAbi>
 > = (
@@ -108,10 +107,7 @@ type SafeBaseContract<SafeContractAbi extends Abi> = {
 } & {
   safeVersion: SafeVersion
   encode: EncodeSafeFunction<SafeContractAbi>
-  estimateGas: EstimateGasSafeFunction<
-    SafeContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
+  estimateGas: EstimateGasSafeFunction<SafeContractAbi, EthersTransactionOptions>
 }
 
 export default SafeBaseContract

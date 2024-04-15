@@ -9,11 +9,6 @@ import {
   EthersTransactionOptions,
   EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers'
-import {
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from '@safe-global/protocol-kit/adapters/web3'
-
 /**
  * Encodes a function call for a CreateCall contract.
  *
@@ -42,7 +37,7 @@ export type GetAddressCreateCallFunction = () => Promise<string>
  */
 export type EstimateGasCreateCallFunction<
   CreateCallContractAbi extends Abi, // Abi of the CreateCall Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions,
+  TransactionOptions extends EthersTransactionOptions,
   CreateCallFunction extends
     ExtractAbiFunctionNames<CreateCallContractAbi> = ExtractAbiFunctionNames<CreateCallContractAbi>
 > = (
@@ -70,13 +65,13 @@ export type CreateCallContractReadFunctions<CreateCallContractAbi extends Abi> =
  */
 export type PerformCreateFunction<
   CreateCallContractAbi extends Abi, // Abi of the CreateCall Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions
+  TransactionOptions extends EthersTransactionOptions
 > = (
   args: AbiParametersToPrimitiveTypes<
     ExtractAbiFunction<CreateCallContractAbi, 'performCreate'>['inputs']
   >,
   options?: TransactionOptions
-) => Promise<EthersTransactionResult | Web3TransactionResult>
+) => Promise<EthersTransactionResult>
 
 /**
  * Deploys a new contract using the create2 opcode.
@@ -85,13 +80,13 @@ export type PerformCreateFunction<
  */
 export type PerformCreate2Function<
   CreateCallContractAbi extends Abi, // Abi of the CreateCall Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions
+  TransactionOptions extends EthersTransactionOptions
 > = (
   args: AbiParametersToPrimitiveTypes<
     ExtractAbiFunction<CreateCallContractAbi, 'performCreate2'>['inputs']
   >,
   options?: TransactionOptions
-) => Promise<EthersTransactionResult | Web3TransactionResult>
+) => Promise<EthersTransactionResult>
 
 type CreateCallBaseContract<CreateCallContractAbi extends Abi> = {
   [ProxyFactoryFunction in CreateCallContractReadFunctions<CreateCallContractAbi>]: (
@@ -111,18 +106,9 @@ type CreateCallBaseContract<CreateCallContractAbi extends Abi> = {
   safeVersion: SafeVersion
   encode: EncodeCreateCallFunction<CreateCallContractAbi>
   getAddress: GetAddressCreateCallFunction
-  estimateGas: EstimateGasCreateCallFunction<
-    CreateCallContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
-  performCreate: PerformCreateFunction<
-    CreateCallContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
-  performCreate2: PerformCreate2Function<
-    CreateCallContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
+  estimateGas: EstimateGasCreateCallFunction<CreateCallContractAbi, EthersTransactionOptions>
+  performCreate: PerformCreateFunction<CreateCallContractAbi, EthersTransactionOptions>
+  performCreate2: PerformCreate2Function<CreateCallContractAbi, EthersTransactionOptions>
 }
 
 export default CreateCallBaseContract

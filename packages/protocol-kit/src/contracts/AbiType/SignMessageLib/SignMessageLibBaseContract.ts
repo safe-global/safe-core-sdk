@@ -3,10 +3,6 @@ import {
   EthersTransactionResult
 } from '@safe-global/protocol-kit/adapters/ethers'
 import {
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from '@safe-global/protocol-kit/adapters/web3'
-import {
   Abi,
   AbiParametersToPrimitiveTypes,
   ExtractAbiFunction,
@@ -58,7 +54,7 @@ export type EncodeSignMessageLibFunction<
  */
 export type EstimateGasSignMessageLibFunction<
   SignMessageLibContractAbi extends Abi, // Abi of the SignMessageLib Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions,
+  TransactionOptions extends EthersTransactionOptions,
   SignMessageLibFunction extends
     ExtractAbiFunctionNames<SignMessageLibContractAbi> = ExtractAbiFunctionNames<SignMessageLibContractAbi>
 > = (
@@ -77,13 +73,13 @@ export type EstimateGasSignMessageLibFunction<
  */
 export type SignMessageFunction<
   SignMessageLibContractAbi extends Abi, // Abi of the SignMessageLib Contract,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions
+  TransactionOptions extends EthersTransactionOptions
 > = (
   args: AbiParametersToPrimitiveTypes<
     ExtractAbiFunction<SignMessageLibContractAbi, 'signMessage'>['inputs']
   >,
   options?: TransactionOptions
-) => Promise<EthersTransactionResult | Web3TransactionResult>
+) => Promise<EthersTransactionResult>
 
 export type GetAddressSignMessageLibFunction = () => Promise<string>
 
@@ -108,12 +104,9 @@ type SignMessageLibBaseContract<SignMessageLibContractAbi extends Abi> = {
   getAddress: GetAddressSignMessageLibFunction
   estimateGas: EstimateGasSignMessageLibFunction<
     SignMessageLibContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
+    EthersTransactionOptions
   >
-  signMessage: SignMessageFunction<
-    SignMessageLibContractAbi,
-    EthersTransactionOptions | Web3TransactionOptions
-  >
+  signMessage: SignMessageFunction<SignMessageLibContractAbi, EthersTransactionOptions>
 }
 
 export default SignMessageLibBaseContract

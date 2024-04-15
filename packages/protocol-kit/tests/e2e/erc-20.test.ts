@@ -1,4 +1,5 @@
 import Safe, {
+  SafeProvider,
   createERC20TokenTransferTransaction,
   getERC20Decimals,
   isGasTokenCompatibleWithHandlePayment
@@ -22,7 +23,13 @@ chai.use(chaiAsPromised)
 
 const ERC20_TOKEN_ADDRESS = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 
-describe('ERC-20 utils', () => {
+describe.only('ERC-20 utils', () => {
+  let callStub: sinon.SinonStub
+
+  afterEach(() => {
+    callStub.restore()
+  })
+
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
@@ -49,7 +56,7 @@ describe('ERC-20 utils', () => {
         const provider = await getEip1193Provider(account1.signer)
 
         // mock decimals() call
-        sinon.stub(provider, 'call').returns(Promise.resolve('0x12'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
 
         const safeSdk = await Safe.create({
           provider,
@@ -74,7 +81,7 @@ describe('ERC-20 utils', () => {
         const provider = await getEip1193Provider(account1.signer)
 
         // mock decimals() call
-        sinon.stub(provider, 'call').returns(Promise.resolve('0x06'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
 
         const safeSdk = await Safe.create({
           provider,
@@ -99,7 +106,7 @@ describe('ERC-20 utils', () => {
         const provider = await getEip1193Provider(account1.signer)
 
         // mock decimals() call
-        sinon.stub(safeProvider, 'call').returns(Promise.resolve('0x'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x'))
 
         const safeSdk = await Safe.create({
           provider,
@@ -126,7 +133,7 @@ describe('ERC-20 utils', () => {
         const provider = await getEip1193Provider(account1.signer)
 
         const safeSdk = await Safe.create({
-          safeProvider,
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -151,7 +158,7 @@ describe('ERC-20 utils', () => {
         const provider = await getEip1193Provider(account1.signer)
 
         // mock decimals() call
-        sinon.stub(provider, 'call').returns(Promise.resolve('0x12'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
 
         const safeSdk = await Safe.create({
           provider,
@@ -179,7 +186,7 @@ describe('ERC-20 utils', () => {
         const provider = await getEip1193Provider(account1.signer)
 
         // mock decimals() call
-        sinon.stub(provider, 'call').returns(Promise.resolve('0x06'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
 
         const safeSdk = await Safe.create({
           provider,
@@ -202,11 +209,7 @@ describe('ERC-20 utils', () => {
       const toAddress = '0xbc2BB26a6d821e69A38016f3858561a1D80d4182'
       const amount = '12345'
 
-      const transfer = await createERC20TokenTransferTransaction(
-        ERC20_TOKEN_ADDRESS,
-        toAddress,
-        amount
-      )
+      const transfer = createERC20TokenTransferTransaction(ERC20_TOKEN_ADDRESS, toAddress, amount)
 
       chai.expect(transfer).to.be.deep.equal({
         to: ERC20_TOKEN_ADDRESS,

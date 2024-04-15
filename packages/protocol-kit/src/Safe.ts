@@ -114,12 +114,14 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { provider, signerAddress, isL1SafeSingleton, contractNetworks } = config
+    const { provider, signerAddress, privateKeyOrMnemonic, isL1SafeSingleton, contractNetworks } =
+      config
 
     this.#provider = provider
     this.#safeProvider = new SafeProvider({
       providerOrUrl: provider,
-      signerAddress
+      signerAddress,
+      privateKeyOrMnemonic
     })
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe

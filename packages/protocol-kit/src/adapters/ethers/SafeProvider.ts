@@ -43,24 +43,22 @@ export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */
   providerOrUrl: Eip1193Provider | string
   signerAddress?: string
+  privateKeyOrMnemonic?: string
 }
 
 class SafeProvider implements ISafeProvider {
-  get #signer(): Promise<AbstractSigner | undefined> {
-    console.log(this.#signerAddress)
-    return this.#provider.getSigner(this.#signerAddress)
-  }
-
   #provider: BrowserProvider | JsonRpcProvider
   #signerAddress?: string
+  #privateKeyOrMnemonic?: string
 
-  constructor({ providerOrUrl, signerAddress }: SafeProviderConfig) {
+  constructor({ providerOrUrl, signerAddress, privateKeyOrMnemonic }: SafeProviderConfig) {
     if (typeof providerOrUrl === 'string') {
       this.#provider = new JsonRpcProvider(providerOrUrl)
     } else {
       this.#provider = new BrowserProvider(providerOrUrl)
     }
 
+    this.#privateKeyOrMnemonic = privateKeyOrMnemonic
     this.#signerAddress = signerAddress
   }
 
@@ -68,8 +66,21 @@ class SafeProvider implements ISafeProvider {
     return this.#provider
   }
 
-  getSigner(): Promise<AbstractSigner | undefined> {
-    return this.#signer
+  async getSigner(): Promise<AbstractSigner | undefined> {
+    if (this.#privateKeyOrMnemonic) {
+      const privateKeySigner = new ethers.Wallet(this.#privateKeyOrMnemonic, this.#provider)
+      return privateKeySigner
+    }
+
+    if (this.#signerAddress) {
+      return this.#provider.getSigner(this.#signerAddress)
+    }
+
+    if (this.#provider instanceof BrowserProvider) {
+      return this.#provider.getSigner()
+    }
+
+    return undefined
   }
 
   isAddress(address: string): boolean {
@@ -131,7 +142,7 @@ class SafeProvider implements ISafeProvider {
     if (!contractAddress) {
       throw new Error('Invalid SafeProxyFactory contract address')
     }
-    const signerOrProvider = (await this.#signer) || this.#provider
+    const signerOrProvider = (await this.getSigner()) || this.#provider
     return getSafeProxyFactoryContractInstance(
       safeVersion,
       contractAddress,
@@ -195,7 +206,7 @@ class SafeProvider implements ISafeProvider {
     if (!contractAddress) {
       throw new Error('Invalid CompatibilityFallbackHandler contract address')
     }
-    const signerOrProvider = (await this.#signer) || this.#provider
+    const signerOrProvider = (await this.getSigner()) || this.#provider
     return getCompatibilityFallbackHandlerContractInstance(
       safeVersion,
       contractAddress,
@@ -274,13 +285,13 @@ class SafeProvider implements ISafeProvider {
   }
 
   async getSignerAddress(): Promise<string | undefined> {
-    const signer = await this.#signer
+    const signer = await this.getSigner()
 
     return signer?.getAddress()
   }
 
   async signMessage(message: string): Promise<string> {
-    const signer = await this.#signer
+    const signer = await this.getSigner()
 
     if (!signer) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
@@ -291,7 +302,7 @@ class SafeProvider implements ISafeProvider {
   }
 
   async signTypedData(safeEIP712Args: SafeEIP712Args): Promise<string> {
-    const signer = await this.#signer
+    const signer = await this.getSigner()
 
     if (!signer) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')

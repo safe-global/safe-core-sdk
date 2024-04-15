@@ -103,9 +103,8 @@ describe('Safe contracts', () => {
   })
 
   describe('getMultiSendContract', async () => {
-    it.only('should return a MultiSend contract from safe-deployments', async () => {
-      const { accounts } = await setupTests()
-      const safeProvider = getSafeProviderFromNetwork('mainnet', accounts[0].signer)
+    it('should return a MultiSend contract from safe-deployments', async () => {
+      const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
       const chainId = 1n
       const singletonDeployment = getMultiSendContractDeployment(safeVersion, chainId)

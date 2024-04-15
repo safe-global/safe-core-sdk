@@ -13,7 +13,7 @@ let signer: Signer
 describe('removeSafeDelegate', () => {
   before(async () => {
     ;({ safeApiKit, signer } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
@@ -31,7 +31,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is empty', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = ''
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
@@ -44,7 +44,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if Safe delegate address is not checksummed', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'.toLowerCase()
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
@@ -57,7 +57,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is not checksummed', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = (await signer.getAddress()).toLowerCase()
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
@@ -81,7 +81,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should remove a delegate', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
@@ -103,7 +103,7 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should remove a delegate EIP-3770', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
     const delegatorAddress = await signer.getAddress()
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`

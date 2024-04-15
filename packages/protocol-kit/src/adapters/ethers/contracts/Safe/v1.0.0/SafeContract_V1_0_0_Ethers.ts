@@ -60,8 +60,8 @@ class SafeContract_V1_0_0_Ethers extends SafeContractEthers {
     if (start === SENTINEL_ADDRESS) {
       return array.slice(0, pageSize)
     } else {
-      const ownerIndex = array.findIndex((module: string) => sameString(module, start))
-      return ownerIndex === -1 ? [] : array.slice(ownerIndex + 1, pageSize)
+      const moduleIndex = array.findIndex((module: string) => sameString(module, start))
+      return moduleIndex === -1 ? [] : array.slice(moduleIndex + 1, pageSize)
     }
   }
 

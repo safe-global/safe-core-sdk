@@ -56,6 +56,8 @@ class SafeContract_V1_0_0_Ethers extends SafeContractEthers {
   }
 
   async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
+    if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
+
     const array = await this.getModules()
     if (start === SENTINEL_ADDRESS) {
       return array.slice(0, pageSize)

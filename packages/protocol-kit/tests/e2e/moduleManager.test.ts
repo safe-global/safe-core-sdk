@@ -107,7 +107,7 @@ describe('Safe modules manager', () => {
       chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(1)
     })
 
-    it('should contrain the returned modules by pageSize', async () => {
+    it('should constraint returned modules by pageSize', async () => {
       const { safe, accounts, dailyLimitModule, contractNetworks, socialRecoveryModule } =
         await setupTests()
       const [account1] = accounts
@@ -130,6 +130,7 @@ describe('Safe modules manager', () => {
       await waitSafeTxReceipt(soecialRecoveryResponse)
 
       chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(2)
+      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 1)).length).to.be.eq(1)
       chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 1)).length).to.be.eq(1)
     })
 
@@ -159,6 +160,21 @@ describe('Safe modules manager', () => {
       chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(2)
       chai.expect((await safeSdk.getModulesPaginated(firstModule, 10)).length).to.be.eq(1)
       chai.expect((await safeSdk.getModulesPaginated(secondModule, 10)).length).to.be.eq(0)
+    })
+
+    it('should fail if pageSize is invalid', async () => {
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const ethAdapter = await getEthAdapter(account1.signer)
+      const safeSdk = await Safe.create({
+        ethAdapter,
+        predictedSafe,
+        contractNetworks
+      })
+
+      chai
+        .expect(safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 0))
+        .to.be.rejectedWith('Invalid page size for fetching paginated modules')
     })
   })
 

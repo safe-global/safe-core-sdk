@@ -23,7 +23,7 @@ chai.use(chaiAsPromised)
 
 const ERC20_TOKEN_ADDRESS = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 
-describe.only('ERC-20 utils', () => {
+describe('ERC-20 utils', () => {
   let callStub: sinon.SinonStub
 
   afterEach(() => {

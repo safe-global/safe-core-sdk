@@ -61,7 +61,7 @@ class SafeContract_V1_0_0_Ethers extends SafeContractEthers {
       return array.slice(0, pageSize)
     } else {
       const ownerIndex = array.findIndex((module: string) => sameString(module, start))
-      return ownerIndex === -1 ? [] : array.slice(ownerIndex, pageSize)
+      return ownerIndex === -1 ? [] : array.slice(ownerIndex + 1, pageSize)
     }
   }
 

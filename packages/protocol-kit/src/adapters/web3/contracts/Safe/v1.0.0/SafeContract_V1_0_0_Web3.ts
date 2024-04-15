@@ -57,7 +57,7 @@ class SafeContract_V1_0_0_Web3 extends SafeContractWeb3 {
       return array.slice(0, pageSize)
     } else {
       const ownerIndex = array.findIndex((module: string) => sameString(module, start))
-      return ownerIndex === -1 ? [] : array.slice(ownerIndex, pageSize)
+      return ownerIndex === -1 ? [] : array.slice(ownerIndex + 1, pageSize)
     }
   }
 

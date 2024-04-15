@@ -110,14 +110,14 @@ describe('The EIP1271 implementation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should validate on-chain messages (Approved hashes)',
       async () => {
-        const { contractNetworks, safeSdk1, safeSdk2, provider1 } = await setupTests()
+        const { contractNetworks, safeSdk1, safeSdk2 } = await setupTests()
 
         const chainId = await safeSdk1.getChainId()
         const safeVersion = await safeSdk1.getContractVersion()
 
         const customContract = contractNetworks[chainId.toString()]
 
-        const signMessageLibContract = await provider1.getSignMessageLibContract({
+        const signMessageLibContract = await safeSdk1.getSafeProvider().getSignMessageLibContract({
           safeVersion,
           customContractAddress: customContract.signMessageLibAddress,
           customContractAbi: customContract.signMessageLibAbi

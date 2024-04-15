@@ -693,7 +693,7 @@ class Safe {
 
     const owners = await this.getOwners()
     const signerAddress = await this.#safeProvider.getSignerAddress()
-    console.log('signerAddress', signerAddress)
+
     if (!signerAddress) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }

@@ -80,7 +80,7 @@ describe('Safe Info', () => {
 
     it('should connect a deployed Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
+      const [account1, account2, account3] = accounts
       const provider = await getEip1193Provider(account1.signer)
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
@@ -104,13 +104,18 @@ describe('Safe Info', () => {
         .expect(await safeSdk2.getSafeProvider().getSignerAddress())
         .to.be.eq(await account2.signer.getAddress())
 
-      const safe2 = await getSafeWithOwners([accounts[2].address])
+      const safe2 = await getSafeWithOwners([account3.address])
+      const provider3 = await getEip1193Provider(account3.signer)
       const safe2Address = await safe2.getAddress()
-      const safeSdk3 = await safeSdk2.connect({ safeAddress: safe2Address })
+      const safeSdk3 = await safeSdk2.connect({
+        safeAddress: safe2Address,
+        provider: provider3,
+        signerAddress: account3.address
+      })
       chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2Address)
       chai
         .expect(await safeSdk3.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account2.signer.getAddress())
+        .to.be.eq(await account3.signer.getAddress())
     })
   })
 
@@ -334,10 +339,16 @@ describe('Safe Info', () => {
           contractNetworks
         })
         chai.expect(await safeSdk.getBalance()).to.be.eq(0n)
-        await account1.signer.sendTransaction({
+
+        const txResponse = await account1.signer.sendTransaction({
           to: await safeSdk.getAddress(),
           value: BigInt(`${1e18}`)
         })
+        await txResponse.wait(1)
+
+        // TODO: Not working without this delay
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
         chai.expect(await safeSdk.getBalance()).to.be.eq(BigInt(`${1e18}`))
       }
     )
@@ -349,14 +360,21 @@ describe('Safe Info', () => {
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
+        signerAddress: account1.address,
         safeAddress,
         contractNetworks
       })
       chai.expect(await safeSdk.getBalance()).to.be.eq(0n)
-      await account1.signer.sendTransaction({
-        to: await safeSdk.getAddress(),
+
+      const txResponse = await account1.signer.sendTransaction({
+        to: safeAddress,
         value: BigInt(`${1e18}`)
       })
+      await txResponse.wait(1)
+
+      // TODO: Not working without this delay
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       chai.expect(await safeSdk.getBalance()).to.be.eq(BigInt(`${1e18}`))
     })
   })

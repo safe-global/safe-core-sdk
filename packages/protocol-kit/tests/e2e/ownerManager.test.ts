@@ -44,9 +44,8 @@ describe('Safe owners manager', () => {
 
   describe('getOwners', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -59,7 +58,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -76,7 +75,7 @@ describe('Safe owners manager', () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -89,7 +88,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -103,7 +102,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -118,7 +117,7 @@ describe('Safe owners manager', () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -132,7 +131,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -146,7 +145,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -160,7 +159,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -174,7 +173,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -188,7 +187,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -208,7 +207,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -222,7 +221,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -249,7 +248,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -274,7 +273,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -302,7 +301,7 @@ describe('Safe owners manager', () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -313,9 +312,8 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is invalid', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -326,9 +324,8 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -339,9 +336,8 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -354,7 +350,7 @@ describe('Safe owners manager', () => {
     it('should fail if address is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, , , account4] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -367,7 +363,7 @@ describe('Safe owners manager', () => {
     it('should fail if the threshold is bigger than the number of owners', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -386,7 +382,7 @@ describe('Safe owners manager', () => {
     it('should fail if the threshold is not bigger than 0', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -399,7 +395,7 @@ describe('Safe owners manager', () => {
     it('should build the transaction with the optional props', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider1 = await getEip1193Provider(account1.signer)
+      const provider1 = getEip1193Provider()
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress: await safe.getAddress(),
@@ -425,18 +421,18 @@ describe('Safe owners manager', () => {
     it('should remove the first owner of a Safe and decrease the threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const provider1 = await getEip1193Provider(account1.signer)
+      const provider1 = getEip1193Provider()
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress: await safe.getAddress(),
         contractNetworks
       })
-      const provider2 = await getEip1193Provider(account2.signer)
+      const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
       })
-      const provider3 = await getEip1193Provider(account3.signer)
+      const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
         signerAddress: account3.address
@@ -463,18 +459,18 @@ describe('Safe owners manager', () => {
     it('should remove any owner of a Safe and decrease the threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const provider1 = await getEip1193Provider(account1.signer)
+      const provider1 = getEip1193Provider()
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress: await safe.getAddress(),
         contractNetworks
       })
-      const provider2 = await getEip1193Provider(account2.signer)
+      const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
       })
-      const provider3 = await getEip1193Provider(account3.signer)
+      const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
         signerAddress: account3.address,
@@ -502,18 +498,18 @@ describe('Safe owners manager', () => {
     it('should remove an owner and update the threshold', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const provider1 = await getEip1193Provider(account1.signer)
+      const provider1 = getEip1193Provider()
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress: await safe.getAddress(),
         contractNetworks
       })
-      const provider2 = await getEip1193Provider(account2.signer)
+      const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
       })
-      const provider3 = await getEip1193Provider(account3.signer)
+      const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
         signerAddress: account3.address
@@ -544,7 +540,7 @@ describe('Safe owners manager', () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -561,7 +557,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -578,7 +574,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -595,7 +591,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -612,7 +608,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -629,7 +625,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -646,7 +642,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -663,7 +659,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2, , account4] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -680,7 +676,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -697,7 +693,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -727,7 +723,7 @@ describe('Safe owners manager', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -750,18 +746,18 @@ describe('Safe owners manager', () => {
     it('should replace any owner of a Safe', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3, account4] = accounts
-      const provider1 = await getEip1193Provider(account1.signer)
+      const provider1 = getEip1193Provider()
       const safeSdk1 = await Safe.create({
         provider: provider1,
         safeAddress: await safe.getAddress(),
         contractNetworks
       })
-      const provider2 = await getEip1193Provider(account2.signer)
+      const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
         signerAddress: account2.address
       })
-      const provider3 = await getEip1193Provider(account3.signer)
+      const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
         signerAddress: account3.address

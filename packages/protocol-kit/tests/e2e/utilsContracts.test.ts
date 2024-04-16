@@ -59,7 +59,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -105,7 +105,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -151,7 +151,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -197,7 +197,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -232,7 +232,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -267,7 +267,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -301,7 +301,7 @@ describe('Contract utils', () => {
       const invalidOwners: string[] = []
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(accounts[0].signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -336,7 +336,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -430,7 +430,7 @@ describe('Contract utils', () => {
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const provider = await getEip1193Provider(owner1.signer)
+      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ providerOrUrl: provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -495,7 +495,7 @@ describe('Contract utils', () => {
         const [owner1] = accounts
         const owners = [owner1.address]
         const threshold = 1
-        const provider = await getEip1193Provider(owner1.signer)
+        const provider = getEip1193Provider()
         const customContracts = contractNetworks[chainId.toString()]
 
         const safeAccountConfig: SafeAccountConfig = {

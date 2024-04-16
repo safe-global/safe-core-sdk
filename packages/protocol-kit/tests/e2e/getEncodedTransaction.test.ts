@@ -26,7 +26,7 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = await getEip1193Provider(account1.signer)
+    const provider = getEip1193Provider()
 
     const safeSdk = await Safe.create({
       provider,
@@ -57,7 +57,7 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = await getEip1193Provider(account1.signer)
+    const provider = getEip1193Provider()
 
     const safeSdk = await Safe.create({
       provider,
@@ -88,7 +88,7 @@ describe('getEncodedTransaction', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = await getEip1193Provider(account1.signer)
+    const provider = getEip1193Provider()
 
     const safeSdk = await Safe.create({
       provider,

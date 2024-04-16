@@ -46,9 +46,8 @@ describe('Safe modules manager', () => {
 
   describe('getModules', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -58,9 +57,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should return all the enabled modules', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -77,9 +75,8 @@ describe('Safe modules manager', () => {
 
   describe('isModuleEnabled', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -90,9 +87,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should return true if a module is enabled', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -109,9 +105,8 @@ describe('Safe modules manager', () => {
 
   describe('createEnableModuleTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -122,9 +117,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is invalid', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -136,9 +130,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -150,9 +143,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -164,9 +156,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is already enabled', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -181,9 +172,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should build the transaction with the optional props', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -208,9 +198,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should enable a Safe module', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -229,9 +218,8 @@ describe('Safe modules manager', () => {
 
   describe('createDisableModuleTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -242,9 +230,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is invalid', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -256,9 +243,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -270,9 +256,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -284,9 +269,8 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is not enabled', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -302,7 +286,7 @@ describe('Safe modules manager', () => {
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress,
@@ -338,7 +322,7 @@ describe('Safe modules manager', () => {
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress,

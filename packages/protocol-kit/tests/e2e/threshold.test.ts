@@ -39,9 +39,8 @@ describe('Safe Threshold', () => {
 
   describe('getThreshold', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -51,9 +50,8 @@ describe('Safe Threshold', () => {
     })
 
     it('should return the Safe threshold', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -65,9 +63,8 @@ describe('Safe Threshold', () => {
 
   describe('createChangeThresholdTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -80,9 +77,8 @@ describe('Safe Threshold', () => {
     })
 
     it('should fail if the threshold is bigger than the number of owners', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -97,9 +93,8 @@ describe('Safe Threshold', () => {
     })
 
     it('should fail if the threshold is not bigger than 0', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -115,7 +110,7 @@ describe('Safe Threshold', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),
@@ -144,7 +139,7 @@ describe('Safe Threshold', () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress: await safe.getAddress(),

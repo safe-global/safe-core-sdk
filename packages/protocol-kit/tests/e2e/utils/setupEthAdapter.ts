@@ -7,7 +7,7 @@ import { custom, createWalletClient } from 'viem'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
-export async function getEip1193Provider(): Promise<Eip1193Provider> {
+export function getEip1193Provider(): Eip1193Provider {
   switch (process.env.ETH_LIB) {
     case 'viem':
       const client = createWalletClient({

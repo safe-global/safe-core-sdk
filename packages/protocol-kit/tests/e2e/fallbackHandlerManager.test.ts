@@ -48,10 +48,9 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed < '1.1.1')(
       'should fail if getting the enabled fallback handler is not supported',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = await safe.getAddress()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const provider = getEip1193Provider()
         const safeSdk = await Safe.create({
           provider,
           safeAddress,
@@ -67,9 +66,8 @@ describe('Fallback handler manager', () => {
     )
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { predictedSafe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -79,9 +77,8 @@ describe('Fallback handler manager', () => {
     })
 
     itif(safeVersionDeployed >= '1.1.1')('should return the enabled fallback handler', async () => {
-      const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks, defaultCallbackHandler } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -107,10 +104,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail if the Safe with version <v1.3.0 is not deployed',
       async () => {
-        const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
-          await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { predictedSafe, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const provider = getEip1193Provider()
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -128,10 +123,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should fail if the Safe with version >=v1.3.0 is not deployed',
       async () => {
-        const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
-          await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { predictedSafe, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const provider = getEip1193Provider()
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -145,9 +138,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed < '1.1.1')(
       'should fail if enabling a fallback handler is not supported',
       async () => {
-        const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { safe, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -164,9 +156,8 @@ describe('Fallback handler manager', () => {
     )
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is invalid', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -180,9 +171,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')(
       'should fail if address is equal to 0x address',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { safe, contractNetworks } = await setupTests()
+        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -195,9 +185,8 @@ describe('Fallback handler manager', () => {
     )
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is already enabled', async () => {
-      const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks, defaultCallbackHandler } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -216,9 +205,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')(
       'should build the transaction with the optional props',
       async () => {
-        const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { safe, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -247,9 +235,8 @@ describe('Fallback handler manager', () => {
     )
 
     itif(safeVersionDeployed >= '1.1.1')('should enable a fallback handler', async () => {
-      const { safe, accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
-      const [account1] = accounts
-      const provider = await getEip1193Provider(account1.signer)
+      const { safe, contractNetworks, defaultCallbackHandler } = await setupTests()
+      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -275,9 +262,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail if the Safe with version <v1.3.0 is not deployed',
       async () => {
-        const { predictedSafe, accounts, contractNetworks } = await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { predictedSafe, contractNetworks } = await setupTests()
+        const provider = getEip1193Provider()
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -295,10 +281,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should fail if the Safe with version >=v1.3.0 is not deployed',
       async () => {
-        const { predictedSafe, accounts, contractNetworks, defaultCallbackHandler } =
-          await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { predictedSafe, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const provider = getEip1193Provider()
         const safeSdk = await Safe.create({
           provider,
           predictedSafe,
@@ -316,7 +300,7 @@ describe('Fallback handler manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEip1193Provider(account1.signer)
+        const provider = getEip1193Provider()
         const safeSdk = await Safe.create({
           provider,
           safeAddress,
@@ -334,9 +318,8 @@ describe('Fallback handler manager', () => {
     itif(safeVersionDeployed >= '1.1.1')(
       'should fail if no fallback handler is enabled',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
-        const [account1] = accounts
-        const provider = await getEip1193Provider(account1.signer)
+        const { safe, contractNetworks } = await setupTests()
+        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -361,7 +344,7 @@ describe('Fallback handler manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const provider = await getEip1193Provider(account1.signer)
+        const provider = getEip1193Provider()
         const safeSdk = await Safe.create({
           provider,
           safeAddress,
@@ -399,7 +382,7 @@ describe('Fallback handler manager', () => {
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = await getEip1193Provider(account1.signer)
+      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress,

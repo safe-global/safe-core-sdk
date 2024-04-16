@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-        provider: [ethers, web3]
+        provider: [ethers, web3, viem]
         contract-version: [v1.0.0, v1.1.1, v1.2.0, v1.3.0, v1.4.1]
     steps:
       - uses: actions/checkout@v3

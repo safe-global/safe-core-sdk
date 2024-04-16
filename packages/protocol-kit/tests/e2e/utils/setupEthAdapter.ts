@@ -1,17 +1,36 @@
-import { Provider } from 'ethers'
-import { ethers, web3 } from 'hardhat'
+import hre, { ethers } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
+import { custom, createWalletClient } from 'viem'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
-export async function getEip1193Provider(signer: HardhatEthersSigner): Promise<Eip1193Provider> {
-  return {
-    request: async (request) => {
-      return signer.provider.send(request.method, [...((request.params as unknown[]) ?? [])])
-    }
+export async function getEip1193Provider(): Promise<Eip1193Provider> {
+  switch (process.env.ETH_LIB) {
+    case 'viem':
+      const client = createWalletClient({
+        transport: custom(hre.network.provider)
+      })
+
+      return { request: client.request } as Eip1193Provider
+
+    case 'web3':
+      const web3Provider = new Web3(hre.network.provider)
+
+      return web3Provider.currentProvider as Eip1193Provider
+
+    case 'ethers':
+      const browserProvider = new ethers.BrowserProvider(hre.network.provider)
+
+      return {
+        request: async (request) => {
+          return browserProvider.send(request.method, [...((request.params as unknown[]) ?? [])])
+        }
+      }
+    default:
+      throw new Error('ETH_LIB not set')
   }
 }
 

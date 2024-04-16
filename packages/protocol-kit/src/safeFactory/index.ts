@@ -14,15 +14,12 @@ import {
 import {
   ContractNetworksConfig,
   SafeAccountConfig,
-  SafeDeploymentConfig
+  SafeContractImplementationType,
+  SafeDeploymentConfig,
+  SafeProxyFactoryContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import {
-  EthAdapter,
-  SafeContract,
-  SafeProxyFactoryContract,
-  SafeVersion,
-  TransactionOptions
-} from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
+import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
@@ -58,8 +55,8 @@ class SafeFactory {
   #isL1SafeSingleton?: boolean
   #safeVersion!: SafeVersion
   #ethAdapter!: EthAdapter
-  #safeProxyFactoryContract!: SafeProxyFactoryContract
-  #safeContract!: SafeContract
+  #safeProxyFactoryContract!: SafeProxyFactoryContractImplementationType
+  #safeContract!: SafeContractImplementationType
 
   static async create({
     ethAdapter,
@@ -162,7 +159,8 @@ class SafeFactory {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
-    const safeAddress = await this.#safeProxyFactoryContract.createProxy({
+
+    const safeAddress = await this.#safeProxyFactoryContract.createProxyWithOptions({
       safeSingletonAddress: await this.#safeContract.getAddress(),
       initializer,
       saltNonce: saltNonce || getChainSpecificDefaultSaltNonce(chainId),

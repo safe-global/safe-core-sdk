@@ -5,7 +5,7 @@ import {
   Web3Adapter,
   Web3AdapterConfig
 } from '@safe-global/protocol-kit/index'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import { ethers, web3 } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'

@@ -1,12 +1,6 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
-import {
-  Eip3770Address,
-  EthAdapter,
-  EthAdapterTransaction,
-  GetContractProps,
-  SafeEIP712Args
-} from '@safe-global/safe-core-sdk-types'
+import { Eip3770Address, SafeEIP712Args } from '@safe-global/safe-core-sdk-types'
 import Web3 from 'web3'
 import { Transaction } from 'web3-core'
 import { ContractOptions } from 'web3-eth-contract'
@@ -25,6 +19,7 @@ import {
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesWeb3'
+import { EthAdapter, EthAdapterTransaction, GetContractProps } from '../ethAdapter'
 
 export interface Web3AdapterConfig {
   /** web3 - Web3 library */

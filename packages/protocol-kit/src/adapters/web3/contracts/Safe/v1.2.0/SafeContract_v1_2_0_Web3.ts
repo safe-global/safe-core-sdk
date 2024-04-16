@@ -298,6 +298,26 @@ class SafeContract_v1_2_0_Web3
     } catch {}
     return isTxValid
   }
+
+  /**
+   * returns the version of the Safe contract.
+   *
+   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
+   */
+  async getVersion(): Promise<SafeVersion> {
+    const [safeVersion] = await this.VERSION()
+    return safeVersion as SafeVersion
+  }
+
+  /**
+   * returns the nonce of the Safe contract.
+   *
+   * @returns {Promise<bigint>} A promise that resolves to the nonce of the Safe contract.
+   */
+  async getNonce(): Promise<bigint> {
+    const [nonce] = await this.nonce()
+    return nonce
+  }
 }
 
 export default SafeContract_v1_2_0_Web3

@@ -287,9 +287,9 @@ class SafeContract_v1_4_1_Ethers
    * Returns array of first 10 modules.
    * @returns Array[modules]
    */
-  async getModules(): Promise<readonly string[]> {
+  async getModules(): Promise<string[]> {
     const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
-    return modules
+    return [...modules]
   }
 
   /**
@@ -314,6 +314,26 @@ class SafeContract_v1_4_1_Ethers
    */
   async getChainId(): Promise<[bigint]> {
     return [await this.contract.getChainId()]
+  }
+
+  /**
+   * returns the version of the Safe contract.
+   *
+   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
+   */
+  async getVersion(): Promise<SafeVersion> {
+    const [safeVersion] = await this.VERSION()
+    return safeVersion as SafeVersion
+  }
+
+  /**
+   * returns the nonce of the Safe contract.
+   *
+   * @returns {Promise<bigint>} A promise that resolves to the nonce of the Safe contract.
+   */
+  async getNonce(): Promise<bigint> {
+    const [nonce] = await this.nonce()
+    return nonce
   }
 }
 

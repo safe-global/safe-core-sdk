@@ -1,5 +1,4 @@
 import {
-  EthAdapter,
   OperationType,
   SafeMultisigTransactionResponse,
   SafeMultisigConfirmationResponse,
@@ -12,9 +11,9 @@ import {
   TransactionResult,
   MetaTransactionData,
   Transaction,
-  CompatibilityFallbackHandlerContract,
   EIP712TypedData,
-  SafeTransactionData
+  SafeTransactionData,
+  CompatibilityFallbackHandlerContractType
 } from '@safe-global/safe-core-sdk-types'
 import {
   encodeSetupCallData,
@@ -70,6 +69,7 @@ import {
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
+import { EthAdapter } from './adapters/ethAdapter'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -304,7 +304,9 @@ class Safe {
       return Promise.resolve(0)
     }
 
-    return this.#contractManager.safeContract.getNonce()
+    const nonce = await this.#contractManager.safeContract.getNonce()
+
+    return Number(nonce)
   }
 
   /**
@@ -766,6 +768,7 @@ class Safe {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
+    // TODO: fix this
     return this.#contractManager.safeContract.approveHash(hash, {
       from: signerAddress,
       ...options
@@ -786,7 +789,7 @@ class Safe {
     const owners = await this.getOwners()
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
-      const approved = await this.#contractManager.safeContract.approvedHashes(owner, txHash)
+      const [approved] = await this.#contractManager.safeContract.approvedHashes([owner, txHash])
       if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
@@ -1351,7 +1354,7 @@ class Safe {
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
         await safeSingletonContract.getAddress(),
         initializer, // call to the setup method to set the threshold & owners of the new Safe
-        saltNonce
+        BigInt(saltNonce)
       ])
     }
 
@@ -1402,7 +1405,7 @@ class Safe {
    *
    * @returns The fallback Handler contract
    */
-  private async getFallbackHandlerContract(): Promise<CompatibilityFallbackHandlerContract> {
+  private async getFallbackHandlerContract(): Promise<CompatibilityFallbackHandlerContractType> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
     }
@@ -1456,15 +1459,9 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
-    const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const data = fallbackHandler.encode('isValidSignature', [messageHash, signatureToCheck])
 
-    const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const bytesData = fallbackHandler.encode('isValidSignature', [messageHash, signatureToCheck])
 
     try {
       const isValidSignatureResponse = await Promise.all([

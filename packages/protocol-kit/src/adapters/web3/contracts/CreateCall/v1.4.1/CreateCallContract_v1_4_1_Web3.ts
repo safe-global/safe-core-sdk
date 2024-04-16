@@ -12,21 +12,21 @@ import {
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 
 /**
- * CreateCallContract_V1_4_1_Web3 is the implementation specific to the CreateCall contract version 1.4.1.
+ * CreateCallContract_v1_4_1_Web3 is the implementation specific to the CreateCall contract version 1.4.1.
  *
  * This class specializes in handling interactions with the CreateCall contract version 1.4.1 using Web3.js.
  *
  * @extends CreateCallBaseContractWeb3<CreateCallContract_v1_4_1_Abi> - Inherits from CreateCallBaseContractWeb3 with ABI specific to CreateCall contract version 1.4.1.
  * @implements CreateCallContract_v1_4_1_Contract - Implements the interface specific to CreateCall contract version 1.4.1.
  */
-class CreateCallContract_V1_4_1_Web3
+class CreateCallContract_v1_4_1_Web3
   extends CreateCallBaseContractWeb3<DeepWriteable<CreateCallContract_v1_4_1_Abi>>
   implements CreateCallContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of CreateCallContract_V1_4_1_Web3
+   * Constructs an instance of CreateCallContract_v1_4_1_Web3
    *
    * @param chainId - The chain ID where the contract resides.
    * @param web3Adapter - An instance of Web3Adapter.
@@ -83,4 +83,4 @@ class CreateCallContract_V1_4_1_Web3
   }
 }
 
-export default CreateCallContract_V1_4_1_Web3
+export default CreateCallContract_v1_4_1_Web3

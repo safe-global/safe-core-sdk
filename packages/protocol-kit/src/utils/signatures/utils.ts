@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import {
-  EthAdapter,
   SafeSignature,
   SafeEIP712Args,
   SafeTransactionData

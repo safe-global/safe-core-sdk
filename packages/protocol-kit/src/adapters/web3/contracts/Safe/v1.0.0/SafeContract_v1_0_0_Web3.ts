@@ -258,12 +258,12 @@ class SafeContract_v1_0_0_Web3
    * @param moduleAddress - The module address to check.
    * @returns True, if the module with the given address is enabled.
    */
-  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+  async isModuleEnabled(moduleAddress: string[]): Promise<boolean[]> {
     const [modules] = await this.getModules()
     const isModuleEnabled = modules.some((enabledModuleAddress) =>
-      sameString(enabledModuleAddress, moduleAddress)
+      sameString(enabledModuleAddress, moduleAddress[0])
     )
-    return isModuleEnabled
+    return [isModuleEnabled]
   }
 
   /**
@@ -314,6 +314,26 @@ class SafeContract_v1_0_0_Web3
         .call(options)
     } catch {}
     return isTxValid
+  }
+
+  /**
+   * returns the version of the Safe contract.
+   *
+   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
+   */
+  async getVersion(): Promise<SafeVersion> {
+    const [safeVersion] = await this.VERSION()
+    return safeVersion as SafeVersion
+  }
+
+  /**
+   * returns the nonce of the Safe contract.
+   *
+   * @returns {Promise<bigint>} A promise that resolves to the nonce of the Safe contract.
+   */
+  async getNonce(): Promise<bigint> {
+    const [nonce] = await this.nonce()
+    return nonce
   }
 }
 

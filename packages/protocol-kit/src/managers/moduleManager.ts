@@ -1,12 +1,13 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
+import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
 
 class ModuleManager {
   #ethAdapter: EthAdapter
-  #safeContract?: SafeContract
+  #safeContract?: SafeContractImplementationType
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
+  constructor(ethAdapter: EthAdapter, safeContract?: SafeContractImplementationType) {
     this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }
@@ -39,14 +40,20 @@ class ModuleManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.getModules()
+
+    const [modules] = await this.#safeContract.getModules()
+
+    return [...modules]
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.isModuleEnabled(moduleAddress)
+
+    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled([moduleAddress])
+
+    return isModuleEnabled
   }
 
   async encodeEnableModuleData(moduleAddress: string): Promise<string> {

@@ -36,15 +36,15 @@ import SafeProxyFactoryContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adap
 import SafeProxyFactoryContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Web3'
 import SimulateTxAccessorContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0_Web3'
 import SimulateTxAccessorContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Web3'
-import CreateCallContract_V1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Web3'
-import CreateCallContract_V1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Web3'
-import MultiSendContract_V1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Web3'
-import MultiSendContract_V1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Web3'
-import MultiSendContract_V1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Web3'
-import MultiSendCallOnlyContract_V1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Web3'
-import MultiSendCallOnlyContract_V1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Web3'
-import SignMessageLibContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SignMessageLib/v1.3.0/SignMessageLibContract_V1_3_0_Web3'
-import SignMessageLibContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SignMessageLib/v1.4.1/SignMessageLibContract_V1_4_1_Web3'
+import CreateCallContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Web3'
+import CreateCallContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Web3'
+import MultiSendContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.1.1/MultiSendContract_v1_1_1_Web3'
+import MultiSendContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.3.0/MultiSendContract_v1_3_0_Web3'
+import MultiSendContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.4.1/MultiSendContract_v1_4_1_Web3'
+import MultiSendCallOnlyContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0_Web3'
+import MultiSendCallOnlyContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1_Web3'
+import SignMessageLibContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0_Web3'
+import SignMessageLibContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1_Web3'
 import CompatibilityFallbackHandlerContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1_Web3'
 import CompatibilityFallbackHandlerContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0_Web3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
@@ -155,20 +155,20 @@ export async function getMultiSendContractInstance(
   contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
 ): Promise<
-  MultiSendContract_V1_4_1_Web3 | MultiSendContract_V1_3_0_Web3 | MultiSendContract_V1_1_1_Web3
+  MultiSendContract_v1_4_1_Web3 | MultiSendContract_v1_3_0_Web3 | MultiSendContract_v1_1_1_Web3
 > {
   const chainId = await web3Adapter.getChainId()
 
   switch (safeVersion) {
     case '1.4.1':
-      return new MultiSendContract_V1_4_1_Web3(
+      return new MultiSendContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendContract_v1_4_1_Abi>
       )
     case '1.3.0':
-      return new MultiSendContract_V1_3_0_Web3(
+      return new MultiSendContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
@@ -177,7 +177,7 @@ export async function getMultiSendContractInstance(
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new MultiSendContract_V1_1_1_Web3(
+      return new MultiSendContract_v1_1_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
@@ -193,12 +193,12 @@ export async function getMultiSendCallOnlyContractInstance(
   web3Adapter: Web3Adapter,
   contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<MultiSendCallOnlyContract_V1_4_1_Web3 | MultiSendCallOnlyContract_V1_3_0_Web3> {
+): Promise<MultiSendCallOnlyContract_v1_4_1_Web3 | MultiSendCallOnlyContract_v1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
 
   switch (safeVersion) {
     case '1.4.1':
-      return new MultiSendCallOnlyContract_V1_4_1_Web3(
+      return new MultiSendCallOnlyContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
@@ -208,7 +208,7 @@ export async function getMultiSendCallOnlyContractInstance(
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new MultiSendCallOnlyContract_V1_3_0_Web3(
+      return new MultiSendCallOnlyContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,
@@ -301,12 +301,12 @@ export async function getCreateCallContractInstance(
   web3Adapter: Web3Adapter,
   contractAddress?: string,
   customContractAbi?: AbiItem | AbiItem[] | undefined
-): Promise<CreateCallContract_V1_4_1_Web3 | CreateCallContract_V1_3_0_Web3> {
+): Promise<CreateCallContract_v1_4_1_Web3 | CreateCallContract_v1_3_0_Web3> {
   const chainId = await web3Adapter.getChainId()
 
   switch (safeVersion) {
     case '1.4.1':
-      return new CreateCallContract_V1_4_1_Web3(
+      return new CreateCallContract_v1_4_1_Web3(
         chainId,
         web3Adapter,
         contractAddress,
@@ -317,7 +317,7 @@ export async function getCreateCallContractInstance(
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new CreateCallContract_V1_3_0_Web3(
+      return new CreateCallContract_v1_3_0_Web3(
         chainId,
         web3Adapter,
         contractAddress,

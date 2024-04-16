@@ -4,21 +4,22 @@ import {
   getMultiSendContract,
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
-import { ContractNetworksConfig, SafeConfig } from '@safe-global/protocol-kit/types'
 import {
-  MultiSendCallOnlyContract,
-  MultiSendContract,
-  SafeContract
-} from '@safe-global/safe-core-sdk-types'
+  ContractNetworksConfig,
+  MultiSendCallOnlyContractImplementationType,
+  MultiSendContractImplementationType,
+  SafeConfig,
+  SafeContractImplementationType
+} from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types/dist/src/types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeSingleton?: boolean
-  #safeContract?: SafeContract
-  #multiSendContract!: MultiSendContract
-  #multiSendCallOnlyContract!: MultiSendCallOnlyContract
+  #safeContract?: SafeContractImplementationType
+  #multiSendContract!: MultiSendContractImplementationType
+  #multiSendCallOnlyContract!: MultiSendCallOnlyContractImplementationType
 
   static async create(config: SafeConfig): Promise<ContractManager> {
     const contractManager = new ContractManager()
@@ -86,15 +87,15 @@ class ContractManager {
     return this.#isL1SafeSingleton
   }
 
-  get safeContract(): SafeContract | undefined {
+  get safeContract(): SafeContractImplementationType | undefined {
     return this.#safeContract
   }
 
-  get multiSendContract(): MultiSendContract {
+  get multiSendContract(): MultiSendContractImplementationType {
     return this.#multiSendContract
   }
 
-  get multiSendCallOnlyContract(): MultiSendCallOnlyContract {
+  get multiSendCallOnlyContract(): MultiSendCallOnlyContractImplementationType {
     return this.#multiSendCallOnlyContract
   }
 }

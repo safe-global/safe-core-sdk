@@ -11,21 +11,21 @@ import {
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 
 /**
- * CreateCallContract_V1_3_0_Ethers is the implementation specific to the CreateCall contract version 1.3.0.
+ * CreateCallContract_v1_3_0_Ethers is the implementation specific to the CreateCall contract version 1.3.0.
  *
  * This class specializes in handling interactions with the CreateCall contract version 1.3.0 using Ethers.js v6.
  *
  * @extends CreateCallBaseContractEthers<CreateCallContract_v1_3_0_Abi> - Inherits from CreateCallBaseContractEthers with ABI specific to CreateCall contract version 1.3.0.
  * @implements CreateCallContract_v1_3_0_Contract - Implements the interface specific to CreateCall contract version 1.3.0.
  */
-class CreateCallContract_V1_3_0_Ethers
+class CreateCallContract_v1_3_0_Ethers
   extends CreateCallBaseContractEthers<CreateCallContract_v1_3_0_Abi>
   implements CreateCallContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of CreateCallContract_V1_3_0_Ethers
+   * Constructs an instance of CreateCallContract_v1_3_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
    * @param ethersAdapter - An instance of EthersAdapter.
@@ -83,4 +83,4 @@ class CreateCallContract_V1_3_0_Ethers
   }
 }
 
-export default CreateCallContract_V1_3_0_Ethers
+export default CreateCallContract_v1_3_0_Ethers

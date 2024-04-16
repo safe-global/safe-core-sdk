@@ -22,7 +22,7 @@ import {
  * @implements SafeProxyFactoryContract_v1_1_1_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.1.1.
  */
 class SafeProxyFactoryContract_v1_1_1_Web3
-  extends SafeProxyFactoryBaseContractWeb3<SafeProxyFactoryContract_v1_1_1_Abi>
+  extends SafeProxyFactoryBaseContractWeb3<DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>>
   implements SafeProxyFactoryContract_v1_1_1_Contract
 {
   safeVersion: SafeVersion
@@ -43,7 +43,7 @@ class SafeProxyFactoryContract_v1_1_1_Web3
   ) {
     const safeVersion = '1.1.1'
     const defaultAbi =
-      safeProxyFactory_1_1_1_ContractArtifacts.abi as SafeProxyFactoryContract_v1_1_1_Abi
+      safeProxyFactory_1_1_1_ContractArtifacts.abi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>
 
     super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 

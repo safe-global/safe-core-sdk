@@ -3,12 +3,8 @@ import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
-import {
-  EthAdapter,
-  SafeContract,
-  SafeProxyFactoryContract,
-  SafeVersion
-} from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
+import { SafeProxyFactoryContractType, SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 
@@ -19,7 +15,12 @@ import {
   getProxyFactoryContract,
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
-import { ContractNetworkConfig, SafeAccountConfig, SafeDeploymentConfig } from '../types'
+import {
+  ContractNetworkConfig,
+  SafeAccountConfig,
+  SafeContractImplementationType,
+  SafeDeploymentConfig
+} from '../types'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =
@@ -58,20 +59,20 @@ export interface PredictSafeAddressProps {
 export interface encodeSetupCallDataProps {
   ethAdapter: EthAdapter
   safeAccountConfig: SafeAccountConfig
-  safeContract: SafeContract
+  safeContract: SafeContractImplementationType
   customContracts?: ContractNetworkConfig
   customSafeVersion?: SafeVersion
 }
 
 export function encodeCreateProxyWithNonce(
-  safeProxyFactoryContract: SafeProxyFactoryContract,
+  safeProxyFactoryContract: SafeProxyFactoryContractType,
   safeSingletonAddress: string,
   initializer: string
 ) {
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
     safeSingletonAddress,
     initializer,
-    PREDETERMINED_SALT_NONCE
+    BigInt(PREDETERMINED_SALT_NONCE)
   ])
 }
 

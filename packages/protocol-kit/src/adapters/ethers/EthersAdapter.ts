@@ -3,9 +3,6 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  EthAdapter,
-  EthAdapterTransaction,
-  GetContractProps,
   SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import { ethers, TransactionResponse, AbstractSigner, Provider } from 'ethers'
@@ -20,6 +17,7 @@ import {
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
 import { isTypedDataSigner, isSignerCompatible } from './utils'
+import { EthAdapter, EthAdapterTransaction, GetContractProps } from '../ethAdapter'
 
 type Ethers = typeof ethers
 

@@ -109,7 +109,7 @@ class SafeProxyFactoryContract_v1_4_1_Ethers
    * @param {CreateProxyProps} props - Properties for the new proxy contract.
    * @returns The address of the new proxy contract.
    */
-  async createProxy({
+  async createProxyWithOptions({
     safeSingletonAddress,
     initializer,
     saltNonce,

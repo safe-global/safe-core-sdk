@@ -1,5 +1,4 @@
-import { AbstractSigner, Provider } from 'ethers'
-import { AbiItem } from 'web3-utils'
+import { JsonFragment, AbstractSigner, Provider } from 'ethers'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_3_0 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.3.0/factories/Compatibility_fallback_handler__factory'
 import { Compatibility_fallback_handler__factory as CompatibilityFallbackHandler_V1_4_1 } from '@safe-global/protocol-kit/typechain/src/ethers-v6/v1.4.1/factories/Compatibility_fallback_handler__factory'
 import {
@@ -56,7 +55,7 @@ export async function getSafeContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   safeProvider: SafeProvider,
-  customContractAbi?: AbiItem | AbiItem[] | undefined,
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined,
   isL1SafeSingleton?: boolean
   // TODO <any> return type used until Typechain is removed
 ): Promise<any> {
@@ -153,7 +152,7 @@ export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   safeProvider: SafeProvider,
-  customContractAbi?: AbiItem | AbiItem[] | undefined
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<
   | MultiSendContract_V1_4_1_Ethers
   | MultiSendContract_V1_3_0_Ethers
@@ -194,7 +193,7 @@ export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   safeProvider: SafeProvider,
-  customContractAbi?: AbiItem | AbiItem[] | undefined
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<MultiSendCallOnlyContract_V1_4_1_Ethers | MultiSendCallOnlyContract_V1_3_0_Ethers> {
   const chainId = await safeProvider.getChainId()
   switch (safeVersion) {
@@ -225,7 +224,7 @@ export async function getSafeProxyFactoryContractInstance(
   contractAddress: string,
   signerOrProvider: AbstractSigner | Provider,
   safeProvider: SafeProvider,
-  customContractAbi?: AbiItem | AbiItem[] | undefined
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ) {
   const chainId = await safeProvider.getChainId()
   let safeProxyFactoryContract
@@ -281,7 +280,7 @@ export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   safeProvider: SafeProvider,
-  customContractAbi?: AbiItem | AbiItem[] | undefined
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<SignMessageLibContract> {
   const chainId = await safeProvider.getChainId()
   let signMessageLibContract
@@ -316,7 +315,7 @@ export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   safeProvider: SafeProvider,
-  customContractAbi?: AbiItem | AbiItem[] | undefined
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<CreateCallContract> {
   const chainId = await safeProvider.getChainId()
   let createCallContract
@@ -353,7 +352,7 @@ export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   contractAddress: string,
   safeProvider: SafeProvider,
-  customContractAbi?: AbiItem | AbiItem[] | undefined
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<SimulateTxAccessorContract> {
   const chainId = await safeProvider.getChainId()
 

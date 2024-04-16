@@ -1,4 +1,4 @@
-import { ZeroAddress } from 'ethers'
+import { ZeroAddress, JsonFragment } from 'ethers'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -48,11 +48,10 @@ import {
 import { DebugTransactionGuard } from '@safe-global/protocol-kit/typechain/tests/ethers-v6/v1.3.0'
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
-import { AbiItem } from 'web3-utils'
 
 export const getSafeSingleton = async (): Promise<{
   contract: Safe_V1_4_1 | Safe_V1_3_0 | Safe_V1_2_0 | Safe_V1_1_1 | Safe_V1_0_0
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const SafeDeployment = await deployments.get(safeDeployed.name)
   const Safe = await ethers.getContractFactory(safeDeployed.name)
@@ -73,7 +72,7 @@ export const getFactory = async (): Promise<{
     | SafeProxyFactory_V1_3_0
     | SafeProxyFactory_V1_1_1
     | SafeProxyFactory_V1_0_0
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const Factory = await ethers.getContractFactory(proxyFactoryDeployed.name)
@@ -144,7 +143,7 @@ export const getSafeWithOwners = async (
 
 export const getCompatibilityFallbackHandler = async (): Promise<{
   contract: CompatibilityFallbackHandler_V1_4_1 | CompatibilityFallbackHandler_V1_3_0
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const CompatibilityFallbackHandlerDeployment = await deployments.get(
     compatibilityFallbackHandlerDeployed.name
@@ -162,7 +161,7 @@ export const getCompatibilityFallbackHandler = async (): Promise<{
 
 export const getMultiSend = async (): Promise<{
   contract: MultiSend_V1_4_1 | MultiSend_V1_3_0 | MultiSend_V1_1_1
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
   const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)
@@ -177,7 +176,7 @@ export const getMultiSend = async (): Promise<{
 
 export const getMultiSendCallOnly = async (): Promise<{
   contract: MultiSendCallOnly_V1_4_1 | MultiSendCallOnly_V1_3_0
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const MultiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
   const MultiSendCallOnly = await ethers.getContractFactory(multiSendCallOnlyDeployed.name)
@@ -191,7 +190,7 @@ export const getMultiSendCallOnly = async (): Promise<{
 
 export const getSignMessageLib = async (): Promise<{
   contract: SignMessageLib_V1_4_1 | SignMessageLib_V1_3_0
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const SignMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
   const SignMessageLib = await ethers.getContractFactory(signMessageLibDeployed.name)
@@ -205,7 +204,7 @@ export const getSignMessageLib = async (): Promise<{
 
 export const getCreateCall = async (): Promise<{
   contract: CreateCall_V1_4_1 | CreateCall_V1_3_0
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const CreateCallDeployment = await deployments.get(createCallDeployed.name)
   const CreateCall = await ethers.getContractFactory(createCallDeployed.name)
@@ -219,7 +218,7 @@ export const getCreateCall = async (): Promise<{
 
 export const getSimulateTxAccessor = async (): Promise<{
   contract: SimulateTxAccessor_V1_4_1 | SimulateTxAccessor_V1_3_0
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const SimulateTxAccessorDeployment = await deployments.get(simulateTxAccessorDeployed.name)
   const SimulateTxAccessor = await ethers.getContractFactory(simulateTxAccessorDeployed.name)

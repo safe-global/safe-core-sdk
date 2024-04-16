@@ -1,3 +1,4 @@
+import { JsonFragment } from 'ethers'
 import { CompatibilityFallbackHandlerContract } from '@safe-global/safe-core-sdk-types/contracts/CompatibilityFallbackHandlerContract'
 import { CreateCallContract } from '@safe-global/safe-core-sdk-types/contracts/CreateCallContract'
 import { MultiSendCallOnlyContract } from '@safe-global/safe-core-sdk-types/contracts/MultiSendCallOnlyContract'
@@ -8,7 +9,6 @@ import { SignMessageLibContract } from '@safe-global/safe-core-sdk-types/contrac
 import { SimulateTxAccessorContract } from '@safe-global/safe-core-sdk-types/contracts/SimulateTxAccessorContract'
 import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-core-sdk-types/types'
 import { SingletonDeployment } from '@safe-global/safe-deployments'
-import { AbiItem } from 'web3-utils'
 
 export interface SafeProviderTransaction {
   to: string
@@ -25,7 +25,7 @@ export interface GetContractProps {
   safeVersion: SafeVersion
   singletonDeployment?: SingletonDeployment
   customContractAddress?: string
-  customContractAbi?: AbiItem | AbiItem[]
+  customContractAbi?: JsonFragment | JsonFragment[]
   isL1SafeSingleton?: boolean
 }
 

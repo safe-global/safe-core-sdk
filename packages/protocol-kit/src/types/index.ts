@@ -5,7 +5,7 @@ import {
   SafeTransactionDataPartial,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
-import { AbiItem } from 'web3-utils'
+import { JsonFragment } from 'ethers'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -32,35 +32,35 @@ export interface ContractNetworkConfig {
   /** safeSingletonAddress - Address of the Safe Singleton contract deployed on a specific network */
   safeSingletonAddress: string
   /** safeSingletonAbi - Abi of the Safe Singleton contract deployed on a specific network */
-  safeSingletonAbi?: AbiItem | AbiItem[]
+  safeSingletonAbi?: JsonFragment | JsonFragment[]
   /** safeProxyFactoryAddress - Address of the SafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAddress: string
   /** safeProxyFactoryAbi - Abi of the SafeProxyFactory contract deployed on a specific network */
-  safeProxyFactoryAbi?: AbiItem | AbiItem[]
+  safeProxyFactoryAbi?: JsonFragment | JsonFragment[]
   /** multiSendAddress - Address of the MultiSend contract deployed on a specific network */
   multiSendAddress: string
   /** multiSendAbi - Abi of the MultiSend contract deployed on a specific network */
-  multiSendAbi?: AbiItem | AbiItem[]
+  multiSendAbi?: JsonFragment | JsonFragment[]
   /** multiSendCallOnlyAddress - Address of the MultiSendCallOnly contract deployed on a specific network */
   multiSendCallOnlyAddress: string
   /** multiSendCallOnlyAbi - Abi of the MultiSendCallOnly contract deployed on a specific network */
-  multiSendCallOnlyAbi?: AbiItem | AbiItem[]
+  multiSendCallOnlyAbi?: JsonFragment | JsonFragment[]
   /** fallbackHandlerAddress - Address of the Fallback Handler contract deployed on a specific network */
   fallbackHandlerAddress: string
   /** fallbackHandlerAbi - Abi of the Fallback Handler contract deployed on a specific network */
-  fallbackHandlerAbi?: AbiItem | AbiItem[]
+  fallbackHandlerAbi?: JsonFragment | JsonFragment[]
   /** signMessageLibAddress - Address of the SignMessageLib contract deployed on a specific network */
   signMessageLibAddress: string
   /** signMessageLibAbi - Abi of the SignMessageLib contract deployed on a specific network */
-  signMessageLibAbi?: AbiItem | AbiItem[]
+  signMessageLibAbi?: JsonFragment | JsonFragment[]
   /** createCallAddress - Address of the CreateCall contract deployed on a specific network */
   createCallAddress: string
   /** createCallAbi - Abi of the CreateCall contract deployed on a specific network */
-  createCallAbi?: AbiItem | AbiItem[]
+  createCallAbi?: JsonFragment | JsonFragment[]
   /** simulateTxAccessorAddress - Address of the SimulateTxAccessor contract deployed on a specific network */
   simulateTxAccessorAddress: string
   /** simulateTxAccessorAbi - Abi of the SimulateTxAccessor contract deployed on a specific network */
-  simulateTxAccessorAbi?: AbiItem | AbiItem[]
+  simulateTxAccessorAbi?: JsonFragment | JsonFragment[]
 }
 
 export interface ContractNetworksConfig {

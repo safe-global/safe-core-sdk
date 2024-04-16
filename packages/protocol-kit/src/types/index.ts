@@ -3,7 +3,8 @@ import {
   MetaTransactionData,
   SafeContract,
   SafeTransactionDataPartial,
-  SafeVersion
+  SafeVersion,
+  Eip1193Provider
 } from '@safe-global/safe-core-sdk-types'
 import { JsonFragment } from 'ethers'
 
@@ -80,15 +81,6 @@ type SafeConfigWithPredictedSafeProps = {
   safeAddress?: never
   /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe: PredictedSafeProps
-}
-
-interface RequestArguments {
-  readonly method: string
-  readonly params?: readonly unknown[] | object
-}
-
-export interface Eip1193Provider {
-  request: (args: RequestArguments) => Promise<unknown>
 }
 
 export type SafeConfigProps = {

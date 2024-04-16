@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -8,7 +8,7 @@ import { getServiceClient } from '../utils/setupServiceClient'
 chai.use(chaiAsPromised)
 
 let safeApiKit: SafeApiKit
-let ethAdapter: EthAdapter
+let provider: Eip1193Provider
 let protocolKit: Safe
 
 const generateRandomUUID = (): string => {
@@ -24,12 +24,12 @@ const safeAddress = '0x3296b3DD454B7c3912F7F477787B503918C50082'
 
 describe('addMessage', () => {
   before(async () => {
-    ;({ safeApiKit, ethAdapter } = await getServiceClient(
+    ;({ safeApiKit, provider } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
     ))
 
     protocolKit = await Safe.create({
-      ethAdapter,
+      provider,
       safeAddress
     })
   })

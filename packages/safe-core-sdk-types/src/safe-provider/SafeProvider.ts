@@ -10,6 +10,15 @@ import { SimulateTxAccessorContract } from '@safe-global/safe-core-sdk-types/con
 import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-core-sdk-types/types'
 import { SingletonDeployment } from '@safe-global/safe-deployments'
 
+export type RequestArguments = {
+  readonly method: string
+  readonly params?: readonly unknown[] | object
+}
+
+export interface Eip1193Provider {
+  request: (args: RequestArguments) => Promise<unknown>
+}
+
 export interface SafeProviderTransaction {
   to: string
   from: string

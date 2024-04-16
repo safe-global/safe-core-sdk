@@ -1,35 +1,17 @@
-import { AbstractSigner, Provider } from 'ethers'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
-import {
-  EthersAdapter,
-  EthersAdapterConfig,
-  Web3Adapter,
-  Web3AdapterConfig
-} from '@safe-global/protocol-kit'
 import { ethers, web3 } from 'hardhat'
+import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 
-export async function getEthAdapter(
-  signerOrProvider: AbstractSigner | Provider
-): Promise<EthAdapter> {
-  let ethAdapter: EthAdapter
+export function getEip1193Provider(): Eip1193Provider {
   switch (process.env.ETH_LIB) {
     case 'web3':
-      const signerAddress =
-        signerOrProvider instanceof AbstractSigner ? await signerOrProvider.getAddress() : undefined
-
-      const web3AdapterConfig: Web3AdapterConfig = {
-        web3,
-        signerAddress
-      }
-
-      ethAdapter = new Web3Adapter(web3AdapterConfig)
-      break
+      return web3.currentProvider as Eip1193Provider
     case 'ethers':
-      const ethersAdapterConfig: EthersAdapterConfig = { ethers, signerOrProvider }
-      ethAdapter = new EthersAdapter(ethersAdapterConfig)
-      break
+      return {
+        request: async (request) => {
+          return ethers.provider.send(request.method, [...((request.params as unknown[]) ?? [])])
+        }
+      }
     default:
       throw new Error('Ethereum library not supported')
   }
-  return ethAdapter
 }

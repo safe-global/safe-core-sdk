@@ -1,7 +1,7 @@
 import hre, { ethers } from 'hardhat'
 import Web3 from 'web3'
+import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
-import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
 import { custom, createWalletClient } from 'viem'
 

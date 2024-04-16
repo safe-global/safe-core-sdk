@@ -13,7 +13,6 @@ import {
 } from '@safe-global/protocol-kit/contracts/utils'
 import {
   ContractNetworksConfig,
-  Eip1193Provider,
   SafeAccountConfig,
   SafeDeploymentConfig
 } from '@safe-global/protocol-kit/types'
@@ -22,7 +21,8 @@ import {
   SafeContract,
   SafeProxyFactoryContract,
   SafeVersion,
-  TransactionOptions
+  TransactionOptions,
+  Eip1193Provider
 } from '@safe-global/safe-core-sdk-types'
 import { SafeProvider } from '../adapters/ethers'
 

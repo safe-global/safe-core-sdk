@@ -9,7 +9,8 @@ import {
   GetContractProps,
   SafeEIP712Args,
   SignMessageLibContract,
-  SimulateTxAccessorContract
+  SimulateTxAccessorContract,
+  Eip1193Provider
 } from '@safe-global/safe-core-sdk-types'
 import {
   ethers,
@@ -37,7 +38,6 @@ import MultiSendCallOnlyContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.
 import MultiSendContract_v1_1_1_Ethers from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
 import MultiSendContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
 import MultiSendContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
-import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */

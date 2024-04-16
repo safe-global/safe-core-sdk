@@ -14,7 +14,8 @@ import {
   Transaction,
   CompatibilityFallbackHandlerContract,
   EIP712TypedData,
-  SafeTransactionData
+  SafeTransactionData,
+  Eip1193Provider
 } from '@safe-global/safe-core-sdk-types'
 import {
   encodeSetupCallData,
@@ -31,7 +32,6 @@ import {
   AddOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
-  Eip1193Provider,
   PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeConfig,

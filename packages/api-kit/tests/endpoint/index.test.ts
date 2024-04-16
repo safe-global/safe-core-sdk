@@ -7,7 +7,7 @@ import SafeApiKit, {
 } from '@safe-global/api-kit/index'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
@@ -28,19 +28,19 @@ const tokenAddress = '0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D'
 const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
 const txServiceBaseUrl = 'https://safe-transaction-goerli.safe.global/api'
-const provider = getDefaultProvider(config.JSON_RPC)
+const defaultProvider = getDefaultProvider(config.JSON_RPC)
 const signer = new Wallet(
   '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
-  provider
+  defaultProvider
 )
-let ethAdapter: EthAdapter
+let provider: Eip1193Provider
 let safeApiKit: SafeApiKit
 let delegatorAddress: string
 let eip3770DelegatorAddress: string
 
 describe('Endpoint tests', () => {
   before(async () => {
-    ;({ safeApiKit, ethAdapter } = await getServiceClient(
+    ;({ safeApiKit, provider } = await getServiceClient(
       '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
     ))
     delegatorAddress = await signer.getAddress()
@@ -364,7 +364,7 @@ describe('Endpoint tests', () => {
       }
       const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
-      const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+      const safeSdk = await Safe.create({ provider, safeAddress })
       const safeTransaction = await safeSdk.createTransaction({
         transactions: [safeTransactionData],
         options
@@ -413,7 +413,7 @@ describe('Endpoint tests', () => {
       }
       const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
-      const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+      const safeSdk = await Safe.create({ provider, safeAddress })
       const safeTransaction = await safeSdk.createTransaction({
         transactions: [safeTransactionData],
         options

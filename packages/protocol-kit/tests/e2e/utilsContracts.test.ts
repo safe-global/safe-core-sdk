@@ -1,6 +1,6 @@
 import chai from 'chai'
 import { deployments } from 'hardhat'
-
+import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
@@ -13,8 +13,7 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import {
   SafeDeploymentConfig,
   SafeAccountConfig,
-  ContractNetworksConfig,
-  Eip1193Provider
+  ContractNetworksConfig
 } from '@safe-global/protocol-kit/types'
 import Safe, { SafeFactory, DeploySafeProps, SafeProvider } from '@safe-global/protocol-kit/index'
 import { itif } from './utils/helpers'
@@ -295,7 +294,7 @@ describe('Contract utils', () => {
     })
 
     it('should fail if no owners are present (empty array)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
 
       // invalid owners 1/0 Safe
       const invalidOwners: string[] = []

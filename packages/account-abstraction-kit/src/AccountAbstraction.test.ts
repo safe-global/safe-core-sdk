@@ -1,5 +1,4 @@
-import Safe, { predictSafeAddress } from '@safe-global/protocol-kit'
-import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
+import Safe, { predictSafeAddress, EthAdapter } from '@safe-global/protocol-kit'
 import { GelatoRelayPack, RelayKitBasePack } from '@safe-global/relay-kit'
 import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import AccountAbstraction from './AccountAbstraction'

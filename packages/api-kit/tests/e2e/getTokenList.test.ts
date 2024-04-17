@@ -7,7 +7,7 @@ let safeApiKit: SafeApiKit
 describe('getTokenList', () => {
   before(async () => {
     ;({ safeApiKit } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 

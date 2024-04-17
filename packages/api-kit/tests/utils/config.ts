@@ -1,8 +1,7 @@
 const config = {
-  CHAIN_ID: 5n,
-  BASE_URL: 'https://safe-transaction-goerli.safe.global',
-  JSON_RPC: 'https://rpc.ankr.com/eth_goerli',
-  EIP_3770_PREFIX: 'gor'
+  CHAIN_ID: 11155111n,
+  JSON_RPC: 'https://rpc.ankr.com/eth_sepolia',
+  EIP_3770_PREFIX: 'sep'
 }
 
 export default config

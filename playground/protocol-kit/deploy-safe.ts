@@ -17,7 +17,7 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: 'https://rpc.ankr.com/eth_goerli',
+  RPC_URL: 'https://rpc.ankr.com/eth_sepolia',
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
     OWNERS: ['OWNER_ADDRESS'],

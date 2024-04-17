@@ -10,7 +10,7 @@ let safeApiKit: SafeApiKit
 describe('getNextNonce', () => {
   before(async () => {
     ;({ safeApiKit } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
@@ -22,20 +22,20 @@ describe('getNextNonce', () => {
   })
 
   it('should return the next Safe nonce when there are pending transactions', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const nextNonce = await safeApiKit.getNextNonce(safeAddress)
-    chai.expect(nextNonce).to.be.equal(9)
+    chai.expect(nextNonce).to.be.equal(11)
   })
 
   it('should return the next Safe nonce when there are pending transactions EIP-3770', async () => {
-    const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const nextNonce = await safeApiKit.getNextNonce(eip3770SafeAddress)
-    chai.expect(nextNonce).to.be.equal(9)
+    chai.expect(nextNonce).to.be.equal(11)
   })
 
   it('should return the next Safe nonce when there are no pending transactions', async () => {
-    const safeAddress = '0x72c346260a4887F0231af41178C1c818Ce34543f'
+    const safeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3'
     const nextNonce = await safeApiKit.getNextNonce(safeAddress)
     chai.expect(nextNonce).to.be.equal(5)
   })

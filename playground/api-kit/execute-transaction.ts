@@ -9,16 +9,14 @@ interface Config {
   RPC_URL: string
   SIGNER_ADDRESS_PRIVATE_KEY: string
   SAFE_ADDRESS: string
-  TX_SERVICE_URL: string
   SAFE_TX_HASH: string
 }
 
 const config: Config = {
-  CHAIN_ID: 5n,
-  RPC_URL: 'https://rpc.ankr.com/eth_goerli',
+  CHAIN_ID: 11155111n,
+  RPC_URL: 'https://rpc.ankr.com/eth_sepolia',
   SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
   SAFE_ADDRESS: '<SAFE_ADDRESS>',
-  TX_SERVICE_URL: 'https://safe-transaction-goerli.safe.global/', // Check https://docs.safe.global/safe-core-api/available-services
   SAFE_TX_HASH: '<SAFE_TX_HASH>'
 }
 

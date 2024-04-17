@@ -16,7 +16,7 @@ import {
   ContractNetworksConfig
 } from '@safe-global/protocol-kit/types'
 import Safe, { SafeFactory, DeploySafeProps } from '@safe-global/protocol-kit/index'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import { itif } from './utils/helpers'
 
 // test util funcion to deploy a safe (needed to check the expected Safe Address)

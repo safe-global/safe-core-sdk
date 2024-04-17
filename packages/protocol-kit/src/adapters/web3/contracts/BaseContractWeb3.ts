@@ -4,14 +4,14 @@ import { AbiItem } from 'web3-utils'
 
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import {
   EncodeFunction,
   EstimateGasFunction,
-  GetAddressFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/common/BaseContract'
+  GetAddressFunction,
+  SafeVersion,
+  Web3TransactionOptions
+} from '@safe-global/safe-core-sdk-types'
 import BaseContract from '@safe-global/protocol-kit/adapters/BaseContract'
-import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3/types'
 
 /**
  * Abstract class BaseContractWeb3 extends BaseContract to specifically integrate with the Web3.js library.
@@ -67,7 +67,7 @@ abstract class BaseContractWeb3<
   }
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
-    return this.contract.methods[functionToEncode](...(args as Array<any>)).encodeABI()
+    return this.contract.methods[functionToEncode](...(args as Array<[]>)).encodeABI()
   }
 
   estimateGas: EstimateGasFunction<ContractAbiType, Web3TransactionOptions> = (
@@ -75,7 +75,7 @@ abstract class BaseContractWeb3<
     args,
     options = {}
   ) => {
-    return this.contract.methods[functionToEstimate](...(args as Array<any>))
+    return this.contract.methods[functionToEstimate](...(args as Array<[]>))
       .estimateGas(options)
       .then(BigInt)
   }

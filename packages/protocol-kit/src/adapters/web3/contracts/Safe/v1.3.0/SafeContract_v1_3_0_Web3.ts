@@ -1,21 +1,18 @@
 import SafeBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/SafeBaseContractWeb3'
-import {
-  DeepWriteable,
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from '@safe-global/protocol-kit/adapters/web3/types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/adapters/web3/utils/constants'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import safe_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.3.0/gnosis_safe_l2'
-import SafeContract_v1_3_0_Contract, {
-  SafeContract_v1_3_0_Abi as SafeContract_v1_3_0_Abi_Readonly,
-  SafeContract_v1_3_0_Function
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.3.0/SafeContract_v1_3_0'
-import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
-
-// Remove all nested `readonly` modifiers from the ABI type
-type SafeContract_v1_3_0_Abi = DeepWriteable<SafeContract_v1_3_0_Abi_Readonly>
+import {
+  DeepWriteable,
+  SafeVersion,
+  safe_1_3_0_ContractArtifacts,
+  SafeContract_v1_3_0_Function,
+  SafeContract_v1_3_0_Abi,
+  SafeContract_v1_3_0_Contract,
+  SafeTransaction,
+  Web3TransactionOptions,
+  Web3TransactionResult
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeContract_v1_3_0_Web3 is the implementation specific to the Safe contract version 1.3.0.
@@ -45,7 +42,7 @@ class SafeContract_v1_3_0_Web3
     web3Adapter: Web3Adapter,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContract_v1_3_0_Abi_Readonly
+    customContractAbi?: DeepWriteable<SafeContract_v1_3_0_Abi>
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = safe_1_3_0_ContractArtifacts.abi as DeepWriteable<SafeContract_v1_3_0_Abi>
@@ -57,7 +54,7 @@ class SafeContract_v1_3_0_Web3
       safeVersion,
       isL1SafeSingleton,
       customContractAddress,
-      customContractAbi as DeepWriteable<SafeContract_v1_3_0_Abi>
+      customContractAbi
     )
 
     this.safeVersion = safeVersion
@@ -297,9 +294,9 @@ class SafeContract_v1_3_0_Web3
    * Returns array of first 10 modules.
    * @returns Array[modules]
    */
-  async getModules(): Promise<readonly string[]> {
+  async getModules(): Promise<string[]> {
     const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
-    return modules
+    return [...modules]
   }
 
   /**
@@ -319,71 +316,28 @@ class SafeContract_v1_3_0_Web3
     return toTxResult(txResponse, options)
   }
 
-  /**
-   * Returns the chain id of the Safe contract. (Custom method - not defined in the Safe Contract)
-   * @returns Array[chainId]
-   */
   async getChainId(): Promise<[bigint]> {
     return [await this.contract.methods.getChainId().call()]
   }
 
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
+  /**
+   * returns the version of the Safe contract.
+   *
+   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
+   */
+  async getVersion(): Promise<SafeVersion> {
+    const [safeVersion] = await this.VERSION()
+    return safeVersion as SafeVersion
+  }
 
-      setup: (): any => {
-        // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_3_0_Contract
-        return
-      },
-
-      approveHash: this.approveHash.bind(this),
-
-      isValidTransaction: this.isValidTransaction.bind(this),
-
-      execTransaction: this.execTransaction.bind(this),
-
-      getAddress: this.getAddress.bind(this),
-
-      getModules: this.getModules.bind(this),
-
-      isModuleEnabled: async (moduleAddress: string) =>
-        (await this.isModuleEnabled([moduleAddress]))[0],
-
-      getVersion: async () => (await this.VERSION())[0] as SafeVersion,
-
-      getNonce: async () => Number((await this.nonce())[0]),
-
-      getThreshold: async () => Number((await this.getThreshold())[0]),
-
-      getOwners: async () => (await this.getOwners())[0],
-
-      isOwner: async (address: string) => (await this.isOwner([address]))[0],
-
-      getTransactionHash: async (safeTransactionData: SafeTransactionData) => {
-        return (
-          await this.getTransactionHash([
-            safeTransactionData.to,
-            BigInt(safeTransactionData.value),
-            safeTransactionData.data,
-            safeTransactionData.operation,
-            BigInt(safeTransactionData.safeTxGas),
-            BigInt(safeTransactionData.baseGas),
-            BigInt(safeTransactionData.gasPrice),
-            safeTransactionData.gasToken,
-            safeTransactionData.refundReceiver,
-            BigInt(safeTransactionData.nonce)
-          ])
-        )[0]
-      },
-
-      approvedHashes: async (ownerAddress: string, hash: string) =>
-        (await this.approvedHashes([ownerAddress, hash]))[0],
-
-      encode: this.encode.bind(this),
-
-      estimateGas: this.estimateGas.bind(this)
-    }
+  /**
+   * returns the nonce of the Safe contract.
+   *
+   * @returns {Promise<bigint>} A promise that resolves to the nonce of the Safe contract.
+   */
+  async getNonce(): Promise<bigint> {
+    const [nonce] = await this.nonce()
+    return nonce
   }
 }
 

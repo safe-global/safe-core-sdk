@@ -1,12 +1,13 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
+import { SafeContractImplementationType } from '../types'
 
 class OwnerManager {
   #ethAdapter: EthAdapter
-  #safeContract?: SafeContract
+  #safeContract?: SafeContractImplementationType
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
+  constructor(ethAdapter: EthAdapter, safeContract?: SafeContractImplementationType) {
     this.#ethAdapter = ethAdapter
     this.#safeContract = safeContract
   }
@@ -56,7 +57,7 @@ class OwnerManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    const owners = await this.#safeContract.getOwners()
+    const [owners] = await this.#safeContract.getOwners()
     return [...owners]
   }
 
@@ -64,14 +65,19 @@ class OwnerManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.getThreshold()
+
+    const [threshold] = await this.#safeContract.getThreshold()
+
+    return Number(threshold)
   }
 
   async isOwner(ownerAddress: string): Promise<boolean> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.isOwner(ownerAddress)
+
+    const [isOwner] = await this.#safeContract.isOwner([ownerAddress])
+    return isOwner
   }
 
   async encodeAddOwnerWithThresholdData(ownerAddress: string, threshold?: number): Promise<string> {

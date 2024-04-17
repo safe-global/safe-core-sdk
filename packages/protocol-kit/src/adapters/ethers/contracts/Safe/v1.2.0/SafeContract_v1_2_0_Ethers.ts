@@ -1,16 +1,16 @@
 import SafeBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/SafeBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import {
+  SafeVersion,
+  SafeContract_v1_2_0_Abi,
+  SafeContract_v1_2_0_Contract,
+  SafeContract_v1_2_0_Function,
+  SafeTransaction,
+  safe_1_2_0_ContractArtifacts,
   EthersTransactionOptions,
   EthersTransactionResult
-} from '@safe-global/protocol-kit/adapters/ethers/types'
-import SafeContract_v1_2_0_Contract, {
-  SafeContract_v1_2_0_Abi,
-  SafeContract_v1_2_0_Function
-} from '@safe-global/protocol-kit/contracts/AbiType/Safe/v1.2.0/SafeContract_v1_2_0'
-import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
-import safe_1_2_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/Safe/v1.2.0/gnosis_safe'
-import { SafeTransaction, SafeTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeContract_v1_2_0_Ethers is the implementation specific to the Safe contract version 1.2.0.
@@ -301,63 +301,24 @@ class SafeContract_v1_2_0_Ethers
     }
   }
 
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
+  /**
+   * returns the version of the Safe contract.
+   *
+   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
+   */
+  async getVersion(): Promise<SafeVersion> {
+    const [safeVersion] = await this.VERSION()
+    return safeVersion as SafeVersion
+  }
 
-      setup: (): any => {
-        // setup function is labelled as `external` on the contract code, but not present on type SafeContract_v1_2_0_Contract
-        return
-      },
-
-      approveHash: this.approveHash.bind(this),
-
-      isValidTransaction: this.isValidTransaction.bind(this),
-
-      execTransaction: this.execTransaction.bind(this),
-
-      getAddress: this.getAddress.bind(this),
-
-      getModules: async () => (await this.getModules())[0],
-
-      isModuleEnabled: async (moduleAddress: string) =>
-        (await this.isModuleEnabled([moduleAddress]))[0],
-
-      getVersion: async () => (await this.VERSION())[0] as SafeVersion,
-
-      getNonce: async () => Number((await this.nonce())[0]),
-
-      getThreshold: async () => Number((await this.getThreshold())[0]),
-
-      getOwners: async () => (await this.getOwners())[0],
-
-      isOwner: async (address: string) => (await this.isOwner([address]))[0],
-
-      getTransactionHash: async (safeTransactionData: SafeTransactionData) => {
-        return (
-          await this.getTransactionHash([
-            safeTransactionData.to,
-            BigInt(safeTransactionData.value),
-            safeTransactionData.data,
-            safeTransactionData.operation,
-            BigInt(safeTransactionData.safeTxGas),
-            BigInt(safeTransactionData.baseGas),
-            BigInt(safeTransactionData.gasPrice),
-            safeTransactionData.gasToken,
-            safeTransactionData.refundReceiver,
-            BigInt(safeTransactionData.nonce)
-          ])
-        )[0]
-      },
-
-      approvedHashes: async (ownerAddress: string, hash: string) =>
-        (await this.approvedHashes([ownerAddress, hash]))[0],
-
-      encode: this.encode.bind(this),
-
-      estimateGas: this.estimateGas.bind(this)
-    }
+  /**
+   * returns the nonce of the Safe contract.
+   *
+   * @returns {Promise<bigint>} A promise that resolves to the nonce of the Safe contract.
+   */
+  async getNonce(): Promise<bigint> {
+    const [nonce] = await this.nonce()
+    return nonce
   }
 }
 

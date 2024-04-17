@@ -1,12 +1,55 @@
 import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/utils/transactions'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import {
-  EthAdapter,
   MetaTransactionData,
-  SafeContract,
   SafeTransactionDataPartial,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import { AbiItem } from 'web3-utils'
+import SafeContract_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Ethers'
+import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Ethers'
+import SafeContract_v1_2_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Ethers'
+import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
+import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Ethers'
+import SafeContract_v1_0_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Web3'
+import SafeContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Web3'
+import SafeContract_v1_2_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Web3'
+import SafeContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Web3'
+import SafeContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Web3'
+import MultiSendContract_v1_1_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.1.1/MultiSendContract_v1_1_1_Web3'
+import MultiSendContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.1.1/MultiSendContract_v1_1_1_Ethers'
+import MultiSendContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.3.0/MultiSendContract_v1_3_0_Web3'
+import MultiSendContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.3.0/MultiSendContract_v1_3_0_Ethers'
+import MultiSendContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.4.1/MultiSendContract_v1_4_1_Web3'
+import MultiSendContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.4.1/MultiSendContract_v1_4_1_Ethers'
+import MultiSendCallOnlyContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1_Ethers'
+import MultiSendCallOnlyContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0_Ethers'
+import MultiSendCallOnlyContract_v1_3_0_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0_Web3'
+import MultiSendCallOnlyContract_v1_4_1_Web3 from '@safe-global/protocol-kit/adapters/web3/contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1_Web3'
+import CompatibilityFallbackHandlerContract_v1_3_0_Web3 from '../adapters/web3/contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0_Web3'
+import CompatibilityFallbackHandlerContract_v1_3_0_Ethers from '../adapters/ethers/contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0_Ethers'
+import CompatibilityFallbackHandlerContract_v1_4_1_Web3 from '../adapters/web3/contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1_Web3'
+import CompatibilityFallbackHandlerContract_v1_4_1_Ethers from '../adapters/ethers/contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1_Ethers'
+import SafeProxyFactoryContract_v1_0_0_Web3 from '../adapters/web3/contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0_Web3'
+import SafeProxyFactoryContract_v1_0_0_Ethers from '../adapters/ethers/contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0_Ethers'
+import SafeProxyFactoryContract_v1_1_1_Web3 from '../adapters/web3/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1_Web3'
+import SafeProxyFactoryContract_v1_1_1_Ethers from '../adapters/ethers/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1_Ethers'
+import SafeProxyFactoryContract_v1_3_0_Web3 from '../adapters/web3/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0_Web3'
+import SafeProxyFactoryContract_v1_3_0_Ethers from '../adapters/ethers/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0_Ethers'
+import SafeProxyFactoryContract_v1_4_1_Web3 from '../adapters/web3/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Web3'
+import SafeProxyFactoryContract_v1_4_1_Ethers from '../adapters/ethers/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1_Ethers'
+import SignMessageLibContract_v1_3_0_Web3 from '../adapters/web3/contracts/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0_Web3'
+import SignMessageLibContract_v1_3_0_Ethers from '../adapters/ethers/contracts/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0_Ethers'
+import SignMessageLibContract_v1_4_1_Web3 from '../adapters/web3/contracts/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1_Web3'
+import SignMessageLibContract_v1_4_1_Ethers from '../adapters/ethers/contracts/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1_Ethers'
+import SimulateTxAccessorContract_v1_3_0_Web3 from '../adapters/web3/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0_Web3'
+import SimulateTxAccessorContract_v1_3_0_Ethers from '../adapters/ethers/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0_Ethers'
+import SimulateTxAccessorContract_v1_4_1_Web3 from '../adapters/web3/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Web3'
+import SimulateTxAccessorContract_v1_4_1_Ethers from '../adapters/ethers/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Ethers'
+import CreateCallContract_v1_3_0_Web3 from '../adapters/web3/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Web3'
+import CreateCallContract_v1_3_0_Ethers from '../adapters/ethers/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Ethers'
+import CreateCallContract_v1_4_1_Web3 from '../adapters/web3/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Web3'
+import CreateCallContract_v1_4_1_Ethers from '../adapters/ethers/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Ethers'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -159,7 +202,7 @@ export interface SwapOwnerTxParams {
 
 type StandardizeSafeTxDataWithSafeContractProps = {
   /** safeContract - The Safe contract to use */
-  safeContract: SafeContract
+  safeContract: SafeContractImplementationType
   /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe?: never
 }
@@ -197,3 +240,145 @@ export enum SigningMethod {
 }
 
 export type SigningMethodType = SigningMethod | string
+
+// Safe contract implementation types
+
+export type SafeContract_v1_0_0_ImplementationType =
+  | SafeContract_v1_0_0_Web3
+  | SafeContract_v1_0_0_Ethers
+
+export type SafeContract_v1_1_0_ImplementationType =
+  | SafeContract_v1_1_1_Web3
+  | SafeContract_v1_1_1_Ethers
+
+export type SafeContract_v1_2_0_ImplementationType =
+  | SafeContract_v1_2_0_Web3
+  | SafeContract_v1_2_0_Ethers
+
+export type SafeContract_v1_3_0_ImplementationType =
+  | SafeContract_v1_3_0_Web3
+  | SafeContract_v1_3_0_Ethers
+
+export type SafeContract_v1_4_1_ImplementationType =
+  | SafeContract_v1_4_1_Web3
+  | SafeContract_v1_4_1_Ethers
+
+export type SafeContractImplementationType =
+  | SafeContract_v1_0_0_ImplementationType
+  | SafeContract_v1_1_0_ImplementationType
+  | SafeContract_v1_2_0_ImplementationType
+  | SafeContract_v1_3_0_ImplementationType
+  | SafeContract_v1_4_1_ImplementationType
+
+// MultiSend contract implementation types
+
+export type MultiSendContract_v1_1_1_ImplementationType =
+  | MultiSendContract_v1_1_1_Web3
+  | MultiSendContract_v1_1_1_Ethers
+
+export type MultiSendContract_v1_3_0_ImplementationType =
+  | MultiSendContract_v1_3_0_Web3
+  | MultiSendContract_v1_3_0_Ethers
+
+export type MultiSendContract_v1_4_1_ImplementationType =
+  | MultiSendContract_v1_4_1_Web3
+  | MultiSendContract_v1_4_1_Ethers
+
+export type MultiSendContractImplementationType =
+  | MultiSendContract_v1_1_1_ImplementationType
+  | MultiSendContract_v1_3_0_ImplementationType
+  | MultiSendContract_v1_4_1_ImplementationType
+
+// MultiSendCallOnly contract implementation types
+
+export type MultiSendCallOnlyContract_v1_3_0_ImplementationType =
+  | MultiSendCallOnlyContract_v1_3_0_Web3
+  | MultiSendCallOnlyContract_v1_3_0_Ethers
+
+export type MultiSendCallOnlyContract_v1_4_1_ImplementationType =
+  | MultiSendCallOnlyContract_v1_4_1_Web3
+  | MultiSendCallOnlyContract_v1_4_1_Ethers
+
+export type MultiSendCallOnlyContractImplementationType =
+  | MultiSendCallOnlyContract_v1_3_0_ImplementationType
+  | MultiSendCallOnlyContract_v1_4_1_ImplementationType
+
+// CompatibilityFallbackHandler contract implementation types
+
+export type CompatibilityFallbackHandlerContract_v1_3_0_ImplementationType =
+  | CompatibilityFallbackHandlerContract_v1_3_0_Web3
+  | CompatibilityFallbackHandlerContract_v1_3_0_Ethers
+
+export type CompatibilityFallbackHandlerContract_v1_4_1_ImplementationType =
+  | CompatibilityFallbackHandlerContract_v1_4_1_Web3
+  | CompatibilityFallbackHandlerContract_v1_4_1_Ethers
+
+export type CompatibilityFallbackHandlerContractImplementationType =
+  | CompatibilityFallbackHandlerContract_v1_3_0_ImplementationType
+  | CompatibilityFallbackHandlerContract_v1_4_1_ImplementationType
+
+// SafeProxyFactory contract implementation types
+
+export type SafeProxyFactoryContract_v1_0_0_ImplementationType =
+  | SafeProxyFactoryContract_v1_0_0_Web3
+  | SafeProxyFactoryContract_v1_0_0_Ethers
+
+export type SafeProxyFactoryContract_v1_1_1_ImplementationType =
+  | SafeProxyFactoryContract_v1_1_1_Web3
+  | SafeProxyFactoryContract_v1_1_1_Ethers
+
+export type SafeProxyFactoryContract_v1_3_0_ImplementationType =
+  | SafeProxyFactoryContract_v1_3_0_Web3
+  | SafeProxyFactoryContract_v1_3_0_Ethers
+
+export type SafeProxyFactoryContract_v1_4_1_ImplementationType =
+  | SafeProxyFactoryContract_v1_4_1_Web3
+  | SafeProxyFactoryContract_v1_4_1_Ethers
+
+export type SafeProxyFactoryContractImplementationType =
+  | SafeProxyFactoryContract_v1_0_0_ImplementationType
+  | SafeProxyFactoryContract_v1_1_1_ImplementationType
+  | SafeProxyFactoryContract_v1_3_0_ImplementationType
+  | SafeProxyFactoryContract_v1_4_1_ImplementationType
+
+// SignMessageLib contract implementation types
+
+export type SignMessageLibContract_v1_3_0_ImplementationType =
+  | SignMessageLibContract_v1_3_0_Web3
+  | SignMessageLibContract_v1_3_0_Ethers
+
+export type SignMessageLibContract_v1_4_1_ImplementationType =
+  | SignMessageLibContract_v1_4_1_Web3
+  | SignMessageLibContract_v1_4_1_Ethers
+
+export type SignMessageLibContractImplementationType =
+  | SignMessageLibContract_v1_3_0_ImplementationType
+  | SignMessageLibContract_v1_4_1_ImplementationType
+
+// SimulateTxAccessor contract implementation types
+
+export type SimulateTxAccessorContract_v1_3_0_ImplementationType =
+  | SimulateTxAccessorContract_v1_3_0_Web3
+  | SimulateTxAccessorContract_v1_3_0_Ethers
+
+export type SimulateTxAccessorContract_v1_4_1_ImplementationType =
+  | SimulateTxAccessorContract_v1_4_1_Web3
+  | SimulateTxAccessorContract_v1_4_1_Ethers
+
+export type SimulateTxAccessorContractImplementationType =
+  | SimulateTxAccessorContract_v1_3_0_ImplementationType
+  | SimulateTxAccessorContract_v1_4_1_ImplementationType
+
+// CreateCall contract implementation types
+
+export type CreateCallContract_v1_3_0_ImplementationType =
+  | CreateCallContract_v1_3_0_Web3
+  | CreateCallContract_v1_3_0_Ethers
+
+export type CreateCallContract_v1_4_1_ImplementationType =
+  | CreateCallContract_v1_4_1_Web3
+  | CreateCallContract_v1_4_1_Ethers
+
+export type CreateCallContractImplementationType =
+  | CreateCallContract_v1_3_0_ImplementationType
+  | CreateCallContract_v1_4_1_ImplementationType

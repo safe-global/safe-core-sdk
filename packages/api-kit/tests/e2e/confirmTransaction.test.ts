@@ -2,9 +2,10 @@ import Safe, {
   EthSafeSignature,
   buildSignatureBytes,
   SigningMethod,
-  buildContractSignature
+  buildContractSignature,
+  EthAdapter
 } from '@safe-global/protocol-kit'
-import { EthAdapter, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'

@@ -1,10 +1,11 @@
 import CompatibilityFallbackHandlerBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import CompatibilityFallbackHandlerContract_v1_4_1_Contract, {
-  CompatibilityFallbackHandlerContract_v1_4_1_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
-import CompatibilityFallbackHandler_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CompatibilityFallbackHandler/v1.4.1/compatibility_fallback_handler'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  compatibilityFallbackHandler_1_4_1_ContractArtifacts,
+  CompatibilityFallbackHandlerContract_v1_4_1_Abi,
+  CompatibilityFallbackHandlerContract_v1_4_1_Contract,
+  SafeVersion
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * CompatibilityFallbackHandlerContract_v1_4_1_Ethers is the implementation specific to the CompatibilityFallbackHandler contract version 1.4.1.
@@ -35,7 +36,7 @@ class CompatibilityFallbackHandlerContract_v1_4_1_Ethers
     customContractAbi?: CompatibilityFallbackHandlerContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
-    const defaultAbi = CompatibilityFallbackHandler_1_4_1_ContractArtifacts.abi
+    const defaultAbi = compatibilityFallbackHandler_1_4_1_ContractArtifacts.abi
 
     super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 

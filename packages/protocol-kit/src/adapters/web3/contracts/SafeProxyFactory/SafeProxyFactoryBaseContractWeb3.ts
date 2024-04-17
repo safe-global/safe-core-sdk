@@ -1,13 +1,13 @@
 import { Abi } from 'abitype'
 import { AbiItem } from 'web3-utils'
 
-import { Web3TransactionOptions } from '@safe-global/protocol-kit/adapters/web3/types'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
 import BaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/BaseContractWeb3'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 import {
   CreateProxyProps as CreateProxyPropsGeneral,
-  SafeVersion
+  SafeVersion,
+  Web3TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 
 export interface CreateProxyProps extends CreateProxyPropsGeneral {

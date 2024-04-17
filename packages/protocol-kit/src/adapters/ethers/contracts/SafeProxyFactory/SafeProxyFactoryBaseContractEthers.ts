@@ -1,12 +1,11 @@
 import { Abi } from 'abitype'
 import { ContractRunner, InterfaceAbi } from 'ethers'
-
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import {
-  CreateProxyProps as CreateProxyPropsGeneral,
-  SafeVersion
+  SafeVersion,
+  EthersTransactionOptions,
+  CreateProxyProps as CreateProxyPropsGeneral
 } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 

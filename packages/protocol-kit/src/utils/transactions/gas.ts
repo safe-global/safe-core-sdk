@@ -1,18 +1,20 @@
-import {
-  EthAdapter,
-  SafeContract,
-  OperationType,
-  SafeVersion,
-  SafeTransaction
-} from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe from '@safe-global/protocol-kit/Safe'
-import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
+import {
+  ContractNetworksConfig,
+  SafeContractImplementationType
+} from '@safe-global/protocol-kit/types'
 import { ZERO_ADDRESS } from '../constants'
 import {
   getSafeContract,
   getSimulateTxAccessorContract
 } from '../../contracts/safeDeploymentContracts'
+import {
+  isSafeContractCompatibleWithRequiredTxGas,
+  isSafeContractCompatibleWithSimulateAndRevert
+} from '../safeVersions'
 
 // Every byte == 00 -> 4  Gas cost
 const CALL_DATA_ZERO_BYTE_GAS_COST = 4
@@ -60,7 +62,7 @@ function estimateDataGasCosts(data: string): number {
 
 export async function estimateGas(
   safeVersion: SafeVersion,
-  safeContract: SafeContract,
+  safeContract: SafeContractImplementationType,
   ethAdapter: EthAdapter,
   to: string,
   valueInWei: string,
@@ -77,15 +79,18 @@ export async function estimateGas(
 
   const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
     to,
-    valueInWei,
+    BigInt(valueInWei),
     data,
     operation
   ])
 
-  const safeFunctionToEstimate = safeContract.encode('simulateAndRevert', [
-    await simulateTxAccessorContract.getAddress(),
-    transactionDataToEstimate
-  ])
+  const safeContractContractCompatibleWithSimulateAndRevert =
+    await isSafeContractCompatibleWithSimulateAndRevert(safeContract)
+
+  const safeFunctionToEstimate = safeContractContractCompatibleWithSimulateAndRevert.encode(
+    'simulateAndRevert',
+    [await simulateTxAccessorContract.getAddress(), transactionDataToEstimate]
+  )
   const safeAddress = await safeContract.getAddress()
   const transactionToEstimateGas = {
     to: safeAddress,
@@ -104,7 +109,7 @@ export async function estimateGas(
 }
 
 export async function estimateTxGas(
-  safeContract: SafeContract,
+  safeContract: SafeContractImplementationType,
   ethAdapter: EthAdapter,
   to: string,
   valueInWei: string,
@@ -114,12 +119,17 @@ export async function estimateTxGas(
   let txGasEstimation = 0
   const safeAddress = await safeContract.getAddress()
 
-  const estimateData: string = safeContract.encode('requiredTxGas', [
+  const safeContractCompatibleWithRequiredTxGas =
+    await isSafeContractCompatibleWithRequiredTxGas(safeContract)
+
+  // @ts-expect-error Expression produces a union type that is too complex to represent
+  const estimateData = safeContractCompatibleWithRequiredTxGas.encode('requiredTxGas', [
     to,
-    valueInWei,
+    BigInt(valueInWei),
     data,
     operation
   ])
+
   try {
     const estimateResponse = await ethAdapter.estimateGas({
       to: safeAddress,
@@ -216,9 +226,10 @@ export async function estimateTxBaseGas(
     customContracts
   })
 
-  const execTransactionData: string = safeSingletonContract.encode('execTransaction', [
+  // @ts-expect-error Expression produces a union type that is too complex to represent
+  const execTransactionData = safeSingletonContract.encode('execTransaction', [
     to,
-    value,
+    BigInt(value),
     data,
     operation,
     encodeSafeTxGas,
@@ -326,12 +337,18 @@ async function estimateSafeTxGasWithRequiredTxGas(
     customContracts
   })
 
-  const transactionDataToEstimate: string = safeSingletonContract.encode('requiredTxGas', [
-    safeTransaction.data.to,
-    safeTransaction.data.value,
-    safeTransaction.data.data,
-    safeTransaction.data.operation
-  ])
+  const safeContractCompatibleWithRequiredTxGas =
+    await isSafeContractCompatibleWithRequiredTxGas(safeSingletonContract)
+
+  const transactionDataToEstimate: string = safeContractCompatibleWithRequiredTxGas.encode(
+    'requiredTxGas',
+    [
+      safeTransaction.data.to,
+      safeTransaction.data.value,
+      safeTransaction.data.data,
+      safeTransaction.data.operation
+    ]
+  )
 
   const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
 
@@ -459,7 +476,7 @@ async function estimateSafeTxGasWithSimulate(
 
   const transactionDataToEstimate: string = simulateTxAccessorContract.encode('simulate', [
     safeTransaction.data.to,
-    safeTransaction.data.value,
+    BigInt(safeTransaction.data.value),
     safeTransaction.data.data,
     safeTransaction.data.operation
   ])
@@ -467,10 +484,13 @@ async function estimateSafeTxGasWithSimulate(
   // if the Safe is not deployed we can use the singleton address to simulate
   const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
 
-  const safeFunctionToEstimate: string = safeSingletonContract.encode('simulateAndRevert', [
-    await simulateTxAccessorContract.getAddress(),
-    transactionDataToEstimate
-  ])
+  const SafeContractCompatibleWithSimulateAndRevert =
+    await isSafeContractCompatibleWithSimulateAndRevert(safeSingletonContract)
+
+  const safeFunctionToEstimate: string = SafeContractCompatibleWithSimulateAndRevert.encode(
+    'simulateAndRevert',
+    [await simulateTxAccessorContract.getAddress(), transactionDataToEstimate]
+  )
 
   const transactionToEstimateGas = {
     to,

@@ -1,5 +1,6 @@
 import { ContractTransactionReceipt } from 'ethers'
-import { EthAdapter, TransactionResult } from '@safe-global/safe-core-sdk-types'
+import { TransactionResult } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import { TransactionReceipt } from 'web3-core/types'
 
 export async function waitSafeTxReceipt(

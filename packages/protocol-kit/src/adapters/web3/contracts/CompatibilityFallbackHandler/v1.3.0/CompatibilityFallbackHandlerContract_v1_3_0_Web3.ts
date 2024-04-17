@@ -1,11 +1,12 @@
 import CompatibilityFallbackHandlerBaseContractWeb3 from '@safe-global/protocol-kit/adapters/web3/contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerBaseContractWeb3'
 import Web3Adapter from '@safe-global/protocol-kit/adapters/web3/Web3Adapter'
-import { DeepWriteable } from '@safe-global/protocol-kit/adapters/web3/types'
-import CompatibilityFallbackHandlerContract_v1_3_0_Contract, {
-  CompatibilityFallbackHandlerContract_v1_3_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
-import CompatibilityFallbackHandler_1_3_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/CompatibilityFallbackHandler/v1.3.0/compatibility_fallback_handler'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  DeepWriteable,
+  SafeVersion,
+  CompatibilityFallbackHandlerContract_v1_3_0_Abi,
+  CompatibilityFallbackHandlerContract_v1_3_0_Contract,
+  compatibilityFallbackHandler_1_3_0_ContractArtifacts
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * CompatibilityFallbackHandlerContract_v1_3_0_Web3 is the implementation specific to the CompatibilityFallbackHandler contract version 1.3.0.
@@ -35,20 +36,13 @@ class CompatibilityFallbackHandlerContract_v1_3_0_Web3
     chainId: bigint,
     web3Adapter: Web3Adapter,
     customContractAddress?: string,
-    customContractAbi?: CompatibilityFallbackHandlerContract_v1_3_0_Abi
+    customContractAbi?: DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi =
-      CompatibilityFallbackHandler_1_3_0_ContractArtifacts.abi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
+      compatibilityFallbackHandler_1_3_0_ContractArtifacts.abi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
 
-    super(
-      chainId,
-      web3Adapter,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
-    )
+    super(chainId, web3Adapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

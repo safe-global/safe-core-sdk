@@ -3,11 +3,9 @@ import {
   CreateCallBaseContractEthers,
   EthersAdapter,
   EthersAdapterConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
   MultiSendBaseContractEthers,
   MultiSendCallOnlyBaseContractEthers,
-  SafeContractEthers,
+  SafeBaseContractEthers,
   SafeProxyFactoryBaseContractEthers,
   SignMessageLibBaseContractEthers
 } from './adapters/ethers'
@@ -15,13 +13,11 @@ import {
   CreateCallBaseContractWeb3,
   MultiSendBaseContractWeb3,
   MultiSendCallOnlyBaseContractWeb3,
-  SafeContractWeb3,
+  SafeBaseContractWeb3,
   SafeProxyFactoryBaseContractWeb3,
   SignMessageLibBaseContractWeb3,
   Web3Adapter,
-  Web3AdapterConfig,
-  Web3TransactionOptions,
-  Web3TransactionResult
+  Web3AdapterConfig
 } from './adapters/web3'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import {
@@ -91,6 +87,7 @@ import {
   hashSafeMessage,
   generateTypedData
 } from './utils/eip-712'
+import { EthAdapter } from './adapters/ethAdapter'
 
 export {
   AddOwnerTxParams,
@@ -109,11 +106,10 @@ export {
   CreateTransactionProps,
   DEFAULT_SAFE_VERSION,
   DeploySafeProps,
+  EthAdapter,
   EthSafeSignature,
   EthersAdapter,
   EthersAdapterConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
   MultiSendCallOnlyBaseContractEthers,
   MultiSendCallOnlyBaseContractWeb3,
   MultiSendBaseContractEthers,
@@ -125,8 +121,8 @@ export {
   SafeConfig,
   SafeConfigWithPredictedSafe,
   SafeConfigWithSafeAddress,
-  SafeContractEthers,
-  SafeContractWeb3,
+  SafeBaseContractEthers,
+  SafeBaseContractWeb3,
   SafeDeploymentConfig,
   SafeFactory,
   SafeFactoryConfig,
@@ -140,8 +136,6 @@ export {
   SigningMethod,
   Web3Adapter,
   Web3AdapterConfig,
-  Web3TransactionOptions,
-  Web3TransactionResult,
   encodeCreateProxyWithNonce,
   encodeMultiSendData,
   encodeSetupCallData,

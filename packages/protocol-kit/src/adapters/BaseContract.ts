@@ -47,7 +47,7 @@ abstract class BaseContract<ContractAbiType> {
     const contractAddress = customContractAddress || deployment?.defaultAddress
 
     if (!contractAddress) {
-      throw new Error('Invalid contract address')
+      throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
     }
 
     this.contractAddress = contractAddress

@@ -1,6 +1,6 @@
 # Ethers Adapter
 
-Ethers.js wrapper that contains some utilities and the Safe contracts types (generated with `typechain` `ethers-v6`). It is used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit).
+Ethers.js wrapper that contains some utilities and the Safe contracts types. It is used to initialize the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit).
 
 ## How to use
 

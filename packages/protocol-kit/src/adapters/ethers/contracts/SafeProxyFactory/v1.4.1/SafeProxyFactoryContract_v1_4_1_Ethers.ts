@@ -3,12 +3,13 @@ import SafeProxyFactoryBaseContractEthers, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
 import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
-import safeProxyFactory_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.4.1/safe_proxy_factory'
-import SafeProxyFactoryContract_v1_4_1_Contract, {
+import {
+  SafeVersion,
   SafeProxyFactoryContract_v1_4_1_Abi,
-  SafeProxyFactoryContract_v1_4_1_Function
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+  SafeProxyFactoryContract_v1_4_1_Contract,
+  SafeProxyFactoryContract_v1_4_1_Function,
+  safeProxyFactory_1_4_1_ContractArtifacts
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeProxyFactoryContract_v1_4_1_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -108,7 +109,7 @@ class SafeProxyFactoryContract_v1_4_1_Ethers
    * @param {CreateProxyProps} props - Properties for the new proxy contract.
    * @returns The address of the new proxy contract.
    */
-  async createProxy({
+  async createProxyWithOptions({
     safeSingletonAddress,
     initializer,
     saltNonce,
@@ -145,24 +146,6 @@ class SafeProxyFactoryContract_v1_4_1_Ethers
         return proxyAddress
       })
     return proxyAddress
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      encode: this.encode.bind(this),
-
-      estimateGas: async (...args: Parameters<typeof this.estimateGas>) =>
-        (await this.estimateGas(...args)).toString(),
-
-      createProxy: this.createProxy.bind(this),
-
-      getAddress: this.getAddress.bind(this),
-
-      proxyCreationCode: async () => (await this.proxyCreationCode())[0]
-    }
   }
 }
 

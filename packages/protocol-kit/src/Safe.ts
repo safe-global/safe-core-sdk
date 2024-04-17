@@ -1,5 +1,4 @@
 import {
-  EthAdapter,
   OperationType,
   SafeMultisigTransactionResponse,
   SafeMultisigConfirmationResponse,
@@ -12,9 +11,9 @@ import {
   TransactionResult,
   MetaTransactionData,
   Transaction,
-  CompatibilityFallbackHandlerContract,
   EIP712TypedData,
-  SafeTransactionData
+  SafeTransactionData,
+  CompatibilityFallbackHandlerContractType
 } from '@safe-global/safe-core-sdk-types'
 import {
   encodeSetupCallData,
@@ -66,11 +65,11 @@ import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
-  getProxyFactoryContract,
-  getSafeContract
+  getProxyFactoryContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
+import { EthAdapter } from './adapters/ethAdapter'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -305,7 +304,9 @@ class Safe {
       return Promise.resolve(0)
     }
 
-    return this.#contractManager.safeContract.getNonce()
+    const nonce = await this.#contractManager.safeContract.getNonce()
+
+    return Number(nonce)
   }
 
   /**
@@ -767,6 +768,7 @@ class Safe {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
+    // TODO: fix this
     return this.#contractManager.safeContract.approveHash(hash, {
       from: signerAddress,
       ...options
@@ -787,7 +789,7 @@ class Safe {
     const owners = await this.getOwners()
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
-      const approved = await this.#contractManager.safeContract.approvedHashes(owner, txHash)
+      const [approved] = await this.#contractManager.safeContract.approvedHashes([owner, txHash])
       if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
@@ -1212,14 +1214,14 @@ class Safe {
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
-    const safeSingletonContract = await getSafeContract({
-      ethAdapter: this.#ethAdapter,
-      safeVersion: safeVersion,
+    const safeSingletonContract = await this.#ethAdapter.getSafeContract({
+      safeVersion,
       isL1SafeSingleton,
-      customContracts
+      customContractAbi: customContracts?.safeSingletonAbi,
+      customContractAddress: customContracts?.safeSingletonAddress
     })
 
-    const encodedTransaction: string = safeSingletonContract.encode('execTransaction', [
+    const encodedTransaction = safeSingletonContract.encode('execTransaction', [
       safeTransaction.data.to,
       safeTransaction.data.value,
       safeTransaction.data.data,
@@ -1230,7 +1232,7 @@ class Safe {
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
       safeTransaction.encodedSignatures()
-    ]) as string
+    ])
 
     return encodedTransaction
   }
@@ -1318,11 +1320,11 @@ class Safe {
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
-    const safeSingletonContract = await getSafeContract({
-      ethAdapter: this.#ethAdapter,
+    const safeSingletonContract = await ethAdapter.getSafeContract({
       safeVersion,
       isL1SafeSingleton,
-      customContracts
+      customContractAddress: customContracts?.safeSingletonAddress,
+      customContractAbi: customContracts?.safeSingletonAbi
     })
 
     // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol
@@ -1353,7 +1355,7 @@ class Safe {
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
         await safeSingletonContract.getAddress(),
         initializer, // call to the setup method to set the threshold & owners of the new Safe
-        saltNonce
+        BigInt(saltNonce)
       ])
     }
 
@@ -1404,7 +1406,7 @@ class Safe {
    *
    * @returns The fallback Handler contract
    */
-  private async getFallbackHandlerContract(): Promise<CompatibilityFallbackHandlerContract> {
+  private async getFallbackHandlerContract(): Promise<CompatibilityFallbackHandlerContractType> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
     }
@@ -1458,11 +1460,13 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
+    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
     const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
       messageHash,
       signatureToCheck
     ])
 
+    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
     const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
       messageHash,
       signatureToCheck

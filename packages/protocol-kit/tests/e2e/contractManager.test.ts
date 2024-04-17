@@ -70,7 +70,7 @@ describe('Safe contracts manager', () => {
             safeAddress
           })
         )
-        .to.be.rejectedWith('Invalid MultiSend contract address')
+        .to.be.rejectedWith('Invalid multiSend contract address')
     })
 
     it('should fail if SafeProxy contract is not deployed on the current network', async () => {

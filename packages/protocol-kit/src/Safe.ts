@@ -1323,6 +1323,7 @@ class Safe {
     const safeSingletonContract = await ethAdapter.getSafeContract({
       safeVersion,
       isL1SafeSingleton,
+      customContractAddress: customContracts?.safeSingletonAddress,
       customContractAbi: customContracts?.safeSingletonAbi
     })
 
@@ -1459,9 +1460,17 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
-    const data = fallbackHandler.encode('isValidSignature', [messageHash, signatureToCheck])
+    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
+    const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
+      messageHash,
+      signatureToCheck
+    ])
 
-    const bytesData = fallbackHandler.encode('isValidSignature', [messageHash, signatureToCheck])
+    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
+    const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
+      messageHash,
+      signatureToCheck
+    ])
 
     try {
       const isValidSignatureResponse = await Promise.all([

@@ -11,7 +11,7 @@ import {
   SafeConfig,
   SafeContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types/dist/src/types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 
 class ContractManager {

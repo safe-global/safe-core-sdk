@@ -1,7 +1,4 @@
-import {
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from 'packages/safe-core-sdk-types/dist/src'
+import { Web3TransactionOptions, Web3TransactionResult } from 'packages/safe-core-sdk-types'
 import { PromiEvent, TransactionReceipt } from 'web3-core/types'
 
 export function sameString(str1: string, str2: string): boolean {

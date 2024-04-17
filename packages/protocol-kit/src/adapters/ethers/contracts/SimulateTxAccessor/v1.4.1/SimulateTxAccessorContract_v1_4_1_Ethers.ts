@@ -1,16 +1,12 @@
 import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContractEthers'
-import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
-import SimulateTxAccessorContract_v1_4_1_Contract, {
-  SimulateTxAccessorContract_v1_4_1_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
-import SimulateTxAccessor_1_4_1_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SimulateTxAccessor/v1.4.1/simulate_tx_accessor'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import {
-  EncodeSimulateTxAccessorFunction,
-  GetAddressSimulateTxAccessorFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SimulateTxAccessor/SimulateTxAccessorBaseContract'
-import { AbstractSigner } from 'ethers'
-
+  SafeVersion,
+  simulateTxAccessor_1_4_1_ContractArtifacts,
+  SimulateTxAccessorContract_v1_4_1_Abi,
+  SimulateTxAccessorContract_v1_4_1_Contract,
+  SimulateTxAccessorContract_v1_4_1_Function
+} from '@safe-global/safe-core-sdk-types'
 /**
  * SimulateTxAccessorContract_v1_4_1_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.4.1.
  *
@@ -29,38 +25,29 @@ class SimulateTxAccessorContract_v1_4_1_Ethers
    * Constructs an instance of SimulateTxAccessorContract_v1_4_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param safeProvider - An instance of SafeProvider.
+   * @param ethersAdapter - An instance of EthersAdapter.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SimulateTxAccessor deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.4.1 is used.
    */
   constructor(
     chainId: bigint,
-    signer: AbstractSigner,
+    ethersAdapter: EthersAdapter,
     customContractAddress?: string,
     customContractAbi?: SimulateTxAccessorContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
-    const defaultAbi = SimulateTxAccessor_1_4_1_ContractArtifacts.abi
+    const defaultAbi = simulateTxAccessor_1_4_1_ContractArtifacts.abi
 
-    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }
 
-  getAddress: GetAddressSimulateTxAccessorFunction = () => {
-    return this.contract.getAddress()
-  }
-
-  encode: EncodeSimulateTxAccessorFunction<SimulateTxAccessorContract_v1_4_1_Abi> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  simulate: SimulateTxAccessorContract_v1_4_1_Contract['simulate'] = (
-    args: readonly [to: string, value: bigint, data: string, operation: number]
-  ) => {
+  /**
+   * @param args - Array[to, value, data, operation]
+   * @returns Array[estimate, success, returnData]
+   */
+  simulate: SimulateTxAccessorContract_v1_4_1_Function<'simulate'> = (args) => {
     return this.contract.simulate(...args)
   }
 }

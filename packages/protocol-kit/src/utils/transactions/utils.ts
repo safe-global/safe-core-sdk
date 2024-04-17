@@ -42,7 +42,7 @@ export async function standardizeSafeTransactionData({
     gasPrice: tx.gasPrice ?? '0',
     gasToken: tx.gasToken || ZERO_ADDRESS,
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
-    nonce: tx.nonce ?? (safeContract ? await safeContract.getNonce() : 0)
+    nonce: tx.nonce ?? (safeContract ? Number(await safeContract.getNonce()) : 0)
   }
 
   if (typeof tx.safeTxGas !== 'undefined') {

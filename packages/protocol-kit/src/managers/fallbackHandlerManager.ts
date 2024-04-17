@@ -2,18 +2,20 @@ import {
   hasSafeFeature,
   isZeroAddress,
   SAFE_FEATURES,
+  SafeContractCompatibleWithFallbackHandler,
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { ISafeProvider, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
+import SafeProvider from '../adapters/ethers/SafeProvider'
 
 class FallbackHandlerManager {
-  #safeProvider: ISafeProvider
-  #safeContract?: SafeContract
+  #safeProvider: SafeProvider
+  #safeContract?: SafeContractImplementationType
   // keccak256("fallback_manager.handler.address")
   #slot = '0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5'
 
-  constructor(safeProvider: ISafeProvider, safeContract?: SafeContract) {
+  constructor(safeProvider: SafeProvider, safeContract?: SafeContractImplementationType) {
     this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
@@ -40,37 +42,44 @@ class FallbackHandlerManager {
     }
   }
 
-  async getFallbackHandler(): Promise<string> {
+  private async isFallbackHandlerCompatible(): Promise<SafeContractCompatibleWithFallbackHandler> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
     const safeVersion = await this.#safeContract.getVersion()
-    if (hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
-      return this.#safeProvider.getStorageAt(await this.#safeContract.getAddress(), this.#slot)
-    } else {
+    if (!hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
       throw new Error(
         'Current version of the Safe does not support the fallback handler functionality'
       )
     }
+
+    return this.#safeContract as SafeContractCompatibleWithFallbackHandler
+  }
+
+  async getFallbackHandler(): Promise<string> {
+    const safeContract = await this.isFallbackHandlerCompatible()
+
+    return this.#safeProvider.getStorageAt(await safeContract.getAddress(), this.#slot)
   }
 
   async encodeEnableFallbackHandlerData(fallbackHandlerAddress: string): Promise<string> {
-    if (!this.#safeContract) {
-      throw new Error('Safe is not deployed')
-    }
+    const safeContract = await this.isFallbackHandlerCompatible()
+
     this.validateFallbackHandlerAddress(fallbackHandlerAddress)
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
-    return this.#safeContract.encode('setFallbackHandler', [fallbackHandlerAddress])
+
+    // @ts-expect-error Expression produces a union type that is too complex to represent
+    return safeContract.encode('setFallbackHandler', [fallbackHandlerAddress])
   }
 
   async encodeDisableFallbackHandlerData(): Promise<string> {
-    if (!this.#safeContract) {
-      throw new Error('Safe is not deployed')
-    }
+    const safeContract = await this.isFallbackHandlerCompatible()
+
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsEnabled(currentFallbackHandler)
-    return this.#safeContract.encode('setFallbackHandler', [ZERO_ADDRESS])
+
+    return safeContract.encode('setFallbackHandler', [ZERO_ADDRESS])
   }
 }
 

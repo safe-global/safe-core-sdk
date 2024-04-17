@@ -92,9 +92,9 @@ const config: HardhatUserConfig = {
         }
       ]
     },
-    goerli: {
+    sepolia: {
       ...sharedNetworkConfig,
-      url: 'https://rpc.ankr.com/eth_goerli'
+      url: 'https://rpc.ankr.com/eth_sepolia'
     }
   },
   //@ts-expect-error Type not found

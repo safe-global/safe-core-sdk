@@ -1,7 +1,10 @@
-import { hashMessage } from 'ethers'
+import { Contract, hashMessage } from 'ethers'
 import { PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKitPackage from '@safe-global/protocol-kit'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import {
+  OperationType,
+  signMessageLib_1_4_1_ContractArtifacts
+} from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit'
 
 import { SafeMoneriumClient } from './SafeMoneriumClient'
@@ -115,7 +118,7 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should allow to check if a message is NOT signed in the smart contract if the promise is fulfilled', async () => {
-    // Promise fullfilled without signature
+    // Promise fulfilled without signature
     protocolKit.getEthAdapter().call = jest.fn().mockImplementation(async () => '0x')
 
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(
@@ -220,7 +223,13 @@ describe('SafeMoneriumClient', () => {
     }
 
     jest.spyOn(protocolKitPackage, 'getSignMessageLibContract').mockResolvedValueOnce({
+      safeVersion: '1.3.0',
+      contractName: 'signMessageLibVersion',
+      contract: new Contract('target', []),
+      adapter: protocolKit.getEthAdapter() as protocolKitPackage.EthersAdapter,
       encode: jest.fn(),
+      contractAbi: signMessageLib_1_4_1_ContractArtifacts.abi,
+      contractAddress: '',
       getAddress: jest.fn(),
       getMessageHash: jest.fn(),
       signMessage: jest.fn(),

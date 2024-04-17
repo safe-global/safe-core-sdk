@@ -1,17 +1,3 @@
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
-import {
-  CreateCallContract,
-  EIP712TypedDataMessage,
-  EIP712TypedDataTx,
-  Eip3770Address,
-  ISafeProvider,
-  SafeProviderTransaction,
-  GetContractProps,
-  SafeEIP712Args,
-  SignMessageLibContract,
-  SimulateTxAccessorContract,
-  Eip1193Provider
-} from '@safe-global/safe-core-sdk-types'
 import {
   ethers,
   TransactionResponse,
@@ -20,8 +6,14 @@ import {
   BrowserProvider,
   JsonRpcProvider
 } from 'ethers'
-import CompatibilityFallbackHandlerContractEthers from './contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerEthersContract'
-import SafeContractEthers from './contracts/Safe/SafeContractEthers'
+import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import {
+  EIP712TypedDataMessage,
+  EIP712TypedDataTx,
+  Eip3770Address,
+  SafeEIP712Args,
+  Eip1193Provider
+} from '@safe-global/safe-core-sdk-types'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -33,11 +25,7 @@ import {
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
 import { isTypedDataSigner } from './utils'
-import MultiSendCallOnlyContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_V1_3_0_Ethers'
-import MultiSendCallOnlyContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_V1_4_1_Ethers'
-import MultiSendContract_v1_1_1_Ethers from './contracts/MultiSend/v1.1.1/MultiSendContract_V1_1_1_Ethers'
-import MultiSendContract_v1_3_0_Ethers from './contracts/MultiSend/v1.3.0/MultiSendContract_V1_3_0_Ethers'
-import MultiSendContract_v1_4_1_Ethers from './contracts/MultiSend/v1.4.1/MultiSendContract_V1_4_1_Ethers'
+import { SafeProviderTransaction, GetContractProps } from '../ethAdapter'
 
 export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */
@@ -46,7 +34,7 @@ export interface SafeProviderConfig {
   privateKeyOrMnemonic?: string
 }
 
-class SafeProvider implements ISafeProvider {
+class SafeProvider {
   #provider: BrowserProvider | JsonRpcProvider
   #signerAddress?: string
   #privateKeyOrMnemonic?: string
@@ -110,21 +98,14 @@ class SafeProvider implements ISafeProvider {
 
   async getSafeContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi,
     isL1SafeSingleton
-  }: GetContractProps): Promise<SafeContractEthers> {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid SafeProxy contract address')
-    }
+  }: GetContractProps) {
     return getSafeContractInstance(
       safeVersion,
-      contractAddress,
       this,
+      customContractAddress,
       customContractAbi,
       isL1SafeSingleton
     )
@@ -132,135 +113,88 @@ class SafeProvider implements ISafeProvider {
 
   async getSafeProxyFactoryContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid SafeProxyFactory contract address')
-    }
     const signerOrProvider = (await this.getSigner()) || this.#provider
     return getSafeProxyFactoryContractInstance(
       safeVersion,
-      contractAddress,
-      signerOrProvider,
       this,
+      signerOrProvider,
+      customContractAddress,
       customContractAbi
     )
   }
 
   async getMultiSendContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<
-    | MultiSendContract_v1_4_1_Ethers
-    | MultiSendContract_v1_3_0_Ethers
-    | MultiSendContract_v1_1_1_Ethers
-  > {
-    const chainId = await this.getChainId()
-
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid MultiSend contract address')
-    }
-
-    return getMultiSendContractInstance(safeVersion, contractAddress, this, customContractAbi)
+  }: GetContractProps) {
+    return getMultiSendContractInstance(safeVersion, this, customContractAddress, customContractAbi)
   }
 
   async getMultiSendCallOnlyContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<
-    MultiSendCallOnlyContract_v1_4_1_Ethers | MultiSendCallOnlyContract_v1_3_0_Ethers
-  > {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid MultiSendCallOnly contract address')
-    }
+  }: GetContractProps) {
     return getMultiSendCallOnlyContractInstance(
       safeVersion,
-      contractAddress,
       this,
+      customContractAddress,
       customContractAbi
     )
   }
 
   async getCompatibilityFallbackHandlerContract({
     safeVersion,
-    singletonDeployment,
-    customContractAddress
-  }: GetContractProps): Promise<CompatibilityFallbackHandlerContractEthers> {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid CompatibilityFallbackHandler contract address')
-    }
-    const signerOrProvider = (await this.getSigner()) || this.#provider
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps) {
     return getCompatibilityFallbackHandlerContractInstance(
       safeVersion,
-      contractAddress,
-      signerOrProvider
+      this,
+      customContractAddress,
+      customContractAbi
     )
   }
 
   async getSignMessageLibContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SignMessageLibContract> {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid SignMessageLib contract address')
-    }
-
-    return getSignMessageLibContractInstance(safeVersion, contractAddress, this, customContractAbi)
+  }: GetContractProps) {
+    return getSignMessageLibContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
   }
 
   async getCreateCallContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<CreateCallContract> {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid CreateCall contract address')
-    }
-    return getCreateCallContractInstance(safeVersion, contractAddress, this, customContractAbi)
+  }: GetContractProps) {
+    return getCreateCallContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
   }
 
   async getSimulateTxAccessorContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress,
     customContractAbi
-  }: GetContractProps): Promise<SimulateTxAccessorContract> {
-    const chainId = await this.getChainId()
-    const contractAddress =
-      customContractAddress ?? singletonDeployment?.networkAddresses[chainId.toString()]
-    if (!contractAddress) {
-      throw new Error('Invalid SimulateTxAccessor contract address')
-    }
+  }: GetContractProps) {
     return getSimulateTxAccessorContractInstance(
       safeVersion,
-      contractAddress,
       this,
+      customContractAddress,
       customContractAbi
     )
   }
@@ -331,6 +265,7 @@ class SafeProvider implements ISafeProvider {
     return this.#provider.call({ ...transaction, blockTag })
   }
 
+  // TODO: fix anys
   encodeParameters(types: string[], values: any[]): string {
     return new ethers.AbiCoder().encode(types, values)
   }

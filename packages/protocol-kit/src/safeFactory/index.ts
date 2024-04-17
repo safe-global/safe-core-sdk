@@ -14,16 +14,11 @@ import {
 import {
   ContractNetworksConfig,
   SafeAccountConfig,
-  SafeDeploymentConfig
+  SafeContractImplementationType,
+  SafeDeploymentConfig,
+  SafeProxyFactoryContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import {
-  ISafeProvider,
-  SafeContract,
-  SafeProxyFactoryContract,
-  SafeVersion,
-  TransactionOptions,
-  Eip1193Provider
-} from '@safe-global/safe-core-sdk-types'
+import { SafeVersion, TransactionOptions, Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import { SafeProvider } from '../adapters/ethers'
 
 export interface DeploySafeProps {
@@ -63,10 +58,10 @@ class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeSingleton?: boolean
   #safeVersion!: SafeVersion
+  #safeProxyFactoryContract!: SafeProxyFactoryContractImplementationType
+  #safeContract!: SafeContractImplementationType
   #provider!: Eip1193Provider
-  #safeProvider!: ISafeProvider
-  #safeProxyFactoryContract!: SafeProxyFactoryContract
-  #safeContract!: SafeContract
+  #safeProvider!: SafeProvider
 
   static async create({
     provider,
@@ -105,7 +100,7 @@ class SafeFactory {
     })
   }
 
-  getSafeProvider(): ISafeProvider {
+  getSafeProvider(): SafeProvider {
     return this.#safeProvider
   }
 
@@ -170,7 +165,8 @@ class SafeFactory {
     if (options?.gas && options?.gasLimit) {
       throw new Error('Cannot specify gas and gasLimit together in transaction options')
     }
-    const safeAddress = await this.#safeProxyFactoryContract.createProxy({
+
+    const safeAddress = await this.#safeProxyFactoryContract.createProxyWithOptions({
       safeSingletonAddress: await this.#safeContract.getAddress(),
       initializer,
       saltNonce: saltNonce || getChainSpecificDefaultSaltNonce(chainId),

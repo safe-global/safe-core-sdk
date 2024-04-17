@@ -1,10 +1,6 @@
-import Safe, { SafeAccountConfig, predictSafeAddress } from '@safe-global/protocol-kit'
+import Safe, { SafeAccountConfig, predictSafeAddress, EthAdapter } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit'
-import {
-  MetaTransactionData,
-  MetaTransactionOptions,
-  EthAdapter
-} from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
 
 /**
  * @class

@@ -10,18 +10,14 @@ import {
   placeOrderMessage,
   ClassOptions
 } from '@monerium/sdk'
-import Safe, { getSignMessageLibContract } from '@safe-global/protocol-kit'
+import Safe, { getSignMessageLibContract, EthAdapter } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import {
   decodeSignatureData,
   getErrorMessage,
   parseIsValidSignatureErrorResponse
 } from '@safe-global/onramp-kit/lib/errors'
-import {
-  EthAdapter,
-  OperationType,
-  SafeMultisigTransactionResponse
-} from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types'
 
 import {
   EIP_1271_BYTES_INTERFACE,

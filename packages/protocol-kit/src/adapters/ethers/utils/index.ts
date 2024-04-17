@@ -1,6 +1,5 @@
 import { ContractTransactionResponse, Provider, AbstractSigner } from 'ethers'
-import { EthersTransactionOptions, EthersTransactionResult } from '../types'
-
+import { EthersTransactionOptions, EthersTransactionResult } from '@safe-global/safe-core-sdk-types'
 export function sameString(str1: string, str2: string): boolean {
   return str1.toLowerCase() === str2.toLowerCase()
 }

@@ -1,16 +1,15 @@
-import { AbstractSigner, ContractRunner, EventLog } from 'ethers'
-import SafeProxyFactoryBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
-import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
-import { EthersTransactionOptions } from '@safe-global/protocol-kit/adapters/ethers/types'
-import safeProxyFactory_1_0_0_ContractArtifacts from '@safe-global/protocol-kit/contracts/AbiType/assets/SafeProxyFactory/v1.0.0/proxy_factory'
+import { ContractRunner, EventLog } from 'ethers'
+import SafeProxyFactoryBaseContractEthers, {
+  CreateProxyProps
+} from '@safe-global/protocol-kit/adapters/ethers/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
+import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
 import {
-  EncodeSafeProxyFactoryFunction,
-  EstimateGasSafeProxyFactoryFunction
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/SafeProxyFactoryBaseContract'
-import SafeProxyFactoryContract_v1_0_0_Contract, {
-  SafeProxyFactoryContract_v1_0_0_Abi
-} from '@safe-global/protocol-kit/contracts/AbiType/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+  SafeVersion,
+  SafeProxyFactoryContract_v1_0_0_Abi,
+  SafeProxyFactoryContract_v1_0_0_Contract,
+  SafeProxyFactoryContract_v1_0_0_Function,
+  safeProxyFactory_1_0_0_ContractArtifacts
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * SafeProxyFactoryContract_v1_0_0_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
@@ -30,13 +29,13 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
    * Constructs an instance of SafeProxyFactoryContract_v1_0_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param safeProvider - An instance of SafeProvider.
+   * @param ethersAdapter - An instance of EthersAdapter.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.0.0 is used.
    */
   constructor(
     chainId: bigint,
-    signer: AbstractSigner,
+    ethersAdapter: EthersAdapter,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi,
     runner?: ContractRunner | null
@@ -46,7 +45,7 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
 
     super(
       chainId,
-      signer,
+      ethersAdapter,
       defaultAbi,
       safeVersion,
       customContractAddress,
@@ -57,57 +56,54 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
     this.safeVersion = safeVersion
   }
 
-  encode: EncodeSafeProxyFactoryFunction<SafeProxyFactoryContract_v1_0_0_Abi> = (
-    functionToEncode,
-    args
-  ) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args)
-  }
-
-  estimateGas: EstimateGasSafeProxyFactoryFunction<
-    SafeProxyFactoryContract_v1_0_0_Abi,
-    EthersTransactionOptions
-  > = (functionToEstimate, args, options = {}) => {
-    const contractMethodToStimate = this.contract.getFunction(functionToEstimate)
-
-    return contractMethodToStimate.estimateGas(...args, options)
-  }
-
-  getAddress(): Promise<string> {
-    return this.contract.getAddress()
-  }
-
-  async proxyCreationCode(): Promise<[string]> {
+  /**
+   * Allows to retrieve the creation code used for the Proxy deployment. With this it is easily possible to calculate predicted address.
+   * @returns Array[creationCode]
+   */
+  proxyCreationCode: SafeProxyFactoryContract_v1_0_0_Function<'proxyCreationCode'> = async () => {
     return [await this.contract.proxyCreationCode()]
   }
 
-  async proxyRuntimeCode(): Promise<[string]> {
+  /**
+   * Allows to retrieve the runtime code of a deployed Proxy. This can be used to check that the expected Proxy was deployed.
+   * @returns Array[runtimeCode]
+   */
+  proxyRuntimeCode: SafeProxyFactoryContract_v1_0_0_Function<'proxyRuntimeCode'> = async () => {
     return [await this.contract.proxyRuntimeCode()]
   }
 
-  async createProxy(args: readonly [masterCopy: string, data: string]): Promise<[string]> {
+  /**
+   * Allows to create new proxy contact and execute a message call to the new proxy within one transaction.
+   * @param args - Array[masterCopy, data]
+   * @returns Array[proxyAddress]
+   */
+  createProxy: SafeProxyFactoryContract_v1_0_0_Function<'createProxy'> = async (args) => {
     return [await this.contract.createProxy(...args)]
   }
 
-  async createProxyWithNonce(
-    args: readonly [masterCopy: string, initializer: string, saltNonce: bigint]
-  ): Promise<[string]> {
+  /**
+   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
+   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @returns Array[proxyAddress]
+   */
+  createProxyWithNonce: SafeProxyFactoryContract_v1_0_0_Function<'createProxyWithNonce'> = async (
+    args
+  ) => {
     return [await this.contract.createProxyWithNonce(...args)]
   }
 
+  /**
+   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
+   * @param {CreateProxyProps} props - Properties for the new proxy contract.
+   * @returns The address of the new proxy contract.
+   */
   async createProxyWithOptions({
     safeSingletonAddress,
     initializer,
     saltNonce,
     options,
     callback
-  }: {
-    safeSingletonAddress: string
-    initializer: string
-    saltNonce: string
-    options?: EthersTransactionOptions
-    callback?: (txHash: string) => void
-  }): Promise<string> {
+  }: CreateProxyProps): Promise<string> {
     const saltNonceBigInt = BigInt(saltNonce)
 
     if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')
@@ -138,24 +134,6 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
         return proxyAddress
       })
     return proxyAddress
-  }
-
-  // TODO: Remove this mapper after remove Typechain
-  mapToTypechainContract(): any {
-    return {
-      contract: this.contract,
-
-      encode: this.encode.bind(this),
-
-      estimateGas: async (...args: Parameters<typeof this.estimateGas>) =>
-        (await this.estimateGas(...args)).toString(),
-
-      createProxy: this.createProxyWithOptions.bind(this),
-
-      getAddress: this.getAddress.bind(this),
-
-      proxyCreationCode: async () => (await this.proxyCreationCode())[0]
-    }
   }
 }
 

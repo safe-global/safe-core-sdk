@@ -1,12 +1,3 @@
-import {
-  getCompatibilityFallbackHandlerContractDeployment,
-  getCreateCallContractDeployment,
-  getMultiSendCallOnlyContractDeployment,
-  getMultiSendContractDeployment,
-  getSafeContractDeployment,
-  getSafeProxyFactoryContractDeployment,
-  getSignMessageLibContractDeployment
-} from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -44,11 +35,8 @@ describe('Safe contracts', () => {
     it('should return an L1 Safe contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 1n
-      const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
       const safeContract = await safeProvider.getSafeContract({
-        safeVersion,
-        singletonDeployment
+        safeVersion
       })
       chai
         .expect(await safeContract.getAddress())
@@ -58,11 +46,8 @@ describe('Safe contracts', () => {
     it('should return an L2 Safe contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('gnosis')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 100n
-      const singletonDeployment = getSafeContractDeployment(safeVersion, chainId)
       const safeContract = await safeProvider.getSafeContract({
-        safeVersion,
-        singletonDeployment
+        safeVersion
       })
       chai
         .expect(await safeContract.getAddress())
@@ -72,12 +57,10 @@ describe('Safe contracts', () => {
     it('should return an L1 Safe contract from safe-deployments using the L1 flag', async () => {
       const safeProvider = getSafeProviderFromNetwork('gnosis')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 100n
       const isL1SafeSingleton = true
-      const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeSingleton)
       const safeContract = await safeProvider.getSafeContract({
         safeVersion,
-        singletonDeployment
+        isL1SafeSingleton
       })
       chai
         .expect(await safeContract.getAddress())
@@ -105,11 +88,8 @@ describe('Safe contracts', () => {
     it('should return a MultiSend contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 1n
-      const singletonDeployment = getMultiSendContractDeployment(safeVersion, chainId)
       const multiSendContract = await safeProvider.getMultiSendContract({
-        safeVersion,
-        singletonDeployment
+        safeVersion
       })
       chai
         .expect(await multiSendContract.getAddress())
@@ -137,11 +117,8 @@ describe('Safe contracts', () => {
     it('should return a MultiSendCallOnly contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 1n
-      const singletonDeployment = getMultiSendCallOnlyContractDeployment(safeVersion, chainId)
       const multiSendCallOnlyContract = await safeProvider.getMultiSendCallOnlyContract({
-        safeVersion,
-        singletonDeployment
+        safeVersion
       })
       chai
         .expect(await multiSendCallOnlyContract.getAddress())
@@ -169,15 +146,9 @@ describe('Safe contracts', () => {
     it('should return a CompatibilityFallbackHandler contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 1n
-      const singletonDeployment = getCompatibilityFallbackHandlerContractDeployment(
-        safeVersion,
-        chainId
-      )
       const compatibilityFallbackHandlerContract =
         await safeProvider.getCompatibilityFallbackHandlerContract({
-          safeVersion,
-          singletonDeployment
+          safeVersion
         })
       chai
         .expect(await compatibilityFallbackHandlerContract.getAddress())
@@ -206,11 +177,8 @@ describe('Safe contracts', () => {
     it('should return a SafeProxyFactory contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 1n
-      const singletonDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
       const factoryContract = await safeProvider.getSafeProxyFactoryContract({
-        safeVersion,
-        singletonDeployment
+        safeVersion
       })
       chai
         .expect(await factoryContract.getAddress())
@@ -239,11 +207,8 @@ describe('Safe contracts', () => {
     it('should return a SignMessageLib contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 1n
-      const singletonDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
       const signMessageLibContract = await safeProvider.getSignMessageLibContract({
-        safeVersion,
-        singletonDeployment
+        safeVersion
       })
       chai
         .expect(await signMessageLibContract.getAddress())
@@ -271,11 +236,8 @@ describe('Safe contracts', () => {
     it('should return a CreateCall contract from safe-deployments', async () => {
       const safeProvider = getSafeProviderFromNetwork('mainnet')
       const safeVersion: SafeVersion = '1.3.0'
-      const chainId = 1n
-      const singletonDeployment = getCreateCallContractDeployment(safeVersion, chainId)
       const createCallContract = await safeProvider.getCreateCallContract({
-        safeVersion,
-        singletonDeployment
+        safeVersion
       })
       chai
         .expect(await createCallContract.getAddress())

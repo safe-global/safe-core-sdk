@@ -4,22 +4,23 @@ import {
   getMultiSendContract,
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
-import { ContractNetworksConfig, SafeConfig } from '@safe-global/protocol-kit/types'
 import {
-  ISafeProvider,
-  MultiSendCallOnlyContract,
-  MultiSendContract,
-  SafeContract
-} from '@safe-global/safe-core-sdk-types'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types/dist/src/types'
+  ContractNetworksConfig,
+  MultiSendCallOnlyContractImplementationType,
+  MultiSendContractImplementationType,
+  SafeConfig,
+  SafeContractImplementationType
+} from '@safe-global/protocol-kit/types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
+import SafeProvider from '../adapters/ethers/SafeProvider'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
   #isL1SafeSingleton?: boolean
-  #safeContract?: SafeContract
-  #multiSendContract!: MultiSendContract
-  #multiSendCallOnlyContract!: MultiSendCallOnlyContract
+  #safeContract?: SafeContractImplementationType
+  #multiSendContract!: MultiSendContractImplementationType
+  #multiSendCallOnlyContract!: MultiSendCallOnlyContractImplementationType
 
   static async create(config: SafeConfig, safeProvider: ISafeProvider): Promise<ContractManager> {
     const contractManager = new ContractManager()
@@ -27,7 +28,7 @@ class ContractManager {
     return contractManager
   }
 
-  async init(config: SafeConfig, safeProvider: ISafeProvider): Promise<void> {
+  async init(config: SafeConfig, safeProvider: SafeProvider): Promise<void> {
     const { isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
 
     const chainId = await safeProvider.getChainId()
@@ -87,15 +88,15 @@ class ContractManager {
     return this.#isL1SafeSingleton
   }
 
-  get safeContract(): SafeContract | undefined {
+  get safeContract(): SafeContractImplementationType | undefined {
     return this.#safeContract
   }
 
-  get multiSendContract(): MultiSendContract {
+  get multiSendContract(): MultiSendContractImplementationType {
     return this.#multiSendContract
   }
 
-  get multiSendCallOnlyContract(): MultiSendCallOnlyContract {
+  get multiSendCallOnlyContract(): MultiSendCallOnlyContractImplementationType {
     return this.#multiSendCallOnlyContract
   }
 }

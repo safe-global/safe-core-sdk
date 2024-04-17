@@ -1,5 +1,6 @@
 import { ContractTransactionReceipt } from 'ethers'
-import { ISafeProvider, TransactionResult } from '@safe-global/safe-core-sdk-types'
+import { TransactionResult } from '@safe-global/safe-core-sdk-types'
+import { SafeProvider } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import { TransactionReceipt } from 'web3-core/types'
 
 export async function waitSafeTxReceipt(
@@ -20,7 +21,7 @@ export async function waitSafeTxReceipt(
 }
 
 export async function getTransaction(
-  safeProvider: ISafeProvider,
+  safeProvider: SafeProvider,
   transactionHash: string
 ): Promise<any> {
   return safeProvider.getTransaction(transactionHash)

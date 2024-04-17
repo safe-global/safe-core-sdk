@@ -1,33 +1,19 @@
-import { ContractNetworkConfig } from '@safe-global/protocol-kit/types'
+import SafeProvider from '../adapters/ethers/SafeProvider'
 import {
-  CompatibilityFallbackHandlerContract,
-  CreateCallContract,
-  ISafeProvider,
-  MultiSendCallOnlyContract,
-  MultiSendContract,
-  SafeContract,
-  SafeProxyFactoryContract,
-  SafeVersion,
-  SignMessageLibContract,
-  SimulateTxAccessorContract
-} from '@safe-global/safe-core-sdk-types'
-import {
-  DeploymentFilter,
-  SingletonDeployment,
-  getCompatibilityFallbackHandlerDeployment,
-  getCreateCallDeployment,
-  getMultiSendCallOnlyDeployment,
-  getMultiSendDeployment,
-  getProxyFactoryDeployment,
-  getSafeL2SingletonDeployment,
-  getSafeSingletonDeployment,
-  getSignMessageLibDeployment,
-  getSimulateTxAccessorDeployment
-} from '@safe-global/safe-deployments'
-import { safeDeploymentsL1ChainIds, safeDeploymentsVersions } from './config'
+  CompatibilityFallbackHandlerContractImplementationType,
+  ContractNetworkConfig,
+  CreateCallContractImplementationType,
+  MultiSendCallOnlyContractImplementationType,
+  MultiSendContractImplementationType,
+  SafeContractImplementationType,
+  SafeProxyFactoryContractImplementationType,
+  SignMessageLibContractImplementationType,
+  SimulateTxAccessorContractImplementationType
+} from '@safe-global/protocol-kit/types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 export interface GetContractInstanceProps {
-  safeProvider: ISafeProvider
+  safeProvider: SafeProvider
   safeVersion: SafeVersion
   customContracts?: ContractNetworkConfig
 }
@@ -37,91 +23,15 @@ export interface GetSafeContractInstanceProps extends GetContractInstanceProps {
   customSafeAddress?: string
 }
 
-export function getSafeContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint,
-  isL1SafeSingleton = false
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].safeSingletonVersion
-  const filters: DeploymentFilter = { version, network: chainId.toString(), released: true }
-  if (safeDeploymentsL1ChainIds.includes(chainId) || isL1SafeSingleton) {
-    return getSafeSingletonDeployment(filters)
-  }
-  return getSafeL2SingletonDeployment(filters)
-}
-
-export function getCompatibilityFallbackHandlerContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].compatibilityFallbackHandler
-  return getCompatibilityFallbackHandlerDeployment({
-    version,
-    network: chainId.toString(),
-    released: true
-  })
-}
-
-export function getMultiSendCallOnlyContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].multiSendCallOnlyVersion
-  return getMultiSendCallOnlyDeployment({ version, network: chainId.toString(), released: true })
-}
-
-export function getMultiSendContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].multiSendVersion
-  return getMultiSendDeployment({ version, network: chainId.toString(), released: true })
-}
-
-export function getSafeProxyFactoryContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].safeProxyFactoryVersion
-  return getProxyFactoryDeployment({ version, network: chainId.toString(), released: true })
-}
-
-export function getSignMessageLibContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].signMessageLibVersion
-  return getSignMessageLibDeployment({ version, network: chainId.toString(), released: true })
-}
-
-export function getCreateCallContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].createCallVersion
-  return getCreateCallDeployment({ version, network: chainId.toString(), released: true })
-}
-
-export function getSimulateTxAccessorContractDeployment(
-  safeVersion: SafeVersion,
-  chainId: bigint
-): SingletonDeployment | undefined {
-  const version = safeDeploymentsVersions[safeVersion].createCallVersion
-  return getSimulateTxAccessorDeployment({ version, network: chainId.toString(), released: true })
-}
-
 export async function getSafeContract({
   safeProvider,
   safeVersion,
   customSafeAddress,
   isL1SafeSingleton,
   customContracts
-}: GetSafeContractInstanceProps): Promise<SafeContract> {
-  const chainId = await safeProvider.getChainId()
-  const singletonDeployment = getSafeContractDeployment(safeVersion, chainId, isL1SafeSingleton)
+}: GetSafeContractInstanceProps): Promise<SafeContractImplementationType> {
   const safeContract = await safeProvider.getSafeContract({
     safeVersion,
-    singletonDeployment,
     customContractAddress: customSafeAddress ?? customContracts?.safeSingletonAddress,
     customContractAbi: customContracts?.safeSingletonAbi,
     isL1SafeSingleton
@@ -137,12 +47,9 @@ export async function getProxyFactoryContract({
   safeProvider,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<SafeProxyFactoryContract> {
-  const chainId = await safeProvider.getChainId()
-  const proxyFactoryDeployment = getSafeProxyFactoryContractDeployment(safeVersion, chainId)
+}: GetContractInstanceProps): Promise<SafeProxyFactoryContractImplementationType> {
   const safeProxyFactoryContract = await safeProvider.getSafeProxyFactoryContract({
     safeVersion,
-    singletonDeployment: proxyFactoryDeployment,
     customContractAddress: customContracts?.safeProxyFactoryAddress,
     customContractAbi: customContracts?.safeProxyFactoryAbi
   })
@@ -159,15 +66,9 @@ export async function getCompatibilityFallbackHandlerContract({
   safeProvider,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<CompatibilityFallbackHandlerContract> {
-  const chainId = await safeProvider.getChainId()
-  const fallbackHandlerDeployment = getCompatibilityFallbackHandlerContractDeployment(
-    safeVersion,
-    chainId
-  )
+}: GetContractInstanceProps): Promise<CompatibilityFallbackHandlerContractImplementationType> {
   const fallbackHandlerContract = await safeProvider.getCompatibilityFallbackHandlerContract({
     safeVersion,
-    singletonDeployment: fallbackHandlerDeployment,
     customContractAddress: customContracts?.fallbackHandlerAddress,
     customContractAbi: customContracts?.fallbackHandlerAbi
   })
@@ -184,12 +85,9 @@ export async function getMultiSendContract({
   safeProvider,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<MultiSendContract> {
-  const chainId = await safeProvider.getChainId()
-  const multiSendDeployment = getMultiSendContractDeployment(safeVersion, chainId)
+}: GetContractInstanceProps): Promise<MultiSendContractImplementationType> {
   const multiSendContract = await safeProvider.getMultiSendContract({
     safeVersion,
-    singletonDeployment: multiSendDeployment,
     customContractAddress: customContracts?.multiSendAddress,
     customContractAbi: customContracts?.multiSendAbi
   })
@@ -206,12 +104,9 @@ export async function getMultiSendCallOnlyContract({
   safeProvider,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<MultiSendCallOnlyContract> {
-  const chainId = await safeProvider.getChainId()
-  const multiSendCallOnlyDeployment = getMultiSendCallOnlyContractDeployment(safeVersion, chainId)
+}: GetContractInstanceProps): Promise<MultiSendCallOnlyContractImplementationType> {
   const multiSendCallOnlyContract = await safeProvider.getMultiSendCallOnlyContract({
     safeVersion,
-    singletonDeployment: multiSendCallOnlyDeployment,
     customContractAddress: customContracts?.multiSendCallOnlyAddress,
     customContractAbi: customContracts?.multiSendCallOnlyAbi
   })
@@ -228,12 +123,9 @@ export async function getSignMessageLibContract({
   safeProvider,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<SignMessageLibContract> {
-  const chainId = await safeProvider.getChainId()
-  const signMessageLibDeployment = getSignMessageLibContractDeployment(safeVersion, chainId)
+}: GetContractInstanceProps): Promise<SignMessageLibContractImplementationType> {
   const signMessageLibContract = await safeProvider.getSignMessageLibContract({
     safeVersion,
-    singletonDeployment: signMessageLibDeployment,
     customContractAddress: customContracts?.signMessageLibAddress,
     customContractAbi: customContracts?.signMessageLibAbi
   })
@@ -250,12 +142,9 @@ export async function getCreateCallContract({
   safeProvider,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<CreateCallContract> {
-  const chainId = await safeProvider.getChainId()
-  const createCallDeployment = getCreateCallContractDeployment(safeVersion, chainId)
+}: GetContractInstanceProps): Promise<CreateCallContractImplementationType> {
   const createCallContract = await safeProvider.getCreateCallContract({
     safeVersion,
-    singletonDeployment: createCallDeployment,
     customContractAddress: customContracts?.createCallAddress,
     customContractAbi: customContracts?.createCallAbi
   })
@@ -272,12 +161,9 @@ export async function getSimulateTxAccessorContract({
   safeProvider,
   safeVersion,
   customContracts
-}: GetContractInstanceProps): Promise<SimulateTxAccessorContract> {
-  const chainId = await safeProvider.getChainId()
-  const simulateTxAccessorDeployment = getSimulateTxAccessorContractDeployment(safeVersion, chainId)
+}: GetContractInstanceProps): Promise<SimulateTxAccessorContractImplementationType> {
   const simulateTxAccessorContract = await safeProvider.getSimulateTxAccessorContract({
     safeVersion,
-    singletonDeployment: simulateTxAccessorDeployment,
     customContractAddress: customContracts?.simulateTxAccessorAddress,
     customContractAbi: customContracts?.simulateTxAccessorAbi
   })

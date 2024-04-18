@@ -18,8 +18,9 @@ import {
   SafeDeploymentConfig,
   SafeProxyFactoryContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion, TransactionOptions, Eip1193Provider } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 import { SafeProvider } from '../adapters/ethers'
+import { Eip1193Provider } from '../adapters/ethAdapter'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig

@@ -111,7 +111,7 @@ export async function generateSignature(
 ): Promise<SafeSignature> {
   const signerAddress = await safeProvider.getSignerAddress()
   if (!signerAddress) {
-    throw new Error('ISafeProvider must be initialized with a signer to use this method')
+    throw new Error('SafeProvider must be initialized with a signer to use this method')
   }
 
   let signature = await safeProvider.signMessage(hash)
@@ -127,9 +127,10 @@ export async function generateEIP712Signature(
 ): Promise<SafeSignature> {
   const signerAddress = await safeProvider.getSignerAddress()
   if (!signerAddress) {
-    throw new Error('ISafeProvider must be initialized with a signer to use this method')
+    throw new Error('SafeProvider must be initialized with a signer to use this method')
   }
 
+  //@ts-expect-error: Evaluate removal of methodVersion and use v4
   let signature = await safeProvider.signTypedData(safeEIP712Args, methodVersion)
 
   signature = adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)

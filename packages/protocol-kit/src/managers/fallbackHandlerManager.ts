@@ -69,7 +69,6 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
 
-    // @ts-expect-error Expression produces a union type that is too complex to represent
     return safeContract.encode('setFallbackHandler', [fallbackHandlerAddress])
   }
 

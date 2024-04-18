@@ -1,12 +1,7 @@
-import {
-  SafeProvider,
-  SafeContract,
-  OperationType,
-  SafeVersion,
-  SafeTransaction
-} from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe from '@safe-global/protocol-kit/Safe'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import {
   ContractNetworksConfig,
   SafeContractImplementationType
@@ -127,7 +122,6 @@ export async function estimateTxGas(
   const safeContractCompatibleWithRequiredTxGas =
     await isSafeContractCompatibleWithRequiredTxGas(safeContract)
 
-  // @ts-expect-error Expression produces a union type that is too complex to represent
   const estimateData = safeContractCompatibleWithRequiredTxGas.encode('requiredTxGas', [
     to,
     BigInt(valueInWei),
@@ -231,7 +225,6 @@ export async function estimateTxBaseGas(
     customContracts
   })
 
-  // @ts-expect-error Expression produces a union type that is too complex to represent
   const execTransactionData = safeSingletonContract.encode('execTransaction', [
     to,
     BigInt(value),

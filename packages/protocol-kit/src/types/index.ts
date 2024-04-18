@@ -3,8 +3,7 @@ import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/utils/tr
 import {
   MetaTransactionData,
   SafeTransactionDataPartial,
-  SafeVersion,
-  Eip1193Provider
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import SafeContract_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Ethers'
 import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Ethers'
@@ -28,6 +27,7 @@ import SimulateTxAccessorContract_v1_3_0_Ethers from '../adapters/ethers/contrac
 import SimulateTxAccessorContract_v1_4_1_Ethers from '../adapters/ethers/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Ethers'
 import CreateCallContract_v1_3_0_Ethers from '../adapters/ethers/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Ethers'
 import CreateCallContract_v1_4_1_Ethers from '../adapters/ethers/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Ethers'
+import { Eip1193Provider } from '../adapters/ethAdapter'
 
 export interface SafeAccountConfig {
   owners: string[]

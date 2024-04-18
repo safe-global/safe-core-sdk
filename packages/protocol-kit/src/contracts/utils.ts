@@ -20,7 +20,7 @@ import {
   SafeContractImplementationType,
   SafeDeploymentConfig
 } from '../types'
-import SafeProvider from '../adapters/ethers/SafeProvider'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =

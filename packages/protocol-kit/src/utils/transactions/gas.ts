@@ -225,6 +225,8 @@ export async function estimateTxBaseGas(
     customContracts
   })
 
+  //@ts-expect-error: Type too complex to represent.
+  //TODO: We should explore contract versions and map to the correct types
   const execTransactionData = safeSingletonContract.encode('execTransaction', [
     to,
     BigInt(value),

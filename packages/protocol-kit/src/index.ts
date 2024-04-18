@@ -3,8 +3,6 @@ import {
   CreateCallBaseContractEthers,
   SafeProvider,
   SafeProviderConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
   MultiSendBaseContractEthers,
   MultiSendCallOnlyBaseContractEthers,
   SafeBaseContractEthers,
@@ -79,7 +77,6 @@ import {
   hashSafeMessage,
   generateTypedData
 } from './utils/eip-712'
-import { EthAdapter } from './adapters/ethAdapter'
 
 export {
   AddOwnerTxParams,
@@ -97,12 +94,9 @@ export {
   CreateTransactionProps,
   DEFAULT_SAFE_VERSION,
   DeploySafeProps,
-  EthAdapter,
   EthSafeSignature,
   SafeProvider,
   SafeProviderConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
   MultiSendCallOnlyBaseContractEthers,
   MultiSendBaseContractEthers,
   PREDETERMINED_SALT_NONCE,

@@ -1,5 +1,5 @@
 import MultiSendCallOnlyBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/MultiSendCallOnlyBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import {
   SafeVersion,
   multiSendCallOnly_1_4_1_ContractArtifacts,
@@ -25,20 +25,20 @@ class MultiSendCallOnlyContract_v1_4_1_Ethers
    * Constructs an instance of MultiSendCallOnlyContract_v1_4_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSendCallOnly deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.4.1 is used.
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: MultiSendCallOnlyContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = multiSendCallOnly_1_4_1_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

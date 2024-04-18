@@ -1,7 +1,7 @@
 import { Abi } from 'abitype'
 import { InterfaceAbi } from 'ethers'
 
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
@@ -32,7 +32,7 @@ abstract class SafeBaseContractEthers<
    * Constructs an instance of SafeBaseContractEthers.
    *
    * @param chainId - The chain ID of the contract.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param defaultAbi - The default ABI for the Safe contract. It should be compatible with the specific version of the Safe contract.
    * @param safeVersion - The version of the Safe contract.
    * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
@@ -41,7 +41,7 @@ abstract class SafeBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    safeProvider: SafeProvider,
     defaultAbi: SafeContractAbiType,
     safeVersion: SafeVersion,
     isL1SafeSingleton = false,
@@ -54,7 +54,7 @@ abstract class SafeBaseContractEthers<
     super(
       contractName,
       chainId,
-      ethersAdapter,
+      safeProvider,
       defaultAbi,
       safeVersion,
       customContractAddress,

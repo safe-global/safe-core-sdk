@@ -3,7 +3,7 @@ import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
 
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 import BaseContract from '@safe-global/protocol-kit/adapters/BaseContract'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import {
   EncodeFunction,
   EstimateGasFunction,
@@ -32,7 +32,7 @@ abstract class BaseContractEthers<
   ContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<ContractAbiType> {
   contract: Contract
-  adapter: EthersAdapter
+  safeProvider: SafeProvider
 
   /**
    * @constructor
@@ -40,7 +40,7 @@ abstract class BaseContractEthers<
    *
    * @param contractName - The contract name.
    * @param chainId - The chain ID of the contract.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param defaultAbi - The default ABI for the contract. It should be compatible with the specific version of the contract.
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
@@ -49,7 +49,7 @@ abstract class BaseContractEthers<
   constructor(
     contractName: contractName,
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    safeProvider: SafeProvider,
     defaultAbi: ContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
@@ -58,11 +58,11 @@ abstract class BaseContractEthers<
   ) {
     super(contractName, chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
-    this.adapter = ethersAdapter
+    this.safeProvider = safeProvider
     this.contract = new Contract(
       this.contractAddress,
       this.contractAbi,
-      runner || this.adapter.getSigner()
+      runner || this.safeProvider.getSigner()
     )
   }
 

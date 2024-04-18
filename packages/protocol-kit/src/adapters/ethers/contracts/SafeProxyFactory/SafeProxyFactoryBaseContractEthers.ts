@@ -1,6 +1,6 @@
 import { Abi } from 'abitype'
 import { ContractRunner, InterfaceAbi } from 'ethers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import {
   SafeVersion,
@@ -39,7 +39,7 @@ abstract class SafeProxyFactoryBaseContractEthers<
    * Constructs an instance of SafeProxyFactoryBaseContractEthers.
    *
    * @param chainId - The chain ID of the contract.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param defaultAbi - The default ABI for the Safe contract. It should be compatible with the specific version of the contract.
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
@@ -47,7 +47,7 @@ abstract class SafeProxyFactoryBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    safeProvider: SafeProvider,
     defaultAbi: SafeProxyFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
@@ -59,7 +59,7 @@ abstract class SafeProxyFactoryBaseContractEthers<
     super(
       contractName,
       chainId,
-      ethersAdapter,
+      safeProvider,
       defaultAbi,
       safeVersion,
       customContractAddress,

@@ -1,15 +1,15 @@
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import {
   SafeVersion,
+  AdapterSpecificContractFunction,
   SignMessageLibContract_v1_4_1_Abi,
   SignMessageLibContract_v1_4_1_Contract,
   SignMessageLibContract_v1_4_1_Function,
   signMessageLib_1_4_1_ContractArtifacts,
-  EthersTransactionOptions,
-  EncodeFunction,
+  EthersTransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 
 /**
  * SignMessageLibContract_v1_4_1_Ethers is the implementation specific to the SignMessageLib contract version 1.4.1.
@@ -29,7 +29,7 @@ class SignMessageLibContract_v1_4_1_Ethers
    * Constructs an instance of SignMessageLibContract_v1_4_1_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SignMessageLib deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.4.1 is used.
    */
@@ -46,9 +46,6 @@ class SignMessageLibContract_v1_4_1_Ethers
 
     this.safeVersion = safeVersion
   }
-  encode: EncodeFunction<readonly [{ readonly anonymous: false; readonly inputs: readonly [{ readonly indexed: true; readonly internalType: 'bytes32'; readonly name: 'msgHash'; readonly type: 'bytes32' }]; readonly name: 'SignMsg'; readonly type: 'event' }, { ... }, { ... }], 'getMessageHash' | 'signMessage'>
-  getAddress: GetAddressFunction
-  estimateGas: EstimateGasFunction<readonly [{ readonly anonymous: false; readonly inputs: readonly [{ readonly indexed: true; readonly internalType: 'bytes32'; readonly name: 'msgHash'; readonly type: 'bytes32' }]; readonly name: 'SignMsg'; readonly type: 'event' }, { ... }, { ... }]>
 
   /**
    * @param args - Array[message]

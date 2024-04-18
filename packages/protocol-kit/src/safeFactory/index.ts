@@ -29,7 +29,7 @@ export interface DeploySafeProps {
 }
 
 export interface SafeFactoryConfig {
-  /** safeProvider - Ethereum adapter */
+  /** provider - Ethereum EIP-1193 compatible provider */
   provider: Eip1193Provider
   signerAddress?: string
   privateKeyOrMnemonic?: string
@@ -42,7 +42,7 @@ export interface SafeFactoryConfig {
 }
 
 interface SafeFactoryInitConfig {
-  /** safeProvider - Ethereum adapter */
+  /** provider - Ethereum EIP-1193 compatible provider */
   provider: Eip1193Provider
   signerAddress?: string
   privateKeyOrMnemonic?: string

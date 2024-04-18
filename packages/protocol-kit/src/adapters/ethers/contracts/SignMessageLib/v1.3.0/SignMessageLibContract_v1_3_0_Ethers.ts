@@ -1,6 +1,6 @@
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
 import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import {
   SafeVersion,
   AdapterSpecificContractFunction,
@@ -8,10 +8,7 @@ import {
   SignMessageLibContract_v1_3_0_Contract,
   SignMessageLibContract_v1_3_0_Function,
   signMessageLib_1_3_0_ContractArtifacts,
-  EthersTransactionOptions,
-  EncodeFunction,
-  EstimateGasFunction,
-  GetAddressFunction
+  EthersTransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -32,26 +29,23 @@ class SignMessageLibContract_v1_3_0_Ethers
    * Constructs an instance of SignMessageLibContract_v1_3_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
-   * @param ethersAdapter - An instance of EthersAdapter.
+   * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SignMessageLib deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
    */
   constructor(
     chainId: bigint,
-    ethersAdapter: EthersAdapter,
+    safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SignMessageLibContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = signMessageLib_1_3_0_ContractArtifacts.abi
 
-    super(chainId, ethersAdapter, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }
-  encode: EncodeFunction<readonly [{ readonly anonymous: false; readonly inputs: readonly [{ readonly indexed: true; readonly internalType: 'bytes32'; readonly name: 'msgHash'; readonly type: 'bytes32' }]; readonly name: 'SignMsg'; readonly type: 'event' }, { ... }, { ... }], 'getMessageHash' | 'signMessage'>
-  getAddress: GetAddressFunction
-  estimateGas: EstimateGasFunction<readonly [{ readonly anonymous: false; readonly inputs: readonly [{ readonly indexed: true; readonly internalType: 'bytes32'; readonly name: 'msgHash'; readonly type: 'bytes32' }]; readonly name: 'SignMsg'; readonly type: 'event' }, { ... }, { ... }]>
 
   /**
    * @param args - Array[message]

@@ -1,5 +1,6 @@
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 
 /**
  * Abstract class BaseContract serves as a base for creating a contract for a specific adapter (Ethers.js, Web3.js, or viem.js)
@@ -21,7 +22,7 @@ abstract class BaseContract<ContractAbiType> {
   abstract safeVersion: SafeVersion
 
   abstract contract: unknown // This needs to be implemented for each adapter.
-  abstract adapter: unknown // This needs to be implemented for each adapter.
+  abstract safeProvider: SafeProvider // This needs to be implemented for each adapter.
 
   /**
    * Constructs a new BaseContract instance.

@@ -1,7 +1,7 @@
 import { Abi } from 'abitype'
 import { ContractRunner, InterfaceAbi } from 'ethers'
 
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
@@ -49,7 +49,7 @@ abstract class CreateCallBaseContractEthers<
     super(
       contractName,
       chainId,
-      ethersAdapter,
+      safeProvider,
       defaultAbi,
       safeVersion,
       customContractAddress,

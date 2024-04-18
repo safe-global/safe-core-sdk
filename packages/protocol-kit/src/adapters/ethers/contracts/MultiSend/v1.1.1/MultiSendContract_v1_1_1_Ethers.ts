@@ -1,5 +1,5 @@
 import MultiSendBaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/MultiSendBaseContractEthers'
-import EthersAdapter from '@safe-global/protocol-kit/adapters/ethers/EthersAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import {
   SafeVersion,
   multisend_1_1_1_ContractArtifacts,
@@ -31,14 +31,14 @@ class MultiSendContract_v1_1_1_Ethers
    */
   constructor(
     chainId: bigint,
-    signer: AbstractSigner,
+    safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: MultiSendContract_v1_1_1_Abi
   ) {
     const safeVersion = '1.1.1'
     const defaultAbi = multisend_1_1_1_ContractArtifacts.abi
 
-    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

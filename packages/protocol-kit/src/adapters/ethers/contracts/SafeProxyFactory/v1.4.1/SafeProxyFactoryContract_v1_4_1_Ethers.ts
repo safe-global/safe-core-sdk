@@ -9,6 +9,7 @@ import {
   SafeProxyFactoryContract_v1_4_1_Function,
   safeProxyFactory_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 
 /**
  * SafeProxyFactoryContract_v1_4_1_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.4.1.

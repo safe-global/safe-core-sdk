@@ -63,56 +63,61 @@ export async function getSafeContractInstance(
   | SafeContract_v1_0_0_Ethers
 > {
   const chainId = await safeProvider.getChainId()
+  let safeContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      return new SafeContract_v1_4_1_Ethers(
+      safeContractInstance = new SafeContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_4_1_Abi>
       )
-
+      break
     case '1.3.0':
-      return new SafeContract_v1_3_0_Ethers(
+      safeContractInstance = new SafeContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_3_0_Abi>
       )
-
+      break
     case '1.2.0':
-      return new SafeContract_v1_2_0_Ethers(
+      safeContractInstance = new SafeContract_v1_2_0_Ethers(
         chainId,
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_2_0_Abi>
       )
-
+      break
     case '1.1.1':
-      return new SafeContract_v1_1_1_Ethers(
+      safeContractInstance = new SafeContract_v1_1_1_Ethers(
         chainId,
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_1_1_Abi>
       )
-
+      break
     case '1.0.0':
-      return new SafeContract_v1_0_0_Ethers(
+      safeContractInstance = new SafeContract_v1_0_0_Ethers(
         chainId,
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_0_0_Abi>
       )
-
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await safeContractInstance.init()
+
+  return safeContractInstance
 }
 
 export async function getCompatibilityFallbackHandlerContractInstance(
@@ -125,28 +130,34 @@ export async function getCompatibilityFallbackHandlerContractInstance(
   | CompatibilityFallbackHandlerContract_v1_3_0_Ethers
 > {
   const chainId = await safeProvider.getChainId()
+  let compatibilityFallbackHandlerInstance
+
   switch (safeVersion) {
     case '1.4.1':
-      return new CompatibilityFallbackHandlerContract_v1_4_1_Ethers(
+      compatibilityFallbackHandlerInstance = new CompatibilityFallbackHandlerContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
       )
-
+      break
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
-      return new CompatibilityFallbackHandlerContract_v1_3_0_Ethers(
+      compatibilityFallbackHandlerInstance = new CompatibilityFallbackHandlerContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
       )
-
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await compatibilityFallbackHandlerInstance.init()
+
+  return compatibilityFallbackHandlerInstance
 }
 
 export async function getMultiSendContractInstance(
@@ -160,37 +171,42 @@ export async function getMultiSendContractInstance(
   | MultiSendContract_v1_1_1_Ethers
 > {
   const chainId = await safeProvider.getChainId()
+  let multiSendContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      return new MultiSendContract_v1_4_1_Ethers(
+      multiSendContractInstance = new MultiSendContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendContract_v1_4_1_Abi>
       )
-
+      break
     case '1.3.0':
-      return new MultiSendContract_v1_3_0_Ethers(
+      multiSendContractInstance = new MultiSendContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendContract_v1_3_0_Abi>
       )
-
+      break
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new MultiSendContract_v1_1_1_Ethers(
+      multiSendContractInstance = new MultiSendContract_v1_1_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendContract_v1_1_1_Abi>
       )
-
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await multiSendContractInstance.init()
+
+  return multiSendContractInstance
 }
 
 export async function getMultiSendCallOnlyContractInstance(
@@ -200,28 +216,35 @@ export async function getMultiSendCallOnlyContractInstance(
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<MultiSendCallOnlyContract_v1_4_1_Ethers | MultiSendCallOnlyContract_v1_3_0_Ethers> {
   const chainId = await safeProvider.getChainId()
+  let multiSendCallOnlyContractInstance
+
   switch (safeVersion) {
     case '1.4.1':
-      return new MultiSendCallOnlyContract_v1_4_1_Ethers(
+      multiSendCallOnlyContractInstance = new MultiSendCallOnlyContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi>
       )
-
+      break
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new MultiSendCallOnlyContract_v1_3_0_Ethers(
+      multiSendCallOnlyContractInstance = new MultiSendCallOnlyContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>
       )
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await multiSendCallOnlyContractInstance.init()
+
+  return multiSendCallOnlyContractInstance
 }
 
 export async function getSafeProxyFactoryContractInstance(
@@ -238,47 +261,53 @@ export async function getSafeProxyFactoryContractInstance(
   | SafeProxyFactoryContract_v1_0_0_Ethers
 > {
   const chainId = await safeProvider.getChainId()
+  let safeProxyFactoryContractInstance
+
   switch (safeVersion) {
     case '1.4.1':
-      return new SafeProxyFactoryContract_v1_4_1_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>,
         signerOrProvider
       )
-
+      break
     case '1.3.0':
-      return new SafeProxyFactoryContract_v1_3_0_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>,
         signerOrProvider
       )
-
+      break
     case '1.2.0':
     case '1.1.1':
-      return new SafeProxyFactoryContract_v1_1_1_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_1_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>,
         signerOrProvider
       )
-
+      break
     case '1.0.0':
-      return new SafeProxyFactoryContract_v1_0_0_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_0_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>,
         signerOrProvider
       )
-
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await safeProxyFactoryContractInstance.init()
+
+  return safeProxyFactoryContractInstance
 }
 
 export async function getSignMessageLibContractInstance(
@@ -288,27 +317,32 @@ export async function getSignMessageLibContractInstance(
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<SignMessageLibContract_v1_4_1_Ethers | SignMessageLibContract_v1_3_0_Ethers> {
   const chainId = await safeProvider.getChainId()
+  let signMessageLibContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      return new SignMessageLibContract_v1_4_1_Ethers(
+      signMessageLibContractInstance = new SignMessageLibContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SignMessageLibContract_v1_4_1_Abi>
       )
-
+      break
     case '1.3.0':
-      return new SignMessageLibContract_v1_3_0_Ethers(
+      signMessageLibContractInstance = new SignMessageLibContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SignMessageLibContract_v1_3_0_Abi>
       )
-
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await signMessageLibContractInstance.init()
+
+  return signMessageLibContractInstance
 }
 
 export async function getCreateCallContractInstance(
@@ -318,30 +352,35 @@ export async function getCreateCallContractInstance(
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<CreateCallContract_v1_4_1_Ethers | CreateCallContract_v1_3_0_Ethers> {
   const chainId = await safeProvider.getChainId()
+  let createCallContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      return new CreateCallContract_v1_4_1_Ethers(
+      createCallContractInstance = new CreateCallContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<CreateCallContract_v1_4_1_Abi>
       )
-
+      break
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      return new CreateCallContract_v1_3_0_Ethers(
+      createCallContractInstance = new CreateCallContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
       )
-
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await createCallContractInstance.init()
+
+  return createCallContractInstance
 }
 
 export async function getSimulateTxAccessorContractInstance(
@@ -351,24 +390,30 @@ export async function getSimulateTxAccessorContractInstance(
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<SimulateTxAccessorContract_v1_4_1_Ethers | SimulateTxAccessorContract_v1_3_0_Ethers> {
   const chainId = await safeProvider.getChainId()
+  let simulateTxAccessorContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      return new SimulateTxAccessorContract_v1_4_1_Ethers(
+      simulateTxAccessorContractInstance = new SimulateTxAccessorContract_v1_4_1_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi>
       )
-
+      break
     case '1.3.0':
-      return new SimulateTxAccessorContract_v1_3_0_Ethers(
+      simulateTxAccessorContractInstance = new SimulateTxAccessorContract_v1_3_0_Ethers(
         chainId,
         safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi>
       )
+      break
     default:
       throw new Error('Invalid Safe version')
   }
+
+  await simulateTxAccessorContractInstance.init()
+
+  return simulateTxAccessorContractInstance
 }

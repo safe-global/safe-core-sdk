@@ -22,7 +22,7 @@ class ContractManager {
   #multiSendContract!: MultiSendContractImplementationType
   #multiSendCallOnlyContract!: MultiSendCallOnlyContractImplementationType
 
-  static async create(config: SafeConfig, safeProvider: ISafeProvider): Promise<ContractManager> {
+  static async create(config: SafeConfig, safeProvider: SafeProvider): Promise<ContractManager> {
     const contractManager = new ContractManager()
     await contractManager.init(config, safeProvider)
     return contractManager

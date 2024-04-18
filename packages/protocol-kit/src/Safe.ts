@@ -13,7 +13,6 @@ import {
   Transaction,
   EIP712TypedData,
   SafeTransactionData,
-  Eip1193Provider
   CompatibilityFallbackHandlerContractType
 } from '@safe-global/safe-core-sdk-types'
 import {
@@ -71,6 +70,7 @@ import {
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import { SafeProvider } from './adapters/ethers'
+import { Eip1193Provider } from './adapters/ethAdapter'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -78,7 +78,7 @@ const EQ_OR_GT_1_3_0 = '>=1.3.0'
 class Safe {
   #predictedSafe?: PredictedSafeProps
   #provider!: Eip1193Provider
-  #safeProvider!: ISafeProvider
+  #safeProvider!: SafeProvider
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
   #moduleManager!: ModuleManager
@@ -252,7 +252,7 @@ class Safe {
    *
    * @returns The current SafeProvider
    */
-  getSafeProvider(): ISafeProvider {
+  getSafeProvider(): SafeProvider {
     return this.#safeProvider
   }
 

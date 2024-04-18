@@ -1,5 +1,5 @@
 import { JsonFragment } from 'ethers'
-import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-core-sdk-types/types'
+import { Eip3770Address, SafeEIP712Args, SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 import {
   CompatibilityFallbackHandlerContractImplementationType,

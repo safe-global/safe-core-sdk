@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
+import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import {
   SafeSignature,
   SafeEIP712Args,
@@ -106,7 +106,7 @@ export const adjustVInSignature: AdjustVOverload = (
 }
 
 export async function generateSignature(
-  safeProvider: ISafeProvider,
+  safeProvider: SafeProvider,
   hash: string
 ): Promise<SafeSignature> {
   const signerAddress = await safeProvider.getSignerAddress()
@@ -121,7 +121,7 @@ export async function generateSignature(
 }
 
 export async function generateEIP712Signature(
-  safeProvider: ISafeProvider,
+  safeProvider: SafeProvider,
   safeEIP712Args: SafeEIP712Args,
   methodVersion?: 'v3' | 'v4'
 ): Promise<SafeSignature> {

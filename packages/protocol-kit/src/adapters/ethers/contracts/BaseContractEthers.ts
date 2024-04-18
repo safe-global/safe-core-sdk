@@ -31,8 +31,9 @@ import {
 abstract class BaseContractEthers<
   ContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<ContractAbiType> {
-  contract: Contract
+  contract!: Contract
   safeProvider: SafeProvider
+  runner?: ContractRunner | null
 
   /**
    * @constructor
@@ -58,11 +59,15 @@ abstract class BaseContractEthers<
   ) {
     super(contractName, chainId, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
+    this.runner = runner
     this.safeProvider = safeProvider
+  }
+
+  async init() {
     this.contract = new Contract(
       this.contractAddress,
       this.contractAbi,
-      runner || this.safeProvider.getSigner()
+      this.runner || (await this.safeProvider.getSigner())
     )
   }
 

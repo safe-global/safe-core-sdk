@@ -342,7 +342,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     'requiredTxGas',
     [
       safeTransaction.data.to,
-      safeTransaction.data.value,
+      BigInt(safeTransaction.data.value),
       safeTransaction.data.data,
       safeTransaction.data.operation
     ]

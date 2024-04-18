@@ -241,7 +241,7 @@ class SafeContract_v1_1_1_Ethers
    * @param moduleAddress - The module address to check.
    * @returns True, if the module with the given address is enabled.
    */
-  async isModuleEnabled(moduleAddress: string[]): Promise<boolean[]> {
+  async isModuleEnabled([moduleAddress]: [string]): Promise<[boolean]> {
     const [modules] = await this.getModules()
     const isModuleEnabled = modules.some((enabledModuleAddress) =>
       sameString(enabledModuleAddress, moduleAddress[0])

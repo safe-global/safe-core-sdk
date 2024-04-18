@@ -8,7 +8,7 @@ import {
 import SafeContract_v1_0_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.0.0/SafeContract_v1_0_0_Ethers'
 import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.1.1/SafeContract_v1_1_1_Ethers'
 import SafeContract_v1_2_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.2.0/SafeContract_v1_2_0_Ethers'
-import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.3.0/SafeContract_v1_3_0_Ethers'
+import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/v1.3.0/SafeContract_v1_3_0_Ethers'
 import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/Safe/v1.4.1/SafeContract_v1_4_1_Ethers'
 import MultiSendContract_v1_1_1_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.1.1/MultiSendContract_v1_1_1_Ethers'
 import MultiSendContract_v1_3_0_Ethers from '@safe-global/protocol-kit/adapters/ethers/contracts/MultiSend/v1.3.0/MultiSendContract_v1_3_0_Ethers'

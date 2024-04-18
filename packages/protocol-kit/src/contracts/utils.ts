@@ -3,11 +3,7 @@ import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
-import {
-  SafeContract,
-  SafeProxyFactoryContract,
-  SafeVersion
-} from '@safe-global/safe-core-sdk-types'
+import { SafeProxyFactoryContractType, SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 
@@ -24,6 +20,7 @@ import {
   SafeContractImplementationType,
   SafeDeploymentConfig
 } from '../types'
+import SafeProvider from '../adapters/ethers/SafeProvider'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =
@@ -51,7 +48,7 @@ const ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE: {
 const ZKSYNC_CREATE2_PREFIX = '0x2020dba91b30cc0006188af794c2fb30dd8520db7e2c088b7fc7c103c00ca494'
 
 export interface PredictSafeAddressProps {
-  safeProvider: ISafeProvider
+  safeProvider: SafeProvider
   chainId: bigint // required for performance
   safeAccountConfig: SafeAccountConfig
   safeDeploymentConfig?: SafeDeploymentConfig
@@ -60,7 +57,7 @@ export interface PredictSafeAddressProps {
 }
 
 export interface encodeSetupCallDataProps {
-  safeProvider: ISafeProvider
+  safeProvider: SafeProvider
   safeAccountConfig: SafeAccountConfig
   safeContract: SafeContractImplementationType
   customContracts?: ContractNetworkConfig

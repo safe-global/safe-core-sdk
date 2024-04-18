@@ -9,10 +9,6 @@ import {
   EthersTransactionOptions,
   EthersTransactionResult
 } from '@safe-global/safe-core-sdk-types/ethereumLibs/ethers/types'
-import {
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from '@safe-global/safe-core-sdk-types/ethereumLibs/web3/types'
 
 /**
  * Extracts the names of read-only functions (view or pure) from a given contract ABI.
@@ -79,9 +75,7 @@ export type EncodeFunction<
  */
 export type EstimateGasFunction<
   ContractAbi extends Abi,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions =
-    | EthersTransactionOptions
-    | Web3TransactionOptions,
+  TransactionOptions extends EthersTransactionOptions = EthersTransactionOptions,
   ContractFunctionName extends
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
@@ -124,12 +118,8 @@ export type AdapterSpecificContractFunction<
   ContractAbi extends Abi,
   ContractFunctionName extends
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>,
-  TransactionOptions extends EthersTransactionOptions | Web3TransactionOptions =
-    | EthersTransactionOptions
-    | Web3TransactionOptions,
-  TransactionResult extends EthersTransactionResult | Web3TransactionResult =
-    | EthersTransactionResult
-    | Web3TransactionResult
+  TransactionOptions extends EthersTransactionOptions = EthersTransactionOptions,
+  TransactionResult extends EthersTransactionResult = EthersTransactionResult
 > = (
   // TODO: remove `DeepWriteable` here when web3 dependency is removed
   args: DeepWriteable<

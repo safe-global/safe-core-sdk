@@ -1,4 +1,3 @@
-import { AbstractSigner, Provider } from 'ethers'
 import { JsonFragment, AbstractSigner, Provider } from 'ethers'
 import {
   DeepWriteable,
@@ -69,7 +68,7 @@ export async function getSafeContractInstance(
     case '1.4.1':
       return new SafeContract_v1_4_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_4_1_Abi>
@@ -78,7 +77,7 @@ export async function getSafeContractInstance(
     case '1.3.0':
       return new SafeContract_v1_3_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_3_0_Abi>
@@ -87,7 +86,7 @@ export async function getSafeContractInstance(
     case '1.2.0':
       return new SafeContract_v1_2_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_2_0_Abi>
@@ -96,7 +95,7 @@ export async function getSafeContractInstance(
     case '1.1.1':
       return new SafeContract_v1_1_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_1_1_Abi>
@@ -105,7 +104,7 @@ export async function getSafeContractInstance(
     case '1.0.0':
       return new SafeContract_v1_0_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         isL1SafeSingleton,
         contractAddress,
         customContractAbi as DeepWriteable<SafeContract_v1_0_0_Abi>
@@ -166,7 +165,7 @@ export async function getMultiSendContractInstance(
     case '1.4.1':
       return new MultiSendContract_v1_4_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendContract_v1_4_1_Abi>
       )
@@ -174,7 +173,7 @@ export async function getMultiSendContractInstance(
     case '1.3.0':
       return new MultiSendContract_v1_3_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendContract_v1_3_0_Abi>
       )
@@ -184,7 +183,7 @@ export async function getMultiSendContractInstance(
     case '1.0.0':
       return new MultiSendContract_v1_1_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendContract_v1_1_1_Abi>
       )
@@ -205,7 +204,7 @@ export async function getMultiSendCallOnlyContractInstance(
     case '1.4.1':
       return new MultiSendCallOnlyContract_v1_4_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi>
       )
@@ -216,7 +215,7 @@ export async function getMultiSendCallOnlyContractInstance(
     case '1.0.0':
       return new MultiSendCallOnlyContract_v1_3_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>
       )
@@ -243,7 +242,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.4.1':
       return new SafeProxyFactoryContract_v1_4_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>,
         signerOrProvider
@@ -252,7 +251,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.3.0':
       return new SafeProxyFactoryContract_v1_3_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>,
         signerOrProvider
@@ -262,7 +261,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.1.1':
       return new SafeProxyFactoryContract_v1_1_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>,
         signerOrProvider
@@ -271,7 +270,7 @@ export async function getSafeProxyFactoryContractInstance(
     case '1.0.0':
       return new SafeProxyFactoryContract_v1_0_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>,
         signerOrProvider
@@ -294,7 +293,7 @@ export async function getSignMessageLibContractInstance(
     case '1.4.1':
       return new SignMessageLibContract_v1_4_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SignMessageLibContract_v1_4_1_Abi>
       )
@@ -302,7 +301,7 @@ export async function getSignMessageLibContractInstance(
     case '1.3.0':
       return new SignMessageLibContract_v1_3_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SignMessageLibContract_v1_3_0_Abi>
       )
@@ -324,7 +323,7 @@ export async function getCreateCallContractInstance(
     case '1.4.1':
       return new CreateCallContract_v1_4_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<CreateCallContract_v1_4_1_Abi>
       )
@@ -335,7 +334,7 @@ export async function getCreateCallContractInstance(
     case '1.0.0':
       return new CreateCallContract_v1_3_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
       )
@@ -357,7 +356,7 @@ export async function getSimulateTxAccessorContractInstance(
     case '1.4.1':
       return new SimulateTxAccessorContract_v1_4_1_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi>
       )
@@ -365,7 +364,7 @@ export async function getSimulateTxAccessorContractInstance(
     case '1.3.0':
       return new SimulateTxAccessorContract_v1_3_0_Ethers(
         chainId,
-        (await safeProvider.getSigner()) as AbstractSigner,
+        safeProvider,
         contractAddress,
         customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi>
       )

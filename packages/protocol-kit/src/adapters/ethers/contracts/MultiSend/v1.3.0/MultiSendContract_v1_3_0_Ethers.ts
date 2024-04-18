@@ -31,14 +31,14 @@ class MultiSendContract_v1_3_0_Ethers
    */
   constructor(
     chainId: bigint,
-    signer: AbstractSigner,
+    safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: MultiSendContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = multisend_1_3_0_ContractArtifacts.abi
 
-    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

@@ -37,7 +37,7 @@ abstract class CreateCallBaseContractEthers<
    */
   constructor(
     chainId: bigint,
-    signer: AbstractSigner,
+    safeProvider: SafeProvider,
     defaultAbi: CreateCallContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,

@@ -9,7 +9,6 @@ import {
   EthersTransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/adapters/ethers/utils'
-import { AbstractSigner } from 'ethers'
 
 /**
  * CreateCallContract_v1_4_1_Ethers is the implementation specific to the CreateCall contract version 1.4.1.
@@ -35,14 +34,14 @@ class CreateCallContract_v1_4_1_Ethers
    */
   constructor(
     chainId: bigint,
-    signer: AbstractSigner,
+    safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: CreateCallContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = createCall_1_4_1_ContractArtifacts.abi
 
-    super(chainId, signer, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

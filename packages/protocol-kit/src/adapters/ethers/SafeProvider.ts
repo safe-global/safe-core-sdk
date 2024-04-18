@@ -11,8 +11,7 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args,
-  Eip1193Provider
+  SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -25,7 +24,7 @@ import {
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
 import { isTypedDataSigner } from './utils'
-import { SafeProviderTransaction, GetContractProps } from '../ethAdapter'
+import { SafeProviderTransaction, GetContractProps, Eip1193Provider } from '../ethAdapter'
 
 export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */

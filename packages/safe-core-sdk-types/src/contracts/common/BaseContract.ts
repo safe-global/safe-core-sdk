@@ -62,8 +62,7 @@ export type EncodeFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
-  // TODO: remove `DeepWriteable` here when web3 dependency is removed
-  args: DeepWriteable<ExtractFunctionArgs<ContractAbi, ContractFunctionName>>
+  args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>
 ) => string
 
 /**
@@ -80,8 +79,7 @@ export type EstimateGasFunction<
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
-  // TODO: remove `DeepWriteable` here when web3 dependency is removed
-  args: DeepWriteable<ExtractFunctionArgs<ContractAbi, ContractFunctionName>>,
+  args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>,
   options?: TransactionOptions
 ) => Promise<bigint>
 
@@ -101,8 +99,7 @@ export type ContractFunction<
   // input parameters (only if function has inputs, otherwise no parameters)
   ...args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>['length'] extends 0
     ? []
-    : // TODO: remove `DeepWriteable` here when web3 dependency is removed
-      [DeepWriteable<ExtractFunctionArgs<ContractAbi, ContractFunctionName>>]
+    : [ExtractFunctionArgs<ContractAbi, ContractFunctionName>]
   // returned values as a Promise
 ) => Promise<ExtractFunctionArgs<ContractAbi, ContractFunctionName, 'outputs'>>
 
@@ -121,9 +118,8 @@ export type AdapterSpecificContractFunction<
   TransactionOptions extends EthersTransactionOptions = EthersTransactionOptions,
   TransactionResult extends EthersTransactionResult = EthersTransactionResult
 > = (
-  // TODO: remove `DeepWriteable` here when web3 dependency is removed
-  args: DeepWriteable<
-    AbiParametersToPrimitiveTypes<ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']>
+  args: AbiParametersToPrimitiveTypes<
+    ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']
   >,
   options?: TransactionOptions
 ) => Promise<TransactionResult>
@@ -147,17 +143,5 @@ type BaseContract<
   encode: EncodeFunction<ContractAbi>
   getAddress: GetAddressFunction
 }
-
-/**
- * Removes `readonly` modifier from all properties in T recursively.
- *
- * @template T - The type to make writable.
- */
-export type DeepWriteable<T> = T extends object & NotFunction<T>
-  ? { -readonly [K in keyof T]: DeepWriteable<T[K]> }
-  : T
-
-type Not<T, U> = T extends U ? never : T
-type NotFunction<T> = Not<T, (...args: any) => any>
 
 export default BaseContract

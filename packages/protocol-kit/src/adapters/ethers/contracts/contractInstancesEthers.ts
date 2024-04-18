@@ -1,6 +1,5 @@
 import { JsonFragment, AbstractSigner, Provider } from 'ethers'
 import {
-  DeepWriteable,
   SafeVersion,
   SafeContract_v1_3_0_Abi,
   SafeContract_v1_4_1_Abi,
@@ -72,7 +71,7 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeContract_v1_4_1_Abi>
+        customContractAbi as SafeContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -81,7 +80,7 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeContract_v1_3_0_Abi>
+        customContractAbi as SafeContract_v1_3_0_Abi
       )
       break
     case '1.2.0':
@@ -90,7 +89,7 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeContract_v1_2_0_Abi>
+        customContractAbi as SafeContract_v1_2_0_Abi
       )
       break
     case '1.1.1':
@@ -99,7 +98,7 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeContract_v1_1_1_Abi>
+        customContractAbi as SafeContract_v1_1_1_Abi
       )
       break
     case '1.0.0':
@@ -108,7 +107,7 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeContract_v1_0_0_Abi>
+        customContractAbi as SafeContract_v1_0_0_Abi
       )
       break
     default:
@@ -138,7 +137,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
+        customContractAbi as CompatibilityFallbackHandlerContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -148,7 +147,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
+        customContractAbi as CompatibilityFallbackHandlerContract_v1_3_0_Abi
       )
       break
     default:
@@ -179,7 +178,7 @@ export async function getMultiSendContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<MultiSendContract_v1_4_1_Abi>
+        customContractAbi as MultiSendContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -187,7 +186,7 @@ export async function getMultiSendContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<MultiSendContract_v1_3_0_Abi>
+        customContractAbi as MultiSendContract_v1_3_0_Abi
       )
       break
     case '1.2.0':
@@ -197,7 +196,7 @@ export async function getMultiSendContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<MultiSendContract_v1_1_1_Abi>
+        customContractAbi as MultiSendContract_v1_1_1_Abi
       )
       break
     default:
@@ -224,7 +223,7 @@ export async function getMultiSendCallOnlyContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_4_1_Abi>
+        customContractAbi as MultiSendCallOnlyContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -235,7 +234,7 @@ export async function getMultiSendCallOnlyContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<MultiSendCallOnlyContract_v1_3_0_Abi>
+        customContractAbi as MultiSendCallOnlyContract_v1_3_0_Abi
       )
       break
     default:
@@ -269,7 +268,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_4_1_Abi>,
+        customContractAbi as SafeProxyFactoryContract_v1_4_1_Abi,
         signerOrProvider
       )
       break
@@ -278,7 +277,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_3_0_Abi>,
+        customContractAbi as SafeProxyFactoryContract_v1_3_0_Abi,
         signerOrProvider
       )
       break
@@ -288,7 +287,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_1_1_Abi>,
+        customContractAbi as SafeProxyFactoryContract_v1_1_1_Abi,
         signerOrProvider
       )
       break
@@ -297,7 +296,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SafeProxyFactoryContract_v1_0_0_Abi>,
+        customContractAbi as SafeProxyFactoryContract_v1_0_0_Abi,
         signerOrProvider
       )
       break
@@ -325,7 +324,7 @@ export async function getSignMessageLibContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SignMessageLibContract_v1_4_1_Abi>
+        customContractAbi as SignMessageLibContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -333,7 +332,7 @@ export async function getSignMessageLibContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SignMessageLibContract_v1_3_0_Abi>
+        customContractAbi as SignMessageLibContract_v1_3_0_Abi
       )
       break
     default:
@@ -360,7 +359,7 @@ export async function getCreateCallContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<CreateCallContract_v1_4_1_Abi>
+        customContractAbi as CreateCallContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -371,7 +370,7 @@ export async function getCreateCallContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<CreateCallContract_v1_3_0_Abi>
+        customContractAbi as CreateCallContract_v1_3_0_Abi
       )
       break
     default:
@@ -398,7 +397,7 @@ export async function getSimulateTxAccessorContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_4_1_Abi>
+        customContractAbi as SimulateTxAccessorContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -406,7 +405,7 @@ export async function getSimulateTxAccessorContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as DeepWriteable<SimulateTxAccessorContract_v1_3_0_Abi>
+        customContractAbi as SimulateTxAccessorContract_v1_3_0_Abi
       )
       break
     default:

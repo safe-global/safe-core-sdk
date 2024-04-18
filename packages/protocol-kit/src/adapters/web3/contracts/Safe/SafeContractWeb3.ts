@@ -84,6 +84,8 @@ abstract class SafeContractWeb3 implements SafeContract {
 
   abstract getModules(): Promise<string[]>
 
+  abstract getModulesPaginated(start: string, pageSize: number): Promise<string[]>
+
   abstract isModuleEnabled(moduleAddress: string): Promise<boolean>
 
   async isValidTransaction(

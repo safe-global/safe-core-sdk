@@ -34,24 +34,22 @@ import {
 export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */
   providerOrUrl: Eip1193Provider | string
-  signerAddress?: string
+  signer?: string
   privateKeyOrMnemonic?: string
 }
 
 class SafeProvider {
   #provider: BrowserProvider | JsonRpcProvider
-  #signerAddress?: string
-  #privateKeyOrMnemonic?: string
+  #signer?: string
 
-  constructor({ providerOrUrl, signerAddress, privateKeyOrMnemonic }: SafeProviderConfig) {
+  constructor({ providerOrUrl, signer }: SafeProviderConfig) {
     if (typeof providerOrUrl === 'string') {
       this.#provider = new JsonRpcProvider(providerOrUrl)
     } else {
       this.#provider = new BrowserProvider(providerOrUrl)
     }
 
-    this.#privateKeyOrMnemonic = privateKeyOrMnemonic
-    this.#signerAddress = signerAddress
+    this.#signer = signer
   }
 
   getProvider(): Provider {
@@ -59,13 +57,14 @@ class SafeProvider {
   }
 
   async getSigner(): Promise<AbstractSigner | undefined> {
-    if (this.#privateKeyOrMnemonic) {
-      const privateKeySigner = new ethers.Wallet(this.#privateKeyOrMnemonic, this.#provider)
+    // If the signer is not an Ethereum address, it should be a private key
+    if (this.#signer && !ethers.isAddress(this.#signer)) {
+      const privateKeySigner = new ethers.Wallet(this.#signer, this.#provider)
       return privateKeySigner
     }
 
-    if (this.#signerAddress) {
-      return this.#provider.getSigner(this.#signerAddress)
+    if (this.#signer) {
+      return this.#provider.getSigner(this.#signer)
     }
 
     if (this.#provider instanceof BrowserProvider) {

@@ -106,8 +106,7 @@ type SafeConfigWithPredictedSafeProps = {
 export type SafeConfigProps = {
   /** provider - Compatible EIP-1193 provider */
   provider: Eip1193Provider
-  signerAddress?: string
-  privateKeyOrMnemonic?: string
+  signer?: string
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
@@ -135,8 +134,7 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 type ConnectSafeConfigProps = {
   /** provider - Compatible EIP-1193 provider */
   provider?: Eip1193Provider
-  signerAddress?: string
-  privateKeyOrMnemonic?: string
+  signer?: string
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
@@ -198,8 +196,7 @@ type StandardizeSafeTxDataWithPredictedSafeProps = {
 interface StandardizeSafeTransactionData {
   /** provider - Compatible EIP-1193 provider */
   provider: Eip1193Provider
-  signerAddress?: string
-  privateKeyOrMnemonic?: string
+  signer?: string
   /** tx - Safe transaction */
   tx: SafeTransactionDataPartial
   /** contractNetworks - Contract network configuration */

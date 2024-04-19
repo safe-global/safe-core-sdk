@@ -288,7 +288,7 @@ class SafeContract_v1_3_0_Ethers
    */
   async getModules(): Promise<string[]> {
     const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
-    return [...modules]
+    return [modules]
   }
 
   /**

@@ -244,7 +244,7 @@ class SafeContract_v1_1_1_Ethers
   async isModuleEnabled([moduleAddress]: [string]): Promise<[boolean]> {
     const [modules] = await this.getModules()
     const isModuleEnabled = modules.some((enabledModuleAddress) =>
-      sameString(enabledModuleAddress, moduleAddress[0])
+      sameString(enabledModuleAddress, moduleAddress)
     )
     return [isModuleEnabled]
   }

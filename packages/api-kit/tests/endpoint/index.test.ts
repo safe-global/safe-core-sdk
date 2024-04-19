@@ -14,6 +14,7 @@ import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
+import SafeOperation from '@safe-global/relay-kit/packs/safe-4337/SafeOperation'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -642,6 +643,77 @@ describe('Endpoint tests', () => {
         method: 'post',
         body: {
           signature
+        }
+      })
+    })
+
+    it('getSafeOperationsByAddress', async () => {
+      await chai
+        .expect(safeApiKit.getSafeOperationsByAddress(safeAddress))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
+        method: 'get'
+      })
+    })
+
+    it('getSafeOperation', async () => {
+      const safeOperationHash = 'safe-operation-hash'
+
+      await chai
+        .expect(safeApiKit.getSafeOperation(safeOperationHash))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/`,
+        method: 'get'
+      })
+    })
+
+    it('addSafeOperation', async () => {
+      const signature = '0xsignature'
+      const moduleAddress = '0xa581c4A4DB7175302464fF3C06380BC3270b4037'
+
+      const safeOperation = {
+        data: {
+          nonce: 42,
+          initCode: '0x123initcode',
+          callData: '0xcallData123',
+          callGasLimit: 123,
+          verificationGasLimit: 234,
+          preVerificationGas: 345,
+          maxFeePerGas: 456,
+          maxPriorityFeePerGas: 567,
+          paymasterAndData: '0xpaymasterAndData123',
+          entryPoint: '0xentryPoint',
+          validAfter: 'validAfter',
+          validUntil: 'validUntil'
+        },
+        getSignature: () => ({ data: signature })
+      } as unknown as SafeOperation
+
+      await chai
+        .expect(
+          safeApiKit.addSafeOperation({
+            moduleAddress,
+            safeAddress,
+            safeOperation,
+            signer
+          })
+        )
+        .to.be.eventually.deep.equals({ data: { success: true } })
+
+      // We need to get the object without the "callGasLimit" prop because the api endpoint expects it as "callDataGasLimit"
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+      const { callGasLimit, ...safeOperationWithoutCallGasLimit } = safeOperation.data
+
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
+        method: 'post',
+        body: {
+          ...safeOperationWithoutCallGasLimit,
+          callDataGasLimit: safeOperation.data.callGasLimit,
+          signature,
+          moduleAddress
         }
       })
     })

@@ -8,7 +8,7 @@ import {
   SafeBaseContractEthers,
   SafeProxyFactoryBaseContractEthers,
   SignMessageLibBaseContractEthers
-} from './adapters/ethers'
+} from './contracts'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,

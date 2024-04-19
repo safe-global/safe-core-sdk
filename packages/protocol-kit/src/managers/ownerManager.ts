@@ -1,7 +1,7 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '../types'
-import SafeProvider from '../adapters/ethers/SafeProvider'
+import SafeProvider from '../SafeProvider'
 
 class OwnerManager {
   #safeProvider: SafeProvider

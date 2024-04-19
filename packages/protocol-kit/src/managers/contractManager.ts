@@ -13,7 +13,7 @@ import {
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
-import SafeProvider from '../adapters/ethers/SafeProvider'
+import SafeProvider from '../SafeProvider'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig

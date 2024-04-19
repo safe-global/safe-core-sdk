@@ -1,9 +1,20 @@
-import { isAddress, zeroPadValue } from 'ethers'
+import {
+  ContractTransactionResponse,
+  Provider,
+  AbstractSigner,
+  isAddress,
+  zeroPadValue
+} from 'ethers'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
-import { SafeProxyFactoryContractType, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  SafeProxyFactoryContractType,
+  SafeVersion,
+  EthersTransactionOptions,
+  EthersTransactionResult
+} from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 
@@ -20,7 +31,7 @@ import {
   SafeContractImplementationType,
   SafeDeploymentConfig
 } from '../types'
-import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =
@@ -305,4 +316,38 @@ export function zkSyncEraCreate2Address(
     .slice(24)
 
   return addressBytes
+}
+
+export function sameString(str1: string, str2: string): boolean {
+  return str1.toLowerCase() === str2.toLowerCase()
+}
+
+export function toTxResult(
+  transactionResponse: ContractTransactionResponse,
+  options?: EthersTransactionOptions
+): EthersTransactionResult {
+  return {
+    hash: transactionResponse.hash,
+    options,
+    transactionResponse
+  }
+}
+
+export function isTypedDataSigner(signer: any): signer is AbstractSigner {
+  return (signer as unknown as AbstractSigner).signTypedData !== undefined
+}
+
+/**
+ * Check if the signerOrProvider is compatible with `Signer`
+ * @param signerOrProvider - Signer or provider
+ * @returns true if the parameter is compatible with `Signer`
+ */
+export function isSignerCompatible(signerOrProvider: AbstractSigner | Provider): boolean {
+  const candidate = signerOrProvider as AbstractSigner
+
+  const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
+  const isSignMessageCompatible = typeof candidate.signMessage === 'function'
+  const isGetAddressCompatible = typeof candidate.getAddress === 'function'
+
+  return isSigntransactionCompatible && isSignMessageCompatible && isGetAddressCompatible
 }

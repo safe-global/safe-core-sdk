@@ -1,7 +1,7 @@
 import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe from '@safe-global/protocol-kit/Safe'
-import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   ContractNetworksConfig,
   SafeContractImplementationType

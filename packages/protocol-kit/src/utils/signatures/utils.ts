@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeSignature,
   SafeEIP712Args,

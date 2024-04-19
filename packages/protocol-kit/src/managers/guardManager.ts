@@ -7,7 +7,7 @@ import {
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
-import SafeProvider from '../adapters/ethers/SafeProvider'
+import SafeProvider from '../SafeProvider'
 
 class GuardManager {
   #safeProvider: SafeProvider

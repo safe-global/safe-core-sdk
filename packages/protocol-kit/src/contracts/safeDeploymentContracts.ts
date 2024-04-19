@@ -1,4 +1,4 @@
-import SafeProvider from '../adapters/ethers/SafeProvider'
+import SafeProvider from '../SafeProvider'
 import {
   CompatibilityFallbackHandlerContractImplementationType,
   ContractNetworkConfig,

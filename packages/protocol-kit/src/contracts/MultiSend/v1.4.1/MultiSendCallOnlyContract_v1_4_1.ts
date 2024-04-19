@@ -8,21 +8,21 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 /**
- * MultiSendCallOnlyContract_v1_4_1_Ethers is the implementation specific to the MultiSend contract version 1.4.1.
+ * MultiSendCallOnlyContract_v1_4_1  is the implementation specific to the MultiSend contract version 1.4.1.
  *
  * This class specializes in handling interactions with the MultiSendCallOnly contract version 1.4.1 using Ethers.js v6.
  *
  * @extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi> - Inherits from MultiSendBaseContractEthers with ABI specific to MultiSendCallOnly contract version 1.4.1.
  * @implements MultiSendCallOnlyContract_v1_4_1_Contract - Implements the interface specific to MultiSendCallOnly contract version 1.4.1.
  */
-class MultiSendCallOnlyContract_v1_4_1_Ethers
+class MultiSendCallOnlyContract_v1_4_1
   extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi>
   implements MultiSendCallOnlyContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of MultiSendCallOnlyContract_v1_4_1_Ethers
+   * Constructs an instance of MultiSendCallOnlyContract_v1_4_1
    *
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
@@ -44,4 +44,4 @@ class MultiSendCallOnlyContract_v1_4_1_Ethers
   }
 }
 
-export default MultiSendCallOnlyContract_v1_4_1_Ethers
+export default MultiSendCallOnlyContract_v1_4_1

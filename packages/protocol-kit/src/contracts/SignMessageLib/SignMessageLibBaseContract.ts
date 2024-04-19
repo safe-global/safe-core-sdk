@@ -16,8 +16,8 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * @extends BaseContract<SignMessageLibContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SignMessageLibContract_v1_4_1_Ethers extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_4_1_Abi>
- * - SignMessageLibContract_v1_3_0_Ethers extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
+ * - SignMessageLibContract_v1_4_1  extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_4_1_Abi>
+ * - SignMessageLibContract_v1_3_0  extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
  */
 abstract class SignMessageLibBaseContractEthers<
   SignMessageLibContractAbiType extends InterfaceAbi & Abi

@@ -16,8 +16,8 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * @extends BaseContract<SimulateTxAccessorContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SimulateTxAccessorContract_v1_4_1_Ethers extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi>
- * - SimulateTxAccessorContract_v1_3_0_Ethers extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_3_0_Abi>
+ * - SimulateTxAccessorContract_v1_4_1  extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi>
+ * - SimulateTxAccessorContract_v1_3_0  extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_3_0_Abi>
  */
 abstract class SimulateTxAccessorBaseContractEthers<
   SimulateTxAccessorContractAbiType extends InterfaceAbi & Abi

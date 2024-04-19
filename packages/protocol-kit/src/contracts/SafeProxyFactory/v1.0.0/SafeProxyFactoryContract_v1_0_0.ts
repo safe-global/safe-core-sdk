@@ -12,21 +12,21 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 /**
- * SafeProxyFactoryContract_v1_0_0_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
+ * SafeProxyFactoryContract_v1_0_0  is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
  *
  * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.0.0 using Ethers.js v6.
  *
  * @extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi> - Inherits from SafeProxyFactoryBaseContractEthers with ABI specific to Safe Proxy Factory contract version 1.0.0.
  * @implements SafeProxyFactoryContract_v1_0_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.0.0.
  */
-class SafeProxyFactoryContract_v1_0_0_Ethers
+class SafeProxyFactoryContract_v1_0_0
   extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
   implements SafeProxyFactoryContract_v1_0_0_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeProxyFactoryContract_v1_0_0_Ethers
+   * Constructs an instance of SafeProxyFactoryContract_v1_0_0
    *
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
@@ -137,4 +137,4 @@ class SafeProxyFactoryContract_v1_0_0_Ethers
   }
 }
 
-export default SafeProxyFactoryContract_v1_0_0_Ethers
+export default SafeProxyFactoryContract_v1_0_0

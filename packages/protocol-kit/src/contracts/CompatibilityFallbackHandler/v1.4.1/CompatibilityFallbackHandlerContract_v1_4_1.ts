@@ -8,21 +8,21 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 /**
- * CompatibilityFallbackHandlerContract_v1_4_1_Ethers is the implementation specific to the CompatibilityFallbackHandler contract version 1.4.1.
+ * CompatibilityFallbackHandlerContract_v1_4_1  is the implementation specific to the CompatibilityFallbackHandler contract version 1.4.1.
  *
  * This class specializes in handling interactions with the CompatibilityFallbackHandler contract version 1.4.1 using Ethers.js v6.
  *
  * @extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_4_1_Abi> - Inherits from CompatibilityFallbackHandlerBaseContractEthers with ABI specific to CompatibilityFallbackHandler contract version 1.4.1.
  * @implements CompatibilityFallbackHandlerContract_v1_4_1_Contract - Implements the interface specific to CompatibilityFallbackHandler contract version 1.4.1.
  */
-class CompatibilityFallbackHandlerContract_v1_4_1_Ethers
+class CompatibilityFallbackHandlerContract_v1_4_1
   extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
   implements CompatibilityFallbackHandlerContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of CompatibilityFallbackHandlerContract_v1_4_1_Ethers
+   * Constructs an instance of CompatibilityFallbackHandlerContract_v1_4_1
    *
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
@@ -44,4 +44,4 @@ class CompatibilityFallbackHandlerContract_v1_4_1_Ethers
   }
 }
 
-export default CompatibilityFallbackHandlerContract_v1_4_1_Ethers
+export default CompatibilityFallbackHandlerContract_v1_4_1

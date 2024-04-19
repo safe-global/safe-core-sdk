@@ -16,11 +16,11 @@ import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-k
  * @extends BaseContract<SafeContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SafeContract_v1_4_1_Ethers extends SafeBaseContractEthers<SafeContract_v1_4_1_Abi>
- * - SafeContract_v1_3_0_Ethers extends SafeBaseContractEthers<SafeContract_v1_3_0_Abi>
- * - SafeContract_v1_2_0_Ethers extends SafeBaseContractEthers<SafeContract_v1_2_0_Abi>
- * - SafeContract_v1_1_1_Ethers extends SafeBaseContractEthers<SafeContract_v1_1_1_Abi>
- * - SafeContract_v1_0_0_Ethers extends SafeBaseContractEthers<SafeContract_v1_0_0_Abi>
+ * - SafeContract_v1_4_1  extends SafeBaseContractEthers<SafeContract_v1_4_1_Abi>
+ * - SafeContract_v1_3_0  extends SafeBaseContractEthers<SafeContract_v1_3_0_Abi>
+ * - SafeContract_v1_2_0  extends SafeBaseContractEthers<SafeContract_v1_2_0_Abi>
+ * - SafeContract_v1_1_1  extends SafeBaseContractEthers<SafeContract_v1_1_1_Abi>
+ * - SafeContract_v1_0_0  extends SafeBaseContractEthers<SafeContract_v1_0_0_Abi>
  */
 abstract class SafeBaseContractEthers<
   SafeContractAbiType extends InterfaceAbi & Abi

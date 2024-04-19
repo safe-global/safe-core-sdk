@@ -16,8 +16,8 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * @extends BaseContract<MultiSendCallOnlyContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - MultiSendCallOnlyContract_v1_4_1_Ethers extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi>
- * - MultiSendCallOnlyContract_v1_3_0_Ethers extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_3_0_Abi>
+ * - MultiSendCallOnlyContract_v1_4_1  extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi>
+ * - MultiSendCallOnlyContract_v1_3_0  extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_3_0_Abi>
  */
 abstract class MultiSendCallOnlyBaseContractEthers<
   MultiSendCallOnlyContractAbiType extends InterfaceAbi & Abi

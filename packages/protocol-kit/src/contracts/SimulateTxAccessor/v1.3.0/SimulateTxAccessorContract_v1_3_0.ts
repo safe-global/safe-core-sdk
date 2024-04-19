@@ -9,21 +9,21 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 /**
- * SimulateTxAccessorContract_v1_3_0_Ethers is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
+ * SimulateTxAccessorContract_v1_3_0  is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
  *
  * This class specializes in handling interactions with the SimulateTxAccessor contract version 1.3.0 using Ethers.js v6.
  *
  * @extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_3_0_Abi> - Inherits from SimulateTxAccessorBaseContractEthers with ABI specific to SimulateTxAccessor contract version 1.3.0.
  * @implements SimulateTxAccessorContract_v1_3_0_Contract - Implements the interface specific to SimulateTxAccessor contract version 1.3.0.
  */
-class SimulateTxAccessorContract_v1_3_0_Ethers
+class SimulateTxAccessorContract_v1_3_0
   extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_3_0_Abi>
   implements SimulateTxAccessorContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SimulateTxAccessorContract_v1_3_0_Ethers
+   * Constructs an instance of SimulateTxAccessorContract_v1_3_0
    *
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
@@ -53,4 +53,4 @@ class SimulateTxAccessorContract_v1_3_0_Ethers
   }
 }
 
-export default SimulateTxAccessorContract_v1_3_0_Ethers
+export default SimulateTxAccessorContract_v1_3_0

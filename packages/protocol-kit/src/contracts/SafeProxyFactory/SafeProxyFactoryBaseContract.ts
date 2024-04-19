@@ -23,11 +23,11 @@ export interface CreateProxyProps extends CreateProxyPropsGeneral {
  * @extends BaseContract<SafeProxyFactoryContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SafeProxyFactoryContract_v1_4_1_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_4_1_Abi>
- * - SafeProxyFactoryContract_v1_3_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi>
- * - SafeProxyFactoryContract_v1_2_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_2_0_Abi>
- * - SafeProxyFactoryContract_v1_1_1_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_1_1_Abi>
- * - SafeProxyFactoryContract_v1_0_0_Ethers extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
+ * - SafeProxyFactoryContract_v1_4_1  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_4_1_Abi>
+ * - SafeProxyFactoryContract_v1_3_0  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi>
+ * - SafeProxyFactoryContract_v1_2_0  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_2_0_Abi>
+ * - SafeProxyFactoryContract_v1_1_1  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_1_1_Abi>
+ * - SafeProxyFactoryContract_v1_0_0  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
  */
 abstract class SafeProxyFactoryBaseContractEthers<
   SafeProxyFactoryContractAbiType extends InterfaceAbi & Abi

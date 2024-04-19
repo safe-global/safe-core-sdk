@@ -12,21 +12,21 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 /**
- * SignMessageLibContract_v1_3_0_Ethers is the implementation specific to the SignMessageLib contract version 1.3.0.
+ * SignMessageLibContract_v1_3_0  is the implementation specific to the SignMessageLib contract version 1.3.0.
  *
  * This class specializes in handling interactions with the SignMessageLib contract version 1.3.0 using Ethers.js v6.
  *
  * @extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi> - Inherits from SignMessageLibBaseContractEthers with ABI specific to SignMessageLib contract version 1.3.0.
  * @implements SignMessageLibContract_v1_3_0_Contract - Implements the interface specific to SignMessageLib contract version 1.3.0.
  */
-class SignMessageLibContract_v1_3_0_Ethers
+class SignMessageLibContract_v1_3_0
   extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
   implements SignMessageLibContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SignMessageLibContract_v1_3_0_Ethers
+   * Constructs an instance of SignMessageLibContract_v1_3_0
    *
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
@@ -71,4 +71,4 @@ class SignMessageLibContract_v1_3_0_Ethers
   }
 }
 
-export default SignMessageLibContract_v1_3_0_Ethers
+export default SignMessageLibContract_v1_3_0

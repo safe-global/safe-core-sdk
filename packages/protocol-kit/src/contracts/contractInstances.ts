@@ -24,28 +24,28 @@ import {
   SimulateTxAccessorContract_v1_4_1_Abi,
   SimulateTxAccessorContract_v1_3_0_Abi
 } from '@safe-global/safe-core-sdk-types'
-import CreateCallContract_v1_3_0_Ethers from './CreateCall/v1.3.0/CreateCallContract_v1_3_0'
-import CreateCallContract_v1_4_1_Ethers from './CreateCall/v1.4.1/CreateCallContract_v1_4_1'
-import MultiSendContract_v1_1_1_Ethers from './MultiSend/v1.1.1/MultiSendContract_v1_1_1'
-import MultiSendContract_v1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendContract_v1_3_0'
-import MultiSendContract_v1_4_1_Ethers from './MultiSend/v1.4.1/MultiSendContract_v1_4_1'
-import MultiSendCallOnlyContract_v1_3_0_Ethers from './MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
-import MultiSendCallOnlyContract_v1_4_1_Ethers from './MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
-import SignMessageLibContract_v1_3_0_Ethers from './SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import SignMessageLibContract_v1_4_1_Ethers from './SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
-import SafeContract_v1_0_0_Ethers from './Safe/v1.0.0/SafeContract_v1_0_0'
-import SafeContract_v1_1_1_Ethers from './Safe/v1.1.1/SafeContract_v1_1_1'
-import SafeContract_v1_2_0_Ethers from './Safe/v1.2.0/SafeContract_v1_2_0'
-import SafeContract_v1_3_0_Ethers from './Safe/v1.3.0/SafeContract_v1_3_0'
-import SafeContract_v1_4_1_Ethers from './Safe/v1.4.1/SafeContract_v1_4_1'
-import SafeProxyFactoryContract_v1_0_0_Ethers from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import SafeProxyFactoryContract_v1_1_1_Ethers from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
-import SafeProxyFactoryContract_v1_3_0_Ethers from './SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
-import SafeProxyFactoryContract_v1_4_1_Ethers from './SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
-import SimulateTxAccessorContract_v1_3_0_Ethers from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
-import SimulateTxAccessorContract_v1_4_1_Ethers from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
-import CompatibilityFallbackHandlerContract_v1_3_0_Ethers from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
-import CompatibilityFallbackHandlerContract_v1_4_1_Ethers from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
+import CreateCallContract_v1_3_0 from './CreateCall/v1.3.0/CreateCallContract_v1_3_0'
+import CreateCallContract_v1_4_1 from './CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import MultiSendContract_v1_1_1 from './MultiSend/v1.1.1/MultiSendContract_v1_1_1'
+import MultiSendContract_v1_3_0 from './MultiSend/v1.3.0/MultiSendContract_v1_3_0'
+import MultiSendContract_v1_4_1 from './MultiSend/v1.4.1/MultiSendContract_v1_4_1'
+import MultiSendCallOnlyContract_v1_3_0 from './MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
+import MultiSendCallOnlyContract_v1_4_1 from './MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
+import SignMessageLibContract_v1_3_0 from './SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
+import SignMessageLibContract_v1_4_1 from './SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
+import SafeContract_v1_0_0 from './Safe/v1.0.0/SafeContract_v1_0_0'
+import SafeContract_v1_1_1 from './Safe/v1.1.1/SafeContract_v1_1_1'
+import SafeContract_v1_2_0 from './Safe/v1.2.0/SafeContract_v1_2_0'
+import SafeContract_v1_3_0 from './Safe/v1.3.0/SafeContract_v1_3_0'
+import SafeContract_v1_4_1 from './Safe/v1.4.1/SafeContract_v1_4_1'
+import SafeProxyFactoryContract_v1_0_0 from './SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
+import SafeProxyFactoryContract_v1_1_1 from './SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
+import SafeProxyFactoryContract_v1_3_0 from './SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import SafeProxyFactoryContract_v1_4_1 from './SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
+import SimulateTxAccessorContract_v1_3_0 from './SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
+import SimulateTxAccessorContract_v1_4_1 from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
+import CompatibilityFallbackHandlerContract_v1_3_0 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
+import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import SafeProvider from '../SafeProvider'
 
 export async function getSafeContractInstance(
@@ -55,18 +55,18 @@ export async function getSafeContractInstance(
   customContractAbi?: JsonFragment | JsonFragment[] | undefined,
   isL1SafeSingleton?: boolean
 ): Promise<
-  | SafeContract_v1_4_1_Ethers
-  | SafeContract_v1_3_0_Ethers
-  | SafeContract_v1_2_0_Ethers
-  | SafeContract_v1_1_1_Ethers
-  | SafeContract_v1_0_0_Ethers
+  | SafeContract_v1_4_1
+  | SafeContract_v1_3_0
+  | SafeContract_v1_2_0
+  | SafeContract_v1_1_1
+  | SafeContract_v1_0_0
 > {
   const chainId = await safeProvider.getChainId()
   let safeContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      safeContractInstance = new SafeContract_v1_4_1_Ethers(
+      safeContractInstance = new SafeContract_v1_4_1(
         chainId,
         safeProvider,
         isL1SafeSingleton,
@@ -75,7 +75,7 @@ export async function getSafeContractInstance(
       )
       break
     case '1.3.0':
-      safeContractInstance = new SafeContract_v1_3_0_Ethers(
+      safeContractInstance = new SafeContract_v1_3_0(
         chainId,
         safeProvider,
         isL1SafeSingleton,
@@ -84,7 +84,7 @@ export async function getSafeContractInstance(
       )
       break
     case '1.2.0':
-      safeContractInstance = new SafeContract_v1_2_0_Ethers(
+      safeContractInstance = new SafeContract_v1_2_0(
         chainId,
         safeProvider,
         isL1SafeSingleton,
@@ -93,7 +93,7 @@ export async function getSafeContractInstance(
       )
       break
     case '1.1.1':
-      safeContractInstance = new SafeContract_v1_1_1_Ethers(
+      safeContractInstance = new SafeContract_v1_1_1(
         chainId,
         safeProvider,
         isL1SafeSingleton,
@@ -102,7 +102,7 @@ export async function getSafeContractInstance(
       )
       break
     case '1.0.0':
-      safeContractInstance = new SafeContract_v1_0_0_Ethers(
+      safeContractInstance = new SafeContract_v1_0_0(
         chainId,
         safeProvider,
         isL1SafeSingleton,
@@ -125,15 +125,14 @@ export async function getCompatibilityFallbackHandlerContractInstance(
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<
-  | CompatibilityFallbackHandlerContract_v1_4_1_Ethers
-  | CompatibilityFallbackHandlerContract_v1_3_0_Ethers
+  CompatibilityFallbackHandlerContract_v1_4_1 | CompatibilityFallbackHandlerContract_v1_3_0
 > {
   const chainId = await safeProvider.getChainId()
   let compatibilityFallbackHandlerInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      compatibilityFallbackHandlerInstance = new CompatibilityFallbackHandlerContract_v1_4_1_Ethers(
+      compatibilityFallbackHandlerInstance = new CompatibilityFallbackHandlerContract_v1_4_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -143,7 +142,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
     case '1.3.0':
     case '1.2.0':
     case '1.1.1':
-      compatibilityFallbackHandlerInstance = new CompatibilityFallbackHandlerContract_v1_3_0_Ethers(
+      compatibilityFallbackHandlerInstance = new CompatibilityFallbackHandlerContract_v1_3_0(
         chainId,
         safeProvider,
         contractAddress,
@@ -164,17 +163,13 @@ export async function getMultiSendContractInstance(
   safeProvider: SafeProvider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
-): Promise<
-  | MultiSendContract_v1_4_1_Ethers
-  | MultiSendContract_v1_3_0_Ethers
-  | MultiSendContract_v1_1_1_Ethers
-> {
+): Promise<MultiSendContract_v1_4_1 | MultiSendContract_v1_3_0 | MultiSendContract_v1_1_1> {
   const chainId = await safeProvider.getChainId()
   let multiSendContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      multiSendContractInstance = new MultiSendContract_v1_4_1_Ethers(
+      multiSendContractInstance = new MultiSendContract_v1_4_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -182,7 +177,7 @@ export async function getMultiSendContractInstance(
       )
       break
     case '1.3.0':
-      multiSendContractInstance = new MultiSendContract_v1_3_0_Ethers(
+      multiSendContractInstance = new MultiSendContract_v1_3_0(
         chainId,
         safeProvider,
         contractAddress,
@@ -192,7 +187,7 @@ export async function getMultiSendContractInstance(
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      multiSendContractInstance = new MultiSendContract_v1_1_1_Ethers(
+      multiSendContractInstance = new MultiSendContract_v1_1_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -213,13 +208,13 @@ export async function getMultiSendCallOnlyContractInstance(
   safeProvider: SafeProvider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
-): Promise<MultiSendCallOnlyContract_v1_4_1_Ethers | MultiSendCallOnlyContract_v1_3_0_Ethers> {
+): Promise<MultiSendCallOnlyContract_v1_4_1 | MultiSendCallOnlyContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let multiSendCallOnlyContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      multiSendCallOnlyContractInstance = new MultiSendCallOnlyContract_v1_4_1_Ethers(
+      multiSendCallOnlyContractInstance = new MultiSendCallOnlyContract_v1_4_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -230,7 +225,7 @@ export async function getMultiSendCallOnlyContractInstance(
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      multiSendCallOnlyContractInstance = new MultiSendCallOnlyContract_v1_3_0_Ethers(
+      multiSendCallOnlyContractInstance = new MultiSendCallOnlyContract_v1_3_0(
         chainId,
         safeProvider,
         contractAddress,
@@ -254,17 +249,17 @@ export async function getSafeProxyFactoryContractInstance(
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<
-  | SafeProxyFactoryContract_v1_4_1_Ethers
-  | SafeProxyFactoryContract_v1_3_0_Ethers
-  | SafeProxyFactoryContract_v1_1_1_Ethers
-  | SafeProxyFactoryContract_v1_0_0_Ethers
+  | SafeProxyFactoryContract_v1_4_1
+  | SafeProxyFactoryContract_v1_3_0
+  | SafeProxyFactoryContract_v1_1_1
+  | SafeProxyFactoryContract_v1_0_0
 > {
   const chainId = await safeProvider.getChainId()
   let safeProxyFactoryContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_4_1_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_4_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -273,7 +268,7 @@ export async function getSafeProxyFactoryContractInstance(
       )
       break
     case '1.3.0':
-      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_3_0_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_3_0(
         chainId,
         safeProvider,
         contractAddress,
@@ -283,7 +278,7 @@ export async function getSafeProxyFactoryContractInstance(
       break
     case '1.2.0':
     case '1.1.1':
-      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_1_1_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_1_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -292,7 +287,7 @@ export async function getSafeProxyFactoryContractInstance(
       )
       break
     case '1.0.0':
-      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_0_0_Ethers(
+      safeProxyFactoryContractInstance = new SafeProxyFactoryContract_v1_0_0(
         chainId,
         safeProvider,
         contractAddress,
@@ -314,13 +309,13 @@ export async function getSignMessageLibContractInstance(
   safeProvider: SafeProvider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
-): Promise<SignMessageLibContract_v1_4_1_Ethers | SignMessageLibContract_v1_3_0_Ethers> {
+): Promise<SignMessageLibContract_v1_4_1 | SignMessageLibContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let signMessageLibContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      signMessageLibContractInstance = new SignMessageLibContract_v1_4_1_Ethers(
+      signMessageLibContractInstance = new SignMessageLibContract_v1_4_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -328,7 +323,7 @@ export async function getSignMessageLibContractInstance(
       )
       break
     case '1.3.0':
-      signMessageLibContractInstance = new SignMessageLibContract_v1_3_0_Ethers(
+      signMessageLibContractInstance = new SignMessageLibContract_v1_3_0(
         chainId,
         safeProvider,
         contractAddress,
@@ -349,13 +344,13 @@ export async function getCreateCallContractInstance(
   safeProvider: SafeProvider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
-): Promise<CreateCallContract_v1_4_1_Ethers | CreateCallContract_v1_3_0_Ethers> {
+): Promise<CreateCallContract_v1_4_1 | CreateCallContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let createCallContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      createCallContractInstance = new CreateCallContract_v1_4_1_Ethers(
+      createCallContractInstance = new CreateCallContract_v1_4_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -366,7 +361,7 @@ export async function getCreateCallContractInstance(
     case '1.2.0':
     case '1.1.1':
     case '1.0.0':
-      createCallContractInstance = new CreateCallContract_v1_3_0_Ethers(
+      createCallContractInstance = new CreateCallContract_v1_3_0(
         chainId,
         safeProvider,
         contractAddress,
@@ -387,13 +382,13 @@ export async function getSimulateTxAccessorContractInstance(
   safeProvider: SafeProvider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
-): Promise<SimulateTxAccessorContract_v1_4_1_Ethers | SimulateTxAccessorContract_v1_3_0_Ethers> {
+): Promise<SimulateTxAccessorContract_v1_4_1 | SimulateTxAccessorContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let simulateTxAccessorContractInstance
 
   switch (safeVersion) {
     case '1.4.1':
-      simulateTxAccessorContractInstance = new SimulateTxAccessorContract_v1_4_1_Ethers(
+      simulateTxAccessorContractInstance = new SimulateTxAccessorContract_v1_4_1(
         chainId,
         safeProvider,
         contractAddress,
@@ -401,7 +396,7 @@ export async function getSimulateTxAccessorContractInstance(
       )
       break
     case '1.3.0':
-      simulateTxAccessorContractInstance = new SimulateTxAccessorContract_v1_3_0_Ethers(
+      simulateTxAccessorContractInstance = new SimulateTxAccessorContract_v1_3_0(
         chainId,
         safeProvider,
         contractAddress,

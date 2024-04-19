@@ -16,8 +16,8 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * @extends BaseContract<CompatibilityFallbackHandlerContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - CompatibilityFallbackHandlerContract_v1_4_1_Ethers extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
- * - CompatibilityFallbackHandlerContract_v1_3_0_Ethers extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
+ * - CompatibilityFallbackHandlerContract_v1_4_1  extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
+ * - CompatibilityFallbackHandlerContract_v1_3_0  extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
  */
 abstract class CompatibilityFallbackHandlerBaseContractEthers<
   CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi & Abi

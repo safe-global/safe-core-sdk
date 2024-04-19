@@ -14,21 +14,21 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 
 /**
- * SafeContract_v1_1_1_Ethers is the implementation specific to the Safe contract version 1.1.1.
+ * SafeContract_v1_1_1  is the implementation specific to the Safe contract version 1.1.1.
  *
  * This class specializes in handling interactions with the Safe contract version 1.1.1 using Ethers.js v6.
  *
  * @extends SafeBaseContractEthers<SafeContract_v1_1_1_Abi> - Inherits from SafeBaseContractEthers with ABI specific to Safe contract version 1.1.1.
  * @implements SafeContract_v1_1_1_Contract - Implements the interface specific to Safe contract version 1.1.1.
  */
-class SafeContract_v1_1_1_Ethers
+class SafeContract_v1_1_1
   extends SafeBaseContractEthers<SafeContract_v1_1_1_Abi>
   implements SafeContract_v1_1_1_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeContract_v1_1_1_Ethers
+   * Constructs an instance of SafeContract_v1_1_1
    *
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
@@ -318,4 +318,4 @@ class SafeContract_v1_1_1_Ethers
   }
 }
 
-export default SafeContract_v1_1_1_Ethers
+export default SafeContract_v1_1_1

@@ -5,28 +5,28 @@ import {
   SafeTransactionDataPartial,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
-import SafeContract_v1_0_0_Ethers from '@safe-global/protocol-kit/contracts/Safe/v1.0.0/SafeContract_v1_0_0'
-import SafeContract_v1_1_1_Ethers from '@safe-global/protocol-kit/contracts/Safe/v1.1.1/SafeContract_v1_1_1'
-import SafeContract_v1_2_0_Ethers from '@safe-global/protocol-kit/contracts/Safe/v1.2.0/SafeContract_v1_2_0'
-import SafeContract_v1_3_0_Ethers from '@safe-global/protocol-kit/contracts/Safe/v1.3.0/SafeContract_v1_3_0'
-import SafeContract_v1_4_1_Ethers from '@safe-global/protocol-kit/contracts/Safe/v1.4.1/SafeContract_v1_4_1'
-import MultiSendContract_v1_1_1_Ethers from '@safe-global/protocol-kit/contracts/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
-import MultiSendContract_v1_3_0_Ethers from '@safe-global/protocol-kit/contracts/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
-import MultiSendContract_v1_4_1_Ethers from '@safe-global/protocol-kit/contracts/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
-import MultiSendCallOnlyContract_v1_4_1_Ethers from '@safe-global/protocol-kit/contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
-import MultiSendCallOnlyContract_v1_3_0_Ethers from '@safe-global/protocol-kit/contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
-import CompatibilityFallbackHandlerContract_v1_3_0_Ethers from '../contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
-import CompatibilityFallbackHandlerContract_v1_4_1_Ethers from '../contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
-import SafeProxyFactoryContract_v1_0_0_Ethers from '../contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
-import SafeProxyFactoryContract_v1_1_1_Ethers from '../contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
-import SafeProxyFactoryContract_v1_3_0_Ethers from '../contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
-import SafeProxyFactoryContract_v1_4_1_Ethers from '../contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
-import SignMessageLibContract_v1_3_0_Ethers from '../contracts/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
-import SignMessageLibContract_v1_4_1_Ethers from '../contracts/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
-import SimulateTxAccessorContract_v1_3_0_Ethers from '../contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
-import SimulateTxAccessorContract_v1_4_1_Ethers from '../contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
-import CreateCallContract_v1_3_0_Ethers from '../contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
-import CreateCallContract_v1_4_1_Ethers from '../contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import SafeContract_v1_0_0 from '@safe-global/protocol-kit/contracts/Safe/v1.0.0/SafeContract_v1_0_0'
+import SafeContract_v1_1_1 from '@safe-global/protocol-kit/contracts/Safe/v1.1.1/SafeContract_v1_1_1'
+import SafeContract_v1_2_0 from '@safe-global/protocol-kit/contracts/Safe/v1.2.0/SafeContract_v1_2_0'
+import SafeContract_v1_3_0 from '@safe-global/protocol-kit/contracts/Safe/v1.3.0/SafeContract_v1_3_0'
+import SafeContract_v1_4_1 from '@safe-global/protocol-kit/contracts/Safe/v1.4.1/SafeContract_v1_4_1'
+import MultiSendContract_v1_1_1 from '@safe-global/protocol-kit/contracts/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
+import MultiSendContract_v1_3_0 from '@safe-global/protocol-kit/contracts/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
+import MultiSendContract_v1_4_1 from '@safe-global/protocol-kit/contracts/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
+import MultiSendCallOnlyContract_v1_4_1 from '@safe-global/protocol-kit/contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
+import MultiSendCallOnlyContract_v1_3_0 from '@safe-global/protocol-kit/contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
+import CompatibilityFallbackHandlerContract_v1_3_0 from '../contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
+import CompatibilityFallbackHandlerContract_v1_4_1 from '../contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
+import SafeProxyFactoryContract_v1_0_0 from '../contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
+import SafeProxyFactoryContract_v1_1_1 from '../contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
+import SafeProxyFactoryContract_v1_3_0 from '../contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
+import SafeProxyFactoryContract_v1_4_1 from '../contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
+import SignMessageLibContract_v1_3_0 from '../contracts/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
+import SignMessageLibContract_v1_4_1 from '../contracts/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
+import SimulateTxAccessorContract_v1_3_0 from '../contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
+import SimulateTxAccessorContract_v1_4_1 from '../contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
+import CreateCallContract_v1_3_0 from '../contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
+import CreateCallContract_v1_4_1 from '../contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -223,15 +223,15 @@ export type SigningMethodType = SigningMethod | string
 
 // Safe contract implementation types
 
-export type SafeContract_v1_0_0_ImplementationType = SafeContract_v1_0_0_Ethers
+export type SafeContract_v1_0_0_ImplementationType = SafeContract_v1_0_0
 
-export type SafeContract_v1_1_0_ImplementationType = SafeContract_v1_1_1_Ethers
+export type SafeContract_v1_1_0_ImplementationType = SafeContract_v1_1_1
 
-export type SafeContract_v1_2_0_ImplementationType = SafeContract_v1_2_0_Ethers
+export type SafeContract_v1_2_0_ImplementationType = SafeContract_v1_2_0
 
-export type SafeContract_v1_3_0_ImplementationType = SafeContract_v1_3_0_Ethers
+export type SafeContract_v1_3_0_ImplementationType = SafeContract_v1_3_0
 
-export type SafeContract_v1_4_1_ImplementationType = SafeContract_v1_4_1_Ethers
+export type SafeContract_v1_4_1_ImplementationType = SafeContract_v1_4_1
 
 export type SafeContractImplementationType =
   | SafeContract_v1_0_0_ImplementationType
@@ -242,11 +242,11 @@ export type SafeContractImplementationType =
 
 // MultiSend contract implementation types
 
-export type MultiSendContract_v1_1_1_ImplementationType = MultiSendContract_v1_1_1_Ethers
+export type MultiSendContract_v1_1_1_ImplementationType = MultiSendContract_v1_1_1
 
-export type MultiSendContract_v1_3_0_ImplementationType = MultiSendContract_v1_3_0_Ethers
+export type MultiSendContract_v1_3_0_ImplementationType = MultiSendContract_v1_3_0
 
-export type MultiSendContract_v1_4_1_ImplementationType = MultiSendContract_v1_4_1_Ethers
+export type MultiSendContract_v1_4_1_ImplementationType = MultiSendContract_v1_4_1
 
 export type MultiSendContractImplementationType =
   | MultiSendContract_v1_1_1_ImplementationType
@@ -255,11 +255,9 @@ export type MultiSendContractImplementationType =
 
 // MultiSendCallOnly contract implementation types
 
-export type MultiSendCallOnlyContract_v1_3_0_ImplementationType =
-  MultiSendCallOnlyContract_v1_3_0_Ethers
+export type MultiSendCallOnlyContract_v1_3_0_ImplementationType = MultiSendCallOnlyContract_v1_3_0
 
-export type MultiSendCallOnlyContract_v1_4_1_ImplementationType =
-  MultiSendCallOnlyContract_v1_4_1_Ethers
+export type MultiSendCallOnlyContract_v1_4_1_ImplementationType = MultiSendCallOnlyContract_v1_4_1
 
 export type MultiSendCallOnlyContractImplementationType =
   | MultiSendCallOnlyContract_v1_3_0_ImplementationType
@@ -268,10 +266,10 @@ export type MultiSendCallOnlyContractImplementationType =
 // CompatibilityFallbackHandler contract implementation types
 
 export type CompatibilityFallbackHandlerContract_v1_3_0_ImplementationType =
-  CompatibilityFallbackHandlerContract_v1_3_0_Ethers
+  CompatibilityFallbackHandlerContract_v1_3_0
 
 export type CompatibilityFallbackHandlerContract_v1_4_1_ImplementationType =
-  CompatibilityFallbackHandlerContract_v1_4_1_Ethers
+  CompatibilityFallbackHandlerContract_v1_4_1
 
 export type CompatibilityFallbackHandlerContractImplementationType =
   | CompatibilityFallbackHandlerContract_v1_3_0_ImplementationType
@@ -279,17 +277,13 @@ export type CompatibilityFallbackHandlerContractImplementationType =
 
 // SafeProxyFactory contract implementation types
 
-export type SafeProxyFactoryContract_v1_0_0_ImplementationType =
-  SafeProxyFactoryContract_v1_0_0_Ethers
+export type SafeProxyFactoryContract_v1_0_0_ImplementationType = SafeProxyFactoryContract_v1_0_0
 
-export type SafeProxyFactoryContract_v1_1_1_ImplementationType =
-  SafeProxyFactoryContract_v1_1_1_Ethers
+export type SafeProxyFactoryContract_v1_1_1_ImplementationType = SafeProxyFactoryContract_v1_1_1
 
-export type SafeProxyFactoryContract_v1_3_0_ImplementationType =
-  SafeProxyFactoryContract_v1_3_0_Ethers
+export type SafeProxyFactoryContract_v1_3_0_ImplementationType = SafeProxyFactoryContract_v1_3_0
 
-export type SafeProxyFactoryContract_v1_4_1_ImplementationType =
-  SafeProxyFactoryContract_v1_4_1_Ethers
+export type SafeProxyFactoryContract_v1_4_1_ImplementationType = SafeProxyFactoryContract_v1_4_1
 
 export type SafeProxyFactoryContractImplementationType =
   | SafeProxyFactoryContract_v1_0_0_ImplementationType
@@ -299,9 +293,9 @@ export type SafeProxyFactoryContractImplementationType =
 
 // SignMessageLib contract implementation types
 
-export type SignMessageLibContract_v1_3_0_ImplementationType = SignMessageLibContract_v1_3_0_Ethers
+export type SignMessageLibContract_v1_3_0_ImplementationType = SignMessageLibContract_v1_3_0
 
-export type SignMessageLibContract_v1_4_1_ImplementationType = SignMessageLibContract_v1_4_1_Ethers
+export type SignMessageLibContract_v1_4_1_ImplementationType = SignMessageLibContract_v1_4_1
 
 export type SignMessageLibContractImplementationType =
   | SignMessageLibContract_v1_3_0_ImplementationType
@@ -309,11 +303,9 @@ export type SignMessageLibContractImplementationType =
 
 // SimulateTxAccessor contract implementation types
 
-export type SimulateTxAccessorContract_v1_3_0_ImplementationType =
-  SimulateTxAccessorContract_v1_3_0_Ethers
+export type SimulateTxAccessorContract_v1_3_0_ImplementationType = SimulateTxAccessorContract_v1_3_0
 
-export type SimulateTxAccessorContract_v1_4_1_ImplementationType =
-  SimulateTxAccessorContract_v1_4_1_Ethers
+export type SimulateTxAccessorContract_v1_4_1_ImplementationType = SimulateTxAccessorContract_v1_4_1
 
 export type SimulateTxAccessorContractImplementationType =
   | SimulateTxAccessorContract_v1_3_0_ImplementationType
@@ -321,9 +313,9 @@ export type SimulateTxAccessorContractImplementationType =
 
 // CreateCall contract implementation types
 
-export type CreateCallContract_v1_3_0_ImplementationType = CreateCallContract_v1_3_0_Ethers
+export type CreateCallContract_v1_3_0_ImplementationType = CreateCallContract_v1_3_0
 
-export type CreateCallContract_v1_4_1_ImplementationType = CreateCallContract_v1_4_1_Ethers
+export type CreateCallContract_v1_4_1_ImplementationType = CreateCallContract_v1_4_1
 
 export type CreateCallContractImplementationType =
   | CreateCallContract_v1_3_0_ImplementationType

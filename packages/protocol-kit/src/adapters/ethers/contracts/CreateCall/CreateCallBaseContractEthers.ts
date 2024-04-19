@@ -2,18 +2,18 @@ import { Abi } from 'abitype'
 import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
-import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
+import BaseContract from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContract'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class CreateCallBaseContractEthers extends BaseContractEthers to specifically integrate with the CreateCall contract.
+ * Abstract class CreateCallBaseContractEthers extends BaseContract to specifically integrate with the CreateCall contract.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
  * Subclasses of CreateCallBaseContractEthers are expected to represent specific versions of the contract.
  *
  * @template CreateCallContractAbiType - The ABI type specific to the version of the CreateCall contract, extending InterfaceAbi from Ethers.
- * @extends BaseContractEthers<CreateCallContractAbiType> - Extends the generic BaseContractEthers.
+ * @extends BaseContract<CreateCallContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
  * - CreateCallContract_v1_4_1_Ethers extends CreateCallBaseContractEthers<CreateCallContract_v1_4_1_Abi>
@@ -21,7 +21,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  */
 abstract class CreateCallBaseContractEthers<
   CreateCallContractAbiType extends InterfaceAbi & Abi
-> extends BaseContractEthers<CreateCallContractAbiType> {
+> extends BaseContract<CreateCallContractAbiType> {
   contractName: contractName
 
   /**

@@ -2,18 +2,18 @@ import { Abi } from 'abitype'
 import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
-import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
+import BaseContract from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContract'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class CompatibilityFallbackHandlerBaseContractEthers extends BaseContractEthers to specifically integrate with the CompatibilityFallbackHandler contract.
+ * Abstract class CompatibilityFallbackHandlerBaseContractEthers extends BaseContract to specifically integrate with the CompatibilityFallbackHandler contract.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
  * Subclasses of CompatibilityFallbackHandlerBaseContractEthers are expected to represent specific versions of the contract.
  *
  * @template CompatibilityFallbackHandlerContractAbiType - The ABI type specific to the version of the CompatibilityFallbackHandler contract, extending InterfaceAbi from Ethers.
- * @extends BaseContractEthers<CompatibilityFallbackHandlerContractAbiType> - Extends the generic BaseContractEthers.
+ * @extends BaseContract<CompatibilityFallbackHandlerContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
  * - CompatibilityFallbackHandlerContract_v1_4_1_Ethers extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
@@ -21,7 +21,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  */
 abstract class CompatibilityFallbackHandlerBaseContractEthers<
   CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi & Abi
-> extends BaseContractEthers<CompatibilityFallbackHandlerContractAbiType> {
+> extends BaseContract<CompatibilityFallbackHandlerContractAbiType> {
   contractName: contractName
 
   /**

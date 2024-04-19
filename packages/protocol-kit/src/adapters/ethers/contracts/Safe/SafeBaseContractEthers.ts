@@ -3,17 +3,17 @@ import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
+import BaseContract from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContract'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SafeBaseContractEthers extends BaseContractEthers to specifically integrate with the Safe contract.
+ * Abstract class SafeBaseContractEthers extends BaseContract to specifically integrate with the Safe contract.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
  * Subclasses of SafeBaseContractEthers are expected to represent specific versions of the Safe contract.
  *
  * @template SafeContractAbiType - The ABI type specific to the version of the Safe contract, extending InterfaceAbi from Ethers.
- * @extends BaseContractEthers<SafeContractAbiType> - Extends the generic BaseContractEthers.
+ * @extends BaseContract<SafeContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
  * - SafeContract_v1_4_1_Ethers extends SafeBaseContractEthers<SafeContract_v1_4_1_Abi>
@@ -24,7 +24,7 @@ import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-k
  */
 abstract class SafeBaseContractEthers<
   SafeContractAbiType extends InterfaceAbi & Abi
-> extends BaseContractEthers<SafeContractAbiType> {
+> extends BaseContract<SafeContractAbiType> {
   contractName: contractName
 
   /**

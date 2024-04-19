@@ -3,17 +3,17 @@ import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
+import BaseContract from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SignMessageLibBaseContractEthers extends BaseContractEthers to specifically integrate with the SignMessageLib contract.
+ * Abstract class SignMessageLibBaseContractEthers extends BaseContract to specifically integrate with the SignMessageLib contract.
  * It is designed to be instantiated for different versions of the SignMessageLib contract.
  *
  * Subclasses of SignMessageLibBaseContractEthers are expected to represent specific versions of the SignMessageLib contract.
  *
  * @template SignMessageLibContractAbiType - The ABI type specific to the version of the SignMessageLib contract, extending InterfaceAbi from Ethers.
- * @extends BaseContractEthers<SignMessageLibContractAbiType> - Extends the generic BaseContractEthers.
+ * @extends BaseContract<SignMessageLibContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
  * - SignMessageLibContract_v1_4_1_Ethers extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_4_1_Abi>
@@ -21,7 +21,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  */
 abstract class SignMessageLibBaseContractEthers<
   SignMessageLibContractAbiType extends InterfaceAbi & Abi
-> extends BaseContractEthers<SignMessageLibContractAbiType> {
+> extends BaseContract<SignMessageLibContractAbiType> {
   contractName: contractName
 
   /**

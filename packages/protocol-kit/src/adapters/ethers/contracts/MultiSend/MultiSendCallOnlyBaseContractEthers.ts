@@ -3,17 +3,17 @@ import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/adapters/ethers/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import BaseContractEthers from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContractEthers'
+import BaseContract from '@safe-global/protocol-kit/adapters/ethers/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class MultiSendCallOnlyBaseContractEthers extends BaseContractEthers to specifically integrate with the MultiSendCallOnly contract.
+ * Abstract class MultiSendCallOnlyBaseContractEthers extends BaseContract to specifically integrate with the MultiSendCallOnly contract.
  * It is designed to be instantiated for different versions of the MultiSendCallOnly contract.
  *
  * Subclasses of MultiSendCallOnlyBaseContractEthers are expected to represent specific versions of the MultiSendCallOnly contract.
  *
  * @template MultiSendCallOnlyContractAbiType - The ABI type specific to the version of the MultiSendCallOnly contract, extending InterfaceAbi from Ethers.
- * @extends BaseContractEthers<MultiSendCallOnlyContractAbiType> - Extends the generic BaseContractEthers.
+ * @extends BaseContract<MultiSendCallOnlyContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
  * - MultiSendCallOnlyContract_v1_4_1_Ethers extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi>
@@ -21,7 +21,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  */
 abstract class MultiSendCallOnlyBaseContractEthers<
   MultiSendCallOnlyContractAbiType extends InterfaceAbi & Abi
-> extends BaseContractEthers<MultiSendCallOnlyContractAbiType> {
+> extends BaseContract<MultiSendCallOnlyContractAbiType> {
   contractName: contractName
 
   /**

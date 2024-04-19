@@ -26,7 +26,7 @@ import {
   predictSafeAddress
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
-import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
+import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './SafeFactory'
 import {
   AddOwnerTxParams,
   ConnectSafeConfig,

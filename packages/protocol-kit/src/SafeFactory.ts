@@ -19,7 +19,7 @@ import {
   SafeProxyFactoryContractImplementationType
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-types'
-import SafeProvider from '../SafeProvider'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 export interface DeploySafeProps {

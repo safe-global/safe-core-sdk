@@ -1,47 +1,47 @@
 import { ContractRunner, EventLog } from 'ethers'
 import SafeProxyFactoryBaseContractEthers, {
   CreateProxyProps
-} from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
+} from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,
-  SafeProxyFactoryContract_v1_1_1_Abi,
-  SafeProxyFactoryContract_v1_1_1_Contract,
-  SafeProxyFactoryContract_v1_1_1_Function,
-  safeProxyFactory_1_1_1_ContractArtifacts
+  SafeProxyFactoryContract_v1_3_0_Abi,
+  SafeProxyFactoryContract_v1_3_0_Contract,
+  SafeProxyFactoryContract_v1_3_0_Function,
+  safeProxyFactory_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
- * SafeProxyFactoryContract_v1_1_1_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.1.1.
+ * SafeProxyFactoryContract_v1_3_0_Ethers is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
  *
- * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.1.1 using Ethers.js v6.
+ * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.3.0 using Ethers.js v6.
  *
- * @extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_1_1_Abi> - Inherits from SafeProxyFactoryBaseContractEthers with ABI specific to Safe Proxy Factory contract version 1.1.1.
- * @implements SafeProxyFactoryContract_v1_1_1_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.1.1.
+ * @extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi> - Inherits from SafeProxyFactoryBaseContractEthers with ABI specific to Safe Proxy Factory contract version 1.3.0.
+ * @implements SafeProxyFactoryContract_v1_3_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.3.0.
  */
-class SafeProxyFactoryContract_v1_1_1_Ethers
-  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_1_1_Abi>
-  implements SafeProxyFactoryContract_v1_1_1_Contract
+class SafeProxyFactoryContract_v1_3_0_Ethers
+  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi>
+  implements SafeProxyFactoryContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion
 
   /**
-   * Constructs an instance of SafeProxyFactoryContract_v1_1_1_Ethers
+   * Constructs an instance of SafeProxyFactoryContract_v1_3_0_Ethers
    *
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
-   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.1.1 is used.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
    */
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_1_1_Abi,
+    customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi,
     runner?: ContractRunner | null
   ) {
-    const safeVersion = '1.1.1'
-    const defaultAbi = safeProxyFactory_1_1_1_ContractArtifacts.abi
+    const safeVersion = '1.3.0'
+    const defaultAbi = safeProxyFactory_1_3_0_ContractArtifacts.abi
 
     super(
       chainId,
@@ -60,7 +60,7 @@ class SafeProxyFactoryContract_v1_1_1_Ethers
    * Allows to retrieve the creation code used for the Proxy deployment. With this it is easily possible to calculate predicted address.
    * @returns Array[creationCode]
    */
-  proxyCreationCode: SafeProxyFactoryContract_v1_1_1_Function<'proxyCreationCode'> = async () => {
+  proxyCreationCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyCreationCode'> = async () => {
     return [await this.contract.proxyCreationCode()]
   }
 
@@ -68,45 +68,45 @@ class SafeProxyFactoryContract_v1_1_1_Ethers
    * Allows to retrieve the runtime code of a deployed Proxy. This can be used to check that the expected Proxy was deployed.
    * @returns Array[runtimeCode]
    */
-  proxyRuntimeCode: SafeProxyFactoryContract_v1_1_1_Function<'proxyRuntimeCode'> = async () => {
+  proxyRuntimeCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyRuntimeCode'> = async () => {
     return [await this.contract.proxyRuntimeCode()]
   }
 
   /**
    * Allows to get the address for a new proxy contact created via `createProxyWithNonce`.
-   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonce]
    * @returns Array[proxyAddress]
    */
-  calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_1_1_Function<'calculateCreateProxyWithNonceAddress'> =
+  calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_3_0_Function<'calculateCreateProxyWithNonceAddress'> =
     async (args) => {
       return [await this.contract.calculateCreateProxyWithNonceAddress(...args)]
     }
 
   /**
    * Allows to create new proxy contact and execute a message call to the new proxy within one transaction.
-   * @param args - Array[masterCopy, data]
+   * @param args - Array[singleton, data]
    * @returns Array[proxyAddress]
    */
-  createProxy: SafeProxyFactoryContract_v1_1_1_Function<'createProxy'> = async (args) => {
+  createProxy: SafeProxyFactoryContract_v1_3_0_Function<'createProxy'> = async (args) => {
     return [await this.contract.createProxy(...args)]
   }
 
   /**
    * Allows to create new proxy contract, execute a message call to the new proxy and call a specified callback within one transaction.
-   * @param args - Array[masterCopy, initializer, saltNonce, callback]
+   * @param args - Array[singleton, initializer, saltNonce, callback]
    * @returns Array[proxyAddress]
    */
-  createProxyWithCallback: SafeProxyFactoryContract_v1_1_1_Function<'createProxyWithCallback'> =
+  createProxyWithCallback: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithCallback'> =
     async (args) => {
       return [await this.contract.createProxyWithCallback(...args)]
     }
 
   /**
    * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
-   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonce]
    * @returns Array[proxyAddress]
    */
-  createProxyWithNonce: SafeProxyFactoryContract_v1_1_1_Function<'createProxyWithNonce'> = async (
+  createProxyWithNonce: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithNonce'> = async (
     args
   ) => {
     return [await this.contract.createProxyWithNonce(...args)]
@@ -157,4 +157,4 @@ class SafeProxyFactoryContract_v1_1_1_Ethers
   }
 }
 
-export default SafeProxyFactoryContract_v1_1_1_Ethers
+export default SafeProxyFactoryContract_v1_3_0_Ethers

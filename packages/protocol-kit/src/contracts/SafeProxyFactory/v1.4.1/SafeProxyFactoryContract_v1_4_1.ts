@@ -1,7 +1,7 @@
 import { ContractRunner, EventLog } from 'ethers'
 import SafeProxyFactoryBaseContractEthers, {
   CreateProxyProps
-} from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
+} from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import {
   SafeVersion,
   SafeProxyFactoryContract_v1_4_1_Abi,

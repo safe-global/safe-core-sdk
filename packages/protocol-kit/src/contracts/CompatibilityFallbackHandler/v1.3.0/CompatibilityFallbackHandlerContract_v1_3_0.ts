@@ -1,4 +1,4 @@
-import CompatibilityFallbackHandlerBaseContractEthers from '@safe-global/protocol-kit/contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerBaseContractEthers'
+import CompatibilityFallbackHandlerBaseContractEthers from '@safe-global/protocol-kit/contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,

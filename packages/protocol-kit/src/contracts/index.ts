@@ -1,10 +1,10 @@
 import SafeProvider, { SafeProviderConfig } from '../SafeProvider'
-import CreateCallBaseContractEthers from './CreateCall/CreateCallBaseContractEthers'
-import MultiSendBaseContractEthers from './MultiSend/MultiSendBaseContractEthers'
-import MultiSendCallOnlyBaseContractEthers from './MultiSend/MultiSendCallOnlyBaseContractEthers'
-import SafeBaseContractEthers from './Safe/SafeBaseContractEthers'
-import SafeProxyFactoryBaseContractEthers from './SafeProxyFactory/SafeProxyFactoryBaseContractEthers'
-import SignMessageLibBaseContractEthers from './SignMessageLib/SignMessageLibBaseContractEthers'
+import CreateCallBaseContractEthers from './CreateCall/CreateCallBaseContract'
+import MultiSendBaseContractEthers from './MultiSend/MultiSendBaseContract'
+import MultiSendCallOnlyBaseContractEthers from './MultiSend/MultiSendCallOnlyBaseContract'
+import SafeBaseContractEthers from './Safe/SafeBaseContract'
+import SafeProxyFactoryBaseContractEthers from './SafeProxyFactory/SafeProxyFactoryBaseContract'
+import SignMessageLibBaseContractEthers from './SignMessageLib/SignMessageLibBaseContract'
 
 export {
   CreateCallBaseContractEthers,

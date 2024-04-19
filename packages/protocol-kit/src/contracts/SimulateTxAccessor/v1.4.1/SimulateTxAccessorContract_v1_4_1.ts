@@ -1,4 +1,4 @@
-import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContractEthers'
+import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,

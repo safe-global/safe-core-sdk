@@ -1,4 +1,4 @@
-import CreateCallBaseContractEthers from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContractEthers'
+import CreateCallBaseContractEthers from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,

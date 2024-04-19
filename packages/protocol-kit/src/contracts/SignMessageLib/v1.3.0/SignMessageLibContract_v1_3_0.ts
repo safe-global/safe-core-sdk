@@ -1,5 +1,5 @@
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
-import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContractEthers'
+import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,

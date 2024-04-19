@@ -24,7 +24,7 @@ import {
   getSafeProxyFactoryContractInstance,
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
-} from './contracts/contractInstancesEthers'
+} from './contracts/contractInstances'
 import {
   SafeProviderTransaction,
   GetContractProps,

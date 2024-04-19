@@ -1,4 +1,4 @@
-import MultiSendBaseContractEthers from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContractEthers'
+import MultiSendBaseContractEthers from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,

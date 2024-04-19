@@ -1,4 +1,4 @@
-import SafeBaseContractEthers from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContractEthers'
+import SafeBaseContractEthers from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'

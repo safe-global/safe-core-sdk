@@ -287,9 +287,9 @@ class SafeContract_v1_4_1_Ethers
    * Returns array of first 10 modules.
    * @returns Array[modules]
    */
-  async getModules(): Promise<string[]> {
+  async getModules(): Promise<[string[]]> {
     const [modules] = await this.getModulesPaginated([SENTINEL_ADDRESS, BigInt(10)])
-    return [modules]
+    return [modules.map((module) => module)]
   }
 
   /**

@@ -57,7 +57,7 @@ describe('Safe modules manager', () => {
     })
 
     it('should return all the enabled modules', async () => {
-      const { safe, dailyLimitModule, contractNetworks } = await setupTests()
+      const { safe, dailyLimitModule, socialRecoveryModule, contractNetworks } = await setupTests()
       const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
@@ -66,10 +66,21 @@ describe('Safe modules manager', () => {
         contractNetworks
       })
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
-      const tx = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
-      const txResponse = await safeSdk.executeTransaction(tx)
-      await waitSafeTxReceipt(txResponse)
-      chai.expect((await safeSdk.getModules()).length).to.be.eq(1)
+      const enableDailyLimitModuleTx = await safeSdk.createEnableModuleTx(
+        await dailyLimitModule.getAddress()
+      )
+      const enableDailyLimitModuleTxResponse =
+        await safeSdk.executeTransaction(enableDailyLimitModuleTx)
+      const socialRecoveryModuleTx = await safeSdk.createEnableModuleTx(
+        await socialRecoveryModule.getAddress()
+      )
+      const socialRecoveryModuleTxResponse =
+        await safeSdk.executeTransaction(socialRecoveryModuleTx)
+      await Promise.all([
+        waitSafeTxReceipt(enableDailyLimitModuleTxResponse),
+        waitSafeTxReceipt(socialRecoveryModuleTxResponse)
+      ])
+      chai.expect((await safeSdk.getModules()).length).to.be.eq(2)
     })
   })
 

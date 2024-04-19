@@ -1,10 +1,12 @@
 import {
   AddMessageProps,
   AddSafeDelegateProps,
+  AddSafeOperationProps,
   AllTransactionsListResponse,
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
+  GetSafeOperationListResponse,
   SafeSingletonResponse,
   GetSafeMessageListProps,
   ModulesResponse,
@@ -20,6 +22,7 @@ import {
   SafeMultisigTransactionEstimate,
   SafeMultisigTransactionEstimateResponse,
   SafeMultisigTransactionListResponse,
+  SafeOperationResponse,
   SafeServiceInfoResponse,
   SignatureResponse,
   TokenInfoListResponse,
@@ -34,6 +37,7 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
+import { isEmptyHexData } from './utils'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -712,6 +716,110 @@ class SafeApiKit {
       method: HttpMethod.Post,
       body: {
         signature
+      }
+    })
+  }
+
+  /**
+   * Get the SafeOperations that were sent from a particular address.
+   * @param safeAddress - The Safe address to retrieve SafeOperations for
+   * @throws "Safe address must not be empty"
+   * @throws "Invalid Ethereum address {safeAddress}"
+   * @returns The SafeOperations sent from the given Safe's address
+   */
+  async getSafeOperationsByAddress(safeAddress: string): Promise<GetSafeOperationListResponse> {
+    if (!safeAddress) {
+      throw new Error('Safe address must not be empty')
+    }
+    const { address } = this.#getEip3770Address(safeAddress)
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/safe-operations/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Get a SafeOperation by its hash.
+   * @param safeOperationHash The SafeOperation hash
+   * @throws "SafeOperation hash must not be empty"
+   * @throws "Not found."
+   * @returns The SafeOperation
+   */
+  async getSafeOperation(safeOperationHash: string): Promise<SafeOperationResponse> {
+    if (!safeOperationHash) {
+      throw new Error('SafeOperation hash must not be empty')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Create a new 4337 SafeOperation for a Safe.
+   * @param addSafeOperationProps - The configuration of the SafeOperation
+   * @throws "Safe address must not be empty"
+   * @throws "Invalid Safe address {safeAddress}"
+   * @throws "Module address must not be empty"
+   * @throws "Invalid module address {moduleAddress}"
+   * @throws "SafeOperation is not signed by the given signer {signerAddress}"
+   */
+  async addSafeOperation({
+    moduleAddress: moduleAddressProp,
+    safeAddress: safeAddressProp,
+    safeOperation,
+    signer
+  }: AddSafeOperationProps): Promise<void> {
+    let safeAddress: string, moduleAddress: string
+
+    if (!safeAddressProp) {
+      throw new Error('Safe address must not be empty')
+    }
+    try {
+      safeAddress = this.#getEip3770Address(safeAddressProp).address
+    } catch (err) {
+      throw new Error(`Invalid Safe address ${safeAddressProp}`)
+    }
+
+    if (!moduleAddressProp) {
+      throw new Error('Module address must not be empty')
+    }
+
+    try {
+      moduleAddress = this.#getEip3770Address(moduleAddressProp).address
+    } catch (err) {
+      throw new Error(`Invalid module address ${moduleAddressProp}`)
+    }
+
+    const signerAddress = await signer.getAddress()
+    const signature = safeOperation.getSignature(signerAddress)
+
+    if (!signature) {
+      throw new Error(`SafeOperation is not signed by the given signer ${signerAddress}`)
+    }
+
+    const { data } = safeOperation
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
+      method: HttpMethod.Post,
+      body: {
+        nonce: Number(data.nonce),
+        initCode: isEmptyHexData(data.initCode) ? null : data.initCode,
+        callData: data.callData,
+        callDataGasLimit: Number(data.callGasLimit),
+        verificationGasLimit: Number(data.verificationGasLimit),
+        preVerificationGas: Number(data.preVerificationGas),
+        maxFeePerGas: Number(data.maxFeePerGas),
+        maxPriorityFeePerGas: Number(data.maxPriorityFeePerGas),
+        paymasterAndData: isEmptyHexData(data.paymasterAndData) ? null : data.paymasterAndData,
+        entryPoint: data.entryPoint,
+        validAfter: !data.validAfter ? null : data.validAfter,
+        validUntil: !data.validUntil ? null : data.validUntil,
+        signature: signature.data,
+        moduleAddress
       }
     })
   }

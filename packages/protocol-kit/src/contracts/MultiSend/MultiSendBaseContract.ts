@@ -7,26 +7,26 @@ import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class MultiSendBaseContractEthers extends BaseContract to specifically integrate with the MultiSend contract.
+ * Abstract class MultiSendBaseContract extends BaseContract to specifically integrate with the MultiSend contract.
  * It is designed to be instantiated for different versions of the MultiSend contract.
  *
- * Subclasses of MultiSendBaseContractEthers are expected to represent specific versions of the MultiSend contract.
+ * Subclasses of MultiSendBaseContract are expected to represent specific versions of the MultiSend contract.
  *
  * @template MultiSendContractAbiType - The ABI type specific to the version of the MultiSend contract, extending InterfaceAbi from Ethers.
  * @extends BaseContract<MultiSendContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - MultiSendContract_v1_4_1  extends MultiSendBaseContractEthers<MultiSendContract_v1_4_1_Abi>
- * - MultiSendContract_v1_3_0  extends MultiSendBaseContractEthers<MultiSendContract_v1_3_0_Abi>
+ * - MultiSendContract_v1_4_1  extends MultiSendBaseContract<MultiSendContract_v1_4_1_Abi>
+ * - MultiSendContract_v1_3_0  extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
  */
-abstract class MultiSendBaseContractEthers<
+abstract class MultiSendBaseContract<
   MultiSendContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<MultiSendContractAbiType> {
   contractName: contractName
 
   /**
    * @constructor
-   * Constructs an instance of MultiSendBaseContractEthers.
+   * Constructs an instance of MultiSendBaseContract.
    *
    * @param chainId - The chain ID of the contract.
    * @param safeProvider - An instance of SafeProvider.
@@ -59,4 +59,4 @@ abstract class MultiSendBaseContractEthers<
   }
 }
 
-export default MultiSendBaseContractEthers
+export default MultiSendBaseContract

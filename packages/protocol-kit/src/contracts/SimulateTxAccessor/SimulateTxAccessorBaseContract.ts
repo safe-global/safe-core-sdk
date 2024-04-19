@@ -7,26 +7,26 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SimulateTxAccessorBaseContractEthers extends BaseContract to specifically integrate with the SimulateTxAccessor contract.
+ * Abstract class SimulateTxAccessorBaseContract extends BaseContract to specifically integrate with the SimulateTxAccessor contract.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
- * Subclasses of SimulateTxAccessorBaseContractEthers are expected to represent specific versions of the contract.
+ * Subclasses of SimulateTxAccessorBaseContract are expected to represent specific versions of the contract.
  *
  * @template SimulateTxAccessorContractAbiType - The ABI type specific to the version of the SimulateTxAccessor contract, extending InterfaceAbi from Ethers.
  * @extends BaseContract<SimulateTxAccessorContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SimulateTxAccessorContract_v1_4_1  extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi>
- * - SimulateTxAccessorContract_v1_3_0  extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_3_0_Abi>
+ * - SimulateTxAccessorContract_v1_4_1  extends SimulateTxAccessorBaseContract<SimulateTxAccessorContract_v1_4_1_Abi>
+ * - SimulateTxAccessorContract_v1_3_0  extends SimulateTxAccessorBaseContract<SimulateTxAccessorContract_v1_3_0_Abi>
  */
-abstract class SimulateTxAccessorBaseContractEthers<
+abstract class SimulateTxAccessorBaseContract<
   SimulateTxAccessorContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<SimulateTxAccessorContractAbiType> {
   contractName: contractName
 
   /**
    * @constructor
-   * Constructs an instance of SimulateTxAccessorBaseContractEthers.
+   * Constructs an instance of SimulateTxAccessorBaseContract.
    *
    * @param chainId - The chain ID of the contract.
    * @param safeProvider - An instance of SafeProvider.
@@ -61,4 +61,4 @@ abstract class SimulateTxAccessorBaseContractEthers<
   }
 }
 
-export default SimulateTxAccessorBaseContractEthers
+export default SimulateTxAccessorBaseContract

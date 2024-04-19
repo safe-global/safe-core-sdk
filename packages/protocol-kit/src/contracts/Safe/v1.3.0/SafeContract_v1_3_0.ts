@@ -1,4 +1,4 @@
-import SafeBaseContractEthers from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
+import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -17,11 +17,11 @@ import {
  *
  * This class specializes in handling interactions with the Safe contract version 1.3.0 using Ethers.js v6.
  *
- * @extends SafeBaseContractEthers<SafeContract_v1_3_0_Abi> - Inherits from SafeBaseContractEthers with ABI specific to Safe contract version 1.3.0.
+ * @extends SafeBaseContract<SafeContract_v1_3_0_Abi> - Inherits from SafeBaseContract with ABI specific to Safe contract version 1.3.0.
  * @implements SafeContract_v1_3_0_Contract - Implements the interface specific to Safe contract version 1.3.0.
  */
 class SafeContract_v1_3_0
-  extends SafeBaseContractEthers<SafeContract_v1_3_0_Abi>
+  extends SafeBaseContract<SafeContract_v1_3_0_Abi>
   implements SafeContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion

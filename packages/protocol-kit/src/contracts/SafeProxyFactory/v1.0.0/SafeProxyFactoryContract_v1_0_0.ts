@@ -1,5 +1,5 @@
 import { ContractRunner, EventLog } from 'ethers'
-import SafeProxyFactoryBaseContractEthers, {
+import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -16,11 +16,11 @@ import {
  *
  * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.0.0 using Ethers.js v6.
  *
- * @extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi> - Inherits from SafeProxyFactoryBaseContractEthers with ABI specific to Safe Proxy Factory contract version 1.0.0.
+ * @extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_0_0_Abi> - Inherits from SafeProxyFactoryBaseContract with ABI specific to Safe Proxy Factory contract version 1.0.0.
  * @implements SafeProxyFactoryContract_v1_0_0_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.0.0.
  */
 class SafeProxyFactoryContract_v1_0_0
-  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
+  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_0_0_Abi>
   implements SafeProxyFactoryContract_v1_0_0_Contract
 {
   safeVersion: SafeVersion

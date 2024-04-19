@@ -7,26 +7,26 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class CompatibilityFallbackHandlerBaseContractEthers extends BaseContract to specifically integrate with the CompatibilityFallbackHandler contract.
+ * Abstract class  CompatibilityFallbackHandlerBaseContract extends BaseContract to specifically integrate with the CompatibilityFallbackHandler contract.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
- * Subclasses of CompatibilityFallbackHandlerBaseContractEthers are expected to represent specific versions of the contract.
+ * Subclasses of  CompatibilityFallbackHandlerBaseContract are expected to represent specific versions of the contract.
  *
  * @template CompatibilityFallbackHandlerContractAbiType - The ABI type specific to the version of the CompatibilityFallbackHandler contract, extending InterfaceAbi from Ethers.
  * @extends BaseContract<CompatibilityFallbackHandlerContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - CompatibilityFallbackHandlerContract_v1_4_1  extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
- * - CompatibilityFallbackHandlerContract_v1_3_0  extends CompatibilityFallbackHandlerBaseContractEthers<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
+ * - CompatibilityFallbackHandlerContract_v1_4_1  extends  CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContract_v1_4_1_Abi>
+ * - CompatibilityFallbackHandlerContract_v1_3_0  extends  CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
  */
-abstract class CompatibilityFallbackHandlerBaseContractEthers<
+abstract class CompatibilityFallbackHandlerBaseContract<
   CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<CompatibilityFallbackHandlerContractAbiType> {
   contractName: contractName
 
   /**
    * @constructor
-   * Constructs an instance of CompatibilityFallbackHandlerBaseContractEthers.
+   * Constructs an instance of  CompatibilityFallbackHandlerBaseContract.
    *
    * @param chainId - The chain ID of the contract.
    * @param safeProvider - An instance of SafeProvider.
@@ -61,4 +61,4 @@ abstract class CompatibilityFallbackHandlerBaseContractEthers<
   }
 }
 
-export default CompatibilityFallbackHandlerBaseContractEthers
+export default CompatibilityFallbackHandlerBaseContract

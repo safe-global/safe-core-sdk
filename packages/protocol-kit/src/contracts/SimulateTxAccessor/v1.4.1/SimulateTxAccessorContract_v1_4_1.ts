@@ -1,4 +1,4 @@
-import SimulateTxAccessorBaseContractEthers from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContract'
+import SimulateTxAccessorBaseContract from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,
@@ -12,11 +12,11 @@ import {
  *
  * This class specializes in handling interactions with the SimulateTxAccessor contract version 1.4.1 using Ethers.js v6.
  *
- * @extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi> - Inherits from SimulateTxAccessorBaseContractEthers with ABI specific to SimulateTxAccessor contract version 1.4.1.
+ * @extends SimulateTxAccessorBaseContract<SimulateTxAccessorContract_v1_4_1_Abi> - Inherits from SimulateTxAccessorBaseContract with ABI specific to SimulateTxAccessor contract version 1.4.1.
  * @implements SimulateTxAccessorContract_v1_4_1_Contract - Implements the interface specific to SimulateTxAccessor contract version 1.4.1.
  */
 class SimulateTxAccessorContract_v1_4_1
-  extends SimulateTxAccessorBaseContractEthers<SimulateTxAccessorContract_v1_4_1_Abi>
+  extends SimulateTxAccessorBaseContract<SimulateTxAccessorContract_v1_4_1_Abi>
   implements SimulateTxAccessorContract_v1_4_1_Contract
 {
   safeVersion: SafeVersion

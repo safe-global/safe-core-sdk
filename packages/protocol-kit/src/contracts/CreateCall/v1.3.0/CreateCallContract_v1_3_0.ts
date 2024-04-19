@@ -1,4 +1,4 @@
-import CreateCallBaseContractEthers from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContract'
+import CreateCallBaseContract from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContract'
 import {
   SafeVersion,
   CreateCallContract_v1_3_0_Abi,
@@ -15,11 +15,11 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
  *
  * This class specializes in handling interactions with the CreateCall contract version 1.3.0 using Ethers.js v6.
  *
- * @extends CreateCallBaseContractEthers<CreateCallContract_v1_3_0_Abi> - Inherits from CreateCallBaseContractEthers with ABI specific to CreateCall contract version 1.3.0.
+ * @extends CreateCallBaseContract<CreateCallContract_v1_3_0_Abi> - Inherits from CreateCallBaseContract with ABI specific to CreateCall contract version 1.3.0.
  * @implements CreateCallContract_v1_3_0_Contract - Implements the interface specific to CreateCall contract version 1.3.0.
  */
 class CreateCallContract_v1_3_0
-  extends CreateCallBaseContractEthers<CreateCallContract_v1_3_0_Abi>
+  extends CreateCallBaseContract<CreateCallContract_v1_3_0_Abi>
   implements CreateCallContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion

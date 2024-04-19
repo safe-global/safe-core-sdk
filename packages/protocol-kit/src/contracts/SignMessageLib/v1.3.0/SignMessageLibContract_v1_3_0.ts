@@ -1,5 +1,5 @@
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
-import SignMessageLibBaseContractEthers from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContract'
+import SignMessageLibBaseContract from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,
@@ -16,11 +16,11 @@ import {
  *
  * This class specializes in handling interactions with the SignMessageLib contract version 1.3.0 using Ethers.js v6.
  *
- * @extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi> - Inherits from SignMessageLibBaseContractEthers with ABI specific to SignMessageLib contract version 1.3.0.
+ * @extends  SignMessageLibBaseContract<SignMessageLibContract_v1_3_0_Abi> - Inherits from  SignMessageLibBaseContract with ABI specific to SignMessageLib contract version 1.3.0.
  * @implements SignMessageLibContract_v1_3_0_Contract - Implements the interface specific to SignMessageLib contract version 1.3.0.
  */
 class SignMessageLibContract_v1_3_0
-  extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
+  extends SignMessageLibBaseContract<SignMessageLibContract_v1_3_0_Abi>
   implements SignMessageLibContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion

@@ -7,26 +7,26 @@ import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class MultiSendCallOnlyBaseContractEthers extends BaseContract to specifically integrate with the MultiSendCallOnly contract.
+ * Abstract class MultiSendCallOnlyBaseContract extends BaseContract to specifically integrate with the MultiSendCallOnly contract.
  * It is designed to be instantiated for different versions of the MultiSendCallOnly contract.
  *
- * Subclasses of MultiSendCallOnlyBaseContractEthers are expected to represent specific versions of the MultiSendCallOnly contract.
+ * Subclasses of MultiSendCallOnlyBaseContract are expected to represent specific versions of the MultiSendCallOnly contract.
  *
  * @template MultiSendCallOnlyContractAbiType - The ABI type specific to the version of the MultiSendCallOnly contract, extending InterfaceAbi from Ethers.
  * @extends BaseContract<MultiSendCallOnlyContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - MultiSendCallOnlyContract_v1_4_1  extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_4_1_Abi>
- * - MultiSendCallOnlyContract_v1_3_0  extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_3_0_Abi>
+ * - MultiSendCallOnlyContract_v1_4_1  extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContract_v1_4_1_Abi>
+ * - MultiSendCallOnlyContract_v1_3_0  extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContract_v1_3_0_Abi>
  */
-abstract class MultiSendCallOnlyBaseContractEthers<
+abstract class MultiSendCallOnlyBaseContract<
   MultiSendCallOnlyContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<MultiSendCallOnlyContractAbiType> {
   contractName: contractName
 
   /**
    * @constructor
-   * Constructs an instance of MultiSendCallOnlyBaseContractEthers.
+   * Constructs an instance of MultiSendCallOnlyBaseContract.
    *
    * @param chainId - The chain ID of the contract.
    * @param safeProvider - An instance of SafeProvider.
@@ -59,4 +59,4 @@ abstract class MultiSendCallOnlyBaseContractEthers<
   }
 }
 
-export default MultiSendCallOnlyBaseContractEthers
+export default MultiSendCallOnlyBaseContract

@@ -1,4 +1,4 @@
-import MultiSendBaseContractEthers from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
+import MultiSendBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,
@@ -12,11 +12,11 @@ import {
  *
  * This class specializes in handling interactions with the MultiSend contract version 1.3.0 using Ethers.js v6.
  *
- * @extends MultiSendBaseContractEthers<MultiSendContract_v1_3_0_Abi> - Inherits from MultiSendBaseContractEthers with ABI specific to MultiSend contract version 1.3.0.
+ * @extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi> - Inherits from MultiSendBaseContract with ABI specific to MultiSend contract version 1.3.0.
  * @implements MultiSendContract_v1_3_0_Contract - Implements the interface specific to MultiSend contract version 1.3.0.
  */
 class MultiSendContract_v1_3_0
-  extends MultiSendBaseContractEthers<MultiSendContract_v1_3_0_Abi>
+  extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
   implements MultiSendContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion

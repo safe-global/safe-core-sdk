@@ -14,29 +14,29 @@ export interface CreateProxyProps extends CreateProxyPropsGeneral {
 }
 
 /**
- * Abstract class SafeProxyFactoryBaseContractEthers extends BaseContract to specifically integrate with the SafeProxyFactory contract.
+ * Abstract class SafeProxyFactoryBaseContract extends BaseContract to specifically integrate with the SafeProxyFactory contract.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
- * Subclasses of SafeProxyFactoryBaseContractEthers are expected to represent specific versions of the contract.
+ * Subclasses of SafeProxyFactoryBaseContract are expected to represent specific versions of the contract.
  *
  * @template SafeProxyFactoryContractAbiType - The ABI type specific to the version of the Safe Proxy Factory contract, extending InterfaceAbi from Ethers.
  * @extends BaseContract<SafeProxyFactoryContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SafeProxyFactoryContract_v1_4_1  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_4_1_Abi>
- * - SafeProxyFactoryContract_v1_3_0  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_3_0_Abi>
- * - SafeProxyFactoryContract_v1_2_0  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_2_0_Abi>
- * - SafeProxyFactoryContract_v1_1_1  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_1_1_Abi>
- * - SafeProxyFactoryContract_v1_0_0  extends SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContract_v1_0_0_Abi>
+ * - SafeProxyFactoryContract_v1_4_1  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_4_1_Abi>
+ * - SafeProxyFactoryContract_v1_3_0  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_3_0_Abi>
+ * - SafeProxyFactoryContract_v1_2_0  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_2_0_Abi>
+ * - SafeProxyFactoryContract_v1_1_1  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_1_1_Abi>
+ * - SafeProxyFactoryContract_v1_0_0  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_0_0_Abi>
  */
-abstract class SafeProxyFactoryBaseContractEthers<
+abstract class SafeProxyFactoryBaseContract<
   SafeProxyFactoryContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<SafeProxyFactoryContractAbiType> {
   contractName: contractName
 
   /**
    * @constructor
-   * Constructs an instance of SafeProxyFactoryBaseContractEthers.
+   * Constructs an instance of SafeProxyFactoryBaseContract.
    *
    * @param chainId - The chain ID of the contract.
    * @param safeProvider - An instance of SafeProvider.
@@ -71,4 +71,4 @@ abstract class SafeProxyFactoryBaseContractEthers<
   }
 }
 
-export default SafeProxyFactoryBaseContractEthers
+export default SafeProxyFactoryBaseContract

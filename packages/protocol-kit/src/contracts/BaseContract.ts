@@ -22,9 +22,9 @@ import {
  * @template ContractAbiType - The ABI type specific to the version of the contract, extending InterfaceAbi from Ethers.
  *
  * Example subclasses:
- * - SafeBaseContractEthers<SafeContractAbiType> extends BaseContract<SafeContractAbiType>
- * - CreateCallBaseContractEthers<CreateCallContractAbiType> extends BaseContract<CreateCallContractAbiType>
- * - SafeProxyFactoryBaseContractEthers<SafeProxyFactoryContractAbiType> extends BaseContract<SafeProxyFactoryContractAbiType>
+ * - SafeBaseContract<SafeContractAbiType> extends BaseContract<SafeContractAbiType>
+ * - CreateCallBaseContract<CreateCallContractAbiType> extends BaseContract<CreateCallContractAbiType>
+ * - SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbiType> extends BaseContract<SafeProxyFactoryContractAbiType>
  */
 class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
   contractAbi: ContractAbiType

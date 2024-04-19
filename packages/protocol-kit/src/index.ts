@@ -1,13 +1,13 @@
 import Safe from './Safe'
 import {
-  CreateCallBaseContractEthers,
+  CreateCallBaseContract,
   SafeProvider,
   SafeProviderConfig,
-  MultiSendBaseContractEthers,
-  MultiSendCallOnlyBaseContractEthers,
-  SafeBaseContractEthers,
-  SafeProxyFactoryBaseContractEthers,
-  SignMessageLibBaseContractEthers
+  MultiSendBaseContract,
+  MultiSendCallOnlyBaseContract,
+  SafeBaseContract,
+  SafeProxyFactoryBaseContract,
+  SignMessageLibBaseContract
 } from './contracts'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import {
@@ -89,7 +89,7 @@ export {
   ConnectSafeConfigWithSafeAddress,
   ContractManager,
   ContractNetworksConfig,
-  CreateCallBaseContractEthers,
+  CreateCallBaseContract,
   createERC20TokenTransferTransaction,
   CreateTransactionProps,
   DEFAULT_SAFE_VERSION,
@@ -97,8 +97,8 @@ export {
   EthSafeSignature,
   SafeProvider,
   SafeProviderConfig,
-  MultiSendCallOnlyBaseContractEthers,
-  MultiSendBaseContractEthers,
+  MultiSendCallOnlyBaseContract,
+  MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,
   RemoveOwnerTxParams,
@@ -106,13 +106,13 @@ export {
   SafeConfig,
   SafeConfigWithPredictedSafe,
   SafeConfigWithSafeAddress,
-  SafeBaseContractEthers,
+  SafeBaseContract,
   SafeDeploymentConfig,
   SafeFactory,
   SafeFactoryConfig,
-  SafeProxyFactoryBaseContractEthers,
+  SafeProxyFactoryBaseContract,
   SafeTransactionOptionalProps,
-  SignMessageLibBaseContractEthers,
+  SignMessageLibBaseContract,
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams,
   SigningMethod,

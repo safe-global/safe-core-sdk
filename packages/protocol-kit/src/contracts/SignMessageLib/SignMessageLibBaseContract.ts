@@ -7,26 +7,26 @@ import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SignMessageLibBaseContractEthers extends BaseContract to specifically integrate with the SignMessageLib contract.
+ * Abstract class  SignMessageLibBaseContract extends BaseContract to specifically integrate with the SignMessageLib contract.
  * It is designed to be instantiated for different versions of the SignMessageLib contract.
  *
- * Subclasses of SignMessageLibBaseContractEthers are expected to represent specific versions of the SignMessageLib contract.
+ * Subclasses of  SignMessageLibBaseContract are expected to represent specific versions of the SignMessageLib contract.
  *
  * @template SignMessageLibContractAbiType - The ABI type specific to the version of the SignMessageLib contract, extending InterfaceAbi from Ethers.
  * @extends BaseContract<SignMessageLibContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SignMessageLibContract_v1_4_1  extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_4_1_Abi>
- * - SignMessageLibContract_v1_3_0  extends SignMessageLibBaseContractEthers<SignMessageLibContract_v1_3_0_Abi>
+ * - SignMessageLibContract_v1_4_1  extends  SignMessageLibBaseContract<SignMessageLibContract_v1_4_1_Abi>
+ * - SignMessageLibContract_v1_3_0  extends  SignMessageLibBaseContract<SignMessageLibContract_v1_3_0_Abi>
  */
-abstract class SignMessageLibBaseContractEthers<
+abstract class SignMessageLibBaseContract<
   SignMessageLibContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<SignMessageLibContractAbiType> {
   contractName: contractName
 
   /**
    * @constructor
-   * Constructs an instance of SignMessageLibBaseContractEthers.
+   * Constructs an instance of  SignMessageLibBaseContract.
    *
    * @param chainId - The chain ID of the contract.
    * @param safeProvider - An instance of SafeProvider.
@@ -59,4 +59,4 @@ abstract class SignMessageLibBaseContractEthers<
   }
 }
 
-export default SignMessageLibBaseContractEthers
+export default SignMessageLibBaseContract

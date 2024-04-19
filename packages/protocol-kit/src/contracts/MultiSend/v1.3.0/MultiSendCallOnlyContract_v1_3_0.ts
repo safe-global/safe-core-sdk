@@ -1,4 +1,4 @@
-import MultiSendCallOnlyBaseContractEthers from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendCallOnlyBaseContract'
+import MultiSendCallOnlyBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendCallOnlyBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,
@@ -12,11 +12,11 @@ import {
  *
  * This class specializes in handling interactions with the MultiSendCallOnly contract version 1.3.0 using Ethers.js v6.
  *
- * @extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_3_0_Abi> - Inherits from MultiSendCallOnlyBaseContractEthers with ABI specific to MultiSendCallOnly contract version 1.3.0.
+ * @extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContract_v1_3_0_Abi> - Inherits from MultiSendCallOnlyBaseContract with ABI specific to MultiSendCallOnly contract version 1.3.0.
  * @implements MultiSendCallOnlyContract_v1_3_0_Contract - Implements the interface specific to MultiSendCallOnly contract version 1.3.0.
  */
 class MultiSendCallOnlyContract_v1_3_0
-  extends MultiSendCallOnlyBaseContractEthers<MultiSendCallOnlyContract_v1_3_0_Abi>
+  extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContract_v1_3_0_Abi>
   implements MultiSendCallOnlyContract_v1_3_0_Contract
 {
   safeVersion: SafeVersion

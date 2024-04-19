@@ -7,29 +7,29 @@ import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
 
 /**
- * Abstract class SafeBaseContractEthers extends BaseContract to specifically integrate with the Safe contract.
+ * Abstract class SafeBaseContract extends BaseContract to specifically integrate with the Safe contract.
  * It is designed to be instantiated for different versions of the Safe contract.
  *
- * Subclasses of SafeBaseContractEthers are expected to represent specific versions of the Safe contract.
+ * Subclasses of SafeBaseContract are expected to represent specific versions of the Safe contract.
  *
  * @template SafeContractAbiType - The ABI type specific to the version of the Safe contract, extending InterfaceAbi from Ethers.
  * @extends BaseContract<SafeContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SafeContract_v1_4_1  extends SafeBaseContractEthers<SafeContract_v1_4_1_Abi>
- * - SafeContract_v1_3_0  extends SafeBaseContractEthers<SafeContract_v1_3_0_Abi>
- * - SafeContract_v1_2_0  extends SafeBaseContractEthers<SafeContract_v1_2_0_Abi>
- * - SafeContract_v1_1_1  extends SafeBaseContractEthers<SafeContract_v1_1_1_Abi>
- * - SafeContract_v1_0_0  extends SafeBaseContractEthers<SafeContract_v1_0_0_Abi>
+ * - SafeContract_v1_4_1  extends SafeBaseContract<SafeContract_v1_4_1_Abi>
+ * - SafeContract_v1_3_0  extends SafeBaseContract<SafeContract_v1_3_0_Abi>
+ * - SafeContract_v1_2_0  extends SafeBaseContract<SafeContract_v1_2_0_Abi>
+ * - SafeContract_v1_1_1  extends SafeBaseContract<SafeContract_v1_1_1_Abi>
+ * - SafeContract_v1_0_0  extends SafeBaseContract<SafeContract_v1_0_0_Abi>
  */
-abstract class SafeBaseContractEthers<
+abstract class SafeBaseContract<
   SafeContractAbiType extends InterfaceAbi & Abi
 > extends BaseContract<SafeContractAbiType> {
   contractName: contractName
 
   /**
    * @constructor
-   * Constructs an instance of SafeBaseContractEthers.
+   * Constructs an instance of SafeBaseContract.
    *
    * @param chainId - The chain ID of the contract.
    * @param safeProvider - An instance of SafeProvider.
@@ -65,4 +65,4 @@ abstract class SafeBaseContractEthers<
   }
 }
 
-export default SafeBaseContractEthers
+export default SafeBaseContract

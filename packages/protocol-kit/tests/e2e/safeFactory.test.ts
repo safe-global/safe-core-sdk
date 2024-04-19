@@ -92,7 +92,7 @@ describe('SafeProxyFactory', () => {
   })
 
   describe('getEip1193Provider', async () => {
-    it('should return the connected ISafeProvider', async () => {
+    it('should return the connected SafeProvider', async () => {
       const { accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const provider = getEip1193Provider()

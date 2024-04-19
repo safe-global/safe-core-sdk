@@ -536,7 +536,7 @@ describe('Contract utils', () => {
         const { contractNetworks } = await setupTests()
 
         const safeVersion = safeVersionDeployed
-        // Create ISafeProvider instance
+        // Create SafeProvider instance
         const safeProvider = getSafeProviderFromNetwork('zksync')
         const chainId = await safeProvider.getChainId()
         const customContracts = contractNetworks[chainId.toString()]

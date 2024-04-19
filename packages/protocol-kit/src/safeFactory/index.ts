@@ -151,7 +151,7 @@ class SafeFactory {
 
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('ISafeProvider must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
     const chainId = await this.getChainId()

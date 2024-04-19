@@ -104,14 +104,14 @@ describe('The EIP1271 implementation', () => {
         tx = await protocolKit.signTransaction(tx) // Owner 1 signature
         protocolKit = await protocolKit.connect({
           provider: provider2,
-          signerAddress: account2.address
+          signer: account2.address
         }) // Connect another owner
         tx = await protocolKit.signTransaction(tx) // Owner 2 signature
 
         // 1/1 Signer Safe signature
         protocolKit = await protocolKit.connect({
           provider: provider3,
-          signerAddress: account3.address,
+          signer: account3.address,
           safeAddress: signerSafeAddress1_1
         })
         let signerSafeTx1_1 = await protocolKit.createTransaction({
@@ -131,7 +131,7 @@ describe('The EIP1271 implementation', () => {
         // 2/3 Signer Safe signature
         protocolKit = await protocolKit.connect({
           provider: provider4,
-          signerAddress: account4.address,
+          signer: account4.address,
           safeAddress: signerSafeAddress2_3
         })
         let signerSafeTx2_3 = await protocolKit.createTransaction({
@@ -144,7 +144,7 @@ describe('The EIP1271 implementation', () => {
         )
         protocolKit = await protocolKit.connect({
           provider: provider5,
-          signerAddress: account5.address
+          signer: account5.address
         })
         signerSafeTx2_3 = await protocolKit.signTransaction(
           signerSafeTx2_3,
@@ -164,7 +164,7 @@ describe('The EIP1271 implementation', () => {
         })
         protocolKit = await protocolKit.connect({
           provider: provider1,
-          signerAddress: account1.address,
+          signer: account1.address,
           safeAddress
         })
         const execResponse = await protocolKit.executeTransaction(tx)
@@ -256,14 +256,14 @@ describe('The EIP1271 implementation', () => {
         message = await protocolKit.signMessage(message) // Owner 1 signature
         protocolKit = await protocolKit.connect({
           provider: provider2,
-          signerAddress: account2.address
+          signer: account2.address
         }) // Connect another owner
         message = await protocolKit.signMessage(message) // Owner 2 signature
 
         // 1/1 Signer Safe signature
         protocolKit = await protocolKit.connect({
           provider: provider3,
-          signerAddress: account3.address,
+          signer: account3.address,
           safeAddress: signerSafeAddress1_1
         })
         let signerSafeMessage1_1 = protocolKit.createMessage(MESSAGE)
@@ -281,7 +281,7 @@ describe('The EIP1271 implementation', () => {
         // 2/3 Signer Safe signature
         protocolKit = await protocolKit.connect({
           provider: provider4,
-          signerAddress: account4.address,
+          signer: account4.address,
           safeAddress: signerSafeAddress2_3
         })
         let signerSafeMessage2_3 = protocolKit.createMessage(MESSAGE)
@@ -292,7 +292,7 @@ describe('The EIP1271 implementation', () => {
         )
         protocolKit = await protocolKit.connect({
           provider: provider5,
-          signerAddress: account5.address
+          signer: account5.address
         })
         signerSafeMessage2_3 = await protocolKit.signMessage(
           signerSafeMessage2_3,
@@ -308,7 +308,7 @@ describe('The EIP1271 implementation', () => {
         // Connect the original Safe
         protocolKit = await protocolKit.connect({
           provider: provider1,
-          signerAddress: account1.address,
+          signer: account1.address,
           safeAddress
         })
 

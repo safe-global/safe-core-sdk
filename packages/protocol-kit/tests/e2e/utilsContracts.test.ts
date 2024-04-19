@@ -60,7 +60,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -106,7 +106,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -152,7 +152,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -198,7 +198,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -233,7 +233,7 @@ describe('Contract utils', () => {
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -268,7 +268,7 @@ describe('Contract utils', () => {
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -302,7 +302,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -337,7 +337,7 @@ describe('Contract utils', () => {
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -431,7 +431,7 @@ describe('Contract utils', () => {
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -503,7 +503,7 @@ describe('Contract utils', () => {
           threshold
         }
 
-        const safeProvider = new SafeProvider({ providerOrUrl: provider })
+        const safeProvider = new SafeProvider({ provider })
 
         const predictedSafeAddress = await predictSafeAddress({
           safeProvider,

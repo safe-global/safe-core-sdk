@@ -59,5 +59,5 @@ export function getSafeProviderFromNetwork(
       throw new Error('Chain not supported')
   }
 
-  return new SafeProvider({ providerOrUrl: rpcUrl, signerAddress: signer?.address })
+  return new SafeProvider({ provider: rpcUrl, signer: signer?.address })
 }

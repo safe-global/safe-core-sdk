@@ -116,7 +116,7 @@ describe('Safe owners manager', () => {
   describe('createAddOwnerTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
+      const [, account2] = accounts
       const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
@@ -300,7 +300,7 @@ describe('Safe owners manager', () => {
   describe('createRemoveOwnerTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
+      const [, account2] = accounts
       const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
@@ -349,7 +349,7 @@ describe('Safe owners manager', () => {
 
     it('should fail if address is not an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1, , , account4] = accounts
+      const [, , , account4] = accounts
       const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
@@ -430,12 +430,12 @@ describe('Safe owners manager', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
-        signerAddress: account3.address
+        signer: account3.address
       })
       const initialThreshold = await safeSdk1.getThreshold()
       const initialOwners = await safeSdk1.getOwners()
@@ -468,12 +468,12 @@ describe('Safe owners manager', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
-        signerAddress: account3.address,
+        signer: account3.address,
         contractNetworks
       })
       const initialThreshold = await safeSdk1.getThreshold()
@@ -507,12 +507,12 @@ describe('Safe owners manager', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
-        signerAddress: account3.address
+        signer: account3.address
       })
       const newThreshold = 1
       const initialOwners = await safeSdk1.getOwners()
@@ -755,12 +755,12 @@ describe('Safe owners manager', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
-        signerAddress: account3.address
+        signer: account3.address
       })
       const initialOwners = await safeSdk1.getOwners()
       chai.expect(initialOwners.length).to.be.eq(3)

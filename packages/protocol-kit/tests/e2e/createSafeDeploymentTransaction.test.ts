@@ -193,7 +193,7 @@ describe('createSafeDeploymentTransaction', () => {
       const { contractNetworks, predictedSafe, chainId } = await setupTests()
 
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -217,7 +217,7 @@ describe('createSafeDeploymentTransaction', () => {
       const { contractNetworks, predictedSafe } = await setupTests()
 
       const provider = getEip1193Provider()
-      const safeProvider = new SafeProvider({ providerOrUrl: provider })
+      const safeProvider = new SafeProvider({ provider })
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,

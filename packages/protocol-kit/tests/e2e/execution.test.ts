@@ -46,7 +46,7 @@ describe('Transactions execution', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address,
+        signer: account2.address,
         contractNetworks
       })
       await account1.signer.sendTransaction({
@@ -139,7 +139,7 @@ describe('Transactions execution', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const safeTransactionData = {
         to: safeAddress,
@@ -192,7 +192,7 @@ describe('Transactions execution', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address,
+        signer: account2.address,
         contractNetworks
       })
       await account1.signer.sendTransaction({
@@ -321,11 +321,11 @@ describe('Transactions execution', () => {
         })
         const safeSdk2 = await safeSdk1.connect({
           provider: provider2,
-          signerAddress: account2.address
+          signer: account2.address
         })
         const safeSdk3 = await safeSdk1.connect({
           provider: provider3,
-          signerAddress: account3.address
+          signer: account3.address
         })
         const safeInitialBalance = await safeSdk1.getBalance()
         const safeTransactionData = {
@@ -380,15 +380,15 @@ describe('Transactions execution', () => {
         })
         const safeSdk2 = await safeSdk1.connect({
           provider: provider2,
-          signerAddress: account2.address
+          signer: account2.address
         })
         const safeSdk3 = await safeSdk1.connect({
           provider: provider3,
-          signerAddress: account3.address
+          signer: account3.address
         })
         const safeSdk4 = await safeSdk1.connect({
           provider: provider4,
-          signerAddress: account4.address
+          signer: account4.address
         })
         const safeInitialBalance = await safeSdk1.getBalance()
         const safeTransactionData = {
@@ -448,19 +448,19 @@ describe('Transactions execution', () => {
         })
         const safeSdk2 = await safeSdk1.connect({
           provider: provider2,
-          signerAddress: account2.address
+          signer: account2.address
         })
         const safeSdk3 = await safeSdk1.connect({
           provider: provider3,
-          signerAddress: account3.address
+          signer: account3.address
         })
         const safeSdk4 = await safeSdk1.connect({
           provider: provider4,
-          signerAddress: account4.address
+          signer: account4.address
         })
         const safeSdk5 = await safeSdk1.connect({
           provider: provider5,
-          signerAddress: account5.address
+          signer: account5.address
         })
         const safeInitialBalance = await safeSdk1.getBalance()
         const safeTransactionData = {
@@ -525,23 +525,23 @@ describe('Transactions execution', () => {
         })
         const safeSdk2 = await safeSdk1.connect({
           provider: provider2,
-          signerAddress: account2.address
+          signer: account2.address
         })
         const safeSdk3 = await safeSdk1.connect({
           provider: provider3,
-          signerAddress: account3.address
+          signer: account3.address
         })
         const safeSdk4 = await safeSdk1.connect({
           provider: provider4,
-          signerAddress: account4.address
+          signer: account4.address
         })
         const safeSdk5 = await safeSdk1.connect({
           provider: provider5,
-          signerAddress: account5.address
+          signer: account5.address
         })
         const safeSdk6 = await safeSdk1.connect({
           provider: provider6,
-          signerAddress: account6.address
+          signer: account6.address
         })
         const safeInitialBalance = await safeSdk1.getBalance()
         const safeTransactionData = {
@@ -580,7 +580,7 @@ describe('Transactions execution', () => {
 
     it('should execute a transaction when is not submitted by an owner', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2, account3] = accounts
+      const [, account2, account3] = accounts
       const provider1 = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
@@ -591,12 +591,12 @@ describe('Transactions execution', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
-        signerAddress: account3.address
+        signer: account3.address
       })
       await account2.signer.sendTransaction({
         to: safeAddress,
@@ -870,12 +870,12 @@ describe('Transactions execution', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
-        signerAddress: account3.address
+        signer: account3.address
       })
       await account1.signer.sendTransaction({
         to: safeAddress,
@@ -921,12 +921,12 @@ describe('Transactions execution', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const provider3 = getEip1193Provider()
       const safeSdk3 = await safeSdk1.connect({
         provider: provider3,
-        signerAddress: account3.address
+        signer: account3.address
       })
 
       await erc20Mintable.mint(safeAddress, '1200000000000000000') // 1.2 ERC20

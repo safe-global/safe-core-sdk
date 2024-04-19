@@ -77,7 +77,7 @@ describe('The EIP1271 implementation', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await Safe.create({
         provider: provider2,
-        signerAddress: account2.address,
+        signer: account2.address,
         safeAddress,
         contractNetworks
       })
@@ -85,7 +85,7 @@ describe('The EIP1271 implementation', () => {
       // Adapter and Safe instance for owner 3
       const safeSdk3 = await Safe.create({
         provider: provider1,
-        signerAddress: account1.address,
+        signer: account1.address,
         safeAddress: signerSafeAddress,
         contractNetworks
       })

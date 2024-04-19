@@ -116,7 +116,7 @@ class Safe {
 
     this.#provider = provider
     this.#safeProvider = new SafeProvider({
-      providerOrUrl: provider,
+      provider,
       signer
     })
     if (isSafeConfigWithPredictedSafe(config)) {

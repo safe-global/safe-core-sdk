@@ -95,7 +95,7 @@ describe('Safe Info', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk.connect({
         provider: provider2,
-        signerAddress: account2.address,
+        signer: account2.address,
         contractNetworks
       })
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)
@@ -109,7 +109,7 @@ describe('Safe Info', () => {
       const safeSdk3 = await safeSdk2.connect({
         safeAddress: safe2Address,
         provider: provider3,
-        signerAddress: account3.address
+        signer: account3.address
       })
       chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2Address)
       chai
@@ -349,7 +349,7 @@ describe('Safe Info', () => {
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
-        signerAddress: account1.address,
+        signer: account1.address,
         safeAddress,
         contractNetworks
       })

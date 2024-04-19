@@ -31,10 +31,16 @@ import {
   Eip1193Provider
 } from '@safe-global/protocol-kit/types'
 
+export type HexAddress = `0x${string}`
+export type PrivateKey = string
+export type HttpTransport = `http${string}`
+export type SocketTransport = `ws${string}`
+export type SafeSigner = HexAddress | PrivateKey
+
 export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */
-  providerOrUrl: Eip1193Provider | string
-  signer?: string
+  provider: Eip1193Provider | HttpTransport | SocketTransport
+  signer?: HexAddress | PrivateKey
   privateKeyOrMnemonic?: string
 }
 
@@ -42,11 +48,11 @@ class SafeProvider {
   #provider: BrowserProvider | JsonRpcProvider
   #signer?: string
 
-  constructor({ providerOrUrl, signer }: SafeProviderConfig) {
-    if (typeof providerOrUrl === 'string') {
-      this.#provider = new JsonRpcProvider(providerOrUrl)
+  constructor({ provider, signer }: SafeProviderConfig) {
+    if (typeof provider === 'string') {
+      this.#provider = new JsonRpcProvider(provider)
     } else {
-      this.#provider = new BrowserProvider(providerOrUrl)
+      this.#provider = new BrowserProvider(provider)
     }
 
     this.#signer = signer

@@ -56,7 +56,7 @@ describe('On-chain signatures', () => {
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
-        signerAddress: account3.address,
+        signer: account3.address,
         safeAddress,
         contractNetworks
       })
@@ -137,7 +137,7 @@ describe('On-chain signatures', () => {
 
     it('should return the list of owners who approved a transaction hash', async () => {
       const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
+      const [, account2] = accounts
       const provider1 = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
@@ -148,7 +148,7 @@ describe('On-chain signatures', () => {
       const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
         provider: provider2,
-        signerAddress: account2.address
+        signer: account2.address
       })
       const safeTransactionData = {
         to: safeAddress,

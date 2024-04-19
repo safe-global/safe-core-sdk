@@ -136,7 +136,7 @@ describe('Off-chain signatures', () => {
       const safeSdk = await Safe.create({
         provider,
         safeAddress,
-        signerAddress: account3.address,
+        signer: account3.address,
         contractNetworks
       })
       const safeTransactionData = {

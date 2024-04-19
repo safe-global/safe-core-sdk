@@ -12,7 +12,7 @@ import {
   getSafeSingleton,
   getSignMessageLib
 } from './utils/setupContracts'
-import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupEthAdapter'
+import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
 

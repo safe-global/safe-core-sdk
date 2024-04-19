@@ -1,5 +1,5 @@
 import { ethers, web3 } from 'hardhat'
-import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
+import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 export function getEip1193Provider(): Eip1193Provider {
   switch (process.env.ETH_LIB) {

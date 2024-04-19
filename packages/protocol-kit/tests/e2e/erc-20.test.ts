@@ -12,7 +12,7 @@ import sinonChai from 'sinon-chai'
 import { deployments } from 'hardhat'
 
 import { itif } from './utils/helpers'
-import { getEip1193Provider } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -119,10 +119,8 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return true if it is the Native token',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = await safe.getAddress()
-
-        const [account1] = accounts
 
         const provider = getEip1193Provider()
 

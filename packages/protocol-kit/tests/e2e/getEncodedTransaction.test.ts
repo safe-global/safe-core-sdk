@@ -4,7 +4,7 @@ import chai from 'chai'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEip1193Provider } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { itif } from './utils/helpers'
 

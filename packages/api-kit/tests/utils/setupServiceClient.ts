@@ -1,8 +1,8 @@
 import { getDefaultProvider, Wallet } from 'ethers'
-import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import config from '../utils/config'
-import { getEip1193Provider } from '../utils/setupEthAdapter'
+import { getEip1193Provider } from '../utils/setupProvider'
+import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 interface ServiceClientConfig {
   safeApiKit: SafeApiKit

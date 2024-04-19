@@ -11,7 +11,7 @@ import Safe, {
 } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners, getFactory } from './utils/setupContracts'
-import { getEip1193Provider } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { itif } from './utils/helpers'
 

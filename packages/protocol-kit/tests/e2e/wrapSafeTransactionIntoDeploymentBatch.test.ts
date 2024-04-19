@@ -6,7 +6,7 @@ import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { itif } from './utils/helpers'
 import { getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
-import { getEip1193Provider } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -71,7 +71,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1, account2] = accounts
+      const [, account2] = accounts
 
       const provider = getEip1193Provider()
 
@@ -107,7 +107,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1, account2] = accounts
+      const [, account2] = accounts
 
       const provider = getEip1193Provider()
 
@@ -143,7 +143,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
     'should include the custom salt nonce in the Safe deployment data',
     async () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1, account2] = accounts
+      const [, account2] = accounts
 
       const provider = getEip1193Provider()
 

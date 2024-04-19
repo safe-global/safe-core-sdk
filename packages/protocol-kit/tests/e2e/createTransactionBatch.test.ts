@@ -5,7 +5,7 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
-import { getEip1193Provider } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 

@@ -11,7 +11,7 @@ import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
-import { getEip1193Provider } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -230,7 +230,7 @@ describe('Transactions creation', () => {
   describe('createTransaction', async () => {
     it('should create a single transaction with gasPrice=0', async () => {
       const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
+      const [, account2] = accounts
       const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,

@@ -24,7 +24,7 @@ import {
   getSignMessageLib,
   getSimulateTxAccessor
 } from './utils/setupContracts'
-import { getEip1193Provider } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)

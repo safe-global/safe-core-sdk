@@ -4,7 +4,7 @@ import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
-import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupEthAdapter'
+import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress

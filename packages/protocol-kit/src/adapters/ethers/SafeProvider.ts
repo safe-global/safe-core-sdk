@@ -24,7 +24,11 @@ import {
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstancesEthers'
 import { isTypedDataSigner } from './utils'
-import { SafeProviderTransaction, GetContractProps, Eip1193Provider } from '../ethAdapter'
+import {
+  SafeProviderTransaction,
+  GetContractProps,
+  Eip1193Provider
+} from '@safe-global/protocol-kit/types'
 
 export interface SafeProviderConfig {
   /** signerOrProvider - Ethers signer or provider */

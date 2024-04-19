@@ -30,6 +30,7 @@ import {
   AddOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
+  Eip1193Provider,
   PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeConfig,
@@ -70,7 +71,6 @@ import {
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import { SafeProvider } from './adapters/ethers'
-import { Eip1193Provider } from './adapters/ethAdapter'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'

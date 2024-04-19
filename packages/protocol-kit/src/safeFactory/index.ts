@@ -20,7 +20,7 @@ import {
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 import { SafeProvider } from '../adapters/ethers'
-import { Eip1193Provider } from '../adapters/ethAdapter'
+import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig

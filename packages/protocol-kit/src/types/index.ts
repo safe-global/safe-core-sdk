@@ -27,7 +27,6 @@ import SimulateTxAccessorContract_v1_3_0_Ethers from '../adapters/ethers/contrac
 import SimulateTxAccessorContract_v1_4_1_Ethers from '../adapters/ethers/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1_Ethers'
 import CreateCallContract_v1_3_0_Ethers from '../adapters/ethers/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0_Ethers'
 import CreateCallContract_v1_4_1_Ethers from '../adapters/ethers/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1_Ethers'
-import { Eip1193Provider } from '../adapters/ethAdapter'
 
 export interface SafeAccountConfig {
   owners: string[]
@@ -332,3 +331,30 @@ export type CreateCallContract_v1_4_1_ImplementationType = CreateCallContract_v1
 export type CreateCallContractImplementationType =
   | CreateCallContract_v1_3_0_ImplementationType
   | CreateCallContract_v1_4_1_ImplementationType
+
+export type RequestArguments = {
+  readonly method: string
+  readonly params?: readonly unknown[] | object
+}
+
+export interface Eip1193Provider {
+  request: (args: RequestArguments) => Promise<unknown>
+}
+
+export interface SafeProviderTransaction {
+  to: string
+  from: string
+  data: string
+  value?: string
+  gasPrice?: number | string
+  gasLimit?: number | string
+  maxFeePerGas?: number | string
+  maxPriorityFeePerGas?: number | string
+}
+
+export interface GetContractProps {
+  safeVersion: SafeVersion
+  customContractAddress?: string
+  customContractAbi?: JsonFragment | JsonFragment[]
+  isL1SafeSingleton?: boolean
+}

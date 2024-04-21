@@ -10,7 +10,7 @@ import {
   placeOrderMessage,
   ClassOptions
 } from '@monerium/sdk'
-import Safe, { getSignMessageLibContract, EthAdapter } from '@safe-global/protocol-kit'
+import Safe, { getSignMessageLibContract, SafeProvider } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import {
   decodeSignatureData,
@@ -29,7 +29,7 @@ import { SafeMoneriumOrder } from './types'
 
 export class SafeMoneriumClient extends MoneriumClient {
   #protocolKit: Safe
-  #ethAdapter: EthAdapter
+  #safeProvider: SafeProvider
 
   /**
    * Constructor where the Monerium environment and the Protocol kit instance are set
@@ -40,7 +40,7 @@ export class SafeMoneriumClient extends MoneriumClient {
     super(moneriumOptions)
 
     this.#protocolKit = protocolKit
-    this.#ethAdapter = protocolKit.getEthAdapter()
+    this.#safeProvider = protocolKit.getSafeProvider()
   }
 
   /**
@@ -119,7 +119,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       const safeVersion = await this.#protocolKit.getContractVersion()
 
       const signMessageContract = await getSignMessageLibContract({
-        ethAdapter: this.#ethAdapter,
+        safeProvider: this.#safeProvider,
         safeVersion
       })
 
@@ -147,7 +147,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         safeAddress,
         safeTransactionData: safeTransaction.data,
         safeTxHash,
-        senderAddress: (await this.#ethAdapter.getSignerAddress()) || '',
+        senderAddress: (await this.#safeProvider.getSignerAddress()) || '',
         senderSignature: senderSignature.data
       })
 
@@ -207,12 +207,12 @@ export class SafeMoneriumClient extends MoneriumClient {
       ])
 
       const checks = [
-        this.#ethAdapter.call({
+        this.#safeProvider.call({
           from: safeAddress,
           to: safeAddress,
           data: eip1271data
         }),
-        this.#ethAdapter.call({
+        this.#safeProvider.call({
           from: safeAddress,
           to: safeAddress,
           data: eip1271BytesData

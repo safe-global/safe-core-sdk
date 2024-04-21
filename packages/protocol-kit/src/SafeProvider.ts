@@ -28,21 +28,8 @@ import {
 import {
   SafeProviderTransaction,
   GetContractProps,
-  Eip1193Provider
+  SafeProviderConfig
 } from '@safe-global/protocol-kit/types'
-
-export type HexAddress = `0x${string}`
-export type PrivateKey = string
-export type HttpTransport = `http${string}`
-export type SocketTransport = `ws${string}`
-export type SafeSigner = HexAddress | PrivateKey
-
-export interface SafeProviderConfig {
-  /** signerOrProvider - Ethers signer or provider */
-  provider: Eip1193Provider | HttpTransport | SocketTransport
-  signer?: HexAddress | PrivateKey
-  privateKeyOrMnemonic?: string
-}
 
 class SafeProvider {
   #provider: BrowserProvider | JsonRpcProvider

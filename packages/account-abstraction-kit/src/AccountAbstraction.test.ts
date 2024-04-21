@@ -1,4 +1,4 @@
-import Safe, { predictSafeAddress, EthAdapter } from '@safe-global/protocol-kit'
+import Safe, { predictSafeAddress } from '@safe-global/protocol-kit'
 import { GelatoRelayPack, RelayKitBasePack } from '@safe-global/relay-kit'
 import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import AccountAbstraction from './AccountAbstraction'
@@ -11,7 +11,10 @@ const predictSafeAddressMock = predictSafeAddress as jest.MockedFunction<typeof 
 const SafeMock = Safe as jest.MockedClass<typeof Safe>
 
 describe('AccountAbstraction', () => {
-  const ethersAdapter = {
+  const provider = {
+    request: jest.fn()
+  }
+  const safeProvider = {
     getSignerAddress: jest.fn(),
     isContractDeployed: jest.fn(),
     getChainId: jest.fn()
@@ -21,54 +24,54 @@ describe('AccountAbstraction', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ethersAdapter.getSignerAddress.mockResolvedValue(signerAddress)
+    safeProvider.getSignerAddress.mockResolvedValue(signerAddress)
     predictSafeAddressMock.mockResolvedValue(predictSafeAddress)
   })
 
   describe('init', () => {
-    const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+    const accountAbstraction = new AccountAbstraction({ provider })
 
     it('should initialize a Safe instance with its address if contract is deployed already', async () => {
-      ethersAdapter.isContractDeployed.mockResolvedValueOnce(true)
+      safeProvider.isContractDeployed.mockResolvedValueOnce(true)
 
       await accountAbstraction.init()
 
-      expect(ethersAdapter.getSignerAddress).toHaveBeenCalledTimes(1)
+      expect(safeProvider.getSignerAddress).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledWith({
-        ethAdapter: ethersAdapter,
+        safeProvider,
         safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
       })
       expect(SafeMock.create).toHaveBeenCalledTimes(1)
       expect(SafeMock.create).toHaveBeenCalledWith({
-        ethAdapter: ethersAdapter,
+        safeProvider,
         safeAddress: predictSafeAddress
       })
     })
 
     it('should initialize a Safe instance with a config if contract is NOT deployed yet', async () => {
-      ethersAdapter.isContractDeployed.mockResolvedValueOnce(false)
+      safeProvider.isContractDeployed.mockResolvedValueOnce(false)
 
       await accountAbstraction.init()
 
-      expect(ethersAdapter.getSignerAddress).toHaveBeenCalledTimes(1)
+      expect(safeProvider.getSignerAddress).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledWith({
-        ethAdapter: ethersAdapter,
+        safeProvider,
         safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
       })
       expect(SafeMock.create).toHaveBeenCalledTimes(1)
       expect(SafeMock.create).toHaveBeenCalledWith({
-        ethAdapter: ethersAdapter,
+        safeProvider,
         predictedSafe: { safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 } }
       })
     })
 
     it('should throw an error if the provider has not a signer', async () => {
-      ethersAdapter.getSignerAddress.mockResolvedValueOnce(undefined)
+      safeProvider.getSignerAddress.mockResolvedValueOnce(undefined)
 
       expect(accountAbstraction.init()).rejects.toThrow(
-        `There's no signer in the provided EthAdapter`
+        `There's no signer in the provided SafeProvider`
       )
       expect(SafeMock.create).not.toHaveBeenCalled()
     })
@@ -83,7 +86,7 @@ describe('AccountAbstraction', () => {
     }
 
     const initAccountAbstraction = async () => {
-      const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+      const accountAbstraction = new AccountAbstraction({ provider })
       await accountAbstraction.init()
       return accountAbstraction
     }
@@ -107,7 +110,7 @@ describe('AccountAbstraction', () => {
       })
 
       it('should not be called if the protocol-kit is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+        const accountAbstraction = new AccountAbstraction({ provider })
         expect(accountAbstraction.protocolKit).toBe(undefined)
         expect(safeInstanceMock.getNonce).not.toHaveBeenCalled()
       })
@@ -124,7 +127,7 @@ describe('AccountAbstraction', () => {
       })
 
       it('should not be called if the protocol-kit is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+        const accountAbstraction = new AccountAbstraction({ provider })
         expect(accountAbstraction.protocolKit).toBe(undefined)
         expect(safeInstanceMock.getAddress).not.toHaveBeenCalled()
       })
@@ -139,7 +142,7 @@ describe('AccountAbstraction', () => {
       })
 
       it('should not be called if the protocol-kit is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+        const accountAbstraction = new AccountAbstraction({ provider })
         expect(accountAbstraction.protocolKit).toBe(undefined)
         expect(safeInstanceMock.isSafeDeployed).not.toHaveBeenCalled()
       })
@@ -183,7 +186,7 @@ describe('AccountAbstraction', () => {
       })
 
       it('should throw if the protocol-kit is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+        const accountAbstraction = new AccountAbstraction({ provider })
         accountAbstraction.setRelayKit(
           new GelatoRelayPack({ protocolKit: accountAbstraction.protocolKit })
         )

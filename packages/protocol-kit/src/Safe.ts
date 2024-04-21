@@ -31,12 +31,14 @@ import {
   ConnectSafeConfig,
   CreateTransactionProps,
   Eip1193Provider,
+  HttpTransport,
   PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeConfig,
   SafeConfigProps,
   SigningMethod,
   SigningMethodType,
+  SocketTransport,
   SwapOwnerTxParams
 } from './types'
 import {
@@ -77,7 +79,7 @@ const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
-  #provider!: Eip1193Provider
+  #provider!: Eip1193Provider | HttpTransport | SocketTransport
   #safeProvider!: SafeProvider
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager

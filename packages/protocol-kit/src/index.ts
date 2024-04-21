@@ -28,24 +28,6 @@ import {
 import ContractManager from './managers/contractManager'
 import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './SafeFactory'
 import {
-  AddOwnerTxParams,
-  ConnectSafeConfig,
-  ConnectSafeConfigWithPredictedSafe,
-  ConnectSafeConfigWithSafeAddress,
-  ContractNetworksConfig,
-  CreateTransactionProps,
-  PredictedSafeProps,
-  RemoveOwnerTxParams,
-  SafeAccountConfig,
-  SafeConfig,
-  SafeConfigWithPredictedSafe,
-  SafeConfigWithSafeAddress,
-  SafeDeploymentConfig,
-  StandardizeSafeTransactionDataProps,
-  SwapOwnerTxParams,
-  SigningMethod
-} from './types'
-import {
   EthSafeSignature,
   estimateTxBaseGas,
   estimateTxGas,
@@ -79,19 +61,13 @@ import {
 } from './utils/eip-712'
 
 export {
-  AddOwnerTxParams,
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
-  ConnectSafeConfig,
-  ConnectSafeConfigWithPredictedSafe,
-  ConnectSafeConfigWithSafeAddress,
   ContractManager,
-  ContractNetworksConfig,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
-  CreateTransactionProps,
   DEFAULT_SAFE_VERSION,
   DeploySafeProps,
   EthSafeSignature,
@@ -100,22 +76,12 @@ export {
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
-  PredictedSafeProps,
-  RemoveOwnerTxParams,
-  SafeAccountConfig,
-  SafeConfig,
-  SafeConfigWithPredictedSafe,
-  SafeConfigWithSafeAddress,
   SafeBaseContract,
-  SafeDeploymentConfig,
   SafeFactory,
   SafeFactoryConfig,
   SafeProxyFactoryBaseContract,
   SafeTransactionOptionalProps,
   SignMessageLibBaseContract,
-  StandardizeSafeTransactionDataProps,
-  SwapOwnerTxParams,
-  SigningMethod,
   encodeCreateProxyWithNonce,
   encodeMultiSendData,
   encodeSetupCallData,
@@ -143,5 +109,7 @@ export {
   hashSafeMessage,
   generateTypedData
 }
+
+export * from './types'
 
 export default Safe

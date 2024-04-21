@@ -44,12 +44,12 @@ describe('SafeMoneriumClient', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     protocolKit.getChainId = jest.fn().mockResolvedValue(5)
-    protocolKit.getEthAdapter = jest.fn().mockReturnValue({
+    protocolKit.getSafeProvider = jest.fn().mockReturnValue({
       call: jest.fn().mockImplementation(async () => MAGIC_VALUE),
       getSignerAddress: jest.fn().mockResolvedValue('0xSignerAddress')
     })
 
-    protocolKit.getEthAdapter.call = jest.fn().mockImplementation(async () => MAGIC_VALUE)
+    protocolKit.getSafeProvider.call = jest.fn().mockImplementation(async () => MAGIC_VALUE)
     safeMoneriumClient = new SafeMoneriumClient(
       { environment: 'sandbox', clientId: 'mockClientId', redirectUrl: 'http://mockUrl' },
       protocolKit
@@ -119,7 +119,7 @@ describe('SafeMoneriumClient', () => {
 
   it('should allow to check if a message is NOT signed in the smart contract if the promise is fulfilled', async () => {
     // Promise fulfilled without signature
-    protocolKit.getEthAdapter().call = jest.fn().mockImplementation(async () => '0x')
+    protocolKit.getSafeProvider().call = jest.fn().mockImplementation(async () => '0x')
 
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(
       '0xSafeAddress',
@@ -139,7 +139,7 @@ describe('SafeMoneriumClient', () => {
     }
 
     // promise is rejected with the signature
-    protocolKit.getEthAdapter().call = jest
+    protocolKit.getSafeProvider().call = jest
       .fn()
       .mockImplementation(() =>
         Promise.reject(new EthersError('execution reverted: "Hash not approved"', MAGIC_VALUE))
@@ -163,7 +163,7 @@ describe('SafeMoneriumClient', () => {
     }
 
     // promise is rejected without a signature
-    protocolKit.getEthAdapter().call = jest
+    protocolKit.getSafeProvider().call = jest
       .fn()
       .mockImplementation(() =>
         Promise.reject(new EthersError('execution reverted: "Hash not approved"', '0x'))
@@ -226,14 +226,15 @@ describe('SafeMoneriumClient', () => {
       safeVersion: '1.3.0',
       contractName: 'signMessageLibVersion',
       contract: new Contract('target', []),
-      adapter: protocolKit.getEthAdapter() as protocolKitPackage.EthersAdapter,
+      safeProvider: protocolKit.getSafeProvider() as protocolKitPackage.SafeProvider,
       encode: jest.fn(),
       contractAbi: signMessageLib_1_4_1_ContractArtifacts.abi,
       contractAddress: '',
       getAddress: jest.fn(),
       getMessageHash: jest.fn(),
       signMessage: jest.fn(),
-      estimateGas: jest.fn()
+      estimateGas: jest.fn(),
+      init: jest.fn()
     })
 
     protocolKit.createTransaction = jest.fn().mockResolvedValueOnce({

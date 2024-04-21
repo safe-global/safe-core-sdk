@@ -1,4 +1,5 @@
-import SafeProvider, { SafeProviderConfig } from '../SafeProvider'
+import SafeProvider from '../SafeProvider'
+import { SafeProviderConfig } from '../types'
 import CreateCallBaseContract from './CreateCall/CreateCallBaseContract'
 import MultiSendBaseContract from './MultiSend/MultiSendBaseContract'
 import MultiSendCallOnlyBaseContract from './MultiSend/MultiSendCallOnlyBaseContract'

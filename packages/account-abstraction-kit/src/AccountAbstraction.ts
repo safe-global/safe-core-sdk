@@ -1,4 +1,14 @@
-import Safe, { SafeAccountConfig, predictSafeAddress, EthAdapter } from '@safe-global/protocol-kit'
+import Safe, {
+  SafeAccountConfig,
+  predictSafeAddress,
+  SafeProvider,
+  HexAddress,
+  HttpTransport,
+  PrivateKey,
+  SocketTransport,
+  SafeProviderConfig,
+  Eip1193Provider
+} from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit'
 import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
 
@@ -9,21 +19,24 @@ import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-c
 class AccountAbstraction {
   protocolKit!: Safe
   relayKit?: RelayKitBasePack
-  #ethAdapter: EthAdapter
+  #provider: Eip1193Provider | HttpTransport | SocketTransport
+  #signer?: HexAddress | PrivateKey
 
   /**
    * @constructor
-   * @param ethAdapter The EthAdapter instance to be used by the Account Abstraction (e.g. EthersAdapter)
+   * @param safeProvider The EthAdapter instance to be used by the Account Abstraction (e.g. EthersAdapter)
    */
-  constructor(ethAdapter: EthAdapter) {
-    this.#ethAdapter = ethAdapter
+  constructor({ provider, signer }: SafeProviderConfig) {
+    this.#provider = provider
+    this.#signer = signer
   }
 
   #initializeProtocolKit = async () => {
-    const signer = await this.#ethAdapter.getSignerAddress()
+    const safeProvider = new SafeProvider({ provider: this.#provider, signer: this.#signer })
+    const signer = await safeProvider.getSignerAddress()
 
     if (!signer) {
-      throw new Error("There's no signer in the provided EthAdapter")
+      throw new Error("There's no signer in the provided SafeProvider")
     }
 
     const owners = [signer]
@@ -35,18 +48,18 @@ class AccountAbstraction {
     }
 
     const safeAddress = await predictSafeAddress({
-      ethAdapter: this.#ethAdapter,
-      chainId: await this.#ethAdapter.getChainId(),
+      safeProvider,
+      chainId: await safeProvider.getChainId(),
       safeAccountConfig
     })
 
-    const isSafeDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
+    const isSafeDeployed = await safeProvider.isContractDeployed(safeAddress)
 
     if (isSafeDeployed) {
-      this.protocolKit = await Safe.create({ ethAdapter: this.#ethAdapter, safeAddress })
+      this.protocolKit = await Safe.create({ provider: this.#provider, safeAddress })
     } else {
       this.protocolKit = await Safe.create({
-        ethAdapter: this.#ethAdapter,
+        provider: this.#provider,
         predictedSafe: { safeAccountConfig }
       })
     }

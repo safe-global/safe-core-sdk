@@ -105,7 +105,7 @@ type SafeConfigWithPredictedSafeProps = {
 
 export type SafeConfigProps = {
   /** provider - Compatible EIP-1193 provider */
-  provider: Eip1193Provider
+  provider: Eip1193Provider | HttpTransport | SocketTransport
   signer?: string
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
@@ -133,7 +133,7 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 
 type ConnectSafeConfigProps = {
   /** provider - Compatible EIP-1193 provider */
-  provider?: Eip1193Provider
+  provider?: Eip1193Provider | HttpTransport | SocketTransport
   signer?: string
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
@@ -195,7 +195,7 @@ type StandardizeSafeTxDataWithPredictedSafeProps = {
 
 interface StandardizeSafeTransactionData {
   /** provider - Compatible EIP-1193 provider */
-  provider: Eip1193Provider
+  provider: Eip1193Provider | HttpTransport | SocketTransport
   signer?: string
   /** tx - Safe transaction */
   tx: SafeTransactionDataPartial
@@ -346,4 +346,16 @@ export interface GetContractProps {
   customContractAddress?: string
   customContractAbi?: JsonFragment | JsonFragment[]
   isL1SafeSingleton?: boolean
+}
+
+export type HexAddress = `0x${string}`
+export type PrivateKey = string
+export type HttpTransport = `http${string}`
+export type SocketTransport = `ws${string}`
+export type SafeSigner = HexAddress | PrivateKey
+
+export interface SafeProviderConfig {
+  /** signerOrProvider - Ethers signer or provider */
+  provider: Eip1193Provider | HttpTransport | SocketTransport
+  signer?: HexAddress | PrivateKey
 }

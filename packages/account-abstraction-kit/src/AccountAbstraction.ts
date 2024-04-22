@@ -10,7 +10,11 @@ import Safe, {
   Eip1193Provider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit'
-import { MetaTransactionData, MetaTransactionOptions } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  SafeTransaction
+} from '@safe-global/safe-core-sdk-types'
 
 /**
  * @class
@@ -100,14 +104,14 @@ class AccountAbstraction {
       throw new Error('relayKit not initialized. Call setRelayKit(pack) first')
     }
 
-    const relayedTransaction = await this.relayKit.createRelayedTransaction({
+    const relayedTransaction = (await this.relayKit.createTransaction({
       transactions,
       options
-    })
+    })) as SafeTransaction
 
     const signedSafeTransaction = await this.protocolKit.signTransaction(relayedTransaction)
 
-    return await this.relayKit.executeRelayTransaction(signedSafeTransaction, options)
+    return this.relayKit.executeTransaction({ executable: signedSafeTransaction, options })
   }
 }
 

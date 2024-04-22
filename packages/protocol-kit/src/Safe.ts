@@ -18,6 +18,7 @@ import {
 import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
+  getPredictedSafeAddressInitCode,
   predictSafeAddress
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
@@ -203,6 +204,26 @@ class Safe {
   }
 
   /**
+   * Returns the initialization code to deploy a Safe account based on the predicted address.
+   *
+   * @returns The Safe configuration
+   */
+  async getInitCode(): Promise<string> {
+    if (!this.#predictedSafe) {
+      throw new Error('The Safe already exists')
+    }
+
+    const chainId = await this.#ethAdapter.getChainId()
+
+    return getPredictedSafeAddressInitCode({
+      ethAdapter: this.#ethAdapter,
+      chainId,
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
+      ...this.#predictedSafe
+    })
+  }
+
+  /**
    * Returns the address of the current SafeProxy contract.
    *
    * @returns The address of the SafeProxy contract
@@ -381,6 +402,17 @@ class Safe {
    */
   async getModules(): Promise<string[]> {
     return this.#moduleManager.getModules()
+  }
+
+  /**
+   * Returns the list of addresses of all the enabled Safe modules. The list will start on the next position address in relation to start.
+   *
+   * @param start - The address to be "offsetted" from the list, should be SENTINEL_ADDRESS otherwise.
+   * @param pageSize - The size of the page. It will be the max length of the returning array. Must be greater then 0.
+   * @returns The list of addresses of all the enabled Safe modules
+   */
+  async getModulesPaginated(start: string, pageSize: number = 10): Promise<string[]> {
+    return this.#moduleManager.getModulesPaginated(start, pageSize)
   }
 
   /**

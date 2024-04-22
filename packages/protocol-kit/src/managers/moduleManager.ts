@@ -46,11 +46,17 @@ class ModuleManager {
     return [...modules]
   }
 
+  //TODO: Implement getModulesPaginated in the new code
   async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
-    if (!this.#safeContract) {
-      throw new Error('Safe is not deployed')
-    }
-    return this.#safeContract.getModulesPaginated(start, pageSize)
+    console.log('getModulesPaginated', start, pageSize)
+    return []
+    // if (!this.#safeContract) {
+    //   throw new Error('Safe is not deployed')
+    // }
+
+    // const [modules] = await this.#safeContract.getModulesPaginated(start, pageSize)
+
+    // return [...modules]
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {

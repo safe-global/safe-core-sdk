@@ -1,5 +1,4 @@
 import { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 
@@ -28,21 +27,16 @@ const config: Config = {
 }
 
 async function main() {
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
-  const deployerSigner = new ethers.Wallet(config.DEPLOYER_ADDRESS_PRIVATE_KEY, provider)
-
-  // Create EthAdapter instance
-  const ethAdapter = new EthersAdapter({
-    ethers,
-    signerOrProvider: deployerSigner
-  })
-
   const safeVersion = config.DEPLOY_SAFE.SAFE_VERSION as SafeVersion
 
   console.log('safe config: ', config.DEPLOY_SAFE)
 
   // Create SafeFactory instance
-  const safeFactory = await SafeFactory.create({ ethAdapter, safeVersion })
+  const safeFactory = await SafeFactory.create({
+    provider: config.RPC_URL,
+    signer: config.DEPLOYER_ADDRESS_PRIVATE_KEY,
+    safeVersion
+  })
 
   // Config of the deployed Safe
   const safeAccountConfig: SafeAccountConfig = {

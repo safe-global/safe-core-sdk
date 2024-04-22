@@ -1,6 +1,5 @@
-import { ethers } from 'ethers'
 import * as dotenv from 'dotenv'
-import Safe, { EthersAdapter, SigningMethod } from '@safe-global/protocol-kit'
+import Safe, { SigningMethod } from '@safe-global/protocol-kit'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 
 dotenv.config()
@@ -25,18 +24,10 @@ const config: Config = {
 }
 
 async function main() {
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
-  const signer = new ethers.Wallet(config.SIGNER_ADDRESS_PRIVATE_KEY, provider)
-
-  // Create EthAdapter instance
-  const ethAdapter = new EthersAdapter({
-    ethers,
-    signerOrProvider: signer
-  })
-
   // Create Safe instance
   const safe = await Safe.create({
-    ethAdapter,
+    provider: config.RPC_URL,
+    signer: config.SIGNER_ADDRESS_PRIVATE_KEY,
     safeAddress: config.SAFE_ADDRESS
   })
 

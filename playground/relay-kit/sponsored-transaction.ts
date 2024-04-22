@@ -1,5 +1,4 @@
 import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
@@ -39,15 +38,10 @@ async function main() {
 
   // SDK Initialization
 
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
-  const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
-
-  const safeAccountAbstraction = new AccountAbstraction(
-    new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    })
-  )
+  const safeAccountAbstraction = new AccountAbstraction({
+    provider: config.RPC_URL,
+    signer: config.SAFE_SIGNER_PRIVATE_KEY
+  })
 
   await safeAccountAbstraction.init()
 
@@ -68,6 +62,7 @@ async function main() {
 
   // Fake on-ramp to fund the Safe
 
+  const provider = safeAccountAbstraction.protocolKit.getSafeProvider().getProvider()
   const safeBalance = await provider.getBalance(predictedSafeAddress)
   console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
   if (safeBalance < BigInt(txConfig.VALUE)) {

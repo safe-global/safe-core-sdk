@@ -6,7 +6,6 @@ import {
   OperationType
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 
 // Check the status of a transaction after it is relayed:
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
@@ -30,7 +29,7 @@ const txConfig = {
   VALUE: '<VALUE>',
   // Options:
   GAS_LIMIT: '<GAS_LIMIT>',
-  GAS_TOKEN: ethers.ZeroAddress
+  GAS_TOKEN: '0x0000000000000000000000000000000000000000'
 }
 
 async function main() {
@@ -38,15 +37,10 @@ async function main() {
 
   // SDK Initialization
 
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
-  const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
-
-  const safeAccountAbstraction = new AccountAbstraction(
-    new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    })
-  )
+  const safeAccountAbstraction = new AccountAbstraction({
+    provider: config.RPC_URL,
+    signer: config.SAFE_SIGNER_PRIVATE_KEY
+  })
 
   await safeAccountAbstraction.init()
 
@@ -61,6 +55,8 @@ async function main() {
 
   const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
+
+  const provider = safeAccountAbstraction.protocolKit.getSafeProvider().getProvider()
 
   // Fake on-ramp to transfer enough funds to the Safe address
 

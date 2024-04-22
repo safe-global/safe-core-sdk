@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import { EthersAdapter, hashSafeMessage } from '@safe-global/protocol-kit'
+import { hashSafeMessage } from '@safe-global/protocol-kit'
 import { ethers, JsonRpcProvider } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK
@@ -22,24 +22,16 @@ const config: Config = {
 }
 
 async function main() {
-  const provider = new JsonRpcProvider(config.RPC_URL)
-  const signer1 = new ethers.Wallet(config.OWNER1_PRIVATE_KEY, provider)
-  const signer2 = new ethers.Wallet(config.OWNER2_PRIVATE_KEY, provider)
-
   // Create safeSdk instances
   const safeSdk1 = await Safe.create({
-    ethAdapter: new EthersAdapter({
-      ethers,
-      signerOrProvider: signer1
-    }),
+    provider: config.RPC_URL,
+    signer: config.OWNER1_PRIVATE_KEY,
     safeAddress: config.SAFE_2_3_ADDRESS
   })
 
   const safeSdk2 = await Safe.create({
-    ethAdapter: new EthersAdapter({
-      ethers,
-      signerOrProvider: signer2
-    }),
+    provider: config.RPC_URL,
+    signer: config.OWNER2_PRIVATE_KEY,
     safeAddress: config.SAFE_2_3_ADDRESS
   })
 

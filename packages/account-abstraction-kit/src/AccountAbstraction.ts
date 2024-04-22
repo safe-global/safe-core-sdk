@@ -24,7 +24,7 @@ class AccountAbstraction {
 
   /**
    * @constructor
-   * @param safeProvider The EthAdapter instance to be used by the Account Abstraction (e.g. EthersAdapter)
+   * @param config  The SafeProviderConfig
    */
   constructor({ provider, signer }: SafeProviderConfig) {
     this.#provider = provider

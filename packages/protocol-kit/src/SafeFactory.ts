@@ -13,14 +13,18 @@ import {
 } from '@safe-global/protocol-kit/contracts/utils'
 import {
   ContractNetworksConfig,
+  HexAddress,
+  HttpTransport,
+  PrivateKey,
   SafeAccountConfig,
   SafeContractImplementationType,
   SafeDeploymentConfig,
-  SafeProxyFactoryContractImplementationType
+  SafeProxyFactoryContractImplementationType,
+  SocketTransport,
+  Eip1193Provider
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 export interface DeploySafeProps {
   safeAccountConfig: SafeAccountConfig
@@ -31,9 +35,8 @@ export interface DeploySafeProps {
 
 export interface SafeFactoryConfig {
   /** provider - Ethereum EIP-1193 compatible provider */
-  provider: Eip1193Provider
-  signerAddress?: string
-  privateKeyOrMnemonic?: string
+  provider: Eip1193Provider | HttpTransport | SocketTransport
+  signer?: HexAddress | PrivateKey
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
@@ -44,8 +47,8 @@ export interface SafeFactoryConfig {
 
 interface SafeFactoryInitConfig {
   /** provider - Ethereum EIP-1193 compatible provider */
-  provider: Eip1193Provider
-  signerAddress?: string
+  provider: Eip1193Provider | HttpTransport | SocketTransport
+  signer?: HexAddress | PrivateKey
   privateKeyOrMnemonic?: string
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion
@@ -61,27 +64,37 @@ class SafeFactory {
   #safeVersion!: SafeVersion
   #safeProxyFactoryContract!: SafeProxyFactoryContractImplementationType
   #safeContract!: SafeContractImplementationType
-  #provider!: Eip1193Provider
+  #provider!: Eip1193Provider | HttpTransport | SocketTransport
+  #signer?: HexAddress | PrivateKey
   #safeProvider!: SafeProvider
 
   static async create({
     provider,
+    signer,
     safeVersion = DEFAULT_SAFE_VERSION,
     isL1SafeSingleton = false,
     contractNetworks
   }: SafeFactoryConfig): Promise<SafeFactory> {
     const safeFactorySdk = new SafeFactory()
-    await safeFactorySdk.init({ provider, safeVersion, isL1SafeSingleton, contractNetworks })
+    await safeFactorySdk.init({
+      provider,
+      signer,
+      safeVersion,
+      isL1SafeSingleton,
+      contractNetworks
+    })
     return safeFactorySdk
   }
 
   private async init({
     provider,
+    signer,
     safeVersion,
     isL1SafeSingleton,
     contractNetworks
   }: SafeFactoryInitConfig): Promise<void> {
     this.#provider = provider
+    this.#signer = signer
     this.#safeProvider = new SafeProvider({ provider })
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
@@ -183,6 +196,7 @@ class SafeFactory {
     }
     const safe = await Safe.create({
       provider: this.#provider,
+      signer: this.#signer,
       safeAddress,
       isL1SafeSingleton: this.#isL1SafeSingleton,
       contractNetworks: this.#contractNetworks

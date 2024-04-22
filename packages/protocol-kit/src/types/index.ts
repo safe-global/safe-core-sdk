@@ -348,10 +348,10 @@ export interface GetContractProps {
   isL1SafeSingleton?: boolean
 }
 
-export type HexAddress = `0x${string}`
+export type HexAddress = string
 export type PrivateKey = string
-export type HttpTransport = `http${string}`
-export type SocketTransport = `ws${string}`
+export type HttpTransport = string
+export type SocketTransport = string
 export type SafeSigner = HexAddress | PrivateKey
 
 export interface SafeProviderConfig {

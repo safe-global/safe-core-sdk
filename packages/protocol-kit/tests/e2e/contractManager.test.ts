@@ -27,18 +27,19 @@ describe('Safe contracts manager', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
     return {
       safe: await getSafeWithOwners([accounts[0].address]),
       accounts,
       contractNetworks,
-      chainId
+      chainId,
+      provider
     }
   })
 
   describe('create', async () => {
     it('should initialize the SDK with a Safe that is not deployed', async () => {
-      const { accounts, contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const predictedSafe: PredictedSafeProps = {
         safeAccountConfig: {
           owners: [accounts[0].address],
@@ -58,8 +59,7 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
-      const { safe } = await setupTests()
-      const provider = getEip1193Provider()
+      const { safe, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
       await chai
         .expect(
@@ -72,8 +72,7 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if SafeProxy contract is not deployed on the current network', async () => {
-      const { contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, provider } = await setupTests()
       await chai
         .expect(
           Safe.create({
@@ -86,7 +85,7 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
-      const { safe, chainId } = await setupTests()
+      const { safe, chainId, provider } = await setupTests()
       const customContractNetworks: ContractNetworksConfig = {
         [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
@@ -108,7 +107,6 @@ describe('Safe contracts manager', () => {
         }
       }
 
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       await chai
         .expect(
@@ -122,8 +120,7 @@ describe('Safe contracts manager', () => {
     })
 
     it('should set the MultiSend contract available on the current network', async () => {
-      const { safe, chainId, contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { safe, chainId, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,

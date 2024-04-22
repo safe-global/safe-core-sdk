@@ -2,9 +2,10 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, {
   PredictedSafeProps,
   SafeTransactionOptionalProps,
-  standardizeSafeTransactionData
+  standardizeSafeTransactionData,
+  SafeContractImplementationType as SafeContract
 } from '@safe-global/protocol-kit/index'
-import { SafeContract, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -31,6 +32,7 @@ describe('Transactions creation', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
         owners: [accounts[0].address],
@@ -46,7 +48,8 @@ describe('Transactions creation', () => {
       accounts,
       chainId,
       contractNetworks,
-      predictedSafe
+      predictedSafe,
+      provider
     }
   })
 
@@ -54,10 +57,9 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return a transaction with safeTxGas=0 if safeVersion>=1.3.0 and gasPrice=0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -82,10 +84,9 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return a transaction with estimated safeTxGas if safeVersion>=1.3.0 and gasPrice>0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -111,10 +112,9 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return a transaction with defined safeTxGas if safeVersion>=1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -141,10 +141,9 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should return a transaction with estimated safeTxGas if safeVersion<1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -169,10 +168,9 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should return a transaction with defined safeTxGas of 0 if safeVersion<1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -199,10 +197,9 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should return a transaction with defined safeTxGas if safeVersion<1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const provider = getEip1193Provider()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,
@@ -229,9 +226,8 @@ describe('Transactions creation', () => {
 
   describe('createTransaction', async () => {
     it('should create a single transaction with gasPrice=0', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
+      const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
       const [, account2] = accounts
-      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         predictedSafe,
@@ -251,10 +247,9 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction with gasPrice=0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -282,10 +277,9 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction with gasPrice>0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -313,10 +307,9 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction when passing a transaction array with length=1', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -335,10 +328,9 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction when passing a transaction array with length=1 and options', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -364,10 +356,9 @@ describe('Transactions creation', () => {
     })
 
     it('should fail when creating a MultiSend transaction passing a transaction array with length=0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -379,10 +370,9 @@ describe('Transactions creation', () => {
     })
 
     it('should create a MultiSend transaction', async () => {
-      const { accounts, contractNetworks, erc20Mintable, chainId } = await setupTests()
+      const { accounts, contractNetworks, erc20Mintable, chainId, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({
         provider,
@@ -414,11 +404,10 @@ describe('Transactions creation', () => {
     })
 
     it('should create a MultiSend transaction with options', async () => {
-      const { accounts, contractNetworks, erc20Mintable, chainId } = await setupTests()
+      const { accounts, contractNetworks, erc20Mintable, chainId, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const provider = getEip1193Provider()
       const safeSdk = await Safe.create({
         provider,
         safeAddress,
@@ -460,8 +449,7 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail to create a transaction if the Safe with version <v1.3.0 is using predicted config',
       async () => {
-        const { safe, predictedSafe, contractNetworks } = await setupTests()
-        const provider = getEip1193Provider()
+        const { safe, predictedSafe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
         const safeSdk = await Safe.create({
           provider,

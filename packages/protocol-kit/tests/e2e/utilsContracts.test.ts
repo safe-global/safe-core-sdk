@@ -42,24 +42,26 @@ describe('Contract utils', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
+
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
       chainId,
       accounts,
-      contractNetworks
+      contractNetworks,
+      provider
     }
   })
 
   describe('predictSafeAddress', () => {
     it('returns the predicted address of a 1/1 Safe', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 1/1 Safe
       const [owner1] = accounts
       const owners = [owner1.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -98,14 +100,13 @@ describe('Contract utils', () => {
     })
 
     it('returns the predicted address of a 1/2 Safe', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 1/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -144,14 +145,13 @@ describe('Contract utils', () => {
     })
 
     it('returns the predicted address of a 2/2 Safe', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -190,14 +190,13 @@ describe('Contract utils', () => {
     })
 
     it('should fail if the provided threshold is invalid (greater than owners length)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // invalid threshold 3/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -225,14 +224,13 @@ describe('Contract utils', () => {
     })
 
     it('should fail if the provided threshold is invalid (zero value)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // invalid threshold 0/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -260,14 +258,13 @@ describe('Contract utils', () => {
     })
 
     it('should fail if the provided threshold is invalid (negative value)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // invalid threshold -2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -295,13 +292,12 @@ describe('Contract utils', () => {
     })
 
     it('should fail if no owners are present (empty array)', async () => {
-      const { contractNetworks, chainId } = await setupTests()
+      const { contractNetworks, chainId, provider } = await setupTests()
 
       // invalid owners 1/0 Safe
       const invalidOwners: string[] = []
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -329,14 +325,13 @@ describe('Contract utils', () => {
     })
 
     it('returns different addresses with different saltNonce value but same Safe config (threshold & owners)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 1/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -423,14 +418,13 @@ describe('Contract utils', () => {
     })
 
     it('returns the same predicted address for multiple calls to predictedSafeAddress with the same config (owners, threshold & saltNonce)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const provider = getEip1193Provider()
       const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
@@ -489,13 +483,12 @@ describe('Contract utils', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'safeDeploymentConfig is an optional parameter',
       async () => {
-        const { accounts, contractNetworks, chainId } = await setupTests()
+        const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
         // 1/1 Safe
         const [owner1] = accounts
         const owners = [owner1.address]
         const threshold = 1
-        const provider = getEip1193Provider()
         const customContracts = contractNetworks[chainId.toString()]
 
         const safeAccountConfig: SafeAccountConfig = {

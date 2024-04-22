@@ -24,10 +24,13 @@ describe('Safe contracts', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
+
     return {
       accounts,
       contractNetworks,
-      chainId
+      chainId,
+      provider
     }
   })
 
@@ -68,8 +71,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a Safe contract from the custom addresses', async () => {
-      const { contractNetworks, chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -97,8 +99,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a MultiSend contract from the custom addresses', async () => {
-      const { contractNetworks, chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -126,8 +127,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a MultiSendCallOnly contract from the custom addresses', async () => {
-      const { contractNetworks, chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -156,8 +156,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a CompatibilityFallbackHandler contract from the custom addresses', async () => {
-      const { contractNetworks, chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -186,8 +185,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a SafeProxyFactory contract from the custom addresses', async () => {
-      const { contractNetworks, chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -215,8 +213,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a SignMessageLib contract from the custom addresses', async () => {
-      const { contractNetworks, chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -244,8 +241,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a SafeProxyFactory contract from the custom addresses', async () => {
-      const { contractNetworks, chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]

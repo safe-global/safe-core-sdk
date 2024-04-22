@@ -48,6 +48,7 @@ describe('The EIP1271 implementation', () => {
       const contractNetworks = await getContractNetworks(BigInt(chainId))
       const fallbackHandlerAddress = contractNetworks[chainId].fallbackHandlerAddress
       const [account1, account2] = accounts
+      const provider = getEip1193Provider()
 
       // Create a 1/2 Safe to sign the messages
       const signerSafe = await getSafeWithOwners(
@@ -65,18 +66,15 @@ describe('The EIP1271 implementation', () => {
       )
       const safeAddress = await safe.getAddress()
 
-      // Adapter and Safe instance for owner 1
-      const provider1 = getEip1193Provider()
       const safeSdk1 = await Safe.create({
-        provider: provider1,
+        provider,
         safeAddress,
         contractNetworks
       })
 
       // Adapter and Safe instance for owner 2
-      const provider2 = getEip1193Provider()
       const safeSdk2 = await Safe.create({
-        provider: provider2,
+        provider,
         signer: account2.address,
         safeAddress,
         contractNetworks
@@ -84,7 +82,7 @@ describe('The EIP1271 implementation', () => {
 
       // Adapter and Safe instance for owner 3
       const safeSdk3 = await Safe.create({
-        provider: provider1,
+        provider,
         signer: account1.address,
         safeAddress: signerSafeAddress,
         contractNetworks
@@ -97,9 +95,8 @@ describe('The EIP1271 implementation', () => {
         signerSafeAddress,
         accounts,
         contractNetworks,
+        provider,
         chainId,
-        provider1,
-        provider2,
         safeSdk1,
         safeSdk2,
         safeSdk3,

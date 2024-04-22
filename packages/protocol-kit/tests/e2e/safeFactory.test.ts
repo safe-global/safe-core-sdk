@@ -35,25 +35,27 @@ describe('SafeProxyFactory', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
+
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
       chainId,
       accounts,
-      contractNetworks
+      contractNetworks,
+      provider
     }
   })
 
   describe('create', async () => {
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
-      const provider = getEip1193Provider()
+      const { provider } = await setupTests()
       chai
         .expect(SafeFactory.create({ provider }))
         .rejectedWith('Invalid SafeProxyFactory contract')
     })
 
     it('should fail if the contractNetworks provided are not deployed', async () => {
-      const { chainId } = await setupTests()
-      const provider = getEip1193Provider()
+      const { chainId, provider } = await setupTests()
       const contractNetworks: ContractNetworksConfig = {
         [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
@@ -80,8 +82,7 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should instantiate the SafeProxyFactory', async () => {
-      const { contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const networkId = await safeProvider.getChainId()
@@ -93,9 +94,8 @@ describe('SafeProxyFactory', () => {
 
   describe('getEip1193Provider', async () => {
     it('should return the connected SafeProvider', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       chai
         .expect(await safeFactory.getSafeProvider().getSignerAddress())
@@ -105,8 +105,7 @@ describe('SafeProxyFactory', () => {
 
   describe('getChainId', async () => {
     it('should return the chainId of the current network', async () => {
-      const { chainId, contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { chainId, contractNetworks, provider } = await setupTests()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       chai.expect(await safeFactory.getChainId()).to.be.eq(chainId)
     })
@@ -114,8 +113,7 @@ describe('SafeProxyFactory', () => {
 
   describe('predictSafeAddress', async () => {
     it('should fail if there are no owners', async () => {
-      const { contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, provider } = await setupTests()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners: string[] = []
       const threshold = 2
@@ -128,9 +126,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should fail if the threshold is lower than 0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const invalidThreshold = 0
@@ -143,9 +140,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should fail if the threshold is higher than the threshold', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const invalidThreshold = 3
@@ -158,9 +154,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should fail if the saltNonce is lower than 0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -177,9 +172,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should predict a new Safe with saltNonce', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -204,9 +198,8 @@ describe('SafeProxyFactory', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'should predict a new Safe with the default CompatibilityFallbackHandler',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
-        const provider = getEip1193Provider()
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -233,9 +226,8 @@ describe('SafeProxyFactory', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'should predict a new Safe with a custom fallback handler',
       async () => {
-        const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
         const [account1, account2] = accounts
-        const provider = getEip1193Provider()
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -265,8 +257,7 @@ describe('SafeProxyFactory', () => {
 
   describe('deploySafe', async () => {
     it('should fail if there are no owners', async () => {
-      const { contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { contractNetworks, provider } = await setupTests()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners: string[] = []
       const threshold = 2
@@ -278,9 +269,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should fail if the threshold is lower than 0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const threshold = 0
@@ -292,9 +282,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should fail if the threshold is higher than the threshold', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const threshold = 3
@@ -306,9 +295,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should fail if the saltNonce is lower than 0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -327,9 +315,8 @@ describe('SafeProxyFactory', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'should deploy a new Safe with custom fallback handler',
       async () => {
-        const { accounts, contractNetworks, defaultCallbackHandler } = await setupTests()
+        const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
         const [account1, account2] = accounts
-        const provider = getEip1193Provider()
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -356,9 +343,8 @@ describe('SafeProxyFactory', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'should deploy a new Safe with the default CompatibilityFallbackHandler',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
-        const provider = getEip1193Provider()
         const safeFactory = await SafeFactory.create({
           provider,
           safeVersion: safeVersionDeployed,
@@ -378,9 +364,8 @@ describe('SafeProxyFactory', () => {
     )
 
     it('should deploy a new Safe without saltNonce', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -398,9 +383,8 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should deploy a new Safe with saltNonce', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -419,13 +403,12 @@ describe('SafeProxyFactory', () => {
     })
 
     it('should deploy a new Safe with callback', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       let callbackResult = ''
       const callback = (txHash: string) => {
         callbackResult = txHash
       }
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,
@@ -445,9 +428,8 @@ describe('SafeProxyFactory', () => {
     itif(safeVersionDeployed === DEFAULT_SAFE_VERSION)(
       'should deploy last Safe version by default',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
-        const provider = getEip1193Provider()
         const safeFactory = await SafeFactory.create({ provider, contractNetworks })
         const owners = [account1.address, account2.address]
         const threshold = 2
@@ -460,9 +442,8 @@ describe('SafeProxyFactory', () => {
     )
 
     it('should deploy a specific Safe version', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const provider = getEip1193Provider()
       const safeFactory = await SafeFactory.create({
         provider,
         safeVersion: safeVersionDeployed,

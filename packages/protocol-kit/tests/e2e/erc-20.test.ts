@@ -35,11 +35,13 @@ describe('ERC-20 utils', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
 
     return {
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       contractNetworks,
-      accounts
+      accounts,
+      provider
     }
   })
 
@@ -47,11 +49,9 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the correct decimals for a standard ERC20 token',
       async () => {
-        const { safe, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
 
         const safeAddress = await safe.getAddress()
-
-        const provider = getEip1193Provider()
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
@@ -71,10 +71,8 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the correct decimals for a non-standard ERC20 token',
       async () => {
-        const { safe, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-
-        const provider = getEip1193Provider()
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
@@ -94,10 +92,8 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should throw an error if decimals() fn is not defined',
       async () => {
-        const { safe, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-
-        const provider = getEip1193Provider()
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x'))
@@ -119,10 +115,8 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return true if it is the Native token',
       async () => {
-        const { safe, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-
-        const provider = getEip1193Provider()
 
         const safeSdk = await Safe.create({
           provider,
@@ -142,10 +136,8 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return true if it is an standard ERC20 token',
       async () => {
-        const { safe, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-
-        const provider = getEip1193Provider()
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
@@ -168,10 +160,8 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return false for a non-standard ERC20 token',
       async () => {
-        const { safe, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-
-        const provider = getEip1193Provider()
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))

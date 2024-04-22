@@ -29,22 +29,23 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         safeVersion: safeVersionDeployed
       }
     }
+    const provider = getEip1193Provider()
 
     return {
       accounts,
       contractNetworks,
       predictedSafe,
-      chainId
+      chainId,
+      provider
     }
   })
 
   it('should throw an error if the Safe is already deployed', async () => {
-    const { accounts, contractNetworks } = await setupTests()
+    const { accounts, contractNetworks, provider } = await setupTests()
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = getEip1193Provider()
 
     const safeSdk = await Safe.create({
       provider,
@@ -70,10 +71,8 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed == '1.4.1')(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
+      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
       const [, account2] = accounts
-
-      const provider = getEip1193Provider()
 
       const safeSdk = await Safe.create({
         provider,
@@ -106,10 +105,8 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed == '1.3.0')(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
+      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
       const [, account2] = accounts
-
-      const provider = getEip1193Provider()
 
       const safeSdk = await Safe.create({
         provider,
@@ -142,10 +139,8 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed >= '1.3.0')(
     'should include the custom salt nonce in the Safe deployment data',
     async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
+      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
       const [, account2] = accounts
-
-      const provider = getEip1193Provider()
 
       const safeSdk = await Safe.create({
         provider,

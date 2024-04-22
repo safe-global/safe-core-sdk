@@ -14,19 +14,21 @@ describe('getEncodedTransaction', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
+
     return {
       accounts,
-      contractNetworks
+      contractNetworks,
+      provider
     }
   })
 
   itif(safeVersionDeployed >= '1.3.0')('should return a transaction encoded', async () => {
-    const { accounts, contractNetworks } = await setupTests()
+    const { accounts, contractNetworks, provider } = await setupTests()
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = getEip1193Provider()
 
     const safeSdk = await Safe.create({
       provider,
@@ -52,12 +54,11 @@ describe('getEncodedTransaction', () => {
   })
 
   itif(safeVersionDeployed <= '1.2.0')('should return a transaction encoded', async () => {
-    const { accounts, contractNetworks } = await setupTests()
+    const { accounts, contractNetworks, provider } = await setupTests()
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = getEip1193Provider()
 
     const safeSdk = await Safe.create({
       provider,
@@ -83,12 +84,11 @@ describe('getEncodedTransaction', () => {
   })
 
   it('should return a signed transaction with the signatures encoded', async () => {
-    const { accounts, contractNetworks } = await setupTests()
+    const { accounts, contractNetworks, provider } = await setupTests()
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const provider = getEip1193Provider()
 
     const safeSdk = await Safe.create({
       provider,

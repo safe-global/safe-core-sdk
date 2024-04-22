@@ -26,18 +26,20 @@ describe('On-chain signatures', () => {
         safeVersion: safeVersionDeployed
       }
     }
+    const provider = getEip1193Provider()
+
     return {
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       accounts,
       contractNetworks,
-      predictedSafe
+      predictedSafe,
+      provider
     }
   })
 
   describe('approveTransactionHash', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks } = await setupTests()
-      const provider = getEip1193Provider()
+      const { predictedSafe, contractNetworks, provider } = await setupTests()
       const safeSdk1 = await Safe.create({
         provider,
         predictedSafe,
@@ -50,9 +52,8 @@ describe('On-chain signatures', () => {
     })
 
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks, provider } = await setupTests()
       const account3 = accounts[2]
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
@@ -73,9 +74,8 @@ describe('On-chain signatures', () => {
     })
 
     it('should approve the transaction hash', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
@@ -95,9 +95,8 @@ describe('On-chain signatures', () => {
     })
 
     it('should ignore a duplicated signatures', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const provider = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
         provider,
@@ -123,10 +122,9 @@ describe('On-chain signatures', () => {
 
   describe('getOwnersWhoApprovedTx', async () => {
     it('should fail if Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks } = await setupTests()
-      const provider1 = getEip1193Provider()
+      const { predictedSafe, contractNetworks, provider } = await setupTests()
       const safeSdk1 = await Safe.create({
-        provider: provider1,
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -136,18 +134,15 @@ describe('On-chain signatures', () => {
     })
 
     it('should return the list of owners who approved a transaction hash', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
+      const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [, account2] = accounts
-      const provider1 = getEip1193Provider()
       const safeAddress = await safe.getAddress()
       const safeSdk1 = await Safe.create({
-        provider: provider1,
+        provider,
         safeAddress: safeAddress,
         contractNetworks
       })
-      const provider2 = getEip1193Provider()
       const safeSdk2 = await safeSdk1.connect({
-        provider: provider2,
         signer: account2.address
       })
       const safeTransactionData = {

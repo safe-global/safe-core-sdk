@@ -197,7 +197,7 @@ export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
 }
 
 export async function getPredictedSafeAddressInitCode({
-  ethAdapter,
+  safeProvider,
   chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
@@ -213,14 +213,14 @@ export async function getPredictedSafeAddressInitCode({
   } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     customContracts,
     chainId: chainId.toString()
   })
 
   const safeContract = await memoizedGetSafeContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     isL1SafeSingleton,
     customContracts,
@@ -228,14 +228,14 @@ export async function getPredictedSafeAddressInitCode({
   })
 
   const initializer = await encodeSetupCallData({
-    ethAdapter,
+    safeProvider,
     safeAccountConfig,
     safeContract,
     customContracts,
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
-  const encodedNonce = toBuffer(ethAdapter.encodeParameters(['uint256'], [saltNonce])).toString(
+  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
     'hex'
   )
   const safeSingletonAddress = await safeContract.getAddress()

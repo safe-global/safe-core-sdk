@@ -213,10 +213,10 @@ class Safe {
       throw new Error('The Safe already exists')
     }
 
-    const chainId = await this.#ethAdapter.getChainId()
+    const chainId = await this.#safeProvider.getChainId()
 
     return getPredictedSafeAddressInitCode({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       chainId,
       customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
       ...this.#predictedSafe

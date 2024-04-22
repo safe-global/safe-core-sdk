@@ -46,6 +46,13 @@ class ModuleManager {
     return [...modules]
   }
 
+  async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
+    return this.#safeContract.getModulesPaginated(start, pageSize)
+  }
+
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')

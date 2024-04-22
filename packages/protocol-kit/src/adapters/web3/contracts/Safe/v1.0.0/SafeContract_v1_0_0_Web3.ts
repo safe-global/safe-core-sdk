@@ -13,6 +13,7 @@ import {
   Web3TransactionOptions,
   Web3TransactionResult
 } from '@safe-global/safe-core-sdk-types'
+import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
 /**
  * SafeContract_v1_0_0_Web3 is the implementation specific to the Safe contract version 1.0.0.
@@ -251,6 +252,18 @@ class SafeContract_v1_0_0_Web3
       .send(options)
 
     return toTxResult(txResponse, options)
+  }
+
+  async getModulesPaginated(start: string, pageSize: bigint): Promise<string[]> {
+    if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
+
+    const [array] = await this.getModules()
+    if (start === SENTINEL_ADDRESS) {
+      return array.slice(0, Number(pageSize))
+    } else {
+      const moduleIndex = array.findIndex((module: string) => sameString(module, start))
+      return moduleIndex === -1 ? [] : array.slice(moduleIndex + 1, Number(pageSize))
+    }
   }
 
   /**

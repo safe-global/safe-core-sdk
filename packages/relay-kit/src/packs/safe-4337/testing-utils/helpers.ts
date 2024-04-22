@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import * as protocolKit from '@safe-global/protocol-kit'
 import { Safe4337InitOptions } from '../types'
 import { Safe4337Pack } from '../Safe4337Pack'
 import * as fixtures from './fixtures'
@@ -14,19 +13,13 @@ export const generateTransferCallData = (to: string, value: bigint) => {
 export const createSafe4337Pack = async (
   initOptions: Partial<Safe4337InitOptions>
 ): Promise<Safe4337Pack> => {
-  const provider = new ethers.JsonRpcProvider(fixtures.RPC_URL)
-  const signer = new ethers.Wallet(process.env.PRIVATE_KEY || '0x', provider)
-  const ethersAdapter = new protocolKit.EthersAdapter({
-    ethers,
-    signerOrProvider: signer
-  })
-
   const safe4337Pack = await Safe4337Pack.init({
+    provider: fixtures.RPC_URL,
+    signer: process.env.PRIVATE_KEY,
     options: {
       safeAddress: ''
     },
     ...initOptions,
-    ethersAdapter,
     rpcUrl: fixtures.RPC_URL,
     bundlerUrl: fixtures.BUNDLER_URL
   })

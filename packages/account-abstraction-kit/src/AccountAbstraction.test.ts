@@ -199,7 +199,7 @@ describe('AccountAbstraction', () => {
       })
 
       it('should throw if relay-kit is not initialized', async () => {
-        const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+        const accountAbstraction = new AccountAbstraction({ provider })
         await accountAbstraction.init()
 
         expect(accountAbstraction.relayTransaction(transactionsMock, optionsMock)).rejects.toThrow(

@@ -1,13 +1,8 @@
 import Safe, {
   SafeAccountConfig,
   predictSafeAddress,
-  SafeProvider,
-  HexAddress,
-  HttpTransport,
-  PrivateKey,
-  SocketTransport,
   SafeProviderConfig,
-  Eip1193Provider
+  SafeProvider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit'
 import {
@@ -23,8 +18,8 @@ import {
 class AccountAbstraction {
   protocolKit!: Safe
   relayKit?: RelayKitBasePack
-  #provider: Eip1193Provider | HttpTransport | SocketTransport
-  #signer?: HexAddress | PrivateKey
+  #provider: SafeProviderConfig['provider']
+  #signer?: SafeProviderConfig['signer']
 
   /**
    * @constructor

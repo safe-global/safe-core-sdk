@@ -37,7 +37,7 @@
   "dependencies": {
     "@monerium/sdk": "^2.9.0",
     "@safe-global/api-kit": "^2.3.0",
-    "@safe-global/protocol-kit": "^3.0.2",
+    "@safe-global/protocol-kit": "3.1.0-alpha.0",
     "@safe-global/safe-core-sdk-types": "^4.0.2",
     "@stripe/crypto": "^0.0.4",
     "@stripe/stripe-js": "^1.54.2",

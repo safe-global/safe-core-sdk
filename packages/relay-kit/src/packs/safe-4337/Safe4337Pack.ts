@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
-  EthersAdapter,
+  SafeProvider,
   SigningMethod,
   encodeMultiSendData,
   getMultiSendContract
@@ -105,7 +105,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { ethersAdapter, options, bundlerUrl, rpcUrl, customContracts, paymasterOptions } =
+    const { provider, signer, options, bundlerUrl, rpcUrl, customContracts, paymasterOptions } =
       initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
@@ -143,7 +143,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     // Existing Safe
     if ('safeAddress' in options) {
       protocolKit = await Safe.create({
-        ethAdapter: ethersAdapter,
+        provider,
+        signer,
         safeAddress: options.safeAddress
       })
 
@@ -211,7 +212,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ])
 
         const multiSendContract = await getMultiSendContract({
-          ethAdapter: ethersAdapter,
+          safeProvider: new SafeProvider({ provider, signer }),
           safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
         })
 
@@ -220,7 +221,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       protocolKit = await Safe.create({
-        ethAdapter: ethersAdapter,
+        provider,
+        signer,
         predictedSafe: {
           safeDeploymentConfig: {
             safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
@@ -424,7 +426,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
   ): Promise<SafeOperation> {
     const owners = await this.protocolKit.getOwners()
-    const signerAddress = await this.protocolKit.getEthAdapter().getSignerAddress()
+    const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
     if (!signerAddress) {
       throw new Error('EthAdapter must be initialized with a signer to use this method')
     }
@@ -446,7 +448,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     ) {
       signature = await this.#signTypedData(safeOperation.data)
     } else {
-      const chainId = await this.protocolKit.getEthAdapter().getChainId()
+      const chainId = await this.protocolKit.getSafeProvider().getChainId()
       const safeOpHash = this.#getSafeUserOperationHash(safeOperation.data, chainId)
 
       signature = await this.protocolKit.signHash(safeOpHash)
@@ -578,9 +580,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.
    */
   async #signTypedData(safeUserOperation: SafeUserOperation): Promise<SafeSignature> {
-    const ethAdapter = this.protocolKit.getEthAdapter() as EthersAdapter
-    const signer = ethAdapter.getSigner() as ethers.Signer
-    const chainId = await ethAdapter.getChainId()
+    const safeProvider = this.protocolKit.getSafeProvider()
+    const signer = (await safeProvider.getSigner()) as ethers.Signer
+    const chainId = await safeProvider.getChainId()
     const signerAddress = await signer.getAddress()
     const signature = await signer.signTypedData(
       {

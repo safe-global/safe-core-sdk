@@ -207,8 +207,4 @@ export const networks: NetworkShortName[] = [
   { chainId: 11297108109n, shortName: 'palm' }
 ]
 
-if (process.env.TEST_NETWORK === 'hardhat') {
-  networks.push({ shortName: 'local', chainId: 31337n })
-} else if (process.env.TEST_NETWORK === 'ganache') {
-  networks.push({ shortName: 'local', chainId: 1337n })
-}
+networks.push({ shortName: 'local', chainId: 31337n })

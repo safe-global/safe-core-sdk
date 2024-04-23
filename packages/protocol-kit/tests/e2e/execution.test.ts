@@ -1,10 +1,10 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, {
+import Safe, { SigningMethod } from '@safe-global/protocol-kit/index'
+import {
   EthersTransactionOptions,
-  SigningMethod,
-  Web3TransactionOptions
-} from '@safe-global/protocol-kit/index'
-import { MetaTransactionData, TransactionOptions } from '@safe-global/safe-core-sdk-types'
+  MetaTransactionData,
+  TransactionOptions
+} from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -674,7 +674,7 @@ describe('Transactions execution', () => {
     )
 
     itif(process.env.ETH_LIB === 'web3')(
-      'should execute a transaction with options: { gas }',
+      'should execute a transaction with options: { gasPrice }',
       async () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
@@ -695,37 +695,7 @@ describe('Transactions execution', () => {
           data: '0x'
         }
         const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-        const execOptions: Web3TransactionOptions = { gas: 123456 }
-        const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
-        await waitSafeTxReceipt(txResponse)
-        const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
-        chai.expect(execOptions.gas).to.be.eq(txConfirmed.gas)
-      }
-    )
-
-    itif(process.env.ETH_LIB === 'web3')(
-      'should execute a transaction with options: { gas, gasPrice }',
-      async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
-        const [account1, account2] = accounts
-        const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
-        const safeSdk1 = await Safe.create({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
-        await account1.signer.sendTransaction({
-          to: safeAddress,
-          value: 1_000_000_000_000_000_000n // 1 ETH
-        })
-        const safeTransactionData = {
-          to: account2.address,
-          value: '500000000000000000', // 0.5 ETH
-          data: '0x'
-        }
-        const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-        const execOptions: Web3TransactionOptions = {
+        const execOptions = {
           gas: 123456,
           gasPrice: 170000000
         }
@@ -733,7 +703,6 @@ describe('Transactions execution', () => {
         await waitSafeTxReceipt(txResponse)
         const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
         chai.expect(execOptions.gasPrice).to.be.eq(Number(txConfirmed.gasPrice))
-        chai.expect(execOptions.gas).to.be.eq(txConfirmed.gas)
       }
     )
 

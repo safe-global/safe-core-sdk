@@ -238,28 +238,6 @@ describe('Off-chain signatures', () => {
       }
     )
 
-    itif(process.env.ETH_LIB === 'web3')(
-      'should fail if the signature of the current signer is added using eth_signTypedData with web3 provider',
-      async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
-        const safeTransactionData = {
-          to: safeAddress,
-          value: '0',
-          data: '0x'
-        }
-        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
-        await chai
-          .expect(safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA))
-          .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
-      }
-    )
-
     itif(process.env.ETH_LIB === 'ethers')(
       'should add the signature of the current signer using eth_signTypedData_v3 with ethers provider',
       async () => {
@@ -280,28 +258,6 @@ describe('Off-chain signatures', () => {
         const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA_V3)
         chai.expect(tx.signatures.size).to.be.eq(0)
         chai.expect(signedTx.signatures.size).to.be.eq(1)
-      }
-    )
-
-    itif(process.env.ETH_LIB === 'web3')(
-      'should fail if the signature of the current signer is added using eth_signTypedData_v3 with web3 provider',
-      async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
-        const safeTransactionData = {
-          to: safeAddress,
-          value: '0',
-          data: '0x'
-        }
-        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
-        await chai
-          .expect(safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA_V3))
-          .to.be.rejectedWith("EIP-712 is not supported by user's wallet")
       }
     )
 

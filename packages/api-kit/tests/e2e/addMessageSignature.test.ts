@@ -3,21 +3,23 @@ import Safe, {
   buildSignatureBytes,
   hashSafeMessage,
   SigningMethod,
-  buildContractSignature,
-  EthAdapter
+  buildContractSignature
 } from '@safe-global/protocol-kit'
-import { Eip1193Provider, SafeMessage } from '@safe-global/safe-core-sdk-types'
+import { SafeMessage } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { getServiceClient } from '../utils/setupServiceClient'
+import { getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
 
-let safeApiKit1: SafeApiKit
+const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
+const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'
+
+let safeApiKit: SafeApiKit
 let protocolKit: Safe
-let provider1: Eip1193Provider
-let provider2: Eip1193Provider
+const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+const signerSafeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3'
 
 const generateRandomUUID = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -28,39 +30,28 @@ const generateRandomUUID = (): string => {
 }
 
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
-const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
-const signerSafeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3'
 
 describe('addMessageSignature', () => {
   before(async () => {
-    ;({ safeApiKit: safeApiKit1, provider: provider1 } = await getServiceClient(
-      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-    ))
-    ;({ provider: provider2 } = await getServiceClient(
-      '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'
-    ))
+    ;({ safeApiKit, protocolKit } = await getKits({
+      safeAddress,
+      signer: PRIVATE_KEY_1
+    }))
   })
 
   it('should fail if safeAddress is empty', async () => {
     await chai
-      .expect(safeApiKit1.addMessageSignature('', '0x'))
+      .expect(safeApiKit.addMessageSignature('', '0x'))
       .to.be.rejectedWith('Invalid messageHash or signature')
   })
 
   it('should fail if signature is empty', async () => {
     await chai
-      .expect(safeApiKit1.addMessageSignature(safeAddress, ''))
+      .expect(safeApiKit.addMessageSignature(safeAddress, ''))
       .to.be.rejectedWith('Invalid messageHash or signature')
   })
 
   describe('when adding a new message', () => {
-    beforeEach(async () => {
-      protocolKit = await Safe.create({
-        provider: provider1,
-        safeAddress
-      })
-    })
-
     it('should allow to add a confirmation signature using the EIP-712', async () => {
       const rawMessage: string = generateMessage()
       let safeMessage: SafeMessage = protocolKit.createMessage(rawMessage)
@@ -69,33 +60,33 @@ describe('addMessageSignature', () => {
       let signerAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
 
       await chai.expect(
-        safeApiKit1.addMessage(safeAddress, {
+        safeApiKit.addMessage(safeAddress, {
           message: rawMessage,
           signature: safeMessage.getSignature(signerAddress)?.data || '0x'
         })
       ).to.be.fulfilled
 
-      protocolKit = await protocolKit.connect({ provider: provider2 })
+      protocolKit = await protocolKit.connect({ signer: PRIVATE_KEY_2 })
       safeMessage = await protocolKit.signMessage(safeMessage, 'eth_signTypedData_v4')
 
       const safeMessageHash = await protocolKit.getSafeMessageHash(hashSafeMessage(rawMessage))
       signerAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
 
       await chai.expect(
-        safeApiKit1.addMessageSignature(
+        safeApiKit.addMessageSignature(
           safeMessageHash,
           safeMessage.getSignature(signerAddress)?.data || '0x'
         )
       ).to.be.fulfilled
 
-      const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
+      const confirmedMessage = await safeApiKit.getMessage(safeMessageHash)
 
       chai.expect(confirmedMessage.confirmations.length).to.eq(2)
     })
 
     it('should allow to add a confirmation signature using a Safe signer', async () => {
       protocolKit = await protocolKit.connect({
-        provider: provider1,
+        signer: PRIVATE_KEY_1,
         safeAddress
       })
 
@@ -109,14 +100,14 @@ describe('addMessageSignature', () => {
       const ethSig = safeMessage.getSignature(signerAddress) as EthSafeSignature
 
       await chai.expect(
-        safeApiKit1.addMessage(safeAddress, {
+        safeApiKit.addMessage(safeAddress, {
           message: rawMessage,
           signature: buildSignatureBytes([ethSig])
         })
       ).to.be.fulfilled
 
       protocolKit = await protocolKit.connect({
-        provider: provider1,
+        signer: PRIVATE_KEY_1,
         safeAddress: signerSafeAddress
       })
       let signerSafeMessage = protocolKit.createMessage(rawMessage)
@@ -127,7 +118,7 @@ describe('addMessageSignature', () => {
       )
 
       protocolKit = await protocolKit.connect({
-        provider: provider2,
+        signer: PRIVATE_KEY_2,
         safeAddress: signerSafeAddress
       })
       signerSafeMessage = await protocolKit.signMessage(
@@ -142,7 +133,7 @@ describe('addMessageSignature', () => {
       )
 
       protocolKit = await protocolKit.connect({
-        provider: provider1,
+        signer: PRIVATE_KEY_1,
         safeAddress
       })
 
@@ -157,10 +148,10 @@ describe('addMessageSignature', () => {
 
       const contractSig = buildSignatureBytes([signerSafeSig])
 
-      await chai.expect(safeApiKit1.addMessageSignature(safeMessageHash, contractSig)).to.be
+      await chai.expect(safeApiKit.addMessageSignature(safeMessageHash, contractSig)).to.be
         .fulfilled
 
-      const confirmedMessage = await safeApiKit1.getMessage(safeMessageHash)
+      const confirmedMessage = await safeApiKit.getMessage(safeMessageHash)
       chai.expect(confirmedMessage.confirmations.length).to.eq(2)
     })
   })

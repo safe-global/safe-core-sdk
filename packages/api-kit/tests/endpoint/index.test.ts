@@ -7,16 +7,17 @@ import SafeApiKit, {
 } from '@safe-global/api-kit/index'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
-import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import config from '../utils/config'
-import { getServiceClient } from '../utils/setupServiceClient'
+import { getApiKit, getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
+
+const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 
 const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
 const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
@@ -29,21 +30,17 @@ const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
 const txServiceBaseUrl = 'https://safe-transaction-sepolia.safe.global/api'
 const defaultProvider = getDefaultProvider(config.JSON_RPC)
-const signer = new Wallet(
-  '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676',
-  defaultProvider
-)
-let provider: Eip1193Provider
+const signer = new Wallet(PRIVATE_KEY_1, defaultProvider)
+
+let protocolKit: Safe
 let safeApiKit: SafeApiKit
 let delegatorAddress: string
 let eip3770DelegatorAddress: string
 
 describe('Endpoint tests', () => {
   before(async () => {
-    ;({ safeApiKit, provider } = await getServiceClient(
-      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-    ))
-    delegatorAddress = await signer.getAddress()
+    ;({ safeApiKit, protocolKit } = await getKits({ signer: PRIVATE_KEY_1, safeAddress }))
+    delegatorAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
     eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
   })
 
@@ -364,12 +361,11 @@ describe('Endpoint tests', () => {
       }
       const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
-      const safeSdk = await Safe.create({ provider, safeAddress })
-      const safeTransaction = await safeSdk.createTransaction({
+      const safeTransaction = await protocolKit.createTransaction({
         transactions: [safeTransactionData],
         options
       })
-      const senderSignature = await safeSdk.signHash(safeTxHash)
+      const senderSignature = await protocolKit.signHash(safeTxHash)
       await chai
         .expect(
           safeApiKit.proposeTransaction({
@@ -413,12 +409,11 @@ describe('Endpoint tests', () => {
       }
       const origin = 'Safe Core SDK: Safe API Kit'
       const signerAddress = await signer.getAddress()
-      const safeSdk = await Safe.create({ provider, safeAddress })
-      const safeTransaction = await safeSdk.createTransaction({
+      const safeTransaction = await protocolKit.createTransaction({
         transactions: [safeTransactionData],
         options
       })
-      const senderSignature = await safeSdk.signHash(safeTxHash)
+      const senderSignature = await protocolKit.signHash(safeTxHash)
       await chai
         .expect(
           safeApiKit.proposeTransaction({
@@ -651,12 +646,9 @@ describe('Endpoint tests', () => {
     const txServiceUrl = 'http://my-custom-tx-service.com/api'
 
     it('should can instantiate the SafeApiKit with a custom endpoint', async () => {
-      ;({ safeApiKit } = await getServiceClient(
-        '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676',
-        txServiceUrl
-      ))
+      const apiKit = getApiKit(txServiceUrl)
 
-      await chai.expect(safeApiKit.getServiceInfo()).to.be.fulfilled
+      await chai.expect(apiKit.getServiceInfo()).to.be.fulfilled
 
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceUrl}/v1/about`,

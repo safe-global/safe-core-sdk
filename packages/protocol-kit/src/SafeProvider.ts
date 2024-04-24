@@ -28,40 +28,45 @@ import {
 import {
   SafeProviderTransaction,
   GetContractProps,
-  SafeProviderConfig
+  SafeProviderConfig,
+  Eip1193Provider,
+  HttpTransport,
+  SocketTransport
 } from '@safe-global/protocol-kit/types'
 
 class SafeProvider {
-  #provider: BrowserProvider | JsonRpcProvider
-  #signer?: string
+  #externalProvider: BrowserProvider | JsonRpcProvider
+  signer?: string
+  provider: Eip1193Provider | HttpTransport | SocketTransport
 
   constructor({ provider, signer }: SafeProviderConfig) {
     if (typeof provider === 'string') {
-      this.#provider = new JsonRpcProvider(provider)
+      this.#externalProvider = new JsonRpcProvider(provider)
     } else {
-      this.#provider = new BrowserProvider(provider)
+      this.#externalProvider = new BrowserProvider(provider)
     }
 
-    this.#signer = signer
+    this.provider = provider
+    this.signer = signer
   }
 
-  getProvider(): Provider {
-    return this.#provider
+  getExternalProvider(): Provider {
+    return this.#externalProvider
   }
 
-  async getSigner(): Promise<AbstractSigner | undefined> {
+  async getExternalSigner(): Promise<AbstractSigner | undefined> {
     // If the signer is not an Ethereum address, it should be a private key
-    if (this.#signer && !ethers.isAddress(this.#signer)) {
-      const privateKeySigner = new ethers.Wallet(this.#signer, this.#provider)
+    if (this.signer && !ethers.isAddress(this.signer)) {
+      const privateKeySigner = new ethers.Wallet(this.signer, this.#externalProvider)
       return privateKeySigner
     }
 
-    if (this.#signer) {
-      return this.#provider.getSigner(this.#signer)
+    if (this.signer) {
+      return this.#externalProvider.getSigner(this.signer)
     }
 
-    if (this.#provider instanceof BrowserProvider) {
-      return this.#provider.getSigner()
+    if (this.#externalProvider instanceof BrowserProvider) {
+      return this.#externalProvider.getSigner()
     }
 
     return undefined
@@ -77,15 +82,15 @@ class SafeProvider {
   }
 
   async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
-    return this.#provider.getBalance(address, blockTag)
+    return this.#externalProvider.getBalance(address, blockTag)
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {
-    return this.#provider.getTransactionCount(address, blockTag)
+    return this.#externalProvider.getTransactionCount(address, blockTag)
   }
 
   async getChainId(): Promise<bigint> {
-    return (await this.#provider.getNetwork()).chainId
+    return (await this.#externalProvider.getNetwork()).chainId
   }
 
   getChecksummedAddress(address: string): string {
@@ -112,7 +117,7 @@ class SafeProvider {
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const signerOrProvider = (await this.getSigner()) || this.#provider
+    const signerOrProvider = (await this.getExternalSigner()) || this.#externalProvider
     return getSafeProxyFactoryContractInstance(
       safeVersion,
       this,
@@ -196,32 +201,32 @@ class SafeProvider {
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
-    return this.#provider.getCode(address, blockTag)
+    return this.#externalProvider.getCode(address, blockTag)
   }
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
-    const contractCode = await this.#provider.getCode(address, blockTag)
+    const contractCode = await this.#externalProvider.getCode(address, blockTag)
     return contractCode !== '0x'
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {
-    const content = await this.#provider.getStorage(address, position)
+    const content = await this.#externalProvider.getStorage(address, position)
     const decodedContent = this.decodeParameters(['address'], content)
     return decodedContent[0]
   }
 
   async getTransaction(transactionHash: string): Promise<TransactionResponse> {
-    return this.#provider.getTransaction(transactionHash) as Promise<TransactionResponse>
+    return this.#externalProvider.getTransaction(transactionHash) as Promise<TransactionResponse>
   }
 
   async getSignerAddress(): Promise<string | undefined> {
-    const signer = await this.getSigner()
+    const signer = await this.getExternalSigner()
 
     return signer?.getAddress()
   }
 
   async signMessage(message: string): Promise<string> {
-    const signer = await this.getSigner()
+    const signer = await this.getExternalSigner()
 
     if (!signer) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
@@ -232,7 +237,7 @@ class SafeProvider {
   }
 
   async signTypedData(safeEIP712Args: SafeEIP712Args): Promise<string> {
-    const signer = await this.getSigner()
+    const signer = await this.getExternalSigner()
 
     if (!signer) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
@@ -254,11 +259,11 @@ class SafeProvider {
   }
 
   async estimateGas(transaction: SafeProviderTransaction): Promise<string> {
-    return (await this.#provider.estimateGas(transaction)).toString()
+    return (await this.#externalProvider.estimateGas(transaction)).toString()
   }
 
   call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
-    return this.#provider.call({ ...transaction, blockTag })
+    return this.#externalProvider.call({ ...transaction, blockTag })
   }
 
   // TODO: fix anys

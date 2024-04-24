@@ -81,7 +81,7 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
     this.contract = new Contract(
       this.contractAddress,
       this.contractAbi,
-      this.runner || (await this.safeProvider.getSigner())
+      this.runner || (await this.safeProvider.getExternalSigner())
     )
   }
 

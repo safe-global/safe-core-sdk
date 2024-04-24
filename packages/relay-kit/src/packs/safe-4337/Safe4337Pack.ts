@@ -581,7 +581,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    */
   async #signTypedData(safeUserOperation: SafeUserOperation): Promise<SafeSignature> {
     const safeProvider = this.protocolKit.getSafeProvider()
-    const signer = (await safeProvider.getSigner()) as ethers.Signer
+    const signer = (await safeProvider.getExternalSigner()) as ethers.Signer
     const chainId = await safeProvider.getChainId()
     const signerAddress = await signer.getAddress()
     const signature = await signer.signTypedData(

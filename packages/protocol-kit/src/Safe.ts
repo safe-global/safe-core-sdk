@@ -31,15 +31,12 @@ import {
   AddOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
-  Eip1193Provider,
-  HttpTransport,
   PredictedSafeProps,
   RemoveOwnerTxParams,
   SafeConfig,
   SafeConfigProps,
   SigningMethod,
   SigningMethodType,
-  SocketTransport,
   SwapOwnerTxParams
 } from './types'
 import {
@@ -80,7 +77,6 @@ const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
-  #provider!: Eip1193Provider | HttpTransport | SocketTransport
   #safeProvider!: SafeProvider
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
@@ -117,7 +113,6 @@ class Safe {
   private async init(config: SafeConfig): Promise<void> {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    this.#provider = provider
     this.#safeProvider = new SafeProvider({
       provider,
       signer
@@ -126,7 +121,7 @@ class Safe {
       this.#predictedSafe = config.predictedSafe
       this.#contractManager = await ContractManager.create(
         {
-          provider: this.#provider,
+          provider,
           predictedSafe: this.#predictedSafe,
           isL1SafeSingleton,
           contractNetworks
@@ -136,7 +131,7 @@ class Safe {
     } else {
       this.#contractManager = await ContractManager.create(
         {
-          provider: this.#provider,
+          provider,
           safeAddress: config.safeAddress,
           isL1SafeSingleton,
           contractNetworks
@@ -166,7 +161,7 @@ class Safe {
     const { provider, signer, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } =
       config
     const configProps: SafeConfigProps = {
-      provider: provider || this.#provider,
+      provider: provider || this.#safeProvider.provider,
       signer,
       isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
@@ -490,7 +485,7 @@ class Safe {
       return new EthSafeTransaction(
         await standardizeSafeTransactionData({
           predictedSafe: this.#predictedSafe,
-          provider: this.#provider,
+          provider: this.#safeProvider.provider,
           tx: newTransaction,
           contractNetworks: this.#contractManager.contractNetworks
         })
@@ -503,7 +498,7 @@ class Safe {
     return new EthSafeTransaction(
       await standardizeSafeTransactionData({
         safeContract: this.#contractManager.safeContract,
-        provider: this.#provider,
+        provider: this.#safeProvider.provider,
         tx: newTransaction,
         contractNetworks: this.#contractManager.contractNetworks
       })
@@ -689,7 +684,7 @@ class Safe {
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
-      chainId: await this.getSafeProvider().getChainId(),
+      chainId: await this.#safeProvider.getChainId(),
       data: eip712Data.data
     }
 

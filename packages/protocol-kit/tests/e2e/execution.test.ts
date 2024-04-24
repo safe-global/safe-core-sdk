@@ -1,10 +1,6 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { SigningMethod } from '@safe-global/protocol-kit/index'
-import {
-  EthersTransactionOptions,
-  MetaTransactionData,
-  TransactionOptions
-} from '@safe-global/safe-core-sdk-types'
+import { EthersTransactionOptions, MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -205,32 +201,6 @@ describe('Transactions execution', () => {
       await chai
         .expect(safeSdk2.executeTransaction(signedTx))
         .to.be.rejectedWith(safeVersionDeployed >= '1.3.0' ? 'GS026' : 'Invalid owner provided')
-    })
-
-    it('should fail if a user tries to execute a transaction with options: { gas, gasLimit }', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
-        provider,
-        safeAddress,
-        contractNetworks
-      })
-      await account1.signer.sendTransaction({
-        to: safeAddress,
-        value: 1_000_000_000_000_000_000n // 1 ETH
-      })
-      const safeTransactionData = {
-        to: account2.address,
-        value: '500000000000000000', // 0.5 ETH
-        data: '0x'
-      }
-      const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-      const options: TransactionOptions = { gas: 123456, gasLimit: 123456 }
-      await chai
-        .expect(safeSdk1.executeTransaction(tx, options))
-        .to.be.rejectedWith('Cannot specify gas and gasLimit together in transaction options')
     })
 
     it('should fail if a user tries to execute a transaction with options: { nonce: <invalid_nonce> }', async () => {

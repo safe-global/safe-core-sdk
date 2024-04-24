@@ -104,7 +104,6 @@ type SafeConfigWithPredictedSafeProps = {
 }
 
 export type SafeConfigProps = {
-  /** provider - Compatible EIP-1193 provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
   signer?: string
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
@@ -132,7 +131,6 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 }
 
 type ConnectSafeConfigProps = {
-  /** provider - Compatible EIP-1193 provider */
   provider?: Eip1193Provider | HttpTransport | SocketTransport
   signer?: string
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
@@ -194,7 +192,6 @@ type StandardizeSafeTxDataWithPredictedSafeProps = {
 }
 
 interface StandardizeSafeTransactionData {
-  /** provider - Compatible EIP-1193 provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
   signer?: string
   /** tx - Safe transaction */
@@ -222,104 +219,50 @@ export enum SigningMethod {
 export type SigningMethodType = SigningMethod | string
 
 // Safe contract implementation types
-
-export type SafeContract_v1_0_0_ImplementationType = SafeContract_v1_0_0
-
-export type SafeContract_v1_1_0_ImplementationType = SafeContract_v1_1_1
-
-export type SafeContract_v1_2_0_ImplementationType = SafeContract_v1_2_0
-
-export type SafeContract_v1_3_0_ImplementationType = SafeContract_v1_3_0
-
-export type SafeContract_v1_4_1_ImplementationType = SafeContract_v1_4_1
-
 export type SafeContractImplementationType =
-  | SafeContract_v1_0_0_ImplementationType
-  | SafeContract_v1_1_0_ImplementationType
-  | SafeContract_v1_2_0_ImplementationType
-  | SafeContract_v1_3_0_ImplementationType
-  | SafeContract_v1_4_1_ImplementationType
+  | SafeContract_v1_0_0
+  | SafeContract_v1_1_1
+  | SafeContract_v1_2_0
+  | SafeContract_v1_3_0
+  | SafeContract_v1_4_1
 
 // MultiSend contract implementation types
-
-export type MultiSendContract_v1_1_1_ImplementationType = MultiSendContract_v1_1_1
-
-export type MultiSendContract_v1_3_0_ImplementationType = MultiSendContract_v1_3_0
-
-export type MultiSendContract_v1_4_1_ImplementationType = MultiSendContract_v1_4_1
-
 export type MultiSendContractImplementationType =
-  | MultiSendContract_v1_1_1_ImplementationType
-  | MultiSendContract_v1_3_0_ImplementationType
-  | MultiSendContract_v1_4_1_ImplementationType
+  | MultiSendContract_v1_1_1
+  | MultiSendContract_v1_3_0
+  | MultiSendContract_v1_4_1
 
 // MultiSendCallOnly contract implementation types
-
-export type MultiSendCallOnlyContract_v1_3_0_ImplementationType = MultiSendCallOnlyContract_v1_3_0
-
-export type MultiSendCallOnlyContract_v1_4_1_ImplementationType = MultiSendCallOnlyContract_v1_4_1
-
 export type MultiSendCallOnlyContractImplementationType =
-  | MultiSendCallOnlyContract_v1_3_0_ImplementationType
-  | MultiSendCallOnlyContract_v1_4_1_ImplementationType
+  | MultiSendCallOnlyContract_v1_3_0
+  | MultiSendCallOnlyContract_v1_4_1
 
 // CompatibilityFallbackHandler contract implementation types
-
-export type CompatibilityFallbackHandlerContract_v1_3_0_ImplementationType =
-  CompatibilityFallbackHandlerContract_v1_3_0
-
-export type CompatibilityFallbackHandlerContract_v1_4_1_ImplementationType =
-  CompatibilityFallbackHandlerContract_v1_4_1
-
 export type CompatibilityFallbackHandlerContractImplementationType =
-  | CompatibilityFallbackHandlerContract_v1_3_0_ImplementationType
-  | CompatibilityFallbackHandlerContract_v1_4_1_ImplementationType
+  | CompatibilityFallbackHandlerContract_v1_3_0
+  | CompatibilityFallbackHandlerContract_v1_4_1
 
 // SafeProxyFactory contract implementation types
-
-export type SafeProxyFactoryContract_v1_0_0_ImplementationType = SafeProxyFactoryContract_v1_0_0
-
-export type SafeProxyFactoryContract_v1_1_1_ImplementationType = SafeProxyFactoryContract_v1_1_1
-
-export type SafeProxyFactoryContract_v1_3_0_ImplementationType = SafeProxyFactoryContract_v1_3_0
-
-export type SafeProxyFactoryContract_v1_4_1_ImplementationType = SafeProxyFactoryContract_v1_4_1
-
 export type SafeProxyFactoryContractImplementationType =
-  | SafeProxyFactoryContract_v1_0_0_ImplementationType
-  | SafeProxyFactoryContract_v1_1_1_ImplementationType
-  | SafeProxyFactoryContract_v1_3_0_ImplementationType
-  | SafeProxyFactoryContract_v1_4_1_ImplementationType
+  | SafeProxyFactoryContract_v1_0_0
+  | SafeProxyFactoryContract_v1_1_1
+  | SafeProxyFactoryContract_v1_3_0
+  | SafeProxyFactoryContract_v1_4_1
 
 // SignMessageLib contract implementation types
-
-export type SignMessageLibContract_v1_3_0_ImplementationType = SignMessageLibContract_v1_3_0
-
-export type SignMessageLibContract_v1_4_1_ImplementationType = SignMessageLibContract_v1_4_1
-
 export type SignMessageLibContractImplementationType =
-  | SignMessageLibContract_v1_3_0_ImplementationType
-  | SignMessageLibContract_v1_4_1_ImplementationType
+  | SignMessageLibContract_v1_3_0
+  | SignMessageLibContract_v1_4_1
 
 // SimulateTxAccessor contract implementation types
-
-export type SimulateTxAccessorContract_v1_3_0_ImplementationType = SimulateTxAccessorContract_v1_3_0
-
-export type SimulateTxAccessorContract_v1_4_1_ImplementationType = SimulateTxAccessorContract_v1_4_1
-
 export type SimulateTxAccessorContractImplementationType =
-  | SimulateTxAccessorContract_v1_3_0_ImplementationType
-  | SimulateTxAccessorContract_v1_4_1_ImplementationType
+  | SimulateTxAccessorContract_v1_3_0
+  | SimulateTxAccessorContract_v1_4_1
 
 // CreateCall contract implementation types
-
-export type CreateCallContract_v1_3_0_ImplementationType = CreateCallContract_v1_3_0
-
-export type CreateCallContract_v1_4_1_ImplementationType = CreateCallContract_v1_4_1
-
 export type CreateCallContractImplementationType =
-  | CreateCallContract_v1_3_0_ImplementationType
-  | CreateCallContract_v1_4_1_ImplementationType
+  | CreateCallContract_v1_3_0
+  | CreateCallContract_v1_4_1
 
 export type RequestArguments = {
   readonly method: string

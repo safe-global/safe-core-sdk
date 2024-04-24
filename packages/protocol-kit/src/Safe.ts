@@ -813,9 +813,7 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
-    if (options?.gas && options?.gasLimit) {
-      throw new Error('Cannot specify gas and gasLimit together in transaction options')
-    }
+
     // TODO: fix this
     return this.#contractManager.safeContract.approveHash(hash, {
       from: signerAddress,
@@ -1235,9 +1233,6 @@ class Safe {
       }
     }
 
-    if (options?.gas && options?.gasLimit) {
-      throw new Error('Cannot specify gas and gasLimit together in transaction options')
-    }
     const txResponse = await this.#contractManager.safeContract.execTransaction(
       signedSafeTransaction,
       {

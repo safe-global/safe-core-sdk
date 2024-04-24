@@ -176,10 +176,6 @@ class SafeFactory {
       customContracts
     })
 
-    if (options?.gas && options?.gasLimit) {
-      throw new Error('Cannot specify gas and gasLimit together in transaction options')
-    }
-
     const safeAddress = await this.#safeProxyFactoryContract.createProxyWithOptions({
       safeSingletonAddress: await this.#safeContract.getAddress(),
       initializer,

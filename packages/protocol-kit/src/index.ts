@@ -1,8 +1,7 @@
 import Safe from './Safe'
+import SafeProvider from './SafeProvider'
 import {
   CreateCallBaseContract,
-  SafeProvider,
-  SafeProviderConfig,
   MultiSendBaseContract,
   MultiSendCallOnlyBaseContract,
   SafeBaseContract,
@@ -72,8 +71,6 @@ export {
   DEFAULT_SAFE_VERSION,
   DeploySafeProps,
   EthSafeSignature,
-  SafeProvider,
-  SafeProviderConfig,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
@@ -109,7 +106,8 @@ export {
   getEip712TxTypes,
   getEip712MessageTypes,
   hashSafeMessage,
-  generateTypedData
+  generateTypedData,
+  SafeProvider
 }
 
 export * from './types'

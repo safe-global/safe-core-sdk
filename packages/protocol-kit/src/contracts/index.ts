@@ -1,5 +1,3 @@
-import SafeProvider from '../SafeProvider'
-import { SafeProviderConfig } from '../types'
 import CreateCallBaseContract from './CreateCall/CreateCallBaseContract'
 import MultiSendBaseContract from './MultiSend/MultiSendBaseContract'
 import MultiSendCallOnlyBaseContract from './MultiSend/MultiSendCallOnlyBaseContract'
@@ -9,8 +7,6 @@ import SignMessageLibBaseContract from './SignMessageLib/SignMessageLibBaseContr
 
 export {
   CreateCallBaseContract,
-  SafeProvider,
-  SafeProviderConfig,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   SafeBaseContract,

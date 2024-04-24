@@ -1,4 +1,5 @@
 import { ethers, Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
@@ -14,7 +15,6 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
-import { SafeProvider } from '../..'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial

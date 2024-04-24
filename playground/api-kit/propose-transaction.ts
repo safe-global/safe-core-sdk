@@ -20,42 +20,44 @@ const config: Config = {
 
 async function main() {
   // Create Safe instance
-  const safe = await Safe.create({
+  const protocolKit = await Safe.create({
     provider: config.RPC_URL,
     signer: config.SIGNER_ADDRESS_PRIVATE_KEY,
     safeAddress: config.SAFE_ADDRESS
   })
 
   // Create Safe API Kit instance
-  const service = new SafeApiKit({
+  const apiKit = new SafeApiKit({
     chainId: config.CHAIN_ID
   })
 
   // Create transaction
   const safeTransactionData: SafeTransactionDataPartial = {
-    to: '0x',
+    to: config.SAFE_ADDRESS,
     value: '1', // 1 wei
     data: '0x',
     operation: OperationType.Call
   }
-  const safeTransaction = await safe.createTransaction({ transactions: [safeTransactionData] })
+  const safeTransaction = await protocolKit.createTransaction({
+    transactions: [safeTransactionData]
+  })
 
-  const senderAddress = (await safe.getSafeProvider().getSignerAddress()) || '0x'
-  const safeTxHash = await safe.getTransactionHash(safeTransaction)
-  const signature = await safe.signHash(safeTxHash)
+  const signerAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
+  const safeTxHash = await protocolKit.getTransactionHash(safeTransaction)
+  const signature = await protocolKit.signHash(safeTxHash)
 
   // Propose transaction to the service
-  await service.proposeTransaction({
+  await apiKit.proposeTransaction({
     safeAddress: config.SAFE_ADDRESS,
     safeTransactionData: safeTransaction.data,
     safeTxHash,
-    senderAddress,
+    senderAddress: signerAddress,
     senderSignature: signature.data
   })
 
   console.log('Proposed a transaction with Safe:', config.SAFE_ADDRESS)
   console.log('- safeTxHash:', safeTxHash)
-  console.log('- Sender:', senderAddress)
+  console.log('- Sender:', signerAddress)
   console.log('- Sender signature:', signature.data)
 }
 

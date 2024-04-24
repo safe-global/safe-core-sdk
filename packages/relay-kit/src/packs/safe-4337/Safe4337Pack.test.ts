@@ -194,7 +194,7 @@ describe('Safe4337Pack', () => {
       expect(encodeFunctionDataSpy).toHaveBeenCalledWith('enableModules', [[safe4337ModuleAddress]])
       expect(safeCreateSpy).toHaveBeenCalledWith({
         provider: safe4337Pack.protocolKit.getSafeProvider().provider,
-        signer: await safe4337Pack.protocolKit.getSafeProvider().signer,
+        signer: safe4337Pack.protocolKit.getSafeProvider().signer,
         predictedSafe: {
           safeDeploymentConfig: {
             safeVersion: constants.DEFAULT_SAFE_VERSION,
@@ -261,7 +261,7 @@ describe('Safe4337Pack', () => {
       expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(4, 'multiSend', [multiSendData])
       expect(safeCreateSpy).toHaveBeenCalledWith({
         provider: safe4337Pack.protocolKit.getSafeProvider().provider,
-        signer: await safe4337Pack.protocolKit.getSafeProvider().signer,
+        signer: safe4337Pack.protocolKit.getSafeProvider().signer,
         predictedSafe: {
           safeDeploymentConfig: {
             safeVersion: constants.DEFAULT_SAFE_VERSION,

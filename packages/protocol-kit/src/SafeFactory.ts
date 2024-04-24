@@ -34,7 +34,6 @@ export interface DeploySafeProps {
 }
 
 export interface SafeFactoryConfig {
-  /** provider - Ethereum EIP-1193 compatible provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
   signer?: HexAddress | PrivateKey
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
@@ -46,7 +45,6 @@ export interface SafeFactoryConfig {
 }
 
 interface SafeFactoryInitConfig {
-  /** provider - Ethereum EIP-1193 compatible provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
   signer?: HexAddress | PrivateKey
   privateKeyOrMnemonic?: string
@@ -95,7 +93,7 @@ class SafeFactory {
   }: SafeFactoryInitConfig): Promise<void> {
     this.#provider = provider
     this.#signer = signer
-    this.#safeProvider = new SafeProvider({ provider })
+    this.#safeProvider = new SafeProvider({ provider, signer })
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks

@@ -428,7 +428,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const owners = await this.protocolKit.getOwners()
     const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
     if (!signerAddress) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('There is no signer address available to sign the SafeOperation')
     }
 
     const addressIsOwner = owners.some(

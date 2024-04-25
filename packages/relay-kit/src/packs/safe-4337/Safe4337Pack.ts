@@ -572,9 +572,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   /**
    * Signs typed data.
-   *  This is currently only EthersAdapter compatible (Reflected in the init() props). If I want to make it compatible with any EthAdapter I need to either:
-   *   - Add a SafeOp type to the protocol-kit (createSafeOperation, signSafeOperation, etc)
-   *   - Allow to pass the data types (SafeOp, SafeMessage, SafeTx) to the signTypedData method and refactor the protocol-kit to allow any kind of data signing from outside (Currently only SafeTx and SafeMessage)
    *
    * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.
    * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.

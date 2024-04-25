@@ -62,11 +62,11 @@ async function main() {
 
   // Fake on-ramp to fund the Safe
 
-  const provider = safeAccountAbstraction.protocolKit.getSafeProvider().getProvider()
-  const safeBalance = await provider.getBalance(predictedSafeAddress)
+  const ethersProvider = safeAccountAbstraction.protocolKit.getSafeProvider().getExternalProvider()
+  const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
   console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
   if (safeBalance < BigInt(txConfig.VALUE)) {
-    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
+    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, ethersProvider)
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,
       value: txConfig.VALUE
@@ -74,7 +74,7 @@ async function main() {
     console.log(`Funding the Safe with ${ethers.formatEther(txConfig.VALUE.toString())} ETH`)
     await onRampResponse.wait()
 
-    const safeBalanceAfter = await provider.getBalance(predictedSafeAddress)
+    const safeBalanceAfter = await ethersProvider.getBalance(predictedSafeAddress)
     console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
   }
 

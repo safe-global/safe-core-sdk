@@ -56,20 +56,20 @@ async function main() {
   const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
-  const provider = safeAccountAbstraction.protocolKit.getSafeProvider().getProvider()
+  const ethersProvider = safeAccountAbstraction.protocolKit.getSafeProvider().getExternalProvider()
 
   // Fake on-ramp to transfer enough funds to the Safe address
 
-  const chainId = (await provider.getNetwork()).chainId
+  const chainId = (await ethersProvider.getNetwork()).chainId
   const relayFee = BigInt(
     await relayPack.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
   )
-  const safeBalance = await provider.getBalance(predictedSafeAddress)
+  const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
   console.log({ minSafeBalance: ethers.formatEther(relayFee.toString()) })
   console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
 
   if (safeBalance < relayFee) {
-    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
+    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, ethersProvider)
     const fundingAmount = safeBalance < relayFee ? relayFee - safeBalance : safeBalance - relayFee
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,
@@ -78,7 +78,7 @@ async function main() {
     console.log(`Funding the Safe with ${ethers.formatEther(fundingAmount.toString())} ETH`)
     await onRampResponse.wait()
 
-    const safeBalanceAfter = await provider.getBalance(predictedSafeAddress)
+    const safeBalanceAfter = await ethersProvider.getBalance(predictedSafeAddress)
     console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
   }
 

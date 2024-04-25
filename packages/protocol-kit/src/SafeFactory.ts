@@ -13,48 +13,17 @@ import {
 } from '@safe-global/protocol-kit/contracts/utils'
 import {
   ContractNetworksConfig,
-  HexAddress,
-  HttpTransport,
-  PrivateKey,
   SafeAccountConfig,
   SafeContractImplementationType,
   SafeDeploymentConfig,
   SafeProxyFactoryContractImplementationType,
-  SocketTransport,
-  Eip1193Provider
+  SafeProviderConfig,
+  SafeFactoryConfig,
+  SafeFactoryInitConfig,
+  DeploySafeProps
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-
-export interface DeploySafeProps {
-  safeAccountConfig: SafeAccountConfig
-  saltNonce?: string
-  options?: TransactionOptions
-  callback?: (txHash: string) => void
-}
-
-export interface SafeFactoryConfig {
-  provider: Eip1193Provider | HttpTransport | SocketTransport
-  signer?: HexAddress | PrivateKey
-  /** safeVersion - Versions of the Safe deployed by this Factory contract */
-  safeVersion?: SafeVersion
-  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeSingleton?: boolean
-  /** contractNetworks - Contract network configuration */
-  contractNetworks?: ContractNetworksConfig
-}
-
-interface SafeFactoryInitConfig {
-  provider: Eip1193Provider | HttpTransport | SocketTransport
-  signer?: HexAddress | PrivateKey
-  privateKeyOrMnemonic?: string
-  /** safeVersion - Versions of the Safe deployed by this Factory contract */
-  safeVersion: SafeVersion
-  /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
-  isL1SafeSingleton?: boolean
-  /** contractNetworks - Contract network configuration */
-  contractNetworks?: ContractNetworksConfig
-}
 
 class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
@@ -62,8 +31,8 @@ class SafeFactory {
   #safeVersion!: SafeVersion
   #safeProxyFactoryContract!: SafeProxyFactoryContractImplementationType
   #safeContract!: SafeContractImplementationType
-  #provider!: Eip1193Provider | HttpTransport | SocketTransport
-  #signer?: HexAddress | PrivateKey
+  #provider!: SafeProviderConfig['provider']
+  #signer?: SafeFactoryConfig['signer']
   #safeProvider!: SafeProvider
 
   static async create({

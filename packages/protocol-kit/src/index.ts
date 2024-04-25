@@ -26,7 +26,7 @@ import {
   getPredictedSafeAddressInitCode
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
-import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './SafeFactory'
+import SafeFactory from './SafeFactory'
 import {
   EthSafeSignature,
   estimateTxBaseGas,
@@ -69,14 +69,12 @@ export {
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
   DEFAULT_SAFE_VERSION,
-  DeploySafeProps,
   EthSafeSignature,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
   SafeBaseContract,
   SafeFactory,
-  SafeFactoryConfig,
   SafeProxyFactoryBaseContract,
   SafeTransactionOptionalProps,
   SignMessageLibBaseContract,

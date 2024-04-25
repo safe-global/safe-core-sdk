@@ -1,6 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
 import { hashSafeMessage } from '@safe-global/protocol-kit'
-import { ethers, JsonRpcProvider } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK
 

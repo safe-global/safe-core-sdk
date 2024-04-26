@@ -1,4 +1,4 @@
-name: Protocol Kit E2E Testing
+name: Protocol Kit - E2E Tests
 on:
   pull_request:
   push:

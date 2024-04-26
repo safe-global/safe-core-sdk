@@ -1,4 +1,4 @@
-name: Kits Unit Testing
+name: SDK - Unit Tests
 on:
   pull_request:
   push:

@@ -1,4 +1,4 @@
-name: Api Kit E2E Testing
+name: API Kit - E2E Tests
 on:
   pull_request:
   push:

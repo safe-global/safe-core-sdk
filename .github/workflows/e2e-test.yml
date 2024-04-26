@@ -22,5 +22,5 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
-          cd packages/protocol-kit
+          cd packages/api-kit
           yarn test:ci:${{ matrix.provider }}

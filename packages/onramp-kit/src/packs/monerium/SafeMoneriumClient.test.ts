@@ -268,7 +268,7 @@ describe('SafeMoneriumClient', () => {
   it('should map the protocol kit chainId to the Monerium Chain types', async () => {
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(1n)
     expect(await safeMoneriumClient.getChain()).toBe('ethereum')
-    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(5n)
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(11155111n)
     expect(await safeMoneriumClient.getChain()).toBe('ethereum')
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(100n)
     expect(await safeMoneriumClient.getChain()).toBe('gnosis')
@@ -285,8 +285,8 @@ describe('SafeMoneriumClient', () => {
   it('should map the protocol kit chainId to the Monerium Network types', async () => {
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(1n)
     expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
-    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(5n)
-    expect(await safeMoneriumClient.getNetwork()).toBe('goerli')
+    protocolKit.getChainId = jest.fn().mockResolvedValueOnce(11155111n)
+    expect(await safeMoneriumClient.getNetwork()).toBe('sepolia')
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(100n)
     expect(await safeMoneriumClient.getNetwork()).toBe('mainnet')
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(10200n)

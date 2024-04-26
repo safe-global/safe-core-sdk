@@ -107,7 +107,7 @@ export type ContractFunction<
  * @template ContractAbi - The ABI of the contract.
  * @template ContractFunctionName - The function name, derived from the ABI.
  */
-export type AdapterSpecificContractFunction<
+export type SafeContractFunction<
   ContractAbi extends Abi,
   ContractFunctionName extends
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>

@@ -3,7 +3,7 @@ import SignMessageLibBaseContract from '@safe-global/protocol-kit/contracts/Sign
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeVersion,
-  AdapterSpecificContractFunction,
+  SafeContractFunction,
   SignMessageLibContract_v1_3_0_Abi,
   SignMessageLibContract_v1_3_0_Contract,
   SignMessageLibContract_v1_3_0_Function,
@@ -55,16 +55,18 @@ class SignMessageLibContract_v1_3_0
   /**
    * @param args - Array[data]
    */
-  signMessage: AdapterSpecificContractFunction<SignMessageLibContract_v1_3_0_Abi, 'signMessage'> =
-    async (data, options) => {
-      if (options && !options.gasLimit) {
-        options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
-      }
-
-      const txResponse = await this.contract.signMessage(data, { ...options })
-
-      return toTxResult(txResponse, options)
+  signMessage: SafeContractFunction<SignMessageLibContract_v1_3_0_Abi, 'signMessage'> = async (
+    data,
+    options
+  ) => {
+    if (options && !options.gasLimit) {
+      options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
+
+    const txResponse = await this.contract.signMessage(data, { ...options })
+
+    return toTxResult(txResponse, options)
+  }
 }
 
 export default SignMessageLibContract_v1_3_0

@@ -5,7 +5,7 @@ import {
   CreateCallContract_v1_4_1_Abi,
   CreateCallContract_v1_4_1_Contract,
   createCall_1_4_1_ContractArtifacts,
-  AdapterSpecificContractFunction
+  SafeContractFunction
 } from '@safe-global/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 
@@ -50,30 +50,34 @@ class CreateCallContract_v1_4_1
    * @param options - TransactionOptions
    * @returns Promise<TransactionResult>
    */
-  performCreate: AdapterSpecificContractFunction<CreateCallContract_v1_4_1_Abi, 'performCreate'> =
-    async (args, options) => {
-      if (options && !options.gasLimit) {
-        options.gasLimit = (await this.estimateGas('performCreate', args, options)).toString()
-      }
-      const txResponse = await this.contract.performCreate(...args, options)
-      return toTxResult(txResponse, options)
+  performCreate: SafeContractFunction<CreateCallContract_v1_4_1_Abi, 'performCreate'> = async (
+    args,
+    options
+  ) => {
+    if (options && !options.gasLimit) {
+      options.gasLimit = (await this.estimateGas('performCreate', args, options)).toString()
     }
+    const txResponse = await this.contract.performCreate(...args, options)
+    return toTxResult(txResponse, options)
+  }
 
   /**
    * @param args - Array[value, deploymentData, salt]
    * @param options - TransactionOptions
    * @returns Promise<TransactionResult>
    */
-  performCreate2: AdapterSpecificContractFunction<CreateCallContract_v1_4_1_Abi, 'performCreate2'> =
-    async (args, options) => {
-      if (options && !options.gasLimit) {
-        options.gasLimit = (
-          await this.estimateGas('performCreate2', [...args], { ...options })
-        ).toString()
-      }
-      const txResponse = await this.contract.performCreate2(...args)
-      return toTxResult(txResponse, options)
+  performCreate2: SafeContractFunction<CreateCallContract_v1_4_1_Abi, 'performCreate2'> = async (
+    args,
+    options
+  ) => {
+    if (options && !options.gasLimit) {
+      options.gasLimit = (
+        await this.estimateGas('performCreate2', [...args], { ...options })
+      ).toString()
     }
+    const txResponse = await this.contract.performCreate2(...args)
+    return toTxResult(txResponse, options)
+  }
 }
 
 export default CreateCallContract_v1_4_1

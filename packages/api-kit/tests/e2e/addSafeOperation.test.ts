@@ -22,6 +22,7 @@ const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f'
 const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}`
+const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit
 let ethAdapter: EthAdapter
@@ -38,7 +39,11 @@ describe('addSafeOperation', () => {
   }
 
   before(async () => {
-    ;({ safeApiKit, ethAdapter, signer } = await getServiceClient(SIGNER_PK, undefined, RPC_URL))
+    ;({ safeApiKit, ethAdapter, signer } = await getServiceClient(
+      SIGNER_PK,
+      TX_SERVICE_URL,
+      RPC_URL
+    ))
 
     const ethersAdapter = new EthersAdapter({
       ethers,

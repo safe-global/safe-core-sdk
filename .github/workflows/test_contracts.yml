@@ -1,4 +1,4 @@
-name: Safe Core SDK Test - Contracts
+name: Protocol Kit E2E Testing
 on:
   pull_request:
   push:

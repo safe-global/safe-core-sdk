@@ -1,4 +1,4 @@
-name: Monorepo Test
+name: Kits Unit Testing
 on:
   pull_request:
   push:

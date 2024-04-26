@@ -1,4 +1,4 @@
-name: e2e Test
+name: Api Kit E2E Testing
 on:
   pull_request:
   push:
@@ -22,4 +22,5 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
+          cd packages/protocol-kit
           yarn test:ci:${{ matrix.provider }}

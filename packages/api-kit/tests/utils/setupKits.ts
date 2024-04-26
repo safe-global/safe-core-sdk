@@ -1,6 +1,9 @@
+import hre, { ethers } from 'hardhat'
+import Web3 from 'web3'
+import { custom, createWalletClient } from 'viem'
+
 import Safe, { SafeProviderConfig, Eip1193Provider } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
-import { ethers, web3 } from 'hardhat'
 
 import config from './config'
 
@@ -15,18 +18,30 @@ type GetKitsOptions = {
   safeAddress: string
 }
 
-function getEip1193Provider(): Eip1193Provider {
+export function getEip1193Provider(): Eip1193Provider {
   switch (process.env.ETH_LIB) {
+    case 'viem':
+      const client = createWalletClient({
+        transport: custom(hre.network.provider)
+      })
+
+      return { request: client.request } as Eip1193Provider
+
     case 'web3':
-      return web3.currentProvider as Eip1193Provider
+      const web3Provider = new Web3(hre.network.provider)
+
+      return web3Provider.currentProvider as Eip1193Provider
+
     case 'ethers':
+      const browserProvider = new ethers.BrowserProvider(hre.network.provider)
+
       return {
         request: async (request) => {
-          return ethers.provider.send(request.method, [...((request.params as unknown[]) ?? [])])
+          return browserProvider.send(request.method, [...((request.params as unknown[]) ?? [])])
         }
       }
     default:
-      throw new Error('Ethereum library not supported')
+      throw new Error('ETH_LIB not set')
   }
 }
 

@@ -1,8 +1,9 @@
 import hre, { ethers } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
-import { SafeProvider } from '@safe-global/protocol-kit/index'
 import { custom, createWalletClient } from 'viem'
+
+import { SafeProvider } from '@safe-global/protocol-kit/index'
 import { Eip1193Provider } from '@safe-global/protocol-kit/types'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'

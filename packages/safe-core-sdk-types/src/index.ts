@@ -7,7 +7,6 @@ export * from './contracts/SignMessageLib'
 export * from './contracts/SimulateTxAccessor'
 export * from './contracts/common/BaseContract'
 export * from './contracts/assets'
-export * from './ethereumLibs/ethers/types'
 export * from './types'
 
 // see docs: https://abitype.dev/config

@@ -6,7 +6,6 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   EncodeFunction,
   EstimateGasFunction,
-  EthersTransactionOptions,
   GetAddressFunction,
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
@@ -93,11 +92,7 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
     return this.contract.interface.encodeFunctionData(functionToEncode, args as ReadonlyArray<[]>)
   }
 
-  estimateGas: EstimateGasFunction<ContractAbiType, EthersTransactionOptions> = (
-    functionToEstimate,
-    args,
-    options = {}
-  ) => {
+  estimateGas: EstimateGasFunction<ContractAbiType> = (functionToEstimate, args, options = {}) => {
     const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
     return contractMethodToEstimate.estimateGas(...(args as ReadonlyArray<[]>), options)
   }

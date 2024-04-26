@@ -7,8 +7,7 @@ import {
   SignMessageLibContract_v1_4_1_Abi,
   SignMessageLibContract_v1_4_1_Contract,
   SignMessageLibContract_v1_4_1_Function,
-  signMessageLib_1_4_1_ContractArtifacts,
-  EthersTransactionOptions
+  signMessageLib_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -57,19 +56,16 @@ class SignMessageLibContract_v1_4_1
   /**
    * @param args - Array[data]
    */
-  signMessage: AdapterSpecificContractFunction<
-    SignMessageLibContract_v1_4_1_Abi,
-    'signMessage',
-    EthersTransactionOptions
-  > = async (data, options) => {
-    if (options && !options.gasLimit) {
-      options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
+  signMessage: AdapterSpecificContractFunction<SignMessageLibContract_v1_4_1_Abi, 'signMessage'> =
+    async (data, options) => {
+      if (options && !options.gasLimit) {
+        options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
+      }
+
+      const txResponse = await this.contract.signMessage(data, { ...options })
+
+      return toTxResult(txResponse, options)
     }
-
-    const txResponse = await this.contract.signMessage(data, { ...options })
-
-    return toTxResult(txResponse, options)
-  }
 }
 
 export default SignMessageLibContract_v1_4_1

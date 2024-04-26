@@ -376,6 +376,7 @@ describe('Transactions execution', () => {
 
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
+        await new Promise((resolve) => setTimeout(resolve, 500))
         const safeFinalBalance = await safeSdk1.getBalance()
         chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
       }

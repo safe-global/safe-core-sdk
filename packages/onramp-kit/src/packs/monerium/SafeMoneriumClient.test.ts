@@ -225,7 +225,7 @@ describe('SafeMoneriumClient', () => {
     jest.spyOn(protocolKitPackage, 'getSignMessageLibContract').mockResolvedValueOnce({
       safeVersion: '1.3.0',
       contractName: 'signMessageLibVersion',
-      contract: new Contract('target', []),
+      contract: new Contract('0x0000000000000000000000000000000000000001', []),
       safeProvider: protocolKit.getSafeProvider() as protocolKitPackage.SafeProvider,
       encode: jest.fn(),
       contractAbi: signMessageLib_1_4_1_ContractArtifacts.abi,

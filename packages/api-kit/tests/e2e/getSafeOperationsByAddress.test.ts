@@ -1,4 +1,4 @@
-import SafeApiKit from '@safe-global/api-kit/index'
+import SafeApiKit from '@safe-global/api-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getServiceClient } from '../utils/setupServiceClient'
@@ -7,12 +7,13 @@ chai.use(chaiAsPromised)
 
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // v1.4.1
 const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
+const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit
 
 describe('getSafeOperationsByAddress', () => {
   before(async () => {
-    ;({ safeApiKit } = await getServiceClient(SIGNER_PK))
+    ;({ safeApiKit } = await getServiceClient(SIGNER_PK, TX_SERVICE_URL))
   })
 
   describe('should fail', () => {

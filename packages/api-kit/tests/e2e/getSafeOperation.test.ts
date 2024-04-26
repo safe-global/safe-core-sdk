@@ -1,4 +1,4 @@
-import SafeApiKit from '@safe-global/api-kit/index'
+import SafeApiKit from '@safe-global/api-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getServiceClient } from '../utils/setupServiceClient'

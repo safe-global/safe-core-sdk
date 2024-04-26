@@ -7,8 +7,9 @@ import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 import { getSafe4337ModuleDeployment } from '@safe-global/safe-modules-deployments'
-import { EthersAdapter } from 'packages/protocol-kit/dist/src'
+import { EthersAdapter } from 'packages/protocol-kit'
 import { getServiceClient } from '../utils/setupServiceClient'
+import config from '../utils/config'
 
 dotenv.config()
 
@@ -18,7 +19,6 @@ chai.use(chaiAsPromised)
 
 const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/1 Safe (v1.4.1) with signer above as owner + 4337 module enabled
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f'
 const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}`
@@ -39,11 +39,7 @@ describe('addSafeOperation', () => {
   }
 
   before(async () => {
-    ;({ safeApiKit, ethAdapter, signer } = await getServiceClient(
-      SIGNER_PK,
-      TX_SERVICE_URL,
-      RPC_URL
-    ))
+    ;({ safeApiKit, ethAdapter, signer } = await getServiceClient(SIGNER_PK, TX_SERVICE_URL))
 
     const ethersAdapter = new EthersAdapter({
       ethers,
@@ -53,7 +49,7 @@ describe('addSafeOperation', () => {
     safe4337Pack = await Safe4337Pack.init({
       options: { safeAddress: SAFE_ADDRESS },
       ethersAdapter,
-      rpcUrl: RPC_URL,
+      rpcUrl: config.JSON_RPC,
       bundlerUrl: BUNDLER_URL,
       paymasterOptions: {
         paymasterTokenAddress: PAYMASTER_TOKEN_ADDRESS,

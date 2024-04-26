@@ -12,10 +12,9 @@ interface ServiceClientConfig {
 
 export async function getServiceClient(
   signerPk: string,
-  txServiceUrl?: string,
-  rpcUrl?: string
+  txServiceUrl?: string
 ): Promise<ServiceClientConfig> {
-  const provider = getDefaultProvider(rpcUrl || config.JSON_RPC)
+  const provider = getDefaultProvider(config.JSON_RPC)
   const signer = new Wallet(signerPk, provider)
   const ethAdapter = await getEthAdapter(signer)
   const safeApiKit = new SafeApiKit({ chainId: config.CHAIN_ID, txServiceUrl })

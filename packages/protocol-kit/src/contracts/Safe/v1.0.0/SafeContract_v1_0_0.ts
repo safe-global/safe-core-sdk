@@ -247,7 +247,7 @@ class SafeContract_v1_0_0
     return toTxResult(txResponse, options)
   }
 
-  async getModulesPaginated(start: string, pageSize: bigint): Promise<string[]> {
+  async getModulesPaginated([start, pageSize]: [string, bigint]): Promise<string[]> {
     if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
 
     const [array] = await this.getModules()

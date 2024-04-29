@@ -247,15 +247,23 @@ class SafeContract_v1_0_0
     return toTxResult(txResponse, options)
   }
 
-  async getModulesPaginated([start, pageSize]: [string, bigint]): Promise<string[]> {
+  async getModulesPaginated([start, pageSize]: [string, bigint]): Promise<[string[], string]> {
     if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
 
+    const size = Number(pageSize)
     const [array] = await this.getModules()
     if (start === SENTINEL_ADDRESS) {
-      return array.slice(0, Number(pageSize))
+      const next = pageSize < array.length ? array[size - 1] : SENTINEL_ADDRESS
+      return [array.slice(0, size), next]
     } else {
       const moduleIndex = array.findIndex((module: string) => sameString(module, start))
-      return moduleIndex === -1 ? [] : array.slice(moduleIndex + 1, Number(pageSize))
+      if (moduleIndex !== -1) {
+        const next =
+          size + moduleIndex < array.length ? array[size + moduleIndex] : SENTINEL_ADDRESS
+        return [array.slice(moduleIndex + 1, size), next]
+      } else {
+        return [[], SENTINEL_ADDRESS]
+      }
     }
   }
 

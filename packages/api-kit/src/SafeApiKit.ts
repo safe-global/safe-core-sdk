@@ -256,7 +256,7 @@ class SafeApiKit {
     limit,
     offset
   }: GetSafeDelegateProps): Promise<SafeDelegateListResponse> {
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/delegates`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates`)
 
     if (safeAddress) {
       const { address: safe } = this.#getEip3770Address(safeAddress)
@@ -327,7 +327,7 @@ class SafeApiKit {
       signature
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/delegates/`,
+      url: `${this.#txServiceBaseUrl}/v2/delegates/`,
       method: HttpMethod.Post,
       body
     })
@@ -361,10 +361,10 @@ class SafeApiKit {
     const data = delegate + totp
     const signature = await signer.signMessage(data)
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/delegates/${delegate}`,
+      url: `${this.#txServiceBaseUrl}/v2/delegates/${delegate}`,
       method: HttpMethod.Delete,
       body: {
-        delegate,
+        delegate, // This changed, beware and understand why.
         delegator,
         signature
       }

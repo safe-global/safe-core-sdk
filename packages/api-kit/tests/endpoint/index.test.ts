@@ -7,14 +7,13 @@ import SafeApiKit, {
 } from '@safe-global/api-kit/index'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter, SafeOperation } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
-import SafeOperation from '@safe-global/relay-kit/packs/safe-4337/SafeOperation'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)

@@ -8,12 +8,17 @@ import Safe, {
   getMultiSendContract
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
-import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  OperationType,
+  SafeSignature,
+  UserOperation,
+  SafeUserOperation
+} from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
-
 import SafeOperation from './SafeOperation'
 import {
   EstimateFeeProps,
@@ -21,8 +26,6 @@ import {
   Safe4337ExecutableProps,
   Safe4337InitOptions,
   Safe4337Options,
-  SafeUserOperation,
-  UserOperation,
   UserOperationReceipt,
   UserOperationWithPayload,
   PaymasterOptions

@@ -1,9 +1,9 @@
 import { Signer, TypedDataDomain, TypedDataField } from 'ethers'
 import {
   SafeMultisigTransactionResponse,
+  SafeOperation,
   SafeTransactionData
 } from '@safe-global/safe-core-sdk-types'
-import SafeOperation from '@safe-global/relay-kit/src/packs/safe-4337/SafeOperation'
 
 export type SafeServiceInfoResponse = {
   readonly name: string

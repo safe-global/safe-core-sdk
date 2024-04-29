@@ -1,12 +1,16 @@
 import { ethers } from 'ethers'
-import { SafeSignature } from '@safe-global/safe-core-sdk-types'
+import {
+  EstimateGasData,
+  SafeOperation as SafeOperationType,
+  SafeSignature,
+  SafeUserOperation,
+  UserOperation
+} from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
-
-import { EstimateGasData, SafeUserOperation, UserOperation } from './types'
 
 type SafeOperationOptions = { entryPoint: string; validAfter?: number; validUntil?: number }
 
-class SafeOperation {
+class SafeOperation implements SafeOperationType {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
 

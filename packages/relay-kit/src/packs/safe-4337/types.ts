@@ -1,5 +1,10 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
-import { MetaTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  EstimateGasData,
+  MetaTransactionData,
+  SafeVersion,
+  UserOperation
+} from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import SafeOperation from './SafeOperation'
 
@@ -59,44 +64,6 @@ export type Safe4337CreateTransactionProps = {
 
 export type Safe4337ExecutableProps = {
   executable: SafeOperation
-}
-
-export type SafeUserOperation = {
-  safe: string
-  nonce: bigint
-  initCode: string
-  callData: string
-  callGasLimit: bigint
-  verificationGasLimit: bigint
-  preVerificationGas: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
-  paymasterAndData: string
-  validAfter: number
-  validUntil: number
-  entryPoint: string
-}
-
-export type UserOperation = {
-  sender: string
-  nonce: string
-  initCode: string
-  callData: string
-  callGasLimit: bigint
-  verificationGasLimit: bigint
-  preVerificationGas: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
-  paymasterAndData: string
-  signature: string
-}
-
-export type EstimateGasData = {
-  maxFeePerGas?: bigint
-  maxPriorityFeePerGas?: bigint
-  preVerificationGas?: bigint
-  verificationGasLimit?: bigint
-  callGasLimit?: bigint
 }
 
 export type EstimateSponsoredGasData = {

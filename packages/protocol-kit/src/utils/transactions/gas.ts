@@ -400,7 +400,11 @@ function decodeSafeTxGas(encodedDataResponse: string): string {
 
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
 type EthersEstimationError = { data: string }
-type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
+type ViemEstimationError = { info: { error: { message: string } } }
+type EstimationError = Error &
+  EthersEstimationError &
+  GnosisChainEstimationError &
+  ViemEstimationError
 
 /**
  * Parses the SafeTxGas estimation response from different providers.
@@ -415,6 +419,12 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   const ethersData = error?.data
   if (ethersData) {
     return decodeSafeTxGas(ethersData)
+  }
+
+  // viem
+  const viemError = error?.info?.error?.message
+  if (viemError) {
+    return decodeSafeTxGas(viemError)
   }
 
   // gnosis-chain

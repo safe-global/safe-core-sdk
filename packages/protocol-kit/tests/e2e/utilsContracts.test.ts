@@ -4,7 +4,7 @@ import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
-import { getEip1193Provider } from './utils/setupProvider'
+import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
@@ -523,154 +523,152 @@ describe('Contract utils', () => {
       }
     )
 
-    //TODO: Fix add-eip1193-provider
-    // itif(safeVersionDeployed === '1.3.0')(
-    //   'returns the predicted address for Safes deployed on zkSync Era',
-    //   async () => {
-    //     const { contractNetworks } = await setupTests()
+    itif(safeVersionDeployed === '1.3.0')(
+      'returns the predicted address for Safes deployed on zkSync Era',
+      async () => {
+        const { contractNetworks } = await setupTests()
 
-    //     const safeVersion = safeVersionDeployed
-    //     // Create SafeProvider instance
-    //     const safeProvider = getSafeProviderFromNetwork('zksync')
-    //     const chainId = await safeProvider.getChainId()
-    //     const customContracts = contractNetworks[chainId.toString()]
+        const safeVersion = safeVersionDeployed
+        // Create SafeProvider instance
+        const safeProvider = getSafeProviderFromNetwork('zksync')
+        const chainId = await safeProvider.getChainId()
+        const customContracts = contractNetworks[chainId.toString()]
 
-    //     // We check real deployments from zksync return the expected address.
+        // We check real deployments from zksync return the expected address.
 
-    //     // 1/1 Safe
-    //     const safeAccountConfig1: SafeAccountConfig = {
-    //       owners: ['0xc6b82bA149CFA113f8f48d5E3b1F78e933e16DfD'],
-    //       threshold: 1
-    //     }
-    //     const safeDeploymentConfig1: SafeDeploymentConfig = {
-    //       safeVersion,
-    //       saltNonce: '1691490995332'
-    //     }
-    //     const expectedSafeAddress1 = '0x4e19dA81a54eFbaBeb9AD50646f7643076475D65'
+        // 1/1 Safe
+        const safeAccountConfig1: SafeAccountConfig = {
+          owners: ['0xc6b82bA149CFA113f8f48d5E3b1F78e933e16DfD'],
+          threshold: 1
+        }
+        const safeDeploymentConfig1: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1691490995332'
+        }
+        const expectedSafeAddress1 = '0x4e19dA81a54eFbaBeb9AD50646f7643076475D65'
 
-    //     const firstPredictedSafeAddress = await predictSafeAddress({
-    //       safeProvider,
-    //       chainId,
-    //       safeAccountConfig: safeAccountConfig1,
-    //       safeDeploymentConfig: safeDeploymentConfig1,
-    //       customContracts
-    //     })
+        const firstPredictedSafeAddress = await predictSafeAddress({
+          safeProvider,
+          chainId,
+          safeAccountConfig: safeAccountConfig1,
+          safeDeploymentConfig: safeDeploymentConfig1,
+          customContracts
+        })
 
-    //     // 1/2 Safe
-    //     const safeAccountConfig2: SafeAccountConfig = {
-    //       owners: [
-    //         '0x7E5E1C1FC6d625C1e60d78fDAB1CCE91e32261e4',
-    //         '0x6994Dc2544C1137b355488A9fc7b4F6EC2Bfeb5D'
-    //       ],
-    //       threshold: 1
-    //     }
-    //     const safeDeploymentConfig2: SafeDeploymentConfig = {
-    //       safeVersion,
-    //       saltNonce: '1690771277826'
-    //     }
-    //     const expectedSafeAddress2 = '0x60c7F13dE7C8Fb88b3845e58859658bdc44243F8'
+        // 1/2 Safe
+        const safeAccountConfig2: SafeAccountConfig = {
+          owners: [
+            '0x7E5E1C1FC6d625C1e60d78fDAB1CCE91e32261e4',
+            '0x6994Dc2544C1137b355488A9fc7b4F6EC2Bfeb5D'
+          ],
+          threshold: 1
+        }
+        const safeDeploymentConfig2: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1690771277826'
+        }
+        const expectedSafeAddress2 = '0x60c7F13dE7C8Fb88b3845e58859658bdc44243F8'
 
-    //     const secondPredictedSafeAddress = await predictSafeAddress({
-    //       safeProvider,
-    //       chainId,
-    //       safeAccountConfig: safeAccountConfig2,
-    //       safeDeploymentConfig: safeDeploymentConfig2,
-    //       customContracts
-    //     })
+        const secondPredictedSafeAddress = await predictSafeAddress({
+          safeProvider,
+          chainId,
+          safeAccountConfig: safeAccountConfig2,
+          safeDeploymentConfig: safeDeploymentConfig2,
+          customContracts
+        })
 
-    //     // 2/3 Safe
-    //     const safeAccountConfig3: SafeAccountConfig = {
-    //       owners: [
-    //         '0x99999A3C4cB8427c44294Ad36895b6a3A047060d',
-    //         '0x1234561fEd41DD2D867a038bBdB857f291864225',
-    //         '0xe2c1F5DDcc99B0D70584fB4aD9D52b49cD4Cab03'
-    //       ],
-    //       threshold: 2
-    //     }
-    //     const safeDeploymentConfig3: SafeDeploymentConfig = {
-    //       safeVersion,
-    //       saltNonce: '1690944491662'
-    //     }
-    //     const expectedSafeAddress3 = '0xD971FAA20db3ad4d51D453047ca03Ce4ec164CE2'
+        // 2/3 Safe
+        const safeAccountConfig3: SafeAccountConfig = {
+          owners: [
+            '0x99999A3C4cB8427c44294Ad36895b6a3A047060d',
+            '0x1234561fEd41DD2D867a038bBdB857f291864225',
+            '0xe2c1F5DDcc99B0D70584fB4aD9D52b49cD4Cab03'
+          ],
+          threshold: 2
+        }
+        const safeDeploymentConfig3: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1690944491662'
+        }
+        const expectedSafeAddress3 = '0xD971FAA20db3ad4d51D453047ca03Ce4ec164CE2'
 
-    //     const thirdPredictedSafeAddress = await predictSafeAddress({
-    //       safeProvider,
-    //       chainId,
-    //       safeAccountConfig: safeAccountConfig3,
-    //       safeDeploymentConfig: safeDeploymentConfig3,
-    //       customContracts
-    //     })
+        const thirdPredictedSafeAddress = await predictSafeAddress({
+          safeProvider,
+          chainId,
+          safeAccountConfig: safeAccountConfig3,
+          safeDeploymentConfig: safeDeploymentConfig3,
+          customContracts
+        })
 
-    //     // returns the same predicted address each call
-    //     chai.expect(firstPredictedSafeAddress).to.be.equal(expectedSafeAddress1)
-    //     chai.expect(secondPredictedSafeAddress).to.be.equal(expectedSafeAddress2)
-    //     chai.expect(thirdPredictedSafeAddress).to.be.equal(expectedSafeAddress3)
-    //   }
-    // )
+        // returns the same predicted address each call
+        chai.expect(firstPredictedSafeAddress).to.be.equal(expectedSafeAddress1)
+        chai.expect(secondPredictedSafeAddress).to.be.equal(expectedSafeAddress2)
+        chai.expect(thirdPredictedSafeAddress).to.be.equal(expectedSafeAddress3)
+      }
+    )
 
-    //TODO: Fix add-eip1193-provider
-    // itif(safeVersionDeployed === '1.3.0')(
-    //   // see: https://github.com/safe-global/safe-core-sdk/issues/598
-    //   'returns the correct predicted address for each chain',
-    //   async () => {
-    //     const { accounts } = await setupTests()
-    //     const [owner] = accounts
-    //     const safeVersion = safeVersionDeployed
+    itif(safeVersionDeployed === '1.3.0')(
+      // see: https://github.com/safe-global/safe-core-sdk/issues/598
+      'returns the correct predicted address for each chain',
+      async () => {
+        const { accounts } = await setupTests()
+        const [owner] = accounts
+        const safeVersion = safeVersionDeployed
 
-    //     const gnosisSafeProvider = getSafeProviderFromNetwork('gnosis')
-    //     const zkSyncSafeProvider = getSafeProviderFromNetwork('zksync')
-    //     const sepoliaSafeProvider = getSafeProviderFromNetwork('sepolia')
-    //     const mainnetSafeProvider = getSafeProviderFromNetwork('mainnet')
+        const gnosisSafeProvider = getSafeProviderFromNetwork('gnosis')
+        const zkSyncSafeProvider = getSafeProviderFromNetwork('zksync')
+        const sepoliaSafeProvider = getSafeProviderFromNetwork('sepolia')
+        const mainnetSafeProvider = getSafeProviderFromNetwork('mainnet')
 
-    //     // 1/1 Safe
-    //     const safeAccountConfig: SafeAccountConfig = {
-    //       owners: [owner.address],
-    //       threshold: 1
-    //     }
-    //     const safeDeploymentConfig: SafeDeploymentConfig = {
-    //       safeVersion,
-    //       saltNonce: '1691490995332'
-    //     }
+        // 1/1 Safe
+        const safeAccountConfig: SafeAccountConfig = {
+          owners: [owner.address],
+          threshold: 1
+        }
+        const safeDeploymentConfig: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: '1691490995332'
+        }
 
-    //     const gnosisPredictedSafeAddress = await predictSafeAddress({
-    //       safeProvider: gnosisSafeProvider,
-    //       chainId: await gnosisSafeProvider.getChainId(),
-    //       safeAccountConfig: safeAccountConfig,
-    //       safeDeploymentConfig: safeDeploymentConfig
-    //     })
+        const gnosisPredictedSafeAddress = await predictSafeAddress({
+          safeProvider: gnosisSafeProvider,
+          chainId: await gnosisSafeProvider.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
 
-    //     const zkSyncPredictedSafeAddress = await predictSafeAddress({
-    //       safeProvider: zkSyncSafeProvider,
-    //       chainId: await zkSyncSafeProvider.getChainId(),
-    //       safeAccountConfig: safeAccountConfig,
-    //       safeDeploymentConfig: safeDeploymentConfig
-    //     })
+        const zkSyncPredictedSafeAddress = await predictSafeAddress({
+          safeProvider: zkSyncSafeProvider,
+          chainId: await zkSyncSafeProvider.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
 
-    //     const sepoliaPredictedSafeAddress = await predictSafeAddress({
-    //       safeProvider: sepoliaSafeProvider,
-    //       chainId: await sepoliaSafeProvider.getChainId(),
-    //       safeAccountConfig: safeAccountConfig,
-    //       safeDeploymentConfig: safeDeploymentConfig
-    //     })
+        const sepoliaPredictedSafeAddress = await predictSafeAddress({
+          safeProvider: sepoliaSafeProvider,
+          chainId: await sepoliaSafeProvider.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
 
-    //     const mainnetPredictedSafeAddress = await predictSafeAddress({
-    //       safeProvider: mainnetSafeProvider,
-    //       chainId: await mainnetSafeProvider.getChainId(),
-    //       safeAccountConfig: safeAccountConfig,
-    //       safeDeploymentConfig: safeDeploymentConfig
-    //     })
+        const mainnetPredictedSafeAddress = await predictSafeAddress({
+          safeProvider: mainnetSafeProvider,
+          chainId: await mainnetSafeProvider.getChainId(),
+          safeAccountConfig: safeAccountConfig,
+          safeDeploymentConfig: safeDeploymentConfig
+        })
 
-    //     const expectedGnosisSafeAddress = '0x30421B2bE26942448CD6C690f21F551BF6C8A45F'
-    //     const expectedSkSyncSafeAddress = '0x4680B7AC23A98d5D68c21e3d6F8cBC9576A5920A'
-    //     const expectedSepoliaSafeAddress = '0x7f44E49C9E4C7D19fA2A704c2E66527Bd4688f99'
-    //     const expectedMainnetSafeAddress = '0x9C1C8c37a68242cEC6d68Ab091583c81FBF479C0'
+        const expectedGnosisSafeAddress = '0x30421B2bE26942448CD6C690f21F551BF6C8A45F'
+        const expectedSkSyncSafeAddress = '0x4680B7AC23A98d5D68c21e3d6F8cBC9576A5920A'
+        const expectedSepoliaSafeAddress = '0x7f44E49C9E4C7D19fA2A704c2E66527Bd4688f99'
+        const expectedMainnetSafeAddress = '0x9C1C8c37a68242cEC6d68Ab091583c81FBF479C0'
 
-    //     // returns the correct predicted address for each chain
-    //     chai.expect(gnosisPredictedSafeAddress).to.be.equal(expectedGnosisSafeAddress)
-    //     chai.expect(zkSyncPredictedSafeAddress).to.be.equal(expectedSkSyncSafeAddress)
-    //     chai.expect(sepoliaPredictedSafeAddress).to.be.equal(expectedSepoliaSafeAddress)
-    //     chai.expect(mainnetPredictedSafeAddress).to.be.equal(expectedMainnetSafeAddress)
-    //   }
-    // )
+        // returns the correct predicted address for each chain
+        chai.expect(gnosisPredictedSafeAddress).to.be.equal(expectedGnosisSafeAddress)
+        chai.expect(zkSyncPredictedSafeAddress).to.be.equal(expectedSkSyncSafeAddress)
+        chai.expect(sepoliaPredictedSafeAddress).to.be.equal(expectedSepoliaSafeAddress)
+        chai.expect(mainnetPredictedSafeAddress).to.be.equal(expectedMainnetSafeAddress)
+      }
+    )
   })
 })

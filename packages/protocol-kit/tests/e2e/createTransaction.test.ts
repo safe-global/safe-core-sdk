@@ -81,34 +81,33 @@ describe('Transactions creation', () => {
       }
     )
 
-    //TODO: Fix add-eip1193-provider
-    // itif(safeVersionDeployed >= '1.3.0')(
-    //   'should return a transaction with estimated safeTxGas if safeVersion>=1.3.0 and gasPrice>0',
-    //   async () => {
-    //     const { accounts, contractNetworks, provider } = await setupTests()
-    //     const [account1, account2] = accounts
-    //     const safe = await getSafeWithOwners([account1.address])
-    //     const safeAddress = await safe.getAddress()
-    //     const safeSdk = await Safe.create({
-    //       provider,
-    //       safeAddress,
-    //       contractNetworks
-    //     })
-    //     const txDataPartial: SafeTransactionDataPartial = {
-    //       to: account2.address,
-    //       value: '0',
-    //       data: '0x',
-    //       gasPrice: BASE_OPTIONS.gasPrice
-    //     }
-    //     const safeTxData = await standardizeSafeTransactionData({
-    //       safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-    //       provider,
-    //       tx: txDataPartial,
-    //       contractNetworks
-    //     })
-    //     chai.expect(BigInt(safeTxData.safeTxGas) > 0).to.be.true
-    //   }
-    // )
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should return a transaction with estimated safeTxGas if safeVersion>=1.3.0 and gasPrice>0',
+      async () => {
+        const { accounts, contractNetworks, provider } = await setupTests()
+        const [account1, account2] = accounts
+        const safe = await getSafeWithOwners([account1.address])
+        const safeAddress = await safe.getAddress()
+        const safeSdk = await Safe.create({
+          provider,
+          safeAddress,
+          contractNetworks
+        })
+        const txDataPartial: SafeTransactionDataPartial = {
+          to: account2.address,
+          value: '0',
+          data: '0x',
+          gasPrice: BASE_OPTIONS.gasPrice
+        }
+        const safeTxData = await standardizeSafeTransactionData({
+          safeContract: safeSdk.getContractManager().safeContract as SafeContract,
+          provider,
+          tx: txDataPartial,
+          contractNetworks
+        })
+        chai.expect(BigInt(safeTxData.safeTxGas) > 0).to.be.true
+      }
+    )
 
     itif(safeVersionDeployed >= '1.3.0')(
       'should return a transaction with defined safeTxGas if safeVersion>=1.3.0',

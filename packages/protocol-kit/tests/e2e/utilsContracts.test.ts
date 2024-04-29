@@ -1,6 +1,5 @@
 import chai from 'chai'
 import { deployments } from 'hardhat'
-import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
@@ -13,7 +12,8 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import {
   SafeDeploymentConfig,
   SafeAccountConfig,
-  ContractNetworksConfig
+  ContractNetworksConfig,
+  Eip1193Provider
 } from '@safe-global/protocol-kit/types'
 import Safe, { SafeFactory, DeploySafeProps } from '@safe-global/protocol-kit/index'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -28,7 +28,7 @@ async function deploySafe(
 ): Promise<Safe> {
   const safeFactory = await SafeFactory.create({
     provider,
-    signerAddress,
+    signer: signerAddress,
     safeVersion: safeVersionDeployed,
     contractNetworks
   })

@@ -252,18 +252,18 @@ class SafeContract_v1_0_0
 
     const size = Number(pageSize)
     const [array] = await this.getModules()
+
     if (start === SENTINEL_ADDRESS) {
       const next = pageSize < array.length ? array[size - 1] : SENTINEL_ADDRESS
       return [array.slice(0, size), next]
     } else {
       const moduleIndex = array.findIndex((module: string) => sameString(module, start))
-      if (moduleIndex !== -1) {
-        const next =
-          size + moduleIndex < array.length ? array[size + moduleIndex] : SENTINEL_ADDRESS
-        return [array.slice(moduleIndex + 1, size), next]
-      } else {
+      if (moduleIndex === -1) {
         return [[], SENTINEL_ADDRESS]
       }
+
+      const next = size + moduleIndex < array.length ? array[size + moduleIndex] : SENTINEL_ADDRESS
+      return [array.slice(moduleIndex + 1, size), next]
     }
   }
 

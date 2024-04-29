@@ -12,8 +12,8 @@ import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized
 import {
   SafeProxyFactoryContractType,
   SafeVersion,
-  EthersTransactionOptions,
-  EthersTransactionResult
+  TransactionOptions,
+  TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
@@ -380,8 +380,8 @@ export function sameString(str1: string, str2: string): boolean {
 
 export function toTxResult(
   transactionResponse: ContractTransactionResponse,
-  options?: EthersTransactionOptions
-): EthersTransactionResult {
+  options?: TransactionOptions
+): TransactionResult {
   return {
     hash: transactionResponse.hash,
     options,

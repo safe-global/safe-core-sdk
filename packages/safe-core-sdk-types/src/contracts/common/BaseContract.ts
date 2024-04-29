@@ -4,11 +4,11 @@ import {
   ExtractAbiFunction,
   ExtractAbiFunctionNames
 } from 'abitype'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types/types'
 import {
-  EthersTransactionOptions,
-  EthersTransactionResult
-} from '@safe-global/safe-core-sdk-types/ethereumLibs/ethers/types'
+  SafeVersion,
+  TransactionOptions,
+  TransactionResult
+} from '@safe-global/safe-core-sdk-types/types'
 
 /**
  * Extracts the names of read-only functions (view or pure) from a given contract ABI.
@@ -69,12 +69,10 @@ export type EncodeFunction<
  * Estimates the gas required for a function call on a contract.
  *
  * @template ContractAbi - The ABI of the contract.
- * @template TransactionOptions - The transaction options object.
  * @template ContractFunctionName - The function for which gas is being estimated, derived from the ABI.
  */
 export type EstimateGasFunction<
   ContractAbi extends Abi,
-  TransactionOptions extends EthersTransactionOptions = EthersTransactionOptions,
   ContractFunctionName extends
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
@@ -108,15 +106,11 @@ export type ContractFunction<
  *
  * @template ContractAbi - The ABI of the contract.
  * @template ContractFunctionName - The function name, derived from the ABI.
- * @template TransactionOptions - The transaction options type depending on the Adapter.
- * @template TransactionResult - The transaction result type depending on the Adapter.
  */
-export type AdapterSpecificContractFunction<
+export type SafeContractFunction<
   ContractAbi extends Abi,
   ContractFunctionName extends
-    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>,
-  TransactionOptions extends EthersTransactionOptions = EthersTransactionOptions,
-  TransactionResult extends EthersTransactionResult = EthersTransactionResult
+    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
 > = (
   args: AbiParametersToPrimitiveTypes<
     ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']

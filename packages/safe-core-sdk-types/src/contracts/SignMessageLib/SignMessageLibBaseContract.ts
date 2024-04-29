@@ -1,6 +1,6 @@
 import { Abi } from 'abitype'
 import BaseContract, {
-  AdapterSpecificContractFunction,
+  SafeContractFunction,
   ContractReadFunctionNames,
   EstimateGasFunction
 } from '../common/BaseContract'
@@ -16,7 +16,7 @@ type SignMessageLibBaseContract<SignMessageLibContractAbi extends Abi> = BaseCon
   ContractReadFunctionNames<SignMessageLibContractAbi>
 > & {
   estimateGas: EstimateGasFunction<SignMessageLibContractAbi>
-  signMessage: AdapterSpecificContractFunction<SignMessageLibContractAbi, 'signMessage'>
+  signMessage: SafeContractFunction<SignMessageLibContractAbi, 'signMessage'>
 }
 
 export default SignMessageLibBaseContract

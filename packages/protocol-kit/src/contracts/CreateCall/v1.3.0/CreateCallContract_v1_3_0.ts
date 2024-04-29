@@ -4,8 +4,7 @@ import {
   CreateCallContract_v1_3_0_Abi,
   CreateCallContract_v1_3_0_Contract,
   createCall_1_3_0_ContractArtifacts,
-  AdapterSpecificContractFunction,
-  EthersTransactionOptions
+  SafeContractFunction
 } from '@safe-global/safe-core-sdk-types'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -48,14 +47,13 @@ class CreateCallContract_v1_3_0
 
   /**
    * @param args - Array[value, deploymentData]
-   * @param options - EthersTransactionOptions
-   * @returns Promise<EthersTransactionResult>
+   * @param options - TransactionOptions
+   * @returns Promise<TransactionResult>
    */
-  performCreate: AdapterSpecificContractFunction<
-    CreateCallContract_v1_3_0_Abi,
-    'performCreate',
-    EthersTransactionOptions
-  > = async (args, options) => {
+  performCreate: SafeContractFunction<CreateCallContract_v1_3_0_Abi, 'performCreate'> = async (
+    args,
+    options
+  ) => {
     if (options && !options.gasLimit) {
       options.gasLimit = (
         await this.estimateGas('performCreate', [...args], { ...options })
@@ -67,14 +65,13 @@ class CreateCallContract_v1_3_0
 
   /**
    * @param args - Array[value, deploymentData, salt]
-   * @param options - EthersTransactionOptions
-   * @returns Promise<EthersTransactionResult>
+   * @param options - TransactionOptions
+   * @returns Promise<TransactionResult>
    */
-  performCreate2: AdapterSpecificContractFunction<
-    CreateCallContract_v1_3_0_Abi,
-    'performCreate2',
-    EthersTransactionOptions
-  > = async (args, options) => {
+  performCreate2: SafeContractFunction<CreateCallContract_v1_3_0_Abi, 'performCreate2'> = async (
+    args,
+    options
+  ) => {
     if (options && !options.gasLimit) {
       options.gasLimit = (await this.estimateGas('performCreate2', args, options)).toString()
     }

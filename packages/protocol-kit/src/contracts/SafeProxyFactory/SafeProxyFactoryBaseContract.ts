@@ -4,13 +4,13 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import {
   SafeVersion,
-  EthersTransactionOptions,
+  TransactionOptions,
   CreateProxyProps as CreateProxyPropsGeneral
 } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 export interface CreateProxyProps extends CreateProxyPropsGeneral {
-  options?: EthersTransactionOptions
+  options?: TransactionOptions
 }
 
 /**

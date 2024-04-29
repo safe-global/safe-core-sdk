@@ -33,9 +33,6 @@ In the examples below, you can see `provider` and `signer` properties, which rep
 - `provider`: You can provide an EIP-1193 compatible provider or an HTTP/WebSocket RPC URL.
 - `signer`: This is optional. If not provided, we will try to get the connected account of the provider. If you provide it, it represents either the provider's address you want to use or a private key, which we will use internally to retrieve the provider's address.
 
-````js
-
-
 ### Initialize the Safe API Kit
 
 As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service). To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit` and pass the URL to the constructor of the Safe Transaction Service you want to use depending on the network.
@@ -44,7 +41,7 @@ As stated in the introduction, the [Safe API Kit](https://github.com/safe-global
 import SafeApiKit from '@safe-global/api-kit'
 
 const safeService = new SafeApiKit({ chainId })
-````
+```
 
 Using the `chainId` is enough for chains where Safe runs a Transaction Service. For those chains where Safe doesn't run a service, use the `txServiceUrl` parameter to set the custom service endpoint.
 

@@ -1,6 +1,6 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { SigningMethod } from '@safe-global/protocol-kit/index'
-import { EthersTransactionOptions, MetaTransactionData } from '@safe-global/safe-core-sdk-types'
+import { TransactionOptions, MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -169,7 +169,7 @@ describe('Transactions execution', () => {
         .to.be.rejectedWith('There are 2 signatures missing')
     })
 
-    it.only('should fail if the user tries to execute a transaction that was rejected', async () => {
+    it('should fail if the user tries to execute a transaction that was rejected', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
@@ -238,7 +238,7 @@ describe('Transactions execution', () => {
         data: '0x'
       }
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-      const execOptions: EthersTransactionOptions = { nonce: 123456789 }
+      const execOptions: TransactionOptions = { nonce: 123456789 }
       await chai
         .expect(safeSdk1.executeTransaction(tx, execOptions))
         .to.be.rejectedWith('Nonce too high')
@@ -376,6 +376,7 @@ describe('Transactions execution', () => {
 
         const txResponse2 = await safeSdk1.executeTransaction(signedTx)
         await waitSafeTxReceipt(txResponse2)
+        await new Promise((resolve) => setTimeout(resolve, 500))
         const safeFinalBalance = await safeSdk1.getBalance()
         chai.expect(safeInitialBalance).to.be.eq(safeFinalBalance + BigInt(tx.data.value))
       }
@@ -580,7 +581,7 @@ describe('Transactions execution', () => {
           data: '0x'
         }
         const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-        const execOptions: EthersTransactionOptions = { gasLimit: 123456 }
+        const execOptions: TransactionOptions = { gasLimit: 123456 }
         const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
         await waitSafeTxReceipt(txResponse)
         const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
@@ -610,7 +611,7 @@ describe('Transactions execution', () => {
           data: '0x'
         }
         const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-        const execOptions: EthersTransactionOptions = {
+        const execOptions: TransactionOptions = {
           gasLimit: 123456,
           gasPrice: 170000000
         }
@@ -748,7 +749,7 @@ describe('Transactions execution', () => {
       }
       const currentNonce = await safeSdk1.getSafeProvider().getNonce(account1.address, 'pending')
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
-      const execOptions: EthersTransactionOptions = { nonce: currentNonce }
+      const execOptions: TransactionOptions = { nonce: currentNonce }
       const txResponse = await safeSdk1.executeTransaction(tx, execOptions)
       await waitSafeTxReceipt(txResponse)
       const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)

@@ -9,8 +9,8 @@ import {
   SafeContract_v1_4_1_Function,
   SafeTransaction,
   safe_1_4_1_ContractArtifacts,
-  EthersTransactionOptions,
-  EthersTransactionResult
+  TransactionOptions,
+  TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 
 /**
@@ -195,10 +195,7 @@ class SafeContract_v1_4_1
    * @param options - Optional transaction options.
    * @returns True, if the given transactions is valid.
    */
-  async isValidTransaction(
-    safeTransaction: SafeTransaction,
-    options: EthersTransactionOptions = {}
-  ) {
+  async isValidTransaction(safeTransaction: SafeTransaction, options: TransactionOptions = {}) {
     try {
       const gasLimit =
         options?.gasLimit ||
@@ -245,8 +242,8 @@ class SafeContract_v1_4_1
    */
   async execTransaction(
     safeTransaction: SafeTransaction,
-    options?: EthersTransactionOptions
-  ): Promise<EthersTransactionResult> {
+    options?: TransactionOptions
+  ): Promise<TransactionResult> {
     const gasLimit =
       options?.gasLimit ||
       (await this.estimateGas(
@@ -298,10 +295,7 @@ class SafeContract_v1_4_1
    * @param options - Optional transaction options.
    * @returns Transaction result.
    */
-  async approveHash(
-    hash: string,
-    options?: EthersTransactionOptions
-  ): Promise<EthersTransactionResult> {
+  async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
     const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
     const txResponse = await this.contract.approveHash(hash, { ...options, gasLimit })
 

@@ -2,8 +2,9 @@ export function createMemoizedFunction<T extends (...args: Parameters<T>) => Ret
   callback: T,
   cache: Record<string, ReturnType<T>> = {}
 ) {
+  const replacer = createBigIntSerializerReplacer()
   return (...args: Parameters<T>): ReturnType<T> => {
-    const key = JSON.stringify(args, bigIntSerializerReplacer)
+    const key = JSON.stringify(args, replacer)
 
     cache[key] = cache[key] || callback(...args)
 
@@ -12,7 +13,7 @@ export function createMemoizedFunction<T extends (...args: Parameters<T>) => Ret
 }
 
 // EIP1193 providers from web3.currentProvider and hre.network.provider fail to serialize BigInts
-function bigIntSerializerReplacer() {
+function createBigIntSerializerReplacer() {
   const seen = new Set()
 
   return (_: string, value: unknown) => {

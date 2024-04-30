@@ -1,6 +1,5 @@
 import chai from 'chai'
 import { deployments } from 'hardhat'
-import { Eip1193Provider } from '@safe-global/safe-core-sdk-types'
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
@@ -13,7 +12,8 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import {
   SafeDeploymentConfig,
   SafeAccountConfig,
-  ContractNetworksConfig
+  ContractNetworksConfig,
+  Eip1193Provider
 } from '@safe-global/protocol-kit/types'
 import Safe, { SafeFactory, DeploySafeProps } from '@safe-global/protocol-kit/index'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -28,7 +28,7 @@ async function deploySafe(
 ): Promise<Safe> {
   const safeFactory = await SafeFactory.create({
     provider,
-    signerAddress,
+    signer: signerAddress,
     safeVersion: safeVersionDeployed,
     contractNetworks
   })
@@ -658,10 +658,10 @@ describe('Contract utils', () => {
           safeDeploymentConfig: safeDeploymentConfig
         })
 
-        const expectedGnosisSafeAddress = '0x30421B2bE26942448CD6C690f21F551BF6C8A45F'
+        const expectedGnosisSafeAddress = '0x39aC50A7B35c43429397D0481EBa8769B5e4b9a6'
         const expectedSkSyncSafeAddress = '0x4680B7AC23A98d5D68c21e3d6F8cBC9576A5920A'
-        const expectedSepoliaSafeAddress = '0x7f44E49C9E4C7D19fA2A704c2E66527Bd4688f99'
-        const expectedMainnetSafeAddress = '0x9C1C8c37a68242cEC6d68Ab091583c81FBF479C0'
+        const expectedSepoliaSafeAddress = '0x643bD5C3Fd6c546c1452A16f978C350F8a0A2a8D'
+        const expectedMainnetSafeAddress = '0x22b257EABfA3B8BC9e0C5f6BA03400933834675B'
 
         // returns the correct predicted address for each chain
         chai.expect(gnosisPredictedSafeAddress).to.be.equal(expectedGnosisSafeAddress)

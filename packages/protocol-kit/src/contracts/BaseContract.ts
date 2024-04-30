@@ -58,7 +58,10 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
-    const contractAddress = customContractAddress || deployment?.defaultAddress
+    const contractAddress =
+      customContractAddress ||
+      deployment?.networkAddresses[chainId.toString()] ||
+      deployment?.defaultAddress
 
     if (!contractAddress) {
       throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)

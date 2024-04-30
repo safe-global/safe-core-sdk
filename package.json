@@ -46,5 +46,8 @@
     "./packages/**/*.{json,md}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "@safe-global/safe-deployments": "^1.35.0"
   }
 }

@@ -1,5 +1,6 @@
 name: Protocol Kit - E2E Tests
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:

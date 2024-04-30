@@ -34,6 +34,7 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
+import { Signer } from 'ethers'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -70,6 +71,25 @@ class SafeApiKit {
     } catch {
       return false
     }
+  }
+
+  async #signDelegate(signer: Signer, delegateAddress: string) {
+    const domain = {
+      name: 'Safe Transaction Service',
+      version: '1.0',
+      chainId: this.#chainId
+    }
+
+    const types = {
+      Delegate: [
+        { name: 'delegateAddress', type: 'bytes32' },
+        { name: 'totp', type: 'uint256' }
+      ]
+    }
+
+    const totp = Math.floor(Date.now() / 1000 / 3600)
+
+    return await signer.signTypedData(domain, types, { delegateAddress, totp })
   }
 
   #getEip3770Address(fullAddress: string): Eip3770Address {
@@ -316,9 +336,8 @@ class SafeApiKit {
     }
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegate + totp
-    const signature = await signer.signMessage(data)
+    const signature = await this.#signDelegate(signer, delegate)
+
     const body: any = {
       safe: safeAddress ? this.#getEip3770Address(safeAddress).address : null,
       delegate,
@@ -357,14 +376,12 @@ class SafeApiKit {
     }
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegate + totp
-    const signature = await signer.signMessage(data)
+    const signature = await this.#signDelegate(signer, delegate)
+
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v2/delegates/${delegate}`,
       method: HttpMethod.Delete,
       body: {
-        delegate, // This changed, beware and understand why.
         delegator,
         signature
       }

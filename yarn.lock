@@ -1250,10 +1250,10 @@
     semver "^7.5.4"
     superstruct "^1.0.3"
 
-"@monerium/sdk@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.9.0.tgz#ec7296623853acd0b7477b1b088f8c8fae42f197"
-  integrity sha512-6tr1fWau5tca2xjgIB/7NLJQFoVLcRvGQh6gqzgPJZCS9kRIVlupGk1MaejFdGWOmoEqJSFVUzi0TGhEJK+VcA==
+"@monerium/sdk@^2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.12.0.tgz#57ccc1668a354c28d083c29928690f15fe11c479"
+  integrity sha512-tZxQNAlUpCbVkZfWIVB2yWYjyYZGKckEfzUZbWQyDdxUo487iNJQRr1Z64MZofJ/gKCPfOPJbiZzUGWbl8eLQA==
   dependencies:
     crypto-js "^4.2.0"
 

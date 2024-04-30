@@ -1850,31 +1850,10 @@
     picocolors "^1.0.0"
     tslib "^2.6.0"
 
-"@safe-global/protocol-kit@^3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@safe-global/protocol-kit/-/protocol-kit-3.0.2.tgz#cfa4c5e890c101aa89e11768d07b2bc5455f72fb"
-  integrity sha512-Jxvvfu4yqEdWeOuY3VWOOs/q5f27om3tctL2guOCDbAuSx3Vd1peaKRwLiREkvrrqKEW0tfmzUSsqtmlJExfBw==
-  dependencies:
-    "@noble/hashes" "^1.3.3"
-    "@safe-global/safe-deployments" "^1.34.0"
-    ethereumjs-util "^7.1.5"
-    ethers "^6.7.1"
-    semver "^7.5.4"
-    web3 "^1.10.3"
-    web3-core "^1.10.3"
-    web3-utils "^1.10.3"
-
 "@safe-global/safe-contracts-v1.4.1@npm:@safe-global/safe-contracts@1.4.1":
   version "1.4.1"
   resolved "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
-
-"@safe-global/safe-deployments@^1.34.0":
-  version "1.34.0"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.34.0.tgz#5eef33012a4af55c4440036b1c0cfdb2245c6e49"
-  integrity sha512-J55iHhB1tiNoPeVQ5s943zrfeKRYPqBtnz/EM7d878WzUmmDlTGKHN98qPYKBxkRKP1UjEWuQDrZxy80lx1rJw==
-  dependencies:
-    semver "^7.3.7"
 
 "@safe-global/safe-deployments@^1.35.0":
   version "1.35.0"

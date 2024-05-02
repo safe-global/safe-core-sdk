@@ -34,7 +34,8 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
-import { Signer, zeroPadValue } from 'ethers'
+import { Signer } from 'ethers'
+import { zeroPadValue } from './utils/data'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -88,11 +89,7 @@ class SafeApiKit {
     }
 
     const totp = Math.floor(Date.now() / 1000 / 3600)
-
-    console.log('domain: ', domain)
-    console.log('delegateAddress: ', delegateAddress)
-
-    const paddedAddress = zeroPadValue(delegateAddress, 32)
+    const paddedAddress = zeroPadValue(delegateAddress, { size: 32 })
 
     return await signer.signTypedData(domain, types, { delegateAddress: paddedAddress, totp })
   }

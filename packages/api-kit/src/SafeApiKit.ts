@@ -34,7 +34,7 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
-import { Signer } from 'ethers'
+import { Signer, zeroPadValue } from 'ethers'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -89,7 +89,12 @@ class SafeApiKit {
 
     const totp = Math.floor(Date.now() / 1000 / 3600)
 
-    return await signer.signTypedData(domain, types, { delegateAddress, totp })
+    console.log('domain: ', domain)
+    console.log('delegateAddress: ', delegateAddress)
+
+    const paddedAddress = zeroPadValue(delegateAddress, 32)
+
+    return await signer.signTypedData(domain, types, { delegateAddress: paddedAddress, totp })
   }
 
   #getEip3770Address(fullAddress: string): Eip3770Address {
@@ -276,7 +281,7 @@ class SafeApiKit {
     limit,
     offset
   }: GetSafeDelegateProps): Promise<SafeDelegateListResponse> {
-    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates/`)
 
     if (safeAddress) {
       const { address: safe } = this.#getEip3770Address(safeAddress)
@@ -299,6 +304,7 @@ class SafeApiKit {
     if (offset) {
       url.searchParams.set('offset', offset)
     }
+    console.log('>>> url: ', url)
     return sendRequest({
       url: url.toString(),
       method: HttpMethod.Get

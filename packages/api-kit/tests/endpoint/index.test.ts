@@ -18,19 +18,19 @@ import { getServiceClient } from '../utils/setupServiceClient'
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
-const safeAddress = '0x9D1E7371852a9baF631Ea115b9815deb97cC3205'
+const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
 const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
 const randomAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
 const eip3770RandomAddress = `${config.EIP_3770_PREFIX}:${randomAddress}`
 const delegateAddress = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
 const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-const tokenAddress = '0x210EC22dD6b1c174E5cA1A261DD9791e0755cc6D'
+const tokenAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
 const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
-const safeTxHash = '0xede78ed72e9a8afd2b7a21f35c86f56cba5fffb2fff0838e253b7a41d19ceb48'
+const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
 const txServiceBaseUrl = 'https://safe-transaction-sepolia.safe.global/api'
 const provider = getDefaultProvider(config.JSON_RPC)
 const signer = new Wallet(
-  '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
+  '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676',
   provider
 )
 let ethAdapter: EthAdapter
@@ -41,7 +41,7 @@ let eip3770DelegatorAddress: string
 describe('Endpoint tests', () => {
   before(async () => {
     ;({ safeApiKit, ethAdapter } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
     delegatorAddress = await signer.getAddress()
     eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
@@ -347,8 +347,7 @@ describe('Endpoint tests', () => {
       })
     })
 
-    // FIXME when tests are migrated to Sepolia
-    it.skip('proposeTransaction', async () => {
+    it('proposeTransaction', async () => {
       const safeTransactionData = {
         to: safeAddress,
         data: '0x',
@@ -397,8 +396,7 @@ describe('Endpoint tests', () => {
       })
     })
 
-    // FIXME when tests are migrated to Sepolia
-    it.skip('proposeTransaction EIP-3770', async () => {
+    it('proposeTransaction EIP-3770', async () => {
       const safeTransactionData = {
         to: safeAddress,
         data: '0x',
@@ -654,7 +652,7 @@ describe('Endpoint tests', () => {
 
     it('should can instantiate the SafeApiKit with a custom endpoint', async () => {
       ;({ safeApiKit } = await getServiceClient(
-        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d',
+        '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676',
         txServiceUrl
       ))
 

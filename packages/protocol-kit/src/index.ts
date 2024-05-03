@@ -39,7 +39,8 @@ import {
   PREDETERMINED_SALT_NONCE,
   encodeCreateProxyWithNonce,
   encodeSetupCallData,
-  predictSafeAddress
+  predictSafeAddress,
+  getPredictedSafeAddressInitCode
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
@@ -159,6 +160,7 @@ export {
   getSignMessageLibContract,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
+  getPredictedSafeAddressInitCode,
   standardizeSafeTransactionData,
   validateEip3770Address,
   validateEthereumAddress,

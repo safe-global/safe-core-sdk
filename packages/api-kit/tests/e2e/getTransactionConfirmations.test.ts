@@ -10,7 +10,7 @@ let safeApiKit: SafeApiKit
 describe('getTransactionConfirmations', () => {
   before(async () => {
     ;({ safeApiKit } = await getServiceClient(
-      '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
     ))
   })
 
@@ -29,7 +29,7 @@ describe('getTransactionConfirmations', () => {
   })
 
   it('should return the transaction with the given safeTxHash', async () => {
-    const safeTxHash = '0xc58b604550610302477087256063d1ba195fbec20b2fd27648fec55242074592'
+    const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
     const transactionConfirmations = await safeApiKit.getTransactionConfirmations(safeTxHash)
     chai.expect(transactionConfirmations.count).to.be.equal(2)
     chai.expect(transactionConfirmations.results.length).to.be.equal(2)

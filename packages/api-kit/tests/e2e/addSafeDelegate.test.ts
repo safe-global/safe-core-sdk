@@ -110,7 +110,7 @@ describe('addSafeDelegate', () => {
 
   it('should fail if Safe does not exist', async () => {
     const safeAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -171,7 +171,7 @@ describe('addSafeDelegate', () => {
   })
 
   it('should add a new delegate without specifying a Safe', async () => {
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
@@ -200,7 +200,7 @@ describe('addSafeDelegate', () => {
   it('should add a new delegate EIP-3770', async () => {
     const safeAddress = '0xe4bb611E4e4164D54Ad7361B9d58b0A1eBD462B8'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const delegateAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
     const delegatorAddress = await signer.getAddress()
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`

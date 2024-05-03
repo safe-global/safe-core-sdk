@@ -19,6 +19,7 @@ export interface SafeContract {
   approvedHashes(ownerAddress: string, hash: string): Promise<bigint>
   approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult>
   getModules(): Promise<string[]>
+  getModulesPaginated(start: string, pageSize: number): Promise<string[]>
   isModuleEnabled(moduleAddress: string): Promise<boolean>
   isValidTransaction(
     safeTransaction: SafeTransaction,

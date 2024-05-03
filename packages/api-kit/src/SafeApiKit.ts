@@ -301,7 +301,7 @@ class SafeApiKit {
     if (offset) {
       url.searchParams.set('offset', offset)
     }
-    console.log('>>> url: ', url)
+
     return sendRequest({
       url: url.toString(),
       method: HttpMethod.Get

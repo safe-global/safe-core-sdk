@@ -8,7 +8,7 @@ function padHex(hex: string, { dir, size = 32 }: { dir: string; size: number }) 
 
 export function zeroPadValue(
   hex: string,
-  { dir = 'left', size = 32 }: { dir?: string; size: number }
+  { dir = 'right', size = 32 }: { dir?: string; size: number }
 ): string {
   return padHex(hex, { dir, size })
 }

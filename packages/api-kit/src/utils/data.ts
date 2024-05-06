@@ -1,3 +1,4 @@
+// TODO: remove this function in favor of viem#pad
 export function padHex(
   hex: string,
   { dir = 'left', size = 32 }: { dir?: string; size?: number } = {}

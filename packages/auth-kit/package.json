@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/auth-kit",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Authentication library for web2 logins",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -40,8 +40,8 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@safe-global/api-kit": "^2.3.0",
-    "@safe-global/protocol-kit": "^3.0.2",
+    "@safe-global/api-kit": "^2.3.1",
+    "@safe-global/protocol-kit": "^3.1.0",
     "@web3auth/safeauth-embed": "^0.0.0",
     "ethers": "^6.7.1"
   }

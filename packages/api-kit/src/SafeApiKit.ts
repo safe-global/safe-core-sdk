@@ -27,6 +27,7 @@ import {
   TransferListResponse
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
+import { padHex } from '@safe-global/api-kit/utils/data'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
@@ -35,7 +36,6 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { Signer } from 'ethers'
-import { padHex } from '@safe-global/protocol-kit/src/utils'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */

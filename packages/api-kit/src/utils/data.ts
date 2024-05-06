@@ -1,4 +1,3 @@
-// TODO: Use the pad function when integrate viem
 export function padHex(
   hex: string,
   { dir = 'left', size = 32 }: { dir?: string; size?: number } = {}

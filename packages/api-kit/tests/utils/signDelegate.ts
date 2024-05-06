@@ -16,7 +16,7 @@ export async function signDelegate(signer: Signer, delegateAddress: string, chai
   }
 
   const totp = Math.floor(Date.now() / 1000 / 3600)
-  const paddedAddress = padHex(delegateAddress, { size: 32 })
+  const paddedAddress = padHex(delegateAddress, { size: 32, dir: 'right' })
 
   return await signer.signTypedData(domain, types, { delegateAddress: paddedAddress, totp })
 }

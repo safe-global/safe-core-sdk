@@ -1,4 +1,4 @@
-import { isAddress, padHex } from 'ethers'
+import { isAddress, zeroPadValue } from 'ethers'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -349,7 +349,7 @@ export function zkSyncEraCreate2Address(
   const addressBytes = keccak256(
     toBuffer(
       ZKSYNC_CREATE2_PREFIX +
-        padHex(from, 32).slice(2) +
+        zeroPadValue(from, 32).slice(2) +
         salt.toString('hex') +
         bytecodeHash.slice(2) +
         inputHash.toString('hex')

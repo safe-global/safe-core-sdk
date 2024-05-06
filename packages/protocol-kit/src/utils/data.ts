@@ -1,6 +1,7 @@
+// TODO: Use the pad function when integrate viem
 export function padHex(
   hex: string,
-  { dir = 'right', size = 32 }: { dir?: string; size?: number } = {}
+  { dir = 'left', size = 32 }: { dir?: string; size?: number } = {}
 ): string {
   if (size === null) return hex
   const result = hex.replace('0x', '')

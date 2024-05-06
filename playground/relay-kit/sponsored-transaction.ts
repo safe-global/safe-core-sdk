@@ -14,7 +14,7 @@ import { ethers } from 'ethers'
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
 
 // Check the status of a transaction after it is executed:
-// https://goerli.etherscan.io/tx/<TRANSACTION_HASH>
+// https://sepolia.etherscan.io/tx/<TRANSACTION_HASH>
 
 const config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',

@@ -1,4 +1,4 @@
-import Safe, { predictSafeAddress } from '@safe-global/protocol-kit'
+import Safe, { predictSafeAddress, SafeProvider } from '@safe-global/protocol-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import AccountAbstraction from './AccountAbstraction'
@@ -9,70 +9,72 @@ jest.mock('@safe-global/relay-kit')
 const GelatoRelayPackMock = GelatoRelayPack as jest.MockedClass<typeof GelatoRelayPack>
 const predictSafeAddressMock = predictSafeAddress as jest.MockedFunction<typeof predictSafeAddress>
 const SafeMock = Safe as jest.MockedClass<typeof Safe>
+const SafeProviderMock = SafeProvider as jest.MockedClass<typeof SafeProvider>
 
 describe('AccountAbstraction', () => {
   const provider = {
     request: jest.fn()
   }
-  const safeProvider = {
-    getSignerAddress: jest.fn(),
-    isContractDeployed: jest.fn(),
-    getChainId: jest.fn()
-  }
+
   const signerAddress = '0xSignerAddress'
   const predictSafeAddress = '0xPredictSafeAddressMock'
 
   beforeEach(() => {
     jest.clearAllMocks()
-    safeProvider.getSignerAddress.mockResolvedValue(signerAddress)
     predictSafeAddressMock.mockResolvedValue(predictSafeAddress)
+    SafeProviderMock.prototype.getSignerAddress.mockResolvedValue(signerAddress)
   })
 
   describe('init', () => {
-    const accountAbstraction = new AccountAbstraction({ provider })
+    const accountAbstraction = new AccountAbstraction({ provider, signer: signerAddress })
 
     it('should initialize a Safe instance with its address if contract is deployed already', async () => {
-      safeProvider.isContractDeployed.mockResolvedValueOnce(true)
+      SafeProviderMock.prototype.isContractDeployed.mockResolvedValueOnce(true)
 
       await accountAbstraction.init()
 
-      expect(safeProvider.getSignerAddress).toHaveBeenCalledTimes(1)
+      expect(SafeProviderMock.prototype.getSignerAddress).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledTimes(1)
-      expect(predictSafeAddressMock).toHaveBeenCalledWith({
-        safeProvider,
-        safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
-      })
+      expect(predictSafeAddressMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
+        })
+      )
       expect(SafeMock.create).toHaveBeenCalledTimes(1)
-      expect(SafeMock.create).toHaveBeenCalledWith({
-        safeProvider,
-        safeAddress: predictSafeAddress
-      })
+      expect(SafeMock.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          safeAddress: predictSafeAddress
+        })
+      )
     })
 
     it('should initialize a Safe instance with a config if contract is NOT deployed yet', async () => {
-      safeProvider.isContractDeployed.mockResolvedValueOnce(false)
+      SafeProviderMock.prototype.isContractDeployed.mockResolvedValueOnce(false)
 
       await accountAbstraction.init()
 
-      expect(safeProvider.getSignerAddress).toHaveBeenCalledTimes(1)
+      expect(SafeProviderMock.prototype.getSignerAddress).toHaveBeenCalledTimes(1)
       expect(predictSafeAddressMock).toHaveBeenCalledTimes(1)
-      expect(predictSafeAddressMock).toHaveBeenCalledWith({
-        safeProvider,
-        safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
-      })
+      expect(predictSafeAddressMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
+        })
+      )
       expect(SafeMock.create).toHaveBeenCalledTimes(1)
-      expect(SafeMock.create).toHaveBeenCalledWith({
-        safeProvider,
-        predictedSafe: { safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 } }
-      })
+      expect(SafeMock.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          predictedSafe: { safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 } }
+        })
+      )
     })
 
     it('should throw an error if the provider has not a signer', async () => {
-      safeProvider.getSignerAddress.mockResolvedValueOnce(undefined)
+      SafeProviderMock.prototype.getSignerAddress.mockResolvedValueOnce(undefined)
 
       expect(accountAbstraction.init()).rejects.toThrow(
-        `There's no signer in the provided SafeProvider`
+        `There's no signer available with the provided config (provider, signer)`
       )
+
       expect(SafeMock.create).not.toHaveBeenCalled()
     })
   })

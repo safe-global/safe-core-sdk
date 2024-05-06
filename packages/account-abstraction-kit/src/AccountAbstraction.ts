@@ -35,7 +35,7 @@ class AccountAbstraction {
     const signer = await safeProvider.getSignerAddress()
 
     if (!signer) {
-      throw new Error("There's no signer available in the provided config")
+      throw new Error("There's no signer available with the provided config (provider, signer)")
     }
 
     const owners = [signer]

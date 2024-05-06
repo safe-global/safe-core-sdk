@@ -278,7 +278,7 @@ class SafeApiKit {
     limit,
     offset
   }: GetSafeDelegateProps): Promise<SafeDelegateListResponse> {
-    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates`)
 
     if (safeAddress) {
       const { address: safe } = this.#getEip3770Address(safeAddress)

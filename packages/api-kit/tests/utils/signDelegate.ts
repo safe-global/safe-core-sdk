@@ -1,5 +1,5 @@
 import { Signer } from 'ethers'
-import { zeroPadValue } from '@safe-global/api-kit/utils/data'
+import { padHex } from '@safe-global/api-kit/utils/data'
 
 export async function signDelegate(signer: Signer, delegateAddress: string, chainId: string) {
   const domain = {
@@ -16,7 +16,7 @@ export async function signDelegate(signer: Signer, delegateAddress: string, chai
   }
 
   const totp = Math.floor(Date.now() / 1000 / 3600)
-  const paddedAddress = zeroPadValue(delegateAddress, { size: 32 })
+  const paddedAddress = padHex(delegateAddress, { size: 32 })
 
   return await signer.signTypedData(domain, types, { delegateAddress: paddedAddress, totp })
 }

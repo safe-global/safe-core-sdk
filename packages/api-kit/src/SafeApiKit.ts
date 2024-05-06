@@ -35,7 +35,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { Signer } from 'ethers'
-import { zeroPadValue } from './utils/data'
+import { padHex } from '@safe-global/protocol-kit/src/utils'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -89,7 +89,7 @@ class SafeApiKit {
     }
 
     const totp = Math.floor(Date.now() / 1000 / 3600)
-    const paddedAddress = zeroPadValue(delegateAddress, { size: 32 })
+    const paddedAddress = padHex(delegateAddress, { size: 32 })
 
     return await signer.signTypedData(domain, types, { delegateAddress: paddedAddress, totp })
   }

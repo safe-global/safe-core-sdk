@@ -56,6 +56,11 @@ class SafeContract_V1_1_1_Ethers extends SafeContractEthers {
     return this.contract.getModules()
   }
 
+  async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
+    const { array } = await this.contract.getModulesPaginated(start, pageSize)
+    return array
+  }
+
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
     const modules = await this.getModules()
     const isModuleEnabled = modules.some((enabledModuleAddress: string) =>

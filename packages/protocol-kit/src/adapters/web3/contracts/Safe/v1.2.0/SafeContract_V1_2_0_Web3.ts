@@ -48,6 +48,11 @@ class SafeContract_V1_2_0_Web3 extends SafeContractWeb3 {
     return this.contract.methods.getModules().call()
   }
 
+  async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
+    const { array } = await this.contract.methods.getModulesPaginated(start, pageSize).call()
+    return array
+  }
+
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
     return this.contract.methods.isModuleEnabled(moduleAddress).call()
   }

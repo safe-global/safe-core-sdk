@@ -3,7 +3,11 @@ import {
   Web3TransactionResult
 } from '@safe-global/protocol-kit/adapters/web3/types'
 import { sameString, toTxResult } from '@safe-global/protocol-kit/adapters/web3/utils'
-import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/adapters/web3/utils/constants'
+import {
+  EMPTY_DATA,
+  ZERO_ADDRESS,
+  SENTINEL_ADDRESS
+} from '@safe-global/protocol-kit/adapters/web3/utils/constants'
 import { Gnosis_safe as Safe } from '@safe-global/protocol-kit/typechain/src/web3-v1/v1.0.0/Gnosis_safe'
 import { SafeSetupConfig } from '@safe-global/safe-core-sdk-types'
 import SafeContractWeb3 from '../SafeContractWeb3'
@@ -45,6 +49,18 @@ class SafeContract_V1_0_0_Web3 extends SafeContractWeb3 {
 
   async getModules(): Promise<string[]> {
     return this.contract.methods.getModules().call()
+  }
+
+  async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
+    if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
+
+    const array = await this.getModules()
+    if (start === SENTINEL_ADDRESS) {
+      return array.slice(0, pageSize)
+    } else {
+      const moduleIndex = array.findIndex((module: string) => sameString(module, start))
+      return moduleIndex === -1 ? [] : array.slice(moduleIndex + 1, pageSize)
+    }
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {

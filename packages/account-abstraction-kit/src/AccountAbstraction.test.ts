@@ -1,5 +1,5 @@
 import Safe, { predictSafeAddress } from '@safe-global/protocol-kit'
-import { GelatoRelayPack, RelayKitBasePack } from '@safe-global/relay-kit'
+import { GelatoRelayPack } from '@safe-global/relay-kit'
 import { EthAdapter, SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import AccountAbstraction from './AccountAbstraction'
 
@@ -153,11 +153,9 @@ describe('AccountAbstraction', () => {
       const relayResponseMock = { taskId: '0xTaskID' }
 
       it('should return the Gelato taskId of the relayed transaction', async () => {
-        GelatoRelayPackMock.prototype.createRelayedTransaction.mockResolvedValueOnce(safeTxMock)
+        GelatoRelayPackMock.prototype.createTransaction.mockResolvedValueOnce(safeTxMock)
         safeInstanceMock.signTransaction.mockResolvedValueOnce(signedSafeTxMock)
-        GelatoRelayPackMock.prototype.executeRelayTransaction.mockResolvedValueOnce(
-          relayResponseMock
-        )
+        GelatoRelayPackMock.prototype.executeTransaction.mockResolvedValueOnce(relayResponseMock)
         accountAbstraction.setRelayKit(
           new GelatoRelayPack({ protocolKit: accountAbstraction.protocolKit })
         )
@@ -166,8 +164,8 @@ describe('AccountAbstraction', () => {
 
         expect(result).toBe(relayResponseMock)
 
-        expect(GelatoRelayPackMock.prototype.createRelayedTransaction).toHaveBeenCalledTimes(1)
-        expect(GelatoRelayPackMock.prototype.createRelayedTransaction).toHaveBeenCalledWith({
+        expect(GelatoRelayPackMock.prototype.createTransaction).toHaveBeenCalledTimes(1)
+        expect(GelatoRelayPackMock.prototype.createTransaction).toHaveBeenCalledWith({
           transactions: transactionsMock,
           options: optionsMock
         })
@@ -175,11 +173,11 @@ describe('AccountAbstraction', () => {
         expect(safeInstanceMock.signTransaction).toHaveBeenCalledTimes(1)
         expect(safeInstanceMock.signTransaction).toHaveBeenCalledWith(safeTxMock)
 
-        expect(GelatoRelayPackMock.prototype.executeRelayTransaction).toHaveBeenCalledTimes(1)
-        expect(GelatoRelayPackMock.prototype.executeRelayTransaction).toHaveBeenCalledWith(
-          signedSafeTxMock,
-          optionsMock
-        )
+        expect(GelatoRelayPackMock.prototype.executeTransaction).toHaveBeenCalledTimes(1)
+        expect(GelatoRelayPackMock.prototype.executeTransaction).toHaveBeenCalledWith({
+          executable: signedSafeTxMock,
+          options: optionsMock
+        })
       })
 
       it('should throw if the protocol-kit is not initialized', async () => {
@@ -192,21 +190,22 @@ describe('AccountAbstraction', () => {
           'protocolKit not initialized. Call init() first'
         )
 
-        expect(GelatoRelayPackMock.prototype.createRelayedTransaction).not.toHaveBeenCalled()
+        expect(GelatoRelayPackMock.prototype.createTransaction).not.toHaveBeenCalled()
         expect(safeInstanceMock.signTransaction).not.toHaveBeenCalled()
-        expect(GelatoRelayPackMock.prototype.executeRelayTransaction).not.toHaveBeenCalled()
+        expect(GelatoRelayPackMock.prototype.executeTransaction).not.toHaveBeenCalled()
       })
 
       it('should throw if relay-kit is not initialized', async () => {
-        accountAbstraction.setRelayKit(undefined as unknown as RelayKitBasePack)
+        const accountAbstraction = new AccountAbstraction(ethersAdapter as unknown as EthAdapter)
+        await accountAbstraction.init()
 
         expect(accountAbstraction.relayTransaction(transactionsMock, optionsMock)).rejects.toThrow(
           'relayKit not initialized. Call setRelayKit(pack) first'
         )
 
-        expect(GelatoRelayPackMock.prototype.createRelayedTransaction).not.toHaveBeenCalled()
+        expect(GelatoRelayPackMock.prototype.createTransaction).not.toHaveBeenCalled()
         expect(safeInstanceMock.signTransaction).not.toHaveBeenCalled()
-        expect(GelatoRelayPackMock.prototype.executeRelayTransaction).not.toHaveBeenCalled()
+        expect(GelatoRelayPackMock.prototype.executeTransaction).not.toHaveBeenCalled()
       })
     })
   })

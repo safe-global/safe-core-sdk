@@ -1,8 +1,11 @@
+// @ts-nocheck
+
 import { execSync } from 'child_process'
 
 const playInput = process.argv[2]
 
 const playgroundProtocolKitPaths = {
+  'create-execute-transaction': 'protocol-kit/create-execute-transaction',
   'deploy-safe': 'protocol-kit/deploy-safe',
   'generate-safe-address': 'protocol-kit/generate-safe-address',
   eip1271: 'protocol-kit/eip1271'
@@ -14,7 +17,14 @@ const playgroundApiKitPaths = {
 }
 const playgroundRelayKitPaths = {
   'relay-paid-transaction': 'relay-kit/paid-transaction',
-  'relay-sponsored-transaction': 'relay-kit/sponsored-transaction'
+  'relay-sponsored-transaction': 'relay-kit/sponsored-transaction',
+  'usdc-transfer-4337': 'relay-kit/usdc-transfer-4337',
+  'usdc-transfer-4337-erc20': 'relay-kit/usdc-transfer-4337-erc20',
+  'usdc-transfer-4337-sponsored': 'relay-kit/usdc-transfer-4337-sponsored',
+  'usdc-transfer-4337-counterfactual': 'relay-kit/usdc-transfer-4337-counterfactual',
+  'usdc-transfer-4337-erc20-counterfactual': 'relay-kit/usdc-transfer-4337-erc20-counterfactual',
+  'usdc-transfer-4337-sponsored-counterfactual':
+    'relay-kit/usdc-transfer-4337-sponsored-counterfactual'
 }
 
 const path =
@@ -22,7 +32,7 @@ const path =
   playgroundApiKitPaths[playInput] ||
   playgroundRelayKitPaths[playInput]
 
-function printPlaygrounds(playgroundPaths) {
+function printPlaygrounds(playgroundPaths: Record<string, string>) {
   const playgroundKits = Object.keys(playgroundPaths)
   playgroundKits.forEach((name) => {
     console.log(`> yarn play ${name}`)

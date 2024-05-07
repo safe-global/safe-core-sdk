@@ -49,7 +49,11 @@ class SafeContract_V1_4_1_Web3 extends SafeContractWeb3 {
   }
 
   async getModules(): Promise<string[]> {
-    const { array } = await this.contract.methods.getModulesPaginated(SENTINEL_ADDRESS, 10).call()
+    return await this.getModulesPaginated(SENTINEL_ADDRESS, 10)
+  }
+
+  async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
+    const { array } = await this.contract.methods.getModulesPaginated(start, pageSize).call()
     return array
   }
 

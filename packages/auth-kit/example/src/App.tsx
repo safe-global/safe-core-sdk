@@ -87,14 +87,22 @@ function App() {
   }, [isAuthenticated])
 
   const login = async () => {
-    const signInInfo = await safeAuthPack?.signIn()
+    if (!safeAuthPack) {
+      throw new Error('SafeAuthPack is not initialized')
+    }
+
+    const signInInfo = await safeAuthPack.signIn()
 
     setSafeAuthSignInResponse(signInInfo)
     setIsAuthenticated(true)
   }
 
   const logout = async () => {
-    await safeAuthPack?.signOut()
+    if (!safeAuthPack) {
+      throw new Error('SafeAuthPack is not initialized')
+    }
+
+    await safeAuthPack.signOut()
 
     setSafeAuthSignInResponse(null)
   }
@@ -204,7 +212,7 @@ function App() {
           symbol: 'ETH',
           decimals: 18
         },
-        rpcUrls: ['https://base.publicnode.com'],
+        rpcUrls: ['https://rpc.ankr.com/base'],
         blockExplorerUrls: ['https://basescan.org/']
       }
     ])

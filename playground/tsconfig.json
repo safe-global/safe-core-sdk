@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.settings.json",
+  "compilerOptions": {
+    "composite": true,
+    "noImplicitThis": false,
+    "outDir": "dist"
+  },
+  "include": ["api-kit/**/*", "config/**/*", "protocol-kit/**/*", "relay-kit/**/*"]
+}

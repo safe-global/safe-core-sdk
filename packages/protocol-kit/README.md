@@ -567,14 +567,14 @@ const options: SafeTransactionOptionalProps = {
 const safeTransaction = await safeSdk.createTransaction({ transactions, options })
 ```
 
-In addition, the optional `callsOnly` parameter, which is `false` by default, allows to force the use of the `MultiSendCallOnly` instead of the `MultiSend` contract when sending a batch transaction:
+In addition, the optional `onlyCalls` parameter, which is `false` by default, allows to force the use of the `MultiSendCallOnly` instead of the `MultiSend` contract when sending a batch transaction:
 
 ```js
-const callsOnly = true
+const onlyCalls = true
 const safeTransaction = await safeSdk.createTransaction({
   transactions,
   options,
-  callsOnly
+  onlyCalls
 })
 ```
 

@@ -102,6 +102,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 2221n, shortName: 'tkava' },
   { chainId: 2222n, shortName: 'kava' },
   { chainId: 2358n, shortName: 'kroma-sepolia' },
+  { chainId: 2810n, shortName: 'morph-holesky' },
   { chainId: 3737n, shortName: 'csb' },
   { chainId: 4002n, shortName: 'tftm' },
   { chainId: 4337n, shortName: 'beam' },

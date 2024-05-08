@@ -383,6 +383,7 @@ describe('Fallback handler manager', () => {
       )
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
+      await new Promise((resolve) => setTimeout(resolve, 500))
       chai
         .expect(await safeSdk.getFallbackHandler())
         .to.be.eq(await defaultCallbackHandler.getAddress())

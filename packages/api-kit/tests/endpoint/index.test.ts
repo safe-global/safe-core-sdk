@@ -675,17 +675,18 @@ describe('Endpoint tests', () => {
       const safeOperation = {
         data: {
           nonce: 42,
-          initCode: '0x123initcode',
-          callData: '0xcallData123',
-          callGasLimit: '123',
-          verificationGasLimit: '234',
-          preVerificationGas: '345',
-          maxFeePerGas: '456',
-          maxPriorityFeePerGas: '567',
-          paymasterAndData: '0xpaymasterAndData123',
-          entryPoint: '0xentryPoint',
-          validAfter: 'validAfter',
-          validUntil: 'validUntil'
+          initCode: '0xfbc38024f74946d9ec31e0c8658dd65e335c6e57c14575250787ec5fb270c08a',
+          callData:
+            '0x7bb374280000000000000000000000001c7d4b196cb0c7b01d743fbc6116a902379c72380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb00000000000000000000000060c4ab82d06fd7dfe9517e17736c2dcc77443ef000000000000000000000000000000000000000000000000000000000000186a000000000000000000000000000000000000000000000000000000000',
+          callGasLimit: '150799',
+          verificationGasLimit: '200691',
+          preVerificationGas: '50943',
+          maxFeePerGas: '1949282597',
+          maxPriorityFeePerGas: '1380000000',
+          paymasterAndData: '0xdff7fa1077bce740a6a212b3995990682c0ba66d',
+          entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+          validAfter: '2024-01-01T00:00:00Z',
+          validUntil: '2024-04-12T00:00:00Z'
         },
         getSignature: () => ({ data: signature })
       } as unknown as SafeOperation

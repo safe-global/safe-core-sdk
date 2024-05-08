@@ -37,7 +37,7 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
-import { isEmptyHexData } from './utils'
+import { isEmptyData } from './utils'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -807,14 +807,14 @@ class SafeApiKit {
       method: HttpMethod.Post,
       body: {
         nonce: Number(data.nonce),
-        initCode: isEmptyHexData(data.initCode) ? null : data.initCode,
+        initCode: isEmptyData(data.initCode) ? null : data.initCode,
         callData: data.callData,
         callDataGasLimit: data.callGasLimit.toString(),
         verificationGasLimit: data.verificationGasLimit.toString(),
         preVerificationGas: data.preVerificationGas.toString(),
         maxFeePerGas: data.maxFeePerGas.toString(),
         maxPriorityFeePerGas: data.maxPriorityFeePerGas.toString(),
-        paymasterAndData: isEmptyHexData(data.paymasterAndData) ? null : data.paymasterAndData,
+        paymasterAndData: isEmptyData(data.paymasterAndData) ? null : data.paymasterAndData,
         entryPoint: data.entryPoint,
         validAfter: !data.validAfter ? null : data.validAfter,
         validUntil: !data.validUntil ? null : data.validUntil,

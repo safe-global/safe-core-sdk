@@ -235,7 +235,7 @@ describe('Off-chain signatures', () => {
       chai.expect(signedTx.signatures.size).to.be.eq(1)
     })
 
-    it('should add the signature of the current signer using eth_signTypedData_v3 with ethers provider', async () => {
+    it('should add the signature of the current signer using eth_signTypedData_v3', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({

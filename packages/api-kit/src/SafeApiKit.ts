@@ -27,7 +27,7 @@ import {
   TransferListResponse
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
-import { padHex } from '@safe-global/api-kit/utils/data'
+import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
@@ -35,7 +35,6 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
-import { Signer } from 'ethers'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -72,26 +71,6 @@ class SafeApiKit {
     } catch {
       return false
     }
-  }
-
-  async #signDelegate(signer: Signer, delegateAddress: string) {
-    const domain = {
-      name: 'Safe Transaction Service',
-      version: '1.0',
-      chainId: this.#chainId
-    }
-
-    const types = {
-      Delegate: [
-        { name: 'delegateAddress', type: 'bytes32' },
-        { name: 'totp', type: 'uint256' }
-      ]
-    }
-
-    const totp = Math.floor(Date.now() / 1000 / 3600)
-    const paddedAddress = padHex(delegateAddress, { size: 32, dir: 'right' })
-
-    return await signer.signTypedData(domain, types, { delegateAddress: paddedAddress, totp })
   }
 
   #getEip3770Address(fullAddress: string): Eip3770Address {
@@ -339,7 +318,7 @@ class SafeApiKit {
     }
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const signature = await this.#signDelegate(signer, delegate)
+    const signature = await signDelegate(signer, delegate, this.#chainId)
 
     const body: any = {
       safe: safeAddress ? this.#getEip3770Address(safeAddress).address : null,

@@ -14,7 +14,7 @@ import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
-import { signDelegate } from '../utils/signDelegate'
+import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)

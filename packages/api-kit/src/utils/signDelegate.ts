@@ -1,5 +1,5 @@
 import { Signer } from 'ethers'
-import { padHex } from '@safe-global/api-kit/utils/data'
+import { padHex } from './data'
 
 export async function signDelegate(signer: Signer, delegateAddress: string, chainId: string) {
   const domain = {

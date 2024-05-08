@@ -6,22 +6,22 @@ import {
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
+import SafeProvider from '../SafeProvider'
 
 class GuardManager {
-  #ethAdapter: EthAdapter
+  #safeProvider: SafeProvider
   #safeContract?: SafeContractImplementationType
   // keccak256("guard_manager.guard.address")
   #slot = '0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8'
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContractImplementationType) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: SafeProvider, safeContract?: SafeContractImplementationType) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateGuardAddress(guardAddress: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(guardAddress)
+    const isValidAddress = this.#safeProvider.isAddress(guardAddress)
     if (!isValidAddress || isZeroAddress(guardAddress)) {
       throw new Error('Invalid guard address provided')
     }
@@ -56,7 +56,7 @@ class GuardManager {
   async getGuard(): Promise<string> {
     const safeContract = await this.isGuardCompatible()
 
-    return this.#ethAdapter.getStorageAt(await safeContract.getAddress(), this.#slot)
+    return this.#safeProvider.getStorageAt(await safeContract.getAddress(), this.#slot)
   }
 
   async encodeEnableGuardData(guardAddress: string): Promise<string> {

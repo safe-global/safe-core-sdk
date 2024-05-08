@@ -1,7 +1,7 @@
 import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/safe-core-sdk-types'
-import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe from '@safe-global/protocol-kit/Safe'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   ContractNetworksConfig,
   SafeContractImplementationType
@@ -63,16 +63,16 @@ function estimateDataGasCosts(data: string): number {
 export async function estimateGas(
   safeVersion: SafeVersion,
   safeContract: SafeContractImplementationType,
-  ethAdapter: EthAdapter,
+  safeProvider: SafeProvider,
   to: string,
   valueInWei: string,
   data: string,
   operation: OperationType,
   customContracts?: ContractNetworksConfig
 ) {
-  const chainId = await ethAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
   const simulateTxAccessorContract = await getSimulateTxAccessorContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     customContracts: customContracts?.[chainId.toString()]
   })
@@ -100,7 +100,7 @@ export async function estimateGas(
   }
 
   try {
-    const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
+    const encodedResponse = await safeProvider.call(transactionToEstimateGas)
 
     return decodeSafeTxGas(encodedResponse)
   } catch (error: any) {
@@ -110,7 +110,7 @@ export async function estimateGas(
 
 export async function estimateTxGas(
   safeContract: SafeContractImplementationType,
-  ethAdapter: EthAdapter,
+  safeProvider: SafeProvider,
   to: string,
   valueInWei: string,
   data: string,
@@ -122,7 +122,6 @@ export async function estimateTxGas(
   const safeContractCompatibleWithRequiredTxGas =
     await isSafeContractCompatibleWithRequiredTxGas(safeContract)
 
-  // @ts-expect-error Expression produces a union type that is too complex to represent
   const estimateData = safeContractCompatibleWithRequiredTxGas.encode('requiredTxGas', [
     to,
     BigInt(valueInWei),
@@ -131,7 +130,7 @@ export async function estimateTxGas(
   ])
 
   try {
-    const estimateResponse = await ethAdapter.estimateGas({
+    const estimateResponse = await safeProvider.estimateGas({
       to: safeAddress,
       from: safeAddress,
       data: estimateData
@@ -144,7 +143,7 @@ export async function estimateTxGas(
     let additionalGas = 10000
     for (let i = 0; i < 10; i++) {
       try {
-        const estimateResponse = await ethAdapter.call({
+        const estimateResponse = await safeProvider.call({
           to: safeAddress,
           from: safeAddress,
           data: estimateData,
@@ -162,7 +161,7 @@ export async function estimateTxGas(
   }
 
   try {
-    const estimateGas = await ethAdapter.estimateGas({
+    const estimateGas = await safeProvider.estimateGas({
       to,
       from: safeAddress,
       value: valueInWei,
@@ -214,19 +213,20 @@ export async function estimateTxBaseGas(
   const signatures = '0x'
 
   const safeVersion = await safe.getContractVersion()
-  const ethAdapter = safe.getEthAdapter()
+  const safeProvider = safe.getSafeProvider()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
   const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     isL1SafeSingleton,
     customContracts
   })
 
-  // @ts-expect-error Expression produces a union type that is too complex to represent
+  //@ts-expect-error: Type too complex to represent.
+  //TODO: We should explore contract versions and map to the correct types
   const execTransactionData = safeSingletonContract.encode('execTransaction', [
     to,
     BigInt(value),
@@ -325,13 +325,13 @@ async function estimateSafeTxGasWithRequiredTxGas(
   const isSafeDeployed = await safe.isSafeDeployed()
   const safeAddress = await safe.getAddress()
   const safeVersion = await safe.getContractVersion()
-  const ethAdapter = safe.getEthAdapter()
+  const safeProvider = safe.getSafeProvider()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
   const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     isL1SafeSingleton,
     customContracts
@@ -344,7 +344,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     'requiredTxGas',
     [
       safeTransaction.data.to,
-      safeTransaction.data.value,
+      BigInt(safeTransaction.data.value),
       safeTransaction.data.data,
       safeTransaction.data.operation
     ]
@@ -359,7 +359,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     from: safeAddress
   }
   try {
-    const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
+    const encodedResponse = await safeProvider.call(transactionToEstimateGas)
 
     const safeTxGas = '0x' + encodedResponse.slice(-32)
 
@@ -385,11 +385,11 @@ async function estimateSafeTxGasWithRequiredTxGas(
 
 // TO-DO: Improve decoding
 /*
-  const simulateAndRevertResponse = ethAdapter.decodeParameters(
+  const simulateAndRevertResponse = safeProvider.decodeParameters(
     ['bool', 'bytes'],
     encodedResponse
   )
-  const returnedData = ethAdapter.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
+  const returnedData = safeProvider.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
   */
 function decodeSafeTxGas(encodedDataResponse: string): string {
   const [, encodedSafeTxGas] = encodedDataResponse.split('0x')
@@ -400,7 +400,11 @@ function decodeSafeTxGas(encodedDataResponse: string): string {
 
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
 type EthersEstimationError = { data: string }
-type EstimationError = Error & EthersEstimationError & GnosisChainEstimationError
+type ViemEstimationError = { info: { error: { message: string } } }
+type EstimationError = Error &
+  EthersEstimationError &
+  GnosisChainEstimationError &
+  ViemEstimationError
 
 /**
  * Parses the SafeTxGas estimation response from different providers.
@@ -415,6 +419,12 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   const ethersData = error?.data
   if (ethersData) {
     return decodeSafeTxGas(ethersData)
+  }
+
+  // viem
+  const viemError = error?.info?.error?.message
+  if (viemError) {
+    return decodeSafeTxGas(viemError)
   }
 
   // gnosis-chain
@@ -455,13 +465,13 @@ async function estimateSafeTxGasWithSimulate(
   const isSafeDeployed = await safe.isSafeDeployed()
   const safeAddress = await safe.getAddress()
   const safeVersion = await safe.getContractVersion()
-  const ethAdapter = safe.getEthAdapter()
+  const safeProvider = safe.getSafeProvider()
   const chainId = await safe.getChainId()
   const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
 
   const safeSingletonContract = await getSafeContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     isL1SafeSingleton,
     customContracts
@@ -469,7 +479,7 @@ async function estimateSafeTxGasWithSimulate(
 
   // new version of the estimation
   const simulateTxAccessorContract = await getSimulateTxAccessorContract({
-    ethAdapter,
+    safeProvider,
     safeVersion,
     customContracts
   })
@@ -500,7 +510,7 @@ async function estimateSafeTxGasWithSimulate(
   }
 
   try {
-    const encodedResponse = await ethAdapter.call(transactionToEstimateGas)
+    const encodedResponse = await safeProvider.call(transactionToEstimateGas)
 
     const safeTxGas = decodeSafeTxGas(encodedResponse)
 
@@ -510,8 +520,6 @@ async function estimateSafeTxGasWithSimulate(
   } catch (error: any) {
     return parseSafeTxGasErrorResponse(error)
   }
-
-  return '0'
 }
 
 /**
@@ -531,10 +539,10 @@ export async function estimateSafeDeploymentGas(safe: Safe): Promise<string> {
     return '0'
   }
 
-  const ethAdapter = safe.getEthAdapter()
+  const safeProvider = safe.getSafeProvider()
   const safeDeploymentTransaction = await safe.createSafeDeploymentTransaction()
 
-  const estimation = await ethAdapter.estimateGas({
+  const estimation = await safeProvider.estimateGas({
     ...safeDeploymentTransaction,
     from: ZERO_ADDRESS // if we use the Safe address the estimation always fails due to CREATE2
   })

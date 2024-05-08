@@ -1,6 +1,3 @@
-import { ContractTransactionResponse } from 'ethers'
-import { PromiEvent, TransactionReceipt } from 'web3-core/types'
-
 export type SafeVersion = '1.4.1' | '1.3.0' | '1.2.0' | '1.1.1' | '1.0.0'
 
 export enum OperationType {
@@ -86,7 +83,6 @@ interface TransactionBase {
 
 export interface TransactionOptions {
   from?: string
-  gas?: number | string
   gasLimit?: number | string
   gasPrice?: number | string
   maxFeePerGas?: number | string
@@ -99,8 +95,7 @@ export interface BaseTransactionResult {
 }
 
 export interface TransactionResult extends BaseTransactionResult {
-  promiEvent?: PromiEvent<TransactionReceipt>
-  transactionResponse?: ContractTransactionResponse
+  transactionResponse: unknown
   options?: TransactionOptions
 }
 

@@ -1,4 +1,4 @@
-import { Contract, ZeroAddress } from 'ethers'
+import { Contract, ZeroAddress, JsonFragment } from 'ethers'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -12,13 +12,12 @@ import {
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
-import { AbiItem } from 'web3-utils'
 
 // TODO: changue contract por abitype objts
 
 export const getSafeSingleton = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const SafeDeployment = await deployments.get(safeDeployed.name)
   const Safe = await ethers.getContractFactory(safeDeployed.name)
@@ -30,7 +29,7 @@ export const getSafeSingleton = async (): Promise<{
 
 export const getFactory = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const Factory = await ethers.getContractFactory(proxyFactoryDeployed.name)
@@ -90,7 +89,7 @@ export const getSafeWithOwners = async (
 
 export const getCompatibilityFallbackHandler = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const CompatibilityFallbackHandlerDeployment = await deployments.get(
     compatibilityFallbackHandlerDeployed.name
@@ -106,7 +105,7 @@ export const getCompatibilityFallbackHandler = async (): Promise<{
 
 export const getMultiSend = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
   const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)
@@ -118,7 +117,7 @@ export const getMultiSend = async (): Promise<{
 
 export const getMultiSendCallOnly = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const MultiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
   const MultiSendCallOnly = await ethers.getContractFactory(multiSendCallOnlyDeployed.name)
@@ -130,7 +129,7 @@ export const getMultiSendCallOnly = async (): Promise<{
 
 export const getSignMessageLib = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const SignMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
   const SignMessageLib = await ethers.getContractFactory(signMessageLibDeployed.name)
@@ -142,7 +141,7 @@ export const getSignMessageLib = async (): Promise<{
 
 export const getCreateCall = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const CreateCallDeployment = await deployments.get(createCallDeployed.name)
   const CreateCall = await ethers.getContractFactory(createCallDeployed.name)
@@ -154,7 +153,7 @@ export const getCreateCall = async (): Promise<{
 
 export const getSimulateTxAccessor = async (): Promise<{
   contract: Contract
-  abi: AbiItem | AbiItem[]
+  abi: JsonFragment | JsonFragment[]
 }> => {
   const SimulateTxAccessorDeployment = await deployments.get(simulateTxAccessorDeployed.name)
   const SimulateTxAccessor = await ethers.getContractFactory(simulateTxAccessorDeployed.name)
@@ -174,6 +173,18 @@ export const getSocialRecoveryModule = async (): Promise<Contract> => {
   const SocialRecoveryModuleDeployment = await deployments.get('SocialRecoveryModule')
   const SocialRecoveryModule = await ethers.getContractFactory('SocialRecoveryModule')
   return SocialRecoveryModule.attach(SocialRecoveryModuleDeployment.address)
+}
+
+export const getStateChannelModule = async (): Promise<Contract> => {
+  const StateChannelModuleDeployment = await deployments.get('StateChannelModule')
+  const StateChannelModule = await ethers.getContractFactory('StateChannelModule')
+  return StateChannelModule.attach(StateChannelModuleDeployment.address)
+}
+
+export const getWhiteListModule = async (): Promise<Contract> => {
+  const WhiteListModuleDeployment = await deployments.get('WhitelistModule')
+  const WhiteListModule = await ethers.getContractFactory('WhitelistModule')
+  return WhiteListModule.attach(WhiteListModuleDeployment.address)
 }
 
 export const getERC20Mintable = async (): Promise<Contract> => {

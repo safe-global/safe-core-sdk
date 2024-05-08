@@ -1,4 +1,4 @@
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import Safe, { SafeProviderConfig } from '@safe-global/protocol-kit'
 import { MetaTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import SafeOperation from './SafeOperation'
@@ -24,7 +24,8 @@ export type PaymasterOptions = {
 }
 
 export type Safe4337InitOptions = {
-  ethersAdapter: EthersAdapter
+  provider: SafeProviderConfig['provider']
+  signer?: SafeProviderConfig['signer']
   bundlerUrl: string
   rpcUrl: string
   safeModulesVersion?: string

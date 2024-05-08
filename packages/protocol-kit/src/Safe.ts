@@ -37,7 +37,8 @@ import {
   SafeConfigProps,
   SigningMethod,
   SigningMethodType,
-  SwapOwnerTxParams
+  SwapOwnerTxParams,
+  SafeModulesPaginated
 } from './types'
 import {
   EthSafeSignature,
@@ -70,14 +71,14 @@ import {
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
-import { EthAdapter } from './adapters/ethAdapter'
+import SafeProvider from './SafeProvider'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
 class Safe {
   #predictedSafe?: PredictedSafeProps
-  #ethAdapter!: EthAdapter
+  #safeProvider!: SafeProvider
   #contractManager!: ContractManager
   #ownerManager!: OwnerManager
   #moduleManager!: ModuleManager
@@ -111,32 +112,40 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   private async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeSingleton, contractNetworks } = config
+    const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    this.#ethAdapter = ethAdapter
-
+    this.#safeProvider = new SafeProvider({
+      provider,
+      signer
+    })
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
-      this.#contractManager = await ContractManager.create({
-        ethAdapter: this.#ethAdapter,
-        predictedSafe: this.#predictedSafe,
-        isL1SafeSingleton,
-        contractNetworks
-      })
+      this.#contractManager = await ContractManager.create(
+        {
+          provider,
+          predictedSafe: this.#predictedSafe,
+          isL1SafeSingleton,
+          contractNetworks
+        },
+        this.#safeProvider
+      )
     } else {
-      this.#contractManager = await ContractManager.create({
-        ethAdapter: this.#ethAdapter,
-        safeAddress: config.safeAddress,
-        isL1SafeSingleton,
-        contractNetworks
-      })
+      this.#contractManager = await ContractManager.create(
+        {
+          provider,
+          safeAddress: config.safeAddress,
+          isL1SafeSingleton,
+          contractNetworks
+        },
+        this.#safeProvider
+      )
     }
 
-    this.#ownerManager = new OwnerManager(this.#ethAdapter, this.#contractManager.safeContract)
-    this.#moduleManager = new ModuleManager(this.#ethAdapter, this.#contractManager.safeContract)
-    this.#guardManager = new GuardManager(this.#ethAdapter, this.#contractManager.safeContract)
+    this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
+    this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
+    this.#guardManager = new GuardManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#fallbackHandlerManager = new FallbackHandlerManager(
-      this.#ethAdapter,
+      this.#safeProvider,
       this.#contractManager.safeContract
     )
   }
@@ -150,9 +159,11 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect(config: ConnectSafeConfig): Promise<Safe> {
-    const { ethAdapter, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } = config
+    const { provider, signer, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } =
+      config
     const configProps: SafeConfigProps = {
-      ethAdapter: ethAdapter || this.#ethAdapter,
+      provider: provider || this.#safeProvider.provider,
+      signer,
       isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks
     }
@@ -198,10 +209,10 @@ class Safe {
       throw new Error('The Safe already exists')
     }
 
-    const chainId = await this.#ethAdapter.getChainId()
+    const chainId = await this.#safeProvider.getChainId()
 
     return getPredictedSafeAddressInitCode({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       chainId,
       customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
       ...this.#predictedSafe
@@ -222,9 +233,9 @@ class Safe {
         )
       }
 
-      const chainId = await this.#ethAdapter.getChainId()
+      const chainId = await this.#safeProvider.getChainId()
       return predictSafeAddress({
-        ethAdapter: this.#ethAdapter,
+        safeProvider: this.#safeProvider,
         chainId,
         customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
         ...this.#predictedSafe
@@ -248,12 +259,12 @@ class Safe {
   }
 
   /**
-   * Returns the current EthAdapter.
+   * Returns the current SafeProvider.
    *
-   * @returns The current EthAdapter
+   * @returns The current SafeProvider
    */
-  getEthAdapter(): EthAdapter {
-    return this.#ethAdapter
+  getSafeProvider(): SafeProvider {
+    return this.#safeProvider
   }
 
   /**
@@ -281,7 +292,7 @@ class Safe {
    */
   async isSafeDeployed(): Promise<boolean> {
     const safeAddress = await this.getAddress()
-    const isSafeDeployed = await this.#ethAdapter.isContractDeployed(safeAddress)
+    const isSafeDeployed = await this.#safeProvider.isContractDeployed(safeAddress)
     return isSafeDeployed
   }
 
@@ -349,7 +360,7 @@ class Safe {
    * @returns The chainId of the connected network
    */
   async getChainId(): Promise<bigint> {
-    return this.#ethAdapter.getChainId()
+    return this.#safeProvider.getChainId()
   }
 
   /**
@@ -358,7 +369,7 @@ class Safe {
    * @returns The ETH balance of the Safe
    */
   async getBalance(): Promise<bigint> {
-    return this.#ethAdapter.getBalance(await this.getAddress())
+    return this.#safeProvider.getBalance(await this.getAddress())
   }
 
   /**
@@ -396,7 +407,7 @@ class Safe {
    * @param pageSize - The size of the page. It will be the max length of the returning array. Must be greater then 0.
    * @returns The list of addresses of all the enabled Safe modules
    */
-  async getModulesPaginated(start: string, pageSize: number = 10): Promise<string[]> {
+  async getModulesPaginated(start: string, pageSize: number = 10): Promise<SafeModulesPaginated> {
     return this.#moduleManager.getModulesPaginated(start, pageSize)
   }
 
@@ -475,7 +486,7 @@ class Safe {
       return new EthSafeTransaction(
         await standardizeSafeTransactionData({
           predictedSafe: this.#predictedSafe,
-          ethAdapter: this.#ethAdapter,
+          provider: this.#safeProvider.provider,
           tx: newTransaction,
           contractNetworks: this.#contractManager.contractNetworks
         })
@@ -488,7 +499,7 @@ class Safe {
     return new EthSafeTransaction(
       await standardizeSafeTransactionData({
         safeContract: this.#contractManager.safeContract,
-        ethAdapter: this.#ethAdapter,
+        provider: this.#safeProvider.provider,
         tx: newTransaction,
         contractNetworks: this.#contractManager.contractNetworks
       })
@@ -560,7 +571,7 @@ class Safe {
    * @returns The Safe signature
    */
   async signHash(hash: string): Promise<SafeSignature> {
-    const signature = await generateSignature(this.#ethAdapter, hash)
+    const signature = await generateSignature(this.#safeProvider, hash)
 
     return signature
   }
@@ -592,9 +603,9 @@ class Safe {
     preimageSafeAddress?: string
   ): Promise<SafeMessage> {
     const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
     const addressIsOwner = owners.some(
@@ -674,11 +685,11 @@ class Safe {
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
       safeVersion: await this.getContractVersion(),
-      chainId: await this.getEthAdapter().getChainId(),
+      chainId: await this.#safeProvider.getChainId(),
       data: eip712Data.data
     }
 
-    return generateEIP712Signature(this.#ethAdapter, safeEIP712Args, methodVersion)
+    return generateEIP712Signature(this.#safeProvider, safeEIP712Args, methodVersion)
   }
 
   /**
@@ -703,9 +714,10 @@ class Safe {
       : safeTransaction
 
     const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
+
     if (!signerAddress) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
     const addressIsOwner = owners.some(
@@ -787,9 +799,9 @@ class Safe {
     }
 
     const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
     const addressIsOwner = owners.some(
       (owner: string) => signerAddress && sameString(owner, signerAddress)
@@ -797,9 +809,7 @@ class Safe {
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
-    if (options?.gas && options?.gasLimit) {
-      throw new Error('Cannot specify gas and gasLimit together in transaction options')
-    }
+
     // TODO: fix this
     return this.#contractManager.safeContract.approveHash(hash, {
       from: signerAddress,
@@ -1145,9 +1155,9 @@ class Safe {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('EthAdapter must be initialized with a signer to use this method')
+      throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
     if (owners.includes(signerAddress)) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
@@ -1193,7 +1203,7 @@ class Safe {
     }
     const owners = await this.getOwners()
     const threshold = await this.getThreshold()
-    const signerAddress = await this.#ethAdapter.getSignerAddress()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
     if (
       threshold > signedSafeTransaction.signatures.size &&
       signerAddress &&
@@ -1219,9 +1229,6 @@ class Safe {
       }
     }
 
-    if (options?.gas && options?.gasLimit) {
-      throw new Error('Cannot specify gas and gasLimit together in transaction options')
-    }
     const txResponse = await this.#contractManager.safeContract.execTransaction(
       signedSafeTransaction,
       {
@@ -1246,7 +1253,7 @@ class Safe {
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
-    const safeSingletonContract = await this.#ethAdapter.getSafeContract({
+    const safeSingletonContract = await this.#safeProvider.getSafeContract({
       safeVersion,
       isL1SafeSingleton,
       customContractAbi: customContracts?.safeSingletonAbi,
@@ -1347,12 +1354,12 @@ class Safe {
     const { safeAccountConfig, safeDeploymentConfig } = this.#predictedSafe
 
     const safeVersion = await this.getContractVersion()
-    const ethAdapter = this.#ethAdapter
-    const chainId = await ethAdapter.getChainId()
+    const safeProvider = this.#safeProvider
+    const chainId = await safeProvider.getChainId()
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
-    const safeSingletonContract = await ethAdapter.getSafeContract({
+    const safeSingletonContract = await safeProvider.getSafeContract({
       safeVersion,
       isL1SafeSingleton,
       customContractAddress: customContracts?.safeSingletonAddress,
@@ -1361,14 +1368,14 @@ class Safe {
 
     // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol
     const safeProxyFactoryContract = await getProxyFactoryContract({
-      ethAdapter,
+      safeProvider,
       safeVersion,
       customContracts
     })
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/Safe.sol#L95
     const initializer = await encodeSetupCallData({
-      ethAdapter,
+      safeProvider,
       safeContract: safeSingletonContract,
       safeAccountConfig: safeAccountConfig,
       customContracts
@@ -1409,11 +1416,11 @@ class Safe {
     transactions: MetaTransactionData[],
     transactionOptions?: TransactionOptions
   ): Promise<Transaction> {
-    const chainId = await this.#ethAdapter.getChainId()
+    const chainId = await this.#safeProvider.getChainId()
 
     // we use the MultiSend contract to create the batch, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/libraries/MultiSendCallOnly.sol
     const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       safeVersion: await this.getContractVersion(),
       customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
     })
@@ -1445,10 +1452,10 @@ class Safe {
 
     const safeVersion =
       (await this.#contractManager.safeContract.getVersion()) ?? DEFAULT_SAFE_VERSION
-    const chainId = await this.#ethAdapter.getChainId()
+    const chainId = await this.#safeProvider.getChainId()
 
     const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
-      ethAdapter: this.#ethAdapter,
+      safeProvider: this.#safeProvider,
       safeVersion,
       customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
     })
@@ -1506,12 +1513,12 @@ class Safe {
 
     try {
       const isValidSignatureResponse = await Promise.all([
-        this.#ethAdapter.call({
+        this.#safeProvider.call({
           from: safeAddress,
           to: safeAddress,
           data: data
         }),
-        this.#ethAdapter.call({
+        this.#safeProvider.call({
           from: safeAddress,
           to: safeAddress,
           data: bytesData

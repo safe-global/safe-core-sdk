@@ -1,5 +1,4 @@
 import '@nomicfoundation/hardhat-ethers'
-import '@nomiclabs/hardhat-web3'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import yargs from 'yargs'

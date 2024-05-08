@@ -1,3 +1,4 @@
+import SafeProvider from '../SafeProvider'
 import {
   CompatibilityFallbackHandlerContractImplementationType,
   ContractNetworkConfig,
@@ -10,10 +11,9 @@ import {
   SimulateTxAccessorContractImplementationType
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 
 export interface GetContractInstanceProps {
-  ethAdapter: EthAdapter
+  safeProvider: SafeProvider
   safeVersion: SafeVersion
   customContracts?: ContractNetworkConfig
 }
@@ -24,19 +24,19 @@ export interface GetSafeContractInstanceProps extends GetContractInstanceProps {
 }
 
 export async function getSafeContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customSafeAddress,
   isL1SafeSingleton,
   customContracts
 }: GetSafeContractInstanceProps): Promise<SafeContractImplementationType> {
-  const safeContract = await ethAdapter.getSafeContract({
+  const safeContract = await safeProvider.getSafeContract({
     safeVersion,
     customContractAddress: customSafeAddress ?? customContracts?.safeSingletonAddress,
     customContractAbi: customContracts?.safeSingletonAbi,
     isL1SafeSingleton
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(await safeContract.getAddress())
+  const isContractDeployed = await safeProvider.isContractDeployed(await safeContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('SafeProxy contract is not deployed on the current network')
   }
@@ -44,16 +44,16 @@ export async function getSafeContract({
 }
 
 export async function getProxyFactoryContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SafeProxyFactoryContractImplementationType> {
-  const safeProxyFactoryContract = await ethAdapter.getSafeProxyFactoryContract({
+  const safeProxyFactoryContract = await safeProvider.getSafeProxyFactoryContract({
     safeVersion,
     customContractAddress: customContracts?.safeProxyFactoryAddress,
     customContractAbi: customContracts?.safeProxyFactoryAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(
+  const isContractDeployed = await safeProvider.isContractDeployed(
     await safeProxyFactoryContract.getAddress()
   )
   if (!isContractDeployed) {
@@ -63,16 +63,16 @@ export async function getProxyFactoryContract({
 }
 
 export async function getCompatibilityFallbackHandlerContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<CompatibilityFallbackHandlerContractImplementationType> {
-  const fallbackHandlerContract = await ethAdapter.getCompatibilityFallbackHandlerContract({
+  const fallbackHandlerContract = await safeProvider.getCompatibilityFallbackHandlerContract({
     safeVersion,
     customContractAddress: customContracts?.fallbackHandlerAddress,
     customContractAbi: customContracts?.fallbackHandlerAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(
+  const isContractDeployed = await safeProvider.isContractDeployed(
     await fallbackHandlerContract.getAddress()
   )
   if (!isContractDeployed) {
@@ -82,16 +82,16 @@ export async function getCompatibilityFallbackHandlerContract({
 }
 
 export async function getMultiSendContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<MultiSendContractImplementationType> {
-  const multiSendContract = await ethAdapter.getMultiSendContract({
+  const multiSendContract = await safeProvider.getMultiSendContract({
     safeVersion,
     customContractAddress: customContracts?.multiSendAddress,
     customContractAbi: customContracts?.multiSendAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(
+  const isContractDeployed = await safeProvider.isContractDeployed(
     await multiSendContract.getAddress()
   )
   if (!isContractDeployed) {
@@ -101,16 +101,16 @@ export async function getMultiSendContract({
 }
 
 export async function getMultiSendCallOnlyContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<MultiSendCallOnlyContractImplementationType> {
-  const multiSendCallOnlyContract = await ethAdapter.getMultiSendCallOnlyContract({
+  const multiSendCallOnlyContract = await safeProvider.getMultiSendCallOnlyContract({
     safeVersion,
     customContractAddress: customContracts?.multiSendCallOnlyAddress,
     customContractAbi: customContracts?.multiSendCallOnlyAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(
+  const isContractDeployed = await safeProvider.isContractDeployed(
     await multiSendCallOnlyContract.getAddress()
   )
   if (!isContractDeployed) {
@@ -120,16 +120,16 @@ export async function getMultiSendCallOnlyContract({
 }
 
 export async function getSignMessageLibContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SignMessageLibContractImplementationType> {
-  const signMessageLibContract = await ethAdapter.getSignMessageLibContract({
+  const signMessageLibContract = await safeProvider.getSignMessageLibContract({
     safeVersion,
     customContractAddress: customContracts?.signMessageLibAddress,
     customContractAbi: customContracts?.signMessageLibAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(
+  const isContractDeployed = await safeProvider.isContractDeployed(
     await signMessageLibContract.getAddress()
   )
   if (!isContractDeployed) {
@@ -139,16 +139,16 @@ export async function getSignMessageLibContract({
 }
 
 export async function getCreateCallContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<CreateCallContractImplementationType> {
-  const createCallContract = await ethAdapter.getCreateCallContract({
+  const createCallContract = await safeProvider.getCreateCallContract({
     safeVersion,
     customContractAddress: customContracts?.createCallAddress,
     customContractAbi: customContracts?.createCallAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(
+  const isContractDeployed = await safeProvider.isContractDeployed(
     await createCallContract.getAddress()
   )
   if (!isContractDeployed) {
@@ -158,16 +158,16 @@ export async function getCreateCallContract({
 }
 
 export async function getSimulateTxAccessorContract({
-  ethAdapter,
+  safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SimulateTxAccessorContractImplementationType> {
-  const simulateTxAccessorContract = await ethAdapter.getSimulateTxAccessorContract({
+  const simulateTxAccessorContract = await safeProvider.getSimulateTxAccessorContract({
     safeVersion,
     customContractAddress: customContracts?.simulateTxAccessorAddress,
     customContractAbi: customContracts?.simulateTxAccessorAbi
   })
-  const isContractDeployed = await ethAdapter.isContractDeployed(
+  const isContractDeployed = await safeProvider.isContractDeployed(
     await simulateTxAccessorContract.getAddress()
   )
   if (!isContractDeployed) {

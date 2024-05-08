@@ -6,22 +6,22 @@ import {
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
 import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
+import SafeProvider from '../SafeProvider'
 
 class FallbackHandlerManager {
-  #ethAdapter: EthAdapter
+  #safeProvider: SafeProvider
   #safeContract?: SafeContractImplementationType
   // keccak256("fallback_manager.handler.address")
   #slot = '0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5'
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContractImplementationType) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: SafeProvider, safeContract?: SafeContractImplementationType) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateFallbackHandlerAddress(fallbackHandlerAddress: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(fallbackHandlerAddress)
+    const isValidAddress = this.#safeProvider.isAddress(fallbackHandlerAddress)
     if (!isValidAddress || isZeroAddress(fallbackHandlerAddress)) {
       throw new Error('Invalid fallback handler address provided')
     }
@@ -59,7 +59,7 @@ class FallbackHandlerManager {
   async getFallbackHandler(): Promise<string> {
     const safeContract = await this.isFallbackHandlerCompatible()
 
-    return this.#ethAdapter.getStorageAt(await safeContract.getAddress(), this.#slot)
+    return this.#safeProvider.getStorageAt(await safeContract.getAddress(), this.#slot)
   }
 
   async encodeEnableFallbackHandlerData(fallbackHandlerAddress: string): Promise<string> {
@@ -69,7 +69,6 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
 
-    // @ts-expect-error Expression produces a union type that is too complex to represent
     return safeContract.encode('setFallbackHandler', [fallbackHandlerAddress])
   }
 

@@ -1,19 +1,22 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter } from '@safe-global/protocol-kit/adapters/ethAdapter'
-import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
+import {
+  SafeContractImplementationType,
+  SafeModulesPaginated
+} from '@safe-global/protocol-kit/types'
+import SafeProvider from '../SafeProvider'
 
 class ModuleManager {
-  #ethAdapter: EthAdapter
+  #safeProvider: SafeProvider
   #safeContract?: SafeContractImplementationType
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContractImplementationType) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: SafeProvider, safeContract?: SafeContractImplementationType) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateModuleAddress(moduleAddress: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(moduleAddress)
+    const isValidAddress = this.#safeProvider.isAddress(moduleAddress)
     if (!isValidAddress || isRestrictedAddress(moduleAddress)) {
       throw new Error('Invalid module address provided')
     }
@@ -46,17 +49,13 @@ class ModuleManager {
     return [...modules]
   }
 
-  //TODO: Implement getModulesPaginated in the new code
-  async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
-    console.log('getModulesPaginated', start, pageSize)
-    return []
-    // if (!this.#safeContract) {
-    //   throw new Error('Safe is not deployed')
-    // }
+  async getModulesPaginated(start: string, pageSize: number): Promise<SafeModulesPaginated> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
 
-    // const [modules] = await this.#safeContract.getModulesPaginated(start, pageSize)
-
-    // return [...modules]
+    const [modules, next] = await this.#safeContract.getModulesPaginated([start, BigInt(pageSize)])
+    return { modules: modules as string[], next }
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {

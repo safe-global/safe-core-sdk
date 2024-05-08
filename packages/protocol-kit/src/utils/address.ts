@@ -8,7 +8,7 @@ export function isZeroAddress(address: string): boolean {
   return sameString(address, ZERO_ADDRESS)
 }
 
-function isSentinelAddress(address: string): boolean {
+export function isSentinelAddress(address: string): boolean {
   return sameString(address, SENTINEL_ADDRESS)
 }
 

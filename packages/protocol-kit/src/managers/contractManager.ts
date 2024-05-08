@@ -13,6 +13,7 @@ import {
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
+import SafeProvider from '../SafeProvider'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
@@ -21,16 +22,16 @@ class ContractManager {
   #multiSendContract!: MultiSendContractImplementationType
   #multiSendCallOnlyContract!: MultiSendCallOnlyContractImplementationType
 
-  static async create(config: SafeConfig): Promise<ContractManager> {
+  static async create(config: SafeConfig, safeProvider: SafeProvider): Promise<ContractManager> {
     const contractManager = new ContractManager()
-    await contractManager.init(config)
+    await contractManager.init(config, safeProvider)
     return contractManager
   }
 
-  async init(config: SafeConfig): Promise<void> {
-    const { ethAdapter, isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
+  async init(config: SafeConfig, safeProvider: SafeProvider): Promise<void> {
+    const { isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
 
-    const chainId = await ethAdapter.getChainId()
+    const chainId = await safeProvider.getChainId()
     const customContracts = contractNetworks?.[chainId.toString()]
     this.#contractNetworks = contractNetworks
     this.#isL1SafeSingleton = isL1SafeSingleton
@@ -42,7 +43,7 @@ class ContractManager {
     } else {
       // We use the default version of the Safe contract to get the correct version of this Safe
       const defaultSafeContractInstance = await getSafeContract({
-        ethAdapter,
+        safeProvider,
         safeVersion: DEFAULT_SAFE_VERSION,
         isL1SafeSingleton,
         customSafeAddress: safeAddress,
@@ -58,7 +59,7 @@ class ContractManager {
       this.#safeContract = isTheDefaultSafeVersion
         ? defaultSafeContractInstance
         : await getSafeContract({
-            ethAdapter,
+            safeProvider,
             safeVersion,
             isL1SafeSingleton,
             customSafeAddress: safeAddress,
@@ -67,13 +68,13 @@ class ContractManager {
     }
 
     this.#multiSendContract = await getMultiSendContract({
-      ethAdapter,
+      safeProvider,
       safeVersion,
       customContracts
     })
 
     this.#multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
-      ethAdapter,
+      safeProvider,
       safeVersion,
       customContracts
     })

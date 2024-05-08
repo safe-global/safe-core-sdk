@@ -1,7 +1,7 @@
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
-import { sameString } from '@safe-global/protocol-kit/utils'
+import { sameString, isSentinelAddress } from '@safe-global/protocol-kit/utils'
 import {
   SafeVersion,
   SafeContract_v1_0_0_Abi,
@@ -247,15 +247,25 @@ class SafeContract_v1_0_0
     return toTxResult(txResponse, options)
   }
 
-  async getModulesPaginated(start: string, pageSize: bigint): Promise<string[]> {
+  async getModulesPaginated([start, pageSize]: [string, bigint]): Promise<[string[], string]> {
     if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
 
+    const size = Number(pageSize)
     const [array] = await this.getModules()
-    if (start === SENTINEL_ADDRESS) {
-      return array.slice(0, Number(pageSize))
+
+    if (isSentinelAddress(start)) {
+      const next = pageSize < array.length ? array[size] : SENTINEL_ADDRESS
+      return [array.slice(0, size), next]
     } else {
       const moduleIndex = array.findIndex((module: string) => sameString(module, start))
-      return moduleIndex === -1 ? [] : array.slice(moduleIndex + 1, Number(pageSize))
+      if (moduleIndex === -1) {
+        return [[], SENTINEL_ADDRESS]
+      }
+
+      const nextElementIndex = moduleIndex + 1
+      const nextPageAddress =
+        nextElementIndex + size < array.length ? array[nextElementIndex + size] : SENTINEL_ADDRESS
+      return [array.slice(moduleIndex + 1, nextElementIndex + size), nextPageAddress]
     }
   }
 

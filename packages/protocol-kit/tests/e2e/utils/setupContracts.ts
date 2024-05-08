@@ -175,6 +175,18 @@ export const getSocialRecoveryModule = async (): Promise<Contract> => {
   return SocialRecoveryModule.attach(SocialRecoveryModuleDeployment.address)
 }
 
+export const getStateChannelModule = async (): Promise<Contract> => {
+  const StateChannelModuleDeployment = await deployments.get('StateChannelModule')
+  const StateChannelModule = await ethers.getContractFactory('StateChannelModule')
+  return StateChannelModule.attach(StateChannelModuleDeployment.address)
+}
+
+export const getWhiteListModule = async (): Promise<Contract> => {
+  const WhiteListModuleDeployment = await deployments.get('WhitelistModule')
+  const WhiteListModule = await ethers.getContractFactory('WhitelistModule')
+  return WhiteListModule.attach(WhiteListModuleDeployment.address)
+}
+
 export const getERC20Mintable = async (): Promise<Contract> => {
   const ERC20MintableDeployment = await deployments.get('ERC20Mintable')
   const ERC20Mintable = await ethers.getContractFactory('ERC20Mintable')

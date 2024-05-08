@@ -702,16 +702,16 @@ describe('Endpoint tests', () => {
         )
         .to.be.eventually.deep.equals({ data: { success: true } })
 
-      // We need to get the object without the "callGasLimit" prop because the api endpoint expects it as "callDataGasLimit"
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { callGasLimit, ...safeOperationWithoutCallGasLimit } = safeOperation.data
+      // We need to rename the "callGasLimit" prop here because the api endpoint expects it as "callDataGasLimit"
+      const { callGasLimit: callDataGasLimit, ...safeOperationWithoutCallGasLimit } =
+        safeOperation.data
 
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
         method: 'post',
         body: {
           ...safeOperationWithoutCallGasLimit,
-          callDataGasLimit: safeOperation.data.callGasLimit,
+          callDataGasLimit,
           signature,
           moduleAddress
         }

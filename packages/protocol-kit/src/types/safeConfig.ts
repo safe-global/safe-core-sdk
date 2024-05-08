@@ -2,6 +2,7 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 import { SafeProviderConfig } from './safeProvider'
 import { ContractNetworksConfig } from './contracts'
+import { passkeyArgType } from './passkeys'
 
 export type SafeAccountConfig = {
   owners: string[]
@@ -40,7 +41,7 @@ type SafeConfigWithPredictedSafeProps = {
 
 export type SafeConfigProps = {
   provider: SafeProviderConfig['provider']
-  signer?: SafeProviderConfig['signer']
+  signer?: string | passkeyArgType
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
@@ -67,7 +68,7 @@ type ConnectSafeConfigWithPredictedSafeProps = {
 
 type ConnectSafeConfigProps = {
   provider?: SafeProviderConfig['provider']
-  signer?: SafeProviderConfig['signer']
+  signer?: string | passkeyArgType
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */

@@ -2,14 +2,16 @@ import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config
 import {
   getMultiSendCallOnlyContract,
   getMultiSendContract,
-  getSafeContract
+  getSafeContract,
+  getSafeWebAuthnSignerFactoryContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import {
   ContractNetworksConfig,
   MultiSendCallOnlyContractImplementationType,
   MultiSendContractImplementationType,
   SafeConfig,
-  SafeContractImplementationType
+  SafeContractImplementationType,
+  SafeWebAuthnSignerFactoryContractImplementationType
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
@@ -21,6 +23,7 @@ class ContractManager {
   #safeContract?: SafeContractImplementationType
   #multiSendContract!: MultiSendContractImplementationType
   #multiSendCallOnlyContract!: MultiSendCallOnlyContractImplementationType
+  #safeWebAuthnSignerFactoryContract!: SafeWebAuthnSignerFactoryContractImplementationType
 
   static async init(config: SafeConfig, safeProvider: SafeProvider): Promise<ContractManager> {
     const contractManager = new ContractManager()
@@ -78,6 +81,12 @@ class ContractManager {
       safeVersion,
       customContracts
     })
+
+    this.#safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+      safeProvider,
+      safeVersion,
+      customContracts
+    })
   }
 
   get contractNetworks(): ContractNetworksConfig | undefined {
@@ -98,6 +107,10 @@ class ContractManager {
 
   get multiSendCallOnlyContract(): MultiSendCallOnlyContractImplementationType {
     return this.#multiSendCallOnlyContract
+  }
+
+  get safeWebAuthnSignerFactoryContract(): SafeWebAuthnSignerFactoryContractImplementationType {
+    return this.#safeWebAuthnSignerFactoryContract
   }
 }
 

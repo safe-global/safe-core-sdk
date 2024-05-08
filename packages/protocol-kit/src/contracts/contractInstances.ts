@@ -22,7 +22,8 @@ import {
   CreateCallContract_v1_4_1_Abi,
   CreateCallContract_v1_3_0_Abi,
   SimulateTxAccessorContract_v1_4_1_Abi,
-  SimulateTxAccessorContract_v1_3_0_Abi
+  SimulateTxAccessorContract_v1_3_0_Abi,
+  SafeWebAuthnSignerFactoryContract_v1_4_1_Abi
 } from '@safe-global/safe-core-sdk-types'
 import CreateCallContract_v1_3_0 from './CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from './CreateCall/v1.4.1/CreateCallContract_v1_4_1'
@@ -46,6 +47,7 @@ import SimulateTxAccessorContract_v1_3_0 from './SimulateTxAccessor/v1.3.0/Simul
 import SimulateTxAccessorContract_v1_4_1 from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 import CompatibilityFallbackHandlerContract_v1_3_0 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
 import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
+import SafeWebAuthnSignerFactoryContract_v1_4_1 from './SafeWebAuthnSignerFactory/v1.4.1/SafeWebAuthnSignerFactoryContract_v1_4_1'
 import SafeProvider from '../SafeProvider'
 
 export async function getSafeContractInstance(
@@ -410,4 +412,36 @@ export async function getSimulateTxAccessorContractInstance(
   await simulateTxAccessorContractInstance.init()
 
   return simulateTxAccessorContractInstance
+}
+
+export async function getSafeWebAuthnSignerFactoryContractInstance(
+  safeVersion: SafeVersion,
+  safeProvider: SafeProvider,
+  contractAddress?: string,
+  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+): Promise<SafeWebAuthnSignerFactoryContract_v1_4_1> {
+  const chainId = await safeProvider.getChainId()
+
+  switch (safeVersion) {
+    case '1.4.1':
+    case '1.3.0':
+    case '1.2.0':
+    case '1.1.1':
+    case '1.0.0':
+      const safeWebAuthnSignerFactoryContractInstance =
+        new SafeWebAuthnSignerFactoryContract_v1_4_1(
+          chainId,
+          safeProvider,
+          contractAddress,
+          customContractAbi as SafeWebAuthnSignerFactoryContract_v1_4_1_Abi,
+          safeProvider.getExternalProvider()
+        )
+
+      await safeWebAuthnSignerFactoryContractInstance.init()
+
+      return safeWebAuthnSignerFactoryContractInstance
+
+    default:
+      throw new Error('Invalid Safe version')
+  }
 }

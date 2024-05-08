@@ -7,6 +7,7 @@ import {
   MultiSendContractImplementationType,
   SafeContractImplementationType,
   SafeProxyFactoryContractImplementationType,
+  SafeWebAuthnSignerFactoryContractImplementationType,
   SignMessageLibContractImplementationType,
   SimulateTxAccessorContractImplementationType
 } from '@safe-global/protocol-kit/types'
@@ -174,4 +175,26 @@ export async function getSimulateTxAccessorContract({
     throw new Error('SimulateTxAccessor contract is not deployed on the current network')
   }
   return simulateTxAccessorContract
+}
+
+export async function getSafeWebAuthnSignerFactoryContract({
+  safeProvider,
+  safeVersion,
+  customContracts
+}: GetContractInstanceProps): Promise<SafeWebAuthnSignerFactoryContractImplementationType> {
+  const safeWebAuthnSignerFactoryContract = await safeProvider.getSafeWebAuthnSignerFactoryContract(
+    {
+      safeVersion,
+      customContractAddress: customContracts?.simulateTxAccessorAddress,
+      customContractAbi: customContracts?.simulateTxAccessorAbi
+    }
+  )
+
+  const isContractDeployed = await safeProvider.isContractDeployed(
+    await safeWebAuthnSignerFactoryContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('safeWebAuthnSignerFactory contract is not deployed on the current network')
+  }
+  return safeWebAuthnSignerFactoryContract
 }

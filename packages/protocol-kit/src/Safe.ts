@@ -29,6 +29,7 @@ import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import {
   AddOwnerTxParams,
+  AddPasskeyOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
   PredictedSafeProps,
@@ -38,7 +39,8 @@ import {
   SigningMethod,
   SigningMethodType,
   SwapOwnerTxParams,
-  SafeModulesPaginated
+  SafeModulesPaginated,
+  passkeyArgType
 } from './types'
 import {
   EthSafeSignature,
@@ -54,7 +56,8 @@ import {
   generatePreValidatedSignature,
   generateSignature,
   preimageSafeMessageHash,
-  preimageSafeTransactionHash
+  preimageSafeTransactionHash,
+  adjustVInSignature
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -67,11 +70,13 @@ import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
-  getProxyFactoryContract
+  getProxyFactoryContract,
+  getSafeWebAuthnSignerFactoryContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
+import PasskeySigner from './utils/passkeys/PasskeySigner'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -114,10 +119,38 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    this.#safeProvider = new SafeProvider({
-      provider,
-      signer
-    })
+    const isPasskeySigner = signer && typeof signer !== 'string'
+
+    if (isPasskeySigner) {
+      const safeProvider = new SafeProvider({
+        provider
+      })
+      const chainId = await safeProvider.getChainId()
+      const customContracts = contractNetworks?.[chainId.toString()]
+
+      const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+        safeProvider,
+        safeVersion: '1.4.1',
+        customContracts
+      })
+
+      const passkeySigner = await PasskeySigner.init(
+        signer,
+        safeWebAuthnSignerFactoryContract,
+        safeProvider.getExternalProvider()
+      )
+
+      this.#safeProvider = new SafeProvider({
+        provider,
+        signer: passkeySigner
+      })
+    } else {
+      this.#safeProvider = new SafeProvider({
+        provider,
+        signer
+      })
+    }
+
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
       this.#contractManager = await ContractManager.init(
@@ -422,12 +455,36 @@ class Safe {
   }
 
   /**
+   * Checks if a specific address or passkey is an owner of the current Safe.
+   *
+   * @param owner - The owner address or a passkey object
+   * @returns TRUE if the account is an owner
+   */
+  async isOwner(owner: string | passkeyArgType): Promise<boolean> {
+    const isOwnerAddress = typeof owner === 'string'
+
+    if (isOwnerAddress) {
+      return this.#isOwnerAddress(owner)
+    }
+
+    // passkey flow
+    const webAuthnSignerFactoryContract = this.#contractManager.safeWebAuthnSignerFactoryContract
+    const provider = this.#safeProvider.getExternalProvider()
+
+    const passkeySigner = await PasskeySigner.init(owner, webAuthnSignerFactoryContract, provider)
+
+    const ownerAddress = await passkeySigner.getAddress()
+
+    return this.#isOwnerAddress(ownerAddress)
+  }
+
+  /**
    * Checks if a specific address is an owner of the current Safe.
    *
    * @param ownerAddress - The account address
    * @returns TRUE if the account is an owner
    */
-  async isOwner(ownerAddress: string): Promise<boolean> {
+  async #isOwnerAddress(ownerAddress: string): Promise<boolean> {
     if (this.#predictedSafe?.safeAccountConfig.owners) {
       return Promise.resolve(
         this.#predictedSafe?.safeAccountConfig.owners.some((owner: string) =>
@@ -727,6 +784,27 @@ class Safe {
       throw new Error('Transactions can only be signed by Safe owners')
     }
 
+    // passkey flow
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+    if (isPasskeySigner) {
+      const txHash = await this.getTransactionHash(transaction)
+      const signedHash = await this.#safeProvider.signMessage(txHash)
+
+      const signatureAdjusted = adjustVInSignature(
+        SigningMethod.ETH_SIGN,
+        signedHash,
+        txHash,
+        signerAddress
+      )
+
+      const signature = new EthSafeSignature(signerAddress, signatureAdjusted, true)
+
+      const signedSafeTransaction = await this.copyTransaction(transaction)
+      signedSafeTransaction.addSignature(signature)
+
+      return signedSafeTransaction
+    }
+
     const safeVersion = await this.getContractVersion()
     if (
       signingMethod === SigningMethod.SAFE_SIGNATURE &&
@@ -998,6 +1076,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
+  // TODO: update this method to get passkey arg
   async createAddOwnerTx(
     { ownerAddress, threshold }: AddOwnerTxParams,
     options?: SafeTransactionOptionalProps
@@ -1012,6 +1091,62 @@ class Safe {
       options
     })
     return safeTransaction
+  }
+
+  // TODO: use createAddOwnerTx instead
+  /**
+   * Returns the Safe transaction to add a passkey owner and optionally change the threshold.
+   *
+   * @param params - The transaction params
+   * @param options - The transaction optional properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "Invalid owner address provided"
+   * @throws "Address provided is already an owner"
+   * @throws "Threshold needs to be greater than 0"
+   * @throws "Threshold cannot exceed owner count"
+   */
+  async createAddPasskeyOwnerTx(
+    { passkey, threshold }: AddPasskeyOwnerTxParams,
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const webAuthnSignerFactoryContract = this.#contractManager.safeWebAuthnSignerFactoryContract
+    const provider = this.#safeProvider.getExternalProvider()
+
+    const passkeySigner = await PasskeySigner.init(passkey, webAuthnSignerFactoryContract, provider)
+
+    // TODO: remove this console.log
+    console.log('passkeySigner address: ', await passkeySigner.getAddress())
+
+    const ownerAddress = await passkeySigner.getAddress()
+    const isPasskeySignerDeployed = await this.#safeProvider.isContractDeployed(ownerAddress)
+
+    if (isPasskeySignerDeployed) {
+      return this.createAddOwnerTx({ ownerAddress, threshold }, options)
+    }
+
+    // if the Signer is not deployed we need to create a batch (Signer deployment + addOwner)
+
+    // First transaction of the batch: The Deployment of the Signer
+    const createSignerTransaction = {
+      to: await passkeySigner.safeWebAuthnSignerFactoryContract.getAddress(),
+      value: '0',
+      data: passkeySigner.encondeCreateSigner()
+    }
+
+    // Second transaction of the batch: The AddOwner transaction
+    const addOwnerTransaction = {
+      to: await this.getAddress(),
+      value: '0',
+      data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
+    }
+
+    // transactions for the batch
+    const transactions = [createSignerTransaction, addOwnerTransaction]
+
+    return await this.createTransaction({
+      transactions,
+      options
+    })
   }
 
   /**

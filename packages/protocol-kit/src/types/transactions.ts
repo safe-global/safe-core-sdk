@@ -5,6 +5,7 @@ import { SafeProviderConfig } from './safeProvider'
 import { SafeContractImplementationType } from './contracts'
 import { ContractNetworksConfig } from './contracts'
 import { PredictedSafeProps } from './safeConfig'
+import { passkeyArgType } from './passkeys'
 
 export type CreateTransactionProps = {
   /** transactions - The transaction array to process */
@@ -49,6 +50,13 @@ export type StandardizeSafeTransactionDataProps =
 export type AddOwnerTxParams = {
   /** ownerAddress - The address of the new owner */
   ownerAddress: string
+  /** threshold - The new threshold */
+  threshold?: number
+}
+
+export type AddPasskeyOwnerTxParams = {
+  /** passkey - The passkey of the new owner */
+  passkey: passkeyArgType
   /** threshold - The new threshold */
   threshold?: number
 }

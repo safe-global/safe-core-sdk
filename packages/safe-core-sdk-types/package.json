@@ -29,7 +29,6 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "dependencies": {
-    "@safe-global/safe-deployments": "^1.34.0",
     "abitype": "^1.0.2"
   }
 }

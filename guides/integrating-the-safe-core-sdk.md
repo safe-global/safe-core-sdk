@@ -31,7 +31,7 @@ To use our kits, you need to provide an Ethereum provider and a signer. The prov
 In the examples below, you can see `provider` and `signer` properties, which represent:
 
 - `provider`: You can provide an EIP-1193 compatible provider or an HTTP/WebSocket RPC URL.
-- `signer`: This is optional. If not provided, we will try to get the connected account of the provider. If you provide it, it represents either the provider's address you want to use or a private key, which we will use internally to retrieve the provider's address.
+- `signer`: This is an optional parameter. It should be the provider's address you want to use or a private key. If not set, it will try to fetch a connected account from the provider.
 
 ### Initialize the Safe API Kit
 

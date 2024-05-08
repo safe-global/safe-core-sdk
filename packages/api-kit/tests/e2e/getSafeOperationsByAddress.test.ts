@@ -19,19 +19,21 @@ describe('getSafeOperationsByAddress', () => {
   describe('should fail', () => {
     it('should fail if safeAddress is empty', async () => {
       await chai
-        .expect(safeApiKit.getSafeOperationsByAddress(''))
+        .expect(safeApiKit.getSafeOperationsByAddress({ safeAddress: '' }))
         .to.be.rejectedWith('Safe address must not be empty')
     })
 
     it('should fail if safeAddress is invalid', async () => {
       await chai
-        .expect(safeApiKit.getSafeOperationsByAddress('0x123'))
+        .expect(safeApiKit.getSafeOperationsByAddress({ safeAddress: '0x123' }))
         .to.be.rejectedWith('Invalid Ethereum address 0x123')
     })
   })
 
   it('should get the SafeOperation list', async () => {
-    const safeOperations = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperations = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
 
     chai.expect(safeOperations).to.have.property('count').greaterThan(1)
     chai.expect(safeOperations).to.have.property('results').to.be.an('array')

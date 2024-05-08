@@ -175,7 +175,9 @@ describe('addSafeOperation', () => {
     const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
-    const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
     const initialNumSafeOperations = safeOperationsBefore.results.length
 
     await chai.expect(
@@ -187,7 +189,9 @@ describe('addSafeOperation', () => {
       })
     ).to.be.fulfilled
 
-    const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
     chai.expect(safeOperationsAfter.results.length).to.equal(initialNumSafeOperations + 1)
   })
 })

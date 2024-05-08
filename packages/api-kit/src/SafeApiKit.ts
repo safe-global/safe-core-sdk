@@ -6,6 +6,7 @@ import {
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
+  GetSafeOperationListProps,
   GetSafeOperationListResponse,
   SafeSingletonResponse,
   GetSafeMessageListProps,
@@ -722,19 +723,39 @@ class SafeApiKit {
 
   /**
    * Get the SafeOperations that were sent from a particular address.
-   * @param safeAddress - The Safe address to retrieve SafeOperations for
+   * @param getSafeOperationsProps - The parameters to filter the list of SafeOperations
    * @throws "Safe address must not be empty"
    * @throws "Invalid Ethereum address {safeAddress}"
    * @returns The SafeOperations sent from the given Safe's address
    */
-  async getSafeOperationsByAddress(safeAddress: string): Promise<GetSafeOperationListResponse> {
+  async getSafeOperationsByAddress({
+    safeAddress,
+    ordering,
+    limit,
+    offset
+  }: GetSafeOperationListProps): Promise<GetSafeOperationListResponse> {
     if (!safeAddress) {
       throw new Error('Safe address must not be empty')
     }
+
     const { address } = this.#getEip3770Address(safeAddress)
 
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/safe-operations/`)
+
+    if (ordering) {
+      url.searchParams.set('ordering', ordering)
+    }
+
+    if (limit) {
+      url.searchParams.set('limit', limit)
+    }
+
+    if (offset) {
+      url.searchParams.set('offset', offset)
+    }
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/safe-operations/`,
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }

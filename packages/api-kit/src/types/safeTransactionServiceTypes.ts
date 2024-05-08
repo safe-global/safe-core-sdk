@@ -323,6 +323,17 @@ export type SafeOperationResponse = {
   readonly preparedSignature?: string
 }
 
+export type GetSafeOperationListProps = {
+  /** Address of the Safe to get SafeOperations for */
+  safeAddress: string
+  /** Which field to use when ordering the results */
+  ordering?: string
+  /** Maximum number of results to return per page */
+  limit?: string
+  /** Initial index from which to return the results */
+  offset?: string
+}
+
 export type GetSafeOperationListResponse = {
   readonly count: number
   readonly next?: string

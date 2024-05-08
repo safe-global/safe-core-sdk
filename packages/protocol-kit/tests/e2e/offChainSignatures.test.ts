@@ -215,51 +215,45 @@ describe('Off-chain signatures', () => {
       }
     )
 
-    itif(process.env.ETH_LIB === 'ethers')(
-      'should add the signature of the current signer using eth_signTypedData with ethers provider',
-      async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
-        const safeTransactionData = {
-          to: safeAddress,
-          value: '0',
-          data: '0x'
-        }
-        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
-        chai.expect(tx.signatures.size).to.be.eq(0)
-        const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA)
-        chai.expect(tx.signatures.size).to.be.eq(0)
-        chai.expect(signedTx.signatures.size).to.be.eq(1)
+    it('should add the signature of the current signer using eth_signTypedData with ethers provider', async () => {
+      const { safe, contractNetworks, provider } = await setupTests()
+      const safeAddress = await safe.getAddress()
+      const safeSdk = await Safe.create({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const safeTransactionData = {
+        to: safeAddress,
+        value: '0',
+        data: '0x'
       }
-    )
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
+      chai.expect(tx.signatures.size).to.be.eq(0)
+      const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA)
+      chai.expect(tx.signatures.size).to.be.eq(0)
+      chai.expect(signedTx.signatures.size).to.be.eq(1)
+    })
 
-    itif(process.env.ETH_LIB === 'ethers')(
-      'should add the signature of the current signer using eth_signTypedData_v3 with ethers provider',
-      async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
-        const safeTransactionData = {
-          to: safeAddress,
-          value: '0',
-          data: '0x'
-        }
-        const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
-        chai.expect(tx.signatures.size).to.be.eq(0)
-        const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA_V3)
-        chai.expect(tx.signatures.size).to.be.eq(0)
-        chai.expect(signedTx.signatures.size).to.be.eq(1)
+    it('should add the signature of the current signer using eth_signTypedData_v3 with ethers provider', async () => {
+      const { safe, contractNetworks, provider } = await setupTests()
+      const safeAddress = await safe.getAddress()
+      const safeSdk = await Safe.create({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const safeTransactionData = {
+        to: safeAddress,
+        value: '0',
+        data: '0x'
       }
-    )
+      const tx = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
+      chai.expect(tx.signatures.size).to.be.eq(0)
+      const signedTx = await safeSdk.signTransaction(tx, SigningMethod.ETH_SIGN_TYPED_DATA_V3)
+      chai.expect(tx.signatures.size).to.be.eq(0)
+      chai.expect(signedTx.signatures.size).to.be.eq(1)
+    })
 
     it('should add the signature of the current signer using eth_signTypedData_v4', async () => {
       const { safe, contractNetworks, provider } = await setupTests()

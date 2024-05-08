@@ -14,13 +14,14 @@ import { ethers } from 'ethers'
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
 
 // Check the status of a transaction after it is executed:
-// https://goerli.etherscan.io/tx/<TRANSACTION_HASH>
+// https://sepolia.etherscan.io/tx/<TRANSACTION_HASH>
 
 const config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',
-  RPC_URL: 'https://goerli.infura.io/v3/<INFURA_API_KEY>',
   RELAY_API_KEY: '<GELATO_RELAY_API_KEY>'
 }
+
+const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',
@@ -39,7 +40,7 @@ async function main() {
   // SDK Initialization
 
   const safeAccountAbstraction = new AccountAbstraction({
-    provider: config.RPC_URL,
+    provider: RPC_URL,
     signer: config.SAFE_SIGNER_PRIVATE_KEY
   })
 

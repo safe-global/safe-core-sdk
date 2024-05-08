@@ -26,12 +26,12 @@ To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) i
 
 ### Select your Ethereum `provider` and `signer`
 
-To use our kits, you need to provide an Ethereum provider and a signer. The provider is the connection to the Ethereum network, while the signer is the account that will sign the transactions (The safe owner). When using an injected provider like MetaMask, the signer is the account selected in the wallet.
+To use our kits, you need to provide an Ethereum provider and a signer. The provider is the connection to the Ethereum network, while the signer is an account that will sign the transactions (a Safe owner). When using an injected provider like MetaMask, the signer is the account selected in the wallet.
 
 In the examples below, you can see `provider` and `signer` properties, which represent:
 
 - `provider`: You can provide an EIP-1193 compatible provider or an HTTP/WebSocket RPC URL.
-- `signer`: This is optional. If not provided, we will try to get the connected account of the provider. If you provide it, it represents either the provider's address you want to use or a private key, which we will use internally to retrieve the provider's address.
+- `signer`: This is an optional parameter. It should be the provider's address you want to use or a private key. If not set, it will try to fetch a connected account from the provider.
 
 ### Initialize the Safe API Kit
 

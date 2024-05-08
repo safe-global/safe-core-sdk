@@ -155,20 +155,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     deterministicDeployment: true
   })
 
-  await deploy('StateChannelModule', {
-    from: deployer,
-    args: [],
-    log: true,
-    deterministicDeployment: true
-  })
-
-  await deploy('WhitelistModule', {
-    from: deployer,
-    args: [],
-    log: true,
-    deterministicDeployment: true
-  })
-
   await deploy('ERC20Mintable', {
     from: deployer,
     args: [],
@@ -197,6 +183,20 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
   })
 
   await deploy('TokenCallbackHandler_SV1_4_1', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('StateChannelModule', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('WhitelistModule', {
     from: deployer,
     args: [],
     log: true,

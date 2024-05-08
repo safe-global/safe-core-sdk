@@ -30,6 +30,8 @@ describe('getSafeOperation', () => {
 
   it('should get the SafeOperation', async () => {
     const safeOperations = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    chai.expect(safeOperations.results.length).to.have.above(0)
+
     const safeOperationHash = safeOperations.results[0].safeOperationHash
 
     const safeOperation = await safeApiKit.getSafeOperation(safeOperationHash)

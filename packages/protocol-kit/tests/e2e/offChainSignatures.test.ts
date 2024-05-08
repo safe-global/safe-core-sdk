@@ -215,7 +215,7 @@ describe('Off-chain signatures', () => {
       }
     )
 
-    it('should add the signature of the current signer using eth_signTypedData with ethers provider', async () => {
+    it('should add the signature of the current signer using eth_signTypedData', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
       const safeSdk = await Safe.create({

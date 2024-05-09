@@ -358,7 +358,7 @@ class SafeApiKit {
     }
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const signature = await this.#signDelegate(signer, delegate)
+    const signature = await signDelegate(signer, delegate, this.#chainId)
 
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v2/delegates/${delegate}`,

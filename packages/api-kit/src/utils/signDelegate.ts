@@ -12,7 +12,7 @@ function padHex(
   return `0x${result[dir === 'right' ? 'padEnd' : 'padStart'](size * 2, '0')}`
 }
 
-export async function signDelegate(signer: Signer, delegateAddress: string, chainId: string) {
+export async function signDelegate(signer: Signer, delegateAddress: string, chainId: bigint) {
   const domain = {
     name: 'Safe Transaction Service',
     version: '1.0',

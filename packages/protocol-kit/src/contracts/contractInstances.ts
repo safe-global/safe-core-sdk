@@ -432,8 +432,7 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
           chainId,
           safeProvider,
           contractAddress,
-          customContractAbi as SafeWebAuthnSignerFactoryContract_v1_4_1_Abi,
-          safeProvider.getExternalProvider()
+          customContractAbi as SafeWebAuthnSignerFactoryContract_v1_4_1_Abi
         )
 
       await safeWebAuthnSignerFactoryContractInstance.init()

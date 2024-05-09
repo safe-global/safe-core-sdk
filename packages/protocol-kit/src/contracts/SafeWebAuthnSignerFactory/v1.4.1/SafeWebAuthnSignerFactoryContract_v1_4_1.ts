@@ -7,7 +7,6 @@ import {
   SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { ContractRunner } from 'ethers'
 
 /**
  * SafeWebAuthnSignerFactoryContract_v1_4_1  is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -35,21 +34,12 @@ class SafeWebAuthnSignerFactoryContract_v1_4_1
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeWebAuthnSignerFactoryContract_v1_4_1_Abi,
-    runner?: ContractRunner | null
+    customContractAbi?: SafeWebAuthnSignerFactoryContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts.abi
 
-    super(
-      chainId,
-      safeProvider,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi,
-      runner
-    )
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
 
     this.safeVersion = safeVersion
   }

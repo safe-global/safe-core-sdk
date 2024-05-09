@@ -75,7 +75,7 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
       (deployment?.abi as unknown as ContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
       defaultAbi // if no customAbi and no abi is present in the safe-deployments we use our hardcoded abi
 
-    this.runner = runner
+    this.runner = runner || safeProvider.getExternalProvider()
     this.safeProvider = safeProvider
   }
 
@@ -83,7 +83,7 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
     this.contract = new Contract(
       this.contractAddress,
       this.contractAbi,
-      this.runner || (await this.safeProvider.getExternalSigner())
+      (await this.safeProvider.getExternalSigner()) || this.runner
     )
   }
 

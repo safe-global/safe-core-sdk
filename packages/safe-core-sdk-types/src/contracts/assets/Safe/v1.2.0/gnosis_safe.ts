@@ -1,19 +1,7 @@
 // Source: https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.2.0/gnosis_safe.json
 export default {
-  defaultAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-  released: true,
   contractName: 'GnosisSafe',
   version: '1.2.0',
-  networkAddresses: {
-    '1': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    '4': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    '5': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    '42': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    '88': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    '100': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    '246': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    '73799': '0x6851D6fDFAfD08c0295C392436245E5bc78B0185'
-  },
   abi: [
     {
       inputs: [],

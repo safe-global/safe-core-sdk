@@ -1,15 +1,6 @@
 export default {
-  defaultAddress: '0x12302fE9c02ff50939BaAaaf415fc226C078613C',
-  released: true,
   contractName: 'ProxyFactory',
   version: '1.0.0',
-  networkAddresses: {
-    '1': '0x12302fE9c02ff50939BaAaaf415fc226C078613C',
-    '4': '0x12302fE9c02ff50939BaAaaf415fc226C078613C',
-    '5': '0x12302fE9c02ff50939BaAaaf415fc226C078613C',
-    '42': '0x12302fE9c02ff50939BaAaaf415fc226C078613C',
-    '100': '0x12302fE9c02ff50939BaAaaf415fc226C078613C'
-  },
   abi: [
     {
       constant: false,

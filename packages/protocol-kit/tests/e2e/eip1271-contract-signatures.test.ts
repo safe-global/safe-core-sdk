@@ -80,7 +80,7 @@ describe('The EIP1271 implementation', () => {
         // Create adapters and the protocol kit instance
         const [account1, account2, account3, account4, account5] = accounts
 
-        let protocolKit = await Safe.create({
+        let protocolKit = await Safe.init({
           provider: provider,
           safeAddress,
           contractNetworks
@@ -232,7 +232,7 @@ describe('The EIP1271 implementation', () => {
         // Create adapters and the protocol kit instance
         const [account1, account2, account3, account4, account5] = accounts
 
-        let protocolKit = await Safe.create({
+        let protocolKit = await Safe.init({
           provider,
           safeAddress,
           contractNetworks

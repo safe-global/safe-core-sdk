@@ -49,9 +49,7 @@ describe('SafeProxyFactory', () => {
   describe('create', async () => {
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
       const { provider } = await setupTests()
-      chai
-        .expect(SafeFactory.create({ provider }))
-        .rejectedWith('Invalid SafeProxyFactory contract')
+      chai.expect(SafeFactory.init({ provider })).rejectedWith('Invalid SafeProxyFactory contract')
     })
 
     it('should fail if the contractNetworks provided are not deployed', async () => {
@@ -77,14 +75,14 @@ describe('SafeProxyFactory', () => {
         }
       }
       chai
-        .expect(SafeFactory.create({ provider, contractNetworks }))
+        .expect(SafeFactory.init({ provider, contractNetworks }))
         .rejectedWith('SafeProxyFactory contract is not deployed on the current network')
     })
 
     it('should instantiate the SafeProxyFactory', async () => {
       const { contractNetworks, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const networkId = await safeProvider.getChainId()
       chai
         .expect(await safeFactory.getAddress())
@@ -96,7 +94,7 @@ describe('SafeProxyFactory', () => {
     it('should return the connected SafeProvider', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       chai
         .expect(await safeFactory.getSafeProvider().getSignerAddress())
         .to.be.eq(await account1.signer.getAddress())
@@ -106,7 +104,7 @@ describe('SafeProxyFactory', () => {
   describe('getChainId', async () => {
     it('should return the chainId of the current network', async () => {
       const { chainId, contractNetworks, provider } = await setupTests()
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       chai.expect(await safeFactory.getChainId()).to.be.eq(chainId)
     })
   })
@@ -114,7 +112,7 @@ describe('SafeProxyFactory', () => {
   describe('predictSafeAddress', async () => {
     it('should fail if there are no owners', async () => {
       const { contractNetworks, provider } = await setupTests()
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const owners: string[] = []
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
@@ -128,7 +126,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is lower than 0', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const invalidThreshold = 0
       const safeAccountConfig: SafeAccountConfig = { owners, threshold: invalidThreshold }
@@ -142,7 +140,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is higher than the threshold', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const invalidThreshold = 3
       const safeAccountConfig: SafeAccountConfig = { owners, threshold: invalidThreshold }
@@ -156,7 +154,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the saltNonce is lower than 0', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({
+      const safeFactory = await SafeFactory.init({
         provider,
         safeVersion: safeVersionDeployed,
         contractNetworks
@@ -174,7 +172,7 @@ describe('SafeProxyFactory', () => {
     it('should predict a new Safe with saltNonce', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({
+      const safeFactory = await SafeFactory.init({
         provider,
         safeVersion: safeVersionDeployed,
         contractNetworks
@@ -200,7 +198,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
-        const safeFactory = await SafeFactory.create({
+        const safeFactory = await SafeFactory.init({
           provider,
           safeVersion: safeVersionDeployed,
           contractNetworks
@@ -228,7 +226,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
         const [account1, account2] = accounts
-        const safeFactory = await SafeFactory.create({
+        const safeFactory = await SafeFactory.init({
           provider,
           safeVersion: safeVersionDeployed,
           contractNetworks
@@ -258,7 +256,7 @@ describe('SafeProxyFactory', () => {
   describe('deploySafe', async () => {
     it('should fail if there are no owners', async () => {
       const { contractNetworks, provider } = await setupTests()
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const owners: string[] = []
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
@@ -271,7 +269,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is lower than 0', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const threshold = 0
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
@@ -284,7 +282,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the threshold is higher than the threshold', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+      const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const owners = [account1.address, account2.address]
       const threshold = 3
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
@@ -297,7 +295,7 @@ describe('SafeProxyFactory', () => {
     it('should fail if the saltNonce is lower than 0', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({
+      const safeFactory = await SafeFactory.init({
         provider,
         safeVersion: safeVersionDeployed,
         contractNetworks
@@ -317,7 +315,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
         const [account1, account2] = accounts
-        const safeFactory = await SafeFactory.create({
+        const safeFactory = await SafeFactory.init({
           provider,
           safeVersion: safeVersionDeployed,
           contractNetworks
@@ -345,7 +343,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
-        const safeFactory = await SafeFactory.create({
+        const safeFactory = await SafeFactory.init({
           provider,
           safeVersion: safeVersionDeployed,
           contractNetworks
@@ -366,7 +364,7 @@ describe('SafeProxyFactory', () => {
     it('should deploy a new Safe without saltNonce', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({
+      const safeFactory = await SafeFactory.init({
         provider,
         safeVersion: safeVersionDeployed,
         contractNetworks
@@ -385,7 +383,7 @@ describe('SafeProxyFactory', () => {
     it('should deploy a new Safe with saltNonce', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({
+      const safeFactory = await SafeFactory.init({
         provider,
         safeVersion: safeVersionDeployed,
         contractNetworks
@@ -409,7 +407,7 @@ describe('SafeProxyFactory', () => {
       const callback = (txHash: string) => {
         callbackResult = txHash
       }
-      const safeFactory = await SafeFactory.create({
+      const safeFactory = await SafeFactory.init({
         provider,
         safeVersion: safeVersionDeployed,
         contractNetworks
@@ -430,7 +428,7 @@ describe('SafeProxyFactory', () => {
       async () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
-        const safeFactory = await SafeFactory.create({ provider, contractNetworks })
+        const safeFactory = await SafeFactory.init({ provider, contractNetworks })
         const owners = [account1.address, account2.address]
         const threshold = 2
         const safeAccountConfig: SafeAccountConfig = { owners, threshold }
@@ -444,7 +442,7 @@ describe('SafeProxyFactory', () => {
     it('should deploy a specific Safe version', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
-      const safeFactory = await SafeFactory.create({
+      const safeFactory = await SafeFactory.init({
         provider,
         safeVersion: safeVersionDeployed,
         contractNetworks

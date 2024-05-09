@@ -35,7 +35,7 @@ class SafeFactory {
   #signer?: SafeFactoryConfig['signer']
   #safeProvider!: SafeProvider
 
-  static async create({
+  static async init({
     provider,
     signer,
     safeVersion = DEFAULT_SAFE_VERSION,
@@ -43,7 +43,7 @@ class SafeFactory {
     contractNetworks
   }: SafeFactoryConfig): Promise<SafeFactory> {
     const safeFactorySdk = new SafeFactory()
-    await safeFactorySdk.init({
+    await safeFactorySdk.#initializeSafeFactory({
       provider,
       signer,
       safeVersion,
@@ -53,7 +53,7 @@ class SafeFactory {
     return safeFactorySdk
   }
 
-  private async init({
+  async #initializeSafeFactory({
     provider,
     signer,
     safeVersion,
@@ -157,7 +157,7 @@ class SafeFactory {
     if (!isContractDeployed) {
       throw new Error('SafeProxy contract is not deployed on the current network')
     }
-    const safe = await Safe.create({
+    const safe = await Safe.init({
       provider: this.#provider,
       signer: this.#signer,
       safeAddress,

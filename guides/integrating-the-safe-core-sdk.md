@@ -57,9 +57,9 @@ const safeService = new SafeApiKit({
 ```js
 import Safe, { SafeFactory } from '@safe-global/protocol-kit'
 
-const safeFactory = await SafeFactory.create({ provider, signer })
+const safeFactory = await SafeFactory.init({ provider, signer })
 
-const safeSdk = await Safe.create({ provider, signer, safeAddress })
+const safeSdk = await Safe.init({ provider, signer, safeAddress })
 ```
 
 There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
@@ -67,9 +67,9 @@ There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe
 By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeSingleton` to force the use of the `Safe.sol` contract.
 
 ```js
-const safeFactory = await SafeFactory.create({ provider, signer, isL1SafeSingleton: true })
+const safeFactory = await SafeFactory.init({ provider, signer, isL1SafeSingleton: true })
 
-const safeSdk = await Safe.create({ provider, signer, safeAddress, isL1SafeSingleton: true })
+const safeSdk = await Safe.init({ provider, signer, safeAddress, isL1SafeSingleton: true })
 ```
 
 If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
@@ -100,16 +100,16 @@ const contractNetworks: ContractNetworksConfig = {
   }
 }
 
-const safeFactory = await SafeFactory.create({ provider, signer, contractNetworks })
+const safeFactory = await SafeFactory.init({ provider, signer, contractNetworks })
 
-const safeSdk = await Safe.create({ provider, signer, safeAddress, contractNetworks })
+const safeSdk = await Safe.init({ provider, signer, safeAddress, contractNetworks })
 ```
 
 The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0`, `1.3.0` or `1.4.1`. If not specified, the `DEFAULT_SAFE_VERSION` value will be used.
 
 ```js
 const safeVersion = 'X.Y.Z'
-const safeFactory = await SafeFactory.create({ provider, signer, safeVersion })
+const safeFactory = await SafeFactory.init({ provider, signer, safeVersion })
 ```
 
 ## <a name="deploy-safe">3. Deploy a new Safe</a>

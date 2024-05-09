@@ -182,7 +182,7 @@ describe('Safe4337Pack', () => {
 
     it('should encode the enableModules transaction as deployment data', async () => {
       const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
-      const safeCreateSpy = jest.spyOn(Safe, 'create')
+      const safeCreateSpy = jest.spyOn(Safe, 'init')
 
       const safe4337Pack = await createSafe4337Pack({
         options: {
@@ -218,7 +218,7 @@ describe('Safe4337Pack', () => {
 
     it('should encode the enablesModule transaction together with a specific token approval in a multiSend call when trying to use a paymaster', async () => {
       const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
-      const safeCreateSpy = jest.spyOn(Safe, 'create')
+      const safeCreateSpy = jest.spyOn(Safe, 'init')
 
       const safe4337Pack = await createSafe4337Pack({
         options: {

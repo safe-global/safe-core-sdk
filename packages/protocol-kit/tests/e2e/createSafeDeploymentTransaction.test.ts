@@ -46,7 +46,7 @@ describe('createSafeDeploymentTransaction', () => {
   itif(safeVersionDeployed == '1.4.1')('should return a Safe deployment transactions', async () => {
     const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       predictedSafe,
       contractNetworks
@@ -67,7 +67,7 @@ describe('createSafeDeploymentTransaction', () => {
   itif(safeVersionDeployed == '1.3.0')('should return a Safe deployment transactions', async () => {
     const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       predictedSafe,
       contractNetworks
@@ -88,7 +88,7 @@ describe('createSafeDeploymentTransaction', () => {
   itif(safeVersionDeployed == '1.2.0')('should return a Safe deployment transactions', async () => {
     const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       predictedSafe,
       contractNetworks
@@ -109,7 +109,7 @@ describe('createSafeDeploymentTransaction', () => {
   itif(safeVersionDeployed == '1.1.1')('should return a Safe deployment transactions', async () => {
     const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       predictedSafe,
       contractNetworks
@@ -130,7 +130,7 @@ describe('createSafeDeploymentTransaction', () => {
   itif(safeVersionDeployed == '1.0.0')('should return a Safe deployment transactions', async () => {
     const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       predictedSafe,
       contractNetworks
@@ -151,7 +151,7 @@ describe('createSafeDeploymentTransaction', () => {
   it('should contain the initializer setup call in the deployment data to sets the threshold & owners of the deployed Safe', async () => {
     const { contractNetworks, predictedSafe, chainId, provider } = await setupTests()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       predictedSafe,
       contractNetworks
@@ -183,7 +183,7 @@ describe('createSafeDeploymentTransaction', () => {
       const { contractNetworks, predictedSafe, chainId, provider } = await setupTests()
 
       const safeProvider = new SafeProvider({ provider })
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -206,7 +206,7 @@ describe('createSafeDeploymentTransaction', () => {
       const { contractNetworks, predictedSafe, provider } = await setupTests()
 
       const safeProvider = new SafeProvider({ provider })
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -227,7 +227,7 @@ describe('createSafeDeploymentTransaction', () => {
 
       const customSaltNonce = '123456789'
 
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe: {
           ...predictedSafe,
@@ -257,7 +257,7 @@ describe('createSafeDeploymentTransaction', () => {
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       safeAddress,
       contractNetworks

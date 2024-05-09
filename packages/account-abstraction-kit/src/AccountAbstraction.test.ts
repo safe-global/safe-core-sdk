@@ -40,8 +40,8 @@ describe('AccountAbstraction', () => {
           safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
         })
       )
-      expect(SafeMock.create).toHaveBeenCalledTimes(1)
-      expect(SafeMock.create).toHaveBeenCalledWith(
+      expect(SafeMock.init).toHaveBeenCalledTimes(1)
+      expect(SafeMock.init).toHaveBeenCalledWith(
         expect.objectContaining({
           safeAddress: predictSafeAddress
         })
@@ -60,8 +60,8 @@ describe('AccountAbstraction', () => {
           safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 }
         })
       )
-      expect(SafeMock.create).toHaveBeenCalledTimes(1)
-      expect(SafeMock.create).toHaveBeenCalledWith(
+      expect(SafeMock.init).toHaveBeenCalledTimes(1)
+      expect(SafeMock.init).toHaveBeenCalledWith(
         expect.objectContaining({
           predictedSafe: { safeAccountConfig: { owners: ['0xSignerAddress'], threshold: 1 } }
         })
@@ -75,7 +75,7 @@ describe('AccountAbstraction', () => {
         `There's no signer available with the provided config (provider, signer)`
       )
 
-      expect(SafeMock.create).not.toHaveBeenCalled()
+      expect(SafeMock.init).not.toHaveBeenCalled()
     })
   })
 
@@ -97,7 +97,7 @@ describe('AccountAbstraction', () => {
 
     beforeEach(async () => {
       jest.clearAllMocks()
-      SafeMock.create = () => Promise.resolve(safeInstanceMock as unknown as Safe)
+      SafeMock.init = () => Promise.resolve(safeInstanceMock as unknown as Safe)
       accountAbstraction = await initAccountAbstraction()
     })
 

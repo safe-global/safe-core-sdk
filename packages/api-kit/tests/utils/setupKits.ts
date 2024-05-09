@@ -53,7 +53,7 @@ export async function getProtocolKit({
   safeAddress: GetKitsOptions['safeAddress']
 }): Promise<Safe> {
   const provider = getEip1193Provider()
-  const protocolKit = await Safe.create({ provider, signer, safeAddress })
+  const protocolKit = await Safe.init({ provider, signer, safeAddress })
 
   return protocolKit
 }

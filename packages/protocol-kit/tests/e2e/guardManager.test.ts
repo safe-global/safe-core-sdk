@@ -48,7 +48,7 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -64,7 +64,7 @@ describe('Safe guard manager', () => {
 
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, contractNetworks, provider } = await setupTests()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -77,7 +77,7 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -89,7 +89,7 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should return the enabled Safe guard', async () => {
       const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -108,7 +108,7 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -126,7 +126,7 @@ describe('Safe guard manager', () => {
       const { predictedSafe, debugTransactionGuard, contractNetworks, provider } =
         await setupTests()
 
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -138,7 +138,7 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -153,7 +153,7 @@ describe('Safe guard manager', () => {
         const { safe, contractNetworks, provider } = await setupTests()
 
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -167,7 +167,7 @@ describe('Safe guard manager', () => {
       const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
 
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -185,7 +185,7 @@ describe('Safe guard manager', () => {
         const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
 
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -215,7 +215,7 @@ describe('Safe guard manager', () => {
       const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
 
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -236,7 +236,7 @@ describe('Safe guard manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -253,7 +253,7 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, contractNetworks, provider } = await setupTests()
 
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -266,7 +266,7 @@ describe('Safe guard manager', () => {
       const { safe, contractNetworks, provider } = await setupTests()
 
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -282,7 +282,7 @@ describe('Safe guard manager', () => {
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -314,7 +314,7 @@ describe('Safe guard manager', () => {
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks

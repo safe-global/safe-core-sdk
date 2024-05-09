@@ -47,7 +47,7 @@ describe('createTransactionBatch', () => {
     const provider = getEip1193Provider()
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       safeAddress,
       contractNetworks

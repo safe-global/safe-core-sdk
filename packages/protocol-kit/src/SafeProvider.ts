@@ -34,6 +34,26 @@ import {
   SocketTransport
 } from '@safe-global/protocol-kit/types'
 
+export function http(transportUrl: string): Provider {
+  return new JsonRpcProvider(transportUrl)
+}
+
+export function socket(transportUrl: string): Provider {
+  return new JsonRpcProvider(transportUrl)
+}
+
+export function eip1193(provider: Eip1193Provider): Provider {
+  return new BrowserProvider(provider)
+}
+
+export function privateKey(privateKey: string): string {
+  return privateKey
+}
+
+export function providerAddress(address: string): string {
+  return address
+}
+
 class SafeProvider {
   #externalProvider: BrowserProvider | JsonRpcProvider
   signer?: string

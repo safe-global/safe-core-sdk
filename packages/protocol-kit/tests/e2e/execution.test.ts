@@ -36,7 +36,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -72,7 +72,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -101,7 +101,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -124,7 +124,7 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -153,7 +153,7 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -174,7 +174,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -223,7 +223,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -249,7 +249,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -285,7 +285,7 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -338,7 +338,7 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -399,7 +399,7 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -466,7 +466,7 @@ describe('Transactions execution', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -525,7 +525,7 @@ describe('Transactions execution', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [, account2, account3] = accounts
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -566,7 +566,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -596,7 +596,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -630,7 +630,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -666,7 +666,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -699,7 +699,7 @@ describe('Transactions execution', () => {
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
         const safeAddress = await safe.getAddress()
-        const safeSdk1 = await Safe.create({
+        const safeSdk1 = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -733,7 +733,7 @@ describe('Transactions execution', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -763,7 +763,7 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -811,7 +811,7 @@ describe('Transactions execution', () => {
       const [account1, account2, account3] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address, account3.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks

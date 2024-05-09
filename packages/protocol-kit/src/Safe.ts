@@ -122,7 +122,7 @@ class Safe {
     })
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
-      this.#contractManager = await ContractManager.create(
+      this.#contractManager = await ContractManager.init(
         {
           provider,
           predictedSafe: this.#predictedSafe,
@@ -132,7 +132,7 @@ class Safe {
         this.#safeProvider
       )
     } else {
-      this.#contractManager = await ContractManager.create(
+      this.#contractManager = await ContractManager.init(
         {
           provider,
           safeAddress: config.safeAddress,

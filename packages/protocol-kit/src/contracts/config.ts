@@ -100,7 +100,6 @@ export const safeDeploymentsL1ChainIds = [
   1n // Ethereum Mainnet
 ]
 
-// TODO: UPDATE THIS
 /*
   Some of the contracts used in the PoC app are still experimental, and not included in
   the production deployment packages, thus we need to hardcode their addresses here.

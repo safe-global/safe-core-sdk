@@ -246,7 +246,6 @@ export async function getMultiSendCallOnlyContractInstance(
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  // TODO: remove this ??
   signerOrProvider: AbstractSigner | Provider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined

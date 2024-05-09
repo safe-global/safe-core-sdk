@@ -1,7 +1,11 @@
 import { ethers, Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
-import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
+import {
+  AddOwnerTxParams,
+  AddPasskeyOwnerTxParams,
+  StandardizeSafeTransactionDataProps
+} from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
@@ -156,4 +160,16 @@ export function isSafeMultisigTransactionResponse(
   safeTransaction: SafeTransaction | SafeMultisigTransactionResponse
 ): safeTransaction is SafeMultisigTransactionResponse {
   return (safeTransaction as SafeMultisigTransactionResponse).isExecuted !== undefined
+}
+
+export function isAddOwnerTxParams(
+  params: AddOwnerTxParams | AddPasskeyOwnerTxParams
+): params is AddOwnerTxParams {
+  return (params as AddOwnerTxParams).ownerAddress !== undefined
+}
+
+export function isAddPasskeyOwnerTxParams(
+  params: AddOwnerTxParams | AddPasskeyOwnerTxParams
+): params is AddPasskeyOwnerTxParams {
+  return (params as AddPasskeyOwnerTxParams).passkey !== undefined
 }

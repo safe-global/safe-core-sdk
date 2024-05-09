@@ -6,10 +6,27 @@ import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types
 // Sepolia only
 const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
 
-// TODO: ADD JSDOC
+/**
+ * Represents a Signer that is created using a passkey.
+ * This class extends the AbstractSigner to implement signer functionalities.
+ *
+ * @extends {AbstractSigner}
+ */
 class PasskeySigner extends AbstractSigner {
+  /**
+   * The raw identifier of the passkey.
+   * see: https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/rawId
+   */
   passkeyRawId: ArrayBuffer
+
+  /**
+   * Passkey Coordinates.
+   */
   coordinates: PasskeyCoordinates
+
+  /**
+   * Safe WebAuthn signer factory Contract.
+   */
   safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType
 
   constructor(
@@ -40,6 +57,10 @@ class PasskeySigner extends AbstractSigner {
     )
   }
 
+  /**
+   * Returns the address associated with the Signer.
+   * @returns {Promise<string>} A promise that resolves to the signer's address.
+   */
   async getAddress(): Promise<string> {
     const [signerAddress] = await this.safeWebAuthnSignerFactoryContract.getSigner([
       BigInt(this.coordinates.x),
@@ -50,8 +71,11 @@ class PasskeySigner extends AbstractSigner {
     return signerAddress
   }
 
-  // TODO: create createSignerTransaction() ???
-  encondeCreateSigner(): string {
+  /**
+   * Encodes the createSigner contract function.
+   * @returns {string} The encoded data to create a signer.
+   */
+  encodeCreateSigner(): string {
     return this.safeWebAuthnSignerFactoryContract.encode('createSigner', [
       BigInt(this.coordinates.x),
       BigInt(this.coordinates.y),
@@ -59,6 +83,11 @@ class PasskeySigner extends AbstractSigner {
     ])
   }
 
+  /**
+   * Signs the provided data using the passkey.
+   * @param {Uint8Array} data - The data to be signed.
+   * @returns {Promise<string>} A promise that resolves to the signed data.
+   */
   async sign(data: Uint8Array): Promise<string> {
     const assertion = (await navigator.credentials.get({
       publicKey: {
@@ -69,7 +98,7 @@ class PasskeySigner extends AbstractSigner {
     })) as PublicKeyCredential & { response: AuthenticatorAssertionResponse }
 
     if (!assertion || !assertion?.response?.authenticatorData) {
-      throw new Error('Failed to sign data with passkeys')
+      throw new Error('Failed to sign data with passkey Signer')
     }
 
     const { authenticatorData, signature, clientDataJSON } = assertion.response
@@ -84,12 +113,17 @@ class PasskeySigner extends AbstractSigner {
     )
   }
 
-  connect(): ethers.Signer {
-    throw new Error('Method not implemented.')
+  connect(provider: Provider): ethers.Signer {
+    return new PasskeySigner(
+      this.passkeyRawId,
+      this.coordinates,
+      this.safeWebAuthnSignerFactoryContract,
+      provider
+    )
   }
 
   signTransaction(): Promise<string> {
-    throw new Error('Method not implemented.')
+    throw new Error('Passkey Signers cannot sign transactions, they can only sign data.')
   }
 
   signMessage(message: string | Uint8Array): Promise<string> {
@@ -101,12 +135,19 @@ class PasskeySigner extends AbstractSigner {
   }
 
   signTypedData(): Promise<string> {
-    throw new Error('Method not implemented.')
+    throw new Error('Passkey Signers cannot sign signTypedData, they can only sign data.')
   }
 }
 
 export default PasskeySigner
 
+/**
+ * Extracts and returns coordinates from a given passkey public key.
+ *
+ * @param {ArrayBuffer} publicKey - The public key of the passkey from which coordinates will be extracted.
+ * @returns {Promise<PasskeyCoordinates>} A promise that resolves to an object containing the coordinates derived from the public key of the passkey.
+ * @throws {Error} Throws an error if the coordinates could not be extracted via `crypto.subtle.exportKey()`
+ */
 async function extractPasskeyCoordinates(publicKey: ArrayBuffer): Promise<PasskeyCoordinates> {
   const algorithm = {
     name: 'ECDSA',
@@ -136,6 +177,10 @@ async function extractPasskeyCoordinates(publicKey: ArrayBuffer): Promise<Passke
  * added by the authenticator).
  *
  * See <https://w3c.github.io/webauthn/#clientdatajson-serialization>
+ *
+ * @param {ArrayBuffer} clientDataJSON - The client data JSON.
+ * @returns {string} A hex string of the additional fields from the client data JSON.
+ * @throws {Error} Throws an error if the client data JSON does not contain the expected 'challenge' field pattern.
  */
 function extractClientDataFields(clientDataJSON: ArrayBuffer): string {
   const decodedClientDataJSON = new TextDecoder('utf-8').decode(clientDataJSON)
@@ -151,6 +196,14 @@ function extractClientDataFields(clientDataJSON: ArrayBuffer): string {
   return ethers.hexlify(ethers.toUtf8Bytes(fields))
 }
 
+/**
+ * Extracts the numeric values r and s from a DER-encoded ECDSA signature.
+ * This function decodes the signature based on a specific format and validates the encoding at each step.
+ *
+ * @param {ArrayBuffer} signature - The DER-encoded signature to be decoded.
+ * @returns {[bigint, bigint]} A tuple containing two BigInt values, r and s, which are the numeric values extracted from the signature.
+ * @throws {Error} Throws an error if the signature encoding is invalid or does not meet expected conditions.
+ */
 function extractSignature(signature: ArrayBuffer): [bigint, bigint] {
   const check = (x: boolean) => {
     if (!x) {

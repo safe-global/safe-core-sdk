@@ -63,6 +63,7 @@ import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
   encodeMultiSendData,
+  isAddPasskeyOwnerTxParams,
   standardizeMetaTransactionData,
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
@@ -888,7 +889,6 @@ class Safe {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
 
-    // TODO: fix this
     return this.#contractManager.safeContract.approveHash(hash, {
       from: signerAddress,
       ...options
@@ -1076,11 +1076,18 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  // TODO: update this method to get passkey arg
   async createAddOwnerTx(
-    { ownerAddress, threshold }: AddOwnerTxParams,
+    params: AddOwnerTxParams | AddPasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const isPasskey = isAddPasskeyOwnerTxParams(params)
+
+    if (isPasskey) {
+      return this.#createAddPasskeyOwnerTx(params, options)
+    }
+
+    const { ownerAddress, threshold } = params
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -1093,9 +1100,8 @@ class Safe {
     return safeTransaction
   }
 
-  // TODO: use createAddOwnerTx instead
   /**
-   * Returns the Safe transaction to add a passkey owner and optionally change the threshold.
+   * Returns the Safe transaction to add a passkey as owner and optionally change the threshold.
    *
    * @param params - The transaction params
    * @param options - The transaction optional properties
@@ -1105,7 +1111,7 @@ class Safe {
    * @throws "Threshold needs to be greater than 0"
    * @throws "Threshold cannot exceed owner count"
    */
-  async createAddPasskeyOwnerTx(
+  async #createAddPasskeyOwnerTx(
     { passkey, threshold }: AddPasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
@@ -1114,23 +1120,21 @@ class Safe {
 
     const passkeySigner = await PasskeySigner.init(passkey, webAuthnSignerFactoryContract, provider)
 
-    // TODO: remove this console.log
-    console.log('passkeySigner address: ', await passkeySigner.getAddress())
-
     const ownerAddress = await passkeySigner.getAddress()
     const isPasskeySignerDeployed = await this.#safeProvider.isContractDeployed(ownerAddress)
 
+    // The passkey Signer is a contract compliant with EIP-1271 standards, we need to check if it has been deployed.
     if (isPasskeySignerDeployed) {
       return this.createAddOwnerTx({ ownerAddress, threshold }, options)
     }
 
-    // if the Signer is not deployed we need to create a batch (Signer deployment + addOwner)
+    // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
 
     // First transaction of the batch: The Deployment of the Signer
     const createSignerTransaction = {
       to: await passkeySigner.safeWebAuthnSignerFactoryContract.getAddress(),
       value: '0',
-      data: passkeySigner.encondeCreateSigner()
+      data: passkeySigner.encodeCreateSigner()
     }
 
     // Second transaction of the batch: The AddOwner transaction

@@ -39,6 +39,6 @@
     "@safe-global/protocol-kit": "^4.0.0-alpha.0",
     "@safe-global/safe-core-sdk-types": "^5.0.0-alpha.0",
     "@safe-global/safe-modules-deployments": "^2.0.0",
-    "ethers": "^6.7.1"
+    "ethers": "^6.12.1"
   }
 }

@@ -1,5 +1,6 @@
 import { ethers, AbstractSigner, Provider } from 'ethers'
 import { Buffer } from 'buffer'
+
 import { PasskeyCoordinates, passkeyArgType } from '../../types/passkeys'
 import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
 

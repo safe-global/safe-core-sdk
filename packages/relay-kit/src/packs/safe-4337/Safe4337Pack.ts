@@ -212,7 +212,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ])
 
         const multiSendContract = await getMultiSendContract({
-          safeProvider: new SafeProvider({ provider, signer }),
+          safeProvider: new SafeProvider({ provider, signer: signer as string }),
           safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
         })
 

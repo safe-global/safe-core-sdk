@@ -33,16 +33,23 @@ import {
   SafeProviderConfig,
   Eip1193Provider,
   HttpTransport,
-  SocketTransport
+  SocketTransport,
+  SafeSigner
 } from '@safe-global/protocol-kit/types'
 import PasskeySigner from './utils/passkeys/PasskeySigner'
 
 class SafeProvider {
   #externalProvider: BrowserProvider | JsonRpcProvider
-  signer?: string | PasskeySigner
+  signer?: SafeSigner
   provider: Eip1193Provider | HttpTransport | SocketTransport
 
-  constructor({ provider, signer }: SafeProviderConfig) {
+  constructor({
+    provider,
+    signer
+  }: {
+    provider: SafeProviderConfig['provider']
+    signer?: SafeSigner
+  }) {
     if (typeof provider === 'string') {
       this.#externalProvider = new JsonRpcProvider(provider)
     } else {

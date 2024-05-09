@@ -1,22 +1,7 @@
 // Source: https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.4.1/safe_l2.json
 export default {
-  defaultAddress: '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-  released: true,
   contractName: 'SafeL2',
   version: '1.4.1',
-  networkAddresses: {
-    '1': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '5': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '56': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '100': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '137': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '1442': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '8194': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '17000': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '80001': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '84531': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762',
-    '11155111': '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762'
-  },
   abi: [
     {
       anonymous: false,

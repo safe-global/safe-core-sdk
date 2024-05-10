@@ -14,10 +14,12 @@ import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import config from '../utils/config'
 import { getServiceClient } from '../utils/setupServiceClient'
+import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
+const chainId = '0xaa36a7'
 const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
 const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
 const randomAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
@@ -180,7 +182,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getSafeDelegates({ safeAddress }))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/delegates?safe=${safeAddress}`,
+        url: `${txServiceBaseUrl}/v2/delegates?safe=${safeAddress}`,
         method: 'get'
       })
     })
@@ -190,7 +192,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getSafeDelegates({ safeAddress: eip3770SafeAddress }))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/delegates?safe=${safeAddress}`,
+        url: `${txServiceBaseUrl}/v2/delegates?safe=${safeAddress}`,
         method: 'get'
       })
     })
@@ -202,14 +204,13 @@ describe('Endpoint tests', () => {
         signer,
         label: 'label'
       }
-      const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = delegateAddress + totp
-      const signature = await signer.signMessage(data)
+
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/delegates/`,
+        url: `${txServiceBaseUrl}/v2/delegates/`,
         method: 'post',
         body: {
           safe: null,
@@ -228,14 +229,13 @@ describe('Endpoint tests', () => {
         signer,
         label: 'label'
       }
-      const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = delegateAddress + totp
-      const signature = await signer.signMessage(data)
+
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/delegates/`,
+        url: `${txServiceBaseUrl}/v2/delegates/`,
         method: 'post',
         body: {
           safe: null,
@@ -253,17 +253,15 @@ describe('Endpoint tests', () => {
         delegatorAddress,
         signer
       }
-      const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = delegateAddress + totp
-      const signature = await signer.signMessage(data)
+
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/delegates/${delegateConfig.delegateAddress}`,
+        url: `${txServiceBaseUrl}/v2/delegates/${delegateConfig.delegateAddress}`,
         method: 'delete',
         body: {
-          delegate: delegateAddress,
           delegator: delegatorAddress,
           signature
         }
@@ -276,17 +274,15 @@ describe('Endpoint tests', () => {
         delegatorAddress,
         signer
       }
-      const totp = Math.floor(Date.now() / 1000 / 3600)
-      const data = delegateAddress + totp
-      const signature = await signer.signMessage(data)
+
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/delegates/${delegateAddress}`,
+        url: `${txServiceBaseUrl}/v2/delegates/${delegateAddress}`,
         method: 'delete',
         body: {
-          delegate: delegateAddress,
           delegator: delegatorAddress,
           signature
         }

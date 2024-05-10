@@ -28,7 +28,7 @@ class ContractManager {
     return contractManager
   }
 
-  async #initializeContractManager(config: SafeConfig, safeProvider: SafeProvider): Promise<void> {
+  async #initializeContractManager(config: SafeConfig, safeProvider: SafeProvider) {
     const { isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
 
     const chainId = await safeProvider.getChainId()

@@ -111,7 +111,7 @@ class Safe {
    * @throws "MultiSend contract is not deployed on the current network"
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
-  async #initializeProtocolKit(config: SafeConfig): Promise<Safe> {
+  async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
     this.#safeProvider = new SafeProvider({

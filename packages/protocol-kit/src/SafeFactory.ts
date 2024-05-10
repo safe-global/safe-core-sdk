@@ -59,7 +59,7 @@ class SafeFactory {
     safeVersion,
     isL1SafeSingleton,
     contractNetworks
-  }: SafeFactoryInitConfig): Promise<void> {
+  }: SafeFactoryInitConfig) {
     this.#provider = provider
     this.#signer = signer
     this.#safeProvider = new SafeProvider({ provider, signer })

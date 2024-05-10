@@ -25,7 +25,7 @@ const config: Config = {
 
 async function main() {
   // Create Safe instance
-  const safe = await Safe.create({
+  const safe = await Safe.init({
     provider: config.RPC_URL,
     signer: config.SIGNER_ADDRESS_PRIVATE_KEY,
     safeAddress: config.SAFE_ADDRESS

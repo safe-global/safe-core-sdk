@@ -55,13 +55,13 @@ class AccountAbstraction {
     const isSafeDeployed = await safeProvider.isContractDeployed(safeAddress)
 
     if (isSafeDeployed) {
-      this.protocolKit = await Safe.create({
+      this.protocolKit = await Safe.init({
         provider: this.#provider,
         signer: this.#signer,
         safeAddress
       })
     } else {
-      this.protocolKit = await Safe.create({
+      this.protocolKit = await Safe.init({
         provider: this.#provider,
         signer: this.#signer,
         predictedSafe: { safeAccountConfig }

@@ -26,7 +26,7 @@ const config: Config = {
 
 async function main() {
   // Create safeSdk instances
-  let protocolKit = await Safe.create({
+  let protocolKit = await Safe.init({
     provider: config.RPC_URL,
     signer: config.OWNER1_PRIVATE_KEY,
     safeAddress: config.SAFE_3_3_ADDRESS

@@ -50,7 +50,7 @@ describe('Safe contracts manager', () => {
         }
       }
       chai.expect(
-        await Safe.create({
+        await Safe.init({
           provider,
           predictedSafe,
           contractNetworks
@@ -63,7 +63,7 @@ describe('Safe contracts manager', () => {
       const safeAddress = await safe.getAddress()
       await chai
         .expect(
-          Safe.create({
+          Safe.init({
             provider,
             safeAddress
           })
@@ -75,7 +75,7 @@ describe('Safe contracts manager', () => {
       const { contractNetworks, provider } = await setupTests()
       await chai
         .expect(
-          Safe.create({
+          Safe.init({
             provider,
             safeAddress: ZERO_ADDRESS,
             contractNetworks
@@ -110,7 +110,7 @@ describe('Safe contracts manager', () => {
       const safeAddress = await safe.getAddress()
       await chai
         .expect(
-          Safe.create({
+          Safe.init({
             provider,
             safeAddress,
             contractNetworks: customContractNetworks
@@ -122,7 +122,7 @@ describe('Safe contracts manager', () => {
     it('should set the MultiSend contract available on the current network', async () => {
       const { safe, chainId, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks

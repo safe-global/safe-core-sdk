@@ -47,7 +47,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       safeAddress,
       contractNetworks
@@ -74,7 +74,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
       const [, account2] = accounts
 
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -108,7 +108,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
       const [, account2] = accounts
 
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -142,7 +142,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
       const [, account2] = accounts
 
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks

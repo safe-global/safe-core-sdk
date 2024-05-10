@@ -22,7 +22,7 @@ function Monerium() {
     ;(async () => {
       if (!authProvider || !selectedSafe) return
 
-      const protocolKit = await Safe.create({
+      const protocolKit = await Safe.init({
         provider: authProvider,
         safeAddress: selectedSafe,
         isL1SafeSingleton: true

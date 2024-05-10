@@ -26,7 +26,7 @@ async function deploySafe(
   contractNetworks: ContractNetworksConfig,
   signerAddress?: string
 ): Promise<Safe> {
-  const safeFactory = await SafeFactory.create({
+  const safeFactory = await SafeFactory.init({
     provider,
     signer: signerAddress,
     safeVersion: safeVersionDeployed,

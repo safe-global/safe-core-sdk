@@ -20,7 +20,7 @@ const config: Config = {
 
 async function main() {
   // Create Safe instance
-  const protocolKit = await Safe.create({
+  const protocolKit = await Safe.init({
     provider: config.RPC_URL,
     signer: config.SIGNER_ADDRESS_PRIVATE_KEY,
     safeAddress: config.SAFE_ADDRESS

@@ -40,7 +40,7 @@ describe('On-chain signatures', () => {
   describe('approveTransactionHash', async () => {
     it('should fail if the Safe is not deployed', async () => {
       const { predictedSafe, contractNetworks, provider } = await setupTests()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -55,7 +55,7 @@ describe('On-chain signatures', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const account3 = accounts[2]
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         signer: account3.address,
         safeAddress,
@@ -77,7 +77,7 @@ describe('On-chain signatures', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -98,7 +98,7 @@ describe('On-chain signatures', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -123,7 +123,7 @@ describe('On-chain signatures', () => {
   describe('getOwnersWhoApprovedTx', async () => {
     it('should fail if Safe is not deployed', async () => {
       const { predictedSafe, contractNetworks, provider } = await setupTests()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -137,7 +137,7 @@ describe('On-chain signatures', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [, account2] = accounts
       const safeAddress = await safe.getAddress()
-      const safeSdk1 = await Safe.create({
+      const safeSdk1 = await Safe.init({
         provider,
         safeAddress: safeAddress,
         contractNetworks

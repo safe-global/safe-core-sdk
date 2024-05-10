@@ -45,7 +45,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -65,7 +65,7 @@ describe('Safe Info', () => {
         const { predictedSafe, safe, accounts, contractNetworks, provider } = await setupTests()
         const [account1] = accounts
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -81,7 +81,7 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2, account3] = accounts
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -116,7 +116,7 @@ describe('Safe Info', () => {
   describe('getContractVersion', async () => {
     it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {
       const { predictedSafe, contractNetworks, provider } = await setupTests()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -131,7 +131,7 @@ describe('Safe Info', () => {
         ...predictedSafe,
         safeDeploymentConfig: {}
       }
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe: safeConfig,
         contractNetworks
@@ -143,7 +143,7 @@ describe('Safe Info', () => {
     it('should return the Safe contract version', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -158,7 +158,7 @@ describe('Safe Info', () => {
       'should fail to return the address of a Safe <v1.3.0 that is not deployed',
       async () => {
         const { predictedSafe, contractNetworks, provider } = await setupTests()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           predictedSafe,
           contractNetworks
@@ -176,14 +176,14 @@ describe('Safe Info', () => {
       'should return the address of a Safe >=v1.3.0 that is not deployed',
       async () => {
         const { predictedSafe, contractNetworks, provider } = await setupTests()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           predictedSafe,
           contractNetworks
         })
         const safeAddress = await safeSdk.getAddress()
 
-        const safeFactory = await SafeFactory.create({
+        const safeFactory = await SafeFactory.init({
           provider,
           safeVersion: safeVersionDeployed,
           contractNetworks
@@ -198,7 +198,7 @@ describe('Safe Info', () => {
     it('should return the address of a deployed Safe', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
@@ -212,7 +212,7 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress: safeAddress,
         contractNetworks
@@ -226,7 +226,7 @@ describe('Safe Info', () => {
   describe('getNonce', async () => {
     it('should return the nonce of a Safe that is not deployed', async () => {
       const { predictedSafe, contractNetworks, provider } = await setupTests()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -239,7 +239,7 @@ describe('Safe Info', () => {
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress: safeAddress,
         contractNetworks
@@ -261,7 +261,7 @@ describe('Safe Info', () => {
   describe('getChainId', async () => {
     it('should return the chainId of a Safe that is not deployed', async () => {
       const { predictedSafe, chainId, contractNetworks, provider } = await setupTests()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         predictedSafe,
         contractNetworks
@@ -272,7 +272,7 @@ describe('Safe Info', () => {
     it('should return the chainId of the current network', async () => {
       const { safe, chainId, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         safeAddress: safeAddress,
         contractNetworks
@@ -286,7 +286,7 @@ describe('Safe Info', () => {
       'should fail to return the balance of a Safe <v1.3.0 that is not deployed',
       async () => {
         const { predictedSafe, contractNetworks, provider } = await setupTests()
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           predictedSafe,
           contractNetworks
@@ -304,7 +304,7 @@ describe('Safe Info', () => {
       async () => {
         const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
         const [account1] = accounts
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           predictedSafe,
           contractNetworks
@@ -328,7 +328,7 @@ describe('Safe Info', () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
+      const safeSdk = await Safe.init({
         provider,
         signer: account1.address,
         safeAddress,

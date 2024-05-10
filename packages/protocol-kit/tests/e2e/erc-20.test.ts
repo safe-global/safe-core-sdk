@@ -56,7 +56,7 @@ describe('ERC-20 utils', () => {
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
 
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -77,7 +77,7 @@ describe('ERC-20 utils', () => {
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
 
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -98,7 +98,7 @@ describe('ERC-20 utils', () => {
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x'))
 
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -118,7 +118,7 @@ describe('ERC-20 utils', () => {
         const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
 
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -142,7 +142,7 @@ describe('ERC-20 utils', () => {
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
 
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
@@ -166,7 +166,7 @@ describe('ERC-20 utils', () => {
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
 
-        const safeSdk = await Safe.create({
+        const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks

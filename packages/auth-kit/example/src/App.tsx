@@ -129,7 +129,7 @@ function App() {
     const safeAddress = safeAuthSignInResponse?.safes?.[index] || '0x'
 
     // Wrap Web3Auth provider with ethers
-    const protocolKit = await Safe.create({
+    const protocolKit = await Safe.init({
       provider: safeAuthPack?.getProvider() as Eip1193Provider,
       safeAddress
     })

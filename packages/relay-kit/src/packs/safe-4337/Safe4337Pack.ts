@@ -142,7 +142,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     // Existing Safe
     if ('safeAddress' in options) {
-      protocolKit = await Safe.create({
+      protocolKit = await Safe.init({
         provider,
         signer,
         safeAddress: options.safeAddress
@@ -220,7 +220,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         deploymentData = batchData
       }
 
-      protocolKit = await Safe.create({
+      protocolKit = await Safe.init({
         provider,
         signer,
         predictedSafe: {

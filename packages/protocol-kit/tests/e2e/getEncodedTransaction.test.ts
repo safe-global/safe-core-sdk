@@ -30,7 +30,7 @@ describe('getEncodedTransaction', () => {
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       safeAddress,
       contractNetworks
@@ -60,7 +60,7 @@ describe('getEncodedTransaction', () => {
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       safeAddress,
       contractNetworks
@@ -90,7 +90,7 @@ describe('getEncodedTransaction', () => {
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
+    const safeSdk = await Safe.init({
       provider,
       safeAddress,
       contractNetworks

@@ -22,13 +22,13 @@ class ContractManager {
   #multiSendContract!: MultiSendContractImplementationType
   #multiSendCallOnlyContract!: MultiSendCallOnlyContractImplementationType
 
-  static async create(config: SafeConfig, safeProvider: SafeProvider): Promise<ContractManager> {
+  static async init(config: SafeConfig, safeProvider: SafeProvider): Promise<ContractManager> {
     const contractManager = new ContractManager()
-    await contractManager.init(config, safeProvider)
+    await contractManager.#initializeContractManager(config, safeProvider)
     return contractManager
   }
 
-  async init(config: SafeConfig, safeProvider: SafeProvider): Promise<void> {
+  async #initializeContractManager(config: SafeConfig, safeProvider: SafeProvider) {
     const { isL1SafeSingleton, contractNetworks, predictedSafe, safeAddress } = config
 
     const chainId = await safeProvider.getChainId()

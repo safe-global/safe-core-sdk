@@ -114,8 +114,6 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig): Promise<Safe> {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    const safeSdk = new Safe()
-
     this.#safeProvider = new SafeProvider({
       provider,
       signer
@@ -150,8 +148,6 @@ class Safe {
       this.#safeProvider,
       this.#contractManager.safeContract
     )
-
-    return safeSdk
   }
 
   /**

@@ -68,6 +68,8 @@ cd packages/<package-name>
 yarn test
 ```
 
+For some packages you may need to fill a .env file with some configuration. In those packages you will be able to find a `.env.example` file specifying the necessary parameters.
+
 #### Using the playground
 
 You can use the playground section to do some manual testing using a specific Safe or configuration. The playground can be run from the root of the project as follow:

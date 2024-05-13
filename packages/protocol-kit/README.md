@@ -4,10 +4,11 @@
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts).
+Software development kit that facilitates the interaction with the [Safe Smart Account](https://github.com/safe-global/safe-smart-account).
 
 ## Table of contents
 
+- [Documentation](#documentation)
 - [Installation](#installation)
 - [Build](#build)
 - [Tests](#tests)
@@ -16,6 +17,10 @@ Software development kit that facilitates the interaction with the [Safe contrac
 - [Safe Core SDK API Reference](#sdk-api)
 - [License](#license)
 - [Contributors](#contributors)
+
+## Documentation
+
+Head to the [Protocol Kit docs](https://docs.safe.global/sdk/protocol-kit) to learn more about how to use this SDK.
 
 ## <a name="installation">Installation</a>
 

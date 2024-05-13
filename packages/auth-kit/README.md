@@ -6,7 +6,7 @@
 
 The Auth Kit provides a way to authenticate blockchain accounts using email addresses, social accounts or traditional web3 wallets (ex. Metamask). When using web2 methods as your email or social account, a derived Ethereum address will be generated.
 
-## Reference
+## Documentation
 
 - [Auth Kit integration guides](https://docs.safe.global/sdk/auth-kit)
 

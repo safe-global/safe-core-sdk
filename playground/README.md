@@ -2,7 +2,7 @@
 
 This playground contains several scripts that can be used as a starting point to use the Safe{Core} SDK. These scripts do not cover all the functionality exposed by the SDK but showcase some steps of the Safe transaction flow.
 
-Before starting, make sure to install and build the Safe{Core} SDK monorepo.
+Before starting, make sure to install and build the Safe{Core} SDK monorepo. From the project root, run:
 
 ```bash
 yarn install

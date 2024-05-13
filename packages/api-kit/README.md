@@ -8,6 +8,7 @@ Software development kit that facilitates the interaction with the [Safe Transac
 
 ## Table of contents
 
+- [Documentation](#documentation)
 - [Installation](#installation)
 - [Build](#build)
 - [Tests](#tests)
@@ -16,13 +17,17 @@ Software development kit that facilitates the interaction with the [Safe Transac
 - [License](#license)
 - [Contributors](#contributors)
 
-## <a name="installation">Installation</a>
+## Documentation
+
+Head to the [API Kit docs](https://docs.safe.global/sdk/api-kit) to learn more about how to use this SDK.
+
+## Installation
 
 Install the package with yarn or npm:
 
 ```bash
-yarn install
-npm install
+yarn add @safe-global/api-kit
+npm install @safe-global/api-kit
 ```
 
 ## <a name="build">Build</a>

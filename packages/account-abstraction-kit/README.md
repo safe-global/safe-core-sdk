@@ -41,4 +41,4 @@ Initialization TBD
 
 ## <a name="license">License</a>
 
-This library is [released under MIT](https://github.com/safe-global/account-abstraction-sdk/blob/main/LICENSE.md).
+This library is [released under MIT](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md).

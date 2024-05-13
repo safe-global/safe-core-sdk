@@ -6,9 +6,9 @@
 
 The Relay Kit allows to abstract users from the transaction fees payment (gas fees) allowing the use of native token or ERC-20 tokens. This will enable you to pay transaction fees directly from funding available in a Safe.
 
-## Reference
+## Documentation
 
-- [Relay Kit docs](https://docs.safe.global/safe-core-aa-sdk/relay-kit)
+Head to the [Relay Kit docs](https://docs.safe.global/sdk/relay-kit) to learn more about how to use this SDK.
 
 ## License
 

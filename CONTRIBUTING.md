@@ -64,8 +64,9 @@ yarn test
 If you would like to test individual packages, **once you make sure you did the build from the root**, you can:
 
 ```bash
-cd packages/<package-name>
-yarn test
+yarn test --scope=<package-name>
+yarn test --scope=@safe-global/protocol-kit
+yarn test --scope=@safe-global/api-kit
 ```
 
 For some packages you may need to fill a .env file with some configuration. In those packages you will be able to find a `.env.example` file specifying the necessary parameters.

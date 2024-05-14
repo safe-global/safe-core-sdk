@@ -785,13 +785,14 @@ class SafeApiKit {
    * @throws "Invalid Safe address {safeAddress}"
    * @throws "Module address must not be empty"
    * @throws "Invalid module address {moduleAddress}"
-   * @throws "SafeOperation is not signed by the given signer {signerAddress}"
+   * @throws "Signature must not be empty"
    */
   async addSafeOperation({
+    entryPoint,
     moduleAddress: moduleAddressProp,
+    options,
     safeAddress: safeAddressProp,
-    safeOperation,
-    signer
+    userOperation
   }: AddSafeOperationProps): Promise<void> {
     let safeAddress: string, moduleAddress: string
 
@@ -814,32 +815,29 @@ class SafeApiKit {
       throw new Error(`Invalid module address ${moduleAddressProp}`)
     }
 
-    const signerAddress = await signer.getAddress()
-    const signature = safeOperation.getSignature(signerAddress)
-
-    if (!signature) {
-      throw new Error(`SafeOperation is not signed by the given signer ${signerAddress}`)
+    if (isEmptyData(userOperation.signature)) {
+      throw new Error('Signature must not be empty')
     }
-
-    const { data } = safeOperation
 
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
       method: HttpMethod.Post,
       body: {
-        nonce: Number(data.nonce),
-        initCode: isEmptyData(data.initCode) ? null : data.initCode,
-        callData: data.callData,
-        callDataGasLimit: data.callGasLimit.toString(),
-        verificationGasLimit: data.verificationGasLimit.toString(),
-        preVerificationGas: data.preVerificationGas.toString(),
-        maxFeePerGas: data.maxFeePerGas.toString(),
-        maxPriorityFeePerGas: data.maxPriorityFeePerGas.toString(),
-        paymasterAndData: isEmptyData(data.paymasterAndData) ? null : data.paymasterAndData,
-        entryPoint: data.entryPoint,
-        validAfter: !data.validAfter ? null : data.validAfter,
-        validUntil: !data.validUntil ? null : data.validUntil,
-        signature: signature.data,
+        nonce: Number(userOperation.nonce),
+        initCode: isEmptyData(userOperation.initCode) ? null : userOperation.initCode,
+        callData: userOperation.callData,
+        callDataGasLimit: userOperation.callGasLimit.toString(),
+        verificationGasLimit: userOperation.verificationGasLimit.toString(),
+        preVerificationGas: userOperation.preVerificationGas.toString(),
+        maxFeePerGas: userOperation.maxFeePerGas.toString(),
+        maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas.toString(),
+        paymasterAndData: isEmptyData(userOperation.paymasterAndData)
+          ? null
+          : userOperation.paymasterAndData,
+        entryPoint,
+        validAfter: !options?.validAfter ? null : options?.validAfter,
+        validUntil: !options?.validUntil ? null : options?.validUntil,
+        signature: userOperation.signature,
         moduleAddress
       }
     })

@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { Wallet, ethers } from 'ethers'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import { EthAdapter, SafeOperation } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
@@ -49,6 +49,13 @@ describe('addSafeOperation', () => {
     .returns(
       Promise.resolve({ fast: { maxFeePerGas: '0x3b9aca00', maxPriorityFeePerGas: '0x3b9aca00' } })
     )
+  providerStub.withArgs(RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS, sinon.match.any).returns(
+    Promise.resolve({
+      preVerificationGas: BigInt(Date.now()),
+      callGasLimit: BigInt(Date.now()),
+      verificationGasLimit: BigInt(Date.now())
+    })
+  )
 
   providerStub.callThrough()
 
@@ -80,18 +87,32 @@ describe('addSafeOperation', () => {
     })?.networkAddresses[chainId] as string
   })
 
+  const getAddSafeOperationProps = async (safeOperation: SafeOperation) => {
+    const userOperation = safeOperation.toUserOperation()
+    userOperation.signature = safeOperation.encodedSignatures()
+    return {
+      entryPoint: safeOperation.data.entryPoint,
+      moduleAddress,
+      safeAddress: SAFE_ADDRESS,
+      userOperation,
+      options: {
+        validAfter: safeOperation.data.validAfter,
+        validUntil: safeOperation.data.validUntil
+      }
+    }
+  }
+
   describe('should fail', () => {
     it('if safeAddress is empty', async () => {
       const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
       const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+      const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
       await chai
         .expect(
           safeApiKit.addSafeOperation({
-            moduleAddress,
-            safeAddress: '',
-            safeOperation: signedSafeOperation,
-            signer
+            ...addSafeOperationProps,
+            safeAddress: ''
           })
         )
         .to.be.rejectedWith('Safe address must not be empty')
@@ -100,14 +121,13 @@ describe('addSafeOperation', () => {
     it('if safeAddress is invalid', async () => {
       const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
       const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+      const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
       await chai
         .expect(
           safeApiKit.addSafeOperation({
-            moduleAddress,
-            safeAddress: '0x123',
-            safeOperation: signedSafeOperation,
-            signer
+            ...addSafeOperationProps,
+            safeAddress: '0x123'
           })
         )
         .to.be.rejectedWith('Invalid Safe address 0x123')
@@ -116,14 +136,13 @@ describe('addSafeOperation', () => {
     it('if moduleAddress is empty', async () => {
       const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
       const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+      const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
       await chai
         .expect(
           safeApiKit.addSafeOperation({
-            moduleAddress: '',
-            safeAddress: SAFE_ADDRESS,
-            safeOperation: signedSafeOperation,
-            signer
+            ...addSafeOperationProps,
+            moduleAddress: ''
           })
         )
         .to.be.rejectedWith('Module address must not be empty')
@@ -132,14 +151,13 @@ describe('addSafeOperation', () => {
     it('if moduleAddress is invalid', async () => {
       const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
       const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+      const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
       await chai
         .expect(
           safeApiKit.addSafeOperation({
-            moduleAddress: '0x234',
-            safeAddress: SAFE_ADDRESS,
-            safeOperation: signedSafeOperation,
-            signer
+            ...addSafeOperationProps,
+            moduleAddress: '0x234'
           })
         )
         .to.be.rejectedWith('Invalid module address 0x234')
@@ -147,47 +165,26 @@ describe('addSafeOperation', () => {
 
     it('if the SafeOperation is not signed', async () => {
       const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
+      const addSafeOperationProps = await getAddSafeOperationProps(safeOperation)
 
       await chai
-        .expect(
-          safeApiKit.addSafeOperation({
-            moduleAddress,
-            safeAddress: SAFE_ADDRESS,
-            safeOperation,
-            signer
-          })
-        )
-        .to.be.rejectedWith(
-          'SafeOperation is not signed by the given signer 0x56e2C102c664De6DfD7315d12c0178b61D16F171'
-        )
+        .expect(safeApiKit.addSafeOperation(addSafeOperationProps))
+        .to.be.rejectedWith('Signature must not be empty')
     })
   })
 
   it('should add a new SafeOperation', async () => {
-    providerStub.withArgs(RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS, sinon.match.any).returns(
-      Promise.resolve({
-        preVerificationGas: BigInt(Date.now()),
-        callGasLimit: BigInt(Date.now()),
-        verificationGasLimit: BigInt(Date.now())
-      })
-    )
-
     const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+    const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
+    // Get the number of SafeOperations before adding a new one
     const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS
     })
     const initialNumSafeOperations = safeOperationsBefore.results.length
 
-    await chai.expect(
-      safeApiKit.addSafeOperation({
-        moduleAddress,
-        safeAddress: SAFE_ADDRESS,
-        safeOperation: signedSafeOperation,
-        signer
-      })
-    ).to.be.fulfilled
+    await chai.expect(safeApiKit.addSafeOperation(addSafeOperationProps)).to.be.fulfilled
 
     const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS

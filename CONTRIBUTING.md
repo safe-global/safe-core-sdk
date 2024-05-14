@@ -18,12 +18,12 @@ You will need to agree to [our CLA](https://safe.global/cla) in order to be poss
 ### Starting Guide
 
 By following the steps bellow you will understand the development process and worflow.
-1. Forking the repository
-2. Installing Node and Yarn
-3. Installing dependencies
-4. Running the tests
-5. Using the playground
-6. Submitting a pull request
+1. [Forking the repository](#forking-the-repository)
+2. [Installing Node and Yarn](#installing-node-and-yarn)
+3. [Installing dependencies](#installing-dependencies)
+4. [Running the tests](#running-the-tests)
+5. [Using the playground](#using-the-playground)
+6. [Submitting a pull request](#submitting-a-pull-request)
 
 #### Forking the repository
 

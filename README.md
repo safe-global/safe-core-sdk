@@ -8,6 +8,7 @@
 - [Documentation](#documentation)
 - [Guides](#guides)
 - [Packages](#packages)
+- [Need Help or Have Questions?](#need-help-or-have-questions)
 - [Contributing](#contributing)
 - [Playground](#playground)
 - [License](#license)
@@ -36,6 +37,10 @@ Visit [https://docs.safe.global/sdk/overview](https://docs.safe.global/sdk/overv
 | [protocol-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit)                 | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit)       | TypeScript library that facilitates the interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts)                                                |
 | [relay-kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/relay-kit)                       | ​​​[​![NPM Version](https://badge.fury.io/js/%40safe-global%2Frelay-kit.svg)​](https://badge.fury.io/js/%40safe-global%2Frelay-kit)​             | Library to abstract transaction fees payment (gas fees), allowing the use of native tokens or ERC-20​​                                                                                 |
 | [safe-core-sdk-types](https://github.com/safe-global/safe-core-sdk/tree/main/packages/safe-core-sdk-types)   | [![NPM Version](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types.svg)](https://badge.fury.io/js/%40safe-global%2Fsafe-core-sdk-types)  | Common types extracted from the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk/tree/main/packages) packages                                                   |
+
+## Need Help or Have Questions?
+
+If you have any doubts, questions, or need assistance, feel free to reach out! [Here you will find how to get support.](https://github.com/safe-global/safe-core-sdk/tree/main/SUPPORT.md)
 
 ## Contributing
 

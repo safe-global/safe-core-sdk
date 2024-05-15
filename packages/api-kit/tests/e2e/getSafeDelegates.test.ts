@@ -13,7 +13,8 @@ let signer: Signer
 describe('getSafeDelegates', () => {
   before(async () => {
     ;({ safeApiKit, signer } = await getServiceClient(
-      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
+      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676',
+      'https://safe-transaction-sepolia.staging.5afe.dev/api'
     ))
   })
 

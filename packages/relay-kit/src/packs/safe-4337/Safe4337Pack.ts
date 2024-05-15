@@ -274,8 +274,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<SafeOperation> {
-    const userOperation = safeOperation.toUserOperation()
-
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -288,7 +286,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const estimateUserOperationGas = await this.#bundlerClient.send(
       RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
-      [userOperationToHexValues(userOperation), this.#ENTRYPOINT_ADDRESS]
+      [userOperationToHexValues(safeOperation.toUserOperation()), this.#ENTRYPOINT_ADDRESS]
     )
 
     if (estimateUserOperationGas) {

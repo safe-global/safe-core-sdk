@@ -33,7 +33,7 @@ npm install @safe-global/api-kit
 ```js
 import SafeApiKit from '@safe-global/api-kit'
 
-const safeService = new SafeApiKit({
+const apiKit = new SafeApiKit({
   chainId: 1n,
   // Optional. txServiceUrl must be used to set a custom service. For example on chains where Safe doesn't run services.
   txServiceUrl: 'https://safe-transaction-mainnet.safe.global'

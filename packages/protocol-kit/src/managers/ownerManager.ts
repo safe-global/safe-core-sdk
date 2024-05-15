@@ -1,4 +1,4 @@
-import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
+import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '../types'
 import SafeProvider from '../SafeProvider'

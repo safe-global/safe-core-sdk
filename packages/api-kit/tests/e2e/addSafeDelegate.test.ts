@@ -25,7 +25,7 @@ describe('addSafeDelegate', () => {
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: ''
     }
     await chai
@@ -39,7 +39,7 @@ describe('addSafeDelegate', () => {
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     await chai
@@ -53,7 +53,7 @@ describe('addSafeDelegate', () => {
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     await chai
@@ -69,7 +69,7 @@ describe('addSafeDelegate', () => {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     await chai
@@ -85,7 +85,7 @@ describe('addSafeDelegate', () => {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     await chai
@@ -101,7 +101,7 @@ describe('addSafeDelegate', () => {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     await chai
@@ -117,7 +117,7 @@ describe('addSafeDelegate', () => {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     await chai
@@ -152,7 +152,7 @@ describe('addSafeDelegate', () => {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({ safeAddress })
@@ -174,7 +174,7 @@ describe('addSafeDelegate', () => {
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({
@@ -206,7 +206,7 @@ describe('addSafeDelegate', () => {
       safeAddress: eip3770SafeAddress,
       delegateAddress: eip3770DelegateAddress,
       delegatorAddress: eip3770DelegatorAddress,
-      signer: signer,
+      signer,
       label: 'Label'
     }
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({

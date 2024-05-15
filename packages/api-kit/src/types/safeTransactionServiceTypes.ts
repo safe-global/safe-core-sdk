@@ -297,13 +297,10 @@ export type SafeOperationConfirmation = {
   readonly signatureType: string
 }
 
-export type SafeOperationResponse = {
-  readonly created: string
-  readonly modified: string
+export type UserOperationResponse = {
   readonly ethereumTxHash: string
   readonly sender: string
   readonly userOperationHash: string
-  readonly safeOperationHash: string
   readonly nonce: number
   readonly initCode: null | string
   readonly callData: null | string
@@ -316,11 +313,18 @@ export type SafeOperationResponse = {
   readonly paymasterData: null | string
   readonly signature: string
   readonly entryPoint: string
+}
+
+export type SafeOperationResponse = {
+  readonly created: string
+  readonly modified: string
+  readonly safeOperationHash: string
   readonly validAfter: string
   readonly validUntil: string
   readonly moduleAddress: string
   readonly confirmations?: Array<SafeOperationConfirmation>
   readonly preparedSignature?: string
+  readonly userOperation?: UserOperationResponse
 }
 
 export type GetSafeOperationListProps = {

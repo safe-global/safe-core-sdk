@@ -11,23 +11,21 @@ const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c
 const PRIVATE_KEY_2 = '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
 
 let safeApiKit: SafeApiKit
-let signer1: Signer
-let signer2: Signer
+let signer: Signer
 
 describe('addSafeDelegate', () => {
   before(async () => {
-    safeApiKit = getApiKit()
-    signer1 = new ethers.Wallet(PRIVATE_KEY_1)
-    signer2 = new ethers.Wallet(PRIVATE_KEY_2)
+    safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
+    signer = new ethers.Wallet(PRIVATE_KEY_1)
   })
 
   it('should fail if Label is empty', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: ''
     }
     await chai
@@ -37,11 +35,11 @@ describe('addSafeDelegate', () => {
 
   it('should fail if Safe delegate address is empty', async () => {
     const delegateAddress = ''
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     await chai
@@ -50,12 +48,12 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is empty', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
+    const delegateAddress = '0xe4bb611E4e4164D54Ad7361B9d58b0A1eBD462B8'
     const delegatorAddress = ''
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     await chai
@@ -66,12 +64,12 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     await chai
@@ -82,12 +80,12 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe delegate address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     await chai
@@ -98,12 +96,12 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe delegator address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = (await signer1.getAddress()).toLowerCase()
+    const delegatorAddress = (await signer.getAddress()).toLowerCase()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     await chai
@@ -114,12 +112,12 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe does not exist', async () => {
     const safeAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     await chai
@@ -130,12 +128,13 @@ describe('addSafeDelegate', () => {
   it('should fail if the signer is not an owner of the Safe', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer2.getAddress()
+    const nonOwnerSigner = new ethers.Wallet(PRIVATE_KEY_2)
+    const delegatorAddress = await nonOwnerSigner.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer2,
+      signer: nonOwnerSigner,
       label: 'Label'
     }
     await chai
@@ -148,12 +147,12 @@ describe('addSafeDelegate', () => {
   it('should add a new delegate', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({ safeAddress })
@@ -171,11 +170,11 @@ describe('addSafeDelegate', () => {
 
   it('should add a new delegate without specifying a Safe', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({
@@ -201,13 +200,13 @@ describe('addSafeDelegate', () => {
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-    const delegatorAddress = await signer1.getAddress()
+    const delegatorAddress = await signer.getAddress()
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress: eip3770SafeAddress,
       delegateAddress: eip3770DelegateAddress,
       delegatorAddress: eip3770DelegatorAddress,
-      signer: signer1,
+      signer: signer,
       label: 'Label'
     }
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({

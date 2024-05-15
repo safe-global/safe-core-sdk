@@ -27,6 +27,7 @@ import {
   TransferListResponse
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
+import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
@@ -256,7 +257,7 @@ class SafeApiKit {
     limit,
     offset
   }: GetSafeDelegateProps): Promise<SafeDelegateListResponse> {
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/delegates`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates`)
 
     if (safeAddress) {
       const { address: safe } = this.#getEip3770Address(safeAddress)
@@ -279,6 +280,7 @@ class SafeApiKit {
     if (offset) {
       url.searchParams.set('offset', offset)
     }
+
     return sendRequest({
       url: url.toString(),
       method: HttpMethod.Get
@@ -316,9 +318,8 @@ class SafeApiKit {
     }
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegate + totp
-    const signature = await signer.signMessage(data)
+    const signature = await signDelegate(signer, delegate, this.#chainId)
+
     const body: any = {
       safe: safeAddress ? this.#getEip3770Address(safeAddress).address : null,
       delegate,
@@ -327,7 +328,7 @@ class SafeApiKit {
       signature
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/delegates/`,
+      url: `${this.#txServiceBaseUrl}/v2/delegates/`,
       method: HttpMethod.Post,
       body
     })
@@ -357,14 +358,12 @@ class SafeApiKit {
     }
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const totp = Math.floor(Date.now() / 1000 / 3600)
-    const data = delegate + totp
-    const signature = await signer.signMessage(data)
+    const signature = await signDelegate(signer, delegate, this.#chainId)
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/delegates/${delegate}`,
+      url: `${this.#txServiceBaseUrl}/v2/delegates/${delegate}`,
       method: HttpMethod.Delete,
       body: {
-        delegate,
         delegator,
         signature
       }

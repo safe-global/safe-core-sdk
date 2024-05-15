@@ -40,7 +40,7 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       ...sharedNetworkConfig,
-      url: 'https://rpc.ankr.com/eth_sepolia'
+      url: 'https://rpc2.sepolia.org'
     }
   },
   //@ts-expect-error Type not found

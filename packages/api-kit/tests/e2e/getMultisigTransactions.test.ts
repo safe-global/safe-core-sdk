@@ -39,8 +39,8 @@ describe('getMultisigTransactions', () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with multisig transactions
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(safeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(18)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(18)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(22)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(22)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })
@@ -51,8 +51,8 @@ describe('getMultisigTransactions', () => {
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(eip3770SafeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(18)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(18)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(22)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(22)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })

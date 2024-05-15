@@ -8,6 +8,7 @@ import {
 } from 'ethers'
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
+import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
 
 import {
   EIP712TypedDataMessage,
@@ -206,7 +207,7 @@ class SafeProvider {
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
     const contractCode = await this.#externalProvider.getCode(address, blockTag)
-    return contractCode !== '0x'
+    return contractCode !== EMPTY_DATA
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {

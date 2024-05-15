@@ -17,7 +17,7 @@ const config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>'
 }
 
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
+const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',

@@ -10,7 +10,7 @@ const PIMLICO_API_KEY = ''
 const OWNER_ADDRESS = ''
 
 // RPC URL
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia' // SEPOLIA
+const RPC_URL = 'https://sepolia.gateway.tenderly.co' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // CHAIN

@@ -15,7 +15,7 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: 'https://rpc.ankr.com/eth_sepolia',
+  RPC_URL: 'https://sepolia.gateway.tenderly.co',
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
     OWNERS: ['OWNER_ADDRESS'],

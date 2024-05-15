@@ -51,7 +51,7 @@ export function getSafeProviderFromNetwork(
       rpcUrl = 'https://rpc.ankr.com/eth_goerli'
       break
     case 'sepolia':
-      rpcUrl = 'https://rpc.ankr.com/eth_sepolia'
+      rpcUrl = 'https://sepolia.gateway.tenderly.co'
       break
     case 'mainnet':
       rpcUrl = 'https://rpc.ankr.com/eth'

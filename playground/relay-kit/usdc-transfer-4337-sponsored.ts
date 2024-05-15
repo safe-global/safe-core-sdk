@@ -17,7 +17,7 @@ const CHAIN_NAME = 'sepolia'
 // const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia' // SEPOLIA
+const RPC_URL = 'https://sepolia.gateway.tenderly.co' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL

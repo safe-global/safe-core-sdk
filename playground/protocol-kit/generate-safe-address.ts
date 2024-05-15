@@ -11,7 +11,7 @@ import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 const config: Config = {
   // REQUIRED PARAMETERS
   owners: ['0x680cde08860141F9D223cE4E620B10Cd6741037E'],
-  rpcUrl: 'https://rpc.ankr.com/eth_sepolia',
+  rpcUrl: 'https://sepolia.gateway.tenderly.co',
   // OPTIONAL PARAMETERS
   pattern: '0x5afe',
   safeVersion: '1.3.0',

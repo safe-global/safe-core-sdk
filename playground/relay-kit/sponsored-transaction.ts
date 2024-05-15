@@ -21,7 +21,7 @@ const config = {
   RELAY_API_KEY: '<GELATO_RELAY_API_KEY>'
 }
 
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
+const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',

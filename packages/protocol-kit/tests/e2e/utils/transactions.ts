@@ -1,11 +1,16 @@
 import { ContractTransactionReceipt } from 'ethers'
+import { TransactionReceipt as ViemTransactionReceipt } from 'viem'
 import { EthAdapter, TransactionResult } from '@safe-global/safe-core-sdk-types'
 import { TransactionReceipt } from 'web3-core/types'
 
 export async function waitSafeTxReceipt(
   txResult: TransactionResult
-): Promise<ContractTransactionReceipt | TransactionReceipt | undefined> {
-  const receipt: ContractTransactionReceipt | TransactionReceipt | undefined = txResult.promiEvent
+): Promise<ContractTransactionReceipt | TransactionReceipt | ViemTransactionReceipt | undefined> {
+  const receipt:
+    | ContractTransactionReceipt
+    | TransactionReceipt
+    | ViemTransactionReceipt
+    | undefined = txResult.promiEvent
     ? await new Promise(
         (resolve, reject) =>
           txResult.promiEvent &&
@@ -15,7 +20,11 @@ export async function waitSafeTxReceipt(
             )
             .catch(reject)
       )
-    : txResult.transactionResponse && (await txResult.transactionResponse.wait())
+    : txResult.transactionResponse
+    ? await txResult.transactionResponse.wait()
+    : txResult.wait
+    ? await txResult.wait()
+    : undefined
   return receipt
 }
 

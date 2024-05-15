@@ -6,14 +6,18 @@ import {
   Web3AdapterConfig
 } from '@safe-global/protocol-kit/index'
 import { EthAdapter } from '@safe-global/safe-core-sdk-types'
-import { ethers, web3 } from 'hardhat'
+import { ethers, web3, network as hhNetwork } from 'hardhat'
 import Web3 from 'web3'
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
+import { ViemAdapter } from '@safe-global/protocol-kit/adapters/viem/ViemAdapter'
+import { Address, Chain, Client, Transport, createClient, http } from 'viem'
+import { gnosis, goerli, hardhat, mainnet, sepolia, zkSync } from 'viem/chains'
+import { custom } from 'viem'
 
 type Network = 'mainnet' | 'gnosis' | 'zksync' | 'goerli' | 'sepolia'
 
 export async function getEthAdapter(
-  signerOrProvider: AbstractSigner | Provider | Web3
+  signerOrProvider: AbstractSigner | Provider | Web3 | Client<Transport, Chain>
 ): Promise<EthAdapter> {
   let ethAdapter: EthAdapter
   switch (process.env.ETH_LIB) {
@@ -34,6 +38,18 @@ export async function getEthAdapter(
       }
       ethAdapter = new EthersAdapter(ethersAdapterConfig)
       break
+    case 'viem':
+      ethAdapter = new ViemAdapter({
+        client:
+          signerOrProvider instanceof HardhatEthersSigner
+            ? createClient({
+                chain: hardhat,
+                transport: custom(hhNetwork.provider),
+                account: signerOrProvider.address as Address
+              })
+            : (signerOrProvider as Client<Transport, Chain>)
+      })
+      break
     default:
       throw new Error('Ethereum library not supported')
   }
@@ -41,7 +57,7 @@ export async function getEthAdapter(
   return ethAdapter
 }
 
-export function getNetworkProvider(network: Network): Provider | Web3 {
+export function getNetworkProvider(network: Network): Provider | Web3 | Client<Transport, Chain> {
   let rpcUrl: string
   switch (network) {
     case 'zksync':
@@ -71,9 +87,27 @@ export function getNetworkProvider(network: Network): Provider | Web3 {
     case 'ethers':
       provider = new ethers.JsonRpcProvider(rpcUrl)
       break
+    case 'viem':
+      provider = createClient({ chain: getViemChain(network), transport: http(rpcUrl) })
+      break
     default:
       throw new Error('Ethereum library not supported')
   }
 
   return provider
+}
+
+function getViemChain(network: Network) {
+  switch (network) {
+    case 'mainnet':
+      return mainnet
+    case 'goerli':
+      return goerli
+    case 'gnosis':
+      return gnosis
+    case 'zksync':
+      return zkSync
+    case 'sepolia':
+      return sepolia
+  }
 }

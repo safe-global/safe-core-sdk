@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with the [Safe Smart Account](https://github.com/safe-global/safe-smart-account).
+Software development kit that facilitates the interaction with [Safe Smart Accounts](https://github.com/safe-global/safe-smart-account).
 
 ## Table of contents
 

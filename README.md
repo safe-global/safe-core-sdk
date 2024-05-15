@@ -15,11 +15,11 @@
 
 ## About
 
-This is a mono-repository containing Javascript software developer tools that facilitate the interaction with the [Safe Smart Account](https://github.com/safe-global/safe-smart-account) and [services](https://github.com/safe-global/safe-transaction-service).
+This is a mono-repository containing Javascript software developer tools that facilitate the interaction with [Safe Smart Accounts](https://github.com/safe-global/safe-smart-account) and [services](https://github.com/safe-global/safe-transaction-service).
 
 ## Documentation
 
-Visit [https://docs.safe.global/sdk/overview](https://docs.safe.global/sdk/overview) to view the full documentation.
+Visit [our documentation site](https://docs.safe.global/sdk/overview) to start developing using our SDK.
 
 ## Guides
 

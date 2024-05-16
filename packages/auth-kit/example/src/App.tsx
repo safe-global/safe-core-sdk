@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BrowserProvider, Eip1193Provider, ethers } from 'ethers'
 import { Box, Button, Divider, Grid, Typography } from '@mui/material'
 import { EthHashInfo } from '@safe-global/safe-react-components'
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import Safe from '@safe-global/protocol-kit'
 import AppBar from './AppBar'
 import {
   AuthKitSignInData,
@@ -129,15 +129,9 @@ function App() {
     const safeAddress = safeAuthSignInResponse?.safes?.[index] || '0x'
 
     // Wrap Web3Auth provider with ethers
-    const provider = new BrowserProvider(safeAuthPack?.getProvider() as Eip1193Provider)
-    const signer = await provider.getSigner()
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    })
-    const protocolKit = await Safe.create({
-      safeAddress,
-      ethAdapter
+    const protocolKit = await Safe.init({
+      provider: safeAuthPack?.getProvider() as Eip1193Provider,
+      safeAddress
     })
 
     // Create transaction

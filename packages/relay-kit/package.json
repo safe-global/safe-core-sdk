@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/relay-kit",
-  "version": "2.1.1",
+  "version": "3.0.0-alpha.0",
   "description": "Safe Relay Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,7 +9,8 @@
     "Ethereum",
     "Account Abstraction",
     "SDK",
-    "Relay"
+    "Relay",
+    "4337"
   ],
   "scripts": {
     "test": "jest src --coverage",
@@ -36,9 +37,9 @@
   },
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^5.5.0",
-    "@safe-global/protocol-kit": "^3.1.1",
-    "@safe-global/safe-core-sdk-types": "^4.1.1",
+    "@safe-global/protocol-kit": "^4.0.0-alpha.0",
+    "@safe-global/safe-core-sdk-types": "^5.0.0-alpha.0",
     "@safe-global/safe-modules-deployments": "^2.0.0",
-    "ethers": "^6.7.1"
+    "ethers": "^6.12.1"
   }
 }

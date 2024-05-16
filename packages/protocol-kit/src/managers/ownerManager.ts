@@ -1,18 +1,19 @@
-import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
+import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import { SafeContractImplementationType } from '../types'
+import SafeProvider from '../SafeProvider'
 
 class OwnerManager {
-  #ethAdapter: EthAdapter
-  #safeContract?: SafeContract
+  #safeProvider: SafeProvider
+  #safeContract?: SafeContractImplementationType
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: SafeProvider, safeContract?: SafeContractImplementationType) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateOwnerAddress(ownerAddress: string, errorMessage?: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(ownerAddress)
+    const isValidAddress = this.#safeProvider.isAddress(ownerAddress)
     if (!isValidAddress || isRestrictedAddress(ownerAddress)) {
       throw new Error(errorMessage || 'Invalid owner address provided')
     }
@@ -56,7 +57,7 @@ class OwnerManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    const owners = await this.#safeContract.getOwners()
+    const [owners] = await this.#safeContract.getOwners()
     return [...owners]
   }
 
@@ -64,14 +65,19 @@ class OwnerManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.getThreshold()
+
+    const [threshold] = await this.#safeContract.getThreshold()
+
+    return Number(threshold)
   }
 
   async isOwner(ownerAddress: string): Promise<boolean> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.isOwner(ownerAddress)
+
+    const [isOwner] = await this.#safeContract.isOwner([ownerAddress])
+    return isOwner
   }
 
   async encodeAddOwnerWithThresholdData(ownerAddress: string, threshold?: number): Promise<string> {

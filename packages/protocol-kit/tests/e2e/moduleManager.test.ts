@@ -11,11 +11,14 @@ import { getContractNetworks } from './utils/setupContractNetworks'
 import {
   getDailyLimitModule,
   getSafeWithOwners,
-  getSocialRecoveryModule
+  getSocialRecoveryModule,
+  getStateChannelModule,
+  getWhiteListModule
 } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
+import semverSatisfies from 'semver/functions/satisfies'
 
 chai.use(chaiAsPromised)
 
@@ -34,23 +37,26 @@ describe('Safe modules manager', () => {
         safeVersion: safeVersionDeployed
       }
     }
+    const provider = getEip1193Provider()
+
     return {
       dailyLimitModule: await getDailyLimitModule(),
       socialRecoveryModule: await getSocialRecoveryModule(),
+      stateChannelModule: await getStateChannelModule(),
+      whiteListModule: await getWhiteListModule(),
       safe: await getSafeWithOwners([accounts[0].address]),
       accounts,
       contractNetworks,
-      predictedSafe
+      predictedSafe,
+      provider
     }
   })
 
   describe('getModules', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -58,30 +64,38 @@ describe('Safe modules manager', () => {
     })
 
     it('should return all the enabled modules', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, dailyLimitModule, socialRecoveryModule, contractNetworks, provider } =
+        await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
-      const tx = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
-      const txResponse = await safeSdk.executeTransaction(tx)
-      await waitSafeTxReceipt(txResponse)
-      chai.expect((await safeSdk.getModules()).length).to.be.eq(1)
+      const enableDailyLimitModuleTx = await safeSdk.createEnableModuleTx(
+        await dailyLimitModule.getAddress()
+      )
+      const enableDailyLimitModuleTxResponse =
+        await safeSdk.executeTransaction(enableDailyLimitModuleTx)
+      const socialRecoveryModuleTx = await safeSdk.createEnableModuleTx(
+        await socialRecoveryModule.getAddress()
+      )
+      const socialRecoveryModuleTxResponse =
+        await safeSdk.executeTransaction(socialRecoveryModuleTx)
+      await Promise.all([
+        waitSafeTxReceipt(enableDailyLimitModuleTxResponse),
+        waitSafeTxReceipt(socialRecoveryModuleTxResponse)
+      ])
+      chai.expect((await safeSdk.getModules()).length).to.be.eq(2)
     })
   })
 
   describe('getModulesPaginated', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -91,83 +105,149 @@ describe('Safe modules manager', () => {
     })
 
     it('should return the enabled modules', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
-      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(0)
+
+      const emptyModuleList = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
       const tx = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(1)
+      const moduleList = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
+
+      chai.expect(emptyModuleList.modules.length).to.be.eq(0)
+      chai.expect(emptyModuleList.next).to.be.eq(SENTINEL_ADDRESS)
+      chai.expect(moduleList.modules.length).to.be.eq(1)
+      chai.expect(emptyModuleList.next).to.be.eq(SENTINEL_ADDRESS)
     })
 
     it('should constraint returned modules by pageSize', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks, socialRecoveryModule } =
-        await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const {
+        safe,
+        dailyLimitModule,
+        contractNetworks,
+        socialRecoveryModule,
+        stateChannelModule,
+        whiteListModule,
+        provider
+      } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const dailyLimitsAddress = await await dailyLimitModule.getAddress()
-      const socialRecoveryAddress = await await socialRecoveryModule.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const dailyLimitsAddress = await dailyLimitModule.getAddress()
+      const socialRecoveryAddress = await socialRecoveryModule.getAddress()
+      const stateChannelAddress = await stateChannelModule.getAddress()
+      const whiteListAddress = await whiteListModule.getAddress()
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
+      const currentPageNext = semverSatisfies(await safeSdk.getContractVersion(), '>=1.4.1')
 
-      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(0)
-      const txDailyLimits = await safeSdk.createEnableModuleTx(dailyLimitsAddress)
-      const dailyLimitsResponse = await safeSdk.executeTransaction(txDailyLimits)
-      await waitSafeTxReceipt(dailyLimitsResponse)
-      const txSocialRecovery = await safeSdk.createEnableModuleTx(socialRecoveryAddress)
-      const soecialRecoveryResponse = await safeSdk.executeTransaction(txSocialRecovery)
-      await waitSafeTxReceipt(soecialRecoveryResponse)
+      chai
+        .expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).modules.length)
+        .to.be.eq(0)
 
-      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(2)
-      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 1)).length).to.be.eq(1)
-      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 1)).length).to.be.eq(1)
+      const moduleDeployment = [
+        dailyLimitsAddress,
+        socialRecoveryAddress,
+        stateChannelAddress,
+        whiteListAddress
+      ].map(async (moduleAddress) => {
+        const txModule = await safeSdk.createEnableModuleTx(moduleAddress)
+        const moduleResponse = await safeSdk.executeTransaction(txModule)
+        await waitSafeTxReceipt(moduleResponse)
+      })
+
+      await Promise.all(moduleDeployment)
+
+      const modules1 = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
+      const modules2 = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 1)
+      const modules3 = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 2)
+
+      chai.expect(modules1.modules.length).to.be.eq(4)
+      chai
+        .expect(modules1.modules)
+        .to.deep.eq([
+          whiteListAddress,
+          stateChannelAddress,
+          socialRecoveryAddress,
+          dailyLimitsAddress
+        ])
+      chai.expect(modules1.next).to.be.eq(SENTINEL_ADDRESS)
+
+      chai.expect(modules2.modules.length).to.be.eq(1)
+      chai.expect(modules2.modules).to.deep.eq([whiteListAddress])
+      chai.expect(modules2.next).to.be.eq(currentPageNext ? whiteListAddress : stateChannelAddress)
+
+      chai.expect(modules3.modules.length).to.be.eq(2)
+      chai.expect(modules3.modules).to.deep.eq([whiteListAddress, stateChannelAddress])
+      chai
+        .expect(modules3.next)
+        .to.be.eq(currentPageNext ? stateChannelAddress : socialRecoveryAddress)
     })
 
     it('should offset the returned modules', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks, socialRecoveryModule } =
-        await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const {
+        safe,
+        dailyLimitModule,
+        contractNetworks,
+        socialRecoveryModule,
+        stateChannelModule,
+        whiteListModule,
+        provider
+      } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const dailyLimitsAddress = await await dailyLimitModule.getAddress()
-      const socialRecoveryAddress = await await socialRecoveryModule.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const dailyLimitsAddress = await dailyLimitModule.getAddress()
+      const socialRecoveryAddress = await socialRecoveryModule.getAddress()
+      const stateChannelAddress = await stateChannelModule.getAddress()
+      const whiteListAddress = await whiteListModule.getAddress()
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
+      const currentPageNext = semverSatisfies(await safeSdk.getContractVersion(), '>=1.4.1')
 
-      const txDailyLimits = await safeSdk.createEnableModuleTx(dailyLimitsAddress)
-      const dailyLimitsResponse = await safeSdk.executeTransaction(txDailyLimits)
-      await waitSafeTxReceipt(dailyLimitsResponse)
-      const txSocialRecovery = await safeSdk.createEnableModuleTx(socialRecoveryAddress)
-      const soecialRecoveryResponse = await safeSdk.executeTransaction(txSocialRecovery)
-      await waitSafeTxReceipt(soecialRecoveryResponse)
+      const moduleDeployment = [
+        dailyLimitsAddress,
+        socialRecoveryAddress,
+        stateChannelAddress,
+        whiteListAddress
+      ].map(async (moduleAddress) => {
+        const txModule = await safeSdk.createEnableModuleTx(moduleAddress)
+        const moduleResponse = await safeSdk.executeTransaction(txModule)
+        await waitSafeTxReceipt(moduleResponse)
+      })
 
-      const [firstModule, secondModule] = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
+      await Promise.all(moduleDeployment)
 
-      chai.expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).length).to.be.eq(2)
-      chai.expect((await safeSdk.getModulesPaginated(firstModule, 10)).length).to.be.eq(1)
-      chai.expect((await safeSdk.getModulesPaginated(secondModule, 10)).length).to.be.eq(0)
+      const {
+        modules: [firstModule, secondModule, thirdModule, fourthModule]
+      } = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
+
+      const modules1 = await safeSdk.getModulesPaginated(firstModule, 10)
+      const modules2 = await safeSdk.getModulesPaginated(firstModule, 2)
+      const modules3 = await safeSdk.getModulesPaginated(firstModule, 3)
+
+      chai
+        .expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).modules.length)
+        .to.be.eq(4)
+      chai.expect(modules1.modules).to.deep.eq([secondModule, thirdModule, fourthModule])
+      chai.expect(modules1.next).to.be.eq(SENTINEL_ADDRESS)
+      chai.expect(modules2.modules).to.deep.eq([secondModule, thirdModule])
+      chai.expect(modules2.next).to.be.eq(currentPageNext ? thirdModule : fourthModule)
+      chai.expect(modules3.modules).to.deep.eq([secondModule, thirdModule, fourthModule])
+      chai.expect(modules3.next).to.be.eq(SENTINEL_ADDRESS)
     })
 
     it('should fail if pageSize is invalid', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -180,11 +260,9 @@ describe('Safe modules manager', () => {
 
   describe('isModuleEnabled', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const { predictedSafe, dailyLimitModule, contractNetworks, provider } = await setupTests()
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -193,12 +271,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should return true if a module is enabled', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -212,11 +288,9 @@ describe('Safe modules manager', () => {
 
   describe('createEnableModuleTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const { predictedSafe, dailyLimitModule, contractNetworks, provider } = await setupTests()
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -225,12 +299,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is invalid', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -239,12 +311,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -253,12 +323,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -267,12 +335,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is already enabled', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -284,12 +350,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should build the transaction with the optional props', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -311,12 +375,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should enable a Safe module', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -332,11 +394,9 @@ describe('Safe modules manager', () => {
 
   describe('createDisableModuleTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const { predictedSafe, dailyLimitModule, contractNetworks, provider } = await setupTests()
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -345,12 +405,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is invalid', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -359,12 +417,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -373,12 +429,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe, accounts, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -387,12 +441,10 @@ describe('Safe modules manager', () => {
     })
 
     it('should fail if address is not enabled', async () => {
-      const { safe, accounts, dailyLimitModule, contractNetworks } = await setupTests()
-      const [account1] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -401,13 +453,12 @@ describe('Safe modules manager', () => {
     })
 
     it('should build the transaction with the optional props', async () => {
-      const { dailyLimitModule, accounts, contractNetworks } = await setupTests()
+      const { dailyLimitModule, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -436,14 +487,13 @@ describe('Safe modules manager', () => {
     })
 
     it('should disable Safe modules', async () => {
-      const { dailyLimitModule, accounts, socialRecoveryModule, contractNetworks } =
+      const { dailyLimitModule, accounts, socialRecoveryModule, contractNetworks, provider } =
         await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })

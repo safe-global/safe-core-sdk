@@ -6,7 +6,7 @@ import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { itif } from './utils/helpers'
 import { getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -29,25 +29,26 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         safeVersion: safeVersionDeployed
       }
     }
+    const provider = getEip1193Provider()
 
     return {
       accounts,
       contractNetworks,
       predictedSafe,
-      chainId
+      chainId,
+      provider
     }
   })
 
   it('should throw an error if the Safe is already deployed', async () => {
-    const { accounts, contractNetworks } = await setupTests()
+    const { accounts, contractNetworks, provider } = await setupTests()
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
     const safeAddress = await safe.getAddress()
-    const ethAdapter = await getEthAdapter(account1.signer)
 
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       safeAddress,
       contractNetworks
     })
@@ -70,13 +71,11 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed == '1.4.1')(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1, account2] = accounts
+      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
+      const [, account2] = accounts
 
-      const ethAdapter = await getEthAdapter(account1.signer)
-
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -106,13 +105,11 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed == '1.3.0')(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1, account2] = accounts
+      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
+      const [, account2] = accounts
 
-      const ethAdapter = await getEthAdapter(account1.signer)
-
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -142,13 +139,11 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed >= '1.3.0')(
     'should include the custom salt nonce in the Safe deployment data',
     async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1, account2] = accounts
+      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
+      const [, account2] = accounts
 
-      const ethAdapter = await getEthAdapter(account1.signer)
-
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -171,7 +166,9 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         customSaltNonce
       )
 
-      const customSaltNonceEncoded = ethAdapter.encodeParameters(['uint256'], [customSaltNonce])
+      const customSaltNonceEncoded = safeSdk
+        .getSafeProvider()
+        .encodeParameters(['uint256'], [customSaltNonce])
 
       // custom salt nonce included in the deployment data
       chai.expect(batchTransaction.data).to.contains(customSaltNonceEncoded.replace('0x', ''))

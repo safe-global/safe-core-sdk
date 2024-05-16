@@ -2,16 +2,17 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, {
   PredictedSafeProps,
   SafeTransactionOptionalProps,
-  standardizeSafeTransactionData
+  standardizeSafeTransactionData,
+  SafeContractImplementationType as SafeContract
 } from '@safe-global/protocol-kit/index'
-import { SafeContract, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { itif } from './utils/helpers'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
@@ -31,6 +32,7 @@ describe('Transactions creation', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
         owners: [accounts[0].address],
@@ -46,7 +48,8 @@ describe('Transactions creation', () => {
       accounts,
       chainId,
       contractNetworks,
-      predictedSafe
+      predictedSafe,
+      provider
     }
   })
 
@@ -54,13 +57,12 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return a transaction with safeTxGas=0 if safeVersion>=1.3.0 and gasPrice=0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -71,7 +73,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -82,13 +84,12 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return a transaction with estimated safeTxGas if safeVersion>=1.3.0 and gasPrice>0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -100,7 +101,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -111,13 +112,12 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return a transaction with defined safeTxGas if safeVersion>=1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -130,7 +130,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -141,13 +141,12 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should return a transaction with estimated safeTxGas if safeVersion<1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -158,7 +157,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -169,13 +168,12 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should return a transaction with defined safeTxGas of 0 if safeVersion<1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -188,7 +186,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -199,13 +197,12 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should return a transaction with defined safeTxGas if safeVersion<1.3.0',
       async () => {
-        const { accounts, contractNetworks } = await setupTests()
+        const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const ethAdapter = await getEthAdapter(account1.signer)
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -218,7 +215,7 @@ describe('Transactions creation', () => {
         }
         const safeTxData = await standardizeSafeTransactionData({
           safeContract: safeSdk.getContractManager().safeContract as SafeContract,
-          ethAdapter,
+          provider,
           tx: txDataPartial,
           contractNetworks
         })
@@ -229,11 +226,10 @@ describe('Transactions creation', () => {
 
   describe('createTransaction', async () => {
     it('should create a single transaction with gasPrice=0', async () => {
-      const { predictedSafe, accounts, contractNetworks } = await setupTests()
-      const [account1, account2] = accounts
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
+      const [, account2] = accounts
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
@@ -251,13 +247,12 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction with gasPrice=0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -282,13 +277,12 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction with gasPrice>0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -313,13 +307,12 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction when passing a transaction array with length=1', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -335,13 +328,12 @@ describe('Transactions creation', () => {
     })
 
     it('should create a single transaction when passing a transaction array with length=1 and options', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -364,13 +356,12 @@ describe('Transactions creation', () => {
     })
 
     it('should fail when creating a MultiSend transaction passing a transaction array with length=0', async () => {
-      const { accounts, contractNetworks } = await setupTests()
+      const { accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -379,13 +370,12 @@ describe('Transactions creation', () => {
     })
 
     it('should create a MultiSend transaction', async () => {
-      const { accounts, contractNetworks, erc20Mintable, chainId } = await setupTests()
+      const { accounts, contractNetworks, erc20Mintable, chainId, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const ethAdapter = await getEthAdapter(account1.signer)
       const safeAddress = await safe.getAddress()
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -414,13 +404,12 @@ describe('Transactions creation', () => {
     })
 
     it('should create a MultiSend transaction with options', async () => {
-      const { accounts, contractNetworks, erc20Mintable, chainId } = await setupTests()
+      const { accounts, contractNetworks, erc20Mintable, chainId, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
       const safeAddress = await safe.getAddress()
-      const ethAdapter = await getEthAdapter(account1.signer)
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
@@ -460,12 +449,10 @@ describe('Transactions creation', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail to create a transaction if the Safe with version <v1.3.0 is using predicted config',
       async () => {
-        const { safe, predictedSafe, accounts, contractNetworks } = await setupTests()
-        const account = accounts[0]
-        const ethAdapter = await getEthAdapter(account.signer)
+        const { safe, predictedSafe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           predictedSafe,
           contractNetworks
         })

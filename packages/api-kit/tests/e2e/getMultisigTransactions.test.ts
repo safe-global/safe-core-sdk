@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
 import config from '../utils/config'
-import { getServiceClient } from '../utils/setupServiceClient'
+import { getApiKit } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
 
@@ -10,9 +10,7 @@ let safeApiKit: SafeApiKit
 
 describe('getMultisigTransactions', () => {
   before(async () => {
-    ;({ safeApiKit } = await getServiceClient(
-      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-    ))
+    safeApiKit = getApiKit()
   })
 
   it('should fail if Safe address is empty', async () => {
@@ -41,8 +39,8 @@ describe('getMultisigTransactions', () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with multisig transactions
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(safeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(18)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(18)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(22)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(22)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })
@@ -53,8 +51,8 @@ describe('getMultisigTransactions', () => {
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(eip3770SafeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(18)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(18)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(22)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(22)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })

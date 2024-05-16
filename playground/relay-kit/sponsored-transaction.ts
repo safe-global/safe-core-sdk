@@ -1,5 +1,4 @@
 import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
@@ -15,13 +14,14 @@ import { ethers } from 'ethers'
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
 
 // Check the status of a transaction after it is executed:
-// https://goerli.etherscan.io/tx/<TRANSACTION_HASH>
+// https://sepolia.etherscan.io/tx/<TRANSACTION_HASH>
 
 const config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',
-  RPC_URL: 'https://goerli.infura.io/v3/<INFURA_API_KEY>',
   RELAY_API_KEY: '<GELATO_RELAY_API_KEY>'
 }
+
+const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',
@@ -39,15 +39,10 @@ async function main() {
 
   // SDK Initialization
 
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
-  const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
-
-  const safeAccountAbstraction = new AccountAbstraction(
-    new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    })
-  )
+  const safeAccountAbstraction = new AccountAbstraction({
+    provider: RPC_URL,
+    signer: config.SAFE_SIGNER_PRIVATE_KEY
+  })
 
   await safeAccountAbstraction.init()
 
@@ -68,10 +63,11 @@ async function main() {
 
   // Fake on-ramp to fund the Safe
 
-  const safeBalance = await provider.getBalance(predictedSafeAddress)
+  const ethersProvider = safeAccountAbstraction.protocolKit.getSafeProvider().getExternalProvider()
+  const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
   console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
   if (safeBalance < BigInt(txConfig.VALUE)) {
-    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
+    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, ethersProvider)
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,
       value: txConfig.VALUE
@@ -79,7 +75,7 @@ async function main() {
     console.log(`Funding the Safe with ${ethers.formatEther(txConfig.VALUE.toString())} ETH`)
     await onRampResponse.wait()
 
-    const safeBalanceAfter = await provider.getBalance(predictedSafeAddress)
+    const safeBalanceAfter = await ethersProvider.getBalance(predictedSafeAddress)
     console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
   }
 

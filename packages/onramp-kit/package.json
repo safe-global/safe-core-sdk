@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/onramp-kit",
-  "version": "3.0.4",
+  "version": "3.0.4-alpha.0",
   "description": "Onramp library",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -35,13 +35,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@monerium/sdk": "^2.9.0",
-    "@safe-global/api-kit": "^2.3.2",
-    "@safe-global/protocol-kit": "^3.1.1",
-    "@safe-global/safe-core-sdk-types": "^4.1.1",
+    "@monerium/sdk": "^2.12.0",
+    "@safe-global/api-kit": "^2.3.2-alpha.0",
+    "@safe-global/protocol-kit": "^4.0.0-alpha.0",
+    "@safe-global/safe-core-sdk-types": "^5.0.0-alpha.0",
     "@stripe/crypto": "^0.0.4",
     "@stripe/stripe-js": "^1.54.2",
-    "ethers": "^6.7.1"
+    "ethers": "^6.12.1"
   },
   "devDependencies": {
     "events": "^3.3.0",

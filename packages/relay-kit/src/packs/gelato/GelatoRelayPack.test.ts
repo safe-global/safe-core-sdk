@@ -7,6 +7,7 @@ import Safe, {
   createERC20TokenTransferTransaction
 } from '@safe-global/protocol-kit'
 import { MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
+import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
 
 import {
   GELATO_FEE_COLLECTOR,
@@ -14,7 +15,6 @@ import {
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
 import { GelatoRelayPack } from './GelatoRelayPack'
-import { SafeTransaction } from 'packages/safe-core-sdk-types/dist/src'
 
 enum TaskState {
   CheckPending = 'CheckPending'

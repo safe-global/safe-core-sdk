@@ -1,10 +1,9 @@
 import chai from 'chai'
 import { deployments } from 'hardhat'
-
 import { getAccounts } from './utils/setupTestNetwork'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
-import { getEthAdapter, getNetworkProvider } from './utils/setupEthAdapter'
+import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
@@ -13,20 +12,23 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import {
   SafeDeploymentConfig,
   SafeAccountConfig,
-  ContractNetworksConfig
+  ContractNetworksConfig,
+  Eip1193Provider
 } from '@safe-global/protocol-kit/types'
 import Safe, { SafeFactory, DeploySafeProps } from '@safe-global/protocol-kit/index'
-import { EthAdapter } from '@safe-global/safe-core-sdk-types'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { itif } from './utils/helpers'
 
 // test util funcion to deploy a safe (needed to check the expected Safe Address)
 async function deploySafe(
   deploySafeProps: DeploySafeProps,
-  ethAdapter: EthAdapter,
-  contractNetworks: ContractNetworksConfig
+  provider: Eip1193Provider,
+  contractNetworks: ContractNetworksConfig,
+  signerAddress?: string
 ): Promise<Safe> {
-  const safeFactory = await SafeFactory.create({
-    ethAdapter,
+  const safeFactory = await SafeFactory.init({
+    provider,
+    signer: signerAddress,
     safeVersion: safeVersionDeployed,
     contractNetworks
   })
@@ -40,24 +42,27 @@ describe('Contract utils', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
+
     return {
       defaultCallbackHandler: await getDefaultCallbackHandler(),
       chainId,
       accounts,
-      contractNetworks
+      contractNetworks,
+      provider
     }
   })
 
   describe('predictSafeAddress', () => {
     it('returns the predicted address of a 1/1 Safe', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 1/1 Safe
       const [owner1] = accounts
       const owners = [owner1.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -71,7 +76,7 @@ describe('Contract utils', () => {
       }
 
       const predictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -81,8 +86,9 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
-        contractNetworks
+        provider,
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -94,14 +100,14 @@ describe('Contract utils', () => {
     })
 
     it('returns the predicted address of a 1/2 Safe', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 1/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -115,7 +121,7 @@ describe('Contract utils', () => {
       }
 
       const predictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -125,8 +131,9 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
-        contractNetworks
+        provider,
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -138,14 +145,14 @@ describe('Contract utils', () => {
     })
 
     it('returns the predicted address of a 2/2 Safe', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -159,7 +166,7 @@ describe('Contract utils', () => {
       }
 
       const predictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -169,8 +176,9 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
-        contractNetworks
+        provider,
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -182,14 +190,14 @@ describe('Contract utils', () => {
     })
 
     it('should fail if the provided threshold is invalid (greater than owners length)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // invalid threshold 3/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 3
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -203,7 +211,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -216,14 +224,14 @@ describe('Contract utils', () => {
     })
 
     it('should fail if the provided threshold is invalid (zero value)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // invalid threshold 0/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = 0
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -237,7 +245,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -250,14 +258,14 @@ describe('Contract utils', () => {
     })
 
     it('should fail if the provided threshold is invalid (negative value)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // invalid threshold -2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const invalidThreshold = -2
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -271,7 +279,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -284,13 +292,13 @@ describe('Contract utils', () => {
     })
 
     it('should fail if no owners are present (empty array)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { contractNetworks, chainId, provider } = await setupTests()
 
       // invalid owners 1/0 Safe
       const invalidOwners: string[] = []
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(accounts[0].signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -304,7 +312,7 @@ describe('Contract utils', () => {
       }
 
       const predictSafeAddressWithInvalidThreshold = {
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -317,14 +325,14 @@ describe('Contract utils', () => {
     })
 
     it('returns different addresses with different saltNonce value but same Safe config (threshold & owners)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 1/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 1
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -337,7 +345,7 @@ describe('Contract utils', () => {
       const thirdSaltNonce = '3'
 
       const predictedSafeAddress1 = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
@@ -350,8 +358,9 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const firstDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: firstSaltNonce },
-        ethAdapter,
-        contractNetworks
+        provider,
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -360,7 +369,7 @@ describe('Contract utils', () => {
       chai.expect(predictedSafeAddress1).to.be.equal(await firstDeployedSafe.getAddress())
 
       const predictedSafeAddress2 = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
@@ -373,8 +382,9 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const secondDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: secondSaltNonce },
-        ethAdapter,
-        contractNetworks
+        provider,
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -383,7 +393,7 @@ describe('Contract utils', () => {
       chai.expect(predictedSafeAddress2).to.be.equal(await secondDeployedSafe.getAddress())
 
       const predictedSafeAddress3 = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig: {
@@ -396,8 +406,9 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const thirdDeployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: thirdSaltNonce },
-        ethAdapter,
-        contractNetworks
+        provider,
+        contractNetworks,
+        owner1.address
       )
 
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -407,14 +418,14 @@ describe('Contract utils', () => {
     })
 
     it('returns the same predicted address for multiple calls to predictedSafeAddress with the same config (owners, threshold & saltNonce)', async () => {
-      const { accounts, contractNetworks, chainId } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
       // 2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
       const threshold = 2
       const safeVersion = safeVersionDeployed
-      const ethAdapter = await getEthAdapter(owner1.signer)
+      const safeProvider = new SafeProvider({ provider })
       const customContracts = contractNetworks[chainId.toString()]
 
       const safeAccountConfig: SafeAccountConfig = {
@@ -430,15 +441,16 @@ describe('Contract utils', () => {
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
         { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
-        ethAdapter,
-        contractNetworks
+        provider,
+        contractNetworks,
+        owner1.address
       )
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
       const isSafeDeployed = await deployedSafe.isSafeDeployed()
       const expectedSafeAddress = await deployedSafe.getAddress()
 
       const firstPredictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -446,7 +458,7 @@ describe('Contract utils', () => {
       })
 
       const secondPredictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -454,7 +466,7 @@ describe('Contract utils', () => {
       })
 
       const thirdPredictedSafeAddress = await predictSafeAddress({
-        ethAdapter,
+        safeProvider,
         chainId,
         safeAccountConfig,
         safeDeploymentConfig,
@@ -471,13 +483,12 @@ describe('Contract utils', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'safeDeploymentConfig is an optional parameter',
       async () => {
-        const { accounts, contractNetworks, chainId } = await setupTests()
+        const { accounts, contractNetworks, chainId, provider } = await setupTests()
 
         // 1/1 Safe
         const [owner1] = accounts
         const owners = [owner1.address]
         const threshold = 1
-        const ethAdapter = await getEthAdapter(owner1.signer)
         const customContracts = contractNetworks[chainId.toString()]
 
         const safeAccountConfig: SafeAccountConfig = {
@@ -485,15 +496,22 @@ describe('Contract utils', () => {
           threshold
         }
 
+        const safeProvider = new SafeProvider({ provider })
+
         const predictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          safeProvider,
           chainId,
           safeAccountConfig,
           customContracts
         })
 
         // we deploy the Safe by providing only the safeAccountConfig (owners & threshold)
-        const deployedSafe = await deploySafe({ safeAccountConfig }, ethAdapter, contractNetworks)
+        const deployedSafe = await deploySafe(
+          { safeAccountConfig },
+          provider,
+          contractNetworks,
+          owner1.address
+        )
 
         // We ensure the Safe is deployed
         const isSafeDeployed = await deployedSafe.isSafeDeployed()
@@ -511,9 +529,9 @@ describe('Contract utils', () => {
         const { contractNetworks } = await setupTests()
 
         const safeVersion = safeVersionDeployed
-        // Create EthAdapter instance
-        const ethAdapter = await getEthAdapter(getNetworkProvider('zksync'))
-        const chainId = await ethAdapter.getChainId()
+        // Create SafeProvider instance
+        const safeProvider = getSafeProviderFromNetwork('zksync')
+        const chainId = await safeProvider.getChainId()
         const customContracts = contractNetworks[chainId.toString()]
 
         // We check real deployments from zksync return the expected address.
@@ -530,7 +548,7 @@ describe('Contract utils', () => {
         const expectedSafeAddress1 = '0x4e19dA81a54eFbaBeb9AD50646f7643076475D65'
 
         const firstPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          safeProvider,
           chainId,
           safeAccountConfig: safeAccountConfig1,
           safeDeploymentConfig: safeDeploymentConfig1,
@@ -552,7 +570,7 @@ describe('Contract utils', () => {
         const expectedSafeAddress2 = '0x60c7F13dE7C8Fb88b3845e58859658bdc44243F8'
 
         const secondPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          safeProvider,
           chainId,
           safeAccountConfig: safeAccountConfig2,
           safeDeploymentConfig: safeDeploymentConfig2,
@@ -575,7 +593,7 @@ describe('Contract utils', () => {
         const expectedSafeAddress3 = '0xD971FAA20db3ad4d51D453047ca03Ce4ec164CE2'
 
         const thirdPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter,
+          safeProvider,
           chainId,
           safeAccountConfig: safeAccountConfig3,
           safeDeploymentConfig: safeDeploymentConfig3,
@@ -597,10 +615,10 @@ describe('Contract utils', () => {
         const [owner] = accounts
         const safeVersion = safeVersionDeployed
 
-        const gnosisEthAdapter = await getEthAdapter(getNetworkProvider('gnosis'))
-        const zkSyncEthAdapter = await getEthAdapter(getNetworkProvider('zksync'))
-        const sepoliaEthAdapter = await getEthAdapter(getNetworkProvider('sepolia'))
-        const mainnetEthAdapter = await getEthAdapter(getNetworkProvider('mainnet'))
+        const gnosisSafeProvider = getSafeProviderFromNetwork('gnosis')
+        const zkSyncSafeProvider = getSafeProviderFromNetwork('zksync')
+        const sepoliaSafeProvider = getSafeProviderFromNetwork('sepolia')
+        const mainnetSafeProvider = getSafeProviderFromNetwork('mainnet')
 
         // 1/1 Safe
         const safeAccountConfig: SafeAccountConfig = {
@@ -613,37 +631,37 @@ describe('Contract utils', () => {
         }
 
         const gnosisPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: gnosisEthAdapter,
-          chainId: await gnosisEthAdapter.getChainId(),
+          safeProvider: gnosisSafeProvider,
+          chainId: await gnosisSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const zkSyncPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: zkSyncEthAdapter,
-          chainId: await zkSyncEthAdapter.getChainId(),
+          safeProvider: zkSyncSafeProvider,
+          chainId: await zkSyncSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const sepoliaPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: sepoliaEthAdapter,
-          chainId: await sepoliaEthAdapter.getChainId(),
+          safeProvider: sepoliaSafeProvider,
+          chainId: await sepoliaSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
         const mainnetPredictedSafeAddress = await predictSafeAddress({
-          ethAdapter: mainnetEthAdapter,
-          chainId: await mainnetEthAdapter.getChainId(),
+          safeProvider: mainnetSafeProvider,
+          chainId: await mainnetSafeProvider.getChainId(),
           safeAccountConfig: safeAccountConfig,
           safeDeploymentConfig: safeDeploymentConfig
         })
 
-        const expectedGnosisSafeAddress = '0x30421B2bE26942448CD6C690f21F551BF6C8A45F'
+        const expectedGnosisSafeAddress = '0x39aC50A7B35c43429397D0481EBa8769B5e4b9a6'
         const expectedSkSyncSafeAddress = '0x4680B7AC23A98d5D68c21e3d6F8cBC9576A5920A'
-        const expectedSepoliaSafeAddress = '0x7f44E49C9E4C7D19fA2A704c2E66527Bd4688f99'
-        const expectedMainnetSafeAddress = '0x9C1C8c37a68242cEC6d68Ab091583c81FBF479C0'
+        const expectedSepoliaSafeAddress = '0x643bD5C3Fd6c546c1452A16f978C350F8a0A2a8D'
+        const expectedMainnetSafeAddress = '0x22b257EABfA3B8BC9e0C5f6BA03400933834675B'
 
         // returns the correct predicted address for each chain
         chai.expect(gnosisPredictedSafeAddress).to.be.equal(expectedGnosisSafeAddress)

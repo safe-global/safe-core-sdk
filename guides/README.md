@@ -6,7 +6,7 @@ Read about the basics of Safe and how it compares to other solutions [here](http
 
 ## Safe Core SDK
 
-The [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) is a monorepo that contains software developer tools that allows interaction with the [Safe contracts](https://github.com/safe-global/safe-contracts) and the [Safe Transaction Service](https://github.com/safe-global/safe-transaction-service).
+The [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) is a monorepo that contains software developer tools that allows interaction with [Safe Smart Accounts](https://github.com/safe-global/safe-smart-account) and the [Safe Transaction Service](https://github.com/safe-global/safe-transaction-service).
 
 In this guide we will use the following packages to deploy new Safes, create transactions, collect off-chain signatures and execute transactions:
 * **safe-core-sdk-types**
@@ -22,7 +22,7 @@ In this guide we will use the following packages to deploy new Safes, create tra
     - Approve Safe transactions on-chain
     - Execute Safe transactions once they have the required confirmations
 
-  Check the complete [API reference](/packages/protocol-kit#api-reference) for more details.
+  Check the complete [API reference](https://docs.safe.global/sdk/protocol-kit/reference) for more details.
 
 * **api-kit**
 
@@ -33,7 +33,7 @@ In this guide we will use the following packages to deploy new Safes, create tra
     - Get the transaction history of a Safe (and filter by pending, incoming, multisig transactions, etc.)
     - Get balances, list of tokens, etc.
 
-  Check the complete [API reference](/packages/api-kit#api-reference) for more details.
+  Check the complete [API reference](https://docs.safe.global/sdk/api-kit/reference) for more details.
 
 ## Prerequisites
 

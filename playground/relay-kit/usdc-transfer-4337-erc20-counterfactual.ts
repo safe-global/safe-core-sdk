@@ -1,4 +1,3 @@
-import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 
@@ -7,12 +6,15 @@ const PRIVATE_KEY = ''
 
 const PIMLICO_API_KEY = ''
 
+// Safe owner address
+const OWNER_ADDRESS = ''
+
 // CHAIN
 const CHAIN_NAME = 'sepolia'
 // const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia' // SEPOLIA
+const RPC_URL = 'https://sepolia.gateway.tenderly.co' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL
@@ -28,17 +30,10 @@ const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 // const usdcTokenAddress = '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83' // GNOSIS
 
 async function main() {
-  // Instantiate EtherAdapter
-  const provider = new ethers.JsonRpcProvider(RPC_URL)
-  const signer = new ethers.Wallet(PRIVATE_KEY, provider)
-  const ethersAdapter = new EthersAdapter({
-    ethers,
-    signerOrProvider: signer
-  })
-
   // 1) Initialize pack with the paymaster data
   const safe4337Pack = await Safe4337Pack.init({
-    ethersAdapter,
+    provider: RPC_URL,
+    signer: PRIVATE_KEY,
     rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
     paymasterOptions: {
@@ -47,7 +42,7 @@ async function main() {
       // amountToApprove?: bigint // optional value to set the paymaster approve amount on the deployment
     },
     options: {
-      owners: [await signer.getAddress()],
+      owners: [OWNER_ADDRESS],
       threshold: 1,
       saltNonce: '4337' + '1' // to update the address
     }
@@ -68,8 +63,15 @@ async function main() {
 
   console.log(`sending USDC...`)
 
+  const ethersSigner = await safe4337Pack.protocolKit.getSafeProvider().getExternalSigner()
+  const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+
+  if (!ethersSigner) {
+    throw new Error('No signer found!')
+  }
+
   // send 15 USDC to the Safe
-  await transfer(signer, usdcTokenAddress, senderAddress, usdcAmount * 150n)
+  await transfer(ethersSigner, usdcTokenAddress, senderAddress, usdcAmount * 150n)
 
   console.log(`creating the Safe batch...`)
 
@@ -79,7 +81,7 @@ async function main() {
     value: '0'
   }
   const transactions = [transferUSDC, transferUSDC]
-  const timestamp = (await provider.getBlock('latest'))?.timestamp || 0
+  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
@@ -126,7 +128,12 @@ const generateTransferCallData = (to: string, value: bigint) => {
   return iface.encodeFunctionData('transfer', [to, value])
 }
 
-async function transfer(signer: ethers.Wallet, tokenAddress: string, to: string, amount: bigint) {
+async function transfer(
+  signer: ethers.AbstractSigner,
+  tokenAddress: string,
+  to: string,
+  amount: bigint
+) {
   const transferEC20 = {
     to: tokenAddress,
     data: generateTransferCallData(to, amount),

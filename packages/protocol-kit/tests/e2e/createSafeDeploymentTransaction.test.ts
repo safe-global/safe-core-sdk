@@ -6,11 +6,12 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, {
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,
+  SafeProvider,
   encodeSetupCallData
 } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners, getFactory } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { itif } from './utils/helpers'
 
@@ -22,7 +23,7 @@ describe('createSafeDeploymentTransaction', () => {
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
-
+    const provider = getEip1193Provider()
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
         owners: [accounts[0].address],
@@ -37,18 +38,16 @@ describe('createSafeDeploymentTransaction', () => {
       accounts,
       contractNetworks,
       predictedSafe,
-      chainId
+      chainId,
+      provider
     }
   })
 
   itif(safeVersionDeployed == '1.4.1')('should return a Safe deployment transactions', async () => {
-    const { accounts, contractNetworks, predictedSafe } = await setupTests()
-    const [account1] = accounts
+    const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const ethAdapter = await getEthAdapter(account1.signer)
-
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       predictedSafe,
       contractNetworks
     })
@@ -66,13 +65,10 @@ describe('createSafeDeploymentTransaction', () => {
   })
 
   itif(safeVersionDeployed == '1.3.0')('should return a Safe deployment transactions', async () => {
-    const { accounts, contractNetworks, predictedSafe } = await setupTests()
-    const [account1] = accounts
+    const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const ethAdapter = await getEthAdapter(account1.signer)
-
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       predictedSafe,
       contractNetworks
     })
@@ -90,13 +86,10 @@ describe('createSafeDeploymentTransaction', () => {
   })
 
   itif(safeVersionDeployed == '1.2.0')('should return a Safe deployment transactions', async () => {
-    const { accounts, contractNetworks, predictedSafe } = await setupTests()
-    const [account1] = accounts
+    const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const ethAdapter = await getEthAdapter(account1.signer)
-
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       predictedSafe,
       contractNetworks
     })
@@ -114,13 +107,10 @@ describe('createSafeDeploymentTransaction', () => {
   })
 
   itif(safeVersionDeployed == '1.1.1')('should return a Safe deployment transactions', async () => {
-    const { accounts, contractNetworks, predictedSafe } = await setupTests()
-    const [account1] = accounts
+    const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const ethAdapter = await getEthAdapter(account1.signer)
-
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       predictedSafe,
       contractNetworks
     })
@@ -138,13 +128,10 @@ describe('createSafeDeploymentTransaction', () => {
   })
 
   itif(safeVersionDeployed == '1.0.0')('should return a Safe deployment transactions', async () => {
-    const { accounts, contractNetworks, predictedSafe } = await setupTests()
-    const [account1] = accounts
+    const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-    const ethAdapter = await getEthAdapter(account1.signer)
-
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       predictedSafe,
       contractNetworks
     })
@@ -162,21 +149,18 @@ describe('createSafeDeploymentTransaction', () => {
   })
 
   it('should contain the initializer setup call in the deployment data to sets the threshold & owners of the deployed Safe', async () => {
-    const { accounts, contractNetworks, predictedSafe, chainId } = await setupTests()
-    const [account1] = accounts
+    const { contractNetworks, predictedSafe, chainId, provider } = await setupTests()
 
-    const ethAdapter = await getEthAdapter(account1.signer)
-
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       predictedSafe,
       contractNetworks
     })
-
+    const safeProvider = safeSdk.getSafeProvider()
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
     const customContract = contractNetworks[chainId.toString()]
-    const safeContract = await ethAdapter.getSafeContract({
+    const safeContract = await safeProvider.getSafeContract({
       safeVersion: safeVersionDeployed,
       customContractAddress: customContract?.safeSingletonAddress,
       customContractAbi: customContract?.safeSingletonAbi
@@ -184,7 +168,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe
     const initializer = await encodeSetupCallData({
-      ethAdapter,
+      safeProvider,
       safeContract,
       safeAccountConfig: predictedSafe.safeAccountConfig,
       customContracts: contractNetworks[chainId.toString()]
@@ -196,18 +180,16 @@ describe('createSafeDeploymentTransaction', () => {
 
   describe('salt nonce', () => {
     it('should include the predetermined salt nonce in the Safe deployment data', async () => {
-      const { accounts, contractNetworks, predictedSafe, chainId } = await setupTests()
-      const [account1] = accounts
+      const { contractNetworks, predictedSafe, chainId, provider } = await setupTests()
 
-      const ethAdapter = await getEthAdapter(account1.signer)
-
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeProvider = new SafeProvider({ provider })
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
 
-      const predeterminedSaltNonceEncoded = ethAdapter.encodeParameters(
+      const predeterminedSaltNonceEncoded = safeProvider.encodeParameters(
         ['uint256'],
         [`0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`]
       )
@@ -221,20 +203,18 @@ describe('createSafeDeploymentTransaction', () => {
     })
 
     it('should include the custom salt nonce in the Safe deployment data', async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1] = accounts
+      const { contractNetworks, predictedSafe, provider } = await setupTests()
 
-      const ethAdapter = await getEthAdapter(account1.signer)
-
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeProvider = new SafeProvider({ provider })
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe,
         contractNetworks
       })
 
       const customSaltNonce = '123456789'
 
-      const customSaltNonceEncoded = ethAdapter.encodeParameters(['uint256'], [customSaltNonce])
+      const customSaltNonceEncoded = safeProvider.encodeParameters(['uint256'], [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 
@@ -243,15 +223,12 @@ describe('createSafeDeploymentTransaction', () => {
     })
 
     it('should include the salt nonce included in the safeDeploymentConfig in the Safe deployment data', async () => {
-      const { accounts, contractNetworks, predictedSafe } = await setupTests()
-      const [account1] = accounts
-
-      const ethAdapter = await getEthAdapter(account1.signer)
+      const { contractNetworks, predictedSafe, provider } = await setupTests()
 
       const customSaltNonce = '123456789'
 
-      const safeSdk = await Safe.create({
-        ethAdapter,
+      const safeSdk = await Safe.init({
+        provider,
         predictedSafe: {
           ...predictedSafe,
           safeDeploymentConfig: {
@@ -262,7 +239,9 @@ describe('createSafeDeploymentTransaction', () => {
         contractNetworks
       })
 
-      const saltNonceEncoded = ethAdapter.encodeParameters(['uint256'], [customSaltNonce])
+      const saltNonceEncoded = safeSdk
+        .getSafeProvider()
+        .encodeParameters(['uint256'], [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 
@@ -272,15 +251,14 @@ describe('createSafeDeploymentTransaction', () => {
   })
 
   it('should throw an error if predicted Safe is not present', async () => {
-    const { accounts, contractNetworks } = await setupTests()
+    const { accounts, contractNetworks, provider } = await setupTests()
     const [account1] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const ethAdapter = await getEthAdapter(account1.signer)
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       safeAddress,
       contractNetworks
     })

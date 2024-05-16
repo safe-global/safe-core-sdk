@@ -1,18 +1,17 @@
 import {
-  EthersAdapter,
+  SafeProvider,
   SafeAccountConfig,
   SafeDeploymentConfig,
   predictSafeAddress
 } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
 
 // This script can be used to generate a custom Safe address
 
 const config: Config = {
   // REQUIRED PARAMETERS
   owners: ['0x680cde08860141F9D223cE4E620B10Cd6741037E'],
-  rpcUrl: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+  rpcUrl: 'https://sepolia.gateway.tenderly.co',
   // OPTIONAL PARAMETERS
   pattern: '0x5afe',
   safeVersion: '1.3.0',
@@ -29,7 +28,7 @@ async function generateSafeAddresses() {
     threshold: config.threshold
   }
 
-  const chainId = await ethAdapter.getChainId()
+  const chainId = await safeProvider.getChainId()
 
   // infinite loop to search a valid Safe addresses
   for (saltNonce; true; saltNonce++ && iteractions++) {
@@ -41,7 +40,7 @@ async function generateSafeAddresses() {
 
     // we predict the Safe address using the current saltNonce
     const predictedSafeAddress = await predictSafeAddress({
-      ethAdapter,
+      safeProvider,
       chainId,
       safeAccountConfig,
       safeDeploymentConfig
@@ -60,11 +59,8 @@ async function generateSafeAddresses() {
   }
 }
 
-const provider = new ethers.JsonRpcProvider(config.rpcUrl)
-
-const ethAdapter = new EthersAdapter({
-  ethers,
-  signerOrProvider: provider
+const safeProvider = new SafeProvider({
+  provider: config.rpcUrl
 })
 
 const start = Date.now()

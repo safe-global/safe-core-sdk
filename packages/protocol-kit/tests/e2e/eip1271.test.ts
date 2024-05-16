@@ -14,7 +14,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
@@ -48,6 +48,7 @@ describe('The EIP1271 implementation', () => {
       const contractNetworks = await getContractNetworks(BigInt(chainId))
       const fallbackHandlerAddress = contractNetworks[chainId].fallbackHandlerAddress
       const [account1, account2] = accounts
+      const provider = getEip1193Provider()
 
       // Create a 1/2 Safe to sign the messages
       const signerSafe = await getSafeWithOwners(
@@ -65,25 +66,24 @@ describe('The EIP1271 implementation', () => {
       )
       const safeAddress = await safe.getAddress()
 
-      // Adapter and Safe instance for owner 1
-      const ethAdapter1 = await getEthAdapter(account1.signer)
-      const safeSdk1 = await Safe.create({
-        ethAdapter: ethAdapter1,
+      const safeSdk1 = await Safe.init({
+        provider,
         safeAddress,
         contractNetworks
       })
 
       // Adapter and Safe instance for owner 2
-      const ethAdapter2 = await getEthAdapter(account2.signer)
-      const safeSdk2 = await Safe.create({
-        ethAdapter: ethAdapter2,
+      const safeSdk2 = await Safe.init({
+        provider,
+        signer: account2.address,
         safeAddress,
         contractNetworks
       })
 
       // Adapter and Safe instance for owner 3
-      const safeSdk3 = await Safe.create({
-        ethAdapter: ethAdapter1,
+      const safeSdk3 = await Safe.init({
+        provider,
+        signer: account1.address,
         safeAddress: signerSafeAddress,
         contractNetworks
       })
@@ -95,9 +95,8 @@ describe('The EIP1271 implementation', () => {
         signerSafeAddress,
         accounts,
         contractNetworks,
+        provider,
         chainId,
-        ethAdapter1,
-        ethAdapter2,
         safeSdk1,
         safeSdk2,
         safeSdk3,
@@ -108,14 +107,14 @@ describe('The EIP1271 implementation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should validate on-chain messages (Approved hashes)',
       async () => {
-        const { contractNetworks, safeSdk1, safeSdk2, ethAdapter1 } = await setupTests()
+        const { contractNetworks, safeSdk1, safeSdk2 } = await setupTests()
 
         const chainId = await safeSdk1.getChainId()
         const safeVersion = await safeSdk1.getContractVersion()
 
         const customContract = contractNetworks[chainId.toString()]
 
-        const signMessageLibContract = await ethAdapter1.getSignMessageLibContract({
+        const signMessageLibContract = await safeSdk1.getSafeProvider().getSignMessageLibContract({
           safeVersion,
           customContractAddress: customContract.signMessageLibAddress,
           customContractAbi: customContract.signMessageLibAbi
@@ -380,7 +379,7 @@ describe('The EIP1271 implementation', () => {
           // EOA sign
           const safeMessage1 = safeSdk1.createMessage(MESSAGE)
           const signedMessage1: SafeMessage = await safeSdk1.signMessage(safeMessage1)
-          const signerAddress1 = (await safeSdk1.getEthAdapter().getSignerAddress()) as string
+          const signerAddress1 = (await safeSdk1.getSafeProvider().getSignerAddress()) as string
           const ethSig = signedMessage1.getSignature(signerAddress1) as EthSafeSignature
 
           // Signer Safe sign
@@ -390,7 +389,7 @@ describe('The EIP1271 implementation', () => {
             SigningMethod.SAFE_SIGNATURE,
             safeAddress
           )
-          const signerAddress2 = (await safeSdk3.getEthAdapter().getSignerAddress()) as string
+          const signerAddress2 = (await safeSdk3.getSafeProvider().getSignerAddress()) as string
           const safeSignerSig = await buildContractSignature(
             [signedMessage2.getSignature(signerAddress2) as EthSafeSignature],
             signerSafeAddress

@@ -1,18 +1,22 @@
-import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils/address'
+import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { EthAdapter, SafeContract } from '@safe-global/safe-core-sdk-types'
+import {
+  SafeContractImplementationType,
+  SafeModulesPaginated
+} from '@safe-global/protocol-kit/types'
+import SafeProvider from '../SafeProvider'
 
 class ModuleManager {
-  #ethAdapter: EthAdapter
-  #safeContract?: SafeContract
+  #safeProvider: SafeProvider
+  #safeContract?: SafeContractImplementationType
 
-  constructor(ethAdapter: EthAdapter, safeContract?: SafeContract) {
-    this.#ethAdapter = ethAdapter
+  constructor(safeProvider: SafeProvider, safeContract?: SafeContractImplementationType) {
+    this.#safeProvider = safeProvider
     this.#safeContract = safeContract
   }
 
   private validateModuleAddress(moduleAddress: string): void {
-    const isValidAddress = this.#ethAdapter.isAddress(moduleAddress)
+    const isValidAddress = this.#safeProvider.isAddress(moduleAddress)
     if (!isValidAddress || isRestrictedAddress(moduleAddress)) {
       throw new Error('Invalid module address provided')
     }
@@ -39,21 +43,29 @@ class ModuleManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.getModules()
+
+    const [modules] = await this.#safeContract.getModules()
+
+    return [...modules]
   }
 
-  async getModulesPaginated(start: string, pageSize: number): Promise<string[]> {
+  async getModulesPaginated(start: string, pageSize: number): Promise<SafeModulesPaginated> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.getModulesPaginated(start, pageSize)
+
+    const [modules, next] = await this.#safeContract.getModulesPaginated([start, BigInt(pageSize)])
+    return { modules: modules as string[], next }
   }
 
   async isModuleEnabled(moduleAddress: string): Promise<boolean> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    return this.#safeContract.isModuleEnabled(moduleAddress)
+
+    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled([moduleAddress])
+
+    return isModuleEnabled
   }
 
   async encodeEnableModuleData(moduleAddress: string): Promise<string> {

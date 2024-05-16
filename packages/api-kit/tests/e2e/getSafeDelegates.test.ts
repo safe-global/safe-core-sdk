@@ -1,21 +1,21 @@
-import { Signer } from 'ethers'
+import { ethers, Signer } from 'ethers'
 import SafeApiKit, { DeleteSafeDelegateProps } from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
-import { getServiceClient } from '../utils/setupServiceClient'
+import { getApiKit } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
+
+const PRIVATE_KEY = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 
 let safeApiKit: SafeApiKit
 let signer: Signer
 
 describe('getSafeDelegates', () => {
   before(async () => {
-    ;({ safeApiKit, signer } = await getServiceClient(
-      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676',
-      'https://safe-transaction-sepolia.staging.5afe.dev/api'
-    ))
+    safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
+    signer = new ethers.Wallet(PRIVATE_KEY)
   })
 
   it('should fail if Safe address is empty', async () => {

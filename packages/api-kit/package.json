@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "2.3.2",
+  "version": "2.3.2-alpha.0",
   "description": "Safe API Kit",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -13,9 +13,11 @@
   "scripts": {
     "test:web3": "export TESTS_PATH=tests/endpoint && export ETH_LIB=web3 && nyc hardhat test",
     "test:ethers": "export TESTS_PATH=tests/endpoint && export ETH_LIB=ethers && nyc --reporter=lcov  hardhat test",
+    "test:viem": "export TESTS_PATH=tests/endpoint && export ETH_LIB=viem && nyc hardhat test",
     "test": "yarn test:ethers",
     "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc hardhat test",
     "test:ci:ethers": "export TESTS_PATH=tests/e2e && export ETH_LIB=ethers && nyc --reporter=lcov hardhat test",
+    "test:ci:viem": "export TESTS_PATH=tests/e2e && export ETH_LIB=viem && nyc --reporter=lcov hardhat test",
     "test:ci": "yarn test:ci:ethers",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
@@ -37,27 +39,28 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.5",
-    "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@types/chai": "^4.3.11",
+    "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
-    "@types/node-fetch": "^2.6.9",
+    "@types/node-fetch": "^2.6.11",
     "@types/sinon-chai": "^3.2.11",
     "@types/yargs": "^17.0.32",
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "hardhat": "^2.19.3",
     "mocha": "^10.2.0",
-    "semver": "^7.5.4",
+    "semver": "^7.6.1",
     "sinon": "^14.0.2",
     "sinon-chai": "^3.7.0",
     "tsconfig-paths": "^4.2.0",
+    "viem": "^2.10.2",
+    "web3": "^4.7.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^3.1.1",
-    "@safe-global/safe-core-sdk-types": "^4.1.1",
-    "ethers": "^6.7.1",
+    "@safe-global/protocol-kit": "^4.0.0-alpha.0",
+    "@safe-global/safe-core-sdk-types": "^5.0.0-alpha.0",
+    "ethers": "^6.12.1",
     "node-fetch": "^2.7.0"
   }
 }

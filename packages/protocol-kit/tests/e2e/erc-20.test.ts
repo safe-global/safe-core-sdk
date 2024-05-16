@@ -1,4 +1,5 @@
 import Safe, {
+  SafeProvider,
   createERC20TokenTransferTransaction,
   getERC20Decimals,
   isGasTokenCompatibleWithHandlePayment
@@ -11,7 +12,7 @@ import sinonChai from 'sinon-chai'
 import { deployments } from 'hardhat'
 
 import { itif } from './utils/helpers'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
 import { getAccounts } from './utils/setupTestNetwork'
@@ -23,16 +24,24 @@ chai.use(chaiAsPromised)
 const ERC20_TOKEN_ADDRESS = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 
 describe('ERC-20 utils', () => {
+  let callStub: sinon.SinonStub
+
+  afterEach(() => {
+    callStub.restore()
+  })
+
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
+    const provider = getEip1193Provider()
 
     return {
       safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
       contractNetworks,
-      accounts
+      accounts,
+      provider
     }
   })
 
@@ -40,19 +49,15 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the correct decimals for a standard ERC20 token',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
 
         const safeAddress = await safe.getAddress()
 
-        const [account1] = accounts
-
-        const ethAdapter = await getEthAdapter(account1.signer)
-
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x12'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
 
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -66,18 +71,14 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the correct decimals for a non-standard ERC20 token',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
 
-        const [account1] = accounts
-
-        const ethAdapter = await getEthAdapter(account1.signer)
-
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x06'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
 
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -91,18 +92,14 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should throw an error if decimals() fn is not defined',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
 
-        const [account1] = accounts
-
-        const ethAdapter = await getEthAdapter(account1.signer)
-
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x'))
 
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -118,15 +115,11 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return true if it is the Native token',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
 
-        const [account1] = accounts
-
-        const ethAdapter = await getEthAdapter(account1.signer)
-
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -143,18 +136,14 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return true if it is an standard ERC20 token',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
 
-        const [account1] = accounts
-
-        const ethAdapter = await getEthAdapter(account1.signer)
-
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x12'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
 
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -171,18 +160,14 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return false for a non-standard ERC20 token',
       async () => {
-        const { safe, accounts, contractNetworks } = await setupTests()
+        const { safe, contractNetworks, provider } = await setupTests()
         const safeAddress = await safe.getAddress()
 
-        const [account1] = accounts
-
-        const ethAdapter = await getEthAdapter(account1.signer)
-
         // mock decimals() call
-        sinon.stub(ethAdapter, 'call').returns(Promise.resolve('0x06'))
+        callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
 
-        const safeSdk = await Safe.create({
-          ethAdapter,
+        const safeSdk = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -202,11 +187,7 @@ describe('ERC-20 utils', () => {
       const toAddress = '0xbc2BB26a6d821e69A38016f3858561a1D80d4182'
       const amount = '12345'
 
-      const transfer = await createERC20TokenTransferTransaction(
-        ERC20_TOKEN_ADDRESS,
-        toAddress,
-        amount
-      )
+      const transfer = createERC20TokenTransferTransaction(ERC20_TOKEN_ADDRESS, toAddress, amount)
 
       chai.expect(transfer).to.be.deep.equal({
         to: ERC20_TOKEN_ADDRESS,

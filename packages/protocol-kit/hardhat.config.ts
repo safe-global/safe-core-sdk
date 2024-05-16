@@ -2,7 +2,6 @@ import '@nomicfoundation/hardhat-ethers'
 import 'hardhat-deploy'
 import 'hardhat-deploy-ethers'
 import 'tsconfig-paths/register'
-import '@nomiclabs/hardhat-web3'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import yargs from 'yargs'
@@ -49,7 +48,6 @@ const config: HardhatUserConfig = {
       blockGasLimit: 100000000,
       gas: 100000000,
       accounts: [
-        // Same as ganache-cli -d
         {
           balance: '100000000000000000000',
           privateKey: '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d'
@@ -94,7 +92,7 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       ...sharedNetworkConfig,
-      url: 'https://rpc.ankr.com/eth_sepolia'
+      url: 'https://sepolia.gateway.tenderly.co'
     }
   },
   //@ts-expect-error Type not found

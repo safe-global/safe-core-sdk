@@ -1,4 +1,3 @@
-import { EthersAdapter } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 
@@ -14,24 +13,17 @@ const SAFE_ADDRESS = ''
 const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
 // RPC URL
-const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
+const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 
 async function main() {
-  // Instantiate EtherAdapter
-  const provider = new ethers.JsonRpcProvider(RPC_URL)
-  const signer = new ethers.Wallet(PRIVATE_KEY, provider)
-  const ethersAdapter = new EthersAdapter({
-    ethers,
-    signerOrProvider: signer
-  })
-
   // 1) Initialize pack
   const safe4337Pack = await Safe4337Pack.init({
-    ethersAdapter,
+    provider: RPC_URL,
+    signer: PRIVATE_KEY,
     rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
     options: {
@@ -55,7 +47,8 @@ async function main() {
     value: '0'
   }
   const transactions = [transferUSDC, transferUSDC]
-  const timestamp = (await provider.getBlock('latest'))?.timestamp || 0
+  const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({

@@ -4,37 +4,29 @@ import Safe, {
   SigningMethod,
   buildContractSignature
 } from '@safe-global/protocol-kit'
-import { EthAdapter, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { getServiceClient } from '../utils/setupServiceClient'
+import { getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
 
-let safeApiKit1: SafeApiKit
+const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
+const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'
+
+let safeApiKit: SafeApiKit
 let protocolKit: Safe
-let ethAdapter1: EthAdapter
-let ethAdapter2: EthAdapter
 
 const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
 const signerSafeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3'
 
 describe('proposeTransaction', () => {
   before(async () => {
-    ;({ safeApiKit: safeApiKit1, ethAdapter: ethAdapter1 } = await getServiceClient(
-      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-    ))
-    ;({ ethAdapter: ethAdapter2 } = await getServiceClient(
-      '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'
-    ))
-  })
-
-  beforeEach(async () => {
-    protocolKit = await Safe.create({
-      ethAdapter: ethAdapter1,
+    ;({ safeApiKit, protocolKit } = await getKits({
+      signer: PRIVATE_KEY_1,
       safeAddress
-    })
+    }))
   })
 
   it('should allow to create and confirm transactions signature using a Safe signer', async () => {
@@ -50,7 +42,7 @@ describe('proposeTransaction', () => {
     // EOA signature
     tx = await protocolKit.signTransaction(tx)
 
-    const signerAddress = (await ethAdapter1.getSignerAddress()) || '0x'
+    const signerAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
     const ethSig = tx.getSignature(signerAddress) as EthSafeSignature
 
     const txOptions = {
@@ -61,11 +53,11 @@ describe('proposeTransaction', () => {
       senderSignature: buildSignatureBytes([ethSig])
     }
 
-    await chai.expect(safeApiKit1.proposeTransaction(txOptions)).to.be.fulfilled
+    await chai.expect(safeApiKit.proposeTransaction(txOptions)).to.be.fulfilled
 
     // Signer Safe signature
     protocolKit = await protocolKit.connect({
-      ethAdapter: ethAdapter1,
+      signer: PRIVATE_KEY_1,
       safeAddress: signerSafeAddress
     })
 
@@ -79,7 +71,7 @@ describe('proposeTransaction', () => {
     )
 
     protocolKit = await protocolKit.connect({
-      ethAdapter: ethAdapter2,
+      signer: PRIVATE_KEY_2,
       safeAddress: signerSafeAddress
     })
     signerSafeTx = await protocolKit.signTransaction(
@@ -94,7 +86,7 @@ describe('proposeTransaction', () => {
     )
 
     protocolKit = await protocolKit.connect({
-      ethAdapter: ethAdapter1,
+      signer: PRIVATE_KEY_1,
       safeAddress
     })
 
@@ -103,9 +95,9 @@ describe('proposeTransaction', () => {
     // chai.expect(isValidSignature).to.be.true
 
     const contractSig = buildSignatureBytes([signerSafeSig])
-    await chai.expect(safeApiKit1.confirmTransaction(txHash, contractSig)).to.be.fulfilled
+    await chai.expect(safeApiKit.confirmTransaction(txHash, contractSig)).to.be.fulfilled
 
-    const confirmedMessage = await safeApiKit1.getTransaction(txHash)
-    chai.expect(confirmedMessage.confirmations.length).to.eq(2)
+    const confirmedMessage = await safeApiKit.getTransaction(txHash)
+    chai.expect(confirmedMessage?.confirmations?.length).to.eq(2)
   })
 })

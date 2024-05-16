@@ -5,9 +5,9 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
-import { OperationType } from 'packages/safe-core-sdk-types/dist/src'
+import { OperationType } from '@safe-global/safe-core-sdk-types'
 
 chai.use(chaiAsPromised)
 
@@ -44,11 +44,11 @@ describe('createTransactionBatch', () => {
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const ethAdapter = await getEthAdapter(account1.signer)
+    const provider = getEip1193Provider()
     const safeAddress = await safe.getAddress()
 
-    const safeSdk = await Safe.create({
-      ethAdapter,
+    const safeSdk = await Safe.init({
+      provider,
       safeAddress,
       contractNetworks
     })

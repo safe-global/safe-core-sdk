@@ -23,5 +23,4 @@ To use the example properly in your local machine follow these steps:
 **In the auth-kit example root folder**
 
 3. `yarn install`
-4. Configure `.env` following `.env.sample`
-5. `yarn start`
+4. `yarn start`

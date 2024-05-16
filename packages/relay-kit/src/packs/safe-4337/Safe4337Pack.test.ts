@@ -182,7 +182,7 @@ describe('Safe4337Pack', () => {
 
     it('should encode the enableModules transaction as deployment data', async () => {
       const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
-      const safeCreateSpy = jest.spyOn(Safe, 'create')
+      const safeCreateSpy = jest.spyOn(Safe, 'init')
 
       const safe4337Pack = await createSafe4337Pack({
         options: {
@@ -193,7 +193,8 @@ describe('Safe4337Pack', () => {
 
       expect(encodeFunctionDataSpy).toHaveBeenCalledWith('enableModules', [[safe4337ModuleAddress]])
       expect(safeCreateSpy).toHaveBeenCalledWith({
-        ethAdapter: safe4337Pack.protocolKit.getEthAdapter(),
+        provider: safe4337Pack.protocolKit.getSafeProvider().provider,
+        signer: safe4337Pack.protocolKit.getSafeProvider().signer,
         predictedSafe: {
           safeDeploymentConfig: {
             safeVersion: constants.DEFAULT_SAFE_VERSION,
@@ -217,7 +218,7 @@ describe('Safe4337Pack', () => {
 
     it('should encode the enablesModule transaction together with a specific token approval in a multiSend call when trying to use a paymaster', async () => {
       const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
-      const safeCreateSpy = jest.spyOn(Safe, 'create')
+      const safeCreateSpy = jest.spyOn(Safe, 'init')
 
       const safe4337Pack = await createSafe4337Pack({
         options: {
@@ -259,7 +260,8 @@ describe('Safe4337Pack', () => {
 
       expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(4, 'multiSend', [multiSendData])
       expect(safeCreateSpy).toHaveBeenCalledWith({
-        ethAdapter: safe4337Pack.protocolKit.getEthAdapter(),
+        provider: safe4337Pack.protocolKit.getSafeProvider().provider,
+        signer: safe4337Pack.protocolKit.getSafeProvider().signer,
         predictedSafe: {
           safeDeploymentConfig: {
             safeVersion: constants.DEFAULT_SAFE_VERSION,

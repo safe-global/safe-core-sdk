@@ -54,9 +54,6 @@ cache
 artifacts
 deployments
 
-# Typechain
-typechain
-
 openapi/
 
 .idea

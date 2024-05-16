@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { ethers } from 'ethers'
 import { AuthContext, OrderState, PaymentStandard } from '@monerium/sdk'
 import { Box } from '@mui/material'
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import Safe from '@safe-global/protocol-kit'
 
 import { useAuth } from '../../AuthContext'
 import { MoneriumPack, SafeMoneriumClient } from '@safe-global/onramp-kit'
@@ -23,13 +22,8 @@ function Monerium() {
     ;(async () => {
       if (!authProvider || !selectedSafe) return
 
-      const provider = new ethers.BrowserProvider(authProvider)
-
-      const safeOwner = await provider.getSigner()
-      const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: safeOwner })
-
-      const protocolKit = await Safe.create({
-        ethAdapter: ethAdapter,
+      const protocolKit = await Safe.init({
+        provider: authProvider,
         safeAddress: selectedSafe,
         isL1SafeSingleton: true
       })

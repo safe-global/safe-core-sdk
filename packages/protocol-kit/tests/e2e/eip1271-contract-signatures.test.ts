@@ -7,7 +7,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
-import { getEthAdapter } from './utils/setupEthAdapter'
+import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
@@ -23,6 +23,7 @@ describe('The EIP1271 implementation', () => {
       const contractNetworks = await getContractNetworks(BigInt(chainId))
       const fallbackHandlerAddress = contractNetworks[chainId].fallbackHandlerAddress
       const [account1, account2, account3, account4, account5] = accounts
+      const provider = getEip1193Provider()
 
       // Create a 1/1 signer Safe
       const signerSafe1_1 = await getSafeWithOwners(
@@ -59,7 +60,8 @@ describe('The EIP1271 implementation', () => {
         accounts,
         contractNetworks,
         chainId,
-        fallbackHandlerAddress
+        fallbackHandlerAddress,
+        provider
       }
     })
 
@@ -71,20 +73,15 @@ describe('The EIP1271 implementation', () => {
           accounts,
           signerSafeAddress1_1,
           signerSafeAddress2_3,
-          contractNetworks
+          contractNetworks,
+          provider
         } = await setupTests()
 
         // Create adapters and the protocol kit instance
         const [account1, account2, account3, account4, account5] = accounts
 
-        const ethAdapter1 = await getEthAdapter(account1.signer)
-        const ethAdapter2 = await getEthAdapter(account2.signer)
-        const ethAdapter3 = await getEthAdapter(account3.signer)
-        const ethAdapter4 = await getEthAdapter(account4.signer)
-        const ethAdapter5 = await getEthAdapter(account5.signer)
-
-        let protocolKit = await Safe.create({
-          ethAdapter: ethAdapter1,
+        let protocolKit = await Safe.init({
+          provider: provider,
           safeAddress,
           contractNetworks
         })
@@ -102,12 +99,14 @@ describe('The EIP1271 implementation', () => {
 
         // EOA signatures
         tx = await protocolKit.signTransaction(tx) // Owner 1 signature
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter2 }) // Connect another owner
+        protocolKit = await protocolKit.connect({
+          signer: account2.address
+        }) // Connect another owner
         tx = await protocolKit.signTransaction(tx) // Owner 2 signature
 
         // 1/1 Signer Safe signature
         protocolKit = await protocolKit.connect({
-          ethAdapter: ethAdapter3,
+          signer: account3.address,
           safeAddress: signerSafeAddress1_1
         })
         let signerSafeTx1_1 = await protocolKit.createTransaction({
@@ -126,7 +125,7 @@ describe('The EIP1271 implementation', () => {
 
         // 2/3 Signer Safe signature
         protocolKit = await protocolKit.connect({
-          ethAdapter: ethAdapter4,
+          signer: account4.address,
           safeAddress: signerSafeAddress2_3
         })
         let signerSafeTx2_3 = await protocolKit.createTransaction({
@@ -137,7 +136,9 @@ describe('The EIP1271 implementation', () => {
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
+        protocolKit = await protocolKit.connect({
+          signer: account5.address
+        })
         signerSafeTx2_3 = await protocolKit.signTransaction(
           signerSafeTx2_3,
           SigningMethod.SAFE_SIGNATURE,
@@ -154,7 +155,11 @@ describe('The EIP1271 implementation', () => {
           to: safeAddress,
           value: 1_000_000_000_000_000_000n // 1 ETH
         })
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter1, safeAddress })
+        protocolKit = await protocolKit.connect({
+          provider: provider,
+          signer: account1.address,
+          safeAddress
+        })
         const execResponse = await protocolKit.executeTransaction(tx)
 
         await waitSafeTxReceipt(execResponse)
@@ -173,7 +178,8 @@ describe('The EIP1271 implementation', () => {
           signerSafeAddress1_1,
           signerSafeAddress2_3,
           contractNetworks,
-          chainId
+          chainId,
+          provider
         } = await setupTests()
 
         const MESSAGE = {
@@ -226,14 +232,8 @@ describe('The EIP1271 implementation', () => {
         // Create adapters and the protocol kit instance
         const [account1, account2, account3, account4, account5] = accounts
 
-        const ethAdapter1 = await getEthAdapter(account1.signer)
-        const ethAdapter2 = await getEthAdapter(account2.signer)
-        const ethAdapter3 = await getEthAdapter(account3.signer)
-        const ethAdapter4 = await getEthAdapter(account4.signer)
-        const ethAdapter5 = await getEthAdapter(account5.signer)
-
-        let protocolKit = await Safe.create({
-          ethAdapter: ethAdapter1,
+        let protocolKit = await Safe.init({
+          provider,
           safeAddress,
           contractNetworks
         })
@@ -242,12 +242,14 @@ describe('The EIP1271 implementation', () => {
 
         // EOA signatures
         message = await protocolKit.signMessage(message) // Owner 1 signature
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter2 }) // Connect another owner
+        protocolKit = await protocolKit.connect({
+          signer: account2.address
+        }) // Connect another owner
         message = await protocolKit.signMessage(message) // Owner 2 signature
 
         // 1/1 Signer Safe signature
         protocolKit = await protocolKit.connect({
-          ethAdapter: ethAdapter3,
+          signer: account3.address,
           safeAddress: signerSafeAddress1_1
         })
         let signerSafeMessage1_1 = protocolKit.createMessage(MESSAGE)
@@ -264,7 +266,7 @@ describe('The EIP1271 implementation', () => {
 
         // 2/3 Signer Safe signature
         protocolKit = await protocolKit.connect({
-          ethAdapter: ethAdapter4,
+          signer: account4.address,
           safeAddress: signerSafeAddress2_3
         })
         let signerSafeMessage2_3 = protocolKit.createMessage(MESSAGE)
@@ -273,7 +275,9 @@ describe('The EIP1271 implementation', () => {
           SigningMethod.SAFE_SIGNATURE,
           safeAddress
         )
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter5 })
+        protocolKit = await protocolKit.connect({
+          signer: account5.address
+        })
         signerSafeMessage2_3 = await protocolKit.signMessage(
           signerSafeMessage2_3,
           SigningMethod.SAFE_SIGNATURE,
@@ -286,7 +290,10 @@ describe('The EIP1271 implementation', () => {
         message.addSignature(signerSafeSig2_3)
 
         // Connect the original Safe
-        protocolKit = await protocolKit.connect({ ethAdapter: ethAdapter1, safeAddress })
+        protocolKit = await protocolKit.connect({
+          signer: account1.address,
+          safeAddress
+        })
 
         chai.expect(
           await protocolKit.isValidSignature(hashSafeMessage(MESSAGE), message.encodedSignatures())

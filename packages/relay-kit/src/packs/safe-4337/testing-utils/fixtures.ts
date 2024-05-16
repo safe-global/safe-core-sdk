@@ -9,7 +9,7 @@ export const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f'
 export const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 export const CHAIN_ID = '0xaa36a7'
 
-export const RPC_URL = 'https://rpc.ankr.com/eth_sepolia'
+export const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 export const BUNDLER_URL = 'https://bundler.url'
 export const PAYMASTER_URL = 'https://paymaster.url'
 

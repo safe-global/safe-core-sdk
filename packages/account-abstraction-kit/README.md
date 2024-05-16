@@ -9,36 +9,27 @@ Description TBD
 ## Table of contents
 
 - [Installation](#installation)
-- [Build](#build)
-- [Initialization](#initialization)
+- [Need Help or Have Questions?](#need-help-or-have-questions)
+- [Contributing](#contributing)
 - [License](#license)
 
-## <a name="installation">Installation</a>
+## Installation
 
 Install the package with yarn or npm:
 
 ```bash
-yarn install
-npm install
+yarn add @safe-global/account-abstraction-kit-poc
+npm install @safe-global/account-abstraction-kit-poc
 ```
 
-## <a name="build">Build</a>
+## Need Help or Have Questions?
 
-Build the package with yarn or npm:
+If you have any doubts, questions, or need assistance, feel free to reach out! [Here you will find how to get support.](https://github.com/safe-global/safe-core-sdk/tree/main/SUPPORT.md)
 
-```bash
-yarn build
-npm run build
-```
+## Contributing
 
-## <a name="initialization">Initialization</a>
-
-Initialization TBD
-
-```js
-
-```
+Please read our [contribution guidelines](https://github.com/safe-global/safe-core-sdk/tree/main/CONTRIBUTING.md) before submitting any changes. We appreciate your help! 🙌
 
 ## <a name="license">License</a>
 
-This library is [released under MIT](https://github.com/safe-global/account-abstraction-sdk/blob/main/LICENSE.md).
+This library is [released under MIT](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md).

@@ -19,7 +19,7 @@ const ERC20_ABI = [
  * @throws "Invalid ERC-20 decimals"
  */
 export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promise<number> {
-  const ethAdapter = safe.getEthAdapter()
+  const safeProvider = safe.getSafeProvider()
   const erc20Interface = new Interface(ERC20_ABI)
 
   const getTokenDecimalsTransaction = {
@@ -29,7 +29,7 @@ export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promis
     data: erc20Interface.encodeFunctionData('decimals')
   }
 
-  const response = await ethAdapter.call(getTokenDecimalsTransaction)
+  const response = await safeProvider.call(getTokenDecimalsTransaction)
 
   const decimals = Number(response)
 

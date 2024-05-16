@@ -1,30 +1,13 @@
 import Safe from './Safe'
+import SafeProvider from './SafeProvider'
 import {
-  CreateCallEthersContract,
-  CreateProxyProps as CreateEthersProxyProps,
-  EthersAdapter,
-  EthersAdapterConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
-  MultiSendCallOnlyEthersContract,
-  MultiSendEthersContract,
-  SafeContractEthers,
-  SafeProxyFactoryEthersContract,
-  SignMessageLibEthersContract
-} from './adapters/ethers'
-import {
-  CreateCallWeb3Contract,
-  CreateProxyProps as CreateWeb3ProxyProps,
-  MultiSendCallOnlyWeb3Contract,
-  MultiSendWeb3Contract,
-  SafeContractWeb3,
-  SafeProxyFactoryWeb3Contract,
-  SignMessageLibWeb3Contract,
-  Web3Adapter,
-  Web3AdapterConfig,
-  Web3TransactionOptions,
-  Web3TransactionResult
-} from './adapters/web3'
+  CreateCallBaseContract,
+  MultiSendBaseContract,
+  MultiSendCallOnlyBaseContract,
+  SafeBaseContract,
+  SafeProxyFactoryBaseContract,
+  SignMessageLibBaseContract
+} from './contracts'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,
@@ -43,25 +26,7 @@ import {
   getPredictedSafeAddressInitCode
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
-import SafeFactory, { DeploySafeProps, SafeFactoryConfig } from './safeFactory'
-import {
-  AddOwnerTxParams,
-  ConnectSafeConfig,
-  ConnectSafeConfigWithPredictedSafe,
-  ConnectSafeConfigWithSafeAddress,
-  ContractNetworksConfig,
-  CreateTransactionProps,
-  PredictedSafeProps,
-  RemoveOwnerTxParams,
-  SafeAccountConfig,
-  SafeConfig,
-  SafeConfigWithPredictedSafe,
-  SafeConfigWithSafeAddress,
-  SafeDeploymentConfig,
-  StandardizeSafeTransactionDataProps,
-  SwapOwnerTxParams,
-  SigningMethod
-} from './types'
+import SafeFactory from './SafeFactory'
 import {
   EthSafeSignature,
   estimateTxBaseGas,
@@ -96,57 +61,23 @@ import {
 } from './utils/eip-712'
 
 export {
-  AddOwnerTxParams,
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
-  ConnectSafeConfig,
-  ConnectSafeConfigWithPredictedSafe,
-  ConnectSafeConfigWithSafeAddress,
   ContractManager,
-  ContractNetworksConfig,
-  CreateCallEthersContract,
-  CreateCallWeb3Contract,
+  CreateCallBaseContract,
   createERC20TokenTransferTransaction,
-  CreateEthersProxyProps,
-  CreateTransactionProps,
-  CreateWeb3ProxyProps,
   DEFAULT_SAFE_VERSION,
-  DeploySafeProps,
   EthSafeSignature,
-  EthersAdapter,
-  EthersAdapterConfig,
-  EthersTransactionOptions,
-  EthersTransactionResult,
-  MultiSendCallOnlyEthersContract,
-  MultiSendCallOnlyWeb3Contract,
-  MultiSendEthersContract,
-  MultiSendWeb3Contract,
+  MultiSendCallOnlyBaseContract,
+  MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
-  PredictedSafeProps,
-  RemoveOwnerTxParams,
-  SafeAccountConfig,
-  SafeConfig,
-  SafeConfigWithPredictedSafe,
-  SafeConfigWithSafeAddress,
-  SafeContractEthers,
-  SafeContractWeb3,
-  SafeDeploymentConfig,
+  SafeBaseContract,
   SafeFactory,
-  SafeFactoryConfig,
-  SafeProxyFactoryEthersContract,
-  SafeProxyFactoryWeb3Contract,
+  SafeProxyFactoryBaseContract,
   SafeTransactionOptionalProps,
-  SignMessageLibEthersContract,
-  SignMessageLibWeb3Contract,
-  StandardizeSafeTransactionDataProps,
-  SwapOwnerTxParams,
-  SigningMethod,
-  Web3Adapter,
-  Web3AdapterConfig,
-  Web3TransactionOptions,
-  Web3TransactionResult,
+  SignMessageLibBaseContract,
   encodeCreateProxyWithNonce,
   encodeMultiSendData,
   encodeSetupCallData,
@@ -173,7 +104,10 @@ export {
   getEip712TxTypes,
   getEip712MessageTypes,
   hashSafeMessage,
-  generateTypedData
+  generateTypedData,
+  SafeProvider
 }
+
+export * from './types'
 
 export default Safe

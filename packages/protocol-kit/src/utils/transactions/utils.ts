@@ -1,4 +1,5 @@
-import { Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
+import { ethers, Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
@@ -13,7 +14,6 @@ import {
   SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
-import { hexToNumber, hexToNumberString, toChecksumAddress } from 'web3-utils'
 import { estimateGas, estimateTxGas } from './gas'
 
 export function standardizeMetaTransactionData(
@@ -29,7 +29,7 @@ export function standardizeMetaTransactionData(
 export async function standardizeSafeTransactionData({
   safeContract,
   predictedSafe,
-  ethAdapter,
+  provider,
   tx,
   contractNetworks
 }: StandardizeSafeTransactionDataProps): Promise<SafeTransactionData> {
@@ -42,7 +42,7 @@ export async function standardizeSafeTransactionData({
     gasPrice: tx.gasPrice ?? '0',
     gasToken: tx.gasToken || ZERO_ADDRESS,
     refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
-    nonce: tx.nonce ?? (safeContract ? await safeContract.getNonce() : 0)
+    nonce: tx.nonce ?? (safeContract ? Number(await safeContract.getNonce()) : 0)
   }
 
   if (typeof tx.safeTxGas !== 'undefined') {
@@ -78,11 +78,13 @@ export async function standardizeSafeTransactionData({
   }
 
   let safeTxGas
+
+  const safeProvider = new SafeProvider({ provider })
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     safeTxGas = await estimateGas(
       safeVersion,
       safeContract,
-      ethAdapter,
+      safeProvider,
       standardizedTxs.to,
       standardizedTxs.value,
       standardizedTxs.data,
@@ -92,7 +94,7 @@ export async function standardizeSafeTransactionData({
   } else {
     safeTxGas = await estimateTxGas(
       safeContract,
-      ethAdapter,
+      safeProvider,
       standardizedTxs.to,
       standardizedTxs.value,
       standardizedTxs.data,
@@ -140,9 +142,9 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
     const data = `0x${decodedData.slice(index, (index += dataLength))}`
 
     txs.push({
-      operation: hexToNumber(operation) as OperationType,
-      to: toChecksumAddress(to),
-      value: hexToNumberString(value),
+      operation: Number(operation) as OperationType,
+      to: ethers.getAddress(to),
+      value: BigInt(value).toString(),
       data
     })
   }

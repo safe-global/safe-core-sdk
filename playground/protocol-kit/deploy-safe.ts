@@ -1,7 +1,5 @@
 import { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
 
 // This file can be used to play around with the Safe Core SDK
 
@@ -17,7 +15,7 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: 'https://rpc.ankr.com/eth_sepolia',
+  RPC_URL: 'https://sepolia.gateway.tenderly.co',
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
     OWNERS: ['OWNER_ADDRESS'],
@@ -28,21 +26,16 @@ const config: Config = {
 }
 
 async function main() {
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
-  const deployerSigner = new ethers.Wallet(config.DEPLOYER_ADDRESS_PRIVATE_KEY, provider)
-
-  // Create EthAdapter instance
-  const ethAdapter = new EthersAdapter({
-    ethers,
-    signerOrProvider: deployerSigner
-  })
-
   const safeVersion = config.DEPLOY_SAFE.SAFE_VERSION as SafeVersion
 
   console.log('safe config: ', config.DEPLOY_SAFE)
 
   // Create SafeFactory instance
-  const safeFactory = await SafeFactory.create({ ethAdapter, safeVersion })
+  const safeFactory = await SafeFactory.init({
+    provider: config.RPC_URL,
+    signer: config.DEPLOYER_ADDRESS_PRIVATE_KEY,
+    safeVersion
+  })
 
   // Config of the deployed Safe
   const safeAccountConfig: SafeAccountConfig = {

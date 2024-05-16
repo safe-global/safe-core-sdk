@@ -8,306 +8,46 @@ Software development kit that facilitates the interaction with the [Safe Transac
 
 ## Table of contents
 
+- [Documentation](#documentation)
 - [Installation](#installation)
-- [Build](#build)
-- [Tests](#tests)
-- [Initialization](#initialization)
-- [API Reference](#api-reference)
+- [Quick Start](#quick-start)
+- [Need Help or Have Questions?](#need-help-or-have-questions)
+- [Contributing](#contributing)
 - [License](#license)
-- [Contributors](#contributors)
 
-## <a name="installation">Installation</a>
+## Documentation
+
+Head to the [API Kit docs](https://docs.safe.global/sdk/api-kit) to learn more about how to use this SDK.
+
+## Installation
 
 Install the package with yarn or npm:
 
 ```bash
-yarn install
-npm install
+yarn add @safe-global/api-kit
+npm install @safe-global/api-kit
 ```
 
-## <a name="build">Build</a>
-
-Build the package with yarn or npm:
-
-```bash
-yarn build
-npm run build
-```
-
-## <a name="tests">Tests</a>
-
-Create a `.env` file with environment variables. You can use the `.env.example` file as a reference.
-
-Test the package with yarn or npm:
-
-```bash
-yarn test
-npm run test
-```
-
-## <a name="initialization">Initialization</a>
-
-### Initialize the SafeApiKit
+## Quick Start
 
 ```js
 import SafeApiKit from '@safe-global/api-kit'
 
-const safeService = new SafeApiKit({
+const apiKit = new SafeApiKit({
   chainId: 1n,
   // Optional. txServiceUrl must be used to set a custom service. For example on chains where Safe doesn't run services.
   txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
 })
 ```
 
-## <a name="api-reference">API Reference</a>
+## Need Help or Have Questions?
 
-### getServiceInfo
+If you have any doubts, questions, or need assistance, feel free to reach out! [Here you will find how to get support.](https://github.com/safe-global/safe-core-sdk/tree/main/SUPPORT.md)
 
-Returns the information and configuration of the service.
+## Contributing
 
-```js
-const serviceInfo: SafeServiceInfoResponse = await safeService.getServiceInfo()
-```
+Please read our [contribution guidelines](https://github.com/safe-global/safe-core-sdk/tree/main/CONTRIBUTING.md) before submitting any changes. We appreciate your help! 🙌
 
-### getServiceSingletonsInfo
+## License
 
-Returns the list of Safe singleton copies.
-
-```js
-const singletons: SafeSingletonResponse = await safeService.getServiceSingletonsInfo()
-```
-
-### decodeData
-
-Decodes the specified Safe transaction data.
-
-```js
-const decodedData = await safeService.decodeData(data)
-```
-
-### getSafesByOwner
-
-Returns the list of Safes where the address provided is an owner.
-
-```js
-const safes: OwnerResponse = await safeService.getSafesByOwner(ownerAddress)
-```
-
-### getSafesByModule
-
-Returns the list of Safes where the module address provided is enabled.
-
-```js
-const safes: ModulesResponse = await getSafesByModule(moduleAddress)
-```
-
-### getTransaction
-
-Returns all the information of a Safe transaction.
-
-```js
-const tx: SafeMultisigTransactionResponse = await safeService.getTransaction(safeTxHash)
-```
-
-### getTransactionConfirmations
-
-Returns the list of confirmations for a given a Safe transaction.
-
-```js
-const confirmations: SafeMultisigConfirmationListResponse =
-  await safeService.getTransactionConfirmations(safeTxHash)
-```
-
-### confirmTransaction
-
-Adds a confirmation for a Safe transaction.
-
-```js
-const signature: SignatureResponse = await safeService.confirmTransaction(safeTxHash, signature)
-```
-
-### getSafeInfo
-
-Returns the information and configuration of the provided Safe address.
-
-```js
-const safeInfo: SafeInfoResponse = await safeService.getSafeInfo(safeAddress)
-```
-
-### getSafeDelegates
-
-Returns the list of delegates for a given Safe address.
-
-```js
-const delegateConfig: GetSafeDelegateProps = {
-  safeAddress, // Optional
-  delegateAddress, // Optional
-  delegatorAddress, // Optional
-  label, // Optional
-  limit, // Optional
-  offset // Optional
-}
-const delegates: SafeDelegateListResponse = await safeService.getSafeDelegates(delegateConfig)
-```
-
-### addSafeDelegate
-
-Adds a new delegate for a given Safe address.
-
-```js
-const delegateConfig: AddSafeDelegateProps = {
-  safeAddress, // Optional
-  delegateAddress,
-  delegatorAddress,
-  label,
-  signer
-}
-await safeService.addSafeDelegate(delegateConfig)
-```
-
-### removeSafeDelegate
-
-Removes a delegate for a given Safe address.
-
-```js
-const delegateConfig: DeleteSafeDelegateProps = {
-  delegateAddress,
-  delegatorAddress,
-  signer
-}
-await safeService.removeSafeDelegate(delegateConfig)
-```
-
-### getSafeCreationInfo
-
-Returns the creation information of a Safe.
-
-```js
-const safeCreationInfo: SafeCreationInfoResponse = await safeService.getSafeCreationInfo(
-  safeAddress
-)
-```
-
-### estimateSafeTransaction
-
-Estimates the safeTxGas for a given Safe multi-signature transaction.
-
-```js
-const estimateTx: SafeMultisigTransactionEstimateResponse =
-  await safeService.estimateSafeTransaction(safeAddress, safeTransaction)
-```
-
-### proposeTransaction
-
-Creates a new multi-signature transaction and stores it in the Safe Transaction Service.
-
-```js
-const transactionConfig: ProposeTransactionProps = {
-  safeAddress,
-  safeTxHash,
-  safeTransactionData,
-  senderAddress,
-  senderSignature,
-  origin
-}
-await safeService.proposeTransaction(transactionConfig)
-```
-
-### getIncomingTransactions
-
-Returns the history of incoming transactions of a Safe account.
-
-```js
-const incomingTxs: TransferListResponse = await safeService.getIncomingTransactions(safeAddress)
-```
-
-### getModuleTransactions
-
-Returns the history of module transactions of a Safe account.
-
-```js
-const moduleTxs: SafeModuleTransactionListResponse = await safeService.getModuleTransactions(
-  safeAddress
-)
-```
-
-### getMultisigTransactions
-
-Returns the history of multi-signature transactions of a Safe account.
-
-```js
-const multisigTxs: SafeMultisigTransactionListResponse = await safeService.getMultisigTransactions(
-  safeAddress
-)
-```
-
-### getPendingTransactions
-
-Returns the list of multi-signature transactions that are waiting for the confirmation of the Safe owners.
-
-```js
-const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(
-  safeAddress
-)
-```
-
-```js
-const pendingTxs: SafeMultisigTransactionListResponse = await safeService.getPendingTransactions(
-  safeAddress,
-  currentNonce
-)
-```
-
-### getAllTransactions
-
-Returns a list of transactions for a Safe. The list has different structures depending on the transaction type.
-
-```js
-const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(
-  safeAddress
-)
-```
-
-```js
-const allTxsOptions: AllTransactionsOptions = {
-  executed,
-  queued,
-  trusted
-}
-const allTxs: SafeMultisigTransactionListResponse = await safeService.getAllTransactions(
-  safeAddress,
-  allTxsOptions
-)
-```
-
-### getNextNonce
-
-Returns the right nonce to propose a new transaction right after the last pending transaction.
-
-```js
-const nextNonce = await safeService.getNextNonce(safeAddress)
-```
-
-### getTokenList
-
-Returns the list of all the ERC20 tokens handled by the Safe.
-
-```js
-const tokens: TokenInfoListResponse = await safeService.getTokenList()
-```
-
-### getToken
-
-Returns the information of a given ERC20 token.
-
-```js
-const token: TokenInfoResponse = await safeService.getToken(tokenAddress)
-```
-
-## <a name="license">License</a>
-
-This library is released under MIT.
-
-## <a name="contributors">Contributors</a>
-
-- Germán Martínez ([germartinez](https://github.com/germartinez))
+This library is [released under MIT](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md).

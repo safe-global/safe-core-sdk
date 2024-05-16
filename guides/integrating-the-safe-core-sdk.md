@@ -24,16 +24,14 @@ To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) i
 
 ## <a name="initialize-sdks">2. Initialize the SDK’s</a>
 
-### Instantiate an EthAdapter
+### Select your Ethereum `provider` and `signer`
 
-First of all, we need to create an `EthAdapter`, which contains all the required utilities for the SDKs to interact with the blockchain. It acts as a wrapper for [web3.js](https://web3js.readthedocs.io/) or [ethers.js](https://docs.ethers.org/v6/) Ethereum libraries.
+To use our kits, you need to provide an Ethereum provider and a signer. The provider is the connection to the Ethereum network, while the signer is an account that will sign the transactions (a Safe owner). When using an injected provider like MetaMask, the signer is the account selected in the wallet.
 
-Depending on the library used by the Dapp, there are two options:
+In the examples below, you can see `provider` and `signer` properties, which represent:
 
-- [Create an `EthersAdapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/ethers)
-- [Create a `Web3Adapter` instance](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit/src/adapters/web3)
-
-Once the instance of `EthersAdapter` or `Web3Adapter` is created, it can be used in the SDK initialization.
+- `provider`: You can provide an EIP-1193 compatible provider or an HTTP/WebSocket RPC URL.
+- `signer`: This is an optional parameter. It should be the provider's address you want to use or a private key. If not set, it will try to fetch a connected account from the provider.
 
 ### Initialize the Safe API Kit
 
@@ -42,13 +40,13 @@ As stated in the introduction, the [Safe API Kit](https://github.com/safe-global
 ```js
 import SafeApiKit from '@safe-global/api-kit'
 
-const safeService = new SafeApiKit({ chainId })
+const apiKit = new SafeApiKit({ chainId })
 ```
 
 Using the `chainId` is enough for chains where Safe runs a Transaction Service. For those chains where Safe doesn't run a service, use the `txServiceUrl` parameter to set the custom service endpoint.
 
 ```js
-const safeService = new SafeApiKit({
+const apiKit = new SafeApiKit({
   chainId,
   txServiceUrl: 'https://txServiceUrl.com'
 })
@@ -59,9 +57,9 @@ const safeService = new SafeApiKit({
 ```js
 import Safe, { SafeFactory } from '@safe-global/protocol-kit'
 
-const safeFactory = await SafeFactory.create({ ethAdapter })
+const safeFactory = await SafeFactory.init({ provider, signer })
 
-const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+const protocolKit = await Safe.init({ provider, signer, safeAddress })
 ```
 
 There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/Safe.sol) that does not trigger events in order to save gas and [SafeL2.sol](https://github.com/safe-global/safe-contracts/blob/v1.4.1/contracts/SafeL2.sol) that does, which is more appropriate for L2 networks.
@@ -69,17 +67,18 @@ There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe
 By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeSingleton` to force the use of the `Safe.sol` contract.
 
 ```js
-const safeFactory = await SafeFactory.create({ ethAdapter, isL1SafeSingleton: true })
+const safeFactory = await SafeFactory.init({ provider, signer, isL1SafeSingleton: true })
 
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, isL1SafeSingleton: true })
+const protocolKit = await Safe.init({ provider, signer, safeAddress, isL1SafeSingleton: true })
 ```
 
 If the Safe contracts are not deployed to your current network, the property `contractNetworks` will be required to point to the addresses of the Safe contracts previously deployed by you.
 
 ```js
-import { ContractNetworksConfig } from '@safe-global/protocol-kit'
+import { ContractNetworksConfig, SafeProvider } from '@safe-global/protocol-kit'
 
-const chainId = await ethAdapter.getChainId()
+const safeProvider = new SafeProvider({ provider, signer })
+const chainId = await safeProvider.getChainId()
 const contractNetworks: ContractNetworksConfig = {
   [chainId]: {
     safeSingletonAddress: '<SINGLETON_ADDRESS>',
@@ -101,16 +100,16 @@ const contractNetworks: ContractNetworksConfig = {
   }
 }
 
-const safeFactory = await SafeFactory.create({ ethAdapter, contractNetworks })
+const safeFactory = await SafeFactory.init({ provider, signer, contractNetworks })
 
-const safeSdk = await Safe.create({ ethAdapter, safeAddress, contractNetworks })
+const protocolKit = await Safe.init({ provider, signer, safeAddress, contractNetworks })
 ```
 
 The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0`, `1.3.0` or `1.4.1`. If not specified, the `DEFAULT_SAFE_VERSION` value will be used.
 
 ```js
 const safeVersion = 'X.Y.Z'
-const safeFactory = await SafeFactory.create({ ethAdapter, safeVersion })
+const safeFactory = await SafeFactory.init({ provider, signer, safeVersion })
 ```
 
 ## <a name="deploy-safe">3. Deploy a new Safe</a>
@@ -127,7 +126,7 @@ const safeAccountConfig: SafeAccountConfig = {
   threshold: 2,
   // ... (optional params)
 }
-const safeSdk = await safeFactory.deploySafe({ safeAccountConfig })
+const protocolKit = await safeFactory.deploySafe({ safeAccountConfig })
 ```
 
 Calling the method `deploySafe` will deploy the desired Safe and return a Protocol Kit initialized instance ready to be used. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit#deploysafe) for more details on additional configuration parameters and callbacks.
@@ -140,42 +139,42 @@ This method takes an array of `MetaTransactionData` objects that represent the i
 
 When the array contains only one transaction, it is not wrapped in the MultiSend.
 
-  ```js
-  import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'
-  import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
+```js
+import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'
+import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
-  const transactions: MetaTransactionData[] = [
-    {
-      to,
-      data,
-      value,
-      operation
-    },
-    {
-      to,
-      data,
-      value,
-      operation
-    }
-    // ...
-  ]
-
-  const options: SafeTransactionOptionalProps = {
-    safeTxGas, // Optional
-    baseGas, // Optional
-    gasPrice, // Optional
-    gasToken, // Optional
-    refundReceiver, // Optional
-    nonce // Optional
+const transactions: MetaTransactionData[] = [
+  {
+    to,
+    data,
+    value,
+    operation
+  },
+  {
+    to,
+    data,
+    value,
+    operation
   }
+  // ...
+]
 
-  const safeTransaction = await safeSdk.createTransaction({ transactions, options })
-  ```
+const options: SafeTransactionOptionalProps = {
+  safeTxGas, // Optional
+  baseGas, // Optional
+  gasPrice, // Optional
+  gasToken, // Optional
+  refundReceiver, // Optional
+  nonce // Optional
+}
+
+const safeTransaction = await protocolKit.createTransaction({ transactions, options })
+```
 
 We can specify the `nonce` of our Safe transaction as long as it is not lower than the current Safe nonce. If multiple transactions are created but not executed they will share the same `nonce` if no `nonce` is specified, validating the first executed transaction and invalidating all the rest. We can prevent this by calling the method `getNextNonce` from the Safe API Kit instance. This method takes all queued/pending transactions into account when calculating the next nonce, creating a unique one for all different transactions.
 
 ```js
-const nonce = await safeService.getNextNonce(safeAddress)
+const nonce = await apiKit.getNextNonce(safeAddress)
 ```
 
 ## <a name="propose-transaction">5. Propose the transaction to the service</a>
@@ -190,9 +189,9 @@ Once we have the Safe transaction object we can share it with the other owners o
 - `origin`: Optional string that allows to provide more information about the app proposing the transaction.
 
 ```js
-const safeTxHash = await safeSdk.getTransactionHash(safeTransaction)
-const senderSignature = await safeSdk.signHash(safeTxHash)
-await safeService.proposeTransaction({
+const safeTxHash = await protocolKit.getTransactionHash(safeTransaction)
+const senderSignature = await protocolKit.signHash(safeTxHash)
+await apiKit.proposeTransaction({
   safeAddress,
   safeTransactionData: safeTransaction.data,
   safeTxHash,
@@ -209,13 +208,13 @@ The transaction is then available on the Safe Transaction Service and the owners
 Get a list of pending transactions:
 
 ```js
-const pendingTxs = await safeService.getPendingTransactions(safeAddress)
+const pendingTxs = await apiKit.getPendingTransactions(safeAddress)
 ```
 
 Get a specific transaction given its Safe transaction hash:
 
 ```js
-const tx = await safeService.getTransaction(safeTxHash)
+const tx = await apiKit.getTransaction(safeTxHash)
 ```
 
 The retrieved transaction will have this type:
@@ -271,8 +270,8 @@ The owners of the Safe can now sign the transaction obtained from the Safe Trans
 // transaction: SafeMultisigTransactionResponse
 
 const hash = transaction.safeTxHash
-let signature = await safeSdk.signHash(hash)
-await safeService.confirmTransaction(hash, signature.data)
+let signature = await protocolKit.signHash(hash)
+await apiKit.confirmTransaction(hash, signature.data)
 ```
 
 ## <a name="execute-transaction">8. Execute the transaction</a>
@@ -282,15 +281,15 @@ Once there are enough confirmations in the service the transaction is ready to b
 The method `executeTransaction` accepts an instance of the class `SafeTransaction` so the transaction needs to be transformed from the type `SafeMultisigTransactionResponse`.
 
 ```js
-const safeTransaction = await safeService.getTransaction(...)
-const executeTxResponse = await safeSdk.executeTransaction(safeTransaction)
+const safeTransaction = await apiKit.getTransaction(...)
+const executeTxResponse = await protocolKit.executeTransaction(safeTransaction)
 const receipt = executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
 ```
 
 Optionally, the `isValidTransaction` method, that returns a boolean value, could be called right before the `executeTransaction` method to check if the transaction will be executed successfully or not.
 
 ```js
-const isValidTx = await safeSdk.isValidTransaction(safeTransaction)
+const isValidTx = await protocolKit.isValidTransaction(safeTransaction)
 ```
 
 ## <a name="interface-checks">9. Interface checks</a>

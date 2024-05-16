@@ -1,20 +1,22 @@
-import { Signer } from 'ethers'
+import { ethers, Signer } from 'ethers'
 import SafeApiKit, { AddSafeDelegateProps } from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
-import { getServiceClient } from '../utils/setupServiceClient'
+import { getApiKit } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
+
+const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
+const PRIVATE_KEY_2 = '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
 
 let safeApiKit: SafeApiKit
 let signer: Signer
 
 describe('addSafeDelegate', () => {
   before(async () => {
-    ;({ safeApiKit, signer } = await getServiceClient(
-      '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-    ))
+    safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
+    signer = new ethers.Wallet(PRIVATE_KEY_1)
   })
 
   it('should fail if Label is empty', async () => {
@@ -46,7 +48,7 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is empty', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
+    const delegateAddress = '0xe4bb611E4e4164D54Ad7361B9d58b0A1eBD462B8'
     const delegatorAddress = ''
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
@@ -124,17 +126,15 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if the signer is not an owner of the Safe', async () => {
-    const { safeApiKit, signer } = await getServiceClient(
-      '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
-    )
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer.getAddress()
+    const nonOwnerSigner = new ethers.Wallet(PRIVATE_KEY_2)
+    const delegatorAddress = await nonOwnerSigner.getAddress()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer,
+      signer: nonOwnerSigner,
       label: 'Label'
     }
     await chai

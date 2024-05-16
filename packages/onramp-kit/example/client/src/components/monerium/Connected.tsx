@@ -31,7 +31,9 @@ function Connected({ authContext, orderState, safe, onLogout, onTransfer }: Conn
 
       {isLoading ? (
         <Box display="flex" alignItems="center">
-          <Loader color="primary" size={40} sx={{ mr: 2 }} />
+          {orderState && [OrderState.placed, OrderState.pending].includes(orderState) && (
+            <Loader color="primary" size={40} sx={{ mr: 2 }} />
+          )}
           {orderState && (
             <>
               {orderState === OrderState.placed && <Alert severity="info">Order placed</Alert>}

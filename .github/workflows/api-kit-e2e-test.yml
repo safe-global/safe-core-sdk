@@ -1,0 +1,32 @@
+name: API Kit - E2E Tests
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - development
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: |
+          cd packages/api-kit
+          yarn test:ci:ethers
+          yarn test:ci:web3
+          yarn test:ci:viem

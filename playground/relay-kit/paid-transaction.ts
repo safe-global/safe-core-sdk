@@ -6,18 +6,18 @@ import {
   OperationType
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
-import { EthersAdapter } from '@safe-global/protocol-kit'
 
 // Check the status of a transaction after it is relayed:
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
 
 // Check the status of a transaction after it is executed:
-// https://goerli.etherscan.io/tx/<TRANSACTION_HASH>
+// https://sepolia.etherscan.io/tx/<TRANSACTION_HASH>
 
 const config = {
-  SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',
-  RPC_URL: 'https://goerli.infura.io/v3/<INFURA_API_KEY>'
+  SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>'
 }
+
+const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',
@@ -30,7 +30,7 @@ const txConfig = {
   VALUE: '<VALUE>',
   // Options:
   GAS_LIMIT: '<GAS_LIMIT>',
-  GAS_TOKEN: ethers.ZeroAddress
+  GAS_TOKEN: '0x0000000000000000000000000000000000000000'
 }
 
 async function main() {
@@ -38,15 +38,10 @@ async function main() {
 
   // SDK Initialization
 
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL)
-  const signer = new ethers.Wallet(config.SAFE_SIGNER_PRIVATE_KEY, provider)
-
-  const safeAccountAbstraction = new AccountAbstraction(
-    new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    })
-  )
+  const safeAccountAbstraction = new AccountAbstraction({
+    provider: RPC_URL,
+    signer: config.SAFE_SIGNER_PRIVATE_KEY
+  })
 
   await safeAccountAbstraction.init()
 
@@ -62,18 +57,20 @@ async function main() {
   const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
+  const ethersProvider = safeAccountAbstraction.protocolKit.getSafeProvider().getExternalProvider()
+
   // Fake on-ramp to transfer enough funds to the Safe address
 
-  const chainId = (await provider.getNetwork()).chainId
+  const chainId = (await ethersProvider.getNetwork()).chainId
   const relayFee = BigInt(
     await relayPack.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
   )
-  const safeBalance = await provider.getBalance(predictedSafeAddress)
+  const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
   console.log({ minSafeBalance: ethers.formatEther(relayFee.toString()) })
   console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
 
   if (safeBalance < relayFee) {
-    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, provider)
+    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, ethersProvider)
     const fundingAmount = safeBalance < relayFee ? relayFee - safeBalance : safeBalance - relayFee
     const onRampResponse = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,
@@ -82,7 +79,7 @@ async function main() {
     console.log(`Funding the Safe with ${ethers.formatEther(fundingAmount.toString())} ETH`)
     await onRampResponse.wait()
 
-    const safeBalanceAfter = await provider.getBalance(predictedSafeAddress)
+    const safeBalanceAfter = await ethersProvider.getBalance(predictedSafeAddress)
     console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
   }
 

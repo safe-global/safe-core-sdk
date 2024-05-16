@@ -1,17 +1,17 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { Wallet, ethers } from 'ethers'
+import { ethers } from 'ethers'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import { EthAdapter, SafeOperation } from '@safe-global/safe-core-sdk-types'
+import { SafeOperation } from '@safe-global/safe-core-sdk-types'
+import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
-import { EthersAdapter } from 'packages/protocol-kit'
 import { getSafe4337ModuleDeployment } from '@safe-global/safe-modules-deployments'
 import config from '../utils/config'
-import { getServiceClient } from '../utils/setupServiceClient'
+import { getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -24,9 +24,8 @@ const BUNDLER_URL = `https://bundler.url`
 const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit
-let ethAdapter: EthAdapter
+let protocolKit: Safe
 let safe4337Pack: Safe4337Pack
-let signer: Wallet
 let moduleAddress: string
 
 describe('addSafeOperation', () => {
@@ -60,16 +59,16 @@ describe('addSafeOperation', () => {
   providerStub.callThrough()
 
   before(async () => {
-    ;({ safeApiKit, ethAdapter, signer } = await getServiceClient(SIGNER_PK, TX_SERVICE_URL))
-
-    const ethersAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    })
+    ;({ safeApiKit, protocolKit } = await getKits({
+      safeAddress: SAFE_ADDRESS,
+      signer: SIGNER_PK,
+      txServiceUrl: TX_SERVICE_URL
+    }))
 
     safe4337Pack = await Safe4337Pack.init({
+      provider: protocolKit.getSafeProvider().provider,
+      signer: protocolKit.getSafeProvider().signer,
       options: { safeAddress: SAFE_ADDRESS },
-      ethersAdapter,
       rpcUrl: config.JSON_RPC,
       bundlerUrl: BUNDLER_URL,
       paymasterOptions: {
@@ -78,7 +77,7 @@ describe('addSafeOperation', () => {
       }
     })
 
-    const chainId = (await ethAdapter.getChainId()).toString()
+    const chainId = (await protocolKit.getSafeProvider().getChainId()).toString()
 
     moduleAddress = getSafe4337ModuleDeployment({
       released: true,

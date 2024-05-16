@@ -1,7 +1,7 @@
 import SafeApiKit from '@safe-global/api-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { getApiKit } from '../utils/getKits'
+import { getApiKit } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
 

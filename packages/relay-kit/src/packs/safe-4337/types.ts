@@ -6,7 +6,7 @@ import {
   UserOperation
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
-import SafeOperation from './SafeOperation'
+import EthSafeOperation from './SafeOperation'
 
 type ExistingSafeOptions = {
   safeAddress: string
@@ -64,7 +64,7 @@ export type Safe4337CreateTransactionProps = {
 }
 
 export type Safe4337ExecutableProps = {
-  executable: SafeOperation
+  executable: EthSafeOperation
 }
 
 export type EstimateSponsoredGasData = {
@@ -149,6 +149,6 @@ export interface IFeeEstimator {
 }
 
 export type EstimateFeeProps = {
-  safeOperation: SafeOperation
+  safeOperation: EthSafeOperation
   feeEstimator?: IFeeEstimator
 }

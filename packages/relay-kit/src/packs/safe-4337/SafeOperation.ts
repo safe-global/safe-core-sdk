@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import {
   EstimateGasData,
-  SafeOperation as SafeOperationType,
+  SafeOperation,
   SafeSignature,
   SafeUserOperation,
   UserOperation
@@ -10,7 +10,7 @@ import { buildSignatureBytes } from '@safe-global/protocol-kit'
 
 type SafeOperationOptions = { entryPoint: string; validAfter?: number; validUntil?: number }
 
-class SafeOperation implements SafeOperationType {
+class EthSafeOperation implements SafeOperation {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
 
@@ -81,4 +81,4 @@ class SafeOperation implements SafeOperationType {
   }
 }
 
-export default SafeOperation
+export default EthSafeOperation

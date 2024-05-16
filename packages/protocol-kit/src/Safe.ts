@@ -798,6 +798,8 @@ class Safe {
         signerAddress
       )
 
+      // TODO: USE signature = await this.signHash(txHash)
+
       const signature = new EthSafeSignature(signerAddress, signatureAdjusted, true)
 
       const signedSafeTransaction = await this.copyTransaction(transaction)

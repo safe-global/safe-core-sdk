@@ -5,7 +5,9 @@ import Safe, {
   SafeProvider,
   SigningMethod,
   encodeMultiSendData,
-  getMultiSendContract
+  getMultiSendContract,
+  getSafeWebAuthnSignerFactoryContract,
+  PasskeySigner
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
@@ -39,6 +41,18 @@ import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+
+/*
+  Some of the contracts used in the PoC app are still experimental, and not included in
+  the production deployment packages, thus we need to hardcode their addresses here.
+  Deployment commit: https://github.com/safe-global/safe-modules/commit/3853f34f31837e0a0aee47a4452564278f8c62ba
+*/
+const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
+
+// Sepolia only
+const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
+
+// TODO: ADD the SafeWebAuthnSharedSigner.sol to the protocol-kit
 
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
@@ -180,8 +194,18 @@ export class Safe4337Pack extends RelayKitBasePack<{
         throw new Error('Owners and threshold are required to deploy a new Safe')
       }
 
-      let deploymentTo = addModulesLibAddress
-      let deploymentData = INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]])
+      // we need to create a batch to setup the 4337 Safe
+      const setupTransactions = []
+
+      // first setup transaction: Enable 4337 module
+      const enable4337ModuleTransaction = {
+        to: addModulesLibAddress,
+        value: '0',
+        data: INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]]),
+        operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
+      }
+
+      setupTransactions.push(enable4337ModuleTransaction)
 
       const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
 
@@ -191,13 +215,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       if (isApproveTransactionRequired) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
 
-        const enable4337ModulesTransaction = {
-          to: addModulesLibAddress,
-          value: '0',
-          data: INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]]),
-          operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
-        }
-
+        // second transaction: approve ERC-20 paymaster token
         const approveToPaymasterTransaction = {
           to: paymasterTokenAddress,
           data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
@@ -205,20 +223,77 @@ export class Safe4337Pack extends RelayKitBasePack<{
           operation: OperationType.Call // Call for approve
         }
 
-        const setupBatch = [enable4337ModulesTransaction, approveToPaymasterTransaction]
+        setupTransactions.push(approveToPaymasterTransaction)
+      }
 
-        const batchData = INTERFACES.encodeFunctionData('multiSend', [
-          encodeMultiSendData(setupBatch)
-        ])
+      // third transaction: passkey support via shared signer SafeWebAuthnSharedSigner
+      // see: https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/4337/experimental/README.md
+      const isPasskeySigner = signer && typeof signer !== 'string'
 
+      if (isPasskeySigner) {
+        const safeProvider = new SafeProvider({
+          provider
+        })
+
+        const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+          safeProvider,
+          safeVersion: '1.4.1'
+        })
+
+        const passkeySigner = await PasskeySigner.init(
+          signer,
+          safeWebAuthnSignerFactoryContract,
+          safeProvider.getExternalProvider()
+        )
+
+        const ownerAddress = await passkeySigner.getAddress()
+
+        if (!options.owners.includes(ownerAddress)) {
+          options.owners.push(ownerAddress)
+        }
+
+        const passkeyOwnerConfiguration = {
+          ...passkeySigner.coordinates,
+          verifiers: P256_VERIFIER_ADDRESS
+        }
+
+        const sharedSignerTransaction = {
+          to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          value: '0',
+          data: INTERFACES.encodeFunctionData('configure', [passkeyOwnerConfiguration]),
+          operation: OperationType.DelegateCall // DelegateCall required into the SafeWebAuthnSharedSigner instance in order for it to set its configuration.
+        }
+
+        setupTransactions.push(sharedSignerTransaction)
+      }
+
+      // TODO: END CREATE A PRIVATE FUNCTION
+
+      let deploymentTo
+      let deploymentData
+
+      const isBatch = setupTransactions.length > 1
+
+      if (isBatch) {
         const multiSendContract = await getMultiSendContract({
-          safeProvider: new SafeProvider({ provider, signer: signer as string }),
+          safeProvider: new SafeProvider({ provider }),
           safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
         })
 
+        const batchData = INTERFACES.encodeFunctionData('multiSend', [
+          encodeMultiSendData(setupTransactions)
+        ])
+
         deploymentTo = await multiSendContract.getAddress()
         deploymentData = batchData
+      } else {
+        deploymentTo = setupTransactions[0].to
+        deploymentData = setupTransactions[0].data
       }
+
+      const owners = isPasskeySigner
+        ? [SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, ...options.owners]
+        : options.owners
 
       protocolKit = await Safe.init({
         provider,
@@ -229,7 +304,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
             saltNonce: options.saltNonce || undefined
           },
           safeAccountConfig: {
-            owners: options.owners,
+            owners,
             threshold: options.threshold,
             to: deploymentTo,
             data: deploymentData,
@@ -398,6 +473,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     if (!isSafeDeployed) {
       userOperation.initCode = await this.protocolKit.getInitCode()
+
+      // TODO: const isPasskeySigner = signer && typeof signer !== 'string'
     }
 
     const safeOperation = new SafeOperation(userOperation, {
@@ -439,17 +516,34 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     let signature: SafeSignature
 
-    if (
-      signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4 ||
-      signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3 ||
-      signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA
-    ) {
-      signature = await this.#signTypedData(safeOperation.data)
-    } else {
+    const isPasskeySigner = await this.protocolKit.getSafeProvider().isPasskeySigner()
+
+    if (isPasskeySigner) {
       const chainId = await this.protocolKit.getSafeProvider().getChainId()
       const safeOpHash = this.#getSafeUserOperationHash(safeOperation.data, chainId)
 
-      signature = await this.protocolKit.signHash(safeOpHash)
+      const passkeySignature = await this.protocolKit.signHash(safeOpHash)
+
+      signature = new EthSafeSignature(
+        SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+        passkeySignature.data,
+        true
+      )
+
+      // TODO: implement passkey flow
+    } else {
+      if (
+        signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4 ||
+        signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3 ||
+        signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA
+      ) {
+        signature = await this.#signTypedData(safeOperation.data)
+      } else {
+        const chainId = await this.protocolKit.getSafeProvider().getChainId()
+        const safeOpHash = this.#getSafeUserOperationHash(safeOperation.data, chainId)
+
+        signature = await this.protocolKit.signHash(safeOpHash)
+      }
     }
 
     const signedSafeOperation = new SafeOperation(safeOperation.toUserOperation(), {

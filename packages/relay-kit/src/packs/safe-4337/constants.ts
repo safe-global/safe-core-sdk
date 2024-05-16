@@ -25,7 +25,8 @@ export const INTERFACES = new ethers.Interface([
   'function enableModules(address[])',
   'function multiSend(bytes memory transactions) public payable',
   'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)',
-  'function approve(address _spender, uint256 _value)'
+  'function approve(address _spender, uint256 _value)',
+  'function configure((uint256 x, uint256 y, uint176 verifiers) signer)'
 ])
 
 export const RPC_4337_CALLS = {

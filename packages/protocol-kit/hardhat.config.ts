@@ -34,52 +34,8 @@ const config: HardhatUserConfig = {
     compilers: [
       { version: '0.5.17' },
       { version: '0.5.3' },
-      { version: '0.8.0' }
-      // {
-      //   version: '0.8.24',
-      //   settings: {
-      //     optimizer: {
-      //       enabled: true,
-      //       runs: 200
-      //     }
-      //   }
-      // }
-      // {
-      //   version: '0.8.24',
-      //   settings: {
-      //     optimizer: {
-      //       enabled: true,
-      //       runs: 10_000_000
-      //     },
-      //     viaIR: false,
-      //     evmVersion: 'paris'
-      //   }
-      // }
-    ],
-    overrides: {
-      '@safe-global/safe-passkey/contracts/SafeWebAuthnSignerFactory.sol': {
-        version: '0.8.24',
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 10_000_000
-          },
-          viaIR: false,
-          evmVersion: 'paris'
-        }
-      },
-      '@safe-global/safe-passkey/contracts/libraries/P256.sol': {
-        version: '0.8.24',
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 10_000_000
-          },
-          viaIR: false,
-          evmVersion: 'paris'
-        }
-      },
-      '@safe-global/safe-passkey/contracts/libraries/WebAuthn.sol': {
+      { version: '0.8.0' },
+      {
         version: '0.8.24',
         settings: {
           optimizer: {
@@ -90,13 +46,11 @@ const config: HardhatUserConfig = {
           evmVersion: 'paris'
         }
       }
-
-      // '@gnosis.pm/safe-contracts-v1.3.0/contracts/interfaces/ISignatureValidator.sol': {
-      //   version: '0.8.0'
-      // },
-      // '@gnosis.pm/safe-contracts-v1.3.0/contracts/handler/CompatibilityFallbackHandler.sol': {
-      //   version: '0.8.0'
-      // }
+    ],
+    overrides: {
+      '@gnosis.pm/safe-contracts-v1.3.0/contracts/handler/CompatibilityFallbackHandler.sol': {
+        version: '0.8.0'
+      }
     }
   },
   paths: {

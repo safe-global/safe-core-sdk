@@ -70,6 +70,14 @@ const simulateTxAccessorContracts: SafeVersions = {
   '1.0.0': { name: 'SimulateTxAccessor_SV1_3_0' }
 }
 
+const safeWebAuthnSignerFactoryContracts: SafeVersions = {
+  '1.4.1': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
+  '1.3.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
+  '1.2.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
+  '1.1.1': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
+  '1.0.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' }
+}
+
 export const safeDeployed = safeContracts[safeVersionDeployed]
 export const proxyFactoryDeployed = proxyFactoryContracts[safeVersionDeployed]
 export const multiSendDeployed = multiSendContracts[safeVersionDeployed]
@@ -79,6 +87,8 @@ export const compatibilityFallbackHandlerDeployed =
 export const signMessageLibDeployed = signMessageLibContracts[safeVersionDeployed]
 export const createCallDeployed = createCallContracts[safeVersionDeployed]
 export const simulateTxAccessorDeployed = simulateTxAccessorContracts[safeVersionDeployed]
+export const safeWebAuthnSignerFactoryDeployed =
+  safeWebAuthnSignerFactoryContracts[safeVersionDeployed]
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   const { deployments, getNamedAccounts } = hre
@@ -135,6 +145,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
   })
 
   await deploy(simulateTxAccessorDeployed.name, {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy(safeWebAuthnSignerFactoryDeployed.name, {
     from: deployer,
     args: [],
     log: true,

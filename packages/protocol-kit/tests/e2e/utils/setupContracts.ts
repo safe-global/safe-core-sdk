@@ -7,6 +7,7 @@ import {
   proxyFactoryDeployed,
   safeDeployed,
   safeVersionDeployed,
+  safeWebAuthnSignerFactoryDeployed,
   signMessageLibDeployed,
   simulateTxAccessorDeployed
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
@@ -160,6 +161,22 @@ export const getSimulateTxAccessor = async (): Promise<{
   return {
     contract: SimulateTxAccessor.attach(SimulateTxAccessorDeployment.address),
     abi: SimulateTxAccessorDeployment.abi
+  }
+}
+
+export const getSafeWebAuthnSignerFactory = async (): Promise<{
+  contract: Contract
+  abi: JsonFragment | JsonFragment[]
+}> => {
+  const SafeWebAuthnSignerFactoryDeployment = await deployments.get(
+    safeWebAuthnSignerFactoryDeployed.name
+  )
+  const SafeWebAuthnSignerFactory = await ethers.getContractFactory(
+    safeWebAuthnSignerFactoryDeployed.name
+  )
+  return {
+    contract: SafeWebAuthnSignerFactory.attach(SafeWebAuthnSignerFactoryDeployment.address),
+    abi: SafeWebAuthnSignerFactoryDeployment.abi
   }
 }
 

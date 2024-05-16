@@ -10,6 +10,7 @@ import { SignMessageLib } from "@safe-global/safe-contracts-v1.4.1/contracts/lib
 import { CreateCall } from "@safe-global/safe-contracts-v1.4.1/contracts/libraries/CreateCall.sol";
 import { TokenCallbackHandler } from "@safe-global/safe-contracts-v1.4.1/contracts/handler/TokenCallbackHandler.sol";
 import { SimulateTxAccessor } from "@safe-global/safe-contracts-v1.4.1/contracts/accessors/SimulateTxAccessor.sol";
+import { SafeWebAuthnSignerFactory } from "@safe-global/safe-passkey/contracts/SafeWebAuthnSignerFactory.sol";
 
 // Testing contracts
 import { DebugTransactionGuard} from "@safe-global/safe-contracts-v1.4.1/contracts/examples/guards/DebugTransactionGuard.sol";
@@ -23,6 +24,7 @@ contract SignMessageLib_SV1_4_1 is SignMessageLib {}
 contract CreateCall_SV1_4_1 is CreateCall {}
 contract TokenCallbackHandler_SV1_4_1 is TokenCallbackHandler {}
 contract SimulateTxAccessor_SV1_4_1 is SimulateTxAccessor {}
+contract SafeWebAuthnSignerFactory_SV1_4_1 is SafeWebAuthnSignerFactory {}
 
 // Testing contracts
 contract DebugTransactionGuard_SV1_4_1 is DebugTransactionGuard {}

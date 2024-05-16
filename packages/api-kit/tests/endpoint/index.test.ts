@@ -67,7 +67,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getServiceSingletonsInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/about/master-copies`,
+        url: `${txServiceBaseUrl}/v1/about/singletons`,
         method: 'get'
       })
     })

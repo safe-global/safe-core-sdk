@@ -101,7 +101,7 @@ class SafeApiKit {
    */
   async getServiceSingletonsInfo(): Promise<SafeSingletonResponse[]> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/about/master-copies`,
+      url: `${this.#txServiceBaseUrl}/v1/about/singletons`,
       method: HttpMethod.Get
     })
   }

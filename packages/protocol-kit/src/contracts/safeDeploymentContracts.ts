@@ -185,8 +185,8 @@ export async function getSafeWebAuthnSignerFactoryContract({
   const safeWebAuthnSignerFactoryContract = await safeProvider.getSafeWebAuthnSignerFactoryContract(
     {
       safeVersion,
-      customContractAddress: customContracts?.simulateTxAccessorAddress,
-      customContractAbi: customContracts?.simulateTxAccessorAbi
+      customContractAddress: customContracts?.safeWebAuthnSignerFactoryAddress,
+      customContractAbi: customContracts?.safeWebAuthnSignerFactoryAbi
     }
   )
 

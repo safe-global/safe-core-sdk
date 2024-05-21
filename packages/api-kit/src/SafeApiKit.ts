@@ -1,10 +1,13 @@
 import {
   AddMessageProps,
   AddSafeDelegateProps,
+  AddSafeOperationProps,
   AllTransactionsListResponse,
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
+  GetSafeOperationListProps,
+  GetSafeOperationListResponse,
   SafeSingletonResponse,
   GetSafeMessageListProps,
   ModulesResponse,
@@ -20,6 +23,7 @@ import {
   SafeMultisigTransactionEstimate,
   SafeMultisigTransactionEstimateResponse,
   SafeMultisigTransactionListResponse,
+  SafeOperationResponse,
   SafeServiceInfoResponse,
   SignatureResponse,
   TokenInfoListResponse,
@@ -35,6 +39,7 @@ import {
   SafeMultisigTransactionResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
+import { isEmptyData } from './utils'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -96,7 +101,7 @@ class SafeApiKit {
    */
   async getServiceSingletonsInfo(): Promise<SafeSingletonResponse[]> {
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/about/master-copies`,
+      url: `${this.#txServiceBaseUrl}/v1/about/singletons`,
       method: HttpMethod.Get
     })
   }
@@ -711,6 +716,128 @@ class SafeApiKit {
       method: HttpMethod.Post,
       body: {
         signature
+      }
+    })
+  }
+
+  /**
+   * Get the SafeOperations that were sent from a particular address.
+   * @param getSafeOperationsProps - The parameters to filter the list of SafeOperations
+   * @throws "Safe address must not be empty"
+   * @throws "Invalid Ethereum address {safeAddress}"
+   * @returns The SafeOperations sent from the given Safe's address
+   */
+  async getSafeOperationsByAddress({
+    safeAddress,
+    ordering,
+    limit,
+    offset
+  }: GetSafeOperationListProps): Promise<GetSafeOperationListResponse> {
+    if (!safeAddress) {
+      throw new Error('Safe address must not be empty')
+    }
+
+    const { address } = this.#getEip3770Address(safeAddress)
+
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/safe-operations/`)
+
+    if (ordering) {
+      url.searchParams.set('ordering', ordering)
+    }
+
+    if (limit) {
+      url.searchParams.set('limit', limit)
+    }
+
+    if (offset) {
+      url.searchParams.set('offset', offset)
+    }
+
+    return sendRequest({
+      url: url.toString(),
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Get a SafeOperation by its hash.
+   * @param safeOperationHash The SafeOperation hash
+   * @throws "SafeOperation hash must not be empty"
+   * @throws "Not found."
+   * @returns The SafeOperation
+   */
+  async getSafeOperation(safeOperationHash: string): Promise<SafeOperationResponse> {
+    if (!safeOperationHash) {
+      throw new Error('SafeOperation hash must not be empty')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Create a new 4337 SafeOperation for a Safe.
+   * @param addSafeOperationProps - The configuration of the SafeOperation
+   * @throws "Safe address must not be empty"
+   * @throws "Invalid Safe address {safeAddress}"
+   * @throws "Module address must not be empty"
+   * @throws "Invalid module address {moduleAddress}"
+   * @throws "Signature must not be empty"
+   */
+  async addSafeOperation({
+    entryPoint,
+    moduleAddress: moduleAddressProp,
+    options,
+    safeAddress: safeAddressProp,
+    userOperation
+  }: AddSafeOperationProps): Promise<void> {
+    let safeAddress: string, moduleAddress: string
+
+    if (!safeAddressProp) {
+      throw new Error('Safe address must not be empty')
+    }
+    try {
+      safeAddress = this.#getEip3770Address(safeAddressProp).address
+    } catch (err) {
+      throw new Error(`Invalid Safe address ${safeAddressProp}`)
+    }
+
+    if (!moduleAddressProp) {
+      throw new Error('Module address must not be empty')
+    }
+
+    try {
+      moduleAddress = this.#getEip3770Address(moduleAddressProp).address
+    } catch (err) {
+      throw new Error(`Invalid module address ${moduleAddressProp}`)
+    }
+
+    if (isEmptyData(userOperation.signature)) {
+      throw new Error('Signature must not be empty')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
+      method: HttpMethod.Post,
+      body: {
+        nonce: Number(userOperation.nonce),
+        initCode: isEmptyData(userOperation.initCode) ? null : userOperation.initCode,
+        callData: userOperation.callData,
+        callDataGasLimit: userOperation.callGasLimit.toString(),
+        verificationGasLimit: userOperation.verificationGasLimit.toString(),
+        preVerificationGas: userOperation.preVerificationGas.toString(),
+        maxFeePerGas: userOperation.maxFeePerGas.toString(),
+        maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas.toString(),
+        paymasterAndData: isEmptyData(userOperation.paymasterAndData)
+          ? null
+          : userOperation.paymasterAndData,
+        entryPoint,
+        validAfter: !options?.validAfter ? null : options?.validAfter,
+        validUntil: !options?.validUntil ? null : options?.validUntil,
+        signature: userOperation.signature,
+        moduleAddress
       }
     })
   }

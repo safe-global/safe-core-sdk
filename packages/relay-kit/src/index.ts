@@ -1,3 +1,5 @@
+export * from './deprecated'
+
 export * from './packs/gelato/GelatoRelayPack'
 export * from './packs/gelato/types'
 

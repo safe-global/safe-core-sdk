@@ -6,7 +6,7 @@ import {
 } from '@safe-global/safe-modules-deployments'
 import { MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
 import { Safe4337Pack } from './Safe4337Pack'
-import SafeOperation from './SafeOperation'
+import EthSafeOperation from './SafeOperation'
 import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
@@ -308,7 +308,7 @@ describe('Safe4337Pack', () => {
         transactions
       })
 
-      expect(safeOperation).toBeInstanceOf(SafeOperation)
+      expect(safeOperation).toBeInstanceOf(EthSafeOperation)
       expect(safeOperation.data).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
@@ -338,7 +338,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(safeOperation).toBeInstanceOf(SafeOperation)
+      expect(safeOperation).toBeInstanceOf(EthSafeOperation)
       expect(safeOperation.data).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
@@ -397,7 +397,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperation)
+      expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
       expect(sponsoredSafeOperation.data).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
@@ -470,7 +470,7 @@ describe('Safe4337Pack', () => {
 
       const batch = [transferUSDC, approveTransaction]
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperation)
+      expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
       expect(sponsoredSafeOperation.data).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',

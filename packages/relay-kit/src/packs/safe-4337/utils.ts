@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { UserOperation } from './types'
+import { UserOperation } from '@safe-global/safe-core-sdk-types'
 
 /**
  * Gets the EIP-4337 bundler provider.

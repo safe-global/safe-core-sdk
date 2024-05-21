@@ -7,6 +7,7 @@ import SafeApiKit, {
 } from '@safe-global/api-kit/index'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
+import { UserOperation } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
@@ -66,7 +67,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getServiceSingletonsInfo())
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/about/master-copies`,
+        url: `${txServiceBaseUrl}/v1/about/singletons`,
         method: 'get'
       })
     })
@@ -633,6 +634,82 @@ describe('Endpoint tests', () => {
         method: 'post',
         body: {
           signature
+        }
+      })
+    })
+
+    it('getSafeOperationsByAddress', async () => {
+      await chai
+        .expect(safeApiKit.getSafeOperationsByAddress({ safeAddress }))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
+        method: 'get'
+      })
+    })
+
+    it('getSafeOperation', async () => {
+      const safeOperationHash = 'safe-operation-hash'
+
+      await chai
+        .expect(safeApiKit.getSafeOperation(safeOperationHash))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/`,
+        method: 'get'
+      })
+    })
+
+    it('addSafeOperation', async () => {
+      const moduleAddress = '0xa581c4A4DB7175302464fF3C06380BC3270b4037'
+
+      const userOperation: UserOperation = {
+        sender: safeAddress,
+        nonce: '42',
+        initCode: '0xfbc38024f74946d9ec31e0c8658dd65e335c6e57c14575250787ec5fb270c08a',
+        callData:
+          '0x7bb374280000000000000000000000001c7d4b196cb0c7b01d743fbc6116a902379c72380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb00000000000000000000000060c4ab82d06fd7dfe9517e17736c2dcc77443ef000000000000000000000000000000000000000000000000000000000000186a000000000000000000000000000000000000000000000000000000000',
+        callGasLimit: 150799n,
+        verificationGasLimit: 200691n,
+        preVerificationGas: 50943n,
+        maxFeePerGas: 1949282597n,
+        maxPriorityFeePerGas: 1380000000n,
+        paymasterAndData: '0xdff7fa1077bce740a6a212b3995990682c0ba66d',
+        signature: '0xsignature'
+      }
+
+      const entryPoint = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
+      const options = { validAfter: 123, validUntil: 234 }
+
+      await chai
+        .expect(
+          safeApiKit.addSafeOperation({
+            entryPoint,
+            moduleAddress,
+            options,
+            safeAddress,
+            userOperation
+          })
+        )
+        .to.be.eventually.deep.equals({ data: { success: true } })
+
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
+        method: 'post',
+        body: {
+          nonce: Number(userOperation.nonce),
+          initCode: userOperation.initCode,
+          callData: userOperation.callData,
+          callDataGasLimit: userOperation.callGasLimit.toString(),
+          verificationGasLimit: userOperation.verificationGasLimit.toString(),
+          preVerificationGas: userOperation.preVerificationGas.toString(),
+          maxFeePerGas: userOperation.maxFeePerGas.toString(),
+          maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas.toString(),
+          paymasterAndData: userOperation.paymasterAndData,
+          entryPoint,
+          ...options,
+          signature: userOperation.signature,
+          moduleAddress
         }
       })
     })

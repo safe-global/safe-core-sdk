@@ -19,6 +19,8 @@ import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
   getPredictedSafeAddressInitCode,
+  getSafeFactory,
+  getSafeFactoryData,
   predictSafeAddress
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
@@ -212,6 +214,46 @@ class Safe {
     const chainId = await this.#safeProvider.getChainId()
 
     return getPredictedSafeAddressInitCode({
+      safeProvider: this.#safeProvider,
+      chainId,
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
+      ...this.#predictedSafe
+    })
+  }
+
+  /**
+   * Returns the safe Factory address.
+   *
+   * @returns The Safe Factory address
+   */
+  async getFactory(): Promise<string> {
+    if (!this.#predictedSafe) {
+      throw new Error('The Safe already exists')
+    }
+
+    const chainId = await this.#safeProvider.getChainId()
+
+    return getSafeFactory({
+      safeProvider: this.#safeProvider,
+      chainId,
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
+      ...this.#predictedSafe
+    })
+  }
+
+  /**
+   * Returns the safe Factory data.
+   *
+   * @returns The Safe Factory data
+   */
+  async getFactoryData(): Promise<string> {
+    if (!this.#predictedSafe) {
+      throw new Error('The Safe already exists')
+    }
+
+    const chainId = await this.#safeProvider.getChainId()
+
+    return getSafeFactoryData({
       safeProvider: this.#safeProvider,
       chainId,
       customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],

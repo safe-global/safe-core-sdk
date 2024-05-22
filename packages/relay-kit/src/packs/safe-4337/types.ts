@@ -3,7 +3,7 @@ import {
   EstimateGasData,
   MetaTransactionData,
   SafeVersion,
-  UserOperation
+  VersionedUserOperation
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 import EthSafeOperation from './SafeOperation'
@@ -110,7 +110,7 @@ export type UserOperationReceipt = {
 }
 
 export type UserOperationWithPayload = {
-  userOperation: UserOperation
+  userOperation: VersionedUserOperation['V6'] | VersionedUserOperation['V7']
   entryPoint: string
   transactionHash: string
   blockHash: string
@@ -118,7 +118,7 @@ export type UserOperationWithPayload = {
 }
 
 export type EstimateFeeFunctionProps = {
-  userOperation: UserOperation
+  userOperation: VersionedUserOperation['V6'] | VersionedUserOperation['V7']
   bundlerUrl: string
   entryPoint: string
 }
@@ -130,7 +130,7 @@ export type EstimateFeeFunction = ({
 }: EstimateFeeFunctionProps) => Promise<EstimateGasData>
 
 export type EstimateSponsoredFeeFunctionProps = {
-  userOperation: UserOperation
+  userOperation: VersionedUserOperation['V6'] | VersionedUserOperation['V7']
   paymasterUrl: string
   entryPoint: string
   sponsorshipPolicyId?: string

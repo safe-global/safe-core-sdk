@@ -256,34 +256,74 @@ export interface MetaTransactionOptions {
   isSponsored?: boolean
 }
 
-export type UserOperation = {
-  sender: string
-  nonce: string
-  initCode: string
-  callData: string
-  callGasLimit: bigint
-  verificationGasLimit: bigint
-  preVerificationGas: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
-  paymasterAndData: string
-  signature: string
+export type VersionedUserOperation = {
+  V6: {
+    sender: string
+    nonce: string
+    initCode: string
+    callData: string
+    callGasLimit: bigint
+    verificationGasLimit: bigint
+    preVerificationGas: bigint
+    maxFeePerGas: bigint
+    maxPriorityFeePerGas: bigint
+    paymasterAndData: string
+    signature: string
+  }
+  V7: {
+    sender: string
+    nonce: string
+    factory: string
+    factoryData: string
+    callData: string
+    callGasLimit: bigint
+    verificationGasLimit: bigint
+    preVerificationGas: bigint
+    maxFeePerGas: bigint
+    maxPriorityFeePerGas: bigint
+    signature: string
+    paymasterData: string
+    paymaster: string
+  }
 }
 
-export type SafeUserOperation = {
-  safe: string
-  nonce: bigint
-  initCode: string
-  callData: string
-  callGasLimit: bigint
-  verificationGasLimit: bigint
-  preVerificationGas: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
-  paymasterAndData: string
-  validAfter: number
-  validUntil: number
-  entryPoint: string
+export type UserOperation = VersionedUserOperation['V6']
+
+export type SafeUserOperation = VersionedSafeUserOperation['V6']
+
+export type VersionedSafeUserOperation = {
+  V6: {
+    safe: string
+    nonce: bigint
+    initCode: string
+    callData: string
+    callGasLimit: bigint
+    verificationGasLimit: bigint
+    preVerificationGas: bigint
+    maxFeePerGas: bigint
+    maxPriorityFeePerGas: bigint
+    paymasterAndData: string
+    validAfter: number
+    validUntil: number
+    entryPoint: string
+  }
+  V7: {
+    safe: string
+    nonce: bigint
+    factory: string
+    factoryData: string
+    callData: string
+    callGasLimit: bigint
+    verificationGasLimit: bigint
+    preVerificationGas: bigint
+    maxFeePerGas: bigint
+    maxPriorityFeePerGas: bigint
+    paymaster: string
+    paymasterData: string
+    validAfter: number
+    validUntil: number
+    entryPoint: string
+  }
 }
 
 export type EstimateGasData = {
@@ -295,11 +335,11 @@ export type EstimateGasData = {
 }
 
 export interface SafeOperation {
-  readonly data: SafeUserOperation
+  readonly data: VersionedSafeUserOperation['V6'] | VersionedSafeUserOperation['V7']
   readonly signatures: Map<string, SafeSignature>
   getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
   addEstimations(estimations: EstimateGasData): void
-  toUserOperation(): UserOperation
+  toUserOperation(): VersionedUserOperation['V6'] | VersionedUserOperation['V7']
 }

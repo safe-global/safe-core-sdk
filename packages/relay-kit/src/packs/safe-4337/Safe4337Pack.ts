@@ -12,8 +12,8 @@ import {
   MetaTransactionData,
   OperationType,
   SafeSignature,
-  UserOperation,
-  SafeUserOperation
+  VersionedUserOperation,
+  VersionedSafeUserOperation
 } from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
@@ -38,14 +38,14 @@ import {
   RPC_4337_CALLS
 } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
-import { entryPointToSafeModules, isEntryPointV6 } from './utils/entrypoint'
+import { isEntryPointV6 } from './utils/entrypoint'
+import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
-const EQ_OR_GT_0_3_0 = '>=0.3.0'
 
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
@@ -91,12 +91,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
     super(protocolKit)
 
     this.#BUNDLER_URL = bundlerUrl
-
     this.#bundlerClient = bundlerClient
     this.#publicClient = publicClient
-
     this.#paymasterOptions = paymasterOptions
-
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
   }
@@ -124,18 +121,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const safeModulesVersion = initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION
 
-    if (semverSatisfies(safeModulesVersion, EQ_OR_GT_0_3_0)) {
-      throw new Error(
-        `Safe Modules incompatible version of ${safeModulesVersion}. The supported etrypoint is only compatible with v0.2.0`
-      )
-    }
-
     if (!addModulesLibAddress) {
       const addModulesDeployment = getAddModulesLibDeployment({
         released: true,
         version: safeModulesVersion,
         network
       })
+
       addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
     }
 
@@ -289,10 +281,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     }
 
-    if (!isEntryPointV6(selectedEntryPoint)) {
-      throw new Error(`Entrypoint version higher then 6 is currently not supported`)
-    }
-
     return new Safe4337Pack({
       protocolKit,
       bundlerClient,
@@ -362,8 +350,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
         sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId
       })
 
-      safeOperation.data.paymasterAndData =
-        paymasterEstimation?.paymasterAndData || safeOperation.data.paymasterAndData
+      if (isEntryPointV6(this.#ENTRYPOINT_ADDRESS)) {
+        const data = safeOperation.data as VersionedSafeUserOperation['V6']
+        data.paymasterAndData = paymasterEstimation?.paymasterAndData || data.paymasterAndData
+      }
 
       if (paymasterEstimation) {
         safeOperation.addEstimations(paymasterEstimation)
@@ -419,26 +409,51 @@ export class Safe4337Pack extends RelayKitBasePack<{
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
 
-    const paymasterAndData = this.#paymasterOptions?.paymasterAddress || '0x'
-
-    const userOperation: UserOperation = {
-      sender: safeAddress,
-      nonce: nonce,
-      initCode: '0x',
-      callData,
-      callGasLimit: 1n,
-      verificationGasLimit: 1n,
-      preVerificationGas: 1n,
-      maxFeePerGas: 1n,
-      maxPriorityFeePerGas: 1n,
-      paymasterAndData,
-      signature: '0x'
-    }
-
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
 
-    if (!isSafeDeployed) {
-      userOperation.initCode = await this.protocolKit.getInitCode()
+    let userOperation
+    if (isEntryPointV6(this.#ENTRYPOINT_ADDRESS)) {
+      const paymasterAndData = this.#paymasterOptions?.paymasterAddress || '0x'
+      userOperation = {
+        sender: safeAddress,
+        nonce: nonce,
+        initCode: '0x',
+        callData,
+        callGasLimit: 1n,
+        verificationGasLimit: 1n,
+        preVerificationGas: 1n,
+        maxFeePerGas: 1n,
+        maxPriorityFeePerGas: 1n,
+        paymasterAndData,
+        signature: '0x'
+      }
+
+      if (!isSafeDeployed) {
+        userOperation.initCode = await this.protocolKit.getInitCode()
+      }
+    } else {
+      const paymaster = this.#paymasterOptions?.paymasterAddress || '0x'
+      const paymasterData = this.#paymasterOptions?.paymasterAddress || '0x'
+      userOperation = {
+        sender: safeAddress,
+        nonce: nonce,
+        factory: '0x',
+        factoryData: '0x',
+        callData,
+        callGasLimit: 1n,
+        verificationGasLimit: 1n,
+        preVerificationGas: 1n,
+        maxFeePerGas: 1n,
+        maxPriorityFeePerGas: 1n,
+        paymaster,
+        paymasterData,
+        signature: '0x'
+      }
+
+      if (!isSafeDeployed) {
+        userOperation.factory = await this.protocolKit.getFactory()
+        userOperation.factoryData = await this.protocolKit.getFactoryData()
+      }
     }
 
     const safeOperation = new EthSafeOperation(userOperation, {
@@ -585,7 +600,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {bigint} chainId - The chain id.
    * @return {string} The hash of the safe operation.
    */
-  #getSafeUserOperationHash(safeUserOperation: SafeUserOperation, chainId: bigint): string {
+  #getSafeUserOperationHash(
+    safeUserOperation: VersionedSafeUserOperation['V6'] | VersionedSafeUserOperation['V7'],
+    chainId: bigint
+  ): string {
     return ethers.TypedDataEncoder.hash(
       {
         chainId,
@@ -602,7 +620,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {UserOperation} userOpWithSignature - The signed UserOperation to send to the bundler.
    * @return {Promise<string>} The hash.
    */
-  async #sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
+  async #sendUserOperation(
+    userOpWithSignature: VersionedUserOperation['V6'] | VersionedUserOperation['V7']
+  ): Promise<string> {
     return await this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
       userOperationToHexValues(userOpWithSignature),
       this.#ENTRYPOINT_ADDRESS
@@ -615,7 +635,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.
    * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.
    */
-  async #signTypedData(safeUserOperation: SafeUserOperation): Promise<SafeSignature> {
+  async #signTypedData(
+    safeUserOperation: VersionedSafeUserOperation['V6'] | VersionedSafeUserOperation['V7']
+  ): Promise<SafeSignature> {
     const safeProvider = this.protocolKit.getSafeProvider()
     const signer = (await safeProvider.getExternalSigner()) as ethers.Signer
     const chainId = await safeProvider.getChainId()
@@ -639,7 +661,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }
 
   /**
-   * Gets account nonce from the bundler.
+   * Gets account nonce from the entrypoint.
    *
    * @param {string} sender - Account address for which the nonce is to be fetched.
    * @returns {Promise<string>} The Promise object will resolve to the account nonce.

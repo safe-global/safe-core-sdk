@@ -102,19 +102,23 @@ describe('Safe4337Pack', () => {
       )
     })
 
-    it('should throw an error if the Safe Modules do not match the supported version', async () => {
+    it('should throw an error if the injected Entrypoint does not match the correct module version', async () => {
       await expect(
         createSafe4337Pack({
-          safeModulesVersion: fixtures.SAVE_MODULES_V0_3_0
+          safeModulesVersion: '0.3.0',
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
         })
-      ).rejects.toThrow(
-        'Safe Modules incompatible version of 0.3.0. The supported etrypoint is only compatible with v0.2.0'
-      )
-    })
-  })
+      ).rejects.toThrow('The used entrypoint is not compatbile with version 0.3.0 of safe modules')
 
-  describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {
-    it('should throw an error if the version of the entrypoint used is incompatible', async () => {
+      await expect(
+        createSafe4337Pack({
+          safeModulesVersion: '0.2.0',
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[0] }
+        })
+      ).rejects.toThrow('The used entrypoint is not compatbile with version 0.2.0 of safe modules')
+
       await expect(
         createSafe4337Pack({
           options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
@@ -122,7 +126,9 @@ describe('Safe4337Pack', () => {
         })
       ).rejects.toThrow('The used entrypoint is not compatbile with version 0.2.0 of safe modules')
     })
+  })
 
+  describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {
     it('should be able to instantiate the pack using a existing Safe', async () => {
       const safe4337Pack = await createSafe4337Pack({
         options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 }
@@ -526,9 +532,44 @@ describe('Safe4337Pack', () => {
         preVerificationGas: 100000n
       })
     })
+
+    it('should pick an entrypoint that matches the modules version', async () => {
+      const transferUSDC = {
+        to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),
+        value: '0',
+        operation: 0
+      }
+
+      const safe4337entrypointV7 = await createSafe4337Pack({
+        safeModulesVersion: '0.3.0',
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        }
+      })
+
+      const safeOperation1 = await safe4337entrypointV7.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      expect(safeOperation1.data.entryPoint).toBe(fixtures.ENTRYPOINTS[1])
+
+      const safe4337entrypointV6 = await createSafe4337Pack({
+        safeModulesVersion: '0.2.0',
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        }
+      })
+
+      const safeOperation2 = await safe4337entrypointV6.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      expect(safeOperation2.data.entryPoint).toBe(fixtures.ENTRYPOINTS[0])
+    })
   })
 
-  it('should all to sign a SafeOperation', async () => {
+  it('should allow to sign a SafeOperation', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
       data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),

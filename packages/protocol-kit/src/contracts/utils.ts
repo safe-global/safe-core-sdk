@@ -207,6 +207,63 @@ export async function getPredictedSafeAddressInitCode({
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
+  const initCodeCallData = await getSafeFactoryData({
+    safeProvider,
+    chainId,
+    safeAccountConfig,
+    safeDeploymentConfig,
+    isL1SafeSingleton,
+    customContracts
+  })
+
+  const safeProxyFactoryAddress = await getSafeFactory({
+    safeProvider,
+    chainId,
+    safeAccountConfig,
+    safeDeploymentConfig,
+    customContracts
+  })
+  const initCode = `0x${[safeProxyFactoryAddress, initCodeCallData].reduce(
+    (acc, x) => acc + x.replace('0x', ''),
+    ''
+  )}`
+
+  return initCode
+}
+
+export async function getSafeFactory({
+  safeProvider,
+  chainId,
+  safeAccountConfig,
+  safeDeploymentConfig = {},
+  customContracts
+}: PredictSafeAddressProps): Promise<string> {
+  validateSafeAccountConfig(safeAccountConfig)
+  validateSafeDeploymentConfig(safeDeploymentConfig)
+
+  const { safeVersion = DEFAULT_SAFE_VERSION } = safeDeploymentConfig
+
+  const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
+    safeProvider,
+    safeVersion,
+    customContracts,
+    chainId: chainId.toString()
+  })
+
+  return await safeProxyFactoryContract.getAddress()
+}
+
+export async function getSafeFactoryData({
+  safeProvider,
+  chainId,
+  safeAccountConfig,
+  safeDeploymentConfig = {},
+  isL1SafeSingleton = false,
+  customContracts
+}: PredictSafeAddressProps): Promise<string> {
+  validateSafeAccountConfig(safeAccountConfig)
+  validateSafeDeploymentConfig(safeDeploymentConfig)
+
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
     saltNonce = getChainSpecificDefaultSaltNonce(chainId)
@@ -239,19 +296,12 @@ export async function getPredictedSafeAddressInitCode({
     'hex'
   )
   const safeSingletonAddress = await safeContract.getAddress()
-  const initCodeCallData = encodeCreateProxyWithNonce(
+  return encodeCreateProxyWithNonce(
     safeProxyFactoryContract,
     safeSingletonAddress,
     initializer,
     '0x' + encodedNonce
   )
-  const safeProxyFactoryAddress = await safeProxyFactoryContract.getAddress()
-  const initCode = `0x${[safeProxyFactoryAddress, initCodeCallData].reduce(
-    (acc, x) => acc + x.replace('0x', ''),
-    ''
-  )}`
-
-  return initCode
 }
 
 export async function predictSafeAddress({

@@ -3,35 +3,61 @@ import {
   EstimateGasData,
   SafeOperation,
   SafeSignature,
-  SafeUserOperation,
-  UserOperation
+  VersionedSafeUserOperation,
+  VersionedUserOperation
 } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
+import { isEntryPointV6 } from './utils/entrypoint'
 
 type SafeOperationOptions = { entryPoint: string; validAfter?: number; validUntil?: number }
 
 class EthSafeOperation implements SafeOperation {
-  data: SafeUserOperation
+  data: VersionedSafeUserOperation['V6'] | VersionedSafeUserOperation['V7']
   signatures: Map<string, SafeSignature> = new Map()
 
   constructor(
-    userOperation: UserOperation,
+    userOperation: VersionedUserOperation['V6'] | VersionedUserOperation['V7'],
     { entryPoint, validAfter, validUntil }: SafeOperationOptions
   ) {
-    this.data = {
-      safe: userOperation.sender,
-      nonce: BigInt(userOperation.nonce),
-      initCode: userOperation.initCode,
-      callData: userOperation.callData,
-      callGasLimit: userOperation.callGasLimit,
-      verificationGasLimit: userOperation.verificationGasLimit,
-      preVerificationGas: userOperation.preVerificationGas,
-      maxFeePerGas: userOperation.maxFeePerGas,
-      maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas,
-      paymasterAndData: userOperation.paymasterAndData,
-      validAfter: validAfter || 0,
-      validUntil: validUntil || 0,
-      entryPoint
+    // we assume forward compatibility from 0.7 forward.
+    if (isEntryPointV6(entryPoint)) {
+      const operation = userOperation as VersionedUserOperation['V6']
+      const data: VersionedSafeUserOperation['V6'] = {
+        safe: operation.sender,
+        nonce: BigInt(operation.nonce),
+        initCode: operation.initCode,
+        callData: operation.callData,
+        callGasLimit: operation.callGasLimit,
+        verificationGasLimit: operation.verificationGasLimit,
+        preVerificationGas: operation.preVerificationGas,
+        maxFeePerGas: operation.maxFeePerGas,
+        maxPriorityFeePerGas: operation.maxPriorityFeePerGas,
+        paymasterAndData: operation.paymasterAndData,
+        validAfter: validAfter || 0,
+        validUntil: validUntil || 0,
+        entryPoint
+      }
+      this.data = data
+    } else {
+      const operation = userOperation as VersionedUserOperation['V7']
+      const data: VersionedSafeUserOperation['V7'] = {
+        safe: operation.sender,
+        nonce: BigInt(operation.nonce),
+        factory: operation.factory,
+        factoryData: operation.factoryData,
+        callData: operation.callData,
+        callGasLimit: operation.callGasLimit,
+        verificationGasLimit: operation.verificationGasLimit,
+        preVerificationGas: operation.preVerificationGas,
+        maxFeePerGas: operation.maxFeePerGas,
+        maxPriorityFeePerGas: operation.maxPriorityFeePerGas,
+        paymaster: operation.paymaster,
+        paymasterData: operation.paymasterData,
+        validAfter: validAfter || 0,
+        validUntil: validUntil || 0,
+        entryPoint
+      }
+      this.data = data
     }
   }
 
@@ -61,22 +87,45 @@ class EthSafeOperation implements SafeOperation {
     }
   }
 
-  toUserOperation(): UserOperation {
-    return {
-      sender: this.data.safe,
-      nonce: ethers.toBeHex(this.data.nonce),
-      initCode: this.data.initCode,
-      callData: this.data.callData,
-      callGasLimit: this.data.callGasLimit,
-      verificationGasLimit: this.data.verificationGasLimit,
-      preVerificationGas: this.data.preVerificationGas,
-      maxFeePerGas: this.data.maxFeePerGas,
-      maxPriorityFeePerGas: this.data.maxPriorityFeePerGas,
-      paymasterAndData: this.data.paymasterAndData,
-      signature: ethers.solidityPacked(
-        ['uint48', 'uint48', 'bytes'],
-        [this.data.validAfter, this.data.validUntil, this.encodedSignatures()]
-      )
+  toUserOperation(): VersionedUserOperation['V6'] | VersionedUserOperation['V7'] {
+    if (isEntryPointV6(this.data.entryPoint)) {
+      const data = this.data as VersionedSafeUserOperation['V6']
+      return {
+        sender: data.safe,
+        nonce: ethers.toBeHex(data.nonce),
+        initCode: data.initCode,
+        callData: data.callData,
+        callGasLimit: data.callGasLimit,
+        verificationGasLimit: data.verificationGasLimit,
+        preVerificationGas: data.preVerificationGas,
+        maxFeePerGas: data.maxFeePerGas,
+        maxPriorityFeePerGas: data.maxPriorityFeePerGas,
+        paymasterAndData: data.paymasterAndData,
+        signature: ethers.solidityPacked(
+          ['uint48', 'uint48', 'bytes'],
+          [data.validAfter, data.validUntil, this.encodedSignatures()]
+        )
+      }
+    } else {
+      const data = this.data as VersionedSafeUserOperation['V7']
+      return {
+        sender: data.safe,
+        nonce: ethers.toBeHex(data.nonce),
+        factory: data.factory,
+        factoryData: data.factoryData,
+        callData: data.callData,
+        callGasLimit: data.callGasLimit,
+        verificationGasLimit: data.verificationGasLimit,
+        preVerificationGas: data.preVerificationGas,
+        maxFeePerGas: data.maxFeePerGas,
+        maxPriorityFeePerGas: data.maxPriorityFeePerGas,
+        paymaster: data.paymaster,
+        paymasterData: data.paymasterData,
+        signature: ethers.solidityPacked(
+          ['uint48', 'uint48', 'bytes'],
+          [data.validAfter, data.validUntil, this.encodedSignatures()]
+        )
+      }
     }
   }
 }

@@ -100,6 +100,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 2020n, shortName: 'pmint' },
   { chainId: 2021n, shortName: 'edg' },
   { chainId: 2221n, shortName: 'tkava' },
+  { chainId: 2039n, shortName: 'aleph-zero-testnet' },
   { chainId: 2222n, shortName: 'kava' },
   { chainId: 2358n, shortName: 'kroma-sepolia' },
   { chainId: 3737n, shortName: 'csb' },

@@ -1,12 +1,14 @@
 {
   "name": "@safe-global/protocol-kit",
   "version": "4.0.0",
-  "description": "SDK to interact with Safe smart contracts",
+  "description": "SDK that facilitates the interaction with Safe Smart Accounts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
+    "Wallet",
     "Safe",
+    "Smart Account",
     "SDK"
   ],
   "scripts": {

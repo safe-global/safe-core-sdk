@@ -6,7 +6,9 @@
   "types": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
+    "Wallet",
     "Safe",
+    "Smart Account",
     "SDK"
   ],
   "scripts": {

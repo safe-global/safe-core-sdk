@@ -1,6 +1,6 @@
 # Relay Kit
 
-[![NPM Version](https://badge.fury.io/js/%40safe-global%2Frelay-kit.svg)](https://badge.fury.io/js/%40safe-global%2Frelay-kit)
+[![npm Version](https://badge.fury.io/js/%40safe-global%2Frelay-kit.svg)](https://badge.fury.io/js/%40safe-global%2Frelay-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 

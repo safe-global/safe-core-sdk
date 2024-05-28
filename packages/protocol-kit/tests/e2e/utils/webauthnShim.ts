@@ -52,6 +52,18 @@ function b2ab(buf: Uint8Array): ArrayBuffer {
 }
 
 /**
+ * Compare the equality of two Uint8Arrays.
+ * @param a First array.
+ * @param b Second array.
+ * @returns Whether the two arrays are equal.
+ */
+function isEqualArray(a: Uint8Array, b: Uint8Array) {
+  if (a.length != b.length) return false
+  for (let i = 0; i < a.length; i++) if (a[i] != b[i]) return false
+  return true
+}
+
+/**
  * Returns the message that gets signed by the WebAuthn credentials.
  *
  * See <https://w3c.github.io/webauthn/#fig-signature>
@@ -126,6 +138,7 @@ export interface PublicKeyCredential<AuthenticatorResponse> {
 export interface AuthenticatorAttestationResponse {
   clientDataJSON: ArrayBuffer
   attestationObject: ArrayBuffer
+  getPublicKey: () => ArrayBuffer
 }
 
 /**
@@ -182,7 +195,7 @@ class Credential {
 }
 
 export class WebAuthnCredentials {
-  #credentials: Credential[] = []
+  credentials: Credential[] = []
 
   /**
    * This is a shim for `navigator.credentials.create` method.
@@ -199,7 +212,7 @@ export class WebAuthnCredentials {
     }
 
     const credential = new Credential(publicKey.rp.id, publicKey.user.id)
-    this.#credentials.push(credential)
+    this.credentials.push(credential)
 
     // <https://w3c.github.io/webauthn/#dictionary-client-data>
     const clientData = {
@@ -235,7 +248,8 @@ export class WebAuthnCredentials {
       rawId: credential.rawId.slice(),
       response: {
         clientDataJSON: b2ab(ethers.toUtf8Bytes(JSON.stringify(clientData))),
-        attestationObject: b2ab(CBOR.encode(attestationObject))
+        attestationObject: b2ab(CBOR.encode(attestationObject)),
+        getPublicKey: () => b2ab(p256.getPublicKey(credential.pk, false))
       },
       type: 'public-key'
     }
@@ -252,9 +266,7 @@ export class WebAuthnCredentials {
     publicKey
   }: CredentialRequestOptions): PublicKeyCredential<AuthenticatorAssertionResponse> {
     const credential = publicKey.allowCredentials
-      .flatMap(({ id }) =>
-        this.#credentials.filter((c) => c.rp === publicKey.rpId && c.id === ethers.hexlify(id))
-      )
+      .flatMap(({ id }) => this.credentials.filter((c) => isEqualArray(c.rawId, id)))
       .at(0)
     if (credential === undefined) {
       throw new Error('credential not found')
@@ -264,7 +276,7 @@ export class WebAuthnCredentials {
     const clientData = {
       type: 'webauthn.get' as const,
       challenge: base64UrlEncode(publicKey.challenge),
-      origin: `https://${publicKey.rpId}`
+      origin: `https://${credential.rp}`
     }
 
     // <https://w3c.github.io/webauthn/#sctn-authenticator-data>
@@ -274,7 +286,7 @@ export class WebAuthnCredentials {
     const authenticatorData = ethers.solidityPacked(
       ['bytes32', 'uint8', 'uint32'],
       [
-        ethers.sha256(ethers.toUtf8Bytes(publicKey.rpId)),
+        ethers.sha256(ethers.toUtf8Bytes(credential.rp)),
         userVerificationFlag(publicKey.userVerification), // flags = user_present
         0 // signCount
       ]

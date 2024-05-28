@@ -181,13 +181,13 @@ describe('addSafeOperation', () => {
     const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS
     })
-    const initialNumSafeOperations = safeOperationsBefore.results.length
+    const initialNumSafeOperations = safeOperationsBefore.count
 
     await chai.expect(safeApiKit.addSafeOperation(addSafeOperationProps)).to.be.fulfilled
 
     const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS
     })
-    chai.expect(safeOperationsAfter.results.length).to.equal(initialNumSafeOperations + 1)
+    chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 })

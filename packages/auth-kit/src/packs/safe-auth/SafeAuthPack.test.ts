@@ -1,11 +1,21 @@
 import { SafeAuthPack } from './SafeAuthPack'
-import { generateTestingUtils } from 'eth-testing'
 import { AuthKitBasePack } from '@safe-global/auth-kit/index'
 import { SafeAuthInitOptions } from './types'
 import { CHAIN_CONFIG } from './constants'
 
-const testingUtils = generateTestingUtils({ providerType: 'MetaMask' })
-const mockProvider = testingUtils.getProvider()
+const mockProvider = {
+  request: async ({ method }: { method: string }) => {
+    if (method === 'eth_accounts') {
+      return Promise.resolve(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
+    }
+
+    if (method === 'eth_chainId') {
+      return Promise.resolve('0x1')
+    }
+
+    return null
+  }
+}
 const mockInit = jest.fn()
 const mockLogin = jest.fn()
 const mockLogout = jest.fn()
@@ -56,7 +66,6 @@ describe('SafeAuthPack', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    testingUtils.clearAllMocks()
     mockInit.mockClear()
     mockLogin.mockClear()
   })
@@ -92,9 +101,6 @@ describe('SafeAuthPack', () => {
 
   describe('signIn()', () => {
     it('should call the login() method', async () => {
-      testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
-      testingUtils.mockChainId('0x1')
-
       const authKitSignInData = await safeAuthPack.signIn()
 
       expect(mockLogin).toHaveBeenCalled()
@@ -120,8 +126,6 @@ describe('SafeAuthPack', () => {
     })
 
     it('should return the provider after initialization', async () => {
-      testingUtils.mockAccounts(['0xf61B443A155b07D2b2cAeA2d99715dC84E839EEf'])
-
       await safeAuthPack.init(safeAuthInitOptions)
 
       expect(safeAuthPack.getProvider()).toEqual(mockProvider)

@@ -2588,11 +2588,6 @@ abitype@1.0.0:
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-1.0.0.tgz#237176dace81d90d018bebf3a45cb42f2a2d9e97"
   integrity sha512-NMeMah//6bJ56H5XRj8QCV4AwuW6hB6zqz2LnhhLdcWVQOsXki6/Pn3APeqxCma62nXIcmZWdu1DlHWS74umVQ==
 
-abitype@^0.1.6:
-  version "0.1.8"
-  resolved "https://registry.npmjs.org/abitype/-/abitype-0.1.8.tgz"
-  integrity sha512-2pde0KepTzdfu19ZrzYTYVIWo69+6UbBCY4B1RDiwWgo2XZtFSJhF6C+XThuRXbbZ823J0Rw1Y5cP0NXYVcCdQ==
-
 abitype@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-1.0.2.tgz#183c28f2f3b4278810ed1543941b555bb73f301d"
@@ -4232,14 +4227,6 @@ esutils@^2.0.2:
   resolved "https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-eth-testing@^1.14.0:
-  version "1.14.0"
-  resolved "https://registry.npmjs.org/eth-testing/-/eth-testing-1.14.0.tgz"
-  integrity sha512-KRVSXHogM4byUUqoGlUK0ce3U4GsZcf/BAbY/L1LzMPPVntWfm12XQP3pxy0OPTSgvvP7sDGz41qifAZeVRUeQ==
-  dependencies:
-    abitype "^0.1.6"
-    ethers "^5.5.4"
-
 ethereum-cryptography@0.1.3, ethereum-cryptography@^0.1.3:
   version "0.1.3"
   resolved "https://registry.npmjs.org/ethereum-cryptography/-/ethereum-cryptography-0.1.3.tgz"
@@ -4326,7 +4313,7 @@ ethers@6.7.0:
     tslib "2.4.0"
     ws "8.5.0"
 
-ethers@^5.5.4, ethers@^5.7.0, ethers@^5.7.1:
+ethers@^5.7.0, ethers@^5.7.1:
   version "5.7.2"
   resolved "https://registry.npmjs.org/ethers/-/ethers-5.7.2.tgz"
   integrity sha512-wswUsmWo1aOK8rR7DIKiWSw9DbLWe6x98Jrn8wcTflTVvaXhAMaB5zGAXy0GYQEQp9iO1iSHWVyARQm11zUtyg==

@@ -68,6 +68,7 @@ describe('Safe4337Pack', () => {
       network
     })?.networkAddresses[network] as string
   })
+
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -186,7 +187,7 @@ describe('Safe4337Pack', () => {
 
       const safe4337Pack = await createSafe4337Pack({
         options: {
-          owners: [fixtures.OWNER_1],
+          owners: [fixtures.OWNER_1, fixtures.OWNER_2],
           threshold: 1
         }
       })
@@ -201,7 +202,7 @@ describe('Safe4337Pack', () => {
             saltNonce: undefined
           },
           safeAccountConfig: {
-            owners: [fixtures.OWNER_1],
+            owners: [fixtures.OWNER_1, fixtures.OWNER_2],
             threshold: 1,
             to: addModulesLibAddress,
             data: constants.INTERFACES.encodeFunctionData('enableModules', [

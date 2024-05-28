@@ -16,8 +16,8 @@ about: Bug report about the Safe Core SDK
 Please describe concisely the bug you have found.
 
 ## Environment
-
 - Safe Core SDK versions:
+  <!-- Please leave empty or delete those that you don't use. -->
   - api-kit:
   - auth-kit:
   - onramp-kit

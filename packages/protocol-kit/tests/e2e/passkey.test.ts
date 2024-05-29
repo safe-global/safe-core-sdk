@@ -68,7 +68,7 @@ async function createMockPasskey(name: string): Promise<passkeyArgType> {
   return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
 }
 
-describe.only('Passkey', () => {
+describe('Passkey', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
 
@@ -202,12 +202,6 @@ describe.only('Passkey', () => {
       const tx = await safeSdk.createTransaction({
         transactions: [{ to: safeAddress, value: '0', data: '0x' }]
       })
-      const txHash = await safeSdk.getTransactionHash(tx)
-      const signature = await sign(keyPair1.privateKey, txHash)
-
-      global.navigator.credentials.get = sinon
-        .stub()
-        .resolves(navigatorCredentialsGetResponseMock(signature))
 
       chai.expect(tx.signatures.size).to.be.eq(0)
       const signedTx = await safeSdk.signTransaction(tx)

@@ -23,144 +23,57 @@ import { WebAuthnCredentials } from './utils/webauthnShim'
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
+const webAuthnCredentials = new WebAuthnCredentials()
+
 global.crypto = crypto as unknown as Crypto
-global.navigator = { credentials: { get: sinon.stub() } } as unknown as Navigator
 
-async function createKeypair(): Promise<CryptoKeyPair> {
-  return crypto.subtle.generateKey(
-    {
-      name: 'ECDSA',
-      namedCurve: 'P-256',
-      hash: { name: 'SHA-256' }
-    },
-    true,
-    ['sign', 'verify']
-  )
-}
-
-async function createMockPasskey(keyPair: CryptoKeyPair): Promise<passkeyArgType> {
-  const exportedPublicKey = await crypto.subtle.exportKey('spki', keyPair.publicKey)
-  console.log({ exportedPublicKey })
-  return { rawId: new Uint8Array([1, 2, 3]), publicKey: exportedPublicKey }
-}
-
-async function sign(key: CryptoKey, data: string): Promise<ArrayBuffer> {
-  const dataArray = ethers.getBytes(data)
-
-  const rawSignature = new Uint8Array(
-    await crypto.subtle.sign(
-      {
-        name: 'ECDSA',
-        hash: { name: 'SHA-256' }
-      },
-      key,
-      dataArray
-    )
-  )
-
-  // Split the signature into r and s
-  const r = rawSignature.slice(0, rawSignature.length / 2)
-  const s = rawSignature.slice(rawSignature.length / 2)
-
-  // Convert r and s to BigInts
-  const rBigInt = BigInt(`0x${Buffer.from(r).toString('hex')}`)
-  const sBigInt = BigInt(`0x${Buffer.from(s).toString('hex')}`)
-
-  // Convert the BigInts to DER-encoded integers
-  const rDer = Buffer.from(rBigInt.toString(16), 'hex')
-  const sDer = Buffer.from(sBigInt.toString(16), 'hex')
-
-  // Create the DER-encoded sequence
-  const sequence = Buffer.concat([
-    Buffer.from([0x02, rDer.length]), // Integer tag and length for r
-    rDer,
-    Buffer.from([0x02, sDer.length]), // Integer tag and length for s
-    sDer
-  ])
-
-  // Create the final DER-encoded signature
-  const derSignature = Buffer.concat([
-    Buffer.from([0x30, sequence.length]), // Sequence tag and length
-    sequence
-  ])
-
-  // Convert Node.js Buffer to ArrayBuffer
-  const derSignatureArrayBuffer = derSignature.buffer.slice(
-    derSignature.byteOffset,
-    derSignature.byteOffset + derSignature.byteLength
-  )
-
-  return derSignatureArrayBuffer
-}
-
-function navigatorCredentialsGetResponseMock(signature: ArrayBuffer) {
-  return {
-    id: 'mockId',
-    rawId: new Uint8Array([1, 2, 3]),
-    response: {
-      clientDataJSON: new TextEncoder().encode(
-        JSON.stringify({
-          type: 'webauthn.get',
-          challenge: 'ThisMockChallengeHasExactlyForty-ThreeChars',
-          origin: 'https://example.com'
-        })
-      ),
-      authenticatorData: 'mockAuthenticatorData',
-      signature
-      // signature: new Uint8Array([
-      //   0x30, 0x44, 0x02, 0x20, 0x3d, 0x46, 0x28, 0x7b, 0x8b, 0x22, 0x64, 0x20, 0x4f, 0x38, 0x50,
-      //   0x3c, 0x06, 0x14, 0x9c, 0x97, 0x31, 0x22, 0x7f, 0xef, 0x46, 0x66, 0x2b, 0x74, 0xf1, 0x12,
-      //   0x63, 0x1f, 0x88, 0x8f, 0x2e, 0x02, 0x02, 0x02, 0x97, 0x60, 0x50, 0x02, 0x62, 0xcd, 0xd,
-      //   0x6a, 0x3d, 0x35, 0x4e, 0x7e, 0x8b, 0x4f, 0x24, 0xf6, 0x7f, 0x63, 0x4f, 0x07, 0x10, 0x5a,
-      //   0x55, 0xb1, 0x74, 0xd7, 0x85, 0x2b, 0x8e, 0x1f, 0x0e, 0x16
-      // ]).buffer
-    },
-    type: 'public-key'
+global.navigator = {
+  credentials: {
+    create: sinon.stub().callsFake(webAuthnCredentials.create.bind(webAuthnCredentials)),
+    get: sinon.stub().callsFake(webAuthnCredentials.get.bind(webAuthnCredentials))
   }
+} as unknown as Navigator
+
+async function createMockPasskey(name: string): Promise<passkeyArgType> {
+  const passkeyCredential = await webAuthnCredentials.create({
+    publicKey: {
+      rp: {
+        name: 'Safe',
+        id: 'safe.global'
+      },
+      user: {
+        id: ethers.getBytes(ethers.id(name)),
+        name: name,
+        displayName: name
+      },
+      challenge: ethers.toBeArray(Date.now()),
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
+    }
+  })
+
+  const algorithm = {
+    name: 'ECDSA',
+    namedCurve: 'P-256',
+    hash: { name: 'SHA-256' }
+  }
+  const key = await crypto.subtle.importKey(
+    'raw',
+    passkeyCredential.response.getPublicKey(),
+    algorithm,
+    true,
+    ['verify']
+  )
+  const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
+
+  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
 }
 
 describe.only('Passkey', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
 
-    const keyPair1 = await createKeypair()
-    const keyPair2 = await createKeypair()
-
-    const navigator = { credentials: new WebAuthnCredentials() }
-
-    const passkeyCredential = navigator.credentials.create({
-      publicKey: {
-        rp: {
-          name: 'Safe',
-          id: 'safe.global'
-        },
-        user: {
-          id: ethers.getBytes(ethers.id('chucknorris')),
-          name: 'chucknorris',
-          displayName: 'Chuck Norris'
-        },
-        challenge: ethers.toBeArray(Date.now()),
-        pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
-      }
-    })
-
-    const algorithm = {
-      name: 'ECDSA',
-      namedCurve: 'P-256',
-      hash: { name: 'SHA-256' }
-    }
-    const key = await crypto.subtle.importKey(
-      'raw',
-      passkeyCredential.response.getPublicKey(),
-      algorithm,
-      true,
-      ['verify']
-    )
-    const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
-
-    const passkey1 = { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
-    // const passkey1 = await createMockPasskey(keyPair1)
-    const passkey2 = await createMockPasskey(keyPair2)
+    const passkey1 = await createMockPasskey('chucknorris')
+    const passkey2 = await createMockPasskey('brucelee')
 
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
@@ -197,11 +110,10 @@ describe.only('Passkey', () => {
     }
 
     return {
+      accounts: await getAccounts(),
       contractNetworks,
-      navigator,
       predictedSafe,
       provider,
-      keyPairs: [keyPair1, keyPair2],
       passkeys: [passkey1, passkey2],
       passkeySigners: [passkeySigner1, passkeySigner2]
     }
@@ -272,7 +184,6 @@ describe.only('Passkey', () => {
       const {
         contractNetworks,
         provider,
-        keyPairs: [keyPair1],
         passkeys: [passkey1],
         passkeySigners: [passkeySigner1]
       } = await setupTests()
@@ -333,113 +244,137 @@ describe.only('Passkey', () => {
     })
   })
 
-  describe.only('createAddOwnerTx', async () => {
-    it('should add an owner and keep the same threshold', async () => {
-      const [account1] = await getAccounts()
-      const {
-        contractNetworks,
-        provider,
-        passkeys: [passkey1],
-        passkeySigners: [passkeySigner1]
-      } = await setupTests()
+  describe('createAddOwnerTx', async () => {
+    describe('when signing the transaction with an EOA', () => {
+      it('should add a passkey owner to a Safe and keep the same threshold', async () => {
+        const {
+          accounts: [account1],
+          contractNetworks,
+          provider,
+          passkeys: [passkey1],
+          passkeySigners: [passkeySigner1]
+        } = await setupTests()
+        const passkeySigner1Address = await passkeySigner1.getAddress()
 
-      const safe = await getSafeWithOwners([account1.address])
-      const safeSdk = await Safe.init({
-        provider,
-        safeAddress: await safe.getAddress(),
-        contractNetworks
-      })
-      const initialThreshold = await safeSdk.getThreshold()
-      const initialOwners = await safeSdk.getOwners()
+        // First create transaction for the deployment of the passkey signer
+        const createPasskeySignerTransaction = {
+          to: await passkeySigner1.safeWebAuthnSignerFactoryContract.getAddress(),
+          value: '0',
+          data: passkeySigner1.encodeCreateSigner()
+        }
+        // Deploy the passkey signer
+        await account1.signer.sendTransaction(createPasskeySignerTransaction)
 
-      chai.expect(initialOwners.length).to.be.eq(1)
-      chai.expect(initialOwners[0]).to.be.eq(account1.address)
+        // Passkey signer should be deployed now
+        chai
+          .expect(await account1.signer.provider.getCode(passkeySigner1Address))
+          .length.to.be.gt(2)
 
-      const tx = await safeSdk.createAddOwnerTx({ passkey: passkey1 })
+        const safe = await getSafeWithOwners([account1.address])
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress: await safe.getAddress(),
+          contractNetworks
+        })
+        const initialThreshold = await safeSdk.getThreshold()
+        const initialOwners = await safeSdk.getOwners()
 
-      // TODO: check if the signer is not deployed, but is deployed after the transaction is executed
+        chai.expect(initialOwners.length).to.be.eq(1)
+        chai.expect(initialOwners[0]).to.be.eq(account1.address)
 
-      const txResponse = await safeSdk.executeTransaction(tx)
+        const tx = await safeSdk.createAddOwnerTx({ passkey: passkey1 })
 
-      await waitSafeTxReceipt(txResponse)
+        const txResponse = await safeSdk.executeTransaction(tx)
 
-      const finalThreshold = await safeSdk.getThreshold()
-      chai.expect(initialThreshold).to.be.eq(finalThreshold)
-      const owners = await safeSdk.getOwners()
-      chai.expect(owners.length).to.be.eq(initialOwners.length + 1)
-      chai.expect(owners[0]).to.be.eq(await passkeySigner1.getAddress())
-      chai.expect(owners[1]).to.be.eq(account1.address)
-    })
+        await waitSafeTxReceipt(txResponse)
 
-    it.only('should create a transaction to add an owner to a deployed Safe', async () => {
-      const [account1] = await getAccounts()
-      const {
-        contractNetworks,
-        navigator,
-        provider,
-        passkeys: [passkey1, passkey2],
-        passkeySigners: [passkeySigner1, passkeySigner2]
-      } = await setupTests()
-
-      global.navigator.credentials.get = sinon
-        .stub()
-        .callsFake(navigator.credentials.get.bind(navigator.credentials))
-
-      const passkeySigner1Address = await passkeySigner1.getAddress()
-      const passkeySigner2Address = await passkeySigner2.getAddress()
-      const safe = await getSafeWithOwners([passkeySigner1Address])
-
-      const safeAddress = await safe.getAddress()
-
-      // First create transaction for the deployment of the passkey signer
-      const createPasskeySignerTransaction = {
-        to: await passkeySigner1.safeWebAuthnSignerFactoryContract.getAddress(),
-        value: '0',
-        data: passkeySigner1.encodeCreateSigner()
-      }
-
-      // Deploy the passkey signer
-      await account1.signer.sendTransaction(createPasskeySignerTransaction)
-
-      // Create a Safe instance with the passkey signer
-      const safeSdk = await Safe.init({
-        provider,
-        safeAddress,
-        contractNetworks,
-        signer: passkey1
+        const finalThreshold = await safeSdk.getThreshold()
+        chai.expect(initialThreshold).to.be.eq(finalThreshold)
+        const owners = await safeSdk.getOwners()
+        chai.expect(owners.length).to.be.eq(initialOwners.length + 1)
+        chai.expect(owners[0]).to.be.eq(passkeySigner1Address)
+        chai.expect(owners[1]).to.be.eq(account1.address)
       })
 
-      // Create a transaction to add another passkey owner
-      const addOwnerTx = await safeSdk.createAddOwnerTx({ passkey: passkey2 })
+      it('should also deploy a passkey signer if is not deployed yet', async () => {
+        const {
+          accounts: [account1],
+          contractNetworks,
+          provider,
+          passkeys: [passkey1],
+          passkeySigners: [passkeySigner1]
+        } = await setupTests()
+        const passkeySigner1Address = await passkeySigner1.getAddress()
 
-      const initialThreshold = await safeSdk.getThreshold()
-      const initialOwners = await safeSdk.getOwners()
+        const safe = await getSafeWithOwners([account1.address])
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress: await safe.getAddress(),
+          contractNetworks
+        })
+        const initialThreshold = await safeSdk.getThreshold()
+        const initialOwners = await safeSdk.getOwners()
 
-      chai.expect(initialOwners.length).to.be.eq(1)
-      chai.expect(initialOwners[0]).to.be.eq(passkeySigner1Address)
+        chai.expect(initialOwners.length).to.be.eq(1)
+        chai.expect(initialOwners[0]).to.be.eq(account1.address)
 
-      // Sign the transaction with the passkey signer
-      const signedAddOwnerTx = await safeSdk.signTransaction(addOwnerTx)
-      console.log({ signedAddOwnerTx })
+        const tx = await safeSdk.createAddOwnerTx({ passkey: passkey1 })
 
-      // Create a Safe instance with an EOA signer to execute the transaction
-      const safeSdkEOA = await Safe.init({
-        provider,
-        safeAddress,
-        contractNetworks
+        // Check that the passkey signer is not deployed yet
+        chai.expect(await account1.signer.provider.getCode(passkeySigner1Address)).to.be.eq('0x')
+
+        const txResponse = await safeSdk.executeTransaction(tx)
+
+        await waitSafeTxReceipt(txResponse)
+
+        const finalThreshold = await safeSdk.getThreshold()
+        chai.expect(initialThreshold).to.be.eq(finalThreshold)
+        const owners = await safeSdk.getOwners()
+        chai.expect(owners.length).to.be.eq(initialOwners.length + 1)
+        chai.expect(owners[0]).to.be.eq(passkeySigner1Address)
+        chai.expect(owners[1]).to.be.eq(account1.address)
+
+        // Passkey signer should be deployed now
+        chai
+          .expect(await account1.signer.provider.getCode(passkeySigner1Address))
+          .length.to.be.gt(2)
       })
 
-      // The transaction can only be executed by an EOA signer
-      const txResponse = await safeSdkEOA.executeTransaction(signedAddOwnerTx)
-      await waitSafeTxReceipt(txResponse)
+      it('should add a passkey owner and update the threshold', async () => {
+        const {
+          accounts: [account1],
+          contractNetworks,
+          provider,
+          passkeys: [passkey1],
+          passkeySigners: [passkeySigner1]
+        } = await setupTests()
+        const passkeySigner1Address = await passkeySigner1.getAddress()
 
-      const finalThreshold = await safeSdk.getThreshold()
-      chai.expect(initialThreshold).to.be.eq(finalThreshold)
+        const safe = await getSafeWithOwners([account1.address])
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress: await safe.getAddress(),
+          contractNetworks
+        })
+        const newThreshold = 2
+        const initialOwners = await safeSdk.getOwners()
 
-      const owners = await safeSdk.getOwners()
-      chai.expect(owners.length).to.be.eq(initialOwners.length + 1)
-      chai.expect(owners[0]).to.be.eq(passkeySigner1Address)
-      chai.expect(owners[1]).to.be.eq(passkeySigner2Address)
+        chai.expect(initialOwners.length).to.be.eq(1)
+        chai.expect(initialOwners[0]).to.be.eq(account1.address)
+
+        const tx = await safeSdk.createAddOwnerTx({ passkey: passkey1, threshold: newThreshold })
+
+        const txResponse = await safeSdk.executeTransaction(tx)
+
+        await waitSafeTxReceipt(txResponse)
+
+        const finalThreshold = await safeSdk.getThreshold()
+        chai.expect(newThreshold).to.be.eq(finalThreshold)
+        const owners = await safeSdk.getOwners()
+        chai.expect(owners.length).to.be.eq(initialOwners.length + 1)
+        chai.expect(owners[0]).to.be.eq(passkeySigner1Address)
+        chai.expect(owners[1]).to.be.eq(account1.address)
+      })
     })
   })
 })

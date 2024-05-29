@@ -370,5 +370,95 @@ describe('Passkey', () => {
         chai.expect(owners[1]).to.be.eq(account1.address)
       })
     })
+
+    describe.only('when signing the transaction with a passkey owner', () => {
+      it('should add a passkey owner to a Safe and keep the same threshold', async () => {
+        const {
+          accounts: [account1],
+          contractNetworks,
+          provider,
+          passkeys: [passkey1, passkey2],
+          passkeySigners: [passkeySigner1, passkeySigner2]
+        } = await setupTests()
+
+        const passkeySigner1Address = await passkeySigner1.getAddress()
+        const passkeySigner2Address = await passkeySigner2.getAddress()
+        const safe = await getSafeWithOwners([passkeySigner1Address])
+
+        const safeAddress = await safe.getAddress()
+
+        // First create transaction for the deployment of the passkey signer
+        const createPasskeySignerTransaction = {
+          to: await passkeySigner1.safeWebAuthnSignerFactoryContract.getAddress(),
+          value: '0',
+          data: passkeySigner1.encodeCreateSigner()
+        }
+        // Deploy the passkey signer
+        await account1.signer.sendTransaction(createPasskeySignerTransaction)
+
+        // Passkey signer should be deployed now
+        chai
+          .expect(await account1.signer.provider.getCode(passkeySigner1Address))
+          .length.to.be.gt(2)
+
+        // Create a Safe instance with the passkey signer
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress,
+          contractNetworks,
+          signer: passkey1
+        })
+
+        // Create a transaction to add another passkey owner
+        const addOwnerTx = await safeSdk.createAddOwnerTx({ passkey: passkey2 })
+
+        const initialThreshold = await safeSdk.getThreshold()
+        const initialOwners = await safeSdk.getOwners()
+
+        chai.expect(initialOwners.length).to.be.eq(1)
+        chai.expect(initialOwners[0]).to.be.eq(passkeySigner1Address)
+
+        // Sign the transaction with the passkey signer
+        const signedAddOwnerTx = await safeSdk.signTransaction(addOwnerTx)
+
+        // ------------ test: call isValidSignature directly
+        const passkeySignerContract = new ethers.Contract(
+          passkeySigner1Address,
+          ['function isValidSignature(bytes32 message, bytes calldata signature)'],
+          account1.signer
+        )
+
+        const isValidSignature = await passkeySignerContract.isValidSignature(
+          await safeSdk.getTransactionHash(signedAddOwnerTx),
+          signedAddOwnerTx.getSignature(passkeySigner1Address)!.data
+        )
+
+        const [magicValue] = ethers.AbiCoder.defaultAbiCoder().decode(
+          ['bytes4'],
+          isValidSignature.data
+        )
+        chai.expect(magicValue).to.be.eq('0x1626ba7e')
+        // --------------------------------------
+
+        // Create a Safe instance with an EOA signer to execute the transaction
+        const safeSdkEOA = await Safe.init({
+          provider,
+          safeAddress,
+          contractNetworks
+        })
+
+        // The transaction can only be executed by an EOA signer
+        const txResponse = await safeSdkEOA.executeTransaction(signedAddOwnerTx)
+        await waitSafeTxReceipt(txResponse)
+
+        const finalThreshold = await safeSdk.getThreshold()
+        chai.expect(initialThreshold).to.be.eq(finalThreshold)
+
+        const owners = await safeSdk.getOwners()
+        chai.expect(owners.length).to.be.eq(initialOwners.length + 1)
+        chai.expect(owners[0]).to.be.eq(passkeySigner1Address)
+        chai.expect(owners[1]).to.be.eq(passkeySigner2Address)
+      })
+    })
   })
 })

@@ -1,12 +1,14 @@
 {
   "name": "@safe-global/relay-kit",
   "version": "3.0.0",
-  "description": "Safe Relay Kit",
+  "description": "SDK for Safe Smart Accounts with support for ERC-4337 and Relay",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
-    "Safe",
     "Ethereum",
+    "Wallet",
+    "Safe",
+    "Smart Account",
     "Account Abstraction",
     "SDK",
     "Relay",

@@ -1,13 +1,14 @@
 {
   "name": "@safe-global/api-kit",
   "version": "2.4.0",
-  "description": "Safe API Kit",
+  "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
+    "Wallet",
     "Safe",
-    "Service",
+    "Smart Account",
     "API"
   ],
   "scripts": {

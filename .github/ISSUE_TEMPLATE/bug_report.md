@@ -6,7 +6,7 @@ about: Bug report about the Safe Core SDK
 ## Prerequisites
 
 - First, many thanks for taking part in the community and helping us improve. We appreciate that a lot.
-- Support questions are better asked in our Discord chat: https://chat.safe.global/
+- **For support questions please follow our support guidelines:** https://github.com/safe-global/safe-core-sdk/tree/main/SUPPORT.md
 - Please ensure the issue isn't already reported.
 
 *Please delete the above section and the instructions in the sections below before submitting*
@@ -16,8 +16,14 @@ about: Bug report about the Safe Core SDK
 Please describe concisely the bug you have found.
 
 ## Environment
-
-- Safe Core SDK version: 
+- Safe Core SDK versions:
+  <!-- Please leave empty or delete those that you don't use. -->
+  - api-kit:
+  - auth-kit:
+  - onramp-kit
+  - protocol-kit:
+  - relay-kit:
+  - safe-core-sdk-types:
 - Safe contract version: 
 - Environment:
   - browser

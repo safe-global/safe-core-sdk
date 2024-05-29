@@ -1,10 +1,10 @@
 # Relay Kit
 
-[![NPM Version](https://badge.fury.io/js/%40safe-global%2Frelay-kit.svg)](https://badge.fury.io/js/%40safe-global%2Frelay-kit)
+[![npm Version](https://badge.fury.io/js/%40safe-global%2Frelay-kit.svg)](https://badge.fury.io/js/%40safe-global%2Frelay-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-The Relay Kit lets users pay transaction fees (gas fees) using the native blockchain token or ERC-20 tokens. Gas fees can be payed with this kit using any ERC-20 token in your Safe, even if there is no native token balance. This kit enables the use of ERC-4337 with Safe.
+The Relay Kit enables ERC-4337 with Safe and allows users to pay for the transaction fees from their Safe account balance using the blockchain native token or ERC-20 tokens, or to get their transactions sponsored.
 
 ## Table of contents
 

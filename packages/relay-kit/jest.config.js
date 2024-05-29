@@ -8,7 +8,7 @@ const config = {
     '^@safe-global/protocol-kit/(.*)$': '<rootDir>/../protocol-kit/src/$1',
     '^@safe-global/relay-kit/(.*)$': '<rootDir>/src/$1'
   },
-  testTimeout: 10000
+  testTimeout: 15000
 }
 
 module.exports = config

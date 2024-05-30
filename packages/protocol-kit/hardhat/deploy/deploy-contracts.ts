@@ -158,6 +158,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     deterministicDeployment: true
   })
 
+  await deploy('WebAuthnContract', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
   await deploy('DailyLimitModule', {
     from: deployer,
     args: [],

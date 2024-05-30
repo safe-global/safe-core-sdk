@@ -180,6 +180,12 @@ export const getSafeWebAuthnSignerFactory = async (): Promise<{
   }
 }
 
+export const getWebAuthnContract = async (): Promise<Contract> => {
+  const WebAuthnContractDeployment = await deployments.get('WebAuthnContract')
+  const WebAuthn = await ethers.getContractFactory('WebAuthnContract')
+  return WebAuthn.attach(WebAuthnContractDeployment.address)
+}
+
 export const getDailyLimitModule = async (): Promise<Contract> => {
   const DailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
   const DailyLimitModule = await ethers.getContractFactory('DailyLimitModule')

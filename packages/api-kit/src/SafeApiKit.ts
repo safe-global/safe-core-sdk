@@ -23,7 +23,6 @@ import {
   SafeMultisigTransactionEstimate,
   SafeMultisigTransactionEstimateResponse,
   SafeMultisigTransactionListResponse,
-  SafeOperationResponse,
   SafeServiceInfoResponse,
   SignatureResponse,
   TokenInfoListResponse,
@@ -36,7 +35,8 @@ import { validateEip3770Address, validateEthereumAddress } from '@safe-global/pr
 import {
   Eip3770Address,
   SafeMultisigConfirmationListResponse,
-  SafeMultisigTransactionResponse
+  SafeMultisigTransactionResponse,
+  SafeOperationResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'

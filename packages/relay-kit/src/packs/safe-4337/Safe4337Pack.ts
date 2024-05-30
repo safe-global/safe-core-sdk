@@ -13,7 +13,8 @@ import {
   OperationType,
   SafeSignature,
   UserOperation,
-  SafeUserOperation
+  SafeUserOperation,
+  SafeOperationResponse
 } from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
@@ -415,6 +416,33 @@ export class Safe4337Pack extends RelayKitBasePack<{
     })
   }
 
+  #toSafeOperation(safeOperationResponse: SafeOperationResponse): EthSafeOperation {
+    const { validUntil, validAfter, userOperation } = safeOperationResponse
+
+    const safeOperation = new EthSafeOperation(
+      {
+        sender: userOperation?.sender || '0x',
+        nonce: userOperation?.nonce?.toString() || '0',
+        initCode: userOperation?.initCode || '',
+        callData: userOperation?.callData || '',
+        callGasLimit: BigInt(userOperation?.callDataGasLimit || 0n),
+        verificationGasLimit: BigInt(userOperation?.verificationGasLimit || 0),
+        preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
+        maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
+        maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
+        paymasterAndData: userOperation?.paymasterData || '',
+        signature: userOperation?.signature || ''
+      },
+      {
+        entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
+        validAfter: validAfter ? new Date(validAfter).getTime() : undefined,
+        validUntil: validUntil ? new Date(validUntil).getTime() : undefined
+      }
+    )
+
+    return safeOperation
+  }
+
   /**
    * Signs a safe operation.
    *
@@ -423,9 +451,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<EthSafeOperation>} The Promise object will resolve to the signed SafeOperation.
    */
   async signSafeOperation(
-    safeOperation: EthSafeOperation,
+    safeOperation: EthSafeOperation | SafeOperationResponse,
     signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
   ): Promise<EthSafeOperation> {
+    let safeOp: EthSafeOperation
+
+    if ('safeOperationHash' in safeOperation) {
+      safeOp = this.#toSafeOperation(safeOperation)
+    } else {
+      safeOp = safeOperation
+    }
+
     const owners = await this.protocolKit.getOwners()
     const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
     if (!signerAddress) {
@@ -447,18 +483,18 @@ export class Safe4337Pack extends RelayKitBasePack<{
       signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3 ||
       signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA
     ) {
-      signature = await this.#signTypedData(safeOperation.data)
+      signature = await this.#signTypedData(safeOp.data)
     } else {
       const chainId = await this.protocolKit.getSafeProvider().getChainId()
-      const safeOpHash = this.#getSafeUserOperationHash(safeOperation.data, chainId)
+      const safeOpHash = this.#getSafeUserOperationHash(safeOp.data, chainId)
 
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
-    const signedSafeOperation = new EthSafeOperation(safeOperation.toUserOperation(), {
+    const signedSafeOperation = new EthSafeOperation(safeOp.toUserOperation(), {
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      validUntil: safeOperation.data.validUntil,
-      validAfter: safeOperation.data.validAfter
+      validUntil: safeOp.data.validUntil,
+      validAfter: safeOp.data.validAfter
     })
 
     signedSafeOperation.signatures.forEach((signature: SafeSignature) => {
@@ -476,9 +512,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {EthSafeOperation} safeOperation - The SafeOperation to execute.
    * @return {Promise<string>} The user operation hash.
    */
-  async executeTransaction({
-    executable: safeOperation
-  }: Safe4337ExecutableProps): Promise<string> {
+  async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {
+    let safeOperation: EthSafeOperation
+
+    if ('safeOperationHash' in executable) {
+      safeOperation = this.#toSafeOperation(executable)
+    } else {
+      safeOperation = executable
+    }
+
     const userOperation = safeOperation.toUserOperation()
 
     return this.#sendUserOperation(userOperation)

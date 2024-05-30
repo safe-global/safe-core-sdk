@@ -303,3 +303,41 @@ export interface SafeOperation {
   addEstimations(estimations: EstimateGasData): void
   toUserOperation(): UserOperation
 }
+
+export type SafeOperationConfirmation = {
+  readonly created: string
+  readonly modified: string
+  readonly owner: string
+  readonly signature: string
+  readonly signatureType: string
+}
+
+export type UserOperationResponse = {
+  readonly ethereumTxHash: string
+  readonly sender: string
+  readonly userOperationHash: string
+  readonly nonce: number
+  readonly initCode: null | string
+  readonly callData: null | string
+  readonly callDataGasLimit: number
+  readonly verificationGasLimit: number
+  readonly preVerificationGas: number
+  readonly maxFeePerGas: number
+  readonly maxPriorityFeePerGas: number
+  readonly paymaster: null | string
+  readonly paymasterData: null | string
+  readonly signature: string
+  readonly entryPoint: string
+}
+
+export type SafeOperationResponse = {
+  readonly created: string
+  readonly modified: string
+  readonly safeOperationHash: string
+  readonly validAfter: string
+  readonly validUntil: string
+  readonly moduleAddress: string
+  readonly confirmations?: Array<SafeOperationConfirmation>
+  readonly preparedSignature?: string
+  readonly userOperation?: UserOperationResponse
+}

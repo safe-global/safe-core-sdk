@@ -270,7 +270,7 @@ describe('Passkey', () => {
 
   describe('createAddOwnerTx', () => {
     describe('when signing the transaction with an EOA', () => {
-      itif(['1.3.0', '1.4.1'].includes(safeVersionDeployed))(
+      itif(safeVersionDeployed >= '1.3.0')(
         'should add a passkey owner to a Safe and keep the same threshold',
         async () => {
           const {
@@ -324,7 +324,7 @@ describe('Passkey', () => {
         }
       )
 
-      itif(['1.3.0', '1.4.1'].includes(safeVersionDeployed))(
+      itif(safeVersionDeployed >= '1.3.0')(
         'should also deploy a passkey signer before adding as an owner if is not deployed yet',
         async () => {
           const {
@@ -371,7 +371,7 @@ describe('Passkey', () => {
         }
       )
 
-      itif(['1.3.0', '1.4.1'].includes(safeVersionDeployed))(
+      itif(safeVersionDeployed >= '1.3.0')(
         'should add a passkey owner and update the threshold',
         async () => {
           const {
@@ -412,7 +412,7 @@ describe('Passkey', () => {
     })
 
     describe('when signing the transaction with a passkey owner', () => {
-      itif(['1.3.0', '1.4.1'].includes(safeVersionDeployed))(
+      itif(safeVersionDeployed >= '1.3.0')(
         'should add a passkey owner to a Safe and keep the same threshold',
         async () => {
           const {

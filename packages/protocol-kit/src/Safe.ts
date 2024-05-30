@@ -56,8 +56,7 @@ import {
   generatePreValidatedSignature,
   generateSignature,
   preimageSafeMessageHash,
-  preimageSafeTransactionHash,
-  adjustVInSignature
+  preimageSafeTransactionHash
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -785,29 +784,6 @@ class Safe {
       throw new Error('Transactions can only be signed by Safe owners')
     }
 
-    // passkey flow
-    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
-    if (isPasskeySigner) {
-      const txHash = await this.getTransactionHash(transaction)
-      const signedHash = await this.#safeProvider.signMessage(txHash)
-
-      const signatureAdjusted = adjustVInSignature(
-        SigningMethod.ETH_SIGN,
-        signedHash,
-        txHash,
-        signerAddress
-      )
-
-      // TODO: USE signature = await this.signHash(txHash)
-
-      const signature = new EthSafeSignature(signerAddress, signatureAdjusted, true)
-
-      const signedSafeTransaction = await this.copyTransaction(transaction)
-      signedSafeTransaction.addSignature(signature)
-
-      return signedSafeTransaction
-    }
-
     const safeVersion = await this.getContractVersion()
     if (
       signingMethod === SigningMethod.SAFE_SIGNATURE &&
@@ -819,7 +795,13 @@ class Safe {
 
     let signature: SafeSignature
 
-    if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+
+    if (isPasskeySigner) {
+      const txHash = await this.getTransactionHash(transaction)
+
+      signature = await this.signHash(txHash)
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(transaction, 'v4')
     } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(transaction, 'v3')

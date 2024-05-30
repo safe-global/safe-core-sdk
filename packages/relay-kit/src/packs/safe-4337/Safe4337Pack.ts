@@ -52,8 +52,6 @@ const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c424
 // Sepolia only
 const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
 
-// TODO: ADD the SafeWebAuthnSharedSigner.sol to the protocol-kit
-
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
  * This class provides an implementation of the ERC-4337 that enables Safe accounts to wrk with UserOperations.
@@ -194,8 +192,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
         throw new Error('Owners and threshold are required to deploy a new Safe')
       }
 
-      // we need to create a batch to setup the 4337 Safe
-      const setupTransactions = []
+      const safeVersion = options.safeVersion || DEFAULT_SAFE_VERSION
+
+      // we need to create a batch to setup the 4337 Safe Account
 
       // first setup transaction: Enable 4337 module
       const enable4337ModuleTransaction = {
@@ -205,7 +204,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
       }
 
-      setupTransactions.push(enable4337ModuleTransaction)
+      const setupTransactions = [enable4337ModuleTransaction]
 
       const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
 
@@ -237,7 +236,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
           safeProvider,
-          safeVersion: '1.4.1'
+          safeVersion
         })
 
         const passkeySigner = await PasskeySigner.init(
@@ -250,6 +249,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         if (!options.owners.includes(ownerAddress)) {
           options.owners.push(ownerAddress)
+        }
+
+        if (!options.owners.includes(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)) {
+          options.owners.push(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)
         }
 
         const passkeyOwnerConfiguration = {
@@ -267,8 +270,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
         setupTransactions.push(sharedSignerTransaction)
       }
 
-      // TODO: END CREATE A PRIVATE FUNCTION
-
       let deploymentTo
       let deploymentData
 
@@ -277,7 +278,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       if (isBatch) {
         const multiSendContract = await getMultiSendContract({
           safeProvider: new SafeProvider({ provider }),
-          safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
+          safeVersion
         })
 
         const batchData = INTERFACES.encodeFunctionData('multiSend', [
@@ -291,20 +292,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
         deploymentData = setupTransactions[0].data
       }
 
-      const owners = isPasskeySigner
-        ? [SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, ...options.owners]
-        : options.owners
-
       protocolKit = await Safe.init({
         provider,
         signer,
         predictedSafe: {
           safeDeploymentConfig: {
-            safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
+            safeVersion,
             saltNonce: options.saltNonce || undefined
           },
           safeAccountConfig: {
-            owners,
+            owners: options.owners,
             threshold: options.threshold,
             to: deploymentTo,
             data: deploymentData,
@@ -473,8 +470,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     if (!isSafeDeployed) {
       userOperation.initCode = await this.protocolKit.getInitCode()
-
-      // TODO: const isPasskeySigner = signer && typeof signer !== 'string'
     }
 
     const safeOperation = new SafeOperation(userOperation, {
@@ -501,7 +496,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
     signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
   ): Promise<SafeOperation> {
     const owners = await this.protocolKit.getOwners()
-    const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
+    const safeProvider = this.protocolKit.getSafeProvider()
+    const signerAddress = await safeProvider.getSignerAddress()
+    const chainId = await safeProvider.getChainId()
+
     if (!signerAddress) {
       throw new Error('There is no signer address available to sign the SafeOperation')
     }
@@ -516,21 +514,19 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     let signature: SafeSignature
 
-    const isPasskeySigner = await this.protocolKit.getSafeProvider().isPasskeySigner()
+    const isPasskeySigner = await safeProvider.isPasskeySigner()
 
     if (isPasskeySigner) {
-      const chainId = await this.protocolKit.getSafeProvider().getChainId()
       const safeOpHash = this.#getSafeUserOperationHash(safeOperation.data, chainId)
 
       const passkeySignature = await this.protocolKit.signHash(safeOpHash)
 
+      // SafeWebAuthnSharedSigner signature
       signature = new EthSafeSignature(
         SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
         passkeySignature.data,
         true
       )
-
-      // TODO: implement passkey flow
     } else {
       if (
         signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4 ||
@@ -539,7 +535,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       ) {
         signature = await this.#signTypedData(safeOperation.data)
       } else {
-        const chainId = await this.protocolKit.getSafeProvider().getChainId()
         const safeOpHash = this.#getSafeUserOperationHash(safeOperation.data, chainId)
 
         signature = await this.protocolKit.signHash(safeOpHash)

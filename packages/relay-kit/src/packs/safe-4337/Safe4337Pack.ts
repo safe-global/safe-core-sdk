@@ -425,7 +425,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         nonce: userOperation?.nonce?.toString() || '0',
         initCode: userOperation?.initCode || '',
         callData: userOperation?.callData || '',
-        callGasLimit: BigInt(userOperation?.callDataGasLimit || 0n),
+        callGasLimit: BigInt(userOperation?.callGasLimit || 0n),
         verificationGasLimit: BigInt(userOperation?.verificationGasLimit || 0),
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),

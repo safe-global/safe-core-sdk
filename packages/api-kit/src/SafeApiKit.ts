@@ -825,7 +825,7 @@ class SafeApiKit {
         nonce: Number(userOperation.nonce),
         initCode: isEmptyData(userOperation.initCode) ? null : userOperation.initCode,
         callData: userOperation.callData,
-        callDataGasLimit: userOperation.callGasLimit.toString(),
+        callGasLimit: userOperation.callGasLimit.toString(),
         verificationGasLimit: userOperation.verificationGasLimit.toString(),
         preVerificationGas: userOperation.preVerificationGas.toString(),
         maxFeePerGas: userOperation.maxFeePerGas.toString(),

@@ -54,7 +54,7 @@ describe('getSafeOperationsByAddress', () => {
       chai.expect(safeOperation.userOperation).to.have.property('nonce')
       chai.expect(safeOperation.userOperation).to.have.property('initCode')
       chai.expect(safeOperation.userOperation).to.have.property('callData')
-      chai.expect(safeOperation.userOperation).to.have.property('callDataGasLimit')
+      chai.expect(safeOperation.userOperation).to.have.property('callGasLimit')
       chai.expect(safeOperation.userOperation).to.have.property('verificationGasLimit')
       chai.expect(safeOperation.userOperation).to.have.property('preVerificationGas')
       chai.expect(safeOperation.userOperation).to.have.property('maxFeePerGas')

@@ -26,7 +26,9 @@ chai.use(sinonChai)
 
 const webAuthnCredentials = new WebAuthnCredentials()
 
-global.crypto = crypto as unknown as Crypto
+if (!global.crypto) {
+  global.crypto = crypto as unknown as Crypto
+}
 
 global.navigator = {
   credentials: {

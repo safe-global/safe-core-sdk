@@ -700,7 +700,7 @@ describe('Endpoint tests', () => {
           nonce: Number(userOperation.nonce),
           initCode: userOperation.initCode,
           callData: userOperation.callData,
-          callDataGasLimit: userOperation.callGasLimit.toString(),
+          callGasLimit: userOperation.callGasLimit.toString(),
           verificationGasLimit: userOperation.verificationGasLimit.toString(),
           preVerificationGas: userOperation.preVerificationGas.toString(),
           maxFeePerGas: userOperation.maxFeePerGas.toString(),

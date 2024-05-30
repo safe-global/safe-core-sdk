@@ -304,7 +304,7 @@ export type UserOperationResponse = {
   readonly nonce: number
   readonly initCode: null | string
   readonly callData: null | string
-  readonly callDataGasLimit: number
+  readonly callGasLimit: number
   readonly verificationGasLimit: number
   readonly preVerificationGas: number
   readonly maxFeePerGas: number

@@ -1,6 +1,6 @@
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { waitForOperationToFinish } from '../utils'
+import { sortResultsByCreatedDateDesc, waitForOperationToFinish } from '../utils'
 
 // Variables
 const OWNER_1_PRIVATE_KEY = ''
@@ -45,9 +45,10 @@ async function main() {
 
   let signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
+  console.log('SafeOperation signature 1', signedSafeOperation)
   await apiKit.addSafeOperation(signedSafeOperation)
 
-  const safeOperations = await apiKit.getSafeOperationsByAddress({
+  let safeOperations = await apiKit.getSafeOperationsByAddress({
     safeAddress: SAFE_ADDRESS,
     ordering: '-created'
   })
@@ -68,12 +69,25 @@ async function main() {
       }
     })
 
-    signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperations.results[0])
+    signedSafeOperation = await safe4337Pack.signSafeOperation(
+      sortResultsByCreatedDateDesc(safeOperations).results[0]
+    )
 
-    // Update Safe Operation??
+    console.log('SafeOperation signature 2', signedSafeOperation)
+
+    // TODO. This should be the place to confirm the safe operation but the api endpoint is not available yet
+    // Update this once the new endpoint is released
+    await apiKit.addSafeOperation(signedSafeOperation)
+
+    safeOperations = await apiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
+      ordering: '-created'
+    })
+
+    console.log('SafeOperationList', safeOperations)
 
     const userOperationHash = await safe4337Pack.executeTransaction({
-      executable: signedSafeOperation
+      executable: sortResultsByCreatedDateDesc(safeOperations).results[0]
     })
 
     await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)

@@ -16,6 +16,7 @@ const playgroundApiKitPaths = {
   'execute-transaction': 'api-kit/execute-transaction'
 }
 const playgroundRelayKitPaths = {
+  'api-kit-interoperability': 'relay-kit/api-kit-interoperability',
   'relay-paid-transaction': 'relay-kit/paid-transaction',
   'relay-sponsored-transaction': 'relay-kit/sponsored-transaction',
   'usdc-transfer-4337': 'relay-kit/usdc-transfer-4337',

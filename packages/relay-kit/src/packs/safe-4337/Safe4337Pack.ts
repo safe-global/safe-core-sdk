@@ -405,6 +405,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const safeOperation = new EthSafeOperation(userOperation, {
+      moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil,
       validAfter
@@ -430,15 +431,22 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: userOperation?.paymasterData || '',
-        signature: userOperation?.signature || ''
+        paymasterAndData: userOperation?.paymasterData || '0x',
+        signature: userOperation?.signature || '0x'
       },
       {
+        moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
         entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
         validAfter: validAfter ? new Date(validAfter).getTime() : undefined,
         validUntil: validUntil ? new Date(validUntil).getTime() : undefined
       }
     )
+
+    if (safeOperationResponse.confirmations) {
+      safeOperationResponse.confirmations.forEach((confirmation) => {
+        safeOperation.addSignature(new EthSafeSignature(confirmation.owner, confirmation.signature))
+      })
+    }
 
     return safeOperation
   }
@@ -477,7 +485,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     let signature: SafeSignature
-
     if (
       signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4 ||
       signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3 ||
@@ -492,12 +499,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const signedSafeOperation = new EthSafeOperation(safeOp.toUserOperation(), {
+      moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil: safeOp.data.validUntil,
       validAfter: safeOp.data.validAfter
     })
 
-    signedSafeOperation.signatures.forEach((signature: SafeSignature) => {
+    safeOp.signatures.forEach((signature: SafeSignature) => {
       signedSafeOperation.addSignature(signature)
     })
 

@@ -36,10 +36,12 @@ import {
   Eip3770Address,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
-  SafeOperationResponse
+  SafeOperationResponse,
+  SafeOperation
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
+import { getAddSafeOperationProps } from './utils/safeOperation'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -786,15 +788,23 @@ class SafeApiKit {
    * @throws "Invalid module address {moduleAddress}"
    * @throws "Signature must not be empty"
    */
-  async addSafeOperation({
-    entryPoint,
-    moduleAddress: moduleAddressProp,
-    options,
-    safeAddress: safeAddressProp,
-    userOperation
-  }: AddSafeOperationProps): Promise<void> {
+  async addSafeOperation(safeOperation: AddSafeOperationProps | SafeOperation): Promise<void> {
     let safeAddress: string, moduleAddress: string
+    let addSafeOperationProps: AddSafeOperationProps
 
+    if ('userOperation' in safeOperation) {
+      addSafeOperationProps = safeOperation
+    } else {
+      addSafeOperationProps = await getAddSafeOperationProps(safeOperation)
+    }
+
+    const {
+      entryPoint,
+      moduleAddress: moduleAddressProp,
+      options,
+      safeAddress: safeAddressProp,
+      userOperation
+    } = addSafeOperationProps
     if (!safeAddressProp) {
       throw new Error('Safe address must not be empty')
     }

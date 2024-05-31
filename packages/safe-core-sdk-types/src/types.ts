@@ -295,6 +295,7 @@ export type EstimateGasData = {
 }
 
 export interface SafeOperation {
+  readonly moduleAddress: string
   readonly data: SafeUserOperation
   readonly signatures: Map<string, SafeSignature>
   getSignature(signer: string): SafeSignature | undefined

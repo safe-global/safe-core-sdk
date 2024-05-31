@@ -527,6 +527,34 @@ describe('Safe4337Pack', () => {
     })
   })
 
+  it('should allow to sign a SafeOperation using a SafeOperationResponse object from the api to add a signature', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+      }
+    })
+
+    expect(await safe4337Pack.signSafeOperation(fixtures.SAFE_OPERATION_RESPONSE)).toMatchObject({
+      signatures: new Map()
+        .set(
+          fixtures.OWNER_1.toLowerCase(),
+          new protocolKit.EthSafeSignature(
+            fixtures.OWNER_1,
+            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1c',
+            false
+          )
+        )
+        .set(
+          fixtures.OWNER_2.toLowerCase(),
+          new protocolKit.EthSafeSignature(
+            fixtures.OWNER_2,
+            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d',
+            false
+          )
+        )
+    })
+  })
+
   it('should allow to send an UserOperation to a bundler', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,

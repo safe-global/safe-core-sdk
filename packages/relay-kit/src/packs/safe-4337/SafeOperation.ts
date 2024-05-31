@@ -80,10 +80,13 @@ class EthSafeOperation implements SafeOperation {
       maxFeePerGas: this.data.maxFeePerGas,
       maxPriorityFeePerGas: this.data.maxPriorityFeePerGas,
       paymasterAndData: this.data.paymasterAndData,
-      signature: ethers.solidityPacked(
-        ['uint48', 'uint48', 'bytes'],
-        [this.data.validAfter, this.data.validUntil, this.encodedSignatures()]
-      )
+      signature:
+        this.signatures.size > 0
+          ? ethers.solidityPacked(
+              ['uint48', 'uint48', 'bytes'],
+              [this.data.validAfter, this.data.validUntil, this.encodedSignatures()]
+            )
+          : '0x'
     }
   }
 }

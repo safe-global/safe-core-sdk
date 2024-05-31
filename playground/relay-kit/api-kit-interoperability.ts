@@ -1,5 +1,6 @@
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
+import { waitForOperationToFinish } from '../utils'
 
 // Variables
 const OWNER_1_PRIVATE_KEY = ''
@@ -75,21 +76,7 @@ async function main() {
       executable: signedSafeOperation
     })
 
-    console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${CHAIN_NAME}`)
-
-    let userOperationReceipt = null
-    while (!userOperationReceipt) {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      userOperationReceipt = await safe4337Pack.getUserOperationReceipt(userOperationHash)
-    }
-
-    console.group('User Operation Receipt and hash')
-    console.log('User Operation Receipt', userOperationReceipt)
-    console.log(
-      'User Operation By Hash',
-      await safe4337Pack.getUserOperationByHash(userOperationHash)
-    )
-    console.groupEnd()
+    await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)
   }
 }
 

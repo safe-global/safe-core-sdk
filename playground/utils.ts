@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import { Safe4337Pack } from '@safe-global/relay-kit'
+import { GetSafeOperationListResponse } from 'packages/api-kit/dist/src'
 
 export async function waitForOperationToFinish(
   userOperationHash: string,
@@ -45,4 +46,21 @@ export async function transfer(
   const transactionResponse = await signer.sendTransaction(transferEC20)
 
   return await transactionResponse.wait()
+}
+
+export function sortResultsByCreatedDateDesc(
+  data: GetSafeOperationListResponse
+): GetSafeOperationListResponse {
+  if (!data || !Array.isArray(data.results)) {
+    throw new Error('The provided data is invalid or does not contain a results array.')
+  }
+
+  data.results.sort((a, b) => {
+    const dateA = new Date(a.created).getTime()
+    const dateB = new Date(b.created).getTime()
+
+    return dateB - dateA
+  })
+
+  return data
 }

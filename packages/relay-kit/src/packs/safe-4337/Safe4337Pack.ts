@@ -14,7 +14,9 @@ import {
   SafeSignature,
   UserOperation,
   SafeUserOperation,
-  SafeOperationResponse
+  SafeOperationResponse,
+  SafeOperationConfirmation,
+  isSafeOperationResponse
 } from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
@@ -443,7 +445,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     )
 
     if (safeOperationResponse.confirmations) {
-      safeOperationResponse.confirmations.forEach((confirmation) => {
+      safeOperationResponse.confirmations.forEach((confirmation: SafeOperationConfirmation) => {
         safeOperation.addSignature(new EthSafeSignature(confirmation.owner, confirmation.signature))
       })
     }
@@ -464,7 +466,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   ): Promise<EthSafeOperation> {
     let safeOp: EthSafeOperation
 
-    if ('safeOperationHash' in safeOperation) {
+    if (isSafeOperationResponse(safeOperation)) {
       safeOp = this.#toSafeOperation(safeOperation)
     } else {
       safeOp = safeOperation
@@ -523,7 +525,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {
     let safeOperation: EthSafeOperation
 
-    if ('safeOperationHash' in executable) {
+    if (isSafeOperationResponse(executable)) {
       safeOperation = this.#toSafeOperation(executable)
     } else {
       safeOperation = executable

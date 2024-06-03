@@ -305,6 +305,12 @@ export interface SafeOperation {
   toUserOperation(): UserOperation
 }
 
+export const isSafeOperation = (response: unknown): response is SafeOperation => {
+  const safeOperation = response as SafeOperation
+
+  return 'data' in safeOperation && 'signatures' in safeOperation
+}
+
 export type SafeOperationConfirmation = {
   readonly created: string
   readonly modified: string
@@ -341,4 +347,10 @@ export type SafeOperationResponse = {
   readonly confirmations?: Array<SafeOperationConfirmation>
   readonly preparedSignature?: string
   readonly userOperation?: UserOperationResponse
+}
+
+export const isSafeOperationResponse = (response: unknown): response is SafeOperationResponse => {
+  const safeOperationResponse = response as SafeOperationResponse
+
+  return 'userOperation' in safeOperationResponse && 'safeOperationHash' in safeOperationResponse
 }

@@ -37,7 +37,8 @@ import {
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
   SafeOperationResponse,
-  SafeOperation
+  SafeOperation,
+  isSafeOperation
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
@@ -792,10 +793,10 @@ class SafeApiKit {
     let safeAddress: string, moduleAddress: string
     let addSafeOperationProps: AddSafeOperationProps
 
-    if ('userOperation' in safeOperation) {
-      addSafeOperationProps = safeOperation
-    } else {
+    if (isSafeOperation(safeOperation)) {
       addSafeOperationProps = await getAddSafeOperationProps(safeOperation)
+    } else {
+      addSafeOperationProps = safeOperation
     }
 
     const {

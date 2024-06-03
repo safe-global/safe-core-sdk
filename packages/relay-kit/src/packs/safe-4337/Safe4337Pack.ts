@@ -419,6 +419,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
     })
   }
 
+  /**
+   * Converts a SafeOperationResponse to an EthSafeOperation.
+   *
+   * @param {SafeOperationResponse} safeOperationResponse - The SafeOperationResponse to convert to EthSafeOperation
+   * @returns {EthSafeOperation} - The EthSafeOperation object
+   */
   #toSafeOperation(safeOperationResponse: SafeOperationResponse): EthSafeOperation {
     const { validUntil, validAfter, userOperation } = safeOperationResponse
 
@@ -456,7 +462,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Signs a safe operation.
    *
-   * @param {EthSafeOperation} safeOperation - The SafeOperation to sign.
+   * @param {EthSafeOperation | SafeOperationResponse} safeOperation - The SafeOperation to sign. It can be:
+   * - A response from the API (Tx Service)
+   * - An instance of EthSafeOperation
    * @param {SigningMethod} signingMethod - The signing method to use.
    * @return {Promise<EthSafeOperation>} The Promise object will resolve to the signed SafeOperation.
    */
@@ -519,7 +527,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Executes the relay transaction.
    *
-   * @param {EthSafeOperation} safeOperation - The SafeOperation to execute.
+   * @param {Safe4337ExecutableProps} props - The parameters for the transaction execution.
+   * @param {EthSafeOperation | SafeOperationResponse} props.executable - The SafeOperation to execute. It can be:
+   * - A response from the API (Tx Service)
+   * - An instance of EthSafeOperation
    * @return {Promise<string>} The user operation hash.
    */
   async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {

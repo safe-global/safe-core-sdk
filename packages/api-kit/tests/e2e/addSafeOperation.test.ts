@@ -167,7 +167,9 @@ describe('addSafeOperation', () => {
   })
 
   it('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
-    const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
+    const safeOperation = await safe4337Pack.createTransaction({
+      transactions: [transferUSDC, transferUSDC]
+    })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
     // Get the number of SafeOperations before adding a new one

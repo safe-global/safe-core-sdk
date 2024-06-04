@@ -3,7 +3,7 @@ export type PasskeyCoordinates = {
   y: string
 }
 
-export type passkeyArgType = {
+export type PasskeyArgType = {
   rawId: ArrayBuffer // required to sign data
   publicKey: ArrayBuffer // required to generate X & Y Coordinates
 }

@@ -1,7 +1,7 @@
 import { ethers, AbstractSigner, Provider } from 'ethers'
 import { Buffer } from 'buffer'
 
-import { PasskeyCoordinates, passkeyArgType } from '../../types/passkeys'
+import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
 import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
 
 // Sepolia only
@@ -44,7 +44,7 @@ class PasskeySigner extends AbstractSigner {
   }
 
   static async init(
-    passkey: passkeyArgType,
+    passkey: PasskeyArgType,
     safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
     provider: Provider
   ): Promise<PasskeySigner> {

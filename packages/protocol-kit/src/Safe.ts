@@ -40,7 +40,7 @@ import {
   SigningMethodType,
   SwapOwnerTxParams,
   SafeModulesPaginated,
-  passkeyArgType
+  PasskeyArgType
 } from './types'
 import {
   EthSafeSignature,
@@ -461,7 +461,7 @@ class Safe {
    * @param owner - The owner address or a passkey object
    * @returns TRUE if the account is an owner
    */
-  async isOwner(owner: string | passkeyArgType): Promise<boolean> {
+  async isOwner(owner: string | PasskeyArgType): Promise<boolean> {
     const isOwnerAddress = typeof owner === 'string'
 
     if (isOwnerAddress) {

@@ -1829,10 +1829,10 @@
   dependencies:
     semver "^7.6.0"
 
-"@safe-global/safe-modules-deployments@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.0.0.tgz#08a201a6ddc141714b475c8d205d0a0f6c73d7f2"
-  integrity sha512-TIlZ2j/nqj5kK7cKHSwwYTJrXcata6nKMI+lm2oed70eAoKqFIMdCG0JQQzl5vy85xfu9KPJxS8bTUXH10YJsw==
+"@safe-global/safe-modules-deployments@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.1.1.tgz#ee887d7349dc6b8e9caa944cd612e71a73b5c8ac"
+  integrity sha512-Tfiv+qYGEJM7idF8Ee1Gu8thg3qkCONBlOQxjS45kTAWn2VfnaPgIH2aMguiXbhkU8LgbNTzWtmmib+dR7KGpQ==
 
 "@scure/base@^1.1.3", "@scure/base@~1.1.0", "@scure/base@~1.1.2":
   version "1.1.6"

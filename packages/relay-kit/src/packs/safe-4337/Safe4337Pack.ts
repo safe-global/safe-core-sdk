@@ -290,7 +290,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     if (!isEntryPointV6(selectedEntryPoint)) {
-      throw new Error(`Entrypoint version higher then 6 is currently not supported.`)
+      throw new Error(`Entrypoint version higher then 6 is currently not supported`)
     }
 
     return new Safe4337Pack({

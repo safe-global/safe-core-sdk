@@ -115,6 +115,7 @@ describe('Safe4337Pack', () => {
     it('should throw an error if the version of the entrypoint used is incompatible', async () => {
       await expect(
         createSafe4337Pack({
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
           customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
         })
       ).rejects.toThrow('`Entrypoint version higher then 6 is currently not supported.')

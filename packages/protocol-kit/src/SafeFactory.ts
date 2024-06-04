@@ -24,7 +24,7 @@ import {
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { createSafeProvider } from '@safe-global/protocol-kit/utils'
 
 class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
@@ -63,38 +63,7 @@ class SafeFactory {
   }: SafeFactoryInitConfig) {
     this.#provider = provider
     this.#signer = signer
-    const isPasskeySigner = signer && typeof signer !== 'string'
-
-    if (isPasskeySigner) {
-      const safeProvider = new SafeProvider({
-        provider
-      })
-      const chainId = await safeProvider.getChainId()
-      const customContracts = contractNetworks?.[chainId.toString()]
-
-      const safeWebAuthnSignerFactoryContract =
-        await safeProvider.getSafeWebAuthnSignerFactoryContract({
-          safeVersion: '1.4.1',
-          customContractAddress: customContracts?.safeWebAuthnSignerFactoryAddress,
-          customContractAbi: customContracts?.safeWebAuthnSignerFactoryAbi
-        })
-
-      const passkeySigner = await PasskeySigner.init(
-        signer,
-        safeWebAuthnSignerFactoryContract,
-        safeProvider.getExternalProvider()
-      )
-
-      this.#safeProvider = new SafeProvider({
-        provider,
-        signer: passkeySigner
-      })
-    } else {
-      this.#safeProvider = new SafeProvider({
-        provider,
-        signer
-      })
-    }
+    this.#safeProvider = await createSafeProvider(provider, signer, contractNetworks)
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks

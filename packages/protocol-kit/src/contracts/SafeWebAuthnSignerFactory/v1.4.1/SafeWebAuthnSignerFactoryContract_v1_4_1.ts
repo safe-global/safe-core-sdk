@@ -9,12 +9,12 @@ import {
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 
 /**
- * SafeWebAuthnSignerFactoryContract_v1_4_1  is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
+ * SafeWebAuthnSignerFactoryContract_v1_4_1  is the implementation specific to the SafeWebAuthnSigner Factory contract version 1.4.1.
  *
- * This class specializes in handling interactions with the Safe Proxy Factory contract version 1.4.1 using Ethers.js v6.
+ * This class specializes in handling interactions with the SafeWebAuthnSigner Factory contract version 1.4.1 using Ethers.js v6.
  *
- * @extends SafeWebAuthnSignerFactoryBaseContract<SafeWebAuthnSignerFactoryContract_v1_4_1_Abi> - Inherits from SafeWebAuthnSignerFactoryBaseContract with ABI specific to Safe Proxy Factory contract version 1.4.1.
- * @implements SafeWebAuthnSignerFactoryContract_v1_4_1_Contract - Implements the interface specific to Safe Proxy Factory contract version 1.4.1.
+ * @extends SafeWebAuthnSignerFactoryBaseContract<SafeWebAuthnSignerFactoryContract_v1_4_1_Abi> - Inherits from SafeWebAuthnSignerFactoryBaseContract with ABI specific to SafeWebAuthnSigner Factory contract version 1.4.1.
+ * @implements SafeWebAuthnSignerFactoryContract_v1_4_1_Contract - Implements the interface specific to SafeWebAuthnSigner Factory contract version 1.4.1.
  */
 class SafeWebAuthnSignerFactoryContract_v1_4_1
   extends SafeWebAuthnSignerFactoryBaseContract<SafeWebAuthnSignerFactoryContract_v1_4_1_Abi>

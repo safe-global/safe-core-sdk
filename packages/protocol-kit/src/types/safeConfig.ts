@@ -41,7 +41,7 @@ type SafeConfigWithPredictedSafeProps = {
 
 export type SafeConfigProps = {
   provider: SafeProviderConfig['provider']
-  signer?: string | passkeyArgType
+  signer?: SafeProviderConfig['signer']
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */

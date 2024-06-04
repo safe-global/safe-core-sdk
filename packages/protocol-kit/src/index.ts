@@ -35,7 +35,8 @@ import {
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
   validateEthereumAddress,
-  validateEip3770Address
+  validateEip3770Address,
+  createSafeProvider
 } from './utils'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
@@ -71,6 +72,7 @@ export {
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
+  createSafeProvider,
   DEFAULT_SAFE_VERSION,
   EthSafeSignature,
   MultiSendCallOnlyBaseContract,

@@ -70,13 +70,13 @@ import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
-  getProxyFactoryContract,
-  getSafeWebAuthnSignerFactoryContract
+  getProxyFactoryContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { createSafeProvider } from './utils/safeProvider'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -119,37 +119,7 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    const isPasskeySigner = signer && typeof signer !== 'string'
-
-    if (isPasskeySigner) {
-      const safeProvider = new SafeProvider({
-        provider
-      })
-      const chainId = await safeProvider.getChainId()
-      const customContracts = contractNetworks?.[chainId.toString()]
-
-      const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
-        safeProvider,
-        safeVersion: '1.4.1',
-        customContracts
-      })
-
-      const passkeySigner = await PasskeySigner.init(
-        signer,
-        safeWebAuthnSignerFactoryContract,
-        safeProvider.getExternalProvider()
-      )
-
-      this.#safeProvider = new SafeProvider({
-        provider,
-        signer: passkeySigner
-      })
-    } else {
-      this.#safeProvider = new SafeProvider({
-        provider,
-        signer
-      })
-    }
+    this.#safeProvider = await createSafeProvider(provider, signer, contractNetworks)
 
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe

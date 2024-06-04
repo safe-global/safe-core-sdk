@@ -67,14 +67,12 @@ class SafeProvider {
   async getExternalSigner(): Promise<AbstractSigner | undefined> {
     if (typeof this.signer === 'string') {
       // If the signer is not an Ethereum address, it should be a private key
-      if (this.signer && !ethers.isAddress(this.signer)) {
+      if (!ethers.isAddress(this.signer)) {
         const privateKeySigner = new ethers.Wallet(this.signer, this.#externalProvider)
         return privateKeySigner
       }
 
-      if (this.signer) {
-        return this.#externalProvider.getSigner(this.signer)
-      }
+      return this.#externalProvider.getSigner(this.signer)
     } else {
       if (this.signer) {
         return this.signer

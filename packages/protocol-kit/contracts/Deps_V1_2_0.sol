@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.5.0 <0.8.0;
+pragma solidity >=0.5.0 <0.9.0;
 
 import { GnosisSafeProxyFactory } from "./safe_V1_2_0/proxies/GnosisSafeProxyFactory.sol";
 import { GnosisSafe } from "./safe_V1_2_0/GnosisSafe.sol";

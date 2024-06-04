@@ -2,12 +2,11 @@ import { ethers } from 'ethers'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
-  SafeProvider,
   SigningMethod,
   encodeMultiSendData,
   getMultiSendContract,
-  getSafeWebAuthnSignerFactoryContract,
-  PasskeySigner
+  PasskeySigner,
+  createSafeProvider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
@@ -225,26 +224,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
         setupTransactions.push(approveToPaymasterTransaction)
       }
 
+      const safeProvider = await createSafeProvider(provider, signer)
+
       // third transaction: passkey support via shared signer SafeWebAuthnSharedSigner
       // see: https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/4337/experimental/README.md
-      const isPasskeySigner = signer && typeof signer !== 'string'
+      const isPasskeySigner = await safeProvider.isPasskeySigner()
 
       if (isPasskeySigner) {
-        const safeProvider = new SafeProvider({
-          provider
-        })
-
-        const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
-          safeProvider,
-          safeVersion
-        })
-
-        const passkeySigner = await PasskeySigner.init(
-          signer,
-          safeWebAuthnSignerFactoryContract,
-          safeProvider.getExternalProvider()
-        )
-
+        const passkeySigner = (await safeProvider.getExternalSigner()) as PasskeySigner
         const ownerAddress = await passkeySigner.getAddress()
 
         if (!options.owners.includes(ownerAddress)) {
@@ -277,7 +264,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       if (isBatch) {
         const multiSendContract = await getMultiSendContract({
-          safeProvider: new SafeProvider({ provider }),
+          safeProvider,
           safeVersion
         })
 

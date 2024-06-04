@@ -101,6 +101,24 @@ describe('Safe4337Pack', () => {
         'Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: 0xa581c4A4DB7175302464fF3C06380BC3270b4037) to ensure compatibility.'
       )
     })
+
+    it('should throw an error if the Safe Modules do not match the supported version', async () => {
+      await expect(
+        createSafe4337Pack({
+          safeModulesVersion: fixtures.SAVE_MODULES_V0_3_0
+        })
+      ).rejects.toThrow(
+        'Safe Modules incompatible version of 0.3.0. The supported etrypoint is only compatible with v0.2.0'
+      )
+    })
+
+    it('should throw an error if the version of the entrypoint used is incompatible', async () => {
+      await expect(
+        createSafe4337Pack({
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
+        })
+      ).rejects.toThrow('`Entrypoint version higher then 6 is currently not supported.')
+    })
   })
 
   describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {

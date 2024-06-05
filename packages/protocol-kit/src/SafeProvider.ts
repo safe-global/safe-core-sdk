@@ -8,6 +8,7 @@ import {
 } from 'ethers'
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
+import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
 
 import {
@@ -34,7 +35,9 @@ import {
   Eip1193Provider,
   HttpTransport,
   SocketTransport,
-  SafeSigner
+  SafeSigner,
+  SafeConfig,
+  ContractNetworksConfig
 } from '@safe-global/protocol-kit/types'
 import PasskeySigner from './utils/passkeys/PasskeySigner'
 
@@ -62,6 +65,44 @@ class SafeProvider {
 
   getExternalProvider(): Provider {
     return this.#externalProvider
+  }
+
+  static async init(
+    provider: SafeConfig['provider'],
+    signer?: SafeConfig['signer'],
+    contractNetworks?: ContractNetworksConfig
+  ): Promise<SafeProvider> {
+    const isPasskeySigner = signer && typeof signer !== 'string'
+
+    if (isPasskeySigner) {
+      const safeProvider = new SafeProvider({
+        provider
+      })
+      const chainId = await safeProvider.getChainId()
+      const customContracts = contractNetworks?.[chainId.toString()]
+
+      const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+        safeProvider,
+        safeVersion: '1.4.1',
+        customContracts
+      })
+
+      const passkeySigner = await PasskeySigner.init(
+        signer,
+        safeWebAuthnSignerFactoryContract,
+        safeProvider.getExternalProvider()
+      )
+
+      return new SafeProvider({
+        provider,
+        signer: passkeySigner
+      })
+    } else {
+      return new SafeProvider({
+        provider,
+        signer
+      })
+    }
   }
 
   async getExternalSigner(): Promise<AbstractSigner | undefined> {

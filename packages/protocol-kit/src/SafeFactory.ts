@@ -24,7 +24,6 @@ import {
 } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { createSafeProvider } from '@safe-global/protocol-kit/utils'
 
 class SafeFactory {
   #contractNetworks?: ContractNetworksConfig
@@ -63,7 +62,7 @@ class SafeFactory {
   }: SafeFactoryInitConfig) {
     this.#provider = provider
     this.#signer = signer
-    this.#safeProvider = await createSafeProvider(provider, signer, contractNetworks)
+    this.#safeProvider = await SafeProvider.init(provider, signer, contractNetworks)
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks

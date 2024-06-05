@@ -2,7 +2,7 @@ import Safe, {
   SafeAccountConfig,
   predictSafeAddress,
   SafeProviderConfig,
-  createSafeProvider
+  SafeProvider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit'
 import {
@@ -31,7 +31,7 @@ class AccountAbstraction {
   }
 
   #initializeProtocolKit = async () => {
-    const safeProvider = await createSafeProvider(this.#provider, this.#signer)
+    const safeProvider = await SafeProvider.init(this.#provider, this.#signer)
     const signer = await safeProvider.getSignerAddress()
 
     if (!signer) {

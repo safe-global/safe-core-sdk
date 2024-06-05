@@ -6,7 +6,7 @@ import Safe, {
   encodeMultiSendData,
   getMultiSendContract,
   PasskeySigner,
-  createSafeProvider
+  SafeProvider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
@@ -224,7 +224,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         setupTransactions.push(approveToPaymasterTransaction)
       }
 
-      const safeProvider = await createSafeProvider(provider, signer)
+      const safeProvider = await SafeProvider.init(provider, signer)
 
       // third transaction: passkey support via shared signer SafeWebAuthnSharedSigner
       // see: https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/4337/experimental/README.md

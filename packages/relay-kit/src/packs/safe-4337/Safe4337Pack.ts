@@ -516,9 +516,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
       )
     } else {
       if (
-        signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4 ||
-        signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3 ||
-        signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA
+        signingMethod in
+        [
+          SigningMethod.ETH_SIGN_TYPED_DATA_V4,
+          SigningMethod.ETH_SIGN_TYPED_DATA_V3,
+          SigningMethod.ETH_SIGN_TYPED_DATA
+        ]
       ) {
         signature = await this.#signTypedData(safeOperation.data)
       } else {

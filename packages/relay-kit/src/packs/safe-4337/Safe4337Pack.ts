@@ -46,8 +46,10 @@ const MAX_ERC20_AMOUNT_TO_APPROVE =
   the production deployment packages, thus we need to hardcode their addresses here.
   Deployment commit: https://github.com/safe-global/safe-modules/commit/3853f34f31837e0a0aee47a4452564278f8c62ba
 */
+// FIXME: use the production deployment packages instead of a hardcoded address
 const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
 
+// FIXME: use the production deployment packages instead of a hardcoded address
 // Sepolia only
 const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
 
@@ -275,8 +277,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
         deploymentTo = await multiSendContract.getAddress()
         deploymentData = batchData
       } else {
-        deploymentTo = setupTransactions[0].to
-        deploymentData = setupTransactions[0].data
+        deploymentTo = enable4337ModuleTransaction.to
+        deploymentData = enable4337ModuleTransaction.data
       }
 
       protocolKit = await Safe.init({

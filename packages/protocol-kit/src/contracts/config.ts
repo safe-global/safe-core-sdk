@@ -105,6 +105,7 @@ export const safeDeploymentsL1ChainIds = [
   the production deployment packages, thus we need to hardcode their addresses here.
   Deployment commit: https://github.com/safe-global/safe-modules/commit/3853f34f31837e0a0aee47a4452564278f8c62ba
 */
+// FIXME: use the production deployment packages instead of a hardcoded address
 const WEBAUTHN_SIGNER_FACTORY_ADDRESS = '0xc40156AbFEE908E2e3269DA84fa9609bcCDDec60'
 
 const contractFunctions: Record<

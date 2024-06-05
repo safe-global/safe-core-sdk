@@ -4,6 +4,7 @@ import { Buffer } from 'buffer'
 import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
 import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
 
+// FIXME: use the production deployment packages instead of a hardcoded address
 const P256_VERIFIER_ADDRESS =
   process.env.TEST_NETWORK === 'hardhat'
     ? '0x0287C6F8975f2571E8FAa1D34fe638B1468D563D' // In Hardhat, use the local deployed FCLP256Verifier contract

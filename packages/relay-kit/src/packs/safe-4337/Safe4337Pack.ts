@@ -8,21 +8,24 @@ import Safe, {
   getMultiSendContract
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
-import { MetaTransactionData, OperationType, SafeSignature } from '@safe-global/safe-core-sdk-types'
+import {
+  MetaTransactionData,
+  OperationType,
+  SafeSignature,
+  UserOperation,
+  SafeUserOperation
+} from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
-
-import SafeOperation from './SafeOperation'
+import EthSafeOperation from './SafeOperation'
 import {
   EstimateFeeProps,
   Safe4337CreateTransactionProps,
   Safe4337ExecutableProps,
   Safe4337InitOptions,
   Safe4337Options,
-  SafeUserOperation,
-  UserOperation,
   UserOperationReceipt,
   UserOperationWithPayload,
   PaymasterOptions
@@ -51,9 +54,9 @@ const MAX_ERC20_AMOUNT_TO_APPROVE =
  */
 export class Safe4337Pack extends RelayKitBasePack<{
   EstimateFeeProps: EstimateFeeProps
-  EstimateFeeResult: SafeOperation
+  EstimateFeeResult: EthSafeOperation
   CreateTransactionProps: Safe4337CreateTransactionProps
-  CreateTransactionResult: SafeOperation
+  CreateTransactionResult: EthSafeOperation
   ExecuteTransactionProps: Safe4337ExecutableProps
   ExecuteTransactionResult: string
 }> {
@@ -267,15 +270,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * Estimates gas for the SafeOperation.
    *
    * @param {EstimateFeeProps} props - The parameters for the gas estimation.
-   * @param {SafeOperation} props.safeOperation - The SafeOperation to estimate the gas.
+   * @param {EthSafeOperation} props.safeOperation - The SafeOperation to estimate the gas.
    * @param {IFeeEstimator} props.feeEstimator - The function to estimate the gas.
-   * @return {Promise<SafeOperation>} The Promise object that will be resolved into the gas estimation.
+   * @return {Promise<EthSafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
 
   async getEstimateFee({
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()
-  }: EstimateFeeProps): Promise<SafeOperation> {
+  }: EstimateFeeProps): Promise<EthSafeOperation> {
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -337,12 +340,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
    *
    * @param {MetaTransactionData[]} transactions - The transactions to batch in a SafeOperation.
    * @param options - Optional configuration options for the transaction creation.
-   * @return {Promise<SafeOperation>} The Promise object will resolve a SafeOperation.
+   * @return {Promise<EthSafeOperation>} The Promise object will resolve a SafeOperation.
    */
   async createTransaction({
     transactions,
     options = {}
-  }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
+  }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getAccountNonce(safeAddress)
 
@@ -400,7 +403,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation.initCode = await this.protocolKit.getInitCode()
     }
 
-    const safeOperation = new SafeOperation(userOperation, {
+    const safeOperation = new EthSafeOperation(userOperation, {
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil,
       validAfter
@@ -415,14 +418,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Signs a safe operation.
    *
-   * @param {SafeOperation} safeOperation - The SafeOperation to sign.
+   * @param {EthSafeOperation} safeOperation - The SafeOperation to sign.
    * @param {SigningMethod} signingMethod - The signing method to use.
-   * @return {Promise<SafeOperation>} The Promise object will resolve to the signed SafeOperation.
+   * @return {Promise<EthSafeOperation>} The Promise object will resolve to the signed SafeOperation.
    */
   async signSafeOperation(
-    safeOperation: SafeOperation,
+    safeOperation: EthSafeOperation,
     signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
-  ): Promise<SafeOperation> {
+  ): Promise<EthSafeOperation> {
     const owners = await this.protocolKit.getOwners()
     const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
     if (!signerAddress) {
@@ -452,7 +455,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
-    const signedSafeOperation = new SafeOperation(safeOperation.toUserOperation(), {
+    const signedSafeOperation = new EthSafeOperation(safeOperation.toUserOperation(), {
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil: safeOperation.data.validUntil,
       validAfter: safeOperation.data.validAfter
@@ -470,7 +473,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Executes the relay transaction.
    *
-   * @param {SafeOperation} safeOperation - The SafeOperation to execute.
+   * @param {EthSafeOperation} safeOperation - The SafeOperation to execute.
    * @return {Promise<string>} The user operation hash.
    */
   async executeTransaction({

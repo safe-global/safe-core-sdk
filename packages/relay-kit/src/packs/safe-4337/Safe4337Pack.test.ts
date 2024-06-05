@@ -111,18 +111,18 @@ describe('Safe4337Pack', () => {
         'Safe Modules incompatible version of 0.3.0. The supported etrypoint is only compatible with v0.2.0'
       )
     })
+  })
 
+  describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {
     it('should throw an error if the version of the entrypoint used is incompatible', async () => {
       await expect(
         createSafe4337Pack({
           options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
           customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
         })
-      ).rejects.toThrow('`Entrypoint version higher then 6 is currently not supported.')
+      ).rejects.toThrow('The used entrypoint is not compatbile with version 0.2.0 of safe modules')
     })
-  })
 
-  describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {
     it('should be able to instantiate the pack using a existing Safe', async () => {
       const safe4337Pack = await createSafe4337Pack({
         options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 }
@@ -178,6 +178,18 @@ describe('Safe4337Pack', () => {
       })
 
       expect(await safe4337Pack.protocolKit.getAddress()).toBe(fixtures.PREDICTED_SAFE_ADDRESS)
+    })
+
+    it('should throw an error if the entrypoint is not compatible with the safe modules version', async () => {
+      await expect(
+        createSafe4337Pack({
+          options: {
+            owners: [fixtures.OWNER_1],
+            threshold: 1
+          },
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
+        })
+      ).rejects.toThrow('The used entrypoint is not compatbile with version 0.2.0 of safe modules')
     })
 
     it('should throw an error if the owners or threshold are not specified', async () => {

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { UserOperation } from '@safe-global/safe-core-sdk-types'
+import { VersionedUserOperation } from '@safe-global/safe-core-sdk-types'
 
 /**
  * Gets the EIP-4337 bundler provider.
@@ -11,6 +11,15 @@ export function getEip4337BundlerProvider(bundlerUrl: string): ethers.JsonRpcPro
   const provider = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
     batchMaxCount: 1
   })
+
+  const send = provider.send
+
+  provider.send = async (...args) => {
+    const res = await send.call(provider, ...args)
+    console.log('args: ', JSON.stringify(args))
+    console.log('res: ', res)
+    return res
+  }
 
   return provider
 }
@@ -26,6 +35,15 @@ export function getEip1193Provider(rpcUrl: string): ethers.JsonRpcProvider {
     batchMaxCount: 1
   })
 
+  const send = provider.send
+
+  provider.send = async (...args) => {
+    const res = await send.call(provider, ...args)
+    console.log('args: ', JSON.stringify(args))
+    console.log('res: ', res)
+    return res
+  }
+
   return provider
 }
 
@@ -35,7 +53,9 @@ export function getEip1193Provider(rpcUrl: string): ethers.JsonRpcProvider {
  * @param {UserOperation} userOperation - The UserOperation object whose values are to be converted.
  * @returns {UserOperation} A new UserOperation object with the values converted to hexadecimal.
  */
-export function userOperationToHexValues(userOperation: UserOperation) {
+export function userOperationToHexValues(
+  userOperation: VersionedUserOperation['V6'] | VersionedUserOperation['V7']
+) {
   const userOperationWithHexValues = {
     ...userOperation,
     nonce: ethers.toBeHex(userOperation.nonce),

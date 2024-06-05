@@ -70,7 +70,8 @@ import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
-  getProxyFactoryContract
+  getProxyFactoryContract,
+  getSafeWebAuthnSignerFactoryContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
@@ -437,7 +438,15 @@ class Safe {
     }
 
     // passkey flow
-    const webAuthnSignerFactoryContract = this.#contractManager.safeWebAuthnSignerFactoryContract
+    const chainId = await this.#safeProvider.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+
+    const webAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+      safeProvider: this.#safeProvider,
+      safeVersion: '1.4.1',
+      customContracts
+    })
+
     const provider = this.#safeProvider.getExternalProvider()
 
     const passkeySigner = await PasskeySigner.init(owner, webAuthnSignerFactoryContract, provider)
@@ -1068,7 +1077,15 @@ class Safe {
     { passkey, threshold }: AddPasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const webAuthnSignerFactoryContract = this.#contractManager.safeWebAuthnSignerFactoryContract
+    const chainId = await this.#safeProvider.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+
+    const webAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+      safeProvider: this.#safeProvider,
+      safeVersion: '1.4.1',
+      customContracts
+    })
+
     const provider = this.#safeProvider.getExternalProvider()
 
     const passkeySigner = await PasskeySigner.init(passkey, webAuthnSignerFactoryContract, provider)

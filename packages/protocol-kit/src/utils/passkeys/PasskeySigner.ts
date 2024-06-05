@@ -4,8 +4,10 @@ import { Buffer } from 'buffer'
 import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
 import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
 
-// Sepolia only
-const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
+const P256_VERIFIER_ADDRESS =
+  process.env.TEST_NETWORK === 'hardhat'
+    ? '0x0287C6F8975f2571E8FAa1D34fe638B1468D563D' // In Hardhat, use the local deployed FCLP256Verifier contract
+    : '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier deployed on Sepolia
 
 /**
  * Represents a Signer that is created using a passkey.

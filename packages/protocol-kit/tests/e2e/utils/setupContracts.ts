@@ -7,6 +7,7 @@ import {
   proxyFactoryDeployed,
   safeDeployed,
   safeVersionDeployed,
+  safeWebAuthnSignerFactoryDeployed,
   signMessageLibDeployed,
   simulateTxAccessorDeployed
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
@@ -161,6 +162,28 @@ export const getSimulateTxAccessor = async (): Promise<{
     contract: SimulateTxAccessor.attach(SimulateTxAccessorDeployment.address),
     abi: SimulateTxAccessorDeployment.abi
   }
+}
+
+export const getSafeWebAuthnSignerFactory = async (): Promise<{
+  contract: Contract
+  abi: JsonFragment | JsonFragment[]
+}> => {
+  const SafeWebAuthnSignerFactoryDeployment = await deployments.get(
+    safeWebAuthnSignerFactoryDeployed.name
+  )
+  const SafeWebAuthnSignerFactory = await ethers.getContractFactory(
+    safeWebAuthnSignerFactoryDeployed.name
+  )
+  return {
+    contract: SafeWebAuthnSignerFactory.attach(SafeWebAuthnSignerFactoryDeployment.address),
+    abi: SafeWebAuthnSignerFactoryDeployment.abi
+  }
+}
+
+export const getWebAuthnContract = async (): Promise<Contract> => {
+  const WebAuthnContractDeployment = await deployments.get('WebAuthnContract')
+  const WebAuthn = await ethers.getContractFactory('WebAuthnContract')
+  return WebAuthn.attach(WebAuthnContractDeployment.address)
 }
 
 export const getDailyLimitModule = async (): Promise<Contract> => {

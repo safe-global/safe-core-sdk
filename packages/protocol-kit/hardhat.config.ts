@@ -31,7 +31,27 @@ if (PK) {
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   solidity: {
-    compilers: [{ version: '0.5.17' }, { version: '0.5.3' }, { version: '0.8.0' }]
+    compilers: [
+      { version: '0.5.17' },
+      { version: '0.5.3' },
+      { version: '0.8.0' },
+      {
+        version: '0.8.24',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 10_000_000
+          },
+          viaIR: false,
+          evmVersion: 'paris'
+        }
+      }
+    ],
+    overrides: {
+      '@gnosis.pm/safe-contracts-v1.3.0/contracts/handler/CompatibilityFallbackHandler.sol': {
+        version: '0.8.0'
+      }
+    }
   },
   paths: {
     artifacts: 'artifacts',

@@ -386,7 +386,8 @@ export function toTxResult(
 }
 
 export function isTypedDataSigner(signer: any): signer is AbstractSigner {
-  return (signer as unknown as AbstractSigner).signTypedData !== undefined
+  const isPasskeySigner = !!signer?.passkeyRawId
+  return (signer as unknown as AbstractSigner).signTypedData !== undefined || !isPasskeySigner
 }
 
 /**

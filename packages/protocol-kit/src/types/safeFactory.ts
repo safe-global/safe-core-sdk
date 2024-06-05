@@ -3,7 +3,7 @@ import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-type
 import { SafeProviderConfig } from './safeProvider'
 import { SafeAccountConfig } from './safeConfig'
 import { ContractNetworksConfig } from './contracts'
-import { passkeyArgType } from './passkeys'
+import { PasskeyArgType } from './passkeys'
 
 export type DeploySafeProps = {
   safeAccountConfig: SafeAccountConfig
@@ -14,7 +14,7 @@ export type DeploySafeProps = {
 
 export type SafeFactoryConfig = {
   provider: SafeProviderConfig['provider']
-  signer?: string | passkeyArgType
+  signer?: string | PasskeyArgType
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion?: SafeVersion
   /** isL1SafeSingleton - Forces to use the Safe L1 version of the contract instead of the L2 version */
@@ -25,7 +25,7 @@ export type SafeFactoryConfig = {
 
 export type SafeFactoryInitConfig = {
   provider: SafeProviderConfig['provider']
-  signer?: string | passkeyArgType
+  signer?: string | PasskeyArgType
   privateKeyOrMnemonic?: string
   /** safeVersion - Versions of the Safe deployed by this Factory contract */
   safeVersion: SafeVersion

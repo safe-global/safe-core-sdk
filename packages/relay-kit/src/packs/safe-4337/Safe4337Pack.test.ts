@@ -10,9 +10,9 @@ import EthSafeOperation from './SafeOperation'
 import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
+import * as utils from './utils'
 
 import dotenv from 'dotenv'
-import * as utils from './utils'
 
 dotenv.config()
 

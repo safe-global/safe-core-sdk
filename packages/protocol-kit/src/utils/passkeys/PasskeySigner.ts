@@ -100,7 +100,7 @@ class PasskeySigner extends AbstractSigner {
       }
     })) as PublicKeyCredential & { response: AuthenticatorAssertionResponse }
 
-    if (!assertion || !assertion?.response?.authenticatorData) {
+    if (!assertion?.response?.authenticatorData) {
       throw new Error('Failed to sign data with passkey Signer')
     }
 

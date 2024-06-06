@@ -38,7 +38,7 @@ import {
   RPC_4337_CALLS
 } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
-import { entryPointToSafeModules, isEntryPointV6 } from './utils/entrypoint'
+import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
@@ -126,7 +126,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     if (semverSatisfies(safeModulesVersion, EQ_OR_GT_0_3_0)) {
       throw new Error(
-        `Safe Modules incompatible version of ${safeModulesVersion}. The supported etrypoint is only compatible with v0.2.0`
+        `Incompatibility detected: Safe modules version ${safeModulesVersion} is not supported. The SDK can use 0.2.0 only.`
       )
     }
 
@@ -263,7 +263,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       const requiredSafeModulesVersion = entryPointToSafeModules(customContracts?.entryPointAddress)
       if (!semverSatisfies(safeModulesVersion, requiredSafeModulesVersion))
         throw new Error(
-          `The used entrypoint is not compatbile with version ${safeModulesVersion} of safe modules`
+          `The selected entrypoint ${customContracts?.entryPointAddress} is not compatible with version ${safeModulesVersion} of Safe modules`
         )
 
       selectedEntryPoint = customContracts?.entryPointAddress
@@ -284,13 +284,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       if (!selectedEntryPoint) {
         throw new Error(
-          `No entrypoint provided by the bundler is compatible with the safe modules version ${safeModulesVersion}`
+          `Incompatibility detected: None of the entrypoints provided by the bundler is compatible with the Safe modules version ${safeModulesVersion}`
         )
       }
-    }
-
-    if (!isEntryPointV6(selectedEntryPoint)) {
-      throw new Error(`Entrypoint version higher then 6 is currently not supported`)
     }
 
     return new Safe4337Pack({

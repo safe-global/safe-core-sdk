@@ -105,10 +105,10 @@ describe('Safe4337Pack', () => {
     it('should throw an error if the Safe Modules do not match the supported version', async () => {
       await expect(
         createSafe4337Pack({
-          safeModulesVersion: fixtures.SAVE_MODULES_V0_3_0
+          safeModulesVersion: fixtures.SAFE_MODULES_V0_3_0
         })
       ).rejects.toThrow(
-        'Safe Modules incompatible version of 0.3.0. The supported etrypoint is only compatible with v0.2.0'
+        'Incompatibility detected: Safe modules version 0.3.0 is not supported. The SDK can use v0.2.0 only.'
       )
     })
   })
@@ -120,7 +120,9 @@ describe('Safe4337Pack', () => {
           options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
           customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
         })
-      ).rejects.toThrow('The used entrypoint is not compatbile with version 0.2.0 of safe modules')
+      ).rejects.toThrow(
+        `The selected entrypoint ${fixtures.ENTRYPOINTS[1]} is not compatible with version 0.2.0 of Safe modules`
+      )
     })
 
     it('should be able to instantiate the pack using a existing Safe', async () => {

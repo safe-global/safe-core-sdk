@@ -5,7 +5,12 @@ import {
   SafeSignature,
   UserOperation
 } from '@safe-global/safe-core-sdk-types'
-import { EthSafeSignature, SafeProvider, encodeMultiSendData } from '@safe-global/protocol-kit'
+import {
+  EthSafeSignature,
+  SafeProvider,
+  encodeMultiSendData,
+  buildSignatureBytes
+} from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES } from './constants'
 
@@ -127,4 +132,34 @@ export function userOperationToHexValues(userOperation: UserOperation) {
   }
 
   return userOperationWithHexValues
+}
+
+/**
+ * This method creates a dummy signature for the SafeOperation based the owners.
+ * This is useful for gas estimations
+ * @param userOperation - The user operation
+ * @param safeOwners - The safe owner addresses
+ * @returns The user operation with the dummy signature
+ */
+export function addDummySignature(
+  userOperation: UserOperation,
+  safeOwners: string[]
+): UserOperation {
+  const signatures = []
+  for (const owner of safeOwners) {
+    const dummySignature =
+      '0x000000000000000000000000' +
+      owner.slice(2) +
+      '0000000000000000000000000000000000000000000000000000000000000000' +
+      '01'
+    signatures.push(new EthSafeSignature(owner, dummySignature))
+  }
+
+  return {
+    ...userOperation,
+    signature: ethers.solidityPacked(
+      ['uint48', 'uint48', 'bytes'],
+      [0, 0, buildSignatureBytes(signatures)]
+    )
+  }
 }

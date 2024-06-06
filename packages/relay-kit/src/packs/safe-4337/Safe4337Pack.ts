@@ -39,6 +39,7 @@ import {
   RPC_4337_CALLS
 } from './constants'
 import {
+  addDummySignature,
   calculateSafeUserOperationHash,
   encodeMultiSendCallData,
   getEip1193Provider,
@@ -299,7 +300,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const estimateUserOperationGas = await this.#bundlerClient.send(
       RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
-      [userOperationToHexValues(safeOperation.toUserOperation()), this.#ENTRYPOINT_ADDRESS]
+      [
+        userOperationToHexValues(
+          addDummySignature(safeOperation.toUserOperation(), await this.protocolKit.getOwners())
+        ),
+        this.#ENTRYPOINT_ADDRESS
+      ]
     )
 
     if (estimateUserOperationGas) {

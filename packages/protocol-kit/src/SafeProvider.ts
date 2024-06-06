@@ -81,6 +81,13 @@ class SafeProvider {
       const chainId = await safeProvider.getChainId()
       const customContracts = contractNetworks?.[chainId.toString()]
 
+      // FIXME: Passkeys is an experimental feature and is currently only available on the Sepolia chain.
+      if (chainId !== 11155111n && process.env.TEST_NETWORK !== 'hardhat') {
+        throw new Error(
+          'Passkeys is an experimental feature and is currently only available on the Sepolia chain.'
+        )
+      }
+
       const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
         safeProvider,
         safeVersion: '1.4.1',

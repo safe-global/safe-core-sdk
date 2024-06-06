@@ -89,6 +89,7 @@ const contractNetworks: ContractNetworksConfig = {
     signMessageLibAddress: '<SIGN_MESSAGE_LIB_ADDRESS>',
     createCallAddress: '<CREATE_CALL_ADDRESS>',
     simulateTxAccessorAddress: '<SIMULATE_TX_ACCESSOR_ADDRESS>',
+    safeWebAuthnSignerFactoryAddress:'<SAFE_WEB_AUTHN_SIGNER_FACTORY_ADDRESS>',
     safeSingletonAbi: '<SINGLETON_ABI>', // Optional. Only needed with web3.js
     safeProxyFactoryAbi: '<PROXY_FACTORY_ABI>', // Optional. Only needed with web3.js
     multiSendAbi: '<MULTI_SEND_ABI>', // Optional. Only needed with web3.js
@@ -97,6 +98,7 @@ const contractNetworks: ContractNetworksConfig = {
     signMessageLibAbi: '<SIGN_MESSAGE_LIB_ABI>', // Optional. Only needed with web3.js
     createCallAbi: '<CREATE_CALL_ABI>', // Optional. Only needed with web3.js
     simulateTxAccessorAbi: '<SIMULATE_TX_ACCESSOR_ABI>' // Optional. Only needed with web3.js
+    safeWebAuthnSignerFactoryAbi: '<SAFE_WEB_AUTHN_SIGNER_FACTORY_ABI>' // Optional. Only needed with web3.js
   }
 }
 

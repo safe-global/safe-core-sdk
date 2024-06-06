@@ -31,10 +31,7 @@ class AccountAbstraction {
   }
 
   #initializeProtocolKit = async () => {
-    const safeProvider = new SafeProvider({
-      provider: this.#provider,
-      signer: this.#signer as string
-    })
+    const safeProvider = await SafeProvider.init(this.#provider, this.#signer)
     const signer = await safeProvider.getSignerAddress()
 
     if (!signer) {

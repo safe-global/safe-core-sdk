@@ -56,8 +56,7 @@ import {
   generatePreValidatedSignature,
   generateSignature,
   preimageSafeMessageHash,
-  preimageSafeTransactionHash,
-  adjustVInSignature
+  preimageSafeTransactionHash
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -120,37 +119,7 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    const isPasskeySigner = signer && typeof signer !== 'string'
-
-    if (isPasskeySigner) {
-      const safeProvider = new SafeProvider({
-        provider
-      })
-      const chainId = await safeProvider.getChainId()
-      const customContracts = contractNetworks?.[chainId.toString()]
-
-      const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
-        safeProvider,
-        safeVersion: '1.4.1',
-        customContracts
-      })
-
-      const passkeySigner = await PasskeySigner.init(
-        signer,
-        safeWebAuthnSignerFactoryContract,
-        safeProvider.getExternalProvider()
-      )
-
-      this.#safeProvider = new SafeProvider({
-        provider,
-        signer: passkeySigner
-      })
-    } else {
-      this.#safeProvider = new SafeProvider({
-        provider,
-        signer
-      })
-    }
+    this.#safeProvider = await SafeProvider.init(provider, signer, contractNetworks)
 
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
@@ -469,7 +438,15 @@ class Safe {
     }
 
     // passkey flow
-    const webAuthnSignerFactoryContract = this.#contractManager.safeWebAuthnSignerFactoryContract
+    const chainId = await this.#safeProvider.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+
+    const webAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+      safeProvider: this.#safeProvider,
+      safeVersion: '1.4.1',
+      customContracts
+    })
+
     const provider = this.#safeProvider.getExternalProvider()
 
     const passkeySigner = await PasskeySigner.init(owner, webAuthnSignerFactoryContract, provider)
@@ -785,27 +762,6 @@ class Safe {
       throw new Error('Transactions can only be signed by Safe owners')
     }
 
-    // passkey flow
-    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
-    if (isPasskeySigner) {
-      const txHash = await this.getTransactionHash(transaction)
-      const signedHash = await this.#safeProvider.signMessage(txHash)
-
-      const signatureAdjusted = adjustVInSignature(
-        SigningMethod.ETH_SIGN,
-        signedHash,
-        txHash,
-        signerAddress
-      )
-
-      const signature = new EthSafeSignature(signerAddress, signatureAdjusted, true)
-
-      const signedSafeTransaction = await this.copyTransaction(transaction)
-      signedSafeTransaction.addSignature(signature)
-
-      return signedSafeTransaction
-    }
-
     const safeVersion = await this.getContractVersion()
     if (
       signingMethod === SigningMethod.SAFE_SIGNATURE &&
@@ -817,7 +773,13 @@ class Safe {
 
     let signature: SafeSignature
 
-    if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+
+    if (isPasskeySigner) {
+      const txHash = await this.getTransactionHash(transaction)
+
+      signature = await this.signHash(txHash)
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(transaction, 'v4')
     } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(transaction, 'v3')
@@ -1115,7 +1077,15 @@ class Safe {
     { passkey, threshold }: AddPasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const webAuthnSignerFactoryContract = this.#contractManager.safeWebAuthnSignerFactoryContract
+    const chainId = await this.#safeProvider.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+
+    const webAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+      safeProvider: this.#safeProvider,
+      safeVersion: '1.4.1',
+      customContracts
+    })
+
     const provider = this.#safeProvider.getExternalProvider()
 
     const passkeySigner = await PasskeySigner.init(passkey, webAuthnSignerFactoryContract, provider)

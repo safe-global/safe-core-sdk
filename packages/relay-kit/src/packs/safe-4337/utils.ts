@@ -146,12 +146,9 @@ export function addDummySignature(
   safeOwners: string[]
 ): UserOperation {
   const signatures = []
+
   for (const owner of safeOwners) {
-    const dummySignature =
-      '0x000000000000000000000000' +
-      owner.slice(2) +
-      '0000000000000000000000000000000000000000000000000000000000000000' +
-      '01'
+    const dummySignature = `0x000000000000000000000000${owner.slice(2)}000000000000000000000000000000000000000000000000000000000000000001`
     signatures.push(new EthSafeSignature(owner, dummySignature))
   }
 

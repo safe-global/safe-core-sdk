@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { ethers } from 'ethers'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { WebAuthnCredentials } from '@safe-global/protocol-kit/tests/e2e/utils/webauthnShim'
+import { createMockPasskey } from '@safe-global/protocol-kit/tests/e2e/utils/passkey'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
@@ -17,57 +18,6 @@ import dotenv from 'dotenv'
 import * as utils from './utils'
 
 dotenv.config()
-
-const webAuthnCredentials = new WebAuthnCredentials()
-
-if (!global.crypto) {
-  global.crypto = crypto as unknown as Crypto
-}
-global.navigator = {
-  credentials: {
-    create: jest.fn().mockImplementation(webAuthnCredentials.create.bind(webAuthnCredentials)),
-    get: jest.fn().mockImplementation(webAuthnCredentials.get.bind(webAuthnCredentials))
-  }
-} as unknown as Navigator
-
-/**
- * Creates a mock passkey for testing purposes.
- * @param name User name used for passkey mock
- * @returns Passkey arguments
- */
-async function createMockPasskey(name: string): Promise<protocolKit.PasskeyArgType> {
-  const passkeyCredential = await webAuthnCredentials.create({
-    publicKey: {
-      rp: {
-        name: 'Safe',
-        id: 'safe.global'
-      },
-      user: {
-        id: ethers.getBytes(ethers.id(name)),
-        name: name,
-        displayName: name
-      },
-      challenge: ethers.toBeArray(Date.now()),
-      pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
-    }
-  })
-
-  const algorithm = {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: { name: 'SHA-256' }
-  }
-  const key = await crypto.subtle.importKey(
-    'raw',
-    passkeyCredential.response.getPublicKey(),
-    algorithm,
-    true,
-    ['verify']
-  )
-  const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
-
-  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
-}
 
 const sendMock = jest.fn(async (method: string) => {
   switch (method) {
@@ -337,12 +287,32 @@ describe('Safe4337Pack', () => {
     describe.only('When using a passkey signer', () => {
       const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
       const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
+      const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
+
+      let passkey: protocolKit.PasskeyArgType
+
+      beforeAll(async () => {
+        if (!global.crypto) {
+          global.crypto = crypto as unknown as Crypto
+        }
+
+        const webAuthnCredentials = new WebAuthnCredentials(PASSKEY_PRIVATE_KEY)
+
+        passkey = await createMockPasskey('chucknorris', webAuthnCredentials)
+
+        global.navigator = {
+          credentials: {
+            create: jest
+              .fn()
+              .mockImplementation(webAuthnCredentials.create.bind(webAuthnCredentials)),
+            get: jest.fn().mockImplementation(webAuthnCredentials.get.bind(webAuthnCredentials))
+          }
+        } as unknown as Navigator
+      })
 
       it('should include a passkey configuration transaction to SafeWebAuthnSharedSigner contract in a multiSend call', async () => {
         const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
         const safeCreateSpy = jest.spyOn(Safe, 'init')
-
-        const passkey = await createMockPasskey('chucknorris')
 
         const safe4337Pack = await createSafe4337Pack({
           signer: passkey,
@@ -415,6 +385,65 @@ describe('Safe4337Pack', () => {
             }
           }
         })
+      })
+
+      it('should allow to sign a SafeOperation', async () => {
+        const transferUSDC = {
+          to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+          data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
+          value: '0',
+          operation: 0
+        }
+
+        const safe4337Pack = await createSafe4337Pack({
+          signer: passkey,
+          options: {
+            safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
+          }
+        })
+
+        const safeOperation = await safe4337Pack.createTransaction({
+          transactions: [transferUSDC]
+        })
+
+        expect(await safe4337Pack.signSafeOperation(safeOperation)).toMatchObject({
+          signatures: new Map().set(
+            SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS.toLowerCase(),
+            new protocolKit.EthSafeSignature(
+              SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+              '0x000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0c79e723c4ad6557198f00ab3e8cc1cd3de64b30f6ff44664fc131f37fa1e97fe4dce48568eb0582d34c6adb97a5902b6de0488c10ab3c9f3589b44b98027ac840000000000000000000000000000000000000000000000000000000000000025a24f744b28d73f066bf3203d145765a7bc735e6328168c8b03e476da3ad0d8fe0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e226f726967696e223a2268747470733a2f2f736166652e676c6f62616c22001f',
+              true
+            )
+          )
+        })
+      })
+
+      it('should allow to send an UserOperation to a bundler', async () => {
+        const transferUSDC = {
+          to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+          data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
+          value: '0',
+          operation: 0
+        }
+
+        const safe4337Pack = await createSafe4337Pack({
+          signer: passkey,
+          options: {
+            safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
+          }
+        })
+
+        let safeOperation = await safe4337Pack.createTransaction({
+          transactions: [transferUSDC]
+        })
+        safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+
+        await safe4337Pack.executeTransaction({ executable: safeOperation })
+
+        expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
+          utils.userOperationToHexValues(safeOperation.toUserOperation()),
+          fixtures.ENTRYPOINTS[0]
+        ])
       })
     })
   })

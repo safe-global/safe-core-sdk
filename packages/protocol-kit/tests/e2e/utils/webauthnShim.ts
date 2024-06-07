@@ -159,9 +159,10 @@ class Credential {
 
   constructor(
     public rp: string,
-    public user: Uint8Array
+    public user: Uint8Array,
+    pk?: bigint
   ) {
-    this.pk = p256.utils.normPrivateKeyToScalar(p256.utils.randomPrivateKey())
+    this.pk = pk || p256.utils.normPrivateKeyToScalar(p256.utils.randomPrivateKey())
     this.id = ethers.dataSlice(
       ethers.keccak256(ethers.dataSlice(p256.getPublicKey(this.pk, false), 1)),
       12
@@ -197,6 +198,8 @@ class Credential {
 export class WebAuthnCredentials {
   credentials: Credential[] = []
 
+  constructor(private pk?: bigint) {}
+
   /**
    * This is a shim for `navigator.credentials.create` method.
    * See <https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-create>.
@@ -211,7 +214,7 @@ export class WebAuthnCredentials {
       throw new Error('unsupported signature algorithm(s)')
     }
 
-    const credential = new Credential(publicKey.rp.id, publicKey.user.id)
+    const credential = new Credential(publicKey.rp.id, publicKey.user.id, this.pk)
     this.credentials.push(credential)
 
     // <https://w3c.github.io/webauthn/#dictionary-client-data>

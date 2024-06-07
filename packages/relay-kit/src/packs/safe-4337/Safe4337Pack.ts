@@ -47,10 +47,13 @@ import {
   signSafeOp,
   userOperationToHexValues
 } from './utils'
+import { entryPointToSafeModules, EQ_OR_GT_0_3_0 } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+
+const EQ_OR_GT_1_4_1 = '>=1.4.1'
 
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
@@ -127,10 +130,18 @@ export class Safe4337Pack extends RelayKitBasePack<{
     let addModulesLibAddress = customContracts?.addModulesLibAddress
     const network = parseInt(chainId, 16).toString()
 
+    const safeModulesVersion = initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION
+
+    if (semverSatisfies(safeModulesVersion, EQ_OR_GT_0_3_0)) {
+      throw new Error(
+        `Incompatibility detected: Safe modules version ${safeModulesVersion} is not supported. The SDK can use 0.2.0 only.`
+      )
+    }
+
     if (!addModulesLibAddress) {
       const addModulesDeployment = getAddModulesLibDeployment({
         released: true,
-        version: initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION,
+        version: safeModulesVersion,
         network
       })
       addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
@@ -140,7 +151,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     if (!safe4337ModuleAddress) {
       const safe4337ModuleDeployment = getSafe4337ModuleDeployment({
         released: true,
-        version: initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION,
+        version: safeModulesVersion,
         network
       })
       safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
@@ -148,7 +159,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     if (!addModulesLibAddress || !safe4337ModuleAddress) {
       throw new Error(
-        `Safe4337Module and/or AddModulesLib not available for chain ${network} and modules version ${DEFAULT_SAFE_MODULES_VERSION}`
+        `Safe4337Module and/or AddModulesLib not available for chain ${network} and modules version ${safeModulesVersion}`
       )
     }
 
@@ -161,7 +172,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
 
       const safeVersion = await protocolKit.getContractVersion()
-      const isSafeVersion4337Compatible = semverSatisfies(safeVersion, '>=1.4.1')
+      const isSafeVersion4337Compatible = semverSatisfies(safeVersion, EQ_OR_GT_1_4_1)
 
       if (!isSafeVersion4337Compatible) {
         throw new Error(
@@ -254,13 +265,35 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
     }
 
-    let supportedEntryPoints
+    let selectedEntryPoint
 
-    if (!customContracts?.entryPointAddress) {
-      supportedEntryPoints = await bundlerClient.send(RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS, [])
+    if (customContracts?.entryPointAddress) {
+      const requiredSafeModulesVersion = entryPointToSafeModules(customContracts?.entryPointAddress)
+      if (!semverSatisfies(safeModulesVersion, requiredSafeModulesVersion))
+        throw new Error(
+          `The selected entrypoint ${customContracts?.entryPointAddress} is not compatible with version ${safeModulesVersion} of Safe modules`
+        )
+
+      selectedEntryPoint = customContracts?.entryPointAddress
+    } else {
+      const supportedEntryPoints = await bundlerClient.send(
+        RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS,
+        []
+      )
 
       if (!supportedEntryPoints.length) {
         throw new Error('No entrypoint provided or available through the bundler')
+      }
+
+      selectedEntryPoint = supportedEntryPoints.find((entryPoint: string) => {
+        const requiredSafeModulesVersion = entryPointToSafeModules(entryPoint)
+        return semverSatisfies(safeModulesVersion, requiredSafeModulesVersion)
+      })
+
+      if (!selectedEntryPoint) {
+        throw new Error(
+          `Incompatibility detected: None of the entrypoints provided by the bundler is compatible with the Safe modules version ${safeModulesVersion}`
+        )
       }
     }
 
@@ -270,7 +303,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       publicClient,
       paymasterOptions,
       bundlerUrl,
-      entryPointAddress: customContracts?.entryPointAddress || supportedEntryPoints[0],
+      entryPointAddress: selectedEntryPoint!,
       safe4337ModuleAddress
     })
   }

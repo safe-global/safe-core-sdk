@@ -31,7 +31,7 @@ const sendMock = jest.fn(async (method: string) => {
 
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
-  getEip4337BundlerProvider: () => ({ send: sendMock })
+  getEip4337BundlerProvider: jest.fn(() => ({ send: sendMock }))
 }))
 
 let safe4337ModuleAddress: string
@@ -114,7 +114,7 @@ describe('Safe4337Pack', () => {
       })
 
       const mockedUtils = jest.requireMock('./utils')
-      mockedUtils.getEip4337BundlerProvider = jest.fn().mockImplementationOnce(() => ({
+      mockedUtils.getEip4337BundlerProvider.mockImplementationOnce(() => ({
         send: jest.fn(async (method: string) => overridenMap[method])
       }))
 

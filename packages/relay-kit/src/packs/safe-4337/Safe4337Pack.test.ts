@@ -258,7 +258,7 @@ describe('Safe4337Pack', () => {
         approveToPaymasterTransaction
       ])
 
-      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(4, 'multiSend', [multiSendData])
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, 'multiSend', [multiSendData])
       expect(safeCreateSpy).toHaveBeenCalledWith({
         provider: safe4337Pack.protocolKit.getSafeProvider().provider,
         signer: safe4337Pack.protocolKit.getSafeProvider().signer,
@@ -328,7 +328,7 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 100000n
       })
     })
@@ -356,7 +356,7 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 100000n
       })
     })
@@ -415,7 +415,7 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 100000n
       })
     })
@@ -490,13 +490,13 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 100000n
       })
     })
   })
 
-  it('should all to sign a SafeOperation', async () => {
+  it('should allow to sign a SafeOperation', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
       data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),

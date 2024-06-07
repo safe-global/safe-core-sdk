@@ -1,16 +1,11 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, {
-  PredictedSafeProps,
-  SafeProvider,
-  passkeyArgType
-} from '@safe-global/protocol-kit/index'
+import Safe, { PredictedSafeProps, SafeProvider } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import { deployments } from 'hardhat'
 import crypto from 'crypto'
-import { ethers } from 'ethers'
 import PasskeySigner from '@safe-global/protocol-kit/utils/passkeys/PasskeySigner'
 import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
@@ -20,6 +15,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 import { getAccounts } from './utils/setupTestNetwork'
 import { WebAuthnCredentials } from './utils/webauthnShim'
 import { itif } from './utils/helpers'
+import { createMockPasskey } from './utils/passkey'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -37,51 +33,12 @@ global.navigator = {
   }
 } as unknown as Navigator
 
-/**
- * Creates a mock passkey for testing purposes.
- * @param name User name used for passkey mock
- * @returns Passkey arguments
- */
-async function createMockPasskey(name: string): Promise<passkeyArgType> {
-  const passkeyCredential = await webAuthnCredentials.create({
-    publicKey: {
-      rp: {
-        name: 'Safe',
-        id: 'safe.global'
-      },
-      user: {
-        id: ethers.getBytes(ethers.id(name)),
-        name: name,
-        displayName: name
-      },
-      challenge: ethers.toBeArray(Date.now()),
-      pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
-    }
-  })
-
-  const algorithm = {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: { name: 'SHA-256' }
-  }
-  const key = await crypto.subtle.importKey(
-    'raw',
-    passkeyCredential.response.getPublicKey(),
-    algorithm,
-    true,
-    ['verify']
-  )
-  const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
-
-  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
-}
-
 describe('Passkey', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
 
-    const passkey1 = await createMockPasskey('chucknorris')
-    const passkey2 = await createMockPasskey('brucelee')
+    const passkey1 = await createMockPasskey('chucknorris', webAuthnCredentials)
+    const passkey2 = await createMockPasskey('brucelee', webAuthnCredentials)
 
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)

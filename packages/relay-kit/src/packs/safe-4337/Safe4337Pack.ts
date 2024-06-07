@@ -38,14 +38,13 @@ import {
   RPC_4337_CALLS
 } from './constants'
 import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
-import { entryPointToSafeModules } from './utils/entrypoint'
+import { entryPointToSafeModules, EQ_OR_GT_0_3_0 } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
-const EQ_OR_GT_0_3_0 = '>=0.3.0'
 
 /**
  * Safe4337Pack class that extends RelayKitBasePack.

@@ -10,8 +10,7 @@ import EthSafeOperation from './SafeOperation'
 import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
-import { userOperationToHexValues } from './utils'
-
+import * as utils from './utils'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -32,9 +31,7 @@ const sendMock = jest.fn(async (method: string) => {
 
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
-  getEip4337BundlerProvider: jest.fn(() => ({
-    send: sendMock
-  }))
+  getEip4337BundlerProvider: () => ({ send: sendMock })
 }))
 
 let safe4337ModuleAddress: string
@@ -116,9 +113,12 @@ describe('Safe4337Pack', () => {
         [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: [fixtures.ENTRYPOINTS[1]]
       })
 
-      sendMock.mockImplementationOnce(async (method: string) => {
-        return overridenMap[method]
-      })
+      jest.mock('./utils', () => ({
+        ...jest.requireActual('./utils'),
+        getEip4337BundlerProvider: () => ({
+          send: jest.fn(async (method: string) => overridenMap[method])
+        })
+      }))
 
       await expect(
         createSafe4337Pack({
@@ -588,7 +588,7 @@ describe('Safe4337Pack', () => {
     await safe4337Pack.executeTransaction({ executable: safeOperation })
 
     expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
-      userOperationToHexValues(safeOperation.toUserOperation()),
+      utils.userOperationToHexValues(safeOperation.toUserOperation()),
       fixtures.ENTRYPOINTS[0]
     ])
   })

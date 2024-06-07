@@ -113,11 +113,9 @@ describe('Safe4337Pack', () => {
         [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: [fixtures.ENTRYPOINTS[1]]
       })
 
-      jest.mock('./utils', () => ({
-        ...jest.requireActual('./utils'),
-        getEip4337BundlerProvider: () => ({
-          send: jest.fn(async (method: string) => overridenMap[method])
-        })
+      const mockedUtils = jest.requireMock('./utils')
+      mockedUtils.getEip4337BundlerProvider = jest.fn().mockImplementationOnce(() => ({
+        send: jest.fn(async (method: string) => overridenMap[method])
       }))
 
       await expect(

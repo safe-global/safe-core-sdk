@@ -1,5 +1,7 @@
+import crypto from 'crypto'
 import { ethers } from 'ethers'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
+import { WebAuthnCredentials } from '@safe-global/protocol-kit/tests/e2e/utils/webauthnShim'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
@@ -15,6 +17,57 @@ import dotenv from 'dotenv'
 import * as utils from './utils'
 
 dotenv.config()
+
+const webAuthnCredentials = new WebAuthnCredentials()
+
+if (!global.crypto) {
+  global.crypto = crypto as unknown as Crypto
+}
+global.navigator = {
+  credentials: {
+    create: jest.fn().mockImplementation(webAuthnCredentials.create.bind(webAuthnCredentials)),
+    get: jest.fn().mockImplementation(webAuthnCredentials.get.bind(webAuthnCredentials))
+  }
+} as unknown as Navigator
+
+/**
+ * Creates a mock passkey for testing purposes.
+ * @param name User name used for passkey mock
+ * @returns Passkey arguments
+ */
+async function createMockPasskey(name: string): Promise<protocolKit.PasskeyArgType> {
+  const passkeyCredential = await webAuthnCredentials.create({
+    publicKey: {
+      rp: {
+        name: 'Safe',
+        id: 'safe.global'
+      },
+      user: {
+        id: ethers.getBytes(ethers.id(name)),
+        name: name,
+        displayName: name
+      },
+      challenge: ethers.toBeArray(Date.now()),
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
+    }
+  })
+
+  const algorithm = {
+    name: 'ECDSA',
+    namedCurve: 'P-256',
+    hash: { name: 'SHA-256' }
+  }
+  const key = await crypto.subtle.importKey(
+    'raw',
+    passkeyCredential.response.getPublicKey(),
+    algorithm,
+    true,
+    ['verify']
+  )
+  const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
+
+  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
+}
 
 const sendMock = jest.fn(async (method: string) => {
   switch (method) {
@@ -278,6 +331,90 @@ describe('Safe4337Pack', () => {
             paymentReceiver: ethers.ZeroAddress
           }
         }
+      })
+    })
+
+    describe.only('When using a passkey signer', () => {
+      const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
+      const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
+
+      it('should include a passkey configuration transaction to SafeWebAuthnSharedSigner contract in a multiSend call', async () => {
+        const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
+        const safeCreateSpy = jest.spyOn(Safe, 'init')
+
+        const passkey = await createMockPasskey('chucknorris')
+
+        const safe4337Pack = await createSafe4337Pack({
+          signer: passkey,
+          options: {
+            owners: [fixtures.OWNER_1],
+            threshold: 1
+          }
+        })
+
+        const provider = safe4337Pack.protocolKit.getSafeProvider().provider
+        const safeProvider = await protocolKit.SafeProvider.init(provider, passkey)
+        const passkeySigner = (await safeProvider.getExternalSigner()) as protocolKit.PasskeySigner
+
+        const passkeyOwnerConfiguration = {
+          ...passkeySigner.coordinates,
+          verifiers: P256_VERIFIER_ADDRESS
+        }
+
+        const enableModulesData = constants.INTERFACES.encodeFunctionData('enableModules', [
+          [safe4337ModuleAddress]
+        ])
+        const passkeyConfigureData = constants.INTERFACES.encodeFunctionData('configure', [
+          passkeyOwnerConfiguration
+        ])
+
+        const enable4337ModuleTransaction = {
+          to: addModulesLibAddress,
+          value: '0',
+          data: enableModulesData,
+          operation: OperationType.DelegateCall
+        }
+
+        const sharedSignerTransaction = {
+          to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          value: '0',
+          data: passkeyConfigureData,
+          operation: OperationType.DelegateCall
+        }
+
+        const multiSendData = protocolKit.encodeMultiSendData([
+          enable4337ModuleTransaction,
+          sharedSignerTransaction
+        ])
+
+        expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(2, 'configure', [
+          passkeyOwnerConfiguration
+        ])
+        expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, 'multiSend', [multiSendData])
+        expect(safeCreateSpy).toHaveBeenCalledWith({
+          provider: safe4337Pack.protocolKit.getSafeProvider().provider,
+          signer: passkey,
+          predictedSafe: {
+            safeDeploymentConfig: {
+              safeVersion: constants.DEFAULT_SAFE_VERSION,
+              saltNonce: undefined
+            },
+            safeAccountConfig: {
+              owners: [
+                fixtures.OWNER_1,
+                await passkeySigner.getAddress(),
+                SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS
+              ],
+              threshold: 1,
+              to: await safe4337Pack.protocolKit.getMultiSendAddress(),
+              data: constants.INTERFACES.encodeFunctionData('multiSend', [multiSendData]),
+              fallbackHandler: safe4337ModuleAddress,
+              paymentToken: ethers.ZeroAddress,
+              payment: 0,
+              paymentReceiver: ethers.ZeroAddress
+            }
+          }
+        })
       })
     })
   })

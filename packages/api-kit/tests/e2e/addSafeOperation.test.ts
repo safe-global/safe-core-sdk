@@ -3,15 +3,14 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'ethers'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import { SafeOperation } from '@safe-global/safe-core-sdk-types'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
-import { getSafe4337ModuleDeployment } from '@safe-global/safe-modules-deployments'
 import config from '../utils/config'
 import { getKits } from '../utils/setupKits'
+import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -26,7 +25,6 @@ const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 let safeApiKit: SafeApiKit
 let protocolKit: Safe
 let safe4337Pack: Safe4337Pack
-let moduleAddress: string
 
 describe('addSafeOperation', () => {
   const transferUSDC = {
@@ -76,30 +74,7 @@ describe('addSafeOperation', () => {
         paymasterAddress: PAYMASTER_ADDRESS
       }
     })
-
-    const chainId = (await protocolKit.getSafeProvider().getChainId()).toString()
-
-    moduleAddress = getSafe4337ModuleDeployment({
-      released: true,
-      version: '0.2.0',
-      network: chainId
-    })?.networkAddresses[chainId] as string
   })
-
-  const getAddSafeOperationProps = async (safeOperation: SafeOperation) => {
-    const userOperation = safeOperation.toUserOperation()
-    userOperation.signature = safeOperation.encodedSignatures()
-    return {
-      entryPoint: safeOperation.data.entryPoint,
-      moduleAddress,
-      safeAddress: SAFE_ADDRESS,
-      userOperation,
-      options: {
-        validAfter: safeOperation.data.validAfter,
-        validUntil: safeOperation.data.validUntil
-      }
-    }
-  }
 
   describe('should fail', () => {
     it('if safeAddress is empty', async () => {
@@ -172,7 +147,7 @@ describe('addSafeOperation', () => {
     })
   })
 
-  it('should add a new SafeOperation', async () => {
+  it('should add a new SafeOperation using an standard UserOperation and props', async () => {
     const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
@@ -184,6 +159,26 @@ describe('addSafeOperation', () => {
     const initialNumSafeOperations = safeOperationsBefore.count
 
     await chai.expect(safeApiKit.addSafeOperation(addSafeOperationProps)).to.be.fulfilled
+
+    const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
+    chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
+  })
+
+  it('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
+    const safeOperation = await safe4337Pack.createTransaction({
+      transactions: [transferUSDC, transferUSDC]
+    })
+    const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+
+    // Get the number of SafeOperations before adding a new one
+    const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
+    const initialNumSafeOperations = safeOperationsBefore.count
+
+    await chai.expect(safeApiKit.addSafeOperation(signedSafeOperation)).to.be.fulfilled
 
     const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS

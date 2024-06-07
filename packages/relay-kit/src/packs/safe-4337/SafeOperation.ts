@@ -8,16 +8,23 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
 
-type SafeOperationOptions = { entryPoint: string; validAfter?: number; validUntil?: number }
+type SafeOperationOptions = {
+  moduleAddress: string
+  entryPoint: string
+  validAfter?: number
+  validUntil?: number
+}
 
 class EthSafeOperation implements SafeOperation {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
+  moduleAddress: string
 
   constructor(
     userOperation: UserOperation,
-    { entryPoint, validAfter, validUntil }: SafeOperationOptions
+    { entryPoint, validAfter, validUntil, moduleAddress }: SafeOperationOptions
   ) {
+    this.moduleAddress = moduleAddress
     this.data = {
       safe: userOperation.sender,
       nonce: BigInt(userOperation.nonce),

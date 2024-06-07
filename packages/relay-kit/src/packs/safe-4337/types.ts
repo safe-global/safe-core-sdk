@@ -2,6 +2,7 @@ import Safe, { SafeProviderConfig } from '@safe-global/protocol-kit'
 import {
   EstimateGasData,
   MetaTransactionData,
+  SafeOperationResponse,
   SafeVersion,
   UserOperation
 } from '@safe-global/safe-core-sdk-types'
@@ -64,7 +65,7 @@ export type Safe4337CreateTransactionProps = {
 }
 
 export type Safe4337ExecutableProps = {
-  executable: EthSafeOperation
+  executable: EthSafeOperation | SafeOperationResponse
 }
 
 export type EstimateSponsoredGasData = {

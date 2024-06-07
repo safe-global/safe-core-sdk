@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { GetSafeOperationListResponse } from 'packages/api-kit/dist/src'
+import { GetSafeOperationListResponse } from '@safe-global/api-kit'
 
 export async function waitForOperationToFinish(
   userOperationHash: string,

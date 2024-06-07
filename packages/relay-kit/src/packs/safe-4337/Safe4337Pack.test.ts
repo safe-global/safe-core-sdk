@@ -10,9 +10,9 @@ import EthSafeOperation from './SafeOperation'
 import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
+import * as utils from './utils'
 
 import dotenv from 'dotenv'
-import * as utils from './utils'
 
 dotenv.config()
 
@@ -497,7 +497,7 @@ describe('Safe4337Pack', () => {
     })
   })
 
-  it('should all to sign a SafeOperation', async () => {
+  it('should allow to sign a SafeOperation', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
       data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),
@@ -527,6 +527,34 @@ describe('Safe4337Pack', () => {
     })
   })
 
+  it('should allow to sign a SafeOperation using a SafeOperationResponse object from the api to add a signature', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+      }
+    })
+
+    expect(await safe4337Pack.signSafeOperation(fixtures.SAFE_OPERATION_RESPONSE)).toMatchObject({
+      signatures: new Map()
+        .set(
+          fixtures.OWNER_1.toLowerCase(),
+          new protocolKit.EthSafeSignature(
+            fixtures.OWNER_1,
+            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1c',
+            false
+          )
+        )
+        .set(
+          fixtures.OWNER_2.toLowerCase(),
+          new protocolKit.EthSafeSignature(
+            fixtures.OWNER_2,
+            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d',
+            false
+          )
+        )
+    })
+  })
+
   it('should allow to send an UserOperation to a bundler', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
@@ -550,6 +578,35 @@ describe('Safe4337Pack', () => {
 
     expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
       utils.userOperationToHexValues(safeOperation.toUserOperation()),
+      fixtures.ENTRYPOINTS[0]
+    ])
+  })
+
+  it('should allow to send a UserOperation to the bundler using a SafeOperationResponse object from the api', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+      }
+    })
+
+    await safe4337Pack.executeTransaction({ executable: fixtures.SAFE_OPERATION_RESPONSE })
+
+    expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
+      utils.userOperationToHexValues({
+        sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
+        nonce: '3',
+        initCode: '0x',
+        callData:
+          '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+        callGasLimit: 122497n,
+        verificationGasLimit: 123498n,
+        preVerificationGas: 50705n,
+        maxFeePerGas: 105183831060n,
+        maxPriorityFeePerGas: 1380000000n,
+        paymasterAndData: '0x',
+        signature:
+          '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
+      }),
       fixtures.ENTRYPOINTS[0]
     ])
   })

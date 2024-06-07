@@ -5,5 +5,5 @@
     "noImplicitThis": false,
     "outDir": "dist"
   },
-  "include": ["api-kit/**/*", "config/**/*", "protocol-kit/**/*", "relay-kit/**/*"]
+  "include": ["api-kit/**/*", "config/**/*", "protocol-kit/**/*", "relay-kit/**/*", "utils.ts"]
 }

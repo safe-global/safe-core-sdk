@@ -13,7 +13,9 @@ import {
   OperationType,
   SafeSignature,
   UserOperation,
-  SafeUserOperation
+  SafeOperationResponse,
+  SafeOperationConfirmation,
+  isSafeOperationResponse
 } from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
@@ -33,11 +35,18 @@ import {
 import {
   DEFAULT_SAFE_VERSION,
   DEFAULT_SAFE_MODULES_VERSION,
-  EIP712_SAFE_OPERATION_TYPE,
   INTERFACES,
   RPC_4337_CALLS
 } from './constants'
-import { getEip1193Provider, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
+import {
+  addDummySignature,
+  calculateSafeUserOperationHash,
+  encodeMultiSendCallData,
+  getEip1193Provider,
+  getEip4337BundlerProvider,
+  signSafeOp,
+  userOperationToHexValues
+} from './utils'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
@@ -291,7 +300,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const estimateUserOperationGas = await this.#bundlerClient.send(
       RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
-      [userOperationToHexValues(safeOperation.toUserOperation()), this.#ENTRYPOINT_ADDRESS]
+      [
+        userOperationToHexValues(
+          addDummySignature(safeOperation.toUserOperation(), await this.protocolKit.getOwners())
+        ),
+        this.#ENTRYPOINT_ADDRESS
+      ]
     )
 
     if (estimateUserOperationGas) {
@@ -347,7 +361,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     options = {}
   }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
-    const nonce = await this.#getAccountNonce(safeAddress)
+    const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
 
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
@@ -376,7 +390,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       ? this.#encodeExecuteUserOpCallData({
           to: multiSendAddress,
           value: '0',
-          data: this.#encodeMultiSendCallData(transactions),
+          data: encodeMultiSendCallData(transactions),
           operation: OperationType.DelegateCall
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
@@ -404,6 +418,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const safeOperation = new EthSafeOperation(userOperation, {
+      moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil,
       validAfter
@@ -416,16 +431,66 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }
 
   /**
+   * Converts a SafeOperationResponse to an EthSafeOperation.
+   *
+   * @param {SafeOperationResponse} safeOperationResponse - The SafeOperationResponse to convert to EthSafeOperation
+   * @returns {EthSafeOperation} - The EthSafeOperation object
+   */
+  #toSafeOperation(safeOperationResponse: SafeOperationResponse): EthSafeOperation {
+    const { validUntil, validAfter, userOperation } = safeOperationResponse
+
+    const safeOperation = new EthSafeOperation(
+      {
+        sender: userOperation?.sender || '0x',
+        nonce: userOperation?.nonce?.toString() || '0',
+        initCode: userOperation?.initCode || '',
+        callData: userOperation?.callData || '',
+        callGasLimit: BigInt(userOperation?.callGasLimit || 0n),
+        verificationGasLimit: BigInt(userOperation?.verificationGasLimit || 0),
+        preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
+        maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
+        maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
+        paymasterAndData: userOperation?.paymasterData || '0x',
+        signature: userOperation?.signature || '0x'
+      },
+      {
+        moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
+        entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
+        validAfter: validAfter ? new Date(validAfter).getTime() : undefined,
+        validUntil: validUntil ? new Date(validUntil).getTime() : undefined
+      }
+    )
+
+    if (safeOperationResponse.confirmations) {
+      safeOperationResponse.confirmations.forEach((confirmation: SafeOperationConfirmation) => {
+        safeOperation.addSignature(new EthSafeSignature(confirmation.owner, confirmation.signature))
+      })
+    }
+
+    return safeOperation
+  }
+
+  /**
    * Signs a safe operation.
    *
-   * @param {EthSafeOperation} safeOperation - The SafeOperation to sign.
+   * @param {EthSafeOperation | SafeOperationResponse} safeOperation - The SafeOperation to sign. It can be:
+   * - A response from the API (Tx Service)
+   * - An instance of EthSafeOperation
    * @param {SigningMethod} signingMethod - The signing method to use.
    * @return {Promise<EthSafeOperation>} The Promise object will resolve to the signed SafeOperation.
    */
   async signSafeOperation(
-    safeOperation: EthSafeOperation,
+    safeOperation: EthSafeOperation | SafeOperationResponse,
     signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
   ): Promise<EthSafeOperation> {
+    let safeOp: EthSafeOperation
+
+    if (isSafeOperationResponse(safeOperation)) {
+      safeOp = this.#toSafeOperation(safeOperation)
+    } else {
+      safeOp = safeOperation
+    }
+
     const owners = await this.protocolKit.getOwners()
     const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
     if (!signerAddress) {
@@ -441,27 +506,35 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     let signature: SafeSignature
-
     if (
       signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4 ||
       signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3 ||
       signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA
     ) {
-      signature = await this.#signTypedData(safeOperation.data)
+      signature = await signSafeOp(
+        safeOp.data,
+        this.protocolKit.getSafeProvider(),
+        this.#SAFE_4337_MODULE_ADDRESS
+      )
     } else {
       const chainId = await this.protocolKit.getSafeProvider().getChainId()
-      const safeOpHash = this.#getSafeUserOperationHash(safeOperation.data, chainId)
+      const safeOpHash = calculateSafeUserOperationHash(
+        safeOp.data,
+        chainId,
+        this.#SAFE_4337_MODULE_ADDRESS
+      )
 
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
-    const signedSafeOperation = new EthSafeOperation(safeOperation.toUserOperation(), {
+    const signedSafeOperation = new EthSafeOperation(safeOp.toUserOperation(), {
+      moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      validUntil: safeOperation.data.validUntil,
-      validAfter: safeOperation.data.validAfter
+      validUntil: safeOp.data.validUntil,
+      validAfter: safeOp.data.validAfter
     })
 
-    signedSafeOperation.signatures.forEach((signature: SafeSignature) => {
+    safeOp.signatures.forEach((signature: SafeSignature) => {
       signedSafeOperation.addSignature(signature)
     })
 
@@ -473,15 +546,27 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Executes the relay transaction.
    *
-   * @param {EthSafeOperation} safeOperation - The SafeOperation to execute.
+   * @param {Safe4337ExecutableProps} props - The parameters for the transaction execution.
+   * @param {EthSafeOperation | SafeOperationResponse} props.executable - The SafeOperation to execute. It can be:
+   * - A response from the API (Tx Service)
+   * - An instance of EthSafeOperation
    * @return {Promise<string>} The user operation hash.
    */
-  async executeTransaction({
-    executable: safeOperation
-  }: Safe4337ExecutableProps): Promise<string> {
+  async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {
+    let safeOperation: EthSafeOperation
+
+    if (isSafeOperationResponse(executable)) {
+      safeOperation = this.#toSafeOperation(executable)
+    } else {
+      safeOperation = executable
+    }
+
     const userOperation = safeOperation.toUserOperation()
 
-    return this.#sendUserOperation(userOperation)
+    return this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
+      userOperationToHexValues(userOperation),
+      this.#ENTRYPOINT_ADDRESS
+    ])
   }
 
   /**
@@ -491,12 +576,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {UserOperation} - null in case the UserOperation is not yet included in a block, or a full UserOperation, with the addition of entryPoint, blockNumber, blockHash and transactionHash
    */
   async getUserOperationByHash(userOpHash: string): Promise<UserOperationWithPayload> {
-    const userOperation = await this.#bundlerClient.send(
-      RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH,
-      [userOpHash]
-    )
-
-    return userOperation
+    return this.#bundlerClient.send(RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH, [userOpHash])
   }
 
   /**
@@ -506,12 +586,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {UserOperationReceipt} - null in case the UserOperation is not yet included in a block, or UserOperationReceipt object
    */
   async getUserOperationReceipt(userOpHash: string): Promise<UserOperationReceipt | null> {
-    const userOperationReceipt = await this.#bundlerClient.send(
-      RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT,
-      [userOpHash]
-    )
-
-    return userOperationReceipt
+    return this.#bundlerClient.send(RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT, [userOpHash])
   }
 
   /**
@@ -521,12 +596,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {string[]} - The supported entry points.
    */
   async getSupportedEntryPoints(): Promise<string[]> {
-    const supportedEntryPoints = await this.#bundlerClient.send(
-      RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS,
-      []
-    )
-
-    return supportedEntryPoints
+    return this.#bundlerClient.send(RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS, [])
   }
 
   /**
@@ -535,78 +605,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {string} - The chain id.
    */
   async getChainId(): Promise<string> {
-    const chainId = await this.#bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
-
-    return chainId
-  }
-
-  /**
-   * Gets the safe user operation hash.
-   *
-   * @param {SafeUserOperation} safeUserOperation - The SafeUserOperation.
-   * @param {bigint} chainId - The chain id.
-   * @return {string} The hash of the safe operation.
-   */
-  #getSafeUserOperationHash(safeUserOperation: SafeUserOperation, chainId: bigint): string {
-    return ethers.TypedDataEncoder.hash(
-      {
-        chainId,
-        verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
-      },
-      EIP712_SAFE_OPERATION_TYPE,
-      safeUserOperation
-    )
-  }
-
-  /**
-   * Send the UserOperation to the bundler.
-   *
-   * @param {UserOperation} userOpWithSignature - The signed UserOperation to send to the bundler.
-   * @return {Promise<string>} The hash.
-   */
-  async #sendUserOperation(userOpWithSignature: UserOperation): Promise<string> {
-    return await this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
-      userOperationToHexValues(userOpWithSignature),
-      this.#ENTRYPOINT_ADDRESS
-    ])
-  }
-
-  /**
-   * Signs typed data.
-   *
-   * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.
-   * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.
-   */
-  async #signTypedData(safeUserOperation: SafeUserOperation): Promise<SafeSignature> {
-    const safeProvider = this.protocolKit.getSafeProvider()
-    const signer = (await safeProvider.getExternalSigner()) as ethers.Signer
-    const chainId = await safeProvider.getChainId()
-    const signerAddress = await signer.getAddress()
-    const signature = await signer.signTypedData(
-      {
-        chainId,
-        verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
-      },
-      EIP712_SAFE_OPERATION_TYPE,
-      {
-        ...safeUserOperation,
-        nonce: ethers.toBeHex(safeUserOperation.nonce),
-        validAfter: ethers.toBeHex(safeUserOperation.validAfter),
-        validUntil: ethers.toBeHex(safeUserOperation.validUntil),
-        maxFeePerGas: ethers.toBeHex(safeUserOperation.maxFeePerGas),
-        maxPriorityFeePerGas: ethers.toBeHex(safeUserOperation.maxPriorityFeePerGas)
-      }
-    )
-    return new EthSafeSignature(signerAddress, signature)
+    return this.#bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
   }
 
   /**
    * Gets account nonce from the bundler.
    *
-   * @param {string} sender - Account address for which the nonce is to be fetched.
+   * @param {string} safeAddress - Account address for which the nonce is to be fetched.
    * @returns {Promise<string>} The Promise object will resolve to the account nonce.
    */
-  async #getAccountNonce(sender: string): Promise<string> {
+  async #getSafeNonceFromEntrypoint(safeAddress: string): Promise<string> {
     const abi = [
       {
         inputs: [
@@ -622,7 +630,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const contract = new ethers.Contract(this.#ENTRYPOINT_ADDRESS || '0x', abi, this.#publicClient)
 
-    const newNonce = await contract.getNonce(sender, BigInt(0))
+    const newNonce = await contract.getNonce(safeAddress, BigInt(0))
 
     return newNonce.toString()
   }
@@ -639,20 +647,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       transaction.value,
       transaction.data,
       transaction.operation || OperationType.Call
-    ])
-  }
-
-  /**
-   * Encodes multi-send data from transactions batch.
-   *
-   * @param {MetaTransactionData[]} transactions - an array of transaction to to be encoded.
-   * @return {string} The encoded data string.
-   */
-  #encodeMultiSendCallData(transactions: MetaTransactionData[]): string {
-    return INTERFACES.encodeFunctionData('multiSend', [
-      encodeMultiSendData(
-        transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
-      )
     ])
   }
 }

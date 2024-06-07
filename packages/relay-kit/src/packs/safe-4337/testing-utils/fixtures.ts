@@ -9,7 +9,7 @@ export const SAFE_ADDRESS_4337_FALLBACKHANDLER_NOT_ENABLED =
 export const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f'
 export const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 export const CHAIN_ID = '0xaa36a7'
-
+export const MODULE_ADDRESS = '0xa581c4A4DB7175302464fF3C06380BC3270b4037'
 export const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 export const BUNDLER_URL = 'https://bundler.url'
 export const PAYMASTER_URL = 'https://paymaster.url'
@@ -92,6 +92,46 @@ export const GAS_ESTIMATION = {
   verificationGasLimit: '0x186A0',
   preVerificationGas: '0x186A0',
   callGasLimit: '0x186A0'
+}
+
+export const SAFE_OPERATION_RESPONSE = {
+  created: '2024-05-31T10:12:21.169031Z',
+  modified: '2024-05-31T10:12:21.169031Z',
+  safeOperationHash: '0x5a62b1d61f8fca5f766e9456523bb42765d318058b5f235f967ffe3c2af8b1d7',
+  validAfter: null,
+  validUntil: null,
+  moduleAddress: '0xa581c4A4DB7175302464fF3C06380BC3270b4037',
+  confirmations: [
+    {
+      created: '2024-05-31T10:12:21.184585Z',
+      modified: '2024-05-31T10:12:21.184585Z',
+      owner: '0x3059EfD1BCe33be41eeEfd5fb6D520d7fEd54E43',
+      signature:
+        '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d',
+      signatureType: 'EOA'
+    }
+  ],
+  preparedSignature:
+    '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1c',
+  userOperation: {
+    ethereumTxHash: null,
+    sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
+    userOperationHash: '0x5d23b7d96a718582601183b1849a4c76b2a13d3787f15074d62a0b6e4a3f76a1',
+    nonce: 3,
+    initCode: '0x',
+    callData:
+      '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    callGasLimit: 122497,
+    verificationGasLimit: 123498,
+    preVerificationGas: 50705,
+    maxFeePerGas: 105183831060,
+    maxPriorityFeePerGas: 1380000000,
+    paymaster: null,
+    paymasterData: null,
+    signature:
+      '0x54158da2d357241ee1c5c8fca9c4e1bfa6b92a60bd0ed1bea56f4092b008435153d6264a8a8c00925383ecaeaf9d839a2dc1ff006703c65b7f05d0ce8cdd57ab1b',
+    entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
+  }
 }
 
 export const SPONSORED_GAS_ESTIMATION = {

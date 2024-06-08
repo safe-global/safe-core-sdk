@@ -198,7 +198,11 @@ class Credential {
 export class WebAuthnCredentials {
   credentials: Credential[] = []
 
-  constructor(private pk?: bigint) {}
+  /**
+   * Creates a new instance of the WebAuthn credentials.
+   * @param privateKey The private key to use for the credentials. If not provided, a random key will be generated.
+   */
+  constructor(private privateKey?: bigint) {}
 
   /**
    * This is a shim for `navigator.credentials.create` method.
@@ -214,7 +218,7 @@ export class WebAuthnCredentials {
       throw new Error('unsupported signature algorithm(s)')
     }
 
-    const credential = new Credential(publicKey.rp.id, publicKey.user.id, this.pk)
+    const credential = new Credential(publicKey.rp.id, publicKey.user.id, this.privateKey)
     this.credentials.push(credential)
 
     // <https://w3c.github.io/webauthn/#dictionary-client-data>

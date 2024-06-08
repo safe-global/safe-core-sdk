@@ -284,7 +284,7 @@ describe('Safe4337Pack', () => {
       })
     })
 
-    describe.only('When using a passkey signer', () => {
+    describe('When using a passkey signer', () => {
       const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
       const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
       const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)

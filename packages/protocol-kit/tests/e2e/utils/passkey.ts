@@ -6,8 +6,8 @@ import { WebAuthnCredentials } from './webauthnShim'
 /**
  * Creates a mock passkey for testing purposes.
  * @param name User name used for passkey mock
- * @param pk Private key to use for passkey mock. If not provided, a random key will be generated.
- * @returns Object containing Passkey arguments and WebAuthnCredentials instance for testing
+ * @param webAuthnCredentials WebAuthnCredentials instance used for testing.
+ * @returns Passkey arguments obect with rawId and publicKey.
  */
 export async function createMockPasskey(
   name: string,

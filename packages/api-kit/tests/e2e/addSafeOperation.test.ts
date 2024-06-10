@@ -8,7 +8,6 @@ import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
-import config from '../utils/config'
 import { getKits } from '../utils/setupKits'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 
@@ -67,7 +66,6 @@ describe('addSafeOperation', () => {
       provider: protocolKit.getSafeProvider().provider,
       signer: protocolKit.getSafeProvider().signer,
       options: { safeAddress: SAFE_ADDRESS },
-      rpcUrl: config.JSON_RPC,
       bundlerUrl: BUNDLER_URL,
       paymasterOptions: {
         paymasterTokenAddress: PAYMASTER_TOKEN_ADDRESS,

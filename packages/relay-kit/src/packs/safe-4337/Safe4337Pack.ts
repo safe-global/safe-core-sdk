@@ -42,7 +42,6 @@ import {
   addDummySignature,
   calculateSafeUserOperationHash,
   encodeMultiSendCallData,
-  getEip1193Provider,
   getEip4337BundlerProvider,
   signSafeOp,
   userOperationToHexValues
@@ -78,7 +77,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #SAFE_4337_MODULE_ADDRESS: string = '0x'
 
   #bundlerClient: ethers.JsonRpcProvider
-  #publicClient: ethers.JsonRpcProvider
 
   #paymasterOptions?: PaymasterOptions
 
@@ -90,7 +88,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
   constructor({
     protocolKit,
     bundlerClient,
-    publicClient,
     bundlerUrl,
     paymasterOptions,
     entryPointAddress,
@@ -99,12 +96,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     super(protocolKit)
 
     this.#BUNDLER_URL = bundlerUrl
-
     this.#bundlerClient = bundlerClient
-    this.#publicClient = publicClient
-
     this.#paymasterOptions = paymasterOptions
-
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
   }
@@ -120,11 +113,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { provider, signer, options, bundlerUrl, rpcUrl, customContracts, paymasterOptions } =
-      initOptions
+    const { provider, signer, options, bundlerUrl, customContracts, paymasterOptions } = initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
-    const publicClient = getEip1193Provider(rpcUrl)
     const chainId = await bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
 
     let addModulesLibAddress = customContracts?.addModulesLibAddress
@@ -300,7 +291,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     return new Safe4337Pack({
       protocolKit,
       bundlerClient,
-      publicClient,
       paymasterOptions,
       bundlerUrl,
       entryPointAddress: selectedEntryPoint!,
@@ -661,7 +651,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     ]
 
-    const contract = new ethers.Contract(this.#ENTRYPOINT_ADDRESS || '0x', abi, this.#publicClient)
+    const contract = new ethers.Contract(
+      this.#ENTRYPOINT_ADDRESS || '0x',
+      abi,
+      this.protocolKit.getSafeProvider().getExternalProvider()
+    )
 
     const newNonce = await contract.getNonce(safeAddress, BigInt(0))
 

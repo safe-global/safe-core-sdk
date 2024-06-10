@@ -1,3 +1,4 @@
+import dotenv from 'dotenv'
 import { ethers } from 'ethers'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import {
@@ -10,45 +11,27 @@ import EthSafeOperation from './SafeOperation'
 import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
-
-import dotenv from 'dotenv'
 import * as utils from './utils'
 
 dotenv.config()
 
+const requestResponseMap = {
+  [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: fixtures.ENTRYPOINTS,
+  [constants.RPC_4337_CALLS.CHAIN_ID]: fixtures.CHAIN_ID,
+  [constants.RPC_4337_CALLS.SEND_USER_OPERATION]: fixtures.USER_OPERATION_HASH,
+  [constants.RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS]: fixtures.GAS_ESTIMATION,
+  [constants.RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH]: fixtures.USER_OPERATION_BY_HASH,
+  [constants.RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT]: fixtures.USER_OPERATION_RECEIPT,
+  ['pimlico_getUserOperationGasPrice']: fixtures.USER_OPERATION_GAS_PRICE
+}
+
 const sendMock = jest.fn(async (method: string) => {
-  switch (method) {
-    case constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS:
-      return fixtures.ENTRYPOINTS
-
-    case constants.RPC_4337_CALLS.CHAIN_ID:
-      return fixtures.CHAIN_ID
-
-    case constants.RPC_4337_CALLS.SEND_USER_OPERATION:
-      return fixtures.USER_OPERATION_HASH
-
-    case constants.RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS:
-      return fixtures.GAS_ESTIMATION
-
-    case constants.RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH:
-      return fixtures.USER_OPERATION_BY_HASH
-
-    case constants.RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT:
-      return fixtures.USER_OPERATION_RECEIPT
-
-    case 'pimlico_getUserOperationGasPrice':
-      return fixtures.USER_OPERATION_GAS_PRICE
-
-    default:
-      return undefined
-  }
+  return requestResponseMap[method]
 })
 
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
-  getEip4337BundlerProvider: () => ({
-    send: sendMock
-  })
+  getEip4337BundlerProvider: jest.fn(() => ({ send: sendMock }))
 }))
 
 let safe4337ModuleAddress: string
@@ -101,9 +84,49 @@ describe('Safe4337Pack', () => {
         'Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: 0xa581c4A4DB7175302464fF3C06380BC3270b4037) to ensure compatibility.'
       )
     })
+
+    it('should throw an error if the Safe Modules do not match the supported version', async () => {
+      await expect(
+        createSafe4337Pack({
+          safeModulesVersion: fixtures.SAFE_MODULES_V0_3_0
+        })
+      ).rejects.toThrow(
+        'Incompatibility detected: Safe modules version 0.3.0 is not supported. The SDK can use 0.2.0 only.'
+      )
+    })
   })
 
   describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {
+    it('should throw an error if the version of the entrypoint used is incompatible', async () => {
+      await expect(
+        createSafe4337Pack({
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
+        })
+      ).rejects.toThrow(
+        `The selected entrypoint ${fixtures.ENTRYPOINTS[1]} is not compatible with version 0.2.0 of Safe modules`
+      )
+    })
+
+    it('should throw an error if no supported entrypoints are available', async () => {
+      const overridenMap = Object.assign({}, requestResponseMap, {
+        [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: [fixtures.ENTRYPOINTS[1]]
+      })
+
+      const mockedUtils = jest.requireMock('./utils')
+      mockedUtils.getEip4337BundlerProvider.mockImplementationOnce(() => ({
+        send: jest.fn(async (method: string) => overridenMap[method])
+      }))
+
+      await expect(
+        createSafe4337Pack({
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 }
+        })
+      ).rejects.toThrow(
+        `Incompatibility detected: None of the entrypoints provided by the bundler is compatible with the Safe modules version 0.2.0`
+      )
+    })
+
     it('should be able to instantiate the pack using a existing Safe', async () => {
       const safe4337Pack = await createSafe4337Pack({
         options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 }
@@ -159,6 +182,20 @@ describe('Safe4337Pack', () => {
       })
 
       expect(await safe4337Pack.protocolKit.getAddress()).toBe(fixtures.PREDICTED_SAFE_ADDRESS)
+    })
+
+    it('should throw an error if the entrypoint is not compatible with the safe modules version', async () => {
+      await expect(
+        createSafe4337Pack({
+          options: {
+            owners: [fixtures.OWNER_1],
+            threshold: 1
+          },
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
+        })
+      ).rejects.toThrow(
+        `The selected entrypoint ${fixtures.ENTRYPOINTS[1]} is not compatible with version 0.2.0 of Safe modules`
+      )
     })
 
     it('should throw an error if the owners or threshold are not specified', async () => {
@@ -497,7 +534,7 @@ describe('Safe4337Pack', () => {
     })
   })
 
-  it('should all to sign a SafeOperation', async () => {
+  it('should allow to sign a SafeOperation', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
       data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),
@@ -527,6 +564,34 @@ describe('Safe4337Pack', () => {
     })
   })
 
+  it('should allow to sign a SafeOperation using a SafeOperationResponse object from the api to add a signature', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+      }
+    })
+
+    expect(await safe4337Pack.signSafeOperation(fixtures.SAFE_OPERATION_RESPONSE)).toMatchObject({
+      signatures: new Map()
+        .set(
+          fixtures.OWNER_1.toLowerCase(),
+          new protocolKit.EthSafeSignature(
+            fixtures.OWNER_1,
+            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1c',
+            false
+          )
+        )
+        .set(
+          fixtures.OWNER_2.toLowerCase(),
+          new protocolKit.EthSafeSignature(
+            fixtures.OWNER_2,
+            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d',
+            false
+          )
+        )
+    })
+  })
+
   it('should allow to send an UserOperation to a bundler', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
@@ -550,6 +615,35 @@ describe('Safe4337Pack', () => {
 
     expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
       utils.userOperationToHexValues(safeOperation.toUserOperation()),
+      fixtures.ENTRYPOINTS[0]
+    ])
+  })
+
+  it('should allow to send a UserOperation to the bundler using a SafeOperationResponse object from the api', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+      }
+    })
+
+    await safe4337Pack.executeTransaction({ executable: fixtures.SAFE_OPERATION_RESPONSE })
+
+    expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
+      utils.userOperationToHexValues({
+        sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
+        nonce: '3',
+        initCode: '0x',
+        callData:
+          '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+        callGasLimit: 122497n,
+        verificationGasLimit: 123498n,
+        preVerificationGas: 50705n,
+        maxFeePerGas: 105183831060n,
+        maxPriorityFeePerGas: 1380000000n,
+        paymasterAndData: '0x',
+        signature:
+          '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
+      }),
       fixtures.ENTRYPOINTS[0]
     ])
   })

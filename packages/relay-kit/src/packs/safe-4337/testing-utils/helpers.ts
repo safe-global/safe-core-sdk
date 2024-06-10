@@ -28,7 +28,6 @@ export const createSafe4337Pack = async (
       safeAddress: ''
     },
     ...initOptions,
-    rpcUrl: fixtures.RPC_URL,
     bundlerUrl: fixtures.BUNDLER_URL
   })
 

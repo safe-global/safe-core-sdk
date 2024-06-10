@@ -2,6 +2,7 @@ import Safe, { SafeProviderConfig } from '@safe-global/protocol-kit'
 import {
   EstimateGasData,
   MetaTransactionData,
+  SafeOperationResponse,
   SafeVersion,
   UserOperation
 } from '@safe-global/safe-core-sdk-types'
@@ -32,7 +33,6 @@ export type Safe4337InitOptions = {
   provider: SafeProviderConfig['provider']
   signer?: SafeProviderConfig['signer']
   bundlerUrl: string
-  rpcUrl: string
   safeModulesVersion?: string
   customContracts?: {
     entryPointAddress?: string
@@ -48,7 +48,6 @@ export type Safe4337Options = {
   bundlerUrl: string
   paymasterOptions?: PaymasterOptions
   bundlerClient: ethers.JsonRpcProvider
-  publicClient: ethers.JsonRpcProvider
   entryPointAddress: string
   safe4337ModuleAddress: string
 }
@@ -64,7 +63,7 @@ export type Safe4337CreateTransactionProps = {
 }
 
 export type Safe4337ExecutableProps = {
-  executable: EthSafeOperation
+  executable: EthSafeOperation | SafeOperationResponse
 }
 
 export type EstimateSponsoredGasData = {

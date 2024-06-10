@@ -29,20 +29,6 @@ export function getEip4337BundlerProvider(bundlerUrl: string): ethers.JsonRpcPro
 }
 
 /**
- * Gets the EIP-1193 provider from the bundler url.
- *
- * @param {string} rpcUrl The RPC URL.
- * @return {Provider} The EIP-1193 provider.
- */
-export function getEip1193Provider(rpcUrl: string): ethers.JsonRpcProvider {
-  const provider = new ethers.JsonRpcProvider(rpcUrl, undefined, {
-    batchMaxCount: 1
-  })
-
-  return provider
-}
-
-/**
  * Signs typed data.
  *
  * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.

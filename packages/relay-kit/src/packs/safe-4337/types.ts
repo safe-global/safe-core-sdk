@@ -33,7 +33,6 @@ export type Safe4337InitOptions = {
   provider: SafeProviderConfig['provider']
   signer?: SafeProviderConfig['signer']
   bundlerUrl: string
-  rpcUrl: string
   safeModulesVersion?: string
   customContracts?: {
     entryPointAddress?: string
@@ -49,7 +48,6 @@ export type Safe4337Options = {
   bundlerUrl: string
   paymasterOptions?: PaymasterOptions
   bundlerClient: ethers.JsonRpcProvider
-  publicClient: ethers.JsonRpcProvider
   entryPointAddress: string
   safe4337ModuleAddress: string
 }

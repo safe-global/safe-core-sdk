@@ -25,7 +25,6 @@ async function main() {
   let safe4337Pack = await Safe4337Pack.init({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
     options: {
       owners: [OWNER_1_PRIVATE_KEY, OWNER_2_PRIVATE_KEY],
@@ -57,7 +56,6 @@ async function main() {
     safe4337Pack = await Safe4337Pack.init({
       provider: RPC_URL,
       signer: OWNER_2_PRIVATE_KEY,
-      rpcUrl: RPC_URL,
       bundlerUrl: BUNDLER_URL,
       paymasterOptions: {
         isSponsored: true,

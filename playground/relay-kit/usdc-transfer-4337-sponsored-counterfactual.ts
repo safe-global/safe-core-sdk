@@ -40,7 +40,6 @@ async function main() {
   const safe4337Pack = await Safe4337Pack.init({
     provider: RPC_URL,
     signer: PRIVATE_KEY,
-    rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
     paymasterOptions: {
       isSponsored: true,

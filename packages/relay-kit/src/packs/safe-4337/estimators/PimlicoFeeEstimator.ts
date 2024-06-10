@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
+import { EstimateGasData } from '@safe-global/safe-core-sdk-types'
 import {
   EstimateFeeFunctionProps,
-  EstimateGasData,
   EstimateSponsoredFeeFunctionProps,
   EstimateSponsoredGasData,
   IFeeEstimator

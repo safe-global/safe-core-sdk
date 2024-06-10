@@ -1,7 +1,9 @@
 import { Signer, TypedDataDomain, TypedDataField } from 'ethers'
 import {
   SafeMultisigTransactionResponse,
-  SafeTransactionData
+  SafeTransactionData,
+  UserOperation,
+  SafeOperationResponse
 } from '@safe-global/safe-core-sdk-types'
 
 export type SafeServiceInfoResponse = {
@@ -286,4 +288,40 @@ export type EIP712TypedData = {
   domain: TypedDataDomain
   types: TypedDataField
   message: Record<string, unknown>
+}
+
+export type GetSafeOperationListProps = {
+  /** Address of the Safe to get SafeOperations for */
+  safeAddress: string
+  /** Which field to use when ordering the results */
+  ordering?: string
+  /** Maximum number of results to return per page */
+  limit?: string
+  /** Initial index from which to return the results */
+  offset?: string
+}
+
+export type GetSafeOperationListResponse = {
+  readonly count: number
+  readonly next?: string
+  readonly previous?: string
+  readonly results: Array<SafeOperationResponse>
+}
+
+export type AddSafeOperationProps = {
+  /** Address of the EntryPoint contract */
+  entryPoint: string
+  /** Address of the Safe4337Module contract */
+  moduleAddress: string
+  /** Address of the Safe to add a SafeOperation for */
+  safeAddress: string
+  /** UserOperation object to add */
+  userOperation: UserOperation
+  /** Options object */
+  options?: {
+    /** The UserOperation will remain valid until this block's timestamp */
+    validUntil?: number
+    /** The UserOperation will be valid after this block's timestamp */
+    validAfter?: number
+  }
 }

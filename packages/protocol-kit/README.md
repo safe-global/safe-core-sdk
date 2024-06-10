@@ -1,10 +1,10 @@
 # Protocol Kit
 
-[![NPM Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit)
+[![npm Version](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fprotocol-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with [Safe Smart Accounts](https://github.com/safe-global/safe-smart-account).
+Software development kit that facilitates the interaction with [Safe Smart Accounts](https://github.com/safe-global/safe-smart-account) using a TypeScript interface. This Kit can be used to create new Safe accounts, update the configuration of existing Safes, create and execute transactions, among other features.
 
 ## Table of contents
 

@@ -1,12 +1,14 @@
 {
   "name": "@safe-global/safe-core-sdk-types",
-  "version": "5.0.0-alpha.0",
+  "version": "5.1.0-alpha.0",
   "description": "Safe Core SDK types",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
+    "Wallet",
     "Safe",
+    "Smart Account",
     "SDK"
   ],
   "scripts": {

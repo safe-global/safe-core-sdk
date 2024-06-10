@@ -424,9 +424,6 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
   switch (safeVersion) {
     case '1.4.1':
     case '1.3.0':
-    case '1.2.0':
-    case '1.1.1':
-    case '1.0.0':
       const safeWebAuthnSignerFactoryContractInstance =
         new SafeWebAuthnSignerFactoryContract_v1_4_1(
           chainId,

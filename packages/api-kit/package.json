@@ -1,13 +1,14 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "2.3.2-alpha.0",
-  "description": "Safe API Kit",
+  "version": "2.4.1",
+  "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
+    "Wallet",
     "Safe",
-    "Service",
+    "Smart Account",
     "API"
   ],
   "scripts": {
@@ -58,8 +59,8 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^4.0.0-alpha.0",
-    "@safe-global/safe-core-sdk-types": "^5.0.0-alpha.0",
+    "@safe-global/protocol-kit": "^4.1.0-alpha.0",
+    "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.0",
     "ethers": "^6.12.1",
     "node-fetch": "^2.7.0"
   }

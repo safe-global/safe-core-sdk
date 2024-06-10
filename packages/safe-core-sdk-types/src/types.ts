@@ -255,3 +255,102 @@ export interface MetaTransactionOptions {
   gasToken?: string
   isSponsored?: boolean
 }
+
+export type UserOperation = {
+  sender: string
+  nonce: string
+  initCode: string
+  callData: string
+  callGasLimit: bigint
+  verificationGasLimit: bigint
+  preVerificationGas: bigint
+  maxFeePerGas: bigint
+  maxPriorityFeePerGas: bigint
+  paymasterAndData: string
+  signature: string
+}
+
+export type SafeUserOperation = {
+  safe: string
+  nonce: bigint
+  initCode: string
+  callData: string
+  callGasLimit: bigint
+  verificationGasLimit: bigint
+  preVerificationGas: bigint
+  maxFeePerGas: bigint
+  maxPriorityFeePerGas: bigint
+  paymasterAndData: string
+  validAfter: number
+  validUntil: number
+  entryPoint: string
+}
+
+export type EstimateGasData = {
+  maxFeePerGas?: bigint
+  maxPriorityFeePerGas?: bigint
+  preVerificationGas?: bigint
+  verificationGasLimit?: bigint
+  callGasLimit?: bigint
+}
+
+export interface SafeOperation {
+  readonly moduleAddress: string
+  readonly data: SafeUserOperation
+  readonly signatures: Map<string, SafeSignature>
+  getSignature(signer: string): SafeSignature | undefined
+  addSignature(signature: SafeSignature): void
+  encodedSignatures(): string
+  addEstimations(estimations: EstimateGasData): void
+  toUserOperation(): UserOperation
+}
+
+export const isSafeOperation = (response: unknown): response is SafeOperation => {
+  const safeOperation = response as SafeOperation
+
+  return 'data' in safeOperation && 'signatures' in safeOperation
+}
+
+export type SafeOperationConfirmation = {
+  readonly created: string
+  readonly modified: string
+  readonly owner: string
+  readonly signature: string
+  readonly signatureType: string
+}
+
+export type UserOperationResponse = {
+  readonly ethereumTxHash: null | string
+  readonly sender: string
+  readonly userOperationHash: string
+  readonly nonce: number
+  readonly initCode: null | string
+  readonly callData: null | string
+  readonly callGasLimit: number
+  readonly verificationGasLimit: number
+  readonly preVerificationGas: number
+  readonly maxFeePerGas: number
+  readonly maxPriorityFeePerGas: number
+  readonly paymaster: null | string
+  readonly paymasterData: null | string
+  readonly signature: string
+  readonly entryPoint: string
+}
+
+export type SafeOperationResponse = {
+  readonly created: string
+  readonly modified: string
+  readonly safeOperationHash: string
+  readonly validAfter: null | string
+  readonly validUntil: null | string
+  readonly moduleAddress: string
+  readonly confirmations?: Array<SafeOperationConfirmation>
+  readonly preparedSignature?: string
+  readonly userOperation?: UserOperationResponse
+}
+
+export const isSafeOperationResponse = (response: unknown): response is SafeOperationResponse => {
+  const safeOperationResponse = response as SafeOperationResponse
+
+  return 'userOperation' in safeOperationResponse && 'safeOperationHash' in safeOperationResponse
+}

@@ -1,7 +1,13 @@
 import Safe, { SafeProviderConfig } from '@safe-global/protocol-kit'
-import { MetaTransactionData, SafeVersion } from '@safe-global/safe-core-sdk-types'
+import {
+  EstimateGasData,
+  MetaTransactionData,
+  SafeOperationResponse,
+  SafeVersion,
+  UserOperation
+} from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
-import SafeOperation from './SafeOperation'
+import EthSafeOperation from './SafeOperation'
 
 type ExistingSafeOptions = {
   safeAddress: string
@@ -27,7 +33,6 @@ export type Safe4337InitOptions = {
   provider: SafeProviderConfig['provider']
   signer?: SafeProviderConfig['signer']
   bundlerUrl: string
-  rpcUrl: string
   safeModulesVersion?: string
   customContracts?: {
     entryPointAddress?: string
@@ -43,7 +48,6 @@ export type Safe4337Options = {
   bundlerUrl: string
   paymasterOptions?: PaymasterOptions
   bundlerClient: ethers.JsonRpcProvider
-  publicClient: ethers.JsonRpcProvider
   entryPointAddress: string
   safe4337ModuleAddress: string
 }
@@ -59,45 +63,7 @@ export type Safe4337CreateTransactionProps = {
 }
 
 export type Safe4337ExecutableProps = {
-  executable: SafeOperation
-}
-
-export type SafeUserOperation = {
-  safe: string
-  nonce: bigint
-  initCode: string
-  callData: string
-  callGasLimit: bigint
-  verificationGasLimit: bigint
-  preVerificationGas: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
-  paymasterAndData: string
-  validAfter: number
-  validUntil: number
-  entryPoint: string
-}
-
-export type UserOperation = {
-  sender: string
-  nonce: string
-  initCode: string
-  callData: string
-  callGasLimit: bigint
-  verificationGasLimit: bigint
-  preVerificationGas: bigint
-  maxFeePerGas: bigint
-  maxPriorityFeePerGas: bigint
-  paymasterAndData: string
-  signature: string
-}
-
-export type EstimateGasData = {
-  maxFeePerGas?: bigint
-  maxPriorityFeePerGas?: bigint
-  preVerificationGas?: bigint
-  verificationGasLimit?: bigint
-  callGasLimit?: bigint
+  executable: EthSafeOperation | SafeOperationResponse
 }
 
 export type EstimateSponsoredGasData = {
@@ -182,6 +148,6 @@ export interface IFeeEstimator {
 }
 
 export type EstimateFeeProps = {
-  safeOperation: SafeOperation
+  safeOperation: EthSafeOperation
   feeEstimator?: IFeeEstimator
 }

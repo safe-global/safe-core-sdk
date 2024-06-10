@@ -4,7 +4,11 @@ import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config
 import {
   AddOwnerTxParams,
   AddPasskeyOwnerTxParams,
-  StandardizeSafeTransactionDataProps
+  PasskeyArgType,
+  RemoveOwnerTxParams,
+  RemovePasskeyOwnerTxParams,
+  StandardizeSafeTransactionDataProps,
+  SwapOwnerTxParams
 } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -162,14 +166,26 @@ export function isSafeMultisigTransactionResponse(
   return (safeTransaction as SafeMultisigTransactionResponse).isExecuted !== undefined
 }
 
-export function isAddOwnerTxParams(
-  params: AddOwnerTxParams | AddPasskeyOwnerTxParams
-): params is AddOwnerTxParams {
-  return (params as AddOwnerTxParams).ownerAddress !== undefined
+type PasskeyParam = { passkey: PasskeyArgType }
+
+export function isPasskeyParam(
+  params:
+    | AddOwnerTxParams
+    | AddPasskeyOwnerTxParams
+    | RemoveOwnerTxParams
+    | RemovePasskeyOwnerTxParams
+): params is PasskeyParam {
+  return (params as PasskeyParam).passkey !== undefined
 }
 
-export function isAddPasskeyOwnerTxParams(
-  params: AddOwnerTxParams | AddPasskeyOwnerTxParams
-): params is AddPasskeyOwnerTxParams {
-  return (params as AddPasskeyOwnerTxParams).passkey !== undefined
+export function isOldOwnerPasskey(
+  params: SwapOwnerTxParams
+): params is SwapOwnerTxParams & { oldOwnerPasskey: PasskeyArgType } {
+  return (params as { oldOwnerPasskey: PasskeyArgType }).oldOwnerPasskey !== undefined
+}
+
+export function isNewOwnerPasskey(
+  params: SwapOwnerTxParams
+): params is SwapOwnerTxParams & { newOwnerPasskey: PasskeyArgType } {
+  return (params as { newOwnerPasskey: PasskeyArgType }).newOwnerPasskey !== undefined
 }

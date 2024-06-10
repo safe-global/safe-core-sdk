@@ -229,7 +229,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         setupTransactions.push(approveToPaymasterTransaction)
       }
 
-      const safeProvider = await SafeProvider.init(provider, signer)
+      const safeProvider = await SafeProvider.init(provider, signer, safeVersion)
 
       // third transaction: passkey support via shared signer SafeWebAuthnSharedSigner
       // see: https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/4337/experimental/README.md
@@ -237,11 +237,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       if (isPasskeySigner) {
         const passkeySigner = (await safeProvider.getExternalSigner()) as PasskeySigner
-        const ownerAddress = await passkeySigner.getAddress()
-
-        if (!options.owners.includes(ownerAddress)) {
-          options.owners.push(ownerAddress)
-        }
 
         if (!options.owners.includes(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)) {
           options.owners.push(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)

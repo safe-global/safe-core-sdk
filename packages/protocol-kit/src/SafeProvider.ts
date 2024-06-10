@@ -6,7 +6,12 @@ import {
   BrowserProvider,
   JsonRpcProvider
 } from 'ethers'
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import {
+  SAFE_FEATURES,
+  generateTypedData,
+  hasSafeFeature,
+  validateEip3770Address
+} from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
@@ -15,7 +20,8 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args
+  SafeEIP712Args,
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -40,6 +46,7 @@ import {
   ContractNetworksConfig
 } from '@safe-global/protocol-kit/types'
 import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { DEFAULT_SAFE_VERSION } from './contracts/config'
 
 class SafeProvider {
   #externalProvider: BrowserProvider | JsonRpcProvider
@@ -70,11 +77,18 @@ class SafeProvider {
   static async init(
     provider: SafeConfig['provider'],
     signer?: SafeConfig['signer'],
+    safeVersion: SafeVersion = DEFAULT_SAFE_VERSION,
     contractNetworks?: ContractNetworksConfig
   ): Promise<SafeProvider> {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
     if (isPasskeySigner) {
+      if (!hasSafeFeature(SAFE_FEATURES.PASSKEY_SIGNER, safeVersion)) {
+        throw new Error(
+          'Current version of the Safe does not support the Passkey signer functionality'
+        )
+      }
+
       const safeProvider = new SafeProvider({
         provider
       })
@@ -90,7 +104,7 @@ class SafeProvider {
 
       const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
         safeProvider,
-        safeVersion: '1.4.1',
+        safeVersion,
         customContracts
       })
 

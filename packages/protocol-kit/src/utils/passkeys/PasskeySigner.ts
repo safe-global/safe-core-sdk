@@ -3,6 +3,7 @@ import { Buffer } from 'buffer'
 
 import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
 import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
+import { EMPTY_DATA } from '../constants'
 
 // FIXME: use the production deployment packages instead of a hardcoded address
 const P256_VERIFIER_ADDRESS =
@@ -62,7 +63,7 @@ class PasskeySigner extends AbstractSigner {
   }
 
   /**
-   * Returns the address associated with the Signer.
+   * Returns the address associated with the passkey signer.
    * @returns {Promise<string>} A promise that resolves to the signer's address.
    */
   async getAddress(): Promise<string> {
@@ -85,6 +86,27 @@ class PasskeySigner extends AbstractSigner {
       BigInt(this.coordinates.y),
       BigInt(P256_VERIFIER_ADDRESS)
     ])
+  }
+
+  /**
+   * Creates the deployment transaction to create a passkey signer.
+   * @returns {string} The deployment transaction to create a passkey signer.
+   */
+  async createPasskeyDeploymentTransaction() {
+    const passkeyAddress = await this.getAddress()
+    const isPasskeyDeployed = (await this.provider?.getCode(passkeyAddress)) !== EMPTY_DATA
+
+    if (isPasskeyDeployed) {
+      throw new Error('Passkey Signer contract already deployed')
+    }
+
+    const passkeySignerDeploymentTransaction = {
+      to: await this.safeWebAuthnSignerFactoryContract.getAddress(),
+      value: '0',
+      data: this.encodeCreateSigner()
+    }
+
+    return passkeySignerDeploymentTransaction
   }
 
   /**

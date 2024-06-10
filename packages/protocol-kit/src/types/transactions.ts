@@ -68,9 +68,35 @@ export type RemoveOwnerTxParams = {
   threshold?: number
 }
 
-export type SwapOwnerTxParams = {
-  /** oldOwnerAddress - The old owner address */
-  oldOwnerAddress: string
-  /** newOwnerAddress - The new owner address */
-  newOwnerAddress: string
+export type RemovePasskeyOwnerTxParams = {
+  /** passkey - The passkey of the owner that will be removed */
+  passkey: PasskeyArgType
+  /** threshold - The new threshold */
+  threshold?: number
 }
+
+export type SwapOwnerTxParams =
+  | {
+      /** oldOwnerAddress - The old owner address */
+      oldOwnerAddress: string
+      /** newOwnerAddress - The new owner address */
+      newOwnerAddress: string
+    }
+  | {
+      /** oldOwnerPasskey - The old owner passkey */
+      oldOwnerPasskey: PasskeyArgType
+      /** newOwnerAddress - The new owner address */
+      newOwnerAddress: string
+    }
+  | {
+      /** oldOwnerAddress - The old owner address */
+      oldOwnerAddress: string
+      /** newOwnerPasskey - The new owner passkey */
+      newOwnerPasskey: PasskeyArgType
+    }
+  | {
+      /** oldOwnerPasskey - The old owner passkey */
+      oldOwnerPasskey: PasskeyArgType
+      /** newOwnerPasskey - The new owner passkey */
+      newOwnerPasskey: PasskeyArgType
+    }

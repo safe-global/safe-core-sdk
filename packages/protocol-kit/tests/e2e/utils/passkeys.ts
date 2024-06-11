@@ -4,7 +4,7 @@ import { PasskeyArgType } from '@safe-global/protocol-kit'
 
 let singleInstance: WebAuthnCredentials
 
-// This needs to be a singleton
+// This needs to be a singleton. The reason for that is that we are adding it to a global reference in the tests.
 export function getWebAuthnCredentials() {
   if (!singleInstance) {
     singleInstance = new WebAuthnCredentials()

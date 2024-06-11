@@ -85,7 +85,7 @@ describe('Passkey', () => {
   })
 
   describeif(safeVersionDeployed < '1.3.0')('init', async () => {
-    it('should fail for Safe versions lower then 1.3.0', async () => {
+    it('should fail for Safe versions lower than 1.3.0', async () => {
       const {
         predictedSafe,
         contractNetworks,

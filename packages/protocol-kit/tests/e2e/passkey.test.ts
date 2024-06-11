@@ -1,9 +1,5 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, {
-  PredictedSafeProps,
-  SafeProvider,
-  passkeyArgType
-} from '@safe-global/protocol-kit/index'
+import Safe, { PredictedSafeProps, SafeProvider, PasskeyArgType } from '@safe-global/protocol-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
@@ -42,7 +38,7 @@ global.navigator = {
  * @param name User name used for passkey mock
  * @returns Passkey arguments
  */
-async function createMockPasskey(name: string): Promise<passkeyArgType> {
+async function createMockPasskey(name: string): Promise<PasskeyArgType> {
   const passkeyCredential = await webAuthnCredentials.create({
     publicKey: {
       rp: {

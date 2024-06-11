@@ -1,12 +1,12 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps, SafeProvider, PasskeyArgType } from '@safe-global/protocol-kit'
+
+import Safe, { PredictedSafeProps, SafeProvider } from '@safe-global/protocol-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import { deployments } from 'hardhat'
 import crypto from 'crypto'
-import { ethers } from 'ethers'
 import PasskeySigner from '@safe-global/protocol-kit/utils/passkeys/PasskeySigner'
 import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
@@ -14,13 +14,13 @@ import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { getAccounts } from './utils/setupTestNetwork'
-import { WebAuthnCredentials } from './utils/webauthnShim'
 import { itif, describeif } from './utils/helpers'
+import { createMockPasskey, getWebAuthnCredentials } from './utils/passkeys'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
-const webAuthnCredentials = new WebAuthnCredentials()
+const webAuthnCredentials = getWebAuthnCredentials()
 
 if (!global.crypto) {
   global.crypto = crypto as unknown as Crypto
@@ -32,45 +32,6 @@ global.navigator = {
     get: sinon.stub().callsFake(webAuthnCredentials.get.bind(webAuthnCredentials))
   }
 } as unknown as Navigator
-
-/**
- * Creates a mock passkey for testing purposes.
- * @param name User name used for passkey mock
- * @returns Passkey arguments
- */
-async function createMockPasskey(name: string): Promise<PasskeyArgType> {
-  const passkeyCredential = await webAuthnCredentials.create({
-    publicKey: {
-      rp: {
-        name: 'Safe',
-        id: 'safe.global'
-      },
-      user: {
-        id: ethers.getBytes(ethers.id(name)),
-        name: name,
-        displayName: name
-      },
-      challenge: ethers.toBeArray(Date.now()),
-      pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
-    }
-  })
-
-  const algorithm = {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: { name: 'SHA-256' }
-  }
-  const key = await crypto.subtle.importKey(
-    'raw',
-    passkeyCredential.response.getPublicKey(),
-    algorithm,
-    true,
-    ['verify']
-  )
-  const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
-
-  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
-}
 
 describe('Passkey', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
@@ -261,7 +222,6 @@ describe('Passkey', () => {
         }
         // Deploy the passkey signer
         await account1.signer.sendTransaction(createPasskeySignerTransaction)
-
         // Passkey signer should be deployed now
         chai
           .expect(await account1.signer.provider.getCode(passkeySigner1Address))
@@ -273,7 +233,6 @@ describe('Passkey', () => {
           contractNetworks,
           signer: passkey1
         })
-
         const tx = await safeSdk.createTransaction({
           transactions: [{ to: safeAddress, value: '0', data: '0x' }]
         })
@@ -282,7 +241,6 @@ describe('Passkey', () => {
         const signedTx = await safeSdk.signTransaction(tx)
         chai.expect(tx.signatures.size).to.be.eq(0)
         chai.expect(signedTx.signatures.size).to.be.eq(1)
-
         // Create a Safe instance with an EOA signer to execute the transaction
         const safeSdkEOA = await Safe.init({
           provider,
@@ -342,6 +300,7 @@ describe('Passkey', () => {
           data: passkeySigner1.encodeCreateSigner(),
           signer: account1
         }
+
         // Deploy the passkey signer
         await account1.signer.sendTransaction(createPasskeySignerTransaction)
 

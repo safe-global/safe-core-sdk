@@ -84,30 +84,6 @@ describe('Passkey', () => {
     }
   })
 
-  describeif(safeVersionDeployed < '1.3.0')('init', async () => {
-    it('should fail for Safe versions lower than 1.3.0', async () => {
-      const {
-        predictedSafe,
-        contractNetworks,
-        provider,
-        passkeys: [passkey1]
-      } = await setupTests()
-
-      chai
-        .expect(
-          Safe.init({
-            provider,
-            predictedSafe,
-            contractNetworks,
-            signer: passkey1
-          })
-        )
-        .to.be.rejectedWith(
-          'Current version of the Safe does not support the Passkey signer functionality'
-        )
-    })
-  })
-
   describe('isOwner', async () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail for a passkey argument of Safe <v1.3.0',

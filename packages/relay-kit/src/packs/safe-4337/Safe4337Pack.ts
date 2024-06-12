@@ -61,7 +61,7 @@ const EQ_OR_GT_1_4_1 = '>=1.4.1'
   Deployment commit: https://github.com/safe-global/safe-modules/commit/3853f34f31837e0a0aee47a4452564278f8c62ba
 */
 // FIXME: use the production deployment packages instead of a hardcoded address
-export const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
+const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
 
 // FIXME: use the production deployment packages instead of a hardcoded address
 // Sepolia only
@@ -381,7 +381,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const estimateUserOperationGas = await this.#bundlerClient.send(
       RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
       [
-        userOperationToHexValues(addDummySignature(safeOperation.toUserOperation(), threshold)),
+        userOperationToHexValues(
+          addDummySignature(
+            safeOperation.toUserOperation(),
+            SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+            threshold
+          )
+        ),
         this.#ENTRYPOINT_ADDRESS
       ]
     )
@@ -410,7 +416,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
-        userOperation: addDummySignature(safeOperation.toUserOperation(), threshold),
+        userOperation: addDummySignature(
+          safeOperation.toUserOperation(),
+          SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          threshold
+        ),
         paymasterUrl: this.#paymasterOptions.paymasterUrl,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
         sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId

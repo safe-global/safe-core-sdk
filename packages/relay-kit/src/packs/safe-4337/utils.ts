@@ -13,7 +13,6 @@ import {
 } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
 import { EIP712_SAFE_OPERATION_TYPE, INTERFACES } from './constants'
-import { SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS } from './Safe4337Pack'
 
 /**
  * Gets the EIP-4337 bundler provider.
@@ -126,7 +125,7 @@ export function userOperationToHexValues(userOperation: UserOperation) {
  * to account for variations in WebAuthn implementations.
  */
 export const DUMMY_CLIENT_DATA_FIELDS = [
-  `"origin":"http://safe.global"`,
+  `"origin":"https://safe.global"`,
   `"padding":"This pads the clientDataJSON so that we can leave room for additional implementation specific fields for a more accurate 'preVerificationGas' estimate."`
 ].join(',')
 
@@ -147,14 +146,18 @@ DUMMY_AUTHENTICATOR_DATA[32] = 0x04
  * This method creates a dummy signature for the SafeOperation based on the Safe threshold. We assume that all owners are passkeys
  * This is useful for gas estimations
  * @param userOperation - The user operation
+ * @param signer - The signer
  * @param threshold - The Safe threshold
  * @returns The user operation with the dummy passkey signature
  */
-export function addDummySignature(userOperation: UserOperation, threshold: number): UserOperation {
+export function addDummySignature(
+  userOperation: UserOperation,
+  signer: string,
+  threshold: number
+): UserOperation {
   const signatures = []
 
   for (let i = 0; i < threshold; i++) {
-    const passkeySigner = SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS
     const isContractSignature = true
     const passkeySignature = getSignatureBytes({
       authenticatorData: DUMMY_AUTHENTICATOR_DATA,
@@ -163,7 +166,7 @@ export function addDummySignature(userOperation: UserOperation, threshold: numbe
       s: BigInt(`0x${'d5a'.repeat(21)}f`)
     })
 
-    signatures.push(new EthSafeSignature(passkeySigner, passkeySignature, isContractSignature))
+    signatures.push(new EthSafeSignature(signer, passkeySignature, isContractSignature))
   }
 
   return {

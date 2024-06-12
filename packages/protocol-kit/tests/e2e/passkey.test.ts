@@ -86,7 +86,7 @@ describe('Passkey', () => {
 
   describe('isOwner', async () => {
     itif(safeVersionDeployed < '1.3.0')(
-      'should fail for a passkey argument of Safe <v1.3.0',
+      'should fail for Safe versions lower than 1.3.0',
       async () => {
         const {
           contractNetworks,

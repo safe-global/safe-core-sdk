@@ -56,7 +56,7 @@ describe('Safe contracts', () => {
 
   describe('init', async () => {
     itif(safeVersionDeployed < '1.3.0')(
-      'should return an L1 Safe contract from safe-deployments',
+      'should fail for a passkey signer and Safe <v1.3.0',
       async () => {
         const { provider } = await setupTests()
         const passKeySigner = await createMockPasskey('aName')

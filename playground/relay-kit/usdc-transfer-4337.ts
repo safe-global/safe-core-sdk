@@ -1,5 +1,5 @@
-import { ethers } from 'ethers'
 import { Safe4337Pack } from '@safe-global/relay-kit'
+import { waitForOperationToFinish, generateTransferCallData } from 'playground/utils'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -15,6 +15,8 @@ const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_
 // RPC URL
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 
+const CHAIN_NAME = 'sepolia'
+
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
@@ -24,7 +26,6 @@ async function main() {
   const safe4337Pack = await Safe4337Pack.init({
     provider: RPC_URL,
     signer: PRIVATE_KEY,
-    rpcUrl: RPC_URL,
     bundlerUrl: BUNDLER_URL,
     options: {
       safeAddress: SAFE_ADDRESS
@@ -69,28 +70,7 @@ async function main() {
     executable: signedSafeOperation
   })
 
-  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=sepolia`)
-
-  let userOperationReceipt = null
-  while (!userOperationReceipt) {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    userOperationReceipt = await safe4337Pack.getUserOperationReceipt(userOperationHash)
-  }
-
-  console.group('User Operation Receipt and hash')
-  console.log('User Operation Receipt', userOperationReceipt)
-  console.log(
-    'User Operation By Hash',
-    await safe4337Pack.getUserOperationByHash(userOperationHash)
-  )
-  console.groupEnd()
+  await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)
 }
 
 main()
-
-const generateTransferCallData = (to: string, value: bigint) => {
-  const functionAbi = 'function transfer(address _to, uint256 _value) returns (bool)'
-  const iface = new ethers.Interface([functionAbi])
-
-  return iface.encodeFunctionData('transfer', [to, value])
-}

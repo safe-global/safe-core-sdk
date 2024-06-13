@@ -14,7 +14,7 @@ import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { getAccounts } from './utils/setupTestNetwork'
 import { itif, describeif } from './utils/helpers'
-import { createMockPasskey, getWebAuthnCredentials } from './utils/passkeys'
+import { createMockPasskey, getWebAuthnCredentials, deployPasskeysContract } from './utils/passkeys'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -190,13 +190,8 @@ describe('Passkey', () => {
         const safeAddress = await safe.getAddress()
 
         // First create transaction for the deployment of the passkey signer
-        const createPasskeySignerTransaction = {
-          to: await passkeySigner1.safeWebAuthnSignerFactoryContract.getAddress(),
-          value: '0',
-          data: passkeySigner1.encodeCreateSigner()
-        }
-        // Deploy the passkey signer
-        await account1.signer.sendTransaction(createPasskeySignerTransaction)
+        await deployPasskeysContract([passkeySigner1])
+
         // Passkey signer should be deployed now
         chai
           .expect(await account1.signer.provider.getCode(passkeySigner1Address))
@@ -258,148 +253,145 @@ describe('Passkey', () => {
     })
 
     describeif(safeVersionDeployed >= '1.3.0')('createSwapOwnerTx', () => {
-      describe('when signing the transaction with an EOA', () => {
-        it('should swap a passkey owner in', async () => {
-          const {
-            accounts: [eoaOwner1, eoaOwner2, eoaOwner3],
-            contractNetworks,
-            provider,
-            passkeys: [passkeyNewOwner],
-            passkeySigners: [passkeySigner]
-          } = await setupTests()
+      it('should add a passkey owner to a a Safe', async () => {
+        const {
+          accounts: [eoaOwner1, eoaOwner2, eoaOwner3],
+          contractNetworks,
+          provider,
+          passkeys: [passkeyNewOwner],
+          passkeySigners: [passkeySigner]
+        } = await setupTests()
 
-          const newPasskeyOwnerAddress = await passkeySigner.getAddress()
-          const safe = await getSafeWithOwners(
-            [eoaOwner1.address, eoaOwner2.address, eoaOwner3.address],
-            2
-          )
-          const safeSdk = await Safe.init({
-            provider,
-            safeAddress: await safe.getAddress(),
-            contractNetworks
-          })
-
-          const currentOwners = await safeSdk.getOwners()
-
-          chai
-            .expect(currentOwners)
-            .to.include.members([eoaOwner1.address, eoaOwner2.address, eoaOwner3.address])
-          chai.expect(currentOwners).to.not.include(newPasskeyOwnerAddress)
-
-          const formerOwner = eoaOwner3.address
-          const swapOwnerTransaction = await safeSdk.createSwapOwnerTx({
-            oldOwnerAddress: formerOwner,
-            newOwnerPasskey: passkeyNewOwner
-          })
-
-          const approverSdk = await safeSdk.connect({
-            signer: eoaOwner2.address
-          })
-
-          const approvedTransaction = await approverSdk.signTransaction(swapOwnerTransaction)
-          const result = await safeSdk.executeTransaction(approvedTransaction)
-          await waitSafeTxReceipt(result)
-
-          const newOwners = await safeSdk.getOwners()
-
-          chai
-            .expect(newOwners)
-            .to.include.members([eoaOwner1.address, eoaOwner2.address, newPasskeyOwnerAddress])
-          chai.expect(newOwners).to.not.include(formerOwner)
-        })
-
-        it('should swap a passkey owner out', async () => {
-          const {
-            accounts: [eoaOwner1, newEoaOwner],
-            contractNetworks,
-            provider,
-            passkeys,
-            passkeySigners: [passkeySigner1, passkeySigner2]
-          } = await setupTests()
-
-          const passkeyOwner2 = passkeys[1]
-          const passkeyOwner1Address = await passkeySigner1.getAddress()
-          const passkeyOwner2Address = await passkeySigner2.getAddress()
-          const safe = await getSafeWithOwners(
-            [passkeyOwner1Address, passkeyOwner2Address, eoaOwner1.address],
-            2
-          )
-          const safeSdk = await Safe.init({
-            provider,
-            safeAddress: await safe.getAddress(),
-            contractNetworks
-          })
-
-          const currentOwners = await safeSdk.getOwners()
-
-          chai
-            .expect(currentOwners)
-            .to.include.members([passkeyOwner1Address, passkeyOwner2Address, eoaOwner1.address])
-          chai.expect(currentOwners).to.not.include(newEoaOwner.address)
-
-          const swapOwnerTransaction = await safeSdk.createSwapOwnerTx({
-            oldOwnerPasskey: passkeyOwner2,
-            newOwnerAddress: newEoaOwner.address
-          })
-
-          const signedTransaction = await safeSdk.signTransaction(swapOwnerTransaction)
-
-          const approverSdk = await safeSdk.connect({
-            signer: eoaOwner1.address
-          })
-
-          const approvedTransaction = await approverSdk.signTransaction(signedTransaction)
-          const result = await safeSdk.executeTransaction(approvedTransaction)
-          await waitSafeTxReceipt(result)
-
-          const newOwners = await safeSdk.getOwners()
-
-          chai
-            .expect(newOwners)
-            .to.include.members([passkeyOwner1Address, eoaOwner1.address, newEoaOwner.address])
-          chai.expect(newOwners).to.not.include(passkeyOwner2Address)
-        })
-
-        itif(safeVersionDeployed >= '1.3.0')(
-          'should enable a new passkey owner to sign transactions',
-          async () => {
-            const {
-              accounts: [owner],
-              contractNetworks,
-              provider,
-              passkeys: [passkeyNewOwner]
-            } = await setupTests()
-
-            const safe = await getSafeWithOwners([owner.address])
-            const safeAddress = await safe.getAddress()
-
-            const safeSdk = await Safe.init({
-              provider,
-              safeAddress,
-              contractNetworks
-            })
-
-            const swapOwnerTransaction = await safeSdk.createSwapOwnerTx({
-              oldOwnerAddress: owner.address,
-              newOwnerPasskey: passkeyNewOwner
-            })
-            const swapOwnerResult = await safeSdk.executeTransaction(swapOwnerTransaction)
-            await waitSafeTxReceipt(swapOwnerResult)
-
-            const safeTransactionData = {
-              to: safeAddress,
-              value: '0',
-              data: '0x'
-            }
-
-            const safeSdk2 = await safeSdk.connect({
-              signer: passkeyNewOwner
-            })
-            const tx = await safeSdk2.createTransaction({ transactions: [safeTransactionData] })
-            const signedTx = await safeSdk2.signTransaction(tx)
-            chai.expect(safeSdk.executeTransaction(signedTx)).to.not.be.rejected
-          }
+        const newPasskeyOwnerAddress = await passkeySigner.getAddress()
+        const safe = await getSafeWithOwners(
+          [eoaOwner1.address, eoaOwner2.address, eoaOwner3.address],
+          2
         )
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress: await safe.getAddress(),
+          contractNetworks
+        })
+
+        const currentOwners = await safeSdk.getOwners()
+
+        chai
+          .expect(currentOwners)
+          .to.include.members([eoaOwner1.address, eoaOwner2.address, eoaOwner3.address])
+        chai.expect(currentOwners).to.not.include(newPasskeyOwnerAddress)
+
+        const formerOwner = eoaOwner3.address
+        const swapOwnerTransaction = await safeSdk.createSwapOwnerTx({
+          oldOwnerAddress: formerOwner,
+          newOwnerPasskey: passkeyNewOwner
+        })
+
+        const approverSdk = await safeSdk.connect({
+          signer: eoaOwner2.address
+        })
+
+        const approvedTransaction = await approverSdk.signTransaction(swapOwnerTransaction)
+        const result = await safeSdk.executeTransaction(approvedTransaction)
+        await waitSafeTxReceipt(result)
+
+        const newOwners = await safeSdk.getOwners()
+
+        chai
+          .expect(newOwners)
+          .to.include.members([eoaOwner1.address, eoaOwner2.address, newPasskeyOwnerAddress])
+        chai.expect(newOwners).to.not.include(formerOwner)
+      })
+
+      it('should remove a passkey owner from a Safe', async () => {
+        const {
+          accounts: [eoaOwner1, newEoaOwner],
+          contractNetworks,
+          provider,
+          passkeys: [passkeyOwner1, passkeyOwner2],
+          passkeySigners: [passkeySigner1, passkeySigner2]
+        } = await setupTests()
+
+        const passkeyOwner1Address = await passkeySigner1.getAddress()
+        const passkeyOwner2Address = await passkeySigner2.getAddress()
+
+        await deployPasskeysContract([passkeySigner1, passkeySigner2])
+        const safe = await getSafeWithOwners(
+          [passkeyOwner1Address, passkeyOwner2Address, eoaOwner1.address],
+          2
+        )
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress: await safe.getAddress(),
+          contractNetworks,
+          signer: passkeyOwner1
+        })
+
+        const currentOwners = await safeSdk.getOwners()
+
+        chai
+          .expect(currentOwners)
+          .to.include.members([passkeyOwner1Address, passkeyOwner2Address, eoaOwner1.address])
+        chai.expect(currentOwners).to.not.include(newEoaOwner.address)
+
+        const swapOwnerTransaction = await safeSdk.createSwapOwnerTx({
+          oldOwnerPasskey: passkeyOwner2,
+          newOwnerAddress: newEoaOwner.address
+        })
+
+        const signedTransaction = await safeSdk.signTransaction(swapOwnerTransaction)
+
+        const approverSdk = await safeSdk.connect({
+          signer: eoaOwner1.address
+        })
+
+        const approvedTransaction = await approverSdk.signTransaction(signedTransaction)
+        const result = await approverSdk.executeTransaction(approvedTransaction)
+        await waitSafeTxReceipt(result)
+
+        const newOwners = await safeSdk.getOwners()
+
+        chai
+          .expect(newOwners)
+          .to.include.members([passkeyOwner1Address, eoaOwner1.address, newEoaOwner.address])
+        chai.expect(newOwners).to.not.include(passkeyOwner2Address)
+      })
+
+      it('should enable the new passkey owner to sign transactions', async () => {
+        const {
+          accounts: [owner],
+          contractNetworks,
+          provider,
+          passkeys: [passkeyNewOwner]
+        } = await setupTests()
+
+        const safe = await getSafeWithOwners([owner.address])
+        const safeAddress = await safe.getAddress()
+
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress,
+          contractNetworks
+        })
+
+        const swapOwnerTransaction = await safeSdk.createSwapOwnerTx({
+          oldOwnerAddress: owner.address,
+          newOwnerPasskey: passkeyNewOwner
+        })
+        const swapOwnerResult = await safeSdk.executeTransaction(swapOwnerTransaction)
+        await waitSafeTxReceipt(swapOwnerResult)
+
+        const safeTransactionData = {
+          to: safeAddress,
+          value: '0',
+          data: '0x'
+        }
+
+        const safeSdk2 = await safeSdk.connect({
+          signer: passkeyNewOwner
+        })
+        const tx = await safeSdk2.createTransaction({ transactions: [safeTransactionData] })
+        const signedTx = await safeSdk2.signTransaction(tx)
+        chai.expect(safeSdk.executeTransaction(signedTx)).to.not.be.rejected
       })
     })
 
@@ -415,15 +407,7 @@ describe('Passkey', () => {
         const passkeySigner1Address = await passkeySigner1.getAddress()
 
         // First create transaction for the deployment of the passkey signer
-        const createPasskeySignerTransaction = {
-          to: await passkeySigner1.safeWebAuthnSignerFactoryContract.getAddress(),
-          value: '0',
-          data: passkeySigner1.encodeCreateSigner(),
-          signer: account1
-        }
-
-        // Deploy the passkey signer
-        await account1.signer.sendTransaction(createPasskeySignerTransaction)
+        await deployPasskeysContract([passkeySigner1])
 
         // Passkey signer should be deployed now
         chai
@@ -559,13 +543,7 @@ describe('Passkey', () => {
           const safeAddress = await safe.getAddress()
 
           // First create transaction for the deployment of the passkey signer
-          const createPasskeySignerTransaction = {
-            to: await passkeySigner1.safeWebAuthnSignerFactoryContract.getAddress(),
-            value: '0',
-            data: passkeySigner1.encodeCreateSigner()
-          }
-          // Deploy the passkey signer
-          await account1.signer.sendTransaction(createPasskeySignerTransaction)
+          await deployPasskeysContract([passkeySigner1])
 
           // Passkey signer should be deployed now
           chai

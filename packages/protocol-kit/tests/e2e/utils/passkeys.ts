@@ -1,6 +1,8 @@
 import { WebAuthnCredentials } from './webauthnShim'
 import { ethers } from 'ethers'
 import { PasskeyArgType } from '@safe-global/protocol-kit'
+import { getAccounts } from './setupTestNetwork'
+import PasskeySigner from '@safe-global/protocol-kit/utils/passkeys/PasskeySigner'
 
 let singleInstance: WebAuthnCredentials
 
@@ -11,6 +13,27 @@ export function getWebAuthnCredentials() {
   }
 
   return singleInstance
+}
+
+/**
+ * Deploys the passkey contract for each of the signers.
+ * @param name User name used for passkey mock
+ * @returns Passkey arguments
+ */
+export async function deployPasskeysContract(passkeys: PasskeySigner[]) {
+  const [deployer] = await getAccounts()
+
+  const toDeploy = passkeys.map(async (passkey) => {
+    const createPasskeySignerTransaction = {
+      to: await passkey.safeWebAuthnSignerFactoryContract.getAddress(),
+      value: '0',
+      data: passkey.encodeCreateSigner()
+    }
+    // Deploy the passkey signer
+    return await deployer.signer.sendTransaction(createPasskeySignerTransaction)
+  })
+
+  return Promise.all(toDeploy)
 }
 
 /**

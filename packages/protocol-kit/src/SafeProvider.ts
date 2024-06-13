@@ -108,7 +108,7 @@ class SafeProvider {
         customContracts
       })
 
-      const passkeySigner = await PasskeySigner.init(
+      const passkeySigner = new PasskeySigner(
         signer,
         safeWebAuthnSignerFactoryContract,
         safeProvider.getExternalProvider()

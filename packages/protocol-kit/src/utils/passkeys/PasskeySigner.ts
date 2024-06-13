@@ -1,9 +1,9 @@
 import { ethers, AbstractSigner, Provider } from 'ethers'
-import { Buffer } from 'buffer'
 
 import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
 import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
 import { EMPTY_DATA } from '../constants'
+import { hexStringToUint8Array } from './extractPasskeyData'
 
 // FIXME: use the production deployment packages instead of a hardcoded address
 const P256_VERIFIER_ADDRESS =
@@ -34,32 +34,24 @@ class PasskeySigner extends AbstractSigner {
    */
   safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType
 
+  /**
+   * P256 Verifier Contract address.
+   */
+  verifierAddress: string
+
   constructor(
-    passkeyRawId: ArrayBuffer,
-    coordinates: PasskeyCoordinates,
+    passkey: PasskeyArgType,
     safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
     provider: Provider
   ) {
     super(provider)
 
-    this.passkeyRawId = passkeyRawId
+    const { rawId, coordinates, customVerifierAddress } = passkey
+
+    this.passkeyRawId = hexStringToUint8Array(rawId)
     this.coordinates = coordinates
+    this.verifierAddress = P256_VERIFIER_ADDRESS || customVerifierAddress
     this.safeWebAuthnSignerFactoryContract = safeWebAuthnSignerFactoryContract
-  }
-
-  static async init(
-    passkey: PasskeyArgType,
-    safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
-    provider: Provider
-  ): Promise<PasskeySigner> {
-    const coordinates = await extractPasskeyCoordinates(passkey.publicKey)
-
-    return new PasskeySigner(
-      passkey.rawId,
-      coordinates,
-      safeWebAuthnSignerFactoryContract,
-      provider
-    )
   }
 
   /**
@@ -70,7 +62,7 @@ class PasskeySigner extends AbstractSigner {
     const [signerAddress] = await this.safeWebAuthnSignerFactoryContract.getSigner([
       BigInt(this.coordinates.x),
       BigInt(this.coordinates.y),
-      BigInt(P256_VERIFIER_ADDRESS)
+      BigInt(this.verifierAddress)
     ])
 
     return signerAddress
@@ -84,7 +76,7 @@ class PasskeySigner extends AbstractSigner {
     return this.safeWebAuthnSignerFactoryContract.encode('createSigner', [
       BigInt(this.coordinates.x),
       BigInt(this.coordinates.y),
-      BigInt(P256_VERIFIER_ADDRESS)
+      BigInt(this.verifierAddress)
     ])
   }
 
@@ -140,12 +132,13 @@ class PasskeySigner extends AbstractSigner {
   }
 
   connect(provider: Provider): ethers.Signer {
-    return new PasskeySigner(
-      this.passkeyRawId,
-      this.coordinates,
-      this.safeWebAuthnSignerFactoryContract,
-      provider
-    )
+    const passkey: PasskeyArgType = {
+      rawId: Buffer.from(this.passkeyRawId).toString('hex'),
+      coordinates: this.coordinates,
+      customVerifierAddress: this.verifierAddress
+    }
+
+    return new PasskeySigner(passkey, this.safeWebAuthnSignerFactoryContract, provider)
   }
 
   signTransaction(): Promise<string> {
@@ -166,36 +159,6 @@ class PasskeySigner extends AbstractSigner {
 }
 
 export default PasskeySigner
-
-/**
- * Extracts and returns coordinates from a given passkey public key.
- *
- * @param {ArrayBuffer} publicKey - The public key of the passkey from which coordinates will be extracted.
- * @returns {Promise<PasskeyCoordinates>} A promise that resolves to an object containing the coordinates derived from the public key of the passkey.
- * @throws {Error} Throws an error if the coordinates could not be extracted via `crypto.subtle.exportKey()`
- */
-async function extractPasskeyCoordinates(publicKey: ArrayBuffer): Promise<PasskeyCoordinates> {
-  const algorithm = {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: { name: 'SHA-256' }
-  }
-
-  const key = await crypto.subtle.importKey('spki', publicKey, algorithm, true, ['verify'])
-
-  const { x, y } = await crypto.subtle.exportKey('jwk', key)
-
-  const isValidCoordinates = !!x && !!y
-
-  if (!isValidCoordinates) {
-    throw new Error('Failed to generate passkey Coordinates. crypto.subtle.exportKey() failed')
-  }
-
-  return {
-    x: '0x' + Buffer.from(x, 'base64').toString('hex'),
-    y: '0x' + Buffer.from(y, 'base64').toString('hex')
-  }
-}
 
 /**
  * Compute the additional client data JSON fields. This is the fields other than `type` and

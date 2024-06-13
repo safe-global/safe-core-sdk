@@ -2,7 +2,8 @@ import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/de
 import Safe, {
   PredictedSafeProps,
   SafeProvider,
-  passkeyArgType
+  PasskeyArgType,
+  extractPasskeyData
 } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -42,7 +43,7 @@ global.navigator = {
  * @param name User name used for passkey mock
  * @returns Passkey arguments
  */
-async function createMockPasskey(name: string): Promise<passkeyArgType> {
+async function createMockPasskey(name: string): Promise<PasskeyArgType> {
   const passkeyCredential = await webAuthnCredentials.create({
     publicKey: {
       rp: {
@@ -59,21 +60,9 @@ async function createMockPasskey(name: string): Promise<passkeyArgType> {
     }
   })
 
-  const algorithm = {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: { name: 'SHA-256' }
-  }
-  const key = await crypto.subtle.importKey(
-    'raw',
-    passkeyCredential.response.getPublicKey(),
-    algorithm,
-    true,
-    ['verify']
-  )
-  const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
+  const passkey = await extractPasskeyData(passkeyCredential)
 
-  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
+  return passkey
 }
 
 describe('Passkey', () => {
@@ -95,13 +84,13 @@ describe('Passkey', () => {
       customContracts
     })
 
-    const passkeySigner1 = await PasskeySigner.init(
+    const passkeySigner1 = new PasskeySigner(
       passkey1,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider()
     )
 
-    const passkeySigner2 = await PasskeySigner.init(
+    const passkeySigner2 = new PasskeySigner(
       passkey2,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider()

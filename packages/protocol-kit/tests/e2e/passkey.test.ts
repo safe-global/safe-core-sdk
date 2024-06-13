@@ -306,7 +306,7 @@ describe('Passkey', () => {
             .expect(newOwners)
             .to.include.members([eoaOwner1.address, eoaOwner2.address, newPasskeyOwnerAddress])
           chai.expect(newOwners).to.not.include(formerOwner)
-        }).timeout(1000000000000)
+        })
 
         it('should swap a passkey owner out', async () => {
           const {
@@ -358,7 +358,7 @@ describe('Passkey', () => {
             .expect(newOwners)
             .to.include.members([passkeyOwner1Address, eoaOwner1.address, newEoaOwner.address])
           chai.expect(newOwners).to.not.include(passkeyOwner2Address)
-        }).timeout(100000000)
+        })
 
         itif(safeVersionDeployed >= '1.3.0')(
           'should enable a new passkey owner to sign transactions',

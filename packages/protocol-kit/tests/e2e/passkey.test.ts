@@ -259,7 +259,7 @@ describe('Passkey', () => {
 
     describeif(safeVersionDeployed >= '1.3.0')('createSwapOwnerTx', () => {
       describe('when signing the transaction with an EOA', () => {
-        it.only('should swap a passkey owner in', async () => {
+        it('should swap a passkey owner in', async () => {
           const {
             accounts: [eoaOwner1, eoaOwner2, eoaOwner3],
             contractNetworks,

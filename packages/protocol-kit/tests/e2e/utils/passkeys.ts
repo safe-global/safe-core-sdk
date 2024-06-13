@@ -1,6 +1,6 @@
 import { WebAuthnCredentials } from './webauthnShim'
 import { ethers } from 'ethers'
-import { PasskeyArgType } from '@safe-global/protocol-kit'
+import { PasskeyArgType, extractPasskeyData } from '@safe-global/protocol-kit'
 
 let singleInstance: WebAuthnCredentials
 
@@ -35,19 +35,7 @@ export async function createMockPasskey(name: string): Promise<PasskeyArgType> {
     }
   })
 
-  const algorithm = {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: { name: 'SHA-256' }
-  }
-  const key = await crypto.subtle.importKey(
-    'raw',
-    passkeyCredential.response.getPublicKey(),
-    algorithm,
-    true,
-    ['verify']
-  )
-  const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
+  const passkey = await extractPasskeyData(passkeyCredential)
 
-  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
+  return passkey
 }

@@ -150,6 +150,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 44787n, shortName: 'alfa' },
   { chainId: 45000n, shortName: 'autobahnnetwork' },
   { chainId: 47805n, shortName: 'rei' },
+  { chainId: 48899n, shortName: 'zircuit-tesnet' },
   { chainId: 54211n, shortName: 'islmt' },
   { chainId: 56288n, shortName: 'boba-bnb' },
   { chainId: 57000n, shortName: 'tsys-rollux' },

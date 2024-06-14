@@ -253,7 +253,7 @@ describe('Passkey', () => {
     })
 
     describeif(safeVersionDeployed >= '1.3.0')('createRemoveOwnerTx', () => {
-      it('should remove a passkey owner of a Safe and decrease the threshold', async () => {
+      it('should remove a passkey owner of a Safe and automaticaly decrement the threshold', async () => {
         const {
           accounts: [eoaOwner1, eoaOwner2],
           contractNetworks,
@@ -293,7 +293,7 @@ describe('Passkey', () => {
         chai.expect(await safeSdk.getThreshold()).to.be.eq(1)
       })
 
-      it('should remove a passkey owner of a Safe and change the threshold', async () => {
+      it('should remove a passkey owner of a Safe and set the threshold', async () => {
         const {
           accounts: [eoaOwner1, eoaOwner2],
           contractNetworks,
@@ -381,7 +381,7 @@ describe('Passkey', () => {
         chai
           .expect(signerSdk.signTransaction(tx))
           .to.be.rejectedWith('Transactions can only be signed by Safe owners')
-      }).timeout(900000000)
+      })
     })
 
     describeif(safeVersionDeployed >= '1.3.0')('createSwapOwnerTx', () => {
@@ -514,13 +514,13 @@ describe('Passkey', () => {
           newOwnerAddress: newEoaOwner.address
         })
 
-        const signedTransaction = await safeSdk.signTransaction(swapOwnerTx)
+        const signedTx = await safeSdk.signTransaction(swapOwnerTx)
 
         const approverSdk = await safeSdk.connect({
           signer: eoaOwner1.address
         })
 
-        const approvedTx = await approverSdk.signTransaction(signedTransaction)
+        const approvedTx = await approverSdk.signTransaction(signedTx)
         const result = await approverSdk.executeTransaction(approvedTx)
         await waitSafeTxReceipt(result)
 

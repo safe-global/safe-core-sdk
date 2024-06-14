@@ -29,7 +29,7 @@ export async function createMockPasskey(
   webAuthnCredentials?: WebAuthnCredentials
 ): Promise<PasskeyArgType> {
   const credentialsInstance = webAuthnCredentials ?? getWebAuthnCredentials()
-  const passkeyCredential = await credentialsInstance.create({
+  const passkeyCredential = credentialsInstance.create({
     publicKey: {
       rp: {
         name: 'Safe',

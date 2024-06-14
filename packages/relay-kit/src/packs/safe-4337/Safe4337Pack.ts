@@ -367,6 +367,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<EthSafeOperation> {
+    const threshold = await this.protocolKit.getThreshold()
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -381,7 +382,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
       [
         userOperationToHexValues(
-          addDummySignature(safeOperation.toUserOperation(), await this.protocolKit.getOwners())
+          addDummySignature(
+            safeOperation.toUserOperation(),
+            SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+            threshold
+          )
         ),
         this.#ENTRYPOINT_ADDRESS
       ]
@@ -411,7 +416,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
-        userOperation: safeOperation.toUserOperation(),
+        userOperation: addDummySignature(
+          safeOperation.toUserOperation(),
+          SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          threshold
+        ),
         paymasterUrl: this.#paymasterOptions.paymasterUrl,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
         sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId
@@ -574,6 +583,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeProvider = this.protocolKit.getSafeProvider()
     const signerAddress = await safeProvider.getSignerAddress()
     const chainId = await safeProvider.getChainId()
+    const isPasskeySigner = await safeProvider.isPasskeySigner()
 
     if (!signerAddress) {
       throw new Error('There is no signer address available to sign the SafeOperation')
@@ -583,13 +593,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       (owner: string) => signerAddress && owner.toLowerCase() === signerAddress.toLowerCase()
     )
 
-    if (!addressIsOwner) {
+    if (!addressIsOwner && !isPasskeySigner) {
       throw new Error('UserOperations can only be signed by Safe owners')
     }
 
     let signature: SafeSignature
-
-    const isPasskeySigner = await safeProvider.isPasskeySigner()
 
     if (isPasskeySigner) {
       const safeOpHash = calculateSafeUserOperationHash(

@@ -719,7 +719,7 @@ describe('Safe4337Pack', () => {
         fixtures.OWNER_1.toLowerCase(),
         new protocolKit.EthSafeSignature(
           fixtures.OWNER_1,
-          '0x63de7fdf99bcf20a1981ae74c3960604139d8bf025da894abc11604b30f438e82ceb0d37e73bf16b0b8b896f8be82a49750433733c0414fe4a3b8182a3875e1f1c',
+          '0x40f892ea70b4981af8a4bfcedaf084033f3a6ba9baa79783c3ead7f40d2f042145e735d4c16162a0ee22b5c21631c82bbda9fd63454c496baf59159ab42c98d01f',
           false
         )
       )
@@ -739,7 +739,7 @@ describe('Safe4337Pack', () => {
           fixtures.OWNER_1.toLowerCase(),
           new protocolKit.EthSafeSignature(
             fixtures.OWNER_1,
-            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1c',
+            '0x975c7ddab3dc06240918a7bde0f543d1b082a8cadeca19d4bc13c30430367fac46c7ef923d9d0051423d1d59d106e5d199a734cd6a472276d54bb04ec7b3796520',
             false
           )
         )

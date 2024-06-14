@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import { ethers } from 'ethers'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { WebAuthnCredentials } from '@safe-global/protocol-kit/tests/e2e/utils/webauthnShim'
-import { createMockPasskey } from '@safe-global/protocol-kit/tests/e2e/utils/passkey'
+import { createMockPasskey } from '@safe-global/protocol-kit/tests/e2e/utils/passkeys'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment

@@ -408,11 +408,7 @@ describe('Safe4337Pack', () => {
               saltNonce: undefined
             },
             safeAccountConfig: {
-              owners: [
-                fixtures.OWNER_1,
-                await passkeySigner.getAddress(),
-                SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS
-              ],
+              owners: [fixtures.OWNER_1, SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS],
               threshold: 1,
               to: await safe4337Pack.protocolKit.getMultiSendAddress(),
               data: constants.INTERFACES.encodeFunctionData('multiSend', [multiSendData]),

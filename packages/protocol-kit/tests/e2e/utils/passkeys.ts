@@ -4,7 +4,12 @@ import { PasskeyArgType } from '@safe-global/protocol-kit'
 
 let singleInstance: WebAuthnCredentials
 
-// This needs to be a singleton. The reason for that is that we are adding it to a global reference in the tests.
+/**
+ * This needs to be a singleton by default. The reason for that is that we are adding it to a global reference in the tests.
+ * Should only be used if running the tests with a randomly generated private key.
+ * For testing with a static private key, create a new WebAuthnCredentials instance instead and pass the private key as argument to the constructor.
+ * @returns WebAuthnCredentials singleton instance
+ */
 export function getWebAuthnCredentials() {
   if (!singleInstance) {
     singleInstance = new WebAuthnCredentials()
@@ -16,10 +21,15 @@ export function getWebAuthnCredentials() {
 /**
  * Creates a mock passkey for testing purposes.
  * @param name User name used for passkey mock
+ * @param webAuthnCredentials The credentials instance to use instead of the singleton. This is useful when mocking the passkey with a static private key.
  * @returns Passkey arguments
  */
-export async function createMockPasskey(name: string): Promise<PasskeyArgType> {
-  const passkeyCredential = await getWebAuthnCredentials().create({
+export async function createMockPasskey(
+  name: string,
+  webAuthnCredentials?: WebAuthnCredentials
+): Promise<PasskeyArgType> {
+  const credentialsInstance = webAuthnCredentials ?? getWebAuthnCredentials()
+  const passkeyCredential = await credentialsInstance.create({
     publicKey: {
       rp: {
         name: 'Safe',

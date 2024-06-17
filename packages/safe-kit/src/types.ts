@@ -1,5 +1,11 @@
 import { SafeProvider } from '@safe-global/protocol-kit'
 
+type SafeConfig = {
+  owners: string[]
+  threshold: number
+  saltNonce?: string
+}
+
 type ExistingSafeKitConfig = {
   provider: SafeProvider['provider']
   signer: SafeProvider['signer']
@@ -11,11 +17,7 @@ type PredictedSafeKitConfig = {
   provider: SafeProvider['provider']
   signer: SafeProvider['signer']
   safeAddress: never
-  safeConfig: {
-    owners: string[]
-    threshold: number
-    saltNonce?: string
-  }
+  safeConfig: SafeConfig
 }
 
 type SafeKitRootConfig = {

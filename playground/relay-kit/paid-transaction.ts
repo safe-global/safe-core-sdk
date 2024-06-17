@@ -1,4 +1,4 @@
-import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
+import AccountAbstraction from '@safe-global/safe-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,

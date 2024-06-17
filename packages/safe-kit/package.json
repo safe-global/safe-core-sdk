@@ -1,5 +1,5 @@
 {
-  "name": "@safe-global/account-abstraction-kit-poc",
+  "name": "@safe-global/safe-kit",
   "version": "3.0.1",
   "description": "Safe Account Abstraction Kit PoC",
   "main": "dist/src/index.js",

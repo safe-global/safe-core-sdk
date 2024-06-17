@@ -35,6 +35,7 @@ import {
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
   extractPasskeyData,
+  extractPasskeyCoordinates,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -70,6 +71,7 @@ export {
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
   extractPasskeyData,
+  extractPasskeyCoordinates,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,

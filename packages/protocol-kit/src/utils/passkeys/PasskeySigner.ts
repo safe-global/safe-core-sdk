@@ -50,7 +50,7 @@ class PasskeySigner extends AbstractSigner {
 
     this.passkeyRawId = hexStringToUint8Array(rawId)
     this.coordinates = coordinates
-    this.verifierAddress = P256_VERIFIER_ADDRESS || customVerifierAddress
+    this.verifierAddress = customVerifierAddress || P256_VERIFIER_ADDRESS
     this.safeWebAuthnSignerFactoryContract = safeWebAuthnSignerFactoryContract
   }
 

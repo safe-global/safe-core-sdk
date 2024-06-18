@@ -75,7 +75,7 @@ export interface SafeMessage {
 
 export type Transaction = TransactionBase & TransactionOptions
 
-interface TransactionBase {
+export interface TransactionBase {
   to: string
   value: string
   data: string

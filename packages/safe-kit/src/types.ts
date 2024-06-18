@@ -1,4 +1,5 @@
-import { SafeProvider } from '@safe-global/protocol-kit'
+import Safe, { SafeProvider } from '@safe-global/protocol-kit'
+import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 
 type SafeConfig = {
   owners: string[]
@@ -7,17 +8,13 @@ type SafeConfig = {
 }
 
 type ExistingSafeKitConfig = {
-  provider: SafeProvider['provider']
-  signer: SafeProvider['signer']
-  safeAddress: string
-  safeConfig: never
+  safeAddress?: string
+  safeOptions?: never
 }
 
 type PredictedSafeKitConfig = {
-  provider: SafeProvider['provider']
-  signer: SafeProvider['signer']
-  safeAddress: never
-  safeConfig: SafeConfig
+  safeAddress?: never
+  safeOptions?: SafeConfig
 }
 
 type SafeKitRootConfig = {
@@ -26,3 +23,15 @@ type SafeKitRootConfig = {
 }
 
 export type SafeKitConfig = SafeKitRootConfig & (ExistingSafeKitConfig | PredictedSafeKitConfig)
+
+export type TransactionResult = {
+  hash: string | undefined
+}
+
+export type SafeClient = {
+  protocolKit: Safe
+  send: (
+    transactions: TransactionBase[],
+    options?: TransactionOptions
+  ) => Promise<TransactionResult>
+}

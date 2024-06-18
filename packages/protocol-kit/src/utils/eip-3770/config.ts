@@ -174,6 +174,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 534352n, shortName: 'scr' },
   { chainId: 534353n, shortName: 'scr-alpha' },
   { chainId: 622277n, shortName: 'rth' },
+  { chainId: 656476n, shortName: 'open-campus-codex' },
   { chainId: 713715n, shortName: 'sei-devnet' },
   { chainId: 7777777n, shortName: 'zora' },
   { chainId: 11155111n, shortName: 'sep' },

@@ -1,6 +1,6 @@
 import { WebAuthnCredentials } from './webauthnShim'
 import { ethers } from 'ethers'
-import { PasskeyArgType } from '@safe-global/protocol-kit'
+import { PasskeyArgType, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
 
 let singleInstance: WebAuthnCredentials
 
@@ -59,5 +59,13 @@ export async function createMockPasskey(
   )
   const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
 
-  return { rawId: passkeyCredential.rawId, publicKey: exportedPublicKey }
+  const rawId = Buffer.from(passkeyCredential.rawId).toString('hex')
+  const coordinates = await extractPasskeyCoordinates(exportedPublicKey)
+
+  const passkey: PasskeyArgType = {
+    rawId,
+    coordinates
+  }
+
+  return passkey
 }

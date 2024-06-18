@@ -1,4 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
+import { AbstractSigner } from 'ethers'
 import {
   TransactionBase,
   TransactionOptions,
@@ -6,63 +7,74 @@ import {
   OperationType
 } from '@safe-global/safe-core-sdk-types'
 import { SafeClient, SafeKitConfig } from './types'
-import { AbstractSigner } from 'ethers'
+
+class SafeClientImpl implements SafeClient {
+  protocolKit: Safe
+
+  constructor(protocolKit: Safe) {
+    this.protocolKit = protocolKit
+  }
+
+  async send(
+    transactions: TransactionBase[],
+    options?: TransactionOptions
+  ): Promise<{ hash: string | undefined }> {
+    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
+    console.log('Safe: ', await this.protocolKit.getAddress(), isSafeDeployed)
+    let safeTransaction: SafeTransaction
+    let txHash: string | undefined
+
+    if (!isSafeDeployed) {
+      const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction(
+        (this.protocolKit as any).safeConfig?.saltNonce
+      )
+
+      transactions.unshift(safeDeploymentTransaction)
+
+      const safeDeploymentBatch = await this.protocolKit.createTransactionBatch(
+        transactions.map((tx) => ({ ...tx, operation: OperationType.Call })),
+        options
+      )
+
+      const signer = (await this.protocolKit
+        .getSafeProvider()
+        .getExternalSigner()) as unknown as AbstractSigner
+
+      const txResult = await signer.sendTransaction({
+        from: (await this.protocolKit.getSafeProvider().getSignerAddress()) || '0x',
+        ...safeDeploymentBatch
+      })
+
+      const txResponse = await txResult.wait()
+
+      txHash = txResponse?.hash
+    } else {
+      safeTransaction = await this.protocolKit.createTransaction({ transactions })
+      safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+      console.log(safeTransaction)
+      const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
+
+      txHash = hash
+    }
+
+    return { hash: txHash }
+  }
+
+  extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T {
+    return Object.assign(this, extendFunc(this))
+  }
+}
 
 /**
  * Initializes a Safe client with the given configuration options.
- * @param options - The SafeKit configuration options.
+ * @param config - The SafeKit configuration options.
  * @returns A Safe client instance.
  */
 export async function createSafeClient(config: SafeKitConfig): Promise<SafeClient> {
   const protocolKit = await getSafeProtocolKit(config)
   if (!protocolKit) throw new Error('Failed to create Safe client')
 
-  return {
-    protocolKit,
-    send: async (transactions: TransactionBase[], options?: TransactionOptions) => {
-      const isSafeDeployed = await protocolKit.isSafeDeployed()
-      console.log('Safe: ', await protocolKit.getAddress(), isSafeDeployed)
-      let safeTransaction: SafeTransaction
-      let txHash: string | undefined
-
-      if (!isSafeDeployed) {
-        const safeDeploymentTransaction = await protocolKit.createSafeDeploymentTransaction(
-          config?.safeOptions?.saltNonce
-        )
-
-        transactions.unshift(safeDeploymentTransaction)
-
-        const safeDeploymentBatch = await protocolKit.createTransactionBatch(
-          transactions.map((tx) => ({ ...tx, operation: OperationType.Call })),
-          options
-        )
-
-        const signer = (await protocolKit
-          .getSafeProvider()
-          .getExternalSigner()) as unknown as AbstractSigner
-
-        const txResult = await signer.sendTransaction({
-          from: (await protocolKit.getSafeProvider().getSignerAddress()) || '0x',
-          ...safeDeploymentBatch
-        })
-
-        const txResponse = await txResult.wait()
-
-        txHash = txResponse?.hash
-      } else {
-        safeTransaction = await protocolKit.createTransaction({
-          transactions
-        })
-        safeTransaction = await protocolKit.signTransaction(safeTransaction)
-        console.log(safeTransaction)
-        const { hash } = await protocolKit.executeTransaction(safeTransaction, options)
-
-        txHash = hash
-      }
-
-      return { hash: txHash }
-    }
-  }
+  return new SafeClientImpl(protocolKit)
 }
 
 /**
@@ -104,6 +116,6 @@ async function getSafeProtocolKit(config: SafeKitConfig): Promise<Safe> {
 
     return protocolKit
   } else {
-    throw new Error('Invalid configuration: either safeAddress or safeConfig must be provided.')
+    throw new Error('Invalid configuration: either safeAddress or safeOptions must be provided.')
   }
 }

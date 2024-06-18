@@ -34,4 +34,5 @@ export type SafeClient = {
     transactions: TransactionBase[],
     options?: TransactionOptions
   ) => Promise<TransactionResult>
+  extend: <T>(extendFunc: (client: SafeClient) => T) => SafeClient & T
 }

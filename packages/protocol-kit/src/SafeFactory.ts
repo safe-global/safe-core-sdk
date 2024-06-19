@@ -62,7 +62,7 @@ class SafeFactory {
   }: SafeFactoryInitConfig) {
     this.#provider = provider
     this.#signer = signer
-    this.#safeProvider = new SafeProvider({ provider, signer })
+    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
     this.#safeVersion = safeVersion
     this.#isL1SafeSingleton = isL1SafeSingleton
     this.#contractNetworks = contractNetworks

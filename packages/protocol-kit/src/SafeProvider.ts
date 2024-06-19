@@ -6,15 +6,22 @@ import {
   BrowserProvider,
   JsonRpcProvider
 } from 'ethers'
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import {
+  SAFE_FEATURES,
+  generateTypedData,
+  hasSafeFeature,
+  validateEip3770Address
+} from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
+import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
 
 import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args
+  SafeEIP712Args,
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -23,6 +30,7 @@ import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
+  getSafeWebAuthnSignerFactoryContractInstance,
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstances'
@@ -32,15 +40,26 @@ import {
   SafeProviderConfig,
   Eip1193Provider,
   HttpTransport,
-  SocketTransport
+  SocketTransport,
+  SafeSigner,
+  SafeConfig,
+  ContractNetworksConfig
 } from '@safe-global/protocol-kit/types'
+import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { DEFAULT_SAFE_VERSION } from './contracts/config'
 
 class SafeProvider {
   #externalProvider: BrowserProvider | JsonRpcProvider
-  signer?: string
+  signer?: SafeSigner
   provider: Eip1193Provider | HttpTransport | SocketTransport
 
-  constructor({ provider, signer }: SafeProviderConfig) {
+  constructor({
+    provider,
+    signer
+  }: {
+    provider: SafeProviderConfig['provider']
+    signer?: SafeSigner
+  }) {
     if (typeof provider === 'string') {
       this.#externalProvider = new JsonRpcProvider(provider)
     } else {
@@ -55,15 +74,71 @@ class SafeProvider {
     return this.#externalProvider
   }
 
-  async getExternalSigner(): Promise<AbstractSigner | undefined> {
-    // If the signer is not an Ethereum address, it should be a private key
-    if (this.signer && !ethers.isAddress(this.signer)) {
-      const privateKeySigner = new ethers.Wallet(this.signer, this.#externalProvider)
-      return privateKeySigner
-    }
+  static async init(
+    provider: SafeConfig['provider'],
+    signer?: SafeConfig['signer'],
+    safeVersion: SafeVersion = DEFAULT_SAFE_VERSION,
+    contractNetworks?: ContractNetworksConfig
+  ): Promise<SafeProvider> {
+    const isPasskeySigner = signer && typeof signer !== 'string'
 
-    if (this.signer) {
+    if (isPasskeySigner) {
+      if (!hasSafeFeature(SAFE_FEATURES.PASSKEY_SIGNER, safeVersion)) {
+        throw new Error(
+          'Current version of the Safe does not support the Passkey signer functionality'
+        )
+      }
+
+      const safeProvider = new SafeProvider({
+        provider
+      })
+      const chainId = await safeProvider.getChainId()
+      const customContracts = contractNetworks?.[chainId.toString()]
+
+      // FIXME: Passkeys is an experimental feature and is currently only available on the Sepolia chain.
+      if (chainId !== 11155111n && process.env.TEST_NETWORK !== 'hardhat') {
+        throw new Error(
+          'Passkeys is an experimental feature and is currently only available on the Sepolia chain.'
+        )
+      }
+
+      const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+        safeProvider,
+        safeVersion,
+        customContracts
+      })
+
+      const passkeySigner = new PasskeySigner(
+        signer,
+        safeWebAuthnSignerFactoryContract,
+        safeProvider.getExternalProvider()
+      )
+
+      return new SafeProvider({
+        provider,
+        signer: passkeySigner
+      })
+    } else {
+      return new SafeProvider({
+        provider,
+        signer
+      })
+    }
+  }
+
+  async getExternalSigner(): Promise<AbstractSigner | undefined> {
+    if (typeof this.signer === 'string') {
+      // If the signer is not an Ethereum address, it should be a private key
+      if (!ethers.isAddress(this.signer)) {
+        const privateKeySigner = new ethers.Wallet(this.signer, this.#externalProvider)
+        return privateKeySigner
+      }
+
       return this.#externalProvider.getSigner(this.signer)
+    } else {
+      if (this.signer) {
+        return this.signer
+      }
     }
 
     if (this.#externalProvider instanceof BrowserProvider) {
@@ -71,6 +146,12 @@ class SafeProvider {
     }
 
     return undefined
+  }
+
+  async isPasskeySigner(): Promise<boolean> {
+    const signer = (await this.getExternalSigner()) as PasskeySigner
+
+    return signer && !!signer.passkeyRawId
   }
 
   isAddress(address: string): boolean {
@@ -194,6 +275,19 @@ class SafeProvider {
     customContractAbi
   }: GetContractProps) {
     return getSimulateTxAccessorContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
+  }
+
+  async getSafeWebAuthnSignerFactoryContract({
+    safeVersion,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps) {
+    return getSafeWebAuthnSignerFactoryContractInstance(
       safeVersion,
       this,
       customContractAddress,

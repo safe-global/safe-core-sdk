@@ -16,7 +16,8 @@ import {
   getMultiSendContract,
   getProxyFactoryContract,
   getSafeContract,
-  getSignMessageLibContract
+  getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract
 } from './contracts/safeDeploymentContracts'
 import {
   PREDETERMINED_SALT_NONCE,
@@ -33,6 +34,8 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyData,
+  extractPasskeyCoordinates,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -60,11 +63,15 @@ import {
   generateTypedData
 } from './utils/eip-712'
 
+import PasskeySigner from './utils/passkeys/PasskeySigner'
+
 export {
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyData,
+  extractPasskeyCoordinates,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
@@ -89,6 +96,7 @@ export {
   getProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   getPredictedSafeAddressInitCode,
@@ -105,7 +113,8 @@ export {
   getEip712MessageTypes,
   hashSafeMessage,
   generateTypedData,
-  SafeProvider
+  SafeProvider,
+  PasskeySigner
 }
 
 export * from './types'

@@ -29,6 +29,7 @@ import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import {
   AddOwnerTxParams,
+  AddPasskeyOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
   PredictedSafeProps,
@@ -38,7 +39,9 @@ import {
   SigningMethod,
   SigningMethodType,
   SwapOwnerTxParams,
-  SafeModulesPaginated
+  SafeModulesPaginated,
+  PasskeyArgType,
+  RemovePasskeyOwnerTxParams
 } from './types'
 import {
   EthSafeSignature,
@@ -60,6 +63,9 @@ import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
   encodeMultiSendData,
+  isNewOwnerPasskey,
+  isOldOwnerPasskey,
+  isPasskeyParam,
   standardizeMetaTransactionData,
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
@@ -72,6 +78,7 @@ import {
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
+import PasskeySigner from './utils/passkeys/PasskeySigner'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -114,10 +121,13 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    this.#safeProvider = new SafeProvider({
+    this.#safeProvider = await SafeProvider.init(
       provider,
-      signer
-    })
+      signer,
+      DEFAULT_SAFE_VERSION,
+      contractNetworks
+    )
+
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
       this.#contractManager = await ContractManager.init(
@@ -140,6 +150,9 @@ class Safe {
         this.#safeProvider
       )
     }
+
+    const safeVersion = await this.getContractVersion()
+    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
 
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
@@ -422,12 +435,30 @@ class Safe {
   }
 
   /**
+   * Checks if a specific address or passkey is an owner of the current Safe.
+   *
+   * @param owner - The owner address or a passkey object
+   * @returns TRUE if the account is an owner
+   */
+  async isOwner(owner: string | PasskeyArgType): Promise<boolean> {
+    const isOwnerAddress = typeof owner === 'string'
+
+    if (isOwnerAddress) {
+      return this.#isOwnerAddress(owner)
+    }
+
+    const ownerAddress = await this.getPasskeyOwnerAddress(owner)
+
+    return this.#isOwnerAddress(ownerAddress)
+  }
+
+  /**
    * Checks if a specific address is an owner of the current Safe.
    *
    * @param ownerAddress - The account address
    * @returns TRUE if the account is an owner
    */
-  async isOwner(ownerAddress: string): Promise<boolean> {
+  async #isOwnerAddress(ownerAddress: string): Promise<boolean> {
     if (this.#predictedSafe?.safeAccountConfig.owners) {
       return Promise.resolve(
         this.#predictedSafe?.safeAccountConfig.owners.some((owner: string) =>
@@ -738,7 +769,13 @@ class Safe {
 
     let signature: SafeSignature
 
-    if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+
+    if (isPasskeySigner) {
+      const txHash = await this.getTransactionHash(transaction)
+
+      signature = await this.signHash(txHash)
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(transaction, 'v4')
     } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(transaction, 'v3')
@@ -810,7 +847,6 @@ class Safe {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
 
-    // TODO: fix this
     return this.#contractManager.safeContract.approveHash(hash, {
       from: signerAddress,
       ...options
@@ -999,16 +1035,36 @@ class Safe {
    * @throws "Threshold cannot exceed owner count"
    */
   async createAddOwnerTx(
-    { ownerAddress, threshold }: AddOwnerTxParams,
+    params: AddOwnerTxParams | AddPasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData = {
+    const isPasskey = isPasskeyParam(params)
+
+    const ownerAddress = isPasskey
+      ? await this.getPasskeyOwnerAddress(params.passkey)
+      : params.ownerAddress
+
+    const { threshold } = params
+
+    const addOwnerTransaction = {
       to: await this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
     }
+
+    const transactions = [addOwnerTransaction]
+
+    // The passkey Signer is a contract compliant with EIP-1271 standards, we need to check if it has been deployed.
+    if (isPasskey && !(await this.#safeProvider.isContractDeployed(ownerAddress))) {
+      // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
+      const passkeySigner = await this.#getPasskeySigner(params.passkey)
+      const passkeyDeploymentTransaction = await passkeySigner.createPasskeyDeploymentTransaction()
+
+      transactions.push(passkeyDeploymentTransaction)
+    }
+
     const safeTransaction = await this.createTransaction({
-      transactions: [safeTransactionData],
+      transactions,
       options
     })
     return safeTransaction
@@ -1026,9 +1082,17 @@ class Safe {
    * @throws "Threshold cannot exceed owner count"
    */
   async createRemoveOwnerTx(
-    { ownerAddress, threshold }: RemoveOwnerTxParams,
+    params: RemoveOwnerTxParams | RemovePasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const { threshold } = params
+
+    const isPasskey = isPasskeyParam(params)
+
+    const ownerAddress = isPasskey
+      ? await this.getPasskeyOwnerAddress(params.passkey)
+      : params.ownerAddress
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -1053,18 +1117,42 @@ class Safe {
    * @throws "Old address provided is not an owner"
    */
   async createSwapOwnerTx(
-    { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
+    params: SwapOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData = {
+    const oldOwnerAddress = isOldOwnerPasskey(params)
+      ? await this.getPasskeyOwnerAddress(params.oldOwnerPasskey)
+      : params.oldOwnerAddress
+
+    const newOwnerAddress = isNewOwnerPasskey(params)
+      ? await this.getPasskeyOwnerAddress(params.newOwnerPasskey)
+      : params.newOwnerAddress
+
+    const swapOwnerTransaction = {
       to: await this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
     }
+
+    const transactions = [swapOwnerTransaction]
+
+    // The passkey Signer is a contract compliant with EIP-1271 standards, we need to check if it has been deployed.
+    if (
+      isNewOwnerPasskey(params) &&
+      !(await this.#safeProvider.isContractDeployed(newOwnerAddress))
+    ) {
+      // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
+      const passkeySigner = await this.#getPasskeySigner(params.newOwnerPasskey)
+      const passkeyDeploymentTransaction = await passkeySigner.createPasskeyDeploymentTransaction()
+
+      transactions.push(passkeyDeploymentTransaction)
+    }
+
     const safeTransaction = await this.createTransaction({
-      transactions: [safeTransactionData],
+      transactions,
       options
     })
+
     return safeTransaction
   }
 
@@ -1476,6 +1564,39 @@ class Safe {
     const chainId = await this.getChainId()
 
     return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)
+  }
+
+  /**
+   * Returns the passkey signer of the specific passkey.
+   *
+   * @param {PasskeyArgType} passkey The passkey owner
+   * @returns {Promise<string>} Returns the passkey owner address
+   */
+  async #getPasskeySigner(passkey: PasskeyArgType): Promise<PasskeySigner> {
+    const safeVersion = await this.getContractVersion()
+    const safePasskeyProvider = await SafeProvider.init(
+      this.#safeProvider.provider,
+      passkey,
+      safeVersion,
+      this.#contractManager.contractNetworks
+    )
+
+    const passkeySigner = await safePasskeyProvider.getExternalSigner()
+
+    return passkeySigner as PasskeySigner
+  }
+
+  /**
+   * Returns the owner address of the specific passkey.
+   *
+   * @param {PasskeyArgType} passkey The passkey owner
+   * @returns {Promise<string>} Returns the passkey owner address
+   */
+  async getPasskeyOwnerAddress(passkey: PasskeyArgType): Promise<string> {
+    const passkeySigner = await this.#getPasskeySigner(passkey)
+    const passkeyOwnerAddress = await passkeySigner.getAddress()
+
+    return passkeyOwnerAddress
   }
 
   /**

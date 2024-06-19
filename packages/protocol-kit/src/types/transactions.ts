@@ -5,6 +5,7 @@ import { SafeProviderConfig } from './safeProvider'
 import { SafeContractImplementationType } from './contracts'
 import { ContractNetworksConfig } from './contracts'
 import { PredictedSafeProps } from './safeConfig'
+import { PasskeyArgType } from './passkeys'
 
 export type CreateTransactionProps = {
   /** transactions - The transaction array to process */
@@ -53,6 +54,13 @@ export type AddOwnerTxParams = {
   threshold?: number
 }
 
+export type AddPasskeyOwnerTxParams = {
+  /** passkey - The passkey of the new owner */
+  passkey: PasskeyArgType
+  /** threshold - The new threshold */
+  threshold?: number
+}
+
 export type RemoveOwnerTxParams = {
   /** ownerAddress - The address of the owner that will be removed */
   ownerAddress: string
@@ -60,9 +68,35 @@ export type RemoveOwnerTxParams = {
   threshold?: number
 }
 
-export type SwapOwnerTxParams = {
-  /** oldOwnerAddress - The old owner address */
-  oldOwnerAddress: string
-  /** newOwnerAddress - The new owner address */
-  newOwnerAddress: string
+export type RemovePasskeyOwnerTxParams = {
+  /** passkey - The passkey of the owner that will be removed */
+  passkey: PasskeyArgType
+  /** threshold - The new threshold */
+  threshold?: number
 }
+
+export type SwapOwnerTxParams =
+  | {
+      /** oldOwnerAddress - The old owner address */
+      oldOwnerAddress: string
+      /** newOwnerAddress - The new owner address */
+      newOwnerAddress: string
+    }
+  | {
+      /** oldOwnerPasskey - The old owner passkey */
+      oldOwnerPasskey: PasskeyArgType
+      /** newOwnerAddress - The new owner address */
+      newOwnerAddress: string
+    }
+  | {
+      /** oldOwnerAddress - The old owner address */
+      oldOwnerAddress: string
+      /** newOwnerPasskey - The new owner passkey */
+      newOwnerPasskey: PasskeyArgType
+    }
+  | {
+      /** oldOwnerPasskey - The old owner passkey */
+      oldOwnerPasskey: PasskeyArgType
+      /** newOwnerPasskey - The new owner passkey */
+      newOwnerPasskey: PasskeyArgType
+    }

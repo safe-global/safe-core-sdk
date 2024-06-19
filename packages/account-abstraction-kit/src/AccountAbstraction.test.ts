@@ -16,12 +16,15 @@ describe('AccountAbstraction', () => {
     request: jest.fn()
   }
 
+  SafeProvider.init = jest.fn()
+
   const signerAddress = '0xSignerAddress'
   const predictSafeAddress = '0xPredictSafeAddressMock'
 
   beforeEach(() => {
     jest.clearAllMocks()
     predictSafeAddressMock.mockResolvedValue(predictSafeAddress)
+    SafeProvider.init = jest.fn().mockResolvedValue(new SafeProviderMock({ provider }))
     SafeProviderMock.prototype.getSignerAddress.mockResolvedValue(signerAddress)
   })
 

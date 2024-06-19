@@ -31,7 +31,7 @@ global.navigator = {
   }
 } as unknown as Navigator
 
-describe('Passkey', () => {
+describe.only('Passkey', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
 
@@ -350,7 +350,7 @@ describe('Passkey', () => {
         contractNetworks
       })
 
-      await deployPasskeysContract([passkeySigner], account1.signer)
+      await deployPasskeysContract([passkeySigner], account.signer)
 
       const signerSdk = await safeSdk.connect({
         signer: passkeyFormerOwner
@@ -454,7 +454,7 @@ describe('Passkey', () => {
         contractNetworks
       })
 
-      await deployPasskeysContract([passkeySigner], account1.signer)
+      await deployPasskeysContract([passkeySigner], eoaOwner1.signer)
       chai.expect(await safeSdk.getSafeProvider().isContractDeployed(passkeyNewOwnerAddress)).to.be
         .true
       const currentOwners = await safeSdk.getOwners()
@@ -487,7 +487,7 @@ describe('Passkey', () => {
       const passkeyOwner1Address = await passkeySigner1.getAddress()
       const passkeyOwner2Address = await passkeySigner2.getAddress()
 
-      await deployPasskeysContract([passkeySigner1, passkeySigner2], account1.signer)
+      await deployPasskeysContract([passkeySigner1, passkeySigner2], eoaOwner1.signer)
       const safe = await getSafeWithOwners(
         [passkeyOwner1Address, passkeyOwner2Address, eoaOwner1.address],
         2

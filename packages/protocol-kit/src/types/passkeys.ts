@@ -4,6 +4,7 @@ export type PasskeyCoordinates = {
 }
 
 export type PasskeyArgType = {
-  rawId: ArrayBuffer // required to sign data
-  publicKey: ArrayBuffer // required to generate X & Y Coordinates
+  rawId: string // required to sign data
+  coordinates: PasskeyCoordinates // required to sign data
+  customVerifierAddress?: string // optional
 }

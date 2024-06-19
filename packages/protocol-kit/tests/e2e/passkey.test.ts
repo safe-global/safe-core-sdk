@@ -51,13 +51,13 @@ describe('Passkey', () => {
       customContracts
     })
 
-    const passkeySigner1 = await PasskeySigner.init(
+    const passkeySigner1 = new PasskeySigner(
       passkey1,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider()
     )
 
-    const passkeySigner2 = await PasskeySigner.init(
+    const passkeySigner2 = new PasskeySigner(
       passkey2,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider()

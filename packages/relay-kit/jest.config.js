@@ -5,6 +5,7 @@ const config = {
     '^.+\\.ts?$': 'ts-jest'
   },
   moduleNameMapper: {
+    '^@safe-global/protocol-kit/tests/(.*)$': '<rootDir>/../protocol-kit/tests/$1',
     '^@safe-global/protocol-kit/(.*)$': '<rootDir>/../protocol-kit/src/$1',
     '^@safe-global/relay-kit/(.*)$': '<rootDir>/src/$1'
   },

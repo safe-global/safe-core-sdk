@@ -31,7 +31,7 @@ global.navigator = {
   }
 } as unknown as Navigator
 
-describe.only('Passkey', () => {
+describe('Passkey', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
 

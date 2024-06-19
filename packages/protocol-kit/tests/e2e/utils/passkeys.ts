@@ -1,8 +1,7 @@
-import { WebAuthnCredentials } from './webauthnShim'
 import { ethers } from 'ethers'
-import { PasskeyArgType, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
-import { getAccounts } from './setupTestNetwork'
-import PasskeySigner from '@safe-global/protocol-kit/utils/passkeys/PasskeySigner'
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
+import { PasskeyArgType, PasskeySigner, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
+import { WebAuthnCredentials } from './webauthnShim'
 
 let singleInstance: WebAuthnCredentials
 
@@ -22,12 +21,14 @@ export function getWebAuthnCredentials() {
 
 /**
  * Deploys the passkey contract for each of the signers.
- * @param name User name used for passkey mock
- * @returns Passkey arguments
+ * @param passkeys An array of PasskeySigner representing the passkeys to deploy.
+ * @param signer A signer to deploy the passkey contracts.
+ * @returns Passkey deployment transactions
  */
-export async function deployPasskeysContract(passkeys: PasskeySigner[]) {
-  const [deployer] = await getAccounts()
-
+export async function deployPasskeysContract(
+  passkeys: PasskeySigner[],
+  signer: HardhatEthersSigner
+) {
   const toDeploy = passkeys.map(async (passkey) => {
     const createPasskeySignerTransaction = {
       to: await passkey.safeWebAuthnSignerFactoryContract.getAddress(),
@@ -35,7 +36,7 @@ export async function deployPasskeysContract(passkeys: PasskeySigner[]) {
       data: passkey.encodeCreateSigner()
     }
     // Deploy the passkey signer
-    return await deployer.signer.sendTransaction(createPasskeySignerTransaction)
+    return await signer.sendTransaction(createPasskeySignerTransaction)
   })
 
   return Promise.all(toDeploy)

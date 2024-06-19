@@ -6,7 +6,7 @@ export async function waitSafeTxReceipt(
   txResult: TransactionResult
 ): Promise<ContractTransactionReceipt | null | undefined> {
   const receipt: ContractTransactionReceipt | null | undefined =
-    txResult.transactionResponse && (await (txResult.transactionResponse as any).wait())
+    txResult.transactionResponse && (await txResult.transactionResponse.wait())
 
   return receipt
 }

@@ -1,12 +1,11 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps, SafeProvider } from '@safe-global/protocol-kit'
+import Safe, { PasskeySigner, PredictedSafeProps, SafeProvider } from '@safe-global/protocol-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import { deployments } from 'hardhat'
 import crypto from 'crypto'
-import PasskeySigner from '@safe-global/protocol-kit/utils/passkeys/PasskeySigner'
 import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { getContractNetworks } from './utils/setupContractNetworks'
 import { getSafeWithOwners } from './utils/setupContracts'
@@ -190,7 +189,7 @@ describe('Passkey', () => {
       const safeAddress = await safe.getAddress()
 
       // First create transaction for the deployment of the passkey signer
-      await deployPasskeysContract([passkeySigner1])
+      await deployPasskeysContract([passkeySigner1], account1.signer)
 
       // Passkey signer should be deployed now
       chai.expect(await account1.signer.provider.getCode(passkeySigner1Address)).length.to.be.gt(2)
@@ -351,7 +350,7 @@ describe('Passkey', () => {
         contractNetworks
       })
 
-      await deployPasskeysContract([passkeySigner])
+      await deployPasskeysContract([passkeySigner], account1.signer)
 
       const signerSdk = await safeSdk.connect({
         signer: passkeyFormerOwner
@@ -455,7 +454,7 @@ describe('Passkey', () => {
         contractNetworks
       })
 
-      await deployPasskeysContract([passkeySigner])
+      await deployPasskeysContract([passkeySigner], account1.signer)
       chai.expect(await safeSdk.getSafeProvider().isContractDeployed(passkeyNewOwnerAddress)).to.be
         .true
       const currentOwners = await safeSdk.getOwners()
@@ -488,7 +487,7 @@ describe('Passkey', () => {
       const passkeyOwner1Address = await passkeySigner1.getAddress()
       const passkeyOwner2Address = await passkeySigner2.getAddress()
 
-      await deployPasskeysContract([passkeySigner1, passkeySigner2])
+      await deployPasskeysContract([passkeySigner1, passkeySigner2], account1.signer)
       const safe = await getSafeWithOwners(
         [passkeyOwner1Address, passkeyOwner2Address, eoaOwner1.address],
         2
@@ -581,7 +580,7 @@ describe('Passkey', () => {
       const passkeySigner1Address = await passkeySigner1.getAddress()
 
       // First create transaction for the deployment of the passkey signer
-      await deployPasskeysContract([passkeySigner1])
+      await deployPasskeysContract([passkeySigner1], account1.signer)
 
       // Passkey signer should be deployed now
       chai.expect(await account1.signer.provider.getCode(passkeySigner1Address)).length.to.be.gt(2)
@@ -713,7 +712,7 @@ describe('Passkey', () => {
         const safeAddress = await safe.getAddress()
 
         // First create transaction for the deployment of the passkey signer
-        await deployPasskeysContract([passkeySigner1])
+        await deployPasskeysContract([passkeySigner1], account1.signer)
 
         // Passkey signer should be deployed now
         chai

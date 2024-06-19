@@ -852,6 +852,31 @@ class SafeApiKit {
       }
     })
   }
+
+  /**
+   * Adds a confirmation for a SafeOperation.
+   *
+   * @param safeOperationHash The SafeOperation hash
+   * @param signature - Signature of the SafeOperation
+   * @returns
+   * @throws "Invalid SafeOperation hash"
+   * @throws "Invalid signature"
+   * @throws "Malformed data"
+   * @throws "Error processing data"
+   */
+  async confirmSafeOperation(safeOperationHash: string, signature: string): Promise<void> {
+    if (!safeOperationHash) {
+      throw new Error('Invalid SafeOperation hash')
+    }
+    if (!signature) {
+      throw new Error('Invalid signature')
+    }
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/confirmations/`,
+      method: HttpMethod.Post,
+      body: { signature }
+    })
+  }
 }
 
 export default SafeApiKit

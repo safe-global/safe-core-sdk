@@ -325,3 +325,12 @@ export type AddSafeOperationProps = {
     validAfter?: number
   }
 }
+
+export type GetSafeOperationConfirmationListProps = {
+  /** The hash of the SafeOperation to get confirmations for */
+  safeOperationHash: string
+  /** Maximum number of results to return per page */
+  limit?: string
+  /** Initial index from which to return the results */
+  offset?: string
+}

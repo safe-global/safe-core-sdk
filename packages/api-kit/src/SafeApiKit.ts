@@ -6,10 +6,10 @@ import {
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
+  GetSafeMessageListProps,
+  GetSafeOperationConfirmationListProps,
   GetSafeOperationListProps,
   GetSafeOperationListResponse,
-  SafeSingletonResponse,
-  GetSafeMessageListProps,
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -24,6 +24,7 @@ import {
   SafeMultisigTransactionEstimateResponse,
   SafeMultisigTransactionListResponse,
   SafeServiceInfoResponse,
+  SafeSingletonResponse,
   SignatureResponse,
   TokenInfoListResponse,
   TokenInfoResponse,
@@ -34,11 +35,12 @@ import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
+  isSafeOperation,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
-  SafeOperationResponse,
   SafeOperation,
-  isSafeOperation
+  SafeOperationConfirmationListResponse,
+  SafeOperationResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
@@ -850,6 +852,41 @@ class SafeApiKit {
         signature: userOperation.signature,
         moduleAddress
       }
+    })
+  }
+
+  /**
+   * Returns the list of confirmations for a given a SafeOperation.
+   *
+   * @param getSafeOperationConfirmationsProps - The parameters for fetching the list of confirmations
+   * @returns The list of confirmations
+   * @throws "Invalid SafeOperation hash"
+   * @throws "Invalid data"
+   */
+  async getSafeOperationConfirmations({
+    safeOperationHash,
+    limit,
+    offset
+  }: GetSafeOperationConfirmationListProps): Promise<SafeOperationConfirmationListResponse> {
+    if (!safeOperationHash) {
+      throw new Error('Invalid SafeOperation hash')
+    }
+
+    const url = new URL(
+      `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/confirmations/`
+    )
+
+    if (limit) {
+      url.searchParams.set('limit', limit)
+    }
+
+    if (offset) {
+      url.searchParams.set('offset', offset)
+    }
+
+    return sendRequest({
+      url: url.toString(),
+      method: HttpMethod.Get
     })
   }
 

@@ -203,12 +203,13 @@ export type SafeMultisigConfirmationResponse = {
   readonly signatureType?: string
 }
 
-export type SafeMultisigConfirmationListResponse = {
+type ListResponse<T> = {
   readonly count: number
   readonly next?: string
   readonly previous?: string
-  readonly results: SafeMultisigConfirmationResponse[]
+  readonly results: T[]
 }
+export type SafeMultisigConfirmationListResponse = ListResponse<SafeMultisigConfirmationResponse>
 
 export type SafeMultisigTransactionResponse = {
   readonly safe: string
@@ -354,3 +355,5 @@ export const isSafeOperationResponse = (response: unknown): response is SafeOper
 
   return 'userOperation' in safeOperationResponse && 'safeOperationHash' in safeOperationResponse
 }
+
+export type SafeOperationConfirmationListResponse = ListResponse<SafeOperationConfirmation>

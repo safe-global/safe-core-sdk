@@ -1593,6 +1593,50 @@ class Safe {
    * @returns {Promise<string>} Returns the passkey owner address
    */
   async getPasskeyOwnerAddress(passkey: PasskeyArgType): Promise<string> {
+    const owners = await this.getOwners()
+    const safeVersion = await this.getContractVersion()
+    const chainId = await this.#safeProvider.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+    const customContractAddress = customContracts?.safeWebAuthnSharedSignerAddress
+    const customContractAbi = customContracts?.safeWebAuthnSharedSignerAbi
+
+    const safeWebAuthnSharedSignerContract =
+      await this.#safeProvider.getSafeWebAuthnSharedSignerContract({
+        safeVersion,
+        customContractAddress,
+        customContractAbi
+      })
+    const safeWebAuthnSharedSignerContractAddress =
+      await safeWebAuthnSharedSignerContract.getAddress()
+
+    // we need to check if the Safe owners contains the shared signer address
+    if (owners.includes(safeWebAuthnSharedSignerContractAddress)) {
+      // if the shared signer address is an owner, we read the storage and check the passkey
+      const safeAddress = await this.getAddress()
+      const [signerSlot] = await safeWebAuthnSharedSignerContract.getConfiguration([safeAddress])
+      const { x, y, verifiers } = signerSlot
+
+      console.log('@@@ signer slot: ', signerSlot)
+      console.log('@@@ Y Coordinate: ', x)
+      console.log('@@@ X Coordinate: ', y)
+      console.log('@@@ verifiers: ', verifiers)
+
+      // FIXME: use the production deployment packages instead of a hardcoded address
+      // Sepolia only
+      const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
+
+      const isSharedSigner =
+        x === BigInt(passkey.coordinates.x) &&
+        y === BigInt(passkey.coordinates.y) &&
+        verifiers === BigInt(passkey.customVerifierAddress || P256_VERIFIER_ADDRESS)
+
+      console.log('@@@ isSharedSigner: ', isSharedSigner)
+
+      if (isSharedSigner) {
+        return safeWebAuthnSharedSignerContractAddress
+      }
+    }
+
     const passkeySigner = await this.#getPasskeySigner(passkey)
     const passkeyOwnerAddress = await passkeySigner.getAddress()
 

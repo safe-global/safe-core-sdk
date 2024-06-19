@@ -17,7 +17,8 @@ import {
   getProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
-  getSafeWebAuthnSignerFactoryContract
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract
 } from './contracts/safeDeploymentContracts'
 import {
   PREDETERMINED_SALT_NONCE,
@@ -97,6 +98,7 @@ export {
   getSafeContract,
   getSignMessageLibContract,
   getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   getPredictedSafeAddressInitCode,

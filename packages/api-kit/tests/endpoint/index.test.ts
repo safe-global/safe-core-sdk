@@ -51,6 +51,10 @@ describe('Endpoint tests', () => {
     .stub(httpRequests, 'sendRequest')
     .returns(Promise.resolve({ data: { success: true } }))
 
+  afterEach(() => {
+    sinon.resetHistory()
+  })
+
   describe('Default txServiceUrl', () => {
     it('getServiceInfo', async () => {
       await chai
@@ -151,7 +155,8 @@ describe('Endpoint tests', () => {
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
-        method: 'get'
+        method: 'post',
+        body: { signature: '0x' }
       })
     })
 

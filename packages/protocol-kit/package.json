@@ -67,7 +67,6 @@
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "tsconfig-paths": "^4.2.0",
-    "viem": "^2.15.1",
     "web3": "^4.7.0",
     "yargs": "^17.7.2"
   },
@@ -76,8 +75,8 @@
     "@safe-global/safe-core-sdk-types": "^5.0.2",
     "@safe-global/safe-deployments": "^1.37.0",
     "abitype": "^1.0.2",
-    "ethereumjs-util": "^7.1.5",
     "ethers": "^6.13.1",
-    "semver": "^7.6.2"
+    "semver": "^7.6.2",
+    "viem": "^2.15.1"
   }
 }

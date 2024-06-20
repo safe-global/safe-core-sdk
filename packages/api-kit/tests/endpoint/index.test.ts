@@ -157,7 +157,7 @@ describe('Endpoint tests', () => {
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
         method: 'post',
-        body: { signature: '0x' }
+        body: { signature }
       })
     })
 

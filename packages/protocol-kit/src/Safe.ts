@@ -41,7 +41,8 @@ import {
   SwapOwnerTxParams,
   SafeModulesPaginated,
   PasskeyArgType,
-  RemovePasskeyOwnerTxParams
+  RemovePasskeyOwnerTxParams,
+  SafeWebAuthnSharedSignerContractImplementationType
 } from './types'
 import {
   EthSafeSignature,
@@ -603,6 +604,28 @@ class Safe {
    */
   async signHash(hash: string): Promise<SafeSignature> {
     const signature = await generateSignature(this.#safeProvider, hash)
+
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
+
+    if (isPasskeySigner && signerAddress) {
+      const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeySigner
+      const passkey = {
+        rawId: '', // we dont need this value to check if is a shared signer
+        coordinates: passkeySigner.coordinates,
+        customVerifierAddress: passkeySigner.verifierAddress
+      }
+      const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
+
+      if (isSharedSigner) {
+        const sharedSignerContract = await this.#getSafeWebAuthnSharedSignerContract()
+        const sharedSignerContractAddress = await sharedSignerContract.getAddress()
+
+        return new EthSafeSignature(sharedSignerContractAddress, signature.data, true)
+      }
+
+      return new EthSafeSignature(signerAddress, signature.data, true)
+    }
 
     return signature
   }
@@ -1587,13 +1610,36 @@ class Safe {
   }
 
   /**
-   * Returns the owner address of the specific passkey.
+   * Returns the owner address associated with the specific passkey.
+   * This function first checks if the passkey belongs to a shared signer of the Safe.
+   * If it is a shared signer, it returns the address of the shared signer contract.
+   * Otherwise, it returns the direct owner's address of the passkey.
    *
-   * @param {PasskeyArgType} passkey The passkey owner
-   * @returns {Promise<string>} Returns the passkey owner address
+   * @param {PasskeyArgType} passkey The passkey to check the owner address
+   * @returns {Promise<string>} Returns the passkey owner address associated with the passkey
    */
   async getPasskeyOwnerAddress(passkey: PasskeyArgType): Promise<string> {
-    const owners = await this.getOwners()
+    const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
+
+    if (isSharedSigner) {
+      const sharedSignerContract = await this.#getSafeWebAuthnSharedSignerContract()
+      const sharedSignerContractAddress = await sharedSignerContract.getAddress()
+
+      return sharedSignerContractAddress
+    }
+
+    const passkeySigner = await this.#getPasskeySigner(passkey)
+    const passkeyOwnerAddress = await passkeySigner.getAddress()
+
+    return passkeyOwnerAddress
+  }
+
+  /**
+   * Returns an instance of the SafeWebAuthnSharedSignerContract.
+   *
+   * @returns {Promise<SafeWebAuthnSharedSignerContractImplementationType>} Returns an instance of the SafeWebAuthnSharedSignerContract.
+   */
+  async #getSafeWebAuthnSharedSignerContract(): Promise<SafeWebAuthnSharedSignerContractImplementationType> {
     const safeVersion = await this.getContractVersion()
     const chainId = await this.#safeProvider.getChainId()
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
@@ -1606,41 +1652,42 @@ class Safe {
         customContractAddress,
         customContractAbi
       })
+
+    return safeWebAuthnSharedSignerContract
+  }
+
+  /**
+   * Determines if a given passkey is associated with a shared signer of the Safe.
+   *
+   * @param {PasskeyArgType} passkey The passkey to be checked
+   * @returns {Promise<boolean>} Returns true if the passkey is the shared signer of the Safe, otherwise returns false.
+   */
+  async #isSharedSignerPasskey(passkey: PasskeyArgType): Promise<boolean> {
+    const owners = await this.getOwners()
+    const safeWebAuthnSharedSignerContract = await this.#getSafeWebAuthnSharedSignerContract()
     const safeWebAuthnSharedSignerContractAddress =
       await safeWebAuthnSharedSignerContract.getAddress()
 
-    // we need to check if the Safe owners contains the shared signer address
     if (owners.includes(safeWebAuthnSharedSignerContractAddress)) {
-      // if the shared signer address is an owner, we read the storage and check the passkey
       const safeAddress = await this.getAddress()
-      const [signerSlot] = await safeWebAuthnSharedSignerContract.getConfiguration([safeAddress])
-      const { x, y, verifiers } = signerSlot
-
-      console.log('@@@ signer slot: ', signerSlot)
-      console.log('@@@ Y Coordinate: ', x)
-      console.log('@@@ X Coordinate: ', y)
-      console.log('@@@ verifiers: ', verifiers)
+      const [sharedSignerSlot] = await safeWebAuthnSharedSignerContract.getConfiguration([
+        safeAddress
+      ])
+      const { x, y, verifiers } = sharedSignerSlot
 
       // FIXME: use the production deployment packages instead of a hardcoded address
       // Sepolia only
       const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
 
       const isSharedSigner =
-        x === BigInt(passkey.coordinates.x) &&
-        y === BigInt(passkey.coordinates.y) &&
-        verifiers === BigInt(passkey.customVerifierAddress || P256_VERIFIER_ADDRESS)
+        BigInt(passkey.coordinates.x) === x &&
+        BigInt(passkey.coordinates.y) === y &&
+        BigInt(passkey.customVerifierAddress || P256_VERIFIER_ADDRESS) === verifiers
 
-      console.log('@@@ isSharedSigner: ', isSharedSigner)
-
-      if (isSharedSigner) {
-        return safeWebAuthnSharedSignerContractAddress
-      }
+      return isSharedSigner
     }
 
-    const passkeySigner = await this.#getPasskeySigner(passkey)
-    const passkeyOwnerAddress = await passkeySigner.getAddress()
-
-    return passkeyOwnerAddress
+    return false
   }
 
   /**

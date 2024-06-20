@@ -579,7 +579,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOp = safeOperation
     }
 
-    const owners = await this.protocolKit.getOwners()
     const safeProvider = this.protocolKit.getSafeProvider()
     const signerAddress = await safeProvider.getSignerAddress()
     const chainId = await safeProvider.getChainId()
@@ -589,11 +588,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       throw new Error('There is no signer address available to sign the SafeOperation')
     }
 
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && owner.toLowerCase() === signerAddress.toLowerCase()
-    )
+    const isOwner = this.protocolKit.isOwner(signerAddress)
 
-    if (!addressIsOwner && !isPasskeySigner) {
+    if (!isOwner) {
       throw new Error('UserOperations can only be signed by Safe owners')
     }
 
@@ -606,14 +603,20 @@ export class Safe4337Pack extends RelayKitBasePack<{
         this.#SAFE_4337_MODULE_ADDRESS
       )
 
-      const passkeySignature = await this.protocolKit.signHash(safeOpHash)
+      const isSafeDeployed = await this.protocolKit.isSafeDeployed()
 
-      // SafeWebAuthnSharedSigner signature
-      signature = new EthSafeSignature(
-        SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-        passkeySignature.data,
-        true
-      )
+      // if the Safe is not deployed we force the Shared Signer signature
+      if (!isSafeDeployed) {
+        const passkeySignature = await this.protocolKit.signHash(safeOpHash)
+        // SafeWebAuthnSharedSigner signature
+        signature = new EthSafeSignature(
+          SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          passkeySignature.data,
+          true // passkeys are contract signatures
+        )
+      } else {
+        signature = await this.protocolKit.signHash(safeOpHash)
+      }
     } else {
       if (
         signingMethod in

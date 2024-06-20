@@ -1,7 +1,7 @@
 {
   "name": "@safe-global/safe-kit",
-  "version": "3.0.1",
-  "description": "Safe Account Abstraction Kit PoC",
+  "version": "1.0.0",
+  "description": "Safe Kit is a library that provides a set of tools to interact with the Safe Protocol.",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "keywords": [
@@ -35,7 +35,6 @@
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^4.0.1",
-    "@safe-global/relay-kit": "^3.0.1",
     "@safe-global/safe-core-sdk-types": "^5.0.1",
     "ethers": "^6.13.1"
   }

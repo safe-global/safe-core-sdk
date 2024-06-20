@@ -65,3 +65,5 @@ async function getProtocolKitInstance(config: SafeKitConfig): Promise<Safe> {
     )
   }
 }
+
+export * from './types'

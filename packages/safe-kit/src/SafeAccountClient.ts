@@ -1,6 +1,6 @@
 import Safe from '@safe-global/protocol-kit'
+import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
 import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
-
 import { SafeClient, SafeClientTransactionResult } from './types'
 import { sendTransaction, sendAndDeployTransaction } from './lib'
 
@@ -9,9 +9,11 @@ import { sendTransaction, sendAndDeployTransaction } from './lib'
  */
 export class SafeAccountClient implements SafeClient {
   protocolKit: Safe
+  apiKit: SafeApiKit
 
-  constructor(protocolKit: Safe) {
+  constructor(protocolKit: Safe, apiKit: SafeApiKit) {
     this.protocolKit = protocolKit
+    this.apiKit = apiKit
   }
 
   /**
@@ -48,6 +50,44 @@ export class SafeAccountClient implements SafeClient {
     }
 
     return txResult
+  }
+
+  /**
+   * Confirms a transaction by its safe transaction hash.
+   *
+   * @param {string} safeTxHash - The hash of the safe transaction to confirm.
+   * @returns {Promise<SafeClientTransactionResult>} A promise that resolves to the result of the confirmed transaction.
+   * @throws {Error} If the transaction confirmation fails.
+   */
+  async confirm(safeTxHash: string): Promise<SafeClientTransactionResult> {
+    let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+    const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
+
+    await this.apiKit.confirmTransaction(safeTxHash, signedTransaction.encodedSignatures())
+
+    transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+
+    return {
+      chain: {
+        hash: transactionResponse.transactionHash
+      },
+      safeServices: {
+        safeTxHash: transactionResponse.safeTxHash
+      }
+    }
+  }
+
+  /**
+   * Retrieves the pending transactions for the current safe address.
+   *
+   * @async
+   * @returns {Promise<Array>} A promise that resolves to an array of pending transactions.
+   * @throws {Error} If there is an issue retrieving the safe address or pending transactions.
+   */
+  async getPendingTransactions(): Promise<SafeMultisigTransactionListResponse> {
+    const safeAddress = await this.protocolKit.getAddress()
+
+    return this.apiKit.getPendingTransactions(safeAddress)
   }
 
   extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T {

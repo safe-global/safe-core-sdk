@@ -4,6 +4,7 @@ import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-
 import { SafeAccountClient } from './SafeAccountClient'
 import { sendTransaction, sendAndDeployTransaction } from './lib'
 import { SafeClient, SafeClientTransactionResult } from './types'
+import SafeApiKit from '@safe-global/api-kit'
 
 jest.mock('./lib', () => ({
   sendTransaction: jest.fn(),
@@ -17,11 +18,13 @@ const TRANSACTION_RESPONSE = { chain: { hash: '0xTxHash' } }
 
 describe('SafeAccountClient', () => {
   let protocolKit: Safe
+  let apiKit: SafeApiKit
   let safeAccountClient: SafeAccountClient
 
   beforeEach(async () => {
     protocolKit = new Safe()
-    safeAccountClient = new SafeAccountClient(protocolKit)
+    apiKit = new SafeApiKit({ chainId: 1n })
+    safeAccountClient = new SafeAccountClient(protocolKit, apiKit)
   })
 
   afterEach(() => {

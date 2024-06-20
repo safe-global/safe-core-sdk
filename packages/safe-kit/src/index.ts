@@ -2,6 +2,7 @@ import Safe from '@safe-global/protocol-kit'
 import { SafeClient, SafeKitConfig } from './types'
 import { SafeAccountClient } from './SafeAccountClient'
 import { isValidAddress, isValidSafeConfig } from './utils'
+import SafeApiKit from '@safe-global/api-kit'
 
 /**
  * Initializes a Safe client with the given configuration options.
@@ -11,9 +12,11 @@ import { isValidAddress, isValidSafeConfig } from './utils'
  */
 export async function createSafeClient(config: SafeKitConfig): Promise<SafeClient> {
   const protocolKit = await getProtocolKitInstance(config)
-  if (!protocolKit) throw new Error('Failed to create a protocol-kit instance')
+  const apiKit = await getApiKitInstance(protocolKit)
 
-  return new SafeAccountClient(protocolKit)
+  if (!protocolKit || !apiKit) throw new Error('Failed to create a kit instances')
+
+  return new SafeAccountClient(protocolKit, apiKit)
 }
 
 /**
@@ -64,6 +67,12 @@ async function getProtocolKitInstance(config: SafeKitConfig): Promise<Safe> {
       'Invalid configuration: either a valid safeAddress or valid safeOptions must be provided.'
     )
   }
+}
+
+async function getApiKitInstance(protocolKit: Safe): Promise<SafeApiKit> {
+  const chainId = await protocolKit.getChainId()
+
+  return new SafeApiKit({ chainId })
 }
 
 export * from './types'

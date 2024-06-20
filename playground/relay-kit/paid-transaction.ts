@@ -78,7 +78,7 @@ async function main() {
   const isSafeDeployed = await gelatoSafeClient.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
-  const ethersProvider = safeClient.protocolKit.getSafeProvider().getExternalProvider()
+  const ethersProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
 
   // Fake on-ramp to transfer enough funds to the Safe address
 

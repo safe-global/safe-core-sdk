@@ -7,6 +7,7 @@ import {
   UserOperation
 } from '@safe-global/safe-core-sdk-types'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
+import { calculateSafeUserOperationHash } from './utils'
 
 type SafeOperationOptions = {
   moduleAddress: string
@@ -85,6 +86,10 @@ class EthSafeOperation implements SafeOperation {
         [this.data.validAfter, this.data.validUntil, this.encodedSignatures()]
       )
     }
+  }
+
+  getHash(chainId: bigint): string {
+    return calculateSafeUserOperationHash(this.data, chainId, this.moduleAddress)
   }
 }
 

@@ -9,13 +9,14 @@ import Safe, {
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
+  isSafeOperationResponse,
   MetaTransactionData,
   OperationType,
-  SafeSignature,
-  UserOperation,
-  SafeOperationResponse,
+  SafeOperation,
   SafeOperationConfirmation,
-  isSafeOperationResponse
+  SafeOperationResponse,
+  SafeSignature,
+  UserOperation
 } from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
@@ -40,7 +41,6 @@ import {
 } from './constants'
 import {
   addDummySignature,
-  calculateSafeUserOperationHash,
   encodeMultiSendCallData,
   getEip4337BundlerProvider,
   signSafeOp,
@@ -494,6 +494,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }
 
   /**
+   * Returns the hash for a given SafeOperation.
+   * @param safeOperation - The SafeOperation to hash
+   * @returns The hash of the SafeOperation
+   */
+  async getSafeOperationHash(safeOperation: SafeOperation): Promise<string> {
+    const chainId = await this.getChainId()
+    return safeOperation.getHash(BigInt(chainId))
+  }
+
+  /**
    * Signs a safe operation.
    *
    * @param {EthSafeOperation | SafeOperationResponse} safeOperation - The SafeOperation to sign. It can be:
@@ -540,12 +550,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         this.#SAFE_4337_MODULE_ADDRESS
       )
     } else {
-      const chainId = await this.protocolKit.getSafeProvider().getChainId()
-      const safeOpHash = calculateSafeUserOperationHash(
-        safeOp.data,
-        chainId,
-        this.#SAFE_4337_MODULE_ADDRESS
-      )
+      const safeOpHash = await this.getSafeOperationHash(safeOp)
 
       signature = await this.protocolKit.signHash(safeOpHash)
     }

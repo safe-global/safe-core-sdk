@@ -304,6 +304,7 @@ export interface SafeOperation {
   encodedSignatures(): string
   addEstimations(estimations: EstimateGasData): void
   toUserOperation(): UserOperation
+  getHash(chainId: bigint): string
 }
 
 export const isSafeOperation = (response: unknown): response is SafeOperation => {

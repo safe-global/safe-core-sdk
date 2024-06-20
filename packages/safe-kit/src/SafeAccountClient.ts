@@ -51,6 +51,8 @@ export class SafeAccountClient implements SafeClient {
   }
 
   extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T {
-    return Object.assign(this, extendFunc(this))
+    const extensions = extendFunc(this)
+
+    return Object.assign(this, extensions) as SafeClient & T
   }
 }

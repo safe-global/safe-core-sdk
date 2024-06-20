@@ -29,7 +29,7 @@ describe('getSafeOperationConfirmations', () => {
     chai.expect(safeOpConfirmations.results.length).to.be.equal(0)
   })
 
-  it('should return the transaction with the given safeOperationHash', async () => {
+  it('should return the SafeOperation with the given safeOperationHash', async () => {
     const safeOperationHash = '0x375d3bd580600ce04d7d2c1d8d88d85f27b9c7d14d7b544f2ee585d672f2b449'
     const safeOpConfirmations = await safeApiKit.getSafeOperationConfirmations({
       safeOperationHash

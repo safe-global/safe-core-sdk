@@ -1,13 +1,13 @@
 import Safe from '@safe-global/protocol-kit'
 import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 
-import { SafeClient, SafeClientTransactionResult } from './types'
+import { SafeClientTransactionResult } from './types'
 import { sendTransaction, sendAndDeployTransaction } from './lib'
 
 /**
- * A Safe account client.
+ * A Safe client.
  */
-export class SafeAccountClient implements SafeClient {
+export class SafeClient {
   protocolKit: Safe
 
   constructor(protocolKit: Safe) {

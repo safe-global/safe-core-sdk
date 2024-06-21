@@ -1,5 +1,4 @@
-import Safe, { SafeProvider } from '@safe-global/protocol-kit'
-import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
+import { SafeProvider } from '@safe-global/protocol-kit'
 
 export type SafeConfig = {
   owners: string[]
@@ -31,13 +30,4 @@ export type SafeClientTransactionResult = {
   safeServices?: {
     safeTxHash: string | undefined
   }
-}
-
-export type SafeClient = {
-  protocolKit: Safe
-  send: (
-    transactions: TransactionBase[],
-    options?: TransactionOptions
-  ) => Promise<SafeClientTransactionResult>
-  extend: <T>(extendFunc: (client: SafeClient) => T) => SafeClient & T
 }

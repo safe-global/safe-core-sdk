@@ -1,6 +1,6 @@
 import Safe from '@safe-global/protocol-kit'
-import { SafeClient, SafeKitConfig } from './types'
-import { SafeAccountClient } from './SafeAccountClient'
+import { SafeKitConfig } from './types'
+import { SafeClient } from './SafeClient'
 import { isValidAddress, isValidSafeConfig } from './utils'
 
 /**
@@ -13,7 +13,7 @@ export async function createSafeClient(config: SafeKitConfig): Promise<SafeClien
   const protocolKit = await getProtocolKitInstance(config)
   if (!protocolKit) throw new Error('Failed to create a protocol-kit instance')
 
-  return new SafeAccountClient(protocolKit)
+  return new SafeClient(protocolKit)
 }
 
 /**

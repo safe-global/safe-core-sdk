@@ -2,7 +2,7 @@ import Safe from '@safe-global/protocol-kit'
 import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 
 import { SafeClientTransactionResult } from './types'
-import { sendTransaction, sendAndDeployTransaction } from './lib'
+import { sendTransaction, sendAndDeployTransaction } from './utils'
 
 /**
  * A Safe client.

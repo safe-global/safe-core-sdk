@@ -2,7 +2,7 @@ import Safe from '@safe-global/protocol-kit'
 import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 
 import { SafeClient } from './SafeClient'
-import { sendTransaction, sendAndDeployTransaction } from './lib'
+import { sendTransaction, sendAndDeployTransaction } from './utils'
 import { SafeClientTransactionResult } from './types'
 
 jest.mock('./lib', () => ({

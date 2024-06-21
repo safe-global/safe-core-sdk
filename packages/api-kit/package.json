@@ -39,7 +39,7 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-ethers": "^3.0.6",
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
@@ -54,14 +54,14 @@
     "sinon": "^14.0.2",
     "sinon-chai": "^3.7.0",
     "tsconfig-paths": "^4.2.0",
-    "viem": "^2.10.2",
+    "viem": "^2.15.1",
     "web3": "^4.7.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^4.0.1",
     "@safe-global/safe-core-sdk-types": "^5.0.1",
-    "ethers": "^6.12.1",
+    "ethers": "^6.13.1",
     "node-fetch": "^2.7.0"
   }
 }

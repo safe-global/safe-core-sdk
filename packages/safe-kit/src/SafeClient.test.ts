@@ -5,7 +5,7 @@ import { SafeClient } from './SafeClient'
 import { sendTransaction, sendAndDeployTransaction } from './utils'
 import { SafeClientTransactionResult } from './types'
 
-jest.mock('./lib', () => ({
+jest.mock('./utils', () => ({
   sendTransaction: jest.fn(),
   sendAndDeployTransaction: jest.fn()
 }))

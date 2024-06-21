@@ -1,10 +1,5 @@
-import {
-  ContractTransactionResponse,
-  Provider,
-  AbstractSigner,
-  isAddress,
-  zeroPadValue
-} from 'ethers'
+import { ContractTransactionResponse, Provider, AbstractSigner, isAddress } from 'ethers'
+import { concat, getContractAddress, keccak256, pad } from 'viem'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -15,7 +10,6 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
 
 import {
@@ -235,15 +229,13 @@ export async function getPredictedSafeAddressInitCode({
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
-    'hex'
-  )
+  const encodedNonce = safeProvider.encodeParameters(['uint256'], [saltNonce])
   const safeSingletonAddress = await safeContract.getAddress()
   const initCodeCallData = encodeCreateProxyWithNonce(
     safeProxyFactoryContract,
     safeSingletonAddress,
     initializer,
-    '0x' + encodedNonce
+    encodedNonce
   )
   const safeProxyFactoryAddress = await safeProxyFactoryContract.getAddress()
   const initCode = `0x${[safeProxyFactoryAddress, initCodeCallData].reduce(
@@ -292,24 +284,25 @@ export async function predictSafeAddress({
     chainId: chainId.toString()
   })
 
-  const initializer = await encodeSetupCallData({
+  const initializer = (await encodeSetupCallData({
     safeProvider,
     safeAccountConfig,
     safeContract,
     customContracts,
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
-  })
+  })) as `0x${string}`
+  const initializerHash = keccak256(initializer)
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
-    'hex'
-  )
-  const salt = keccak256(
-    toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
-  )
+  const encodedNonce = safeProvider.encodeParameters(['uint256'], [saltNonce]) as `0x${string}`
 
-  const input = safeProvider.encodeParameters(['address'], [await safeContract.getAddress()])
+  const salt = keccak256(concat([initializerHash, encodedNonce]))
 
-  const from = await safeProxyFactoryContract.getAddress()
+  const input = safeProvider.encodeParameters(
+    ['address'],
+    [await safeContract.getAddress()]
+  ) as `0x${string}`
+
+  const from = (await safeProxyFactoryContract.getAddress()) as `0x${string}`
 
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)
@@ -319,10 +312,14 @@ export async function predictSafeAddress({
     return safeProvider.getChecksummedAddress(proxyAddress)
   }
 
-  const constructorData = toBuffer(input).toString('hex')
-  const initCode = proxyCreationCode + constructorData
-  const proxyAddress =
-    '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
+  const initCode = (proxyCreationCode + input.slice(2)) as `0x${string}`
+
+  const proxyAddress = getContractAddress({
+    from,
+    bytecode: initCode,
+    opcode: 'CREATE2',
+    salt
+  })
 
   return safeProvider.getChecksummedAddress(proxyAddress)
 }
@@ -341,35 +338,28 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
 
 /**
  * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
- * see: https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#address-derivation
+ * see: https://docs.zksync.io/build/developer-reference/ethereum-differences/evm-instructions/#address-derivation
  *
- * @param {string} from - The sender's address.
+ * @param {`0x${string}`} from - The sender's address.
  * @param {SafeVersion} safeVersion - The version of the safe.
- * @param {Buffer} salt - The salt used for address derivation.
- * @param {string} input - Additional input data for the derivation.
+ * @param {`0x${string}`} salt - The salt used for address derivation.
+ * @param {`0x${string}`} input - Additional input data for the derivation.
  *
  * @returns {string} The derived zkSync Era address.
  */
 export function zkSyncEraCreate2Address(
-  from: string,
+  from: `0x${string}`,
   safeVersion: SafeVersion,
-  salt: Buffer,
-  input: string
+  salt: `0x${string}`,
+  input: `0x${string}`
 ): string {
-  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
-  const inputHash = keccak256(toBuffer(input))
+  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion]
+    .deployedBytecodeHash as `0x${string}`
+  const inputHash = keccak256(input)
 
   const addressBytes = keccak256(
-    toBuffer(
-      ZKSYNC_CREATE2_PREFIX +
-        zeroPadValue(from, 32).slice(2) +
-        salt.toString('hex') +
-        bytecodeHash.slice(2) +
-        inputHash.toString('hex')
-    )
-  )
-    .toString('hex')
-    .slice(24)
+    concat([ZKSYNC_CREATE2_PREFIX, pad(from), salt, bytecodeHash, inputHash])
+  ).slice(26)
 
   return addressBytes
 }

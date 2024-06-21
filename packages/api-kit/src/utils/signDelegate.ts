@@ -21,7 +21,7 @@ export async function signDelegate(signer: Signer, delegateAddress: string, chai
 
   const types = {
     Delegate: [
-      { name: 'delegateAddress', type: 'bytes32' },
+      { name: 'delegateAddress', type: 'address' },
       { name: 'totp', type: 'uint256' }
     ]
   }

@@ -57,7 +57,7 @@ describe('SafeAccountClient', () => {
     expect(protocolKit.isSafeDeployed).toHaveBeenCalled()
     expect(protocolKit.getThreshold).toHaveBeenCalled()
     expect(sendAndDeployTransaction).toHaveBeenCalledWith(transactions, options, safeAccountClient)
-    expect(result).toEqual({ chain: { hash: '0xTxHash' } })
+    expect(result).toEqual(TRANSACTION_RESPONSE)
   })
 
   it('should throw an error if Safe is not deployed and threshold is greater than 1', async () => {

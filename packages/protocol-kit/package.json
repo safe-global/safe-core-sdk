@@ -50,7 +50,7 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
-    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-ethers": "^3.0.6",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
     "@types/chai": "^4.3.16",
@@ -67,17 +67,17 @@
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "tsconfig-paths": "^4.2.0",
-    "viem": "^2.10.2",
+    "viem": "^2.15.1",
     "web3": "^4.7.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
     "@noble/hashes": "^1.3.3",
     "@safe-global/safe-core-sdk-types": "^5.0.1",
-    "@safe-global/safe-deployments": "^1.36.0",
+    "@safe-global/safe-deployments": "^1.37.0",
     "abitype": "^1.0.2",
     "ethereumjs-util": "^7.1.5",
-    "ethers": "^6.12.1",
-    "semver": "^7.6.1"
+    "ethers": "^6.13.1",
+    "semver": "^7.6.2"
   }
 }

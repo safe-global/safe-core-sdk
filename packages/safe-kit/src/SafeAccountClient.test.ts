@@ -66,7 +66,7 @@ describe('SafeAccountClient', () => {
     ;(protocolKit.isSafeDeployed as jest.Mock).mockResolvedValue(false)
     ;(protocolKit.getThreshold as jest.Mock).mockResolvedValue(2)
 
-    await expect(safeAccountClient.send(transactions, options)).rejects.toThrowError(
+    await expect(safeAccountClient.send(transactions, options)).rejects.toThrow(
       'Deployment of Safes with threshold more than one is currently not supported'
     )
 

@@ -71,6 +71,17 @@ describe('Safe contracts', () => {
         .to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
     })
 
+    it('should return an L1 Safe contract from safe-deployments when the safeVersion is < 1.3.0', async () => {
+      const safeProvider = getSafeProviderFromNetwork('gnosis')
+      const safeVersion: SafeVersion = '1.1.1'
+      const safeContract = await safeProvider.getSafeContract({
+        safeVersion
+      })
+      chai
+        .expect(await safeContract.getAddress())
+        .to.be.eq('0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F')
+    })
+
     it('should return a Safe contract from the custom addresses', async () => {
       const { contractNetworks, chainId, provider } = await setupTests()
       const safeProvider = new SafeProvider({ provider })

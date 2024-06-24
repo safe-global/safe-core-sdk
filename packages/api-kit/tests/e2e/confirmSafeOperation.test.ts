@@ -67,7 +67,7 @@ describe('confirmSafeOperation', () => {
 
     // Submit a new Safe operation to the transaction service
     safeOperation = await addSafeOperation()
-    safeOpHash = await safe4337Pack.getSafeOperationHash(safeOperation)
+    safeOpHash = await safeOperation.getHash()
   })
 
   describe('should fail', () => {

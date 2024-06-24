@@ -12,7 +12,6 @@ import {
   isSafeOperationResponse,
   MetaTransactionData,
   OperationType,
-  SafeOperation,
   SafeOperationConfirmation,
   SafeOperationResponse,
   SafeSignature,
@@ -78,6 +77,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   #bundlerClient: ethers.JsonRpcProvider
 
+  #chainId: bigint
+
   #paymasterOptions?: PaymasterOptions
 
   /**
@@ -89,6 +90,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     protocolKit,
     bundlerClient,
     bundlerUrl,
+    chainId,
     paymasterOptions,
     entryPointAddress,
     safe4337ModuleAddress
@@ -97,6 +99,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     this.#BUNDLER_URL = bundlerUrl
     this.#bundlerClient = bundlerClient
+    this.#chainId = chainId
     this.#paymasterOptions = paymasterOptions
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
@@ -289,6 +292,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     return new Safe4337Pack({
+      chainId: BigInt(chainId),
       protocolKit,
       bundlerClient,
       paymasterOptions,
@@ -441,6 +445,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const safeOperation = new EthSafeOperation(userOperation, {
+      chainId: this.#chainId,
       moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil,
@@ -477,6 +482,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         signature: userOperation?.signature || '0x'
       },
       {
+        chainId: this.#chainId,
         moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
         entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
         validAfter: validAfter ? new Date(validAfter).getTime() : undefined,
@@ -491,16 +497,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     return safeOperation
-  }
-
-  /**
-   * Returns the hash for a given SafeOperation.
-   * @param safeOperation - The SafeOperation to hash
-   * @returns The hash of the SafeOperation
-   */
-  async getSafeOperationHash(safeOperation: SafeOperation): Promise<string> {
-    const chainId = await this.getChainId()
-    return safeOperation.getHash(BigInt(chainId))
   }
 
   /**
@@ -550,12 +546,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
         this.#SAFE_4337_MODULE_ADDRESS
       )
     } else {
-      const safeOpHash = await this.getSafeOperationHash(safeOp)
+      const safeOpHash = await safeOp.getHash()
 
       signature = await this.protocolKit.signHash(safeOpHash)
     }
 
     const signedSafeOperation = new EthSafeOperation(safeOp.toUserOperation(), {
+      chainId: this.#chainId,
       moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       validUntil: safeOp.data.validUntil,

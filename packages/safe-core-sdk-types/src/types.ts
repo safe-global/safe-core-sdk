@@ -296,6 +296,7 @@ export type EstimateGasData = {
 }
 
 export interface SafeOperation {
+  readonly chainId: bigint
   readonly moduleAddress: string
   readonly data: SafeUserOperation
   readonly signatures: Map<string, SafeSignature>
@@ -304,7 +305,7 @@ export interface SafeOperation {
   encodedSignatures(): string
   addEstimations(estimations: EstimateGasData): void
   toUserOperation(): UserOperation
-  getHash(chainId: bigint): string
+  getHash(): string
 }
 
 export const isSafeOperation = (response: unknown): response is SafeOperation => {

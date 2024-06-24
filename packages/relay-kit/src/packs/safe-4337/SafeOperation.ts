@@ -12,6 +12,7 @@ import { calculateSafeUserOperationHash } from './utils'
 type SafeOperationOptions = {
   moduleAddress: string
   entryPoint: string
+  chainId: bigint
   validAfter?: number
   validUntil?: number
 }
@@ -20,11 +21,13 @@ class EthSafeOperation implements SafeOperation {
   data: SafeUserOperation
   signatures: Map<string, SafeSignature> = new Map()
   moduleAddress: string
+  chainId: bigint
 
   constructor(
     userOperation: UserOperation,
-    { entryPoint, validAfter, validUntil, moduleAddress }: SafeOperationOptions
+    { chainId, entryPoint, validAfter, validUntil, moduleAddress }: SafeOperationOptions
   ) {
+    this.chainId = chainId
     this.moduleAddress = moduleAddress
     this.data = {
       safe: userOperation.sender,
@@ -88,8 +91,8 @@ class EthSafeOperation implements SafeOperation {
     }
   }
 
-  getHash(chainId: bigint): string {
-    return calculateSafeUserOperationHash(this.data, chainId, this.moduleAddress)
+  getHash(): string {
+    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress)
   }
 }
 

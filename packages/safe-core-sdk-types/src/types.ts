@@ -203,7 +203,7 @@ export type SafeMultisigConfirmationResponse = {
   readonly signatureType?: string
 }
 
-type ListResponse<T> = {
+export type ListResponse<T> = {
   readonly count: number
   readonly next?: string
   readonly previous?: string

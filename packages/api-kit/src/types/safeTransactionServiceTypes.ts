@@ -3,7 +3,8 @@ import {
   SafeMultisigTransactionResponse,
   SafeTransactionData,
   UserOperation,
-  SafeOperationResponse
+  SafeOperationResponse,
+  ListResponse
 } from '@safe-global/safe-core-sdk-types'
 
 export type SafeServiceInfoResponse = {
@@ -89,17 +90,12 @@ export type SafeDelegateResponse = {
   readonly signature: string
 }
 
-export type SafeDelegateListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: {
-    readonly safe: string
-    readonly delegate: string
-    readonly delegator: string
-    readonly label: string
-  }[]
-}
+export type SafeDelegateListResponse = ListResponse<{
+  readonly safe: string
+  readonly delegate: string
+  readonly delegator: string
+  readonly label: string
+}>
 
 export type SafeMultisigTransactionEstimate = {
   readonly to: string
@@ -125,12 +121,7 @@ export type ProposeTransactionProps = {
   origin?: string
 }
 
-export type SafeMultisigTransactionListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: SafeMultisigTransactionResponse[]
-}
+export type SafeMultisigTransactionListResponse = ListResponse<SafeMultisigTransactionResponse>
 
 export type TransferResponse = {
   readonly type?: string
@@ -144,12 +135,7 @@ export type TransferResponse = {
   readonly from: string
 }
 
-export type TransferListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: TransferResponse[]
-}
+export type TransferListResponse = ListResponse<TransferResponse>
 
 export type SafeModuleTransaction = {
   readonly created?: string
@@ -166,12 +152,7 @@ export type SafeModuleTransaction = {
   readonly dataDecoded?: string
 }
 
-export type SafeModuleTransactionListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: SafeModuleTransaction[]
-}
+export type SafeModuleTransactionListResponse = ListResponse<SafeModuleTransaction>
 
 export type Erc20Info = {
   readonly name: string
@@ -189,12 +170,7 @@ export type TokenInfoResponse = {
   readonly logoUri?: string
 }
 
-export type TokenInfoListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: TokenInfoResponse[]
-}
+export type TokenInfoListResponse = ListResponse<TokenInfoResponse>
 
 export type TransferWithTokenInfoResponse = TransferResponse & {
   readonly tokenInfo: TokenInfoResponse
@@ -230,16 +206,11 @@ export type AllTransactionsOptions = {
   trusted?: boolean
 }
 
-export type AllTransactionsListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: Array<
-    | SafeModuleTransactionWithTransfersResponse
-    | SafeMultisigTransactionWithTransfersResponse
-    | EthereumTxWithTransfersResponse
-  >
-}
+export type AllTransactionsListResponse = ListResponse<
+  | SafeModuleTransactionWithTransfersResponse
+  | SafeMultisigTransactionWithTransfersResponse
+  | EthereumTxWithTransfersResponse
+>
 
 export type ModulesResponse = {
   safes: string[]
@@ -265,12 +236,7 @@ export type SafeMessage = {
   readonly preparedSignature: string
 }
 
-export type SafeMessageListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: SafeMessage[]
-}
+export type SafeMessageListResponse = ListResponse<SafeMessage>
 
 export type AddMessageProps = {
   message: string | EIP712TypedData
@@ -301,12 +267,7 @@ export type GetSafeOperationListProps = {
   offset?: string
 }
 
-export type GetSafeOperationListResponse = {
-  readonly count: number
-  readonly next?: string
-  readonly previous?: string
-  readonly results: Array<SafeOperationResponse>
-}
+export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 
 export type AddSafeOperationProps = {
   /** Address of the EntryPoint contract */

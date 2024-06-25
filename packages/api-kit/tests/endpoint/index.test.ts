@@ -720,7 +720,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeOperationConfirmations', async () => {
       await chai
-        .expect(safeApiKit.getSafeOperationConfirmations({ safeOperationHash: safeOpHash }))
+        .expect(safeApiKit.getSafeOperationConfirmations(safeOpHash))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safe-operations/${safeOpHash}/confirmations/`,

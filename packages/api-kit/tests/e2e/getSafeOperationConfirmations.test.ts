@@ -16,24 +16,20 @@ describe('getSafeOperationConfirmations', () => {
 
   it('should fail if safeOperationHash is empty', async () => {
     await chai
-      .expect(safeApiKit.getSafeOperationConfirmations({ safeOperationHash: '' }))
+      .expect(safeApiKit.getSafeOperationConfirmations(''))
       .to.be.rejectedWith('Invalid SafeOperation hash')
   })
 
   it('should return an empty array if the safeOperationHash is not found', async () => {
     const safeOperationHash = '0x0000000000000000000000000000000000000000000000000000000000000000'
-    const safeOpConfirmations = await safeApiKit.getSafeOperationConfirmations({
-      safeOperationHash
-    })
+    const safeOpConfirmations = await safeApiKit.getSafeOperationConfirmations(safeOperationHash)
     chai.expect(safeOpConfirmations.count).to.be.equal(0)
     chai.expect(safeOpConfirmations.results.length).to.be.equal(0)
   })
 
   it('should return the SafeOperation with the given safeOperationHash', async () => {
     const safeOperationHash = '0x375d3bd580600ce04d7d2c1d8d88d85f27b9c7d14d7b544f2ee585d672f2b449'
-    const safeOpConfirmations = await safeApiKit.getSafeOperationConfirmations({
-      safeOperationHash
-    })
+    const safeOpConfirmations = await safeApiKit.getSafeOperationConfirmations(safeOperationHash)
     chai.expect(safeOpConfirmations.count).to.be.equal(2)
     chai.expect(safeOpConfirmations.results.length).to.be.equal(2)
   })

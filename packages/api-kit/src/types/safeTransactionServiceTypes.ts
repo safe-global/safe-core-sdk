@@ -287,9 +287,7 @@ export type AddSafeOperationProps = {
   }
 }
 
-export type GetSafeOperationConfirmationListProps = {
-  /** The hash of the SafeOperation to get confirmations for */
-  safeOperationHash: string
+export type GetSafeOperationConfirmationListOptions = {
   /** Maximum number of results to return per page */
   limit?: string
   /** Initial index from which to return the results */

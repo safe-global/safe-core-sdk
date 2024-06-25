@@ -7,7 +7,7 @@ import {
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
   GetSafeMessageListProps,
-  GetSafeOperationConfirmationListProps,
+  GetSafeOperationConfirmationListOptions,
   GetSafeOperationListProps,
   GetSafeOperationListResponse,
   ModulesResponse,
@@ -858,16 +858,16 @@ class SafeApiKit {
   /**
    * Returns the list of confirmations for a given a SafeOperation.
    *
-   * @param getSafeOperationConfirmationsProps - The parameters for fetching the list of confirmations
+   * @param safeOperationHash - The hash of the SafeOperation to get confirmations for
+   * @param getSafeOperationConfirmationsOptions - Additional options for fetching the list of confirmations
    * @returns The list of confirmations
    * @throws "Invalid SafeOperation hash"
    * @throws "Invalid data"
    */
-  async getSafeOperationConfirmations({
-    safeOperationHash,
-    limit,
-    offset
-  }: GetSafeOperationConfirmationListProps): Promise<SafeOperationConfirmationListResponse> {
+  async getSafeOperationConfirmations(
+    safeOperationHash: string,
+    { limit, offset }: GetSafeOperationConfirmationListOptions = {}
+  ): Promise<SafeOperationConfirmationListResponse> {
     if (!safeOperationHash) {
       throw new Error('Invalid SafeOperation hash')
     }

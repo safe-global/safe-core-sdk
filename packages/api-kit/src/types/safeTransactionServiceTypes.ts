@@ -287,9 +287,9 @@ export type AddSafeOperationProps = {
   }
 }
 
-export type GetSafeOperationConfirmationListOptions = {
+export type ListOptions = {
   /** Maximum number of results to return per page */
-  limit?: string
+  limit?: number
   /** Initial index from which to return the results */
-  offset?: string
+  offset?: number
 }

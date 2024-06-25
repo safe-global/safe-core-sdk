@@ -7,9 +7,9 @@ import {
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
   GetSafeMessageListProps,
-  GetSafeOperationConfirmationListOptions,
   GetSafeOperationListProps,
   GetSafeOperationListResponse,
+  ListOptions,
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -866,7 +866,7 @@ class SafeApiKit {
    */
   async getSafeOperationConfirmations(
     safeOperationHash: string,
-    { limit, offset }: GetSafeOperationConfirmationListOptions = {}
+    { limit, offset }: ListOptions = {}
   ): Promise<SafeOperationConfirmationListResponse> {
     if (!safeOperationHash) {
       throw new Error('Invalid SafeOperation hash')
@@ -876,12 +876,12 @@ class SafeApiKit {
       `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/confirmations/`
     )
 
-    if (limit) {
-      url.searchParams.set('limit', limit)
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
     }
 
-    if (offset) {
-      url.searchParams.set('offset', offset)
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
     }
 
     return sendRequest({

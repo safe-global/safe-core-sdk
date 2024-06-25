@@ -1,12 +1,12 @@
 import Safe from '@safe-global/protocol-kit'
 import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 
-import { SafeAccountClient } from './SafeAccountClient'
-import { sendTransaction, sendAndDeployTransaction } from './lib'
-import { SafeClient, SafeClientTransactionResult } from './types'
+import { SafeClient } from './SafeClient'
+import { sendTransaction, sendAndDeployTransaction } from './utils'
+import { SafeClientTransactionResult } from './types'
 import SafeApiKit from '@safe-global/api-kit'
 
-jest.mock('./lib', () => ({
+jest.mock('./utils', () => ({
   sendTransaction: jest.fn(),
   sendAndDeployTransaction: jest.fn()
 }))
@@ -16,23 +16,23 @@ jest.mock('@safe-global/protocol-kit')
 const TRANSACTION = { to: '0xAddress', value: '0', data: '0x' }
 const TRANSACTION_RESPONSE = { chain: { hash: '0xTxHash' } }
 
-describe('SafeAccountClient', () => {
+describe('SafeClient', () => {
   let protocolKit: Safe
   let apiKit: SafeApiKit
-  let safeAccountClient: SafeAccountClient
+  let safeClient: SafeClient
 
   beforeEach(async () => {
     protocolKit = new Safe()
     apiKit = new SafeApiKit({ chainId: 1n })
-    safeAccountClient = new SafeAccountClient(protocolKit, apiKit)
+    safeClient = new SafeClient(protocolKit, apiKit)
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  it('should initialize SafeAccountClient correctly', () => {
-    expect(safeAccountClient).toHaveProperty('protocolKit', protocolKit)
+  it('should initialize SafeClient correctly', () => {
+    expect(safeClient).toHaveProperty('protocolKit', protocolKit)
   })
 
   it('should send transactions if Safe is deployed', async () => {
@@ -41,10 +41,10 @@ describe('SafeAccountClient', () => {
     ;(protocolKit.isSafeDeployed as jest.Mock).mockResolvedValue(true)
     ;(sendTransaction as jest.Mock).mockResolvedValue(TRANSACTION_RESPONSE)
 
-    const result: SafeClientTransactionResult = await safeAccountClient.send(transactions, options)
+    const result: SafeClientTransactionResult = await safeClient.send(transactions, options)
 
     expect(protocolKit.isSafeDeployed).toHaveBeenCalled()
-    expect(sendTransaction).toHaveBeenCalledWith(transactions, options, safeAccountClient)
+    expect(sendTransaction).toHaveBeenCalledWith(transactions, options, safeClient)
     expect(result).toEqual(TRANSACTION_RESPONSE)
   })
 
@@ -55,12 +55,12 @@ describe('SafeAccountClient', () => {
     ;(protocolKit.getThreshold as jest.Mock).mockResolvedValue(1)
     ;(sendAndDeployTransaction as jest.Mock).mockResolvedValue(TRANSACTION_RESPONSE)
 
-    const result: SafeClientTransactionResult = await safeAccountClient.send(transactions, options)
+    const result: SafeClientTransactionResult = await safeClient.send(transactions, options)
 
     expect(protocolKit.isSafeDeployed).toHaveBeenCalled()
     expect(protocolKit.getThreshold).toHaveBeenCalled()
-    expect(sendAndDeployTransaction).toHaveBeenCalledWith(transactions, options, safeAccountClient)
-    expect(result).toEqual({ chain: { hash: '0xTxHash' } })
+    expect(sendAndDeployTransaction).toHaveBeenCalledWith(transactions, options, safeClient)
+    expect(result).toEqual(TRANSACTION_RESPONSE)
   })
 
   it('should throw an error if Safe is not deployed and threshold is greater than 1', async () => {
@@ -69,7 +69,7 @@ describe('SafeAccountClient', () => {
     ;(protocolKit.isSafeDeployed as jest.Mock).mockResolvedValue(false)
     ;(protocolKit.getThreshold as jest.Mock).mockResolvedValue(2)
 
-    await expect(safeAccountClient.send(transactions, options)).rejects.toThrowError(
+    await expect(safeClient.send(transactions, options)).rejects.toThrow(
       'Deployment of Safes with threshold more than one is currently not supported'
     )
 
@@ -80,7 +80,7 @@ describe('SafeAccountClient', () => {
   })
 
   it('should extend the client with additional methods', () => {
-    const extendedClient = safeAccountClient.extend(() => ({
+    const extendedClient = safeClient.extend(() => ({
       newMethod: () => 'new method'
     }))
 

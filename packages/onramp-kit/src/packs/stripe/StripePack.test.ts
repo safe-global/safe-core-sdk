@@ -103,7 +103,7 @@ describe('StripePack', () => {
 
     await stripePack.init()
 
-    await expect(stripePack.open(openOptions)).rejects.toThrowError(error)
+    await expect(stripePack.open(openOptions)).rejects.toThrow(error)
   })
 
   it('should try to get the session if a sessionId is provided', async () => {

@@ -151,9 +151,9 @@ describe('GelatoRelayPack', () => {
   it('should throw an error when trying to do a sponsored transaction without an api key', async () => {
     const relayPack = new GelatoRelayPack({ protocolKit: safe })
 
-    await expect(
-      relayPack.sendSponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)
-    ).rejects.toThrowError('API key not defined')
+    await expect(relayPack.sendSponsorTransaction(SAFE_ADDRESS, '0x', CHAIN_ID)).rejects.toThrow(
+      'API key not defined'
+    )
   })
 
   describe('when creating a relayed transaction', () => {

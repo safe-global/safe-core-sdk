@@ -1,5 +1,5 @@
 import { validateEthereumAddress } from '@safe-global/protocol-kit'
-import { SafeConfig } from './types'
+import { SafeConfig } from '../types'
 
 export const isValidAddress = (address: string): boolean => {
   try {
@@ -15,3 +15,6 @@ export const isValidSafeConfig = (config: SafeConfig): boolean => {
 
   return true
 }
+
+export * from './sendTransaction'
+export * from './sendAndDeployTransaction'

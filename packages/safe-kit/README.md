@@ -1,4 +1,4 @@
-# Safe Account Abstraction Kit PoC
+# Safe Kit
 
 [![npm Version](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction-kit-poc.svg)](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction-kit-poc)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
@@ -18,8 +18,8 @@ Description TBD
 Install the package with yarn or npm:
 
 ```bash
-yarn add @safe-global/account-abstraction-kit-poc
-npm install @safe-global/account-abstraction-kit-poc
+yarn add @safe-global/safe-kit
+npm install @safe-global/safe-kit
 ```
 
 ## Need Help or Have Questions?

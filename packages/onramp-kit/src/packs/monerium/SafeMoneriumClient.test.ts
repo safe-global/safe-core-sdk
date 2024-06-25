@@ -279,7 +279,7 @@ describe('SafeMoneriumClient', () => {
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(80001n)
     expect(await safeMoneriumClient.getChain()).toBe('polygon')
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(300n)
-    expect(safeMoneriumClient.getChain()).rejects.toThrowError('Chain not supported: 300')
+    expect(safeMoneriumClient.getChain()).rejects.toThrow('Chain not supported: 300')
   })
 
   it('should map the protocol kit chainId to the Monerium Network types', async () => {
@@ -296,6 +296,6 @@ describe('SafeMoneriumClient', () => {
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(80001n)
     expect(await safeMoneriumClient.getNetwork()).toBe('mumbai')
     protocolKit.getChainId = jest.fn().mockResolvedValueOnce(300n)
-    expect(safeMoneriumClient.getNetwork()).rejects.toThrowError('Network not supported: 300')
+    expect(safeMoneriumClient.getNetwork()).rejects.toThrow('Network not supported: 300')
   })
 })

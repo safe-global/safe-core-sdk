@@ -25,7 +25,7 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@safe-global/account-abstraction-kit-poc/*": ["./packages/account-abstraction-kit/src/*"],
+      "@safe-global/safe-kit/*": ["./packages/safe-kit/src/*"],
       "@safe-global/api-kit/*": ["./packages/api-kit/src/*"],
       "@safe-global/auth-kit/*": ["./packages/auth-kit/src/*"],
       "@safe-global/onramp-kit/*": ["./packages/onramp-kit/src/*"],

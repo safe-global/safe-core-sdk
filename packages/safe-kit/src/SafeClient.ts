@@ -1,12 +1,18 @@
-import Safe from '@safe-global/protocol-kit'
+import Safe, { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
 import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
 import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
-import { sendTransaction, sendAndDeployTransaction } from './utils'
+import {
+  SafeClientTxStatus,
+  createTransactionResult,
+  executeWithSigner,
+  proposeTransaction
+} from './utils'
 
 import { SafeClientTransactionResult } from './types'
 
 /**
- * A Safe client.
+ * @class
+ * This class provides the functionality to create, sign and execute transactions.
  */
 export class SafeClient {
   protocolKit: Safe
@@ -30,27 +36,73 @@ export class SafeClient {
     options?: TransactionOptions
   ): Promise<SafeClientTransactionResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
+    const safeAddress = await this.protocolKit.getAddress()
+    let safeTransaction = await this.protocolKit.createTransaction({ transactions })
 
-    let txResult: SafeClientTransactionResult
+    const threshold = await this.protocolKit.getThreshold()
 
     if (!isSafeDeployed) {
-      const threshold = await this.protocolKit.getThreshold()
-
       if (threshold === 1) {
-        txResult = await sendAndDeployTransaction(transactions, options || {}, this)
+        // If the threshold is 1, we can deploy the Safe account and execute the transaction in one step
+        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+        const transactionBatchWithDeployment =
+          await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
+        const hash = await executeWithSigner(transactionBatchWithDeployment, options || {}, this)
+
+        return createTransactionResult({
+          status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
+          safeAddress,
+          deploymentTxHash: hash,
+          txHash: hash
+        })
       } else {
-        // TODO: Threshold more than 1 with deployment
-        // 1. Deploy Safe (No signatures needed)
-        // 2. Use api-kit to proposeTransaction with the current signer
-        throw new Error(
-          'Deployment of Safes with threshold more than one is currently not supported '
+        // If the threshold is greater than 1, we need to deploy the Safe account first and
+        // after propose the transaction. The transaction should be confirmed with another owners
+        // until the threshold is reached
+        const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction(
+          undefined,
+          options
         )
+
+        const hash = await executeWithSigner(safeDeploymentTransaction, options || {}, this)
+
+        this.protocolKit = await this.protocolKit.connect({
+          provider: this.protocolKit.getSafeProvider().provider,
+          signer: this.protocolKit.getSafeProvider().signer,
+          safeAddress: await this.protocolKit.getAddress()
+        })
+
+        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+
+        const safeTxHash = await proposeTransaction(safeTransaction, this)
+
+        return createTransactionResult({
+          status: SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES,
+          safeAddress,
+          deploymentTxHash: hash,
+          safeTxHash
+        })
       }
     } else {
-      txResult = await sendTransaction(transactions, options || {}, this)
-    }
+      if (threshold === 1) {
+        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+        const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
 
-    return txResult
+        return createTransactionResult({
+          status: SafeClientTxStatus.EXECUTED,
+          txHash: hash
+        })
+      } else {
+        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+
+        const safeTxHash = await proposeTransaction(safeTransaction, this)
+
+        return createTransactionResult({
+          status: SafeClientTxStatus.PENDING_SIGNATURES,
+          safeTxHash
+        })
+      }
+    }
   }
 
   /**
@@ -69,6 +121,7 @@ export class SafeClient {
     transactionResponse = await this.apiKit.getTransaction(safeTxHash)
 
     return {
+      safeAddress: await this.protocolKit.getAddress(),
       chain: {
         hash: transactionResponse.transactionHash
       },

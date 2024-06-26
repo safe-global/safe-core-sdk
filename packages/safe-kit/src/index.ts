@@ -14,7 +14,9 @@ import { SafeKitConfig } from './types'
 export async function createSafeClient(config: SafeKitConfig): Promise<SafeClient> {
   const protocolKit = await getProtocolKitInstance(config)
   const apiKit = await getApiKitInstance(protocolKit)
+
   if (!protocolKit || !apiKit) throw new Error('Failed to create a kit instances')
+
   return new SafeClient(protocolKit, apiKit)
 }
 
@@ -73,4 +75,5 @@ async function getApiKitInstance(protocolKit: Safe): Promise<SafeApiKit> {
 
   return new SafeApiKit({ chainId })
 }
+
 export * from './types'

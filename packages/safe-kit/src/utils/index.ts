@@ -16,5 +16,6 @@ export const isValidSafeConfig = (config: SafeConfig): boolean => {
   return true
 }
 
-export * from './sendTransaction'
-export * from './sendAndDeployTransaction'
+export * from './executeWithSigner'
+export * from './descriptions'
+export * from './proposeTransaction'

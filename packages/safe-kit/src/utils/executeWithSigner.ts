@@ -1,6 +1,6 @@
 import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
-import { SafeClientTransactionResult } from '../types'
 import { SafeClient } from '../SafeClient'
+import { AbstractSigner } from 'ethers'
 
 /**
  * Sends a transaction using the SafeClient client.
@@ -10,19 +10,22 @@ import { SafeClient } from '../SafeClient'
  * @param {SafeClient} safeClient - The SafeClient client used to send the transaction.
  * @returns {Promise<SafeClientTransactionResult>} A promise that resolves to the result of the transaction.
  */
-export const sendTransaction = async (
-  transactions: TransactionBase[],
+export const executeWithSigner = async (
+  transaction: TransactionBase,
   options: TransactionOptions,
   safeClient: SafeClient
-): Promise<SafeClientTransactionResult> => {
-  let safeTransaction = await safeClient.protocolKit.createTransaction({ transactions })
-  safeTransaction = await safeClient.protocolKit.signTransaction(safeTransaction)
+): Promise<string | undefined> => {
+  const signer = (await safeClient.protocolKit
+    .getSafeProvider()
+    .getExternalSigner()) as unknown as AbstractSigner
 
-  const { hash } = await safeClient.protocolKit.executeTransaction(safeTransaction, options)
+  const txResponsePromise = await signer.sendTransaction({
+    from: (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x',
+    ...transaction,
+    ...options
+  })
 
-  return {
-    chain: {
-      hash
-    }
-  }
+  const txResponse = await txResponsePromise.wait()
+
+  return txResponse?.hash
 }

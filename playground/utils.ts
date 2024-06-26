@@ -1,5 +1,7 @@
 import { ethers } from 'ethers'
+import { Hash } from 'viem'
 import { Safe4337Pack } from '@safe-global/relay-kit'
+import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 import { GetSafeOperationListResponse } from '@safe-global/api-kit'
 
 export async function waitForOperationToFinish(
@@ -24,17 +26,10 @@ export async function waitForOperationToFinish(
   console.groupEnd()
 }
 
-export function generateTransferCallData(to: string, value: bigint) {
-  const functionAbi = 'function transfer(address _to, uint256 _value) returns (bool)'
-  const iface = new ethers.Interface([functionAbi])
-
-  return iface.encodeFunctionData('transfer', [to, value])
-}
-
 export async function transfer(
   signer: ethers.AbstractSigner,
   tokenAddress: string,
-  to: string,
+  to: Hash,
   amount: bigint
 ) {
   const transferEC20 = {

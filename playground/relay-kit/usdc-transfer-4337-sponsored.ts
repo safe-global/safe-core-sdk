@@ -1,5 +1,6 @@
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { waitForOperationToFinish, generateTransferCallData } from '../utils'
+import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
+import { waitForOperationToFinish } from '../utils'
 
 // Safe owner PK
 const PRIVATE_KEY = ''

@@ -1,6 +1,8 @@
+import { Hash } from 'viem'
 import { ethers } from 'ethers'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { waitForOperationToFinish, transfer, generateTransferCallData } from '../utils'
+import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
+import { waitForOperationToFinish, transfer } from '../utils'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -61,7 +63,9 @@ async function main() {
   console.log(`sending ${nativeTokenAmount} ETH...`)
 
   const ethersSigner = await safe4337Pack.protocolKit.getSafeProvider().getExternalSigner()
-  const signerAddress = await safe4337Pack.protocolKit.getSafeProvider().getSignerAddress()
+  const signerAddress = (await safe4337Pack.protocolKit.getSafeProvider().getSignerAddress()) as
+    | Hash
+    | undefined
   const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
 
   if (!ethersSigner || !signerAddress) {

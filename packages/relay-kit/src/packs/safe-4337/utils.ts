@@ -1,3 +1,4 @@
+import { Hash, encodeFunctionData, encodePacked, hashTypedData, toHex } from 'viem'
 import {
   SafeUserOperation,
   OperationType,
@@ -12,7 +13,7 @@ import {
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
 import { ethers } from 'ethers'
-import { EIP712_SAFE_OPERATION_TYPE, INTERFACES } from './constants'
+import { ABI, EIP712_SAFE_OPERATION_TYPE } from './constants'
 
 /**
  * Gets the EIP-4337 bundler provider.
@@ -33,13 +34,13 @@ export function getEip4337BundlerProvider(bundlerUrl: string): ethers.JsonRpcPro
  *
  * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.
  * @param {SafeProvider} safeProvider - Safe provider.
- * @param {string} safe4337ModuleAddress - Safe 4337 module address.
+ * @param {Hash} safe4337ModuleAddress - Safe 4337 module address.
  * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.
  */
 export async function signSafeOp(
   safeUserOperation: SafeUserOperation,
   safeProvider: SafeProvider,
-  safe4337ModuleAddress: string
+  safe4337ModuleAddress: Hash
 ): Promise<SafeSignature> {
   const signer = (await safeProvider.getExternalSigner()) as ethers.Signer
   const chainId = await safeProvider.getChainId()
@@ -52,11 +53,11 @@ export async function signSafeOp(
     EIP712_SAFE_OPERATION_TYPE,
     {
       ...safeUserOperation,
-      nonce: ethers.toBeHex(safeUserOperation.nonce),
-      validAfter: ethers.toBeHex(safeUserOperation.validAfter),
-      validUntil: ethers.toBeHex(safeUserOperation.validUntil),
-      maxFeePerGas: ethers.toBeHex(safeUserOperation.maxFeePerGas),
-      maxPriorityFeePerGas: ethers.toBeHex(safeUserOperation.maxPriorityFeePerGas)
+      nonce: toHex(safeUserOperation.nonce),
+      validAfter: toHex(safeUserOperation.validAfter),
+      validUntil: toHex(safeUserOperation.validUntil),
+      maxFeePerGas: toHex(safeUserOperation.maxFeePerGas),
+      maxPriorityFeePerGas: toHex(safeUserOperation.maxPriorityFeePerGas)
     }
   )
 
@@ -67,14 +68,18 @@ export async function signSafeOp(
  * Encodes multi-send data from transactions batch.
  *
  * @param {MetaTransactionData[]} transactions - an array of transaction to to be encoded.
- * @return {string} The encoded data string.
+ * @return {Hash} The encoded data string.
  */
-export function encodeMultiSendCallData(transactions: MetaTransactionData[]): string {
-  return INTERFACES.encodeFunctionData('multiSend', [
-    encodeMultiSendData(
-      transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
-    )
-  ])
+export function encodeMultiSendCallData(transactions: MetaTransactionData[]): Hash {
+  return encodeFunctionData({
+    abi: ABI,
+    functionName: 'multiSend',
+    args: [
+      encodeMultiSendData(
+        transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
+      )
+    ]
+  })
 }
 
 /**
@@ -82,22 +87,23 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): st
  *
  * @param {SafeUserOperation} safeUserOperation - The SafeUserOperation.
  * @param {bigint} chainId - The chain id.
- * @param {string} safe4337ModuleAddress - The Safe 4337 module address.
+ * @param {Hash} safe4337ModuleAddress - The Safe 4337 module address.
  * @return {string} The hash of the safe operation.
  */
 export function calculateSafeUserOperationHash(
   safeUserOperation: SafeUserOperation,
   chainId: bigint,
-  safe4337ModuleAddress: string
-): string {
-  return ethers.TypedDataEncoder.hash(
-    {
-      chainId,
+  safe4337ModuleAddress: Hash
+): Hash {
+  return hashTypedData({
+    domain: {
+      chainId: Number(chainId),
       verifyingContract: safe4337ModuleAddress
     },
-    EIP712_SAFE_OPERATION_TYPE,
-    safeUserOperation
-  )
+    types: EIP712_SAFE_OPERATION_TYPE,
+    primaryType: 'SafeOp',
+    message: safeUserOperation
+  })
 }
 
 /**
@@ -109,6 +115,16 @@ export function calculateSafeUserOperationHash(
 export function userOperationToHexValues(userOperation: UserOperation) {
   const userOperationWithHexValues = {
     ...userOperation,
+    nonce: toHex(userOperation.nonce),
+    callGasLimit: toHex(userOperation.callGasLimit),
+    verificationGasLimit: toHex(userOperation.verificationGasLimit),
+    preVerificationGas: toHex(userOperation.preVerificationGas),
+    maxFeePerGas: toHex(userOperation.maxFeePerGas),
+    maxPriorityFeePerGas: toHex(userOperation.maxPriorityFeePerGas)
+  }
+
+  const userOperationWithHexValuesEthers = {
+    ...userOperation,
     nonce: ethers.toBeHex(userOperation.nonce),
     callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
     verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
@@ -116,6 +132,9 @@ export function userOperationToHexValues(userOperation: UserOperation) {
     maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
     maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
   }
+
+  console.log(userOperationWithHexValues)
+  console.log(userOperationWithHexValuesEthers)
 
   return userOperationWithHexValues
 }
@@ -140,9 +159,9 @@ export function addDummySignature(
 
   return {
     ...userOperation,
-    signature: ethers.solidityPacked(
+    signature: encodePacked(
       ['uint48', 'uint48', 'bytes'],
-      [0, 0, buildSignatureBytes(signatures)]
+      [0, 0, buildSignatureBytes(signatures) as Hash]
     )
   }
 }

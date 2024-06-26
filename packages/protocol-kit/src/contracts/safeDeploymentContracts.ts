@@ -91,9 +91,8 @@ export async function getMultiSendContract({
     customContractAddress: customContracts?.multiSendAddress,
     customContractAbi: customContracts?.multiSendAbi
   })
-  const isContractDeployed = await safeProvider.isContractDeployed(
-    await multiSendContract.getAddress()
-  )
+  const address = await multiSendContract.getAddress()
+  const isContractDeployed = await safeProvider.isContractDeployed(address)
   if (!isContractDeployed) {
     throw new Error('MultiSend contract is not deployed on the current network')
   }

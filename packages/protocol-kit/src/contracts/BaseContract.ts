@@ -88,7 +88,7 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
   }
 
   getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
+    return this.contract.address
   }
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {

@@ -92,7 +92,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
-      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.address
 
       chai.expect(batchTransaction).to.be.deep.equal({
         to: multiSendContractAddress,
@@ -126,7 +126,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
-      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.address
 
       chai.expect(batchTransaction).to.be.deep.equal({
         to: multiSendContractAddress,

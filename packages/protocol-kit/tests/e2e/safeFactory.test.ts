@@ -216,7 +216,7 @@ describe('SafeProxyFactory', () => {
         chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
         const compatibilityFallbackHandler = await (
           await getCompatibilityFallbackHandler()
-        ).contract.getAddress()
+        ).contract.address
         chai.expect(compatibilityFallbackHandler).to.be.eq(await safe.getFallbackHandler())
       }
     )
@@ -356,7 +356,7 @@ describe('SafeProxyFactory', () => {
         const fallbackHandler = await safe.getFallbackHandler()
         const compatibilityFallbackHandler = await (
           await getCompatibilityFallbackHandler()
-        ).contract.getAddress()
+        ).contract.address
         chai.expect(compatibilityFallbackHandler).to.be.eq(fallbackHandler)
       }
     )

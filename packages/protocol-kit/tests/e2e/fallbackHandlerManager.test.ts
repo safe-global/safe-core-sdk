@@ -87,7 +87,7 @@ describe('Fallback handler manager', () => {
       })
       const compatibilityFallbackHandler = await (
         await getCompatibilityFallbackHandler()
-      ).contract.getAddress()
+      ).contract.address
       chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(compatibilityFallbackHandler)
       const tx = await safeSdk.createEnableFallbackHandlerTx(
         await defaultCallbackHandler.getAddress()
@@ -239,7 +239,7 @@ describe('Fallback handler manager', () => {
       })
       const compatibilityFallbackHandler = await (
         await getCompatibilityFallbackHandler()
-      ).contract.getAddress()
+      ).contract.address
       chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(compatibilityFallbackHandler)
       const tx = await safeSdk.createEnableFallbackHandlerTx(
         await defaultCallbackHandler.getAddress()

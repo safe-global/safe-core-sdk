@@ -94,7 +94,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await safeContract.getAddress())
-        .to.be.eq(await (await getSafeSingleton()).contract.getAddress())
+        .to.be.eq(await (await getSafeSingleton()).contract.address)
     })
   })
 
@@ -122,7 +122,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendContract.getAddress())
-        .to.be.eq(await (await getMultiSend()).contract.getAddress())
+        .to.be.eq(await (await getMultiSend()).contract.address)
     })
   })
 
@@ -150,7 +150,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendCallOnlyContract.getAddress())
-        .to.be.eq(await (await getMultiSendCallOnly()).contract.getAddress())
+        .to.be.eq(await (await getMultiSendCallOnly()).contract.address)
     })
   })
 
@@ -180,7 +180,7 @@ describe('Safe contracts', () => {
         })
       chai
         .expect(await compatibilityFallbackHandlerContract.getAddress())
-        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.getAddress())
+        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.address)
     })
   })
 
@@ -208,7 +208,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await factoryContract.getAddress())
-        .to.be.eq(await (await getFactory()).contract.getAddress())
+        .to.be.eq(await (await getFactory()).contract.address)
     })
   })
 
@@ -236,7 +236,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await signMessageLibContract.getAddress())
-        .to.be.eq(await (await getSignMessageLib()).contract.getAddress())
+        .to.be.eq(await (await getSignMessageLib()).contract.address)
     })
   })
 
@@ -264,7 +264,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await createCallContract.getAddress())
-        .to.be.eq(await (await getCreateCall()).contract.getAddress())
+        .to.be.eq(await (await getCreateCall()).contract.address)
     })
 
     it('should return an external provider (BrowserProvider) and signer (AbstractSigner) when using an EIP1193 provider', async () => {

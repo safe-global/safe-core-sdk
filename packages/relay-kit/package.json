@@ -42,6 +42,7 @@
     "@safe-global/protocol-kit": "^4.0.2",
     "@safe-global/safe-core-sdk-types": "^5.0.2",
     "@safe-global/safe-modules-deployments": "^2.1.1",
-    "ethers": "^6.13.1"
+    "ethers": "^6.13.1",
+    "viem": "^2.16.1"
   }
 }

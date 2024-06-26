@@ -12,7 +12,6 @@ import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
 import * as utils from './utils'
-import { toBeHex } from 'ethers'
 
 dotenv.config()
 
@@ -661,15 +660,12 @@ describe('Safe4337Pack', () => {
     ])
   })
 
-  it.only('should allow to send a UserOperation to the bundler using a SafeOperationResponse object from the api', async () => {
+  it('should allow to send a UserOperation to the bundler using a SafeOperationResponse object from the api', async () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
       }
     })
-
-    console.log('ethers', toBeHex('3'))
-    console.log('viem', viem.toHex('3'))
 
     await safe4337Pack.executeTransaction({ executable: fixtures.SAFE_OPERATION_RESPONSE })
 

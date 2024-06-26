@@ -284,11 +284,11 @@ class SafeApiKit {
     if (label) {
       url.searchParams.set('label', label)
     }
-    if (limit) {
-      url.searchParams.set('limit', limit)
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
     }
-    if (offset) {
-      url.searchParams.set('offset', offset)
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
     }
 
     return sendRequest({
@@ -674,12 +674,12 @@ class SafeApiKit {
       url.searchParams.set('ordering', ordering)
     }
 
-    if (limit) {
-      url.searchParams.set('limit', limit)
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
     }
 
-    if (offset) {
-      url.searchParams.set('offset', offset)
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
     }
 
     return sendRequest({
@@ -750,12 +750,12 @@ class SafeApiKit {
       url.searchParams.set('ordering', ordering)
     }
 
-    if (limit) {
-      url.searchParams.set('limit', limit)
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
     }
 
-    if (offset) {
-      url.searchParams.set('offset', offset)
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
     }
 
     return sendRequest({

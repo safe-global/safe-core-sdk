@@ -7,6 +7,13 @@ import {
   ListResponse
 } from '@safe-global/safe-core-sdk-types'
 
+export type ListOptions = {
+  /** Maximum number of results to return per page */
+  limit?: number
+  /** Initial index from which to return the results */
+  offset?: number
+}
+
 export type SafeServiceInfoResponse = {
   readonly name: string
   readonly version: string
@@ -64,9 +71,7 @@ export type GetSafeDelegateProps = {
   delegateAddress?: string
   delegatorAddress?: string
   label?: string
-  limit?: string
-  offset?: string
-}
+} & ListOptions
 
 export type AddSafeDelegateProps = {
   safeAddress?: string
@@ -246,9 +251,7 @@ export type AddMessageProps = {
 
 export type GetSafeMessageListProps = {
   ordering?: string
-  limit?: string
-  offset?: string
-}
+} & ListOptions
 
 export type EIP712TypedData = {
   domain: TypedDataDomain
@@ -261,11 +264,7 @@ export type GetSafeOperationListProps = {
   safeAddress: string
   /** Which field to use when ordering the results */
   ordering?: string
-  /** Maximum number of results to return per page */
-  limit?: string
-  /** Initial index from which to return the results */
-  offset?: string
-}
+} & ListOptions
 
 export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 
@@ -285,11 +284,4 @@ export type AddSafeOperationProps = {
     /** The UserOperation will be valid after this block's timestamp */
     validAfter?: number
   }
-}
-
-export type ListOptions = {
-  /** Maximum number of results to return per page */
-  limit?: number
-  /** Initial index from which to return the results */
-  offset?: number
 }

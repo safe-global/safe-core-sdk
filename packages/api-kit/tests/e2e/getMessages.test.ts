@@ -28,4 +28,20 @@ describe('getMessages', () => {
     chai.expect(messages.results[0]).to.have.property('confirmations')
     chai.expect(messages.results[0]).to.have.property('safe').to.eq(safeAddress)
   })
+
+  it('should return a maximum of 5 messages with limit = 5', async () => {
+    const messages = await safeApiKit.getMessages(safeAddress, { limit: 5 })
+
+    chai.expect(messages).to.have.property('count').greaterThan(1)
+    chai.expect(messages).to.have.property('results').to.be.an('array')
+    chai.expect(messages.results.length).to.be.lessThanOrEqual(5)
+  })
+
+  it('should return all messages excluding the first one with offset = 1', async () => {
+    const messages = await safeApiKit.getMessages(safeAddress, { offset: 1 })
+
+    chai.expect(messages).to.have.property('count').greaterThan(1)
+    chai.expect(messages).to.have.property('results').to.be.an('array')
+    chai.expect(messages.results.length).to.be.lessThanOrEqual(messages.count - 1)
+  })
 })

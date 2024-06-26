@@ -1,5 +1,6 @@
+import { Hash } from 'viem'
 import { createSafeClient } from '@safe-global/safe-kit'
-import { generateTransferCallData } from '../utils'
+import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 
 const OWNER_1_PRIVATE_KEY = ''
 const OWNER_1_ADDRESS = ''
@@ -19,7 +20,8 @@ async function main() {
     }
   })
 
-  const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
+  const signerAddress = ((await safeClient.protocolKit.getSafeProvider().getSignerAddress()) ||
+    '0x') as Hash
 
   console.log(
     '-Safe Address:',

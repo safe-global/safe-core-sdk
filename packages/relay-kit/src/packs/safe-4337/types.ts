@@ -1,3 +1,4 @@
+import { Hash } from 'viem'
 import Safe, { SafeProviderConfig } from '@safe-global/protocol-kit'
 import {
   EstimateGasData,
@@ -24,7 +25,7 @@ export type PaymasterOptions = {
   paymasterUrl?: string
   isSponsored?: boolean
   sponsorshipPolicyId?: string
-  paymasterAddress: string
+  paymasterAddress: Hash
   paymasterTokenAddress?: string
   amountToApprove?: bigint
 }
@@ -36,7 +37,7 @@ export type Safe4337InitOptions = {
   safeModulesVersion?: string
   customContracts?: {
     entryPointAddress?: string
-    safe4337ModuleAddress?: string
+    safe4337ModuleAddress?: Hash
     addModulesLibAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions
@@ -49,7 +50,7 @@ export type Safe4337Options = {
   paymasterOptions?: PaymasterOptions
   bundlerClient: ethers.JsonRpcProvider
   entryPointAddress: string
-  safe4337ModuleAddress: string
+  safe4337ModuleAddress: Hash
 }
 
 export type Safe4337CreateTransactionProps = {

@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { parseAbi } from 'viem'
 
 export const DEFAULT_SAFE_VERSION = '1.4.1'
 export const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
@@ -21,7 +21,7 @@ export const EIP712_SAFE_OPERATION_TYPE = {
   ]
 }
 
-export const INTERFACES = new ethers.Interface([
+export const ABI = parseAbi([
   'function enableModules(address[])',
   'function multiSend(bytes memory transactions) public payable',
   'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)',

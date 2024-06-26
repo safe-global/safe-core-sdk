@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import { Hash, encodeFunctionData, zeroAddress } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
@@ -33,9 +34,9 @@ import {
   PaymasterOptions
 } from './types'
 import {
+  ABI,
   DEFAULT_SAFE_VERSION,
   DEFAULT_SAFE_MODULES_VERSION,
-  INTERFACES,
   RPC_4337_CALLS
 } from './constants'
 import {
@@ -74,7 +75,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #BUNDLER_URL: string
 
   #ENTRYPOINT_ADDRESS: string
-  #SAFE_4337_MODULE_ADDRESS: string = '0x'
+  #SAFE_4337_MODULE_ADDRESS: Hash = '0x'
 
   #bundlerClient: ethers.JsonRpcProvider
 
@@ -145,7 +146,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
+      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network] as
+        | Hash
+        | undefined
     }
 
     if (!addModulesLibAddress || !safe4337ModuleAddress) {
@@ -195,7 +198,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       let deploymentTo = addModulesLibAddress
-      let deploymentData = INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]])
+      let deploymentData = encodeFunctionData({
+        abi: ABI,
+        functionName: 'enableModules',
+        args: [[safe4337ModuleAddress]]
+      })
 
       const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
 
@@ -208,22 +215,32 @@ export class Safe4337Pack extends RelayKitBasePack<{
         const enable4337ModulesTransaction = {
           to: addModulesLibAddress,
           value: '0',
-          data: INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]]),
+          data: encodeFunctionData({
+            abi: ABI,
+            functionName: 'enableModules',
+            args: [[safe4337ModuleAddress]]
+          }),
           operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
         }
 
         const approveToPaymasterTransaction = {
           to: paymasterTokenAddress,
-          data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+          data: encodeFunctionData({
+            abi: ABI,
+            functionName: 'approve',
+            args: [paymasterAddress, amountToApprove]
+          }),
           value: '0',
           operation: OperationType.Call // Call for approve
         }
 
         const setupBatch = [enable4337ModulesTransaction, approveToPaymasterTransaction]
 
-        const batchData = INTERFACES.encodeFunctionData('multiSend', [
-          encodeMultiSendData(setupBatch)
-        ])
+        const batchData = encodeFunctionData({
+          abi: ABI,
+          functionName: 'multiSend',
+          args: [encodeMultiSendData(setupBatch)]
+        })
 
         const multiSendContract = await getMultiSendContract({
           safeProvider: new SafeProvider({ provider, signer }),
@@ -248,9 +265,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
             to: deploymentTo,
             data: deploymentData,
             fallbackHandler: safe4337ModuleAddress,
-            paymentToken: ethers.ZeroAddress,
+            paymentToken: zeroAddress,
             payment: 0,
-            paymentReceiver: ethers.ZeroAddress
+            paymentReceiver: zeroAddress
           }
         }
       })
@@ -398,7 +415,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       const approveToPaymasterTransaction = {
         to: paymasterTokenAddress,
-        data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+        data: encodeFunctionData({
+          abi: ABI,
+          functionName: 'approve',
+          args: [paymasterAddress, amountToApprove]
+        }),
         value: '0',
         operation: OperationType.Call // Call for approve
       }
@@ -668,12 +689,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {MetaTransactionData} transaction - The transaction data to encode.
    * @return {string} The encoded call data string.
    */
-  #encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
-    return INTERFACES.encodeFunctionData('executeUserOp', [
-      transaction.to,
-      transaction.value,
-      transaction.data,
-      transaction.operation || OperationType.Call
-    ])
+  #encodeExecuteUserOpCallData(transaction: MetaTransactionData): Hash {
+    return encodeFunctionData({
+      abi: ABI,
+      functionName: 'executeUserOp',
+      args: [
+        transaction.to as Hash,
+        BigInt(transaction.value),
+        transaction.data as Hash,
+        transaction.operation || OperationType.Call
+      ]
+    })
   }
 }

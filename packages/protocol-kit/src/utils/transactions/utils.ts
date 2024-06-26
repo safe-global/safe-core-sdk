@@ -1,3 +1,4 @@
+import { Hash } from 'viem'
 import { ethers, Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -116,8 +117,8 @@ function encodeMetaTransaction(tx: MetaTransactionData): string {
   return encoded.slice(2)
 }
 
-export function encodeMultiSendData(txs: MetaTransactionData[]): string {
-  return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
+export function encodeMultiSendData(txs: MetaTransactionData[]): Hash {
+  return `0x${txs.map((tx) => encodeMetaTransaction(tx)).join('')}`
 }
 
 export function decodeMultiSendData(encodedData: string): MetaTransactionData[] {

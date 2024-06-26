@@ -1,22 +1,29 @@
-import { createSafeClient } from '@safe-global/safe-kit'
+import { SafeClientTransactionResult, createSafeClient } from '@safe-global/safe-kit'
 import { generateTransferCallData } from '../utils'
 
 const OWNER_1_PRIVATE_KEY = ''
+const OWNER_2_PRIVATE_KEY = ''
+const OWNER_3_PRIVATE_KEY = ''
+
 const OWNER_1_ADDRESS = ''
 const OWNER_2_ADDRESS = ''
+const OWNER_3_ADDRESS = ''
+
+const THRESHOLD = 3
+const SALT_NONCE = '4'
 
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 const usdcAmount = 10_000n // 0.01 USDC
 
-async function main() {
+async function send(): Promise<SafeClientTransactionResult> {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
     safeOptions: {
-      owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS],
-      threshold: 1,
-      saltNonce: '4'
+      owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
+      threshold: THRESHOLD,
+      saltNonce: SALT_NONCE
     }
   })
 
@@ -38,7 +45,43 @@ async function main() {
 
   const txResult = await safeClient.send(transactions)
 
-  console.log('-Transaction result: ', txResult)
+  console.log('-Send result: ', txResult)
+
+  return txResult
+}
+
+async function confirm({ safeAddress, safeTxHash }: SafeClientTransactionResult, pk: string) {
+  if (!pk) {
+    return
+  }
+
+  const safeClient = await createSafeClient({
+    provider: RPC_URL,
+    signer: pk,
+    safeAddress
+  })
+
+  const pendingTransactions = await safeClient.getPendingTransactions()
+
+  pendingTransactions.results.forEach(async (transaction) => {
+    if (transaction.safeTxHash !== safeTxHash) {
+      return
+    }
+
+    const txResult = await safeClient.confirm(transaction.safeTxHash)
+
+    console.log('-Confirm result: ', txResult)
+  })
+}
+
+async function main() {
+  if (![1, 2, 3].includes(THRESHOLD)) {
+    return
+  }
+
+  const txResult = await send()
+  await confirm(txResult, OWNER_2_PRIVATE_KEY)
+  await confirm(txResult, OWNER_3_PRIVATE_KEY)
 }
 
 main()

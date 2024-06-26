@@ -25,15 +25,16 @@ export const createTransactionResult = ({
   txHash
 }: {
   status: SafeClientTxStatus
-  safeAddress?: string
+  safeAddress: string
   deploymentTxHash?: string
   safeTxHash?: string
   txHash?: string
 }): SafeClientTransactionResult => {
   const txResult: SafeClientTransactionResult = {
+    safeAddress,
     description: '',
     status,
-    txHash
+    safeTxHash
   }
 
   switch (status) {
@@ -41,7 +42,7 @@ export const createTransactionResult = ({
       txResult.description = DEPLOYED_AND_EXECUTED
       break
     case SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES:
-      txResult.description = DEPLOYED_AND_EXECUTED
+      txResult.description = DEPLOYED_AND_PENDING_SIGNATURES
       break
     case SafeClientTxStatus.EXECUTED:
       txResult.description = EXECUTED
@@ -54,13 +55,13 @@ export const createTransactionResult = ({
       break
   }
 
-  if (safeAddress && deploymentTxHash) {
-    txResult.deployment = {
-      safeAddress,
-      deploymentTxHash
-    }
-  }
-  txResult.safeTxHash = safeTxHash
+  txResult.deployment = deploymentTxHash
+    ? {
+        txHash: deploymentTxHash
+      }
+    : undefined
+
+  txResult.execution = txHash ? { txHash } : undefined
 
   return txResult
 }

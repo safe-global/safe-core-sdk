@@ -54,9 +54,16 @@ export class SafeClient {
         const transactionBatchWithDeployment =
           await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction, options)
         const hash = await executeWithSigner(transactionBatchWithDeployment, {}, this)
+
+        this.protocolKit = await this.protocolKit.connect({
+          provider: this.protocolKit.getSafeProvider().provider,
+          signer: this.protocolKit.getSafeProvider().signer,
+          safeAddress: await this.protocolKit.getAddress()
+        })
+
         return createTransactionResult({
-          status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
           safeAddress,
+          status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
           deploymentTxHash: hash,
           txHash: hash
         })
@@ -79,8 +86,8 @@ export class SafeClient {
         const safeTxHash = await proposeTransaction(safeTransaction, this)
 
         return createTransactionResult({
-          status: SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES,
           safeAddress,
+          status: SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES,
           deploymentTxHash: hash,
           safeTxHash
         })
@@ -94,6 +101,7 @@ export class SafeClient {
         const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
 
         return createTransactionResult({
+          safeAddress,
           status: SafeClientTxStatus.EXECUTED,
           txHash: hash
         })
@@ -102,6 +110,7 @@ export class SafeClient {
         const safeTxHash = await proposeTransaction(safeTransaction, this)
 
         return createTransactionResult({
+          safeAddress,
           status: SafeClientTxStatus.PENDING_SIGNATURES,
           safeTxHash
         })
@@ -124,10 +133,13 @@ export class SafeClient {
     await this.apiKit.confirmTransaction(safeTxHash, signedTransaction.encodedSignatures())
 
     transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+
     let executedTransactionResponse: TransactionResult = {
       hash: '',
       transactionResponse: undefined
     }
+
+    console.log('transactionResponse', transactionResponse)
 
     if (
       transactionResponse.confirmations &&
@@ -135,12 +147,18 @@ export class SafeClient {
     ) {
       executedTransactionResponse = await this.protocolKit.executeTransaction(transactionResponse)
       await waitSafeTxReceipt(executedTransactionResponse)
+
+      return createTransactionResult({
+        status: SafeClientTxStatus.EXECUTED,
+        safeAddress,
+        txHash: executedTransactionResponse.hash,
+        safeTxHash
+      })
     }
 
     return createTransactionResult({
-      status: SafeClientTxStatus.EXECUTED,
+      status: SafeClientTxStatus.PENDING_SIGNATURES,
       safeAddress,
-      txHash: executedTransactionResponse.hash,
       safeTxHash
     })
   }

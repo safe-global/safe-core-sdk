@@ -59,8 +59,8 @@ export const createTransactionResult = ({
       safeAddress,
       deploymentTxHash
     }
-    txResult.safeTxHash = safeTxHash
   }
+  txResult.safeTxHash = safeTxHash
 
   return txResult
 }

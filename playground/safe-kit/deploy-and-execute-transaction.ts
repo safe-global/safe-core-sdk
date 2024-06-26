@@ -1,9 +1,9 @@
 import { createSafeClient } from '@safe-global/safe-kit'
 import { generateTransferCallData } from '../utils'
 
-const OWNER_1_PRIVATE_KEY = 'f8193da6493ae1077651cc49a8544bc2e8ee2347ef51cd8dae3aeb8023b906d9'
-const OWNER_1_ADDRESS = '0xBC16A6Fbc93f62187a137F30C92E3F90bBBAA492'
-const OWNER_2_ADDRESS = '0x2946a23fC33217A8fd9C85cb8eAB663c879F0516'
+const OWNER_1_PRIVATE_KEY = ''
+const OWNER_1_ADDRESS = ''
+const OWNER_2_ADDRESS = ''
 
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
@@ -15,8 +15,8 @@ async function main() {
     signer: OWNER_1_PRIVATE_KEY,
     safeOptions: {
       owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS],
-      threshold: 2,
-      saltNonce: '2'
+      threshold: 1,
+      saltNonce: '4'
     }
   })
 

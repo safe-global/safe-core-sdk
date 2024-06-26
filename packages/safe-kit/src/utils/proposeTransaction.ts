@@ -1,6 +1,6 @@
-import { SafeTransaction } from 'packages/safe-core-sdk-types/dist/src'
+import { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
+import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import { SafeClient } from '../SafeClient'
-import { EthSafeSignature, buildSignatureBytes } from 'packages/protocol-kit/dist/src'
 
 export const proposeTransaction = async (
   safeTransaction: SafeTransaction,

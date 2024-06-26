@@ -1,11 +1,16 @@
-import Safe, { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
+import Safe from '@safe-global/protocol-kit'
 import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
-import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
+import {
+  TransactionBase,
+  TransactionOptions,
+  TransactionResult
+} from '@safe-global/safe-core-sdk-types'
 import {
   SafeClientTxStatus,
   createTransactionResult,
   executeWithSigner,
-  proposeTransaction
+  proposeTransaction,
+  waitSafeTxReceipt
 } from './utils'
 
 import { SafeClientTransactionResult } from './types'
@@ -42,13 +47,13 @@ export class SafeClient {
     const threshold = await this.protocolKit.getThreshold()
 
     if (!isSafeDeployed) {
+      // If the Safe does not exist we need to deploy it first
       if (threshold === 1) {
         // If the threshold is 1, we can deploy the Safe account and execute the transaction in one step
         safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
         const transactionBatchWithDeployment =
-          await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
-        const hash = await executeWithSigner(transactionBatchWithDeployment, options || {}, this)
-
+          await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction, options)
+        const hash = await executeWithSigner(transactionBatchWithDeployment, {}, this)
         return createTransactionResult({
           status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
           safeAddress,
@@ -63,9 +68,7 @@ export class SafeClient {
           undefined,
           options
         )
-
         const hash = await executeWithSigner(safeDeploymentTransaction, options || {}, this)
-
         this.protocolKit = await this.protocolKit.connect({
           provider: this.protocolKit.getSafeProvider().provider,
           signer: this.protocolKit.getSafeProvider().signer,
@@ -73,7 +76,6 @@ export class SafeClient {
         })
 
         safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
-
         const safeTxHash = await proposeTransaction(safeTransaction, this)
 
         return createTransactionResult({
@@ -84,8 +86,11 @@ export class SafeClient {
         })
       }
     } else {
+      // If the Safe is deployed we can either execute or propose the transaction
+      safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+
       if (threshold === 1) {
-        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+        // If the threshold is 1, we can execute the transaction
         const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
 
         return createTransactionResult({
@@ -93,8 +98,7 @@ export class SafeClient {
           txHash: hash
         })
       } else {
-        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
-
+        // If the threshold is greater than 1, we need to propose the transaction first
         const safeTxHash = await proposeTransaction(safeTransaction, this)
 
         return createTransactionResult({
@@ -114,21 +118,31 @@ export class SafeClient {
    */
   async confirm(safeTxHash: string): Promise<SafeClientTransactionResult> {
     let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+    const safeAddress = await this.protocolKit.getAddress()
     const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
 
     await this.apiKit.confirmTransaction(safeTxHash, signedTransaction.encodedSignatures())
 
     transactionResponse = await this.apiKit.getTransaction(safeTxHash)
-
-    return {
-      safeAddress: await this.protocolKit.getAddress(),
-      chain: {
-        hash: transactionResponse.transactionHash
-      },
-      safeServices: {
-        safeTxHash: transactionResponse.safeTxHash
-      }
+    let executedTransactionResponse: TransactionResult = {
+      hash: '',
+      transactionResponse: undefined
     }
+
+    if (
+      transactionResponse.confirmations &&
+      transactionResponse.confirmationsRequired === transactionResponse.confirmations.length
+    ) {
+      executedTransactionResponse = await this.protocolKit.executeTransaction(transactionResponse)
+      await waitSafeTxReceipt(executedTransactionResponse)
+    }
+
+    return createTransactionResult({
+      status: SafeClientTxStatus.EXECUTED,
+      safeAddress,
+      txHash: executedTransactionResponse.hash,
+      safeTxHash
+    })
   }
 
   /**

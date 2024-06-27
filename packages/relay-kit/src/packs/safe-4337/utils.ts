@@ -115,26 +115,13 @@ export function calculateSafeUserOperationHash(
 export function userOperationToHexValues(userOperation: UserOperation) {
   const userOperationWithHexValues = {
     ...userOperation,
-    nonce: toHex(userOperation.nonce),
+    nonce: toHex(BigInt(userOperation.nonce)),
     callGasLimit: toHex(userOperation.callGasLimit),
     verificationGasLimit: toHex(userOperation.verificationGasLimit),
     preVerificationGas: toHex(userOperation.preVerificationGas),
     maxFeePerGas: toHex(userOperation.maxFeePerGas),
     maxPriorityFeePerGas: toHex(userOperation.maxPriorityFeePerGas)
   }
-
-  const userOperationWithHexValuesEthers = {
-    ...userOperation,
-    nonce: ethers.toBeHex(userOperation.nonce),
-    callGasLimit: ethers.toBeHex(userOperation.callGasLimit),
-    verificationGasLimit: ethers.toBeHex(userOperation.verificationGasLimit),
-    preVerificationGas: ethers.toBeHex(userOperation.preVerificationGas),
-    maxFeePerGas: ethers.toBeHex(userOperation.maxFeePerGas),
-    maxPriorityFeePerGas: ethers.toBeHex(userOperation.maxPriorityFeePerGas)
-  }
-
-  console.log(userOperationWithHexValues)
-  console.log(userOperationWithHexValuesEthers)
 
   return userOperationWithHexValues
 }

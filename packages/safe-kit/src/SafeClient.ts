@@ -6,12 +6,12 @@ import {
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import {
-  SafeClientTxStatus,
   createTransactionResult,
   executeWithSigner,
   proposeTransaction,
   waitSafeTxReceipt
 } from './utils'
+import { SafeClientTxStatus } from './constants'
 
 import { SafeClientTransactionResult } from './types'
 
@@ -55,11 +55,7 @@ export class SafeClient {
           await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction, options)
         const hash = await executeWithSigner(transactionBatchWithDeployment, {}, this)
 
-        this.protocolKit = await this.protocolKit.connect({
-          provider: this.protocolKit.getSafeProvider().provider,
-          signer: this.protocolKit.getSafeProvider().signer,
-          safeAddress: await this.protocolKit.getAddress()
-        })
+        await this.#reconnectSafe()
 
         return createTransactionResult({
           safeAddress,
@@ -76,11 +72,8 @@ export class SafeClient {
           options
         )
         const hash = await executeWithSigner(safeDeploymentTransaction, options || {}, this)
-        this.protocolKit = await this.protocolKit.connect({
-          provider: this.protocolKit.getSafeProvider().provider,
-          signer: this.protocolKit.getSafeProvider().signer,
-          safeAddress: await this.protocolKit.getAddress()
-        })
+
+        await this.#reconnectSafe()
 
         safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
         const safeTxHash = await proposeTransaction(safeTransaction, this)
@@ -178,5 +171,13 @@ export class SafeClient {
 
   extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T {
     return Object.assign(this, extendFunc(this))
+  }
+
+  async #reconnectSafe(): Promise<void> {
+    this.protocolKit = await this.protocolKit.connect({
+      provider: this.protocolKit.getSafeProvider().provider,
+      signer: this.protocolKit.getSafeProvider().signer,
+      safeAddress: await this.protocolKit.getAddress()
+    })
   }
 }

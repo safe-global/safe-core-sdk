@@ -1,7 +1,9 @@
 import { validateEthereumAddress } from '@safe-global/protocol-kit'
-import { SafeConfig } from '../types'
 import { TransactionResult } from '@safe-global/safe-core-sdk-types'
 import { ContractTransactionReceipt, TransactionResponse } from 'ethers'
+import { MESSAGES, SafeClientTxStatus } from '../constants'
+
+import { SafeClientTransactionResult, SafeConfig } from '../types'
 
 export const isValidAddress = (address: string): boolean => {
   try {
@@ -28,6 +30,28 @@ export const waitSafeTxReceipt = async (
   return receipt as ContractTransactionReceipt
 }
 
+export const createTransactionResult = ({
+  status,
+  safeAddress,
+  deploymentTxHash,
+  safeTxHash,
+  txHash
+}: {
+  status: SafeClientTxStatus
+  safeAddress: string
+  deploymentTxHash?: string
+  safeTxHash?: string
+  txHash?: string
+}): SafeClientTransactionResult => {
+  return {
+    safeAddress,
+    description: MESSAGES[status],
+    status,
+    safeTxHash,
+    deployment: deploymentTxHash ? { txHash: deploymentTxHash } : undefined,
+    execution: txHash ? { txHash } : undefined
+  }
+}
+
 export * from './executeWithSigner'
-export * from './descriptions'
 export * from './proposeTransaction'

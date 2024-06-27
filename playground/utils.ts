@@ -5,7 +5,7 @@ import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-
 import { GetSafeOperationListResponse } from '@safe-global/api-kit'
 
 export async function waitForOperationToFinish(
-  userOperationHash: string,
+  userOperationHash: Hash,
   chainName: string,
   safe4337Pack: Safe4337Pack
 ) {

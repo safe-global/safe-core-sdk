@@ -1,5 +1,4 @@
-import { ethers } from 'ethers'
-import { Hash, encodeFunctionData, zeroAddress } from 'viem'
+import { Address, Hash, encodeFunctionData, zeroAddress } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
@@ -31,13 +30,15 @@ import {
   Safe4337Options,
   UserOperationReceipt,
   UserOperationWithPayload,
-  PaymasterOptions
+  PaymasterOptions,
+  BundlerClient
 } from './types'
 import {
   ABI,
   DEFAULT_SAFE_VERSION,
   DEFAULT_SAFE_MODULES_VERSION,
-  RPC_4337_CALLS
+  RPC_4337_CALLS,
+  ENTRYPOINT_ABI
 } from './constants'
 import {
   addDummySignature,
@@ -73,10 +74,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
 }> {
   #BUNDLER_URL: string
 
-  #ENTRYPOINT_ADDRESS: string
-  #SAFE_4337_MODULE_ADDRESS: Hash = '0x'
+  #ENTRYPOINT_ADDRESS: Address
+  #SAFE_4337_MODULE_ADDRESS: Address = '0x'
 
-  #bundlerClient: ethers.JsonRpcProvider
+  #bundlerClient: BundlerClient
 
   #chainId: bigint
 
@@ -120,7 +121,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const { provider, signer, options, bundlerUrl, customContracts, paymasterOptions } = initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
-    const chainId = await bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
+    const chainId = await bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
 
     let addModulesLibAddress = customContracts?.addModulesLibAddress
     const network = parseInt(chainId, 16).toString()
@@ -139,7 +140,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
+      addModulesLibAddress = addModulesDeployment?.networkAddresses[network] as Address | undefined
     }
 
     let safe4337ModuleAddress = customContracts?.safe4337ModuleAddress
@@ -250,7 +251,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
         })
 
-        deploymentTo = await multiSendContract.getAddress()
+        deploymentTo = (await multiSendContract.getAddress()) as Address
         deploymentData = batchData
       }
 
@@ -276,7 +277,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
     }
 
-    let selectedEntryPoint
+    let selectedEntryPoint: Address | undefined
 
     if (customContracts?.entryPointAddress) {
       const requiredSafeModulesVersion = entryPointToSafeModules(customContracts?.entryPointAddress)
@@ -287,16 +288,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       selectedEntryPoint = customContracts?.entryPointAddress
     } else {
-      const supportedEntryPoints = await bundlerClient.send(
-        RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS,
-        []
-      )
+      const supportedEntryPoints = await bundlerClient.request({
+        method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS
+      })
 
       if (!supportedEntryPoints.length) {
         throw new Error('No entrypoint provided or available through the bundler')
       }
 
-      selectedEntryPoint = supportedEntryPoints.find((entryPoint: string) => {
+      selectedEntryPoint = supportedEntryPoints.find((entryPoint) => {
         const requiredSafeModulesVersion = entryPointToSafeModules(entryPoint)
         return semverSatisfies(safeModulesVersion, requiredSafeModulesVersion)
       })
@@ -342,15 +342,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOperation.addEstimations(setupEstimationData)
     }
 
-    const estimateUserOperationGas = await this.#bundlerClient.send(
-      RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
-      [
+    const estimateUserOperationGas = await this.#bundlerClient.request({
+      method: RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
+      params: [
         userOperationToHexValues(
           addDummySignature(safeOperation.toUserOperation(), await this.protocolKit.getOwners())
         ),
         this.#ENTRYPOINT_ADDRESS
       ]
-    )
+    })
 
     if (estimateUserOperationGas) {
       safeOperation.addEstimations({
@@ -404,7 +404,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
-    const safeAddress = await this.protocolKit.getAddress()
+    const safeAddress = (await this.protocolKit.getAddress()) as Address
     const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
 
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
@@ -596,9 +596,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {EthSafeOperation | SafeOperationResponse} props.executable - The SafeOperation to execute. It can be:
    * - A response from the API (Tx Service)
    * - An instance of EthSafeOperation
-   * @return {Promise<string>} The user operation hash.
+   * @return {Promise<Hash>} The user operation hash.
    */
-  async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {
+  async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<Hash> {
     let safeOperation: EthSafeOperation
 
     if (isSafeOperationResponse(executable)) {
@@ -609,30 +609,36 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const userOperation = safeOperation.toUserOperation()
 
-    return this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
-      userOperationToHexValues(userOperation),
-      this.#ENTRYPOINT_ADDRESS
-    ])
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.SEND_USER_OPERATION,
+      params: [userOperationToHexValues(userOperation), this.#ENTRYPOINT_ADDRESS]
+    })
   }
 
   /**
    * Return a UserOperation based on a hash (userOpHash) returned by eth_sendUserOperation
    *
-   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
+   * @param {Hash} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
    * @returns {UserOperation} - null in case the UserOperation is not yet included in a block, or a full UserOperation, with the addition of entryPoint, blockNumber, blockHash and transactionHash
    */
-  async getUserOperationByHash(userOpHash: string): Promise<UserOperationWithPayload> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH, [userOpHash])
+  async getUserOperationByHash(userOpHash: Hash): Promise<UserOperationWithPayload> {
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH,
+      params: [userOpHash]
+    })
   }
 
   /**
    * Return a UserOperation receipt based on a hash (userOpHash) returned by eth_sendUserOperation
    *
-   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
+   * @param {Hash} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
    * @returns {UserOperationReceipt} - null in case the UserOperation is not yet included in a block, or UserOperationReceipt object
    */
-  async getUserOperationReceipt(userOpHash: string): Promise<UserOperationReceipt | null> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT, [userOpHash])
+  async getUserOperationReceipt(userOpHash: Hash): Promise<UserOperationReceipt | null> {
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT,
+      params: [userOpHash]
+    })
   }
 
   /**
@@ -642,7 +648,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {string[]} - The supported entry points.
    */
   async getSupportedEntryPoints(): Promise<string[]> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS, [])
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS
+    })
   }
 
   /**
@@ -651,36 +659,22 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {string} - The chain id.
    */
   async getChainId(): Promise<string> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
+    return this.#bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
   }
 
   /**
    * Gets account nonce from the bundler.
    *
-   * @param {string} safeAddress - Account address for which the nonce is to be fetched.
+   * @param {Address} safeAddress - Account address for which the nonce is to be fetched.
    * @returns {Promise<string>} The Promise object will resolve to the account nonce.
    */
-  async #getSafeNonceFromEntrypoint(safeAddress: string): Promise<string> {
-    const abi = [
-      {
-        inputs: [
-          { name: 'sender', type: 'address' },
-          { name: 'key', type: 'uint192' }
-        ],
-        name: 'getNonce',
-        outputs: [{ name: 'nonce', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function'
-      }
-    ]
-
-    const contract = new ethers.Contract(
-      this.#ENTRYPOINT_ADDRESS || '0x',
-      abi,
-      this.protocolKit.getSafeProvider().getExternalProvider()
-    )
-
-    const newNonce = await contract.getNonce(safeAddress, BigInt(0))
+  async #getSafeNonceFromEntrypoint(safeAddress: Address): Promise<string> {
+    const newNonce = await this.#bundlerClient.readContract({
+      address: this.#ENTRYPOINT_ADDRESS || '0x',
+      abi: ENTRYPOINT_ABI,
+      functionName: 'getNonce',
+      args: [safeAddress, BigInt(0)]
+    })
 
     return newNonce.toString()
   }

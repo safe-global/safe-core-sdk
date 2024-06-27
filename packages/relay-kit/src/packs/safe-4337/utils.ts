@@ -1,4 +1,14 @@
-import { Hash, encodeFunctionData, encodePacked, hashTypedData, toHex } from 'viem'
+import {
+  Hash,
+  PublicRpcSchema,
+  createPublicClient,
+  encodeFunctionData,
+  encodePacked,
+  hashTypedData,
+  http,
+  rpcSchema,
+  toHex
+} from 'viem'
 import {
   SafeUserOperation,
   OperationType,
@@ -12,18 +22,19 @@ import {
   encodeMultiSendData,
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
-import { ethers } from 'ethers'
 import { ABI, EIP712_SAFE_OPERATION_TYPE } from './constants'
+import { BundlerClient, PimlicoCustomRpcSchema } from './types'
 
 /**
  * Gets the EIP-4337 bundler provider.
  *
  * @param {string} bundlerUrl The EIP-4337 bundler URL.
- * @return {Provider} The EIP-4337 bundler provider.
+ * @return {BundlerClient} The EIP-4337 bundler provider.
  */
-export function getEip4337BundlerProvider(bundlerUrl: string): ethers.JsonRpcProvider {
-  const provider = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
-    batchMaxCount: 1
+export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
+  const provider = createPublicClient({
+    transport: http(bundlerUrl),
+    rpcSchema: rpcSchema<[...PimlicoCustomRpcSchema, ...PublicRpcSchema]>()
   })
 
   return provider
@@ -42,7 +53,12 @@ export async function signSafeOp(
   safeProvider: SafeProvider,
   safe4337ModuleAddress: Hash
 ): Promise<SafeSignature> {
-  const signer = (await safeProvider.getExternalSigner()) as ethers.Signer
+  const signer = await safeProvider.getExternalSigner()
+
+  if (!signer) {
+    throw new Error('No signer found')
+  }
+
   const chainId = await safeProvider.getChainId()
   const signerAddress = await signer.getAddress()
   const signature = await signer.signTypedData(

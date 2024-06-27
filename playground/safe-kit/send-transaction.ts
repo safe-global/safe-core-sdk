@@ -10,7 +10,7 @@ const OWNER_2_ADDRESS = ''
 const OWNER_3_ADDRESS = ''
 
 const THRESHOLD = 3
-const SALT_NONCE = '4'
+const SALT_NONCE = ''
 
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
@@ -80,8 +80,15 @@ async function main() {
   }
 
   const txResult = await send()
-  await confirm(txResult, OWNER_2_PRIVATE_KEY)
-  await confirm(txResult, OWNER_3_PRIVATE_KEY)
+
+  if (THRESHOLD <= 3) {
+    await confirm(txResult, OWNER_2_PRIVATE_KEY)
+  }
+
+  //@ts-ignore-next-line
+  if (THRESHOLD === 3) {
+    await confirm(txResult, OWNER_3_PRIVATE_KEY)
+  }
 }
 
 main()

@@ -53,5 +53,5 @@ export const createTransactionResult = ({
   }
 }
 
-export * from './executeWithSigner'
+export * from './sendTransaction'
 export * from './proposeTransaction'

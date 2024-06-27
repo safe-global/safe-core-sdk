@@ -1,13 +1,14 @@
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
 import {
+  SafeTransaction,
   TransactionBase,
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import {
   createTransactionResult,
-  executeWithSigner,
+  sendTransaction,
   proposeTransaction,
   waitSafeTxReceipt
 } from './utils'
@@ -31,8 +32,8 @@ export class SafeClient {
   /**
    * Sends transactions through the Safe protocol.
    *
-   * @param {TransactionBase[]} transactions - An array of transactions to be sent.
-   * @param {TransactionOptions} [options] - Optional transaction options.
+   * @param {TransactionBase[]} transactions An array of transactions to be sent.
+   * @param {TransactionOptions} [options] Optional transaction options.
    * @returns {Promise<SafeClientTransactionResult>} A promise that resolves to the result of the transaction.
    * @throws {Error} If the Safe deployment with a threshold greater than one is attempted.
    */
@@ -41,72 +42,27 @@ export class SafeClient {
     options?: TransactionOptions
   ): Promise<SafeClientTransactionResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
-    const safeAddress = await this.protocolKit.getAddress()
-    let safeTransaction = await this.protocolKit.createTransaction({ transactions })
+    const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 
-    const threshold = await this.protocolKit.getThreshold()
+    const safeTransaction = await this.protocolKit.createTransaction({ transactions })
 
-    if (!isSafeDeployed) {
-      // If the Safe does not exist we need to deploy it first
-      if (threshold === 1) {
-        // If the threshold is 1, we can deploy the Safe account and execute the transaction in one step
-        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
-        const transactionBatchWithDeployment =
-          await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction, options)
-        const hash = await executeWithSigner(transactionBatchWithDeployment, {}, this)
-
-        await this.#reconnectSafe()
-
-        return createTransactionResult({
-          safeAddress,
-          status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
-          deploymentTxHash: hash,
-          txHash: hash
-        })
+    if (isSafeDeployed) {
+      if (isMultisigSafe) {
+        // If the threshold is greater than 1, we need to propose the transaction first
+        return this.#proposeTransaction(safeTransaction)
       } else {
-        // If the threshold is greater than 1, we need to deploy the Safe account first and
-        // after propose the transaction. The transaction should be confirmed with another owners
-        // until the threshold is reached
-        const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction(
-          undefined,
-          options
-        )
-        const hash = await executeWithSigner(safeDeploymentTransaction, options || {}, this)
-
-        await this.#reconnectSafe()
-
-        safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
-        const safeTxHash = await proposeTransaction(safeTransaction, this)
-
-        return createTransactionResult({
-          safeAddress,
-          status: SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES,
-          deploymentTxHash: hash,
-          safeTxHash
-        })
+        // If the threshold is 1, we can execute the transaction
+        return this.#executeTransaction(safeTransaction, options)
       }
     } else {
-      // If the Safe is deployed we can either execute or propose the transaction
-      safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
-
-      if (threshold === 1) {
-        // If the threshold is 1, we can execute the transaction
-        const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
-
-        return createTransactionResult({
-          safeAddress,
-          status: SafeClientTxStatus.EXECUTED,
-          txHash: hash
-        })
+      if (isMultisigSafe) {
+        // If the threshold is greater than 1, we need to deploy the Safe account first and
+        // afterwards propose the transaction
+        // The transaction should be confirmed with other owners until the threshold is reached
+        return this.#deployAndProposeTransaction(safeTransaction, options)
       } else {
-        // If the threshold is greater than 1, we need to propose the transaction first
-        const safeTxHash = await proposeTransaction(safeTransaction, this)
-
-        return createTransactionResult({
-          safeAddress,
-          status: SafeClientTxStatus.PENDING_SIGNATURES,
-          safeTxHash
-        })
+        // If the threshold is 1, we can deploy the Safe account and execute the transaction in one step
+        return this.#deployAndExecuteTransaction(safeTransaction, options)
       }
     }
   }
@@ -114,7 +70,7 @@ export class SafeClient {
   /**
    * Confirms a transaction by its safe transaction hash.
    *
-   * @param {string} safeTxHash - The hash of the safe transaction to confirm.
+   * @param {string} safeTxHash  The hash of the safe transaction to confirm.
    * @returns {Promise<SafeClientTransactionResult>} A promise that resolves to the result of the confirmed transaction.
    * @throws {Error} If the transaction confirmation fails.
    */
@@ -131,8 +87,6 @@ export class SafeClient {
       hash: '',
       transactionResponse: undefined
     }
-
-    console.log('transactionResponse', transactionResponse)
 
     if (
       transactionResponse.confirmations &&
@@ -160,7 +114,7 @@ export class SafeClient {
    * Retrieves the pending transactions for the current safe address.
    *
    * @async
-   * @returns {Promise<Array>} A promise that resolves to an array of pending transactions.
+   * @returns {Promise<SafeMultisigTransactionListResponse>} A promise that resolves to an array of pending transactions.
    * @throws {Error} If there is an issue retrieving the safe address or pending transactions.
    */
   async getPendingTransactions(): Promise<SafeMultisigTransactionListResponse> {
@@ -169,8 +123,100 @@ export class SafeClient {
     return this.apiKit.getPendingTransactions(safeAddress)
   }
 
+  /**
+   * Extend the SafeClient with additional functionality.
+   *
+   * @param extendFunc
+   * @returns
+   */
   extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T {
-    return Object.assign(this, extendFunc(this))
+    return Object.assign(this, extendFunc(this)) as SafeClient & T
+  }
+
+  /**
+   * Deploys and executes a transaction in one step.
+   *
+   * @param {SafeTransaction} safeTransaction  The safe transaction to be executed
+   * @param {TransactionOptions} options  Optional transaction options
+   * @returns  A promise that resolves to the result of the transaction
+   */
+  async #deployAndExecuteTransaction(
+    safeTransaction: SafeTransaction,
+    options?: TransactionOptions
+  ): Promise<SafeClientTransactionResult> {
+    safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+
+    const transactionBatchWithDeployment =
+      await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction, options)
+    const hash = await sendTransaction(transactionBatchWithDeployment, {}, this)
+
+    await this.#reconnectSafe()
+
+    return createTransactionResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
+      deploymentTxHash: hash,
+      txHash: hash
+    })
+  }
+
+  /**
+   * Deploys and proposes a transaction in one step.
+   *
+   * @param safeTransaction The safe transaction to be proposed
+   * @param options  Optional transaction options
+   * @returns  A promise that resolves to the result of the transaction
+   */
+  async #deployAndProposeTransaction(
+    safeTransaction: SafeTransaction,
+    options?: TransactionOptions
+  ): Promise<SafeClientTransactionResult> {
+    const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction(
+      undefined,
+      options
+    )
+    const hash = await sendTransaction(safeDeploymentTransaction, options || {}, this)
+
+    await this.#reconnectSafe()
+
+    safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+    const safeTxHash = await proposeTransaction(safeTransaction, this)
+
+    return createTransactionResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES,
+      deploymentTxHash: hash,
+      safeTxHash
+    })
+  }
+
+  /**
+   * Executes a transaction.
+   *
+   * @param {SafeTransaction} safeTransaction The safe transaction to be executed
+   * @param {TransactionOptions} options Optional transaction options
+   * @returns A promise that resolves to the result of the transaction
+   */
+  async #executeTransaction(safeTransaction: SafeTransaction, options?: TransactionOptions) {
+    safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+
+    const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
+
+    return createTransactionResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.EXECUTED,
+      txHash: hash
+    })
+  }
+
+  async #proposeTransaction(safeTransaction: SafeTransaction) {
+    const safeTxHash = await proposeTransaction(safeTransaction, this)
+
+    return createTransactionResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.PENDING_SIGNATURES,
+      safeTxHash
+    })
   }
 
   async #reconnectSafe(): Promise<void> {

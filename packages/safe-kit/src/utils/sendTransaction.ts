@@ -10,7 +10,7 @@ import { AbstractSigner } from 'ethers'
  * @param {SafeClient} safeClient - The SafeClient client used to send the transaction.
  * @returns {Promise<SafeClientTransactionResult>} A promise that resolves to the result of the transaction.
  */
-export const executeWithSigner = async (
+export const sendTransaction = async (
   transaction: TransactionBase,
   options: TransactionOptions,
   safeClient: SafeClient

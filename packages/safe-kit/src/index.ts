@@ -77,3 +77,5 @@ async function getApiKitInstance(protocolKit: Safe): Promise<SafeApiKit> {
 }
 
 export * from './types'
+export * from './extensions'
+export * from './SafeClient'

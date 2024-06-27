@@ -6,6 +6,8 @@ export const proposeTransaction = async (
   safeTransaction: SafeTransaction,
   safeClient: SafeClient
 ): Promise<string> => {
+  safeTransaction = await safeClient.protocolKit.signTransaction(safeTransaction)
+
   const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
   const ethSig = safeTransaction.getSignature(signerAddress) as EthSafeSignature
   const safeTxHash = await safeClient.protocolKit.getTransactionHash(safeTransaction)

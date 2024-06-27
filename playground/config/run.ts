@@ -29,8 +29,8 @@ const playgroundRelayKitPaths = {
 }
 
 const playgroundSafeKitPaths = {
-  'deploy-and-execute-transaction': 'safe-kit/deploy-and-execute-transaction',
-  'deploy-and-propose-transaction': 'safe-kit/deploy-and-propose-transaction'
+  'send-transactions': 'safe-kit/send-transactions',
+  'send-on-chain-message': 'safe-kit/send-on-chain-message'
 }
 
 const path =

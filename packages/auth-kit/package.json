@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@safe-global/api-kit": "^2.4.1",
-    "@safe-global/protocol-kit": "^4.1.0-alpha.0",
+    "@safe-global/protocol-kit": "^4.1.0-alpha.1",
     "@web3auth/safeauth-embed": "^0.0.0",
     "ethers": "^6.12.1"
   }

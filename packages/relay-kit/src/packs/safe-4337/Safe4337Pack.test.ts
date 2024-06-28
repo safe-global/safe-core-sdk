@@ -12,6 +12,7 @@ import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
 import * as utils from './utils'
+import { ZERO_ADDRESS } from '@safe-global/relay-kit/constants'
 
 dotenv.config()
 
@@ -732,5 +733,19 @@ describe('Safe4337Pack', () => {
     const supportedEntryPoints = await safe4337Pack.getSupportedEntryPoints()
 
     expect(supportedEntryPoints).toContain('0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789')
+  })
+
+  it('should evalute the expected SafeOpHash', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+      }
+    })
+    const safeOperation = await safe4337Pack.createTransaction({
+      transactions: [{ to: ZERO_ADDRESS, value: '1', data: '0x27' }]
+    })
+
+    const safeOpHash = await safe4337Pack.hashSafeOperation(safeOperation)
+    expect(safeOpHash).toBe('0xb80f1998d7f72a3ee4c27d2db6b308d3744d15ad84d49840978f0d8fd39d82ab')
   })
 })

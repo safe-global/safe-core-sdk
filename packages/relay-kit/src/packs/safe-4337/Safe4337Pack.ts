@@ -540,12 +540,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         this.#SAFE_4337_MODULE_ADDRESS
       )
     } else {
-      const chainId = await this.protocolKit.getSafeProvider().getChainId()
-      const safeOpHash = calculateSafeUserOperationHash(
-        safeOp.data,
-        chainId,
-        this.#SAFE_4337_MODULE_ADDRESS
-      )
+      const safeOpHash = await this.hashSafeOperation(safeOp)
 
       signature = await this.protocolKit.signHash(safeOpHash)
     }
@@ -675,5 +670,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
       transaction.data,
       transaction.operation || OperationType.Call
     ])
+  }
+
+  /**
+   * Evalute the SafeOperationHash of the provided SafeOperation
+   *
+   * @param {EthSafeOperation} safeOp - The Safe Operation data
+   * @return {string} The hash of the safe operation.
+   */
+  async hashSafeOperation(safeOp: EthSafeOperation): Promise<string> {
+    const chainId = await this.protocolKit.getSafeProvider().getChainId()
+    return calculateSafeUserOperationHash(safeOp.data, chainId, this.#SAFE_4337_MODULE_ADDRESS)
   }
 }

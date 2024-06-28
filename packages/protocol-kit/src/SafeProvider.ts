@@ -112,7 +112,8 @@ class SafeProvider {
       const passkeySigner = new PasskeySigner(
         signer,
         safeWebAuthnSignerFactoryContract,
-        safeProvider.getExternalProvider()
+        safeProvider.getExternalProvider(),
+        chainId.toString()
       )
 
       return new SafeProvider({

@@ -153,8 +153,6 @@ const contractFunctions: Record<
     networkAddresses: {},
     released: true
   })
-
-  // TODO: ADD verifier contract
 }
 
 export function getContractDeployment(

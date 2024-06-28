@@ -6,6 +6,7 @@ import {
   getMultiSend,
   getMultiSendCallOnly,
   getSafeSingleton,
+  getSafeWebAuthnSharedSigner,
   getSafeWebAuthnSignerFactory,
   getSignMessageLib,
   getSimulateTxAccessor
@@ -33,7 +34,11 @@ export async function getContractNetworks(chainId: bigint): Promise<ContractNetw
       safeWebAuthnSignerFactoryAddress: await (
         await getSafeWebAuthnSignerFactory()
       ).contract.getAddress(),
-      safeWebAuthnSignerFactoryAbi: (await getSafeWebAuthnSignerFactory()).abi
+      safeWebAuthnSignerFactoryAbi: (await getSafeWebAuthnSignerFactory()).abi,
+      safeWebAuthnSharedSignerAddress: await (
+        await getSafeWebAuthnSharedSigner()
+      ).contract.getAddress(),
+      safeWebAuthnSharedSignerAbi: (await getSafeWebAuthnSharedSigner()).abi
     }
   }
 }

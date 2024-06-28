@@ -58,7 +58,9 @@ import {
   generatePreValidatedSignature,
   generateSignature,
   preimageSafeMessageHash,
-  preimageSafeTransactionHash
+  preimageSafeTransactionHash,
+  adjustVInSignature,
+  getDefaultFCLP256VerifierAddress
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -606,7 +608,7 @@ class Safe {
     const signature = await generateSignature(this.#safeProvider, hash)
 
     const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
+    const signerAddress = await this.getSignerAddress()
 
     if (isPasskeySigner && signerAddress) {
       const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeySigner
@@ -624,7 +626,10 @@ class Safe {
         return new EthSafeSignature(sharedSignerContractAddress, signature.data, true)
       }
 
-      return new EthSafeSignature(signerAddress, signature.data, true)
+      let signature2 = await this.#safeProvider.signMessage(hash)
+
+      signature2 = adjustVInSignature(SigningMethod.ETH_SIGN, signature2, hash, signerAddress)
+      return new EthSafeSignature(signerAddress, signature2, true)
     }
 
     return signature
@@ -657,7 +662,7 @@ class Safe {
     preimageSafeAddress?: string
   ): Promise<SafeMessage> {
     const owners = await this.getOwners()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
+    const signerAddress = await this.getSignerAddress()
     if (!signerAddress) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
@@ -768,7 +773,7 @@ class Safe {
       : safeTransaction
 
     const owners = await this.getOwners()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
+    const signerAddress = await this.getSignerAddress()
 
     if (!signerAddress) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
@@ -859,7 +864,7 @@ class Safe {
     }
 
     const owners = await this.getOwners()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
+    const signerAddress = await this.getSignerAddress()
     if (!signerAddress) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
@@ -1266,7 +1271,7 @@ class Safe {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
     const owners = await this.getOwners()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
+    const signerAddress = await this.getSignerAddress()
     if (!signerAddress) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
@@ -1314,7 +1319,7 @@ class Safe {
     }
     const owners = await this.getOwners()
     const threshold = await this.getThreshold()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
+    const signerAddress = await this.getSignerAddress()
     if (
       threshold > signedSafeTransaction.signatures.size &&
       signerAddress &&
@@ -1635,6 +1640,38 @@ class Safe {
   }
 
   /**
+   * Returns the current signer address.
+   * This function first checks if the signer is a shared passkey signer of the Safe
+   * If the current signer is a shared signer, it returns the address of the shared signer contract.
+   * Otherwise, it returns the signer address from the SafeProvider.
+   *
+   * @returns {Promise<string | undefined>} Returns the signer address if it is defined
+   */
+  async getSignerAddress(): Promise<string | undefined> {
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+
+    if (isPasskeySigner) {
+      // check if the signer is a shared passkey signer of the Safe
+      const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeySigner
+      const passkey = {
+        rawId: '', // we dont need this value to check if is a shared signer
+        coordinates: passkeySigner.coordinates,
+        customVerifierAddress: passkeySigner.verifierAddress
+      }
+      const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
+
+      if (isSharedSigner) {
+        const sharedSignerContract = await this.#getSafeWebAuthnSharedSignerContract()
+        const sharedSignerContractAddress = await sharedSignerContract.getAddress()
+
+        return sharedSignerContractAddress
+      }
+    }
+
+    return await this.#safeProvider.getSignerAddress()
+  }
+
+  /**
    * Returns an instance of the SafeWebAuthnSharedSignerContract.
    *
    * @returns {Promise<SafeWebAuthnSharedSignerContractImplementationType>} Returns an instance of the SafeWebAuthnSharedSignerContract.
@@ -1670,19 +1707,19 @@ class Safe {
 
     if (owners.includes(safeWebAuthnSharedSignerContractAddress)) {
       const safeAddress = await this.getAddress()
+      const chainId = await this.#safeProvider.getChainId()
       const [sharedSignerSlot] = await safeWebAuthnSharedSignerContract.getConfiguration([
         safeAddress
       ])
       const { x, y, verifiers } = sharedSignerSlot
 
-      // FIXME: use the production deployment packages instead of a hardcoded address
-      // Sepolia only
-      const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
+      const passkeyVerifierAddress =
+        passkey.customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId.toString())
 
       const isSharedSigner =
         BigInt(passkey.coordinates.x) === x &&
         BigInt(passkey.coordinates.y) === y &&
-        BigInt(passkey.customVerifierAddress || P256_VERIFIER_ADDRESS) === verifiers
+        BigInt(passkeyVerifierAddress) === verifiers
 
       return isSharedSigner
     }

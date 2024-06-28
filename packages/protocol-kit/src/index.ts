@@ -36,6 +36,7 @@ import {
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
   extractPasskeyData,
+  getDefaultFCLP256VerifierAddress,
   extractPasskeyCoordinates,
   validateEthereumAddress,
   validateEip3770Address
@@ -99,6 +100,7 @@ export {
   getSignMessageLibContract,
   getSafeWebAuthnSignerFactoryContract,
   getSafeWebAuthnSharedSignerContract,
+  getDefaultFCLP256VerifierAddress,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   getPredictedSafeAddressInitCode,

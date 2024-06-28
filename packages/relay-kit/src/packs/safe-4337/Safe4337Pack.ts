@@ -6,7 +6,8 @@ import Safe, {
   encodeMultiSendData,
   getMultiSendContract,
   PasskeySigner,
-  SafeProvider
+  SafeProvider,
+  getDefaultFCLP256VerifierAddress
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
@@ -62,10 +63,6 @@ const EQ_OR_GT_1_4_1 = '>=1.4.1'
 */
 // FIXME: use the production deployment packages instead of a hardcoded address
 const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
-
-// FIXME: use the production deployment packages instead of a hardcoded address
-// Sepolia only
-const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
 
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
@@ -255,7 +252,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         const passkeyOwnerConfiguration = {
           ...passkeySigner.coordinates,
-          verifiers: P256_VERIFIER_ADDRESS
+          verifiers: getDefaultFCLP256VerifierAddress(chainId)
         }
 
         const sharedSignerTransaction = {
@@ -580,7 +577,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const safeProvider = this.protocolKit.getSafeProvider()
-    const signerAddress = await safeProvider.getSignerAddress()
+    const signerAddress = await this.protocolKit.getSignerAddress()
     const chainId = await safeProvider.getChainId()
     const isPasskeySigner = await safeProvider.isPasskeySigner()
 

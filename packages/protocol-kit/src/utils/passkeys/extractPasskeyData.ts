@@ -1,3 +1,4 @@
+import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
 import { Buffer } from 'buffer'
 import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
 
@@ -65,4 +66,20 @@ export function hexStringToUint8Array(hexString: string): Uint8Array {
     arr.push(parseInt(hexString.substr(i, 2), 16))
   }
   return new Uint8Array(arr)
+}
+
+export function getDefaultFCLP256VerifierAddress(chainId: string): string {
+  const FCLP256VerifierDeployment = getFCLP256VerifierDeployment({
+    version: '1.4.1',
+    released: true,
+    network: chainId
+  })
+
+  const verifierAddress = FCLP256VerifierDeployment?.networkAddresses[chainId]
+
+  if (!verifierAddress) {
+    throw new Error('FCLP256Verifier address not found')
+  }
+
+  return verifierAddress
 }

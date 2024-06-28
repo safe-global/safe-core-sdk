@@ -746,7 +746,6 @@ describe('Safe4337Pack', () => {
     })
 
     const safeOpHash = await safe4337Pack.hashSafeOperation(safeOperation)
-
-    expect(safeOpHash).toContain('ProvideExpectedHash')
+    expect(safeOpHash).toBe('0xb80f1998d7f72a3ee4c27d2db6b308d3744d15ad84d49840978f0d8fd39d82ab')
   })
 })

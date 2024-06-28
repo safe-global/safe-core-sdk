@@ -7,14 +7,14 @@ import {
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import {
-  createTransactionResult,
+  createSafeClientResult,
   sendTransaction,
   proposeTransaction,
   waitSafeTxReceipt
 } from './utils'
 import { SafeClientTxStatus } from './constants'
 
-import { SafeClientTransactionResult } from './types'
+import { SafeClientResult } from './types'
 
 /**
  * @class
@@ -34,13 +34,13 @@ export class SafeClient {
    *
    * @param {TransactionBase[]} transactions An array of transactions to be sent.
    * @param {TransactionOptions} [options] Optional transaction options.
-   * @returns {Promise<SafeClientTransactionResult>} A promise that resolves to the result of the transaction.
+   * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
    * @throws {Error} If the Safe deployment with a threshold greater than one is attempted.
    */
   async send(
     transactions: TransactionBase[],
     options?: TransactionOptions
-  ): Promise<SafeClientTransactionResult> {
+  ): Promise<SafeClientResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 
@@ -71,10 +71,10 @@ export class SafeClient {
    * Confirms a transaction by its safe transaction hash.
    *
    * @param {string} safeTxHash  The hash of the safe transaction to confirm.
-   * @returns {Promise<SafeClientTransactionResult>} A promise that resolves to the result of the confirmed transaction.
+   * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the confirmed transaction.
    * @throws {Error} If the transaction confirmation fails.
    */
-  async confirm(safeTxHash: string): Promise<SafeClientTransactionResult> {
+  async confirm(safeTxHash: string): Promise<SafeClientResult> {
     let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
     const safeAddress = await this.protocolKit.getAddress()
     const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
@@ -95,7 +95,7 @@ export class SafeClient {
       executedTransactionResponse = await this.protocolKit.executeTransaction(transactionResponse)
       await waitSafeTxReceipt(executedTransactionResponse)
 
-      return createTransactionResult({
+      return createSafeClientResult({
         status: SafeClientTxStatus.EXECUTED,
         safeAddress,
         txHash: executedTransactionResponse.hash,
@@ -103,7 +103,7 @@ export class SafeClient {
       })
     }
 
-    return createTransactionResult({
+    return createSafeClientResult({
       status: SafeClientTxStatus.PENDING_SIGNATURES,
       safeAddress,
       safeTxHash
@@ -143,16 +143,16 @@ export class SafeClient {
   async #deployAndExecuteTransaction(
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
-  ): Promise<SafeClientTransactionResult> {
+  ): Promise<SafeClientResult> {
     safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
 
     const transactionBatchWithDeployment =
       await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction, options)
-    const hash = await sendTransaction(transactionBatchWithDeployment, {}, this)
+    const hash = await sendTransaction(transactionBatchWithDeployment, {}, this.protocolKit)
 
     await this.#reconnectSafe()
 
-    return createTransactionResult({
+    return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),
       status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
       deploymentTxHash: hash,
@@ -170,19 +170,19 @@ export class SafeClient {
   async #deployAndProposeTransaction(
     safeTransaction: SafeTransaction,
     options?: TransactionOptions
-  ): Promise<SafeClientTransactionResult> {
+  ): Promise<SafeClientResult> {
     const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction(
       undefined,
       options
     )
-    const hash = await sendTransaction(safeDeploymentTransaction, options || {}, this)
+    const hash = await sendTransaction(safeDeploymentTransaction, options || {}, this.protocolKit)
 
     await this.#reconnectSafe()
 
     safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
-    const safeTxHash = await proposeTransaction(safeTransaction, this)
+    const safeTxHash = await proposeTransaction(safeTransaction, this.protocolKit, this.apiKit)
 
-    return createTransactionResult({
+    return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),
       status: SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES,
       deploymentTxHash: hash,
@@ -202,7 +202,7 @@ export class SafeClient {
 
     const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
 
-    return createTransactionResult({
+    return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),
       status: SafeClientTxStatus.EXECUTED,
       txHash: hash
@@ -210,9 +210,9 @@ export class SafeClient {
   }
 
   async #proposeTransaction(safeTransaction: SafeTransaction) {
-    const safeTxHash = await proposeTransaction(safeTransaction, this)
+    const safeTxHash = await proposeTransaction(safeTransaction, this.protocolKit, this.apiKit)
 
-    return createTransactionResult({
+    return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),
       status: SafeClientTxStatus.PENDING_SIGNATURES,
       safeTxHash

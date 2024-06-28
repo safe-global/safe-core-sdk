@@ -1,4 +1,4 @@
-import { SafeClientResult, createSafeClient, onChainMessages } from '@safe-global/safe-kit'
+import { SafeClientResult, createSafeClient, offChainMessages } from '@safe-global/safe-kit'
 
 const OWNER_1_PRIVATE_KEY = ''
 const OWNER_2_PRIVATE_KEY = ''
@@ -12,6 +12,7 @@ const THRESHOLD = 3
 const SALT_NONCE = ''
 
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+
 const MESSAGE = "I'm the owner of this Safe"
 // const MESSAGE = {
 //   types: {
@@ -71,7 +72,7 @@ async function send(): Promise<SafeClientResult> {
     }
   })
 
-  const safeClientWithMessages = safeClient.extend(onChainMessages())
+  const safeClientWithMessages = safeClient.extend(offChainMessages())
 
   const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
 
@@ -89,7 +90,7 @@ async function send(): Promise<SafeClientResult> {
   return txResult
 }
 
-async function confirm({ safeAddress, safeTxHash }: SafeClientResult, pk: string) {
+async function confirm({ safeAddress, messageHash }: SafeClientResult, pk: string) {
   if (!pk) {
     return
   }
@@ -100,14 +101,16 @@ async function confirm({ safeAddress, safeTxHash }: SafeClientResult, pk: string
     safeAddress
   })
 
-  const pendingTransactions = await safeClient.getPendingTransactions()
+  const safeClientWithMessages = safeClient.extend(offChainMessages())
 
-  pendingTransactions.results.forEach(async (transaction) => {
-    if (transaction.safeTxHash !== safeTxHash) {
+  const pendingMessages = await safeClientWithMessages.getPendingMessages()
+
+  pendingMessages.results.forEach(async (message) => {
+    if (message.messageHash !== messageHash) {
       return
     }
 
-    const txResult = await safeClient.confirm(transaction.safeTxHash)
+    const txResult = await safeClientWithMessages.confirmMessage(message.messageHash)
 
     console.log('-Confirm result: ', txResult)
   })

@@ -1,26 +1,34 @@
-import { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
+import Safe, { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
+import SafeApiKit from '@safe-global/api-kit'
 import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
-import { SafeClient } from '../SafeClient'
 
+/**
+ *  Propose a transaction to the Safe.
+ *
+ * @param {SafeTransaction} safeTransaction - The Safe transaction to propose.
+ * @param {Safe} protocolKit - The Safe instance.
+ * @returns - The Safe transaction hash.
+ */
 export const proposeTransaction = async (
   safeTransaction: SafeTransaction,
-  safeClient: SafeClient
+  protocolKit: Safe,
+  apiKit: SafeApiKit
 ): Promise<string> => {
-  safeTransaction = await safeClient.protocolKit.signTransaction(safeTransaction)
+  safeTransaction = await protocolKit.signTransaction(safeTransaction)
 
-  const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
+  const signerAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
   const ethSig = safeTransaction.getSignature(signerAddress) as EthSafeSignature
-  const safeTxHash = await safeClient.protocolKit.getTransactionHash(safeTransaction)
+  const safeTxHash = await protocolKit.getTransactionHash(safeTransaction)
 
   const txOptions = {
-    safeAddress: await safeClient.protocolKit.getAddress(),
+    safeAddress: await protocolKit.getAddress(),
     safeTransactionData: safeTransaction.data,
     safeTxHash,
     senderAddress: signerAddress,
     senderSignature: buildSignatureBytes([ethSig])
   }
 
-  await safeClient.apiKit.proposeTransaction(txOptions)
+  await apiKit.proposeTransaction(txOptions)
 
   return safeTxHash
 }

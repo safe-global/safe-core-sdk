@@ -5,8 +5,8 @@ import {
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 
-import { SafeClient } from '../SafeClient'
-import { SafeClientTransactionResult } from '../types'
+import { SafeClient } from '../../SafeClient'
+import { SafeClientResult } from '../../types'
 
 /**
  * A function to extend the SafeClient with the ability to send on-chain messages.
@@ -16,7 +16,7 @@ export function onChainMessages() {
     async sendMessage(
       message: string | EIP712TypedData,
       options?: TransactionOptions
-    ): Promise<SafeClientTransactionResult> {
+    ): Promise<SafeClientResult> {
       const signMessageLibContract = await client.protocolKit
         .getSafeProvider()
         .getSignMessageLibContract({

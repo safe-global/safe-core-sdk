@@ -3,7 +3,7 @@ import { TransactionResult } from '@safe-global/safe-core-sdk-types'
 import { ContractTransactionReceipt, TransactionResponse } from 'ethers'
 import { MESSAGES, SafeClientTxStatus } from '../constants'
 
-import { SafeClientTransactionResult, SafeConfig } from '../types'
+import { SafeClientResult, SafeConfig } from '../types'
 
 export const isValidAddress = (address: string): boolean => {
   try {
@@ -30,24 +30,27 @@ export const waitSafeTxReceipt = async (
   return receipt as ContractTransactionReceipt
 }
 
-export const createTransactionResult = ({
+export const createSafeClientResult = ({
   status,
   safeAddress,
   deploymentTxHash,
   safeTxHash,
-  txHash
+  txHash,
+  messageHash
 }: {
   status: SafeClientTxStatus
   safeAddress: string
   deploymentTxHash?: string
   safeTxHash?: string
   txHash?: string
-}): SafeClientTransactionResult => {
+  messageHash?: string
+}): SafeClientResult => {
   return {
     safeAddress,
     description: MESSAGES[status],
     status,
     safeTxHash,
+    messageHash,
     deployment: deploymentTxHash ? { txHash: deploymentTxHash } : undefined,
     execution: txHash ? { txHash } : undefined
   }

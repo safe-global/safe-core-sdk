@@ -24,11 +24,12 @@ export type SafeKitRootConfig = {
 
 export type SafeKitConfig = SafeKitRootConfig & (ExistingSafeKitConfig | PredictedSafeKitConfig)
 
-export type SafeClientTransactionResult = {
+export type SafeClientResult = {
   safeAddress: string
   description: string
   status: SafeClientTxStatus
   safeTxHash?: string
+  messageHash?: string
   deployment?: {
     txHash: string
   }

@@ -3,7 +3,7 @@ import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-
 
 import { SafeClient } from './SafeClient'
 
-import { SafeClientTransactionResult } from './types'
+import { SafeClientResult } from './types'
 import SafeApiKit from '@safe-global/api-kit'
 
 jest.mock('./utils', () => ({
@@ -41,7 +41,7 @@ describe('SafeClient', () => {
   //   ;(protocolKit.isSafeDeployed as jest.Mock).mockResolvedValue(true)
   //   ;(sendTransaction as jest.Mock).mockResolvedValue(TRANSACTION_RESPONSE)
 
-  //   const result: SafeClientTransactionResult = await safeClient.send(transactions, options)
+  //   const result: SafeClientResult = await safeClient.send(transactions, options)
 
   //   expect(protocolKit.isSafeDeployed).toHaveBeenCalled()
   //   expect(sendTransaction).toHaveBeenCalledWith(transactions, options, safeClient)
@@ -55,7 +55,7 @@ describe('SafeClient', () => {
   //   ;(protocolKit.getThreshold as jest.Mock).mockResolvedValue(1)
   //   ;(sendAndDeployTransaction as jest.Mock).mockResolvedValue(TRANSACTION_RESPONSE)
 
-  //   const result: SafeClientTransactionResult = await safeClient.send(transactions, options)
+  //   const result: SafeClientResult = await safeClient.send(transactions, options)
 
   //   expect(protocolKit.isSafeDeployed).toHaveBeenCalled()
   //   expect(protocolKit.getThreshold).toHaveBeenCalled()

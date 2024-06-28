@@ -30,7 +30,8 @@ const playgroundRelayKitPaths = {
 
 const playgroundSafeKitPaths = {
   'send-transactions': 'safe-kit/send-transactions',
-  'send-on-chain-message': 'safe-kit/send-on-chain-message'
+  'send-on-chain-message': 'safe-kit/send-on-chain-message',
+  'send-off-chain-message': 'safe-kit/send-off-chain-message'
 }
 
 const path =

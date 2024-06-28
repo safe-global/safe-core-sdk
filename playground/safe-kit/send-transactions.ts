@@ -1,4 +1,4 @@
-import { SafeClientTransactionResult, createSafeClient } from '@safe-global/safe-kit'
+import { SafeClientResult, createSafeClient } from '@safe-global/safe-kit'
 import { generateTransferCallData } from '../utils'
 
 const OWNER_1_PRIVATE_KEY = ''
@@ -16,7 +16,7 @@ const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 const usdcAmount = 10_000n // 0.01 USDC
 
-async function send(): Promise<SafeClientTransactionResult> {
+async function send(): Promise<SafeClientResult> {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
@@ -50,7 +50,7 @@ async function send(): Promise<SafeClientTransactionResult> {
   return txResult
 }
 
-async function confirm({ safeAddress, safeTxHash }: SafeClientTransactionResult, pk: string) {
+async function confirm({ safeAddress, safeTxHash }: SafeClientResult, pk: string) {
   if (!pk) {
     return
   }
@@ -81,12 +81,12 @@ async function main() {
 
   const txResult = await send()
 
-  if (THRESHOLD <= 3) {
+  if (THRESHOLD > 1) {
     await confirm(txResult, OWNER_2_PRIVATE_KEY)
   }
 
   //@ts-ignore-next-line
-  if (THRESHOLD === 3) {
+  if (THRESHOLD > 2) {
     await confirm(txResult, OWNER_3_PRIVATE_KEY)
   }
 }

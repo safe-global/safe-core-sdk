@@ -585,8 +585,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const isOwner = await this.protocolKit.isOwner(signerAddress)
+    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
 
-    if (!isOwner) {
+    if (!isOwner && isSafeDeployed && !isPasskeySigner) {
       throw new Error('UserOperations can only be signed by Safe owners')
     }
 
@@ -598,8 +599,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
         chainId,
         this.#SAFE_4337_MODULE_ADDRESS
       )
-
-      const isSafeDeployed = await this.protocolKit.isSafeDeployed()
 
       // if the Safe is not deployed we force the Shared Signer signature
       if (!isSafeDeployed) {

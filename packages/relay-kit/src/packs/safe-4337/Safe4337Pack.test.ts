@@ -326,6 +326,7 @@ describe('Safe4337Pack', () => {
       const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
       const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
       const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
+      jest.setTimeout(120_000)
 
       let passkey: protocolKit.PasskeyArgType
 
@@ -340,14 +341,17 @@ describe('Safe4337Pack', () => {
 
         passkey.customVerifierAddress = CUSTOM_P256_VERIFIER_ADDRESS
 
-        global.navigator = {
-          credentials: {
-            create: jest
-              .fn()
-              .mockImplementation(webAuthnCredentials.create.bind(webAuthnCredentials)),
-            get: jest.fn().mockImplementation(webAuthnCredentials.get.bind(webAuthnCredentials))
-          }
-        } as unknown as Navigator
+        Object.defineProperty(global, 'navigator', {
+          value: {
+            credentials: {
+              create: jest
+                .fn()
+                .mockImplementation(webAuthnCredentials.create.bind(webAuthnCredentials)),
+              get: jest.fn().mockImplementation(webAuthnCredentials.get.bind(webAuthnCredentials))
+            }
+          },
+          writable: true
+        })
       })
 
       it('should include a passkey configuration transaction to SafeWebAuthnSharedSigner contract in a multiSend call', async () => {

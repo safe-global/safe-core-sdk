@@ -15,8 +15,12 @@ const SALT_NONCE = ''
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 const usdcAmount = 10_000n // 0.01 USDC
+// PAYMASTER ADDRESS
+const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
 
+// Paymaster URL
 const PIMLICO_API_KEY = '30b296fa-8947-4775-b44a-b225336e2a66'
+const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}`
 
 async function send(): Promise<SafeClientResult> {
@@ -30,7 +34,12 @@ async function send(): Promise<SafeClientResult> {
     }
   })
 
-  const safeClientWithSafeOperation = safeClient.extend(safeOperations({ bundlerUrl: BUNDLER_URL }))
+  const safeClientWithSafeOperation = await safeClient.extend(
+    safeOperations(
+      { bundlerUrl: BUNDLER_URL },
+      { isSponsored: true, paymasterAddress, paymasterUrl: PAYMASTER_URL }
+    )
+  )
 
   const signerAddress =
     (await safeClientWithSafeOperation.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
@@ -56,18 +65,27 @@ async function send(): Promise<SafeClientResult> {
   return safeOperationResult
 }
 
-async function confirm({ safeAddress, safeOperationHash }: SafeClientResult, pk: string) {
+async function confirm({ safeOperationHash }: SafeClientResult, pk: string) {
   if (!pk) {
     return
   }
 
   const safeClient = await createSafeClient({
     provider: RPC_URL,
-    signer: pk,
-    safeAddress
+    signer: OWNER_1_PRIVATE_KEY,
+    safeOptions: {
+      owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
+      threshold: THRESHOLD,
+      saltNonce: SALT_NONCE
+    }
   })
 
-  const safeClientWithSafeOperation = safeClient.extend(safeOperations({ bundlerUrl: BUNDLER_URL }))
+  const safeClientWithSafeOperation = await safeClient.extend(
+    safeOperations(
+      { bundlerUrl: BUNDLER_URL },
+      { isSponsored: true, paymasterAddress, paymasterUrl: PAYMASTER_URL }
+    )
+  )
 
   const pendingSafeOperations = await safeClientWithSafeOperation.getPendingSafeOperations()
 
@@ -76,7 +94,8 @@ async function confirm({ safeAddress, safeOperationHash }: SafeClientResult, pk:
       return
     }
 
-    const safeOperationResult = await safeClientWithSafeOperation.confirm(safeOperationHash)
+    const safeOperationResult =
+      await safeClientWithSafeOperation.confirmSafeOperation(safeOperationHash)
 
     console.log('-Confirm result: ', safeOperationResult)
   })

@@ -129,8 +129,19 @@ export class SafeClient {
    * @param extendFunc
    * @returns
    */
-  extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T {
-    return Object.assign(this, extendFunc(this)) as SafeClient & T
+  extend<T>(extendFunc: (client: SafeClient) => Promise<T>): Promise<SafeClient & T>
+  extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T
+
+  extend<T>(
+    extendFunc: (client: SafeClient) => T | Promise<T>
+  ): (SafeClient & T) | Promise<SafeClient & T> {
+    const result = extendFunc(this)
+
+    if (result instanceof Promise) {
+      return result.then((extensions) => Object.assign(this, extensions) as SafeClient & T)
+    } else {
+      return Object.assign(this, result) as SafeClient & T
+    }
   }
 
   /**

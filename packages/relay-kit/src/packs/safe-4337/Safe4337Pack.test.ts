@@ -324,7 +324,7 @@ describe('Safe4337Pack', () => {
 
     describe('When using a passkey signer', () => {
       const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
-      const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
+      const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
       const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
 
       let passkey: protocolKit.PasskeyArgType
@@ -337,6 +337,8 @@ describe('Safe4337Pack', () => {
         const webAuthnCredentials = new WebAuthnCredentials(PASSKEY_PRIVATE_KEY)
 
         passkey = await createMockPasskey('chucknorris', webAuthnCredentials)
+
+        passkey.customVerifierAddress = CUSTOM_P256_VERIFIER_ADDRESS
 
         global.navigator = {
           credentials: {
@@ -366,7 +368,7 @@ describe('Safe4337Pack', () => {
 
         const passkeyOwnerConfiguration = {
           ...passkeySigner.coordinates,
-          verifiers: P256_VERIFIER_ADDRESS
+          verifiers: CUSTOM_P256_VERIFIER_ADDRESS
         }
 
         const enableModulesData = constants.INTERFACES.encodeFunctionData('enableModules', [

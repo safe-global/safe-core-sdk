@@ -6,8 +6,7 @@ import Safe, {
   encodeMultiSendData,
   getMultiSendContract,
   PasskeySigner,
-  SafeProvider,
-  getDefaultFCLP256VerifierAddress
+  SafeProvider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
@@ -252,7 +251,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         const passkeyOwnerConfiguration = {
           ...passkeySigner.coordinates,
-          verifiers: getDefaultFCLP256VerifierAddress(chainId)
+          verifiers: passkeySigner.verifierAddress
         }
 
         const sharedSignerTransaction = {

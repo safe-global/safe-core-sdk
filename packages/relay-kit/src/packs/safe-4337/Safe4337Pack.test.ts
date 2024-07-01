@@ -321,171 +321,6 @@ describe('Safe4337Pack', () => {
         }
       })
     })
-
-    describe('When using a passkey signer', () => {
-      const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
-      const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
-      const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
-      jest.setTimeout(120_000)
-
-      let passkey: protocolKit.PasskeyArgType
-
-      beforeAll(async () => {
-        if (!global.crypto) {
-          global.crypto = crypto as unknown as Crypto
-        }
-
-        const webAuthnCredentials = new WebAuthnCredentials(PASSKEY_PRIVATE_KEY)
-
-        passkey = await createMockPasskey('chucknorris', webAuthnCredentials)
-
-        passkey.customVerifierAddress = CUSTOM_P256_VERIFIER_ADDRESS
-
-        Object.defineProperty(global, 'navigator', {
-          value: {
-            credentials: {
-              create: jest
-                .fn()
-                .mockImplementation(webAuthnCredentials.create.bind(webAuthnCredentials)),
-              get: jest.fn().mockImplementation(webAuthnCredentials.get.bind(webAuthnCredentials))
-            }
-          },
-          writable: true
-        })
-      })
-
-      it('should include a passkey configuration transaction to SafeWebAuthnSharedSigner contract in a multiSend call', async () => {
-        const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
-        const safeCreateSpy = jest.spyOn(Safe, 'init')
-
-        const safe4337Pack = await createSafe4337Pack({
-          signer: passkey,
-          options: {
-            owners: [fixtures.OWNER_1],
-            threshold: 1
-          }
-        })
-
-        const provider = safe4337Pack.protocolKit.getSafeProvider().provider
-        const safeProvider = await protocolKit.SafeProvider.init(provider, passkey)
-        const passkeySigner = (await safeProvider.getExternalSigner()) as protocolKit.PasskeySigner
-
-        const passkeyOwnerConfiguration = {
-          ...passkeySigner.coordinates,
-          verifiers: CUSTOM_P256_VERIFIER_ADDRESS
-        }
-
-        const enableModulesData = constants.INTERFACES.encodeFunctionData('enableModules', [
-          [safe4337ModuleAddress]
-        ])
-        const passkeyConfigureData = constants.INTERFACES.encodeFunctionData('configure', [
-          passkeyOwnerConfiguration
-        ])
-
-        const enable4337ModuleTransaction = {
-          to: addModulesLibAddress,
-          value: '0',
-          data: enableModulesData,
-          operation: OperationType.DelegateCall
-        }
-
-        const sharedSignerTransaction = {
-          to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-          value: '0',
-          data: passkeyConfigureData,
-          operation: OperationType.DelegateCall
-        }
-
-        const multiSendData = protocolKit.encodeMultiSendData([
-          enable4337ModuleTransaction,
-          sharedSignerTransaction
-        ])
-
-        expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(2, 'configure', [
-          passkeyOwnerConfiguration
-        ])
-        expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, 'multiSend', [multiSendData])
-        expect(safeCreateSpy).toHaveBeenCalledWith({
-          provider: safe4337Pack.protocolKit.getSafeProvider().provider,
-          signer: passkey,
-          predictedSafe: {
-            safeDeploymentConfig: {
-              safeVersion: constants.DEFAULT_SAFE_VERSION,
-              saltNonce: undefined
-            },
-            safeAccountConfig: {
-              owners: [fixtures.OWNER_1, SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS],
-              threshold: 1,
-              to: await safe4337Pack.protocolKit.getMultiSendAddress(),
-              data: constants.INTERFACES.encodeFunctionData('multiSend', [multiSendData]),
-              fallbackHandler: safe4337ModuleAddress,
-              paymentToken: ethers.ZeroAddress,
-              payment: 0,
-              paymentReceiver: ethers.ZeroAddress
-            }
-          }
-        })
-      })
-
-      it('should allow to sign a SafeOperation', async () => {
-        const transferUSDC = {
-          to: fixtures.PAYMASTER_TOKEN_ADDRESS,
-          data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
-          value: '0',
-          operation: 0
-        }
-
-        const safe4337Pack = await createSafe4337Pack({
-          signer: passkey,
-          options: {
-            safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
-          }
-        })
-
-        const safeOperation = await safe4337Pack.createTransaction({
-          transactions: [transferUSDC]
-        })
-
-        expect(await safe4337Pack.signSafeOperation(safeOperation)).toMatchObject({
-          signatures: new Map().set(
-            SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS.toLowerCase(),
-            new protocolKit.EthSafeSignature(
-              SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-              '0x000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0c79e723c4ad6557198f00ab3e8cc1cd3de64b30f6ff44664fc131f37fa1e97fe4dce48568eb0582d34c6adb97a5902b6de0488c10ab3c9f3589b44b98027ac840000000000000000000000000000000000000000000000000000000000000025a24f744b28d73f066bf3203d145765a7bc735e6328168c8b03e476da3ad0d8fe0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e226f726967696e223a2268747470733a2f2f736166652e676c6f62616c22001f',
-              true
-            )
-          )
-        })
-      })
-
-      it('should allow to send an UserOperation to a bundler', async () => {
-        const transferUSDC = {
-          to: fixtures.PAYMASTER_TOKEN_ADDRESS,
-          data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
-          value: '0',
-          operation: 0
-        }
-
-        const safe4337Pack = await createSafe4337Pack({
-          signer: passkey,
-          options: {
-            safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
-          }
-        })
-
-        let safeOperation = await safe4337Pack.createTransaction({
-          transactions: [transferUSDC]
-        })
-        safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
-
-        await safe4337Pack.executeTransaction({ executable: safeOperation })
-
-        expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
-          utils.userOperationToHexValues(safeOperation.toUserOperation()),
-          fixtures.ENTRYPOINTS[0]
-        ])
-      })
-    })
   })
 
   describe('When creating a new SafeOperation', () => {
@@ -699,6 +534,169 @@ describe('Safe4337Pack', () => {
         verificationGasLimit: 400000n,
         preVerificationGas: 100000n
       })
+    })
+  })
+
+  describe('When using a passkey signer', () => {
+    const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
+    const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
+    const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
+    jest.setTimeout(120_000)
+
+    let passkey: protocolKit.PasskeyArgType
+
+    beforeAll(async () => {
+      if (!global.crypto) {
+        global.crypto = crypto as unknown as Crypto
+      }
+
+      const webAuthnCredentials = new WebAuthnCredentials(PASSKEY_PRIVATE_KEY)
+
+      passkey = await createMockPasskey('chucknorris', webAuthnCredentials)
+
+      Object.defineProperty(global, 'navigator', {
+        value: {
+          credentials: {
+            create: jest
+              .fn()
+              .mockImplementation(webAuthnCredentials.create.bind(webAuthnCredentials)),
+            get: jest.fn().mockImplementation(webAuthnCredentials.get.bind(webAuthnCredentials))
+          }
+        },
+        writable: true
+      })
+    })
+
+    it('should include a passkey configuration transaction to SafeWebAuthnSharedSigner contract in a multiSend call', async () => {
+      const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
+      const safeCreateSpy = jest.spyOn(Safe, 'init')
+
+      const safe4337Pack = await createSafe4337Pack({
+        signer: passkey,
+        options: {
+          owners: [fixtures.OWNER_1],
+          threshold: 1
+        }
+      })
+
+      const provider = safe4337Pack.protocolKit.getSafeProvider().provider
+      const safeProvider = await protocolKit.SafeProvider.init(provider, passkey)
+      const passkeySigner = (await safeProvider.getExternalSigner()) as protocolKit.PasskeySigner
+
+      const passkeyOwnerConfiguration = {
+        ...passkeySigner.coordinates,
+        verifiers: CUSTOM_P256_VERIFIER_ADDRESS
+      }
+
+      const enableModulesData = constants.INTERFACES.encodeFunctionData('enableModules', [
+        [safe4337ModuleAddress]
+      ])
+      const passkeyConfigureData = constants.INTERFACES.encodeFunctionData('configure', [
+        passkeyOwnerConfiguration
+      ])
+
+      const enable4337ModuleTransaction = {
+        to: addModulesLibAddress,
+        value: '0',
+        data: enableModulesData,
+        operation: OperationType.DelegateCall
+      }
+
+      const sharedSignerTransaction = {
+        to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+        value: '0',
+        data: passkeyConfigureData,
+        operation: OperationType.DelegateCall
+      }
+
+      const multiSendData = protocolKit.encodeMultiSendData([
+        enable4337ModuleTransaction,
+        sharedSignerTransaction
+      ])
+
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(2, 'configure', [
+        passkeyOwnerConfiguration
+      ])
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, 'multiSend', [multiSendData])
+      expect(safeCreateSpy).toHaveBeenCalledWith({
+        provider: safe4337Pack.protocolKit.getSafeProvider().provider,
+        signer: passkey,
+        predictedSafe: {
+          safeDeploymentConfig: {
+            safeVersion: constants.DEFAULT_SAFE_VERSION,
+            saltNonce: undefined
+          },
+          safeAccountConfig: {
+            owners: [fixtures.OWNER_1, SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS],
+            threshold: 1,
+            to: await safe4337Pack.protocolKit.getMultiSendAddress(),
+            data: constants.INTERFACES.encodeFunctionData('multiSend', [multiSendData]),
+            fallbackHandler: safe4337ModuleAddress,
+            paymentToken: ethers.ZeroAddress,
+            payment: 0,
+            paymentReceiver: ethers.ZeroAddress
+          }
+        }
+      })
+    })
+
+    it('should allow to sign a SafeOperation', async () => {
+      const transferUSDC = {
+        to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
+        value: '0',
+        operation: 0
+      }
+
+      const safe4337Pack = await createSafe4337Pack({
+        signer: passkey,
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
+        }
+      })
+
+      const safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      expect(await safe4337Pack.signSafeOperation(safeOperation)).toMatchObject({
+        signatures: new Map().set(
+          '0x23e628b94e0e170d2e47eb1723ff3d2fee951fa8'.toLowerCase(),
+          new protocolKit.EthSafeSignature(
+            '0x23e628b94e0e170d2e47eb1723ff3d2fee951fa8',
+            '0x000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0c79e723c4ad6557198f00ab3e8cc1cd3de64b30f6ff44664fc131f37fa1e97fe4dce48568eb0582d34c6adb97a5902b6de0488c10ab3c9f3589b44b98027ac840000000000000000000000000000000000000000000000000000000000000025a24f744b28d73f066bf3203d145765a7bc735e6328168c8b03e476da3ad0d8fe0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e226f726967696e223a2268747470733a2f2f736166652e676c6f62616c22001f',
+            true
+          )
+        )
+      })
+    })
+
+    it('should allow to send an UserOperation to a bundler', async () => {
+      const transferUSDC = {
+        to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
+        value: '0',
+        operation: 0
+      }
+
+      const safe4337Pack = await createSafe4337Pack({
+        signer: passkey,
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
+        }
+      })
+
+      let safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+      safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+
+      await safe4337Pack.executeTransaction({ executable: safeOperation })
+
+      expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
+        utils.userOperationToHexValues(safeOperation.toUserOperation()),
+        fixtures.ENTRYPOINTS[0]
+      ])
     })
   })
 

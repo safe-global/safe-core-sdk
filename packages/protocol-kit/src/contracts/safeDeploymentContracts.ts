@@ -7,6 +7,7 @@ import {
   MultiSendContractImplementationType,
   SafeContractImplementationType,
   SafeProxyFactoryContractImplementationType,
+  SafeWebAuthnSharedSignerContractImplementationType,
   SafeWebAuthnSignerFactoryContractImplementationType,
   SignMessageLibContractImplementationType,
   SimulateTxAccessorContractImplementationType
@@ -197,4 +198,24 @@ export async function getSafeWebAuthnSignerFactoryContract({
     throw new Error('safeWebAuthnSignerFactory contract is not deployed on the current network')
   }
   return safeWebAuthnSignerFactoryContract
+}
+
+export async function getSafeWebAuthnSharedSignerContract({
+  safeProvider,
+  safeVersion,
+  customContracts
+}: GetContractInstanceProps): Promise<SafeWebAuthnSharedSignerContractImplementationType> {
+  const safeWebAuthnSharedSignerContract = await safeProvider.getSafeWebAuthnSharedSignerContract({
+    safeVersion,
+    customContractAddress: customContracts?.safeWebAuthnSharedSignerAddress,
+    customContractAbi: customContracts?.safeWebAuthnSharedSignerAbi
+  })
+
+  const isContractDeployed = await safeProvider.isContractDeployed(
+    await safeWebAuthnSharedSignerContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('safeWebAuthnSharedSigner contract is not deployed on the current network')
+  }
+  return safeWebAuthnSharedSignerContract
 }

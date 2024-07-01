@@ -63,10 +63,6 @@ const EQ_OR_GT_1_4_1 = '>=1.4.1'
 // FIXME: use the production deployment packages instead of a hardcoded address
 const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
 
-// FIXME: use the production deployment packages instead of a hardcoded address
-// Sepolia only
-const P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier
-
 /**
  * Safe4337Pack class that extends RelayKitBasePack.
  * This class provides an implementation of the ERC-4337 that enables Safe accounts to wrk with UserOperations.
@@ -255,7 +251,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         const passkeyOwnerConfiguration = {
           ...passkeySigner.coordinates,
-          verifiers: P256_VERIFIER_ADDRESS
+          verifiers: passkeySigner.verifierAddress
         }
 
         const sharedSignerTransaction = {
@@ -579,9 +575,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOp = safeOperation
     }
 
-    const owners = await this.protocolKit.getOwners()
     const safeProvider = this.protocolKit.getSafeProvider()
-    const signerAddress = await safeProvider.getSignerAddress()
+    const signerAddress = await this.protocolKit.getSignerAddress()
     const chainId = await safeProvider.getChainId()
     const isPasskeySigner = await safeProvider.isPasskeySigner()
 
@@ -589,11 +584,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
       throw new Error('There is no signer address available to sign the SafeOperation')
     }
 
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && owner.toLowerCase() === signerAddress.toLowerCase()
-    )
+    const isOwner = await this.protocolKit.isOwner(signerAddress)
+    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
 
-    if (!addressIsOwner && !isPasskeySigner) {
+    if ((!isOwner && isSafeDeployed) || (!isSafeDeployed && !isPasskeySigner && !isOwner)) {
       throw new Error('UserOperations can only be signed by Safe owners')
     }
 
@@ -606,14 +600,18 @@ export class Safe4337Pack extends RelayKitBasePack<{
         this.#SAFE_4337_MODULE_ADDRESS
       )
 
-      const passkeySignature = await this.protocolKit.signHash(safeOpHash)
-
-      // SafeWebAuthnSharedSigner signature
-      signature = new EthSafeSignature(
-        SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-        passkeySignature.data,
-        true
-      )
+      // if the Safe is not deployed we force the Shared Signer signature
+      if (!isSafeDeployed) {
+        const passkeySignature = await this.protocolKit.signHash(safeOpHash)
+        // SafeWebAuthnSharedSigner signature
+        signature = new EthSafeSignature(
+          SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          passkeySignature.data,
+          true // passkeys are contract signatures
+        )
+      } else {
+        signature = await this.protocolKit.signHash(safeOpHash)
+      }
     } else {
       if (
         signingMethod in

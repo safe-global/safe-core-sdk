@@ -29,6 +29,7 @@ import simulateTxAccessor_1_3_0_ContractArtifacts from './SimulateTxAccessor/v1.
 import simulateTxAccessor_1_4_1_ContractArtifacts from './SimulateTxAccessor/v1.4.1/simulate_tx_accessor'
 
 import SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts from './SafeWebAuthnSignerFactory/v1.4.1/safe_webauthn_signer_factory'
+import SafeWebAuthnSharedSigner_1_4_1_ContractArtifacts from './SafeWebAuthnSharedSigner/v1.4.1/safe_webauthn_shared_signer'
 
 export {
   compatibilityFallbackHandler_1_3_0_ContractArtifacts,
@@ -53,5 +54,6 @@ export {
   signMessageLib_1_4_1_ContractArtifacts,
   simulateTxAccessor_1_3_0_ContractArtifacts,
   simulateTxAccessor_1_4_1_ContractArtifacts,
-  SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts
+  SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts,
+  SafeWebAuthnSharedSigner_1_4_1_ContractArtifacts
 }

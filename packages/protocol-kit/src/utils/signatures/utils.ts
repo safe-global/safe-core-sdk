@@ -110,8 +110,6 @@ export async function generateSignature(
   hash: string
 ): Promise<SafeSignature> {
   const signerAddress = await safeProvider.getSignerAddress()
-  const isPasskeySigner = await safeProvider.isPasskeySigner()
-  const isContractSignature = !!isPasskeySigner
 
   if (!signerAddress) {
     throw new Error('SafeProvider must be initialized with a signer to use this method')
@@ -120,7 +118,7 @@ export async function generateSignature(
   let signature = await safeProvider.signMessage(hash)
 
   signature = adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
-  return new EthSafeSignature(signerAddress, signature, isContractSignature)
+  return new EthSafeSignature(signerAddress, signature)
 }
 
 export async function generateEIP712Signature(

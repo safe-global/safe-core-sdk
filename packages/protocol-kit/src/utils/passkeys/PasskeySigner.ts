@@ -3,13 +3,7 @@ import { ethers, AbstractSigner, Provider } from 'ethers'
 import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
 import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
 import { EMPTY_DATA } from '../constants'
-import { hexStringToUint8Array } from './extractPasskeyData'
-
-// FIXME: use the production deployment packages instead of a hardcoded address
-const P256_VERIFIER_ADDRESS =
-  process.env.TEST_NETWORK === 'hardhat'
-    ? '0x0287C6F8975f2571E8FAa1D34fe638B1468D563D' // In Hardhat, use the local deployed FCLP256Verifier contract
-    : '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b' // FCLP256Verifier deployed on Sepolia
+import { getDefaultFCLP256VerifierAddress, hexStringToUint8Array } from './extractPasskeyData'
 
 /**
  * Represents a Signer that is created using a passkey.
@@ -39,10 +33,16 @@ class PasskeySigner extends AbstractSigner {
    */
   verifierAddress: string
 
+  /**
+   * chainId
+   */
+  chainId: string
+
   constructor(
     passkey: PasskeyArgType,
     safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
-    provider: Provider
+    provider: Provider,
+    chainId: string
   ) {
     super(provider)
 
@@ -50,8 +50,9 @@ class PasskeySigner extends AbstractSigner {
 
     this.passkeyRawId = hexStringToUint8Array(rawId)
     this.coordinates = coordinates
-    this.verifierAddress = customVerifierAddress || P256_VERIFIER_ADDRESS
     this.safeWebAuthnSignerFactoryContract = safeWebAuthnSignerFactoryContract
+    this.chainId = chainId
+    this.verifierAddress = customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
   }
 
   /**
@@ -138,7 +139,12 @@ class PasskeySigner extends AbstractSigner {
       customVerifierAddress: this.verifierAddress
     }
 
-    return new PasskeySigner(passkey, this.safeWebAuthnSignerFactoryContract, provider)
+    return new PasskeySigner(
+      passkey,
+      this.safeWebAuthnSignerFactoryContract,
+      provider,
+      this.chainId
+    )
   }
 
   signTransaction(): Promise<string> {

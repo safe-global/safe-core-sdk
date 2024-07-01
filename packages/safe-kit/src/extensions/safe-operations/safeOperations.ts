@@ -18,58 +18,52 @@ export function safeOperations(
   { bundlerUrl }: BundlerOptions,
   paymasterOptions?: PaymasterOptions
 ) {
-  return (client: SafeClient) => {
-    let safeOperationClient: SafeOperationClient
+  return async (client: SafeClient) => {
+    const { provider, signer } = client.protocolKit.getSafeProvider()
+    const isSafeDeployed = await client.protocolKit.isSafeDeployed()
 
-    async function getSafeOperationClient(): Promise<SafeOperationClient> {
-      if (!safeOperationClient) {
-        const { provider, signer } = client.protocolKit.getSafeProvider()
-        const isSafeDeployed = await client.protocolKit.isSafeDeployed()
+    let options
+    if (isSafeDeployed) {
+      const safeAddress = await client.protocolKit.getAddress()
 
-        let options
-        if (isSafeDeployed) {
-          const safeAddress = await client.protocolKit.getAddress()
-
-          options = {
-            safeAddress
-          }
-        } else {
-          const { safeDeploymentConfig, safeAccountConfig } =
-            client.protocolKit.getPredictedSafe() as PredictedSafeProps
-
-          options = {
-            owners: safeAccountConfig.owners,
-            threshold: safeAccountConfig.threshold,
-            ...safeDeploymentConfig
-          }
-        }
-
-        const safe4337Pack = await Safe4337Pack.init({
-          provider,
-          signer,
-          bundlerUrl,
-          options,
-          paymasterOptions
-        })
-
-        safeOperationClient = new SafeOperationClient(safe4337Pack, client.apiKit)
+      options = {
+        safeAddress
       }
+    } else {
+      const { safeDeploymentConfig, safeAccountConfig } =
+        client.protocolKit.getPredictedSafe() as PredictedSafeProps
 
-      return safeOperationClient
+      options = {
+        owners: safeAccountConfig.owners,
+        threshold: safeAccountConfig.threshold,
+        ...safeDeploymentConfig
+      }
     }
+
+    const safe4337Pack = await Safe4337Pack.init({
+      provider,
+      signer,
+      bundlerUrl,
+      options,
+      paymasterOptions
+    })
+
+    client.protocolKit = safe4337Pack.protocolKit
+
+    const safeOperationClient = new SafeOperationClient(safe4337Pack, client.apiKit)
 
     return {
       async sendSafeOperation({
         transactions,
         options = {}
       }: Safe4337CreateTransactionProps): Promise<SafeClientResult> {
-        return (await getSafeOperationClient()).sendSafeOperation({ transactions, options })
+        return safeOperationClient.sendSafeOperation({ transactions, options })
       },
       async confirmSafeOperation(userOperationHash: string): Promise<SafeClientResult> {
-        return (await getSafeOperationClient()).confirmSafeOperation(userOperationHash)
+        return safeOperationClient.confirmSafeOperation(userOperationHash)
       },
       async getPendingSafeOperations(): Promise<GetSafeOperationListResponse> {
-        return (await getSafeOperationClient()).getPendingSafeOperations()
+        return safeOperationClient.getPendingSafeOperations()
       }
     }
   }

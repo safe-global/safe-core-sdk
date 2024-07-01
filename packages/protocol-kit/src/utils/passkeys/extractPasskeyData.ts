@@ -69,13 +69,15 @@ export function hexStringToUint8Array(hexString: string): Uint8Array {
 }
 
 export function getDefaultFCLP256VerifierAddress(chainId: string): string {
+  const network = BigInt(chainId).toString()
+
   const FCLP256VerifierDeployment = getFCLP256VerifierDeployment({
-    version: '1.4.1',
+    version: '0.2.0',
     released: true,
-    network: chainId
+    network
   })
 
-  const verifierAddress = FCLP256VerifierDeployment?.networkAddresses[chainId]
+  const verifierAddress = FCLP256VerifierDeployment?.networkAddresses[network]
 
   if (!verifierAddress) {
     throw new Error('FCLP256Verifier address not found')

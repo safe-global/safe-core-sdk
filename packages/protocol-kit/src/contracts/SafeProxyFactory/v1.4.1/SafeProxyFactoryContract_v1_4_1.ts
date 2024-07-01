@@ -1,4 +1,5 @@
-import { ContractRunner, EventLog } from 'ethers'
+import { EventLog } from 'ethers'
+import { PublicClient } from 'viem'
 import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
@@ -38,7 +39,7 @@ class SafeProxyFactoryContract_v1_4_1
     safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi,
-    runner?: ContractRunner | null
+    runner?: PublicClient | null
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = safeProxyFactory_1_4_1_ContractArtifacts.abi
@@ -61,7 +62,7 @@ class SafeProxyFactoryContract_v1_4_1
    * @returns Array[chainId]
    */
   getChainId: SafeProxyFactoryContract_v1_4_1_Function<'getChainId'> = async () => {
-    return [await this.contract.getChainId()]
+    return [await this.contract.read.getChainId()]
   }
 
   /**
@@ -69,7 +70,7 @@ class SafeProxyFactoryContract_v1_4_1
    * @returns Array[creationCode]
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_4_1_Function<'proxyCreationCode'> = async () => {
-    return [await this.contract.proxyCreationCode()]
+    return [await this.contract.read.proxyCreationCode()]
   }
 
   /**
@@ -79,7 +80,7 @@ class SafeProxyFactoryContract_v1_4_1
    */
   createChainSpecificProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createChainSpecificProxyWithNonce'> =
     async (args) => {
-      return [await this.contract.createChainSpecificProxyWithNonce(...args)]
+      return [await this.contract.write.createChainSpecificProxyWithNonce(args, {})]
     }
 
   /**
@@ -90,7 +91,7 @@ class SafeProxyFactoryContract_v1_4_1
    */
   createProxyWithCallback: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithCallback'> =
     async (args) => {
-      return [await this.contract.createProxyWithCallback(...args)]
+      return [await this.contract.write.createProxyWithCallback(args)]
     }
 
   /**
@@ -101,7 +102,7 @@ class SafeProxyFactoryContract_v1_4_1
   createProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.createProxyWithNonce(...args)]
+    return [await this.contract.write.createProxyWithNonce(args)]
   }
 
   /**

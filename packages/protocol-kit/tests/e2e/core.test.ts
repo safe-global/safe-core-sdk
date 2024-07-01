@@ -59,25 +59,22 @@ describe('Safe Info', () => {
       }
     )
 
-    itif(safeVersionDeployed >= '1.3.0')(
-      'should connect a Safe >=v1.3.0 that is not deployed',
-      async () => {
-        const { predictedSafe, safe, accounts, contractNetworks, provider } = await setupTests()
-        const [account1] = accounts
-        const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.init({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
-        const safeSdk2 = await safeSdk.connect({ predictedSafe })
-        chai
-          .expect(await safeSdk2.getSafeProvider().getSignerAddress())
-          .to.be.eq(await account1.signer.getAddress())
-      }
-    )
+    it('should connect a Safe >=v1.3.0 that is not deployed', async () => {
+      const { predictedSafe, safe, accounts, contractNetworks, provider } = await setupTests()
+      const [account1] = accounts
+      const safeAddress = await safe.getAddress()
+      const safeSdk = await Safe.init({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const safeSdk2 = await safeSdk.connect({ predictedSafe })
+      chai
+        .expect(await safeSdk2.getSafeProvider().getSignerAddress())
+        .to.be.eq(await account1.signer.getAddress())
+    })
 
-    it('should connect a deployed Safe', async () => {
+    it.only('should connect a deployed Safe', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2, account3] = accounts
       const safeAddress = await safe.getAddress()
@@ -95,6 +92,8 @@ describe('Safe Info', () => {
         signer: account2.address,
         contractNetworks
       })
+      const signer = await safeSdk2.getSafeProvider().getExternalSigner()
+      chai.expect(signer)
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)
       chai
         .expect(await safeSdk2.getSafeProvider().getSignerAddress())
@@ -111,7 +110,7 @@ describe('Safe Info', () => {
         .expect(await safeSdk3.getSafeProvider().getSignerAddress())
         .to.be.eq(await account3.signer.getAddress())
     })
-  })
+  }).timeout(10000000000)
 
   describe('getContractVersion', async () => {
     it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {

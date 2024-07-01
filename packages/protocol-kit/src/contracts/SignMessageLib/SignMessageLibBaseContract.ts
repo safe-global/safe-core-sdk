@@ -1,5 +1,4 @@
 import { Abi } from 'abitype'
-import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
@@ -20,7 +19,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - SignMessageLibContract_v1_3_0  extends  SignMessageLibBaseContract<SignMessageLibContract_v1_3_0_Abi>
  */
 abstract class SignMessageLibBaseContract<
-  SignMessageLibContractAbiType extends InterfaceAbi & Abi
+  SignMessageLibContractAbiType extends Abi
 > extends BaseContract<SignMessageLibContractAbiType> {
   contractName: contractName
 

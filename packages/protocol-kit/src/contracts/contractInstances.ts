@@ -1,4 +1,5 @@
-import { JsonFragment, AbstractSigner, Provider } from 'ethers'
+import { JsonFragment } from 'ethers'
+import { PublicClient } from 'viem'
 import {
   SafeVersion,
   SafeContract_v1_3_0_Abi,
@@ -245,7 +246,7 @@ export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   // TODO: remove this ??
-  signerOrProvider: AbstractSigner | Provider,
+  signerOrProvider: PublicClient,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
 ): Promise<

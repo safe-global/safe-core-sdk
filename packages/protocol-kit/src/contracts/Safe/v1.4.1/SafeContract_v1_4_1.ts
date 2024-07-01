@@ -63,7 +63,7 @@ class SafeContract_v1_4_1
    * @returns Array[safeContractVersion]
    */
   VERSION: SafeContract_v1_4_1_Function<'VERSION'> = async () => {
-    return [await this.contract.VERSION()]
+    return [await this.contract.read.VERSION()]
   }
 
   /**
@@ -71,7 +71,7 @@ class SafeContract_v1_4_1
    * @returns Array[approvedHashes]
    */
   approvedHashes: SafeContract_v1_4_1_Function<'approvedHashes'> = async (args) => {
-    return [await this.contract.approvedHashes(...args)]
+    return [await this.contract.read.approvedHashes(args)]
   }
 
   /**
@@ -81,7 +81,7 @@ class SafeContract_v1_4_1
    * @returns Empty array
    */
   checkNSignatures: SafeContract_v1_4_1_Function<'checkNSignatures'> = async (args) => {
-    await this.contract.checkNSignatures(...args)
+    await this.contract.read.checkNSignatures(args)
     return []
   }
 
@@ -91,7 +91,7 @@ class SafeContract_v1_4_1
    * @returns Empty array
    */
   checkSignatures: SafeContract_v1_4_1_Function<'checkSignatures'> = async (args) => {
-    await this.contract.checkSignatures(...args)
+    await this.contract.read.checkSignatures(args)
     return []
   }
 
@@ -99,7 +99,7 @@ class SafeContract_v1_4_1
    * @returns Array[domainSeparator]
    */
   domainSeparator: SafeContract_v1_4_1_Function<'domainSeparator'> = async () => {
-    return [await this.contract.domainSeparator()]
+    return [await this.contract.read.domainSeparator()]
   }
 
   /**
@@ -108,7 +108,7 @@ class SafeContract_v1_4_1
    * @returns Array[encodedData]
    */
   encodeTransactionData: SafeContract_v1_4_1_Function<'encodeTransactionData'> = async (args) => {
-    return [await this.contract.encodeTransactionData(...args)]
+    return [await this.contract.read.encodeTransactionData(args)]
   }
 
   /**
@@ -117,7 +117,7 @@ class SafeContract_v1_4_1
    * @returns Array[Array[modules], next]
    */
   getModulesPaginated: SafeContract_v1_4_1_Function<'getModulesPaginated'> = async (args) => {
-    const res = await this.contract.getModulesPaginated(...args)
+    const res = await this.contract.read.getModulesPaginated(args)
     return [res.array, res.next]
   }
 
@@ -126,7 +126,7 @@ class SafeContract_v1_4_1
    * @returns Array[Array[owners]]
    */
   getOwners: SafeContract_v1_4_1_Function<'getOwners'> = async () => {
-    return [await this.contract.getOwners()]
+    return [await this.contract.read.getOwners()]
   }
 
   /**
@@ -135,7 +135,7 @@ class SafeContract_v1_4_1
    * @returns Array[storage]
    */
   getStorageAt: SafeContract_v1_4_1_Function<'getStorageAt'> = async (args) => {
-    return [await this.contract.getStorageAt(...args)]
+    return [await this.contract.read.getStorageAt(args)]
   }
 
   /**
@@ -143,7 +143,7 @@ class SafeContract_v1_4_1
    * @returns Array[threshold]
    */
   getThreshold: SafeContract_v1_4_1_Function<'getThreshold'> = async () => {
-    return [await this.contract.getThreshold()]
+    return [await this.contract.read.getThreshold()]
   }
 
   /**
@@ -152,7 +152,7 @@ class SafeContract_v1_4_1
    * @returns Array[transactionHash]
    */
   getTransactionHash: SafeContract_v1_4_1_Function<'getTransactionHash'> = async (args) => {
-    return [await this.contract.getTransactionHash(...args)]
+    return [await this.contract.read.getTransactionHash(args)]
   }
 
   /**
@@ -161,7 +161,7 @@ class SafeContract_v1_4_1
    * @returns Array[isEnabled]
    */
   isModuleEnabled: SafeContract_v1_4_1_Function<'isModuleEnabled'> = async (args) => {
-    return [await this.contract.isModuleEnabled(...args)]
+    return [await this.contract.read.isModuleEnabled(args)]
   }
 
   /**
@@ -170,7 +170,7 @@ class SafeContract_v1_4_1
    * @returns Array[isOwner]
    */
   isOwner: SafeContract_v1_4_1_Function<'isOwner'> = async (args) => {
-    return [await this.contract.isOwner(...args)]
+    return [await this.contract.read.isOwner(args)]
   }
 
   /**
@@ -178,7 +178,7 @@ class SafeContract_v1_4_1
    * @returns Array[nonce]
    */
   nonce: SafeContract_v1_4_1_Function<'nonce'> = async () => {
-    return [await this.contract.nonce()]
+    return [await this.contract.read.nonce()]
   }
 
   /**
@@ -186,7 +186,7 @@ class SafeContract_v1_4_1
    * @returns Array[signedMessages]
    */
   signedMessages: SafeContract_v1_4_1_Function<'signedMessages'> = async (args) => {
-    return [await this.contract.signedMessages(...args)]
+    return [await this.contract.read.signedMessages(args)]
   }
 
   /**
@@ -263,7 +263,7 @@ class SafeContract_v1_4_1
         options
       ))
 
-    const txResponse = await this.contract.execTransaction(
+    const txResponse = await this.contract.write.execTransaction(
       safeTransaction.data.to,
       safeTransaction.data.value,
       safeTransaction.data.data,
@@ -297,7 +297,7 @@ class SafeContract_v1_4_1
    */
   async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
     const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
-    const txResponse = await this.contract.approveHash(hash, { ...options, gasLimit })
+    const txResponse = await this.contract.write.approveHash(hash, { ...options, gasLimit })
 
     return toTxResult(txResponse, options)
   }
@@ -307,7 +307,7 @@ class SafeContract_v1_4_1
    * @returns Array[chainId]
    */
   async getChainId(): Promise<[bigint]> {
-    return [await this.contract.getChainId()]
+    return [await this.contract.read.getChainId()]
   }
 
   /**

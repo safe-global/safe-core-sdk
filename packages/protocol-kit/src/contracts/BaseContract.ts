@@ -1,6 +1,12 @@
 import { Abi } from 'abitype'
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
-
+import {
+  PublicClient,
+  Address,
+  getContract,
+  encodeFunctionData,
+  GetContractReturnType,
+  WalletClient
+} from 'viem'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
@@ -25,14 +31,14 @@ import {
  * - CreateCallBaseContract<CreateCallContractAbiType> extends BaseContract<CreateCallContractAbiType>
  * - SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbiType> extends BaseContract<SafeProxyFactoryContractAbiType>
  */
-class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
+class BaseContract<ContractAbiType extends Abi> {
   contractAbi: ContractAbiType
   contractAddress: string
   contractName: contractName
   safeVersion: SafeVersion
   safeProvider: SafeProvider
-  contract!: Contract
-  runner?: ContractRunner | null
+  contract!: GetContractReturnType<ContractAbiType, WalletClient>
+  runner?: PublicClient | null
 
   /**
    * @constructor
@@ -54,7 +60,7 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: ContractAbiType,
-    runner?: ContractRunner | null
+    runner?: PublicClient | null
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
@@ -80,24 +86,36 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
   }
 
   async init() {
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      (await this.safeProvider.getExternalSigner()) || this.runner
-    )
+    const client = this.runner || (await this.safeProvider.getExternalSigner())
+    this.contract = getContract({
+      address: this.contractAddress as Address,
+      abi: this.contractAbi,
+      client: client!
+    })
   }
 
   getAddress: GetAddressFunction = () => {
-    return this.contract.address
+    return Promise.resolve(this.contract.address)
   }
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args as ReadonlyArray<[]>)
+    const abi = this.contractAbi as Abi
+    const functionName = functionToEncode as string
+    return encodeFunctionData({
+      abi,
+      functionName,
+      args
+    })
   }
 
   estimateGas: EstimateGasFunction<ContractAbiType> = (functionToEstimate, args, options = {}) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-    return contractMethodToEstimate.estimateGas(...(args as ReadonlyArray<[]>), options)
+    return this.contract?.estimateGas({
+      abi: this.contractAbi,
+      functionName: functionToEstimate,
+      address: this.contract.address,
+      args,
+      ...options
+    })
   }
 }
 

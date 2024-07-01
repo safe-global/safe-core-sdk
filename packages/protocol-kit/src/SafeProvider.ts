@@ -1,11 +1,3 @@
-import {
-  ethers,
-  TransactionResponse,
-  AbstractSigner,
-  Provider,
-  BrowserProvider,
-  JsonRpcProvider
-} from 'ethers'
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
@@ -34,47 +26,85 @@ import {
   HttpTransport,
   SocketTransport
 } from '@safe-global/protocol-kit/types'
+import {
+  createPublicClient,
+  createWalletClient,
+  WalletClient,
+  PublicClient,
+  custom,
+  http,
+  getAddress,
+  BlockTag,
+  toHex,
+  isAddress,
+  Address,
+  Hash,
+  Transaction,
+  Hex,
+  decodeAbiParameters,
+  encodeAbiParameters,
+  parseAbiParameters,
+  toBytes
+} from 'viem'
+import { privateKeyToAccount, privateKeyToAddress } from 'viem/accounts'
+
+const asAddress = (address: string): Address => address as Address
+const asHash = (hash: string): Hash => hash as Hash
+const asBlockId = (blockId: number | string | undefined) =>
+  typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
+const blockNumber = (blockNumber: any) => ({ blockNumber: blockNumber.toNumber() })
+const blockTag = (blockTag: any) => ({ blockTag: blockTag as BlockTag })
+const asHex = (hex?: string) => (hex ? hex : '0x') as Hex
 
 class SafeProvider {
-  #externalProvider: BrowserProvider | JsonRpcProvider
+  #externalProvider: PublicClient
   signer?: string
   provider: Eip1193Provider | HttpTransport | SocketTransport
 
   constructor({ provider, signer }: SafeProviderConfig) {
     if (typeof provider === 'string') {
-      this.#externalProvider = new JsonRpcProvider(provider)
+      this.#externalProvider = createPublicClient({
+        transport: http(provider)
+      })
     } else {
-      this.#externalProvider = new BrowserProvider(provider)
+      this.#externalProvider = createPublicClient({
+        transport: custom(provider)
+      })
     }
 
     this.provider = provider
     this.signer = signer
   }
 
-  getExternalProvider(): Provider {
+  getExternalProvider(): PublicClient {
     return this.#externalProvider
   }
 
-  async getExternalSigner(): Promise<AbstractSigner | undefined> {
+  async getExternalSigner(): Promise<WalletClient | undefined> {
     // If the signer is not an Ethereum address, it should be a private key
-    if (this.signer && !ethers.isAddress(this.signer)) {
-      const privateKeySigner = new ethers.Wallet(this.signer, this.#externalProvider)
-      return privateKeySigner
+    if (this.signer && !this.isAddress(this.signer)) {
+      const account = privateKeyToAccount(asHex(this.signer))
+      const { transport, chain } = this.getExternalProvider()
+      return createWalletClient({
+        account,
+        chain,
+        transport: custom(transport)
+      })
     }
 
+    // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
     if (this.signer) {
-      return this.#externalProvider.getSigner(this.signer)
+      const { chain, transport } = this.getExternalProvider()
+      return createWalletClient({
+        chain,
+        transport: custom(transport)
+      })
     }
-
-    if (this.#externalProvider instanceof BrowserProvider) {
-      return this.#externalProvider.getSigner()
-    }
-
     return undefined
   }
 
   isAddress(address: string): boolean {
-    return ethers.isAddress(address)
+    return isAddress(address)
   }
 
   async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
@@ -83,19 +113,26 @@ class SafeProvider {
   }
 
   async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
-    return this.#externalProvider.getBalance(address, blockTag)
+    return this.#externalProvider.getBalance({
+      address: asAddress(address),
+      ...asBlockId(blockTag)
+    })
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {
-    return this.#externalProvider.getTransactionCount(address, blockTag)
+    return this.#externalProvider.getTransactionCount({
+      address: asAddress(address),
+      ...asBlockId(blockTag)
+    })
   }
 
   async getChainId(): Promise<bigint> {
-    return (await this.#externalProvider.getNetwork()).chainId
+    const res = await this.#externalProvider.getChainId()
+    return BigInt(res)
   }
 
   getChecksummedAddress(address: string): string {
-    return ethers.getAddress(address)
+    return getAddress(address)
   }
 
   async getSafeContract({
@@ -118,7 +155,7 @@ class SafeProvider {
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const signerOrProvider = (await this.getExternalSigner()) || this.#externalProvider
+    const signerOrProvider = this.#externalProvider
     return getSafeProxyFactoryContractInstance(
       safeVersion,
       this,
@@ -202,39 +239,56 @@ class SafeProvider {
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
-    return this.#externalProvider.getCode(address, blockTag)
+    const res = this.#externalProvider.getCode({
+      address: asAddress(address),
+      ...asBlockId(blockTag)
+    })
+    return res?.toString()
   }
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
-    const contractCode = await this.#externalProvider.getCode(address, blockTag)
+    const contractCode = await this.#externalProvider.getCode({
+      address: asAddress(address),
+      ...asBlockId(blockTag)
+    })
     return contractCode !== EMPTY_DATA
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {
-    const content = await this.#externalProvider.getStorage(address, position)
-    const decodedContent = this.decodeParameters(['address'], content)
+    const content = await this.#externalProvider.getStorageAt({
+      address: asAddress(address),
+      slot: toHex(position)
+    })
+    const decodedContent = this.decodeParameters('address', asHex(content))
     return decodedContent[0]
   }
 
-  async getTransaction(transactionHash: string): Promise<TransactionResponse> {
-    return this.#externalProvider.getTransaction(transactionHash) as Promise<TransactionResponse>
+  async getTransaction(transactionHash: string): Promise<Transaction> {
+    return this.#externalProvider.getTransaction({
+      hash: asHash(transactionHash)
+    }) as Promise<Transaction>
   }
 
   async getSignerAddress(): Promise<string | undefined> {
-    const signer = await this.getExternalSigner()
+    if (this.signer && !isAddress(this.signer)) {
+      return privateKeyToAddress(asHex(this.signer))
+    }
 
-    return signer?.getAddress()
+    return this.signer
   }
 
   async signMessage(message: string): Promise<string> {
     const signer = await this.getExternalSigner()
+    const account = await this.getSignerAddress()
 
-    if (!signer) {
+    if (!signer || !account) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
-    const messageArray = ethers.getBytes(message)
 
-    return signer.signMessage(messageArray)
+    return (await signer?.signMessage!({
+      account: asHex(account),
+      message: { raw: toBytes(message) }
+    })) as string
   }
 
   async signTypedData(safeEIP712Args: SafeEIP712Args): Promise<string> {
@@ -260,20 +314,26 @@ class SafeProvider {
   }
 
   async estimateGas(transaction: SafeProviderTransaction): Promise<string> {
-    return (await this.#externalProvider.estimateGas(transaction)).toString()
+    const anyTransaction = transaction as any
+    return (await this.#externalProvider.estimateGas(anyTransaction)).toString()
   }
 
-  call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
-    return this.#externalProvider.call({ ...transaction, blockTag })
+  async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
+    const anyTransaction = transaction as any
+    const { data } = await this.#externalProvider.call({
+      ...anyTransaction,
+      ...asBlockId(blockTag)
+    })
+    return data ?? '0x'
   }
 
   // TODO: fix anys
-  encodeParameters(types: string[], values: any[]): string {
-    return new ethers.AbiCoder().encode(types, values)
+  encodeParameters(types: string, values: any[]): string {
+    return encodeAbiParameters(parseAbiParameters(types), values)
   }
 
-  decodeParameters(types: string[], values: string): { [key: string]: any } {
-    return new ethers.AbiCoder().decode(types, values)
+  decodeParameters(types: string, values: string): { [key: string]: any } {
+    return decodeAbiParameters(parseAbiParameters(types), asHex(values))
   }
 }
 

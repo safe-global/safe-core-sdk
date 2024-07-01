@@ -168,7 +168,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const customSaltNonceEncoded = safeSdk
         .getSafeProvider()
-        .encodeParameters(['uint256'], [customSaltNonce])
+        .encodeParameters('uint256', [customSaltNonce])
 
       // custom salt nonce included in the deployment data
       chai.expect(batchTransaction.data).to.contains(customSaltNonceEncoded.replace('0x', ''))

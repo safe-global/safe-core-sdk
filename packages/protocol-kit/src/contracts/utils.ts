@@ -235,7 +235,7 @@ export async function getPredictedSafeAddressInitCode({
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
+  const encodedNonce = toBuffer(safeProvider.encodeParameters('uint256', [saltNonce])).toString(
     'hex'
   )
   const safeSingletonAddress = await safeContract.getAddress()
@@ -300,14 +300,14 @@ export async function predictSafeAddress({
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
+  const encodedNonce = toBuffer(safeProvider.encodeParameters('uint256', [saltNonce])).toString(
     'hex'
   )
   const salt = keccak256(
     toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
   )
 
-  const input = safeProvider.encodeParameters(['address'], [await safeContract.getAddress()])
+  const input = safeProvider.encodeParameters('address', [await safeContract.getAddress()])
 
   const from = await safeProxyFactoryContract.getAddress()
 

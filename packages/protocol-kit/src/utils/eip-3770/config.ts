@@ -201,6 +201,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 73799n, shortName: 'vt' },
   { chainId: 80001n, shortName: 'maticmum' },
   { chainId: 80002n, shortName: 'polygonamoy' },
+  { chainId: 80084n, shortName: 'berachainbArtio' },
   { chainId: 80085n, shortName: 'berachainArtio' },
   { chainId: 81457n, shortName: 'blastmainnet' },
   { chainId: 84531n, shortName: 'basegor' },

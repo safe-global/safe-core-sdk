@@ -31,6 +31,7 @@ const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
 const tokenAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
 const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
+const safeOpHash = '0x8b1840745ec0a6288e868c6e285dadcfebd49e846d307610a9ccd97f445ace93'
 const txServiceBaseUrl = 'https://safe-transaction-sepolia.safe.global/api'
 const defaultProvider = getDefaultProvider(config.JSON_RPC)
 const signer = new Wallet(PRIVATE_KEY_1, defaultProvider)
@@ -50,6 +51,10 @@ describe('Endpoint tests', () => {
   const fetchData = sinon
     .stub(httpRequests, 'sendRequest')
     .returns(Promise.resolve({ data: { success: true } }))
+
+  afterEach(() => {
+    sinon.resetHistory()
+  })
 
   describe('Default txServiceUrl', () => {
     it('getServiceInfo', async () => {
@@ -151,7 +156,8 @@ describe('Endpoint tests', () => {
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
-        method: 'get'
+        method: 'post',
+        body: { signature }
       })
     })
 
@@ -649,13 +655,11 @@ describe('Endpoint tests', () => {
     })
 
     it('getSafeOperation', async () => {
-      const safeOperationHash = 'safe-operation-hash'
-
       await chai
-        .expect(safeApiKit.getSafeOperation(safeOperationHash))
+        .expect(safeApiKit.getSafeOperation(safeOpHash))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/`,
+        url: `${txServiceBaseUrl}/v1/safe-operations/${safeOpHash}/`,
         method: 'get'
       })
     })
@@ -710,6 +714,31 @@ describe('Endpoint tests', () => {
           ...options,
           signature: userOperation.signature,
           moduleAddress
+        }
+      })
+    })
+
+    it('getSafeOperationConfirmations', async () => {
+      await chai
+        .expect(safeApiKit.getSafeOperationConfirmations(safeOpHash))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safe-operations/${safeOpHash}/confirmations/`,
+        method: 'get'
+      })
+    })
+
+    it('confirmSafeOperation', async () => {
+      const senderSignature = await protocolKit.signHash(safeOpHash)
+      await chai
+        .expect(safeApiKit.confirmSafeOperation(safeOpHash, senderSignature.data))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safe-operations/${safeOpHash}/confirmations/`,
+        method: 'post',
+        body: {
+          signature:
+            '0x23e70757bcfe1ccba40588ee3ec8fbca7ff4b51ad48703a598fbe98b935b927d064a98cdcfaf2eff00ae05628ed38f15799a732e143f9fce7215a62fe8e14ff020'
         }
       })
     })

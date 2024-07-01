@@ -44,6 +44,7 @@ export type Safe4337InitOptions = {
 }
 
 export type Safe4337Options = {
+  chainId: bigint
   protocolKit: Safe
   bundlerUrl: string
   paymasterOptions?: PaymasterOptions

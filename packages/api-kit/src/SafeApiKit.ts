@@ -6,10 +6,10 @@ import {
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
+  GetSafeMessageListProps,
   GetSafeOperationListProps,
   GetSafeOperationListResponse,
-  SafeSingletonResponse,
-  GetSafeMessageListProps,
+  ListOptions,
   ModulesResponse,
   OwnerResponse,
   ProposeTransactionProps,
@@ -24,6 +24,7 @@ import {
   SafeMultisigTransactionEstimateResponse,
   SafeMultisigTransactionListResponse,
   SafeServiceInfoResponse,
+  SafeSingletonResponse,
   SignatureResponse,
   TokenInfoListResponse,
   TokenInfoResponse,
@@ -34,11 +35,12 @@ import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
+  isSafeOperation,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
-  SafeOperationResponse,
   SafeOperation,
-  isSafeOperation
+  SafeOperationConfirmationListResponse,
+  SafeOperationResponse
 } from '@safe-global/safe-core-sdk-types'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
@@ -282,11 +284,11 @@ class SafeApiKit {
     if (label) {
       url.searchParams.set('label', label)
     }
-    if (limit) {
-      url.searchParams.set('limit', limit)
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
     }
-    if (offset) {
-      url.searchParams.set('offset', offset)
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
     }
 
     return sendRequest({
@@ -672,12 +674,12 @@ class SafeApiKit {
       url.searchParams.set('ordering', ordering)
     }
 
-    if (limit) {
-      url.searchParams.set('limit', limit)
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
     }
 
-    if (offset) {
-      url.searchParams.set('offset', offset)
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
     }
 
     return sendRequest({
@@ -748,12 +750,12 @@ class SafeApiKit {
       url.searchParams.set('ordering', ordering)
     }
 
-    if (limit) {
-      url.searchParams.set('limit', limit)
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
     }
 
-    if (offset) {
-      url.searchParams.set('offset', offset)
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
     }
 
     return sendRequest({
@@ -850,6 +852,66 @@ class SafeApiKit {
         signature: userOperation.signature,
         moduleAddress
       }
+    })
+  }
+
+  /**
+   * Returns the list of confirmations for a given a SafeOperation.
+   *
+   * @param safeOperationHash - The hash of the SafeOperation to get confirmations for
+   * @param getSafeOperationConfirmationsOptions - Additional options for fetching the list of confirmations
+   * @returns The list of confirmations
+   * @throws "Invalid SafeOperation hash"
+   * @throws "Invalid data"
+   */
+  async getSafeOperationConfirmations(
+    safeOperationHash: string,
+    { limit, offset }: ListOptions = {}
+  ): Promise<SafeOperationConfirmationListResponse> {
+    if (!safeOperationHash) {
+      throw new Error('Invalid SafeOperation hash')
+    }
+
+    const url = new URL(
+      `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/confirmations/`
+    )
+
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
+    }
+
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
+    }
+
+    return sendRequest({
+      url: url.toString(),
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Adds a confirmation for a SafeOperation.
+   *
+   * @param safeOperationHash The SafeOperation hash
+   * @param signature - Signature of the SafeOperation
+   * @returns
+   * @throws "Invalid SafeOperation hash"
+   * @throws "Invalid signature"
+   * @throws "Malformed data"
+   * @throws "Error processing data"
+   */
+  async confirmSafeOperation(safeOperationHash: string, signature: string): Promise<void> {
+    if (!safeOperationHash) {
+      throw new Error('Invalid SafeOperation hash')
+    }
+    if (!signature) {
+      throw new Error('Invalid signature')
+    }
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/confirmations/`,
+      method: HttpMethod.Post,
+      body: { signature }
     })
   }
 }

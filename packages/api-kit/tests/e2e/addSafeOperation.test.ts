@@ -4,9 +4,9 @@ import { ethers } from 'ethers'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import Safe from '@safe-global/protocol-kit'
-import SafeApiKit from '@safe-global/api-kit'
+import SafeApiKit from '@safe-global/api-kit/index'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
+import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 import { getKits } from '../utils/setupKits'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
@@ -15,7 +15,7 @@ chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
 const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/1 Safe (v1.4.1) with signer above as owner + 4337 module enabled
+const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/2 Safe (v1.4.1) with signer above being an owner + 4337 module enabled
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f'
 const BUNDLER_URL = `https://bundler.url`

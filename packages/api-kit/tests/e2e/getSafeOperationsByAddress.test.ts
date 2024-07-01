@@ -1,7 +1,8 @@
-import SafeApiKit from '@safe-global/api-kit'
+import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getApiKit } from '../utils/setupKits'
+import { SafeOperationResponse } from 'packages/safe-core-sdk-types/dist/src'
 
 chai.use(chaiAsPromised)
 
@@ -14,6 +15,8 @@ describe('getSafeOperationsByAddress', () => {
   before(async () => {
     safeApiKit = getApiKit(TX_SERVICE_URL)
   })
+
+  let safeOperations: SafeOperationResponse[]
 
   describe('should fail', () => {
     it('should fail if safeAddress is empty', async () => {
@@ -30,14 +33,16 @@ describe('getSafeOperationsByAddress', () => {
   })
 
   it('should get the SafeOperation list', async () => {
-    const safeOperations = await safeApiKit.getSafeOperationsByAddress({
+    const response = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS
     })
 
-    chai.expect(safeOperations).to.have.property('count').greaterThan(1)
-    chai.expect(safeOperations).to.have.property('results').to.be.an('array')
+    safeOperations = response.results
 
-    safeOperations.results.every((safeOperation) => {
+    chai.expect(response).to.have.property('count').greaterThan(1)
+    chai.expect(response).to.have.property('results').to.be.an('array')
+
+    response.results.every((safeOperation) => {
       chai.expect(safeOperation).to.have.property('created')
       chai.expect(safeOperation).to.have.property('modified')
       chai.expect(safeOperation).to.have.property('safeOperationHash')
@@ -64,5 +69,30 @@ describe('getSafeOperationsByAddress', () => {
       chai.expect(safeOperation.userOperation).to.have.property('signature')
       chai.expect(safeOperation.userOperation).to.have.property('entryPoint')
     })
+  })
+
+  it('should get a maximum of 3 SafeOperations with limit = 3', async () => {
+    const response = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
+      limit: 3
+    })
+
+    chai.expect(response).to.have.property('count').greaterThan(1)
+    chai.expect(response).to.have.property('results').to.be.an('array')
+    chai.expect(response.results.length).to.be.lessThanOrEqual(3)
+    chai
+      .expect(response.results[0].safeOperationHash)
+      .to.be.eq('0xfbc38024f74946d9ec31e0c8658dd65e335c6e57c14575250787ec5fb270c08a')
+  })
+
+  it('should get all SafeOperations excluding the first one with offset = 1', async () => {
+    const response = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
+      offset: 1
+    })
+
+    chai.expect(response).to.have.property('count').greaterThan(1)
+    chai.expect(response).to.have.property('results').to.be.an('array')
+    chai.expect(response.results[0].safeOperationHash).to.be.eq(safeOperations[1].safeOperationHash)
   })
 })

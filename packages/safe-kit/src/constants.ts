@@ -7,7 +7,9 @@ export enum SafeClientTxStatus {
   MESSAGE_PENDING_SIGNATURES = 'MESSAGE_PENDING_SIGNATURES',
   MESSAGE_CONFIRMED = 'MESSAGE_CONFIRMED',
   DEPLOYED_AND_MESSAGE_PENDING_SIGNATURES = 'DEPLOYED_AND_MESSAGE_PENDING_SIGNATURES',
-  DEPLOYED_AND_MESSAGE_CONFIRMED = 'DEPLOYED_AND_MESSAGE_CONFIRMED'
+  DEPLOYED_AND_MESSAGE_CONFIRMED = 'DEPLOYED_AND_MESSAGE_CONFIRMED',
+  USER_OPERATION_EXECUTED = 'USER_OPERATION_EXECUTED',
+  USER_OPERATION_PENDING_SIGNATURES = 'USER_OPERATION_PENDING_SIGNATURES'
 }
 
 export const MESSAGES = {
@@ -26,5 +28,8 @@ export const MESSAGES = {
   [SafeClientTxStatus.DEPLOYED_AND_MESSAGE_PENDING_SIGNATURES]:
     'A new Safe account was deployed, check the deployment property to see the Safe account information and deployment hash. The message was stored using Safe services and you need to confirm it with other Safe owners in order to make it valid. Use the confirmMessage(messageHash) method with other signer connected to the client.',
   [SafeClientTxStatus.DEPLOYED_AND_MESSAGE_CONFIRMED]:
-    'A new Safe account was deployed and the message was confirmed and is now valid'
+    'A new Safe account was deployed and the message was confirmed and is now valid',
+  [SafeClientTxStatus.USER_OPERATION_EXECUTED]: 'The user operation has been successfully executed',
+  [SafeClientTxStatus.USER_OPERATION_PENDING_SIGNATURES]:
+    'The user operation was stored using the Safe services, you have to confirm it using the confirmUserOperation(safeOperationHash) before send it to the bundler for being processed'
 }

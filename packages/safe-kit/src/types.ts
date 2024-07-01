@@ -30,6 +30,8 @@ export type SafeClientResult = {
   status: SafeClientTxStatus
   safeTxHash?: string
   messageHash?: string
+  userOperationHash?: string
+  safeOperationHash?: string
   deployment?: {
     txHash: string
   }

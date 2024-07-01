@@ -584,7 +584,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       throw new Error('There is no signer address available to sign the SafeOperation')
     }
 
-    const isOwner = this.protocolKit.isOwner(signerAddress)
+    const isOwner = await this.protocolKit.isOwner(signerAddress)
 
     if (!isOwner) {
       throw new Error('UserOperations can only be signed by Safe owners')

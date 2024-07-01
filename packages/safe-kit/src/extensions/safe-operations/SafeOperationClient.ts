@@ -65,6 +65,8 @@ export class SafeOperationClient {
       executable: safeOperation
     })
 
+    await this.#waitForOperationToFinish(userOperationHash)
+
     return createSafeClientResult({
       safeAddress,
       status: SafeClientTxStatus.USER_OPERATION_EXECUTED,
@@ -99,6 +101,8 @@ export class SafeOperationClient {
         executable: confirmedSafeOperation
       })
 
+      await this.#waitForOperationToFinish(userOperationHash)
+
       return createSafeClientResult({
         status: SafeClientTxStatus.USER_OPERATION_EXECUTED,
         safeAddress,
@@ -124,5 +128,15 @@ export class SafeOperationClient {
   async getPendingSafeOperations(): Promise<GetSafeOperationListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
     return this.apiKit.getSafeOperationsByAddress({ safeAddress })
+  }
+
+  async #waitForOperationToFinish(userOperationHash: string): Promise<void> {
+    let userOperationReceipt = null
+    while (!userOperationReceipt) {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      userOperationReceipt = await this.safe4337Pack.getUserOperationReceipt(userOperationHash)
+    }
+
+    console.log('User Operation Receipt', userOperationReceipt)
   }
 }

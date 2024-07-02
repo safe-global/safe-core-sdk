@@ -27,6 +27,7 @@ async function send(): Promise<SafeClientResult> {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
+    //safeAddress: '0x951CC166B2755Aae5C01DBc122e1fa8297f9576c'
     safeOptions: {
       owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
       threshold: THRESHOLD,
@@ -65,7 +66,7 @@ async function send(): Promise<SafeClientResult> {
   return safeOperationResult
 }
 
-async function confirm({ safeOperationHash }: SafeClientResult, pk: string) {
+async function confirm(safeClientResult: SafeClientResult, pk: string) {
   if (!pk) {
     return
   }
@@ -73,12 +74,17 @@ async function confirm({ safeOperationHash }: SafeClientResult, pk: string) {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
+    //safeAddress: '0x951CC166B2755Aae5C01DBc122e1fa8297f9576c'
     safeOptions: {
       owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
       threshold: THRESHOLD,
       saltNonce: SALT_NONCE
     }
   })
+
+  const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
+
+  console.log('-Signer Address:', signerAddress)
 
   const safeClientWithSafeOperation = await safeClient.extend(
     safeOperations(
@@ -90,12 +96,13 @@ async function confirm({ safeOperationHash }: SafeClientResult, pk: string) {
   const pendingSafeOperations = await safeClientWithSafeOperation.getPendingSafeOperations()
 
   pendingSafeOperations.results.forEach(async (safeOperation) => {
-    if (safeOperation.safeOperationHash !== safeOperationHash) {
+    if (safeOperation.safeOperationHash !== safeClientResult.safeOperations?.safeOperationHash) {
       return
     }
 
-    const safeOperationResult =
-      await safeClientWithSafeOperation.confirmSafeOperation(safeOperationHash)
+    const safeOperationResult = await safeClientWithSafeOperation.confirmSafeOperation(
+      safeClientResult.safeOperations?.safeOperationHash
+    )
 
     console.log('-Confirm result: ', safeOperationResult)
   })

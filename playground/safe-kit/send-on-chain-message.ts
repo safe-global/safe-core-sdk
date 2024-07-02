@@ -89,7 +89,7 @@ async function send(): Promise<SafeClientResult> {
   return txResult
 }
 
-async function confirm({ safeAddress, safeTxHash }: SafeClientResult, pk: string) {
+async function confirm({ safeAddress, transactions }: SafeClientResult, pk: string) {
   if (!pk) {
     return
   }
@@ -107,7 +107,7 @@ async function confirm({ safeAddress, safeTxHash }: SafeClientResult, pk: string
   const pendingTransactions = await safeClient.getPendingTransactions()
 
   pendingTransactions.results.forEach(async (transaction) => {
-    if (transaction.safeTxHash !== safeTxHash) {
+    if (transaction.safeTxHash !== transactions?.safeTxHash) {
       return
     }
 

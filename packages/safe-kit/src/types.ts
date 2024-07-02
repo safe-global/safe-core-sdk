@@ -28,14 +28,18 @@ export type SafeClientResult = {
   safeAddress: string
   description: string
   status: SafeClientTxStatus
-  safeTxHash?: string
-  messageHash?: string
-  userOperationHash?: string
-  safeOperationHash?: string
-  deployment?: {
-    txHash: string
+  transactions?: {
+    safeTxHash?: string
+    ethereumTxHash?: string
   }
-  execution?: {
-    txHash: string
+  messages?: {
+    messageHash?: string
+  }
+  safeOperations?: {
+    userOperationHash?: string
+    safeOperationHash?: string
+  }
+  safeAccountDeployment?: {
+    ethereumTxHash?: string
   }
 }

@@ -90,7 +90,7 @@ async function send(): Promise<SafeClientResult> {
   return txResult
 }
 
-async function confirm({ safeAddress, messageHash }: SafeClientResult, pk: string) {
+async function confirm({ safeAddress, messages }: SafeClientResult, pk: string) {
   if (!pk) {
     return
   }
@@ -110,7 +110,7 @@ async function confirm({ safeAddress, messageHash }: SafeClientResult, pk: strin
   const pendingMessages = await safeClientWithMessages.getPendingMessages()
 
   pendingMessages.results.forEach(async (message) => {
-    if (message.messageHash !== messageHash) {
+    if (message.messageHash !== messages?.messageHash) {
       return
     }
 

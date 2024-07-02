@@ -100,7 +100,7 @@ export class SafeMessageClient {
       await this.#reconnectSafe()
 
       const messageResult = await this.#addMessage(safeMessage)
-      const message = await this.apiKit.getMessage(messageResult.messageHash || '0x')
+      const message = await this.apiKit.getMessage(messageResult.messages?.messageHash || '0x')
 
       return createSafeClientResult({
         safeAddress: await this.protocolKit.getAddress(),
@@ -109,7 +109,7 @@ export class SafeMessageClient {
             ? SafeClientTxStatus.DEPLOYED_AND_MESSAGE_CONFIRMED
             : SafeClientTxStatus.DEPLOYED_AND_MESSAGE_PENDING_SIGNATURES,
         deploymentTxHash: hash,
-        messageHash: messageResult.messageHash
+        messageHash: messageResult.messages?.messageHash
       })
     } catch (error) {
       console.error('Error deploying and adding message: ', error)

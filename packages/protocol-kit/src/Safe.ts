@@ -220,6 +220,14 @@ class Safe {
   }
 
   /**
+   * Returns the predicted Safe configuration.
+   * @returns {PredictedSafeProps | undefined} The predicted Safe configuration
+   */
+  getPredictedSafe(): PredictedSafeProps | undefined {
+    return this.#predictedSafe
+  }
+
+  /**
    * Returns the address of the current SafeProxy contract.
    *
    * @returns The address of the SafeProxy contract

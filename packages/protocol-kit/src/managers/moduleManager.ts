@@ -5,6 +5,7 @@ import {
   SafeModulesPaginated
 } from '@safe-global/protocol-kit/types'
 import SafeProvider from '../SafeProvider'
+import { asAddress } from '../utils/types'
 
 class ModuleManager {
   #safeProvider: SafeProvider
@@ -54,7 +55,10 @@ class ModuleManager {
       throw new Error('Safe is not deployed')
     }
 
-    const [modules, next] = await this.#safeContract.getModulesPaginated([start, BigInt(pageSize)])
+    const [modules, next] = await this.#safeContract.getModulesPaginated(
+      asAddress(start),
+      BigInt(pageSize)
+    )
     return { modules: modules as string[], next }
   }
 
@@ -63,7 +67,7 @@ class ModuleManager {
       throw new Error('Safe is not deployed')
     }
 
-    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled([moduleAddress])
+    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled(asAddress(moduleAddress))
 
     return isModuleEnabled
   }

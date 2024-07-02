@@ -95,7 +95,7 @@ class BaseContract<ContractAbiType extends Abi> {
     })
   }
 
-  async getReceiptReceipt(hash: Hash) {
+  async getTransactionReceipt(hash: Hash) {
     const client = this.runner
     return client?.getTransactionReceipt({ hash })
   }

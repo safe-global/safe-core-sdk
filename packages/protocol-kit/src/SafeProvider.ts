@@ -26,6 +26,7 @@ import {
   HttpTransport,
   SocketTransport
 } from '@safe-global/protocol-kit/types'
+import { asAddress, asHash, asHex } from './utils/types'
 import {
   createPublicClient,
   createWalletClient,
@@ -34,27 +35,28 @@ import {
   custom,
   http,
   getAddress,
-  BlockTag,
   toHex,
   isAddress,
-  Address,
-  Hash,
   Transaction,
-  Hex,
   decodeAbiParameters,
   encodeAbiParameters,
   parseAbiParameters,
-  toBytes
+  toBytes,
+  BlockTag
 } from 'viem'
 import { privateKeyToAccount, privateKeyToAddress } from 'viem/accounts'
 
-const asAddress = (address: string): Address => address as Address
-const asHash = (hash: string): Hash => hash as Hash
-const asBlockId = (blockId: number | string | undefined) =>
-  typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
-const blockNumber = (blockNumber: any) => ({ blockNumber: blockNumber.toNumber() })
-const blockTag = (blockTag: any) => ({ blockTag: blockTag as BlockTag })
-const asHex = (hex?: string) => (hex ? hex : '0x') as Hex
+function asBlockId(blockId: number | string | undefined) {
+  return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
+}
+
+function blockNumber(blockNumber: any) {
+  return { blockNumber: blockNumber.toNumber() }
+}
+
+function blockTag(blockTag: any) {
+  return { blockTag: blockTag as BlockTag }
+}
 
 class SafeProvider {
   #externalProvider: PublicClient

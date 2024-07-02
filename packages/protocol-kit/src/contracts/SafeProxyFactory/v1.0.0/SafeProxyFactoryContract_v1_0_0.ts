@@ -90,7 +90,7 @@ class SafeProxyFactoryContract_v1_0_0
   createProxyWithNonce: SafeProxyFactoryContract_v1_0_0_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.write.createProxyWithNonce(...args)]
+    return [await this.contract.write.createProxyWithNonce(args)]
   }
 
   /**

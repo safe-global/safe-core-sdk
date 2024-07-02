@@ -80,7 +80,7 @@ class SafeProxyFactoryContract_v1_1_1
    */
   calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_1_1_Function<'calculateCreateProxyWithNonceAddress'> =
     async (args) => {
-      return [await this.contract.write.calculateCreateProxyWithNonceAddress(...args)]
+      return [await this.contract.write.calculateCreateProxyWithNonceAddress(args)]
     }
 
   /**
@@ -89,7 +89,7 @@ class SafeProxyFactoryContract_v1_1_1
    * @returns Array[proxyAddress]
    */
   createProxy: SafeProxyFactoryContract_v1_1_1_Function<'createProxy'> = async (args) => {
-    return [await this.contract.write.createProxy(...args)]
+    return [await this.contract.write.createProxy(args)]
   }
 
   /**
@@ -99,7 +99,7 @@ class SafeProxyFactoryContract_v1_1_1
    */
   createProxyWithCallback: SafeProxyFactoryContract_v1_1_1_Function<'createProxyWithCallback'> =
     async (args) => {
-      return [await this.contract.write.createProxyWithCallback(...args)]
+      return [await this.contract.write.createProxyWithCallback(args)]
     }
 
   /**

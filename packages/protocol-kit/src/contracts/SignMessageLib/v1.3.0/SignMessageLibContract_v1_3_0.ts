@@ -49,7 +49,7 @@ class SignMessageLibContract_v1_3_0
    * @param args - Array[message]
    */
   getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
-    return [await this.contract.read.getMessageHash(...args)]
+    return [await this.contract.read.getMessageHash(args)]
   }
 
   /**

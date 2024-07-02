@@ -102,7 +102,7 @@ class SafeContract_v1_0_0
    * @returns Array[approvedHashes]
    */
   approvedHashes: SafeContract_v1_0_0_Function<'approvedHashes'> = async (args) => {
-    return [await this.contract.read.approvedHashes(...args)]
+    return [await this.contract.read.approvedHashes(args)]
   }
 
   /**
@@ -142,7 +142,7 @@ class SafeContract_v1_0_0
    * @returns Array[isOwner]
    */
   isOwner: SafeContract_v1_0_0_Function<'isOwner'> = async (args) => {
-    return [await this.contract.read.isOwner(...args)]
+    return [await this.contract.read.isOwner(args)]
   }
 
   /**
@@ -158,7 +158,7 @@ class SafeContract_v1_0_0
    * @returns Array[signedMessages]
    */
   signedMessages: SafeContract_v1_0_0_Function<'signedMessages'> = async (args) => {
-    return [await this.contract.read.signedMessages(...args)]
+    return [await this.contract.read.signedMessages(args)]
   }
 
   /**
@@ -167,7 +167,7 @@ class SafeContract_v1_0_0
    * @returns Array[messageHash]
    */
   getMessageHash: SafeContract_v1_0_0_Function<'getMessageHash'> = async (args) => {
-    return [await this.contract.read.getMessageHash(...args)]
+    return [await this.contract.read.getMessageHash(args)]
   }
 
   /**
@@ -176,7 +176,7 @@ class SafeContract_v1_0_0
    * @returns Array[encodedData]
    */
   encodeTransactionData: SafeContract_v1_0_0_Function<'encodeTransactionData'> = async (args) => {
-    return [await this.contract.read.encodeTransactionData(...args)]
+    return [await this.contract.read.encodeTransactionData(args)]
   }
 
   /**
@@ -185,7 +185,7 @@ class SafeContract_v1_0_0
    * @returns Array[transactionHash]
    */
   getTransactionHash: SafeContract_v1_0_0_Function<'getTransactionHash'> = async (args) => {
-    return [await this.contract.read.getTransactionHash(...args)]
+    return [await this.contract.read.getTransactionHash(args)]
   }
 
   /**

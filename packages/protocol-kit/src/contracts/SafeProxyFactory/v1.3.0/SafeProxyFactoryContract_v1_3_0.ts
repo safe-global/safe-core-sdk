@@ -140,10 +140,10 @@ class SafeProxyFactoryContract_v1_3_0
     }
 
     const proxyAddress = this.contract.write
-      .createProxyWithNonce(safeSingletonAddress, initializer, saltNonce, { ...options })
-      .then(async (txResponse) => {
+      .createProxyWithNonce([safeSingletonAddress, initializer, saltNonce], { ...options })
+      .then(async (hash) => {
         if (callback) {
-          callback(txResponse.hash)
+          callback(hash)
         }
         const txReceipt = await txResponse.wait()
         const events = txReceipt?.logs as EventLog[]

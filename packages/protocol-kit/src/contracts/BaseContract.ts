@@ -5,7 +5,8 @@ import {
   getContract,
   encodeFunctionData,
   GetContractReturnType,
-  WalletClient
+  WalletClient,
+  Hash
 } from 'viem'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -92,6 +93,11 @@ class BaseContract<ContractAbiType extends Abi> {
       abi: this.contractAbi,
       client: client!
     })
+  }
+
+  async getReceiptReceipt(hash: Hash) {
+    const client = this.runner
+    return client?.getTransactionReceipt({ hash })
   }
 
   getAddress: GetAddressFunction = () => {

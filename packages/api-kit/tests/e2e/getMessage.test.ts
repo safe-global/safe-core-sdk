@@ -8,7 +8,7 @@ chai.use(chaiAsPromised)
 let safeApiKit: SafeApiKit
 const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
 
-describe('getMessages', () => {
+describe('getMessage', () => {
   before(async () => {
     safeApiKit = getApiKit()
   })

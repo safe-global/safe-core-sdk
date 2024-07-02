@@ -1,4 +1,4 @@
-import { Hash, Hex, encodePacked, toHex } from 'viem'
+import { Address, Hex, encodePacked, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -54,8 +54,8 @@ class EthSafeOperation implements SafeOperation {
     this.signatures.set(signature.signer.toLowerCase(), signature)
   }
 
-  encodedSignatures(): Hex {
-    return buildSignatureBytes(Array.from(this.signatures.values())) as Hex
+  encodedSignatures(): string {
+    return buildSignatureBytes(Array.from(this.signatures.values()))
   }
 
   addEstimations(estimations: EstimateGasData): void {
@@ -86,13 +86,13 @@ class EthSafeOperation implements SafeOperation {
       paymasterAndData: this.data.paymasterAndData,
       signature: encodePacked(
         ['uint48', 'uint48', 'bytes'],
-        [this.data.validAfter, this.data.validUntil, this.encodedSignatures()]
+        [this.data.validAfter, this.data.validUntil, this.encodedSignatures() as Hex]
       )
     }
   }
 
   getHash(): string {
-    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress as Hash)
+    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress as Address)
   }
 }
 

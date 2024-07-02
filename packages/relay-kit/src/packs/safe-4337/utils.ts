@@ -1,4 +1,5 @@
 import {
+  Address,
   Hash,
   PublicRpcSchema,
   createPublicClient,
@@ -45,13 +46,13 @@ export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
  *
  * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.
  * @param {SafeProvider} safeProvider - Safe provider.
- * @param {Hash} safe4337ModuleAddress - Safe 4337 module address.
+ * @param {string} safe4337ModuleAddress - Safe 4337 module address.
  * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.
  */
 export async function signSafeOp(
   safeUserOperation: SafeUserOperation,
   safeProvider: SafeProvider,
-  safe4337ModuleAddress: Hash
+  safe4337ModuleAddress: string
 ): Promise<SafeSignature> {
   const signer = await safeProvider.getExternalSigner()
 
@@ -84,16 +85,16 @@ export async function signSafeOp(
  * Encodes multi-send data from transactions batch.
  *
  * @param {MetaTransactionData[]} transactions - an array of transaction to to be encoded.
- * @return {Hash} The encoded data string.
+ * @return {string} The encoded data string.
  */
-export function encodeMultiSendCallData(transactions: MetaTransactionData[]): Hash {
+export function encodeMultiSendCallData(transactions: MetaTransactionData[]): string {
   return encodeFunctionData({
     abi: ABI,
     functionName: 'multiSend',
     args: [
       encodeMultiSendData(
         transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
-      )
+      ) as Hash
     ]
   })
 }
@@ -103,18 +104,18 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): Ha
  *
  * @param {SafeUserOperation} safeUserOperation - The SafeUserOperation.
  * @param {bigint} chainId - The chain id.
- * @param {Hash} safe4337ModuleAddress - The Safe 4337 module address.
+ * @param {string} safe4337ModuleAddress - The Safe 4337 module address.
  * @return {string} The hash of the safe operation.
  */
 export function calculateSafeUserOperationHash(
   safeUserOperation: SafeUserOperation,
   chainId: bigint,
-  safe4337ModuleAddress: Hash
-): Hash {
+  safe4337ModuleAddress: string
+): string {
   return hashTypedData({
     domain: {
       chainId: Number(chainId),
-      verifyingContract: safe4337ModuleAddress
+      verifyingContract: safe4337ModuleAddress as Address
     },
     types: EIP712_SAFE_OPERATION_TYPE,
     primaryType: 'SafeOp',

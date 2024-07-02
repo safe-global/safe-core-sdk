@@ -74,8 +74,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
 }> {
   #BUNDLER_URL: string
 
-  #ENTRYPOINT_ADDRESS: Address
-  #SAFE_4337_MODULE_ADDRESS: Address = '0x'
+  #ENTRYPOINT_ADDRESS: string
+  #SAFE_4337_MODULE_ADDRESS: string = '0x'
 
   #bundlerClient: BundlerClient
 
@@ -150,9 +150,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network] as
-        | Hash
-        | undefined
+      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
     }
 
     if (!addModulesLibAddress || !safe4337ModuleAddress) {
@@ -205,7 +203,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       let deploymentData = encodeFunctionData({
         abi: ABI,
         functionName: 'enableModules',
-        args: [[safe4337ModuleAddress]]
+        args: [[safe4337ModuleAddress as Address]]
       })
 
       const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
@@ -222,7 +220,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           data: encodeFunctionData({
             abi: ABI,
             functionName: 'enableModules',
-            args: [[safe4337ModuleAddress]]
+            args: [[safe4337ModuleAddress as Address]]
           }),
           operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
         }
@@ -232,7 +230,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           data: encodeFunctionData({
             abi: ABI,
             functionName: 'approve',
-            args: [paymasterAddress, amountToApprove]
+            args: [paymasterAddress as Address, amountToApprove]
           }),
           value: '0',
           operation: OperationType.Call // Call for approve
@@ -243,7 +241,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         const batchData = encodeFunctionData({
           abi: ABI,
           functionName: 'multiSend',
-          args: [encodeMultiSendData(setupBatch)]
+          args: [encodeMultiSendData(setupBatch) as Hash]
         })
 
         const multiSendContract = await getMultiSendContract({
@@ -277,10 +275,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
       })
     }
 
-    let selectedEntryPoint: Address | undefined
+    let selectedEntryPoint
 
     if (customContracts?.entryPointAddress) {
-      const requiredSafeModulesVersion = entryPointToSafeModules(customContracts?.entryPointAddress)
+      const requiredSafeModulesVersion = entryPointToSafeModules(
+        customContracts?.entryPointAddress as Address
+      )
       if (!semverSatisfies(safeModulesVersion, requiredSafeModulesVersion))
         throw new Error(
           `The selected entrypoint ${customContracts?.entryPointAddress} is not compatible with version ${safeModulesVersion} of Safe modules`
@@ -422,7 +422,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         data: encodeFunctionData({
           abi: ABI,
           functionName: 'approve',
-          args: [paymasterAddress, amountToApprove]
+          args: [paymasterAddress as Address, amountToApprove]
         }),
         value: '0',
         operation: OperationType.Call // Call for approve
@@ -596,9 +596,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {EthSafeOperation | SafeOperationResponse} props.executable - The SafeOperation to execute. It can be:
    * - A response from the API (Tx Service)
    * - An instance of EthSafeOperation
-   * @return {Promise<Hash>} The user operation hash.
+   * @return {Promise<string>} The user operation hash.
    */
-  async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<Hash> {
+  async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {
     let safeOperation: EthSafeOperation
 
     if (isSafeOperationResponse(executable)) {
@@ -618,26 +618,26 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Return a UserOperation based on a hash (userOpHash) returned by eth_sendUserOperation
    *
-   * @param {Hash} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
+   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
    * @returns {UserOperation} - null in case the UserOperation is not yet included in a block, or a full UserOperation, with the addition of entryPoint, blockNumber, blockHash and transactionHash
    */
-  async getUserOperationByHash(userOpHash: Hash): Promise<UserOperationWithPayload> {
+  async getUserOperationByHash(userOpHash: string): Promise<UserOperationWithPayload> {
     return this.#bundlerClient.request({
       method: RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH,
-      params: [userOpHash]
+      params: [userOpHash as Hash]
     })
   }
 
   /**
    * Return a UserOperation receipt based on a hash (userOpHash) returned by eth_sendUserOperation
    *
-   * @param {Hash} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
+   * @param {string} userOpHash - The hash of the user operation to fetch. Returned from the #sendUserOperation method
    * @returns {UserOperationReceipt} - null in case the UserOperation is not yet included in a block, or UserOperationReceipt object
    */
-  async getUserOperationReceipt(userOpHash: Hash): Promise<UserOperationReceipt | null> {
+  async getUserOperationReceipt(userOpHash: string): Promise<UserOperationReceipt | null> {
     return this.#bundlerClient.request({
       method: RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT,
-      params: [userOpHash]
+      params: [userOpHash as Hash]
     })
   }
 
@@ -665,15 +665,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Gets account nonce from the bundler.
    *
-   * @param {Address} safeAddress - Account address for which the nonce is to be fetched.
+   * @param {string} safeAddress - Account address for which the nonce is to be fetched.
    * @returns {Promise<string>} The Promise object will resolve to the account nonce.
    */
-  async #getSafeNonceFromEntrypoint(safeAddress: Address): Promise<string> {
+  async #getSafeNonceFromEntrypoint(safeAddress: string): Promise<string> {
     const newNonce = await this.#bundlerClient.readContract({
-      address: this.#ENTRYPOINT_ADDRESS || '0x',
+      address: (this.#ENTRYPOINT_ADDRESS as Address) || '0x',
       abi: ENTRYPOINT_ABI,
       functionName: 'getNonce',
-      args: [safeAddress, BigInt(0)]
+      args: [safeAddress as Address, BigInt(0)]
     })
 
     return newNonce.toString()
@@ -685,7 +685,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @param {MetaTransactionData} transaction - The transaction data to encode.
    * @return {string} The encoded call data string.
    */
-  #encodeExecuteUserOpCallData(transaction: MetaTransactionData): Hash {
+  #encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
     return encodeFunctionData({
       abi: ABI,
       functionName: 'executeUserOp',

@@ -1,4 +1,4 @@
-import { encodePacked } from 'viem'
+import { Hex, encodePacked } from 'viem'
 import { EthSafeSignature } from '@safe-global/protocol-kit'
 import EthSafeOperation from './SafeOperation'
 import * as fixtures from './testing-utils/fixtures'
@@ -120,7 +120,7 @@ describe('SafeOperation', () => {
         [
           safeOperation.data.validAfter,
           safeOperation.data.validUntil,
-          safeOperation.encodedSignatures()
+          safeOperation.encodedSignatures() as Hex
         ]
       )
     })

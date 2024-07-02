@@ -314,7 +314,7 @@ describe('Safe4337Pack', () => {
       const multiSendData = protocolKit.encodeMultiSendData([
         enable4337ModuleTransaction,
         approveToPaymasterTransaction
-      ])
+      ]) as viem.Hash
 
       expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(4, {
         abi: constants.ABI,
@@ -389,7 +389,7 @@ describe('Safe4337Pack', () => {
             viem.encodeFunctionData({
               abi: constants.ABI,
               functionName: 'multiSend',
-              args: [protocolKit.encodeMultiSendData(transactions)]
+              args: [protocolKit.encodeMultiSendData(transactions) as viem.Hash]
             }),
             OperationType.DelegateCall
           ]
@@ -566,7 +566,7 @@ describe('Safe4337Pack', () => {
             viem.encodeFunctionData({
               abi: constants.ABI,
               functionName: 'multiSend',
-              args: [protocolKit.encodeMultiSendData(batch)]
+              args: [protocolKit.encodeMultiSendData(batch) as viem.Hash]
             }),
             OperationType.DelegateCall
           ]

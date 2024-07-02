@@ -89,10 +89,7 @@ export class SafeOperationClient {
 
     const safeOperation = await this.safe4337Pack.signSafeOperation(safeOperationResponse)
 
-    await this.apiKit.confirmSafeOperation(
-      safeOperation.getHash(),
-      safeOperation.encodedSignatures()
-    )
+    await this.apiKit.confirmSafeOperation(safeOperationHash, safeOperation.encodedSignatures())
 
     const confirmedSafeOperation = await this.apiKit.getSafeOperation(safeOperationHash)
 

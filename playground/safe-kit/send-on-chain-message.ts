@@ -100,6 +100,10 @@ async function confirm({ safeAddress, safeTxHash }: SafeClientResult, pk: string
     safeAddress
   })
 
+  const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
+
+  console.log('-Signer Address:', signerAddress)
+
   const pendingTransactions = await safeClient.getPendingTransactions()
 
   pendingTransactions.results.forEach(async (transaction) => {

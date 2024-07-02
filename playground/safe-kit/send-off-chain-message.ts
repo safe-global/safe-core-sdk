@@ -101,6 +101,10 @@ async function confirm({ safeAddress, messageHash }: SafeClientResult, pk: strin
     safeAddress
   })
 
+  const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
+
+  console.log('-Signer Address:', signerAddress)
+
   const safeClientWithMessages = safeClient.extend(offChainMessages())
 
   const pendingMessages = await safeClientWithMessages.getPendingMessages()

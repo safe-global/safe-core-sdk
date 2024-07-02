@@ -116,8 +116,8 @@ class SafeContract_v1_3_0
    * @returns Array[Array[modules], next]
    */
   getModulesPaginated: SafeContract_v1_3_0_Function<'getModulesPaginated'> = async (args) => {
-    const res = await this.contract.read.getModulesPaginated(args)
-    return [res.array, res.next]
+    const [array, next] = await this.contract.read.getModulesPaginated(args)
+    return [array, next]
   }
 
   /**

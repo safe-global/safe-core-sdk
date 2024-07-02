@@ -11,6 +11,7 @@ import {
   safeProxyFactory_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
+import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SafeProxyFactoryContract_v1_3_0  is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
@@ -75,7 +76,7 @@ class SafeProxyFactoryContract_v1_3_0
 
   /**
    * Allows to get the address for a new proxy contact created via `createProxyWithNonce`.
-   * @param args - Array[singleton, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonceBigInt]
    * @returns Array[proxyAddress]
    */
   calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_3_0_Function<'calculateCreateProxyWithNonceAddress'> =
@@ -104,7 +105,7 @@ class SafeProxyFactoryContract_v1_3_0
 
   /**
    * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
-   * @param args - Array[singleton, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonceBigInt]
    * @returns Array[proxyAddress]
    */
   createProxyWithNonce: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithNonce'> = async (
@@ -133,14 +134,17 @@ class SafeProxyFactoryContract_v1_3_0
       options.gasLimit = (
         await this.estimateGas(
           'createProxyWithNonce',
-          [safeSingletonAddress, initializer, saltNonceBigInt],
+          [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
           { ...options }
         )
       ).toString()
     }
 
     const proxyAddress = this.contract.write
-      .createProxyWithNonce([safeSingletonAddress, initializer, saltNonce], { ...options })
+      .createProxyWithNonce(
+        [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
+        { ...options }
+      )
       .then(async (hash) => {
         if (callback) {
           callback(hash)

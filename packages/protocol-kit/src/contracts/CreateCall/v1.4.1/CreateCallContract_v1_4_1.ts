@@ -57,7 +57,7 @@ class CreateCallContract_v1_4_1
     if (options && !options.gasLimit) {
       options.gasLimit = (await this.estimateGas('performCreate', args, options)).toString()
     }
-    const txResponse = await this.contract.write.performCreate(args, options)
+    const txResponse = await this.contract.write.performCreate(args, { ...options })
     return toTxResult(this.runner!, txResponse, options)
   }
 
@@ -75,7 +75,7 @@ class CreateCallContract_v1_4_1
         await this.estimateGas('performCreate2', [...args], { ...options })
       ).toString()
     }
-    const txResponse = await this.contract.write.performCreate2(args, options)
+    const txResponse = await this.contract.write.performCreate2(args, { ...options })
     return toTxResult(this.runner!, txResponse, options)
   }
 }

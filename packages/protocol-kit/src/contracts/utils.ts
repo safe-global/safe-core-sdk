@@ -12,7 +12,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
-
+import { asAddress, asHex } from '../utils/types'
 import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
@@ -77,8 +77,8 @@ export function encodeCreateProxyWithNonce(
   salt?: string
 ) {
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
-    safeSingletonAddress,
-    initializer,
+    asAddress(safeSingletonAddress),
+    asHex(initializer),
     BigInt(salt || PREDETERMINED_SALT_NONCE)
   ])
 }
@@ -111,11 +111,11 @@ export async function encodeSetupCallData({
     return safeContract.encode('setup', [
       owners,
       threshold,
-      to,
-      data,
-      paymentToken,
+      asAddress(to),
+      asHex(data),
+      asAddress(paymentToken),
       payment,
-      paymentReceiver
+      asAddress(paymentReceiver)
     ])
   }
 

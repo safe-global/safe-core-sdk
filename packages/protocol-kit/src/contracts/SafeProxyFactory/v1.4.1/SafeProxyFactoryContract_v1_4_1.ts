@@ -11,6 +11,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
+import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SafeProxyFactoryContract_v1_4_1  is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -75,12 +76,12 @@ class SafeProxyFactoryContract_v1_4_1
 
   /**
    * Deploys a new chain-specific proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
-   * @param args - Array[singleton, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonceBigInt]
    * @returns Array[proxy]
    */
   createChainSpecificProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createChainSpecificProxyWithNonce'> =
     async (args) => {
-      return [await this.contract.write.createChainSpecificProxyWithNonce(args, {})]
+      return [await this.contract.write.createChainSpecificProxyWithNonce(args)]
     }
 
   /**
@@ -96,7 +97,7 @@ class SafeProxyFactoryContract_v1_4_1
 
   /**
    * Deploys a new proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
-   * @param args - Array[singleton, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonceBigInt]
    * @returns Array[proxy]
    */
   createProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithNonce'> = async (
@@ -125,14 +126,17 @@ class SafeProxyFactoryContract_v1_4_1
       options.gasLimit = (
         await this.estimateGas(
           'createProxyWithNonce',
-          [safeSingletonAddress, initializer, saltNonceBigInt],
+          [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
           { ...options }
         )
       ).toString()
     }
 
     const proxyAddress = this.contract.write
-      .createProxyWithNonce([safeSingletonAddress, initializer, saltNonce], options)
+      .createProxyWithNonce(
+        [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
+        options
+      )
       .then(async (hash) => {
         if (callback) {
           callback(hash)

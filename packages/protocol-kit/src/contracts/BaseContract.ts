@@ -38,7 +38,7 @@ class BaseContract<ContractAbiType extends Abi> {
   contractName: contractName
   safeVersion: SafeVersion
   safeProvider: SafeProvider
-  contract!: GetContractReturnType<ContractAbiType, WalletClient>
+  contract!: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
   runner?: PublicClient | null
 
   /**

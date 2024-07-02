@@ -8,6 +8,10 @@ export function isSafeConfigWithPredictedSafe(
   return (config as unknown as SafeConfigWithPredictedSafe).predictedSafe !== undefined
 }
 
+export function asAddresses(addresses: string[]): Address[] {
+  return addresses.map(asAddress)
+}
+
 export function asAddress(address: string): Address {
   return getAddress(address)
 }

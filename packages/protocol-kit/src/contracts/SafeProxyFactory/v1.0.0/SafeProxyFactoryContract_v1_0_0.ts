@@ -84,7 +84,7 @@ class SafeProxyFactoryContract_v1_0_0
 
   /**
    * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
-   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @param args - Array[masterCopy, initializer, saltNonceBigInt]
    * @returns Array[proxyAddress]
    */
   createProxyWithNonce: SafeProxyFactoryContract_v1_0_0_Function<'createProxyWithNonce'> = async (
@@ -113,14 +113,17 @@ class SafeProxyFactoryContract_v1_0_0
       options.gasLimit = (
         await this.estimateGas(
           'createProxyWithNonce',
-          [safeSingletonAddress, initializer, saltNonceBigInt],
+          [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
           { ...options }
         )
       ).toString()
     }
 
     const proxyAddress = await this.contract.write
-      .createProxyWithNonce([safeSingletonAddress, initializer, saltNonce], { ...options })
+      .createProxyWithNonce(
+        [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
+        { ...options }
+      )
       .then(async (hash) => {
         if (callback) {
           callback(hash)

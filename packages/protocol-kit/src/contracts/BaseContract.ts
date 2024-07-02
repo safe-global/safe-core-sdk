@@ -115,7 +115,7 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   estimateGas: EstimateGasFunction<ContractAbiType> = (functionToEstimate, args, options = {}) => {
-    return this.contract?.estimateGas({
+    return this.runner?.estimateContractGas({
       abi: this.contractAbi,
       functionName: functionToEstimate,
       address: this.contract.address,

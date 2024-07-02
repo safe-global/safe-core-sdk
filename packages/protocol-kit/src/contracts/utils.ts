@@ -1,10 +1,5 @@
-import {
-  ContractTransactionResponse,
-  Provider,
-  AbstractSigner,
-  isAddress,
-  zeroPadValue
-} from 'ethers'
+import { Provider, AbstractSigner, zeroPadValue } from 'ethers'
+import { Hash, isAddress, PublicClient } from 'viem'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -375,13 +370,19 @@ export function zkSyncEraCreate2Address(
 }
 
 export function toTxResult(
-  transactionResponse: ContractTransactionResponse,
+  runner: PublicClient,
+  hash: Hash,
   options?: TransactionOptions
 ): TransactionResult {
+  const wait = async () => {
+    return runner.getTransactionReceipt({ hash })
+  }
   return {
-    hash: transactionResponse.hash,
+    hash,
     options,
-    transactionResponse
+    transactionResponse: {
+      wait
+    }
   }
 }
 

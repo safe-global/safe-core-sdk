@@ -66,7 +66,7 @@ class SignMessageLibContract_v1_4_1
 
     const txResponse = await this.contract.write.signMessage(data, options)
 
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, txResponse, options)
   }
 }
 

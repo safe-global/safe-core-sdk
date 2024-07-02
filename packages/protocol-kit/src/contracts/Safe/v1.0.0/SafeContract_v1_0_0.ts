@@ -13,6 +13,7 @@ import {
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { Address } from 'viem'
 
 /**
  * SafeContract_v1_0_0  is the implementation specific to the Safe contract version 1.0.0.
@@ -198,7 +199,7 @@ class SafeContract_v1_0_0
     const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
     const txResponse = await this.contract.write.approveHash(hash, { ...options, gasLimit })
 
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, txResponse, options)
   }
 
   /**
@@ -244,10 +245,10 @@ class SafeContract_v1_0_0
       { ...options, gasLimit }
     )
 
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, txResponse, options)
   }
 
-  async getModulesPaginated([start, pageSize]: [string, bigint]): Promise<[string[], string]> {
+  async getModulesPaginated([start, pageSize]: [Address, bigint]): Promise<[string[], string]> {
     if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
 
     const size = Number(pageSize)
@@ -274,7 +275,7 @@ class SafeContract_v1_0_0
    * @param moduleAddress - The module address to check.
    * @returns True, if the module with the given address is enabled.
    */
-  async isModuleEnabled([moduleAddress]: [string]): Promise<[boolean]> {
+  async isModuleEnabled([moduleAddress]: [Address]): Promise<[boolean]> {
     const [modules] = await this.getModules()
     const isModuleEnabled = modules.some((enabledModuleAddress) =>
       sameString(enabledModuleAddress, moduleAddress)

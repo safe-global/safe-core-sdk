@@ -184,7 +184,7 @@ class SafeContract_v1_1_1
     const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
     const txResponse = await this.contract.write.approveHash(hash, { ...options, gasLimit })
 
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, txResponse, options)
   }
 
   /**
@@ -230,7 +230,7 @@ class SafeContract_v1_1_1
       { ...options, gasLimit }
     )
 
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, txResponse, options)
   }
 
   /**

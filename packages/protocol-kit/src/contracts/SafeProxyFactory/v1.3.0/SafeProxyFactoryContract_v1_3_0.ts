@@ -1,5 +1,4 @@
-import { EventLog } from 'ethers'
-import { PublicClient } from 'viem'
+import { parseEventLogs, PublicClient } from 'viem'
 import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
@@ -11,6 +10,7 @@ import {
   SafeProxyFactoryContract_v1_3_0_Function,
   safeProxyFactory_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
+import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
 
 /**
  * SafeProxyFactoryContract_v1_3_0  is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
@@ -145,15 +145,15 @@ class SafeProxyFactoryContract_v1_3_0
         if (callback) {
           callback(hash)
         }
-        const txReceipt = await txResponse.wait()
-        const events = txReceipt?.logs as EventLog[]
+        const { logs } = await waitForTransactionReceipt(this.runner!, hash)
+        const events = parseEventLogs({ logs, abi: this.contractAbi })
         const proxyCreationEvent = events.find((event) => event?.eventName === 'ProxyCreation')
         if (!proxyCreationEvent || !proxyCreationEvent.args) {
           throw new Error('SafeProxy was not deployed correctly')
         }
-        const proxyAddress: string = proxyCreationEvent.args[0]
-        return proxyAddress
+        return proxyCreationEvent.args.proxy
       })
+
     return proxyAddress
   }
 }

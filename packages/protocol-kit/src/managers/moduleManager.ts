@@ -55,10 +55,10 @@ class ModuleManager {
       throw new Error('Safe is not deployed')
     }
 
-    const [modules, next] = await this.#safeContract.getModulesPaginated(
+    const [modules, next] = await this.#safeContract.getModulesPaginated([
       asAddress(start),
       BigInt(pageSize)
-    )
+    ])
     return { modules: modules as string[], next }
   }
 
@@ -67,7 +67,7 @@ class ModuleManager {
       throw new Error('Safe is not deployed')
     }
 
-    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled(asAddress(moduleAddress))
+    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled([asAddress(moduleAddress)])
 
     return isModuleEnabled
   }

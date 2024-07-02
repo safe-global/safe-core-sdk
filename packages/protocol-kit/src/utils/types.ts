@@ -16,6 +16,6 @@ export function asHash(hash: string): Hash {
   return hash as Hash
 }
 
-export function asHex(hex: string) {
-  return isHex(hex) ? (hex as Hex) : toHex(hex)
+export function asHex(hex?: string) {
+  return isHex(hex) ? (hex as Hex) : toHex(hex || '0x')
 }

@@ -1,5 +1,4 @@
-import { EventLog } from 'ethers'
-import { PublicClient } from 'viem'
+import { parseEventLogs, PublicClient } from 'viem'
 import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
@@ -11,6 +10,7 @@ import {
   SafeProxyFactoryContract_v1_1_1_Function,
   safeProxyFactory_1_1_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
+import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
 
 /**
  * SafeProxyFactoryContract_v1_1_1  is the implementation specific to the Safe Proxy Factory contract version 1.1.1.
@@ -139,21 +139,21 @@ class SafeProxyFactoryContract_v1_1_1
       ).toString()
     }
 
-    const proxyAddress = this.contract
-      .createProxyWithNonce(safeSingletonAddress, initializer, saltNonce, { ...options })
-      .then(async (txResponse) => {
+    const proxyAddress = this.contract.write
+      .createProxyWithNonce([safeSingletonAddress, initializer, saltNonce], options)
+      .then(async (hash) => {
         if (callback) {
-          callback(txResponse.hash)
+          callback(hash)
         }
-        const txReceipt = await txResponse.wait()
-        const events = txReceipt?.logs as EventLog[]
+        const { logs } = await waitForTransactionReceipt(this.runner!, hash)
+        const events = parseEventLogs({ logs, abi: this.contractAbi })
         const proxyCreationEvent = events.find((event) => event?.eventName === 'ProxyCreation')
         if (!proxyCreationEvent || !proxyCreationEvent.args) {
           throw new Error('SafeProxy was not deployed correctly')
         }
-        const proxyAddress: string = proxyCreationEvent.args[0]
-        return proxyAddress
+        return proxyCreationEvent.args.proxy
       })
+
     return proxyAddress
   }
 }

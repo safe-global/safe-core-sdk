@@ -58,7 +58,7 @@ class CreateCallContract_v1_4_1
       options.gasLimit = (await this.estimateGas('performCreate', args, options)).toString()
     }
     const txResponse = await this.contract.write.performCreate(args, options)
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, txResponse, options)
   }
 
   /**
@@ -76,7 +76,7 @@ class CreateCallContract_v1_4_1
       ).toString()
     }
     const txResponse = await this.contract.write.performCreate2(args, options)
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, txResponse, options)
   }
 }
 

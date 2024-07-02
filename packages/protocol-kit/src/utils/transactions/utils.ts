@@ -1,4 +1,3 @@
-import { Hash } from 'viem'
 import { ethers, Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -16,6 +15,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
+import { PublicClient, Hash } from 'viem'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
@@ -25,6 +25,10 @@ export function standardizeMetaTransactionData(
     operation: tx.operation ?? OperationType.Call
   }
   return standardizedTxs
+}
+
+export function waitForTransactionReceipt(client: PublicClient, hash: Hash) {
+  return client.waitForTransactionReceipt({ hash })
 }
 
 export async function standardizeSafeTransactionData({

@@ -1,5 +1,5 @@
 import { createSafeClient } from '@safe-global/safe-kit'
-import { generateTransferCallData } from '../utils'
+import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 
 const OWNER_1_PRIVATE_KEY = ''
 const OWNER_1_ADDRESS = ''

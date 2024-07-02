@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import { ethers } from 'ethers'
+import * as viem from 'viem'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import {
   getAddModulesLibDeployment,
@@ -22,19 +22,25 @@ const requestResponseMap = {
   [constants.RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS]: fixtures.GAS_ESTIMATION,
   [constants.RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH]: fixtures.USER_OPERATION_BY_HASH,
   [constants.RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT]: fixtures.USER_OPERATION_RECEIPT,
+  [constants.RPC_4337_CALLS.SPONSOR_USER_OPERATION]: fixtures.SPONSORED_GAS_ESTIMATION,
   ['pimlico_getUserOperationGasPrice']: fixtures.USER_OPERATION_GAS_PRICE
 }
 
-const sendMock = jest.fn(async (method: string) => {
+const requestMock = jest.fn(async ({ method }: { method: keyof typeof requestResponseMap }) => {
   return requestResponseMap[method]
 })
 
+const readContractMock = jest.fn().mockResolvedValue(1n)
+
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
-  getEip4337BundlerProvider: jest.fn(() => ({ send: sendMock }))
+  getEip4337BundlerProvider: jest.fn(() => ({
+    request: requestMock,
+    readContract: readContractMock
+  }))
 }))
 
-let safe4337ModuleAddress: string
+let safe4337ModuleAddress: viem.Hash
 let addModulesLibAddress: string
 
 describe('Safe4337Pack', () => {
@@ -44,7 +50,7 @@ describe('Safe4337Pack', () => {
       released: true,
       version: '0.2.0',
       network
-    })?.networkAddresses[network] as string
+    })?.networkAddresses[network] as viem.Hash
     addModulesLibAddress = getAddModulesLibDeployment({
       released: true,
       version: '0.2.0',
@@ -115,7 +121,9 @@ describe('Safe4337Pack', () => {
 
       const mockedUtils = jest.requireMock('./utils')
       mockedUtils.getEip4337BundlerProvider.mockImplementationOnce(() => ({
-        send: jest.fn(async (method: string) => overridenMap[method])
+        request: jest.fn(
+          async ({ method }: { method: keyof typeof overridenMap }) => overridenMap[method]
+        )
       }))
 
       await expect(
@@ -219,7 +227,7 @@ describe('Safe4337Pack', () => {
     })
 
     it('should encode the enableModules transaction as deployment data', async () => {
-      const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
+      const encodeFunctionDataSpy = jest.spyOn(viem, 'encodeFunctionData')
       const safeCreateSpy = jest.spyOn(Safe, 'init')
 
       const safe4337Pack = await createSafe4337Pack({
@@ -229,7 +237,11 @@ describe('Safe4337Pack', () => {
         }
       })
 
-      expect(encodeFunctionDataSpy).toHaveBeenCalledWith('enableModules', [[safe4337ModuleAddress]])
+      expect(encodeFunctionDataSpy).toHaveBeenCalledWith({
+        abi: constants.ABI,
+        functionName: 'enableModules',
+        args: [[safe4337ModuleAddress]]
+      })
       expect(safeCreateSpy).toHaveBeenCalledWith({
         provider: safe4337Pack.protocolKit.getSafeProvider().provider,
         signer: safe4337Pack.protocolKit.getSafeProvider().signer,
@@ -242,20 +254,22 @@ describe('Safe4337Pack', () => {
             owners: [fixtures.OWNER_1, fixtures.OWNER_2],
             threshold: 1,
             to: addModulesLibAddress,
-            data: constants.INTERFACES.encodeFunctionData('enableModules', [
-              [safe4337ModuleAddress]
-            ]),
+            data: viem.encodeFunctionData({
+              abi: constants.ABI,
+              functionName: 'enableModules',
+              args: [[safe4337ModuleAddress]]
+            }),
             fallbackHandler: safe4337ModuleAddress,
-            paymentToken: ethers.ZeroAddress,
+            paymentToken: viem.zeroAddress,
             payment: 0,
-            paymentReceiver: ethers.ZeroAddress
+            paymentReceiver: viem.zeroAddress
           }
         }
       })
     })
 
     it('should encode the enablesModule transaction together with a specific token approval in a multiSend call when trying to use a paymaster', async () => {
-      const encodeFunctionDataSpy = jest.spyOn(constants.INTERFACES, 'encodeFunctionData')
+      const encodeFunctionDataSpy = jest.spyOn(viem, 'encodeFunctionData')
       const safeCreateSpy = jest.spyOn(Safe, 'init')
 
       const safe4337Pack = await createSafe4337Pack({
@@ -269,13 +283,19 @@ describe('Safe4337Pack', () => {
         }
       })
 
-      const enableModulesData = constants.INTERFACES.encodeFunctionData('enableModules', [
-        [safe4337ModuleAddress]
-      ])
-      const approveData = constants.INTERFACES.encodeFunctionData('approve', [
-        fixtures.PAYMASTER_ADDRESS,
-        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
-      ])
+      const enableModulesData = viem.encodeFunctionData({
+        abi: constants.ABI,
+        functionName: 'enableModules',
+        args: [[safe4337ModuleAddress]]
+      })
+      const approveData = viem.encodeFunctionData({
+        abi: constants.ABI,
+        functionName: 'approve',
+        args: [
+          fixtures.PAYMASTER_ADDRESS,
+          0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+        ]
+      })
 
       const enable4337ModuleTransaction = {
         to: addModulesLibAddress,
@@ -294,9 +314,13 @@ describe('Safe4337Pack', () => {
       const multiSendData = protocolKit.encodeMultiSendData([
         enable4337ModuleTransaction,
         approveToPaymasterTransaction
-      ])
+      ]) as viem.Hash
 
-      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(4, 'multiSend', [multiSendData])
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(4, {
+        abi: constants.ABI,
+        functionName: 'multiSend',
+        args: [multiSendData]
+      })
       expect(safeCreateSpy).toHaveBeenCalledWith({
         provider: safe4337Pack.protocolKit.getSafeProvider().provider,
         signer: safe4337Pack.protocolKit.getSafeProvider().signer,
@@ -309,11 +333,15 @@ describe('Safe4337Pack', () => {
             owners: [fixtures.OWNER_1],
             threshold: 1,
             to: await safe4337Pack.protocolKit.getMultiSendAddress(),
-            data: constants.INTERFACES.encodeFunctionData('multiSend', [multiSendData]),
+            data: viem.encodeFunctionData({
+              abi: constants.ABI,
+              functionName: 'multiSend',
+              args: [multiSendData]
+            }),
             fallbackHandler: safe4337ModuleAddress,
-            paymentToken: ethers.ZeroAddress,
+            paymentToken: viem.zeroAddress,
             payment: 0,
-            paymentReceiver: ethers.ZeroAddress
+            paymentReceiver: viem.zeroAddress
           }
         }
       })
@@ -352,14 +380,20 @@ describe('Safe4337Pack', () => {
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
         paymasterAndData: '0x',
-        callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
-          await safe4337Pack.protocolKit.getMultiSendAddress(),
-          '0',
-          constants.INTERFACES.encodeFunctionData('multiSend', [
-            protocolKit.encodeMultiSendData(transactions)
-          ]),
-          OperationType.DelegateCall
-        ]),
+        callData: viem.encodeFunctionData({
+          abi: constants.ABI,
+          functionName: 'executeUserOp',
+          args: [
+            (await safe4337Pack.protocolKit.getMultiSendAddress()) as viem.Hash,
+            0n,
+            viem.encodeFunctionData({
+              abi: constants.ABI,
+              functionName: 'multiSend',
+              args: [protocolKit.encodeMultiSendData(transactions) as viem.Hash]
+            }),
+            OperationType.DelegateCall
+          ]
+        }),
         nonce: 1n,
         callGasLimit: 150000n,
         validAfter: 0,
@@ -382,12 +416,16 @@ describe('Safe4337Pack', () => {
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
         paymasterAndData: '0x',
-        callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
-          transferUSDC.to,
-          transferUSDC.value,
-          transferUSDC.data,
-          OperationType.Call
-        ]),
+        callData: viem.encodeFunctionData({
+          abi: constants.ABI,
+          functionName: 'executeUserOp',
+          args: [
+            transferUSDC.to as viem.Hash,
+            BigInt(transferUSDC.value),
+            transferUSDC.data as viem.Hash,
+            OperationType.Call
+          ]
+        }),
         nonce: 1n,
         callGasLimit: 150000n,
         validAfter: 0,
@@ -440,20 +478,24 @@ describe('Safe4337Pack', () => {
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
-        paymasterAndData: '0x0000000000325602a77416A16136FDafd04b299f',
-        callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
-          transferUSDC.to,
-          transferUSDC.value,
-          transferUSDC.data,
-          OperationType.Call
-        ]),
+        paymasterAndData: '0x1405B3659a11a16459fc27Fa1925b60388C38Ce1',
+        callData: viem.encodeFunctionData({
+          abi: constants.ABI,
+          functionName: 'executeUserOp',
+          args: [
+            transferUSDC.to as viem.Hash,
+            BigInt(transferUSDC.value),
+            transferUSDC.data as viem.Hash,
+            OperationType.Call
+          ]
+        }),
         nonce: 1n,
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 100000n,
         preVerificationGas: 100000n
       })
     })
@@ -498,10 +540,11 @@ describe('Safe4337Pack', () => {
 
       const approveTransaction = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
-        data: constants.INTERFACES.encodeFunctionData('approve', [
-          fixtures.PAYMASTER_ADDRESS,
-          amountToApprove
-        ]),
+        data: viem.encodeFunctionData({
+          abi: constants.ABI,
+          functionName: 'approve',
+          args: [fixtures.PAYMASTER_ADDRESS, amountToApprove]
+        }),
         value: '0',
         operation: OperationType.Call // Call for approve
       }
@@ -514,14 +557,20 @@ describe('Safe4337Pack', () => {
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
         paymasterAndData: '0x0000000000325602a77416A16136FDafd04b299f',
-        callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
-          await safe4337Pack.protocolKit.getMultiSendAddress(),
-          '0',
-          constants.INTERFACES.encodeFunctionData('multiSend', [
-            protocolKit.encodeMultiSendData(batch)
-          ]),
-          OperationType.DelegateCall
-        ]),
+        callData: viem.encodeFunctionData({
+          abi: constants.ABI,
+          functionName: 'executeUserOp',
+          args: [
+            (await safe4337Pack.protocolKit.getMultiSendAddress()) as viem.Hash,
+            0n,
+            viem.encodeFunctionData({
+              abi: constants.ABI,
+              functionName: 'multiSend',
+              args: [protocolKit.encodeMultiSendData(batch) as viem.Hash]
+            }),
+            OperationType.DelegateCall
+          ]
+        }),
         nonce: 1n,
         callGasLimit: 150000n,
         validAfter: 0,
@@ -609,14 +658,24 @@ describe('Safe4337Pack', () => {
     let safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC]
     })
+    expect(readContractMock).toHaveBeenCalledWith({
+      address: constants.ENTRYPOINT_ADDRESS_V06,
+      abi: constants.ENTRYPOINT_ABI,
+      functionName: 'getNonce',
+      args: [fixtures.SAFE_ADDRESS_v1_4_1, 0n]
+    })
+
     safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
     await safe4337Pack.executeTransaction({ executable: safeOperation })
 
-    expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
-      utils.userOperationToHexValues(safeOperation.toUserOperation()),
-      fixtures.ENTRYPOINTS[0]
-    ])
+    expect(requestMock).toHaveBeenCalledWith({
+      method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
+      params: [
+        utils.userOperationToHexValues(safeOperation.toUserOperation()),
+        fixtures.ENTRYPOINTS[0]
+      ]
+    })
   })
 
   it('should allow to send a UserOperation to the bundler using a SafeOperationResponse object from the api', async () => {
@@ -628,24 +687,27 @@ describe('Safe4337Pack', () => {
 
     await safe4337Pack.executeTransaction({ executable: fixtures.SAFE_OPERATION_RESPONSE })
 
-    expect(sendMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
-      utils.userOperationToHexValues({
-        sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
-        nonce: '3',
-        initCode: '0x',
-        callData:
-          '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-        callGasLimit: 122497n,
-        verificationGasLimit: 123498n,
-        preVerificationGas: 50705n,
-        maxFeePerGas: 105183831060n,
-        maxPriorityFeePerGas: 1380000000n,
-        paymasterAndData: '0x',
-        signature:
-          '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
-      }),
-      fixtures.ENTRYPOINTS[0]
-    ])
+    expect(requestMock).toHaveBeenCalledWith({
+      method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
+      params: [
+        utils.userOperationToHexValues({
+          sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
+          nonce: '3',
+          initCode: '0x',
+          callData:
+            '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+          callGasLimit: 122497n,
+          verificationGasLimit: 123498n,
+          preVerificationGas: 50705n,
+          maxFeePerGas: 105183831060n,
+          maxPriorityFeePerGas: 1380000000n,
+          paymasterAndData: '0x',
+          signature:
+            '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
+        }),
+        fixtures.ENTRYPOINTS[0]
+      ]
+    })
   })
 
   it('should return a UserOperation based on a userOpHash', async () => {

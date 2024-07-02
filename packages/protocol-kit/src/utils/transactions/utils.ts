@@ -117,7 +117,7 @@ function encodeMetaTransaction(tx: MetaTransactionData): string {
 }
 
 export function encodeMultiSendData(txs: MetaTransactionData[]): string {
-  return '0x' + txs.map((tx) => encodeMetaTransaction(tx)).join('')
+  return `0x${txs.map((tx) => encodeMetaTransaction(tx)).join('')}`
 }
 
 export function decodeMultiSendData(encodedData: string): MetaTransactionData[] {

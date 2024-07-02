@@ -1,4 +1,4 @@
-import Safe from '@safe-global/protocol-kit'
+import Safe, { buildSignatureBytes } from '@safe-global/protocol-kit'
 import SafeApiKit, { GetSafeOperationListResponse } from '@safe-global/api-kit'
 import { Safe4337CreateTransactionProps, Safe4337Pack } from '@safe-global/relay-kit'
 import { createSafeClientResult } from '../../utils'
@@ -83,13 +83,16 @@ export class SafeOperationClient {
    * @throws {Error} If the transaction confirmation fails.
    */
   async confirmSafeOperation(safeOperationHash: string): Promise<SafeClientResult> {
-    const safeOperationResponse = await this.apiKit.getSafeOperation(safeOperationHash)
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
 
-    const safeOperation = await this.safe4337Pack.signSafeOperation(safeOperationResponse)
-
-    await this.apiKit.confirmSafeOperation(safeOperationHash, safeOperation.encodedSignatures())
+    // TODO: Using signSafeOperation with the API response is not working
+    // This should be investigated as the safeOperationHash we get in the Safe4337Pack
+    // seems to be different from the one we get from the API
+    await this.apiKit.confirmSafeOperation(
+      safeOperationHash,
+      buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
+    )
 
     const confirmedSafeOperation = await this.apiKit.getSafeOperation(safeOperationHash)
 

@@ -1,6 +1,7 @@
 import { validateEthereumAddress } from '@safe-global/protocol-kit'
 import { TransactionResult } from '@safe-global/safe-core-sdk-types'
 import { ContractTransactionReceipt, TransactionResponse } from 'ethers'
+
 import { MESSAGES, SafeClientTxStatus } from '@safe-global/safe-kit/constants'
 import { SafeClientResult, SafeConfig } from '@safe-global/safe-kit/types'
 

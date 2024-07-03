@@ -1,9 +1,9 @@
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { SafeClient } from './SafeClient'
-import { isValidAddress, isValidSafeConfig } from './utils'
 
-import { SafeKitConfig } from './types'
+import { SafeClient } from '@safe-global/safe-kit/SafeClient'
+import { isValidAddress, isValidSafeConfig } from '@safe-global/safe-kit/utils'
+import { SafeKitConfig } from '@safe-global/safe-kit/types'
 
 /**
  * Initializes a Safe client with the given configuration options.

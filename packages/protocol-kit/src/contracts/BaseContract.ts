@@ -145,10 +145,11 @@ class BaseContract<ContractAbiType extends Abi> {
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
     const abi = this.contractAbi as Abi
     const functionName = functionToEncode as string
+    const params = args as unknown[]
     return encodeFunctionData({
       abi,
       functionName,
-      args
+      args: params
     })
   }
 
@@ -159,11 +160,12 @@ class BaseContract<ContractAbiType extends Abi> {
   ) => {
     const contractOptions = await this.convertOptions(options)
     const abi = this.contractAbi as Abi
+    const params = args as unknown[]
     return this.runner!.estimateContractGas({
       abi,
       functionName: functionToEstimate,
       address: this.contract.address,
-      args,
+      args: params,
       ...contractOptions
     })
   }

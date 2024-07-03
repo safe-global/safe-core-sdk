@@ -14,7 +14,7 @@ export enum SafeClientTxStatus {
 const TRANSACTION_EXECUTED =
   'The transaction has been executed, check the ethereumTxHash in the transactions property to view it on the corresponding blockchain explorer'
 const TRANSACTION_SAVED =
-  'The transaction was not executed on-chain yet. It was stored in the Safe services and you need to confirm it with other Safe owners first. Use the confirm(safeTxHash) method with other signer connected to the client'
+  'The transaction was not executed on-chain yet. There are pending signatures and you need to confirm it with other Safe owners first. Use the confirm(safeTxHash) method with other signer connected to the client'
 const OFFCHAIN_MESSAGE_SAVED =
   'The message was stored using the Safe Transaction Service, you need to confirm it with other Safe owners in order to make it valid. Use the confirmMessage(messageHash) method with other signer connected to the client'
 const OFFCHAIN_MESSAGE_CONFIRMED =

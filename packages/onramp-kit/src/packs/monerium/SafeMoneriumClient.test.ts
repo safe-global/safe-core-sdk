@@ -1,4 +1,5 @@
-import { Contract, hashMessage } from 'ethers'
+import { Contract } from 'ethers'
+import { hashMessage } from 'viem'
 import { PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKitPackage from '@safe-global/protocol-kit'
 import {

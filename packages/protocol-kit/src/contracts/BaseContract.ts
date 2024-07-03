@@ -152,13 +152,19 @@ class BaseContract<ContractAbiType extends Abi> {
     })
   }
 
-  estimateGas: EstimateGasFunction<ContractAbiType> = (functionToEstimate, args, options = {}) => {
-    return this.runner.estimateContractGas({
-      abi: this.contractAbi,
+  estimateGas: EstimateGasFunction<ContractAbiType> = async (
+    functionToEstimate,
+    args,
+    options = {}
+  ) => {
+    const contractOptions = await this.convertOptions(options)
+    const abi = this.contractAbi as Abi
+    return this.runner!.estimateContractGas({
+      abi,
       functionName: functionToEstimate,
       address: this.contract.address,
       args,
-      ...options
+      ...contractOptions
     })
   }
 }

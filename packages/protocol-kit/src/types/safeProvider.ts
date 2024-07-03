@@ -25,7 +25,7 @@ export type SafeProviderTransaction = {
   data: string
   value?: string
   gasPrice?: number | string
-  gasLimit?: number | string
+  gasLimit?: number | string | bigint
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
 }

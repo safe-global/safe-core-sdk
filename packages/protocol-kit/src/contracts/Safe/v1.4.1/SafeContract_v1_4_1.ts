@@ -217,7 +217,7 @@ class SafeContract_v1_4_1
           options
         ))
 
-      return await this.contract.simulate.execTransaction(
+      const txResult = await this.contract.simulate.execTransaction(
         [
           asAddress(safeTransaction.data.to),
           BigInt(safeTransaction.data.value),
@@ -232,6 +232,8 @@ class SafeContract_v1_4_1
         ],
         await this.convertOptions({ ...options, gasLimit })
       )
+
+      return txResult.result
     } catch (error) {
       return false
     }

@@ -254,7 +254,8 @@ class SafeContract_v1_2_0
    * @returns Array[chainId]
    */
   async getChainId(): Promise<[bigint]> {
-    return [await this.contract.read.getChainId()]
+    const chainId = await this.runner!.getChainId()
+    return [BigInt(chainId)]
   }
 
   /**
@@ -284,7 +285,7 @@ class SafeContract_v1_2_0
           options
         ))
 
-      return await this.contract.simulate.execTransaction(
+      const transactionResult = await this.contract.simulate.execTransaction(
         [
           asAddress(safeTransaction.data.to),
           BigInt(safeTransaction.data.value),
@@ -299,6 +300,8 @@ class SafeContract_v1_2_0
         ],
         await this.convertOptions({ ...options, gasLimit })
       )
+
+      return transactionResult.result
     } catch (error) {
       return false
     }

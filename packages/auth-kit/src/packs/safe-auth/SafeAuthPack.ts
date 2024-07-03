@@ -1,4 +1,3 @@
-import { Eip1193Provider } from 'ethers'
 import SafeAuthEmbed from '@web3auth/safeauth-embed'
 import { TorusInPageProvider, WsEmbedParams } from '@web3auth/ws-embed'
 import { getErrorMessage } from '@safe-global/auth-kit/lib/errors'
@@ -13,7 +12,7 @@ import {
   SafeAuthUserInfo
 } from './types'
 
-import type { AuthKitSignInData } from '@safe-global/auth-kit/types'
+import type { AuthKitEthereumProvider, AuthKitSignInData } from '@safe-global/auth-kit/types'
 import { CHAIN_CONFIG } from './constants'
 
 const SAFE_WALLET_SERVICES_URL = 'https://safe.web3auth.com'
@@ -25,7 +24,7 @@ const WS_EMBED_NOT_INITIALIZED = 'SafeEmbed SDK is not initialized'
  */
 export class SafeAuthPack extends AuthKitBasePack {
   safeAuthEmbed!: SafeAuthEmbed
-  #provider: Eip1193Provider | null
+  #provider: AuthKitEthereumProvider | null
   #config?: SafeAuthConfig
 
   /**
@@ -72,7 +71,7 @@ export class SafeAuthPack extends AuthKitBasePack {
         }
       })
 
-      this.#provider = this.safeAuthEmbed.provider
+      this.#provider = this.safeAuthEmbed.provider as AuthKitEthereumProvider
     } catch (e) {
       throw new Error(getErrorMessage(e))
     }
@@ -91,7 +90,7 @@ export class SafeAuthPack extends AuthKitBasePack {
 
     await this.safeAuthEmbed.login(options)
 
-    this.#provider = this.safeAuthEmbed.provider
+    this.#provider = this.safeAuthEmbed.provider as AuthKitEthereumProvider
 
     const eoa = await this.getAddress()
     const safes = await this.getSafes(this.#config?.txServiceUrl)
@@ -101,10 +100,10 @@ export class SafeAuthPack extends AuthKitBasePack {
 
   /**
    * Get the provider returned by the Web3Auth WsEmbed
-   * @returns A EIP-1193 compatible provider. Can be wrapped with ethers or web3
+   * @returns A EIP-1193 compatible provider. Can be wrapped with viem, ethers or web3
    */
-  getProvider(): Eip1193Provider | null {
-    return this.#provider as Eip1193Provider
+  getProvider(): AuthKitEthereumProvider | null {
+    return this.#provider
   }
 
   /**

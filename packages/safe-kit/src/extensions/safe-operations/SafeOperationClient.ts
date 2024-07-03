@@ -149,7 +149,5 @@ export class SafeOperationClient {
       await new Promise((resolve) => setTimeout(resolve, 2000))
       userOperationReceipt = await this.safe4337Pack.getUserOperationReceipt(userOperationHash)
     }
-
-    console.log('User Operation Receipt', userOperationReceipt)
   }
 }

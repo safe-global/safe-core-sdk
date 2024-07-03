@@ -81,7 +81,12 @@ class SafeProxyFactoryContract_v1_4_1
    */
   createChainSpecificProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createChainSpecificProxyWithNonce'> =
     async (args) => {
-      return [await this.contract.write.createChainSpecificProxyWithNonce(args)]
+      return [
+        await this.contract.write.createChainSpecificProxyWithNonce(
+          args,
+          await this.convertOptions({})
+        )
+      ]
     }
 
   /**
@@ -92,7 +97,9 @@ class SafeProxyFactoryContract_v1_4_1
    */
   createProxyWithCallback: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithCallback'> =
     async (args) => {
-      return [await this.contract.write.createProxyWithCallback(args)]
+      return [
+        await this.contract.write.createProxyWithCallback(args, await this.convertOptions({}))
+      ]
     }
 
   /**
@@ -103,7 +110,7 @@ class SafeProxyFactoryContract_v1_4_1
   createProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.write.createProxyWithNonce(args)]
+    return [await this.contract.write.createProxyWithNonce(args, await this.convertOptions({}))]
   }
 
   /**

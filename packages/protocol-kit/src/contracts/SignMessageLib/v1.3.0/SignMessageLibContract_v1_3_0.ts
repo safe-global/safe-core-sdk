@@ -63,7 +63,10 @@ class SignMessageLibContract_v1_3_0
       options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
 
-    const txResponse = await this.contract.write.signMessage(data, options)
+    const txResponse = await this.contract.write.signMessage(
+      data,
+      await this.convertOptions(options)
+    )
 
     return toTxResult(this.runner!, txResponse, options)
   }

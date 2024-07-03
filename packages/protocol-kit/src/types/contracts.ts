@@ -23,6 +23,7 @@ import SimulateTxAccessorContract_v1_3_0 from '@safe-global/protocol-kit/contrac
 import SimulateTxAccessorContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 import CreateCallContract_v1_3_0 from '@safe-global/protocol-kit/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from '@safe-global/protocol-kit/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import { Address, Chain } from 'viem'
 
 // Safe contract implementation types
 export type SafeContractImplementationType =
@@ -115,4 +116,14 @@ export type ContractNetworkConfig = {
 export type ContractNetworksConfig = {
   /** id - Network id */
   [id: string]: ContractNetworkConfig
+}
+
+export type ContractTransactionOptions = {
+  chain: Chain
+  account: Address
+  gas?: bigint
+  // gasPrice?: bigint,
+  maxFeePerGas?: bigint
+  maxPriorityFeePerGas?: bigint
+  nonce?: number
 }

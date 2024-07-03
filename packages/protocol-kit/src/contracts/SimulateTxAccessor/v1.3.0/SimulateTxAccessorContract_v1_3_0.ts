@@ -49,7 +49,7 @@ class SimulateTxAccessorContract_v1_3_0
    * @returns Array[estimate, success, returnData]
    */
   simulate: SimulateTxAccessorContract_v1_3_0_Function<'simulate'> = (args) => {
-    return this.contract.write.simulate(args)
+    return this.contract.write.simulate(args, await this.convertOptions({}))
   }
 }
 

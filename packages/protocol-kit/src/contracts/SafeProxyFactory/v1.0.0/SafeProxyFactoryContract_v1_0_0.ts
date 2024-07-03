@@ -79,7 +79,7 @@ class SafeProxyFactoryContract_v1_0_0
    * @returns Array[proxyAddress]
    */
   createProxy: SafeProxyFactoryContract_v1_0_0_Function<'createProxy'> = async (args) => {
-    return [await this.contract.write.createProxy(args)]
+    return [await this.contract.write.createProxy(args, await this.convertOptions({}))]
   }
 
   /**
@@ -90,7 +90,7 @@ class SafeProxyFactoryContract_v1_0_0
   createProxyWithNonce: SafeProxyFactoryContract_v1_0_0_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.write.createProxyWithNonce(args)]
+    return [await this.contract.write.createProxyWithNonce(args, await this.convertOptions({}))]
   }
 
   /**

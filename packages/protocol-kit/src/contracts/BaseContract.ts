@@ -14,8 +14,11 @@ import {
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction,
-  SafeVersion
+  SafeVersion,
+  TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
+import { asAddress } from '../utils/types'
+import { ContractTransactionOptions } from '../types/contracts'
 
 /**
  * Abstract class BaseContract
@@ -38,8 +41,9 @@ class BaseContract<ContractAbiType extends Abi> {
   contractName: contractName
   safeVersion: SafeVersion
   safeProvider: SafeProvider
-  contract!: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
-  runner?: PublicClient | null
+  chainId: bigint
+  contract: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
+  runner: PublicClient | null
 
   /**
    * @constructor
@@ -74,6 +78,7 @@ class BaseContract<ContractAbiType extends Abi> {
       throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
     }
 
+    this.chainId = chainId
     this.contractName = contractName
     this.safeVersion = safeVersion
     this.contractAddress = contractAddress
@@ -100,6 +105,38 @@ class BaseContract<ContractAbiType extends Abi> {
     return client?.getTransactionReceipt({ hash })
   }
 
+  async convertOptions(options?: TransactionOptions): Promise<ContractTransactionOptions> {
+    const chain = this.runner!.chain
+    const signerAddress = await this.safeProvider.getSignerAddress()
+    const account = asAddress(signerAddress!)
+    const result: ContractTransactionOptions = { chain, account }
+    if (options?.from) {
+      result.account = asAddress(options.from)
+    }
+
+    if (options?.gasLimit) {
+      result.gas = BigInt(options.gasLimit)
+    }
+
+    // if (options?.gasPrice) {
+    //   result.gasPrice = BigInt(options.gasPrice)
+    // }
+
+    if (options?.maxFeePerGas) {
+      result.maxFeePerGas = BigInt(options.maxFeePerGas)
+    }
+
+    if (options?.maxPriorityFeePerGas) {
+      result.maxPriorityFeePerGas = BigInt(options.maxPriorityFeePerGas)
+    }
+
+    if (options?.nonce) {
+      result.nonce = options.nonce
+    }
+
+    return result
+  }
+
   getAddress: GetAddressFunction = () => {
     return Promise.resolve(this.contract.address)
   }
@@ -115,7 +152,7 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   estimateGas: EstimateGasFunction<ContractAbiType> = (functionToEstimate, args, options = {}) => {
-    return this.runner?.estimateContractGas({
+    return this.runner.estimateContractGas({
       abi: this.contractAbi,
       functionName: functionToEstimate,
       address: this.contract.address,

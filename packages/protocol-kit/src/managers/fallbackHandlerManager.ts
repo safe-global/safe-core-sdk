@@ -69,7 +69,7 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
 
-    return safeContract.encode('setFallbackHandler', [fallbackHandlerAddress])
+    return safeContract.encode('setFallbackHandler', [asAdddress(fallbackHandlerAddress)])
   }
 
   async encodeDisableFallbackHandlerData(): Promise<string> {

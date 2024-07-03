@@ -9,7 +9,7 @@ const config = {
     '^@safe-global/protocol-kit/(.*)$': '<rootDir>/../protocol-kit/src/$1',
     '^@safe-global/auth-kit/(.*)$': '<rootDir>/src/$1'
   },
-  setupFiles: ['<rootDir>/setup.jest.ts']
+  setupFiles: ['<rootDir>/jest.setup.ts']
 }
 
 module.exports = config

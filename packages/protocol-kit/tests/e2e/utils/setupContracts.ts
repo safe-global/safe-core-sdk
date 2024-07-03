@@ -1,6 +1,6 @@
-import { Contract, JsonFragment } from 'ethers'
+import { Contract } from 'ethers'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { Address, GetContractReturnType } from 'viem'
+import { Address, GetContractReturnType, Abi } from 'viem'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -19,7 +19,7 @@ import semverSatisfies from 'semver/functions/satisfies'
 
 export const getSafeSingleton = async (): Promise<{
   contract: any
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const safeDeployment = await deployments.get(safeDeployed.name)
   const safeAddress = safeDeployment.address as Address
@@ -32,7 +32,7 @@ export const getSafeSingleton = async (): Promise<{
 
 export const getFactory = async (): Promise<{
   contract: any
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const factoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const factoryAddress = factoryDeployment.address as Address
@@ -43,7 +43,7 @@ export const getFactory = async (): Promise<{
   }
 }
 
-export const getSafeTemplate = async (): Promise<any> => {
+export const getSafeTemplate = async (): Promise<GetContractReturnType> => {
   const randomSaltNonce = Math.floor(Math.random() * 1000000000) + 1
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
@@ -91,7 +91,7 @@ export const getSafeWithOwners = async (
 
 export const getCompatibilityFallbackHandler = async (): Promise<{
   contract: GetContractReturnType
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const compatibilityFallbackHandlerDeployment = await deployments.get(
     compatibilityFallbackHandlerDeployed.name
@@ -110,7 +110,7 @@ export const getCompatibilityFallbackHandler = async (): Promise<{
 
 export const getMultiSend = async (): Promise<{
   contract: GetContractReturnType
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const multiSendDeployment = await deployments.get(multiSendDeployed.name)
   const multiSendAddress = multiSendDeployment.address as Address
@@ -123,7 +123,7 @@ export const getMultiSend = async (): Promise<{
 
 export const getMultiSendCallOnly = async (): Promise<{
   contract: GetContractReturnType
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const multiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
   const multiSendAddress = multiSendCallOnlyDeployment.address as Address
@@ -136,7 +136,7 @@ export const getMultiSendCallOnly = async (): Promise<{
 
 export const getSignMessageLib = async (): Promise<{
   contract: GetContractReturnType
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const signMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
   const signMessageLibAddress = signMessageLibDeployment.address as Address
@@ -149,7 +149,7 @@ export const getSignMessageLib = async (): Promise<{
 
 export const getCreateCall = async (): Promise<{
   contract: GetContractReturnType
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const createCallDeployment = await deployments.get(createCallDeployed.name)
   const createCallAddress = createCallDeployment.address as Address
@@ -162,7 +162,7 @@ export const getCreateCall = async (): Promise<{
 
 export const getSimulateTxAccessor = async (): Promise<{
   contract: GetContractReturnType
-  abi: JsonFragment | JsonFragment[]
+  abi: Abi
 }> => {
   const simulateTxAccessorDeployment = await deployments.get(simulateTxAccessorDeployed.name)
   const simulateTxAccessorAddress = simulateTxAccessorDeployment.address as Address

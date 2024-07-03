@@ -1,4 +1,5 @@
-import { Provider, AbstractSigner, zeroPadValue } from 'ethers'
+import { Provider, AbstractSigner } from 'ethers'
+import { pad } from 'viem'
 import { Hash, isAddress, PublicClient } from 'viem'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -357,7 +358,7 @@ export function zkSyncEraCreate2Address(
   const addressBytes = keccak256(
     toBuffer(
       ZKSYNC_CREATE2_PREFIX +
-        zeroPadValue(from, 32).slice(2) +
+        pad(asHex(from), { size: 32 }).slice(2) +
         salt.toString('hex') +
         bytecodeHash.slice(2) +
         inputHash.toString('hex')

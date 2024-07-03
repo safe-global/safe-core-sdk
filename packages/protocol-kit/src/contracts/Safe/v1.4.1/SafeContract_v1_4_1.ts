@@ -303,7 +303,10 @@ class SafeContract_v1_4_1
   async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
     const gasLimit =
       options?.gasLimit || (await this.estimateGas('approveHash', [asHash(hash)], options))
-    const txResponse = await this.contract.write.approveHash(asHash(hash), { ...options, gasLimit })
+    const txResponse = await this.contract.write.approveHash(
+      [asHash(hash)],
+      await this.convertOptions({ ...options, gasLimit })
+    )
 
     return toTxResult(this.runner!, txResponse, options)
   }

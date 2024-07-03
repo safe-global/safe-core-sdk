@@ -11,6 +11,7 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
+import { asAddress, asHash, asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SafeContract_v1_2_0  is the implementation specific to the Safe contract version 1.2.0.
@@ -190,8 +191,12 @@ class SafeContract_v1_2_0
    * @returns Transaction result.
    */
   async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
-    const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
-    const txResponse = await this.contract.write.approveHash(hash, { ...options, gasLimit })
+    const gasLimit =
+      options?.gasLimit || (await this.estimateGas('approveHash', [asHash(hash)], options))
+    const txResponse = await this.contract.write.approveHash(
+      [asHash(hash)],
+      await this.convertOptions({ ...options, gasLimit })
+    )
 
     return toTxResult(this.runner!, txResponse, options)
   }
@@ -211,32 +216,34 @@ class SafeContract_v1_2_0
       (await this.estimateGas(
         'execTransaction',
         [
-          safeTransaction.data.to,
+          asAddress(safeTransaction.data.to),
           BigInt(safeTransaction.data.value),
-          safeTransaction.data.data,
+          asHex(safeTransaction.data.data),
           safeTransaction.data.operation,
           BigInt(safeTransaction.data.safeTxGas),
           BigInt(safeTransaction.data.baseGas),
           BigInt(safeTransaction.data.gasPrice),
-          safeTransaction.data.gasToken,
-          safeTransaction.data.refundReceiver,
-          safeTransaction.encodedSignatures()
+          asAddress(safeTransaction.data.gasToken),
+          asAddress(safeTransaction.data.refundReceiver),
+          asHex(safeTransaction.encodedSignatures())
         ],
         options
       ))
 
     const txResponse = await this.contract.write.execTransaction(
-      safeTransaction.data.to,
-      safeTransaction.data.value,
-      safeTransaction.data.data,
-      safeTransaction.data.operation,
-      safeTransaction.data.safeTxGas,
-      safeTransaction.data.baseGas,
-      safeTransaction.data.gasPrice,
-      safeTransaction.data.gasToken,
-      safeTransaction.data.refundReceiver,
-      safeTransaction.encodedSignatures(),
-      { ...options, gasLimit }
+      [
+        asAddress(safeTransaction.data.to),
+        BigInt(safeTransaction.data.value),
+        asHex(safeTransaction.data.data),
+        safeTransaction.data.operation,
+        BigInt(safeTransaction.data.safeTxGas),
+        BigInt(safeTransaction.data.baseGas),
+        BigInt(safeTransaction.data.gasPrice),
+        asAddress(safeTransaction.data.gasToken),
+        asAddress(safeTransaction.data.refundReceiver),
+        asHex(safeTransaction.encodedSignatures())
+      ],
+      await this.convertOptions({ ...options, gasLimit })
     )
 
     return toTxResult(this.runner!, txResponse, options)
@@ -263,32 +270,34 @@ class SafeContract_v1_2_0
         (await this.estimateGas(
           'execTransaction',
           [
-            safeTransaction.data.to,
+            asAddress(safeTransaction.data.to),
             BigInt(safeTransaction.data.value),
-            safeTransaction.data.data,
+            asHex(safeTransaction.data.data),
             safeTransaction.data.operation,
             BigInt(safeTransaction.data.safeTxGas),
             BigInt(safeTransaction.data.baseGas),
             BigInt(safeTransaction.data.gasPrice),
-            safeTransaction.data.gasToken,
-            safeTransaction.data.refundReceiver,
-            safeTransaction.encodedSignatures()
+            asAddress(safeTransaction.data.gasToken),
+            asAddress(safeTransaction.data.refundReceiver),
+            asHex(safeTransaction.encodedSignatures())
           ],
           options
         ))
 
-      return await this.contract.execTransaction.staticCall(
-        safeTransaction.data.to,
-        BigInt(safeTransaction.data.value),
-        safeTransaction.data.data,
-        safeTransaction.data.operation,
-        BigInt(safeTransaction.data.safeTxGas),
-        BigInt(safeTransaction.data.baseGas),
-        BigInt(safeTransaction.data.gasPrice),
-        safeTransaction.data.gasToken,
-        safeTransaction.data.refundReceiver,
-        safeTransaction.encodedSignatures(),
-        { ...options, gasLimit }
+      return await this.contract.simulate.execTransaction(
+        [
+          asAddress(safeTransaction.data.to),
+          BigInt(safeTransaction.data.value),
+          asHex(safeTransaction.data.data),
+          safeTransaction.data.operation,
+          BigInt(safeTransaction.data.safeTxGas),
+          BigInt(safeTransaction.data.baseGas),
+          BigInt(safeTransaction.data.gasPrice),
+          asAddress(safeTransaction.data.gasToken),
+          asAddress(safeTransaction.data.refundReceiver),
+          asHex(safeTransaction.encodedSignatures())
+        ],
+        await this.convertOptions({ ...options, gasLimit })
       )
     } catch (error) {
       return false

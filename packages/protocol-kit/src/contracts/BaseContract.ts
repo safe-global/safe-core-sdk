@@ -42,7 +42,7 @@ class BaseContract<ContractAbiType extends Abi> {
   safeVersion: SafeVersion
   safeProvider: SafeProvider
   chainId: bigint
-  contract: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
+  contract!: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
   runner: PublicClient | null
 
   /**

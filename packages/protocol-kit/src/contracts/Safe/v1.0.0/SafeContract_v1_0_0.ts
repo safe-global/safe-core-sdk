@@ -199,10 +199,13 @@ class SafeContract_v1_0_0
   async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
     const gasLimit =
       options?.gasLimit || (await this.estimateGas('approveHash', [asHash(hash)], options))
-    const txResponse = await this.contract.write.approveHash([asHash(hash)], {
-      ...options,
-      gasLimit
-    })
+    const txResponse = await this.contract.write.approveHash(
+      [asHash(hash)],
+      await this.convertOptions({
+        ...options,
+        gasLimit
+      })
+    )
 
     return toTxResult(this.runner!, txResponse, options)
   }
@@ -249,7 +252,7 @@ class SafeContract_v1_0_0
         asAddress(safeTransaction.data.refundReceiver),
         asHex(safeTransaction.encodedSignatures())
       ],
-      { ...options, gasLimit }
+      await this.convertOptions({ ...options, gasLimit })
     )
 
     return toTxResult(this.runner!, txResponse, options)
@@ -320,7 +323,7 @@ class SafeContract_v1_0_0
           options
         ))
 
-      return await this.contract.simulate.execTransaction(
+      const txResult = await this.contract.simulate.execTransaction(
         [
           asAddress(safeTransaction.data.to),
           BigInt(safeTransaction.data.value),
@@ -333,8 +336,10 @@ class SafeContract_v1_0_0
           asAddress(safeTransaction.data.refundReceiver),
           asHex(safeTransaction.encodedSignatures())
         ],
-        { ...options, gasLimit }
+        await this.convertOptions({ ...options, gasLimit })
       )
+
+      return txResult.result
     } catch (error) {
       return false
     }

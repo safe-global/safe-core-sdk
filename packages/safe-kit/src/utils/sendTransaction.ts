@@ -3,12 +3,13 @@ import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-
 import { AbstractSigner } from 'ethers'
 
 /**
- * Sends a transaction using the SafeClient client.
+ * Sends a transaction using the signer (owner)
+ * It's useful to deploy Safe accounts
  *
- * @param {TransactionBase} transactions - An array of transactions to be sent.
- * @param {TransactionOptions} options - Options for executing the transaction.
- * @param {Safe} protocolKit - The protocolKit instance .
- * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
+ * @param {TransactionBase} transaction  The transaction.
+ * @param {TransactionOptions} options Options for executing the transaction.
+ * @param {Safe} protocolKit The protocolKit instance
+ * @returns {Promise<string | undefined>} A promise that resolves with the transaction hash
  */
 export const sendTransaction = async (
   transaction: TransactionBase,

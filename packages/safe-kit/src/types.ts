@@ -1,5 +1,5 @@
 import { SafeProvider } from '@safe-global/protocol-kit'
-import { SafeClientTxStatus } from './constants'
+import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
 
 export type SafeConfig = {
   owners: string[]

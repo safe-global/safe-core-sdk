@@ -1,14 +1,15 @@
 import Safe, { buildSignatureBytes } from '@safe-global/protocol-kit'
 import SafeApiKit, { GetSafeOperationListResponse } from '@safe-global/api-kit'
 import { Safe4337CreateTransactionProps, Safe4337Pack } from '@safe-global/relay-kit'
-import { createSafeClientResult } from '../../utils'
-import { SafeClientTxStatus } from '../../constants'
 
-import { SafeClientResult } from '../../types'
+import { createSafeClientResult } from '@safe-global/safe-kit/utils'
+import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+import { SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * @class
- * This class provides the functionality to create, sign and execute transactions.
+ * This class provides the functionality use a bundler and a paymaster with your Safe account
+ * With the features implemented here we can add EIP-4377 support to the Safe account
  */
 export class SafeOperationClient {
   protocolKit: Safe
@@ -22,21 +23,27 @@ export class SafeOperationClient {
   }
 
   /**
-   * Send transactions through the Safe protocol.
+   * Send SafeOperations from a group of transactions.
+   * This method will convert your transactions in a batch and:
+   * - If the threshold > 1 it will save for later the SafeOperation using the Transaction service
+   *   You must confirmSafeOperation() with other owners
+   * - If the threshold = 1 the SafeOperation can be submitted to the bundler so it will execute it immediately
    *
-   * @param {string | EIP712TypedData} message The message.
-   * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
-   * @throws {Error} If the Safe deployment with a threshold greater than one is attempted.
+   * @param {Safe4337CreateTransactionProps} props The Safe4337CreateTransactionProps object
+   * @param {SafeTransaction[]} props.transactions An array of transactions to be batched
+   * @param {TransactionOptions} [props.options] Optional transaction options
+   * @returns {Promise<SafeClientResult>} A promise that resolves with the status of the SafeOperation
    */
   async sendSafeOperation({
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
+    const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
+
     let safeOperation = await this.safe4337Pack.createTransaction({ transactions, options })
     safeOperation = await this.safe4337Pack.signSafeOperation(safeOperation)
 
-    const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
     if (isMultisigSafe) {
       const userOperation = safeOperation.toUserOperation()
       userOperation.signature = safeOperation.encodedSignatures() // Without validity dates
@@ -76,11 +83,12 @@ export class SafeOperationClient {
   }
 
   /**
-   * Confirms a transaction by its safe transaction hash.
+   * Confirms the stored safeOperation
    *
-   * @param {string} userOperationHash  The hash of the safe operation to confirm.
-   * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the confirmed transaction.
-   * @throws {Error} If the transaction confirmation fails.
+   * @param {string} safeOperationHash The hash of the safe operation to confirm.
+   * The safeOperationHash  an be extracted the hash from the SafeClientResult of the sendSafeOperation method under the safeOperations property
+   * You must conformSafeOperation() with the other owners and once the threshold is reached the SafeOperation will be sent to the bundler
+   * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the safeOperation.
    */
   async confirmSafeOperation(safeOperationHash: string): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
@@ -119,7 +127,7 @@ export class SafeOperationClient {
   }
 
   /**
-   * Retrieves the pending Safe operations for the current safe address.
+   * Retrieves the pending Safe operations for the current Safe account
    *
    * @async
    * @returns {Promise<GetSafeOperationListResponse>} A promise that resolves to an array of pending Safe operations.
@@ -130,6 +138,11 @@ export class SafeOperationClient {
     return this.apiKit.getSafeOperationsByAddress({ safeAddress })
   }
 
+  /**
+   * Helper method to wait for the operation to finish
+   * @param userOperationHash The userOperationHash to wait for. This comes from the bundler and can be obtained from the
+   * SafeClientResult method under the safeOperations property
+   */
   async #waitForOperationToFinish(userOperationHash: string): Promise<void> {
     let userOperationReceipt = null
     while (!userOperationReceipt) {

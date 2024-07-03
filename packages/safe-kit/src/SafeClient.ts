@@ -6,19 +6,26 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
+
 import {
   createSafeClientResult,
   sendTransaction,
   proposeTransaction,
   waitSafeTxReceipt
-} from './utils'
-import { SafeClientTxStatus } from './constants'
-
-import { SafeClientResult } from './types'
+} from '@safe-global/safe-kit/utils'
+import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+import { SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * @class
- * This class provides the functionality to create, sign and execute transactions.
+ * This class provides the core functionality to create, sign and execute transactions.
+ * It also provides the ability to be extended with features through the extend function.
+ *
+ * @example
+ * const safeClient = await createSafeClient({ ... })
+ *
+ * const { transactions } = await safeClient.send(...)
+ * await safeClient.confirm(transactions?.safeTxHash)
  */
 export class SafeClient {
   protocolKit: Safe

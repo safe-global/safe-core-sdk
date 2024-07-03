@@ -150,7 +150,7 @@ class SafeProxyFactoryContract_v1_3_0
     const proxyAddress = this.contract.write
       .createProxyWithNonce(
         [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
-        { ...options }
+        await this.convertOptions(options)
       )
       .then(async (hash) => {
         if (callback) {

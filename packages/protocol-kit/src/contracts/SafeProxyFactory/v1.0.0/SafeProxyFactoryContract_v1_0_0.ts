@@ -11,6 +11,7 @@ import {
   safeProxyFactory_1_0_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
+import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SafeProxyFactoryContract_v1_0_0  is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
@@ -122,7 +123,7 @@ class SafeProxyFactoryContract_v1_0_0
     const proxyAddress = await this.contract.write
       .createProxyWithNonce(
         [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
-        { ...options }
+        await this.convertOptions(options)
       )
       .then(async (hash) => {
         if (callback) {

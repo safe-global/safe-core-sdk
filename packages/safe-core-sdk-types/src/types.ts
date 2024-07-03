@@ -83,7 +83,7 @@ export interface TransactionBase {
 
 export interface TransactionOptions {
   from?: string
-  gasLimit?: number | string
+  gasLimit?: number | string | bigint
   gasPrice?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string

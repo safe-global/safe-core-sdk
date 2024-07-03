@@ -107,6 +107,7 @@ class BaseContract<ContractAbiType extends Abi> {
 
   async convertOptions(options?: TransactionOptions): Promise<ContractTransactionOptions> {
     const chain = this.runner!.chain
+    if (!chain) throw new Error() // Put something sensible here
     const signerAddress = await this.safeProvider.getSignerAddress()
     const account = asAddress(signerAddress!)
     const result: ContractTransactionOptions = { chain, account }

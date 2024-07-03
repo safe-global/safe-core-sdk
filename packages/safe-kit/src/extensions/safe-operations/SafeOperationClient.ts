@@ -63,7 +63,7 @@ export class SafeOperationClient {
 
       return createSafeClientResult({
         safeAddress,
-        status: SafeClientTxStatus.USER_OPERATION_PENDING_SIGNATURES,
+        status: SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES,
         safeOperationHash
       })
     }
@@ -76,7 +76,7 @@ export class SafeOperationClient {
 
     return createSafeClientResult({
       safeAddress,
-      status: SafeClientTxStatus.USER_OPERATION_EXECUTED,
+      status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
       userOperationHash,
       safeOperationHash: safeOperation.getHash()
     })
@@ -112,7 +112,7 @@ export class SafeOperationClient {
       await this.#waitForOperationToFinish(userOperationHash)
 
       return createSafeClientResult({
-        status: SafeClientTxStatus.USER_OPERATION_EXECUTED,
+        status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
         safeAddress,
         userOperationHash,
         safeOperationHash
@@ -120,7 +120,7 @@ export class SafeOperationClient {
     }
 
     return createSafeClientResult({
-      status: SafeClientTxStatus.USER_OPERATION_PENDING_SIGNATURES,
+      status: SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES,
       safeAddress,
       safeOperationHash
     })

@@ -554,6 +554,8 @@ describe('Safe4337Pack', () => {
 
       passkey = await createMockPasskey('chucknorris', webAuthnCredentials)
 
+      passkey.customVerifierAddress = CUSTOM_P256_VERIFIER_ADDRESS
+
       Object.defineProperty(global, 'navigator', {
         value: {
           credentials: {
@@ -660,12 +662,20 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
+      const safeOpHash = utils.calculateSafeUserOperationHash(
+        safeOperation.data,
+        BigInt(fixtures.CHAIN_ID),
+        fixtures.MODULE_ADDRESS
+      )
+
+      const passkeySignature = await safe4337Pack.protocolKit.signHash(safeOpHash)
+
       expect(await safe4337Pack.signSafeOperation(safeOperation)).toMatchObject({
         signatures: new Map().set(
           SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS.toLowerCase(),
           new protocolKit.EthSafeSignature(
             SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-            '0x000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0c79e723c4ad6557198f00ab3e8cc1cd3de64b30f6ff44664fc131f37fa1e97fe4dce48568eb0582d34c6adb97a5902b6de0488c10ab3c9f3589b44b98027ac840000000000000000000000000000000000000000000000000000000000000025a24f744b28d73f066bf3203d145765a7bc735e6328168c8b03e476da3ad0d8fe0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e226f726967696e223a2268747470733a2f2f736166652e676c6f62616c22001f',
+            passkeySignature.data,
             true
           )
         )

@@ -170,7 +170,7 @@ export interface EIP712TypedDataMessage {
   }
 }
 
-interface TypedDataDomain {
+export interface TypedDataDomain {
   name?: string
   version?: string
   chainId?: unknown
@@ -178,12 +178,12 @@ interface TypedDataDomain {
   salt?: ArrayLike<number> | string
 }
 
-interface TypedDataTypes {
+export interface TypedDataTypes {
   name: string
   type: string
 }
 
-type TypedMessageTypes = {
+export type TypedMessageTypes = {
   [key: string]: TypedDataTypes[]
 }
 

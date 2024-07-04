@@ -1,6 +1,5 @@
-import { Provider, AbstractSigner } from 'ethers'
 import { pad } from 'viem'
-import { Hash, isAddress, PublicClient } from 'viem'
+import { Hash, isAddress, PublicClient, WalletClient } from 'viem'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -387,21 +386,6 @@ export function toTxResult(
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is AbstractSigner {
-  return (signer as unknown as AbstractSigner).signTypedData !== undefined
-}
-
-/**
- * Check if the signerOrProvider is compatible with `Signer`
- * @param signerOrProvider - Signer or provider
- * @returns true if the parameter is compatible with `Signer`
- */
-export function isSignerCompatible(signerOrProvider: AbstractSigner | Provider): boolean {
-  const candidate = signerOrProvider as AbstractSigner
-
-  const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
-  const isSignMessageCompatible = typeof candidate.signMessage === 'function'
-  const isGetAddressCompatible = typeof candidate.getAddress === 'function'
-
-  return isSigntransactionCompatible && isSignMessageCompatible && isGetAddressCompatible
+export function isTypedDataSigner(signer: any): signer is WalletClient {
+  return (signer as unknown as WalletClient).signTypedData !== undefined
 }

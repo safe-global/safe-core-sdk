@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { hashTypedData } from '@safe-global/protocol-kit/utils/eip-712/encode'
 import Safe, {
   hashSafeMessage,
   buildSignatureBytes,
@@ -28,13 +28,13 @@ export const calculateSafeMessageHash = (
   message: string,
   chainId: number
 ): string => {
-  return ethers.TypedDataEncoder.hash(
-    { verifyingContract: safeAddress, chainId },
-    {
+  return hashTypedData({
+    domain: { verifyingContract: safeAddress, chainId },
+    types: {
       SafeMessage: [{ type: 'bytes', name: 'message' }]
     },
-    { message }
-  )
+    message: { message }
+  })
 }
 
 const MESSAGE = 'I am the owner of this Safe account'

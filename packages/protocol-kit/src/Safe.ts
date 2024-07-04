@@ -475,7 +475,7 @@ class Safe {
         ...options,
         to: await multiSendContract.getAddress(),
         value: '0',
-        data: multiSendContract.encode('multiSend', [multiSendData]),
+        data: multiSendContract.encode('multiSend', [asHex(multiSendData)]),
         operation: OperationType.DelegateCall
       }
       newTransaction = multiSendTransaction
@@ -1431,7 +1431,7 @@ class Safe {
 
     // multiSend method with the transactions encoded
     const batchData = multiSendCallOnlyContract.encode('multiSend', [
-      encodeMultiSendData(transactions) // encoded transactions
+      asHex(encodeMultiSendData(transactions)) // encoded transactions
     ])
 
     const transactionBatch = {

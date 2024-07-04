@@ -115,7 +115,7 @@ export function generateTypedData({
   }
 
   if (eip712WithChainId) {
-    typedData.domain.chainId = chainId.toString()
+    typedData.domain.chainId = Number(chainId)
   }
 
   return typedData

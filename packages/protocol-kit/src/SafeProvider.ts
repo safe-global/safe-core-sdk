@@ -1,7 +1,6 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
-
 import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
@@ -42,9 +41,11 @@ import {
   encodeAbiParameters,
   parseAbiParameters,
   toBytes,
-  BlockTag
+  BlockTag,
+  Transport,
+  Chain
 } from 'viem'
-import { privateKeyToAccount, privateKeyToAddress } from 'viem/accounts'
+import { privateKeyToAccount, privateKeyToAddress, Account } from 'viem/accounts'
 
 function asBlockId(blockId: number | string | undefined) {
   return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
@@ -82,7 +83,9 @@ class SafeProvider {
     return this.#externalProvider
   }
 
-  async getExternalSigner(): Promise<WalletClient | undefined> {
+  async getExternalSigner(): Promise<
+    WalletClient<Transport, Chain | undefined, Account> | undefined
+  > {
     // If the signer is not an Ethereum address, it should be a private key
     if (this.signer && !this.isAddress(this.signer)) {
       const account = privateKeyToAccount(asHex(this.signer))
@@ -302,13 +305,18 @@ class SafeProvider {
 
     if (isTypedDataSigner(signer)) {
       const typedData = generateTypedData(safeEIP712Args)
-      const signature = await signer.signTypedData(
-        typedData.domain,
-        typedData.primaryType === 'SafeMessage'
-          ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
-          : { SafeTx: (typedData as EIP712TypedDataTx).types.SafeTx },
-        typedData.message
-      )
+      const { chainId, verifyingContract } = typedData.domain
+      const domain = { verifyingContract: asAddress(verifyingContract), chainId }
+
+      const signature = await signer.signTypedData({
+        domain,
+        types:
+          typedData.primaryType === 'SafeMessage'
+            ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
+            : { SafeTx: (typedData as EIP712TypedDataTx).types.SafeTx },
+        primaryType: typedData.primaryType,
+        message: typedData.message
+      })
       return signature
     }
 

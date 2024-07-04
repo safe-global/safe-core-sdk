@@ -89,16 +89,13 @@ export class SafeClient {
 
     transactionResponse = await this.apiKit.getTransaction(safeTxHash)
 
-    let executedTransactionResponse: TransactionResult = {
-      hash: '',
-      transactionResponse: undefined
-    }
-
     if (
       transactionResponse.confirmations &&
       transactionResponse.confirmationsRequired === transactionResponse.confirmations.length
     ) {
-      executedTransactionResponse = await this.protocolKit.executeTransaction(transactionResponse)
+      const executedTransactionResponse: TransactionResult =
+        await this.protocolKit.executeTransaction(transactionResponse)
+
       await waitSafeTxReceipt(executedTransactionResponse)
 
       return createSafeClientResult({

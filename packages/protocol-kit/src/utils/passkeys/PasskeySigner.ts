@@ -175,20 +175,22 @@ export default PasskeySigner
  *
  * @param {ArrayBuffer} clientDataJSON - The client data JSON.
  * @returns {string} A hex string of the additional fields from the client data JSON.
- * @throws {Error} Throws an error if the client data JSON does not contain the expected 'challenge' field pattern.
+ * @throws {Error} Throws an error if the client data JSON does not contain the expected 'origin' field.
  */
 function extractClientDataFields(clientDataJSON: ArrayBuffer): string {
-  const decodedClientDataJSON = new TextDecoder('utf-8').decode(clientDataJSON)
-  const match = decodedClientDataJSON.match(
-    /^\{"type":"webauthn.get","challenge":"[A-Za-z0-9\-_]{43}",(.*)\}$/
-  )
+  const { origin, crossOrigin } = JSON.parse(new TextDecoder('utf-8').decode(clientDataJSON))
 
-  if (!match) {
-    throw new Error('challenge not found in client data JSON')
+  if (!origin) {
+    throw new Error('origin not found in client data JSON')
   }
 
-  const [, fields] = match
-  return ethers.hexlify(ethers.toUtf8Bytes(fields))
+  const additionalFields = `"origin":"${origin}"`
+
+  if (crossOrigin !== undefined) {
+    additionalFields.concat(`,"crossOrigin":${crossOrigin}`)
+  }
+
+  return ethers.hexlify(ethers.toUtf8Bytes(additionalFields))
 }
 
 /**

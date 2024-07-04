@@ -605,8 +605,6 @@ class Safe {
    * @returns The Safe signature
    */
   async signHash(hash: string): Promise<SafeSignature> {
-    const signature = await generateSignature(this.#safeProvider, hash)
-
     const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
     const signerAddress = await this.getSignerAddress()
 
@@ -619,18 +617,23 @@ class Safe {
       }
       const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
 
+      let signature = await this.#safeProvider.signMessage(hash)
+
+      signature = adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
+
+      const safeSignature = new EthSafeSignature(signerAddress, signature, true)
+
       if (isSharedSigner) {
         const sharedSignerContract = await this.#getSafeWebAuthnSharedSignerContract()
         const sharedSignerContractAddress = await sharedSignerContract.getAddress()
 
-        return new EthSafeSignature(sharedSignerContractAddress, signature.data, true)
+        return new EthSafeSignature(sharedSignerContractAddress, safeSignature.data, true)
       }
 
-      let signature2 = await this.#safeProvider.signMessage(hash)
-
-      signature2 = adjustVInSignature(SigningMethod.ETH_SIGN, signature2, hash, signerAddress)
-      return new EthSafeSignature(signerAddress, signature2, true)
+      return safeSignature
     }
+
+    const signature = await generateSignature(this.#safeProvider, hash)
 
     return signature
   }

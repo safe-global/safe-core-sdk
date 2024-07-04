@@ -42,7 +42,6 @@ export class SafeClient {
    * @param {TransactionBase[]} transactions An array of transactions to be sent.
    * @param {TransactionOptions} [options] Optional transaction options.
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
-   * @throws {Error} If the Safe deployment with a threshold greater than one is attempted.
    */
   async send(
     transactions: TransactionBase[],

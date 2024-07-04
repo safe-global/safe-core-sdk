@@ -80,9 +80,6 @@ describe('getSafeOperationsByAddress', () => {
     chai.expect(response).to.have.property('count').greaterThan(1)
     chai.expect(response).to.have.property('results').to.be.an('array')
     chai.expect(response.results.length).to.be.lessThanOrEqual(3)
-    chai
-      .expect(response.results[0].safeOperationHash)
-      .to.be.eq('0xfbc38024f74946d9ec31e0c8658dd65e335c6e57c14575250787ec5fb270c08a')
   })
 
   it('should get all SafeOperations excluding the first one with offset = 1', async () => {

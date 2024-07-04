@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { createWalletClient, custom } from 'viem'
 import SafeApiKit from '@safe-global/api-kit'
 
 import type { AuthKitEthereumProvider, AuthKitSignInData } from './types'
@@ -85,11 +85,10 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new ethers.BrowserProvider(authKitProvider)
+    const client = createWalletClient({ transport: custom(authKitProvider) })
+    const [address] = await client.getAddresses()
 
-    const signer = await ethersProvider.getSigner()
-
-    return signer.getAddress()
+    return address
   }
 
   async getChainId(): Promise<bigint> {
@@ -99,11 +98,10 @@ export abstract class AuthKitBasePack {
       throw new Error('Provider is not defined')
     }
 
-    const ethersProvider = new ethers.BrowserProvider(authKitProvider)
+    const client = createWalletClient({ transport: custom(authKitProvider) })
+    const chainId = await client.getChainId()
 
-    const networkDetails = await ethersProvider.getNetwork()
-
-    return networkDetails.chainId
+    return BigInt(chainId)
   }
 
   /**

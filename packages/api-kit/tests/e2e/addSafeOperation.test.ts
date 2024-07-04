@@ -1,15 +1,19 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { ethers } from 'ethers'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
-import { Safe4337Pack } from '@safe-global/relay-kit'
-import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
-import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
-import { getKits } from '../utils/setupKits'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
+import { Safe4337Pack } from '@safe-global/relay-kit'
+import * as viem from '@safe-global/relay-kit/node_modules/viem'
+import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
+import {
+  ENTRYPOINT_ABI,
+  ENTRYPOINT_ADDRESS_V06,
+  RPC_4337_CALLS
+} from '@safe-global/relay-kit/packs/safe-4337/constants'
+import { getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -34,26 +38,23 @@ describe('addSafeOperation', () => {
   }
 
   // Setup mocks for the bundler client
-  const providerStub = sinon.stub(ethers.JsonRpcProvider.prototype, 'send')
+  const requestStub = sinon.stub()
 
-  providerStub.withArgs(RPC_4337_CALLS.CHAIN_ID, []).returns(Promise.resolve('0xaa36a7'))
-  providerStub
-    .withArgs(RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS, [])
-    .returns(Promise.resolve(['0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789']))
-  providerStub
-    .withArgs('pimlico_getUserOperationGasPrice', [])
-    .returns(
-      Promise.resolve({ fast: { maxFeePerGas: '0x3b9aca00', maxPriorityFeePerGas: '0x3b9aca00' } })
-    )
-  providerStub.withArgs(RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS, sinon.match.any).returns(
-    Promise.resolve({
-      preVerificationGas: BigInt(Date.now()),
-      callGasLimit: BigInt(Date.now()),
-      verificationGasLimit: BigInt(Date.now())
-    })
+  sinon.stub(viem, 'createPublicClient').get(
+    () => () =>
+      ({
+        request: requestStub,
+        readContract: sinon
+          .stub()
+          .withArgs({
+            address: ENTRYPOINT_ADDRESS_V06,
+            abi: ENTRYPOINT_ABI,
+            functionName: 'getNonce',
+            args: [SAFE_ADDRESS, BigInt(0)]
+          })
+          .resolves(123n)
+      }) as unknown as viem.PublicClient
   )
-
-  providerStub.callThrough()
 
   before(async () => {
     ;({ safeApiKit, protocolKit } = await getKits({
@@ -61,6 +62,21 @@ describe('addSafeOperation', () => {
       signer: SIGNER_PK,
       txServiceUrl: TX_SERVICE_URL
     }))
+
+    requestStub.withArgs({ method: RPC_4337_CALLS.CHAIN_ID }).resolves('0xaa36a7')
+    requestStub
+      .withArgs({ method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS })
+      .resolves([ENTRYPOINT_ADDRESS_V06])
+    requestStub
+      .withArgs({ method: 'pimlico_getUserOperationGasPrice' })
+      .resolves({ fast: { maxFeePerGas: '0x3b9aca00', maxPriorityFeePerGas: '0x3b9aca00' } })
+    requestStub
+      .withArgs({ method: RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS, params: sinon.match.any })
+      .resolves({
+        preVerificationGas: BigInt(Date.now()),
+        callGasLimit: BigInt(Date.now()),
+        verificationGasLimit: BigInt(Date.now())
+      })
 
     safe4337Pack = await Safe4337Pack.init({
       provider: protocolKit.getSafeProvider().provider,

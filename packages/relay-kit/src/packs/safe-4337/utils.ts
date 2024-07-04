@@ -1,5 +1,17 @@
 import { Hash, encodeFunctionData, encodePacked, hashTypedData, toHex } from 'viem'
 import {
+  Address,
+  Hash,
+  PublicRpcSchema,
+  createPublicClient,
+  encodeFunctionData,
+  encodePacked,
+  hashTypedData,
+  http,
+  rpcSchema,
+  toHex
+} from 'viem'
+import {
   SafeUserOperation,
   OperationType,
   MetaTransactionData,
@@ -12,18 +24,19 @@ import {
   encodeMultiSendData,
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
-import { ethers } from 'ethers'
 import { ABI, EIP712_SAFE_OPERATION_TYPE } from './constants'
+import { BundlerClient, PimlicoCustomRpcSchema } from './types'
 
 /**
  * Gets the EIP-4337 bundler provider.
  *
  * @param {string} bundlerUrl The EIP-4337 bundler URL.
- * @return {Provider} The EIP-4337 bundler provider.
+ * @return {BundlerClient} The EIP-4337 bundler provider.
  */
-export function getEip4337BundlerProvider(bundlerUrl: string): ethers.JsonRpcProvider {
-  const provider = new ethers.JsonRpcProvider(bundlerUrl, undefined, {
-    batchMaxCount: 1
+export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
+  const provider = createPublicClient({
+    transport: http(bundlerUrl),
+    rpcSchema: rpcSchema<[...PimlicoCustomRpcSchema, ...PublicRpcSchema]>()
   })
 
   return provider
@@ -42,7 +55,12 @@ export async function signSafeOp(
   safeProvider: SafeProvider,
   safe4337ModuleAddress: Hash
 ): Promise<SafeSignature> {
-  const signer = (await safeProvider.getExternalSigner()) as ethers.Signer
+  const signer = await safeProvider.getExternalSigner()
+
+  if (!signer) {
+    throw new Error('No signer found')
+  }
+
   const chainId = await safeProvider.getChainId()
   const signerAddress = await signer.getAddress()
   const signature = await signer.signTypedData(
@@ -70,14 +88,14 @@ export async function signSafeOp(
  * @param {MetaTransactionData[]} transactions - an array of transaction to to be encoded.
  * @return {Hash} The encoded data string.
  */
-export function encodeMultiSendCallData(transactions: MetaTransactionData[]): Hash {
+export function encodeMultiSendCallData(transactions: MetaTransactionData[]): string {
   return encodeFunctionData({
     abi: ABI,
     functionName: 'multiSend',
     args: [
       encodeMultiSendData(
         transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
-      )
+      ) as Hash
     ]
   })
 }
@@ -93,12 +111,12 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): Ha
 export function calculateSafeUserOperationHash(
   safeUserOperation: SafeUserOperation,
   chainId: bigint,
-  safe4337ModuleAddress: Hash
-): Hash {
+  safe4337ModuleAddress: string
+): string {
   return hashTypedData({
     domain: {
       chainId: Number(chainId),
-      verifyingContract: safe4337ModuleAddress
+      verifyingContract: safe4337ModuleAddress as Address
     },
     types: EIP712_SAFE_OPERATION_TYPE,
     primaryType: 'SafeOp',

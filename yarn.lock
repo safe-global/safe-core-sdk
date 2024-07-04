@@ -2646,11 +2646,6 @@ abitype@1.0.4:
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-1.0.4.tgz#a817ff44860e8a84e9a37ed22aa9b738dbb51dba"
   integrity sha512-UivtYZOGJGE8rsrM/N5vdRkUpqEZVmuTumfTuolm7m/6O09wprd958rx8kUBwVAAAhQDveGAgD0GJdBuR8s6tw==
 
-abitype@^0.9.8:
-  version "0.9.10"
-  resolved "https://registry.yarnpkg.com/abitype/-/abitype-0.9.10.tgz#fa6fa30a6465da98736f98b6c601a02ed49f6eec"
-  integrity sha512-FIS7U4n7qwAT58KibwYig5iFG4K61rbhAqaQh/UWj8v1Y8mjX3F8TC9gd8cz9yT1TYel9f8nS5NO5kZp2RW0jQ==
-
 abitype@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-1.0.2.tgz#183c28f2f3b4278810ed1543941b555bb73f301d"

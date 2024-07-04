@@ -8,7 +8,7 @@ import { SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * @class
- * This class provides the functionality use a bundler and a paymaster with your Safe account
+ * This class provides the functionality to use a bundler and a paymaster with your Safe account
  * With the features implemented here we can add EIP-4377 support to the Safe account
  */
 export class SafeOperationClient {

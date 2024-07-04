@@ -8,7 +8,7 @@ import { SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * @class
- * This class provides the functionality use a bundler and a paymaster with your Safe account
+ * This class provides the functionality to use a bundler and a paymaster with your Safe account
  * With the features implemented here we can add EIP-4377 support to the Safe account
  */
 export class SafeOperationClient {
@@ -86,8 +86,8 @@ export class SafeOperationClient {
    * Confirms the stored safeOperation
    *
    * @param {string} safeOperationHash The hash of the safe operation to confirm.
-   * The safeOperationHash  an be extracted the hash from the SafeClientResult of the sendSafeOperation method under the safeOperations property
-   * You must conformSafeOperation() with the other owners and once the threshold is reached the SafeOperation will be sent to the bundler
+   * The safeOperationHash can be extracted from the SafeClientResult of the sendSafeOperation method under the safeOperations property
+   * You must confirmSafeOperation() with the other owners and once the threshold is reached the SafeOperation will be sent to the bundler
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the safeOperation.
    */
   async confirmSafeOperation(safeOperationHash: string): Promise<SafeClientResult> {

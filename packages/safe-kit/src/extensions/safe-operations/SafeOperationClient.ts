@@ -87,7 +87,7 @@ export class SafeOperationClient {
    *
    * @param {string} safeOperationHash The hash of the safe operation to confirm.
    * The safeOperationHash can be extracted from the SafeClientResult of the sendSafeOperation method under the safeOperations property
-   * You must conformSafeOperation() with the other owners and once the threshold is reached the SafeOperation will be sent to the bundler
+   * You must confirmSafeOperation() with the other owners and once the threshold is reached the SafeOperation will be sent to the bundler
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the safeOperation.
    */
   async confirmSafeOperation(safeOperationHash: string): Promise<SafeClientResult> {

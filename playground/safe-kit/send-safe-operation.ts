@@ -10,11 +10,12 @@ const OWNER_2_ADDRESS = ''
 const OWNER_3_ADDRESS = ''
 
 const THRESHOLD = 3
-const SALT_NONCE = '10'
+const SALT_NONCE = ''
 
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 const usdcAmount = 10_000n // 0.01 USDC
+
 // PAYMASTER ADDRESS
 const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
 
@@ -27,7 +28,6 @@ async function send(): Promise<SafeClientResult> {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    //safeAddress: '0x951CC166B2755Aae5C01DBc122e1fa8297f9576c'
     safeOptions: {
       owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
       threshold: THRESHOLD,
@@ -74,7 +74,6 @@ async function confirm(safeClientResult: SafeClientResult, pk: string) {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    //safeAddress: '0x951CC166B2755Aae5C01DBc122e1fa8297f9576c'
     safeOptions: {
       owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
       threshold: THRESHOLD,

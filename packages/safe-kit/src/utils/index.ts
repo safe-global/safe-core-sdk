@@ -55,7 +55,8 @@ export const createSafeClientResult = ({
     status,
     transactions: txHash || safeTxHash ? { ethereumTxHash: txHash, safeTxHash } : undefined,
     messages: messageHash ? { messageHash } : undefined,
-    safeOperations: userOperationHash || safeOperationHash ? { userOperationHash, safeOperationHash } : undefined,
+    safeOperations:
+      userOperationHash || safeOperationHash ? { userOperationHash, safeOperationHash } : undefined,
     safeAccountDeployment: deploymentTxHash ? { ethereumTxHash: deploymentTxHash } : undefined
   }
 }

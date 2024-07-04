@@ -1,4 +1,6 @@
-import { ethers, Signer } from 'ethers'
+import { createWalletClient, http } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { sepolia } from 'viem/chains'
 import SafeApiKit, { AddSafeDelegateProps } from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -11,17 +13,21 @@ const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c
 const PRIVATE_KEY_2 = '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
 
 let safeApiKit: SafeApiKit
-let signer: Signer
+let signer: AddSafeDelegateProps['signer']
 
 describe('addSafeDelegate', () => {
   before(async () => {
     safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
-    signer = new ethers.Wallet(PRIVATE_KEY_1)
+    signer = createWalletClient({
+      chain: sepolia,
+      transport: http(),
+      account: privateKeyToAccount(PRIVATE_KEY_1)
+    })
   })
 
   it('should fail if Label is empty', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -35,7 +41,7 @@ describe('addSafeDelegate', () => {
 
   it('should fail if Safe delegate address is empty', async () => {
     const delegateAddress = ''
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -64,7 +70,7 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -80,7 +86,7 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe delegate address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -96,7 +102,7 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe delegator address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = (await signer.getAddress()).toLowerCase()
+    const delegatorAddress = signer.account!.address.toLocaleLowerCase()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -112,7 +118,7 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe does not exist', async () => {
     const safeAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -128,8 +134,12 @@ describe('addSafeDelegate', () => {
   it('should fail if the signer is not an owner of the Safe', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const nonOwnerSigner = new ethers.Wallet(PRIVATE_KEY_2)
-    const delegatorAddress = await nonOwnerSigner.getAddress()
+    const nonOwnerSigner = createWalletClient({
+      chain: sepolia,
+      transport: http(),
+      account: privateKeyToAccount(PRIVATE_KEY_2)
+    })
+    const delegatorAddress = nonOwnerSigner.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -147,7 +157,7 @@ describe('addSafeDelegate', () => {
   it('should add a new delegate', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -170,7 +180,7 @@ describe('addSafeDelegate', () => {
 
   it('should add a new delegate without specifying a Safe', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -200,7 +210,7 @@ describe('addSafeDelegate', () => {
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-    const delegatorAddress = await signer.getAddress()
+    const delegatorAddress = signer.account!.address
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress: eip3770SafeAddress,

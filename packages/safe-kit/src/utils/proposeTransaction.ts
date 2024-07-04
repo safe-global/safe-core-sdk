@@ -7,6 +7,7 @@ import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
  *
  * @param {SafeTransaction} safeTransaction The Safe transaction to propose
  * @param {Safe} protocolKit The Safe instance
+ * @param {SafeApiKit} apiKit The SafeApiKit instance
  * @returns The Safe transaction hash
  */
 export const proposeTransaction = async (

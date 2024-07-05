@@ -54,8 +54,8 @@ class EthSafeOperation implements SafeOperation {
     this.signatures.set(signature.signer.toLowerCase(), signature)
   }
 
-  encodedSignatures(): Hex {
-    return buildSignatureBytes(Array.from(this.signatures.values())) as Hex
+  encodedSignatures(): string {
+    return buildSignatureBytes(Array.from(this.signatures.values()))
   }
 
   addEstimations(estimations: EstimateGasData): void {

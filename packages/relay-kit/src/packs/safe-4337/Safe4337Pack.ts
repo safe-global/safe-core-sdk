@@ -75,7 +75,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #BUNDLER_URL: string
 
   #ENTRYPOINT_ADDRESS: string
-  #SAFE_4337_MODULE_ADDRESS: Hash = '0x'
+  #SAFE_4337_MODULE_ADDRESS: string = '0x'
 
   #bundlerClient: BundlerClient
 
@@ -150,9 +150,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network] as
-        | Hash
-        | undefined
+      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
     }
 
     if (!addModulesLibAddress || !safe4337ModuleAddress) {

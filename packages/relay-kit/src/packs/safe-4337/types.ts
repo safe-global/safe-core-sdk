@@ -25,7 +25,7 @@ export type PaymasterOptions = {
   paymasterUrl?: string
   isSponsored?: boolean
   sponsorshipPolicyId?: string
-  paymasterAddress: Hash
+  paymasterAddress: string
   paymasterTokenAddress?: string
   amountToApprove?: bigint
 }
@@ -37,7 +37,7 @@ export type Safe4337InitOptions = {
   safeModulesVersion?: string
   customContracts?: {
     entryPointAddress?: string
-    safe4337ModuleAddress?: Hash
+    safe4337ModuleAddress?: string
     addModulesLibAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions
@@ -51,7 +51,7 @@ export type Safe4337Options = {
   paymasterOptions?: PaymasterOptions
   bundlerClient: BundlerClient
   entryPointAddress: string
-  safe4337ModuleAddress: Hash
+  safe4337ModuleAddress: string
 }
 
 export type Safe4337CreateTransactionProps = {

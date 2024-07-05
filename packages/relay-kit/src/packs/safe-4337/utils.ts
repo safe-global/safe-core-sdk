@@ -1,4 +1,3 @@
-import { Hash, encodeFunctionData, encodePacked, hashTypedData, toHex } from 'viem'
 import {
   Address,
   Hash,
@@ -47,13 +46,13 @@ export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
  *
  * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.
  * @param {SafeProvider} safeProvider - Safe provider.
- * @param {Hash} safe4337ModuleAddress - Safe 4337 module address.
+ * @param {string} safe4337ModuleAddress - Safe 4337 module address.
  * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.
  */
 export async function signSafeOp(
   safeUserOperation: SafeUserOperation,
   safeProvider: SafeProvider,
-  safe4337ModuleAddress: Hash
+  safe4337ModuleAddress: string
 ): Promise<SafeSignature> {
   const signer = await safeProvider.getExternalSigner()
 
@@ -86,7 +85,7 @@ export async function signSafeOp(
  * Encodes multi-send data from transactions batch.
  *
  * @param {MetaTransactionData[]} transactions - an array of transaction to to be encoded.
- * @return {Hash} The encoded data string.
+ * @return {string} The encoded data string.
  */
 export function encodeMultiSendCallData(transactions: MetaTransactionData[]): string {
   return encodeFunctionData({
@@ -105,7 +104,7 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): st
  *
  * @param {SafeUserOperation} safeUserOperation - The SafeUserOperation.
  * @param {bigint} chainId - The chain id.
- * @param {Hash} safe4337ModuleAddress - The Safe 4337 module address.
+ * @param {string} safe4337ModuleAddress - The Safe 4337 module address.
  * @return {string} The hash of the safe operation.
  */
 export function calculateSafeUserOperationHash(

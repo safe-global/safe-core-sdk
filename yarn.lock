@@ -1805,6 +1805,11 @@
   resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.1.1.tgz#ee887d7349dc6b8e9caa944cd612e71a73b5c8ac"
   integrity sha512-Tfiv+qYGEJM7idF8Ee1Gu8thg3qkCONBlOQxjS45kTAWn2VfnaPgIH2aMguiXbhkU8LgbNTzWtmmib+dR7KGpQ==
 
+"@safe-global/safe-modules-deployments@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.0.tgz#bb42c8010bbde65892fe438aaf8959e17c8654d6"
+  integrity sha512-ZzNhMf8Xxods3TrY7kSrescnicHQRFH7eYx7TMKqVhxFScEiuYmivQMdV94ziF+Hot0xCcrrFeed657U/oXrJw==
+
 "@safe-global/safe-passkey@0.2.0-alpha.1":
   version "0.2.0-alpha.1"
   resolved "https://registry.yarnpkg.com/@safe-global/safe-passkey/-/safe-passkey-0.2.0-alpha.1.tgz#a9e80e727ffe836f656808595dd4d59438948294"

@@ -31,12 +31,15 @@ if (!global.crypto) {
   global.crypto = crypto as unknown as Crypto
 }
 
-global.navigator = {
-  credentials: {
-    create: sinon.stub().callsFake(webAuthnCredentials.create.bind(webAuthnCredentials)),
-    get: sinon.stub().callsFake(webAuthnCredentials.get.bind(webAuthnCredentials))
-  }
-} as unknown as Navigator
+Object.defineProperty(global, 'navigator', {
+  value: {
+    credentials: {
+      create: sinon.stub().callsFake(webAuthnCredentials.create.bind(webAuthnCredentials)),
+      get: sinon.stub().callsFake(webAuthnCredentials.get.bind(webAuthnCredentials))
+    }
+  },
+  writable: true
+})
 
 describe('Safe contracts', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {

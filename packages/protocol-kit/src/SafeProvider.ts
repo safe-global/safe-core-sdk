@@ -30,6 +30,7 @@ import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
+  getSafeWebAuthnSharedSignerContractInstance,
   getSafeWebAuthnSignerFactoryContractInstance,
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
@@ -111,7 +112,8 @@ class SafeProvider {
       const passkeySigner = new PasskeySigner(
         signer,
         safeWebAuthnSignerFactoryContract,
-        safeProvider.getExternalProvider()
+        safeProvider.getExternalProvider(),
+        chainId.toString()
       )
 
       return new SafeProvider({
@@ -288,6 +290,19 @@ class SafeProvider {
     customContractAbi
   }: GetContractProps) {
     return getSafeWebAuthnSignerFactoryContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
+  }
+
+  async getSafeWebAuthnSharedSignerContract({
+    safeVersion,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps) {
+    return getSafeWebAuthnSharedSignerContractInstance(
       safeVersion,
       this,
       customContractAddress,

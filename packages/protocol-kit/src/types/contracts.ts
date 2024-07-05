@@ -24,6 +24,7 @@ import SimulateTxAccessorContract_v1_4_1 from '@safe-global/protocol-kit/contrac
 import CreateCallContract_v1_3_0 from '@safe-global/protocol-kit/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from '@safe-global/protocol-kit/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
 import SafeWebAuthnSignerFactoryContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSignerFactory/v1.4.1/SafeWebAuthnSignerFactoryContract_v1_4_1'
+import SafeWebAuthnSharedSignerContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSharedSigner/v1.4.1/SafeWebAuthnSharedSignerContract_v1_4_1'
 
 // Safe contract implementation types
 export type SafeContractImplementationType =
@@ -75,6 +76,9 @@ export type CreateCallContractImplementationType =
 export type SafeWebAuthnSignerFactoryContractImplementationType =
   SafeWebAuthnSignerFactoryContract_v1_4_1
 
+export type SafeWebAuthnSharedSignerContractImplementationType =
+  SafeWebAuthnSharedSignerContract_v1_4_1
+
 export type GetContractProps = {
   safeVersion: SafeVersion
   customContractAddress?: string
@@ -119,6 +123,10 @@ export type ContractNetworkConfig = {
   safeWebAuthnSignerFactoryAddress: string
   /** safeWebAuthnSignerFactoryAbi - Abi of the SafeWebAuthnSignerFactory contract deployed on a specific network */
   safeWebAuthnSignerFactoryAbi?: JsonFragment | JsonFragment[]
+  /** safeWebAuthnSharedSignerAddress - Address of the SafeWebAuthnSharedSigner contract deployed on a specific network */
+  safeWebAuthnSharedSignerAddress: string
+  /** safeWebAuthnSharedSignerAbi - Abi of the SafeWebAuthnSharedSigner contract deployed on a specific network */
+  safeWebAuthnSharedSignerAbi?: JsonFragment | JsonFragment[]
 }
 
 export type ContractNetworksConfig = {

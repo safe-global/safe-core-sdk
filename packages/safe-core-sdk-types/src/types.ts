@@ -173,7 +173,7 @@ export interface EIP712TypedDataMessage {
 export interface TypedDataDomain {
   name?: string
   version?: string
-  chainId?: unknown
+  chainId?: number
   verifyingContract?: string
   salt?: ArrayLike<number> | string
 }

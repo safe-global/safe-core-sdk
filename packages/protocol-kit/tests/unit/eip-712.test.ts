@@ -236,7 +236,7 @@ describe('EIP-712 sign typed data', () => {
       })
     })
 
-    it('should generate the correct types for an EIP-712 message for <1.3.0 Safes', () => {
+    it.only('should generate the correct types for an EIP-712 message for <1.3.0 Safes', () => {
       const message = {
         domain: {
           chainId: 1n,

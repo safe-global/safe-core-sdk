@@ -89,18 +89,20 @@ describe('getSafeDelegates', () => {
 
     it('should return an array of delegates', async () => {
       const { results, count } = await safeApiKit.getSafeDelegates({ safeAddress })
-      delegatesResponse = results
-      const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
+      delegatesResponse = [...results]
+      results.sort((a: SafeDelegateResponse, b: SafeDelegateResponse) =>
+        a.delegate > b.delegate ? -1 : 1
+      )
       chai.expect(count).to.be.eq(2)
-      chai.expect(sortedResults.length).to.be.eq(2)
-      chai.expect(sortedResults[0].safe).to.be.eq(safeAddress)
-      chai.expect(sortedResults[0].delegate).to.be.eq(delegateConfig1.delegateAddress)
-      chai.expect(sortedResults[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
-      chai.expect(sortedResults[0].label).to.be.eq('Label1')
-      chai.expect(sortedResults[1].safe).to.be.eq(safeAddress)
-      chai.expect(sortedResults[1].delegate).to.be.eq(delegateConfig2.delegateAddress)
-      chai.expect(sortedResults[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
-      chai.expect(sortedResults[1].label).to.be.eq('Label2')
+      chai.expect(results.length).to.be.eq(2)
+      chai.expect(results[0].safe).to.be.eq(safeAddress)
+      chai.expect(results[0].delegate).to.be.eq(delegateConfig1.delegateAddress)
+      chai.expect(results[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
+      chai.expect(results[0].label).to.be.eq('Label1')
+      chai.expect(results[1].safe).to.be.eq(safeAddress)
+      chai.expect(results[1].delegate).to.be.eq(delegateConfig2.delegateAddress)
+      chai.expect(results[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
+      chai.expect(results[1].label).to.be.eq('Label2')
     })
 
     it('should return only the first delegate with limit = 1', async () => {
@@ -146,14 +148,16 @@ describe('getSafeDelegates', () => {
       safeAddress: eip3770SafeAddress
     })
     const { results } = safeDelegateListResponse
-    const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
-    chai.expect(sortedResults.length).to.be.eq(2)
-    chai.expect(sortedResults[0].delegate).to.be.eq('0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B')
-    chai.expect(sortedResults[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
-    chai.expect(sortedResults[0].label).to.be.eq('Label1')
-    chai.expect(sortedResults[1].delegate).to.be.eq('0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b')
-    chai.expect(sortedResults[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
-    chai.expect(sortedResults[1].label).to.be.eq('Label2')
+    results.sort((a: SafeDelegateResponse, b: SafeDelegateResponse) =>
+      a.delegate > b.delegate ? -1 : 1
+    )
+    chai.expect(results.length).to.be.eq(2)
+    chai.expect(results[0].delegate).to.be.eq('0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B')
+    chai.expect(results[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
+    chai.expect(results[0].label).to.be.eq('Label1')
+    chai.expect(results[1].delegate).to.be.eq('0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b')
+    chai.expect(results[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
+    chai.expect(results[1].label).to.be.eq('Label2')
     await safeApiKit.removeSafeDelegate({
       delegateAddress: delegateConfig1.delegateAddress,
       delegatorAddress,

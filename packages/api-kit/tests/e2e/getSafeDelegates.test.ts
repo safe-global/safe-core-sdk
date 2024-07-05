@@ -1,5 +1,8 @@
 import { ethers, Signer } from 'ethers'
-import SafeApiKit, { DeleteSafeDelegateProps } from '@safe-global/api-kit/index'
+import SafeApiKit, {
+  DeleteSafeDelegateProps,
+  SafeDelegateResponse
+} from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
@@ -44,6 +47,7 @@ describe('getSafeDelegates', () => {
     let delegatorAddress: string
     let delegateConfig1: DeleteSafeDelegateProps
     let delegateConfig2: DeleteSafeDelegateProps
+    let delegatesResponse: SafeDelegateResponse[]
 
     before(async () => {
       delegatorAddress = await signer.getAddress()
@@ -85,6 +89,7 @@ describe('getSafeDelegates', () => {
 
     it('should return an array of delegates', async () => {
       const { results, count } = await safeApiKit.getSafeDelegates({ safeAddress })
+      delegatesResponse = results
       const sortedResults = results.sort((a, b) => (a.delegate > b.delegate ? -1 : 1))
       chai.expect(count).to.be.eq(2)
       chai.expect(sortedResults.length).to.be.eq(2)
@@ -102,20 +107,14 @@ describe('getSafeDelegates', () => {
       const { results, count } = await safeApiKit.getSafeDelegates({ safeAddress, limit: 1 })
       chai.expect(count).to.be.eq(2)
       chai.expect(results.length).to.be.eq(1)
-      chai.expect(results[0].safe).to.be.eq(safeAddress)
-      chai.expect(results[0].delegate).to.be.eq(delegateConfig1.delegateAddress)
-      chai.expect(results[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
-      chai.expect(results[0].label).to.be.eq('Label1')
+      chai.expect(results).to.be.deep.eq(delegatesResponse.slice(0, 1))
     })
 
     it('should return only the second delegate with offset = 1', async () => {
       const { results, count } = await safeApiKit.getSafeDelegates({ safeAddress, offset: 1 })
       chai.expect(count).to.be.eq(2)
       chai.expect(results.length).to.be.eq(1)
-      chai.expect(results[0].safe).to.be.eq(safeAddress)
-      chai.expect(results[0].delegate).to.be.eq(delegateConfig2.delegateAddress)
-      chai.expect(results[0].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
-      chai.expect(results[0].label).to.be.eq('Label2')
+      chai.expect(results).to.be.deep.eq(delegatesResponse.slice(1))
     })
   })
 

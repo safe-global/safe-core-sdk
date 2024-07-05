@@ -74,7 +74,7 @@ describe('Safe Info', () => {
         .to.be.eq(await account1.signer.getAddress())
     })
 
-    it.only('should connect a deployed Safe', async () => {
+    it('should connect a deployed Safe', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2, account3] = accounts
       const safeAddress = await safe.getAddress()
@@ -110,7 +110,7 @@ describe('Safe Info', () => {
         .expect(await safeSdk3.getSafeProvider().getSignerAddress())
         .to.be.eq(await account3.signer.getAddress())
     })
-  }).timeout(10000000000)
+  })
 
   describe('getContractVersion', async () => {
     it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {

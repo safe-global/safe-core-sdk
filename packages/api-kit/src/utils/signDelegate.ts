@@ -1,7 +1,7 @@
-import { WalletClient } from 'viem'
+import { Chain, LocalAccount, Transport, WalletClient } from 'viem'
 
 export async function signDelegate(
-  walletClient: WalletClient,
+  walletClient: WalletClient<Transport, Chain, LocalAccount>,
   delegateAddress: string,
   chainId: bigint
 ) {
@@ -21,7 +21,6 @@ export async function signDelegate(
   const totp = Math.floor(Date.now() / 1000 / 3600)
 
   return walletClient.signTypedData({
-    account: walletClient.account!.address,
     domain,
     types,
     primaryType: 'Delegate',

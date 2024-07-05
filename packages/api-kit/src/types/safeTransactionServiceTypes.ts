@@ -1,4 +1,11 @@
-import { TypedDataDomain, TypedDataParameter, WalletClient } from 'viem'
+import {
+  Chain,
+  LocalAccount,
+  Transport,
+  TypedDataDomain,
+  TypedDataParameter,
+  WalletClient
+} from 'viem'
 import {
   SafeMultisigTransactionResponse,
   SafeTransactionData,
@@ -77,14 +84,14 @@ export type AddSafeDelegateProps = {
   safeAddress?: string
   delegateAddress: string
   delegatorAddress: string
-  signer: WalletClient
+  signer: WalletClient<Transport, Chain, LocalAccount>
   label: string
 }
 
 export type DeleteSafeDelegateProps = {
   delegateAddress: string
   delegatorAddress: string
-  signer: WalletClient
+  signer: WalletClient<Transport, Chain, LocalAccount>
 }
 
 export type SafeDelegateResponse = {
@@ -92,15 +99,13 @@ export type SafeDelegateResponse = {
   readonly delegate: string
   readonly delegator: string
   readonly label: string
+}
+
+export type SignedSafeDelegateResponse = SafeDelegateResponse & {
   readonly signature: string
 }
 
-export type SafeDelegateListResponse = ListResponse<{
-  readonly safe: string
-  readonly delegate: string
-  readonly delegator: string
-  readonly label: string
-}>
+export type SafeDelegateListResponse = ListResponse<SafeDelegateResponse>
 
 export type SafeMultisigTransactionEstimate = {
   readonly to: string

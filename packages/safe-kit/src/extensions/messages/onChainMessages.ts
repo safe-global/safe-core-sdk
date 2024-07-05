@@ -28,11 +28,13 @@ export function onChainMessages() {
     /**
      * Creates and sends a message as a regular transaction using the SignMessageLib contract
      * The message can be a string or an EIP712TypedData object
+     * As this method creates a new transaction you can confirm it using the safeTxHash and the confirm() method and
+     * retrieve the pending transactions using the getPendingTransactions() method from the general client
      * @param {string | EIP712TypedData} message The message to be sent
      * @param {TransactionOptions} options Optional transaction options
      * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the safeTxHash to confirm from the transaction property
      */
-    async sendMessage(
+    async sendOnChainMessage(
       message: string | EIP712TypedData,
       options?: TransactionOptions
     ): Promise<SafeClientResult> {

@@ -82,7 +82,7 @@ async function send(): Promise<SafeClientResult> {
   )
   console.log('-Signer Address:', signerAddress)
 
-  const txResult = await safeClientWithMessages.sendMessage(MESSAGE)
+  const txResult = await safeClientWithMessages.sendOnChainMessage(MESSAGE)
 
   console.log('-Send result: ', txResult)
 

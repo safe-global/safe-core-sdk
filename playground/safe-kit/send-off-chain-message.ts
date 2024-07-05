@@ -83,7 +83,7 @@ async function send(): Promise<SafeClientResult> {
   )
   console.log('-Signer Address:', signerAddress)
 
-  const txResult = await safeClientWithMessages.sendMessage(MESSAGE)
+  const txResult = await safeClientWithMessages.sendOffChainMessage(MESSAGE)
 
   console.log('-Send result: ', txResult)
 
@@ -107,14 +107,14 @@ async function confirm({ safeAddress, messages }: SafeClientResult, pk: string) 
 
   const safeClientWithMessages = safeClient.extend(offChainMessages())
 
-  const pendingMessages = await safeClientWithMessages.getPendingMessages()
+  const pendingMessages = await safeClientWithMessages.getPendingOffChainMessages()
 
   pendingMessages.results.forEach(async (message) => {
     if (message.messageHash !== messages?.messageHash) {
       return
     }
 
-    const txResult = await safeClientWithMessages.confirmMessage(message.messageHash)
+    const txResult = await safeClientWithMessages.confirmOffChainMessage(message.messageHash)
 
     console.log('-Confirm result: ', txResult)
   })

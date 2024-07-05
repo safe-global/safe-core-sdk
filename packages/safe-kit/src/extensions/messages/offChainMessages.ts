@@ -29,7 +29,7 @@ export function offChainMessages() {
        * @param {string | EIP712TypedData} message The message to be sent, can be a raw string or an EIP712TypedData object
        * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the messageHash to confirmMessage() afterwards from the messages property
        */
-      async sendMessage(message: string | EIP712TypedData): Promise<SafeClientResult> {
+      async sendOffChainMessage(message: string | EIP712TypedData): Promise<SafeClientResult> {
         return safeMessageClient.sendMessage(message)
       },
       /**
@@ -38,7 +38,7 @@ export function offChainMessages() {
        * @param {string} messageHash The messageHash. Returned from the sendMessage() method inside the SafeClientResult messages property
        * @returns {Promise<SafeClientResult>} A SafeClientResult with the result of the confirmation
        */
-      async confirmMessage(messageHash: string): Promise<SafeClientResult> {
+      async confirmOffChainMessage(messageHash: string): Promise<SafeClientResult> {
         return safeMessageClient.confirmMessage(messageHash)
       },
       /**
@@ -47,7 +47,7 @@ export function offChainMessages() {
        * @param {GetSafeMessageListProps} [options] Optional query parameters for pagination
        * @returns {Promise<SafeMessageListResponse>} A list of pending messages
        */
-      async getPendingMessages(
+      async getPendingOffChainMessages(
         options?: GetSafeMessageListProps
       ): Promise<SafeMessageListResponse> {
         return safeMessageClient.getPendingMessages(options)

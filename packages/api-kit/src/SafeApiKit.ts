@@ -15,7 +15,6 @@ import {
   ProposeTransactionProps,
   SafeCreationInfoResponse,
   SafeDelegateListResponse,
-  SafeDelegateResponse,
   SafeInfoResponse,
   SafeMessage,
   SafeMessageListResponse,
@@ -26,6 +25,7 @@ import {
   SafeServiceInfoResponse,
   SafeSingletonResponse,
   SignatureResponse,
+  SignedSafeDelegateResponse,
   TokenInfoListResponse,
   TokenInfoResponse,
   TransferListResponse
@@ -316,7 +316,7 @@ class SafeApiKit {
     delegatorAddress,
     label,
     signer
-  }: AddSafeDelegateProps): Promise<SafeDelegateResponse> {
+  }: AddSafeDelegateProps): Promise<SignedSafeDelegateResponse> {
     if (delegateAddress === '') {
       throw new Error('Invalid Safe delegate address')
     }

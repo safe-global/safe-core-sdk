@@ -1,9 +1,10 @@
-import { ethers, Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
+import { toBytes, getAddress, encodePacked, bytesToHex, decodeFunctionData } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { asAddress, asHex } from '../types'
 import {
   MetaTransactionData,
   OperationType,
@@ -113,10 +114,16 @@ export async function standardizeSafeTransactionData({
 }
 
 function encodeMetaTransaction(tx: MetaTransactionData): string {
-  const data = getBytes(tx.data)
-  const encoded = solidityPack(
+  const data = toBytes(tx.data)
+  const encoded = encodePacked(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
-    [tx.operation, tx.to, tx.value, data.length, data]
+    [
+      tx.operation ?? OperationType.Call,
+      asAddress(tx.to),
+      BigInt(tx.value),
+      BigInt(data.length),
+      bytesToHex(data)
+    ]
   )
   return encoded.slice(2)
 }
@@ -126,32 +133,35 @@ export function encodeMultiSendData(txs: MetaTransactionData[]): string {
 }
 
 export function decodeMultiSendData(encodedData: string): MetaTransactionData[] {
-  const multiSendInterface = new Interface([
-    'function multiSend(bytes memory transactions) public payable'
-  ])
-  const [decodedData] = multiSendInterface.decodeFunctionData('multiSend', encodedData)
+  const decodedData = decodeFunctionData({
+    abi: ['function multiSend(bytes memory transactions) public payable'],
+    data: asHex(encodedData)
+  })
 
+  const args = decodedData.args
   const txs: MetaTransactionData[] = []
 
   // Decode after 0x
   let index = 2
 
-  while (index < decodedData.length) {
-    // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
-    // uint8 operation, address to, value uint256, dataLength uint256
+  if (args) {
+    while (index < args.length) {
+      // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
+      // uint8 operation, address to, value uint256, dataLength uint256
 
-    const operation = `0x${decodedData.slice(index, (index += 2))}`
-    const to = `0x${decodedData.slice(index, (index += 40))}`
-    const value = `0x${decodedData.slice(index, (index += 64))}`
-    const dataLength = parseInt(decodedData.slice(index, (index += 64)), 16) * 2
-    const data = `0x${decodedData.slice(index, (index += dataLength))}`
+      const operation = `0x${args.slice(index, (index += 2))}`
+      const to = `0x${args.slice(index, (index += 40))}`
+      const value = `0x${args.slice(index, (index += 64))}`
+      const dataLength = parseInt(`${args.slice(index, (index += 64))}`, 16) * 2
+      const data = `0x${args.slice(index, (index += dataLength))}`
 
-    txs.push({
-      operation: Number(operation) as OperationType,
-      to: ethers.getAddress(to),
-      value: BigInt(value).toString(),
-      data
-    })
+      txs.push({
+        operation: Number(operation) as OperationType,
+        to: getAddress(to),
+        value: BigInt(value).toString(),
+        data
+      })
+    }
   }
 
   return txs

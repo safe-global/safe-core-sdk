@@ -306,7 +306,8 @@ class SafeProvider {
     if (isTypedDataSigner(signer)) {
       const typedData = generateTypedData(safeEIP712Args)
       const { chainId, verifyingContract } = typedData.domain
-      const domain = { verifyingContract: asAddress(verifyingContract), chainId }
+      const chain = chainId ? Number(chainId) : undefined // ensure empty string becomes undefined
+      const domain = { verifyingContract: asAddress(verifyingContract), chainId: chain }
 
       const signature = await signer.signTypedData({
         domain,

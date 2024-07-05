@@ -1,6 +1,5 @@
-import { Contract } from 'ethers'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { Address, GetContractReturnType, Abi } from 'viem'
+import { Address, GetContractReturnType, Abi, WalletClient } from 'viem'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -43,7 +42,7 @@ export const getFactory = async (): Promise<{
   }
 }
 
-export const getSafeTemplate = async (): Promise<GetContractReturnType> => {
+export const getSafeTemplate = async (): Promise<GetContractReturnType<Abi, WalletClient>> => {
   const randomSaltNonce = Math.floor(Math.random() * 1000000000) + 1
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
@@ -62,7 +61,7 @@ export const getSafeWithOwners = async (
   owners: string[],
   threshold?: number,
   fallbackHandler?: string
-): Promise<Contract> => {
+): Promise<GetContractReturnType<Abi, WalletClient>> => {
   const template = await getSafeTemplate()
   if (semverSatisfies(safeVersionDeployed, '<=1.0.0')) {
     await template.write.setup([

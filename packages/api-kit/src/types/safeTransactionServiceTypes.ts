@@ -92,15 +92,13 @@ export type SafeDelegateResponse = {
   readonly delegate: string
   readonly delegator: string
   readonly label: string
+}
+
+export type SignedSafeDelegateResponse = SafeDelegateResponse & {
   readonly signature: string
 }
 
-export type SafeDelegateListResponse = ListResponse<{
-  readonly safe: string
-  readonly delegate: string
-  readonly delegator: string
-  readonly label: string
-}>
+export type SafeDelegateListResponse = ListResponse<SafeDelegateResponse>
 
 export type SafeMultisigTransactionEstimate = {
   readonly to: string

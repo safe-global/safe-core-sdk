@@ -9,7 +9,6 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types/types'
-import { Address } from 'viem'
 
 /**
  * Extracts the names of read-only functions (view or pure) from a given contract ABI.
@@ -82,7 +81,7 @@ export type EstimateGasFunction<
   options?: TransactionOptions
 ) => Promise<bigint>
 
-export type GetAddressFunction = () => Promise<Address>
+export type GetAddressFunction = () => Promise<string>
 
 /**
  * Defines a function type for a contract, derived by the given function name from a given contract ABI.

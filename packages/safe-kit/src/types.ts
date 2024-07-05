@@ -1,4 +1,5 @@
 import { SafeProvider } from '@safe-global/protocol-kit'
+import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
 
 export type SafeConfig = {
   owners: string[]
@@ -23,11 +24,22 @@ export type SafeKitRootConfig = {
 
 export type SafeKitConfig = SafeKitRootConfig & (ExistingSafeKitConfig | PredictedSafeKitConfig)
 
-export type SafeClientTransactionResult = {
-  chain: {
-    hash?: string | undefined
+export type SafeClientResult = {
+  safeAddress: string
+  description: string
+  status: SafeClientTxStatus
+  transactions?: {
+    safeTxHash?: string
+    ethereumTxHash?: string
   }
-  safeServices?: {
-    safeTxHash: string | undefined
+  messages?: {
+    messageHash?: string
+  }
+  safeOperations?: {
+    userOperationHash?: string
+    safeOperationHash?: string
+  }
+  safeAccountDeployment?: {
+    ethereumTxHash?: string
   }
 }

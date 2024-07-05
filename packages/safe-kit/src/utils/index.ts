@@ -1,5 +1,9 @@
 import { validateEthereumAddress } from '@safe-global/protocol-kit'
-import { SafeConfig } from '../types'
+import { TransactionResult } from '@safe-global/safe-core-sdk-types'
+import { ContractTransactionReceipt, TransactionResponse } from 'ethers'
+
+import { MESSAGES, SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+import { SafeClientResult, SafeConfig } from '@safe-global/safe-kit/types'
 
 export const isValidAddress = (address: string): boolean => {
   try {
@@ -16,5 +20,46 @@ export const isValidSafeConfig = (config: SafeConfig): boolean => {
   return true
 }
 
+export const waitSafeTxReceipt = async (
+  txResult: TransactionResult
+): Promise<ContractTransactionReceipt | null | undefined> => {
+  const receipt =
+    txResult.transactionResponse &&
+    (await (txResult.transactionResponse as TransactionResponse).wait())
+
+  return receipt as ContractTransactionReceipt
+}
+
+export const createSafeClientResult = ({
+  status,
+  safeAddress,
+  deploymentTxHash,
+  safeTxHash,
+  txHash,
+  messageHash,
+  userOperationHash,
+  safeOperationHash
+}: {
+  status: SafeClientTxStatus
+  safeAddress: string
+  deploymentTxHash?: string
+  safeTxHash?: string
+  txHash?: string
+  messageHash?: string
+  userOperationHash?: string
+  safeOperationHash?: string
+}): SafeClientResult => {
+  return {
+    safeAddress,
+    description: MESSAGES[status],
+    status,
+    transactions: txHash || safeTxHash ? { ethereumTxHash: txHash, safeTxHash } : undefined,
+    messages: messageHash ? { messageHash } : undefined,
+    safeOperations:
+      userOperationHash || safeOperationHash ? { userOperationHash, safeOperationHash } : undefined,
+    safeAccountDeployment: deploymentTxHash ? { ethereumTxHash: deploymentTxHash } : undefined
+  }
+}
+
 export * from './sendTransaction'
-export * from './sendAndDeployTransaction'
+export * from './proposeTransaction'

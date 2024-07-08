@@ -254,7 +254,7 @@ describe('createSafeDeploymentTransaction', () => {
     const [account1] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,

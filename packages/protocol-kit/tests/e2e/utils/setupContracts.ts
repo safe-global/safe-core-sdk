@@ -13,16 +13,15 @@ import {
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { deployments, viem } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
+import { waitTransactionReceipt, getContractAt } from './transactions'
 
 // TODO: changue contract por abitype objts
-
 export const getSafeSingleton = async (): Promise<{
-  contract: any
+  contract: GetContractReturnType
   abi: Abi
 }> => {
   const safeDeployment = await deployments.get(safeDeployed.name)
-  const safeAddress = safeDeployment.address as Address
-  const contract = await viem.getContractAt(safeDeployed.name, safeAddress)
+  const contract = await getContractAt(safeDeployed.name, safeDeployment.address)
   return {
     contract,
     abi: safeDeployment.abi
@@ -30,12 +29,12 @@ export const getSafeSingleton = async (): Promise<{
 }
 
 export const getFactory = async (): Promise<{
-  contract: any
+  contract: GetContractReturnType<Abi, WalletClient>
   abi: Abi
 }> => {
   const factoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const factoryAddress = factoryDeployment.address as Address
-  const contract = await viem.getContractAt(proxyFactoryDeployed.name, factoryAddress)
+  const contract = await getContractAt(proxyFactoryDeployed.name, factoryAddress)
   return {
     contract,
     abi: factoryDeployment.abi
@@ -48,13 +47,14 @@ export const getSafeTemplate = async (): Promise<GetContractReturnType<Abi, Wall
   const factory = (await getFactory()).contract
   const singletonAddress = await singleton.address
 
-  const address = (await factory.read.createProxyWithNonce([
+  const { result } = await factory.simulate.createProxyWithNonce([
     singletonAddress,
     '0x',
     randomSaltNonce
-  ])) as Address
-  await factory.write.createProxyWithNonce([singletonAddress, '0x', randomSaltNonce])
-  return viem.getContractAt(safeDeployed.name, address)
+  ])
+  const hash = await factory.write.createProxyWithNonce([singletonAddress, '0x', randomSaltNonce])
+  await waitTransactionReceipt(hash)
+  return viem.getContractAt(safeDeployed.name, result as Address)
 }
 
 export const getSafeWithOwners = async (

@@ -47,7 +47,7 @@ describe('Safe guard manager', () => {
       'should fail if getting the enabled guard is not supported',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -76,7 +76,7 @@ describe('Safe guard manager', () => {
       'should return 0x address when no Safe guard is enabled',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -88,7 +88,7 @@ describe('Safe guard manager', () => {
 
     itif(safeVersionDeployed >= '1.3.0')('should return the enabled Safe guard', async () => {
       const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -107,7 +107,7 @@ describe('Safe guard manager', () => {
       'should fail if enabling a Safe guard is not supported',
       async () => {
         const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -137,7 +137,7 @@ describe('Safe guard manager', () => {
 
     itif(safeVersionDeployed >= '1.3.0')('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -152,7 +152,7 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
 
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -166,7 +166,7 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if address is already enabled', async () => {
       const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -184,7 +184,7 @@ describe('Safe guard manager', () => {
       async () => {
         const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
 
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -214,7 +214,7 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should enable a Safe guard', async () => {
       const { safe, contractNetworks, debugTransactionGuard, provider } = await setupTests()
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -235,7 +235,7 @@ describe('Safe guard manager', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -265,7 +265,7 @@ describe('Safe guard manager', () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if no Safe guard is enabled', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -281,7 +281,7 @@ describe('Safe guard manager', () => {
         const { accounts, contractNetworks, debugTransactionGuard, provider } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -313,7 +313,7 @@ describe('Safe guard manager', () => {
       const { accounts, contractNetworks, debugTransactionGuard, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,

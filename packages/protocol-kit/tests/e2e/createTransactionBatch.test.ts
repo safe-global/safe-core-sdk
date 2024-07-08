@@ -45,7 +45,7 @@ describe('createTransactionBatch', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const provider = getEip1193Provider()
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,

@@ -54,7 +54,7 @@ describe('On-chain signatures', () => {
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const account3 = accounts[2]
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         signer: account3.address,
@@ -76,7 +76,7 @@ describe('On-chain signatures', () => {
     it('should approve the transaction hash', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
@@ -97,7 +97,7 @@ describe('On-chain signatures', () => {
     it('should ignore a duplicated signatures', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
@@ -136,7 +136,7 @@ describe('On-chain signatures', () => {
     it('should return the list of owners who approved a transaction hash', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [, account2] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         safeAddress: safeAddress,

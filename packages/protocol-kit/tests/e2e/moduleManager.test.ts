@@ -66,7 +66,7 @@ describe('Safe modules manager', () => {
     it('should return all the enabled modules', async () => {
       const { safe, dailyLimitModule, socialRecoveryModule, contractNetworks, provider } =
         await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -106,7 +106,7 @@ describe('Safe modules manager', () => {
 
     it('should return the enabled modules', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -135,7 +135,7 @@ describe('Safe modules manager', () => {
         whiteListModule,
         provider
       } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const dailyLimitsAddress = await dailyLimitModule.getAddress()
       const socialRecoveryAddress = await socialRecoveryModule.getAddress()
       const stateChannelAddress = await stateChannelModule.getAddress()
@@ -200,7 +200,7 @@ describe('Safe modules manager', () => {
         whiteListModule,
         provider
       } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const dailyLimitsAddress = await dailyLimitModule.getAddress()
       const socialRecoveryAddress = await socialRecoveryModule.getAddress()
       const stateChannelAddress = await stateChannelModule.getAddress()
@@ -272,7 +272,7 @@ describe('Safe modules manager', () => {
 
     it('should return true if a module is enabled', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -300,7 +300,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -312,7 +312,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to sentinel', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -324,7 +324,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to 0x address', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -336,7 +336,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is already enabled', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -351,7 +351,7 @@ describe('Safe modules manager', () => {
 
     it('should build the transaction with the optional props', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -376,7 +376,7 @@ describe('Safe modules manager', () => {
 
     it('should enable a Safe module', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -406,7 +406,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -418,7 +418,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to sentinel', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -430,7 +430,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to 0x address', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -442,7 +442,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is not enabled', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -456,7 +456,7 @@ describe('Safe modules manager', () => {
       const { dailyLimitModule, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -491,7 +491,7 @@ describe('Safe modules manager', () => {
         await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,

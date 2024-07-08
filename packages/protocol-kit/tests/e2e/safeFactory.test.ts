@@ -187,7 +187,7 @@ describe('SafeProxyFactory', () => {
       )
       const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
       const safe = await safeFactory.deploySafe(deploySafeProps)
-      chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+      chai.expect(counterfactualSafeAddress).to.be.eq(safe.address)
       chai.expect(threshold).to.be.eq(await safe.getThreshold())
       const deployedSafeOwners = await safe.getOwners()
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
@@ -213,7 +213,7 @@ describe('SafeProxyFactory', () => {
         )
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
         const safe = await safeFactory.deploySafe(deploySafeProps)
-        chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+        chai.expect(counterfactualSafeAddress).to.be.eq(safe.address)
         const compatibilityFallbackHandler = await (
           await getCompatibilityFallbackHandler()
         ).contract.address
@@ -245,7 +245,7 @@ describe('SafeProxyFactory', () => {
         )
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
         const safe = await safeFactory.deploySafe(deploySafeProps)
-        chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+        chai.expect(counterfactualSafeAddress).to.be.eq(safe.address)
         chai
           .expect(await defaultCallbackHandler.getAddress())
           .to.be.eq(await safe.getFallbackHandler())

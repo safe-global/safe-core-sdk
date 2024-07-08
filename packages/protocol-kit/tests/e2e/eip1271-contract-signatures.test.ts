@@ -48,7 +48,7 @@ describe('The EIP1271 implementation', () => {
         fallbackHandlerAddress
       )
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
 
       return {
         safe,

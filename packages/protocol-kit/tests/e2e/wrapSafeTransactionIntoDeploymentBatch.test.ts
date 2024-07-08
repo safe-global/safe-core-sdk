@@ -45,7 +45,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,

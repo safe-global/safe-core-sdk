@@ -52,7 +52,7 @@ describe('Fallback handler manager', () => {
       'should fail if getting the enabled fallback handler is not supported',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -79,7 +79,7 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should return the enabled fallback handler', async () => {
       const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -139,7 +139,7 @@ describe('Fallback handler manager', () => {
       'should fail if enabling a fallback handler is not supported',
       async () => {
         const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -156,7 +156,7 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -170,7 +170,7 @@ describe('Fallback handler manager', () => {
       'should fail if address is equal to 0x address',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -183,7 +183,7 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is already enabled', async () => {
       const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -202,7 +202,7 @@ describe('Fallback handler manager', () => {
       'should build the transaction with the optional props',
       async () => {
         const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -231,7 +231,7 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should enable a fallback handler', async () => {
       const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -292,7 +292,7 @@ describe('Fallback handler manager', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -311,7 +311,7 @@ describe('Fallback handler manager', () => {
       'should fail if no fallback handler is enabled',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -334,7 +334,7 @@ describe('Fallback handler manager', () => {
         const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -371,7 +371,7 @@ describe('Fallback handler manager', () => {
       const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,

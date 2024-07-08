@@ -426,8 +426,7 @@ describe('Safe4337Pack', () => {
         },
         paymasterOptions: {
           isSponsored: true,
-          paymasterUrl: fixtures.PAYMASTER_URL,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          paymasterUrl: fixtures.PAYMASTER_URL
         }
       })
 
@@ -463,9 +462,9 @@ describe('Safe4337Pack', () => {
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
         },
+        // @ts-expect-error - An error will be thrown
         paymasterOptions: {
-          isSponsored: true,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          isSponsored: true
         }
       })
 

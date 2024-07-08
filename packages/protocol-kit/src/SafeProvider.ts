@@ -45,7 +45,7 @@ import {
   Transport,
   Chain
 } from 'viem'
-import { privateKeyToAccount, privateKeyToAddress, Account } from 'viem/accounts'
+import { privateKeyToAccount, Account } from 'viem/accounts'
 
 function asBlockId(blockId: number | string | undefined) {
   return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
@@ -70,9 +70,10 @@ class SafeProvider {
         transport: http(provider)
       })
     } else {
-      this.#externalProvider = createPublicClient({
+      const client = createPublicClient({
         transport: custom(provider)
       })
+      this.#externalProvider = client
     }
 
     this.provider = provider
@@ -87,9 +88,9 @@ class SafeProvider {
     WalletClient<Transport, Chain | undefined, Account> | undefined
   > {
     // If the signer is not an Ethereum address, it should be a private key
+    const { transport, chain } = this.getExternalProvider()
     if (this.signer && !this.isAddress(this.signer)) {
       const account = privateKeyToAccount(asHex(this.signer))
-      const { transport, chain } = this.getExternalProvider()
       return createWalletClient({
         account,
         chain,
@@ -99,12 +100,29 @@ class SafeProvider {
 
     // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
     if (this.signer) {
-      const { chain, transport } = this.getExternalProvider()
       return createWalletClient({
+        account: asAddress(this.signer),
         chain,
         transport: custom(transport)
       })
     }
+
+    if (transport?.type === 'custom') {
+      // This behavior is a reproduction of JsonRpcApiProvider#getSigner (which is super of BrowserProvider).
+      // it dispatches and eth_accounts and picks the index 0. https://github.com/ethers-io/ethers.js/blob/a4b1d1f43fca14f2e826e3c60e0d45f5b6ef3ec4/src.ts/providers/provider-jsonrpc.ts#L1119C24-L1119C37
+      const wallet = createWalletClient({
+        chain,
+        transport: custom(transport)
+      })
+
+      const [address] = await wallet.getAddresses()
+      return createWalletClient({
+        account: address,
+        transport: custom(transport),
+        chain: wallet.chain
+      })
+    }
+
     return undefined
   }
 
@@ -275,11 +293,8 @@ class SafeProvider {
   }
 
   async getSignerAddress(): Promise<string | undefined> {
-    if (this.signer && !isAddress(this.signer)) {
-      return privateKeyToAddress(asHex(this.signer))
-    }
-
-    return this.signer
+    const externalSigner = await this.getExternalSigner()
+    return externalSigner ? getAddress(externalSigner.account.address) : undefined
   }
 
   async signMessage(message: string): Promise<string> {

@@ -1,5 +1,5 @@
 import { viem } from 'hardhat'
-import { WalletClient, Chain, Transport, Account as ViemAccount } from 'viem'
+import { WalletClient, Chain, Transport, getAddress, Account as ViemAccount } from 'viem'
 interface Account {
   signer: WalletClient<Transport, Chain, ViemAccount>
   address: string
@@ -12,7 +12,7 @@ async function getHardhatAccounts(): Promise<Account[]> {
 
   for (let i = 0; i < 10; i++) {
     const wallet = wallets[i]
-    const account: Account = { signer: wallet, address: wallet.account.address }
+    const account: Account = { signer: wallet, address: getAddress(wallet.account.address) }
     accounts.push(account)
   }
 

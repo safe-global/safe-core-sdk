@@ -12,6 +12,7 @@ import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { asAddress } from '@safe-global/protocol-kit/utils/types'
 import { waitTransactionReceipt } from './utils/transactions'
+import { sameString } from '@safe-global/protocol-kit/utils'
 
 chai.use(chaiAsPromised)
 
@@ -86,9 +87,13 @@ describe('Safe Info', () => {
         contractNetworks
       })
       chai.expect(await safeSdk.getAddress()).to.be.eq(safeAddress)
-      chai
-        .expect(await safeSdk.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account1.signer.account?.address)
+
+      chai.expect(
+        sameString(
+          await safeSdk.getSafeProvider().getSignerAddress(),
+          await account1.signer.account?.address
+        )
+      ).to.be.true
 
       const safeSdk2 = await safeSdk.connect({
         signer: account2.address,
@@ -97,9 +102,12 @@ describe('Safe Info', () => {
       const signer = await safeSdk2.getSafeProvider().getExternalSigner()
       chai.expect(signer)
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)
-      chai
-        .expect(await safeSdk2.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account2.signer.account?.address)
+      chai.expect(
+        sameString(
+          await safeSdk2.getSafeProvider().getSignerAddress(),
+          await account2.signer.account?.address
+        )
+      ).to.be.true
 
       const safe2 = await getSafeWithOwners([account3.address])
       const safe2Address = safe2.address
@@ -108,9 +116,12 @@ describe('Safe Info', () => {
         signer: account3.address
       })
       chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2Address)
-      chai
-        .expect(await safeSdk3.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account3.signer.account?.address)
+      chai.expect(
+        sameString(
+          await safeSdk3.getSafeProvider().getSignerAddress(),
+          await account3.signer.account?.address
+        )
+      ).to.be.true
     })
   })
 

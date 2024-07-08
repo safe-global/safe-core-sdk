@@ -91,6 +91,6 @@ describe('getSafeOperationsByAddress', () => {
 
     chai.expect(response).to.have.property('count').greaterThan(1)
     chai.expect(response).to.have.property('results').to.be.an('array')
-    chai.expect(response.results[0].safeOperationHash).to.be.eq(safeOperations[1].safeOperationHash)
+    chai.expect(response.results[0]).to.be.deep.equal(safeOperations[1])
   })
 })

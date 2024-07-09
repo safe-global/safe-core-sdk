@@ -36,7 +36,7 @@ const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01
 const safeOpHash = '0x8b1840745ec0a6288e868c6e285dadcfebd49e846d307610a9ccd97f445ace93'
 const txServiceBaseUrl = 'https://safe-transaction-sepolia.safe.global/api'
 
-const walletClient = createWalletClient({
+const signer = createWalletClient({
   transport: http(),
   chain: sepolia,
   account: privateKeyToAccount(PRIVATE_KEY_1)
@@ -211,11 +211,11 @@ describe('Endpoint tests', () => {
       const delegateConfig: AddSafeDelegateProps = {
         delegateAddress,
         delegatorAddress,
-        signer: walletClient,
+        signer,
         label: 'label'
       }
 
-      const signature = await signDelegate(walletClient, delegateAddress, chainId)
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
@@ -236,11 +236,11 @@ describe('Endpoint tests', () => {
       const delegateConfig: AddSafeDelegateProps = {
         delegateAddress: eip3770DelegateAddress,
         delegatorAddress: eip3770DelegatorAddress,
-        signer: walletClient,
+        signer,
         label: 'label'
       }
 
-      const signature = await signDelegate(walletClient, delegateAddress, chainId)
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.addSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
@@ -261,10 +261,10 @@ describe('Endpoint tests', () => {
       const delegateConfig: DeleteSafeDelegateProps = {
         delegateAddress,
         delegatorAddress,
-        signer: walletClient
+        signer
       }
 
-      const signature = await signDelegate(walletClient, delegateAddress, chainId)
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
@@ -282,10 +282,10 @@ describe('Endpoint tests', () => {
       const delegateConfig: DeleteSafeDelegateProps = {
         delegateAddress: eip3770DelegateAddress,
         delegatorAddress,
-        signer: walletClient
+        signer
       }
 
-      const signature = await signDelegate(walletClient, delegateAddress, chainId)
+      const signature = await signDelegate(signer, delegateAddress, chainId)
       await chai
         .expect(safeApiKit.removeSafeDelegate(delegateConfig))
         .to.be.eventually.deep.equals({ data: { success: true } })
@@ -369,7 +369,7 @@ describe('Endpoint tests', () => {
         nonce: 1
       }
       const origin = 'Safe Core SDK: Safe API Kit'
-      const signerAddress = await walletClient.account.address
+      const signerAddress = signer.account.address
       const safeTransaction = await protocolKit.createTransaction({
         transactions: [safeTransactionData],
         options
@@ -417,7 +417,7 @@ describe('Endpoint tests', () => {
         nonce: 1
       }
       const origin = 'Safe Core SDK: Safe API Kit'
-      const signerAddress = await walletClient.account.address
+      const signerAddress = signer.account.address
       const safeTransaction = await protocolKit.createTransaction({
         transactions: [safeTransactionData],
         options

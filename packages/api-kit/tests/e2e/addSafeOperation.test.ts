@@ -6,7 +6,7 @@ import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import * as viem from '@safe-global/relay-kit/node_modules/viem'
+import viem from 'viem'
 import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
 import {
   ENTRYPOINT_ABI,

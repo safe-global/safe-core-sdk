@@ -1,6 +1,6 @@
 import Safe from '@safe-global/protocol-kit/Safe'
 import { Transaction } from '@safe-global/safe-core-sdk-types'
-import { encodeFunctionData } from 'viem'
+import { encodeFunctionData, parseAbi } from 'viem'
 import { ZERO_ADDRESS } from '../constants'
 
 const ERC20_ABI = [
@@ -20,7 +20,7 @@ const ERC20_ABI = [
 export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promise<number> {
   const safeProvider = safe.getSafeProvider()
   const data = encodeFunctionData({
-    abi: ERC20_ABI,
+    abi: parseAbi(ERC20_ABI),
     functionName: 'decimals'
   })
 
@@ -86,8 +86,8 @@ export function createERC20TokenTransferTransaction(
   amount: string
 ): Transaction {
   const data = encodeFunctionData({
-    abi: ERC20_ABI,
-    functionName: 'decimals',
+    abi: parseAbi(ERC20_ABI),
+    functionName: 'transfer',
     args: [toAddress, amount]
   })
 

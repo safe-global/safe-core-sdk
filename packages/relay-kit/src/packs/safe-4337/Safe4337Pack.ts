@@ -478,7 +478,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: userOperation?.paymasterData || '0x',
+        paymasterAndData: ethers.hexlify(
+          ethers.concat([userOperation?.paymaster || '0x', userOperation?.paymasterData || '0x'])
+        ),
         signature: userOperation?.signature || '0x'
       },
       {

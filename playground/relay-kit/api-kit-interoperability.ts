@@ -10,7 +10,7 @@ const SAFE_ADDRESS = '' // Safe 2/N
 const CHAIN_NAME = 'sepolia'
 
 // Constants
-const BUNDLER_URL = `https://api.pimlico.io/v1/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}`
+const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}`
 const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}`
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA

@@ -14,6 +14,7 @@ import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
+import { encodeFunctionData } from 'viem'
 
 chai.use(chaiAsPromised)
 
@@ -381,20 +382,22 @@ describe('Transactions creation', () => {
       })
       const transactions = [
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '1100000000000000000' // 1.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '1100000000000000000'] // 1.1 ERC20
+          })
         },
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '100000000000000000' // 0.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '100000000000000000'] // 0.1 ERC20
+          })
         }
       ]
       const multiSendTx = await safeSdk.createTransaction({ transactions })
@@ -417,20 +420,22 @@ describe('Transactions creation', () => {
 
       const transactions = [
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '1100000000000000000' // 1.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '1100000000000000000'] // 1.1 ERC20
+          })
         },
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '100000000000000000' // 0.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '100000000000000000'] // 0.1 ERC20
+          })
         }
       ]
       const multiSendTx = await safeSdk.createTransaction({ transactions, options })

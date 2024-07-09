@@ -10,6 +10,7 @@ import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
+import { encodeFunctionData } from 'viem'
 
 chai.use(chaiAsPromised)
 
@@ -641,28 +642,36 @@ describe('Transactions execution', () => {
         signer: account3.address
       })
 
-      await erc20Mintable.mint(safeAddress, '1200000000000000000') // 1.2 ERC20
-      const safeInitialERC20Balance = await erc20Mintable.balanceOf(safeAddress)
-      chai.expect(safeInitialERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ERC20
-      const accountInitialERC20Balance = await erc20Mintable.balanceOf(account2.address)
-      chai.expect(accountInitialERC20Balance.toString()).to.be.eq('0') // 0 ERC20
+      await erc20Mintable.write.mint([safeAddress, '1200000000000000000']) // 1.2 ERC20
+      const safeInitialERC20Balance = await erc20Mintable.read.balanceOf([safeAddress])
+      chai.expect(safeInitialERC20Balance).to.be.eq('1200000000000000000') // 1.2 ERC20
+      const accountInitialERC20Balance = await erc20Mintable.read.balanceOf([account2.address])
+      chai.expect(accountInitialERC20Balance).to.be.eq('0') // 0 ERC20
 
       const transactions: MetaTransactionData[] = [
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '1100000000000000000' // 1.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [
+              account2.address,
+              '1100000000000000000' // 1.1 ERC20
+            ]
+          })
         },
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '100000000000000000' // 0.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [
+              account2.address,
+              '100000000000000000' // 0.1 ERC20
+            ]
+          })
         }
       ]
       const multiSendTx = await safeSdk1.createTransaction({ transactions })
@@ -673,10 +682,10 @@ describe('Transactions execution', () => {
       const txResponse2 = await safeSdk3.executeTransaction(signedMultiSendTx)
       await waitSafeTxReceipt(txResponse2)
 
-      const safeFinalERC20Balance = await erc20Mintable.balanceOf(safeAddress)
-      chai.expect(safeFinalERC20Balance.toString()).to.be.eq('0') // 0 ERC20
-      const accountFinalERC20Balance = await erc20Mintable.balanceOf(account2.address)
-      chai.expect(accountFinalERC20Balance.toString()).to.be.eq('1200000000000000000') // 1.2 ERC20
+      const safeFinalERC20Balance = await erc20Mintable.read.balanceOf([safeAddress])
+      chai.expect(safeFinalERC20Balance).to.be.eq('0') // 0 ERC20
+      const accountFinalERC20Balance = await erc20Mintable.read.balanceOf([account2.address])
+      chai.expect(accountFinalERC20Balance).to.be.eq('1200000000000000000') // 1.2 ERC20
     })
   })
 })

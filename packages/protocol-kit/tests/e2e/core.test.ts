@@ -72,9 +72,12 @@ describe('Safe Info', () => {
         contractNetworks
       })
       const safeSdk2 = await safeSdk.connect({ predictedSafe })
-      chai
-        .expect(await safeSdk2.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account1.signer.account?.address)
+      chai.expect(
+        sameString(
+          await safeSdk2.getSafeProvider().getSignerAddress(),
+          await account1.signer.account?.address
+        )
+      ).to.be.true
     })
 
     it('should connect a deployed Safe', async () => {
@@ -229,9 +232,13 @@ describe('Safe Info', () => {
         safeAddress: safeAddress,
         contractNetworks
       })
-      chai
-        .expect(await safeSdk.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account1.signer.account?.address)
+
+      chai.expect(
+        sameString(
+          await safeSdk.getSafeProvider().getSignerAddress(),
+          await account1.signer.account?.address
+        )
+      ).to.be.true
     })
   })
 

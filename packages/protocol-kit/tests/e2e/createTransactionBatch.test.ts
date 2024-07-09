@@ -8,6 +8,7 @@ import { getERC20Mintable, getSafeWithOwners, getMultiSendCallOnly } from './uti
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { encodeFunctionData } from 'viem'
 
 chai.use(chaiAsPromised)
 
@@ -54,12 +55,13 @@ describe('createTransactionBatch', () => {
     })
 
     const dumpTransfer = {
-      to: await erc20Mintable.getAddress(),
+      to: erc20Mintable.address,
       value: '0',
-      data: erc20Mintable.interface.encodeFunctionData('transfer', [
-        account2.address,
-        AMOUNT_TO_TRANSFER
-      ]),
+      data: encodeFunctionData({
+        abi: erc20Mintable.abi,
+        functionName: 'transfer',
+        args: [account2.address, AMOUNT_TO_TRANSFER] // 0.1 ERC20
+      }),
       operation: OperationType.Call
     }
 

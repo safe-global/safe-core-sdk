@@ -1,4 +1,4 @@
-import { EIP712TypedData, TypedDataTypes } from 'packages/safe-core-sdk-types'
+import { EIP712TypedData, TypedDataTypes, TypedMessageTypes } from 'packages/safe-core-sdk-types'
 import {
   keccak256,
   concat,
@@ -158,7 +158,16 @@ function hashStruct({
   return keccak256(encoded)
 }
 
+function deducePrimaryType(types: TypedMessageTypes) {
+  // In ethers the primaryType is assumed to be the first inserted yielded by a forEach of the types keys
+  // https://github.com/ethers-io/ethers.js/blob/a4b1d1f43fca14f2e826e3c60e0d45f5b6ef3ec4/src.ts/hash/typed-data.ts#L278C13-L278C20
+  return Object.keys(types)[0]
+}
+
 export function hashTypedData(typedData: EIP712TypedData): string {
+  typedData.primaryType = !typedData?.primaryType
+    ? deducePrimaryType(typedData.types)
+    : typedData?.primaryType
   const data = encodeTypedData(typedData)
   return keccak256(asHex(data))
 }

@@ -91,7 +91,7 @@ describe('On-chain signatures', () => {
       const txHash = await safeSdk1.getTransactionHash(tx)
       const txResponse = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(1n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(1n)
     })
 
     it('should ignore a duplicated signatures', async () => {
@@ -110,13 +110,13 @@ describe('On-chain signatures', () => {
       }
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
       const txHash = await safeSdk1.getTransactionHash(tx)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(0n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(0n)
       const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(1n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(1n)
       const txResponse2 = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse2)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(1n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(1n)
     })
   })
 

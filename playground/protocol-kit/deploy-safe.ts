@@ -1,4 +1,4 @@
-import { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
+import Safe, { SafeAccountConfig } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 // This file can be used to play around with the Safe Core SDK
@@ -15,7 +15,7 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: 'https://sepolia.gateway.tenderly.co',
+  RPC_URL: 'https://rpc.sepolia.org',
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
     OWNERS: ['OWNER_ADDRESS'],
@@ -30,40 +30,44 @@ async function main() {
 
   console.log('safe config: ', config.DEPLOY_SAFE)
 
-  // Create SafeFactory instance
-  const safeFactory = await SafeFactory.init({
-    provider: config.RPC_URL,
-    signer: config.DEPLOYER_ADDRESS_PRIVATE_KEY,
-    safeVersion
-  })
-
   // Config of the deployed Safe
   const safeAccountConfig: SafeAccountConfig = {
     owners: config.DEPLOY_SAFE.OWNERS,
     threshold: config.DEPLOY_SAFE.THRESHOLD
   }
+
   const saltNonce = config.DEPLOY_SAFE.SALT_NONCE
 
-  // Predict deployed address
-  const predictedDeploySafeAddress = await safeFactory.predictSafeAddress(
-    safeAccountConfig,
-    saltNonce
-  )
-
-  console.log('Predicted deployed Safe address:', predictedDeploySafeAddress)
-
-  function callback(txHash: string) {
-    console.log('Transaction hash:', txHash)
-  }
-
-  // Deploy Safe
-  const safe = await safeFactory.deploySafe({
-    safeAccountConfig,
-    saltNonce,
-    callback
+  // Create SDK instance
+  const safeSDK = await Safe.init({
+    provider: config.RPC_URL,
+    signer: config.DEPLOYER_ADDRESS_PRIVATE_KEY,
+    predictedSafe: {
+      safeAccountConfig,
+      safeDeploymentConfig: {
+        saltNonce,
+        safeVersion
+      }
+    }
   })
 
-  console.log('Deployed Safe:', await safe.getAddress())
+  // check if its deployed
+  console.log('Safe Account deployed: ', await safeSDK.isSafeDeployed())
+
+  // Predict deployed address
+  const predictedSafeAddress = await safeSDK.getAddress()
+
+  console.log('Predicted Safe address:', predictedSafeAddress)
+
+  console.log('Deploying Safe Account...')
+
+  // Deploy Safe
+  const deployedSafeSDK = await safeSDK.deploy()
+
+  console.log('Deployed Safe address:', await deployedSafeSDK.getAddress())
+
+  // check if its deployed
+  console.log('Safe Account deployed: ', await deployedSafeSDK.isSafeDeployed())
 }
 
 main()

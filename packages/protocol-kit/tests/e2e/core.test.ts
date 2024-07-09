@@ -1,6 +1,6 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
+import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
@@ -183,15 +183,15 @@ describe('Safe Info', () => {
         })
         const safeAddress = await safeSdk.getAddress()
 
-        const safeFactory = await SafeFactory.init({
-          provider,
-          safeVersion: safeVersionDeployed,
-          contractNetworks
-        })
-        const deployedSdk = await safeFactory.deploySafe(predictedSafe)
+        chai.expect(await safeSdk.isSafeDeployed()).to.be.false
+
+        const deployedSdk = await safeSdk.deploy()
+
         const expectedSafeAddress = await deployedSdk.getAddress()
 
         chai.expect(safeAddress).to.be.eq(expectedSafeAddress)
+
+        chai.expect(await deployedSdk.isSafeDeployed()).to.be.true
       }
     )
 

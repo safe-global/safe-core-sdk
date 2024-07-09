@@ -95,9 +95,7 @@ describe('SafeProxyFactory', () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safeFactory = await SafeFactory.init({ provider, contractNetworks })
-      chai
-        .expect(await safeFactory.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account1.signer.getAddress())
+      chai.expect(await safeFactory.getSafeProvider().getSignerAddress()).to.be.eq(account1.address)
     })
   })
 
@@ -187,7 +185,7 @@ describe('SafeProxyFactory', () => {
       )
       const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
       const safe = await safeFactory.deploySafe(deploySafeProps)
-      chai.expect(counterfactualSafeAddress).to.be.eq(safe.address)
+      chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
       chai.expect(threshold).to.be.eq(await safe.getThreshold())
       const deployedSafeOwners = await safe.getOwners()
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
@@ -213,7 +211,7 @@ describe('SafeProxyFactory', () => {
         )
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
         const safe = await safeFactory.deploySafe(deploySafeProps)
-        chai.expect(counterfactualSafeAddress).to.be.eq(safe.address)
+        chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
         const compatibilityFallbackHandler = await (
           await getCompatibilityFallbackHandler()
         ).contract.address
@@ -236,7 +234,7 @@ describe('SafeProxyFactory', () => {
         const safeAccountConfig: SafeAccountConfig = {
           owners,
           threshold,
-          fallbackHandler: await defaultCallbackHandler.getAddress()
+          fallbackHandler: defaultCallbackHandler.address
         }
         const saltNonce = '12345'
         const counterfactualSafeAddress = await safeFactory.predictSafeAddress(
@@ -245,10 +243,8 @@ describe('SafeProxyFactory', () => {
         )
         const deploySafeProps: DeploySafeProps = { safeAccountConfig, saltNonce }
         const safe = await safeFactory.deploySafe(deploySafeProps)
-        chai.expect(counterfactualSafeAddress).to.be.eq(safe.address)
-        chai
-          .expect(await defaultCallbackHandler.getAddress())
-          .to.be.eq(await safe.getFallbackHandler())
+        chai.expect(counterfactualSafeAddress).to.be.eq(await safe.getAddress())
+        chai.expect(defaultCallbackHandler.address).to.be.eq(await safe.getFallbackHandler())
       }
     )
   })
@@ -325,7 +321,7 @@ describe('SafeProxyFactory', () => {
         const safeAccountConfig: SafeAccountConfig = {
           owners,
           threshold,
-          fallbackHandler: await defaultCallbackHandler.getAddress()
+          fallbackHandler: defaultCallbackHandler.address
         }
         const deploySafeProps: DeploySafeProps = { safeAccountConfig }
         const safe = await safeFactory.deploySafe(deploySafeProps)
@@ -334,7 +330,7 @@ describe('SafeProxyFactory', () => {
         const deployedSafeThreshold = await safe.getThreshold()
         chai.expect(deployedSafeThreshold).to.be.eq(threshold)
         const fallbackHandler = await safe.getFallbackHandler()
-        chai.expect(await defaultCallbackHandler.getAddress()).to.be.eq(fallbackHandler)
+        chai.expect(defaultCallbackHandler.address).to.be.eq(fallbackHandler)
       }
     )
 

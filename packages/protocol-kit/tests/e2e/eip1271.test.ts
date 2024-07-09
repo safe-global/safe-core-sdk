@@ -20,6 +20,7 @@ import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
 import SafeMessage from '../../src/utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
+import { asHash } from '@safe-global/protocol-kit/utils/types'
 
 chai.use(chaiAsPromised)
 
@@ -56,7 +57,7 @@ describe('The EIP1271 implementation', () => {
         1,
         fallbackHandlerAddress
       )
-      const signerSafeAddress = await signerSafe.getAddress()
+      const signerSafeAddress = signerSafe.address
 
       // Create a 2/3 Safe
       const safe = await getSafeWithOwners(
@@ -122,7 +123,7 @@ describe('The EIP1271 implementation', () => {
 
         const messageHash = hashSafeMessage(MESSAGE)
 
-        const txData = signMessageLibContract.encode('signMessage', [messageHash])
+        const txData = signMessageLibContract.encode('signMessage', [asHash(messageHash)])
 
         const safeTransactionData: SafeTransactionDataPartial = {
           to: customContract.signMessageLibAddress,

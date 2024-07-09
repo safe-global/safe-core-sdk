@@ -73,6 +73,7 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import { asAddress, asHash, asHex } from './utils/types'
+import { Hash, Hex } from 'viem'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -1511,17 +1512,17 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const bytes32Tuple: [_dataHash: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const data = fallbackHandler.encode('isValidSignature', bytes32Tuple)
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const bytesTuple: [_data: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const bytesData = fallbackHandler.encode('isValidSignature', bytesTuple)
 
     try {
       const isValidSignatureResponse = await Promise.all([

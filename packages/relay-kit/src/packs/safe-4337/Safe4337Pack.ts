@@ -394,12 +394,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
     if (amountToApprove) {
-      if (!paymasterOptions || !paymasterOptions.paymasterTokenAddress) {
+      if (!paymasterOptions || !paymasterOptions?.paymasterTokenAddress) {
         throw new Error('Paymaster must be initialized')
       }
 
-      const paymasterAddress = paymasterOptions.paymasterAddress
-      const paymasterTokenAddress = paymasterOptions.paymasterTokenAddress
+      const paymasterAddress = paymasterOptions?.paymasterAddress
+      const paymasterTokenAddress = paymasterOptions?.paymasterTokenAddress
 
       const approveToPaymasterTransaction = {
         to: paymasterTokenAddress,
@@ -423,7 +423,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
 
-    const paymasterAndData = paymasterOptions.paymasterAddress || '0x'
+    const paymasterAndData = paymasterOptions?.paymasterAddress || '0x'
 
     const userOperation: UserOperation = {
       sender: safeAddress,

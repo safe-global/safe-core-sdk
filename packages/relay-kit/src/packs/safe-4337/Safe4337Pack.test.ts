@@ -439,7 +439,7 @@ describe('Safe4337Pack', () => {
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
-        paymasterAndData: '0x0000000000325602a77416A16136FDafd04b299f',
+        paymasterAndData: '0x',
         callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
           transferUSDC.to,
           transferUSDC.value,

@@ -34,7 +34,6 @@ import {
   custom,
   http,
   getAddress,
-  toHex,
   isAddress,
   Transaction,
   decodeAbiParameters,
@@ -280,7 +279,7 @@ class SafeProvider {
   async getStorageAt(address: string, position: string): Promise<string> {
     const content = await this.#externalProvider.getStorageAt({
       address: asAddress(address),
-      slot: toHex(position)
+      slot: asHex(position)
     })
     const decodedContent = this.decodeParameters('address', asHex(content))
     return decodedContent[0]

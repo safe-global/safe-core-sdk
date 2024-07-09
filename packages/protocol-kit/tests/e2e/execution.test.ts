@@ -209,7 +209,7 @@ describe('Transactions execution', () => {
           await safeSdk2.executeTransaction(signedTx)
         } catch (error) {
           chai
-            .expect((error as any)?.info?.error?.message)
+            .expect((error as any)?.message)
             .includes(safeVersionDeployed >= '1.3.0' ? 'GS026' : 'Invalid owner provided')
         }
       } else {

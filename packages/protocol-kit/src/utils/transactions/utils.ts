@@ -1,4 +1,4 @@
-import { toBytes, getAddress, encodePacked, bytesToHex, decodeFunctionData } from 'viem'
+import { toBytes, getAddress, encodePacked, bytesToHex, decodeFunctionData, parseAbi } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
@@ -134,7 +134,7 @@ export function encodeMultiSendData(txs: MetaTransactionData[]): string {
 
 export function decodeMultiSendData(encodedData: string): MetaTransactionData[] {
   const decodedData = decodeFunctionData({
-    abi: ['function multiSend(bytes memory transactions) public payable'],
+    abi: parseAbi(['function multiSend(bytes memory transactions) public payable']),
     data: asHex(encodedData)
   })
 
@@ -145,7 +145,8 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
   let index = 2
 
   if (args) {
-    while (index < args.length) {
+    const [transactionBytes] = args
+    while (index < transactionBytes.length) {
       // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
       // uint8 operation, address to, value uint256, dataLength uint256
 

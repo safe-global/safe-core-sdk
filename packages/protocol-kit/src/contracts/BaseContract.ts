@@ -6,10 +6,12 @@ import {
   encodeFunctionData,
   GetContractReturnType,
   WalletClient,
-  Hash
+  Hash,
+  Chain
 } from 'viem'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import * as allChains from 'viem/chains'
 import {
   EncodeFunction,
   EstimateGasFunction,
@@ -106,8 +108,8 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   async convertOptions(options?: TransactionOptions): Promise<ContractTransactionOptions> {
-    const chain = this.runner!.chain
-    if (!chain) throw new Error() // Put something sensible here
+    const chain = this.getChain()
+    if (!chain) throw new Error('Invalid chainId')
     const signerAddress = await this.safeProvider.getSignerAddress()
     const account = asAddress(signerAddress!)
     const result: ContractTransactionOptions = { chain, account }
@@ -136,6 +138,10 @@ class BaseContract<ContractAbiType extends Abi> {
     }
 
     return result
+  }
+
+  getChain(): Chain | undefined {
+    return Object.values(allChains).find((chain) => chain.id === Number(this.chainId))
   }
 
   getAddress: GetAddressFunction = () => {

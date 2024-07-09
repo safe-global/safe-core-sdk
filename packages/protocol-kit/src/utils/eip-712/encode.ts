@@ -165,14 +165,15 @@ function deducePrimaryType(types: TypedMessageTypes) {
 }
 
 export function hashTypedData(typedData: EIP712TypedData): string {
-  typedData.primaryType = !typedData?.primaryType
-    ? deducePrimaryType(typedData.types)
-    : typedData?.primaryType
   const data = encodeTypedData(typedData)
   return keccak256(asHex(data))
 }
 
 export function encodeTypedData(typedData: EIP712TypedData): string {
+  typedData.primaryType = !typedData?.primaryType
+    ? deducePrimaryType(typedData.types)
+    : typedData?.primaryType
+
   const { domain = {}, message, primaryType } = typedData as any as HashTypedDataParameters
   const types = {
     EIP712Domain: getTypesForEIP712Domain({ domain: domain as Record<string, unknown> }),

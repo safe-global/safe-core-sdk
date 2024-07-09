@@ -644,9 +644,9 @@ describe('Transactions execution', () => {
 
       await erc20Mintable.write.mint([safeAddress, '1200000000000000000']) // 1.2 ERC20
       const safeInitialERC20Balance = await erc20Mintable.read.balanceOf([safeAddress])
-      chai.expect(safeInitialERC20Balance).to.be.eq('1200000000000000000') // 1.2 ERC20
+      chai.expect(safeInitialERC20Balance).to.be.eq(1200000000000000000n) // 1.2 ERC20
       const accountInitialERC20Balance = await erc20Mintable.read.balanceOf([account2.address])
-      chai.expect(accountInitialERC20Balance).to.be.eq('0') // 0 ERC20
+      chai.expect(accountInitialERC20Balance).to.be.eq(0n) // 0 ERC20
 
       const transactions: MetaTransactionData[] = [
         {
@@ -683,9 +683,9 @@ describe('Transactions execution', () => {
       await waitSafeTxReceipt(txResponse2)
 
       const safeFinalERC20Balance = await erc20Mintable.read.balanceOf([safeAddress])
-      chai.expect(safeFinalERC20Balance).to.be.eq('0') // 0 ERC20
+      chai.expect(safeFinalERC20Balance).to.be.eq(0n) // 0 ERC20
       const accountFinalERC20Balance = await erc20Mintable.read.balanceOf([account2.address])
-      chai.expect(accountFinalERC20Balance).to.be.eq('1200000000000000000') // 1.2 ERC20
+      chai.expect(accountFinalERC20Balance).to.be.eq(1200000000000000000n) // 1.2 ERC20
     })
   })
 })

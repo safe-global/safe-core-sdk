@@ -1,6 +1,5 @@
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
-import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
 import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
@@ -273,7 +272,8 @@ class SafeProvider {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
-    return contractCode !== EMPTY_DATA
+    // https://github.com/wevm/viem/blob/963877cd43083260a4399d6f0bbf142ccede53b4/src/actions/public/getCode.ts#L71
+    return !!contractCode
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {

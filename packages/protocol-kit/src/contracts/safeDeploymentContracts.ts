@@ -7,6 +7,8 @@ import {
   MultiSendContractImplementationType,
   SafeContractImplementationType,
   SafeProxyFactoryContractImplementationType,
+  SafeWebAuthnSharedSignerContractImplementationType,
+  SafeWebAuthnSignerFactoryContractImplementationType,
   SignMessageLibContractImplementationType,
   SimulateTxAccessorContractImplementationType
 } from '@safe-global/protocol-kit/types'
@@ -174,4 +176,46 @@ export async function getSimulateTxAccessorContract({
     throw new Error('SimulateTxAccessor contract is not deployed on the current network')
   }
   return simulateTxAccessorContract
+}
+
+export async function getSafeWebAuthnSignerFactoryContract({
+  safeProvider,
+  safeVersion,
+  customContracts
+}: GetContractInstanceProps): Promise<SafeWebAuthnSignerFactoryContractImplementationType> {
+  const safeWebAuthnSignerFactoryContract = await safeProvider.getSafeWebAuthnSignerFactoryContract(
+    {
+      safeVersion,
+      customContractAddress: customContracts?.safeWebAuthnSignerFactoryAddress,
+      customContractAbi: customContracts?.safeWebAuthnSignerFactoryAbi
+    }
+  )
+
+  const isContractDeployed = await safeProvider.isContractDeployed(
+    await safeWebAuthnSignerFactoryContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('safeWebAuthnSignerFactory contract is not deployed on the current network')
+  }
+  return safeWebAuthnSignerFactoryContract
+}
+
+export async function getSafeWebAuthnSharedSignerContract({
+  safeProvider,
+  safeVersion,
+  customContracts
+}: GetContractInstanceProps): Promise<SafeWebAuthnSharedSignerContractImplementationType> {
+  const safeWebAuthnSharedSignerContract = await safeProvider.getSafeWebAuthnSharedSignerContract({
+    safeVersion,
+    customContractAddress: customContracts?.safeWebAuthnSharedSignerAddress,
+    customContractAbi: customContracts?.safeWebAuthnSharedSignerAbi
+  })
+
+  const isContractDeployed = await safeProvider.isContractDeployed(
+    await safeWebAuthnSharedSignerContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('safeWebAuthnSharedSigner contract is not deployed on the current network')
+  }
+  return safeWebAuthnSharedSignerContract
 }

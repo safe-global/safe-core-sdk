@@ -6,6 +6,7 @@ import * as fixtures from './testing-utils/fixtures'
 describe('SafeOperation', () => {
   it('should create a SafeOperation from an UserOperation', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -31,6 +32,7 @@ describe('SafeOperation', () => {
 
   it('should add and retrieve signatures', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -47,6 +49,7 @@ describe('SafeOperation', () => {
 
   it('should encode the signatures', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -59,6 +62,7 @@ describe('SafeOperation', () => {
 
   it('should add estimations', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -88,6 +92,7 @@ describe('SafeOperation', () => {
 
   it('should convert to UserOperation', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })

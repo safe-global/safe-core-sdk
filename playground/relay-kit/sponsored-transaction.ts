@@ -1,9 +1,10 @@
-import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
+import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
   MetaTransactionOptions,
-  OperationType
+  OperationType,
+  SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
 import { ethers } from 'ethers'
 
@@ -18,6 +19,7 @@ import { ethers } from 'ethers'
 
 const config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',
+  SAFE_SIGNER_ADDRESS: '<SAFE_SIGNER_ADDRESS>',
   RELAY_API_KEY: '<GELATO_RELAY_API_KEY>'
 }
 
@@ -37,33 +39,50 @@ const txConfig = {
 async function main() {
   console.log('Execute meta-transaction via Gelato Relay paid by 1Balance')
 
-  // SDK Initialization
-
-  const safeAccountAbstraction = new AccountAbstraction({
+  const safeClient = await createSafeClient({
     provider: RPC_URL,
-    signer: config.SAFE_SIGNER_PRIVATE_KEY
+    signer: config.SAFE_SIGNER_PRIVATE_KEY,
+    safeOptions: {
+      owners: [config.SAFE_SIGNER_ADDRESS],
+      threshold: 1,
+      saltNonce: '1'
+    }
   })
 
-  await safeAccountAbstraction.init()
-
-  safeAccountAbstraction.setRelayKit(
-    new GelatoRelayPack({
+  const gelatoSafeClient = safeClient.extend((client: SafeClient) => {
+    const relayPack = new GelatoRelayPack({
       apiKey: config.RELAY_API_KEY,
-      protocolKit: safeAccountAbstraction.protocolKit
+      protocolKit: client.protocolKit
     })
-  )
+
+    return {
+      relayTransaction: async (
+        transactions: MetaTransactionData[],
+        options?: MetaTransactionOptions
+      ) => {
+        const relayedTransaction = (await relayPack.createTransaction({
+          transactions,
+          options
+        })) as SafeTransaction
+
+        const signedSafeTransaction = await client.protocolKit.signTransaction(relayedTransaction)
+
+        return relayPack.executeTransaction({ executable: signedSafeTransaction, options })
+      }
+    }
+  })
 
   // Calculate Safe address
 
-  const predictedSafeAddress = await safeAccountAbstraction.protocolKit.getAddress()
+  const predictedSafeAddress = await gelatoSafeClient.protocolKit.getAddress()
   console.log({ predictedSafeAddress })
 
-  const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
+  const isSafeDeployed = await gelatoSafeClient.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
   // Fake on-ramp to fund the Safe
 
-  const ethersProvider = safeAccountAbstraction.protocolKit.getSafeProvider().getExternalProvider()
+  const ethersProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
   const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
   console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
   if (safeBalance < BigInt(txConfig.VALUE)) {
@@ -93,7 +112,7 @@ async function main() {
     isSponsored: true
   }
 
-  const response = await safeAccountAbstraction.relayTransaction(safeTransactions, options)
+  const response = await gelatoSafeClient.relayTransaction(safeTransactions, options)
   console.log({ GelatoTaskId: response })
 }
 

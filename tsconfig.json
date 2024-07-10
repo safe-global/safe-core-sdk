@@ -1,7 +1,7 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/account-abstraction-kit" },
+    { "path": "packages/safe-kit" },
     { "path": "packages/api-kit" },
     { "path": "packages/protocol-kit" },
     { "path": "packages/relay-kit" },

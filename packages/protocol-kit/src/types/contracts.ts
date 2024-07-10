@@ -122,8 +122,15 @@ export type ContractTransactionOptions = {
   chain: Chain
   account: Address
   gas?: bigint
-  // gasPrice?: bigint,
   maxFeePerGas?: bigint
   maxPriorityFeePerGas?: bigint
+  nonce?: number
+}
+
+export type ContractLegacyTransactionOptions = {
+  chain: Chain
+  account: Address
+  gas?: bigint
+  gasPrice?: bigint
   nonce?: number
 }

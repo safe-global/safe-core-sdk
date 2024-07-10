@@ -509,7 +509,7 @@ describe('Transactions execution', () => {
       await waitSafeTxReceipt(txResponse)
       const txConfirmed = await safeSdk1.getSafeProvider().getTransaction(txResponse.hash)
       chai.expect(execOptions.gasPrice).to.be.eq(Number(txConfirmed.gasPrice))
-      chai.expect(execOptions.gasLimit).to.be.eq(Number(txConfirmed.gasLimit))
+      chai.expect(execOptions.gasLimit).to.be.eq(Number(txConfirmed.gas))
     })
 
     it('should execute a transaction with options: { maxFeePerGas, maxPriorityFeePerGas }', async () => {

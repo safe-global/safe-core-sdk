@@ -20,7 +20,8 @@ import {
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import { asAddress } from '../utils/types'
-import { ContractTransactionOptions } from '../types/contracts'
+import { ContractTransactionOptions, ContractLegacyTransactionOptions } from '../types/contracts'
+import { isLegacyTransaction, createTxOptions, createLegacyTxOptions } from './utils'
 
 /**
  * Abstract class BaseContract
@@ -107,37 +108,16 @@ class BaseContract<ContractAbiType extends Abi> {
     return client?.getTransactionReceipt({ hash })
   }
 
-  async convertOptions(options?: TransactionOptions): Promise<ContractTransactionOptions> {
+  async convertOptions(
+    options?: TransactionOptions
+  ): Promise<ContractTransactionOptions | ContractLegacyTransactionOptions> {
     const chain = this.getChain()
     if (!chain) throw new Error('Invalid chainId')
     const signerAddress = await this.safeProvider.getSignerAddress()
     const account = asAddress(signerAddress!)
-    const result: ContractTransactionOptions = { chain, account }
-    if (options?.from) {
-      result.account = asAddress(options.from)
-    }
-
-    if (options?.gasLimit) {
-      result.gas = BigInt(options.gasLimit)
-    }
-
-    // if (options?.gasPrice) {
-    //   result.gasPrice = BigInt(options.gasPrice)
-    // }
-
-    if (options?.maxFeePerGas) {
-      result.maxFeePerGas = BigInt(options.maxFeePerGas)
-    }
-
-    if (options?.maxPriorityFeePerGas) {
-      result.maxPriorityFeePerGas = BigInt(options.maxPriorityFeePerGas)
-    }
-
-    if (options?.nonce) {
-      result.nonce = options.nonce
-    }
-
-    return result
+    return isLegacyTransaction(options)
+      ? createLegacyTxOptions(chain, account, options)
+      : createTxOptions(chain, account, options)
   }
 
   getChain(): Chain | undefined {

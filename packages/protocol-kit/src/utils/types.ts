@@ -1,6 +1,5 @@
 import { SafeConfig, SafeConfigWithPredictedSafe } from '../types'
-
-import { getAddress, Address, isHex, Hex, toHex, Hash } from 'viem'
+import { getAddress, Address, isHex, Hex, Hash } from 'viem'
 
 export function isSafeConfigWithPredictedSafe(
   config: SafeConfig
@@ -20,6 +19,6 @@ export function asHash(hash: string): Hash {
   return hash as Hash
 }
 
-export function asHex(hex?: string) {
-  return isHex(hex) ? (hex as Hex) : toHex(hex || '0x')
+export function asHex(hex?: string): Hex {
+  return isHex(hex) ? (hex as Hex) : (`0x${hex}` as Hex)
 }

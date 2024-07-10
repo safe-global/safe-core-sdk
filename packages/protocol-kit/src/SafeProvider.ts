@@ -75,7 +75,7 @@ class SafeProvider {
     }
 
     this.provider = provider
-    this.signer = signer
+    this.signer = signer ? asHex(signer) : signer
   }
 
   getExternalProvider(): PublicClient {

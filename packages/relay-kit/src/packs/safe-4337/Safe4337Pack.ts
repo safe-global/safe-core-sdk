@@ -390,25 +390,29 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
-    const paymasterOptions = this.#paymasterOptions as ERC20PaymasterOption
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
+    let paymasterAndData = '0x'
 
     if (amountToApprove) {
-      if (!paymasterOptions || !paymasterOptions?.paymasterTokenAddress) {
+      const paymasterOptions = this.#paymasterOptions as ERC20PaymasterOption
+
+      if (!paymasterOptions || !paymasterOptions.paymasterTokenAddress) {
         throw new Error('Paymaster must be initialized')
       }
 
-      const paymasterAddress = paymasterOptions?.paymasterAddress
-      const paymasterTokenAddress = paymasterOptions?.paymasterTokenAddress
-
       const approveToPaymasterTransaction = {
-        to: paymasterTokenAddress,
-        data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+        to: paymasterOptions.paymasterTokenAddress,
+        data: INTERFACES.encodeFunctionData('approve', [
+          paymasterOptions.paymasterAddress,
+          amountToApprove
+        ]),
         value: '0',
         operation: OperationType.Call // Call for approve
       }
 
       transactions.push(approveToPaymasterTransaction)
+
+      paymasterAndData = paymasterOptions.paymasterAddress
     }
 
     const isBatch = transactions.length > 1
@@ -422,8 +426,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
           operation: OperationType.DelegateCall
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
-
-    const paymasterAndData = paymasterOptions?.paymasterAddress || '0x'
 
     const userOperation: UserOperation = {
       sender: safeAddress,

@@ -19,6 +19,7 @@ import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
   getPredictedSafeAddressInitCode,
+  getSafeAddressFromDeploymentTx,
   predictSafeAddress,
   validateSafeAccountConfig,
   validateSafeDeploymentConfig
@@ -1284,12 +1285,6 @@ class Safe {
     safeTransaction?: SafeTransaction | SafeMultisigTransactionResponse,
     options: TransactionOptions = {}
   ): Promise<Safe> {
-    const isSafeDeployed = await this.isSafeDeployed()
-
-    if (isSafeDeployed) {
-      throw new Error('Safe already deployed')
-    }
-
     if (!this.#predictedSafe) {
       throw new Error('Predict Safe should be present')
     }
@@ -1301,12 +1296,11 @@ class Safe {
     }
 
     validateSafeAccountConfig(this.#predictedSafe.safeAccountConfig)
-    validateSafeDeploymentConfig({
-      saltNonce: this.#predictedSafe?.safeDeploymentConfig?.saltNonce,
-      safeVersion: this.#predictedSafe?.safeDeploymentConfig?.safeVersion
-    })
+    validateSafeDeploymentConfig(this.#predictedSafe?.safeDeploymentConfig || {})
 
     const signerAddress = (await this.#safeProvider.getSignerAddress()) || '0x'
+
+    let txReceipt
 
     if (safeTransaction) {
       const transaction = isSafeMultisigTransactionResponse(safeTransaction)
@@ -1330,7 +1324,7 @@ class Safe {
         ...options
       })
 
-      await tx?.wait()
+      txReceipt = await tx?.wait()
     } else {
       // we create the deployment transaction
       const safeDeploymentTransaction = await this.createSafeDeploymentTransaction()
@@ -1341,10 +1335,17 @@ class Safe {
         ...options
       })
 
-      await tx?.wait()
+      txReceipt = await tx?.wait()
     }
 
-    const safeAddress = await this.getAddress()
+    const safeVersion = await this.getContractVersion()
+    const safeAddress = getSafeAddressFromDeploymentTx(txReceipt!, safeVersion)
+
+    const isSafeProxyContractDeployed = await this.#safeProvider.isContractDeployed(safeAddress)
+
+    if (!isSafeProxyContractDeployed) {
+      throw new Error('SafeProxy contract is not deployed on the current network')
+    }
 
     // return a new instance of the SDK with the safe deployed
     return this.connect({ signer: this.#safeProvider.signer, safeAddress })
@@ -1406,13 +1407,6 @@ class Safe {
     transactionOptions?: TransactionOptions,
     customSaltNonce?: string
   ): Promise<Transaction> {
-    const isSafeDeployed = await this.isSafeDeployed()
-
-    // if the safe is already deployed throws an error
-    if (isSafeDeployed) {
-      throw new Error('Safe already deployed')
-    }
-
     // we create the deployment transaction
     const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(customSaltNonce)
 

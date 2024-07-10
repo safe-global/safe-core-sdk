@@ -85,9 +85,7 @@ describe('Safe Deployment', () => {
 
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
-      await chai
-        .expect(safeSDK.getAddress())
-        .rejectedWith('Owner list must have at least one owner')
+      await chai.expect(safeSDK.deploy()).rejectedWith('Owner list must have at least one owner')
     })
 
     it('should fail if the threshold is lower than 0', async () => {
@@ -108,7 +106,7 @@ describe('Safe Deployment', () => {
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
       await chai
-        .expect(safeSDK.getAddress())
+        .expect(safeSDK.deploy())
         .rejectedWith('Threshold must be greater than or equal to 1')
     })
 
@@ -130,7 +128,7 @@ describe('Safe Deployment', () => {
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
       await chai
-        .expect(safeSDK.getAddress())
+        .expect(safeSDK.deploy())
         .rejectedWith('Threshold must be lower than or equal to owners length')
     })
 
@@ -152,11 +150,11 @@ describe('Safe Deployment', () => {
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
       await chai
-        .expect(safeSDK.getAddress())
+        .expect(safeSDK.deploy())
         .rejectedWith('saltNonce must be greater than or equal to 0')
     })
 
-    it('should predict a new Safe with saltNonce', async () => {
+    itif(safeVersionDeployed >= '1.3.0')('should predict a new Safe with saltNonce', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
@@ -216,7 +214,7 @@ describe('Safe Deployment', () => {
       }
     )
 
-    itif(safeVersionDeployed > '1.0.0')(
+    itif(safeVersionDeployed > '1.3.0')(
       'should predict a new Safe with a custom fallback handler',
       async () => {
         const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
@@ -376,8 +374,6 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
-        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
         const safeSDKDeployed = await safeSDK.deploy()
 
         const deployedSafeOwners = await safeSDKDeployed.getOwners()
@@ -388,6 +384,7 @@ describe('Safe Deployment', () => {
         chai.expect(deployedSafeThreshold).to.be.eq(threshold)
         chai.expect(customFallbackHandler).to.be.eq(fallbackHandler)
         chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
         chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
       }
     )
@@ -417,8 +414,6 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
-        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
         const safeSDKDeployed = await safeSDK.deploy()
 
         const defaultCompatibilityFallbackHandler = await (
@@ -430,6 +425,7 @@ describe('Safe Deployment', () => {
           .to.be.eq(await safeSDKDeployed.getFallbackHandler())
 
         chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
         chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
       }
     )
@@ -454,8 +450,6 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
       const safeSDKDeployed = await safeSDK.deploy()
 
       const deployedSafeOwners = await safeSDKDeployed.getOwners()
@@ -464,6 +458,7 @@ describe('Safe Deployment', () => {
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
       chai.expect(deployedSafeThreshold).to.be.eq(threshold)
       chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+      chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
@@ -489,8 +484,6 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
       const safeSDKDeployed = await safeSDK.deploy()
 
       const deployedSafeOwners = await safeSDKDeployed.getOwners()
@@ -499,6 +492,7 @@ describe('Safe Deployment', () => {
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
       chai.expect(deployedSafeThreshold).to.be.eq(threshold)
       chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+      chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
@@ -524,14 +518,13 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
-        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
         const safeSDKDeployed = await safeSDK.deploy()
 
         const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
 
         chai.expect(safeInstanceVersion).to.be.eq(DEFAULT_SAFE_VERSION)
         chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
         chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
       }
     )
@@ -556,106 +549,109 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
       const safeSDKDeployed = await safeSDK.deploy()
 
       const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
 
       chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
       chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+      chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
-    it('should deploy the Safe Account and execute a transaction', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const owners = [account1.address, account2.address]
-      const threshold = 1
-      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should deploy the Safe Account and execute a transaction',
+      async () => {
+        const { accounts, contractNetworks, provider } = await setupTests()
+        const [account1, account2] = accounts
+        const owners = [account1.address, account2.address]
+        const threshold = 1
+        const safeAccountConfig: SafeAccountConfig = { owners, threshold }
 
-      const predictedSafe: PredictedSafeProps = {
-        safeAccountConfig,
-        safeDeploymentConfig: {
-          safeVersion: safeVersionDeployed
+        const predictedSafe: PredictedSafeProps = {
+          safeAccountConfig,
+          safeDeploymentConfig: {
+            safeVersion: safeVersionDeployed
+          }
         }
-      }
 
-      const safeSDK = await Safe.init({
-        provider,
-        contractNetworks,
-        predictedSafe
-      })
+        const safeSDK = await Safe.init({
+          provider,
+          contractNetworks,
+          predictedSafe
+        })
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
-      const transaction = {
-        to: account2.address,
-        value: '0',
-        data: '0x'
-      }
-
-      const safeTransaction = await safeSDK.createTransaction({ transactions: [transaction] })
-
-      const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
-
-      const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
-
-      const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-      chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
-      chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-      chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
-    })
-
-    it('should deploy the Safe Account and execute a batch of transactions', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const owners = [account1.address, account2.address]
-      const threshold = 1
-      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
-
-      const predictedSafe: PredictedSafeProps = {
-        safeAccountConfig,
-        safeDeploymentConfig: {
-          safeVersion: safeVersionDeployed
+        const transaction = {
+          to: account2.address,
+          value: '0',
+          data: '0x'
         }
+
+        const safeTransaction = await safeSDK.createTransaction({ transactions: [transaction] })
+
+        const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
+
+        const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
+
+        const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
+
+        chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
+        chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+        chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
       }
+    )
 
-      const safeSDK = await Safe.init({
-        provider,
-        contractNetworks,
-        predictedSafe
-      })
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should deploy the Safe Account and execute a batch of transactions',
+      async () => {
+        const { accounts, contractNetworks, provider } = await setupTests()
+        const [account1, account2] = accounts
+        const owners = [account1.address, account2.address]
+        const threshold = 1
+        const safeAccountConfig: SafeAccountConfig = { owners, threshold }
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+        const predictedSafe: PredictedSafeProps = {
+          safeAccountConfig,
+          safeDeploymentConfig: {
+            safeVersion: safeVersionDeployed
+          }
+        }
 
-      const firstTransaction = {
-        to: account1.address,
-        value: '0',
-        data: '0x'
+        const safeSDK = await Safe.init({
+          provider,
+          contractNetworks,
+          predictedSafe
+        })
+
+        const firstTransaction = {
+          to: account1.address,
+          value: '0',
+          data: '0x'
+        }
+
+        const secondTransaction = {
+          to: account2.address,
+          value: '0',
+          data: '0x'
+        }
+
+        // batch to execute after the deployment
+        const transactions = [firstTransaction, secondTransaction]
+
+        const safeTransaction = await safeSDK.createTransaction({ transactions })
+
+        const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
+
+        const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
+
+        const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
+
+        chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
+        chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+        chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
       }
-
-      const secondTransaction = {
-        to: account2.address,
-        value: '0',
-        data: '0x'
-      }
-
-      // batch to execute after the deployment
-      const transactions = [firstTransaction, secondTransaction]
-
-      const safeTransaction = await safeSDK.createTransaction({ transactions })
-
-      const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
-
-      const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
-
-      const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-      chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
-      chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-      chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
-    })
+    )
   })
 })

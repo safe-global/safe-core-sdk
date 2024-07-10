@@ -1,7 +1,5 @@
-import { ContractRunner, EventLog } from 'ethers'
-import SafeProxyFactoryBaseContract, {
-  CreateProxyProps
-} from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
+import { ContractRunner } from 'ethers'
+import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import {
   SafeVersion,
   SafeProxyFactoryContract_v1_4_1_Abi,
@@ -102,50 +100,6 @@ class SafeProxyFactoryContract_v1_4_1
     args
   ) => {
     return [await this.contract.createProxyWithNonce(...args)]
-  }
-
-  /**
-   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
-   * @param {CreateProxyProps} props - Properties for the new proxy contract.
-   * @returns The address of the new proxy contract.
-   */
-  async createProxyWithOptions({
-    safeSingletonAddress,
-    initializer,
-    saltNonce,
-    options,
-    callback
-  }: CreateProxyProps): Promise<string> {
-    const saltNonceBigInt = BigInt(saltNonce)
-
-    if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')
-
-    if (options && !options.gasLimit) {
-      options.gasLimit = (
-        await this.estimateGas(
-          'createProxyWithNonce',
-          [safeSingletonAddress, initializer, saltNonceBigInt],
-          { ...options }
-        )
-      ).toString()
-    }
-
-    const proxyAddress = this.contract
-      .createProxyWithNonce(safeSingletonAddress, initializer, saltNonce, { ...options })
-      .then(async (txResponse) => {
-        if (callback) {
-          callback(txResponse.hash)
-        }
-        const txReceipt = await txResponse.wait()
-        const events = txReceipt?.logs as EventLog[]
-        const proxyCreationEvent = events.find((event) => event?.eventName === 'ProxyCreation')
-        if (!proxyCreationEvent || !proxyCreationEvent.args) {
-          throw new Error('SafeProxy was not deployed correctly')
-        }
-        const proxyAddress: string = proxyCreationEvent.args[0]
-        return proxyAddress
-      })
-    return proxyAddress
   }
 }
 

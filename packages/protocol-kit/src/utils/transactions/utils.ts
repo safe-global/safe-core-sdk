@@ -150,11 +150,11 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
       // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
       // uint8 operation, address to, value uint256, dataLength uint256
 
-      const operation = `0x${args.slice(index, (index += 2))}`
-      const to = `0x${args.slice(index, (index += 40))}`
-      const value = `0x${args.slice(index, (index += 64))}`
-      const dataLength = parseInt(`${args.slice(index, (index += 64))}`, 16) * 2
-      const data = `0x${args.slice(index, (index += dataLength))}`
+      const operation = `0x${transactionBytes.slice(index, (index += 2))}`
+      const to = `0x${transactionBytes.slice(index, (index += 40))}`
+      const value = `0x${transactionBytes.slice(index, (index += 64))}`
+      const dataLength = parseInt(`${transactionBytes.slice(index, (index += 64))}`, 16) * 2
+      const data = `0x${transactionBytes.slice(index, (index += dataLength))}`
 
       txs.push({
         operation: Number(operation) as OperationType,

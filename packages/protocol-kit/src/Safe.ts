@@ -229,13 +229,6 @@ class Safe {
    */
   async getAddress(): Promise<string> {
     if (this.#predictedSafe) {
-      const safeVersion = await this.getContractVersion()
-      if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
-        throw new Error(
-          'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
-        )
-      }
-
       const chainId = await this.#safeProvider.getChainId()
       return predictSafeAddress({
         safeProvider: this.#safeProvider,
@@ -855,6 +848,13 @@ class Safe {
     fallbackHandlerAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const safeVersion = await this.getContractVersion()
+    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      throw new Error(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+      )
+    }
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -880,6 +880,13 @@ class Safe {
   async createDisableFallbackHandlerTx(
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const safeVersion = await this.getContractVersion()
+    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      throw new Error(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+      )
+    }
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -1285,6 +1292,13 @@ class Safe {
     safeTransaction?: SafeTransaction | SafeMultisigTransactionResponse,
     options: TransactionOptions = {}
   ): Promise<Safe> {
+    const isSafeDeployed = await this.isSafeDeployed()
+
+    // if the safe is already deployed throws an error
+    if (isSafeDeployed) {
+      throw new Error('Safe already deployed')
+    }
+
     if (!this.#predictedSafe) {
       throw new Error('Predict Safe should be present')
     }
@@ -1407,6 +1421,13 @@ class Safe {
     transactionOptions?: TransactionOptions,
     customSaltNonce?: string
   ): Promise<Transaction> {
+    const isSafeDeployed = await this.isSafeDeployed()
+
+    // if the safe is already deployed throws an error
+    if (isSafeDeployed) {
+      throw new Error('Safe already deployed')
+    }
+
     // we create the deployment transaction
     const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(customSaltNonce)
 

@@ -154,7 +154,7 @@ describe('Safe Deployment', () => {
         .rejectedWith('saltNonce must be greater than or equal to 0')
     })
 
-    itif(safeVersionDeployed >= '1.3.0')('should predict a new Safe with saltNonce', async () => {
+    it('should predict a new Safe with saltNonce', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
@@ -179,6 +179,7 @@ describe('Safe Deployment', () => {
       chai.expect(threshold).to.be.eq(await safeSDKDeployed.getThreshold())
       const deployedSafeOwners = await safeSDKDeployed.getOwners()
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
+      chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
     })
 
     itif(safeVersionDeployed > '1.0.0')(
@@ -211,6 +212,7 @@ describe('Safe Deployment', () => {
         chai
           .expect(compatibilityFallbackHandler)
           .to.be.eq(await safeSDKDeployed.getFallbackHandler())
+        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
       }
     )
 
@@ -250,6 +252,33 @@ describe('Safe Deployment', () => {
   })
 
   describe('deploySafe', async () => {
+    it('should fail if the Safe is deployed', async () => {
+      const { contractNetworks, provider, accounts } = await setupTests()
+      const [account1, account2] = accounts
+      const owners = [account1.address, account2.address]
+      const threshold = 2
+      const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig,
+        safeDeploymentConfig: {
+          safeVersion: safeVersionDeployed
+        }
+      }
+
+      const safeSDK = await Safe.init({
+        provider,
+        contractNetworks,
+        predictedSafe
+      })
+
+      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+
+      const safeSDKDeployed = await safeSDK.deploy()
+
+      await chai.expect(safeSDK.deploy()).rejectedWith('Safe already deployed')
+      chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+    })
+
     it('should fail if there are no owners', async () => {
       const { contractNetworks, provider } = await setupTests()
       const owners: string[] = []
@@ -374,6 +403,8 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+
         const safeSDKDeployed = await safeSDK.deploy()
 
         const deployedSafeOwners = await safeSDKDeployed.getOwners()
@@ -414,6 +445,8 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+
         const safeSDKDeployed = await safeSDK.deploy()
 
         const defaultCompatibilityFallbackHandler = await (
@@ -450,6 +483,8 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
+      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+
       const safeSDKDeployed = await safeSDK.deploy()
 
       const deployedSafeOwners = await safeSDKDeployed.getOwners()
@@ -483,6 +518,8 @@ describe('Safe Deployment', () => {
         contractNetworks,
         predictedSafe
       })
+
+      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
 
       const safeSDKDeployed = await safeSDK.deploy()
 
@@ -518,6 +555,8 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+
         const safeSDKDeployed = await safeSDK.deploy()
 
         const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
@@ -548,6 +587,8 @@ describe('Safe Deployment', () => {
         contractNetworks,
         predictedSafe
       })
+
+      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
 
       const safeSDKDeployed = await safeSDK.deploy()
 
@@ -590,6 +631,8 @@ describe('Safe Deployment', () => {
         const safeTransaction = await safeSDK.createTransaction({ transactions: [transaction] })
 
         const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
+
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
 
         const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
 
@@ -642,6 +685,8 @@ describe('Safe Deployment', () => {
         const safeTransaction = await safeSDK.createTransaction({ transactions })
 
         const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
+
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
 
         const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
 

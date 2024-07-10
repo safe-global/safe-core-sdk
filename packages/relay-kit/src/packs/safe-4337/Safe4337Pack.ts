@@ -391,7 +391,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
-    let paymasterAndData = '0x'
 
     if (amountToApprove) {
       const paymasterOptions = this.#paymasterOptions as ERC20PaymasterOption
@@ -411,8 +410,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       transactions.push(approveToPaymasterTransaction)
-
-      paymasterAndData = paymasterOptions.paymasterAddress
     }
 
     const isBatch = transactions.length > 1
@@ -426,6 +423,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
           operation: OperationType.DelegateCall
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
+
+    const paymasterAndData =
+      this.#paymasterOptions && 'paymasterAddress' in this.#paymasterOptions
+        ? this.#paymasterOptions.paymasterAddress
+        : '0x'
 
     const userOperation: UserOperation = {
       sender: safeAddress,

@@ -1,3 +1,4 @@
-import { TextEncoder, TextDecoder } from 'util'
+import { TextEncoder } from 'util'
 
-Object.assign(global, { TextDecoder, TextEncoder })
+// TextEncoder is used by viem but not bundled with it. Therefore we need to polyfill it for the tests.
+Object.assign(global, { TextEncoder })

@@ -395,7 +395,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     if (amountToApprove) {
       const paymasterOptions = this.#paymasterOptions as ERC20PaymasterOption
 
-      if (!paymasterOptions || !paymasterOptions.paymasterTokenAddress) {
+      if (!paymasterOptions.paymasterTokenAddress) {
         throw new Error('Paymaster must be initialized')
       }
 

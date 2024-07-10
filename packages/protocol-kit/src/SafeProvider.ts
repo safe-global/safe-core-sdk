@@ -39,9 +39,6 @@ import {
   SafeProviderTransaction,
   GetContractProps,
   SafeProviderConfig,
-  Eip1193Provider,
-  HttpTransport,
-  SocketTransport,
   SafeSigner,
   SafeConfig,
   ContractNetworksConfig
@@ -51,8 +48,8 @@ import { DEFAULT_SAFE_VERSION } from './contracts/config'
 
 class SafeProvider {
   #externalProvider: BrowserProvider | JsonRpcProvider
+  provider: SafeProviderConfig['provider']
   signer?: SafeSigner
-  provider: Eip1193Provider | HttpTransport | SocketTransport
 
   constructor({
     provider,
@@ -103,18 +100,27 @@ class SafeProvider {
         )
       }
 
-      const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
-        safeProvider,
-        safeVersion,
-        customContracts
-      })
+      let passkeySigner
+      const isPasskeySignerConfig = !(signer instanceof PasskeySigner)
 
-      const passkeySigner = new PasskeySigner(
-        signer,
-        safeWebAuthnSignerFactoryContract,
-        safeProvider.getExternalProvider(),
-        chainId.toString()
-      )
+      if (isPasskeySignerConfig) {
+        // signer is type PasskeyArgType {rawId, coordinates, customVerifierAddress? }
+        const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+          safeProvider,
+          safeVersion,
+          customContracts
+        })
+
+        passkeySigner = new PasskeySigner(
+          signer,
+          safeWebAuthnSignerFactoryContract,
+          safeProvider.getExternalProvider(),
+          chainId.toString()
+        )
+      } else {
+        // signer was already initialized and we pass a PasskeySigner instance (reconnecting)
+        passkeySigner = signer
+      }
 
       return new SafeProvider({
         provider,

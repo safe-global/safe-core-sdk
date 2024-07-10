@@ -19,7 +19,7 @@ export type SafeSigner = HexAddress | PrivateKey | PasskeySigner
 export type SafeProviderConfig = {
   /** signerOrProvider - Ethers signer or provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
-  signer?: HexAddress | PrivateKey | PasskeyArgType
+  signer?: HexAddress | PrivateKey | PasskeySigner | PasskeyArgType
 }
 
 export type SafeProviderTransaction = {

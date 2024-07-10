@@ -45,19 +45,7 @@ export class SafeOperationClient {
     safeOperation = await this.safe4337Pack.signSafeOperation(safeOperation)
 
     if (isMultisigSafe) {
-      const userOperation = safeOperation.toUserOperation()
-      userOperation.signature = safeOperation.encodedSignatures() // Without validity dates
-
-      await this.apiKit.addSafeOperation({
-        entryPoint: safeOperation.data.entryPoint,
-        moduleAddress: safeOperation.moduleAddress,
-        safeAddress: safeOperation.data.safe,
-        userOperation,
-        options: {
-          validAfter: safeOperation.data.validAfter,
-          validUntil: safeOperation.data.validUntil
-        }
-      })
+      await this.apiKit.addSafeOperation(safeOperation)
 
       const safeOperationHash = safeOperation.getHash()
 

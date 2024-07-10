@@ -342,6 +342,29 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
 }
 
 /**
+ * Returns the ProxyCreation Event based on the Safe version
+ *
+ * based on the Safe Version, we have different proxyCreation events
+ *
+ * @param {safeVersion} safeVersion - The Safe Version.
+ * @returns {string} - The ProxyCreation event.
+ */
+
+function getProxyCreationEvent(safeVersion: SafeVersion): string {
+  const isLegacyProxyCreationEvent = semverSatisfies(safeVersion, '<1.3.0')
+
+  if (isLegacyProxyCreationEvent) {
+    return 'event ProxyCreation(address proxy)' // v1.0.0, 1.1.1 & v1.2.0
+  }
+
+  if (semverSatisfies(safeVersion, '=1.3.0')) {
+    return 'event ProxyCreation(address proxy, address singleton)' // v1.3.0
+  }
+
+  return 'event ProxyCreation(address indexed proxy, address singleton)' // >= v1.4.1
+}
+
+/**
  * Returns the address of a SafeProxy Address from the transaction receipt.
  *
  * This function looks for a ProxyCreation event in the transaction receipt logs to get address of the deployed SafeProxy.
@@ -356,19 +379,10 @@ export function getSafeAddressFromDeploymentTx(
   txReceipt: TransactionReceipt,
   safeVersion: SafeVersion
 ): string {
-  const isLegacyProxyCreationEvent = semverSatisfies(safeVersion, '<1.3.0')
-
-  // based on the Safe Version, we have 2 different proxyCreation events in the deployment transaction
-  const proxyCreationEventInterface = new Interface([
-    isLegacyProxyCreationEvent
-      ? 'event ProxyCreation(address proxy)' // v1.0.0, 1.1.1 & v1.2.0
-      : 'event ProxyCreation(address proxy, address singleton)' // >= v1.3.0
-  ])
-
+  const proxyCreationEventInterface = new Interface([getProxyCreationEvent(safeVersion)])
   const proxyCreationEventFragment = proxyCreationEventInterface.getEvent('ProxyCreation')
 
-  const events = txReceipt?.logs
-  const proxyCreationEvent = events.find(
+  const proxyCreationEvent = txReceipt?.logs.find(
     (event) => event.topics[0] === proxyCreationEventFragment?.topicHash
   )
 

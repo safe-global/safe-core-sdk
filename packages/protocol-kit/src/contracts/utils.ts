@@ -1,5 +1,13 @@
-import { ContractTransactionResponse, Provider, AbstractSigner, isAddress } from 'ethers'
-import { concat, getContractAddress, keccak256, pad } from 'viem'
+import {
+  concat,
+  getContractAddress,
+  Hash,
+  isAddress,
+  keccak256,
+  pad,
+  PublicClient,
+  WalletClient
+} from 'viem'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -11,7 +19,7 @@ import {
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
-
+import { asAddress, asHex } from '../utils/types'
 import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
@@ -26,6 +34,7 @@ import {
   SafeDeploymentConfig
 } from '../types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { ContractLegacyTransactionOptions, ContractTransactionOptions } from '../types'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =
@@ -76,8 +85,8 @@ export function encodeCreateProxyWithNonce(
   salt?: string
 ) {
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
-    safeSingletonAddress,
-    initializer,
+    asAddress(safeSingletonAddress),
+    asHex(initializer),
     BigInt(salt || PREDETERMINED_SALT_NONCE)
   ])
 }
@@ -85,6 +94,58 @@ export function encodeCreateProxyWithNonce(
 const memoizedGetCompatibilityFallbackHandlerContract = createMemoizedFunction(
   getCompatibilityFallbackHandlerContract
 )
+
+export function isLegacyTransaction(options?: TransactionOptions) {
+  return !!options?.gasPrice
+}
+
+export function createLegacyTxOptions(
+  options?: TransactionOptions
+): Partial<ContractLegacyTransactionOptions> {
+  const converted: Partial<ContractLegacyTransactionOptions> = {}
+  if (options?.from) {
+    converted.account = asAddress(options.from)
+  }
+
+  if (options?.gasLimit) {
+    converted.gas = BigInt(options.gasLimit)
+  }
+
+  if (options?.gasPrice) {
+    converted.gasPrice = BigInt(options.gasPrice)
+  }
+
+  if (options?.nonce) {
+    converted.nonce = options.nonce
+  }
+
+  return converted
+}
+
+export function createTxOptions(options?: TransactionOptions): Partial<ContractTransactionOptions> {
+  const converted: Partial<ContractTransactionOptions> = {}
+  if (options?.from) {
+    converted.account = asAddress(options.from)
+  }
+
+  if (options?.gasLimit) {
+    converted.gas = BigInt(options.gasLimit)
+  }
+
+  if (options?.maxFeePerGas) {
+    converted.maxFeePerGas = BigInt(options.maxFeePerGas)
+  }
+
+  if (options?.maxPriorityFeePerGas) {
+    converted.maxPriorityFeePerGas = BigInt(options.maxPriorityFeePerGas)
+  }
+
+  if (options?.nonce) {
+    converted.nonce = options.nonce
+  }
+
+  return converted
+}
 
 export async function encodeSetupCallData({
   safeProvider,
@@ -110,11 +171,11 @@ export async function encodeSetupCallData({
     return safeContract.encode('setup', [
       owners,
       threshold,
-      to,
-      data,
-      paymentToken,
+      asAddress(to),
+      asHex(data),
+      asAddress(paymentToken),
       payment,
-      paymentReceiver
+      asAddress(paymentReceiver)
     ])
   }
 
@@ -229,7 +290,7 @@ export async function getPredictedSafeAddressInitCode({
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
-  const encodedNonce = safeProvider.encodeParameters(['uint256'], [saltNonce])
+  const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce])
   const safeSingletonAddress = await safeContract.getAddress()
   const initCodeCallData = encodeCreateProxyWithNonce(
     safeProxyFactoryContract,
@@ -293,14 +354,13 @@ export async function predictSafeAddress({
   })) as `0x${string}`
   const initializerHash = keccak256(initializer)
 
-  const encodedNonce = safeProvider.encodeParameters(['uint256'], [saltNonce]) as `0x${string}`
+  const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce]) as `0x${string}`
 
   const salt = keccak256(concat([initializerHash, encodedNonce]))
 
-  const input = safeProvider.encodeParameters(
-    ['address'],
-    [await safeContract.getAddress()]
-  ) as `0x${string}`
+  const input = safeProvider.encodeParameters('address', [
+    await safeContract.getAddress()
+  ]) as `0x${string}`
 
   const from = (await safeProxyFactoryContract.getAddress()) as `0x${string}`
 
@@ -365,31 +425,22 @@ export function zkSyncEraCreate2Address(
 }
 
 export function toTxResult(
-  transactionResponse: ContractTransactionResponse,
+  runner: PublicClient,
+  hash: Hash,
   options?: TransactionOptions
 ): TransactionResult {
+  const wait = async () => {
+    return runner.getTransactionReceipt({ hash })
+  }
   return {
-    hash: transactionResponse.hash,
+    hash,
     options,
-    transactionResponse
+    transactionResponse: {
+      wait
+    }
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is AbstractSigner {
-  return (signer as unknown as AbstractSigner).signTypedData !== undefined
-}
-
-/**
- * Check if the signerOrProvider is compatible with `Signer`
- * @param signerOrProvider - Signer or provider
- * @returns true if the parameter is compatible with `Signer`
- */
-export function isSignerCompatible(signerOrProvider: AbstractSigner | Provider): boolean {
-  const candidate = signerOrProvider as AbstractSigner
-
-  const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
-  const isSignMessageCompatible = typeof candidate.signMessage === 'function'
-  const isGetAddressCompatible = typeof candidate.getAddress === 'function'
-
-  return isSigntransactionCompatible && isSignMessageCompatible && isGetAddressCompatible
+export function isTypedDataSigner(signer: any): signer is WalletClient {
+  return (signer as unknown as WalletClient).signTypedData !== undefined
 }

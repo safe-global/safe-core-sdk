@@ -15,6 +15,7 @@ import {
   isSafeContractCompatibleWithRequiredTxGas,
   isSafeContractCompatibleWithSimulateAndRevert
 } from '../safeVersions'
+import { asAddress, asHex } from '../types'
 
 // Every byte == 00 -> 4  Gas cost
 const CALL_DATA_ZERO_BYTE_GAS_COST = 4
@@ -78,9 +79,9 @@ export async function estimateGas(
   })
 
   const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
-    to,
+    asAddress(to),
     BigInt(valueInWei),
-    data,
+    asHex(data),
     operation
   ])
 
@@ -89,7 +90,7 @@ export async function estimateGas(
 
   const safeFunctionToEstimate = safeContractContractCompatibleWithSimulateAndRevert.encode(
     'simulateAndRevert',
-    [await simulateTxAccessorContract.getAddress(), transactionDataToEstimate]
+    [asAddress(await simulateTxAccessorContract.getAddress()), asHex(transactionDataToEstimate)]
   )
   const safeAddress = await safeContract.getAddress()
   const transactionToEstimateGas = {
@@ -116,50 +117,7 @@ export async function estimateTxGas(
   data: string,
   operation: OperationType
 ): Promise<string> {
-  let txGasEstimation = 0
   const safeAddress = await safeContract.getAddress()
-
-  const safeContractCompatibleWithRequiredTxGas =
-    await isSafeContractCompatibleWithRequiredTxGas(safeContract)
-
-  const estimateData = safeContractCompatibleWithRequiredTxGas.encode('requiredTxGas', [
-    to,
-    BigInt(valueInWei),
-    data,
-    operation
-  ])
-
-  try {
-    const estimateResponse = await safeProvider.estimateGas({
-      to: safeAddress,
-      from: safeAddress,
-      data: estimateData
-    })
-    txGasEstimation = Number('0x' + estimateResponse.substring(138)) + 10000
-  } catch (error) {}
-
-  if (txGasEstimation > 0) {
-    const dataGasEstimation = estimateDataGasCosts(estimateData)
-    let additionalGas = 10000
-    for (let i = 0; i < 10; i++) {
-      try {
-        const estimateResponse = await safeProvider.call({
-          to: safeAddress,
-          from: safeAddress,
-          data: estimateData,
-          gasPrice: '0',
-          gasLimit: (txGasEstimation + dataGasEstimation + additionalGas).toString()
-        })
-        if (estimateResponse !== '0x') {
-          break
-        }
-      } catch (error) {}
-      txGasEstimation = txGasEstimation + additionalGas
-      additionalGas *= 2
-    }
-    return (txGasEstimation + additionalGas).toString()
-  }
-
   try {
     const estimateGas = await safeProvider.estimateGas({
       to,
@@ -343,9 +301,9 @@ async function estimateSafeTxGasWithRequiredTxGas(
   const transactionDataToEstimate: string = safeContractCompatibleWithRequiredTxGas.encode(
     'requiredTxGas',
     [
-      safeTransaction.data.to,
+      asAddress(safeTransaction.data.to),
       BigInt(safeTransaction.data.value),
-      safeTransaction.data.data,
+      asHex(safeTransaction.data.data),
       safeTransaction.data.operation
     ]
   )
@@ -401,10 +359,12 @@ function decodeSafeTxGas(encodedDataResponse: string): string {
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
 type EthersEstimationError = { data: string }
 type ViemEstimationError = { info: { error: { message: string } } }
+type CallExecutionError = { details: string }
 type EstimationError = Error &
   EthersEstimationError &
   GnosisChainEstimationError &
-  ViemEstimationError
+  ViemEstimationError &
+  CallExecutionError
 
 /**
  * Parses the SafeTxGas estimation response from different providers.
@@ -422,7 +382,7 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   }
 
   // viem
-  const viemError = error?.info?.error?.message
+  const viemError = error?.info?.error?.message || error?.details
   if (viemError) {
     return decodeSafeTxGas(viemError)
   }
@@ -485,9 +445,9 @@ async function estimateSafeTxGasWithSimulate(
   })
 
   const transactionDataToEstimate: string = simulateTxAccessorContract.encode('simulate', [
-    safeTransaction.data.to,
+    asAddress(safeTransaction.data.to),
     BigInt(safeTransaction.data.value),
-    safeTransaction.data.data,
+    asHex(safeTransaction.data.data),
     safeTransaction.data.operation
   ])
 
@@ -499,7 +459,7 @@ async function estimateSafeTxGasWithSimulate(
 
   const safeFunctionToEstimate: string = SafeContractCompatibleWithSimulateAndRevert.encode(
     'simulateAndRevert',
-    [await simulateTxAccessorContract.getAddress(), transactionDataToEstimate]
+    [asAddress(await simulateTxAccessorContract.getAddress()), asHex(transactionDataToEstimate)]
   )
 
   const transactionToEstimateGas = {

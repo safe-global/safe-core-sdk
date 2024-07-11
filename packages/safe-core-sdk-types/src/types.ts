@@ -75,7 +75,7 @@ export interface SafeMessage {
 
 export type Transaction = TransactionBase & TransactionOptions
 
-interface TransactionBase {
+export interface TransactionBase {
   to: string
   value: string
   data: string
@@ -83,7 +83,7 @@ interface TransactionBase {
 
 export interface TransactionOptions {
   from?: string
-  gasLimit?: number | string
+  gasLimit?: number | string | bigint
   gasPrice?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
@@ -170,20 +170,20 @@ export interface EIP712TypedDataMessage {
   }
 }
 
-interface TypedDataDomain {
+export interface TypedDataDomain {
   name?: string
   version?: string
-  chainId?: unknown
+  chainId?: number
   verifyingContract?: string
   salt?: ArrayLike<number> | string
 }
 
-interface TypedDataTypes {
+export interface TypedDataTypes {
   name: string
   type: string
 }
 
-type TypedMessageTypes = {
+export type TypedMessageTypes = {
   [key: string]: TypedDataTypes[]
 }
 
@@ -203,12 +203,13 @@ export type SafeMultisigConfirmationResponse = {
   readonly signatureType?: string
 }
 
-export type SafeMultisigConfirmationListResponse = {
+export type ListResponse<T> = {
   readonly count: number
   readonly next?: string
   readonly previous?: string
-  readonly results: SafeMultisigConfirmationResponse[]
+  readonly results: T[]
 }
+export type SafeMultisigConfirmationListResponse = ListResponse<SafeMultisigConfirmationResponse>
 
 export type SafeMultisigTransactionResponse = {
   readonly safe: string
@@ -295,6 +296,7 @@ export type EstimateGasData = {
 }
 
 export interface SafeOperation {
+  readonly chainId: bigint
   readonly moduleAddress: string
   readonly data: SafeUserOperation
   readonly signatures: Map<string, SafeSignature>
@@ -303,6 +305,7 @@ export interface SafeOperation {
   encodedSignatures(): string
   addEstimations(estimations: EstimateGasData): void
   toUserOperation(): UserOperation
+  getHash(): string
 }
 
 export const isSafeOperation = (response: unknown): response is SafeOperation => {
@@ -354,3 +357,5 @@ export const isSafeOperationResponse = (response: unknown): response is SafeOper
 
   return 'userOperation' in safeOperationResponse && 'safeOperationHash' in safeOperationResponse
 }
+
+export type SafeOperationConfirmationListResponse = ListResponse<SafeOperationConfirmation>

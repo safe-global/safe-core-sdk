@@ -31,7 +31,7 @@ describe('The EIP1271 implementation', () => {
         1, // Require 1 signatures
         fallbackHandlerAddress
       )
-      const signerSafeAddress1_1 = await signerSafe1_1.getAddress()
+      const signerSafeAddress1_1 = signerSafe1_1.address
 
       // Create a 2/3 signer Safe
       const signerSafe2_3 = await getSafeWithOwners(
@@ -39,7 +39,7 @@ describe('The EIP1271 implementation', () => {
         2, // Require 2 signatures
         fallbackHandlerAddress
       )
-      const signerSafeAddress2_3 = await signerSafe2_3.getAddress()
+      const signerSafeAddress2_3 = signerSafe2_3.address
 
       // Create a 3/4 Safe with the signer Safe as owner
       const safe = await getSafeWithOwners(
@@ -48,7 +48,7 @@ describe('The EIP1271 implementation', () => {
         fallbackHandlerAddress
       )
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
 
       return {
         safe,

@@ -41,7 +41,8 @@
     "@safe-global/safe-core-sdk-types": "^5.0.2",
     "@stripe/crypto": "^0.0.4",
     "@stripe/stripe-js": "^1.54.2",
-    "ethers": "^6.13.1"
+    "ethers": "^6.13.1",
+    "viem": "^2.17.0"
   },
   "devDependencies": {
     "events": "^3.3.0",

@@ -54,7 +54,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
+    const safeFactoryAddress = await (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -75,7 +75,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
+    const safeFactoryAddress = await (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -96,7 +96,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
+    const safeFactoryAddress = await (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -117,7 +117,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
+    const safeFactoryAddress = await (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -138,7 +138,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.getAddress()
+    const safeFactoryAddress = await (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -189,10 +189,9 @@ describe('createSafeDeploymentTransaction', () => {
         contractNetworks
       })
 
-      const predeterminedSaltNonceEncoded = safeProvider.encodeParameters(
-        ['uint256'],
-        [`0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`]
-      )
+      const predeterminedSaltNonceEncoded = safeProvider.encodeParameters('uint256', [
+        `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+      ])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
@@ -214,7 +213,7 @@ describe('createSafeDeploymentTransaction', () => {
 
       const customSaltNonce = '123456789'
 
-      const customSaltNonceEncoded = safeProvider.encodeParameters(['uint256'], [customSaltNonce])
+      const customSaltNonceEncoded = safeProvider.encodeParameters('uint256', [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 
@@ -241,7 +240,7 @@ describe('createSafeDeploymentTransaction', () => {
 
       const saltNonceEncoded = safeSdk
         .getSafeProvider()
-        .encodeParameters(['uint256'], [customSaltNonce])
+        .encodeParameters('uint256', [customSaltNonce])
 
       const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
 
@@ -255,7 +254,7 @@ describe('createSafeDeploymentTransaction', () => {
     const [account1] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,

@@ -1,5 +1,5 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
+import { PublicClient } from 'viem'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - CreateCallContract_v1_3_0  extends CreateCallBaseContract<CreateCallContract_v1_3_0_Abi>
  */
 abstract class CreateCallBaseContract<
-  CreateCallContractAbiType extends InterfaceAbi & Abi
+  CreateCallContractAbiType extends Abi
 > extends BaseContract<CreateCallContractAbiType> {
   contractName: contractName
 
@@ -42,7 +42,7 @@ abstract class CreateCallBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CreateCallContractAbiType,
-    runner?: ContractRunner | null
+    runner?: PublicClient | null
   ) {
     const contractName = 'createCallVersion'
 

@@ -8,6 +8,7 @@ import {
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '../SafeProvider'
+import { asAddress } from '../utils/types'
 
 class FallbackHandlerManager {
   #safeProvider: SafeProvider
@@ -69,7 +70,7 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
 
-    return safeContract.encode('setFallbackHandler', [fallbackHandlerAddress])
+    return safeContract.encode('setFallbackHandler', [asAddress(fallbackHandlerAddress)])
   }
 
   async encodeDisableFallbackHandlerData(): Promise<string> {

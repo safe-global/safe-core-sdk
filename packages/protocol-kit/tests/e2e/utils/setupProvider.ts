@@ -1,7 +1,7 @@
-import hre, { ethers } from 'hardhat'
+import hre from 'hardhat'
 import Web3 from 'web3'
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
-import { custom, createWalletClient } from 'viem'
+import { ethers } from 'ethers'
+import { custom, createWalletClient, Account } from 'viem'
 
 import { SafeProvider } from '@safe-global/protocol-kit/index'
 import { Eip1193Provider } from '@safe-global/protocol-kit/types'
@@ -35,10 +35,7 @@ export function getEip1193Provider(): Eip1193Provider {
   }
 }
 
-export function getSafeProviderFromNetwork(
-  network: Network,
-  signer?: HardhatEthersSigner
-): SafeProvider {
+export function getSafeProviderFromNetwork(network: Network, account?: Account): SafeProvider {
   let rpcUrl: string
   switch (network) {
     case 'zksync':
@@ -60,5 +57,5 @@ export function getSafeProviderFromNetwork(
       throw new Error('Chain not supported')
   }
 
-  return new SafeProvider({ provider: rpcUrl, signer: signer?.address })
+  return new SafeProvider({ provider: rpcUrl, signer: account?.address })
 }

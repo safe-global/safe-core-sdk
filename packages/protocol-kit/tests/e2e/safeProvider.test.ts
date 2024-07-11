@@ -15,7 +15,7 @@ import {
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
-import { AbstractSigner, BrowserProvider, JsonRpcProvider } from 'ethers'
+import { publicActions, walletActions } from 'viem'
 
 chai.use(chaiAsPromised)
 
@@ -94,7 +94,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await safeContract.getAddress())
-        .to.be.eq(await (await getSafeSingleton()).contract.getAddress())
+        .to.be.eq(await (await getSafeSingleton()).contract.address)
     })
   })
 
@@ -122,7 +122,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendContract.getAddress())
-        .to.be.eq(await (await getMultiSend()).contract.getAddress())
+        .to.be.eq(await (await getMultiSend()).contract.address)
     })
   })
 
@@ -150,7 +150,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await multiSendCallOnlyContract.getAddress())
-        .to.be.eq(await (await getMultiSendCallOnly()).contract.getAddress())
+        .to.be.eq(await (await getMultiSendCallOnly()).contract.address)
     })
   })
 
@@ -180,7 +180,7 @@ describe('Safe contracts', () => {
         })
       chai
         .expect(await compatibilityFallbackHandlerContract.getAddress())
-        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.getAddress())
+        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.address)
     })
   })
 
@@ -208,7 +208,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await factoryContract.getAddress())
-        .to.be.eq(await (await getFactory()).contract.getAddress())
+        .to.be.eq(await (await getFactory()).contract.address)
     })
   })
 
@@ -236,7 +236,7 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await signMessageLibContract.getAddress())
-        .to.be.eq(await (await getSignMessageLib()).contract.getAddress())
+        .to.be.eq(await (await getSignMessageLib()).contract.address)
     })
   })
 
@@ -264,26 +264,26 @@ describe('Safe contracts', () => {
       })
       chai
         .expect(await createCallContract.getAddress())
-        .to.be.eq(await (await getCreateCall()).contract.getAddress())
+        .to.be.eq(await (await getCreateCall()).contract.address)
     })
 
-    it('should return an external provider (BrowserProvider) and signer (AbstractSigner) when using an EIP1193 provider', async () => {
+    it('should return an external provider (PublicClient) and signer (WalletClient) when using an EIP1193 provider', async () => {
       const { provider } = await setupTests()
 
       const safeProvider = new SafeProvider({ provider })
 
-      chai.expect(safeProvider.getExternalProvider()).to.be.instanceOf(BrowserProvider)
-      chai.expect(await safeProvider.getExternalSigner()).to.be.instanceOf(AbstractSigner)
+      chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
+      chai.expect(await safeProvider.getExternalSigner()).to.deep.include(walletActions)
     })
 
-    it('should return an external provider (JsonRpcProvider) and signer (AbstractSigner) when using a private key', async () => {
+    it('should return an external provider (PublicClient) and signer (WalletClient) when using a private key', async () => {
       const safeProvider = new SafeProvider({
         provider: 'https://sepolia.gateway.tenderly.co',
         signer: '4ff03ace1395691975678c93449d552dc83df6b773a8024d4c368b39042a7610'
       })
 
-      chai.expect(safeProvider.getExternalProvider()).to.be.instanceOf(JsonRpcProvider)
-      chai.expect(await safeProvider.getExternalSigner()).to.be.instanceOf(AbstractSigner)
+      chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
+      chai.expect(await safeProvider.getExternalSigner()).to.deep.include(walletActions)
     })
 
     it('should return an undefined signer when using an RPC without signer', async () => {
@@ -291,7 +291,7 @@ describe('Safe contracts', () => {
         provider: 'https://sepolia.gateway.tenderly.co'
       })
 
-      chai.expect(safeProvider.getExternalProvider()).to.be.instanceOf(JsonRpcProvider)
+      chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
       chai.expect(await safeProvider.getExternalSigner()).to.be.undefined
     })
   })

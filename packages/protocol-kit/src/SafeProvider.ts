@@ -44,12 +44,7 @@ import {
   Chain
 } from 'viem'
 import { privateKeyToAccount, Account } from 'viem/accounts'
-import { toEstimateGasParameters } from '@safe-global/protocol-kit/utils'
-import {
-  isLegacyTransaction,
-  createLegacyTxOptions,
-  createTxOptions
-} from '@safe-global/protocol-kit/contracts/utils'
+import { toEstimateGasParameters, toCallGasParameters } from '@safe-global/protocol-kit/utils'
 
 function asBlockId(blockId: number | string | undefined) {
   return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
@@ -350,9 +345,7 @@ class SafeProvider {
   }
 
   async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
-    const converted = isLegacyTransaction(transaction)
-      ? createLegacyTxOptions(transaction)
-      : createTxOptions(transaction)
+    const converted = toCallGasParameters(transaction)
     const { data } = await this.#externalProvider.call({
       ...converted,
       ...asBlockId(blockTag)

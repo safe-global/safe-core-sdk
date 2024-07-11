@@ -164,7 +164,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 11437n, shortName: 'shyftt' },
   { chainId: 11891n, shortName: 'Arianee' },
   { chainId: 12324n, shortName: 'l3x' },
-  { chainId: 12325n, shortName: 'l3x-testnet },
+  { chainId: 12325n, shortName: 'l3x-testnet' },
   { chainId: 12357n, shortName: 'rei-testnet' },
   { chainId: 12553n, shortName: 'rss3' },
   { chainId: 13337n, shortName: 'beam-testnet' },

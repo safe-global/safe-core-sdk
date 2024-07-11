@@ -16,7 +16,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
-import { PublicClient, Hash } from 'viem'
+import { PublicClient, Hash, EstimateGasParameters } from 'viem'
 import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
 import {
   isLegacyTransaction,
@@ -180,6 +180,21 @@ export function isSafeMultisigTransactionResponse(
   return (safeTransaction as SafeMultisigTransactionResponse).isExecuted !== undefined
 }
 
-export function fromSafeProviderTransaction(tx: SafeProviderTransaction) {
-  return isLegacyTransaction(tx) ? createLegacyTxOptions(tx) : createTxOptions(tx)
+export function toEstimateGasParameters(tx: SafeProviderTransaction): EstimateGasParameters {
+  const params: EstimateGasParameters = isLegacyTransaction(tx)
+    ? createLegacyTxOptions(tx)
+    : createTxOptions(tx)
+  if (tx.value) {
+    params.value = BigInt(tx.value)
+  }
+
+  if (tx.to) {
+    params.to = asAddress(tx.to)
+  }
+
+  if (tx.value) {
+    params.data = asHex(tx.data)
+  }
+
+  return params
 }

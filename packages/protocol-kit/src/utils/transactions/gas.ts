@@ -117,50 +117,7 @@ export async function estimateTxGas(
   data: string,
   operation: OperationType
 ): Promise<string> {
-  let txGasEstimation = 0
   const safeAddress = await safeContract.getAddress()
-
-  const safeContractCompatibleWithRequiredTxGas =
-    await isSafeContractCompatibleWithRequiredTxGas(safeContract)
-
-  const estimateData = safeContractCompatibleWithRequiredTxGas.encode('requiredTxGas', [
-    asAddress(to),
-    BigInt(valueInWei),
-    asHex(data),
-    operation
-  ])
-
-  try {
-    const estimateResponse = await safeProvider.estimateGas({
-      to: safeAddress,
-      from: safeAddress,
-      data: estimateData
-    })
-    txGasEstimation = Number('0x' + estimateResponse.substring(138)) + 10000
-  } catch (error) {}
-
-  if (txGasEstimation > 0) {
-    const dataGasEstimation = estimateDataGasCosts(estimateData)
-    let additionalGas = 10000
-    for (let i = 0; i < 10; i++) {
-      try {
-        const estimateResponse = await safeProvider.call({
-          to: safeAddress,
-          from: safeAddress,
-          data: estimateData,
-          gasPrice: '0',
-          gasLimit: (txGasEstimation + dataGasEstimation + additionalGas).toString()
-        })
-        if (estimateResponse !== '0x') {
-          break
-        }
-      } catch (error) {}
-      txGasEstimation = txGasEstimation + additionalGas
-      additionalGas *= 2
-    }
-    return (txGasEstimation + additionalGas).toString()
-  }
-
   try {
     const estimateGas = await safeProvider.estimateGas({
       to,

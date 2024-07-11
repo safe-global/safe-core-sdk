@@ -61,22 +61,23 @@ export async function signSafeOp(
   }
 
   const chainId = await safeProvider.getChainId()
-  const signerAddress = await signer.getAddress()
-  const signature = await signer.signTypedData(
-    {
-      chainId,
-      verifyingContract: safe4337ModuleAddress
+  const signerAddress = await signer.account.address
+  const signature = await signer.signTypedData({
+    domain: {
+      chainId: Number(chainId),
+      verifyingContract: safe4337ModuleAddress as Address
     },
-    EIP712_SAFE_OPERATION_TYPE,
-    {
+    types: EIP712_SAFE_OPERATION_TYPE,
+    message: {
       ...safeUserOperation,
       nonce: toHex(safeUserOperation.nonce),
       validAfter: toHex(safeUserOperation.validAfter),
       validUntil: toHex(safeUserOperation.validUntil),
       maxFeePerGas: toHex(safeUserOperation.maxFeePerGas),
       maxPriorityFeePerGas: toHex(safeUserOperation.maxPriorityFeePerGas)
-    }
-  )
+    },
+    primaryType: 'SafeOp'
+  })
 
   return new EthSafeSignature(signerAddress, signature)
 }

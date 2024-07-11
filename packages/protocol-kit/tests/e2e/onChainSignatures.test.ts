@@ -54,7 +54,7 @@ describe('On-chain signatures', () => {
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const account3 = accounts[2]
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         signer: account3.address,
@@ -76,7 +76,7 @@ describe('On-chain signatures', () => {
     it('should approve the transaction hash', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
@@ -91,13 +91,13 @@ describe('On-chain signatures', () => {
       const txHash = await safeSdk1.getTransactionHash(tx)
       const txResponse = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(1n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(1n)
     })
 
     it('should ignore a duplicated signatures', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         safeAddress,
@@ -110,13 +110,13 @@ describe('On-chain signatures', () => {
       }
       const tx = await safeSdk1.createTransaction({ transactions: [safeTransactionData] })
       const txHash = await safeSdk1.getTransactionHash(tx)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(0n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(0n)
       const txResponse1 = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse1)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(1n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(1n)
       const txResponse2 = await safeSdk1.approveTransactionHash(txHash)
       await waitSafeTxReceipt(txResponse2)
-      chai.expect(await safe.approvedHashes(account1.address, txHash)).to.be.equal(1n)
+      chai.expect(await safe.read.approvedHashes([account1.address, txHash])).to.be.equal(1n)
     })
   })
 
@@ -136,7 +136,7 @@ describe('On-chain signatures', () => {
     it('should return the list of owners who approved a transaction hash', async () => {
       const { safe, accounts, contractNetworks, provider } = await setupTests()
       const [, account2] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
         provider,
         safeAddress: safeAddress,

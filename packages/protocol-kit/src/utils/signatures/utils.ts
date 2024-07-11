@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   SafeSignature,
@@ -11,6 +10,8 @@ import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
+import { hashTypedData } from '../eip-712'
+import { encodeTypedData } from '../eip-712/encode'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -197,11 +198,12 @@ export const preimageSafeTransactionHash = (
 ): string => {
   const safeTxTypes = getEip712TxTypes(safeVersion)
 
-  return ethers.TypedDataEncoder.encode(
-    { verifyingContract: safeAddress, chainId },
-    { SafeTx: safeTxTypes.SafeTx },
-    safeTx
-  )
+  const message = safeTx as unknown as Record<string, unknown>
+  return encodeTypedData({
+    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    types: { SafeTx: safeTxTypes.SafeTx },
+    message
+  })
 }
 
 export const preimageSafeMessageHash = (
@@ -212,11 +214,11 @@ export const preimageSafeMessageHash = (
 ): string => {
   const safeMessageTypes = getEip712MessageTypes(safeVersion)
 
-  return ethers.TypedDataEncoder.encode(
-    { verifyingContract: safeAddress, chainId },
-    { SafeMessage: safeMessageTypes.SafeMessage },
-    { message }
-  )
+  return encodeTypedData({
+    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    types: { SafeMessage: safeMessageTypes.SafeMessage },
+    message: { message }
+  })
 }
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -229,15 +231,17 @@ export const calculateSafeTransactionHash = (
 ): string => {
   const safeTxTypes = getEip712TxTypes(safeVersion)
   const domain: {
-    chainId?: bigint
+    chainId?: number
     verifyingContract: string
   } = { verifyingContract: safeAddress }
 
   if (semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)) {
-    domain.chainId = chainId
+    domain.chainId = Number(chainId)
   }
 
-  return ethers.TypedDataEncoder.hash(domain, { SafeTx: safeTxTypes.SafeTx }, safeTx)
+  const message = safeTx as unknown as Record<string, unknown>
+
+  return hashTypedData({ domain, types: { SafeTx: safeTxTypes.SafeTx }, message })
 }
 
 export const calculateSafeMessageHash = (
@@ -248,9 +252,9 @@ export const calculateSafeMessageHash = (
 ): string => {
   const safeMessageTypes = getEip712MessageTypes(safeVersion)
 
-  return ethers.TypedDataEncoder.hash(
-    { verifyingContract: safeAddress, chainId },
-    { SafeMessage: safeMessageTypes.SafeMessage },
-    { message }
-  )
+  return hashTypedData({
+    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    types: { SafeMessage: safeMessageTypes.SafeMessage },
+    message: { message }
+  })
 }

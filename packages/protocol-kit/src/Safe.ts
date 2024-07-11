@@ -72,6 +72,8 @@ import {
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
+import { asAddress, asHash, asHex } from './utils/types'
+import { Hash, Hex } from 'viem'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -482,7 +484,7 @@ class Safe {
         ...options,
         to: await multiSendContract.getAddress(),
         value: '0',
-        data: multiSendContract.encode('multiSend', [multiSendData]),
+        data: multiSendContract.encode('multiSend', [asHex(multiSendData)]),
         operation: OperationType.DelegateCall
       }
       newTransaction = multiSendTransaction
@@ -839,7 +841,10 @@ class Safe {
     const owners = await this.getOwners()
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
-      const [approved] = await this.#contractManager.safeContract.approvedHashes([owner, txHash])
+      const [approved] = await this.#contractManager.safeContract.approvedHashes([
+        asAddress(owner),
+        asHash(txHash)
+      ])
       if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
@@ -1400,8 +1405,8 @@ class Safe {
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        await safeSingletonContract.getAddress(),
-        initializer, // call to the setup method to set the threshold & owners of the new Safe
+        asAddress(await safeSingletonContract.getAddress()),
+        asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
         BigInt(saltNonce)
       ])
     }
@@ -1435,7 +1440,7 @@ class Safe {
 
     // multiSend method with the transactions encoded
     const batchData = multiSendCallOnlyContract.encode('multiSend', [
-      encodeMultiSendData(transactions) // encoded transactions
+      asHex(encodeMultiSendData(transactions)) // encoded transactions
     ])
 
     const transactionBatch = {
@@ -1507,17 +1512,17 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const bytes32Tuple: [_dataHash: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const data = fallbackHandler.encode('isValidSignature', bytes32Tuple)
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const bytesTuple: [_data: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const bytesData = fallbackHandler.encode('isValidSignature', bytesTuple)
 
     try {
       const isValidSignatureResponse = await Promise.all([

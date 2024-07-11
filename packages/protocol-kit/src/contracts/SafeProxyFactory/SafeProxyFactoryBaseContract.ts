@@ -1,5 +1,5 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
+import { PublicClient } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import {
@@ -30,7 +30,7 @@ export interface CreateProxyProps extends CreateProxyPropsGeneral {
  * - SafeProxyFactoryContract_v1_0_0  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_0_0_Abi>
  */
 abstract class SafeProxyFactoryBaseContract<
-  SafeProxyFactoryContractAbiType extends InterfaceAbi & Abi
+  SafeProxyFactoryContractAbiType extends Abi
 > extends BaseContract<SafeProxyFactoryContractAbiType> {
   contractName: contractName
 
@@ -52,7 +52,7 @@ abstract class SafeProxyFactoryBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContractAbiType,
-    runner?: ContractRunner | null
+    runner?: PublicClient | null
   ) {
     const contractName = 'safeProxyFactoryVersion'
 

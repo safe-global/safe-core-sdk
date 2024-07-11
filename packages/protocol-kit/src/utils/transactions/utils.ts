@@ -1,9 +1,10 @@
-import { ethers, Interface, getBytes, solidityPacked as solidityPack } from 'ethers'
+import { toBytes, getAddress, encodePacked, bytesToHex, decodeFunctionData, parseAbi } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { asAddress, asHex } from '../types'
 import {
   MetaTransactionData,
   OperationType,
@@ -15,6 +16,13 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
+import { PublicClient, Hash, EstimateGasParameters, TransactionRequest, UnionOmit } from 'viem'
+import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
+import {
+  isLegacyTransaction,
+  createLegacyTxOptions,
+  createTxOptions
+} from '@safe-global/protocol-kit/contracts/utils'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
@@ -24,6 +32,10 @@ export function standardizeMetaTransactionData(
     operation: tx.operation ?? OperationType.Call
   }
   return standardizedTxs
+}
+
+export function waitForTransactionReceipt(client: PublicClient, hash: Hash) {
+  return client.waitForTransactionReceipt({ hash })
 }
 
 export async function standardizeSafeTransactionData({
@@ -108,10 +120,16 @@ export async function standardizeSafeTransactionData({
 }
 
 function encodeMetaTransaction(tx: MetaTransactionData): string {
-  const data = getBytes(tx.data)
-  const encoded = solidityPack(
+  const data = toBytes(tx.data)
+  const encoded = encodePacked(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
-    [tx.operation, tx.to, tx.value, data.length, data]
+    [
+      tx.operation ?? OperationType.Call,
+      asAddress(tx.to),
+      BigInt(tx.value),
+      BigInt(data.length),
+      bytesToHex(data)
+    ]
   )
   return encoded.slice(2)
 }
@@ -121,32 +139,36 @@ export function encodeMultiSendData(txs: MetaTransactionData[]): string {
 }
 
 export function decodeMultiSendData(encodedData: string): MetaTransactionData[] {
-  const multiSendInterface = new Interface([
-    'function multiSend(bytes memory transactions) public payable'
-  ])
-  const [decodedData] = multiSendInterface.decodeFunctionData('multiSend', encodedData)
+  const decodedData = decodeFunctionData({
+    abi: parseAbi(['function multiSend(bytes memory transactions) public payable']),
+    data: asHex(encodedData)
+  })
 
+  const args = decodedData.args
   const txs: MetaTransactionData[] = []
 
   // Decode after 0x
   let index = 2
 
-  while (index < decodedData.length) {
-    // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
-    // uint8 operation, address to, value uint256, dataLength uint256
+  if (args) {
+    const [transactionBytes] = args
+    while (index < transactionBytes.length) {
+      // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
+      // uint8 operation, address to, value uint256, dataLength uint256
 
-    const operation = `0x${decodedData.slice(index, (index += 2))}`
-    const to = `0x${decodedData.slice(index, (index += 40))}`
-    const value = `0x${decodedData.slice(index, (index += 64))}`
-    const dataLength = parseInt(decodedData.slice(index, (index += 64)), 16) * 2
-    const data = `0x${decodedData.slice(index, (index += dataLength))}`
+      const operation = `0x${transactionBytes.slice(index, (index += 2))}`
+      const to = `0x${transactionBytes.slice(index, (index += 40))}`
+      const value = `0x${transactionBytes.slice(index, (index += 64))}`
+      const dataLength = parseInt(`${transactionBytes.slice(index, (index += 64))}`, 16) * 2
+      const data = `0x${transactionBytes.slice(index, (index += dataLength))}`
 
-    txs.push({
-      operation: Number(operation) as OperationType,
-      to: ethers.getAddress(to),
-      value: BigInt(value).toString(),
-      data
-    })
+      txs.push({
+        operation: Number(operation) as OperationType,
+        to: getAddress(to),
+        value: BigInt(value).toString(),
+        data
+      })
+    }
   }
 
   return txs
@@ -156,4 +178,41 @@ export function isSafeMultisigTransactionResponse(
   safeTransaction: SafeTransaction | SafeMultisigTransactionResponse
 ): safeTransaction is SafeMultisigTransactionResponse {
   return (safeTransaction as SafeMultisigTransactionResponse).isExecuted !== undefined
+}
+
+export function toEstimateGasParameters(tx: SafeProviderTransaction): EstimateGasParameters {
+  const params: EstimateGasParameters = isLegacyTransaction(tx)
+    ? createLegacyTxOptions(tx)
+    : createTxOptions(tx)
+  if (tx.value) {
+    params.value = BigInt(tx.value)
+  }
+
+  if (tx.to) {
+    params.to = asAddress(tx.to)
+  }
+
+  if (tx.data) {
+    params.data = asHex(tx.data)
+  }
+
+  return params
+}
+
+export function toCallGasParameters(
+  tx: SafeProviderTransaction
+): UnionOmit<TransactionRequest, 'from'> {
+  const params: UnionOmit<TransactionRequest, 'from'> = isLegacyTransaction(tx)
+    ? createLegacyTxOptions(tx)
+    : createTxOptions(tx)
+
+  if (tx.to) {
+    params.to = asAddress(tx.to)
+  }
+
+  if (tx.data) {
+    params.data = asHex(tx.data)
+  }
+
+  return params
 }

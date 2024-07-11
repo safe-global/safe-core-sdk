@@ -1,4 +1,4 @@
-import { JsonFragment, AbstractSigner, Provider } from 'ethers'
+import { PublicClient, Abi } from 'viem'
 import {
   SafeVersion,
   SafeContract_v1_3_0_Abi,
@@ -52,7 +52,7 @@ export async function getSafeContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined,
+  customContractAbi?: Abi,
   isL1SafeSingleton?: boolean
 ): Promise<
   | SafeContract_v1_4_1
@@ -123,7 +123,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<
   CompatibilityFallbackHandlerContract_v1_4_1 | CompatibilityFallbackHandlerContract_v1_3_0
 > {
@@ -162,7 +162,7 @@ export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<MultiSendContract_v1_4_1 | MultiSendContract_v1_3_0 | MultiSendContract_v1_1_1> {
   const chainId = await safeProvider.getChainId()
   let multiSendContractInstance
@@ -207,7 +207,7 @@ export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<MultiSendCallOnlyContract_v1_4_1 | MultiSendCallOnlyContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let multiSendCallOnlyContractInstance
@@ -245,9 +245,9 @@ export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   // TODO: remove this ??
-  signerOrProvider: AbstractSigner | Provider,
+  signerOrProvider: PublicClient,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<
   | SafeProxyFactoryContract_v1_4_1
   | SafeProxyFactoryContract_v1_3_0
@@ -308,7 +308,7 @@ export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<SignMessageLibContract_v1_4_1 | SignMessageLibContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let signMessageLibContractInstance
@@ -343,7 +343,7 @@ export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<CreateCallContract_v1_4_1 | CreateCallContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let createCallContractInstance
@@ -381,7 +381,7 @@ export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<SimulateTxAccessorContract_v1_4_1 | SimulateTxAccessorContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let simulateTxAccessorContractInstance

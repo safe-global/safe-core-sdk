@@ -60,7 +60,7 @@ describe('Safe contracts manager', () => {
 
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
       const { safe, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       await chai
         .expect(
           Safe.init({
@@ -107,7 +107,7 @@ describe('Safe contracts manager', () => {
         }
       }
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       await chai
         .expect(
           Safe.init({
@@ -121,7 +121,7 @@ describe('Safe contracts manager', () => {
 
     it('should set the MultiSend contract available on the current network', async () => {
       const { safe, chainId, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,

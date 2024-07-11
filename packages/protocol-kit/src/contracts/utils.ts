@@ -1,4 +1,4 @@
-import { pad, Chain, Address } from 'viem'
+import { pad } from 'viem'
 import { Hash, isAddress, PublicClient, WalletClient } from 'viem'
 import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -93,11 +93,9 @@ export function isLegacyTransaction(options?: TransactionOptions) {
 }
 
 export function createLegacyTxOptions(
-  chain: Chain,
-  account: Address,
   options?: TransactionOptions
-): ContractLegacyTransactionOptions {
-  const converted: ContractLegacyTransactionOptions = { account, chain }
+): Partial<ContractLegacyTransactionOptions> {
+  const converted: Partial<ContractLegacyTransactionOptions> = {}
   if (options?.from) {
     converted.account = asAddress(options.from)
   }
@@ -117,12 +115,8 @@ export function createLegacyTxOptions(
   return converted
 }
 
-export function createTxOptions(
-  chain: Chain,
-  account: Address,
-  options?: TransactionOptions
-): ContractTransactionOptions {
-  const converted: ContractTransactionOptions = { account, chain }
+export function createTxOptions(options?: TransactionOptions): Partial<ContractTransactionOptions> {
+  const converted: Partial<ContractTransactionOptions> = {}
   if (options?.from) {
     converted.account = asAddress(options.from)
   }

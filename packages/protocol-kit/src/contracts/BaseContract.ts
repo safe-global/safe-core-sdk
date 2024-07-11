@@ -115,9 +115,10 @@ class BaseContract<ContractAbiType extends Abi> {
     if (!chain) throw new Error('Invalid chainId')
     const signerAddress = await this.safeProvider.getSignerAddress()
     const account = asAddress(signerAddress!)
-    return isLegacyTransaction(options)
-      ? createLegacyTxOptions(chain, account, options)
-      : createTxOptions(chain, account, options)
+    const txOptions = isLegacyTransaction(options)
+      ? createLegacyTxOptions(options)
+      : createTxOptions(options)
+    return { chain, account, ...txOptions } // Needs to be in this order to override the `account` if necessary
   }
 
   getChain(): Chain | undefined {

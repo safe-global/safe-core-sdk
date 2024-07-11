@@ -44,6 +44,7 @@ import {
   Chain
 } from 'viem'
 import { privateKeyToAccount, Account } from 'viem/accounts'
+import { fromSafeProviderTransaction } from '@safe-global/protocol-kit/utils'
 
 function asBlockId(blockId: number | string | undefined) {
   return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
@@ -339,14 +340,14 @@ class SafeProvider {
   }
 
   async estimateGas(transaction: SafeProviderTransaction): Promise<string> {
-    const anyTransaction = transaction as any
-    return (await this.#externalProvider.estimateGas(anyTransaction)).toString()
+    const converted = fromSafeProviderTransaction(transaction)
+    return (await this.#externalProvider.estimateGas(converted)).toString()
   }
 
   async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
-    const anyTransaction = transaction as any
+    const converted = fromSafeProviderTransaction(transaction)
     const { data } = await this.#externalProvider.call({
-      ...anyTransaction,
+      ...converted,
       ...asBlockId(blockTag)
     })
     return data ?? '0x'

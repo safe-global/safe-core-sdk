@@ -82,7 +82,7 @@ export const getSafeWithOwners = async (
       threshold || owners.length,
       ZERO_ADDRESS,
       '0x',
-      fallbackHandler || (await (await getCompatibilityFallbackHandler()).contract.address),
+      fallbackHandler || (await getCompatibilityFallbackHandler()).contract.address,
       ZERO_ADDRESS,
       0,
       ZERO_ADDRESS

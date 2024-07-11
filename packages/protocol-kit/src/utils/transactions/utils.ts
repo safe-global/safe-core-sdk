@@ -17,6 +17,12 @@ import {
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
 import { PublicClient, Hash } from 'viem'
+import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
+import {
+  isLegacyTransaction,
+  createLegacyTxOptions,
+  createTxOptions
+} from '@safe-global/protocol-kit/contracts/utils'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
@@ -172,4 +178,8 @@ export function isSafeMultisigTransactionResponse(
   safeTransaction: SafeTransaction | SafeMultisigTransactionResponse
 ): safeTransaction is SafeMultisigTransactionResponse {
   return (safeTransaction as SafeMultisigTransactionResponse).isExecuted !== undefined
+}
+
+export function fromSafeProviderTransaction(tx: SafeProviderTransaction) {
+  return isLegacyTransaction(tx) ? createLegacyTxOptions(tx) : createTxOptions(tx)
 }

@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/safe-kit'
 import { generateTransferCallData } from '../utils'
 
@@ -59,7 +60,16 @@ async function send(): Promise<SafeClientResult> {
   }
   const transactions = [transferUSDC, transferUSDC]
 
-  const safeOperationResult = await safeClientWithSafeOperation.sendSafeOperation({ transactions })
+  const ethersProvider = new ethers.JsonRpcProvider(RPC_URL)
+  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+
+  const safeOperationResult = await safeClientWithSafeOperation.sendSafeOperation({
+    transactions,
+    options: {
+      validAfter: timestamp - 60_000,
+      validUntil: timestamp + 60_000
+    }
+  })
 
   console.log('-Send result: ', safeOperationResult)
 

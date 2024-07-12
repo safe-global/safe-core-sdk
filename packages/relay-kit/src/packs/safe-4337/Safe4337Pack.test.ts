@@ -367,7 +367,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -395,7 +395,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -454,7 +454,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -529,7 +529,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
   })

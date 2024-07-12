@@ -6,7 +6,7 @@ import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import viem from 'viem'
+import * as viem from 'viem'
 import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
 import {
   ENTRYPOINT_ABI,
@@ -37,26 +37,24 @@ describe('addSafeOperation', () => {
     operation: 0
   }
 
-  // Setup mocks for the bundler client
   const requestStub = sinon.stub()
-
-  sinon.stub(viem, 'createPublicClient').get(
-    () => () =>
-      ({
-        request: requestStub,
-        readContract: sinon
-          .stub()
-          .withArgs({
-            address: ENTRYPOINT_ADDRESS_V06,
-            abi: ENTRYPOINT_ABI,
-            functionName: 'getNonce',
-            args: [SAFE_ADDRESS, BigInt(0)]
-          })
-          .resolves(123n)
-      }) as unknown as viem.PublicClient
-  )
-
+  // Setup mocks for the bundler client
   before(async () => {
+    sinon.stub(viem, 'createPublicClient').get(
+      () => () =>
+        ({
+          request: requestStub,
+          readContract: sinon
+            .stub()
+            .withArgs({
+              address: ENTRYPOINT_ADDRESS_V06,
+              abi: ENTRYPOINT_ABI,
+              functionName: 'getNonce',
+              args: [SAFE_ADDRESS, BigInt(0)]
+            })
+            .resolves(123n)
+        }) as unknown as viem.PublicClient
+    )
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress: SAFE_ADDRESS,
       signer: SIGNER_PK,

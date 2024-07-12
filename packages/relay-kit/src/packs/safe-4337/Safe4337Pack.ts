@@ -481,7 +481,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         paymasterAndData: ethers.hexlify(
           ethers.concat([userOperation?.paymaster || '0x', userOperation?.paymasterData || '0x'])
         ),
-        signature: safeOperationResponse?.preparedSignature || '0x'
+        signature: safeOperationResponse.preparedSignature || '0x'
       },
       {
         chainId: this.#chainId,

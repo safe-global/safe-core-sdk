@@ -1,4 +1,5 @@
-import hre, { ethers } from 'hardhat'
+import hre from 'hardhat'
+import ethers from 'ethers'
 import Web3 from 'web3'
 import { custom, createWalletClient } from 'viem'
 

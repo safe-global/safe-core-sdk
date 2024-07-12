@@ -15,11 +15,11 @@
     "test:web3": "export TESTS_PATH=tests/endpoint && export ETH_LIB=web3 && nyc hardhat test",
     "test:ethers": "export TESTS_PATH=tests/endpoint && export ETH_LIB=ethers && nyc --reporter=lcov  hardhat test",
     "test:viem": "export TESTS_PATH=tests/endpoint && export ETH_LIB=viem && nyc hardhat test",
-    "test": "yarn test:ethers",
+    "test": "yarn test:viem",
     "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc hardhat test",
     "test:ci:ethers": "export TESTS_PATH=tests/e2e && export ETH_LIB=ethers && nyc --reporter=lcov hardhat test",
     "test:ci:viem": "export TESTS_PATH=tests/e2e && export ETH_LIB=viem && nyc --reporter=lcov hardhat test",
-    "test:ci": "yarn test:ci:ethers",
+    "test:ci": "yarn test:ci:viem",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist .nyc_output cache",
@@ -61,7 +61,6 @@
   "dependencies": {
     "@safe-global/protocol-kit": "^4.0.2",
     "@safe-global/safe-core-sdk-types": "^5.0.2",
-    "ethers": "^6.13.1",
     "node-fetch": "^2.7.0"
   }
 }

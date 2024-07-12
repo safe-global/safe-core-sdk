@@ -6,9 +6,9 @@ import {
   keccak256,
   pad,
   PublicClient,
+  toHex,
   WalletClient
 } from 'viem'
-import { keccak_256 } from '@noble/hashes/sha3'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
@@ -248,7 +248,7 @@ const memoizedGetSafeContract = createMemoizedFunction(
  * @returns {string} The chain-specific salt nonce in hexadecimal format.
  */
 export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
-  return `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+  return keccak256(toHex(PREDETERMINED_SALT_NONCE + chainId))
 }
 
 export async function getPredictedSafeAddressInitCode({

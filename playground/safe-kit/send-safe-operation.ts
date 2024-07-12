@@ -21,7 +21,7 @@ const usdcAmount = 10_000n // 0.01 USDC
 const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
 
 // Paymaster URL
-const PIMLICO_API_KEY = '30b296fa-8947-4775-b44a-b225336e2a66'
+const PIMLICO_API_KEY = ''
 const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}`
 

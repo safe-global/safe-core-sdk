@@ -44,7 +44,11 @@ import {
   Chain
 } from 'viem'
 import { privateKeyToAccount, Account } from 'viem/accounts'
-import { toEstimateGasParameters, toCallGasParameters } from '@safe-global/protocol-kit/utils'
+import {
+  toEstimateGasParameters,
+  toCallGasParameters,
+  sameString
+} from '@safe-global/protocol-kit/utils'
 
 function asBlockId(blockId: number | string | undefined) {
   return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
@@ -305,10 +309,18 @@ class SafeProvider {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
-    return (await signer?.signMessage!({
-      account: asHex(account),
-      message: { raw: toBytes(message) }
-    })) as string
+    // This means that the address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
+    // That is because if we pass a typeof account === 'string' to singMessage, viem assumes a json-rpc account on their parseAccount function insteado of a local one
+    if (sameString(signer.account.address, account)) {
+      return (await signer?.signMessage!({
+        message: { raw: toBytes(message) }
+      })) as string
+    } else {
+      return (await signer?.signMessage!({
+        account: asAddress(account),
+        message: { raw: toBytes(message) }
+      })) as string
+    }
   }
 
   async signTypedData(safeEIP712Args: SafeEIP712Args): Promise<string> {

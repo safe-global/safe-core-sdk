@@ -426,8 +426,7 @@ describe('Safe4337Pack', () => {
         },
         paymasterOptions: {
           isSponsored: true,
-          paymasterUrl: fixtures.PAYMASTER_URL,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          paymasterUrl: fixtures.PAYMASTER_URL
         }
       })
 
@@ -440,7 +439,7 @@ describe('Safe4337Pack', () => {
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
-        paymasterAndData: '0x0000000000325602a77416A16136FDafd04b299f',
+        paymasterAndData: '0x',
         callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
           transferUSDC.to,
           transferUSDC.value,
@@ -463,9 +462,9 @@ describe('Safe4337Pack', () => {
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
         },
+        // @ts-expect-error - An error will be thrown
         paymasterOptions: {
-          isSponsored: true,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          isSponsored: true
         }
       })
 

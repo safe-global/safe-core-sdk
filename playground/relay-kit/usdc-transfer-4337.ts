@@ -10,7 +10,7 @@ const PIMLICO_API_KEY = ''
 const SAFE_ADDRESS = ''
 
 // Bundler URL
-const BUNDLER_URL = `https://api.pimlico.io/v1/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
 // RPC URL
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'

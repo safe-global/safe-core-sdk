@@ -367,7 +367,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -395,7 +395,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -454,7 +454,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -529,7 +529,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 150000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
   })
@@ -557,7 +557,7 @@ describe('Safe4337Pack', () => {
         fixtures.OWNER_1.toLowerCase(),
         new protocolKit.EthSafeSignature(
           fixtures.OWNER_1,
-          '0x63de7fdf99bcf20a1981ae74c3960604139d8bf025da894abc11604b30f438e82ceb0d37e73bf16b0b8b896f8be82a49750433733c0414fe4a3b8182a3875e1f1c',
+          '0x8ce4849928aef19e8f5cc199e069a451568dcbaca194a86dc953ae24acac3cbb02a458343127b2a52e1af3b99622b2fc8f1bd9957f84828c33940532a94ea3261c',
           false
         )
       )

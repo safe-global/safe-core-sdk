@@ -31,6 +31,7 @@ import {
   UserOperationReceipt,
   UserOperationWithPayload,
   PaymasterOptions,
+  ERC20PaymasterOption,
   BundlerClient
 } from './types'
 import {
@@ -206,10 +207,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
         args: [[safe4337ModuleAddress as Address]]
       })
 
-      const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
-
       const isApproveTransactionRequired =
-        !!paymasterOptions && !isSponsored && !!paymasterTokenAddress
+        !!paymasterOptions &&
+        !paymasterOptions.isSponsored &&
+        !!paymasterOptions.paymasterTokenAddress
 
       if (isApproveTransactionRequired) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
@@ -226,7 +227,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         }
 
         const approveToPaymasterTransaction = {
-          to: paymasterTokenAddress,
+          to: paymasterOptions.paymasterTokenAddress,
           data: encodeFunctionData({
             abi: ABI,
             functionName: 'approve',
@@ -406,23 +407,21 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
     const safeAddress = (await this.protocolKit.getAddress()) as Address
     const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
-
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
     if (amountToApprove) {
-      if (!this.#paymasterOptions || !this.#paymasterOptions.paymasterTokenAddress) {
+      const paymasterOptions = this.#paymasterOptions as ERC20PaymasterOption
+
+      if (!paymasterOptions.paymasterTokenAddress) {
         throw new Error('Paymaster must be initialized')
       }
 
-      const paymasterAddress = this.#paymasterOptions.paymasterAddress
-      const paymasterTokenAddress = this.#paymasterOptions.paymasterTokenAddress
-
       const approveToPaymasterTransaction = {
-        to: paymasterTokenAddress,
+        to: paymasterOptions.paymasterTokenAddress,
         data: encodeFunctionData({
           abi: ABI,
           functionName: 'approve',
-          args: [paymasterAddress as Address, amountToApprove]
+          args: [paymasterOptions.paymasterTokenAddress as Address, amountToApprove]
         }),
         value: '0',
         operation: OperationType.Call // Call for approve
@@ -443,7 +442,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
 
-    const paymasterAndData = this.#paymasterOptions?.paymasterAddress || '0x'
+    const paymasterAndData =
+      this.#paymasterOptions && 'paymasterAddress' in this.#paymasterOptions
+        ? this.#paymasterOptions.paymasterAddress
+        : '0x'
 
     const userOperation: UserOperation = {
       sender: safeAddress,

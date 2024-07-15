@@ -464,8 +464,7 @@ describe('Safe4337Pack', () => {
         },
         paymasterOptions: {
           isSponsored: true,
-          paymasterUrl: fixtures.PAYMASTER_URL,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          paymasterUrl: fixtures.PAYMASTER_URL
         }
       })
 
@@ -478,7 +477,7 @@ describe('Safe4337Pack', () => {
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
-        paymasterAndData: '0x1405B3659a11a16459fc27Fa1925b60388C38Ce1',
+        paymasterAndData: '0x',
         callData: viem.encodeFunctionData({
           abi: constants.ABI,
           functionName: 'executeUserOp',
@@ -505,9 +504,9 @@ describe('Safe4337Pack', () => {
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
         },
+        // @ts-expect-error - An error will be thrown
         paymasterOptions: {
-          isSponsored: true,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          isSponsored: true
         }
       })
 

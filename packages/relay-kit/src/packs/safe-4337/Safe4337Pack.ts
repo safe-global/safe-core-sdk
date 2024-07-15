@@ -478,15 +478,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: userOperation?.paymasterData || '0x',
-        signature: userOperation?.signature || '0x'
+        paymasterAndData: ethers.hexlify(
+          ethers.concat([userOperation?.paymaster || '0x', userOperation?.paymasterData || '0x'])
+        ),
+        signature: safeOperationResponse.preparedSignature || '0x'
       },
       {
         chainId: this.#chainId,
         moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
         entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
-        validAfter: validAfter ? new Date(validAfter).getTime() : undefined,
-        validUntil: validUntil ? new Date(validUntil).getTime() : undefined
+        validAfter: this.#timestamp(validAfter),
+        validUntil: this.#timestamp(validUntil)
       }
     )
 
@@ -497,6 +499,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     return safeOperation
+  }
+
+  /**
+   *
+   * @param date An ISO string date
+   * @returns The timestamp in seconds to send to the bundler
+   */
+  #timestamp(date: string | null) {
+    return date ? new Date(date).getTime() / 1000 : undefined
   }
 
   /**
@@ -546,7 +557,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         this.#SAFE_4337_MODULE_ADDRESS
       )
     } else {
-      const safeOpHash = await safeOp.getHash()
+      const safeOpHash = safeOp.getHash()
 
       signature = await this.protocolKit.signHash(safeOpHash)
     }

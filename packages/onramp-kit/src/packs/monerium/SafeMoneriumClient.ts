@@ -1,4 +1,4 @@
-import { Hash, encodeFunctionData, hashMessage } from 'viem'
+import { Hex, encodeFunctionData, hashMessage } from 'viem'
 import {
   getChain as getMoneriumChain,
   getNetwork as getMoneriumNetwork,
@@ -18,7 +18,6 @@ import {
   parseIsValidSignatureErrorResponse
 } from '@safe-global/onramp-kit/lib/errors'
 import { OperationType, SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types'
-
 import { EIP_1271_ABI, EIP_1271_BYTES_ABI, MAGIC_VALUE, MAGIC_VALUE_BYTES } from './signatures'
 import { SafeMoneriumOrder } from './types'
 
@@ -194,7 +193,7 @@ export class SafeMoneriumClient extends MoneriumClient {
         encodeFunctionData({
           abi,
           functionName: 'isValidSignature',
-          args: [messageHash as Hash, '0x']
+          args: [messageHash as Hex, '0x']
         })
       )
 

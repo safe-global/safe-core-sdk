@@ -691,10 +691,10 @@ describe('Endpoint tests', () => {
       const entryPoint = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 
       const ethersProvider = protocolKit.getSafeProvider().getExternalProvider()
-      const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+      const timestamp = (await ethersProvider.getBlock())?.timestamp || 0n
 
-      const validAfter = timestamp - 60_000
-      const validUntil = timestamp + 60_000
+      const validAfter = Number(timestamp - 60_000n)
+      const validUntil = Number(timestamp + 60_000n)
       const options = { validAfter, validUntil }
 
       await chai

@@ -44,6 +44,23 @@ describe('SafeClient', () => {
     apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
 
     safeClient = new SafeClient(protocolKit, apiKit)
+
+    protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
+    protocolKit.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
+    protocolKit.signTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
+    protocolKit.executeTransaction = jest.fn().mockResolvedValue({ hash: ETHEREUM_TX_HASH })
+    protocolKit.connect = jest.fn().mockResolvedValue(protocolKit)
+    protocolKit.getSafeProvider = jest.fn().mockResolvedValue({
+      provider: 'http://ethereum.provider',
+      signer: '0xSignerAddress'
+    })
+    protocolKit.createSafeDeploymentTransaction = jest
+      .fn()
+      .mockResolvedValue(DEPLOYMENT_TRANSACTION)
+
+    protocolKit.wrapSafeTransactionIntoDeploymentBatch = jest
+      .fn()
+      .mockResolvedValue(DEPLOYMENT_TRANSACTION)
   })
 
   afterEach(() => {
@@ -57,27 +74,6 @@ describe('SafeClient', () => {
   })
 
   describe('send', () => {
-    beforeEach(() => {
-      protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
-      protocolKit.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
-      protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
-      protocolKit.executeTransaction = jest.fn().mockResolvedValue({ hash: ETHEREUM_TX_HASH })
-      protocolKit.signTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
-      protocolKit.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
-      protocolKit.connect = jest.fn().mockResolvedValue(protocolKit)
-      protocolKit.getSafeProvider = jest.fn().mockResolvedValue({
-        provider: 'http://ethereum.provider',
-        signer: '0xSignerAddress'
-      })
-      protocolKit.createSafeDeploymentTransaction = jest
-        .fn()
-        .mockResolvedValue(DEPLOYMENT_TRANSACTION)
-
-      protocolKit.wrapSafeTransactionIntoDeploymentBatch = jest
-        .fn()
-        .mockResolvedValue(DEPLOYMENT_TRANSACTION)
-    })
-
     it('should propose the transaction if Safe account exists and has threshold > 1', async () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
@@ -173,6 +169,72 @@ describe('SafeClient', () => {
           ethereumTxHash: DEPLOYMENT_ETHEREUM_TX_HASH
         }
       })
+    })
+  })
+
+  describe('confirm', () => {
+    it('should confirm the transaction when enough signatures', async () => {
+      const TRANSACTION_RESPONSE = {
+        confirmations: [{ signature: '0x1' }, { signature: '0x2' }],
+        confirmationsRequired: 2
+      }
+
+      apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
+
+      const result = await safeClient.confirm(SAFE_TX_HASH)
+
+      expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
+      expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
+      expect(apiKit.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
+      expect(protocolKit.executeTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
+      expect(result).toMatchObject({
+        description: MESSAGES[SafeClientTxStatus.EXECUTED],
+        safeAddress: SAFE_ADDRESS,
+        status: SafeClientTxStatus.EXECUTED,
+        transactions: {
+          ethereumTxHash: ETHEREUM_TX_HASH,
+          safeTxHash: SAFE_TX_HASH
+        }
+      })
+    })
+
+    it('should indicate more signatures are required when threshold is not matched', async () => {
+      const TRANSACTION_RESPONSE = {
+        confirmations: [{ signature: '0x1' }],
+        confirmationsRequired: 2
+      }
+
+      apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
+
+      const result = await safeClient.confirm(SAFE_TX_HASH)
+
+      expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
+      expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
+      expect(apiKit.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
+
+      expect(result).toMatchObject({
+        description: MESSAGES[SafeClientTxStatus.PENDING_SIGNATURES],
+        safeAddress: SAFE_ADDRESS,
+        status: SafeClientTxStatus.PENDING_SIGNATURES,
+        transactions: {
+          ethereumTxHash: undefined,
+          safeTxHash: SAFE_TX_HASH
+        }
+      })
+    })
+  })
+
+  describe('getPendingTransactions', () => {
+    it('should return the pending transactions for the Safe address', async () => {
+      const PENDING_TRANSACTIONS = [{ safeTxHash: '0xPendingSafeTxHash' }]
+
+      apiKit.getPendingTransactions = jest.fn().mockResolvedValue(PENDING_TRANSACTIONS)
+
+      const result = await safeClient.getPendingTransactions()
+
+      expect(protocolKit.getAddress).toHaveBeenCalled()
+      expect(apiKit.getPendingTransactions).toHaveBeenCalledWith(SAFE_ADDRESS)
+      expect(result).toBe(PENDING_TRANSACTIONS)
     })
   })
 })

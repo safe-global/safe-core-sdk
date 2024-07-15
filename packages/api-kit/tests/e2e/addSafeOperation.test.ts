@@ -5,14 +5,14 @@ import sinonChai from 'sinon-chai'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
-import { Safe4337Pack } from '@safe-global/relay-kit'
-import * as viem from 'viem'
+import { BundlerClient, Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
 import {
   ENTRYPOINT_ABI,
   ENTRYPOINT_ADDRESS_V06,
   RPC_4337_CALLS
 } from '@safe-global/relay-kit/packs/safe-4337/constants'
+import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
@@ -40,21 +40,18 @@ describe('addSafeOperation', () => {
   const requestStub = sinon.stub()
   // Setup mocks for the bundler client
   before(async () => {
-    sinon.stub(viem, 'createPublicClient').get(
-      () => () =>
-        ({
-          request: requestStub,
-          readContract: sinon
-            .stub()
-            .withArgs({
-              address: ENTRYPOINT_ADDRESS_V06,
-              abi: ENTRYPOINT_ABI,
-              functionName: 'getNonce',
-              args: [SAFE_ADDRESS, BigInt(0)]
-            })
-            .resolves(123n)
-        }) as unknown as viem.PublicClient
-    )
+    sinon.stub(safe4337Utils, 'getEip4337BundlerProvider').returns({
+      request: requestStub,
+      readContract: sinon
+        .stub()
+        .withArgs({
+          address: ENTRYPOINT_ADDRESS_V06,
+          abi: ENTRYPOINT_ABI,
+          functionName: 'getNonce',
+          args: [SAFE_ADDRESS, BigInt(0)]
+        })
+        .resolves(123n)
+    } as unknown as BundlerClient)
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress: SAFE_ADDRESS,
       signer: SIGNER_PK,

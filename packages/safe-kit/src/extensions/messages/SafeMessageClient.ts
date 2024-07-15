@@ -95,6 +95,7 @@ export class SafeMessageClient {
   async #deployAndAddMessage(safeMessage: SafeMessage): Promise<SafeClientResult> {
     let deploymentTxHash
     const threshold = await this.protocolKit.getThreshold()
+
     const safeDeploymentTransaction =
       await this.protocolKit.createSafeDeploymentTransaction(undefined)
 
@@ -143,6 +144,7 @@ export class SafeMessageClient {
         signature: signedMessage.encodedSignatures()
       })
     } catch (error) {
+      console.log(error)
       throw new Error('Could not add a new off-chain message to the Safe account')
     }
 

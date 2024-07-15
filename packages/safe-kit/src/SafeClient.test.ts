@@ -237,4 +237,17 @@ describe('SafeClient', () => {
       expect(result).toBe(PENDING_TRANSACTIONS)
     })
   })
+
+  describe('extend', () => {
+    it('should extend the SafeClient with additional functionality', async () => {
+      const extendedClient = safeClient.extend(() => ({
+        extendedFunction: () => 'extendedFunction',
+        extendedProp: 'extendedProp'
+      }))
+
+      expect(extendedClient).toBeInstanceOf(SafeClient)
+      expect(extendedClient.extendedFunction()).toEqual('extendedFunction')
+      expect(extendedClient.extendedProp).toEqual('extendedProp')
+    })
+  })
 })

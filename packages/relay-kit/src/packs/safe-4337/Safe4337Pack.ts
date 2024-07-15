@@ -1,4 +1,4 @@
-import { Address, Hash, encodeFunctionData, zeroAddress } from 'viem'
+import { Address, Hash, encodeFunctionData, zeroAddress, toHex, Hex, concat } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
@@ -488,6 +488,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #toSafeOperation(safeOperationResponse: SafeOperationResponse): EthSafeOperation {
     const { validUntil, validAfter, userOperation } = safeOperationResponse
 
+    const paymaster = userOperation?.paymaster || '0x'
+    const paymasterData = userOperation?.paymasterData || '0x'
     const safeOperation = new EthSafeOperation(
       {
         sender: userOperation?.sender || '0x',
@@ -499,9 +501,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: ethers.hexlify(
-          ethers.concat([userOperation?.paymaster || '0x', userOperation?.paymasterData || '0x'])
-        ),
+        paymasterAndData: toHex(concat([paymaster as Hex, paymasterData as Hex])),
         signature: safeOperationResponse.preparedSignature || '0x'
       },
       {

@@ -1,4 +1,4 @@
-import { Address, Hash, encodeFunctionData, zeroAddress, toHex, Hex, concat } from 'viem'
+import { Address, Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
@@ -421,7 +421,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         data: encodeFunctionData({
           abi: ABI,
           functionName: 'approve',
-          args: [paymasterOptions.paymasterTokenAddress as Address, amountToApprove]
+          args: [paymasterOptions.paymasterAddress as Address, amountToApprove]
         }),
         value: '0',
         operation: OperationType.Call // Call for approve
@@ -503,7 +503,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: toHex(concat([paymaster as Hex, paymasterData as Hex])),
+        paymasterAndData: concat([paymaster as Hex, paymasterData as Hex]),
         signature: safeOperationResponse.preparedSignature || '0x'
       },
       {

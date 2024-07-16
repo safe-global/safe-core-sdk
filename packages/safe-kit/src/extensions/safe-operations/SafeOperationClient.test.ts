@@ -1,8 +1,9 @@
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { Safe4337Pack } from '@safe-global/relay-kit'
+import { Safe4337Pack, EthSafeOperation } from '@safe-global/relay-kit'
 
 import { SafeOperationClient } from './SafeOperationClient'
+import { MESSAGES, SafeClientTxStatus } from '../../constants'
 
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/relay-kit')
@@ -17,35 +18,56 @@ jest.mock('../../utils', () => {
 })
 
 const TRANSACTION = { to: '0xEthereumAddres', value: '0', data: '0x' }
-const DEPLOYMENT_TRANSACTION = { to: '0xMultisig', value: '0', data: '0x' }
 const TRANSACTION_BATCH = [TRANSACTION]
 const SAFE_ADDRESS = '0xSafeAddress'
-const SAFE_TX_HASH = '0xSafeTxHash'
-const DEPLOYMENT_ETHEREUM_TX_HASH = '0xSafeDeploymentEthereumHash'
-const ETHEREUM_TX_HASH = '0xEthereumTxHash'
-const SAFE_TRANSACTION = new protocolKitModule.EthSafeTransaction({
-  ...TRANSACTION,
-  operation: 0,
-  safeTxGas: '0',
-  baseGas: '0',
-  gasPrice: '0',
-  gasToken: '0x',
-  refundReceiver: '0x',
-  nonce: 0
-})
+const SAFE_OPERATION_HASH = '0xSafeOperationHash'
+const USER_OPERATION_HASH = '0xUserOperationHash'
+const PENDING_SAFE_OPERATIONS = [{ safeOperationHash: SAFE_OPERATION_HASH }]
+const SAFE_OPERATION_RESPONSE = {
+  confirmations: [
+    {
+      signature: 'OxSignature'
+    },
+    {
+      signature: 'OxSignature'
+    }
+  ]
+}
+const SAFE_OPERATION = new EthSafeOperation(
+  {
+    sender: '0xSenderAddress',
+    nonce: '0',
+    initCode: '0xInitCode',
+    callData: '0xCallData',
+    callGasLimit: 0n,
+    verificationGasLimit: 0n,
+    preVerificationGas: 0n,
+    maxFeePerGas: 0n,
+    maxPriorityFeePerGas: 0n,
+    paymasterAndData: '0xPaymasterAndData',
+    signature: '0xSignature'
+  },
+  {
+    chainId: 1n,
+    entryPoint: '0xEntryPoint',
+    moduleAddress: '0xModuleAddress'
+  }
+)
 
 describe('SafeOperationClient', () => {
   let safeOperationClient: SafeOperationClient
   let protocolKit: Safe
   let apiKit: jest.Mocked<SafeApiKit>
-  let safe4337Pack: jest.Mocked<Safe4337Pack>
+  let safe4337Pack: Safe4337Pack
 
   beforeEach(() => {
+    const bundlerClientMock = { send: jest.fn().mockResolvedValue('1') } as any
+
     protocolKit = new Safe()
     apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
     safe4337Pack = new Safe4337Pack({
       protocolKit,
-      bundlerClient: { send: jest.fn().mockResolvedValue('1') } as any,
+      bundlerClient: bundlerClientMock,
       bundlerUrl: 'http://bundler.url',
       chainId: 1n,
       paymasterOptions: undefined,
@@ -53,24 +75,23 @@ describe('SafeOperationClient', () => {
       safe4337ModuleAddress: '0xModuleAddress'
     }) as jest.Mocked<Safe4337Pack>
 
+    safe4337Pack.protocolKit = protocolKit
+
     safeOperationClient = new SafeOperationClient(safe4337Pack, apiKit)
 
     protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
-    protocolKit.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
-    protocolKit.signTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
-    protocolKit.executeTransaction = jest.fn().mockResolvedValue({ hash: ETHEREUM_TX_HASH })
-    protocolKit.connect = jest.fn().mockResolvedValue(protocolKit)
-    protocolKit.getSafeProvider = jest.fn().mockResolvedValue({
-      provider: 'http://ethereum.provider',
-      signer: '0xSignerAddress'
-    })
-    protocolKit.createSafeDeploymentTransaction = jest
+    protocolKit.signHash = jest
       .fn()
-      .mockResolvedValue(DEPLOYMENT_TRANSACTION)
+      .mockResolvedValue(new protocolKitModule.EthSafeSignature('0xSigner', '0xSignature'))
+    safe4337Pack.createTransaction = jest.fn().mockResolvedValue(SAFE_OPERATION)
+    safe4337Pack.signSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION)
+    safe4337Pack.executeTransaction = jest.fn().mockResolvedValue(USER_OPERATION_HASH)
+    safe4337Pack.getUserOperationReceipt = jest
+      .fn()
+      .mockResolvedValue({ hash: USER_OPERATION_HASH })
 
-    protocolKit.wrapSafeTransactionIntoDeploymentBatch = jest
-      .fn()
-      .mockResolvedValue(DEPLOYMENT_TRANSACTION)
+    apiKit.confirmSafeOperation = jest.fn().mockResolvedValue(true)
+    apiKit.getSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION_RESPONSE)
   })
 
   afterEach(() => {
@@ -83,5 +104,99 @@ describe('SafeOperationClient', () => {
     expect(safeOperationClient.apiKit).toBe(apiKit)
   })
 
-  describe('sendSafeOperation', () => {})
+  describe('sendSafeOperation', () => {
+    it('should save the Safe operation using the Transaction service when threshold is > 1', async () => {
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
+      jest.spyOn(SAFE_OPERATION, 'getHash').mockReturnValue(SAFE_OPERATION_HASH)
+
+      const safeOperationResult = await safeOperationClient.sendSafeOperation({
+        transactions: TRANSACTION_BATCH
+      })
+
+      expect(safe4337Pack.createTransaction).toHaveBeenCalledWith({
+        transactions: TRANSACTION_BATCH,
+        options: {}
+      })
+      expect(safe4337Pack.signSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION)
+      expect(apiKit.addSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION)
+
+      expect(safeOperationResult).toEqual({
+        safeAddress: SAFE_ADDRESS,
+        description: MESSAGES[SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES],
+        status: SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES,
+        safeOperations: { safeOperationHash: SAFE_OPERATION_HASH }
+      })
+    })
+
+    it('should send the Safe operation to the bundler when threshold is = 1', async () => {
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
+      jest.spyOn(SAFE_OPERATION, 'getHash').mockReturnValue(SAFE_OPERATION_HASH)
+
+      const safeOperationResult = await safeOperationClient.sendSafeOperation({
+        transactions: TRANSACTION_BATCH
+      })
+
+      expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({ executable: SAFE_OPERATION })
+
+      expect(safeOperationResult).toEqual({
+        safeAddress: SAFE_ADDRESS,
+        description: MESSAGES[SafeClientTxStatus.SAFE_OPERATION_EXECUTED],
+        status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
+        safeOperations: {
+          safeOperationHash: SAFE_OPERATION_HASH,
+          userOperationHash: USER_OPERATION_HASH
+        }
+      })
+    })
+  })
+
+  describe('confirmSafeOperation', () => {
+    it('should confirm the Safe operation and send it to the bundler when enough signatures', async () => {
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
+
+      const safeOperationResult =
+        await safeOperationClient.confirmSafeOperation(SAFE_OPERATION_HASH)
+
+      expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
+        executable: SAFE_OPERATION_RESPONSE
+      })
+
+      expect(safeOperationResult).toEqual({
+        safeAddress: SAFE_ADDRESS,
+        description: MESSAGES[SafeClientTxStatus.SAFE_OPERATION_EXECUTED],
+        status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
+        safeOperations: {
+          safeOperationHash: SAFE_OPERATION_HASH,
+          userOperationHash: USER_OPERATION_HASH
+        }
+      })
+    })
+    it('should indicate more signatures are required when threshold is not matched', async () => {
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
+
+      const safeOperationResult =
+        await safeOperationClient.confirmSafeOperation(SAFE_OPERATION_HASH)
+
+      expect(safeOperationResult).toEqual({
+        safeAddress: SAFE_ADDRESS,
+        description: MESSAGES[SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES],
+        status: SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES,
+        safeOperations: {
+          safeOperationHash: SAFE_OPERATION_HASH
+        }
+      })
+    })
+  })
+
+  describe('getPendingSafeOperations', () => {
+    it('should return the pending Safe operations for the Safe address', async () => {
+      apiKit.getSafeOperationsByAddress = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
+
+      const result = await safeOperationClient.getPendingSafeOperations()
+
+      expect(protocolKit.getAddress).toHaveBeenCalled()
+      expect(apiKit.getSafeOperationsByAddress).toHaveBeenCalledWith({ safeAddress: SAFE_ADDRESS })
+      expect(result).toBe(PENDING_SAFE_OPERATIONS)
+    })
+  })
 })

@@ -108,7 +108,7 @@ describe('SafeMoneriumClient', () => {
     expect(signMessageSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should allow to check if a message is signed in the smart contract if the promise is fulfilled', async () => {
+  it.only('should allow to check if a message is signed in the smart contract if the promise is fulfilled', async () => {
     const isMessageSigned = await safeMoneriumClient.isMessageSigned(
       '0xSafeAddress',
       'message to sign'

@@ -1,6 +1,6 @@
 import {
   Address,
-  Hash,
+  Hex,
   PublicRpcSchema,
   createPublicClient,
   encodeFunctionData,
@@ -95,7 +95,7 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): st
     args: [
       encodeMultiSendData(
         transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
-      ) as Hash
+      ) as Hex
     ]
   })
 }
@@ -166,7 +166,7 @@ export function addDummySignature(
     ...userOperation,
     signature: encodePacked(
       ['uint48', 'uint48', 'bytes'],
-      [0, 0, buildSignatureBytes(signatures) as Hash]
+      [0, 0, buildSignatureBytes(signatures) as Hex]
     )
   }
 }

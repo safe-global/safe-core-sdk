@@ -22,7 +22,6 @@ const requestResponseMap = {
   [constants.RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS]: fixtures.GAS_ESTIMATION,
   [constants.RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH]: fixtures.USER_OPERATION_BY_HASH,
   [constants.RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT]: fixtures.USER_OPERATION_RECEIPT,
-  [constants.RPC_4337_CALLS.SPONSOR_USER_OPERATION]: fixtures.SPONSORED_GAS_ESTIMATION,
   ['pimlico_getUserOperationGasPrice']: fixtures.USER_OPERATION_GAS_PRICE
 }
 
@@ -489,7 +488,7 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: 1n,
-        callGasLimit: 100000n,
+        callGasLimit: 150000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,

@@ -20,7 +20,7 @@ export const PAYMASTER_URL = 'https://paymaster.url'
 export const USER_OPERATION_HASH =
   '0x3cb881d1969036174f38d636d22108d1d032145518b53104fc0b1e1296d2cc9c'
 
-export const ENTRYPOINTS = [ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07] as const
+export const ENTRYPOINTS = [ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07]
 
 export const USER_OPERATION_RECEIPT = {
   userOpHash: '0x3cb881d1969036174f38d636d22108d1d032145518b53104fc0b1e1296d2cc9c',
@@ -89,9 +89,9 @@ export const USER_OPERATION_BY_HASH = {
 }
 
 export const GAS_ESTIMATION = {
-  verificationGasLimit: 100000n,
-  preVerificationGas: 100000n,
-  callGasLimit: 100000n
+  verificationGasLimit: '0x186A0',
+  preVerificationGas: '0x186A0',
+  callGasLimit: '0x186A0'
 }
 
 export const SAFE_OPERATION_RESPONSE = {
@@ -140,5 +140,5 @@ export const SPONSORED_GAS_ESTIMATION = {
 }
 
 export const USER_OPERATION_GAS_PRICE = {
-  fast: { maxFeePerGas: 100000n, maxPriorityFeePerGas: 200000n }
+  fast: { maxFeePerGas: '0x186A0', maxPriorityFeePerGas: '0x30D40' }
 }

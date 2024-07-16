@@ -35,20 +35,14 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
   }: EstimateSponsoredFeeFunctionProps): Promise<EstimateSponsoredGasData> {
     const paymasterClient = getEip4337BundlerProvider(paymasterUrl)
 
-    const { paymasterAndData, callGasLimit, verificationGasLimit, preVerificationGas } =
-      await paymasterClient.request({
-        method: RPC_4337_CALLS.SPONSOR_USER_OPERATION,
-        params: sponsorshipPolicyId
-          ? [userOperationToHexValues(userOperation), entryPoint, { sponsorshipPolicyId }]
-          : [userOperationToHexValues(userOperation), entryPoint]
-      })
+    const gasEstimate = await paymasterClient.request({
+      method: RPC_4337_CALLS.SPONSOR_USER_OPERATION,
+      params: sponsorshipPolicyId
+        ? [userOperationToHexValues(userOperation), entryPoint, { sponsorshipPolicyId }]
+        : [userOperationToHexValues(userOperation), entryPoint]
+    })
 
-    return {
-      paymasterAndData,
-      callGasLimit: BigInt(callGasLimit),
-      verificationGasLimit: BigInt(verificationGasLimit),
-      preVerificationGas: BigInt(preVerificationGas)
-    }
+    return gasEstimate
   }
 
   async #getFeeData(

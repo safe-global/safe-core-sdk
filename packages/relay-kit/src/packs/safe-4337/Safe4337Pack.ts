@@ -242,7 +242,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         const batchData = encodeFunctionData({
           abi: ABI,
           functionName: 'multiSend',
-          args: [encodeMultiSendData(setupBatch) as Hash]
+          args: [encodeMultiSendData(setupBatch) as Hex]
         })
 
         const multiSendContract = await getMultiSendContract({
@@ -503,7 +503,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: concat([paymaster as Hex, paymasterData as Hex]),
+        paymasterAndData: concat([paymaster as Address, paymasterData as Hex]),
         signature: safeOperationResponse.preparedSignature || '0x'
       },
       {
@@ -703,9 +703,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       abi: ABI,
       functionName: 'executeUserOp',
       args: [
-        transaction.to as Hash,
+        transaction.to as Address,
         BigInt(transaction.value),
-        transaction.data as Hash,
+        transaction.data as Hex,
         transaction.operation || OperationType.Call
       ]
     })

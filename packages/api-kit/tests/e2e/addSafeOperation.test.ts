@@ -85,6 +85,10 @@ describe('addSafeOperation', () => {
     })
   })
 
+  after(() => {
+    sinon.restore()
+  })
+
   describe('should fail', () => {
     it('if safeAddress is empty', async () => {
       const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })

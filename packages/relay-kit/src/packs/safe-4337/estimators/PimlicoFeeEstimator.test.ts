@@ -32,9 +32,10 @@ describe('PimlicoFeeEstimator', () => {
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
 
-    expect(sponsoredGasEstimation).toEqual(fixtures.USER_OPERATION_GAS_PRICE.fast)
+    expect(sponsoredGasEstimation).toEqual({ maxFeePerGas: 100000n, maxPriorityFeePerGas: 200000n })
   })
 
+  // TODO: This tests breaks because of the BigInt serialization and requires further investigation
   it('should enable to adjust the gas estimation', async () => {
     const sponsoredGasEstimation = await estimator.adjustEstimation({
       bundlerUrl: fixtures.BUNDLER_URL,
@@ -43,8 +44,9 @@ describe('PimlicoFeeEstimator', () => {
     })
 
     expect(sponsoredGasEstimation).toEqual({
+      callGasLimit: 181_176n,
       verificationGasLimit: 124_584n,
-      callGasLimit: 181_176n
+      preVerificationGas: 50_996n
     })
   })
 

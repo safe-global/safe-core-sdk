@@ -31,8 +31,8 @@ export function safeOperations(
   return async (client: SafeClient) => {
     const { provider, signer } = client.protocolKit.getSafeProvider()
     const isSafeDeployed = await client.protocolKit.isSafeDeployed()
-    console.log('isSafeDeployed', isSafeDeployed)
     let options
+
     if (isSafeDeployed) {
       const safeAddress = await client.protocolKit.getAddress()
 

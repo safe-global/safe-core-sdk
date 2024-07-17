@@ -1,4 +1,3 @@
-import { toBytes, getAddress, encodePacked, bytesToHex, decodeFunctionData, parseAbi } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
@@ -12,17 +11,26 @@ import {
   SafeTransaction,
   SafeTransactionData,
   SafeTransactionDataPartial,
-  SafeVersion
+  SafeVersion,
+  TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
-import { PublicClient, Hash, EstimateGasParameters, TransactionRequest, UnionOmit } from 'viem'
-import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
 import {
-  isLegacyTransaction,
-  createLegacyTxOptions,
-  createTxOptions
-} from '@safe-global/protocol-kit/contracts/utils'
+  PublicClient,
+  Hash,
+  EstimateGasParameters,
+  TransactionRequest,
+  UnionOmit,
+  toBytes,
+  getAddress,
+  encodePacked,
+  bytesToHex,
+  decodeFunctionData,
+  parseAbi
+} from 'viem'
+import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
+import { WalletLegacyTransactionOptions, WalletTransactionOptions } from './types'
 
 export function standardizeMetaTransactionData(
   tx: SafeTransactionDataPartial
@@ -215,4 +223,62 @@ export function toCallGasParameters(
   }
 
   return params
+}
+
+export function converTransactionOptions(
+  options?: TransactionOptions
+): Partial<WalletLegacyTransactionOptions | WalletTransactionOptions> {
+  return isLegacyTransaction(options) ? createLegacyTxOptions(options) : createTxOptions(options)
+}
+
+export function isLegacyTransaction(options?: TransactionOptions) {
+  return !!options?.gasPrice
+}
+
+export function createLegacyTxOptions(
+  options?: TransactionOptions
+): Partial<WalletLegacyTransactionOptions> {
+  const converted: Partial<WalletLegacyTransactionOptions> = {}
+  if (options?.from) {
+    converted.account = asAddress(options.from)
+  }
+
+  if (options?.gasLimit) {
+    converted.gas = BigInt(options.gasLimit)
+  }
+
+  if (options?.gasPrice) {
+    converted.gasPrice = BigInt(options.gasPrice)
+  }
+
+  if (options?.nonce) {
+    converted.nonce = options.nonce
+  }
+
+  return converted
+}
+
+export function createTxOptions(options?: TransactionOptions): Partial<WalletTransactionOptions> {
+  const converted: Partial<WalletTransactionOptions> = {}
+  if (options?.from) {
+    converted.account = asAddress(options.from)
+  }
+
+  if (options?.gasLimit) {
+    converted.gas = BigInt(options.gasLimit)
+  }
+
+  if (options?.maxFeePerGas) {
+    converted.maxFeePerGas = BigInt(options.maxFeePerGas)
+  }
+
+  if (options?.maxPriorityFeePerGas) {
+    converted.maxPriorityFeePerGas = BigInt(options.maxPriorityFeePerGas)
+  }
+
+  if (options?.nonce) {
+    converted.nonce = options.nonce
+  }
+
+  return converted
 }

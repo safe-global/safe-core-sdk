@@ -20,8 +20,11 @@ import {
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
 import { asAddress } from '../utils/types'
-import { ContractTransactionOptions, ContractLegacyTransactionOptions } from '../types/contracts'
-import { isLegacyTransaction, createTxOptions, createLegacyTxOptions } from './utils'
+import {
+  WalletTransactionOptions,
+  WalletLegacyTransactionOptions,
+  converTransactionOptions
+} from '@safe-global/protocol-kit/utils'
 
 /**
  * Abstract class BaseContract
@@ -110,14 +113,12 @@ class BaseContract<ContractAbiType extends Abi> {
 
   async convertOptions(
     options?: TransactionOptions
-  ): Promise<ContractTransactionOptions | ContractLegacyTransactionOptions> {
+  ): Promise<WalletTransactionOptions | WalletLegacyTransactionOptions> {
     const chain = this.getChain()
     if (!chain) throw new Error('Invalid chainId')
     const signerAddress = await this.safeProvider.getSignerAddress()
     const account = asAddress(signerAddress!)
-    const txOptions = isLegacyTransaction(options)
-      ? createLegacyTxOptions(options)
-      : createTxOptions(options)
+    const txOptions = await converTransactionOptions(options)
     return { chain, account, ...txOptions } // Needs to be in this order to override the `account` if necessary
   }
 

@@ -34,7 +34,6 @@ import {
   SafeDeploymentConfig
 } from '../types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { ContractLegacyTransactionOptions, ContractTransactionOptions } from '../types'
 
 // keccak256(toUtf8Bytes('Safe Account Abstraction'))
 export const PREDETERMINED_SALT_NONCE =
@@ -94,58 +93,6 @@ export function encodeCreateProxyWithNonce(
 const memoizedGetCompatibilityFallbackHandlerContract = createMemoizedFunction(
   getCompatibilityFallbackHandlerContract
 )
-
-export function isLegacyTransaction(options?: TransactionOptions) {
-  return !!options?.gasPrice
-}
-
-export function createLegacyTxOptions(
-  options?: TransactionOptions
-): Partial<ContractLegacyTransactionOptions> {
-  const converted: Partial<ContractLegacyTransactionOptions> = {}
-  if (options?.from) {
-    converted.account = asAddress(options.from)
-  }
-
-  if (options?.gasLimit) {
-    converted.gas = BigInt(options.gasLimit)
-  }
-
-  if (options?.gasPrice) {
-    converted.gasPrice = BigInt(options.gasPrice)
-  }
-
-  if (options?.nonce) {
-    converted.nonce = options.nonce
-  }
-
-  return converted
-}
-
-export function createTxOptions(options?: TransactionOptions): Partial<ContractTransactionOptions> {
-  const converted: Partial<ContractTransactionOptions> = {}
-  if (options?.from) {
-    converted.account = asAddress(options.from)
-  }
-
-  if (options?.gasLimit) {
-    converted.gas = BigInt(options.gasLimit)
-  }
-
-  if (options?.maxFeePerGas) {
-    converted.maxFeePerGas = BigInt(options.maxFeePerGas)
-  }
-
-  if (options?.maxPriorityFeePerGas) {
-    converted.maxPriorityFeePerGas = BigInt(options.maxPriorityFeePerGas)
-  }
-
-  if (options?.nonce) {
-    converted.nonce = options.nonce
-  }
-
-  return converted
-}
 
 export async function encodeSetupCallData({
   safeProvider,

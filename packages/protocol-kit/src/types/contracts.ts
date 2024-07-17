@@ -1,4 +1,4 @@
-import { Abi, Address, Chain } from 'viem'
+import { Abi } from 'viem'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import SafeContract_v1_0_0 from '@safe-global/protocol-kit/contracts/Safe/v1.0.0/SafeContract_v1_0_0'
 import SafeContract_v1_1_1 from '@safe-global/protocol-kit/contracts/Safe/v1.1.1/SafeContract_v1_1_1'
@@ -114,21 +114,4 @@ export type ContractNetworkConfig = {
 export type ContractNetworksConfig = {
   /** id - Network id */
   [id: string]: ContractNetworkConfig
-}
-
-export type ContractTransactionOptions = {
-  chain: Chain
-  account: Address
-  gas?: bigint
-  maxFeePerGas?: bigint
-  maxPriorityFeePerGas?: bigint
-  nonce?: number
-}
-
-export type ContractLegacyTransactionOptions = {
-  chain: Chain
-  account: Address
-  gas?: bigint
-  gasPrice?: bigint
-  nonce?: number
 }

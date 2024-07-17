@@ -1512,6 +1512,8 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
+    // both bytes and bytes32 ends up being resolved to a bytes-like structure which is represented by a `0x` prefixed address.
+    // because there is an overload going on, named-tuples (https://www.typescriptlang.org/play/?ts=4.0.2#example/named-tuples) are used to solve the ambiguity.
     const bytes32Tuple: [_dataHash: Hash, _signature: Hex] = [
       asHash(messageHash),
       asHex(signatureToCheck)

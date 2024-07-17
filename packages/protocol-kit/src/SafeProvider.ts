@@ -265,11 +265,12 @@ class SafeProvider {
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
-    const res = this.#externalProvider.getCode({
+    const res = await this.#externalProvider.getCode({
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
-    return res?.toString()
+
+    return res ?? '0x'
   }
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
@@ -309,17 +310,17 @@ class SafeProvider {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
-    // This means that the address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
+    // This means the address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
     // That is because if we pass a typeof account === 'string' to singMessage, viem assumes a json-rpc account on their parseAccount function insteado of a local one
     if (sameString(signer.account.address, account)) {
-      return (await signer?.signMessage!({
+      return await signer?.signMessage!({
         message: { raw: toBytes(message) }
-      })) as string
+      })
     } else {
-      return (await signer?.signMessage!({
+      return await signer?.signMessage!({
         account: asAddress(account),
         message: { raw: toBytes(message) }
-      })) as string
+      })
     }
   }
 

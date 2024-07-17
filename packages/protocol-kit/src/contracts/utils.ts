@@ -277,7 +277,7 @@ export async function predictSafeAddress({
     chainId: chainId.toString()
   })
 
-  const proxyCreationCode = await memoizedGetProxyCreationCode({
+  const [proxyCreationCode] = await memoizedGetProxyCreationCode({
     safeProvider,
     safeVersion,
     customContracts,
@@ -292,38 +292,36 @@ export async function predictSafeAddress({
     chainId: chainId.toString()
   })
 
-  const initializer = (await encodeSetupCallData({
+  const initializer = await encodeSetupCallData({
     safeProvider,
     safeAccountConfig,
     safeContract,
     customContracts,
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
-  })) as `0x${string}`
-  const initializerHash = keccak256(initializer)
+  })
+  const initializerHash = keccak256(asHex(initializer))
 
-  const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce]) as `0x${string}`
+  const encodedNonce = asHex(safeProvider.encodeParameters('uint256', [saltNonce]))
 
   const salt = keccak256(concat([initializerHash, encodedNonce]))
 
-  const input = safeProvider.encodeParameters('address', [
-    await safeContract.getAddress()
-  ]) as `0x${string}`
+  const input = safeProvider.encodeParameters('address', [await safeContract.getAddress()])
 
-  const from = (await safeProxyFactoryContract.getAddress()) as `0x${string}`
+  const from = asAddress(await safeProxyFactoryContract.getAddress())
 
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)
   if (isZkSyncEraChain) {
-    const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, input)
+    const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, asHex(input))
 
     return safeProvider.getChecksummedAddress(proxyAddress)
   }
 
-  const initCode = (proxyCreationCode + input.slice(2)) as `0x${string}`
+  const initCode = concat([proxyCreationCode, asHex(input)])
 
   const proxyAddress = getContractAddress({
     from,
-    bytecode: initCode,
+    bytecode: asHex(initCode),
     opcode: 'CREATE2',
     salt
   })
@@ -360,8 +358,7 @@ export function zkSyncEraCreate2Address(
   salt: `0x${string}`,
   input: `0x${string}`
 ): string {
-  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion]
-    .deployedBytecodeHash as `0x${string}`
+  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash as Hash
   const inputHash = keccak256(input)
 
   const addressBytes = keccak256(

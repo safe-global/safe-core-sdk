@@ -12,6 +12,8 @@ import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import { hashTypedData } from '../eip-712'
 import { encodeTypedData } from '../eip-712/encode'
+import { asHash, asHex } from '../types'
+import { EMPTY_DATA } from '../constants'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -31,8 +33,8 @@ export async function isTxHashSignedWithPrefix(
   let hasPrefix
   try {
     const recoveredAddress = await recoverAddress({
-      hash: txHash as `0x${string}`,
-      signature: signature as `0x${string}`
+      hash: asHash(txHash),
+      signature: asHex(signature)
     })
 
     hasPrefix = !sameString(recoveredAddress, ownerAddress)
@@ -151,7 +153,7 @@ export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
     left.signer.toLowerCase().localeCompare(right.signer.toLowerCase())
   )
 
-  let signatureBytes = '0x'
+  let signatureBytes = EMPTY_DATA
   let dynamicBytes = ''
 
   for (const signature of signatures) {

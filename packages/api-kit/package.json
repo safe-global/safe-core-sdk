@@ -12,11 +12,11 @@
     "API"
   ],
   "scripts": {
-    "test:web3": "export TESTS_PATH=tests/endpoint && export ETH_LIB=web3 && nyc hardhat test",
-    "test:ethers": "export TESTS_PATH=tests/endpoint && export ETH_LIB=ethers && nyc --reporter=lcov  hardhat test",
-    "test:viem": "export TESTS_PATH=tests/endpoint && export ETH_LIB=viem && nyc hardhat test",
+    "test:web3": "export TESTS_PATH=tests/endpoint && export ETH_LIB=web3 && nyc --reporter=lcov hardhat test",
+    "test:ethers": "export TESTS_PATH=tests/endpoint && export ETH_LIB=ethers && nyc --reporter=lcov hardhat test",
+    "test:viem": "export TESTS_PATH=tests/endpoint && export ETH_LIB=viem && nyc --reporter=lcov hardhat test",
     "test": "yarn test:viem",
-    "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc hardhat test",
+    "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc --reporter=lcov hardhat test",
     "test:ci:ethers": "export TESTS_PATH=tests/e2e && export ETH_LIB=ethers && nyc --reporter=lcov hardhat test",
     "test:ci:viem": "export TESTS_PATH=tests/e2e && export ETH_LIB=viem && nyc --reporter=lcov hardhat test",
     "test:ci": "yarn test:ci:viem",
@@ -52,6 +52,7 @@
     "ethers": "^6.13.1",
     "hardhat": "^2.19.3",
     "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
     "semver": "^7.6.1",
     "sinon": "^14.0.2",
     "sinon-chai": "^3.7.0",

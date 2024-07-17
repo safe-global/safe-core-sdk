@@ -14,6 +14,7 @@ jest.mock('../../utils', () => {
     waitSafeTxReceipt: jest.fn()
   }
 })
+
 describe('onChainMessages', () => {
   let protocolKit: Safe
   let apiKit: jest.Mocked<SafeApiKit>

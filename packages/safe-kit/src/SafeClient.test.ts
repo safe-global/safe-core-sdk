@@ -33,6 +33,11 @@ const SAFE_TRANSACTION = new protocolKitModule.EthSafeTransaction({
   refundReceiver: '0x',
   nonce: 0
 })
+const SAFE_PROVIDER = {
+  provider: 'http://ethereum.provider',
+  signer: '0xSignerAddress'
+}
+const PENDING_TRANSACTIONS = [{ safeTxHash: '0xPendingSafeTxHash' }]
 
 describe('SafeClient', () => {
   let safeClient: SafeClient
@@ -50,14 +55,10 @@ describe('SafeClient', () => {
     protocolKit.signTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
     protocolKit.executeTransaction = jest.fn().mockResolvedValue({ hash: ETHEREUM_TX_HASH })
     protocolKit.connect = jest.fn().mockResolvedValue(protocolKit)
-    protocolKit.getSafeProvider = jest.fn().mockResolvedValue({
-      provider: 'http://ethereum.provider',
-      signer: '0xSignerAddress'
-    })
+    protocolKit.getSafeProvider = jest.fn().mockResolvedValue(SAFE_PROVIDER)
     protocolKit.createSafeDeploymentTransaction = jest
       .fn()
       .mockResolvedValue(DEPLOYMENT_TRANSACTION)
-
     protocolKit.wrapSafeTransactionIntoDeploymentBatch = jest
       .fn()
       .mockResolvedValue(DEPLOYMENT_TRANSACTION)
@@ -96,7 +97,7 @@ describe('SafeClient', () => {
       })
     })
 
-    it('should execute the transaction if Safe account exists and has threshold 1', async () => {
+    it('should execute the transaction if Safe account exists and has threshold === 1', async () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
 
@@ -145,7 +146,7 @@ describe('SafeClient', () => {
       })
     })
 
-    it('should deploy and execute the transaction if Safe account does not exist and has threshold 1', async () => {
+    it('should deploy and execute the transaction if Safe account does not exist and has threshold === 1', async () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
 
@@ -226,8 +227,6 @@ describe('SafeClient', () => {
 
   describe('getPendingTransactions', () => {
     it('should return the pending transactions for the Safe address', async () => {
-      const PENDING_TRANSACTIONS = [{ safeTxHash: '0xPendingSafeTxHash' }]
-
       apiKit.getPendingTransactions = jest.fn().mockResolvedValue(PENDING_TRANSACTIONS)
 
       const result = await safeClient.getPendingTransactions()
@@ -239,7 +238,7 @@ describe('SafeClient', () => {
   })
 
   describe('extend', () => {
-    it('should extend the SafeClient with additional functionality', async () => {
+    it('should enable the extension of the SafeClient with additional functionality', async () => {
       const extendedClient = safeClient.extend(() => ({
         extendedFunction: () => 'extendedFunction',
         extendedProp: 'extendedProp'

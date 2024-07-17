@@ -17,9 +17,14 @@ jest.mock('../../utils', () => {
 })
 
 const MESSAGE = 'I am the owner of this Safe'
+const MESSAGE_RESPONSE = { message: MESSAGE, confirmations: [{ signature: '0xSignature' }] }
 const DEPLOYMENT_TRANSACTION = { to: '0xMultisig', value: '0', data: '0x' }
 const SAFE_ADDRESS = '0xSafeAddress'
 const SAFE_MESSAGE = new protocolKitModule.EthSafeMessage(MESSAGE)
+const SAFE_PROVIDER = {
+  provider: 'http://ethereum.provider',
+  signer: '0xSignerAddress'
+}
 
 describe('SafeClient', () => {
   let safeMessageClient: SafeMessageClient
@@ -31,6 +36,8 @@ describe('SafeClient', () => {
     apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
     safeMessageClient = new SafeMessageClient(protocolKit, apiKit)
 
+    apiKit.getMessage = jest.fn().mockResolvedValue(MESSAGE_RESPONSE)
+
     protocolKit.createMessage = jest.fn().mockReturnValue(SAFE_MESSAGE)
     protocolKit.signMessage = jest.fn().mockResolvedValue(SAFE_MESSAGE)
     protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
@@ -38,10 +45,7 @@ describe('SafeClient', () => {
     protocolKit.getContractVersion = jest.fn().mockResolvedValue('1.1.1')
     protocolKit.getChainId = jest.fn().mockResolvedValue(1n)
     protocolKit.getSafeMessageHash = jest.fn().mockResolvedValue('0xSafeMessageHash')
-    protocolKit.getSafeProvider = jest.fn().mockResolvedValue({
-      provider: 'http://ethereum.provider',
-      signer: '0xSignerAddress'
-    })
+    protocolKit.getSafeProvider = jest.fn().mockResolvedValue(SAFE_PROVIDER)
     protocolKit.createSafeDeploymentTransaction = jest
       .fn()
       .mockResolvedValue(DEPLOYMENT_TRANSACTION)
@@ -62,12 +66,9 @@ describe('SafeClient', () => {
   })
 
   describe('sendMessage', () => {
-    it('should add a confirmed message if the Safe is deployed and the threshold is reached', async () => {
+    it('should add a confirmed message if the Safe exists and the threshold === 1', async () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
-      apiKit.getMessage = jest
-        .fn()
-        .mockResolvedValue({ message: MESSAGE, confirmations: [{ signature: '0xSignature' }] })
 
       const result = await safeMessageClient.sendMessage(MESSAGE)
 
@@ -88,12 +89,9 @@ describe('SafeClient', () => {
       })
     })
 
-    it('should add a pending confirmation message if the Safe is deployed', async () => {
+    it('should add a pending confirmation message if the Safe exists and the threshold > 1', async () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
-      apiKit.getMessage = jest
-        .fn()
-        .mockResolvedValue({ message: MESSAGE, confirmations: [{ signature: '0xSignature' }] })
 
       const result = await safeMessageClient.sendMessage(MESSAGE)
 
@@ -117,9 +115,6 @@ describe('SafeClient', () => {
     it('should deploy and add the message if Safe account does not exist and has threshold > 1', async () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
-      apiKit.getMessage = jest
-        .fn()
-        .mockResolvedValue({ message: MESSAGE, confirmations: [{ signature: '0xSignature' }] })
 
       const result = await safeMessageClient.sendMessage(MESSAGE)
 
@@ -149,20 +144,15 @@ describe('SafeClient', () => {
   })
 
   describe('confirmMessage', () => {
-    it('should allow to confirm the message', async () => {
-      const MESSAGE_RESPONSE = { message: MESSAGE, confirmations: [{ signature: '0xSignature' }] }
-
+    it('should confirm the message', async () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
-      apiKit.getMessage = jest.fn().mockResolvedValue(MESSAGE_RESPONSE)
 
       const result = await safeMessageClient.confirmMessage('0xSafeMessageHash')
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE_RESPONSE.message)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
-
       expect(apiKit.addMessageSignature).toHaveBeenCalledWith('0xSafeMessageHash', undefined)
-
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.MESSAGE_CONFIRMED],
         safeAddress: SAFE_ADDRESS,
@@ -175,7 +165,7 @@ describe('SafeClient', () => {
   })
 
   describe('getPendingMessages', () => {
-    it('should return the pending transactions for the Safe address', async () => {
+    it('should return the pending messages for the Safe address', async () => {
       const PENDING_MESSAGES = [{ messageHash: 'messageHash' }]
 
       apiKit.getMessages = jest.fn().mockResolvedValue(PENDING_MESSAGES)

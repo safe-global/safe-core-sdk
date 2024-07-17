@@ -79,19 +79,20 @@ describe('SafeOperationClient', () => {
 
     safeOperationClient = new SafeOperationClient(safe4337Pack, apiKit)
 
+    apiKit.confirmSafeOperation = jest.fn().mockResolvedValue(true)
+    apiKit.getSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION_RESPONSE)
+
     protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
     protocolKit.signHash = jest
       .fn()
       .mockResolvedValue(new protocolKitModule.EthSafeSignature('0xSigner', '0xSignature'))
+
     safe4337Pack.createTransaction = jest.fn().mockResolvedValue(SAFE_OPERATION)
     safe4337Pack.signSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION)
     safe4337Pack.executeTransaction = jest.fn().mockResolvedValue(USER_OPERATION_HASH)
     safe4337Pack.getUserOperationReceipt = jest
       .fn()
       .mockResolvedValue({ hash: USER_OPERATION_HASH })
-
-    apiKit.confirmSafeOperation = jest.fn().mockResolvedValue(true)
-    apiKit.getSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION_RESPONSE)
   })
 
   afterEach(() => {
@@ -128,7 +129,7 @@ describe('SafeOperationClient', () => {
       })
     })
 
-    it('should send the Safe operation to the bundler when threshold is = 1', async () => {
+    it('should send the Safe operation to the bundler when threshold === 1', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
       jest.spyOn(SAFE_OPERATION, 'getHash').mockReturnValue(SAFE_OPERATION_HASH)
 
@@ -151,7 +152,7 @@ describe('SafeOperationClient', () => {
   })
 
   describe('confirmSafeOperation', () => {
-    it('should confirm the Safe operation and send it to the bundler when enough signatures', async () => {
+    it('should confirm the Safe operation and send it to the bundler when threshold is reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
       const safeOperationResult =
@@ -171,7 +172,7 @@ describe('SafeOperationClient', () => {
         }
       })
     })
-    it('should indicate more signatures are required when threshold is not matched', async () => {
+    it('should indicate more signatures are required when threshold is not reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
 
       const safeOperationResult =

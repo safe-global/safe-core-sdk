@@ -16,6 +16,12 @@ jest.mock('../../utils', () => {
     waitSafeTxReceipt: jest.fn()
   }
 })
+
+const SAFE_PROVIDER = {
+  provider: 'http://ethereum.provider',
+  signer: '0xSignerAddress'
+}
+
 describe('safeOperations', () => {
   let protocolKit: Safe
   let apiKit: jest.Mocked<SafeApiKit>
@@ -33,10 +39,7 @@ describe('safeOperations', () => {
 
   it('should extend the SafeClient with the onChainMessages methods', async () => {
     protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
-    protocolKit.getSafeProvider = jest.fn().mockResolvedValue({
-      provider: 'http://ethereum.provider',
-      signer: '0xSignerAddress'
-    })
+    protocolKit.getSafeProvider = jest.fn().mockResolvedValue(SAFE_PROVIDER)
     protocolKit.getPredictedSafe = jest.fn().mockReturnValue({
       safeDeploymentConfig: {},
       safeAccountConfig: {

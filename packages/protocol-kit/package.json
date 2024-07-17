@@ -61,6 +61,7 @@
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^16.4.5",
+    "ethers": "^6.13.1",
     "hardhat": "^2.19.3",
     "hardhat-deploy": "^0.11.45",
     "mocha": "^10.2.0",

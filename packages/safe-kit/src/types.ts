@@ -8,7 +8,6 @@ export type SafeCreateTransactionProps = {
 }
 
 export type PaginationOptions = {
-  ordering?: string
   limit?: number
   offset?: number
 }

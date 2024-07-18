@@ -1,5 +1,17 @@
 import { SafeProvider } from '@safe-global/protocol-kit'
+import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+
+export type SafeCreateTransactionProps = {
+  transactions: TransactionBase[]
+  options?: TransactionOptions
+}
+
+export type PaginationOptions = {
+  ordering?: string
+  limit?: number
+  offset?: number
+}
 
 export type SafeConfig = {
   owners: string[]

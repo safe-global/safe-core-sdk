@@ -4,7 +4,7 @@ import { Safe4337CreateTransactionProps, Safe4337Pack } from '@safe-global/relay
 
 import { createSafeClientResult } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import { PaginationOptions, SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -121,9 +121,12 @@ export class SafeOperationClient {
    * @returns {Promise<GetSafeOperationListResponse>} A promise that resolves to an array of pending Safe operations.
    * @throws {Error} If there is an issue retrieving the safe address or pending Safe operations.
    */
-  async getPendingSafeOperations(): Promise<GetSafeOperationListResponse> {
+  async getPendingSafeOperations(
+    options?: PaginationOptions
+  ): Promise<GetSafeOperationListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
-    return this.apiKit.getSafeOperationsByAddress({ safeAddress })
+
+    return this.apiKit.getSafeOperationsByAddress({ safeAddress, ...options })
   }
 
   /**

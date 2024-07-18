@@ -9,7 +9,7 @@ import {
 import { SafeClient } from '@safe-global/safe-kit/SafeClient'
 import { SafeOperationClient } from '@safe-global/safe-kit/extensions/safe-operations/SafeOperationClient'
 import { BundlerOptions } from '@safe-global/safe-kit/extensions/safe-operations/types'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import { PaginationOptions, SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use a bundler and a paymaster
@@ -99,8 +99,10 @@ export function safeOperations(
        * @returns {Promise<GetSafeOperationListResponse>} A promise that resolves to an array of pending Safe operations.
        * @throws {Error} If there is an issue retrieving the safe address or pending Safe operations.
        */
-      async getPendingSafeOperations(): Promise<GetSafeOperationListResponse> {
-        return safeOperationClient.getPendingSafeOperations()
+      async getPendingSafeOperations(
+        options?: PaginationOptions
+      ): Promise<GetSafeOperationListResponse> {
+        return safeOperationClient.getPendingSafeOperations(options)
       }
     }
   }

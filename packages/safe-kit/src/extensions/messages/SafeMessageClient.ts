@@ -1,13 +1,12 @@
 import Safe, { hashSafeMessage } from '@safe-global/protocol-kit'
 import SafeApiKit, {
   EIP712TypedData as ApiKitEIP712TypedData,
-  GetSafeMessageListProps,
   SafeMessageListResponse
 } from '@safe-global/api-kit'
 import { EIP712TypedData, SafeMessage } from '@safe-global/safe-core-sdk-types'
 import { createSafeClientResult, sendTransaction } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import { PaginationOptions, SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -77,7 +76,7 @@ export class SafeMessageClient {
    * @param {GetSafeMessageListProps} [options] Optional query parameters for pagination
    * @returns {Promise<SafeMessageListResponse>} A list of pending messages
    */
-  async getPendingMessages(options?: GetSafeMessageListProps): Promise<SafeMessageListResponse> {
+  async getPendingMessages(options?: PaginationOptions): Promise<SafeMessageListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
     return this.apiKit.getMessages(safeAddress, options)

@@ -1,9 +1,9 @@
-import { GetSafeMessageListProps, SafeMessageListResponse } from '@safe-global/api-kit'
+import { SafeMessageListResponse } from '@safe-global/api-kit'
 import { EIP712TypedData } from '@safe-global/safe-core-sdk-types'
 
 import { SafeClient } from '@safe-global/safe-kit/SafeClient'
 import { SafeMessageClient } from '@safe-global/safe-kit/extensions/messages/SafeMessageClient'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import { PaginationOptions, SafeClientResult } from '@safe-global/safe-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use off-chain messages
@@ -48,7 +48,7 @@ export function offChainMessages() {
        * @returns {Promise<SafeMessageListResponse>} A list of pending messages
        */
       async getPendingOffChainMessages(
-        options?: GetSafeMessageListProps
+        options?: PaginationOptions
       ): Promise<SafeMessageListResponse> {
         return safeMessageClient.getPendingMessages(options)
       }

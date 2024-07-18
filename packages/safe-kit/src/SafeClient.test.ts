@@ -79,7 +79,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
-      const result = await safeClient.send(TRANSACTION_BATCH)
+      const result = await safeClient.send({ transactions: TRANSACTION_BATCH })
 
       expect(protocolKit.createTransaction).toHaveBeenCalledWith({
         transactions: TRANSACTION_BATCH
@@ -101,7 +101,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
 
-      const result = await safeClient.send(TRANSACTION_BATCH)
+      const result = await safeClient.send({ transactions: TRANSACTION_BATCH })
 
       expect(protocolKit.createTransaction).toHaveBeenCalledWith({
         transactions: TRANSACTION_BATCH
@@ -125,7 +125,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
-      const result = await safeClient.send(TRANSACTION_BATCH)
+      const result = await safeClient.send({ transactions: TRANSACTION_BATCH })
 
       expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith(undefined, undefined)
       expect(utils.sendTransaction).toHaveBeenCalledWith(DEPLOYMENT_TRANSACTION, {}, protocolKit)
@@ -150,7 +150,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
 
-      const result = await safeClient.send(TRANSACTION_BATCH)
+      const result = await safeClient.send({ transactions: TRANSACTION_BATCH })
 
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION)
       expect(protocolKit.wrapSafeTransactionIntoDeploymentBatch).toHaveBeenCalledWith(

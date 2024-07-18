@@ -51,7 +51,7 @@ export function onChainMessages() {
         operation: OperationType.DelegateCall
       }
 
-      return client.send([transaction], options)
+      return client.send({ transactions: [transaction], options })
     }
   })
 }

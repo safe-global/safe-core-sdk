@@ -43,7 +43,7 @@ async function send(): Promise<SafeClientResult> {
   }
   const transactions = [transferUSDC, transferUSDC]
 
-  const txResult = await safeClient.send(transactions)
+  const txResult = await safeClient.send({ transactions })
 
   console.log('-Send result: ', txResult)
 

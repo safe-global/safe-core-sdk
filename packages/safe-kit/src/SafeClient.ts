@@ -2,7 +2,6 @@ import Safe from '@safe-global/protocol-kit'
 import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
 import {
   SafeTransaction,
-  TransactionBase,
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
@@ -14,7 +13,7 @@ import {
   waitSafeTxReceipt
 } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import { SafeClientResult, SafeCreateTransactionProps } from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -39,14 +38,12 @@ export class SafeClient {
   /**
    * Sends transactions through the Safe protocol.
    *
-   * @param {TransactionBase[]} transactions An array of transactions to be sent.
-   * @param {TransactionOptions} [options] Optional transaction options.
+   * @param {SafeCreateTransactionProps} props The SafeCreateTransactionProps object.
+   * @param {TransactionBase[]} props.transactions An array of transactions to be sent.
+   * @param {TransactionOptions} props.options Optional transaction options.
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
    */
-  async send(
-    transactions: TransactionBase[],
-    options?: TransactionOptions
-  ): Promise<SafeClientResult> {
+  async send({ transactions, options }: SafeCreateTransactionProps): Promise<SafeClientResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 

@@ -373,14 +373,13 @@ export function toTxResult(
   hash: Hash,
   options?: TransactionOptions
 ): TransactionResult {
-  const wait = async () => {
-    return runner.getTransactionReceipt({ hash })
-  }
   return {
     hash,
     options,
     transactionResponse: {
-      wait
+      wait: async () => {
+        return runner.getTransactionReceipt({ hash })
+      }
     }
   }
 }

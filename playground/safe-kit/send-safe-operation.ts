@@ -93,7 +93,7 @@ async function confirm(safeClientResult: SafeClientResult, pk: string) {
 
   const pendingSafeOperations = await safeClientWithSafeOperation.getPendingSafeOperations()
 
-  pendingSafeOperations.results.forEach(async (safeOperation) => {
+  for (const safeOperation of pendingSafeOperations.results) {
     if (safeOperation.safeOperationHash !== safeClientResult.safeOperations?.safeOperationHash) {
       return
     }
@@ -103,7 +103,7 @@ async function confirm(safeClientResult: SafeClientResult, pk: string) {
     })
 
     console.log('-Confirm result: ', safeOperationResult)
-  })
+  }
 }
 
 async function main() {

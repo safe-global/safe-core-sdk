@@ -109,7 +109,7 @@ async function confirm({ safeAddress, messages }: SafeClientResult, pk: string) 
 
   const pendingMessages = await safeClientWithMessages.getPendingOffChainMessages()
 
-  pendingMessages.results.forEach(async (message) => {
+  for (const message of pendingMessages.results) {
     if (message.messageHash !== messages?.messageHash) {
       return
     }
@@ -119,7 +119,7 @@ async function confirm({ safeAddress, messages }: SafeClientResult, pk: string) 
     })
 
     console.log('-Confirm result: ', txResult)
-  })
+  }
 }
 
 async function main() {

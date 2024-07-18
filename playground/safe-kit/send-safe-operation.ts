@@ -59,10 +59,8 @@ async function send(): Promise<SafeClientResult> {
 
   const safeOperationResult = await safeClientWithSafeOperation.sendSafeOperation({
     transactions,
-    options: {
-      validAfter: timestamp - 60_000,
-      validUntil: timestamp + 60_000
-    }
+    validAfter: timestamp - 60_000,
+    validUntil: timestamp + 60_000
   })
 
   console.log('-Send result: ', safeOperationResult)
@@ -100,9 +98,9 @@ async function confirm(safeClientResult: SafeClientResult, pk: string) {
       return
     }
 
-    const safeOperationResult = await safeClientWithSafeOperation.confirmSafeOperation(
-      safeClientResult.safeOperations?.safeOperationHash
-    )
+    const safeOperationResult = await safeClientWithSafeOperation.confirmSafeOperation({
+      safeOperationHash: safeClientResult.safeOperations?.safeOperationHash
+    })
 
     console.log('-Confirm result: ', safeOperationResult)
   })

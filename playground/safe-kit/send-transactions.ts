@@ -72,7 +72,7 @@ async function confirm({ safeAddress, transactions }: SafeClientResult, pk: stri
       return
     }
 
-    const txResult = await safeClient.confirm(transaction.safeTxHash)
+    const txResult = await safeClient.confirm({ safeTxHash: transaction.safeTxHash })
 
     console.log('-Confirm result: ', txResult)
   })

@@ -82,7 +82,7 @@ async function send(): Promise<SafeClientResult> {
   )
   console.log('-Signer Address:', signerAddress)
 
-  const txResult = await safeClientWithMessages.sendOnChainMessage(MESSAGE)
+  const txResult = await safeClientWithMessages.sendOnChainMessage({ message: MESSAGE })
 
   console.log('-Send result: ', txResult)
 
@@ -111,7 +111,7 @@ async function confirm({ safeAddress, transactions }: SafeClientResult, pk: stri
       return
     }
 
-    const txResult = await safeClient.confirm(transaction.safeTxHash)
+    const txResult = await safeClient.confirm({ safeTxHash: transaction.safeTxHash })
 
     console.log('-Confirm result: ', txResult)
   })

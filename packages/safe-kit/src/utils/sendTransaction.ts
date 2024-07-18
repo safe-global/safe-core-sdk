@@ -9,7 +9,6 @@ import { Address, WalletClient, Transport, Chain, Hex } from 'viem'
  * @param {TransactionOptions} options Options for executing the transaction.
  * @param {Safe} protocolKit The protocolKit instance
  * @returns {Promise<string | undefined>} A promise that resolves with the transaction hash
- * @throws
  */
 export const sendTransaction = async (
   transaction: TransactionBase,

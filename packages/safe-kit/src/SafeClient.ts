@@ -13,7 +13,11 @@ import {
   waitSafeTxReceipt
 } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult, SafeCreateTransactionProps } from '@safe-global/safe-kit/types'
+import {
+  ConfirmTransactionProps,
+  SafeClientResult,
+  SendTransactionProps
+} from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -37,13 +41,25 @@ export class SafeClient {
 
   /**
    * Sends transactions through the Safe protocol.
+   * You can send an array to transactions { to, value, data} that we will convert to a transaction batch
    *
-   * @param {SafeCreateTransactionProps} props The SafeCreateTransactionProps object.
+   * @param {SendTransactionProps} props The SendTransactionProps object.
    * @param {TransactionBase[]} props.transactions An array of transactions to be sent.
-   * @param {TransactionOptions} props.options Optional transaction options.
+   * @param {string} props.transactions.to The recipient address of the transaction.
+   * @param {string} props.transactions[].value The value of the transaction.
+   * @param {string} props.transactions[].data The data of the transaction.
+   * @param {string} props.from The sender address of the transaction.
+   * @param {number | string} props.gasLimit The gas limit of the transaction.
+   * @param {number | string} props.gasPrice The gas price of the transaction.
+   * @param {number | string} props.maxFeePerGas The max fee per gas of the transaction.
+   * @param {number | string} props.maxPriorityFeePerGas The max priority fee per gas of the transaction.
+   * @param {number} props.nonce The nonce of the transaction.
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
    */
-  async send({ transactions, options }: SafeCreateTransactionProps): Promise<SafeClientResult> {
+  async send({
+    transactions,
+    ...transactionOptions
+  }: SendTransactionProps): Promise<SafeClientResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 
@@ -55,17 +71,17 @@ export class SafeClient {
         return this.#proposeTransaction(safeTransaction)
       } else {
         // If the threshold is 1, we can execute the transaction
-        return this.#executeTransaction(safeTransaction, options)
+        return this.#executeTransaction(safeTransaction, transactionOptions)
       }
     } else {
       if (isMultisigSafe) {
         // If the threshold is greater than 1, we need to deploy the Safe account first and
         // afterwards propose the transaction
         // The transaction should be confirmed with other owners until the threshold is reached
-        return this.#deployAndProposeTransaction(safeTransaction, options)
+        return this.#deployAndProposeTransaction(safeTransaction, transactionOptions)
       } else {
         // If the threshold is 1, we can deploy the Safe account and execute the transaction in one step
-        return this.#deployAndExecuteTransaction(safeTransaction, options)
+        return this.#deployAndExecuteTransaction(safeTransaction, transactionOptions)
       }
     }
   }
@@ -73,11 +89,12 @@ export class SafeClient {
   /**
    * Confirms a transaction by its safe transaction hash.
    *
-   * @param {string} safeTxHash  The hash of the safe transaction to confirm.
+   * @param {ConfirmTransactionProps} props The ConfirmTransactionProps object.
+   * @param {string} props.safeTxHash  The hash of the safe transaction to confirm.
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the confirmed transaction.
    * @throws {Error} If the transaction confirmation fails.
    */
-  async confirm(safeTxHash: string): Promise<SafeClientResult> {
+  async confirm({ safeTxHash }: ConfirmTransactionProps): Promise<SafeClientResult> {
     let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
     const safeAddress = await this.protocolKit.getAddress()
     const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)

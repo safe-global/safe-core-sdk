@@ -108,7 +108,7 @@ describe('SafeClient', () => {
       })
 
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION)
-      expect(protocolKit.executeTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION, undefined)
+      expect(protocolKit.executeTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION, {})
 
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.EXECUTED],
@@ -127,7 +127,7 @@ describe('SafeClient', () => {
 
       const result = await safeClient.send({ transactions: TRANSACTION_BATCH })
 
-      expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith(undefined, undefined)
+      expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith(undefined, {})
       expect(utils.sendTransaction).toHaveBeenCalledWith(DEPLOYMENT_TRANSACTION, {}, protocolKit)
       expect(protocolKit.connect).toHaveBeenCalled()
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION)
@@ -155,7 +155,7 @@ describe('SafeClient', () => {
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION)
       expect(protocolKit.wrapSafeTransactionIntoDeploymentBatch).toHaveBeenCalledWith(
         SAFE_TRANSACTION,
-        undefined
+        {}
       )
       expect(protocolKit.connect).toHaveBeenCalled()
       expect(result).toMatchObject({
@@ -182,7 +182,7 @@ describe('SafeClient', () => {
 
       apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
 
-      const result = await safeClient.confirm(SAFE_TX_HASH)
+      const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
 
       expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
@@ -207,7 +207,7 @@ describe('SafeClient', () => {
 
       apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
 
-      const result = await safeClient.confirm(SAFE_TX_HASH)
+      const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
 
       expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)

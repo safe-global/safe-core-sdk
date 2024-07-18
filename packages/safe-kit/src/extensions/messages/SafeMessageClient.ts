@@ -3,10 +3,15 @@ import SafeApiKit, {
   EIP712TypedData as ApiKitEIP712TypedData,
   SafeMessageListResponse
 } from '@safe-global/api-kit'
-import { EIP712TypedData, SafeMessage } from '@safe-global/safe-core-sdk-types'
+import { SafeMessage } from '@safe-global/safe-core-sdk-types'
 import { createSafeClientResult, sendTransaction } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { PaginationOptions, SafeClientResult } from '@safe-global/safe-kit/types'
+import {
+  ConfirmOffChainMessageProps,
+  PaginationOptions,
+  SafeClientResult,
+  SendOffChainMessageProps
+} from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -29,10 +34,11 @@ export class SafeMessageClient {
   /**
    * Send off-chain messages using the Transaction service
    *
-   * @param {string | EIP712TypedData} message The message to be sent. Can be a raw string or an EIP712TypedData object
+   * @param {SendOffChainMessageProps} props The message properties
+   * @param {string | EIP712TypedData} props.message The message to be sent. Can be a raw string or an EIP712TypedData object
    * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the messageHash to confirmMessage() afterwards from the messages property
    */
-  async sendMessage(message: string | EIP712TypedData): Promise<SafeClientResult> {
+  async sendMessage({ message }: SendOffChainMessageProps): Promise<SafeClientResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const safeMessage = this.protocolKit.createMessage(message)
 
@@ -46,10 +52,11 @@ export class SafeMessageClient {
   /**
    * Confirms an off-chain message using the Transaction service
    *
-   * @param {string} messageHash The messageHash. Returned from the sendMessage() method inside the SafeClientResult messages property
+   * @param {ConfirmOffChainMessageProps} props The confirmation properties
+   * @param {string} props.messageHash The messageHash. Returned from the sendMessage() method inside the SafeClientResult messages property
    * @returns {Promise<SafeClientResult>} A SafeClientResult with the result of the confirmation
    */
-  async confirmMessage(messageHash: string): Promise<SafeClientResult> {
+  async confirmMessage({ messageHash }: ConfirmOffChainMessageProps): Promise<SafeClientResult> {
     let messageResponse = await this.apiKit.getMessage(messageHash)
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()

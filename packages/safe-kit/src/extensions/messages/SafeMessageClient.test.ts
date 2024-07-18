@@ -70,7 +70,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
 
-      const result = await safeMessageClient.sendMessage(MESSAGE)
+      const result = await safeMessageClient.sendMessage({ message: MESSAGE })
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
@@ -93,7 +93,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(true)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
-      const result = await safeMessageClient.sendMessage(MESSAGE)
+      const result = await safeMessageClient.sendMessage({ message: MESSAGE })
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
@@ -116,7 +116,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
 
-      const result = await safeMessageClient.sendMessage(MESSAGE)
+      const result = await safeMessageClient.sendMessage({ message: MESSAGE })
 
       expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith(undefined)
       expect(utils.sendTransaction).toHaveBeenCalledWith(DEPLOYMENT_TRANSACTION, {}, protocolKit)
@@ -148,7 +148,7 @@ describe('SafeClient', () => {
       protocolKit.isSafeDeployed = jest.fn().mockResolvedValue(false)
       protocolKit.getThreshold = jest.fn().mockResolvedValue(1)
 
-      const result = await safeMessageClient.confirmMessage('0xSafeMessageHash')
+      const result = await safeMessageClient.confirmMessage({ messageHash: '0xSafeMessageHash' })
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE_RESPONSE.message)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)

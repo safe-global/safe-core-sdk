@@ -155,8 +155,9 @@ describe('SafeOperationClient', () => {
     it('should confirm the Safe operation and send it to the bundler when threshold is reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
-      const safeOperationResult =
-        await safeOperationClient.confirmSafeOperation(SAFE_OPERATION_HASH)
+      const safeOperationResult = await safeOperationClient.confirmSafeOperation({
+        safeOperationHash: SAFE_OPERATION_HASH
+      })
 
       expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
         executable: SAFE_OPERATION_RESPONSE
@@ -175,8 +176,9 @@ describe('SafeOperationClient', () => {
     it('should indicate more signatures are required when threshold is not reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
 
-      const safeOperationResult =
-        await safeOperationClient.confirmSafeOperation(SAFE_OPERATION_HASH)
+      const safeOperationResult = await safeOperationClient.confirmSafeOperation({
+        safeOperationHash: SAFE_OPERATION_HASH
+      })
 
       expect(safeOperationResult).toEqual({
         safeAddress: SAFE_ADDRESS,

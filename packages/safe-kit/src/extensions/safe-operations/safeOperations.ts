@@ -1,15 +1,16 @@
 import { PredictedSafeProps } from '@safe-global/protocol-kit'
 import { GetSafeOperationListResponse } from '@safe-global/api-kit'
-import {
-  PaymasterOptions,
-  Safe4337Pack,
-  Safe4337CreateTransactionProps
-} from '@safe-global/relay-kit'
+import { PaymasterOptions, Safe4337Pack } from '@safe-global/relay-kit'
 
 import { SafeClient } from '@safe-global/safe-kit/SafeClient'
 import { SafeOperationClient } from '@safe-global/safe-kit/extensions/safe-operations/SafeOperationClient'
 import { BundlerOptions } from '@safe-global/safe-kit/extensions/safe-operations/types'
-import { PaginationOptions, SafeClientResult } from '@safe-global/safe-kit/types'
+import {
+  ConfirmSafeOperationProps,
+  PaginationOptions,
+  SafeClientResult,
+  SendSafeOperationProps
+} from '@safe-global/safe-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use a bundler and a paymaster
@@ -21,8 +22,8 @@ import { PaginationOptions, SafeClientResult } from '@safe-global/safe-kit/types
  *   safeOperations({ ... }, { ... })
  * )
  *
- * const { safeOperations } = await safeOperationClient.sendSafeOperation(...)
- * await safeOperationClient.confirmSafeOperation(safeOperations?.safeOperationHash)
+ * const { safeOperations } = await safeOperationClient.sendSafeOperation({ transactions })
+ * await safeOperationClient.confirmSafeOperation({ safeOperationHash: safeOperations?.safeOperationHash})
  */
 export function safeOperations(
   { bundlerUrl }: BundlerOptions,
@@ -71,31 +72,25 @@ export function safeOperations(
        * - If the threshold = 1 the SafeOperation can be submitted to the bundler so it will execute it immediately
        *
        * @param {Safe4337CreateTransactionProps} props The Safe4337CreateTransactionProps object
-       * @param {SafeTransaction[]} props.transactions An array of transactions to be batched
-       * @param {TransactionOptions} [props.options] Optional transaction options
        * @returns {Promise<SafeClientResult>} A promise that resolves with the status of the SafeOperation
        */
-      async sendSafeOperation({
-        transactions,
-        options = {}
-      }: Safe4337CreateTransactionProps): Promise<SafeClientResult> {
-        return safeOperationClient.sendSafeOperation({ transactions, options })
+      async sendSafeOperation(props: SendSafeOperationProps): Promise<SafeClientResult> {
+        return safeOperationClient.sendSafeOperation(props)
       },
       /**
        * Confirms the stored safeOperation
        *
-       * @param {string} safeOperationHash The hash of the safe operation to confirm.
-       * The safeOperationHash  an be extracted the hash from the SafeClientResult of the sendSafeOperation method under the safeOperations property
-       * You must conformSafeOperation() with the other owners and once the threshold is reached the SafeOperation will be sent to the bundler
+       * @param {ConfirmSafeOperationProps} props The ConfirmSafeOperationProps object
        * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the safeOperation.
        */
-      async confirmSafeOperation(safeOperationHash: string): Promise<SafeClientResult> {
-        return safeOperationClient.confirmSafeOperation(safeOperationHash)
+      async confirmSafeOperation(props: ConfirmSafeOperationProps): Promise<SafeClientResult> {
+        return safeOperationClient.confirmSafeOperation(props)
       },
       /**
        * Retrieves the pending Safe operations for the current Safe account
        *
        * @async
+       * @param {PaginationOptions} options Optional query parameters for pagination
        * @returns {Promise<GetSafeOperationListResponse>} A promise that resolves to an array of pending Safe operations.
        * @throws {Error} If there is an issue retrieving the safe address or pending Safe operations.
        */

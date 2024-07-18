@@ -310,8 +310,8 @@ class SafeProvider {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
-    // This means the address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
-    // That is because if we pass a typeof account === 'string' to singMessage, viem assumes a json-rpc account on their parseAccount function insteado of a local one
+    // The address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
+    // For viem, in this context a typeof account === 'string' to singMessage is assumed to be a json-rpc account (returned by parseAccount function)
     if (sameString(signer.account.address, account)) {
       return await signer?.signMessage!({
         message: { raw: toBytes(message) }

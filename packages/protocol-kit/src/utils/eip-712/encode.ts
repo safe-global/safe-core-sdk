@@ -159,7 +159,7 @@ function hashStruct({
 }
 
 function deducePrimaryType(types: TypedMessageTypes) {
-  // In ethers the primaryType is assumed to be the first inserted yielded by a forEach of the types keys
+  // In ethers the primaryType is assumed to be the first yielded by a forEach of the types keys
   // https://github.com/ethers-io/ethers.js/blob/a4b1d1f43fca14f2e826e3c60e0d45f5b6ef3ec4/src.ts/hash/typed-data.ts#L278C13-L278C20
   return Object.keys(types)[0]
 }

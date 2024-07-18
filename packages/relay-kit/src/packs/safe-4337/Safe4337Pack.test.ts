@@ -383,12 +383,12 @@ describe('Safe4337Pack', () => {
           abi: constants.ABI,
           functionName: 'executeUserOp',
           args: [
-            (await safe4337Pack.protocolKit.getMultiSendAddress()) as viem.Hash,
+            (await safe4337Pack.protocolKit.getMultiSendAddress()) as viem.Address,
             0n,
             viem.encodeFunctionData({
               abi: constants.ABI,
               functionName: 'multiSend',
-              args: [protocolKit.encodeMultiSendData(transactions) as viem.Hash]
+              args: [protocolKit.encodeMultiSendData(transactions) as viem.Hex]
             }),
             OperationType.DelegateCall
           ]
@@ -419,9 +419,9 @@ describe('Safe4337Pack', () => {
           abi: constants.ABI,
           functionName: 'executeUserOp',
           args: [
-            transferUSDC.to as viem.Hash,
+            transferUSDC.to as viem.Address,
             BigInt(transferUSDC.value),
-            transferUSDC.data as viem.Hash,
+            transferUSDC.data as viem.Hex,
             OperationType.Call
           ]
         }),

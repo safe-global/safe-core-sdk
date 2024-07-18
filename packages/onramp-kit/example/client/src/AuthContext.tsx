@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react'
-import { ethers } from 'ethers'
 import { SafeAuthPack, AuthKitSignInData, SafeAuthInitOptions } from '@safe-global/auth-kit'
+import { Eip1193Provider } from '@safe-global/protocol-kit'
 
 type AuthContextProviderProps = {
   children: React.ReactNode
@@ -8,7 +8,7 @@ type AuthContextProviderProps = {
 
 type AuthContextType = {
   isLoggedIn: boolean
-  provider: ethers.Eip1193Provider | null
+  provider: Eip1193Provider | null
   data?: AuthKitSignInData
   selectedSafe: string
   setSelectedSafe?: (safe: string) => void
@@ -26,7 +26,7 @@ const AuthProvider = ({ children }: AuthContextProviderProps) => {
   const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack>()
   const [isAuthenticated, setIsAuthenticated] = useState(!!safeAuthPack?.isAuthenticated)
   const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData>()
-  const [provider, setProvider] = useState<ethers.Eip1193Provider | null>()
+  const [provider, setProvider] = useState<Eip1193Provider | null>()
   const [selectedSafe, setSelectedSafe] = useState('')
 
   const storedSafe = sessionStorage.getItem(STORED_SAFE)

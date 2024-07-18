@@ -1,3 +1,6 @@
+import { Address, formatEther, createWalletClient, custom, Hex } from 'viem'
+import { sepolia } from 'viem/chains'
+import { privateKeyToAccount } from 'viem/accounts'
 import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
@@ -6,7 +9,6 @@ import {
   OperationType,
   SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
 
 // Check the status of a transaction after it is relayed:
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
@@ -72,36 +74,43 @@ async function main() {
   })
 
   // Calculate Safe address
-  const predictedSafeAddress = await gelatoSafeClient.protocolKit.getAddress()
+  const predictedSafeAddress = (await gelatoSafeClient.protocolKit.getAddress()) as Address
   console.log({ predictedSafeAddress })
 
   const isSafeDeployed = await gelatoSafeClient.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
-  const ethersProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
+  const externalProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
 
   // Fake on-ramp to transfer enough funds to the Safe address
 
-  const chainId = (await ethersProvider.getNetwork()).chainId
+  const chainId = await externalProvider.getChainId()
   const relayFee = BigInt(
-    await gelatoSafeClient.getEstimateFee(chainId, txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
+    await gelatoSafeClient.getEstimateFee(BigInt(chainId), txConfig.GAS_LIMIT, txConfig.GAS_TOKEN)
   )
-  const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
-  console.log({ minSafeBalance: ethers.formatEther(relayFee.toString()) })
-  console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
+  const safeBalance = await externalProvider.getBalance({ address: predictedSafeAddress })
+  console.log({ minSafeBalance: formatEther(relayFee) })
+  console.log({ safeBalance: formatEther(safeBalance) })
 
   if (safeBalance < relayFee) {
-    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, ethersProvider)
-    const fundingAmount = safeBalance < relayFee ? relayFee - safeBalance : safeBalance - relayFee
-    const onRampResponse = await fakeOnRampSigner.sendTransaction({
-      to: predictedSafeAddress,
-      value: fundingAmount
+    const fakeOnRampSigner = createWalletClient({
+      account: privateKeyToAccount(mockOnRampConfig.PRIVATE_KEY as Hex),
+      transport: custom(externalProvider),
+      chain: sepolia
     })
-    console.log(`Funding the Safe with ${ethers.formatEther(fundingAmount.toString())} ETH`)
-    await onRampResponse.wait()
 
-    const safeBalanceAfter = await ethersProvider.getBalance(predictedSafeAddress)
-    console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
+    const fundingAmount = safeBalance < relayFee ? relayFee - safeBalance : safeBalance - relayFee
+    const hash = await fakeOnRampSigner.sendTransaction({
+      to: predictedSafeAddress,
+      value: fundingAmount,
+      account: fakeOnRampSigner.account
+    })
+    console.log(`Funding the Safe with ${formatEther(fundingAmount)} ETH`)
+
+    await externalProvider.waitForTransactionReceipt({ hash })
+
+    const safeBalanceAfter = await externalProvider.getBalance({ address: predictedSafeAddress })
+    console.log({ safeBalance: formatEther(safeBalanceAfter) })
   }
 
   // Relay the transaction

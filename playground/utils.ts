@@ -1,7 +1,17 @@
-import { ethers } from 'ethers'
+import { Address, createPublicClient, custom, encodeFunctionData, parseAbi } from 'viem'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
 import { GetSafeOperationListResponse } from '@safe-global/api-kit'
+import { ExternalSigner } from '@safe-global/protocol-kit'
+
+export const generateTransferCallData = (to: string, value: bigint) => {
+  const functionAbi = parseAbi(['function transfer(address _to, uint256 _value) returns (bool)'])
+
+  return encodeFunctionData({
+    abi: functionAbi,
+    functionName: 'transfer',
+    args: [to as Address, value]
+  })
+}
 
 export async function waitForOperationToFinish(
   userOperationHash: string,
@@ -26,20 +36,26 @@ export async function waitForOperationToFinish(
 }
 
 export async function transfer(
-  signer: ethers.AbstractSigner,
-  tokenAddress: string,
-  to: string,
+  signer: ExternalSigner,
+  tokenAddress: Address,
+  to: Address,
   amount: bigint
 ) {
   const transferEC20 = {
     to: tokenAddress,
     data: generateTransferCallData(to, amount),
-    value: '0'
+    value: 0n,
+    chain: signer.chain
   }
 
-  const transactionResponse = await signer.sendTransaction(transferEC20)
+  const hash = await signer.sendTransaction(transferEC20)
 
-  return await transactionResponse.wait()
+  const publicClient = createPublicClient({
+    chain: signer.chain,
+    transport: custom(signer.transport)
+  })
+
+  return await publicClient.waitForTransactionReceipt({ hash })
 }
 
 export function sortResultsByCreatedDateDesc(

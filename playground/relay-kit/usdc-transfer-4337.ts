@@ -1,6 +1,6 @@
+import { Address } from 'viem'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { generateTransferCallData } from '@safe-global/relay-kit/src/packs/safe-4337/testing-utils/helpers'
-import { waitForOperationToFinish } from 'playground/utils'
+import { generateTransferCallData, waitForOperationToFinish } from '../utils'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -38,7 +38,7 @@ async function main() {
   console.log('Chain Id', await safe4337Pack.getChainId())
 
   // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
+  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as Address
 
   const usdcAmount = 100_000n // 0.1 USDC
 
@@ -49,15 +49,15 @@ async function main() {
     value: '0'
   }
   const transactions = [transferUSDC, transferUSDC]
-  const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
-  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+  const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+  const timestamp = (await externalProvider.getBlock())?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp - 60_000,
-      validUntil: timestamp + 60_000
+      validAfter: Number(timestamp - 60_000n),
+      validUntil: Number(timestamp + 60_000n)
     }
   })
 

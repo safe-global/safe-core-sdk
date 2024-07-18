@@ -1,4 +1,5 @@
-import { ethers } from 'ethers'
+import { createPublicClient, http } from 'viem'
+import { sepolia } from 'viem/chains'
 import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/safe-kit'
 import { generateTransferCallData } from '../utils'
 
@@ -60,14 +61,18 @@ async function send(): Promise<SafeClientResult> {
   }
   const transactions = [transferUSDC, transferUSDC]
 
-  const ethersProvider = new ethers.JsonRpcProvider(RPC_URL)
-  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+  const publicClient = createPublicClient({
+    chain: sepolia,
+    transport: http(RPC_URL)
+  })
+
+  const timestamp = (await publicClient.getBlock())?.timestamp || 0n
 
   const safeOperationResult = await safeClientWithSafeOperation.sendSafeOperation({
     transactions,
     options: {
-      validAfter: timestamp - 60_000,
-      validUntil: timestamp + 60_000
+      validAfter: Number(timestamp - 60_000n),
+      validUntil: Number(timestamp + 60_000n)
     }
   })
 

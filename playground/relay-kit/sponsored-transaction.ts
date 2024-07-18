@@ -1,3 +1,5 @@
+import { Address, createWalletClient, custom, formatEther, Hex } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
@@ -6,7 +8,6 @@ import {
   OperationType,
   SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
 
 // Fund the 1Balance account that will sponsor the transaction and get the API key:
 // https://relay.gelato.network/
@@ -74,7 +75,7 @@ async function main() {
 
   // Calculate Safe address
 
-  const predictedSafeAddress = await gelatoSafeClient.protocolKit.getAddress()
+  const predictedSafeAddress = (await gelatoSafeClient.protocolKit.getAddress()) as Address
   console.log({ predictedSafeAddress })
 
   const isSafeDeployed = await gelatoSafeClient.protocolKit.isSafeDeployed()
@@ -82,20 +83,24 @@ async function main() {
 
   // Fake on-ramp to fund the Safe
 
-  const ethersProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
-  const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
-  console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
+  const externalProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
+  const safeBalance = await externalProvider.getBalance({ address: predictedSafeAddress })
+  console.log({ safeBalance: formatEther(safeBalance) })
   if (safeBalance < BigInt(txConfig.VALUE)) {
-    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, ethersProvider)
-    const onRampResponse = await fakeOnRampSigner.sendTransaction({
-      to: predictedSafeAddress,
-      value: txConfig.VALUE
+    const fakeOnRampSigner = createWalletClient({
+      account: privateKeyToAccount(mockOnRampConfig.PRIVATE_KEY as Hex),
+      transport: custom(externalProvider)
     })
-    console.log(`Funding the Safe with ${ethers.formatEther(txConfig.VALUE.toString())} ETH`)
-    await onRampResponse.wait()
+    const hash = await fakeOnRampSigner.sendTransaction({
+      to: predictedSafeAddress,
+      value: BigInt(txConfig.VALUE),
+      chain: undefined
+    })
+    console.log(`Funding the Safe with ${formatEther(BigInt(txConfig.VALUE))} ETH`)
+    await externalProvider.waitForTransactionReceipt({ hash })
 
-    const safeBalanceAfter = await ethersProvider.getBalance(predictedSafeAddress)
-    console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
+    const safeBalanceAfter = await externalProvider.getBalance({ address: predictedSafeAddress })
+    console.log({ safeBalance: formatEther(safeBalanceAfter) })
   }
 
   // Relay the transaction

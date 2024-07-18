@@ -22,13 +22,13 @@ import {
   SafeProviderConfig,
   Eip1193Provider,
   HttpTransport,
-  SocketTransport
+  SocketTransport,
+  ExternalSigner
 } from '@safe-global/protocol-kit/types'
 import { asAddress, asHash, asHex } from './utils/types'
 import {
   createPublicClient,
   createWalletClient,
-  WalletClient,
   PublicClient,
   custom,
   http,
@@ -39,11 +39,9 @@ import {
   encodeAbiParameters,
   parseAbiParameters,
   toBytes,
-  BlockTag,
-  Transport,
-  Chain
+  BlockTag
 } from 'viem'
-import { privateKeyToAccount, Account } from 'viem/accounts'
+import { privateKeyToAccount } from 'viem/accounts'
 import {
   toEstimateGasParameters,
   toCallGasParameters,
@@ -87,9 +85,7 @@ class SafeProvider {
     return this.#externalProvider
   }
 
-  async getExternalSigner(): Promise<
-    WalletClient<Transport, Chain | undefined, Account> | undefined
-  > {
+  async getExternalSigner(): Promise<ExternalSigner | undefined> {
     // If the signer is not an Ethereum address, it should be a private key
     const { transport, chain } = this.getExternalProvider()
     if (this.signer && !this.isAddress(this.signer)) {

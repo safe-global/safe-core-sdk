@@ -1,3 +1,5 @@
+import { Account, Chain, Transport, WalletClient } from 'viem'
+
 export type RequestArguments = {
   readonly method: string
   readonly params?: readonly unknown[] | object
@@ -6,6 +8,8 @@ export type RequestArguments = {
 export type Eip1193Provider = {
   request: (args: RequestArguments) => Promise<unknown>
 }
+
+export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account>
 
 export type HexAddress = string
 export type PrivateKey = string

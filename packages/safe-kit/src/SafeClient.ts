@@ -45,7 +45,7 @@ export class SafeClient {
    *
    * @param {SendTransactionProps} props The SendTransactionProps object.
    * @param {TransactionBase[]} props.transactions An array of transactions to be sent.
-   * @param {string} props.transactions.to The recipient address of the transaction.
+   * @param {string} props.transactions[].to The recipient address of the transaction.
    * @param {string} props.transactions[].value The value of the transaction.
    * @param {string} props.transactions[].data The data of the transaction.
    * @param {string} props.from The sender address of the transaction.

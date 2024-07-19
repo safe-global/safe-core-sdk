@@ -36,23 +36,23 @@ describe('getMultisigTransactions', () => {
   })
 
   it('should return the list of multisig transactions', async () => {
-    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with multisig transactions
+    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(safeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(22)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(22)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(10)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(10)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })
   })
 
   it('should return the list of multisig transactions EIP-3770', async () => {
-    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78' // Safe with multisig transactions
+    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(eip3770SafeAddress)
-    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(22)
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(22)
+    chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(10)
+    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(10)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
     })

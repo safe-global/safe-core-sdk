@@ -43,9 +43,9 @@ export class SafeMessageClient {
     const safeMessage = this.protocolKit.createMessage(message)
 
     if (isSafeDeployed) {
-      return this.#addMessage(safeMessage)
+      return this.#addMessage({ safeMessage })
     } else {
-      return this.#deployAndAddMessage(safeMessage)
+      return this.#deployAndAddMessage({ safeMessage })
     }
   }
 
@@ -98,21 +98,28 @@ export class SafeMessageClient {
    * @param {SafeTransaction} safeMessage  The safe message
    * @returns {Promise<SafeClientResult>} The SafeClientResult
    */
-  async #deployAndAddMessage(safeMessage: SafeMessage): Promise<SafeClientResult> {
+  async #deployAndAddMessage({
+    safeMessage
+  }: {
+    safeMessage: SafeMessage
+  }): Promise<SafeClientResult> {
     let deploymentTxHash
     const threshold = await this.protocolKit.getThreshold()
     const safeDeploymentTransaction =
       await this.protocolKit.createSafeDeploymentTransaction(undefined)
 
     try {
-      deploymentTxHash = await sendTransaction(safeDeploymentTransaction, {}, this.protocolKit)
+      deploymentTxHash = await sendTransaction({
+        transaction: safeDeploymentTransaction,
+        protocolKit: this.protocolKit
+      })
       await this.#updateProtocolKitWithDeployedSafe()
     } catch (error) {
       throw new Error('Could not deploy the Safe account')
     }
 
     try {
-      const { messages } = await this.#addMessage(safeMessage)
+      const { messages } = await this.#addMessage({ safeMessage })
       const messageResponse = await this.apiKit.getMessage(messages?.messageHash || '0x')
 
       return createSafeClientResult({
@@ -137,7 +144,7 @@ export class SafeMessageClient {
    * @param {SafeMessage} safeMessage The message
    * @returns {Promise<SafeClientResult>} The SafeClientResult
    */
-  async #addMessage(safeMessage: SafeMessage): Promise<SafeClientResult> {
+  async #addMessage({ safeMessage }: { safeMessage: SafeMessage }): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
     const signedMessage = await this.protocolKit.signMessage(safeMessage)

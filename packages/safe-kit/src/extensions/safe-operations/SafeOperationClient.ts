@@ -70,7 +70,7 @@ export class SafeOperationClient {
       executable: safeOperation
     })
 
-    await this.#waitForOperationToFinish(userOperationHash)
+    await this.#waitForOperationToFinish({ userOperationHash })
 
     return createSafeClientResult({
       safeAddress,
@@ -107,7 +107,7 @@ export class SafeOperationClient {
         executable: confirmedSafeOperation
       })
 
-      await this.#waitForOperationToFinish(userOperationHash)
+      await this.#waitForOperationToFinish({ userOperationHash })
 
       return createSafeClientResult({
         status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
@@ -143,7 +143,11 @@ export class SafeOperationClient {
    * @param userOperationHash The userOperationHash to wait for. This comes from the bundler and can be obtained from the
    * SafeClientResult method under the safeOperations property
    */
-  async #waitForOperationToFinish(userOperationHash: string): Promise<void> {
+  async #waitForOperationToFinish({
+    userOperationHash
+  }: {
+    userOperationHash: string
+  }): Promise<void> {
     let userOperationReceipt = null
     while (!userOperationReceipt) {
       await new Promise((resolve) => setTimeout(resolve, 2000))

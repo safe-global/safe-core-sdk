@@ -1,10 +1,9 @@
-import { SafeMessageListResponse } from '@safe-global/api-kit'
+import { ListOptions, SafeMessageListResponse } from '@safe-global/api-kit'
 
 import { SafeClient } from '@safe-global/safe-kit/SafeClient'
 import { SafeMessageClient } from '@safe-global/safe-kit/extensions/messages/SafeMessageClient'
 import {
   ConfirmOffChainMessageProps,
-  PaginationOptions,
   SafeClientResult,
   SendOffChainMessageProps
 } from '@safe-global/safe-kit/types'
@@ -47,12 +46,10 @@ export function offChainMessages() {
       /**
        * Get the list of pending off-chain messages. This messages can be confirmed using the confirmMessage() method
        *
-       * @param {GetSafeMessageListProps} options Optional query parameters for pagination
+       * @param {ListOptions} options The pagination options
        * @returns {Promise<SafeMessageListResponse>} A list of pending messages
        */
-      async getPendingOffChainMessages(
-        options?: PaginationOptions
-      ): Promise<SafeMessageListResponse> {
+      async getPendingOffChainMessages(options?: ListOptions): Promise<SafeMessageListResponse> {
         return safeMessageClient.getPendingMessages(options)
       }
     }

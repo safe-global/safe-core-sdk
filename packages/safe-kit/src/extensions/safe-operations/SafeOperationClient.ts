@@ -1,12 +1,11 @@
 import Safe, { buildSignatureBytes } from '@safe-global/protocol-kit'
-import SafeApiKit, { GetSafeOperationListResponse } from '@safe-global/api-kit'
+import SafeApiKit, { ListOptions, GetSafeOperationListResponse } from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 
 import { createSafeClientResult } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
 import {
   ConfirmSafeOperationProps,
-  PaginationOptions,
   SafeClientResult,
   SendSafeOperationProps
 } from '@safe-global/safe-kit/types'
@@ -129,12 +128,11 @@ export class SafeOperationClient {
    * Retrieves the pending Safe operations for the current Safe account
    *
    * @async
+   * @param {ListOptions} options The pagination options
    * @returns {Promise<GetSafeOperationListResponse>} A promise that resolves to an array of pending Safe operations.
    * @throws {Error} If there is an issue retrieving the safe address or pending Safe operations.
    */
-  async getPendingSafeOperations(
-    options?: PaginationOptions
-  ): Promise<GetSafeOperationListResponse> {
+  async getPendingSafeOperations(options?: ListOptions): Promise<GetSafeOperationListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
     return this.apiKit.getSafeOperationsByAddress({ safeAddress, ...options })

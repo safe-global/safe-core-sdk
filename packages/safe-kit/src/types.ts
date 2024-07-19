@@ -40,11 +40,6 @@ export type ConfirmSafeOperationProps = {
   safeOperationHash: string
 }
 
-export type PaginationOptions = {
-  limit?: number
-  offset?: number
-}
-
 export type SafeConfig = {
   owners: string[]
   threshold: number

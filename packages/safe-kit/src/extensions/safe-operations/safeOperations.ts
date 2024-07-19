@@ -1,5 +1,5 @@
 import { PredictedSafeProps } from '@safe-global/protocol-kit'
-import { GetSafeOperationListResponse } from '@safe-global/api-kit'
+import { GetSafeOperationListResponse, ListOptions } from '@safe-global/api-kit'
 import { PaymasterOptions, Safe4337Pack } from '@safe-global/relay-kit'
 
 import { SafeClient } from '@safe-global/safe-kit/SafeClient'
@@ -7,7 +7,6 @@ import { SafeOperationClient } from '@safe-global/safe-kit/extensions/safe-opera
 import { BundlerOptions } from '@safe-global/safe-kit/extensions/safe-operations/types'
 import {
   ConfirmSafeOperationProps,
-  PaginationOptions,
   SafeClientResult,
   SendSafeOperationProps
 } from '@safe-global/safe-kit/types'
@@ -90,13 +89,11 @@ export function safeOperations(
        * Retrieves the pending Safe operations for the current Safe account
        *
        * @async
-       * @param {PaginationOptions} options Optional query parameters for pagination
+       * @param {ListOptions} options The pagination options
        * @returns {Promise<GetSafeOperationListResponse>} A promise that resolves to an array of pending Safe operations.
        * @throws {Error} If there is an issue retrieving the safe address or pending Safe operations.
        */
-      async getPendingSafeOperations(
-        options?: PaginationOptions
-      ): Promise<GetSafeOperationListResponse> {
+      async getPendingSafeOperations(options?: ListOptions): Promise<GetSafeOperationListResponse> {
         return safeOperationClient.getPendingSafeOperations(options)
       }
     }

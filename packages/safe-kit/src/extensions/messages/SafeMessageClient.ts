@@ -1,6 +1,7 @@
 import Safe, { hashSafeMessage } from '@safe-global/protocol-kit'
 import SafeApiKit, {
   EIP712TypedData as ApiKitEIP712TypedData,
+  ListOptions,
   SafeMessageListResponse
 } from '@safe-global/api-kit'
 import { SafeMessage } from '@safe-global/safe-core-sdk-types'
@@ -8,7 +9,6 @@ import { createSafeClientResult, sendTransaction } from '@safe-global/safe-kit/u
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
 import {
   ConfirmOffChainMessageProps,
-  PaginationOptions,
   SafeClientResult,
   SendOffChainMessageProps
 } from '@safe-global/safe-kit/types'
@@ -80,10 +80,10 @@ export class SafeMessageClient {
   /**
    * Get the list of pending off-chain messages. This messages can be confirmed using the confirmMessage() method
    *
-   * @param {GetSafeMessageListProps} [options] Optional query parameters for pagination
+   * @param {ListOptions} options The pagination options
    * @returns {Promise<SafeMessageListResponse>} A list of pending messages
    */
-  async getPendingMessages(options?: PaginationOptions): Promise<SafeMessageListResponse> {
+  async getPendingMessages(options?: ListOptions): Promise<SafeMessageListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
     return this.apiKit.getMessages(safeAddress, options)

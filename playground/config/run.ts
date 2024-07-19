@@ -32,7 +32,8 @@ const playgroundSafeKitPaths = {
   'send-transactions': 'safe-kit/send-transactions',
   'send-on-chain-message': 'safe-kit/send-on-chain-message',
   'send-off-chain-message': 'safe-kit/send-off-chain-message',
-  'send-safe-operation': 'safe-kit/send-safe-operation'
+  'send-safe-operation': 'safe-kit/send-safe-operation',
+  'viem-compatibility': 'safe-kit/viem-compatibility'
 }
 
 const path =

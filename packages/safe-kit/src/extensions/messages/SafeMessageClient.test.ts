@@ -119,7 +119,10 @@ describe('SafeClient', () => {
       const result = await safeMessageClient.sendMessage({ message: MESSAGE })
 
       expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith(undefined)
-      expect(utils.sendTransaction).toHaveBeenCalledWith(DEPLOYMENT_TRANSACTION, {}, protocolKit)
+      expect(utils.sendTransaction).toHaveBeenCalledWith({
+        transaction: DEPLOYMENT_TRANSACTION,
+        protocolKit
+      })
       expect(protocolKit.connect).toHaveBeenCalled()
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE)

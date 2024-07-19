@@ -85,7 +85,11 @@ describe('SafeClient', () => {
         transactions: TRANSACTION_BATCH
       })
 
-      expect(utils.proposeTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION, protocolKit, apiKit)
+      expect(utils.proposeTransaction).toHaveBeenCalledWith({
+        safeTransaction: SAFE_TRANSACTION,
+        protocolKit,
+        apiKit
+      })
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.PENDING_SIGNATURES],
         safeAddress: SAFE_ADDRESS,
@@ -128,10 +132,17 @@ describe('SafeClient', () => {
       const result = await safeClient.send({ transactions: TRANSACTION_BATCH })
 
       expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith(undefined, {})
-      expect(utils.sendTransaction).toHaveBeenCalledWith(DEPLOYMENT_TRANSACTION, {}, protocolKit)
+      expect(utils.sendTransaction).toHaveBeenCalledWith({
+        transaction: DEPLOYMENT_TRANSACTION,
+        protocolKit
+      })
       expect(protocolKit.connect).toHaveBeenCalled()
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION)
-      expect(utils.proposeTransaction).toHaveBeenCalledWith(SAFE_TRANSACTION, protocolKit, apiKit)
+      expect(utils.proposeTransaction).toHaveBeenCalledWith({
+        safeTransaction: SAFE_TRANSACTION,
+        protocolKit,
+        apiKit
+      })
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES],
         safeAddress: SAFE_ADDRESS,

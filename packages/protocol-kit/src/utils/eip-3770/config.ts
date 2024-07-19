@@ -220,6 +220,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 421613n, shortName: 'arb-goerli' },
   { chainId: 421614n, shortName: 'arb-sep' },
   { chainId: 444444n, shortName: 'syndr' },
+  { chainId: 490000n, shortName: 'autonomystestnet' },
   { chainId: 534351n, shortName: 'scr-sepolia' },
   { chainId: 534352n, shortName: 'scr' },
   { chainId: 534353n, shortName: 'scr-alpha' },

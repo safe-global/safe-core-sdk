@@ -9,6 +9,7 @@ import {
   SignMessageLibContract_v1_3_0_Function,
   signMessageLib_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
+import { asAddress } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SignMessageLibContract_v1_3_0  is the implementation specific to the SignMessageLib contract version 1.3.0.
@@ -49,7 +50,14 @@ class SignMessageLibContract_v1_3_0
    * @param args - Array[message]
    */
   getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
-    return [await this.contract.read.getMessageHash(args)]
+    return [
+      await this.runner.readContract({
+        functionName: 'getMessageHash',
+        abi: this.contractAbi,
+        address: asAddress(this.contractAddress),
+        args
+      })
+    ]
   }
 
   /**

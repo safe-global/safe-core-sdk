@@ -42,7 +42,7 @@ abstract class CreateCallBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CreateCallContractAbiType,
-    runner?: PublicClient | null
+    runner?: PublicClient
   ) {
     const contractName = 'createCallVersion'
 

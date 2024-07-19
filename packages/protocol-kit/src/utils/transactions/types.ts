@@ -1,5 +1,5 @@
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
-import { Chain, Address } from 'viem'
+import { Chain, Address, Account } from 'viem'
 
 export type SafeTransactionOptionalProps = Pick<
   SafeTransactionDataPartial,
@@ -8,7 +8,7 @@ export type SafeTransactionOptionalProps = Pick<
 
 export type WalletTransactionOptions = {
   chain: Chain
-  account: Address
+  account: Address | Account
   gas?: bigint
   maxFeePerGas?: bigint
   maxPriorityFeePerGas?: bigint
@@ -17,7 +17,7 @@ export type WalletTransactionOptions = {
 
 export type WalletLegacyTransactionOptions = {
   chain: Chain
-  account: Address
+  account: Address | Account
   gas?: bigint
   gasPrice?: bigint
   nonce?: number

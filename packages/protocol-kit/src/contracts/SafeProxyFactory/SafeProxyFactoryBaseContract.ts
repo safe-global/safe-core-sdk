@@ -52,7 +52,7 @@ abstract class SafeProxyFactoryBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContractAbiType,
-    runner?: PublicClient | null
+    runner?: PublicClient
   ) {
     const contractName = 'safeProxyFactoryVersion'
 

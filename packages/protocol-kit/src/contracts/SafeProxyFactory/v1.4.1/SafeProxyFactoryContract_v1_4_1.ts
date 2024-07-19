@@ -40,7 +40,7 @@ class SafeProxyFactoryContract_v1_4_1
     safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi,
-    runner?: PublicClient | null
+    runner?: PublicClient
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = safeProxyFactory_1_4_1_ContractArtifacts.abi
@@ -63,7 +63,13 @@ class SafeProxyFactoryContract_v1_4_1
    * @returns Array[chainId]
    */
   getChainId: SafeProxyFactoryContract_v1_4_1_Function<'getChainId'> = async () => {
-    return [await this.contract.read.getChainId()]
+    return [
+      await this.runner.readContract({
+        functionName: 'getChainId',
+        abi: this.contractAbi,
+        address: asAddress(this.contractAddress)
+      })
+    ]
   }
 
   /**
@@ -71,7 +77,13 @@ class SafeProxyFactoryContract_v1_4_1
    * @returns Array[creationCode]
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_4_1_Function<'proxyCreationCode'> = async () => {
-    return [await this.contract.read.proxyCreationCode()]
+    return [
+      await this.runner.readContract({
+        functionName: 'proxyCreationCode',
+        abi: this.contractAbi,
+        address: asAddress(this.contractAddress)
+      })
+    ]
   }
 
   /**

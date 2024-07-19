@@ -1,13 +1,13 @@
 import { Abi } from 'abitype'
 import {
   PublicClient,
-  Address,
-  getContract,
+  Transport,
   encodeFunctionData,
   GetContractReturnType,
   WalletClient,
   Hash,
-  Chain
+  Chain,
+  getContract
 } from 'viem'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -49,7 +49,8 @@ class BaseContract<ContractAbiType extends Abi> {
   safeProvider: SafeProvider
   chainId: bigint
   contract!: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
-  runner: PublicClient | null
+  runner: PublicClient
+  wallet?: WalletClient<Transport, Chain | undefined>
 
   /**
    * @constructor
@@ -71,7 +72,7 @@ class BaseContract<ContractAbiType extends Abi> {
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: ContractAbiType,
-    runner?: PublicClient | null
+    runner?: PublicClient
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
@@ -98,11 +99,11 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   async init() {
-    const client = this.runner || (await this.safeProvider.getExternalSigner())
+    this.wallet = await this.safeProvider.getExternalSigner()
     this.contract = getContract({
-      address: this.contractAddress as Address,
+      address: asAddress(this.contractAddress),
       abi: this.contractAbi,
-      client: client!
+      client: this.wallet || this.runner
     })
   }
 
@@ -117,9 +118,10 @@ class BaseContract<ContractAbiType extends Abi> {
     const chain = this.getChain()
     if (!chain) throw new Error('Invalid chainId')
     const signerAddress = await this.safeProvider.getSignerAddress()
-    const account = asAddress(signerAddress!)
+    const signer = this.wallet?.account
+    const account = signer || asAddress(signerAddress!)
     const txOptions = await converTransactionOptions(options)
-    return { chain, account, ...txOptions } // Needs to be in this order to override the `account` if necessary
+    return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
   }
 
   getChain(): Chain | undefined {

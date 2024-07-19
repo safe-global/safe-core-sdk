@@ -42,7 +42,7 @@ abstract class SimulateTxAccessorBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SimulateTxAccessorContractAbiType,
-    runner?: PublicClient | null
+    runner?: PublicClient
   ) {
     const contractName = 'simulateTxAccessorVersion'
 

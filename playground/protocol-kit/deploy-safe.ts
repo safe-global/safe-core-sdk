@@ -1,5 +1,6 @@
 import { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { privateKeyToAddress } from 'viem/accounts'
 
 // This file can be used to play around with the Safe Core SDK
 
@@ -14,13 +15,15 @@ interface Config {
   }
 }
 
+const privateKey = "0x943bb3afb48b023089757cb3317fba30bd9945edef44907103d3d432f972db90" // 0x2c101b1e0d4d60699e0da38d0630c51833159d4a16c70e29917402af147c6cef
+
 const config: Config = {
-  RPC_URL: 'https://sepolia.gateway.tenderly.co',
-  DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
+  RPC_URL: 'https://rpc.sepolia.org',
+  DEPLOYER_ADDRESS_PRIVATE_KEY: privateKey,
   DEPLOY_SAFE: {
-    OWNERS: ['OWNER_ADDRESS'],
+    OWNERS: [privateKeyToAddress(privateKey)],
     THRESHOLD: 1, // <SAFE_THRESHOLD>
-    SALT_NONCE: '150000',
+    SALT_NONCE: '150002',
     SAFE_VERSION: '1.3.0'
   }
 }

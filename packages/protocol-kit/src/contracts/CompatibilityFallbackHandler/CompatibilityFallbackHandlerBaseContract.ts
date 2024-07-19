@@ -42,7 +42,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
-    runner?: PublicClient | null
+    runner?: PublicClient
   ) {
     const contractName = 'compatibilityFallbackHandler'
 

@@ -10,11 +10,15 @@ import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
  * @param {SafeApiKit} apiKit The SafeApiKit instance
  * @returns The Safe transaction hash
  */
-export const proposeTransaction = async (
-  safeTransaction: SafeTransaction,
-  protocolKit: Safe,
+export const proposeTransaction = async ({
+  safeTransaction,
+  protocolKit,
+  apiKit
+}: {
+  safeTransaction: SafeTransaction
+  protocolKit: Safe
   apiKit: SafeApiKit
-): Promise<string> => {
+}): Promise<string> => {
   safeTransaction = await protocolKit.signTransaction(safeTransaction)
 
   const signerAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'

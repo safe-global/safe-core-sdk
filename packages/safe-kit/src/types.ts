@@ -1,5 +1,44 @@
 import { SafeProvider } from '@safe-global/protocol-kit'
+import {
+  TransactionBase,
+  TransactionOptions,
+  EIP712TypedData,
+  MetaTransactionData
+} from '@safe-global/safe-core-sdk-types'
+import { IFeeEstimator } from '@safe-global/relay-kit'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+
+export type SendTransactionProps = {
+  transactions: TransactionBase[]
+} & TransactionOptions
+
+export type ConfirmTransactionProps = {
+  safeTxHash: string
+}
+
+export type SendOnChainMessageProps = {
+  message: string | EIP712TypedData
+} & TransactionOptions
+
+export type SendOffChainMessageProps = {
+  message: string | EIP712TypedData
+}
+
+export type ConfirmOffChainMessageProps = {
+  messageHash: string
+}
+
+export type SendSafeOperationProps = {
+  transactions: MetaTransactionData[]
+  amountToApprove?: bigint
+  validUntil?: number
+  validAfter?: number
+  feeEstimator?: IFeeEstimator
+}
+
+export type ConfirmSafeOperationProps = {
+  safeOperationHash: string
+}
 
 export type SafeConfig = {
   owners: string[]

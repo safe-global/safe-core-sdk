@@ -14,7 +14,7 @@ const SAFE_ADDRESS = ''
 const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
 // RPC URL
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+const RPC_URL = 'https://rpc.sepolia.org'
 
 const CHAIN_NAME = 'sepolia'
 

@@ -1,3 +1,4 @@
+import { BaseError, CallExecutionErrorType, RawContractErrorType } from 'viem'
 import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe from '@safe-global/protocol-kit/Safe'
@@ -358,13 +359,24 @@ function decodeSafeTxGas(encodedDataResponse: string): string {
 
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
 type EthersEstimationError = { data: string }
-type ViemEstimationError = { info: { error: { message: string } } }
-type CallExecutionError = { details: string }
-type EstimationError = Error &
-  EthersEstimationError &
-  GnosisChainEstimationError &
-  ViemEstimationError &
-  CallExecutionError
+type ViemEstimationError = BaseError | CallExecutionErrorType
+type EstimationError =
+  | Error
+  | EthersEstimationError
+  | GnosisChainEstimationError
+  | ViemEstimationError
+
+function isEthersError(error: EstimationError): error is EthersEstimationError {
+  return (error as EthersEstimationError).data != null
+}
+
+function isViemError(error: EstimationError): error is ViemEstimationError {
+  return (error as ViemEstimationError).version.includes('viem')
+}
+
+function isGnosisChainEstimationError(error: EstimationError): error is GnosisChainEstimationError {
+  return (error as GnosisChainEstimationError).info.error.data != null
+}
 
 /**
  * Parses the SafeTxGas estimation response from different providers.
@@ -376,21 +388,21 @@ type EstimationError = Error &
  */
 function parseSafeTxGasErrorResponse(error: EstimationError) {
   // Ethers v6
-  const ethersData = error?.data
-  if (ethersData) {
-    return decodeSafeTxGas(ethersData)
+  if (isEthersError(error)) {
+    return decodeSafeTxGas(error.data)
   }
 
   // viem
-  const viemError = error?.info?.error?.message || error?.details
-  if (viemError) {
-    return decodeSafeTxGas(viemError)
+  if (isViemError(error)) {
+    const cause = error.walk() as RawContractErrorType
+    if (typeof cause?.data === 'string') {
+      return decodeSafeTxGas(cause?.data)
+    }
   }
 
   // gnosis-chain
-  const gnosisChainProviderData = error?.info?.error?.data
-
-  if (gnosisChainProviderData) {
+  if (isGnosisChainEstimationError(error)) {
+    const gnosisChainProviderData = error.info.error.data
     const isString = typeof gnosisChainProviderData === 'string'
 
     const encodedDataResponse = isString ? gnosisChainProviderData : gnosisChainProviderData.data
@@ -398,10 +410,10 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   }
 
   // Error message
-  const isEncodedDataPresent = error?.message?.includes('0x')
+  const isEncodedDataPresent = error.message.includes('0x')
 
   if (isEncodedDataPresent) {
-    return decodeSafeTxGas(error?.message)
+    return decodeSafeTxGas(error.message)
   }
 
   throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)

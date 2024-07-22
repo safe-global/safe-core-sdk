@@ -21,7 +21,7 @@ const config = {
   SAFE_SIGNER_ADDRESS: '<SAFE_SIGNER_ADDRESS>'
 }
 
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+const RPC_URL = 'https://rpc.sepolia.org'
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',
@@ -130,6 +130,9 @@ async function main() {
 
   const response = await gelatoSafeClient.relayTransaction(safeTransactions, options)
   console.log({ GelatoTaskId: response })
+  console.log(
+    `Check the status of the transaction at https://relay.gelato.digital/tasks/status/${response.taskId}`
+  )
 }
 
 main()

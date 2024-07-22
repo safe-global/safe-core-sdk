@@ -1,10 +1,14 @@
 import Safe, { buildSignatureBytes } from '@safe-global/protocol-kit'
-import SafeApiKit, { GetSafeOperationListResponse } from '@safe-global/api-kit'
-import { Safe4337CreateTransactionProps, Safe4337Pack } from '@safe-global/relay-kit'
+import SafeApiKit, { ListOptions, GetSafeOperationListResponse } from '@safe-global/api-kit'
+import { Safe4337Pack } from '@safe-global/relay-kit'
 
 import { createSafeClientResult } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import {
+  ConfirmSafeOperationProps,
+  SafeClientResult,
+  SendSafeOperationProps
+} from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -31,17 +35,23 @@ export class SafeOperationClient {
    *
    * @param {Safe4337CreateTransactionProps} props The Safe4337CreateTransactionProps object
    * @param {SafeTransaction[]} props.transactions An array of transactions to be batched
-   * @param {TransactionOptions} [props.options] Optional transaction options
+   * @param {TransactionOptions} [props.amountToApprove] The amount to approve for the SafeOperation
+   * @param {TransactionOptions} [props.validUntil] The validUntil timestamp for the SafeOperation
+   * @param {TransactionOptions} [props.validAfter] The validAfter timestamp for the SafeOperation
+   * @param {TransactionOptions} [props.feeEstimator] The feeEstimator to calculate the fees
    * @returns {Promise<SafeClientResult>} A promise that resolves with the status of the SafeOperation
    */
   async sendSafeOperation({
     transactions,
-    options = {}
-  }: Safe4337CreateTransactionProps): Promise<SafeClientResult> {
+    ...sendSafeOperationOptions
+  }: SendSafeOperationProps): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
     const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 
-    let safeOperation = await this.safe4337Pack.createTransaction({ transactions, options })
+    let safeOperation = await this.safe4337Pack.createTransaction({
+      transactions,
+      options: sendSafeOperationOptions
+    })
     safeOperation = await this.safe4337Pack.signSafeOperation(safeOperation)
 
     if (isMultisigSafe) {
@@ -60,7 +70,7 @@ export class SafeOperationClient {
       executable: safeOperation
     })
 
-    await this.#waitForOperationToFinish(userOperationHash)
+    await this.#waitForOperationToFinish({ userOperationHash })
 
     return createSafeClientResult({
       safeAddress,
@@ -73,18 +83,18 @@ export class SafeOperationClient {
   /**
    * Confirms the stored safeOperation
    *
-   * @param {string} safeOperationHash The hash of the safe operation to confirm.
+   * @param {ConfirmSafeOperationProps} props The confirmation properties
+   * @param {string} props.safeOperationHash The hash of the safe operation to confirm.
    * The safeOperationHash can be extracted from the SafeClientResult of the sendSafeOperation method under the safeOperations property
    * You must confirmSafeOperation() with the other owners and once the threshold is reached the SafeOperation will be sent to the bundler
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the safeOperation.
    */
-  async confirmSafeOperation(safeOperationHash: string): Promise<SafeClientResult> {
+  async confirmSafeOperation({
+    safeOperationHash
+  }: ConfirmSafeOperationProps): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
 
-    // TODO: Using signSafeOperation with the API response is not working
-    // This should be investigated as the safeOperationHash we get in the Safe4337Pack
-    // seems to be different from the one we get from the API
     await this.apiKit.confirmSafeOperation(
       safeOperationHash,
       buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
@@ -97,7 +107,7 @@ export class SafeOperationClient {
         executable: confirmedSafeOperation
       })
 
-      await this.#waitForOperationToFinish(userOperationHash)
+      await this.#waitForOperationToFinish({ userOperationHash })
 
       return createSafeClientResult({
         status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
@@ -118,12 +128,14 @@ export class SafeOperationClient {
    * Retrieves the pending Safe operations for the current Safe account
    *
    * @async
+   * @param {ListOptions} options The pagination options
    * @returns {Promise<GetSafeOperationListResponse>} A promise that resolves to an array of pending Safe operations.
    * @throws {Error} If there is an issue retrieving the safe address or pending Safe operations.
    */
-  async getPendingSafeOperations(): Promise<GetSafeOperationListResponse> {
+  async getPendingSafeOperations(options?: ListOptions): Promise<GetSafeOperationListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
-    return this.apiKit.getSafeOperationsByAddress({ safeAddress })
+
+    return this.apiKit.getSafeOperationsByAddress({ safeAddress, ...options })
   }
 
   /**
@@ -131,7 +143,11 @@ export class SafeOperationClient {
    * @param userOperationHash The userOperationHash to wait for. This comes from the bundler and can be obtained from the
    * SafeClientResult method under the safeOperations property
    */
-  async #waitForOperationToFinish(userOperationHash: string): Promise<void> {
+  async #waitForOperationToFinish({
+    userOperationHash
+  }: {
+    userOperationHash: string
+  }): Promise<void> {
     let userOperationReceipt = null
     while (!userOperationReceipt) {
       await new Promise((resolve) => setTimeout(resolve, 2000))

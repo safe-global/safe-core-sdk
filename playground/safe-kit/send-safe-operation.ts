@@ -18,9 +18,6 @@ const RPC_URL = 'https://sepolia.gateway.tenderly.co'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 const usdcAmount = 10_000n // 0.01 USDC
 
-// PAYMASTER ADDRESS
-const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
-
 // Paymaster URL
 const PIMLICO_API_KEY = ''
 const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
@@ -38,10 +35,7 @@ async function send(): Promise<SafeClientResult> {
   })
 
   const safeClientWithSafeOperation = await safeClient.extend(
-    safeOperations(
-      { bundlerUrl: BUNDLER_URL },
-      { isSponsored: true, paymasterAddress, paymasterUrl: PAYMASTER_URL }
-    )
+    safeOperations({ bundlerUrl: BUNDLER_URL }, { isSponsored: true, paymasterUrl: PAYMASTER_URL })
   )
 
   const signerAddress =
@@ -70,10 +64,8 @@ async function send(): Promise<SafeClientResult> {
 
   const safeOperationResult = await safeClientWithSafeOperation.sendSafeOperation({
     transactions,
-    options: {
-      validAfter: Number(timestamp - 60_000n),
-      validUntil: Number(timestamp + 60_000n)
-    }
+    validAfter: Number(timestamp - 60_000n),
+    validUntil: Number(timestamp + 60_000n)
   })
 
   console.log('-Send result: ', safeOperationResult)
@@ -101,25 +93,22 @@ async function confirm(safeClientResult: SafeClientResult, pk: string) {
   console.log('-Signer Address:', signerAddress)
 
   const safeClientWithSafeOperation = await safeClient.extend(
-    safeOperations(
-      { bundlerUrl: BUNDLER_URL },
-      { isSponsored: true, paymasterAddress, paymasterUrl: PAYMASTER_URL }
-    )
+    safeOperations({ bundlerUrl: BUNDLER_URL }, { isSponsored: true, paymasterUrl: PAYMASTER_URL })
   )
 
   const pendingSafeOperations = await safeClientWithSafeOperation.getPendingSafeOperations()
 
-  pendingSafeOperations.results.forEach(async (safeOperation) => {
+  for (const safeOperation of pendingSafeOperations.results) {
     if (safeOperation.safeOperationHash !== safeClientResult.safeOperations?.safeOperationHash) {
       return
     }
 
-    const safeOperationResult = await safeClientWithSafeOperation.confirmSafeOperation(
-      safeClientResult.safeOperations?.safeOperationHash
-    )
+    const safeOperationResult = await safeClientWithSafeOperation.confirmSafeOperation({
+      safeOperationHash: safeClientResult.safeOperations?.safeOperationHash
+    })
 
     console.log('-Confirm result: ', safeOperationResult)
-  })
+  }
 }
 
 async function main() {

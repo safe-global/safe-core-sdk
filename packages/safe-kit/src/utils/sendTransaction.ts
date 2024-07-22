@@ -1,33 +1,37 @@
+import { Address, WalletClient, Transport, Chain, Hex, Account } from 'viem'
 import Safe from '@safe-global/protocol-kit'
-import { TransactionBase, TransactionOptions } from '@safe-global/safe-core-sdk-types'
-import { Address, WalletClient, Transport, Chain, Hex } from 'viem'
+import { Transaction, TransactionOptions } from '@safe-global/safe-core-sdk-types'
+
 /**
  * Sends a transaction using the signer (owner)
  * It's useful to deploy Safe accounts
  *
- * @param {TransactionBase} transaction  The transaction.
- * @param {TransactionOptions} options Options for executing the transaction.
+ * @param {Transaction} transaction  The transaction.
  * @param {Safe} protocolKit The protocolKit instance
  * @returns {Promise<string | undefined>} A promise that resolves with the transaction hash
  */
-export const sendTransaction = async (
-  transaction: TransactionBase,
-  options: TransactionOptions,
+export const sendTransaction = async ({
+  transaction,
+  protocolKit
+}: {
+  transaction: Transaction
   protocolKit: Safe
-): Promise<string | undefined> => {
+}): Promise<string | undefined> => {
   const signer = (await protocolKit.getSafeProvider().getExternalSigner()) as WalletClient<
     Transport,
-    Chain
+    Chain,
+    Account
   >
   const client = await protocolKit.getSafeProvider().getExternalProvider()
 
   if (!signer)
     throw new Error('SafeProvider must be initialized with a signer to use this function')
+
   const hash = await signer.sendTransaction({
     to: transaction.to as Address,
     data: transaction.data as Hex,
     value: BigInt(transaction.value),
-    ...createLegacyTxOptions(options)
+    account: signer.account
   })
 
   const receipt = await client.waitForTransactionReceipt({ hash })

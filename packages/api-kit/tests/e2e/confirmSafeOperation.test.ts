@@ -10,7 +10,6 @@ import { SafeOperation } from '@safe-global/safe-core-sdk-types'
 import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getApiKit, getEip1193Provider } from '../utils/setupKits'
 import {
-  ENTRYPOINT_ABI,
   ENTRYPOINT_ADDRESS_V06,
   RPC_4337_CALLS
 } from '@safe-global/relay-kit/packs/safe-4337/constants'
@@ -34,7 +33,7 @@ describe('confirmSafeOperation', () => {
   const transferUSDC = {
     to: PAYMASTER_TOKEN_ADDRESS,
     data: generateTransferCallData(SAFE_ADDRESS, 100_000n),
-    value: '0',
+    value: Date.now().toString(), // Make sure that the transaction hash is unique
     operation: 0
   }
 
@@ -74,16 +73,7 @@ describe('confirmSafeOperation', () => {
 
   before(async () => {
     sinon.stub(safe4337Utils, 'getEip4337BundlerProvider').returns({
-      request: requestStub,
-      readContract: sinon
-        .stub()
-        .withArgs({
-          address: ENTRYPOINT_ADDRESS_V06,
-          abi: ENTRYPOINT_ABI,
-          functionName: 'getNonce',
-          args: [SAFE_ADDRESS, BigInt(0)]
-        })
-        .resolves(BigInt(Date.now()))
+      request: requestStub
     } as unknown as BundlerClient)
 
     requestStub.withArgs({ method: RPC_4337_CALLS.CHAIN_ID }).resolves('0xaa36a7')

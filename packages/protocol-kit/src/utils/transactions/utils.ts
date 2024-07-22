@@ -225,7 +225,7 @@ export function toCallGasParameters(
   return params
 }
 
-export function converTransactionOptions(
+export function convertTransactionOptions(
   options?: TransactionOptions
 ): Partial<WalletLegacyTransactionOptions | WalletTransactionOptions> {
   return isLegacyTransaction(options) ? createLegacyTxOptions(options) : createTxOptions(options)

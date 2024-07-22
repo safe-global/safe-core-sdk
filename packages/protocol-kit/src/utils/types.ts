@@ -1,5 +1,6 @@
 import { SafeConfig, SafeConfigWithPredictedSafe } from '../types'
-import { getAddress, Address, isHex, Hex, Hash } from 'viem'
+import { getAddress, Address, isHex, Hex, Hash, Chain } from 'viem'
+import * as allChains from 'viem/chains'
 
 export function isSafeConfigWithPredictedSafe(
   config: SafeConfig
@@ -21,4 +22,8 @@ export function asHash(hash: string): Hash {
 
 export function asHex(hex?: string): Hex {
   return isHex(hex) ? (hex as Hex) : (`0x${hex}` as Hex)
+}
+
+export function getChainById(chainId: bigint): Chain | undefined {
+  return Object.values(allChains).find((chain) => chain.id === Number(chainId))
 }

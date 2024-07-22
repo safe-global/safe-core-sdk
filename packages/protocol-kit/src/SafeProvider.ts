@@ -25,7 +25,7 @@ import {
   SocketTransport,
   ExternalSigner
 } from '@safe-global/protocol-kit/types'
-import { asAddress, asHash, asHex } from './utils/types'
+import { asAddress, asHash, asHex, getChainById } from './utils/types'
 import {
   createPublicClient,
   createWalletClient,
@@ -39,7 +39,8 @@ import {
   encodeAbiParameters,
   parseAbiParameters,
   toBytes,
-  BlockTag
+  BlockTag,
+  Chain
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
@@ -61,6 +62,7 @@ function blockTag(blockTag: any) {
 }
 
 class SafeProvider {
+  #chain?: Chain
   #externalProvider: PublicClient
   signer?: string
   provider: Eip1193Provider | HttpTransport | SocketTransport
@@ -87,7 +89,8 @@ class SafeProvider {
 
   async getExternalSigner(): Promise<ExternalSigner | undefined> {
     // If the signer is not an Ethereum address, it should be a private key
-    const { transport, chain } = this.getExternalProvider()
+    const { transport, chain = await this.#getChain() } = this.getExternalProvider()
+
     if (this.signer && !this.isAddress(this.signer)) {
       const account = privateKeyToAccount(asHex(this.signer))
       return createWalletClient({
@@ -369,6 +372,14 @@ class SafeProvider {
 
   decodeParameters(types: string, values: string): { [key: string]: any } {
     return decodeAbiParameters(parseAbiParameters(types), asHex(values))
+  }
+
+  async #getChain(): Promise<Chain> {
+    if (this.#chain) return this.#chain
+    const chain = getChainById(await this.getChainId())
+    if (!chain) throw new Error('Invalid chainId')
+    this.#chain = chain
+    return this.#chain
   }
 }
 

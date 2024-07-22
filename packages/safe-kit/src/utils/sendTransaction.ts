@@ -21,11 +21,9 @@ export const sendTransaction = async (
   >
   const client = await protocolKit.getSafeProvider().getExternalProvider()
 
-  const account = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
   if (!signer)
     throw new Error('SafeProvider must be initialized with a signer to use this function')
   const hash = await signer.sendTransaction({
-    account: account as Address,
     to: transaction.to as Address,
     data: transaction.data as Hex,
     value: BigInt(transaction.value),

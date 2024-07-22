@@ -11,7 +11,6 @@ import {
 } from 'viem'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import * as allChains from 'viem/chains'
 import {
   EncodeFunction,
   EstimateGasFunction,
@@ -19,11 +18,11 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import { asAddress } from '../utils/types'
+import { asAddress, getChainById } from '../utils/types'
 import {
   WalletTransactionOptions,
   WalletLegacyTransactionOptions,
-  converTransactionOptions
+  convertTransactionOptions
 } from '@safe-global/protocol-kit/utils'
 
 /**
@@ -117,15 +116,18 @@ class BaseContract<ContractAbiType extends Abi> {
   ): Promise<WalletTransactionOptions | WalletLegacyTransactionOptions> {
     const chain = this.getChain()
     if (!chain) throw new Error('Invalid chainId')
+
     const signerAddress = await this.safeProvider.getSignerAddress()
     const signer = this.wallet?.account
-    const account = signer || asAddress(signerAddress!)
-    const txOptions = await converTransactionOptions(options)
+    if (!signer || !signerAddress) throw new Error('Invalid signer')
+
+    const account = signer || asAddress(signerAddress)
+    const txOptions = await convertTransactionOptions(options)
     return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
   }
 
   getChain(): Chain | undefined {
-    return Object.values(allChains).find((chain) => chain.id === Number(this.chainId))
+    return getChainById(this.chainId)
   }
 
   getAddress: GetAddressFunction = () => {

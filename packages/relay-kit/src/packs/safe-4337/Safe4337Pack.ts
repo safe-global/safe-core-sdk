@@ -682,11 +682,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {Promise<string>} The Promise object will resolve to the account nonce.
    */
   async #getSafeNonceFromEntrypoint(safeAddress: string): Promise<string> {
-    const newNonce = await this.#bundlerClient.readContract({
+    const externalProvider = this.protocolKit.getSafeProvider().getExternalProvider()
+
+    const newNonce = await externalProvider.readContract({
       address: (this.#ENTRYPOINT_ADDRESS as Address) || '0x',
       abi: ENTRYPOINT_ABI,
       functionName: 'getNonce',
-      args: [safeAddress as Address, BigInt(0)]
+      args: [safeAddress as Address, 0n]
     })
 
     return newNonce.toString()

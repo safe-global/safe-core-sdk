@@ -29,14 +29,9 @@ const requestMock = jest.fn(async ({ method }: { method: keyof typeof requestRes
   return requestResponseMap[method]
 })
 
-const readContractMock = jest.fn().mockResolvedValue(1n)
-
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
-  getEip4337BundlerProvider: jest.fn(() => ({
-    request: requestMock,
-    readContract: readContractMock
-  }))
+  getEip4337BundlerProvider: jest.fn(() => ({ request: requestMock }))
 }))
 
 let safe4337ModuleAddress: viem.Hash
@@ -652,11 +647,15 @@ describe('Safe4337Pack', () => {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
       }
     })
+    const readContractSpy = jest.spyOn(
+      safe4337Pack.protocolKit.getSafeProvider().getExternalProvider(),
+      'readContract'
+    )
 
     let safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC]
     })
-    expect(readContractMock).toHaveBeenCalledWith({
+    expect(readContractSpy).toHaveBeenCalledWith({
       address: constants.ENTRYPOINT_ADDRESS_V06,
       abi: constants.ENTRYPOINT_ABI,
       functionName: 'getNonce',

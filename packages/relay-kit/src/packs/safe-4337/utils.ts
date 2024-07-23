@@ -1,7 +1,6 @@
 import {
   Address,
   Hex,
-  PublicRpcSchema,
   createPublicClient,
   encodeFunctionData,
   encodePacked,
@@ -35,7 +34,7 @@ import { BundlerClient, PimlicoCustomRpcSchema } from './types'
 export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
   const provider = createPublicClient({
     transport: http(bundlerUrl),
-    rpcSchema: rpcSchema<[...PimlicoCustomRpcSchema, ...PublicRpcSchema]>()
+    rpcSchema: rpcSchema<[...PimlicoCustomRpcSchema]>()
   })
 
   return provider

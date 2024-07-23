@@ -1,26 +1,25 @@
-import { Chain } from 'viem'
-import { sepolia } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
+import { sepolia } from 'viem/chains'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish } from '../utils'
 
 // Variables
-const OWNER_1_PRIVATE_KEY = ''
-const OWNER_2_PRIVATE_KEY = ''
+const OWNER_1_PRIVATE_KEY = '0x'
+const OWNER_2_PRIVATE_KEY = '0x'
 const PIMLICO_API_KEY = ''
 const SAFE_ADDRESS = '' // Safe 2/N
-const CHAIN: Chain = sepolia
+
+const CHAIN_NAME = 'sepolia'
+const CHAIN_ID = sepolia.id
+const RPC_URL = sepolia.rpcUrls.default.http[0]
 
 // Constants
-const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN.name.toLowerCase()}/rpc?apikey=${PIMLICO_API_KEY}`
-const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN.name.toLowerCase()}/rpc?apikey=${PIMLICO_API_KEY}`
-const RPC_URL = 'https://rpc.sepolia.org'
+const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}`
+const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}`
 
 async function main() {
-  const apiKit = new SafeApiKit({
-    chainId: BigInt(sepolia.id)
-  })
+  const apiKit = new SafeApiKit({ chainId: BigInt(CHAIN_ID) })
 
   let safe4337Pack = await Safe4337Pack.init({
     provider: RPC_URL,
@@ -88,7 +87,7 @@ async function main() {
   })
   console.log('Executing the SafeOperation...')
 
-  await waitForOperationToFinish(userOperationHash, CHAIN.name.toLowerCase(), safe4337Pack)
+  await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)
 }
 
 main()

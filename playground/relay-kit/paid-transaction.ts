@@ -1,4 +1,4 @@
-import { Address, formatEther, createWalletClient, custom, Hex } from 'viem'
+import { Address, Chain, formatEther, createWalletClient, custom, Hex } from 'viem'
 import { sepolia } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
 import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
@@ -21,7 +21,8 @@ const config = {
   SAFE_SIGNER_ADDRESS: '<SAFE_SIGNER_ADDRESS>'
 }
 
-const RPC_URL = 'https://rpc.sepolia.org'
+const CHAIN: Chain = sepolia
+const RPC_URL = CHAIN.rpcUrls.default.http[0]
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',
@@ -96,7 +97,7 @@ async function main() {
     const fakeOnRampSigner = createWalletClient({
       account: privateKeyToAccount(mockOnRampConfig.PRIVATE_KEY as Hex),
       transport: custom(externalProvider),
-      chain: sepolia
+      chain: CHAIN
     })
 
     const fundingAmount = safeBalance < relayFee ? relayFee - safeBalance : safeBalance - relayFee

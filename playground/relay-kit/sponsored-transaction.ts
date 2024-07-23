@@ -1,4 +1,4 @@
-import { Address, createWalletClient, custom, formatEther, Hex } from 'viem'
+import { Address, Chain, createWalletClient, custom, formatEther, Hex } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
@@ -25,7 +25,8 @@ const config = {
   RELAY_API_KEY: '<GELATO_RELAY_API_KEY>'
 }
 
-const RPC_URL = 'https://rpc.sepolia.org'
+const CHAIN: Chain = sepolia
+const RPC_URL = CHAIN.rpcUrls.default.http[0]
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',
@@ -91,7 +92,7 @@ async function main() {
     const fakeOnRampSigner = createWalletClient({
       account: privateKeyToAccount(mockOnRampConfig.PRIVATE_KEY as Hex),
       transport: custom(externalProvider),
-      chain: sepolia
+      chain: CHAIN
     })
     const hash = await fakeOnRampSigner.sendTransaction({
       to: predictedSafeAddress,

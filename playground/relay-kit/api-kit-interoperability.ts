@@ -1,4 +1,4 @@
-import { privateKeyToAccount } from 'viem/accounts'
+import { privateKeyToAddress } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
@@ -46,7 +46,7 @@ async function main() {
 
   const safeOpSignedByOwner1 = await safe4337Pack.signSafeOperation(safeOperation)
   const signature1 = safeOpSignedByOwner1.getSignature(
-    privateKeyToAccount(OWNER_1_PRIVATE_KEY).address
+    privateKeyToAddress(OWNER_1_PRIVATE_KEY)
   )!.data
 
   console.log('Signed by first owner:', signature1)
@@ -71,7 +71,7 @@ async function main() {
 
   const safeOpSignedByOwner2 = await safe4337Pack.signSafeOperation(addedSafeOperation)
   const signature2 = safeOpSignedByOwner2.getSignature(
-    privateKeyToAccount(OWNER_2_PRIVATE_KEY).address
+    privateKeyToAddress(OWNER_2_PRIVATE_KEY)
   )!.data
 
   console.log('Signed by second owner:', signature2)

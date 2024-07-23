@@ -1,6 +1,5 @@
 import { Address, createPublicClient, custom, encodeFunctionData, parseAbi } from 'viem'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { GetSafeOperationListResponse } from '@safe-global/api-kit'
 import { ExternalSigner } from '@safe-global/protocol-kit'
 
 export const generateTransferCallData = (to: string, value: bigint) => {
@@ -56,21 +55,4 @@ export async function transfer(
   })
 
   return await publicClient.waitForTransactionReceipt({ hash })
-}
-
-export function sortResultsByCreatedDateDesc(
-  data: GetSafeOperationListResponse
-): GetSafeOperationListResponse {
-  if (!data || !Array.isArray(data.results)) {
-    throw new Error('The provided data is invalid or does not contain a results array.')
-  }
-
-  data.results.sort((a, b) => {
-    const dateA = new Date(a.created).getTime()
-    const dateB = new Date(b.created).getTime()
-
-    return dateB - dateA
-  })
-
-  return data
 }

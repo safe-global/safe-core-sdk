@@ -1,4 +1,4 @@
-import { createWalletClient, http } from 'viem'
+import { Address, createWalletClient, http } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import SafeApiKit, { AddSafeDelegateProps } from '@safe-global/api-kit/index'
@@ -14,6 +14,7 @@ const PRIVATE_KEY_2 = '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f75
 
 let safeApiKit: SafeApiKit
 let signer: AddSafeDelegateProps['signer']
+let delegatorAddress: Address
 
 describe('addSafeDelegate', () => {
   before(async () => {
@@ -23,11 +24,11 @@ describe('addSafeDelegate', () => {
       transport: http(),
       account: privateKeyToAccount(PRIVATE_KEY_1)
     })
+    delegatorAddress = (await signer.getAddresses())[0]
   })
 
   it('should fail if Label is empty', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -41,7 +42,6 @@ describe('addSafeDelegate', () => {
 
   it('should fail if Safe delegate address is empty', async () => {
     const delegateAddress = ''
-    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -70,7 +70,6 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -86,7 +85,6 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe delegate address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
-    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -102,23 +100,22 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe delegator address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address.toLocaleLowerCase()
+    const delegatorAddressLowerCase = delegatorAddress.toLocaleLowerCase()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
-      delegatorAddress,
+      delegatorAddress: delegatorAddressLowerCase,
       signer,
       label: 'Label'
     }
     await chai
       .expect(safeApiKit.addSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Address ${delegatorAddress} is not checksumed`)
+      .to.be.rejectedWith(`Address ${delegatorAddressLowerCase} is not checksumed`)
   })
 
   it('should fail if Safe does not exist', async () => {
     const safeAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -139,7 +136,7 @@ describe('addSafeDelegate', () => {
       transport: http(),
       account: privateKeyToAccount(PRIVATE_KEY_2)
     })
-    const delegatorAddress = nonOwnerSigner.account!.address
+    const delegatorAddress = (await nonOwnerSigner.getAddresses())[0]
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -157,7 +154,6 @@ describe('addSafeDelegate', () => {
   it('should add a new delegate', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -180,7 +176,6 @@ describe('addSafeDelegate', () => {
 
   it('should add a new delegate without specifying a Safe', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -210,7 +205,6 @@ describe('addSafeDelegate', () => {
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-    const delegatorAddress = signer.account!.address
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress: eip3770SafeAddress,

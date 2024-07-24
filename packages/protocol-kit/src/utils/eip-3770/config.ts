@@ -119,6 +119,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 2331n, shortName: 'rss3-testnet' },
   { chainId: 2358n, shortName: 'kroma-sepolia' },
   { chainId: 2810n, shortName: 'hmorph' },
+  { chainId: 3338n, shortName: 'PEAQ' },
   { chainId: 3636n, shortName: 'BTNX' },
   { chainId: 3737n, shortName: 'csb' },
   { chainId: 3776n, shortName: 'astrzk' },

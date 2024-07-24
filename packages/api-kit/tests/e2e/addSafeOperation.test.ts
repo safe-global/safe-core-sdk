@@ -12,6 +12,7 @@ import {
   ENTRYPOINT_ADDRESS_V06,
   RPC_4337_CALLS
 } from '@safe-global/relay-kit/packs/safe-4337/constants'
+// Needs to be imported from dist folder in order to mock the getEip4337BundlerProvider function
 import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getKits } from '../utils/setupKits'
 
@@ -22,7 +23,7 @@ const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/2 Safe (v1.4.1) with signer above being an owner + 4337 module enabled
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f'
-const BUNDLER_URL = `https://bundler.url`
+const BUNDLER_URL = 'https://bundler.url'
 const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit

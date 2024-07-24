@@ -1,7 +1,7 @@
-import { Chain, LocalAccount, Transport, WalletClient } from 'viem'
+import { Chain, Account, Transport, WalletClient } from 'viem'
 
 export async function signDelegate(
-  walletClient: WalletClient<Transport, Chain, LocalAccount>,
+  walletClient: WalletClient<Transport, Chain, Account>,
   delegateAddress: string,
   chainId: bigint
 ) {

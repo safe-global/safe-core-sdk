@@ -378,7 +378,7 @@ export function toTxResult(
     options,
     transactionResponse: {
       wait: async () => {
-        return runner.getTransactionReceipt({ hash })
+        return runner.waitForTransactionReceipt({ hash })
       }
     }
   }

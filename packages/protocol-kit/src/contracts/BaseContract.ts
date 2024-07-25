@@ -112,6 +112,14 @@ class BaseContract<ContractAbiType extends Abi> {
     return getTransactionReceipt(this.runner, { hash })
   }
 
+  /**
+   * Converts a type of TransactionOptions to a viem transaction type. The viem transaction type creates a clear distinction between the multiple transaction objects (e.g., post-London hard fork) and doesn't allow a union of fields.
+   * See: https://github.com/wevm/viem/blob/viem%402.18.0/src/types/fee.ts and https://github.com/wevm/viem/blob/603227e2588366914fb79a902d23fd9afc353cc6/src/types/transaction.ts#L200
+   *
+   * @param options - Transaction options as expected throughout safe sdk and propagated on the results.
+   *
+   * @returns Options object compatible with viem
+   */
   async convertOptions(
     options?: TransactionOptions
   ): Promise<WalletTransactionOptions | WalletLegacyTransactionOptions> {
@@ -123,6 +131,7 @@ class BaseContract<ContractAbiType extends Abi> {
     if (!signer || !signerAddress) throw new Error('Invalid signer')
 
     const account = signer || asAddress(signerAddress)
+    this.wallet?.writeContract()
     const txOptions = await convertTransactionOptions(options)
     return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
   }

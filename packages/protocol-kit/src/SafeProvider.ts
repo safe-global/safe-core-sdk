@@ -26,6 +26,7 @@ import {
   ExternalSigner
 } from '@safe-global/protocol-kit/types'
 import { asAddress, asHash, asHex, getChainById } from './utils/types'
+import { asBlockId } from './utils/block'
 import {
   createPublicClient,
   createWalletClient,
@@ -39,7 +40,6 @@ import {
   encodeAbiParameters,
   parseAbiParameters,
   toBytes,
-  BlockTag,
   Chain
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -48,18 +48,6 @@ import {
   toCallGasParameters,
   sameString
 } from '@safe-global/protocol-kit/utils'
-
-function asBlockId(blockId: number | string | undefined) {
-  return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
-}
-
-function blockNumber(blockNumber: any) {
-  return { blockNumber: blockNumber.toNumber() }
-}
-
-function blockTag(blockTag: any) {
-  return { blockTag: blockTag as BlockTag }
-}
 
 class SafeProvider {
   #chain?: Chain

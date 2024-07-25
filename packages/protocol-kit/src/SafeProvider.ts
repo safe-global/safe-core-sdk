@@ -4,7 +4,9 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args
+  SafeEIP712Args,
+  ExternalClient,
+  ExternalSigner
 } from '@safe-global/safe-core-sdk-types'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -22,9 +24,7 @@ import {
   SafeProviderConfig,
   Eip1193Provider,
   HttpTransport,
-  SocketTransport,
-  ExternalSigner,
-  ExternalClient
+  SocketTransport
 } from '@safe-global/protocol-kit/types'
 import { asAddress, asHash, asHex, getChainById } from './utils/types'
 import { asBlockId } from './utils/block'
@@ -40,7 +40,11 @@ import {
   encodeAbiParameters,
   parseAbiParameters,
   toBytes,
-  Chain
+  Chain,
+  Abi,
+  ReadContractParameters,
+  ContractFunctionName,
+  ContractFunctionArgs
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
@@ -50,7 +54,8 @@ import {
   getCode,
   getTransaction,
   getTransactionCount,
-  getStorageAt
+  getStorageAt,
+  readContract
 } from 'viem/actions'
 import {
   toEstimateGasParameters,
@@ -353,6 +358,14 @@ class SafeProvider {
       ...asBlockId(blockTag)
     })
     return data ?? '0x'
+  }
+
+  async readContract<
+    const abi extends Abi | readonly unknown[],
+    functionName extends ContractFunctionName<abi, 'pure' | 'view'>,
+    const args extends ContractFunctionArgs<abi, 'pure' | 'view', functionName>
+  >(args: ReadContractParameters<abi, functionName, args>) {
+    return readContract(this.#externalProvider, args)
   }
 
   // TODO: fix anys

@@ -56,16 +56,9 @@ class SafeProvider {
   provider: Eip1193Provider | HttpTransport | SocketTransport
 
   constructor({ provider, signer }: SafeProviderConfig) {
-    if (typeof provider === 'string') {
-      this.#externalProvider = createPublicClient({
-        transport: http(provider)
-      })
-    } else {
-      const client = createPublicClient({
-        transport: custom(provider)
-      })
-      this.#externalProvider = client
-    }
+    this.#externalProvider = createPublicClient({
+      transport: typeof provider === 'string' ? http(provider) : custom(provider)
+    })
 
     this.provider = provider
     this.signer = signer ? asHex(signer) : signer

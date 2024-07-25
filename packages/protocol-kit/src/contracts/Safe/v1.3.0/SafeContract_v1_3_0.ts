@@ -1,3 +1,4 @@
+import { readContract, simulateContract } from 'viem/actions'
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
@@ -65,7 +66,7 @@ class SafeContract_v1_3_0
    */
   VERSION: SafeContract_v1_3_0_Function<'VERSION'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'VERSION',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -79,7 +80,7 @@ class SafeContract_v1_3_0
    */
   approvedHashes: SafeContract_v1_3_0_Function<'approvedHashes'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'approvedHashes',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -95,7 +96,7 @@ class SafeContract_v1_3_0
    * @returns Empty array
    */
   checkNSignatures: SafeContract_v1_3_0_Function<'checkNSignatures'> = async (args) => {
-    await this.runner.readContract({
+    await readContract(this.runner, {
       functionName: 'checkNSignatures',
       abi: this.contractAbi,
       address: asAddress(this.contractAddress),
@@ -110,7 +111,7 @@ class SafeContract_v1_3_0
    * @returns Empty array
    */
   checkSignatures: SafeContract_v1_3_0_Function<'checkSignatures'> = async (args) => {
-    await this.runner.readContract({
+    await readContract(this.runner, {
       functionName: 'checkSignatures',
       abi: this.contractAbi,
       address: asAddress(this.contractAddress),
@@ -124,7 +125,7 @@ class SafeContract_v1_3_0
    */
   domainSeparator: SafeContract_v1_3_0_Function<'domainSeparator'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'domainSeparator',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -139,7 +140,7 @@ class SafeContract_v1_3_0
    */
   encodeTransactionData: SafeContract_v1_3_0_Function<'encodeTransactionData'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'encodeTransactionData',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -154,7 +155,7 @@ class SafeContract_v1_3_0
    * @returns Array[Array[modules], next]
    */
   getModulesPaginated: SafeContract_v1_3_0_Function<'getModulesPaginated'> = async (args) => {
-    const [array, next] = await this.runner.readContract({
+    const [array, next] = await readContract(this.runner, {
       functionName: 'getModulesPaginated',
       abi: this.contractAbi,
       address: asAddress(this.contractAddress),
@@ -169,7 +170,7 @@ class SafeContract_v1_3_0
    */
   getOwners: SafeContract_v1_3_0_Function<'getOwners'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getOwners',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -184,7 +185,7 @@ class SafeContract_v1_3_0
    */
   getStorageAt: SafeContract_v1_3_0_Function<'getStorageAt'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getStorageAt',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -199,7 +200,7 @@ class SafeContract_v1_3_0
    */
   getThreshold: SafeContract_v1_3_0_Function<'getThreshold'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getThreshold',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -214,7 +215,7 @@ class SafeContract_v1_3_0
    */
   getTransactionHash: SafeContract_v1_3_0_Function<'getTransactionHash'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getTransactionHash',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -230,7 +231,7 @@ class SafeContract_v1_3_0
    */
   isModuleEnabled: SafeContract_v1_3_0_Function<'isModuleEnabled'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'isModuleEnabled',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -246,7 +247,7 @@ class SafeContract_v1_3_0
    */
   isOwner: SafeContract_v1_3_0_Function<'isOwner'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'isOwner',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -261,7 +262,7 @@ class SafeContract_v1_3_0
    */
   nonce: SafeContract_v1_3_0_Function<'nonce'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'nonce',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -275,7 +276,7 @@ class SafeContract_v1_3_0
    */
   signedMessages: SafeContract_v1_3_0_Function<'signedMessages'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'signedMessages',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -312,7 +313,7 @@ class SafeContract_v1_3_0
         ))
 
       const converted = await this.convertOptions({ ...options, gasLimit })
-      const txResult = await this.runner.simulateContract({
+      const txResult = await simulateContract(this.runner, {
         address: asAddress(this.contractAddress),
         functionName: 'execTransaction',
         abi: this.contractAbi,
@@ -417,7 +418,7 @@ class SafeContract_v1_3_0
    */
   async getChainId(): Promise<[bigint]> {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getChainId',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)

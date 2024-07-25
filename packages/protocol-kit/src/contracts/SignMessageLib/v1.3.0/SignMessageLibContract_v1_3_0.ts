@@ -1,3 +1,4 @@
+import { readContract } from 'viem/actions'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import SignMessageLibBaseContract from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -51,7 +52,7 @@ class SignMessageLibContract_v1_3_0
    */
   getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getMessageHash',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),

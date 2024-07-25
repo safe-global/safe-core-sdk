@@ -1,4 +1,5 @@
-import { parseEventLogs, PublicClient } from 'viem'
+import { parseEventLogs } from 'viem'
+import { readContract } from 'viem/actions'
 import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
@@ -12,6 +13,7 @@ import {
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
 import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeProxyFactoryContract_v1_4_1  is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -40,7 +42,7 @@ class SafeProxyFactoryContract_v1_4_1
     safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi,
-    runner?: PublicClient
+    runner?: ExternalClient
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = safeProxyFactory_1_4_1_ContractArtifacts.abi
@@ -64,7 +66,7 @@ class SafeProxyFactoryContract_v1_4_1
    */
   getChainId: SafeProxyFactoryContract_v1_4_1_Function<'getChainId'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getChainId',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -78,7 +80,7 @@ class SafeProxyFactoryContract_v1_4_1
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_4_1_Function<'proxyCreationCode'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'proxyCreationCode',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -160,7 +162,7 @@ class SafeProxyFactoryContract_v1_4_1
         if (callback) {
           callback(hash)
         }
-        const { logs } = await waitForTransactionReceipt(this.runner!, hash)
+        const { logs } = await waitForTransactionReceipt(this.runner, hash)
         const events = parseEventLogs({ logs, abi: this.contractAbi })
         const proxyCreationEvent = events.find((event) => event?.eventName === 'ProxyCreation')
         if (!proxyCreationEvent || !proxyCreationEvent.args) {

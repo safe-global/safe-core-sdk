@@ -23,14 +23,14 @@ import {
   Eip1193Provider,
   HttpTransport,
   SocketTransport,
-  ExternalSigner
+  ExternalSigner,
+  ExternalClient
 } from '@safe-global/protocol-kit/types'
 import { asAddress, asHash, asHex, getChainById } from './utils/types'
 import { asBlockId } from './utils/block'
 import {
   createPublicClient,
   createWalletClient,
-  PublicClient,
   custom,
   http,
   getAddress,
@@ -44,6 +44,15 @@ import {
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
+  call,
+  estimateGas,
+  getBalance,
+  getCode,
+  getTransaction,
+  getTransactionCount,
+  getStorageAt
+} from 'viem/actions'
+import {
   toEstimateGasParameters,
   toCallGasParameters,
   sameString
@@ -51,7 +60,7 @@ import {
 
 class SafeProvider {
   #chain?: Chain
-  #externalProvider: PublicClient
+  #externalProvider: ExternalClient
   signer?: string
   provider: Eip1193Provider | HttpTransport | SocketTransport
 
@@ -64,7 +73,7 @@ class SafeProvider {
     this.signer = signer ? asHex(signer) : signer
   }
 
-  getExternalProvider(): PublicClient {
+  getExternalProvider(): ExternalClient {
     return this.#externalProvider
   }
 
@@ -119,14 +128,14 @@ class SafeProvider {
   }
 
   async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
-    return this.#externalProvider.getBalance({
+    return getBalance(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {
-    return this.#externalProvider.getTransactionCount({
+    return getTransactionCount(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
@@ -245,7 +254,7 @@ class SafeProvider {
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
-    const res = await this.#externalProvider.getCode({
+    const res = await getCode(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
@@ -254,7 +263,7 @@ class SafeProvider {
   }
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
-    const contractCode = await this.#externalProvider.getCode({
+    const contractCode = await getCode(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
@@ -263,7 +272,7 @@ class SafeProvider {
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {
-    const content = await this.#externalProvider.getStorageAt({
+    const content = await getStorageAt(this.#externalProvider, {
       address: asAddress(address),
       slot: asHex(position)
     })
@@ -272,9 +281,9 @@ class SafeProvider {
   }
 
   async getTransaction(transactionHash: string): Promise<Transaction> {
-    return this.#externalProvider.getTransaction({
+    return getTransaction(this.#externalProvider, {
       hash: asHash(transactionHash)
-    }) as Promise<Transaction>
+    }) // as Promise<Transaction>
   }
 
   async getSignerAddress(): Promise<string | undefined> {
@@ -334,12 +343,12 @@ class SafeProvider {
 
   async estimateGas(transaction: SafeProviderTransaction): Promise<string> {
     const converted = toEstimateGasParameters(transaction)
-    return (await this.#externalProvider.estimateGas(converted)).toString()
+    return (await estimateGas(this.#externalProvider, converted)).toString()
   }
 
   async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
     const converted = toCallGasParameters(transaction)
-    const { data } = await this.#externalProvider.call({
+    const { data } = await call(this.#externalProvider, {
       ...converted,
       ...asBlockId(blockTag)
     })

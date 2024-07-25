@@ -9,6 +9,7 @@ import {
   Chain,
   getContract
 } from 'viem'
+import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
@@ -24,6 +25,7 @@ import {
   WalletLegacyTransactionOptions,
   convertTransactionOptions
 } from '@safe-global/protocol-kit/utils'
+import { ExternalClient } from '../types'
 
 /**
  * Abstract class BaseContract
@@ -48,7 +50,7 @@ class BaseContract<ContractAbiType extends Abi> {
   safeProvider: SafeProvider
   chainId: bigint
   contract!: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
-  runner: PublicClient
+  runner: ExternalClient
   wallet?: WalletClient<Transport, Chain | undefined>
 
   /**
@@ -71,7 +73,7 @@ class BaseContract<ContractAbiType extends Abi> {
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: ContractAbiType,
-    runner?: PublicClient
+    runner?: ExternalClient
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
@@ -107,8 +109,7 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   async getTransactionReceipt(hash: Hash) {
-    const client = this.runner
-    return client?.getTransactionReceipt({ hash })
+    return getTransactionReceipt(this.runner, { hash })
   }
 
   async convertOptions(
@@ -153,7 +154,7 @@ class BaseContract<ContractAbiType extends Abi> {
     const contractOptions = await this.convertOptions(options)
     const abi = this.contractAbi as Abi
     const params = args as unknown[]
-    return this.runner!.estimateContractGas({
+    return estimateContractGas(this.runner, {
       abi,
       functionName: functionToEstimate,
       address: this.contract.address,

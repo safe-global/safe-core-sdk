@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import * as viem from 'viem'
+import * as viemActions from 'viem/actions'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import {
   getAddModulesLibDeployment,
@@ -647,20 +648,20 @@ describe('Safe4337Pack', () => {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
       }
     })
-    const readContractSpy = jest.spyOn(
-      safe4337Pack.protocolKit.getSafeProvider().getExternalProvider(),
-      'readContract'
-    )
+    const readContractSpy = jest.spyOn(viemActions, 'readContract')
 
     let safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC]
     })
-    expect(readContractSpy).toHaveBeenCalledWith({
-      address: constants.ENTRYPOINT_ADDRESS_V06,
-      abi: constants.ENTRYPOINT_ABI,
-      functionName: 'getNonce',
-      args: [fixtures.SAFE_ADDRESS_v1_4_1, 0n]
-    })
+    expect(readContractSpy).toHaveBeenCalledWith(
+      safe4337Pack.protocolKit.getSafeProvider().getExternalProvider(),
+      {
+        address: constants.ENTRYPOINT_ADDRESS_V06,
+        abi: constants.ENTRYPOINT_ABI,
+        functionName: 'getNonce',
+        args: [fixtures.SAFE_ADDRESS_v1_4_1, 0n]
+      }
+    )
 
     safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 

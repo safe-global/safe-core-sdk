@@ -1,3 +1,4 @@
+import { readContract, simulateContract } from 'viem/actions'
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
@@ -65,7 +66,7 @@ class SafeContract_v1_1_1
    */
   NAME: SafeContract_v1_1_1_Function<'NAME'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'NAME',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -78,7 +79,7 @@ class SafeContract_v1_1_1
    */
   VERSION: SafeContract_v1_1_1_Function<'VERSION'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'VERSION',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -92,7 +93,7 @@ class SafeContract_v1_1_1
    */
   approvedHashes: SafeContract_v1_1_1_Function<'approvedHashes'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'approvedHashes',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -106,7 +107,7 @@ class SafeContract_v1_1_1
    */
   domainSeparator: SafeContract_v1_1_1_Function<'domainSeparator'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'domainSeparator',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -120,7 +121,7 @@ class SafeContract_v1_1_1
    */
   getModules: SafeContract_v1_1_1_Function<'getModules'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getModules',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -134,7 +135,7 @@ class SafeContract_v1_1_1
    * @returns Array[Array[modules], next]
    */
   getModulesPaginated: SafeContract_v1_1_1_Function<'getModulesPaginated'> = async (args) => {
-    const [array, next] = await this.runner.readContract({
+    const [array, next] = await readContract(this.runner, {
       functionName: 'getModulesPaginated',
       abi: this.contractAbi,
       address: asAddress(this.contractAddress),
@@ -149,7 +150,7 @@ class SafeContract_v1_1_1
    */
   getOwners: SafeContract_v1_1_1_Function<'getOwners'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getOwners',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -163,7 +164,7 @@ class SafeContract_v1_1_1
    */
   getThreshold: SafeContract_v1_1_1_Function<'getThreshold'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getThreshold',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -178,7 +179,7 @@ class SafeContract_v1_1_1
    */
   isOwner: SafeContract_v1_1_1_Function<'isOwner'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'isOwner',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -193,7 +194,7 @@ class SafeContract_v1_1_1
    */
   nonce: SafeContract_v1_1_1_Function<'nonce'> = async () => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'nonce',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress)
@@ -207,7 +208,7 @@ class SafeContract_v1_1_1
    */
   signedMessages: SafeContract_v1_1_1_Function<'signedMessages'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'signedMessages',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -223,7 +224,7 @@ class SafeContract_v1_1_1
    */
   getMessageHash: SafeContract_v1_1_1_Function<'getMessageHash'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getMessageHash',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -239,7 +240,7 @@ class SafeContract_v1_1_1
    */
   encodeTransactionData: SafeContract_v1_1_1_Function<'encodeTransactionData'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'encodeTransactionData',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -255,7 +256,7 @@ class SafeContract_v1_1_1
    */
   getTransactionHash: SafeContract_v1_1_1_Function<'getTransactionHash'> = async (args) => {
     return [
-      await this.runner.readContract({
+      await readContract(this.runner, {
         functionName: 'getTransactionHash',
         abi: this.contractAbi,
         address: asAddress(this.contractAddress),
@@ -373,7 +374,7 @@ class SafeContract_v1_1_1
         ))
 
       const converted = await this.convertOptions({ ...options, gasLimit })
-      const txResult = await this.runner.simulateContract({
+      const txResult = await simulateContract(this.runner, {
         address: asAddress(this.contractAddress),
         functionName: 'execTransaction',
         abi: this.contractAbi,

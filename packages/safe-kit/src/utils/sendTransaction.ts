@@ -1,4 +1,5 @@
 import { Address, WalletClient, Transport, Chain, Hex, Account } from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
 import Safe from '@safe-global/protocol-kit'
 import { Transaction, TransactionOptions } from '@safe-global/safe-core-sdk-types'
 
@@ -34,7 +35,7 @@ export const sendTransaction = async ({
     account: signer.account
   })
 
-  const receipt = await client.waitForTransactionReceipt({ hash })
+  const receipt = await waitForTransactionReceipt(client, { hash })
 
   return receipt.transactionHash
 }

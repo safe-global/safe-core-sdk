@@ -4,9 +4,7 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args,
-  ExternalClient,
-  ExternalSigner
+  SafeEIP712Args
 } from '@safe-global/safe-core-sdk-types'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -22,6 +20,8 @@ import {
   SafeProviderTransaction,
   GetContractProps,
   SafeProviderConfig,
+  ExternalClient,
+  ExternalSigner,
   Eip1193Provider,
   HttpTransport,
   SocketTransport

@@ -2,6 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getApiKit } from '../utils/setupKits'
+import { zeroHash } from 'viem'
 
 chai.use(chaiAsPromised)
 
@@ -40,7 +41,7 @@ describe('getSafeOperationConfirmations', () => {
   })
 
   it('should return an empty array if the safeOperationHash is not found', async () => {
-    const safeOperationHash = '0x0000000000000000000000000000000000000000000000000000000000000000'
+    const safeOperationHash = zeroHash
     const safeOpConfirmations = await safeApiKit.getSafeOperationConfirmations(safeOperationHash)
     chai.expect(safeOpConfirmations.count).to.be.equal(0)
     chai.expect(safeOpConfirmations.results.length).to.be.equal(0)

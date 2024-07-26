@@ -250,7 +250,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
         })
 
-        deploymentTo = (await multiSendContract.getAddress()) as Address
+        deploymentTo = multiSendContract.getAddress() as Address
         deploymentData = batchData
       }
 

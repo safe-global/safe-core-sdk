@@ -120,7 +120,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       const txData = signMessageContract.encode('signMessage', [hashMessage(message)])
 
       const safeTransactionData = {
-        to: await signMessageContract.getAddress(),
+        to: signMessageContract.getAddress(),
         value: '0',
         data: txData,
         operation: OperationType.DelegateCall

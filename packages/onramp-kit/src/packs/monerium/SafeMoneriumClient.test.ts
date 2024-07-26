@@ -61,12 +61,12 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should allow to get the Safe address', async () => {
-    protocolKit.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
+    protocolKit.getAddress = jest.fn(() => '0xSafeAddress')
     expect(await safeMoneriumClient.getSafeAddress()).toBe('0xSafeAddress')
   })
 
   it('should allow to send tokens from then Safe to any IBAN', async () => {
-    protocolKit.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
+    protocolKit.getAddress = jest.fn(() => '0xSafeAddress')
     const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
     //@ts-expect-error - Not all values are mocked
     const signMessageSpy = jest.spyOn(safeMoneriumClient, 'signMessage').mockResolvedValueOnce({
@@ -96,7 +96,7 @@ describe('SafeMoneriumClient', () => {
   })
 
   it('should throw if signing message fails', async () => {
-    protocolKit.getAddress = jest.fn(() => Promise.resolve('0xSafeAddress'))
+    protocolKit.getAddress = jest.fn(() => '0xSafeAddress')
     const placeOrderSpy = jest.spyOn(safeMoneriumClient, 'placeOrder')
     const signMessageSpy = jest
       .spyOn(safeMoneriumClient, 'signMessage')

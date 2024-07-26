@@ -42,9 +42,7 @@ describe('Safe contracts', () => {
       const safeContract = await safeProvider.getSafeContract({
         safeVersion
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
+      chai.expect(safeContract.getAddress()).to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
     })
 
     it('should return an L2 Safe contract from safe-deployments', async () => {
@@ -53,9 +51,7 @@ describe('Safe contracts', () => {
       const safeContract = await safeProvider.getSafeContract({
         safeVersion
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0x3E5c63644E683549055b9Be8653de26E0B4CD36E')
+      chai.expect(safeContract.getAddress()).to.be.eq('0x3E5c63644E683549055b9Be8653de26E0B4CD36E')
     })
 
     it('should return an L1 Safe contract from safe-deployments using the L1 flag', async () => {
@@ -66,9 +62,7 @@ describe('Safe contracts', () => {
         safeVersion,
         isL1SafeSingleton
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
+      chai.expect(safeContract.getAddress()).to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
     })
 
     it('should return an L1 Safe contract from safe-deployments when the safeVersion is < 1.3.0', async () => {
@@ -77,9 +71,7 @@ describe('Safe contracts', () => {
       const safeContract = await safeProvider.getSafeContract({
         safeVersion
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F')
+      chai.expect(safeContract.getAddress()).to.be.eq('0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F')
     })
 
     it('should return a Safe contract from the custom addresses', async () => {
@@ -93,7 +85,7 @@ describe('Safe contracts', () => {
         customContractAbi: customContract?.safeSingletonAbi
       })
       chai
-        .expect(await safeContract.getAddress())
+        .expect(safeContract.getAddress())
         .to.be.eq(await (await getSafeSingleton()).contract.address)
     })
   })

@@ -139,7 +139,7 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   getAddress: GetAddressFunction = () => {
-    return Promise.resolve(this.contract.address)
+    return this.contract.address
   }
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {

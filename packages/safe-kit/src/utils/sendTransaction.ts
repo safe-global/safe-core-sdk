@@ -1,7 +1,7 @@
 import { Address, WalletClient, Transport, Chain, Hex, Account } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import Safe from '@safe-global/protocol-kit'
-import { Transaction, TransactionOptions } from '@safe-global/safe-core-sdk-types'
+import { Transaction } from '@safe-global/safe-core-sdk-types'
 
 /**
  * Sends a transaction using the signer (owner)
@@ -38,33 +38,4 @@ export const sendTransaction = async ({
   const receipt = await waitForTransactionReceipt(client, { hash })
 
   return receipt.transactionHash
-}
-
-export function createLegacyTxOptions(options?: TransactionOptions) {
-  const converted: any = {}
-  if (options?.from) {
-    converted.account = options.from as Address
-  }
-
-  if (options?.gasLimit) {
-    converted.gas = BigInt(options.gasLimit)
-  }
-
-  if (options?.gasPrice) {
-    converted.gasPrice = BigInt(options.gasPrice)
-  }
-
-  if (options?.nonce) {
-    converted.nonce = options.nonce
-  }
-
-  if (options?.maxFeePerGas) {
-    converted.maxFeePerGas = BigInt(options.maxFeePerGas)
-  }
-
-  if (options?.maxPriorityFeePerGas) {
-    converted.maxPriorityFeePerGas = BigInt(options.maxPriorityFeePerGas)
-  }
-
-  return converted
 }

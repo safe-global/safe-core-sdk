@@ -85,7 +85,7 @@ describe('SafeProxyFactory', () => {
       const safeFactory = await SafeFactory.init({ provider, contractNetworks })
       const networkId = await safeProvider.getChainId()
       chai
-        .expect(await safeFactory.getAddress())
+        .expect(safeFactory.getAddress())
         .to.be.eq(contractNetworks[networkId.toString()].safeProxyFactoryAddress)
     })
   })

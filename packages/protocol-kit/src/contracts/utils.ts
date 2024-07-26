@@ -136,7 +136,7 @@ export async function encodeSetupCallData({
       customContracts
     })
 
-    fallbackHandlerAddress = await fallbackHandlerContract.getAddress()
+    fallbackHandlerAddress = fallbackHandlerContract.getAddress()
   }
 
   return safeContract.encode('setup', [
@@ -239,14 +239,14 @@ export async function getPredictedSafeAddressInitCode({
   })
 
   const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce])
-  const safeSingletonAddress = await safeContract.getAddress()
+  const safeSingletonAddress = safeContract.getAddress()
   const initCodeCallData = encodeCreateProxyWithNonce(
     safeProxyFactoryContract,
     safeSingletonAddress,
     initializer,
     encodedNonce
   )
-  const safeProxyFactoryAddress = await safeProxyFactoryContract.getAddress()
+  const safeProxyFactoryAddress = safeProxyFactoryContract.getAddress()
   const initCode = `0x${[safeProxyFactoryAddress, initCodeCallData].reduce(
     (acc, x) => acc + x.replace('0x', ''),
     ''
@@ -306,9 +306,9 @@ export async function predictSafeAddress({
 
   const salt = keccak256(concat([initializerHash, encodedNonce]))
 
-  const input = safeProvider.encodeParameters('address', [await safeContract.getAddress()])
+  const input = safeProvider.encodeParameters('address', [safeContract.getAddress()])
 
-  const from = asAddress(await safeProxyFactoryContract.getAddress())
+  const from = asAddress(safeProxyFactoryContract.getAddress())
 
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)

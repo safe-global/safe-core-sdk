@@ -60,7 +60,7 @@ class FallbackHandlerManager {
   async getFallbackHandler(): Promise<string> {
     const safeContract = await this.isFallbackHandlerCompatible()
 
-    return this.#safeProvider.getStorageAt(await safeContract.getAddress(), this.#slot)
+    return this.#safeProvider.getStorageAt(safeContract.getAddress(), this.#slot)
   }
 
   async encodeEnableFallbackHandlerData(fallbackHandlerAddress: string): Promise<string> {

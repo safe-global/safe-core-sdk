@@ -81,7 +81,7 @@ export type EstimateGasFunction<
   options?: TransactionOptions
 ) => Promise<bigint>
 
-export type GetAddressFunction = () => Promise<string>
+export type GetAddressFunction = () => string
 
 /**
  * Defines a function type for a contract, derived by the given function name from a given contract ABI.

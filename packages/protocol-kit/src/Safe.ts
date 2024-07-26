@@ -256,7 +256,7 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    return await this.#contractManager.safeContract.getAddress()
+    return this.#contractManager.safeContract.getAddress()
   }
 
   /**
@@ -282,8 +282,8 @@ class Safe {
    *
    * @returns The address of the MultiSend contract
    */
-  async getMultiSendAddress(): Promise<string> {
-    return await this.#contractManager.multiSendContract.getAddress()
+  getMultiSendAddress(): string {
+    return this.#contractManager.multiSendContract.getAddress()
   }
 
   /**
@@ -291,8 +291,8 @@ class Safe {
    *
    * @returns The address of the MultiSendCallOnly contract
    */
-  async getMultiSendCallOnlyAddress(): Promise<string> {
-    return await this.#contractManager.multiSendCallOnlyContract.getAddress()
+  getMultiSendCallOnlyAddress(): string {
+    return this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
   /**
@@ -482,7 +482,7 @@ class Safe {
 
       const multiSendTransaction = {
         ...options,
-        to: await multiSendContract.getAddress(),
+        to: multiSendContract.getAddress(),
         value: '0',
         data: multiSendContract.encode('multiSend', [asHex(multiSendData)]),
         operation: OperationType.DelegateCall
@@ -1401,11 +1401,11 @@ class Safe {
 
     const safeDeployTransactionData = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: await safeProxyFactoryContract.getAddress(),
+      to: safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        asAddress(await safeSingletonContract.getAddress()),
+        asAddress(safeSingletonContract.getAddress()),
         asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
         BigInt(saltNonce)
       ])
@@ -1445,7 +1445,7 @@ class Safe {
 
     const transactionBatch = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: await multiSendCallOnlyContract.getAddress(),
+      to: multiSendCallOnlyContract.getAddress(),
       value: '0',
       data: batchData
     }

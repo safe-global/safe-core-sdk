@@ -91,9 +91,9 @@ export async function estimateGas(
 
   const safeFunctionToEstimate = safeContractContractCompatibleWithSimulateAndRevert.encode(
     'simulateAndRevert',
-    [asAddress(await simulateTxAccessorContract.getAddress()), asHex(transactionDataToEstimate)]
+    [asAddress(simulateTxAccessorContract.getAddress()), asHex(transactionDataToEstimate)]
   )
-  const safeAddress = await safeContract.getAddress()
+  const safeAddress = safeContract.getAddress()
   const transactionToEstimateGas = {
     to: safeAddress,
     value: '0',
@@ -118,7 +118,7 @@ export async function estimateTxGas(
   data: string,
   operation: OperationType
 ): Promise<string> {
-  const safeAddress = await safeContract.getAddress()
+  const safeAddress = safeContract.getAddress()
   try {
     const estimateGas = await safeProvider.estimateGas({
       to,
@@ -309,7 +309,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
     ]
   )
 
-  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
 
   const transactionToEstimateGas = {
     to,
@@ -464,14 +464,14 @@ async function estimateSafeTxGasWithSimulate(
   ])
 
   // if the Safe is not deployed we can use the singleton address to simulate
-  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
 
   const SafeContractCompatibleWithSimulateAndRevert =
     await isSafeContractCompatibleWithSimulateAndRevert(safeSingletonContract)
 
   const safeFunctionToEstimate: string = SafeContractCompatibleWithSimulateAndRevert.encode(
     'simulateAndRevert',
-    [asAddress(await simulateTxAccessorContract.getAddress()), asHex(transactionDataToEstimate)]
+    [asAddress(simulateTxAccessorContract.getAddress()), asHex(transactionDataToEstimate)]
   )
 
   const transactionToEstimateGas = {

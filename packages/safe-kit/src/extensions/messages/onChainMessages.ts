@@ -40,7 +40,7 @@ export function onChainMessages() {
         })
 
       const transaction = {
-        to: await signMessageLibContract.getAddress(),
+        to: signMessageLibContract.getAddress(),
         value: '0',
         data: signMessageLibContract.encode('signMessage', [hashSafeMessage(message) as Hash]),
         operation: OperationType.DelegateCall

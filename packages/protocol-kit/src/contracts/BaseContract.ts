@@ -130,7 +130,6 @@ class BaseContract<ContractAbiType extends Abi> {
     if (!signer || !signerAddress) throw new Error('Invalid signer')
 
     const account = signer || asAddress(signerAddress)
-    this.wallet?.writeContract()
     const txOptions = await convertTransactionOptions(options)
     return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
   }

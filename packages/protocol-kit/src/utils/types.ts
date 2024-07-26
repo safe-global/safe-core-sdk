@@ -1,5 +1,5 @@
 import { SafeConfig, SafeConfigWithPredictedSafe } from '../types'
-import { getAddress, Address, isHex, Hex, Hash, Chain } from 'viem'
+import { getAddress, Address, isHex, Hex, Hash, Chain, defineChain, etherUnits } from 'viem'
 import * as allChains from 'viem/chains'
 
 export function isSafeConfigWithPredictedSafe(
@@ -25,5 +25,25 @@ export function asHex(hex?: string): Hex {
 }
 
 export function getChainById(chainId: bigint): Chain | undefined {
-  return Object.values(allChains).find((chain) => chain.id === Number(chainId))
+  const chain = Object.values(allChains).find((chain) => chain.id === Number(chainId))
+  if (chain) {
+    return chain
+  } else {
+    // We assume an ethereum-based chain whose urls will be defined on the client.
+    return defineChain({
+      id: Number(chainId),
+      name: 'Custom',
+      nativeCurrency: {
+        decimals: etherUnits.wei,
+        name: 'Ether',
+        symbol: 'ETH'
+      },
+      rpcUrls: {
+        default: {
+          http: [],
+          webSocket: []
+        }
+      }
+    })
+  }
 }

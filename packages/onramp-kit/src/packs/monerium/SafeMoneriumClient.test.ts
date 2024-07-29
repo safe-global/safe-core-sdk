@@ -1,4 +1,4 @@
-import { createPublicClient, hashMessage, getContract, custom } from 'viem'
+import { createPublicClient, hashMessage, custom } from 'viem'
 import { PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKitPackage from '@safe-global/protocol-kit'
 import {
@@ -225,17 +225,10 @@ describe('SafeMoneriumClient', () => {
     const contract = {
       safeVersion: '1.3.0',
       contractName: 'signMessageLibVersion',
-      contract: getContract({
-        address: '0x0000000000000000000000000000000000000001',
-        abi: signMessageLib_1_4_1_ContractArtifacts.abi,
-        client: createPublicClient({
-          transport: custom({ request: jest.fn() })
-        })
-      }),
       safeProvider: protocolKit.getSafeProvider() as protocolKitPackage.SafeProvider,
       encode: jest.fn(),
       contractAbi: signMessageLib_1_4_1_ContractArtifacts.abi,
-      contractAddress: '',
+      contractAddress: '0x0000000000000000000000000000000000000001',
       getAddress: jest.fn(),
       getMessageHash: jest.fn(),
       signMessage: jest.fn(),
@@ -245,7 +238,10 @@ describe('SafeMoneriumClient', () => {
         transport: custom({ request: jest.fn() })
       }),
       chainId: 1n,
+      read: jest.fn(),
+      write: jest.fn(),
       getChain: jest.fn(),
+      getWallet: jest.fn(),
       convertOptions: jest.fn(),
       getTransactionReceipt: jest.fn()
     } as SignMessageLibContractImplementationType

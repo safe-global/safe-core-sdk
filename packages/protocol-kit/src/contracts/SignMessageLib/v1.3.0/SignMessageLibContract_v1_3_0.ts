@@ -1,4 +1,3 @@
-import { readContract } from 'viem/actions'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import SignMessageLibBaseContract from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -10,7 +9,6 @@ import {
   SignMessageLibContract_v1_3_0_Function,
   signMessageLib_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
-import { asAddress } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SignMessageLibContract_v1_3_0  is the implementation specific to the SignMessageLib contract version 1.3.0.
@@ -51,14 +49,7 @@ class SignMessageLibContract_v1_3_0
    * @param args - Array[message]
    */
   getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
-    return [
-      await readContract(this.runner, {
-        functionName: 'getMessageHash',
-        abi: this.contractAbi,
-        address: asAddress(this.contractAddress),
-        args
-      })
-    ]
+    return [await this.read('getMessageHash', args)]
   }
 
   /**
@@ -72,12 +63,7 @@ class SignMessageLibContract_v1_3_0
       options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
 
-    const txResponse = await this.contract.write.signMessage(
-      data,
-      await this.convertOptions(options)
-    )
-
-    return toTxResult(this.runner!, txResponse, options)
+    return toTxResult(this.runner!, await this.write('signMessage', data, options), options)
   }
 }
 

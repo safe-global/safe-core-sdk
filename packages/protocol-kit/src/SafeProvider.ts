@@ -44,7 +44,13 @@ import {
   Abi,
   ReadContractParameters,
   ContractFunctionName,
-  ContractFunctionArgs
+  ContractFunctionArgs,
+  walletActions,
+  publicActions,
+  createClient,
+  PublicRpcSchema,
+  WalletRpcSchema,
+  rpcSchema
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
@@ -62,6 +68,7 @@ import {
   toCallGasParameters,
   sameString
 } from '@safe-global/protocol-kit/utils'
+import { isEip1193Provider, isPrivateKey } from './utils/provider'
 
 class SafeProvider {
   #chain?: Chain
@@ -71,7 +78,9 @@ class SafeProvider {
 
   constructor({ provider, signer }: SafeProviderConfig) {
     this.#externalProvider = createPublicClient({
-      transport: typeof provider === 'string' ? http(provider) : custom(provider)
+      transport: isEip1193Provider(provider)
+        ? custom(provider as Eip1193Provider)
+        : http(provider as string)
     })
 
     this.provider = provider
@@ -83,10 +92,10 @@ class SafeProvider {
   }
 
   async getExternalSigner(): Promise<ExternalSigner | undefined> {
-    // If the signer is not an Ethereum address, it should be a private key
     const { transport, chain = await this.#getChain() } = this.getExternalProvider()
 
-    if (this.signer && !this.isAddress(this.signer)) {
+    if (isPrivateKey(this.signer)) {
+      // This is a client with a local account, the account needs to be of type Accound as viem consider strings as 'json-rpc' (on parseAccount)
       const account = privateKeyToAccount(asHex(this.signer))
       return createWalletClient({
         account,
@@ -96,7 +105,7 @@ class SafeProvider {
     }
 
     // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
-    if (this.signer) {
+    if (this.signer && isAddress(this.signer)) {
       return createWalletClient({
         account: asAddress(this.signer),
         chain,
@@ -104,7 +113,7 @@ class SafeProvider {
       })
     }
 
-    if (transport?.type === 'custom') {
+    try {
       // This behavior is a reproduction of JsonRpcApiProvider#getSigner (which is super of BrowserProvider).
       // it dispatches and eth_accounts and picks the index 0. https://github.com/ethers-io/ethers.js/blob/a4b1d1f43fca14f2e826e3c60e0d45f5b6ef3ec4/src.ts/providers/provider-jsonrpc.ts#L1119C24-L1119C37
       const wallet = createWalletClient({
@@ -113,12 +122,18 @@ class SafeProvider {
       })
 
       const [address] = await wallet.getAddresses()
-      return createWalletClient({
-        account: address,
-        transport: custom(transport),
-        chain: wallet.chain
-      })
-    }
+      if (address) {
+        const client = createClient({
+          account: address,
+          transport: custom(transport),
+          chain: wallet.chain,
+          rpcSchema: rpcSchema<WalletRpcSchema & PublicRpcSchema>()
+        })
+          .extend(walletActions)
+          .extend(publicActions)
+        return client
+      }
+    } catch {}
 
     return undefined
   }

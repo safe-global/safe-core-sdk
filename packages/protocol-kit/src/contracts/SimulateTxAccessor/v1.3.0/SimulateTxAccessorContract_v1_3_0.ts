@@ -51,10 +51,7 @@ class SimulateTxAccessorContract_v1_3_0
    * @returns Array[estimate, success, returnData]
    */
   simulate: SimulateTxAccessorContract_v1_3_0_Function<'simulate'> = async (args) => {
-    const [estimate, success, returnData] = await this.contract.write.simulate(
-      args,
-      await this.convertOptions({})
-    )
+    const [estimate, success, returnData] = await this.write('simulate', args)
     return [BigInt(estimate), !!success, asHex(returnData)]
   }
 }

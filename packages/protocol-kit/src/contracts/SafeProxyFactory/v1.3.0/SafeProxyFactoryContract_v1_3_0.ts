@@ -1,5 +1,4 @@
 import { parseEventLogs } from 'viem'
-import { readContract } from 'viem/actions'
 import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
@@ -65,13 +64,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[creationCode]
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyCreationCode'> = async () => {
-    return [
-      await readContract(this.runner, {
-        functionName: 'proxyCreationCode',
-        abi: this.contractAbi,
-        address: asAddress(this.contractAddress)
-      })
-    ]
+    return [await this.read('proxyCreationCode')]
   }
 
   /**
@@ -79,13 +72,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[runtimeCode]
    */
   proxyRuntimeCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyRuntimeCode'> = async () => {
-    return [
-      await readContract(this.runner, {
-        functionName: 'proxyRuntimeCode',
-        abi: this.contractAbi,
-        address: asAddress(this.contractAddress)
-      })
-    ]
+    return [await this.read('proxyRuntimeCode')]
   }
 
   /**
@@ -95,12 +82,7 @@ class SafeProxyFactoryContract_v1_3_0
    */
   calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_3_0_Function<'calculateCreateProxyWithNonceAddress'> =
     async (args) => {
-      return [
-        await this.contract.write.calculateCreateProxyWithNonceAddress(
-          args,
-          await this.convertOptions({})
-        )
-      ]
+      return [await this.write('calculateCreateProxyWithNonceAddress', args)]
     }
 
   /**
@@ -109,7 +91,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[proxyAddress]
    */
   createProxy: SafeProxyFactoryContract_v1_3_0_Function<'createProxy'> = async (args) => {
-    return [await this.contract.write.createProxy(args, await this.convertOptions({}))]
+    return [await this.write('createProxy', args)]
   }
 
   /**
@@ -119,9 +101,7 @@ class SafeProxyFactoryContract_v1_3_0
    */
   createProxyWithCallback: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithCallback'> =
     async (args) => {
-      return [
-        await this.contract.write.createProxyWithCallback(args, await this.convertOptions({}))
-      ]
+      return [await this.write('createProxyWithCallback', args)]
     }
 
   /**
@@ -132,7 +112,7 @@ class SafeProxyFactoryContract_v1_3_0
   createProxyWithNonce: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.write.createProxyWithNonce(args, await this.convertOptions({}))]
+    return [await this.write('createProxyWithNonce', args)]
   }
 
   /**
@@ -161,11 +141,15 @@ class SafeProxyFactoryContract_v1_3_0
       ).toString()
     }
 
-    const proxyAddress = this.contract.write
-      .createProxyWithNonce(
-        [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
-        await this.convertOptions(options)
-      )
+    const coverted = await this.convertOptions(options)
+    const proxyAddress = await this.getWallet()
+      .writeContract({
+        address: asAddress(this.contractAddress),
+        abi: this.contractAbi,
+        functionName: 'createProxyWithNonce',
+        args: [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
+        ...coverted
+      })
       .then(async (hash) => {
         if (callback) {
           callback(hash)

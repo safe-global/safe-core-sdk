@@ -59,11 +59,8 @@ class CreateCallContract_v1_3_0
         await this.estimateGas('performCreate', [...args], { ...options })
       ).toString()
     }
-    const txResponse = await this.contract.write.performCreate(
-      args,
-      await this.convertOptions(options)
-    )
-    return toTxResult(this.runner!, txResponse, options)
+
+    return toTxResult(this.runner!, await this.write('performCreate', args, options), options)
   }
 
   /**
@@ -78,11 +75,8 @@ class CreateCallContract_v1_3_0
     if (options && !options.gasLimit) {
       options.gasLimit = (await this.estimateGas('performCreate2', args, options)).toString()
     }
-    const txResponse = await this.contract.write.performCreate2(
-      args,
-      await this.convertOptions(options)
-    )
-    return toTxResult(this.runner!, txResponse, options)
+
+    return toTxResult(this.runner!, await this.write('performCreate2', args, options), options)
   }
 }
 

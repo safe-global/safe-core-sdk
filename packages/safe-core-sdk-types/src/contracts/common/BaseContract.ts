@@ -40,7 +40,7 @@ export type ContractWriteFunctionNames<ContractAbi extends Abi> = ExtractAbiFunc
  * @template ArgType - The type of arguments to extract, either 'inputs' or 'outputs'. (default: 'inputs')
  * @type {ExtractFunctionArgs}
  */
-type ExtractFunctionArgs<
+export type ExtractFunctionArgs<
   ContractAbi extends Abi,
   ContractFunctionName extends
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>,

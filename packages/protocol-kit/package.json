@@ -12,7 +12,7 @@
     "SDK"
   ],
   "scripts": {
-    "safe-deployments": "ts-node scripts/checkSafeDeployments.ts",
+    "safe-deployments": "TS_NODE_DEBUG=true ts-node scripts/checkSafeDeployments.ts",
     "test": "mocha -r ts-node/register -r tsconfig-paths/register tests/unit/**/*.ts",
     "test:hardhat:web3:v1.0.0": "export TEST_NETWORK=hardhat && export ETH_LIB=web3 && export SAFE_VERSION=1.0.0 && hardhat deploy && nyc hardhat test",
     "test:hardhat:web3:v1.1.1": "export TEST_NETWORK=hardhat && export ETH_LIB=web3 && export SAFE_VERSION=1.1.1 && hardhat deploy && nyc hardhat test",

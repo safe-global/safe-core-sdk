@@ -163,17 +163,13 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   async write<
-    ContractFunctionName2 extends ContractFunctionName<ContractAbiType, 'payable' | 'nonpayable'>,
-    ConctractFunctionArgs2 extends ContractFunctionArgs<
+    functionName extends ContractFunctionName<ContractAbiType, 'payable' | 'nonpayable'>,
+    functionArgs extends ContractFunctionArgs<
       ContractAbiType,
       'payable' | 'nonpayable',
-      ContractFunctionName2
+      functionName
     >
-  >(
-    functionName: ContractFunctionName2,
-    args: ConctractFunctionArgs2,
-    options?: TransactionOptions
-  ) {
+  >(functionName: functionName, args: functionArgs, options?: TransactionOptions) {
     const converted = (await this.convertOptions(options)) as any
 
     return await this.getWallet().writeContract({
@@ -186,25 +182,14 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   async read<
-    ContractFunctionName2 extends ContractFunctionName<ContractAbiType, 'pure' | 'view'>,
-    ConctractFunctionArgs2 extends ContractFunctionArgs<
-      ContractAbiType,
-      'pure' | 'view',
-      ContractFunctionName2
-    >
-  >(
-    functionName: ContractFunctionName2,
-    args?: ConctractFunctionArgs2,
-    options?: TransactionOptions
-  ) {
-    const converted = await this.convertOptions(options)
-
+    functionName extends ContractFunctionName<ContractAbiType, 'pure' | 'view'>,
+    functionArgs extends ContractFunctionArgs<ContractAbiType, 'pure' | 'view', functionName>
+  >(functionName: functionName, args?: functionArgs) {
     return await this.runner.readContract({
       functionName,
       abi: this.contractAbi,
       address: asAddress(this.contractAddress),
-      args,
-      ...converted
+      args
     })
   }
 }

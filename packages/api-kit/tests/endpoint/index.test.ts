@@ -683,7 +683,13 @@ describe('Endpoint tests', () => {
       }
 
       const entryPoint = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
-      const options = { validAfter: 123, validUntil: 234 }
+
+      const ethersProvider = protocolKit.getSafeProvider().getExternalProvider()
+      const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+
+      const validAfter = timestamp - 60_000
+      const validUntil = timestamp + 60_000
+      const options = { validAfter, validUntil }
 
       await chai
         .expect(
@@ -711,7 +717,8 @@ describe('Endpoint tests', () => {
           maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas.toString(),
           paymasterAndData: userOperation.paymasterAndData,
           entryPoint,
-          ...options,
+          validAfter: new Date(validAfter * 1000).toISOString(),
+          validUntil: new Date(validUntil * 1000).toISOString(),
           signature: userOperation.signature,
           moduleAddress
         }

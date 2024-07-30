@@ -1,12 +1,8 @@
 import { hashSafeMessage } from '@safe-global/protocol-kit'
-import {
-  EIP712TypedData,
-  OperationType,
-  TransactionOptions
-} from '@safe-global/safe-core-sdk-types'
+import { OperationType } from '@safe-global/safe-core-sdk-types'
 
 import { SafeClient } from '@safe-global/safe-kit/SafeClient'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import { SafeClientResult, SendOnChainMessageProps } from '@safe-global/safe-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use on-chain messages
@@ -20,8 +16,8 @@ import { SafeClientResult } from '@safe-global/safe-kit/types'
  *   onChainMessages()
  * )
  *
- * const { transactions } = await safeMessageClient.sendMessage(...)
- * await safeMessageClient.confirm(transactions?.safeTxHash)
+ * const { transactions } = await safeMessageClient.sendOnChainMessage({ message })
+ * await safeMessageClient.confirm({ safeTxHash: transactions?.safeTxHash})
  */
 export function onChainMessages() {
   return (client: SafeClient) => ({
@@ -30,14 +26,12 @@ export function onChainMessages() {
      * The message can be a string or an EIP712TypedData object
      * As this method creates a new transaction you can confirm it using the safeTxHash and the confirm() method and
      * retrieve the pending transactions using the getPendingTransactions() method from the general client
-     * @param {string | EIP712TypedData} message The message to be sent
-     * @param {TransactionOptions} options Optional transaction options
+     * @param {SendOnChainMessageProps} props The message properties
      * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the safeTxHash to confirm from the transaction property
      */
-    async sendOnChainMessage(
-      message: string | EIP712TypedData,
-      options?: TransactionOptions
-    ): Promise<SafeClientResult> {
+    async sendOnChainMessage(props: SendOnChainMessageProps): Promise<SafeClientResult> {
+      const { message, ...transactionOptions } = props
+
       const signMessageLibContract = await client.protocolKit
         .getSafeProvider()
         .getSignMessageLibContract({
@@ -51,7 +45,7 @@ export function onChainMessages() {
         operation: OperationType.DelegateCall
       }
 
-      return client.send([transaction], options)
+      return client.send({ transactions: [transaction], ...transactionOptions })
     }
   })
 }

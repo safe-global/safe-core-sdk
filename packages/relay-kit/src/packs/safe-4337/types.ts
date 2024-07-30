@@ -20,14 +20,20 @@ type PredictedSafeOptions = {
   saltNonce?: string
 }
 
-export type PaymasterOptions = {
-  paymasterUrl?: string
-  isSponsored?: boolean
+export type SponsoredPaymasterOption = {
+  isSponsored: true
+  paymasterUrl: string
   sponsorshipPolicyId?: string
+}
+
+export type ERC20PaymasterOption = {
+  isSponsored?: false
   paymasterAddress: string
-  paymasterTokenAddress?: string
+  paymasterTokenAddress: string
   amountToApprove?: bigint
 }
+
+export type PaymasterOptions = SponsoredPaymasterOption | ERC20PaymasterOption | undefined
 
 export type Safe4337InitOptions = {
   provider: SafeProviderConfig['provider']

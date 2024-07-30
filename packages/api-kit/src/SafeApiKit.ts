@@ -831,6 +831,10 @@ class SafeApiKit {
       throw new Error('Signature must not be empty')
     }
 
+    // We are receiving the timestamp in seconds (block timestamp), but the API expects it in milliseconds
+    const getISOString = (date: number | undefined) =>
+      !date ? null : new Date(date * 1000).toISOString()
+
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
       method: HttpMethod.Post,
@@ -847,8 +851,8 @@ class SafeApiKit {
           ? null
           : userOperation.paymasterAndData,
         entryPoint,
-        validAfter: !options?.validAfter ? null : options?.validAfter,
-        validUntil: !options?.validUntil ? null : options?.validUntil,
+        validAfter: getISOString(options?.validAfter),
+        validUntil: getISOString(options?.validUntil),
         signature: userOperation.signature,
         moduleAddress
       }

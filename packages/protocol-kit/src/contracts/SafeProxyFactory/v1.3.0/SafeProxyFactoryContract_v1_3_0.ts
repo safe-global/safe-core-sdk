@@ -1,4 +1,4 @@
-import { parseEventLogs, PublicClient } from 'viem'
+import { parseEventLogs } from 'viem'
 import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
@@ -12,6 +12,7 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
 import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeProxyFactoryContract_v1_3_0  is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
@@ -40,7 +41,7 @@ class SafeProxyFactoryContract_v1_3_0
     safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi,
-    runner?: PublicClient
+    runner?: ExternalClient
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = safeProxyFactory_1_3_0_ContractArtifacts.abi
@@ -63,13 +64,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[creationCode]
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyCreationCode'> = async () => {
-    return [
-      await this.runner.readContract({
-        functionName: 'proxyCreationCode',
-        abi: this.contractAbi,
-        address: asAddress(this.contractAddress)
-      })
-    ]
+    return [await this.read('proxyCreationCode')]
   }
 
   /**
@@ -77,13 +72,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[runtimeCode]
    */
   proxyRuntimeCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyRuntimeCode'> = async () => {
-    return [
-      await this.runner.readContract({
-        functionName: 'proxyRuntimeCode',
-        abi: this.contractAbi,
-        address: asAddress(this.contractAddress)
-      })
-    ]
+    return [await this.read('proxyRuntimeCode')]
   }
 
   /**
@@ -93,12 +82,7 @@ class SafeProxyFactoryContract_v1_3_0
    */
   calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_3_0_Function<'calculateCreateProxyWithNonceAddress'> =
     async (args) => {
-      return [
-        await this.contract.write.calculateCreateProxyWithNonceAddress(
-          args,
-          await this.convertOptions({})
-        )
-      ]
+      return [await this.write('calculateCreateProxyWithNonceAddress', args)]
     }
 
   /**
@@ -107,7 +91,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[proxyAddress]
    */
   createProxy: SafeProxyFactoryContract_v1_3_0_Function<'createProxy'> = async (args) => {
-    return [await this.contract.write.createProxy(args, await this.convertOptions({}))]
+    return [await this.write('createProxy', args)]
   }
 
   /**
@@ -117,9 +101,7 @@ class SafeProxyFactoryContract_v1_3_0
    */
   createProxyWithCallback: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithCallback'> =
     async (args) => {
-      return [
-        await this.contract.write.createProxyWithCallback(args, await this.convertOptions({}))
-      ]
+      return [await this.write('createProxyWithCallback', args)]
     }
 
   /**
@@ -130,7 +112,7 @@ class SafeProxyFactoryContract_v1_3_0
   createProxyWithNonce: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.write.createProxyWithNonce(args, await this.convertOptions({}))]
+    return [await this.write('createProxyWithNonce', args)]
   }
 
   /**
@@ -159,16 +141,20 @@ class SafeProxyFactoryContract_v1_3_0
       ).toString()
     }
 
-    const proxyAddress = this.contract.write
-      .createProxyWithNonce(
-        [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
-        await this.convertOptions(options)
-      )
+    const coverted = await this.convertOptions(options)
+    const proxyAddress = await this.getWallet()
+      .writeContract({
+        address: asAddress(this.contractAddress),
+        abi: this.contractAbi,
+        functionName: 'createProxyWithNonce',
+        args: [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
+        ...coverted
+      })
       .then(async (hash) => {
         if (callback) {
           callback(hash)
         }
-        const { logs } = await waitForTransactionReceipt(this.runner!, hash)
+        const { logs } = await waitForTransactionReceipt(this.runner, hash)
         const events = parseEventLogs({ logs, abi: this.contractAbi })
         const proxyCreationEvent = events.find((event) => event?.eventName === 'ProxyCreation')
         if (!proxyCreationEvent || !proxyCreationEvent.args) {

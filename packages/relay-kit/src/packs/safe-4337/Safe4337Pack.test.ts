@@ -647,10 +647,7 @@ describe('Safe4337Pack', () => {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
       }
     })
-    const readContractSpy = jest.spyOn(
-      safe4337Pack.protocolKit.getSafeProvider().getExternalProvider(),
-      'readContract'
-    )
+    const readContractSpy = jest.spyOn(safe4337Pack.protocolKit.getSafeProvider(), 'readContract')
 
     let safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC]

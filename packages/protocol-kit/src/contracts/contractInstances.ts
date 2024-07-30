@@ -1,4 +1,4 @@
-import { PublicClient, Abi } from 'viem'
+import { Abi } from 'viem'
 import {
   SafeVersion,
   SafeContract_v1_3_0_Abi,
@@ -47,6 +47,7 @@ import SimulateTxAccessorContract_v1_4_1 from './SimulateTxAccessor/v1.4.1/Simul
 import CompatibilityFallbackHandlerContract_v1_3_0 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
 import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import SafeProvider from '../SafeProvider'
+import { ExternalClient } from '../types'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -245,7 +246,7 @@ export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   // TODO: remove this ??
-  signerOrProvider: PublicClient,
+  signerOrProvider: ExternalClient,
   contractAddress?: string,
   customContractAbi?: Abi
 ): Promise<

@@ -1,14 +1,6 @@
 import { Abi } from 'abitype'
-import {
-  PublicClient,
-  Transport,
-  encodeFunctionData,
-  GetContractReturnType,
-  WalletClient,
-  Hash,
-  Chain,
-  getContract
-} from 'viem'
+import { Transport, encodeFunctionData, WalletClient, Hash, Chain } from 'viem'
+import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
@@ -24,6 +16,8 @@ import {
   WalletLegacyTransactionOptions,
   convertTransactionOptions
 } from '@safe-global/protocol-kit/utils'
+import { ExternalClient } from '../types'
+import { ContractFunctionName, ContractFunctionArgs } from 'viem'
 
 /**
  * Abstract class BaseContract
@@ -47,8 +41,7 @@ class BaseContract<ContractAbiType extends Abi> {
   safeVersion: SafeVersion
   safeProvider: SafeProvider
   chainId: bigint
-  contract!: GetContractReturnType<ContractAbiType, WalletClient | PublicClient>
-  runner: PublicClient
+  runner: ExternalClient
   wallet?: WalletClient<Transport, Chain | undefined>
 
   /**
@@ -71,7 +64,7 @@ class BaseContract<ContractAbiType extends Abi> {
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: ContractAbiType,
-    runner?: PublicClient
+    runner?: ExternalClient
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
@@ -99,16 +92,10 @@ class BaseContract<ContractAbiType extends Abi> {
 
   async init() {
     this.wallet = await this.safeProvider.getExternalSigner()
-    this.contract = getContract({
-      address: asAddress(this.contractAddress),
-      abi: this.contractAbi,
-      client: this.wallet || this.runner
-    })
   }
 
   async getTransactionReceipt(hash: Hash) {
-    const client = this.runner
-    return client?.getTransactionReceipt({ hash })
+    return getTransactionReceipt(this.runner, { hash })
   }
 
   /**
@@ -139,7 +126,7 @@ class BaseContract<ContractAbiType extends Abi> {
   }
 
   getAddress: GetAddressFunction = () => {
-    return this.contract.address
+    return this.contractAddress
   }
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
@@ -161,12 +148,48 @@ class BaseContract<ContractAbiType extends Abi> {
     const contractOptions = await this.convertOptions(options)
     const abi = this.contractAbi as Abi
     const params = args as unknown[]
-    return this.runner!.estimateContractGas({
+    return estimateContractGas(this.runner, {
       abi,
       functionName: functionToEstimate,
-      address: this.contract.address,
+      address: asAddress(this.getAddress()),
       args: params,
       ...contractOptions
+    })
+  }
+
+  getWallet(): WalletClient<Transport, Chain | undefined> {
+    if (!this.wallet) throw new Error('A signer must be set')
+    return this.wallet
+  }
+
+  async write<
+    functionName extends ContractFunctionName<ContractAbiType, 'payable' | 'nonpayable'>,
+    functionArgs extends ContractFunctionArgs<
+      ContractAbiType,
+      'payable' | 'nonpayable',
+      functionName
+    >
+  >(functionName: functionName, args: functionArgs, options?: TransactionOptions) {
+    const converted = (await this.convertOptions(options)) as any
+
+    return await this.getWallet().writeContract({
+      address: asAddress(this.contractAddress),
+      abi: this.contractAbi,
+      functionName,
+      args: args,
+      ...converted
+    })
+  }
+
+  async read<
+    functionName extends ContractFunctionName<ContractAbiType, 'pure' | 'view'>,
+    functionArgs extends ContractFunctionArgs<ContractAbiType, 'pure' | 'view', functionName>
+  >(functionName: functionName, args?: functionArgs) {
+    return await this.runner.readContract({
+      functionName,
+      abi: this.contractAbi,
+      address: asAddress(this.contractAddress),
+      args
     })
   }
 }

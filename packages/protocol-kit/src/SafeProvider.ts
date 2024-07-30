@@ -20,17 +20,17 @@ import {
   SafeProviderTransaction,
   GetContractProps,
   SafeProviderConfig,
+  ExternalClient,
+  ExternalSigner,
   Eip1193Provider,
   HttpTransport,
-  SocketTransport,
-  ExternalSigner
+  SocketTransport
 } from '@safe-global/protocol-kit/types'
 import { asAddress, asHash, asHex, getChainById } from './utils/types'
 import { asBlockId } from './utils/block'
 import {
   createPublicClient,
   createWalletClient,
-  PublicClient,
   custom,
   http,
   getAddress,
@@ -40,39 +40,62 @@ import {
   encodeAbiParameters,
   parseAbiParameters,
   toBytes,
-  Chain
+  Chain,
+  Abi,
+  ReadContractParameters,
+  ContractFunctionName,
+  ContractFunctionArgs,
+  walletActions,
+  publicActions,
+  createClient,
+  PublicRpcSchema,
+  WalletRpcSchema,
+  rpcSchema
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
+import {
+  call,
+  estimateGas,
+  getBalance,
+  getCode,
+  getTransaction,
+  getTransactionCount,
+  getStorageAt,
+  readContract
+} from 'viem/actions'
 import {
   toEstimateGasParameters,
   toCallGasParameters,
   sameString
 } from '@safe-global/protocol-kit/utils'
+import { isEip1193Provider, isPrivateKey } from './utils/provider'
 
 class SafeProvider {
   #chain?: Chain
-  #externalProvider: PublicClient
+  #externalProvider: ExternalClient
   signer?: string
   provider: Eip1193Provider | HttpTransport | SocketTransport
 
   constructor({ provider, signer }: SafeProviderConfig) {
     this.#externalProvider = createPublicClient({
-      transport: typeof provider === 'string' ? http(provider) : custom(provider)
+      transport: isEip1193Provider(provider)
+        ? custom(provider as Eip1193Provider)
+        : http(provider as string)
     })
 
     this.provider = provider
     this.signer = signer ? asHex(signer) : signer
   }
 
-  getExternalProvider(): PublicClient {
+  getExternalProvider(): ExternalClient {
     return this.#externalProvider
   }
 
   async getExternalSigner(): Promise<ExternalSigner | undefined> {
-    // If the signer is not an Ethereum address, it should be a private key
     const { transport, chain = await this.#getChain() } = this.getExternalProvider()
 
-    if (this.signer && !this.isAddress(this.signer)) {
+    if (isPrivateKey(this.signer)) {
+      // This is a client with a local account, the account needs to be of type Accound as viem consider strings as 'json-rpc' (on parseAccount)
       const account = privateKeyToAccount(asHex(this.signer))
       return createWalletClient({
         account,
@@ -82,7 +105,7 @@ class SafeProvider {
     }
 
     // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
-    if (this.signer) {
+    if (this.signer && isAddress(this.signer)) {
       return createWalletClient({
         account: asAddress(this.signer),
         chain,
@@ -90,7 +113,7 @@ class SafeProvider {
       })
     }
 
-    if (transport?.type === 'custom') {
+    try {
       // This behavior is a reproduction of JsonRpcApiProvider#getSigner (which is super of BrowserProvider).
       // it dispatches and eth_accounts and picks the index 0. https://github.com/ethers-io/ethers.js/blob/a4b1d1f43fca14f2e826e3c60e0d45f5b6ef3ec4/src.ts/providers/provider-jsonrpc.ts#L1119C24-L1119C37
       const wallet = createWalletClient({
@@ -99,12 +122,18 @@ class SafeProvider {
       })
 
       const [address] = await wallet.getAddresses()
-      return createWalletClient({
-        account: address,
-        transport: custom(transport),
-        chain: wallet.chain
-      })
-    }
+      if (address) {
+        const client = createClient({
+          account: address,
+          transport: custom(transport),
+          chain: wallet.chain,
+          rpcSchema: rpcSchema<WalletRpcSchema & PublicRpcSchema>()
+        })
+          .extend(walletActions)
+          .extend(publicActions)
+        return client
+      }
+    } catch {}
 
     return undefined
   }
@@ -119,14 +148,14 @@ class SafeProvider {
   }
 
   async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
-    return this.#externalProvider.getBalance({
+    return getBalance(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {
-    return this.#externalProvider.getTransactionCount({
+    return getTransactionCount(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
@@ -245,7 +274,7 @@ class SafeProvider {
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
-    const res = await this.#externalProvider.getCode({
+    const res = await getCode(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
@@ -254,7 +283,7 @@ class SafeProvider {
   }
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
-    const contractCode = await this.#externalProvider.getCode({
+    const contractCode = await getCode(this.#externalProvider, {
       address: asAddress(address),
       ...asBlockId(blockTag)
     })
@@ -263,7 +292,7 @@ class SafeProvider {
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {
-    const content = await this.#externalProvider.getStorageAt({
+    const content = await getStorageAt(this.#externalProvider, {
       address: asAddress(address),
       slot: asHex(position)
     })
@@ -272,9 +301,9 @@ class SafeProvider {
   }
 
   async getTransaction(transactionHash: string): Promise<Transaction> {
-    return this.#externalProvider.getTransaction({
+    return getTransaction(this.#externalProvider, {
       hash: asHash(transactionHash)
-    }) as Promise<Transaction>
+    }) // as Promise<Transaction>
   }
 
   async getSignerAddress(): Promise<string | undefined> {
@@ -334,16 +363,24 @@ class SafeProvider {
 
   async estimateGas(transaction: SafeProviderTransaction): Promise<string> {
     const converted = toEstimateGasParameters(transaction)
-    return (await this.#externalProvider.estimateGas(converted)).toString()
+    return (await estimateGas(this.#externalProvider, converted)).toString()
   }
 
   async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
     const converted = toCallGasParameters(transaction)
-    const { data } = await this.#externalProvider.call({
+    const { data } = await call(this.#externalProvider, {
       ...converted,
       ...asBlockId(blockTag)
     })
     return data ?? '0x'
+  }
+
+  async readContract<
+    const abi extends Abi | readonly unknown[],
+    functionName extends ContractFunctionName<abi, 'pure' | 'view'>,
+    const args extends ContractFunctionArgs<abi, 'pure' | 'view', functionName>
+  >(args: ReadContractParameters<abi, functionName, args>) {
+    return readContract(this.#externalProvider, args)
   }
 
   // TODO: fix anys

@@ -1,4 +1,5 @@
 import { Chain, Hash } from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
 import { sepolia } from 'viem/chains'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
@@ -40,10 +41,9 @@ async function main() {
     // Execute the transaction
     const txResponse = await protocolKit.executeTransaction(safeTransaction)
 
-    await protocolKit
-      .getSafeProvider()
-      .getExternalProvider()
-      .waitForTransactionReceipt({ hash: txResponse.hash as Hash })
+    await waitForTransactionReceipt(protocolKit.getSafeProvider().getExternalProvider(), {
+      hash: txResponse.hash as Hash
+    })
 
     console.log('Transaction executed.')
     console.log('- Transaction hash:', txResponse.hash)

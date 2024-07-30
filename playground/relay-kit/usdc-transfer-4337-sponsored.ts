@@ -1,4 +1,5 @@
 import { Address } from 'viem'
+import { getBlock } from 'viem/actions'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData, waitForOperationToFinish } from '../utils'
 
@@ -69,7 +70,7 @@ async function main() {
   }
   const transactions = [transferUSDC, transferUSDC]
   const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
-  const timestamp = (await externalProvider.getBlock())?.timestamp || 0n
+  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({

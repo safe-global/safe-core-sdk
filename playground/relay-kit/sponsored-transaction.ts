@@ -1,5 +1,6 @@
 import { Address, Chain, createWalletClient, custom, formatEther, Hex } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
+import { getBalance, waitForTransactionReceipt } from 'viem/actions'
 import { sepolia } from 'viem/chains'
 import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
@@ -86,7 +87,7 @@ async function main() {
   // Fake on-ramp to fund the Safe
 
   const externalProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
-  const safeBalance = await externalProvider.getBalance({ address: predictedSafeAddress })
+  const safeBalance = await getBalance(externalProvider, { address: predictedSafeAddress })
   console.log({ safeBalance: formatEther(safeBalance) })
   if (safeBalance < BigInt(txConfig.VALUE)) {
     const fakeOnRampSigner = createWalletClient({
@@ -99,9 +100,9 @@ async function main() {
       value: BigInt(txConfig.VALUE)
     })
     console.log(`Funding the Safe with ${formatEther(BigInt(txConfig.VALUE))} ETH`)
-    await externalProvider.waitForTransactionReceipt({ hash })
+    await waitForTransactionReceipt(externalProvider, { hash })
 
-    const safeBalanceAfter = await externalProvider.getBalance({ address: predictedSafeAddress })
+    const safeBalanceAfter = await getBalance(externalProvider, { address: predictedSafeAddress })
     console.log({ safeBalance: formatEther(safeBalanceAfter) })
   }
 

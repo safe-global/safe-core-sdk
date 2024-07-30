@@ -5,10 +5,10 @@ import {
   isAddress,
   keccak256,
   pad,
-  PublicClient,
   toHex,
   WalletClient
 } from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
@@ -29,6 +29,7 @@ import {
 } from '../contracts/safeDeploymentContracts'
 import {
   ContractNetworkConfig,
+  ExternalClient,
   SafeAccountConfig,
   SafeContractImplementationType,
   SafeDeploymentConfig
@@ -369,7 +370,7 @@ export function zkSyncEraCreate2Address(
 }
 
 export function toTxResult(
-  runner: PublicClient,
+  runner: ExternalClient,
   hash: Hash,
   options?: TransactionOptions
 ): TransactionResult {
@@ -377,9 +378,7 @@ export function toTxResult(
     hash,
     options,
     transactionResponse: {
-      wait: async () => {
-        return runner.waitForTransactionReceipt({ hash })
-      }
+      wait: async () => waitForTransactionReceipt(runner, { hash })
     }
   }
 }

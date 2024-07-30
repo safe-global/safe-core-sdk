@@ -9,7 +9,6 @@ import {
   SignMessageLibContract_v1_4_1_Function,
   signMessageLib_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
-import { asAddress } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SignMessageLibContract_v1_4_1  is the implementation specific to the SignMessageLib contract version 1.4.1.
@@ -51,14 +50,7 @@ class SignMessageLibContract_v1_4_1
    * @param args - Array[message]
    */
   getMessageHash: SignMessageLibContract_v1_4_1_Function<'getMessageHash'> = async (args) => {
-    return [
-      await this.runner.readContract({
-        functionName: 'getMessageHash',
-        abi: this.contractAbi,
-        address: asAddress(this.contractAddress),
-        args
-      })
-    ]
+    return [await this.read('getMessageHash', args)]
   }
 
   /**
@@ -72,12 +64,7 @@ class SignMessageLibContract_v1_4_1
       options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
 
-    const txResponse = await this.contract.write.signMessage(
-      data,
-      await this.convertOptions(options)
-    )
-
-    return toTxResult(this.runner!, txResponse, options)
+    return toTxResult(this.runner!, await this.write('signMessage', data, options), options)
   }
 }
 

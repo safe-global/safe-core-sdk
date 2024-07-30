@@ -1,4 +1,4 @@
-import { Account, Chain, Transport, WalletClient } from 'viem'
+import { Account, Chain, PublicClient, Transport, WalletClient } from 'viem'
 
 export type RequestArguments = {
   readonly method: string
@@ -10,6 +10,7 @@ export type Eip1193Provider = {
 }
 
 export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account>
+export type ExternalClient = PublicClient | (ExternalSigner & PublicClient)
 
 export type HexAddress = string
 export type PrivateKey = string

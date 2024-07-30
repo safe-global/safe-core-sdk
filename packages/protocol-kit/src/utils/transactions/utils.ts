@@ -1,6 +1,9 @@
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
-import { StandardizeSafeTransactionDataProps } from '@safe-global/protocol-kit/types'
+import {
+  ExternalClient,
+  StandardizeSafeTransactionDataProps
+} from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { asAddress, asHex } from '../types'
@@ -17,7 +20,6 @@ import {
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
 import {
-  PublicClient,
   Hash,
   EstimateGasParameters,
   TransactionRequest,
@@ -29,6 +31,7 @@ import {
   decodeFunctionData,
   parseAbi
 } from 'viem'
+import { waitForTransactionReceipt as waitForTransactionReceiptViem } from 'viem/actions'
 import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
 import { WalletLegacyTransactionOptions, WalletTransactionOptions } from './types'
 
@@ -42,8 +45,8 @@ export function standardizeMetaTransactionData(
   return standardizedTxs
 }
 
-export function waitForTransactionReceipt(client: PublicClient, hash: Hash) {
-  return client.waitForTransactionReceipt({ hash })
+export function waitForTransactionReceipt(client: ExternalClient, hash: Hash) {
+  return waitForTransactionReceiptViem(client, { hash })
 }
 
 export async function standardizeSafeTransactionData({

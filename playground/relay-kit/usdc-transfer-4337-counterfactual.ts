@@ -1,4 +1,5 @@
 import { parseEther, Address } from 'viem'
+import { getBlock, waitForTransactionReceipt } from 'viem/actions'
 import { sepolia } from 'viem/chains'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish, transfer, generateTransferCallData } from '../utils'
@@ -72,7 +73,7 @@ async function main() {
 
   const hash = await externalSigner?.sendTransaction(fundingSafe)
 
-  await externalProvider.waitForTransactionReceipt({ hash })
+  await waitForTransactionReceipt(externalProvider, { hash })
 
   // Create transaction batch with two 0.1 USDC transfers
 
@@ -92,7 +93,7 @@ async function main() {
   }
 
   const transactions = [transferUSDC, transferUSDC]
-  const timestamp = (await externalProvider.getBlock())?.timestamp || 0n
+  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({

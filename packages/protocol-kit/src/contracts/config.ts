@@ -1,6 +1,6 @@
 import {
   DeploymentFilter,
-  SingletonDeployment,
+  SingletonDeploymentV2,
   getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
   getMultiSendCallOnlyDeployment,
@@ -11,9 +11,13 @@ import {
   getSignMessageLibDeployment,
   getSimulateTxAccessorDeployment
 } from '@safe-global/safe-deployments'
+
+import {
+  Deployment,
+  getSafeWebAuthnSignerFactoryDeployment
+} from '@safe-global/safe-modules-deployments'
 import {
   SafeVersion,
-  SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts,
   SafeWebAuthnSharedSigner_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 
@@ -113,12 +117,11 @@ export const safeDeploymentsL1ChainIds = [
   Deployment commit: https://github.com/safe-global/safe-modules/commit/3853f34f31837e0a0aee47a4452564278f8c62ba
 */
 // FIXME: use the production deployment packages instead of a hardcoded addresses
-const WEBAUTHN_SIGNER_FACTORY_ADDRESS = '0xc40156AbFEE908E2e3269DA84fa9609bcCDDec60'
 const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
 
 const contractFunctions: Record<
   contractName,
-  (filter?: DeploymentFilter) => SingletonDeployment | undefined
+  (filter?: DeploymentFilter) => SingletonDeploymentV2 | Deployment | undefined
 > = {
   safeSingletonVersion: getSafeSingletonDeployment,
   safeSingletonL2Version: getSafeL2SingletonDeployment,
@@ -129,18 +132,7 @@ const contractFunctions: Record<
   signMessageLibVersion: getSignMessageLibDeployment,
   createCallVersion: getCreateCallDeployment,
   simulateTxAccessorVersion: getSimulateTxAccessorDeployment,
-  /*
-    safeWebAuthnSignerFactory contract is still experimental, and not included in
-    the production deployment packages, thus we need to hardcode the addresses here
-  */
-  safeWebAuthnSignerFactoryVersion: () => ({
-    abi: SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts.abi as unknown as any[],
-    defaultAddress: WEBAUTHN_SIGNER_FACTORY_ADDRESS,
-    version: '1.4.1',
-    contractName: 'safeWebAuthnSignerFactoryVersion',
-    networkAddresses: {},
-    released: true
-  }),
+  safeWebAuthnSignerFactoryVersion: getSafeWebAuthnSignerFactoryDeployment,
   /*
     safeWebAuthnSharedSigner contract is still experimental, and not included in
     the production deployment packages, thus we need to hardcode the addresses here

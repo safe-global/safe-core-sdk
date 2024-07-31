@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { Address, Hex, encodePacked, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -75,7 +75,7 @@ class EthSafeOperation implements SafeOperation {
   toUserOperation(): UserOperation {
     return {
       sender: this.data.safe,
-      nonce: ethers.toBeHex(this.data.nonce),
+      nonce: toHex(this.data.nonce),
       initCode: this.data.initCode,
       callData: this.data.callData,
       callGasLimit: this.data.callGasLimit,
@@ -84,15 +84,15 @@ class EthSafeOperation implements SafeOperation {
       maxFeePerGas: this.data.maxFeePerGas,
       maxPriorityFeePerGas: this.data.maxPriorityFeePerGas,
       paymasterAndData: this.data.paymasterAndData,
-      signature: ethers.solidityPacked(
+      signature: encodePacked(
         ['uint48', 'uint48', 'bytes'],
-        [this.data.validAfter, this.data.validUntil, this.encodedSignatures()]
+        [this.data.validAfter, this.data.validUntil, this.encodedSignatures() as Hex]
       )
     }
   }
 
   getHash(): string {
-    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress)
+    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress as Address)
   }
 }
 

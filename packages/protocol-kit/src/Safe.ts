@@ -82,6 +82,8 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { asAddress, asHash, asHex } from './utils/types'
+import { Hash, Hex } from 'viem'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -270,7 +272,7 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    return await this.#contractManager.safeContract.getAddress()
+    return this.#contractManager.safeContract.getAddress()
   }
 
   /**
@@ -296,8 +298,8 @@ class Safe {
    *
    * @returns The address of the MultiSend contract
    */
-  async getMultiSendAddress(): Promise<string> {
-    return await this.#contractManager.multiSendContract.getAddress()
+  getMultiSendAddress(): string {
+    return this.#contractManager.multiSendContract.getAddress()
   }
 
   /**
@@ -305,8 +307,8 @@ class Safe {
    *
    * @returns The address of the MultiSendCallOnly contract
    */
-  async getMultiSendCallOnlyAddress(): Promise<string> {
-    return await this.#contractManager.multiSendCallOnlyContract.getAddress()
+  getMultiSendCallOnlyAddress(): string {
+    return this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
   /**
@@ -514,9 +516,9 @@ class Safe {
 
       const multiSendTransaction = {
         ...options,
-        to: await multiSendContract.getAddress(),
+        to: multiSendContract.getAddress(),
         value: '0',
-        data: multiSendContract.encode('multiSend', [multiSendData]),
+        data: multiSendContract.encode('multiSend', [asHex(multiSendData)]),
         operation: OperationType.DelegateCall
       }
       newTransaction = multiSendTransaction
@@ -906,7 +908,10 @@ class Safe {
     const owners = await this.getOwners()
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
-      const [approved] = await this.#contractManager.safeContract.approvedHashes([owner, txHash])
+      const [approved] = await this.#contractManager.safeContract.approvedHashes([
+        asAddress(owner),
+        asHash(txHash)
+      ])
       if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
@@ -1515,12 +1520,12 @@ class Safe {
 
     const safeDeployTransactionData = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: await safeProxyFactoryContract.getAddress(),
+      to: safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        await safeSingletonContract.getAddress(),
-        initializer, // call to the setup method to set the threshold & owners of the new Safe
+        asAddress(safeSingletonContract.getAddress()),
+        asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
         BigInt(saltNonce)
       ])
     }
@@ -1554,12 +1559,12 @@ class Safe {
 
     // multiSend method with the transactions encoded
     const batchData = multiSendCallOnlyContract.encode('multiSend', [
-      encodeMultiSendData(transactions) // encoded transactions
+      asHex(encodeMultiSendData(transactions)) // encoded transactions
     ])
 
     const transactionBatch = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: await multiSendCallOnlyContract.getAddress(),
+      to: multiSendCallOnlyContract.getAddress(),
       value: '0',
       data: batchData
     }
@@ -1759,17 +1764,19 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    // both bytes and bytes32 ends up being resolved to a bytes-like structure which is represented by a `0x` prefixed address.
+    // because there is an overload going on, named-tuples (https://www.typescriptlang.org/play/?ts=4.0.2#example/named-tuples) are used to solve the ambiguity.
+    const bytes32Tuple: [_dataHash: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const data = fallbackHandler.encode('isValidSignature', bytes32Tuple)
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const bytesTuple: [_data: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const bytesData = fallbackHandler.encode('isValidSignature', bytesTuple)
 
     try {
       const isValidSignatureResponse = await Promise.all([

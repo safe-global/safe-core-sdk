@@ -1,11 +1,15 @@
 import {
-  ContractTransactionResponse,
-  Provider,
-  AbstractSigner,
+  concat,
+  getContractAddress,
+  Hash,
   isAddress,
-  zeroPadValue
-} from 'ethers'
-import { keccak_256 } from '@noble/hashes/sha3'
+  keccak256,
+  pad,
+  toHex,
+  Client,
+  WalletClient
+} from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
@@ -15,9 +19,8 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
-import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
 import semverSatisfies from 'semver/functions/satisfies'
-
+import { asAddress, asHex } from '../utils/types'
 import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
@@ -27,6 +30,7 @@ import {
 } from '../contracts/safeDeploymentContracts'
 import {
   ContractNetworkConfig,
+  ExternalClient,
   SafeAccountConfig,
   SafeContractImplementationType,
   SafeDeploymentConfig
@@ -82,8 +86,8 @@ export function encodeCreateProxyWithNonce(
   salt?: string
 ) {
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
-    safeSingletonAddress,
-    initializer,
+    asAddress(safeSingletonAddress),
+    asHex(initializer),
     BigInt(salt || PREDETERMINED_SALT_NONCE)
   ])
 }
@@ -116,11 +120,11 @@ export async function encodeSetupCallData({
     return safeContract.encode('setup', [
       owners,
       threshold,
-      to,
-      data,
-      paymentToken,
+      asAddress(to),
+      asHex(data),
+      asAddress(paymentToken),
       payment,
-      paymentReceiver
+      asAddress(paymentReceiver)
     ])
   }
 
@@ -133,7 +137,7 @@ export async function encodeSetupCallData({
       customContracts
     })
 
-    fallbackHandlerAddress = await fallbackHandlerContract.getAddress()
+    fallbackHandlerAddress = fallbackHandlerContract.getAddress()
   }
 
   return safeContract.encode('setup', [
@@ -193,7 +197,7 @@ const memoizedGetSafeContract = createMemoizedFunction(
  * @returns {string} The chain-specific salt nonce in hexadecimal format.
  */
 export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
-  return `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+  return keccak256(toHex(PREDETERMINED_SALT_NONCE + chainId))
 }
 
 export async function getPredictedSafeAddressInitCode({
@@ -235,17 +239,15 @@ export async function getPredictedSafeAddressInitCode({
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
-    'hex'
-  )
-  const safeSingletonAddress = await safeContract.getAddress()
+  const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce])
+  const safeSingletonAddress = safeContract.getAddress()
   const initCodeCallData = encodeCreateProxyWithNonce(
     safeProxyFactoryContract,
     safeSingletonAddress,
     initializer,
-    '0x' + encodedNonce
+    encodedNonce
   )
-  const safeProxyFactoryAddress = await safeProxyFactoryContract.getAddress()
+  const safeProxyFactoryAddress = safeProxyFactoryContract.getAddress()
   const initCode = `0x${[safeProxyFactoryAddress, initCodeCallData].reduce(
     (acc, x) => acc + x.replace('0x', ''),
     ''
@@ -277,7 +279,7 @@ export async function predictSafeAddress({
     chainId: chainId.toString()
   })
 
-  const proxyCreationCode = await memoizedGetProxyCreationCode({
+  const [proxyCreationCode] = await memoizedGetProxyCreationCode({
     safeProvider,
     safeVersion,
     customContracts,
@@ -299,30 +301,32 @@ export async function predictSafeAddress({
     customContracts,
     customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
   })
+  const initializerHash = keccak256(asHex(initializer))
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
-    'hex'
-  )
-  const salt = keccak256(
-    toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
-  )
+  const encodedNonce = asHex(safeProvider.encodeParameters('uint256', [saltNonce]))
 
-  const input = safeProvider.encodeParameters(['address'], [await safeContract.getAddress()])
+  const salt = keccak256(concat([initializerHash, encodedNonce]))
 
-  const from = await safeProxyFactoryContract.getAddress()
+  const input = safeProvider.encodeParameters('address', [safeContract.getAddress()])
+
+  const from = asAddress(safeProxyFactoryContract.getAddress())
 
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)
   if (isZkSyncEraChain) {
-    const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, input)
+    const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, asHex(input))
 
     return safeProvider.getChecksummedAddress(proxyAddress)
   }
 
-  const constructorData = toBuffer(input).toString('hex')
-  const initCode = proxyCreationCode + constructorData
-  const proxyAddress =
-    '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
+  const initCode = concat([proxyCreationCode, asHex(input)])
+
+  const proxyAddress = getContractAddress({
+    from,
+    bytecode: asHex(initCode),
+    opcode: 'CREATE2',
+    salt
+  })
 
   return safeProvider.getChecksummedAddress(proxyAddress)
 }
@@ -341,53 +345,48 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
 
 /**
  * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
- * see: https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#address-derivation
+ * see: https://docs.zksync.io/build/developer-reference/ethereum-differences/evm-instructions/#address-derivation
  *
- * @param {string} from - The sender's address.
+ * @param {`0x${string}`} from - The sender's address.
  * @param {SafeVersion} safeVersion - The version of the safe.
- * @param {Buffer} salt - The salt used for address derivation.
- * @param {string} input - Additional input data for the derivation.
+ * @param {`0x${string}`} salt - The salt used for address derivation.
+ * @param {`0x${string}`} input - Additional input data for the derivation.
  *
  * @returns {string} The derived zkSync Era address.
  */
 export function zkSyncEraCreate2Address(
-  from: string,
+  from: `0x${string}`,
   safeVersion: SafeVersion,
-  salt: Buffer,
-  input: string
+  salt: `0x${string}`,
+  input: `0x${string}`
 ): string {
-  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
-  const inputHash = keccak256(toBuffer(input))
+  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash as Hash
+  const inputHash = keccak256(input)
 
   const addressBytes = keccak256(
-    toBuffer(
-      ZKSYNC_CREATE2_PREFIX +
-        zeroPadValue(from, 32).slice(2) +
-        salt.toString('hex') +
-        bytecodeHash.slice(2) +
-        inputHash.toString('hex')
-    )
-  )
-    .toString('hex')
-    .slice(24)
+    concat([ZKSYNC_CREATE2_PREFIX, pad(from), salt, bytecodeHash, inputHash])
+  ).slice(26)
 
   return addressBytes
 }
 
 export function toTxResult(
-  transactionResponse: ContractTransactionResponse,
+  runner: ExternalClient,
+  hash: Hash,
   options?: TransactionOptions
 ): TransactionResult {
   return {
-    hash: transactionResponse.hash,
+    hash,
     options,
-    transactionResponse
+    transactionResponse: {
+      wait: async () => waitForTransactionReceipt(runner, { hash })
+    }
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is AbstractSigner {
+export function isTypedDataSigner(signer: any): signer is Client {
   const isPasskeySigner = !!signer?.passkeyRawId
-  return (signer as unknown as AbstractSigner).signTypedData !== undefined || !isPasskeySigner
+  return (signer as unknown as WalletClient).signTypedData !== undefined || !isPasskeySigner
 }
 
 /**

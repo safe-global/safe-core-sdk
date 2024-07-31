@@ -4,11 +4,12 @@ import { deployments } from 'hardhat'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
+import { getSafeWithOwners, getMultiSendCallOnly, getERC20Mintable } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { encodeFunctionData } from 'viem'
 
 chai.use(chaiAsPromised)
 
@@ -41,11 +42,12 @@ describe('createTransactionBatch', () => {
 
   it('should return a batch of the provided transactions', async () => {
     const { accounts, contractNetworks } = await setupTests()
-    const [account1] = accounts
+    const [account1, account2] = accounts
+    const erc20Mintable = await getERC20Mintable()
 
     const safe = await getSafeWithOwners([account1.address])
     const provider = getEip1193Provider()
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,
@@ -56,7 +58,11 @@ describe('createTransactionBatch', () => {
     const dumpTransfer = {
       to: ZERO_ADDRESS,
       value: AMOUNT_TO_TRANSFER,
-      data: '0x',
+      data: encodeFunctionData({
+        abi: erc20Mintable.abi,
+        functionName: 'transfer',
+        args: [account2.address, AMOUNT_TO_TRANSFER] // 0.1 ERC20
+      }),
       operation: OperationType.Call
     }
 
@@ -64,7 +70,7 @@ describe('createTransactionBatch', () => {
 
     const batchTransaction = await safeSdk.createTransactionBatch(transactions)
 
-    const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+    const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.address
 
     chai.expect(batchTransaction).to.be.deep.equal({
       to: multiSendContractAddress,

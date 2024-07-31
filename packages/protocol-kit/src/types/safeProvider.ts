@@ -1,5 +1,6 @@
 import PasskeySigner from '../utils/passkeys/PasskeySigner'
 import { PasskeyArgType } from './passkeys'
+import { Account, Chain, PublicClient, Transport, WalletClient } from 'viem'
 
 export type RequestArguments = {
   readonly method: string
@@ -9,6 +10,9 @@ export type RequestArguments = {
 export type Eip1193Provider = {
   request: (args: RequestArguments) => Promise<unknown>
 }
+
+export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account>
+export type ExternalClient = PublicClient | (ExternalSigner & PublicClient)
 
 export type HexAddress = string
 export type PrivateKey = string
@@ -28,7 +32,7 @@ export type SafeProviderTransaction = {
   data: string
   value?: string
   gasPrice?: number | string
-  gasLimit?: number | string
+  gasLimit?: number | string | bigint
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
 }

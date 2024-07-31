@@ -1,5 +1,5 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
+import { PublicClient } from 'viem'
 
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - SimulateTxAccessorContract_v1_3_0  extends SimulateTxAccessorBaseContract<SimulateTxAccessorContract_v1_3_0_Abi>
  */
 abstract class SimulateTxAccessorBaseContract<
-  SimulateTxAccessorContractAbiType extends InterfaceAbi & Abi
+  SimulateTxAccessorContractAbiType extends Abi
 > extends BaseContract<SimulateTxAccessorContractAbiType> {
   contractName: contractName
 
@@ -42,7 +42,7 @@ abstract class SimulateTxAccessorBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SimulateTxAccessorContractAbiType,
-    runner?: ContractRunner | null
+    runner?: PublicClient
   ) {
     const contractName = 'simulateTxAccessorVersion'
 

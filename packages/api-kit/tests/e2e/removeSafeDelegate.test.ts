@@ -73,7 +73,7 @@ describe('removeSafeDelegate', () => {
     }
     await chai
       .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Address ${delegatorAddress} is not checksumed`)
+      .to.be.rejectedWith(`Address ${delegatorAddressLowerCase} is not checksumed`)
   })
 
   it('should fail if the delegate to remove is not a delegate', async () => {

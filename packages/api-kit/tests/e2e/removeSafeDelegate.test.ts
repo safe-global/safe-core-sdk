@@ -1,4 +1,4 @@
-import { createWalletClient, http } from 'viem'
+import { Address, createWalletClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
 import SafeApiKit, { DeleteSafeDelegateProps } from '@safe-global/api-kit/index'
@@ -13,6 +13,7 @@ const PRIVATE_KEY = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c78
 
 let safeApiKit: SafeApiKit
 let signer: DeleteSafeDelegateProps['signer']
+let delegatorAddress: Address
 
 describe('removeSafeDelegate', () => {
   before(async () => {
@@ -22,11 +23,11 @@ describe('removeSafeDelegate', () => {
       transport: http(),
       account: privateKeyToAccount(PRIVATE_KEY)
     })
+    delegatorAddress = signer.account.address
   })
 
   it('should fail if Safe delegate address is empty', async () => {
     const delegateAddress = ''
-    const delegatorAddress = signer.account!.address
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -52,7 +53,6 @@ describe('removeSafeDelegate', () => {
 
   it('should fail if Safe delegate address is not checksummed', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
-    const delegatorAddress = signer.account!.address
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -65,10 +65,10 @@ describe('removeSafeDelegate', () => {
 
   it('should fail if Safe delegator address is not checksummed', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address.toLowerCase()
+    const delegatorAddressLowerCase = delegatorAddress.toLowerCase()
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
-      delegatorAddress,
+      delegatorAddress: delegatorAddressLowerCase,
       signer
     }
     await chai
@@ -78,7 +78,6 @@ describe('removeSafeDelegate', () => {
 
   it('should fail if the delegate to remove is not a delegate', async () => {
     const delegateAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
-    const delegatorAddress = signer.account!.address
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -89,7 +88,6 @@ describe('removeSafeDelegate', () => {
 
   it('should remove a delegate', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddress = signer.account!.address
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -112,7 +110,6 @@ describe('removeSafeDelegate', () => {
   it('should remove a delegate EIP-3770', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-    const delegatorAddress = signer.account!.address
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
     const delegateConfig: DeleteSafeDelegateProps = {
       delegateAddress: eip3770DelegateAddress,

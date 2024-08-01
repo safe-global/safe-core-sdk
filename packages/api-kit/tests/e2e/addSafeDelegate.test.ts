@@ -24,7 +24,7 @@ describe('addSafeDelegate', () => {
       transport: http(),
       account: privateKeyToAccount(PRIVATE_KEY_1)
     })
-    delegatorAddress = (await signer.getAddresses())[0]
+    delegatorAddress = signer.account.address
   })
 
   it('should fail if Label is empty', async () => {
@@ -100,7 +100,7 @@ describe('addSafeDelegate', () => {
   it('should fail if Safe delegator address is not checksummed', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddressLowerCase = delegatorAddress.toLocaleLowerCase()
+    const delegatorAddressLowerCase = delegatorAddress.toLowerCase()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,

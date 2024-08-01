@@ -23,7 +23,7 @@ export const sendTransaction = async ({
     Chain,
     Account
   >
-  const client = await protocolKit.getSafeProvider().getExternalProvider()
+  const client = protocolKit.getSafeProvider().getExternalProvider()
 
   if (!signer)
     throw new Error('SafeProvider must be initialized with a signer to use this function')

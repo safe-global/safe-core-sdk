@@ -1,4 +1,4 @@
-import { createWalletClient, http } from 'viem'
+import { Address, createWalletClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
 import SafeApiKit, {
@@ -16,6 +16,7 @@ const PRIVATE_KEY = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c78
 
 let safeApiKit: SafeApiKit
 let signer: DeleteSafeDelegateProps['signer']
+let delegatorAddress: Address
 
 describe('getSafeDelegates', () => {
   const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
@@ -27,6 +28,7 @@ describe('getSafeDelegates', () => {
       transport: http(),
       account: privateKeyToAccount(PRIVATE_KEY)
     })
+    delegatorAddress = signer.account.address
   })
 
   it('should fail if Safe address is empty', async () => {
@@ -50,13 +52,11 @@ describe('getSafeDelegates', () => {
   })
 
   describe('for valid parameters', () => {
-    let delegatorAddress: string
     let delegateConfig1: DeleteSafeDelegateProps
     let delegateConfig2: DeleteSafeDelegateProps
     let delegatesResponse: SafeDelegateResponse[]
 
     before(async () => {
-      delegatorAddress = signer.account!.address
       delegateConfig1 = {
         delegateAddress: '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
         delegatorAddress,
@@ -129,7 +129,6 @@ describe('getSafeDelegates', () => {
   it('should return an array of delegates EIP-3770', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const delegatorAddress = signer.account!.address
     const delegateConfig1: DeleteSafeDelegateProps = {
       delegateAddress: `${config.EIP_3770_PREFIX}:0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B`,
       delegatorAddress,

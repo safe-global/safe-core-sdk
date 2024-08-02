@@ -67,7 +67,7 @@ import {
   generateTypedData
 } from './utils/eip-712'
 
-import { createPasskeyClient } from './utils/passkeys/PasskeySigner'
+import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 
 export {
   estimateTxBaseGas,

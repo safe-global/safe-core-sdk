@@ -55,7 +55,7 @@ describe('Passkey', () => {
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     const provider = getEip1193Provider()
-    const safeProvider = new SafeProvider({ provider })
+    const safeProvider = await SafeProvider.init(provider)
     const customContracts = contractNetworks?.[chainId.toString()]
 
     const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
@@ -70,14 +70,14 @@ describe('Passkey', () => {
       customContracts
     })
 
-    const passkeySigner1 = createPasskeyClient(
+    const passkeySigner1 = await createPasskeyClient(
       passkey1,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider(),
       chainId.toString()
     )
 
-    const passkeySigner2 = createPasskeyClient(
+    const passkeySigner2 = await createPasskeyClient(
       passkey2,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider(),
@@ -86,7 +86,7 @@ describe('Passkey', () => {
 
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig: {
-        owners: [await passkeySigner1.getAddress()],
+        owners: [passkeySigner1.getPasskey().address],
         threshold: 1
       },
       safeDeploymentConfig: {
@@ -158,7 +158,7 @@ describe('Passkey', () => {
           passkeys: [passkey1],
           passkeySigners: [passkeySigner1]
         } = await setupTests()
-        const passkeySigner1Address = await passkeySigner1.getAddress()
+        const passkeySigner1Address = passkeySigner1.getPasskey().address
         const safe = await getSafeWithOwners([passkeySigner1Address])
 
         const safeSdk = await Safe.init({
@@ -182,7 +182,7 @@ describe('Passkey', () => {
           passkeys: [passkey1, passkey2],
           passkeySigners: [passkeySigner1]
         } = await setupTests()
-        const passkeySigner1Address = await passkeySigner1.getAddress()
+        const passkeySigner1Address = passkeySigner1.getPasskey().address
         const safe = await getSafeWithOwners([passkeySigner1Address])
 
         const safeSdk = await Safe.init({
@@ -344,7 +344,7 @@ describe('Passkey', () => {
         safeWebAuthnSharedSignerContract
       } = await setupTests()
 
-      const passkeySigner1Address = await passkeySigner1.getAddress()
+      const passkeySigner1Address = passkeySigner1.getPasskey().address
       const safe = await getSafeWithOwners([passkeySigner1Address])
       const safeAddress = safe.address
 
@@ -392,7 +392,7 @@ describe('Passkey', () => {
         passkeySigners: [passkeySigner1]
       } = await setupTests()
       const passkey2 = passkeys[1]
-      const passkeySigner1Address = await passkeySigner1.getAddress()
+      const passkeySigner1Address = passkeySigner1.getPasskey().address
       const safe = await getSafeWithOwners([passkeySigner1Address])
       const safeAddress = safe.address
 
@@ -423,7 +423,7 @@ describe('Passkey', () => {
         passkeySigners: [passkeySigner]
       } = await setupTests()
 
-      const passkeyFormerOwnerAddress = await passkeySigner.getAddress()
+      const passkeyFormerOwnerAddress = passkeySigner.getPasskey().address
       const safe = await getSafeWithOwners(
         [eoaOwner1.address, eoaOwner2.address, passkeyFormerOwnerAddress],
         2
@@ -463,7 +463,7 @@ describe('Passkey', () => {
         passkeySigners: [passkeySigner]
       } = await setupTests()
 
-      const passkeyFormerOwnerAddress = await passkeySigner.getAddress()
+      const passkeyFormerOwnerAddress = passkeySigner.getPasskey().address
       const safe = await getSafeWithOwners(
         [eoaOwner1.address, eoaOwner2.address, passkeyFormerOwnerAddress],
         2
@@ -505,7 +505,7 @@ describe('Passkey', () => {
         safeWebAuthnSharedSignerContract
       } = await setupTests()
 
-      const passkeyFormerOwnerAddress = await passkeySigner.getAddress()
+      const passkeyFormerOwnerAddress = passkeySigner.getPasskey().address
       const safe = await getSafeWithOwners([account.address, passkeyFormerOwnerAddress], 1)
 
       const safeAddress = safe.address
@@ -560,7 +560,7 @@ describe('Passkey', () => {
         passkeySigners: [passkeySigner]
       } = await setupTests()
 
-      const passkeyNewOwnerAddress = await passkeySigner.getAddress()
+      const passkeyNewOwnerAddress = passkeySigner.getPasskey().address
       const safe = await getSafeWithOwners(
         [eoaOwner1.address, eoaOwner2.address, eoaOwner3.address],
         2
@@ -616,7 +616,7 @@ describe('Passkey', () => {
         safeWebAuthnSharedSignerContract
       } = await setupTests()
 
-      const passkeyNewOwnerAddress = await passkeySigner.getAddress()
+      const passkeyNewOwnerAddress = passkeySigner.getPasskey().address
       const safe = await getSafeWithOwners([eoaOwner1.address])
       const safeSdk = await Safe.init({
         provider,
@@ -659,8 +659,8 @@ describe('Passkey', () => {
         safeWebAuthnSharedSignerContract
       } = await setupTests()
 
-      const passkeyOwner1Address = await passkeySigner1.getAddress()
-      const passkeyOwner2Address = await passkeySigner2.getAddress()
+      const passkeyOwner1Address = passkeySigner1.getPasskey().address
+      const passkeyOwner2Address = passkeySigner2.getPasskey().address
 
       await deployPasskeysContract(
         safeWebAuthnSharedSignerContract,
@@ -757,7 +757,7 @@ describe('Passkey', () => {
         passkeySigners: [passkeySigner1],
         safeWebAuthnSharedSignerContract
       } = await setupTests()
-      const passkeySigner1Address = await passkeySigner1.getAddress()
+      const passkeySigner1Address = passkeySigner1.getPasskey().address
 
       // First create transaction for the deployment of the passkey signer
       await deployPasskeysContract(
@@ -803,7 +803,7 @@ describe('Passkey', () => {
         passkeys: [passkey1],
         passkeySigners: [passkeySigner1]
       } = await setupTests()
-      const passkeySigner1Address = await passkeySigner1.getAddress()
+      const passkeySigner1Address = passkeySigner1.getPasskey().address
 
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
@@ -845,7 +845,7 @@ describe('Passkey', () => {
         passkeys: [passkey1],
         passkeySigners: [passkeySigner1]
       } = await setupTests()
-      const passkeySigner1Address = await passkeySigner1.getAddress()
+      const passkeySigner1Address = passkeySigner1.getPasskey().address
 
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
@@ -890,8 +890,8 @@ describe('Passkey', () => {
           safeWebAuthnSharedSignerContract
         } = await setupTests()
 
-        const passkeySigner1Address = await passkeySigner1.getAddress()
-        const passkeySigner2Address = await passkeySigner2.getAddress()
+        const passkeySigner1Address = passkeySigner1.getPasskey().address
+        const passkeySigner2Address = passkeySigner2.getPasskey().address
         const safe = await getSafeWithOwners([passkeySigner1Address])
 
         const safeAddress = safe.address

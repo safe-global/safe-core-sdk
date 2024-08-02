@@ -89,6 +89,7 @@ export const createPasskeyClient = async (
       signTypedData,
       getPasskey(): GetPasskeyType {
         return {
+          address: signerAddress,
           coordinates,
           verifierAddress,
           rawId,

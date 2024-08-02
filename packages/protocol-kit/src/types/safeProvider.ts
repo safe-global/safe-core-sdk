@@ -20,6 +20,7 @@ export type Eip1193Provider = {
 }
 
 export type GetPasskeyType = {
+  address: string
   rawId: string
   coordinates: PasskeyCoordinates
   verifierAddress: string

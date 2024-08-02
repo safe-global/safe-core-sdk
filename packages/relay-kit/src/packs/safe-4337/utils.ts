@@ -231,7 +231,7 @@ export function getSignatureBytes({
   const byteSize = (data: Uint8Array) => 32 * (Math.ceil(data.length / 32) + 1) // +1 is for the length parameter
   // Encode dynamic data padded with zeros if necessary in 32 bytes chunks
   const encodeBytes = (data: Uint8Array) =>
-    `${encodeUint256(data.length)}${ethers.hexlify(data).slice(2)}`.padEnd(byteSize(data) * 2, '0')
+    `${encodeUint256(data.length)}${toHex(data).slice(2)}`.padEnd(byteSize(data) * 2, '0')
 
   // authenticatorData starts after the first four words.
   const authenticatorDataOffset = 32 * 4

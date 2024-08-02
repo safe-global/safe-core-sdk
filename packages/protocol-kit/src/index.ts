@@ -67,7 +67,7 @@ import {
   generateTypedData
 } from './utils/eip-712'
 
-import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { createPasskeyClient } from './utils/passkeys/PasskeySigner'
 
 export {
   estimateTxBaseGas,
@@ -120,7 +120,7 @@ export {
   hashSafeMessage,
   generateTypedData,
   SafeProvider,
-  PasskeySigner,
+  createPasskeyClient,
   EthSafeTransaction,
   EthSafeMessage
 }

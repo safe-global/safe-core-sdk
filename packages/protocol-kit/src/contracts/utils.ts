@@ -394,12 +394,12 @@ export function isTypedDataSigner(signer: any): signer is Client {
  * @param signerOrProvider - Signer or provider
  * @returns true if the parameter is compatible with `Signer`
  */
-export function isSignerCompatible(signerOrProvider: AbstractSigner | Provider): boolean {
-  const candidate = signerOrProvider as AbstractSigner
+export function isSignerCompatible(signerOrProvider: Client | WalletClient): boolean {
+  const candidate = signerOrProvider as WalletClient
 
   const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
   const isSignMessageCompatible = typeof candidate.signMessage === 'function'
-  const isGetAddressCompatible = typeof candidate.getAddress === 'function'
+  const isGetAddressCompatible = typeof candidate.getAddresses === 'function'
 
   return isSigntransactionCompatible && isSignMessageCompatible && isGetAddressCompatible
 }

@@ -36,9 +36,10 @@ import {
   SocketTransport,
   SafeSigner,
   SafeConfig,
-  ContractNetworksConfig
+  ContractNetworksConfig,
+  PasskeyArgType,
+  PasskeyClient
 } from '@safe-global/protocol-kit/types'
-import PasskeySigner from './utils/passkeys/PasskeySigner'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import { asAddress, asHash, asHex, getChainById } from './utils/types'
 import { asBlockId } from './utils/block'
@@ -82,7 +83,8 @@ import {
   toCallGasParameters,
   sameString
 } from '@safe-global/protocol-kit/utils'
-import { isEip1193Provider, isPrivateKey } from './utils/provider'
+import { isEip1193Provider, isPrivateKey, isSignerPasskeyClient } from './utils/provider'
+import { createPasskeyClient, PASSKEY_CLIENT_KEY } from '@safe-global/protocol-kit/utils'
 
 class SafeProvider {
   #chain?: Chain
@@ -139,10 +141,9 @@ class SafeProvider {
         )
       }
 
-      let passkeySigner
-      const isPasskeySignerConfig = !(signer instanceof PasskeySigner)
+      let passkeySigner: PasskeyClient
 
-      if (isPasskeySignerConfig) {
+      if (!isSignerPasskeyClient(signer)) {
         // signer is type PasskeyArgType {rawId, coordinates, customVerifierAddress? }
         const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
           safeProvider,
@@ -150,15 +151,15 @@ class SafeProvider {
           customContracts
         })
 
-        passkeySigner = new PasskeySigner(
-          signer,
+        passkeySigner = await createPasskeyClient(
+          signer as PasskeyArgType,
           safeWebAuthnSignerFactoryContract,
           safeProvider.getExternalProvider(),
           chainId.toString()
         )
       } else {
         // signer was already initialized and we pass a PasskeySigner instance (reconnecting)
-        passkeySigner = signer
+        passkeySigner = signer as PasskeyClient
       }
 
       return new SafeProvider({
@@ -176,9 +177,13 @@ class SafeProvider {
   async getExternalSigner(): Promise<ExternalSigner | undefined> {
     const { transport, chain = await this.#getChain() } = this.getExternalProvider()
 
+    if (isSignerPasskeyClient(this.signer)) {
+      return this.signer as PasskeyClient
+    }
+
     if (isPrivateKey(this.signer)) {
       // This is a client with a local account, the account needs to be of type Accound as viem consider strings as 'json-rpc' (on parseAccount)
-      const account = privateKeyToAccount(asHex(this.signer))
+      const account = privateKeyToAccount(asHex(this.signer as string))
       return createWalletClient({
         account,
         chain,
@@ -187,7 +192,7 @@ class SafeProvider {
     }
 
     // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
-    if (this.signer && isAddress(this.signer)) {
+    if (this.signer && typeof this.signer === 'string') {
       return createWalletClient({
         account: asAddress(this.signer),
         chain,
@@ -221,9 +226,8 @@ class SafeProvider {
   }
 
   async isPasskeySigner(): Promise<boolean> {
-    const signer = (await this.getExternalSigner()) as PasskeySigner
-
-    return signer && !!signer.passkeyRawId
+    const signer = await this.getExternalSigner()
+    return !!signer && signer.key === PASSKEY_CLIENT_KEY
   }
 
   isAddress(address: string): boolean {

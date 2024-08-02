@@ -625,11 +625,13 @@ describe('Safe4337Pack', () => {
 
       const provider = safe4337Pack.protocolKit.getSafeProvider().provider
       const safeProvider = await protocolKit.SafeProvider.init(provider, passkey)
-      const passkeySigner = (await safeProvider.getExternalSigner()) as protocolKit.PasskeySigner
+      const signer = (await safeProvider.getExternalSigner()) as protocolKit.PasskeyClient
+      const passkeySigner = signer.getPasskey()
 
       const passkeyOwnerConfiguration = {
-        ...passkeySigner.coordinates,
-        verifiers: CUSTOM_P256_VERIFIER_ADDRESS
+        x: BigInt(passkeySigner.coordinates.x),
+        y: BigInt(passkeySigner.coordinates.y),
+        verifiers: viem.fromHex(CUSTOM_P256_VERIFIER_ADDRESS, 'bigint')
       }
 
       const enableModulesData = viem.encodeFunctionData({
@@ -682,7 +684,7 @@ describe('Safe4337Pack', () => {
             data: viem.encodeFunctionData({
               abi: constants.ABI,
               functionName: 'multiSend',
-              args: [multiSendData]
+              args: [multiSendData as viem.Hex]
             }),
             fallbackHandler: safe4337ModuleAddress,
             paymentToken: viem.zeroAddress,

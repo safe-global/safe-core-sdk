@@ -1,6 +1,10 @@
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
-import Safe, { PasskeySigner, PredictedSafeProps, SafeProvider } from '@safe-global/protocol-kit'
+import Safe, {
+  createPasskeyClient,
+  PredictedSafeProps,
+  SafeProvider
+} from '@safe-global/protocol-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
@@ -43,7 +47,7 @@ describe('Passkey', () => {
     await deployments.fixture()
 
     const webAuthnContract = await getWebAuthnContract()
-    const customVerifierAddress = await webAuthnContract.getAddress()
+    const customVerifierAddress = webAuthnContract.address
 
     const passkey1 = { ...(await createMockPasskey('chucknorris')), customVerifierAddress }
     const passkey2 = { ...(await createMockPasskey('brucelee')), customVerifierAddress }
@@ -66,14 +70,14 @@ describe('Passkey', () => {
       customContracts
     })
 
-    const passkeySigner1 = new PasskeySigner(
+    const passkeySigner1 = createPasskeyClient(
       passkey1,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider(),
       chainId.toString()
     )
 
-    const passkeySigner2 = new PasskeySigner(
+    const passkeySigner2 = createPasskeyClient(
       passkey2,
       safeWebAuthnSignerFactoryContract,
       safeProvider.getExternalProvider(),
@@ -112,7 +116,7 @@ describe('Passkey', () => {
           passkeys: [passkey1]
         } = await setupTests()
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         // Create a Safe instance with an EOA signer
         const safeSdk = await Safe.init({
@@ -159,7 +163,7 @@ describe('Passkey', () => {
 
         const safeSdk = await Safe.init({
           provider,
-          safeAddress: await safe.getAddress(),
+          safeAddress: safe.address,
           contractNetworks,
           signer: passkey1
         })
@@ -183,7 +187,7 @@ describe('Passkey', () => {
 
         const safeSdk = await Safe.init({
           provider,
-          safeAddress: await safe.getAddress(),
+          safeAddress: safe.address,
           contractNetworks,
           signer: passkey1
         })
@@ -212,7 +216,7 @@ describe('Passkey', () => {
           // configure the shared Signer passkey in the Safe Slot
           const safeSdk = await Safe.init({
             provider,
-            safeAddress: await safe.getAddress(),
+            safeAddress: safe.address,
             contractNetworks
           })
 
@@ -265,7 +269,7 @@ describe('Passkey', () => {
           const sharedSignerContractAddress = await safeWebAuthnSharedSignerContract.getAddress()
 
           const safe = await getSafeWithOwners([EOAaccount1.address])
-          const safeAddress = await safe.getAddress()
+          const safeAddress = safe.address
 
           // configure the shared Signer passkey in the Safe Slot
           const safeSdk = await Safe.init({
@@ -336,15 +340,20 @@ describe('Passkey', () => {
         contractNetworks,
         provider,
         passkeys: [passkey1],
-        passkeySigners: [passkeySigner1]
+        passkeySigners: [passkeySigner1],
+        safeWebAuthnSharedSignerContract
       } = await setupTests()
 
       const passkeySigner1Address = await passkeySigner1.getAddress()
       const safe = await getSafeWithOwners([passkeySigner1Address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
 
       // First create transaction for the deployment of the passkey signer
-      await deployPasskeysContract([passkeySigner1], account1.signer)
+      await deployPasskeysContract(
+        safeWebAuthnSharedSignerContract,
+        [passkeySigner1],
+        account1.signer
+      )
 
       // Passkey signer should be deployed now
       chai.expect(await account1.signer.provider.getCode(passkeySigner1Address)).length.to.be.gt(2)
@@ -385,7 +394,7 @@ describe('Passkey', () => {
       const passkey2 = passkeys[1]
       const passkeySigner1Address = await passkeySigner1.getAddress()
       const safe = await getSafeWithOwners([passkeySigner1Address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
 
       const safeSdk = await Safe.init({
         provider,
@@ -421,7 +430,7 @@ describe('Passkey', () => {
       )
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
 
@@ -461,7 +470,7 @@ describe('Passkey', () => {
       )
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
 
@@ -492,20 +501,25 @@ describe('Passkey', () => {
         contractNetworks,
         provider,
         passkeys: [passkeyFormerOwner],
-        passkeySigners: [passkeySigner]
+        passkeySigners: [passkeySigner],
+        safeWebAuthnSharedSignerContract
       } = await setupTests()
 
       const passkeyFormerOwnerAddress = await passkeySigner.getAddress()
       const safe = await getSafeWithOwners([account.address, passkeyFormerOwnerAddress], 1)
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
 
-      await deployPasskeysContract([passkeySigner], account.signer)
+      await deployPasskeysContract(
+        safeWebAuthnSharedSignerContract,
+        [passkeySigner],
+        account.signer
+      )
 
       const signerSdk = await safeSdk.connect({
         signer: passkeyFormerOwner
@@ -553,7 +567,7 @@ describe('Passkey', () => {
       )
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
 
@@ -598,18 +612,23 @@ describe('Passkey', () => {
         contractNetworks,
         provider,
         passkeys: [passkeyNewOwner],
-        passkeySigners: [passkeySigner]
+        passkeySigners: [passkeySigner],
+        safeWebAuthnSharedSignerContract
       } = await setupTests()
 
       const passkeyNewOwnerAddress = await passkeySigner.getAddress()
       const safe = await getSafeWithOwners([eoaOwner1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
 
-      await deployPasskeysContract([passkeySigner], eoaOwner1.signer)
+      await deployPasskeysContract(
+        safeWebAuthnSharedSignerContract,
+        [passkeySigner],
+        eoaOwner1.signer
+      )
       chai.expect(await safeSdk.getSafeProvider().isContractDeployed(passkeyNewOwnerAddress)).to.be
         .true
       const currentOwners = await safeSdk.getOwners()
@@ -636,20 +655,25 @@ describe('Passkey', () => {
         contractNetworks,
         provider,
         passkeys: [passkeyOwner1, passkeyOwner2],
-        passkeySigners: [passkeySigner1, passkeySigner2]
+        passkeySigners: [passkeySigner1, passkeySigner2],
+        safeWebAuthnSharedSignerContract
       } = await setupTests()
 
       const passkeyOwner1Address = await passkeySigner1.getAddress()
       const passkeyOwner2Address = await passkeySigner2.getAddress()
 
-      await deployPasskeysContract([passkeySigner1, passkeySigner2], eoaOwner1.signer)
+      await deployPasskeysContract(
+        safeWebAuthnSharedSignerContract,
+        [passkeySigner1, passkeySigner2],
+        eoaOwner1.signer
+      )
       const safe = await getSafeWithOwners(
         [passkeyOwner1Address, passkeyOwner2Address, eoaOwner1.address],
         2
       )
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks,
         signer: passkeyOwner1
       })
@@ -693,7 +717,7 @@ describe('Passkey', () => {
       } = await setupTests()
 
       const safe = await getSafeWithOwners([owner.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
 
       const safeSdk = await Safe.init({
         provider,
@@ -730,12 +754,17 @@ describe('Passkey', () => {
         contractNetworks,
         provider,
         passkeys: [passkey1],
-        passkeySigners: [passkeySigner1]
+        passkeySigners: [passkeySigner1],
+        safeWebAuthnSharedSignerContract
       } = await setupTests()
       const passkeySigner1Address = await passkeySigner1.getAddress()
 
       // First create transaction for the deployment of the passkey signer
-      await deployPasskeysContract([passkeySigner1], account1.signer)
+      await deployPasskeysContract(
+        safeWebAuthnSharedSignerContract,
+        [passkeySigner1],
+        account1.signer
+      )
 
       // Passkey signer should be deployed now
       chai.expect(await account1.signer.provider.getCode(passkeySigner1Address)).length.to.be.gt(2)
@@ -743,7 +772,7 @@ describe('Passkey', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const initialThreshold = await safeSdk.getThreshold()
@@ -779,7 +808,7 @@ describe('Passkey', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const initialThreshold = await safeSdk.getThreshold()
@@ -821,7 +850,7 @@ describe('Passkey', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 2
@@ -857,17 +886,22 @@ describe('Passkey', () => {
           contractNetworks,
           provider,
           passkeys: [passkey1, passkey2],
-          passkeySigners: [passkeySigner1, passkeySigner2]
+          passkeySigners: [passkeySigner1, passkeySigner2],
+          safeWebAuthnSharedSignerContract
         } = await setupTests()
 
         const passkeySigner1Address = await passkeySigner1.getAddress()
         const passkeySigner2Address = await passkeySigner2.getAddress()
         const safe = await getSafeWithOwners([passkeySigner1Address])
 
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         // First create transaction for the deployment of the passkey signer
-        await deployPasskeysContract([passkeySigner1], account1.signer)
+        await deployPasskeysContract(
+          safeWebAuthnSharedSignerContract,
+          [passkeySigner1],
+          account1.signer
+        )
 
         // Passkey signer should be deployed now
         chai

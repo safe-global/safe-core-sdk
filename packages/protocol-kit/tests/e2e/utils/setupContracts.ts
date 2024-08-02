@@ -184,15 +184,20 @@ export const getSafeWebAuthnSignerFactory = async (): Promise<{
   contract: GetContractReturnType
   abi: Abi
 }> => {
-  const SafeWebAuthnSignerFactoryDeployment = await deployments.get(
+  const safeWebAuthnSignerFactoryDeployment = await deployments.get(
     safeWebAuthnSignerFactoryDeployed.name
   )
-  const SafeWebAuthnSignerFactory = await ethers.getContractFactory(
-    safeWebAuthnSignerFactoryDeployed.name
+  const safeWebAuthnSignerFactoryAddress = asAddress(safeWebAuthnSignerFactoryDeployment.address)
+  const contract = await viem.getContractAt(
+    proxyFactoryDeployed.name,
+    asAddress(safeWebAuthnSignerFactoryAddress),
+    {
+      client: { wallet: await getDeployer() }
+    }
   )
   return {
-    contract: SafeWebAuthnSignerFactory.attach(SafeWebAuthnSignerFactoryDeployment.address),
-    abi: SafeWebAuthnSignerFactoryDeployment.abi
+    contract,
+    abi: safeWebAuthnSignerFactoryDeployment.abi
   }
 }
 

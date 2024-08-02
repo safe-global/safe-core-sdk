@@ -1,11 +1,11 @@
-import { Address, Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
+import { Address, Hash, encodeFunctionData, zeroAddress, Hex, concat, fromHex } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
   SigningMethod,
   encodeMultiSendData,
   getMultiSendContract,
-  PasskeySigner,
+  PasskeyClient,
   SafeProvider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
@@ -257,15 +257,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
       const isPasskeySigner = await safeProvider.isPasskeySigner()
 
       if (isPasskeySigner) {
-        const passkeySigner = (await safeProvider.getExternalSigner()) as PasskeySigner
+        const passkeySigner = (await safeProvider.getExternalSigner()) as PasskeyClient
 
         if (!options.owners.includes(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)) {
           options.owners.push(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)
         }
 
+        const passkey = passkeySigner.getPasskey()
         const passkeyOwnerConfiguration = {
-          ...passkeySigner.coordinates,
-          verifiers: passkeySigner.verifierAddress
+          x: BigInt(passkey.coordinates.x),
+          y: BigInt(passkey.coordinates.y),
+          verifiers: fromHex(passkey.verifierAddress as Address, 'bigint')
         }
 
         const sharedSignerTransaction = {

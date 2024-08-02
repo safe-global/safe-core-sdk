@@ -1,7 +1,7 @@
-import { ethers } from 'ethers'
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
-import { PasskeyArgType, PasskeySigner, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
+import { PasskeyArgType, PasskeyClient, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
 import { WebAuthnCredentials } from './webauthnShim'
+import { WalletClient, keccak256, toBytes, Address, Hex, Transport, Chain, Account } from 'viem'
+import { SafeWebAuthnSignerFactoryContractImplementationType } from '@safe-global/protocol-kit'
 
 let singleInstance: WebAuthnCredentials
 
@@ -26,14 +26,20 @@ export function getWebAuthnCredentials() {
  * @returns Passkey deployment transactions
  */
 export async function deployPasskeysContract(
-  passkeys: PasskeySigner[],
-  signer: HardhatEthersSigner
+  safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
+  passkeys: PasskeyClient[],
+  signer: WalletClient<Transport, Chain, Account>
 ) {
-  const toDeploy = passkeys.map(async (passkey) => {
+  const toDeploy = passkeys.map(async (client) => {
+    const passkey = client.getPasskey()
     const createPasskeySignerTransaction = {
-      to: await passkey.safeWebAuthnSignerFactoryContract.getAddress(),
-      value: '0',
-      data: passkey.encodeCreateSigner()
+      to: passkey.factoryAddress as Address,
+      value: 0n,
+      data: safeWebAuthnSignerFactoryContract.encode('createSigner', [
+        BigInt(passkey.coordinates.x),
+        BigInt(passkey.coordinates.y),
+        BigInt(passkey.verifierAddress)
+      ]) as Hex
     }
     // Deploy the passkey signer
     return await signer.sendTransaction(createPasskeySignerTransaction)
@@ -60,11 +66,11 @@ export async function createMockPasskey(
         id: 'safe.global'
       },
       user: {
-        id: ethers.getBytes(ethers.id(name)),
+        id: toBytes(keccak256(toBytes(name))),
         name: name,
         displayName: name
       },
-      challenge: ethers.toBeArray(Date.now()),
+      challenge: toBytes(Date.now()),
       pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
     }
   })

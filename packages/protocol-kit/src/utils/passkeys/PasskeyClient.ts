@@ -12,7 +12,9 @@ import {
   custom,
   walletActions,
   maxUint256,
-  Client
+  Client,
+  fromHex,
+  Address
 } from 'viem'
 import { PasskeyClient, GetPasskeyType } from '@safe-global/protocol-kit/types'
 
@@ -67,7 +69,7 @@ export const createPasskeyClient = async (
   const [signerAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
     BigInt(coordinates.x),
     BigInt(coordinates.y),
-    BigInt(verifierAddress)
+    fromHex(verifierAddress as Address, 'bigint')
   ])
 
   return createClient({

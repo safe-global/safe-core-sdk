@@ -1656,12 +1656,13 @@ class Safe {
       return sharedSignerContractAddress
     }
 
-    const passkeySigner = await this.#safeProvider.getExternalSigner()
+    const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeyClient
     if (!passkeySigner) {
       throw new Error('Cannot retrieve the passkey signer')
     }
 
-    return passkeySigner.account.address // wrong
+    const ownerPasskey = passkeySigner.getPasskey()
+    return ownerPasskey.address
   }
 
   /**

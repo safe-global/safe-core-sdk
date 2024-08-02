@@ -13,7 +13,10 @@ import {
 } from 'viem'
 import { asHex } from '../types'
 
-// This whole file was copied (and softly adapted) from viem in order to expose the function that provides just the encoding.
+/*
+ * This whole file was copied (and softly adapted) from viem in order to expose the function that provides just the encoding. The purpose is to expose `encodeTypedData` (viem only exports the hashTypedData)
+ * That function are used by preimageSafeTransactionHash, preimageSafeMessageHash.
+ */
 function encodeField({
   types,
   name,

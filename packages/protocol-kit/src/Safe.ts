@@ -622,7 +622,12 @@ class Safe {
 
     if (isPasskeySigner && signerAddress) {
       const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeyClient
-      const passkey = passkeySigner.getPasskey()
+      const { coordinates, verifierAddress } = passkeySigner.getPasskey()
+      const passkey = {
+        rawId: '', // we dont need this value to check if is a shared signer
+        coordinates: coordinates,
+        customVerifierAddress: verifierAddress
+      }
       const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
 
       let signature = await this.#safeProvider.signMessage(hash)
@@ -1697,7 +1702,12 @@ class Safe {
     if (isPasskeySigner) {
       // check if the signer is a shared passkey signer of the Safe
       const passkeyClient = (await this.#safeProvider.getExternalSigner()) as PasskeyClient
-      const passkey = passkeyClient.getPasskey()
+      const { coordinates, verifierAddress } = passkeyClient.getPasskey()
+      const passkey = {
+        rawId: '', // we dont need this value to check if is a shared signer
+        coordinates: coordinates,
+        customVerifierAddress: verifierAddress
+      }
       const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
 
       if (isSharedSigner) {

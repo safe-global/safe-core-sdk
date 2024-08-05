@@ -32,8 +32,9 @@ export async function deployPasskeysContract(
 ) {
   const toDeploy = passkeys.map(async (client) => {
     const passkey = client.getPasskey()
+    const factoryAddress = safeWebAuthnSignerFactoryContract.getAddress()
     const createPasskeySignerTransaction = {
-      to: passkey.factoryAddress as Address,
+      to: factoryAddress as Address,
       value: 0n,
       data: safeWebAuthnSignerFactoryContract.encode('createSigner', [
         BigInt(passkey.coordinates.x),

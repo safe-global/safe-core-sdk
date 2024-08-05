@@ -101,7 +101,8 @@ describe('Passkey', () => {
       provider,
       passkeys: [passkey1, passkey2],
       passkeySigners: [passkeySigner1, passkeySigner2],
-      safeWebAuthnSharedSignerContract
+      safeWebAuthnSharedSignerContract,
+      safeWebAuthnSignerFactoryContract
     }
   })
 
@@ -341,7 +342,7 @@ describe('Passkey', () => {
         provider,
         passkeys: [passkey1],
         passkeySigners: [passkeySigner1],
-        safeWebAuthnSharedSignerContract
+        safeWebAuthnSignerFactoryContract
       } = await setupTests()
 
       const passkeySigner1Address = passkeySigner1.getPasskey().address
@@ -350,7 +351,7 @@ describe('Passkey', () => {
 
       // First create transaction for the deployment of the passkey signer
       await deployPasskeysContract(
-        safeWebAuthnSharedSignerContract,
+        safeWebAuthnSignerFactoryContract,
         [passkeySigner1],
         account1.signer
       )
@@ -502,7 +503,7 @@ describe('Passkey', () => {
         provider,
         passkeys: [passkeyFormerOwner],
         passkeySigners: [passkeySigner],
-        safeWebAuthnSharedSignerContract
+        safeWebAuthnSignerFactoryContract
       } = await setupTests()
 
       const passkeyFormerOwnerAddress = passkeySigner.getPasskey().address
@@ -516,7 +517,7 @@ describe('Passkey', () => {
       })
 
       await deployPasskeysContract(
-        safeWebAuthnSharedSignerContract,
+        safeWebAuthnSignerFactoryContract,
         [passkeySigner],
         account.signer
       )
@@ -613,7 +614,7 @@ describe('Passkey', () => {
         provider,
         passkeys: [passkeyNewOwner],
         passkeySigners: [passkeySigner],
-        safeWebAuthnSharedSignerContract
+        safeWebAuthnSignerFactoryContract
       } = await setupTests()
 
       const passkeyNewOwnerAddress = passkeySigner.getPasskey().address
@@ -625,7 +626,7 @@ describe('Passkey', () => {
       })
 
       await deployPasskeysContract(
-        safeWebAuthnSharedSignerContract,
+        safeWebAuthnSignerFactoryContract,
         [passkeySigner],
         eoaOwner1.signer
       )
@@ -656,14 +657,14 @@ describe('Passkey', () => {
         provider,
         passkeys: [passkeyOwner1, passkeyOwner2],
         passkeySigners: [passkeySigner1, passkeySigner2],
-        safeWebAuthnSharedSignerContract
+        safeWebAuthnSignerFactoryContract
       } = await setupTests()
 
       const passkeyOwner1Address = passkeySigner1.getPasskey().address
       const passkeyOwner2Address = passkeySigner2.getPasskey().address
 
       await deployPasskeysContract(
-        safeWebAuthnSharedSignerContract,
+        safeWebAuthnSignerFactoryContract,
         [passkeySigner1, passkeySigner2],
         eoaOwner1.signer
       )
@@ -755,13 +756,13 @@ describe('Passkey', () => {
         provider,
         passkeys: [passkey1],
         passkeySigners: [passkeySigner1],
-        safeWebAuthnSharedSignerContract
+        safeWebAuthnSignerFactoryContract
       } = await setupTests()
       const passkeySigner1Address = passkeySigner1.getPasskey().address
 
       // First create transaction for the deployment of the passkey signer
       await deployPasskeysContract(
-        safeWebAuthnSharedSignerContract,
+        safeWebAuthnSignerFactoryContract,
         [passkeySigner1],
         account1.signer
       )
@@ -887,7 +888,7 @@ describe('Passkey', () => {
           provider,
           passkeys: [passkey1, passkey2],
           passkeySigners: [passkeySigner1, passkeySigner2],
-          safeWebAuthnSharedSignerContract
+          safeWebAuthnSignerFactoryContract
         } = await setupTests()
 
         const passkeySigner1Address = passkeySigner1.getPasskey().address
@@ -898,7 +899,7 @@ describe('Passkey', () => {
 
         // First create transaction for the deployment of the passkey signer
         await deployPasskeysContract(
-          safeWebAuthnSharedSignerContract,
+          safeWebAuthnSignerFactoryContract,
           [passkeySigner1],
           account1.signer
         )

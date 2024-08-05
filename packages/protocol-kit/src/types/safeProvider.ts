@@ -24,7 +24,6 @@ export type GetPasskeyType = {
   rawId: string
   coordinates: PasskeyCoordinates
   verifierAddress: string
-  factoryAddress: string
 }
 
 export type PasskeyActions = {

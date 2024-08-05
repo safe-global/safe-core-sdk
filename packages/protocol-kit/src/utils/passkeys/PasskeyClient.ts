@@ -64,8 +64,6 @@ export const createPasskeyClient = async (
   const passkeyRawId = hexStringToUint8Array(rawId)
   const verifierAddress = customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
 
-  const factoryAddress = await safeWebAuthnSignerFactoryContract.getAddress()
-
   const [signerAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
     BigInt(coordinates.x),
     BigInt(coordinates.y),
@@ -94,8 +92,7 @@ export const createPasskeyClient = async (
           address: signerAddress,
           coordinates,
           verifierAddress,
-          rawId,
-          factoryAddress
+          rawId
         }
       }
     })) as PasskeyClient

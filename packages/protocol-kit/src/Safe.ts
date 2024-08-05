@@ -1628,7 +1628,7 @@ class Safe {
   }
 
   async #createPasskeyDeploymentTransaction(newOwnerPasskey: PasskeyArgType) {
-    const passkeyAddress = await this.getAddress()
+    const passkeyAddress = await this.getPasskeyOwnerAddress(newOwnerPasskey)
     const isPasskeyDeployed = await this.#safeProvider?.isContractDeployed(passkeyAddress)
     const chainId = await this.getChainId()
 

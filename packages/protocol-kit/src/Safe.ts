@@ -42,7 +42,9 @@ import {
   SafeModulesPaginated,
   PasskeyArgType,
   RemovePasskeyOwnerTxParams,
-  SafeWebAuthnSharedSignerContractImplementationType
+  SafeWebAuthnSharedSignerContractImplementationType,
+  PasskeyClient,
+  GetPasskeyType
 } from './types'
 import {
   EthSafeSignature,
@@ -84,7 +86,6 @@ import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import { asAddress, asHash, asHex } from './utils/types'
 import { Hash, Hex } from 'viem'
-import { PasskeyClient } from './types'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -1607,6 +1608,24 @@ class Safe {
 
     return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)
   }
+  /**
+   * Returns the passkey signer of the specific passkey.
+   *
+   * @param {PasskeyArgType} passkey The passkey owner
+   * @returns {Promise<string>} Returns the passkey owner address
+   */
+  async #getPasskeySigner(passkey: PasskeyArgType): Promise<GetPasskeyType> {
+    const safeVersion = await this.getContractVersion()
+    const safePasskeyProvider = await SafeProvider.init(
+      this.#safeProvider.provider,
+      passkey,
+      safeVersion,
+      this.#contractManager.contractNetworks
+    )
+    const passkeySigner = (await safePasskeyProvider.getExternalSigner()) as PasskeyClient
+
+    return passkeySigner.getPasskey()
+  }
 
   async #createPasskeyDeploymentTransaction(newOwnerPasskey: PasskeyArgType) {
     const passkeyAddress = await this.getAddress()
@@ -1656,13 +1675,12 @@ class Safe {
       return sharedSignerContractAddress
     }
 
-    const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeyClient
+    const passkeySigner = await this.#getPasskeySigner(passkey)
     if (!passkeySigner) {
       throw new Error('Cannot retrieve the passkey signer')
     }
 
-    const ownerPasskey = passkeySigner.getPasskey()
-    return ownerPasskey.address
+    return passkeySigner.address
   }
 
   /**

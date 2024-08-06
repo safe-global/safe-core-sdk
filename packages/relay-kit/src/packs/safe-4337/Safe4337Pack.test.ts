@@ -665,10 +665,18 @@ describe('Safe4337Pack', () => {
         sharedSignerTransaction
       ])
 
-      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(2, 'configure', [
-        passkeyOwnerConfiguration
-      ])
-      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, 'multiSend', [multiSendData])
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(2, {
+        abi: constants.ABI,
+        functionName: 'configure',
+        args: [passkeyOwnerConfiguration]
+      })
+
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, {
+        abi: constants.ABI,
+        functionName: 'multiSend',
+        args: [multiSendData]
+      })
+
       expect(safeCreateSpy).toHaveBeenCalledWith({
         provider: safe4337Pack.protocolKit.getSafeProvider().provider,
         signer: passkey,

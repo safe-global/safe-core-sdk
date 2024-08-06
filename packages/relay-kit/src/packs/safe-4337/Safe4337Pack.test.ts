@@ -313,7 +313,7 @@ describe('Safe4337Pack', () => {
         approveToPaymasterTransaction
       ]) as viem.Hash
 
-      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(4, {
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, {
         abi: constants.ABI,
         functionName: 'multiSend',
         args: [multiSendData]

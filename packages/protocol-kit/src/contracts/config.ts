@@ -1,6 +1,6 @@
 import {
   DeploymentFilter,
-  SingletonDeploymentV2,
+  SingletonDeployment,
   getCompatibilityFallbackHandlerDeployment,
   getCreateCallDeployment,
   getMultiSendCallOnlyDeployment,
@@ -121,7 +121,7 @@ const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c424
 
 const contractFunctions: Record<
   contractName,
-  (filter?: DeploymentFilter) => SingletonDeploymentV2 | Deployment | undefined
+  (filter?: DeploymentFilter) => Deployment | SingletonDeployment | undefined
 > = {
   safeSingletonVersion: getSafeSingletonDeployment,
   safeSingletonL2Version: getSafeL2SingletonDeployment,
@@ -142,7 +142,19 @@ const contractFunctions: Record<
     defaultAddress: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
     version: '0.2.0',
     contractName: 'safeWebAuthnSharedSignerVersion',
-    networkAddresses: {},
+    networkAddresses: {
+      '1': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '10': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '137': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '4078': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '8453': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '42161': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '80002': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '84532': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '421614': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '11155111': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      '11155420': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS
+    },
     released: true
   })
 }

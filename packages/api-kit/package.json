@@ -49,6 +49,7 @@
     "@types/yargs": "^17.0.32",
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
+    "ethers": "^6.13.1",
     "hardhat": "2.20.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",

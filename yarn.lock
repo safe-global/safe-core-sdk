@@ -1870,7 +1870,7 @@
   dependencies:
     semver "^7.6.2"
 
-"@safe-global/safe-modules-deployments@^2.1.1", "@safe-global/safe-modules-deployments@^2.2.0":
+"@safe-global/safe-modules-deployments@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.0.tgz#bb42c8010bbde65892fe438aaf8959e17c8654d6"
   integrity sha512-ZzNhMf8Xxods3TrY7kSrescnicHQRFH7eYx7TMKqVhxFScEiuYmivQMdV94ziF+Hot0xCcrrFeed657U/oXrJw==

@@ -53,8 +53,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     signMessageLibVersion: '1.4.1',
     createCallVersion: '1.4.1',
     simulateTxAccessorVersion: '1.4.1',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.0',
+    safeWebAuthnSharedSignerVersion: '0.2.0'
   },
   '1.3.0': {
     safeSingletonVersion: '1.3.0',
@@ -66,8 +66,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
     simulateTxAccessorVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.0',
+    safeWebAuthnSharedSignerVersion: '0.2.0'
   },
   '1.2.0': {
     safeSingletonVersion: '1.2.0',
@@ -78,8 +78,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.0',
+    safeWebAuthnSharedSignerVersion: '0.2.0'
   },
   '1.1.1': {
     safeSingletonVersion: '1.1.1',
@@ -90,8 +90,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.0',
+    safeWebAuthnSharedSignerVersion: '0.2.0'
   },
   '1.0.0': {
     safeSingletonVersion: '1.0.0',
@@ -102,8 +102,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.0',
+    safeWebAuthnSharedSignerVersion: '0.2.0'
   }
 }
 
@@ -140,7 +140,7 @@ const contractFunctions: Record<
   safeWebAuthnSharedSignerVersion: () => ({
     abi: SafeWebAuthnSharedSigner_1_4_1_ContractArtifacts.abi as unknown as any[],
     defaultAddress: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-    version: '1.4.1',
+    version: '0.2.0',
     contractName: 'safeWebAuthnSharedSignerVersion',
     networkAddresses: {},
     released: true

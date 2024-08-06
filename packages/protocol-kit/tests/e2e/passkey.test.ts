@@ -335,6 +335,7 @@ describe('Passkey', () => {
       })
     })
   })
+
   describeif(safeVersionDeployed >= '1.3.0')('signTransaction', async () => {
     it('should sign a transaction with the current passkey signer', async () => {
       const {

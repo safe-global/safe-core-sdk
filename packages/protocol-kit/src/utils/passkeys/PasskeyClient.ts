@@ -3,9 +3,10 @@ import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types
 import { getDefaultFCLP256VerifierAddress, hexStringToUint8Array } from './extractPasskeyData'
 import {
   Hex,
-  encodePacked,
+  encodeAbiParameters,
   toHex,
   toBytes,
+  stringToBytes,
   SignableMessage,
   isHex,
   createClient,
@@ -14,7 +15,8 @@ import {
   maxUint256,
   Client,
   fromHex,
-  Address
+  Address,
+  parseAbiParameters
 } from 'viem'
 import { PasskeyClient, GetPasskeyType } from '@safe-global/protocol-kit/types'
 
@@ -36,14 +38,11 @@ const sign = async (passkeyRawId: Uint8Array, data: Uint8Array): Promise<Hex> =>
 
   const { authenticatorData, signature, clientDataJSON } = assertion.response
 
-  return encodePacked(
-    ['bytes', 'bytes', 'uint256[2]'],
-    [
-      toHex(new Uint8Array(authenticatorData)),
-      extractClientDataFields(clientDataJSON),
-      extractSignature(signature)
-    ]
-  )
+  return encodeAbiParameters(parseAbiParameters('bytes, bytes, uint256[2]'), [
+    toHex(new Uint8Array(authenticatorData)),
+    extractClientDataFields(clientDataJSON),
+    extractSignature(signature)
+  ])
 }
 
 const signTransaction = () => {
@@ -120,7 +119,7 @@ function extractClientDataFields(clientDataJSON: ArrayBuffer): Hex {
   }
 
   const [, fields] = match
-  return toHex(toBytes(fields))
+  return toHex(stringToBytes(fields))
 }
 
 /**
@@ -153,7 +152,7 @@ function extractSignature(signature: ArrayBuffer): [bigint, bigint] {
     const len = view.getUint8(offset + 1)
     const start = offset + 2
     const end = start + len
-    const n = BigInt(toHex(new Uint8Array(view.buffer.slice(start, end))))
+    const n = fromHex(toHex(new Uint8Array(view.buffer.slice(start, end))), 'bigint')
     check(n < maxUint256)
     return [n, end] as const
   }

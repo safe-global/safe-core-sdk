@@ -45,5 +45,8 @@
     "./packages/**/*.{json,md}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "viem": "^2.17.4"
   }
 }

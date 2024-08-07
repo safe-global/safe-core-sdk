@@ -152,6 +152,9 @@ class Safe {
       )
     }
 
+    const safeVersion = await this.getContractVersion()
+    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
+
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#guardManager = new GuardManager(this.#safeProvider, this.#contractManager.safeContract)
@@ -160,17 +163,19 @@ class Safe {
       this.#contractManager.safeContract
     )
 
-    const safeVersion = await this.getContractVersion()
-    const safeAddress = await this.getAddress()
-    const owners = await this.getOwners()
-    this.#safeProvider = await SafeProvider.init(
-      provider,
-      signer,
-      safeVersion,
-      contractNetworks,
-      safeAddress,
-      owners
-    )
+    const isPasskeySigner = signer && typeof signer !== 'string'
+    if (isPasskeySigner) {
+      const safeAddress = await this.getAddress()
+      const owners = await this.getOwners()
+      this.#safeProvider = await SafeProvider.init(
+        provider,
+        signer,
+        safeVersion,
+        contractNetworks,
+        safeAddress,
+        owners
+      )
+    }
   }
 
   /**

@@ -152,6 +152,14 @@ class Safe {
       )
     }
 
+    this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
+    this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
+    this.#guardManager = new GuardManager(this.#safeProvider, this.#contractManager.safeContract)
+    this.#fallbackHandlerManager = new FallbackHandlerManager(
+      this.#safeProvider,
+      this.#contractManager.safeContract
+    )
+
     const safeVersion = await this.getContractVersion()
     const safeAddress = await this.getAddress()
     const owners = await this.getOwners()
@@ -162,14 +170,6 @@ class Safe {
       contractNetworks,
       safeAddress,
       owners
-    )
-
-    this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
-    this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
-    this.#guardManager = new GuardManager(this.#safeProvider, this.#contractManager.safeContract)
-    this.#fallbackHandlerManager = new FallbackHandlerManager(
-      this.#safeProvider,
-      this.#contractManager.safeContract
     )
   }
 

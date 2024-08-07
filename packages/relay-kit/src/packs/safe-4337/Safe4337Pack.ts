@@ -582,7 +582,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const safeProvider = this.protocolKit.getSafeProvider()
-    const signerAddress = await this.protocolKit.getSignerAddress()
+    const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
     const isPasskeySigner = await safeProvider.isPasskeySigner()
 
     if (!signerAddress) {

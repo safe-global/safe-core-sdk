@@ -397,8 +397,8 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 100000n
+        verificationGasLimit: 150000n,
+        preVerificationGas: 105000n
       })
     })
 
@@ -429,8 +429,8 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 100000n
+        verificationGasLimit: 150000n,
+        preVerificationGas: 105000n
       })
     })
 

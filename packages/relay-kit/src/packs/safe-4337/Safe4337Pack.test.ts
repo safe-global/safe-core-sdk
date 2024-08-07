@@ -795,7 +795,7 @@ describe('Safe4337Pack', () => {
         fixtures.OWNER_1.toLowerCase(),
         new protocolKit.EthSafeSignature(
           fixtures.OWNER_1,
-          '0x40f892ea70b4981af8a4bfcedaf084033f3a6ba9baa79783c3ead7f40d2f042145e735d4c16162a0ee22b5c21631c82bbda9fd63454c496baf59159ab42c98d01f',
+          '0xe734292ddc79d8fbfcd60d5f816e2e58f684cc2dc5b779167ea1e5be099adeff1eb7e8d9aba7ea298730ff3509a345635da7c156794c014ced7746ec1a96ba9e20',
           false
         )
       )

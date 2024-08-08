@@ -31,7 +31,6 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "dependencies": {
-    "abitype": "^1.0.2",
-    "viem": "^2.19.0"
+    "abitype": "^1.0.2"
   }
 }

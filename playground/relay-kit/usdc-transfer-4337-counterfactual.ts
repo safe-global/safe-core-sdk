@@ -1,4 +1,4 @@
-import { parseEther, Address } from 'viem'
+import { parseEther } from 'viem'
 import { getBlock, waitForTransactionReceipt } from 'viem/actions'
 import { sepolia } from 'viem/chains'
 import { Safe4337Pack } from '@safe-global/relay-kit'
@@ -45,7 +45,7 @@ async function main() {
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
   console.log('Chain Id', await safe4337Pack.getChainId())
 
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress())
+  const senderAddress = await safe4337Pack.protocolKit.getAddress()
 
   console.log('senderAddress: ', senderAddress)
 

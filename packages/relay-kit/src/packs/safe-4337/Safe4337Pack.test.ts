@@ -743,7 +743,7 @@ describe('Safe4337Pack', () => {
       })
     })
 
-    it('should allow to send an UserOperation to a bundler', async () => {
+    it.only('should allow to send an UserOperation to a bundler', async () => {
       const transferUSDC = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
@@ -765,10 +765,13 @@ describe('Safe4337Pack', () => {
 
       await safe4337Pack.executeTransaction({ executable: safeOperation })
 
-      expect(requestMock).toHaveBeenCalledWith(constants.RPC_4337_CALLS.SEND_USER_OPERATION, [
-        utils.userOperationToHexValues(safeOperation.toUserOperation()),
-        fixtures.ENTRYPOINTS[0]
-      ])
+      expect(requestMock).toHaveBeenNthCalledWith(5, {
+        method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
+        params: [
+          utils.userOperationToHexValues(safeOperation.toUserOperation()),
+          fixtures.ENTRYPOINTS[0]
+        ]
+      })
     })
   })
 

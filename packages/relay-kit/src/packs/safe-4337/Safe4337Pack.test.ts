@@ -397,7 +397,7 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 105000n
       })
     })
@@ -429,7 +429,7 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 105000n
       })
     })
@@ -491,7 +491,7 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 105000n
       })
     })
@@ -573,7 +573,7 @@ describe('Safe4337Pack', () => {
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 150000n,
+        verificationGasLimit: 400000n,
         preVerificationGas: 105000n
       })
     })
@@ -582,7 +582,9 @@ describe('Safe4337Pack', () => {
   describe('When using a passkey signer', () => {
     const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
     const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
-    const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
+    const PASSKEY_PRIVATE_KEY = BigInt(
+      '0x1c36e7789d4e7b5f0d0d9b1e01f1a1e3be4ab183f62a77eb10b05d07a6a3a5c2'
+    )
     jest.setTimeout(120_000)
 
     let passkey: protocolKit.PasskeyArgType
@@ -743,7 +745,7 @@ describe('Safe4337Pack', () => {
       })
     })
 
-    it.only('should allow to send an UserOperation to a bundler', async () => {
+    it('should allow to send an UserOperation to a bundler', async () => {
       const transferUSDC = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),

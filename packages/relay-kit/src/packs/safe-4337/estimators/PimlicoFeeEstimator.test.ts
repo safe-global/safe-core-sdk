@@ -45,7 +45,7 @@ describe('PimlicoFeeEstimator', () => {
 
     expect(sponsoredGasEstimation).toEqual({
       callGasLimit: 181_176n,
-      verificationGasLimit: 124_584n,
+      verificationGasLimit: 332_224n,
       preVerificationGas: 50_996n
     })
   })

@@ -45,7 +45,7 @@ async function main() {
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
   console.log('Chain Id', await safe4337Pack.getChainId())
 
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as Address
+  const senderAddress = (await safe4337Pack.protocolKit.getAddress())
 
   console.log('senderAddress: ', senderAddress)
 

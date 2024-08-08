@@ -1,19 +1,11 @@
 import { SafeConfig, SafeConfigWithPredictedSafe } from '../types'
-import { getAddress, Address, isHex, Hex, Hash, Chain, defineChain, etherUnits } from 'viem'
+import { isHex, Hex, Hash, Chain, defineChain, etherUnits } from 'viem'
 import * as allChains from 'viem/chains'
 
 export function isSafeConfigWithPredictedSafe(
   config: SafeConfig
 ): config is SafeConfigWithPredictedSafe {
   return (config as unknown as SafeConfigWithPredictedSafe).predictedSafe !== undefined
-}
-
-export function asAddresses(addresses: string[]): Address[] {
-  return addresses.map(asAddress)
-}
-
-export function asAddress(address: string): Address {
-  return getAddress(address)
 }
 
 export function asHash(hash: string): Hash {

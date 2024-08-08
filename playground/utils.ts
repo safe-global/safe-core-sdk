@@ -8,7 +8,7 @@ export const generateTransferCallData = (to: string, value: bigint) => {
   return encodeFunctionData({
     abi: functionAbi,
     functionName: 'transfer',
-    args: [to as Address, value]
+    args: [to, value]
   })
 }
 

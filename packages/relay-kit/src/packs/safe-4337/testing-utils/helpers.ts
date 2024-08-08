@@ -1,4 +1,4 @@
-import { Address, encodeFunctionData, parseAbi } from 'viem'
+import { encodeFunctionData, parseAbi } from 'viem'
 import { Safe4337InitOptions } from '../types'
 import { Safe4337Pack } from '../Safe4337Pack'
 import * as fixtures from './fixtures'
@@ -9,7 +9,7 @@ export const generateTransferCallData = (to: string, value: bigint) => {
   return encodeFunctionData({
     abi: functionAbi,
     functionName: 'transfer',
-    args: [to as Address, value]
+    args: [to, value]
   })
 }
 

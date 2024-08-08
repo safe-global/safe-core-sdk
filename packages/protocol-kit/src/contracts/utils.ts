@@ -19,7 +19,7 @@ import {
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
-import { asAddress, asHex } from '../utils/types'
+import { asHex } from '../utils/types'
 import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
@@ -85,7 +85,7 @@ export function encodeCreateProxyWithNonce(
   salt?: string
 ) {
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
-    asAddress(safeSingletonAddress),
+    safeSingletonAddress,
     asHex(initializer),
     BigInt(salt || PREDETERMINED_SALT_NONCE)
   ])
@@ -119,11 +119,11 @@ export async function encodeSetupCallData({
     return safeContract.encode('setup', [
       owners,
       threshold,
-      asAddress(to),
+      to,
       asHex(data),
-      asAddress(paymentToken),
+      paymentToken,
       payment,
-      asAddress(paymentReceiver)
+      paymentReceiver
     ])
   }
 
@@ -308,7 +308,7 @@ export async function predictSafeAddress({
 
   const input = safeProvider.encodeParameters('address', [safeContract.getAddress()])
 
-  const from = asAddress(safeProxyFactoryContract.getAddress())
+  const from = safeProxyFactoryContract.getAddress()
 
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)
@@ -346,7 +346,7 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
  * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
  * see: https://docs.zksync.io/build/developer-reference/ethereum-differences/evm-instructions/#address-derivation
  *
- * @param {`0x${string}`} from - The sender's address.
+ * @param {`string`} from - The sender's address.
  * @param {SafeVersion} safeVersion - The version of the safe.
  * @param {`0x${string}`} salt - The salt used for address derivation.
  * @param {`0x${string}`} input - Additional input data for the derivation.
@@ -354,7 +354,7 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
  * @returns {string} The derived zkSync Era address.
  */
 export function zkSyncEraCreate2Address(
-  from: `0x${string}`,
+  from: string,
   safeVersion: SafeVersion,
   salt: `0x${string}`,
   input: `0x${string}`
@@ -363,7 +363,7 @@ export function zkSyncEraCreate2Address(
   const inputHash = keccak256(input)
 
   const addressBytes = keccak256(
-    concat([ZKSYNC_CREATE2_PREFIX, pad(from), salt, bytecodeHash, inputHash])
+    concat([ZKSYNC_CREATE2_PREFIX, pad(asHex(from)), salt, bytecodeHash, inputHash])
   ).slice(26)
 
   return addressBytes

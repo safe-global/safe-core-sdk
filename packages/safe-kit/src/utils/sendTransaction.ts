@@ -1,4 +1,4 @@
-import { Address, WalletClient, Transport, Chain, Hex, Account } from 'viem'
+import { WalletClient, Transport, Chain, Hex, Account } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import Safe from '@safe-global/protocol-kit'
 import { Transaction } from '@safe-global/safe-core-sdk-types'
@@ -29,7 +29,7 @@ export const sendTransaction = async ({
     throw new Error('SafeProvider must be initialized with a signer to use this function')
 
   const hash = await signer.sendTransaction({
-    to: transaction.to as Address,
+    to: transaction.to,
     data: transaction.data as Hex,
     value: BigInt(transaction.value),
     account: signer.account

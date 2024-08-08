@@ -78,7 +78,7 @@ async function main() {
 
   // Calculate Safe address
 
-  const predictedSafeAddress = (await gelatoSafeClient.protocolKit.getAddress()) as Address
+  const predictedSafeAddress = (await gelatoSafeClient.protocolKit.getAddress())
   console.log({ predictedSafeAddress })
 
   const isSafeDeployed = await gelatoSafeClient.protocolKit.isSafeDeployed()

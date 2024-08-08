@@ -1,4 +1,4 @@
-import { Address, Hex, encodePacked, toHex } from 'viem'
+import { Hex, encodePacked, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -92,7 +92,7 @@ class EthSafeOperation implements SafeOperation {
   }
 
   getHash(): string {
-    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress as Address)
+    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress)
   }
 }
 

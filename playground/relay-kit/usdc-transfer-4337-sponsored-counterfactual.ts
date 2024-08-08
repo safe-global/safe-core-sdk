@@ -61,7 +61,7 @@ async function main() {
   console.log('Chain Id', await safe4337Pack.getChainId())
 
   // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as Address
+  const senderAddress = (await safe4337Pack.protocolKit.getAddress())
 
   console.log('senderAddress: ', senderAddress)
 

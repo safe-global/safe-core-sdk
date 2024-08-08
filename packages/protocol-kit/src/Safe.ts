@@ -72,7 +72,7 @@ import {
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
-import { asAddress, asHash, asHex } from './utils/types'
+import { asHash, asHex } from './utils/types'
 import { Hash, Hex } from 'viem'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
@@ -842,7 +842,7 @@ class Safe {
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
       const [approved] = await this.#contractManager.safeContract.approvedHashes([
-        asAddress(owner),
+        owner,
         asHash(txHash)
       ])
       if (approved > 0) {
@@ -1405,7 +1405,7 @@ class Safe {
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        asAddress(safeSingletonContract.getAddress()),
+        safeSingletonContract.getAddress(),
         asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
         BigInt(saltNonce)
       ])

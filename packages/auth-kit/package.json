@@ -42,6 +42,6 @@
     "@safe-global/api-kit": "^2.4.3",
     "@safe-global/protocol-kit": "^4.0.3",
     "@web3auth/safeauth-embed": "^0.0.0",
-    "viem": "^2.17.0"
+    "viem": "^2.19.0"
   }
 }

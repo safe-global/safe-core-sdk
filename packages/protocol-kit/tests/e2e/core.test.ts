@@ -10,7 +10,6 @@ import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
-import { asAddress } from '@safe-global/protocol-kit/utils/types'
 import { waitTransactionReceipt } from './utils/transactions'
 import { sameString } from '@safe-global/protocol-kit/utils'
 
@@ -331,7 +330,7 @@ describe('Safe Info', () => {
         chai.expect(await safeSdk.getBalance()).to.be.eq(0n)
 
         const hash = await account1.signer.sendTransaction({
-          to: asAddress(await safeSdk.getAddress()),
+          to: await safeSdk.getAddress(),
           value: BigInt(`${1e18}`)
         })
         await waitTransactionReceipt(hash)

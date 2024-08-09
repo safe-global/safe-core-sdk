@@ -66,6 +66,7 @@ import {
 } from './utils/eip-712'
 
 import PasskeySigner from './utils/passkeys/PasskeySigner'
+import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 
 export {
   estimateTxBaseGas,
@@ -118,7 +119,8 @@ export {
   hashSafeMessage,
   generateTypedData,
   SafeProvider,
-  PasskeySigner
+  PasskeySigner,
+  getPasskeyOwnerAddress
 }
 
 export * from './types'

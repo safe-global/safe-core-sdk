@@ -7,10 +7,6 @@
     "sourceMap": true /* Generates corresponding '.map' file. */,
     "strict": true /* Enable all strict type-checking options. */,
     "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
-    "strictNullChecks": true /* Enable strict null checks. */,
-    "strictFunctionTypes": true /* Enable strict checking of function types. */,
-    "strictBindCallApply": true /* Enable strict 'bind', 'call', and 'apply' methods on functions. */,
-    "strictPropertyInitialization": true /* Enable strict checking of property initialization in classes. */,
     "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
     "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
     "noUnusedParameters": true /* Report errors on unused parameters. */,
@@ -25,14 +21,14 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@safe-global/safe-kit/*": ["./packages/safe-kit/src/*"],
       "@safe-global/api-kit/*": ["./packages/api-kit/src/*"],
       "@safe-global/auth-kit/*": ["./packages/auth-kit/src/*"],
       "@safe-global/onramp-kit/*": ["./packages/onramp-kit/src/*"],
       "@safe-global/protocol-kit/*": ["./packages/protocol-kit/src/*"],
       "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"],
       "@safe-global/relay-kit/*": ["./packages/relay-kit/src/*"],
-      "@safe-global/safe-core-sdk-types/*": ["./packages/safe-core-sdk-types/src/*"]
+      "@safe-global/safe-core-sdk-types/*": ["./packages/safe-core-sdk-types/src/*"],
+      "@safe-global/sdk-starter-kit/*": ["./packages/sdk-starter-kit/src/*"]
     }
   },
   "exclude": ["**/dist", "**/node_modules"]

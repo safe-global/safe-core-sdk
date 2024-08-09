@@ -2,14 +2,14 @@ import { PredictedSafeProps } from '@safe-global/protocol-kit'
 import { GetSafeOperationListResponse, ListOptions } from '@safe-global/api-kit'
 import { PaymasterOptions, Safe4337Pack } from '@safe-global/relay-kit'
 
-import { SafeClient } from '@safe-global/safe-kit/SafeClient'
-import { SafeOperationClient } from '@safe-global/safe-kit/extensions/safe-operations/SafeOperationClient'
-import { BundlerOptions } from '@safe-global/safe-kit/extensions/safe-operations/types'
+import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
+import { SafeOperationClient } from '@safe-global/sdk-starter-kit/extensions/safe-operations/SafeOperationClient'
+import { BundlerOptions } from '@safe-global/sdk-starter-kit/extensions/safe-operations/types'
 import {
   ConfirmSafeOperationProps,
   SafeClientResult,
   SendSafeOperationProps
-} from '@safe-global/safe-kit/types'
+} from '@safe-global/sdk-starter-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use a bundler and a paymaster

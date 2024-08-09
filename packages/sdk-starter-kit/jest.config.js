@@ -7,7 +7,7 @@ const config = {
   moduleNameMapper: {
     '^@safe-global/protocol-kit/(.*)$': '<rootDir>/../protocol-kit/src/$1',
     '^@safe-global/relay-kit/(.*)$': '<rootDir>/../relay-kit/src/$1',
-    '^@safe-global/safe-kit/(.*)$': '<rootDir>/src/$1'
+    '^@safe-global/sdk-starter-kit/(.*)$': '<rootDir>/src/$1'
   }
 }
 

@@ -1,8 +1,8 @@
 import { hashSafeMessage } from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 
-import { SafeClient } from '@safe-global/safe-kit/SafeClient'
-import { SafeClientResult, SendOnChainMessageProps } from '@safe-global/safe-kit/types'
+import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
+import { SafeClientResult, SendOnChainMessageProps } from '@safe-global/sdk-starter-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use on-chain messages

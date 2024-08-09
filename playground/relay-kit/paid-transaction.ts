@@ -1,4 +1,4 @@
-import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
+import { createSafeClient, SafeClient } from '@safe-global/sdk-starter-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,

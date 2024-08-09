@@ -1,5 +1,4 @@
-import { SafeClientResult, createSafeClient } from '@safe-global/safe-kit'
-import { generateTransferCallData } from '../utils'
+import { SafeClientResult, createSafeClient, onChainMessages } from '@safe-global/sdk-starter-kit'
 
 const OWNER_1_PRIVATE_KEY = ''
 const OWNER_2_PRIVATE_KEY = ''
@@ -13,8 +12,53 @@ const THRESHOLD = 3
 const SALT_NONCE = ''
 
 const RPC_URL = 'https://sepolia.gateway.tenderly.co'
-const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
-const usdcAmount = 10_000n // 0.01 USDC
+const MESSAGE = "I'm the owner of this Safe"
+// const MESSAGE = {
+//   types: {
+//     EIP712Domain: [
+//       { name: 'name', type: 'string' },
+//       { name: 'version', type: 'string' },
+//       { name: 'chainId', type: 'uint256' },
+//       { name: 'verifyingContract', type: 'address' }
+//     ],
+//     Person: [
+//       { name: 'name', type: 'string' },
+//       { name: 'wallets', type: 'address[]' }
+//     ],
+//     Mail: [
+//       { name: 'from', type: 'Person' },
+//       { name: 'to', type: 'Person[]' },
+//       { name: 'contents', type: 'string' }
+//     ]
+//   },
+//   domain: {
+//     name: 'Ether Mail',
+//     version: '1',
+//     chainId: 1,
+//     verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+//   },
+//   primaryType: 'Mail',
+//   message: {
+//     from: {
+//       name: 'Cow',
+//       wallets: [
+//         '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+//         '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'
+//       ]
+//     },
+//     to: [
+//       {
+//         name: 'Bob',
+//         wallets: [
+//           '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+//           '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+//           '0xB0B0b0b0b0b0B000000000000000000000000000'
+//         ]
+//       }
+//     ],
+//     contents: 'Hello, Bob!'
+//   }
+// }
 
 async function send(): Promise<SafeClientResult> {
   const safeClient = await createSafeClient({
@@ -27,6 +71,8 @@ async function send(): Promise<SafeClientResult> {
     }
   })
 
+  const safeClientWithMessages = safeClient.extend(onChainMessages())
+
   const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'
 
   console.log(
@@ -36,14 +82,7 @@ async function send(): Promise<SafeClientResult> {
   )
   console.log('-Signer Address:', signerAddress)
 
-  const transferUSDC = {
-    to: usdcTokenAddress,
-    data: generateTransferCallData(signerAddress, usdcAmount),
-    value: '0'
-  }
-  const transactions = [transferUSDC, transferUSDC]
-
-  const txResult = await safeClient.send({ transactions })
+  const txResult = await safeClientWithMessages.sendOnChainMessage({ message: MESSAGE })
 
   console.log('-Send result: ', txResult)
 

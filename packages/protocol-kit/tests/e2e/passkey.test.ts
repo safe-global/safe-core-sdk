@@ -132,10 +132,8 @@ describe('Passkey', () => {
           contractNetworks
         })
 
-        const passkeyAddress = await getPasskeyOwnerAddress(safeSdk, passkey1)
-
         chai
-          .expect(safeSdk.isOwner(passkeyAddress))
+          .expect(safeSdk.isOwner(await getPasskeyOwnerAddress(safeSdk, passkey1)))
           .to.be.rejectedWith(
             'Current version of the Safe does not support the Passkey signer functionality'
           )

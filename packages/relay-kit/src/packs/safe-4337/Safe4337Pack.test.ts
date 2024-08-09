@@ -754,8 +754,7 @@ describe('Safe4337Pack', () => {
       const safe4337Pack = await createSafe4337Pack({
         signer: passkey,
         options: {
-          owners: [],
-          threshold: 1
+          safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
         }
       })
 

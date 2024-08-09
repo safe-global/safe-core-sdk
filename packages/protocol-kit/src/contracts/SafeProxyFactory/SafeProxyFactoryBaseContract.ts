@@ -2,16 +2,8 @@ import { Abi } from 'abitype'
 import { ContractRunner, InterfaceAbi } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import {
-  SafeVersion,
-  TransactionOptions,
-  CreateProxyProps as CreateProxyPropsGeneral
-} from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-
-export interface CreateProxyProps extends CreateProxyPropsGeneral {
-  options?: TransactionOptions
-}
 
 /**
  * Abstract class SafeProxyFactoryBaseContract extends BaseContract to specifically integrate with the SafeProxyFactory contract.

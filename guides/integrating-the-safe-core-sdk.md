@@ -55,9 +55,7 @@ const apiKit = new SafeApiKit({
 ### Initialize the Protocol Kit
 
 ```js
-import Safe, { SafeFactory } from '@safe-global/protocol-kit'
-
-const safeFactory = await SafeFactory.init({ provider, signer })
+import Safe from '@safe-global/protocol-kit'
 
 const protocolKit = await Safe.init({ provider, signer, safeAddress })
 ```
@@ -67,7 +65,6 @@ There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe
 By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeSingleton` to force the use of the `Safe.sol` contract.
 
 ```js
-const safeFactory = await SafeFactory.init({ provider, signer, isL1SafeSingleton: true })
 
 const protocolKit = await Safe.init({ provider, signer, safeAddress, isL1SafeSingleton: true })
 ```
@@ -100,21 +97,12 @@ const contractNetworks: ContractNetworksConfig = {
   }
 }
 
-const safeFactory = await SafeFactory.init({ provider, signer, contractNetworks })
-
 const protocolKit = await Safe.init({ provider, signer, safeAddress, contractNetworks })
-```
-
-The `SafeFactory` constructor also accepts the property `safeVersion` to specify the Safe contract version that will be deployed. This string can take the values `1.0.0`, `1.1.1`, `1.2.0`, `1.3.0` or `1.4.1`. If not specified, the `DEFAULT_SAFE_VERSION` value will be used.
-
-```js
-const safeVersion = 'X.Y.Z'
-const safeFactory = await SafeFactory.init({ provider, signer, safeVersion })
 ```
 
 ## <a name="deploy-safe">3. Deploy a new Safe</a>
 
-The Protocol Kit library allows the deployment of new Safes using the `safeFactory` instance we just created.
+The Protocol Kit library allows the deployment of new Safes using the `deploy` method.
 
 Here, for example, we can create a new Safe account with 3 owners and 2 required signatures.
 
@@ -126,10 +114,13 @@ const safeAccountConfig: SafeAccountConfig = {
   threshold: 2,
   // ... (optional params)
 }
-const protocolKit = await safeFactory.deploySafe({ safeAccountConfig })
+
+const predictedSafe = await Safe.init({ provider, signer, predictSafe, contractNetworks })
+
+const protocolKit = await predictedSafe.deploy()
 ```
 
-Calling the method `deploySafe` will deploy the desired Safe and return a Protocol Kit initialized instance ready to be used. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit#deploysafe) for more details on additional configuration parameters and callbacks.
+Calling the method `deploy` will deploy the desired Safe and return a Protocol Kit initialized instance ready to be used. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit#deploysafe) for more details on additional configuration parameters and callbacks.
 
 ## <a name="create-transaction">4. Create a transaction</a>
 

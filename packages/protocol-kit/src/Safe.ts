@@ -19,7 +19,10 @@ import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
   getPredictedSafeAddressInitCode,
-  predictSafeAddress
+  getSafeAddressFromDeploymentTx,
+  predictSafeAddress,
+  validateSafeAccountConfig,
+  validateSafeDeploymentConfig
 } from './contracts/utils'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import ContractManager from './managers/contractManager'
@@ -234,13 +237,6 @@ class Safe {
    */
   async getAddress(): Promise<string> {
     if (this.#predictedSafe) {
-      const safeVersion = await this.getContractVersion()
-      if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
-        throw new Error(
-          'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
-        )
-      }
-
       const chainId = await this.#safeProvider.getChainId()
       return predictSafeAddress({
         safeProvider: this.#safeProvider,
@@ -818,7 +814,6 @@ class Safe {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
 
-    // TODO: fix this
     return this.#contractManager.safeContract.approveHash(hash, {
       from: signerAddress,
       ...options
@@ -833,7 +828,7 @@ class Safe {
    */
   async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
     if (!this.#contractManager.safeContract) {
-      throw new Error('Safe is not deployed')
+      return []
     }
 
     const owners = await this.getOwners()
@@ -861,6 +856,13 @@ class Safe {
     fallbackHandlerAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const safeVersion = await this.getContractVersion()
+    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      throw new Error(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+      )
+    }
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -886,6 +888,13 @@ class Safe {
   async createDisableFallbackHandlerTx(
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const safeVersion = await this.getContractVersion()
+    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      throw new Error(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+      )
+    }
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -1202,32 +1211,9 @@ class Safe {
       ? await this.toSafeTransactionType(safeTransaction)
       : safeTransaction
 
-    const signedSafeTransaction = await this.copyTransaction(transaction)
+    const signedSafeTransaction = await this.#addPreValidatedSignature(transaction)
 
-    const txHash = await this.getTransactionHash(signedSafeTransaction)
-    const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
-    for (const owner of ownersWhoApprovedTx) {
-      signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
-    }
-    const owners = await this.getOwners()
-    const threshold = await this.getThreshold()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
-    if (
-      threshold > signedSafeTransaction.signatures.size &&
-      signerAddress &&
-      owners.includes(signerAddress)
-    ) {
-      signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
-    }
-
-    if (threshold > signedSafeTransaction.signatures.size) {
-      const signaturesMissing = threshold - signedSafeTransaction.signatures.size
-      throw new Error(
-        `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
-          signaturesMissing > 1 ? 's' : ''
-        } missing`
-      )
-    }
+    await this.#isReadyToExecute(signedSafeTransaction)
 
     const value = BigInt(signedSafeTransaction.data.value)
     if (value !== 0n) {
@@ -1237,6 +1223,8 @@ class Safe {
       }
     }
 
+    const signerAddress = await this.#safeProvider.getSignerAddress()
+
     const txResponse = await this.#contractManager.safeContract.execTransaction(
       signedSafeTransaction,
       {
@@ -1245,6 +1233,144 @@ class Safe {
       }
     )
     return txResponse
+  }
+
+  /**
+   * Adds a PreValidatedSignature to the transaction if the threshold is not reached.
+   *
+   * @async
+   * @param {SafeTransaction} transaction - The transaction to add a signature to.
+   * @returns {Promise<SafeTransaction>} A promise that resolves to the signed transaction.
+   */
+  async #addPreValidatedSignature(transaction: SafeTransaction): Promise<SafeTransaction> {
+    const signedSafeTransaction = await this.copyTransaction(transaction)
+
+    const txHash = await this.getTransactionHash(signedSafeTransaction)
+    const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
+
+    for (const owner of ownersWhoApprovedTx) {
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
+    }
+
+    const owners = await this.getOwners()
+    const threshold = await this.getThreshold()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
+
+    if (
+      threshold > signedSafeTransaction.signatures.size &&
+      signerAddress &&
+      owners.includes(signerAddress)
+    ) {
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
+    }
+
+    return signedSafeTransaction
+  }
+
+  /**
+   * Checks if the transaction has enough signatures to be executed.
+   *
+   * @async
+   * @param {SafeTransaction} transaction - The Safe transaction to check.
+   * @throws Will throw an error if the required number of signatures is not met.
+   */
+  async #isReadyToExecute(transaction: SafeTransaction) {
+    const threshold = await this.getThreshold()
+
+    if (threshold > transaction.signatures.size) {
+      const signaturesMissing = threshold - transaction.signatures.size
+      throw new Error(
+        `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
+          signaturesMissing > 1 ? 's' : ''
+        } missing`
+      )
+    }
+  }
+
+  /**
+   * Deploys a Safe and optionally executes a transaction in a batch
+   *
+   * @param safeTransaction - The Safe transaction to execute
+   * @param options - The Safe transaction execution options. Optional
+   * @throws "No signer provided"
+   * @throws "There are X signatures missing"
+   * @returns The new instance of the SDK with the Safe deployed
+   */
+  async deploy(
+    safeTransaction?: SafeTransaction | SafeMultisigTransactionResponse,
+    options: TransactionOptions = {}
+  ): Promise<Safe> {
+    const isSafeDeployed = await this.isSafeDeployed()
+
+    // if the safe is already deployed throws an error
+    if (isSafeDeployed) {
+      throw new Error('Safe already deployed')
+    }
+
+    if (!this.#predictedSafe) {
+      throw new Error('Predict Safe should be present')
+    }
+
+    const signer = await this.#safeProvider.getExternalSigner()
+
+    if (!signer) {
+      throw new Error('signer should be present')
+    }
+
+    validateSafeAccountConfig(this.#predictedSafe.safeAccountConfig)
+    validateSafeDeploymentConfig(this.#predictedSafe?.safeDeploymentConfig || {})
+
+    const signerAddress = (await this.#safeProvider.getSignerAddress()) || '0x'
+
+    let txReceipt
+
+    if (safeTransaction) {
+      const transaction = isSafeMultisigTransactionResponse(safeTransaction)
+        ? await this.toSafeTransactionType(safeTransaction)
+        : safeTransaction
+
+      const signedSafeTransaction = await this.#addPreValidatedSignature(transaction)
+
+      await this.#isReadyToExecute(signedSafeTransaction)
+
+      // we add the Safe deployment to the batch
+      const deploymentBatch = await this.wrapSafeTransactionIntoDeploymentBatch(
+        signedSafeTransaction,
+        options
+      )
+
+      // await for the deployment
+      const tx = await signer.sendTransaction({
+        from: signerAddress,
+        ...deploymentBatch,
+        ...options
+      })
+
+      txReceipt = await tx?.wait()
+    } else {
+      // we create the deployment transaction
+      const safeDeploymentTransaction = await this.createSafeDeploymentTransaction()
+
+      const tx = await signer.sendTransaction({
+        from: signerAddress,
+        ...safeDeploymentTransaction,
+        ...options
+      })
+
+      txReceipt = await tx?.wait()
+    }
+
+    const safeVersion = await this.getContractVersion()
+    const safeAddress = getSafeAddressFromDeploymentTx(txReceipt!, safeVersion)
+
+    const isSafeProxyContractDeployed = await this.#safeProvider.isContractDeployed(safeAddress)
+
+    if (!isSafeProxyContractDeployed) {
+      throw new Error('SafeProxy contract is not deployed on the current network')
+    }
+
+    // return a new instance of the SDK with the safe deployed
+    return this.connect({ signer: this.#safeProvider.signer, safeAddress })
   }
 
   /**

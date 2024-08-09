@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { parseAbi } from 'viem'
 
 export const DEFAULT_SAFE_VERSION = '1.4.1'
 export const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
@@ -21,7 +21,7 @@ export const EIP712_SAFE_OPERATION_TYPE = {
   ]
 }
 
-export const INTERFACES = new ethers.Interface([
+export const ABI = parseAbi([
   'function enableModules(address[])',
   'function multiSend(bytes memory transactions) public payable',
   'function executeUserOp(address to, uint256 value, bytes data, uint8 operation)',
@@ -29,15 +29,28 @@ export const INTERFACES = new ethers.Interface([
   'function configure((uint256 x, uint256 y, uint176 verifiers) signer)'
 ])
 
+export const ENTRYPOINT_ABI = [
+  {
+    inputs: [
+      { name: 'sender', type: 'address' },
+      { name: 'key', type: 'uint192' }
+    ],
+    name: 'getNonce',
+    outputs: [{ name: 'nonce', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function'
+  }
+] as const
+
 export const ENTRYPOINT_ADDRESS_V06 = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 export const ENTRYPOINT_ADDRESS_V07 = '0x0000000071727De22E5E9d8BAf0edAc6f37da032'
 
-export const RPC_4337_CALLS = {
-  ESTIMATE_USER_OPERATION_GAS: 'eth_estimateUserOperationGas',
-  SEND_USER_OPERATION: 'eth_sendUserOperation',
-  GET_USER_OPERATION_BY_HASH: 'eth_getUserOperationByHash',
-  GET_USER_OPERATION_RECEIPT: 'eth_getUserOperationReceipt',
-  SUPPORTED_ENTRY_POINTS: 'eth_supportedEntryPoints',
-  CHAIN_ID: 'eth_chainId',
-  SPONSOR_USER_OPERATION: 'pm_sponsorUserOperation'
+export enum RPC_4337_CALLS {
+  ESTIMATE_USER_OPERATION_GAS = 'eth_estimateUserOperationGas',
+  SEND_USER_OPERATION = 'eth_sendUserOperation',
+  GET_USER_OPERATION_BY_HASH = 'eth_getUserOperationByHash',
+  GET_USER_OPERATION_RECEIPT = 'eth_getUserOperationReceipt',
+  SUPPORTED_ENTRY_POINTS = 'eth_supportedEntryPoints',
+  CHAIN_ID = 'eth_chainId',
+  SPONSOR_USER_OPERATION = 'pm_sponsorUserOperation'
 }

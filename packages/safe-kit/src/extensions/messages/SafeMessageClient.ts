@@ -1,13 +1,17 @@
 import Safe, { hashSafeMessage } from '@safe-global/protocol-kit'
 import SafeApiKit, {
   EIP712TypedData as ApiKitEIP712TypedData,
-  GetSafeMessageListProps,
+  ListOptions,
   SafeMessageListResponse
 } from '@safe-global/api-kit'
-import { EIP712TypedData, SafeMessage } from '@safe-global/safe-core-sdk-types'
+import { SafeMessage } from '@safe-global/safe-core-sdk-types'
 import { createSafeClientResult, sendTransaction } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import {
+  ConfirmOffChainMessageProps,
+  SafeClientResult,
+  SendOffChainMessageProps
+} from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -30,27 +34,29 @@ export class SafeMessageClient {
   /**
    * Send off-chain messages using the Transaction service
    *
-   * @param {string | EIP712TypedData} message The message to be sent. Can be a raw string or an EIP712TypedData object
+   * @param {SendOffChainMessageProps} props The message properties
+   * @param {string | EIP712TypedData} props.message The message to be sent. Can be a raw string or an EIP712TypedData object
    * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the messageHash to confirmMessage() afterwards from the messages property
    */
-  async sendMessage(message: string | EIP712TypedData): Promise<SafeClientResult> {
+  async sendMessage({ message }: SendOffChainMessageProps): Promise<SafeClientResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const safeMessage = this.protocolKit.createMessage(message)
 
     if (isSafeDeployed) {
-      return this.#addMessage(safeMessage)
+      return this.#addMessage({ safeMessage })
     } else {
-      return this.#deployAndAddMessage(safeMessage)
+      return this.#deployAndAddMessage({ safeMessage })
     }
   }
 
   /**
    * Confirms an off-chain message using the Transaction service
    *
-   * @param {string} messageHash The messageHash. Returned from the sendMessage() method inside the SafeClientResult messages property
+   * @param {ConfirmOffChainMessageProps} props The confirmation properties
+   * @param {string} props.messageHash The messageHash. Returned from the sendMessage() method inside the SafeClientResult messages property
    * @returns {Promise<SafeClientResult>} A SafeClientResult with the result of the confirmation
    */
-  async confirmMessage(messageHash: string): Promise<SafeClientResult> {
+  async confirmMessage({ messageHash }: ConfirmOffChainMessageProps): Promise<SafeClientResult> {
     let messageResponse = await this.apiKit.getMessage(messageHash)
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
@@ -74,10 +80,10 @@ export class SafeMessageClient {
   /**
    * Get the list of pending off-chain messages. This messages can be confirmed using the confirmMessage() method
    *
-   * @param {GetSafeMessageListProps} [options] Optional query parameters for pagination
+   * @param {ListOptions} options The pagination options
    * @returns {Promise<SafeMessageListResponse>} A list of pending messages
    */
-  async getPendingMessages(options?: GetSafeMessageListProps): Promise<SafeMessageListResponse> {
+  async getPendingMessages(options?: ListOptions): Promise<SafeMessageListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
     return this.apiKit.getMessages(safeAddress, options)
@@ -92,21 +98,28 @@ export class SafeMessageClient {
    * @param {SafeTransaction} safeMessage  The safe message
    * @returns {Promise<SafeClientResult>} The SafeClientResult
    */
-  async #deployAndAddMessage(safeMessage: SafeMessage): Promise<SafeClientResult> {
+  async #deployAndAddMessage({
+    safeMessage
+  }: {
+    safeMessage: SafeMessage
+  }): Promise<SafeClientResult> {
     let deploymentTxHash
     const threshold = await this.protocolKit.getThreshold()
     const safeDeploymentTransaction =
       await this.protocolKit.createSafeDeploymentTransaction(undefined)
 
     try {
-      deploymentTxHash = await sendTransaction(safeDeploymentTransaction, {}, this.protocolKit)
+      deploymentTxHash = await sendTransaction({
+        transaction: safeDeploymentTransaction,
+        protocolKit: this.protocolKit
+      })
       await this.#updateProtocolKitWithDeployedSafe()
     } catch (error) {
       throw new Error('Could not deploy the Safe account')
     }
 
     try {
-      const { messages } = await this.#addMessage(safeMessage)
+      const { messages } = await this.#addMessage({ safeMessage })
       const messageResponse = await this.apiKit.getMessage(messages?.messageHash || '0x')
 
       return createSafeClientResult({
@@ -131,7 +144,7 @@ export class SafeMessageClient {
    * @param {SafeMessage} safeMessage The message
    * @returns {Promise<SafeClientResult>} The SafeClientResult
    */
-  async #addMessage(safeMessage: SafeMessage): Promise<SafeClientResult> {
+  async #addMessage({ safeMessage }: { safeMessage: SafeMessage }): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
     const signedMessage = await this.protocolKit.signMessage(safeMessage)

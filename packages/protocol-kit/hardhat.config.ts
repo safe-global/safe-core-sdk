@@ -1,6 +1,5 @@
-import '@nomicfoundation/hardhat-ethers'
+import '@nomicfoundation/hardhat-viem'
 import 'hardhat-deploy'
-import 'hardhat-deploy-ethers'
 import 'tsconfig-paths/register'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'

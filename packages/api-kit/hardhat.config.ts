@@ -1,4 +1,4 @@
-import '@nomicfoundation/hardhat-ethers'
+import '@nomicfoundation/hardhat-viem'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import yargs from 'yargs'

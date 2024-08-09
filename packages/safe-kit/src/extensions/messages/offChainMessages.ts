@@ -1,9 +1,12 @@
-import { GetSafeMessageListProps, SafeMessageListResponse } from '@safe-global/api-kit'
-import { EIP712TypedData } from '@safe-global/safe-core-sdk-types'
+import { ListOptions, SafeMessageListResponse } from '@safe-global/api-kit'
 
 import { SafeClient } from '@safe-global/safe-kit/SafeClient'
 import { SafeMessageClient } from '@safe-global/safe-kit/extensions/messages/SafeMessageClient'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import {
+  ConfirmOffChainMessageProps,
+  SafeClientResult,
+  SendOffChainMessageProps
+} from '@safe-global/safe-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use off-chain messages
@@ -15,8 +18,8 @@ import { SafeClientResult } from '@safe-global/safe-kit/types'
  *   offChainMessages()
  * )
  *
- * const { messages } = await safeMessagesClient.sendMessage(...)
- * await safeMessagesClient.confirm(messages?.messageHash)
+ * const { messages } = await safeMessagesClient.sendOffChainMessage({ message })
+ * await safeMessagesClient.confirmOffChainMessage({ messageHash: messages?.messageHash})
  */
 export function offChainMessages() {
   return (client: SafeClient) => {
@@ -26,30 +29,27 @@ export function offChainMessages() {
       /**
        * Creates an off-chain message using the Transaction service
        *
-       * @param {string | EIP712TypedData} message The message to be sent, can be a raw string or an EIP712TypedData object
-       * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the messageHash to confirmMessage() afterwards from the messages property
-       */
-      async sendOffChainMessage(message: string | EIP712TypedData): Promise<SafeClientResult> {
-        return safeMessageClient.sendMessage(message)
+       * @param {SendOffChainMessageProps} props The message properties
+       * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the messageHash to confirmMessage() afterwards from the messages property       */
+      async sendOffChainMessage(props: SendOffChainMessageProps): Promise<SafeClientResult> {
+        return safeMessageClient.sendMessage(props)
       },
       /**
        * Confirms an off-chain message using the Transaction service
        *
-       * @param {string} messageHash The messageHash. Returned from the sendMessage() method inside the SafeClientResult messages property
+       * @param {ConfirmOffChainMessageProps} props The confirmation properties
        * @returns {Promise<SafeClientResult>} A SafeClientResult with the result of the confirmation
        */
-      async confirmOffChainMessage(messageHash: string): Promise<SafeClientResult> {
-        return safeMessageClient.confirmMessage(messageHash)
+      async confirmOffChainMessage(props: ConfirmOffChainMessageProps): Promise<SafeClientResult> {
+        return safeMessageClient.confirmMessage(props)
       },
       /**
        * Get the list of pending off-chain messages. This messages can be confirmed using the confirmMessage() method
        *
-       * @param {GetSafeMessageListProps} [options] Optional query parameters for pagination
+       * @param {ListOptions} options The pagination options
        * @returns {Promise<SafeMessageListResponse>} A list of pending messages
        */
-      async getPendingOffChainMessages(
-        options?: GetSafeMessageListProps
-      ): Promise<SafeMessageListResponse> {
+      async getPendingOffChainMessages(options?: ListOptions): Promise<SafeMessageListResponse> {
         return safeMessageClient.getPendingMessages(options)
       }
     }

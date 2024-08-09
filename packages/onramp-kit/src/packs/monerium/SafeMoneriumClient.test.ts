@@ -1,4 +1,4 @@
-import { Contract, hashMessage } from 'ethers'
+import { createPublicClient, hashMessage, custom } from 'viem'
 import { PaymentStandard } from '@monerium/sdk'
 import Safe, * as protocolKitPackage from '@safe-global/protocol-kit'
 import {
@@ -6,9 +6,9 @@ import {
   signMessageLib_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 import SafeApiKit from '@safe-global/api-kit'
-
 import { SafeMoneriumClient } from './SafeMoneriumClient'
 import { MAGIC_VALUE } from './signatures'
+import { SignMessageLibContractImplementationType } from '@safe-global/protocol-kit'
 
 const newOrder = {
   amount: '100',
@@ -222,20 +222,31 @@ describe('SafeMoneriumClient', () => {
       nonce: 0
     }
 
-    jest.spyOn(protocolKitPackage, 'getSignMessageLibContract').mockResolvedValueOnce({
+    const contract = {
       safeVersion: '1.3.0',
       contractName: 'signMessageLibVersion',
-      contract: new Contract('0x0000000000000000000000000000000000000001', []),
       safeProvider: protocolKit.getSafeProvider() as protocolKitPackage.SafeProvider,
       encode: jest.fn(),
       contractAbi: signMessageLib_1_4_1_ContractArtifacts.abi,
-      contractAddress: '',
+      contractAddress: '0x0000000000000000000000000000000000000001',
       getAddress: jest.fn(),
       getMessageHash: jest.fn(),
       signMessage: jest.fn(),
       estimateGas: jest.fn(),
-      init: jest.fn()
-    })
+      init: jest.fn(),
+      runner: createPublicClient({
+        transport: custom({ request: jest.fn() })
+      }),
+      chainId: 1n,
+      read: jest.fn(),
+      write: jest.fn(),
+      getChain: jest.fn(),
+      getWallet: jest.fn(),
+      convertOptions: jest.fn(),
+      getTransactionReceipt: jest.fn()
+    } as SignMessageLibContractImplementationType
+
+    jest.spyOn(protocolKitPackage, 'getSignMessageLibContract').mockResolvedValueOnce(contract)
 
     protocolKit.createTransaction = jest.fn().mockResolvedValueOnce({
       data: txData

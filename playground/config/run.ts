@@ -61,6 +61,9 @@ if (!path) {
   console.log('RELAY KIT')
   printPlaygrounds(playgroundRelayKitPaths)
 
+  console.log('SAFE KIT')
+  printPlaygrounds(playgroundSafeKitPaths)
+
   process.exit()
 }
 

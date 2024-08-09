@@ -1,17 +1,14 @@
+import { privateKeyToAddress } from 'viem/accounts'
 import { SafeClientResult, createSafeClient, offChainMessages } from '@safe-global/safe-kit'
 
-const OWNER_1_PRIVATE_KEY = ''
-const OWNER_2_PRIVATE_KEY = ''
-const OWNER_3_PRIVATE_KEY = ''
-
-const OWNER_1_ADDRESS = ''
-const OWNER_2_ADDRESS = ''
-const OWNER_3_ADDRESS = ''
+const OWNER_1_PRIVATE_KEY = '0x'
+const OWNER_2_PRIVATE_KEY = '0x'
+const OWNER_3_PRIVATE_KEY = '0x'
 
 const THRESHOLD = 3
 const SALT_NONCE = ''
 
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+const RPC_URL = 'https://rpc.sepolia.org'
 
 const MESSAGE = "I'm the owner of this Safe"
 // const MESSAGE = {
@@ -62,11 +59,15 @@ const MESSAGE = "I'm the owner of this Safe"
 // }
 
 async function send(): Promise<SafeClientResult> {
+  const owner1 = privateKeyToAddress(OWNER_1_PRIVATE_KEY)
+  const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY)
+  const owner3 = privateKeyToAddress(OWNER_3_PRIVATE_KEY)
+
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
     safeOptions: {
-      owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
+      owners: [owner1, owner2, owner3],
       threshold: THRESHOLD,
       saltNonce: SALT_NONCE
     }
@@ -83,7 +84,7 @@ async function send(): Promise<SafeClientResult> {
   )
   console.log('-Signer Address:', signerAddress)
 
-  const txResult = await safeClientWithMessages.sendOffChainMessage(MESSAGE)
+  const txResult = await safeClientWithMessages.sendOffChainMessage({ message: MESSAGE })
 
   console.log('-Send result: ', txResult)
 
@@ -109,15 +110,17 @@ async function confirm({ safeAddress, messages }: SafeClientResult, pk: string) 
 
   const pendingMessages = await safeClientWithMessages.getPendingOffChainMessages()
 
-  pendingMessages.results.forEach(async (message) => {
+  for (const message of pendingMessages.results) {
     if (message.messageHash !== messages?.messageHash) {
       return
     }
 
-    const txResult = await safeClientWithMessages.confirmOffChainMessage(message.messageHash)
+    const txResult = await safeClientWithMessages.confirmOffChainMessage({
+      messageHash: message.messageHash
+    })
 
     console.log('-Confirm result: ', txResult)
-  })
+  }
 }
 
 async function main() {

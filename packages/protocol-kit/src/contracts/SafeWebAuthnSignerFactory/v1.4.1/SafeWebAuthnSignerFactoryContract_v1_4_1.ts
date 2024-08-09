@@ -50,7 +50,7 @@ class SafeWebAuthnSignerFactoryContract_v1_4_1
    * @returns Array[signer]
    */
   getSigner: SafeWebAuthnSignerFactoryContract_v1_4_1_Function<'getSigner'> = async (args) => {
-    return [await this.contract.getSigner(...args)]
+    return [await this.read('getSigner', args)]
   }
 
   /**
@@ -61,12 +61,12 @@ class SafeWebAuthnSignerFactoryContract_v1_4_1
   createSigner: SafeWebAuthnSignerFactoryContract_v1_4_1_Function<'createSigner'> = async (
     args
   ) => {
-    return [await this.contract.createSigner(...args)]
+    return [await this.write('createSigner', args)]
   }
 
   isValidSignatureForSigner: SafeWebAuthnSignerFactoryContract_v1_4_1_Function<'isValidSignatureForSigner'> =
     async (args) => {
-      return [await this.contract.isValidSignatureForSigner(...args)]
+      return [await this.read('isValidSignatureForSigner', args)]
     }
 }
 

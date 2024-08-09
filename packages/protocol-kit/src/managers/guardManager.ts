@@ -8,6 +8,7 @@ import {
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '../SafeProvider'
+import { asAddress } from '../utils/types'
 
 class GuardManager {
   #safeProvider: SafeProvider
@@ -56,7 +57,7 @@ class GuardManager {
   async getGuard(): Promise<string> {
     const safeContract = await this.isGuardCompatible()
 
-    return this.#safeProvider.getStorageAt(await safeContract.getAddress(), this.#slot)
+    return this.#safeProvider.getStorageAt(safeContract.getAddress(), this.#slot)
   }
 
   async encodeEnableGuardData(guardAddress: string): Promise<string> {
@@ -65,7 +66,7 @@ class GuardManager {
     this.validateGuardAddress(guardAddress)
     const currentGuard = await this.getGuard()
     this.validateGuardIsNotEnabled(currentGuard, guardAddress)
-    return safeContract.encode('setGuard', [guardAddress])
+    return safeContract.encode('setGuard', [asAddress(guardAddress)])
   }
 
   async encodeDisableGuardData(): Promise<string> {

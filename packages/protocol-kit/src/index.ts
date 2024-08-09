@@ -41,6 +41,8 @@ import {
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
+import EthSafeTransaction from './utils/transactions/SafeTransaction'
+import EthSafeMessage from './utils/messages/SafeMessage'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
 import {
@@ -65,7 +67,7 @@ import {
   generateTypedData
 } from './utils/eip-712'
 
-import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 
 export {
   estimateTxBaseGas,
@@ -118,7 +120,9 @@ export {
   hashSafeMessage,
   generateTypedData,
   SafeProvider,
-  PasskeySigner
+  createPasskeyClient,
+  EthSafeTransaction,
+  EthSafeMessage
 }
 
 export * from './types'

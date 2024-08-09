@@ -42,7 +42,9 @@ import {
   SafeModulesPaginated,
   PasskeyArgType,
   RemovePasskeyOwnerTxParams,
-  SafeWebAuthnSharedSignerContractImplementationType
+  SafeWebAuthnSharedSignerContractImplementationType,
+  PasskeyClient,
+  GetPasskeyType
 } from './types'
 import {
   EthSafeSignature,
@@ -76,12 +78,14 @@ import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
   getMultiSendCallOnlyContract,
-  getProxyFactoryContract
+  getProxyFactoryContract,
+  getSafeWebAuthnSignerFactoryContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
-import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { asAddress, asHash, asHex } from './utils/types'
+import { Hash, Hex } from 'viem'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -270,7 +274,7 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    return await this.#contractManager.safeContract.getAddress()
+    return this.#contractManager.safeContract.getAddress()
   }
 
   /**
@@ -296,8 +300,8 @@ class Safe {
    *
    * @returns The address of the MultiSend contract
    */
-  async getMultiSendAddress(): Promise<string> {
-    return await this.#contractManager.multiSendContract.getAddress()
+  getMultiSendAddress(): string {
+    return this.#contractManager.multiSendContract.getAddress()
   }
 
   /**
@@ -305,8 +309,8 @@ class Safe {
    *
    * @returns The address of the MultiSendCallOnly contract
    */
-  async getMultiSendCallOnlyAddress(): Promise<string> {
-    return await this.#contractManager.multiSendCallOnlyContract.getAddress()
+  getMultiSendCallOnlyAddress(): string {
+    return this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
   /**
@@ -514,9 +518,9 @@ class Safe {
 
       const multiSendTransaction = {
         ...options,
-        to: await multiSendContract.getAddress(),
+        to: multiSendContract.getAddress(),
         value: '0',
-        data: multiSendContract.encode('multiSend', [multiSendData]),
+        data: multiSendContract.encode('multiSend', [asHex(multiSendData)]),
         operation: OperationType.DelegateCall
       }
       newTransaction = multiSendTransaction
@@ -617,17 +621,18 @@ class Safe {
     const signerAddress = await this.getSignerAddress()
 
     if (isPasskeySigner && signerAddress) {
-      const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeySigner
+      const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeyClient
+      const { coordinates, verifierAddress } = passkeySigner.getPasskey()
       const passkey = {
         rawId: '', // we dont need this value to check if is a shared signer
-        coordinates: passkeySigner.coordinates,
-        customVerifierAddress: passkeySigner.verifierAddress
+        coordinates: coordinates,
+        customVerifierAddress: verifierAddress
       }
       const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
 
       let signature = await this.#safeProvider.signMessage(hash)
 
-      signature = adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
+      signature = await adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
 
       const safeSignature = new EthSafeSignature(signerAddress, signature, true)
 
@@ -906,7 +911,10 @@ class Safe {
     const owners = await this.getOwners()
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
-      const [approved] = await this.#contractManager.safeContract.approvedHashes([owner, txHash])
+      const [approved] = await this.#contractManager.safeContract.approvedHashes([
+        asAddress(owner),
+        asHash(txHash)
+      ])
       if (approved > 0) {
         ownersWhoApproved.push(owner)
       }
@@ -1096,9 +1104,9 @@ class Safe {
     // The passkey Signer is a contract compliant with EIP-1271 standards, we need to check if it has been deployed.
     if (isPasskey && !(await this.#safeProvider.isContractDeployed(ownerAddress))) {
       // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
-      const passkeySigner = await this.#getPasskeySigner(params.passkey)
-      const passkeyDeploymentTransaction = await passkeySigner.createPasskeyDeploymentTransaction()
-
+      const passkeyDeploymentTransaction = await this.#createPasskeyDeploymentTransaction(
+        params.passkey
+      )
       transactions.push(passkeyDeploymentTransaction)
     }
 
@@ -1181,8 +1189,9 @@ class Safe {
       !(await this.#safeProvider.isContractDeployed(newOwnerAddress))
     ) {
       // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
-      const passkeySigner = await this.#getPasskeySigner(params.newOwnerPasskey)
-      const passkeyDeploymentTransaction = await passkeySigner.createPasskeyDeploymentTransaction()
+      const passkeyDeploymentTransaction = await this.#createPasskeyDeploymentTransaction(
+        params.newOwnerPasskey
+      )
 
       transactions.push(passkeyDeploymentTransaction)
     }
@@ -1515,12 +1524,12 @@ class Safe {
 
     const safeDeployTransactionData = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: await safeProxyFactoryContract.getAddress(),
+      to: safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        await safeSingletonContract.getAddress(),
-        initializer, // call to the setup method to set the threshold & owners of the new Safe
+        asAddress(safeSingletonContract.getAddress()),
+        asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
         BigInt(saltNonce)
       ])
     }
@@ -1554,12 +1563,12 @@ class Safe {
 
     // multiSend method with the transactions encoded
     const batchData = multiSendCallOnlyContract.encode('multiSend', [
-      encodeMultiSendData(transactions) // encoded transactions
+      asHex(encodeMultiSendData(transactions)) // encoded transactions
     ])
 
     const transactionBatch = {
       ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
-      to: await multiSendCallOnlyContract.getAddress(),
+      to: multiSendCallOnlyContract.getAddress(),
       value: '0',
       data: batchData
     }
@@ -1604,14 +1613,13 @@ class Safe {
 
     return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)
   }
-
   /**
    * Returns the passkey signer of the specific passkey.
    *
    * @param {PasskeyArgType} passkey The passkey owner
    * @returns {Promise<string>} Returns the passkey owner address
    */
-  async #getPasskeySigner(passkey: PasskeyArgType): Promise<PasskeySigner> {
+  async #getPasskeySigner(passkey: PasskeyArgType): Promise<GetPasskeyType> {
     const safeVersion = await this.getContractVersion()
     const safePasskeyProvider = await SafeProvider.init(
       this.#safeProvider.provider,
@@ -1619,10 +1627,38 @@ class Safe {
       safeVersion,
       this.#contractManager.contractNetworks
     )
+    const passkeySigner = (await safePasskeyProvider.getExternalSigner()) as PasskeyClient
 
-    const passkeySigner = await safePasskeyProvider.getExternalSigner()
+    return passkeySigner.getPasskey()
+  }
 
-    return passkeySigner as PasskeySigner
+  async #createPasskeyDeploymentTransaction(newOwnerPasskey: PasskeyArgType) {
+    const passkeyAddress = await this.getPasskeyOwnerAddress(newOwnerPasskey)
+    const isPasskeyDeployed = await this.#safeProvider?.isContractDeployed(passkeyAddress)
+    const chainId = await this.getChainId()
+
+    if (isPasskeyDeployed) {
+      throw new Error('Passkey Signer contract already deployed')
+    }
+    const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+      safeProvider: this.#safeProvider,
+      safeVersion: await this.getContractVersion(),
+      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
+    })
+    const passkeySignerDeploymentTransaction = {
+      to: await safeWebAuthnSignerFactoryContract.getAddress(),
+      value: '0',
+      data: safeWebAuthnSignerFactoryContract.encode('createSigner', [
+        BigInt(newOwnerPasskey.coordinates.x),
+        BigInt(newOwnerPasskey.coordinates.y),
+        BigInt(
+          newOwnerPasskey.customVerifierAddress ||
+            getDefaultFCLP256VerifierAddress(chainId.toString())
+        )
+      ])
+    }
+
+    return passkeySignerDeploymentTransaction
   }
 
   /**
@@ -1645,9 +1681,11 @@ class Safe {
     }
 
     const passkeySigner = await this.#getPasskeySigner(passkey)
-    const passkeyOwnerAddress = await passkeySigner.getAddress()
+    if (!passkeySigner) {
+      throw new Error('Cannot retrieve the passkey signer')
+    }
 
-    return passkeyOwnerAddress
+    return passkeySigner.address
   }
 
   /**
@@ -1663,11 +1701,12 @@ class Safe {
 
     if (isPasskeySigner) {
       // check if the signer is a shared passkey signer of the Safe
-      const passkeySigner = (await this.#safeProvider.getExternalSigner()) as PasskeySigner
+      const passkeyClient = (await this.#safeProvider.getExternalSigner()) as PasskeyClient
+      const { coordinates, verifierAddress } = passkeyClient.getPasskey()
       const passkey = {
         rawId: '', // we dont need this value to check if is a shared signer
-        coordinates: passkeySigner.coordinates,
-        customVerifierAddress: passkeySigner.verifierAddress
+        coordinates: coordinates,
+        customVerifierAddress: verifierAddress
       }
       const isSharedSigner = await this.#isSharedSignerPasskey(passkey)
 
@@ -1720,7 +1759,7 @@ class Safe {
       const safeAddress = await this.getAddress()
       const chainId = await this.#safeProvider.getChainId()
       const [sharedSignerSlot] = await safeWebAuthnSharedSignerContract.getConfiguration([
-        safeAddress
+        asAddress(safeAddress)
       ])
       const { x, y, verifiers } = sharedSignerSlot
 
@@ -1759,17 +1798,19 @@ class Safe {
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const data = fallbackHandler.encode('isValidSignature(bytes32,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    // both bytes and bytes32 ends up being resolved to a bytes-like structure which is represented by a `0x` prefixed address.
+    // because there is an overload going on, named-tuples (https://www.typescriptlang.org/play/?ts=4.0.2#example/named-tuples) are used to solve the ambiguity.
+    const bytes32Tuple: [_dataHash: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const data = fallbackHandler.encode('isValidSignature', bytes32Tuple)
 
-    // @ts-expect-error Argument of type isValidSignature(bytes32,bytes) is not assignable to parameter of type isValidSignature
-    const bytesData = fallbackHandler.encode('isValidSignature(bytes,bytes)', [
-      messageHash,
-      signatureToCheck
-    ])
+    const bytesTuple: [_data: Hash, _signature: Hex] = [
+      asHash(messageHash),
+      asHex(signatureToCheck)
+    ]
+    const bytesData = fallbackHandler.encode('isValidSignature', bytesTuple)
 
     try {
       const isValidSignatureResponse = await Promise.all([

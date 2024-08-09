@@ -55,7 +55,7 @@ describe('Safe Threshold', () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       chai.expect(await safeSdk.getThreshold()).to.be.eq(1)
@@ -80,7 +80,7 @@ describe('Safe Threshold', () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 2
@@ -95,7 +95,7 @@ describe('Safe Threshold', () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 0
@@ -110,7 +110,7 @@ describe('Safe Threshold', () => {
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 2
@@ -138,7 +138,7 @@ describe('Safe Threshold', () => {
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 2

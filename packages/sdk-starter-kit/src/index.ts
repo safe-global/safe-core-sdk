@@ -1,9 +1,9 @@
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 
-import { SafeClient } from 'packages/sdk-starter-kit/src/SafeClient'
-import { isValidAddress, isValidSafeConfig } from 'packages/sdk-starter-kit/src/utils'
-import { SafeKitConfig } from 'packages/sdk-starter-kit/src/types'
+import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
+import { isValidAddress, isValidSafeConfig } from '@safe-global/sdk-starter-kit/utils'
+import { SafeKitConfig } from '@safe-global/sdk-starter-kit/types'
 
 /**
  * Initializes a Safe client with the given configuration options.

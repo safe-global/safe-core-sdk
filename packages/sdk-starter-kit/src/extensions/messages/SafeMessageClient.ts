@@ -5,13 +5,13 @@ import SafeApiKit, {
   SafeMessageListResponse
 } from '@safe-global/api-kit'
 import { SafeMessage } from '@safe-global/safe-core-sdk-types'
-import { createSafeClientResult, sendTransaction } from 'packages/sdk-starter-kit/src/utils'
-import { SafeClientTxStatus } from 'packages/sdk-starter-kit/src/constants'
+import { createSafeClientResult, sendTransaction } from '@safe-global/sdk-starter-kit/utils'
+import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 import {
   ConfirmOffChainMessageProps,
   SafeClientResult,
   SendOffChainMessageProps
-} from 'packages/sdk-starter-kit/src/types'
+} from '@safe-global/sdk-starter-kit/types'
 
 /**
  * @class

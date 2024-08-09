@@ -754,7 +754,8 @@ describe('Safe4337Pack', () => {
       const safe4337Pack = await createSafe4337Pack({
         signer: passkey,
         options: {
-          safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
+          owners: [],
+          threshold: 1
         }
       })
 
@@ -765,7 +766,7 @@ describe('Safe4337Pack', () => {
 
       await safe4337Pack.executeTransaction({ executable: safeOperation })
 
-      expect(requestMock).toHaveBeenNthCalledWith(5, {
+      expect(requestMock).toHaveBeenCalledWith({
         method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
         params: [
           utils.userOperationToHexValues(safeOperation.toUserOperation()),

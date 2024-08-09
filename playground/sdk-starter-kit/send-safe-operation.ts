@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/safe-kit'
+import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/sdk-starter-kit'
 import { generateTransferCallData } from '../utils'
 
 const OWNER_1_PRIVATE_KEY = ''

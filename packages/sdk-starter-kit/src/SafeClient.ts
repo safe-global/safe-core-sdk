@@ -12,13 +12,13 @@ import {
   sendTransaction,
   proposeTransaction,
   waitSafeTxReceipt
-} from '@safe-global/safe-kit/utils'
-import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+} from 'packages/sdk-starter-kit/src/utils'
+import { SafeClientTxStatus } from 'packages/sdk-starter-kit/src/constants'
 import {
   ConfirmTransactionProps,
   SafeClientResult,
   SendTransactionProps
-} from '@safe-global/safe-kit/types'
+} from 'packages/sdk-starter-kit/src/types'
 
 /**
  * @class

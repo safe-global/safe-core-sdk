@@ -6,7 +6,7 @@ import {
   MetaTransactionData
 } from '@safe-global/safe-core-sdk-types'
 import { IFeeEstimator } from '@safe-global/relay-kit'
-import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+import { SafeClientTxStatus } from 'packages/sdk-starter-kit/src/constants'
 
 export type SendTransactionProps = {
   transactions: TransactionBase[]

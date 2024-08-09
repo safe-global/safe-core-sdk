@@ -2,8 +2,8 @@ import { validateEthereumAddress } from '@safe-global/protocol-kit'
 import { TransactionResult } from '@safe-global/safe-core-sdk-types'
 import { ContractTransactionReceipt, TransactionResponse } from 'ethers'
 
-import { MESSAGES, SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult, SafeConfig } from '@safe-global/safe-kit/types'
+import { MESSAGES, SafeClientTxStatus } from 'packages/sdk-starter-kit/src/constants'
+import { SafeClientResult, SafeConfig } from 'packages/sdk-starter-kit/src/types'
 
 export const isValidAddress = (address: string): boolean => {
   try {

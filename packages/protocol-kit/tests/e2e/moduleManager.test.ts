@@ -66,20 +66,18 @@ describe('Safe modules manager', () => {
     it('should return all the enabled modules', async () => {
       const { safe, dailyLimitModule, socialRecoveryModule, contractNetworks, provider } =
         await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
-      const enableDailyLimitModuleTx = await safeSdk.createEnableModuleTx(
-        await dailyLimitModule.getAddress()
-      )
+      const enableDailyLimitModuleTx = await safeSdk.createEnableModuleTx(dailyLimitModule.address)
       const enableDailyLimitModuleTxResponse =
         await safeSdk.executeTransaction(enableDailyLimitModuleTx)
       const socialRecoveryModuleTx = await safeSdk.createEnableModuleTx(
-        await socialRecoveryModule.getAddress()
+        socialRecoveryModule.address
       )
       const socialRecoveryModuleTxResponse =
         await safeSdk.executeTransaction(socialRecoveryModuleTx)
@@ -106,7 +104,7 @@ describe('Safe modules manager', () => {
 
     it('should return the enabled modules', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -114,7 +112,7 @@ describe('Safe modules manager', () => {
       })
 
       const emptyModuleList = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
-      const tx = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      const tx = await safeSdk.createEnableModuleTx(dailyLimitModule.address)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       const moduleList = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
@@ -135,11 +133,11 @@ describe('Safe modules manager', () => {
         whiteListModule,
         provider
       } = await setupTests()
-      const safeAddress = await safe.getAddress()
-      const dailyLimitsAddress = await dailyLimitModule.getAddress()
-      const socialRecoveryAddress = await socialRecoveryModule.getAddress()
-      const stateChannelAddress = await stateChannelModule.getAddress()
-      const whiteListAddress = await whiteListModule.getAddress()
+      const safeAddress = safe.address
+      const dailyLimitsAddress = dailyLimitModule.address
+      const socialRecoveryAddress = socialRecoveryModule.address
+      const stateChannelAddress = stateChannelModule.address
+      const whiteListAddress = whiteListModule.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -200,11 +198,11 @@ describe('Safe modules manager', () => {
         whiteListModule,
         provider
       } = await setupTests()
-      const safeAddress = await safe.getAddress()
-      const dailyLimitsAddress = await dailyLimitModule.getAddress()
-      const socialRecoveryAddress = await socialRecoveryModule.getAddress()
-      const stateChannelAddress = await stateChannelModule.getAddress()
-      const whiteListAddress = await whiteListModule.getAddress()
+      const safeAddress = safe.address
+      const dailyLimitsAddress = dailyLimitModule.address
+      const socialRecoveryAddress = socialRecoveryModule.address
+      const stateChannelAddress = stateChannelModule.address
+      const whiteListAddress = whiteListModule.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -266,23 +264,23 @@ describe('Safe modules manager', () => {
         predictedSafe,
         contractNetworks
       })
-      const tx = safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())
+      const tx = safeSdk.isModuleEnabled(dailyLimitModule.address)
       chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
     })
 
     it('should return true if a module is enabled', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.false
-      const tx = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.false
+      const tx = await safeSdk.createEnableModuleTx(dailyLimitModule.address)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.true
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.true
     })
   })
 
@@ -294,13 +292,13 @@ describe('Safe modules manager', () => {
         predictedSafe,
         contractNetworks
       })
-      const tx = safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      const tx = safeSdk.createEnableModuleTx(dailyLimitModule.address)
       chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
     })
 
     it('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -312,7 +310,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to sentinel', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -324,7 +322,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to 0x address', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -336,22 +334,22 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is already enabled', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
-      const tx1 = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      const tx1 = await safeSdk.createEnableModuleTx(dailyLimitModule.address)
       const txResponse = await safeSdk.executeTransaction(tx1)
       await waitSafeTxReceipt(txResponse)
-      const tx2 = safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      const tx2 = safeSdk.createEnableModuleTx(dailyLimitModule.address)
       await chai.expect(tx2).to.be.rejectedWith('Module provided is already enabled')
     })
 
     it('should build the transaction with the optional props', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -365,7 +363,7 @@ describe('Safe modules manager', () => {
         nonce: 555,
         safeTxGas: '666'
       }
-      const tx = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress(), options)
+      const tx = await safeSdk.createEnableModuleTx(dailyLimitModule.address, options)
       chai.expect(tx.data.baseGas).to.be.eq('111')
       chai.expect(tx.data.gasPrice).to.be.eq('222')
       chai.expect(tx.data.gasToken).to.be.eq('0x333')
@@ -376,19 +374,19 @@ describe('Safe modules manager', () => {
 
     it('should enable a Safe module', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.false
-      const tx = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.false
+      const tx = await safeSdk.createEnableModuleTx(dailyLimitModule.address)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(1)
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.true
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.true
     })
   })
 
@@ -400,13 +398,13 @@ describe('Safe modules manager', () => {
         predictedSafe,
         contractNetworks
       })
-      const tx = safeSdk.createDisableModuleTx(await dailyLimitModule.getAddress())
+      const tx = safeSdk.createDisableModuleTx(dailyLimitModule.address)
       chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
     })
 
     it('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -418,7 +416,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to sentinel', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -430,7 +428,7 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is equal to 0x address', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -442,13 +440,13 @@ describe('Safe modules manager', () => {
 
     it('should fail if address is not enabled', async () => {
       const { safe, dailyLimitModule, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
-      const tx = safeSdk.createDisableModuleTx(await dailyLimitModule.getAddress())
+      const tx = safeSdk.createDisableModuleTx(dailyLimitModule.address)
       await chai.expect(tx).to.be.rejectedWith('Module provided is not enabled yet')
     })
 
@@ -456,18 +454,18 @@ describe('Safe modules manager', () => {
       const { dailyLimitModule, accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
 
-      const tx1 = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      const tx1 = await safeSdk.createEnableModuleTx(dailyLimitModule.address)
       const txResponse1 = await safeSdk.executeTransaction(tx1)
       await waitSafeTxReceipt(txResponse1)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(1)
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.true
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.true
 
       const options: SafeTransactionOptionalProps = {
         baseGas: '111',
@@ -477,7 +475,7 @@ describe('Safe modules manager', () => {
         nonce: 555,
         safeTxGas: '666'
       }
-      const tx2 = await safeSdk.createDisableModuleTx(await dailyLimitModule.getAddress(), options)
+      const tx2 = await safeSdk.createDisableModuleTx(dailyLimitModule.address, options)
       chai.expect(tx2.data.baseGas).to.be.eq('111')
       chai.expect(tx2.data.gasPrice).to.be.eq('222')
       chai.expect(tx2.data.gasToken).to.be.eq('0x333')
@@ -491,37 +489,36 @@ describe('Safe modules manager', () => {
         await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
 
-      const tx1 = await safeSdk.createEnableModuleTx(await dailyLimitModule.getAddress())
+      const tx1 = await safeSdk.createEnableModuleTx(dailyLimitModule.address)
       const txResponse1 = await safeSdk.executeTransaction(tx1)
       await waitSafeTxReceipt(txResponse1)
-      const tx2 = await safeSdk.createEnableModuleTx(await socialRecoveryModule.getAddress())
+      const tx2 = await safeSdk.createEnableModuleTx(socialRecoveryModule.address)
       const txResponse2 = await safeSdk.executeTransaction(tx2)
       await waitSafeTxReceipt(txResponse2)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(2)
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.true
-      chai.expect(await safeSdk.isModuleEnabled(await socialRecoveryModule.getAddress())).to.be.true
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.true
+      chai.expect(await safeSdk.isModuleEnabled(socialRecoveryModule.address)).to.be.true
 
-      const tx3 = await safeSdk.createDisableModuleTx(await dailyLimitModule.getAddress())
+      const tx3 = await safeSdk.createDisableModuleTx(dailyLimitModule.address)
       const txResponse3 = await safeSdk.executeTransaction(tx3)
       await waitSafeTxReceipt(txResponse3)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(1)
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.false
-      chai.expect(await safeSdk.isModuleEnabled(await socialRecoveryModule.getAddress())).to.be.true
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.false
+      chai.expect(await safeSdk.isModuleEnabled(socialRecoveryModule.address)).to.be.true
 
-      const tx4 = await safeSdk.createDisableModuleTx(await socialRecoveryModule.getAddress())
+      const tx4 = await safeSdk.createDisableModuleTx(socialRecoveryModule.address)
       const txResponse4 = await safeSdk.executeTransaction(tx4)
       await waitSafeTxReceipt(txResponse4)
       chai.expect((await safeSdk.getModules()).length).to.be.eq(0)
-      chai.expect(await safeSdk.isModuleEnabled(await dailyLimitModule.getAddress())).to.be.false
-      chai.expect(await safeSdk.isModuleEnabled(await socialRecoveryModule.getAddress())).to.be
-        .false
+      chai.expect(await safeSdk.isModuleEnabled(dailyLimitModule.address)).to.be.false
+      chai.expect(await safeSdk.isModuleEnabled(socialRecoveryModule.address)).to.be.false
     })
   })
 })

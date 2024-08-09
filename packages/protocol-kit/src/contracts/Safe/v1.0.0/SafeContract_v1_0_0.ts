@@ -1,3 +1,5 @@
+import { Address, ContractFunctionArgs } from 'viem'
+import { simulateContract } from 'viem/actions'
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
@@ -13,6 +15,7 @@ import {
   TransactionResult
 } from '@safe-global/safe-core-sdk-types'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { asHash, asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SafeContract_v1_0_0  is the implementation specific to the Safe contract version 1.0.0.
@@ -63,23 +66,23 @@ class SafeContract_v1_0_0
   /* ----- Specific v1.0.0 properties -----  */
   DOMAIN_SEPARATOR_TYPEHASH: SafeContract_v1_0_0_Function<'DOMAIN_SEPARATOR_TYPEHASH'> =
     async () => {
-      return [await this.contract.DOMAIN_SEPARATOR_TYPEHASH()]
+      return [await this.read('DOMAIN_SEPARATOR_TYPEHASH')]
     }
 
   SENTINEL_MODULES: SafeContract_v1_0_0_Function<'SENTINEL_MODULES'> = async () => {
-    return [await this.contract.SENTINEL_MODULES()]
+    return [await this.read('SENTINEL_MODULES')]
   }
 
   SENTINEL_OWNERS: SafeContract_v1_0_0_Function<'SENTINEL_OWNERS'> = async () => {
-    return [await this.contract.SENTINEL_OWNERS()]
+    return [await this.read('SENTINEL_OWNERS')]
   }
 
   SAFE_MSG_TYPEHASH: SafeContract_v1_0_0_Function<'SAFE_MSG_TYPEHASH'> = async () => {
-    return [await this.contract.SAFE_MSG_TYPEHASH()]
+    return [await this.read('SAFE_MSG_TYPEHASH')]
   }
 
   SAFE_TX_TYPEHASH: SafeContract_v1_0_0_Function<'SAFE_TX_TYPEHASH'> = async () => {
-    return [await this.contract.SAFE_TX_TYPEHASH()]
+    return [await this.read('SAFE_TX_TYPEHASH')]
   }
   /* ----- End of specific v1.0.0 properties -----  */
 
@@ -87,14 +90,14 @@ class SafeContract_v1_0_0
    * @returns Array[contractName]
    */
   NAME: SafeContract_v1_0_0_Function<'NAME'> = async () => {
-    return [await this.contract.NAME()]
+    return [await this.read('NAME')]
   }
 
   /**
    * @returns Array[safeContractVersion]
    */
   VERSION: SafeContract_v1_0_0_Function<'VERSION'> = async () => {
-    return [await this.contract.VERSION()]
+    return [await this.read('VERSION')]
   }
 
   /**
@@ -102,14 +105,14 @@ class SafeContract_v1_0_0
    * @returns Array[approvedHashes]
    */
   approvedHashes: SafeContract_v1_0_0_Function<'approvedHashes'> = async (args) => {
-    return [await this.contract.approvedHashes(...args)]
+    return [await this.read('approvedHashes', args)]
   }
 
   /**
    * @returns Array[domainSeparator]
    */
   domainSeparator: SafeContract_v1_0_0_Function<'domainSeparator'> = async () => {
-    return [await this.contract.domainSeparator()]
+    return [await this.read('domainSeparator')]
   }
 
   /**
@@ -117,7 +120,7 @@ class SafeContract_v1_0_0
    * @returns Array[Array[modules]]
    */
   getModules: SafeContract_v1_0_0_Function<'getModules'> = async () => {
-    return [await this.contract.getModules()]
+    return [await this.read('getModules')]
   }
 
   /**
@@ -125,7 +128,7 @@ class SafeContract_v1_0_0
    * @returns Array[Array[owners]]
    */
   getOwners: SafeContract_v1_0_0_Function<'getOwners'> = async () => {
-    return [await this.contract.getOwners()]
+    return [await this.read('getOwners')]
   }
 
   /**
@@ -133,7 +136,7 @@ class SafeContract_v1_0_0
    * @returns Array[threshold]
    */
   getThreshold: SafeContract_v1_0_0_Function<'getThreshold'> = async () => {
-    return [await this.contract.getThreshold()]
+    return [await this.read('getThreshold')]
   }
 
   /**
@@ -142,7 +145,7 @@ class SafeContract_v1_0_0
    * @returns Array[isOwner]
    */
   isOwner: SafeContract_v1_0_0_Function<'isOwner'> = async (args) => {
-    return [await this.contract.isOwner(...args)]
+    return [await this.read('isOwner', args)]
   }
 
   /**
@@ -150,7 +153,7 @@ class SafeContract_v1_0_0
    * @returns Array[nonce]
    */
   nonce: SafeContract_v1_0_0_Function<'nonce'> = async () => {
-    return [await this.contract.nonce()]
+    return [await this.read('nonce')]
   }
 
   /**
@@ -158,7 +161,7 @@ class SafeContract_v1_0_0
    * @returns Array[signedMessages]
    */
   signedMessages: SafeContract_v1_0_0_Function<'signedMessages'> = async (args) => {
-    return [await this.contract.signedMessages(...args)]
+    return [await this.read('signedMessages', args)]
   }
 
   /**
@@ -167,7 +170,7 @@ class SafeContract_v1_0_0
    * @returns Array[messageHash]
    */
   getMessageHash: SafeContract_v1_0_0_Function<'getMessageHash'> = async (args) => {
-    return [await this.contract.getMessageHash(...args)]
+    return [await this.read('getMessageHash', args)]
   }
 
   /**
@@ -176,7 +179,7 @@ class SafeContract_v1_0_0
    * @returns Array[encodedData]
    */
   encodeTransactionData: SafeContract_v1_0_0_Function<'encodeTransactionData'> = async (args) => {
-    return [await this.contract.encodeTransactionData(...args)]
+    return [await this.read('encodeTransactionData', args)]
   }
 
   /**
@@ -185,7 +188,7 @@ class SafeContract_v1_0_0
    * @returns Array[transactionHash]
    */
   getTransactionHash: SafeContract_v1_0_0_Function<'getTransactionHash'> = async (args) => {
-    return [await this.contract.getTransactionHash(...args)]
+    return [await this.read('getTransactionHash', args)]
   }
 
   /**
@@ -195,10 +198,15 @@ class SafeContract_v1_0_0
    * @returns Transaction result.
    */
   async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
-    const gasLimit = options?.gasLimit || (await this.estimateGas('approveHash', [hash], options))
-    const txResponse = await this.contract.approveHash(hash, { ...options, gasLimit })
+    if (!this.wallet) throw new Error()
+    const gasLimit =
+      options?.gasLimit || (await this.estimateGas('approveHash', [asHash(hash)], options))
 
-    return toTxResult(txResponse, options)
+    return toTxResult(
+      this.runner!,
+      await this.write('approveHash', [asHash(hash)], { ...options, gasLimit }),
+      options
+    )
   }
 
   /**
@@ -218,36 +226,39 @@ class SafeContract_v1_0_0
         [
           safeTransaction.data.to,
           BigInt(safeTransaction.data.value),
-          safeTransaction.data.data,
+          asHex(safeTransaction.data.data),
           safeTransaction.data.operation,
           BigInt(safeTransaction.data.safeTxGas),
           BigInt(safeTransaction.data.baseGas),
           BigInt(safeTransaction.data.gasPrice),
           safeTransaction.data.gasToken,
           safeTransaction.data.refundReceiver,
-          safeTransaction.encodedSignatures()
+          asHex(safeTransaction.encodedSignatures())
         ],
         options
       ))
 
-    const txResponse = await this.contract.execTransaction(
+    const args: ContractFunctionArgs<SafeContract_v1_0_0_Abi, 'nonpayable', 'execTransaction'> = [
       safeTransaction.data.to,
-      safeTransaction.data.value,
-      safeTransaction.data.data,
+      BigInt(safeTransaction.data.value),
+      asHex(safeTransaction.data.data),
       safeTransaction.data.operation,
-      safeTransaction.data.safeTxGas,
-      safeTransaction.data.baseGas,
-      safeTransaction.data.gasPrice,
+      BigInt(safeTransaction.data.safeTxGas),
+      BigInt(safeTransaction.data.baseGas),
+      BigInt(safeTransaction.data.gasPrice),
       safeTransaction.data.gasToken,
       safeTransaction.data.refundReceiver,
-      safeTransaction.encodedSignatures(),
-      { ...options, gasLimit }
-    )
+      asHex(safeTransaction.encodedSignatures())
+    ]
 
-    return toTxResult(txResponse, options)
+    return toTxResult(
+      this.runner!,
+      await this.write('execTransaction', args, { ...options, gasLimit }),
+      options
+    )
   }
 
-  async getModulesPaginated([start, pageSize]: [string, bigint]): Promise<[string[], string]> {
+  async getModulesPaginated([start, pageSize]: [Address, bigint]): Promise<[string[], string]> {
     if (pageSize <= 0) throw new Error('Invalid page size for fetching paginated modules')
 
     const size = Number(pageSize)
@@ -274,7 +285,7 @@ class SafeContract_v1_0_0
    * @param moduleAddress - The module address to check.
    * @returns True, if the module with the given address is enabled.
    */
-  async isModuleEnabled([moduleAddress]: [string]): Promise<[boolean]> {
+  async isModuleEnabled([moduleAddress]: [Address]): Promise<[boolean]> {
     const [modules] = await this.getModules()
     const isModuleEnabled = modules.some((enabledModuleAddress) =>
       sameString(enabledModuleAddress, moduleAddress)
@@ -300,31 +311,39 @@ class SafeContract_v1_0_0
           [
             safeTransaction.data.to,
             BigInt(safeTransaction.data.value),
-            safeTransaction.data.data,
+            asHex(safeTransaction.data.data),
             safeTransaction.data.operation,
             BigInt(safeTransaction.data.safeTxGas),
             BigInt(safeTransaction.data.baseGas),
             BigInt(safeTransaction.data.gasPrice),
             safeTransaction.data.gasToken,
             safeTransaction.data.refundReceiver,
-            safeTransaction.encodedSignatures()
+            asHex(safeTransaction.encodedSignatures())
           ],
           options
         ))
 
-      return await this.contract.execTransaction.staticCall(
-        safeTransaction.data.to,
-        BigInt(safeTransaction.data.value),
-        safeTransaction.data.data,
-        safeTransaction.data.operation,
-        BigInt(safeTransaction.data.safeTxGas),
-        BigInt(safeTransaction.data.baseGas),
-        BigInt(safeTransaction.data.gasPrice),
-        safeTransaction.data.gasToken,
-        safeTransaction.data.refundReceiver,
-        safeTransaction.encodedSignatures(),
-        { ...options, gasLimit }
-      )
+      const converted = await this.convertOptions({ ...options, gasLimit })
+      const txResult = await simulateContract(this.runner, {
+        address: this.contractAddress,
+        functionName: 'execTransaction',
+        abi: this.contractAbi,
+        args: [
+          safeTransaction.data.to,
+          BigInt(safeTransaction.data.value),
+          asHex(safeTransaction.data.data),
+          safeTransaction.data.operation,
+          BigInt(safeTransaction.data.safeTxGas),
+          BigInt(safeTransaction.data.baseGas),
+          BigInt(safeTransaction.data.gasPrice),
+          safeTransaction.data.gasToken,
+          safeTransaction.data.refundReceiver,
+          asHex(safeTransaction.encodedSignatures())
+        ],
+        ...converted
+      })
+
+      return txResult.result
     } catch (error) {
       return false
     }

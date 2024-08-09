@@ -1,7 +1,7 @@
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from './constants'
 
-export function sameString(str1: string, str2: string): boolean {
-  return str1.toLowerCase() === str2.toLowerCase()
+export function sameString(str1?: string, str2?: string): boolean {
+  return !!str1 && !!str2 && str1.toLowerCase() === str2.toLowerCase()
 }
 
 export function isZeroAddress(address: string): boolean {

@@ -1,4 +1,4 @@
-import { hashMessage, getBytes } from 'ethers'
+import { Hex, encodeFunctionData, hashMessage } from 'viem'
 import {
   getChain as getMoneriumChain,
   getNetwork as getMoneriumNetwork,
@@ -18,13 +18,7 @@ import {
   parseIsValidSignatureErrorResponse
 } from '@safe-global/onramp-kit/lib/errors'
 import { OperationType, SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types'
-
-import {
-  EIP_1271_BYTES_INTERFACE,
-  EIP_1271_INTERFACE,
-  MAGIC_VALUE,
-  MAGIC_VALUE_BYTES
-} from './signatures'
+import { EIP_1271_ABI, EIP_1271_BYTES_ABI, MAGIC_VALUE, MAGIC_VALUE_BYTES } from './signatures'
 import { SafeMoneriumOrder } from './types'
 
 export class SafeMoneriumClient extends MoneriumClient {
@@ -126,7 +120,7 @@ export class SafeMoneriumClient extends MoneriumClient {
       const txData = signMessageContract.encode('signMessage', [hashMessage(message)])
 
       const safeTransactionData = {
-        to: await signMessageContract.getAddress(),
+        to: signMessageContract.getAddress(),
         value: '0',
         data: txData,
         operation: OperationType.DelegateCall
@@ -195,31 +189,23 @@ export class SafeMoneriumClient extends MoneriumClient {
    */
   async #isValidSignature(safeAddress: string, messageHash: string): Promise<boolean> {
     try {
-      const eip1271data = EIP_1271_INTERFACE.encodeFunctionData('isValidSignature', [
-        messageHash,
-        '0x'
-      ])
-      const msgBytes = getBytes(messageHash)
-
-      const eip1271BytesData = EIP_1271_BYTES_INTERFACE.encodeFunctionData('isValidSignature', [
-        msgBytes,
-        '0x'
-      ])
-
-      const checks = [
-        this.#safeProvider.call({
-          from: safeAddress,
-          to: safeAddress,
-          data: eip1271data
-        }),
-        this.#safeProvider.call({
-          from: safeAddress,
-          to: safeAddress,
-          data: eip1271BytesData
+      const [eip1271data, eip1271BytesData] = [EIP_1271_ABI, EIP_1271_BYTES_ABI].map((abi) =>
+        encodeFunctionData({
+          abi,
+          functionName: 'isValidSignature',
+          args: [messageHash as Hex, '0x']
         })
-      ]
+      )
 
-      const responses = await Promise.allSettled(checks)
+      const responses = await Promise.allSettled(
+        [eip1271data, eip1271BytesData].map((data) =>
+          this.#safeProvider.call({
+            from: safeAddress,
+            to: safeAddress,
+            data
+          })
+        )
+      )
 
       return responses.reduce((prev, response) => {
         if (response.status === 'fulfilled') {

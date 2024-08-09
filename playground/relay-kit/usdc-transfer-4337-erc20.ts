@@ -1,3 +1,4 @@
+import { getBlock } from 'viem/actions'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish, transfer, generateTransferCallData } from '../utils'
 
@@ -14,7 +15,7 @@ const CHAIN_NAME = 'sepolia'
 // const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://sepolia.gateway.tenderly.co' // SEPOLIA
+const RPC_URL = 'https://rpc.sepolia.org' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL
@@ -50,21 +51,21 @@ async function main() {
   console.log('Chain Id', await safe4337Pack.getChainId())
 
   // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
+  const senderAddress = await safe4337Pack.protocolKit.getAddress()
 
   const usdcAmount = 100_000n // 0.1 USDC
 
   console.log(`sending USDC...`)
 
-  const ethersSigner = await safe4337Pack.protocolKit.getSafeProvider().getExternalSigner()
-  const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+  const externalSigner = await safe4337Pack.protocolKit.getSafeProvider().getExternalSigner()
+  const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
 
-  if (!ethersSigner) {
+  if (!externalSigner) {
     throw new Error('No signer found!')
   }
 
   // send 5 USDC to the Safe
-  await transfer(ethersSigner, usdcTokenAddress, senderAddress, usdcAmount * 50n)
+  await transfer(externalSigner, usdcTokenAddress, senderAddress, usdcAmount * 50n)
 
   console.log(`creating the Safe batch...`)
 
@@ -74,14 +75,14 @@ async function main() {
     value: '0'
   }
   const transactions = [transferUSDC, transferUSDC]
-  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp - 60_000,
-      validUntil: timestamp + 60_000
+      validAfter: Number(timestamp - 60_000n),
+      validUntil: Number(timestamp + 60_000n)
     }
   })
 

@@ -1,3 +1,5 @@
+import { Hash } from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 
@@ -39,10 +41,13 @@ async function main() {
   if (isTxExecutable) {
     // Execute the transaction
     const txResponse = await protocolKit.executeTransaction(safeTransaction)
-    const contractReceipt = await txResponse.transactionResponse?.wait()
+
+    await waitForTransactionReceipt(protocolKit.getSafeProvider().getExternalProvider(), {
+      hash: txResponse.hash as Hash
+    })
 
     console.log('Transaction executed.')
-    console.log('- Transaction hash:', contractReceipt?.hash)
+    console.log('- Transaction hash:', txResponse.hash)
   } else {
     console.log('Transaction invalid. Transaction was not executed.')
   }

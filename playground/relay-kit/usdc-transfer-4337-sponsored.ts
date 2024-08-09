@@ -1,5 +1,6 @@
+import { getBlock } from 'viem/actions'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { waitForOperationToFinish, generateTransferCallData } from '../utils'
+import { generateTransferCallData, waitForOperationToFinish } from '../utils'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -17,7 +18,7 @@ const CHAIN_NAME = 'sepolia'
 // const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://sepolia.gateway.tenderly.co' // SEPOLIA
+const RPC_URL = 'https://rpc.sepolia.org' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL
@@ -25,10 +26,6 @@ const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLIC
 
 // Paymaster URL
 const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
-
-// PAYMASTER ADDRESS
-const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
-// const paymasterAddress = '0x000000000034B78bfe02Be30AE4D324c8702803d' // GNOSIS
 
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/
@@ -44,7 +41,6 @@ async function main() {
     paymasterOptions: {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL,
-      paymasterAddress,
       sponsorshipPolicyId: POLICY_ID
     },
     options: {
@@ -57,7 +53,7 @@ async function main() {
   console.log('Chain Id', await safe4337Pack.getChainId())
 
   // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
+  const senderAddress = await safe4337Pack.protocolKit.getAddress()
 
   const usdcAmount = 100_000n // 0.1 USDC
 
@@ -67,15 +63,15 @@ async function main() {
     value: '0'
   }
   const transactions = [transferUSDC, transferUSDC]
-  const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
-  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+  const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp - 60_000,
-      validUntil: timestamp + 60_000
+      validAfter: Number(timestamp - 60_000n),
+      validUntil: Number(timestamp + 60_000n)
     }
   })
 

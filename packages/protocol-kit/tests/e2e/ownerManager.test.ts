@@ -61,7 +61,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address, account2.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const owners = await safeSdk.getOwners()
@@ -89,7 +89,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const isOwner = await safeSdk.isOwner(account1.address)
@@ -102,7 +102,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const isOwner = await safeSdk.isOwner(account2.address)
@@ -129,7 +129,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: '0x123' })
@@ -142,7 +142,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: SENTINEL_ADDRESS })
@@ -155,7 +155,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: ZERO_ADDRESS })
@@ -168,7 +168,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: account1.address })
@@ -181,7 +181,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 3
@@ -200,7 +200,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: account2.address, threshold: 0 })
@@ -213,7 +213,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const options: SafeTransactionOptionalProps = {
@@ -239,7 +239,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const initialThreshold = await safeSdk.getThreshold()
@@ -263,7 +263,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 2
@@ -301,7 +301,7 @@ describe('Safe owners manager', () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: '0x123' })
@@ -312,7 +312,7 @@ describe('Safe owners manager', () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: SENTINEL_ADDRESS })
@@ -323,7 +323,7 @@ describe('Safe owners manager', () => {
       const { safe, contractNetworks, provider } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: ZERO_ADDRESS })
@@ -335,7 +335,7 @@ describe('Safe owners manager', () => {
       const [, , , account4] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: account4.address })
@@ -347,7 +347,7 @@ describe('Safe owners manager', () => {
       const [account1] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 3
@@ -365,7 +365,7 @@ describe('Safe owners manager', () => {
       const [account1] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: account1.address, threshold: 0 })
@@ -377,7 +377,7 @@ describe('Safe owners manager', () => {
       const [account1] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const options: SafeTransactionOptionalProps = {
@@ -402,7 +402,7 @@ describe('Safe owners manager', () => {
       const [account1, account2, account3] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({
@@ -435,7 +435,7 @@ describe('Safe owners manager', () => {
       const [account1, account2, account3] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({
@@ -469,7 +469,7 @@ describe('Safe owners manager', () => {
       const [account1, account2, account3] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({
@@ -522,7 +522,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -538,7 +538,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -554,7 +554,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -570,7 +570,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -586,7 +586,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -602,7 +602,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -618,7 +618,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -634,7 +634,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -650,7 +650,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const options: SafeTransactionOptionalProps = {
@@ -679,7 +679,7 @@ describe('Safe owners manager', () => {
       const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const initialOwners = await safeSdk.getOwners()
@@ -701,7 +701,7 @@ describe('Safe owners manager', () => {
       const [account1, account2, account3, account4] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({

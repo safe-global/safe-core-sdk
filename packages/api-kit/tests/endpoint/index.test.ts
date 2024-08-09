@@ -1,4 +1,10 @@
-import { getDefaultProvider, Wallet } from 'ethers'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
+import { privateKeyToAccount } from 'viem/accounts'
+import { sepolia } from 'viem/chains'
+import { createWalletClient, http } from 'viem'
 import SafeApiKit, {
   AddMessageProps,
   AddSafeDelegateProps,
@@ -8,13 +14,9 @@ import SafeApiKit, {
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
 import { UserOperation } from '@safe-global/safe-core-sdk-types'
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
+import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import config from '../utils/config'
 import { getApiKit, getKits } from '../utils/setupKits'
-import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -33,8 +35,12 @@ const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
 const safeOpHash = '0x8b1840745ec0a6288e868c6e285dadcfebd49e846d307610a9ccd97f445ace93'
 const txServiceBaseUrl = 'https://safe-transaction-sepolia.safe.global/api'
-const defaultProvider = getDefaultProvider(config.JSON_RPC)
-const signer = new Wallet(PRIVATE_KEY_1, defaultProvider)
+
+const signer = createWalletClient({
+  transport: http(),
+  chain: sepolia,
+  account: privateKeyToAccount(PRIVATE_KEY_1)
+})
 
 let protocolKit: Safe
 let safeApiKit: SafeApiKit
@@ -363,7 +369,7 @@ describe('Endpoint tests', () => {
         nonce: 1
       }
       const origin = 'Safe Core SDK: Safe API Kit'
-      const signerAddress = await signer.getAddress()
+      const signerAddress = signer.account.address
       const safeTransaction = await protocolKit.createTransaction({
         transactions: [safeTransactionData],
         options
@@ -411,7 +417,7 @@ describe('Endpoint tests', () => {
         nonce: 1
       }
       const origin = 'Safe Core SDK: Safe API Kit'
-      const signerAddress = await signer.getAddress()
+      const signerAddress = signer.account.address
       const safeTransaction = await protocolKit.createTransaction({
         transactions: [safeTransactionData],
         options
@@ -684,8 +690,8 @@ describe('Endpoint tests', () => {
 
       const entryPoint = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 
-      const ethersProvider = protocolKit.getSafeProvider().getExternalProvider()
-      const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+      const externalProvider = protocolKit.getSafeProvider().getExternalProvider()
+      const timestamp = Number((await externalProvider.getBlock())?.timestamp) || 0
 
       const validAfter = timestamp - 60_000
       const validUntil = timestamp + 60_000

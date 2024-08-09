@@ -1,4 +1,4 @@
-import { Signer, TypedDataDomain, TypedDataField } from 'ethers'
+import { Account, Chain, Transport, TypedDataDomain, TypedDataParameter, WalletClient } from 'viem'
 import {
   SafeMultisigTransactionResponse,
   SafeTransactionData,
@@ -77,14 +77,14 @@ export type AddSafeDelegateProps = {
   safeAddress?: string
   delegateAddress: string
   delegatorAddress: string
-  signer: Signer
+  signer: WalletClient<Transport, Chain, Account>
   label: string
 }
 
 export type DeleteSafeDelegateProps = {
   delegateAddress: string
   delegatorAddress: string
-  signer: Signer
+  signer: WalletClient<Transport, Chain, Account>
 }
 
 export type SafeDelegateResponse = {
@@ -253,7 +253,7 @@ export type GetSafeMessageListProps = {
 
 export type EIP712TypedData = {
   domain: TypedDataDomain
-  types: TypedDataField
+  types: TypedDataParameter
   message: Record<string, unknown>
 }
 

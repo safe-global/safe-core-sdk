@@ -1,5 +1,6 @@
+import { getBlock } from 'viem/actions'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { waitForOperationToFinish, generateTransferCallData } from 'playground/utils'
+import { generateTransferCallData, waitForOperationToFinish } from '../utils'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
@@ -13,7 +14,7 @@ const SAFE_ADDRESS = ''
 const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
 // RPC URL
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+const RPC_URL = 'https://rpc.sepolia.org'
 
 const CHAIN_NAME = 'sepolia'
 
@@ -37,7 +38,7 @@ async function main() {
   console.log('Chain Id', await safe4337Pack.getChainId())
 
   // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
+  const senderAddress = await safe4337Pack.protocolKit.getAddress()
 
   const usdcAmount = 100_000n // 0.1 USDC
 
@@ -48,15 +49,15 @@ async function main() {
     value: '0'
   }
   const transactions = [transferUSDC, transferUSDC]
-  const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
-  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+  const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp - 60_000,
-      validUntil: timestamp + 60_000
+      validAfter: Number(timestamp - 60_000n),
+      validUntil: Number(timestamp + 60_000n)
     }
   })
 

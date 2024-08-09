@@ -1,5 +1,5 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
+import { PublicClient } from 'viem'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - CompatibilityFallbackHandlerContract_v1_3_0  extends  CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
  */
 abstract class CompatibilityFallbackHandlerBaseContract<
-  CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi & Abi
+  CompatibilityFallbackHandlerContractAbiType extends Abi
 > extends BaseContract<CompatibilityFallbackHandlerContractAbiType> {
   contractName: contractName
 
@@ -42,7 +42,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
-    runner?: ContractRunner | null
+    runner?: PublicClient
   ) {
     const contractName = 'compatibilityFallbackHandler'
 

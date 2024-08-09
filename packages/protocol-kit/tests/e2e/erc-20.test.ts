@@ -51,7 +51,7 @@ describe('ERC-20 utils', () => {
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
 
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
@@ -72,7 +72,7 @@ describe('ERC-20 utils', () => {
       'should return the correct decimals for a non-standard ERC20 token',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))
@@ -93,7 +93,7 @@ describe('ERC-20 utils', () => {
       'should throw an error if decimals() fn is not defined',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x'))
@@ -116,7 +116,7 @@ describe('ERC-20 utils', () => {
       'should return true if it is the Native token',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         const safeSdk = await Safe.init({
           provider,
@@ -137,7 +137,7 @@ describe('ERC-20 utils', () => {
       'should return true if it is an standard ERC20 token',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x12'))
@@ -161,7 +161,7 @@ describe('ERC-20 utils', () => {
       'should return false for a non-standard ERC20 token',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
 
         // mock decimals() call
         callStub = sinon.stub(SafeProvider.prototype, 'call').returns(Promise.resolve('0x06'))

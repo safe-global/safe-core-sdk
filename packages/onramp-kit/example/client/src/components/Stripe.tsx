@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { ethers } from 'ethers'
+import { isAddress } from 'viem'
 import { Grid, TextField, Button } from '@mui/material'
 
 import { StripeSession, StripePack } from '@safe-global/onramp-kit'
@@ -13,7 +13,7 @@ function Stripe() {
   const stripeRootRef = useRef<HTMLDivElement>(null)
 
   const handleCreateSession = async () => {
-    if (!isSessionValid(sessionId) && !ethers.isAddress(walletAddress)) return
+    if (!isSessionValid(sessionId) && !isAddress(walletAddress)) return
 
     if (stripeRootRef.current) {
       stripeRootRef.current.innerHTML = ''

@@ -56,7 +56,7 @@ class GuardManager {
   async getGuard(): Promise<string> {
     const safeContract = await this.isGuardCompatible()
 
-    return this.#safeProvider.getStorageAt(await safeContract.getAddress(), this.#slot)
+    return this.#safeProvider.getStorageAt(safeContract.getAddress(), this.#slot)
   }
 
   async encodeEnableGuardData(guardAddress: string): Promise<string> {

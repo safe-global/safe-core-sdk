@@ -1,5 +1,6 @@
-import hre, { ethers } from 'hardhat'
+import hre from 'hardhat'
 import Web3 from 'web3'
+import { BrowserProvider } from 'ethers'
 import { custom, createWalletClient } from 'viem'
 
 import Safe, { SafeProviderConfig, Eip1193Provider } from '@safe-global/protocol-kit'
@@ -33,7 +34,7 @@ export function getEip1193Provider(): Eip1193Provider {
       return web3Provider.currentProvider as Eip1193Provider
 
     case 'ethers':
-      const browserProvider = new ethers.BrowserProvider(hre.network.provider)
+      const browserProvider = new BrowserProvider(hre.network.provider)
 
       return {
         request: async (request) => {

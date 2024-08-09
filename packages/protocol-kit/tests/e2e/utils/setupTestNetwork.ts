@@ -1,18 +1,18 @@
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
-import { ethers } from 'hardhat'
+import { viem } from 'hardhat'
+import { WalletClient, Chain, Transport, getAddress, Account as ViemAccount } from 'viem'
 interface Account {
-  signer: HardhatEthersSigner
+  signer: WalletClient<Transport, Chain, ViemAccount>
   address: string
 }
 
 async function getHardhatAccounts(): Promise<Account[]> {
-  const wallets = await ethers.getSigners()
+  const wallets = await viem.getWalletClients()
 
   const accounts: Account[] = []
 
   for (let i = 0; i < 10; i++) {
     const wallet = wallets[i]
-    const account: Account = { signer: wallet, address: wallet.address }
+    const account: Account = { signer: wallet, address: getAddress(wallet.account.address) }
     accounts.push(account)
   }
 

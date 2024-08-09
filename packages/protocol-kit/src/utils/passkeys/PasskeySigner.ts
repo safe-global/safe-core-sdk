@@ -5,7 +5,6 @@ import {
   SafeWebAuthnSharedSignerContractImplementationType,
   SafeWebAuthnSignerFactoryContractImplementationType
 } from '../../types/contracts'
-import { EMPTY_DATA } from '../constants'
 import { getDefaultFCLP256VerifierAddress, hexStringToUint8Array } from './extractPasskeyData'
 import isSharedSigner from './isSharedSigner'
 
@@ -133,27 +132,6 @@ class PasskeySigner extends AbstractSigner {
       BigInt(this.coordinates.y),
       BigInt(this.verifierAddress)
     ])
-  }
-
-  /**
-   * Creates the deployment transaction to create a passkey signer.
-   * @returns {string} The deployment transaction to create a passkey signer.
-   */
-  async createPasskeyDeploymentTransaction() {
-    const passkeyAddress = await this.getAddress()
-    const isPasskeyDeployed = (await this.provider?.getCode(passkeyAddress)) !== EMPTY_DATA
-
-    if (isPasskeyDeployed) {
-      throw new Error('Passkey Signer contract already deployed')
-    }
-
-    const passkeySignerDeploymentTransaction = {
-      to: await this.safeWebAuthnSignerFactoryContract.getAddress(),
-      value: '0',
-      data: this.encodeCreateSigner()
-    }
-
-    return passkeySignerDeploymentTransaction
   }
 
   /**

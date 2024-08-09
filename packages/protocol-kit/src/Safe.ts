@@ -40,7 +40,6 @@ import {
   SigningMethodType,
   SwapOwnerTxParams,
   SafeModulesPaginated,
-  PasskeyArgType,
   RemovePasskeyOwnerTxParams
 } from './types'
 import {
@@ -79,8 +78,8 @@ import {
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
-import PasskeySigner from './utils/passkeys/PasskeySigner'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
+import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -1076,8 +1075,10 @@ class Safe {
     // The passkey Signer is a contract compliant with EIP-1271 standards, we need to check if it has been deployed.
     if (isPasskey && !(await this.#safeProvider.isContractDeployed(ownerAddress))) {
       // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
-      const passkeySigner = await this.#getPasskeySigner(params.passkey)
-      const passkeyDeploymentTransaction = await passkeySigner.createPasskeyDeploymentTransaction()
+      const passkeyDeploymentTransaction = await createPasskeyDeploymentTransaction(
+        this,
+        params.passkey
+      )
 
       transactions.push(passkeyDeploymentTransaction)
     }
@@ -1161,8 +1162,10 @@ class Safe {
       !(await this.#safeProvider.isContractDeployed(newOwnerAddress))
     ) {
       // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
-      const passkeySigner = await this.#getPasskeySigner(params.newOwnerPasskey)
-      const passkeyDeploymentTransaction = await passkeySigner.createPasskeyDeploymentTransaction()
+      const passkeyDeploymentTransaction = await createPasskeyDeploymentTransaction(
+        this,
+        params.newOwnerPasskey
+      )
 
       transactions.push(passkeyDeploymentTransaction)
     }
@@ -1583,30 +1586,6 @@ class Safe {
     const chainId = await this.getChainId()
 
     return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)
-  }
-
-  /**
-   * Returns the passkey signer of the specific passkey.
-   *
-   * @param {PasskeyArgType} passkey The passkey owner
-   * @returns {Promise<string>} Returns the passkey owner address
-   */
-  async #getPasskeySigner(passkey: PasskeyArgType): Promise<PasskeySigner> {
-    const safeVersion = await this.getContractVersion()
-    const safeAddress = await this.getAddress()
-    const owners = await this.getOwners()
-    const safePasskeyProvider = await SafeProvider.init(
-      this.#safeProvider.provider,
-      passkey,
-      safeVersion,
-      this.#contractManager.contractNetworks,
-      safeAddress,
-      owners
-    )
-
-    const passkeySigner = await safePasskeyProvider.getExternalSigner()
-
-    return passkeySigner as PasskeySigner
   }
 
   /**

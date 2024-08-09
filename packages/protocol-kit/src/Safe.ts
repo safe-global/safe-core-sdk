@@ -80,6 +80,7 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import PasskeySigner from './utils/passkeys/PasskeySigner'
+import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -458,30 +459,12 @@ class Safe {
   }
 
   /**
-   * Checks if a specific address or passkey is an owner of the current Safe.
-   *
-   * @param owner - The owner address or a passkey object
-   * @returns TRUE if the account is an owner
-   */
-  async isOwner(owner: string | PasskeyArgType): Promise<boolean> {
-    const isOwnerAddress = typeof owner === 'string'
-
-    if (isOwnerAddress) {
-      return this.#isOwnerAddress(owner)
-    }
-
-    const ownerAddress = await this.getPasskeyOwnerAddress(owner)
-
-    return this.#isOwnerAddress(ownerAddress)
-  }
-
-  /**
    * Checks if a specific address is an owner of the current Safe.
    *
    * @param ownerAddress - The account address
    * @returns TRUE if the account is an owner
    */
-  async #isOwnerAddress(ownerAddress: string): Promise<boolean> {
+  async isOwner(ownerAddress: string): Promise<boolean> {
     if (this.#predictedSafe?.safeAccountConfig.owners) {
       return Promise.resolve(
         this.#predictedSafe?.safeAccountConfig.owners.some((owner: string) =>
@@ -1077,7 +1060,7 @@ class Safe {
     const isPasskey = isPasskeyParam(params)
 
     const ownerAddress = isPasskey
-      ? await this.getPasskeyOwnerAddress(params.passkey)
+      ? await getPasskeyOwnerAddress(this, params.passkey)
       : params.ownerAddress
 
     const { threshold } = params
@@ -1126,7 +1109,7 @@ class Safe {
     const isPasskey = isPasskeyParam(params)
 
     const ownerAddress = isPasskey
-      ? await this.getPasskeyOwnerAddress(params.passkey)
+      ? await getPasskeyOwnerAddress(this, params.passkey)
       : params.ownerAddress
 
     const safeTransactionData = {
@@ -1157,11 +1140,11 @@ class Safe {
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const oldOwnerAddress = isOldOwnerPasskey(params)
-      ? await this.getPasskeyOwnerAddress(params.oldOwnerPasskey)
+      ? await getPasskeyOwnerAddress(this, params.oldOwnerPasskey)
       : params.oldOwnerAddress
 
     const newOwnerAddress = isNewOwnerPasskey(params)
-      ? await this.getPasskeyOwnerAddress(params.newOwnerPasskey)
+      ? await getPasskeyOwnerAddress(this, params.newOwnerPasskey)
       : params.newOwnerAddress
 
     const swapOwnerTransaction = {
@@ -1624,19 +1607,6 @@ class Safe {
     const passkeySigner = await safePasskeyProvider.getExternalSigner()
 
     return passkeySigner as PasskeySigner
-  }
-
-  /**
-   * Returns the owner address associated with the specific passkey.
-   *
-   * @param {PasskeyArgType} passkey The passkey to check the owner address
-   * @returns {Promise<string>} Returns the passkey owner address associated with the passkey
-   */
-  async getPasskeyOwnerAddress(passkey: PasskeyArgType): Promise<string> {
-    const passkeySigner = await this.#getPasskeySigner(passkey)
-    const passkeyOwnerAddress = await passkeySigner.getAddress()
-
-    return passkeyOwnerAddress
   }
 
   /**

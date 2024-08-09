@@ -163,7 +163,7 @@ describe('Passkey', () => {
           })
 
           const passkeyAddress = await getPasskeyOwnerAddress(safeSdk, passkey1)
-          const expectedPasskeyAddress = await safeWebAuthnSignerFactoryContract.getSigner([
+          const [expectedPasskeyAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
             BigInt(passkey1.coordinates.x),
             BigInt(passkey1.coordinates.y),
             BigInt(passkey1.customVerifierAddress)

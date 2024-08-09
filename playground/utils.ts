@@ -1,6 +1,16 @@
-import { ethers } from 'ethers'
+import { Address, createPublicClient, custom, encodeFunctionData, parseAbi } from 'viem'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { GetSafeOperationListResponse } from '@safe-global/api-kit'
+import { ExternalSigner } from '@safe-global/protocol-kit'
+
+export const generateTransferCallData = (to: string, value: bigint) => {
+  const functionAbi = parseAbi(['function transfer(address _to, uint256 _value) returns (bool)'])
+
+  return encodeFunctionData({
+    abi: functionAbi,
+    functionName: 'transfer',
+    args: [to, value]
+  })
+}
 
 export async function waitForOperationToFinish(
   userOperationHash: string,
@@ -24,43 +34,25 @@ export async function waitForOperationToFinish(
   console.groupEnd()
 }
 
-export function generateTransferCallData(to: string, value: bigint) {
-  const functionAbi = 'function transfer(address _to, uint256 _value) returns (bool)'
-  const iface = new ethers.Interface([functionAbi])
-
-  return iface.encodeFunctionData('transfer', [to, value])
-}
-
 export async function transfer(
-  signer: ethers.AbstractSigner,
-  tokenAddress: string,
-  to: string,
+  signer: ExternalSigner,
+  tokenAddress: Address,
+  to: Address,
   amount: bigint
 ) {
   const transferEC20 = {
     to: tokenAddress,
     data: generateTransferCallData(to, amount),
-    value: '0'
+    value: 0n,
+    chain: signer.chain
   }
 
-  const transactionResponse = await signer.sendTransaction(transferEC20)
+  const hash = await signer.sendTransaction(transferEC20)
 
-  return await transactionResponse.wait()
-}
-
-export function sortResultsByCreatedDateDesc(
-  data: GetSafeOperationListResponse
-): GetSafeOperationListResponse {
-  if (!data || !Array.isArray(data.results)) {
-    throw new Error('The provided data is invalid or does not contain a results array.')
-  }
-
-  data.results.sort((a, b) => {
-    const dateA = new Date(a.created).getTime()
-    const dateB = new Date(b.created).getTime()
-
-    return dateB - dateA
+  const publicClient = createPublicClient({
+    chain: signer.chain,
+    transport: custom(signer.transport)
   })
 
-  return data
+  return await publicClient.waitForTransactionReceipt({ hash })
 }

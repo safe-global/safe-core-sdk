@@ -1,10 +1,14 @@
-import { Signer } from 'ethers'
+import { Chain, Account, Transport, WalletClient } from 'viem'
 
-export async function signDelegate(signer: Signer, delegateAddress: string, chainId: bigint) {
+export async function signDelegate(
+  walletClient: WalletClient<Transport, Chain, Account>,
+  delegateAddress: string,
+  chainId: bigint
+) {
   const domain = {
     name: 'Safe Transaction Service',
     version: '1.0',
-    chainId: chainId
+    chainId: Number(chainId)
   }
 
   const types = {
@@ -16,5 +20,10 @@ export async function signDelegate(signer: Signer, delegateAddress: string, chai
 
   const totp = Math.floor(Date.now() / 1000 / 3600)
 
-  return signer.signTypedData(domain, types, { delegateAddress, totp })
+  return walletClient.signTypedData({
+    domain,
+    types,
+    primaryType: 'Delegate',
+    message: { delegateAddress, totp }
+  })
 }

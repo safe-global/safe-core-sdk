@@ -1,4 +1,3 @@
-import { ContractRunner } from 'ethers'
 import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
@@ -8,6 +7,7 @@ import {
   SafeProxyFactoryContract_v1_0_0_Function,
   safeProxyFactory_1_0_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeProxyFactoryContract_v1_0_0  is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
@@ -36,7 +36,7 @@ class SafeProxyFactoryContract_v1_0_0
     safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const safeVersion = '1.0.0'
     const defaultAbi = safeProxyFactory_1_0_0_ContractArtifacts.abi
@@ -59,7 +59,7 @@ class SafeProxyFactoryContract_v1_0_0
    * @returns Array[creationCode]
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_0_0_Function<'proxyCreationCode'> = async () => {
-    return [await this.contract.proxyCreationCode()]
+    return [await this.read('proxyCreationCode')]
   }
 
   /**
@@ -67,7 +67,7 @@ class SafeProxyFactoryContract_v1_0_0
    * @returns Array[runtimeCode]
    */
   proxyRuntimeCode: SafeProxyFactoryContract_v1_0_0_Function<'proxyRuntimeCode'> = async () => {
-    return [await this.contract.proxyRuntimeCode()]
+    return [await this.read('proxyRuntimeCode')]
   }
 
   /**
@@ -76,18 +76,18 @@ class SafeProxyFactoryContract_v1_0_0
    * @returns Array[proxyAddress]
    */
   createProxy: SafeProxyFactoryContract_v1_0_0_Function<'createProxy'> = async (args) => {
-    return [await this.contract.createProxy(...args)]
+    return [await this.write('createProxy', args)]
   }
 
   /**
    * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
-   * @param args - Array[masterCopy, initializer, saltNonce]
+   * @param args - Array[masterCopy, initializer, saltNonceBigInt]
    * @returns Array[proxyAddress]
    */
   createProxyWithNonce: SafeProxyFactoryContract_v1_0_0_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.createProxyWithNonce(...args)]
+    return [await this.write('createProxyWithNonce', args)]
   }
 }
 

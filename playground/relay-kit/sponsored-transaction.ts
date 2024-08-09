@@ -1,11 +1,15 @@
-import AccountAbstraction from '@safe-global/account-abstraction-kit-poc'
+import { Address, Chain, createWalletClient, custom, formatEther, Hex } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { getBalance, waitForTransactionReceipt } from 'viem/actions'
+import { sepolia } from 'viem/chains'
+import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,
   MetaTransactionOptions,
-  OperationType
+  OperationType,
+  SafeTransaction
 } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
 
 // Fund the 1Balance account that will sponsor the transaction and get the API key:
 // https://relay.gelato.network/
@@ -18,10 +22,12 @@ import { ethers } from 'ethers'
 
 const config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',
+  SAFE_SIGNER_ADDRESS: '<SAFE_SIGNER_ADDRESS>',
   RELAY_API_KEY: '<GELATO_RELAY_API_KEY>'
 }
 
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+const CHAIN: Chain = sepolia
+const RPC_URL = CHAIN.rpcUrls.default.http[0]
 
 const mockOnRampConfig = {
   ADDRESS: '<ADDRESS>',
@@ -37,46 +43,67 @@ const txConfig = {
 async function main() {
   console.log('Execute meta-transaction via Gelato Relay paid by 1Balance')
 
-  // SDK Initialization
-
-  const safeAccountAbstraction = new AccountAbstraction({
+  const safeClient = await createSafeClient({
     provider: RPC_URL,
-    signer: config.SAFE_SIGNER_PRIVATE_KEY
+    signer: config.SAFE_SIGNER_PRIVATE_KEY,
+    safeOptions: {
+      owners: [config.SAFE_SIGNER_ADDRESS],
+      threshold: 1,
+      saltNonce: '1'
+    }
   })
 
-  await safeAccountAbstraction.init()
-
-  safeAccountAbstraction.setRelayKit(
-    new GelatoRelayPack({
+  const gelatoSafeClient = safeClient.extend((client: SafeClient) => {
+    const relayPack = new GelatoRelayPack({
       apiKey: config.RELAY_API_KEY,
-      protocolKit: safeAccountAbstraction.protocolKit
+      protocolKit: client.protocolKit
     })
-  )
+
+    return {
+      relayTransaction: async (
+        transactions: MetaTransactionData[],
+        options?: MetaTransactionOptions
+      ) => {
+        const relayedTransaction = (await relayPack.createTransaction({
+          transactions,
+          options
+        })) as SafeTransaction
+
+        const signedSafeTransaction = await client.protocolKit.signTransaction(relayedTransaction)
+
+        return relayPack.executeTransaction({ executable: signedSafeTransaction, options })
+      }
+    }
+  })
 
   // Calculate Safe address
 
-  const predictedSafeAddress = await safeAccountAbstraction.protocolKit.getAddress()
+  const predictedSafeAddress = (await gelatoSafeClient.protocolKit.getAddress())
   console.log({ predictedSafeAddress })
 
-  const isSafeDeployed = await safeAccountAbstraction.protocolKit.isSafeDeployed()
+  const isSafeDeployed = await gelatoSafeClient.protocolKit.isSafeDeployed()
   console.log({ isSafeDeployed })
 
   // Fake on-ramp to fund the Safe
 
-  const ethersProvider = safeAccountAbstraction.protocolKit.getSafeProvider().getExternalProvider()
-  const safeBalance = await ethersProvider.getBalance(predictedSafeAddress)
-  console.log({ safeBalance: ethers.formatEther(safeBalance.toString()) })
+  const externalProvider = gelatoSafeClient.protocolKit.getSafeProvider().getExternalProvider()
+  const safeBalance = await getBalance(externalProvider, { address: predictedSafeAddress })
+  console.log({ safeBalance: formatEther(safeBalance) })
   if (safeBalance < BigInt(txConfig.VALUE)) {
-    const fakeOnRampSigner = new ethers.Wallet(mockOnRampConfig.PRIVATE_KEY, ethersProvider)
-    const onRampResponse = await fakeOnRampSigner.sendTransaction({
-      to: predictedSafeAddress,
-      value: txConfig.VALUE
+    const fakeOnRampSigner = createWalletClient({
+      account: privateKeyToAccount(mockOnRampConfig.PRIVATE_KEY as Hex),
+      transport: custom(externalProvider),
+      chain: CHAIN
     })
-    console.log(`Funding the Safe with ${ethers.formatEther(txConfig.VALUE.toString())} ETH`)
-    await onRampResponse.wait()
+    const hash = await fakeOnRampSigner.sendTransaction({
+      to: predictedSafeAddress,
+      value: BigInt(txConfig.VALUE)
+    })
+    console.log(`Funding the Safe with ${formatEther(BigInt(txConfig.VALUE))} ETH`)
+    await waitForTransactionReceipt(externalProvider, { hash })
 
-    const safeBalanceAfter = await ethersProvider.getBalance(predictedSafeAddress)
-    console.log({ safeBalance: ethers.formatEther(safeBalanceAfter.toString()) })
+    const safeBalanceAfter = await getBalance(externalProvider, { address: predictedSafeAddress })
+    console.log({ safeBalance: formatEther(safeBalanceAfter) })
   }
 
   // Relay the transaction
@@ -93,8 +120,11 @@ async function main() {
     isSponsored: true
   }
 
-  const response = await safeAccountAbstraction.relayTransaction(safeTransactions, options)
+  const response = await gelatoSafeClient.relayTransaction(safeTransactions, options)
   console.log({ GelatoTaskId: response })
+  console.log(
+    `Check the status of the transaction at https://relay.gelato.digital/tasks/status/${response.taskId}`
+  )
 }
 
 main()

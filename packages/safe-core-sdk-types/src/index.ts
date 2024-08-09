@@ -18,9 +18,11 @@ declare module 'abitype' {
     //   outputs: `0x${string}`
     // }
     AddressType: string
-    BytesType: {
-      inputs: string
-      outputs: string
-    }
+  }
+}
+
+declare module 'viem/node_modules/abitype' {
+  export interface Register {
+    AddressType: string
   }
 }

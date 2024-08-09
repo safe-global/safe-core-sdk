@@ -1,6 +1,6 @@
-import { ethers } from 'ethers'
 import { EstimateGasData } from '@safe-global/safe-core-sdk-types'
 import {
+  BundlerClient,
   EstimateFeeFunctionProps,
   EstimateSponsoredFeeFunctionProps,
   EstimateSponsoredGasData,
@@ -22,7 +22,8 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     return {
       callGasLimit: userOperation.callGasLimit + userOperation.callGasLimit / 2n,
       verificationGasLimit:
-        userOperation.verificationGasLimit + userOperation.verificationGasLimit / 2n
+        userOperation.verificationGasLimit + userOperation.verificationGasLimit / 2n,
+      preVerificationGas: userOperation.preVerificationGas + userOperation.preVerificationGas / 20n
     }
   }
 
@@ -34,20 +35,28 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
   }: EstimateSponsoredFeeFunctionProps): Promise<EstimateSponsoredGasData> {
     const paymasterClient = getEip4337BundlerProvider(paymasterUrl)
 
-    const params = sponsorshipPolicyId
-      ? [userOperationToHexValues(userOperation), entryPoint, { sponsorshipPolicyId }]
-      : [userOperationToHexValues(userOperation), entryPoint]
-
-    const gasEstimate = await paymasterClient.send(RPC_4337_CALLS.SPONSOR_USER_OPERATION, params)
+    const gasEstimate = await paymasterClient.request({
+      method: RPC_4337_CALLS.SPONSOR_USER_OPERATION,
+      params: sponsorshipPolicyId
+        ? [userOperationToHexValues(userOperation), entryPoint, { sponsorshipPolicyId }]
+        : [userOperationToHexValues(userOperation), entryPoint]
+    })
 
     return gasEstimate
   }
 
   async #getFeeData(
-    bundlerClient: ethers.JsonRpcProvider
+    bundlerClient: BundlerClient
   ): Promise<Pick<EstimateGasData, 'maxFeePerGas' | 'maxPriorityFeePerGas'>> {
-    const { fast } = await bundlerClient.send('pimlico_getUserOperationGasPrice', [])
+    const {
+      fast: { maxFeePerGas, maxPriorityFeePerGas }
+    } = await bundlerClient.request({
+      method: 'pimlico_getUserOperationGasPrice'
+    })
 
-    return fast
+    return {
+      maxFeePerGas: BigInt(maxFeePerGas),
+      maxPriorityFeePerGas: BigInt(maxPriorityFeePerGas)
+    }
   }
 }

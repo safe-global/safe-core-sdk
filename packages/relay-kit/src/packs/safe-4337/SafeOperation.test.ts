@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { Hex, encodePacked } from 'viem'
 import { EthSafeSignature } from '@safe-global/protocol-kit'
 import EthSafeOperation from './SafeOperation'
 import * as fixtures from './testing-utils/fixtures'
@@ -6,6 +6,7 @@ import * as fixtures from './testing-utils/fixtures'
 describe('SafeOperation', () => {
   it('should create a SafeOperation from an UserOperation', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -31,6 +32,7 @@ describe('SafeOperation', () => {
 
   it('should add and retrieve signatures', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -47,6 +49,7 @@ describe('SafeOperation', () => {
 
   it('should encode the signatures', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -59,6 +62,7 @@ describe('SafeOperation', () => {
 
   it('should add estimations', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -88,6 +92,7 @@ describe('SafeOperation', () => {
 
   it('should convert to UserOperation', () => {
     const safeOperation = new EthSafeOperation(fixtures.USER_OPERATION, {
+      chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
@@ -101,7 +106,7 @@ describe('SafeOperation', () => {
 
     expect(safeOperation.toUserOperation()).toMatchObject({
       sender: safeOperation.data.safe,
-      nonce: ethers.toBeHex(fixtures.USER_OPERATION.nonce),
+      nonce: fixtures.USER_OPERATION.nonce,
       initCode: safeOperation.data.initCode,
       callData: safeOperation.data.callData,
       callGasLimit: safeOperation.data.callGasLimit,
@@ -110,12 +115,12 @@ describe('SafeOperation', () => {
       maxFeePerGas: safeOperation.data.maxFeePerGas,
       maxPriorityFeePerGas: safeOperation.data.maxPriorityFeePerGas,
       paymasterAndData: safeOperation.data.paymasterAndData,
-      signature: ethers.solidityPacked(
+      signature: encodePacked(
         ['uint48', 'uint48', 'bytes'],
         [
           safeOperation.data.validAfter,
           safeOperation.data.validUntil,
-          safeOperation.encodedSignatures()
+          safeOperation.encodedSignatures() as Hex
         ]
       )
     })

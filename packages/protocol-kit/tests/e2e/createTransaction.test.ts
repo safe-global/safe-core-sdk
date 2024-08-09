@@ -14,6 +14,7 @@ import { getContractNetworks } from './utils/setupContractNetworks'
 import { getERC20Mintable, getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
+import { encodeFunctionData } from 'viem'
 
 chai.use(chaiAsPromised)
 
@@ -60,7 +61,7 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -87,7 +88,7 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -115,7 +116,7 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -144,7 +145,7 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -171,7 +172,7 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -200,7 +201,7 @@ describe('Transactions creation', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -250,7 +251,7 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -280,7 +281,7 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -310,7 +311,7 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -331,7 +332,7 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -359,7 +360,7 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -373,7 +374,7 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, erc20Mintable, chainId, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -381,20 +382,22 @@ describe('Transactions creation', () => {
       })
       const transactions = [
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '1100000000000000000' // 1.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '1100000000000000000'] // 1.1 ERC20
+          })
         },
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '100000000000000000' // 0.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '100000000000000000'] // 0.1 ERC20
+          })
         }
       ]
       const multiSendTx = await safeSdk.createTransaction({ transactions })
@@ -407,7 +410,7 @@ describe('Transactions creation', () => {
       const { accounts, contractNetworks, erc20Mintable, chainId, provider } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -417,20 +420,22 @@ describe('Transactions creation', () => {
 
       const transactions = [
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '1100000000000000000' // 1.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '1100000000000000000'] // 1.1 ERC20
+          })
         },
         {
-          to: await erc20Mintable.getAddress(),
+          to: erc20Mintable.address,
           value: '0',
-          data: erc20Mintable.interface.encodeFunctionData('transfer', [
-            account2.address,
-            '100000000000000000' // 0.1 ERC20
-          ])
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [account2.address, '100000000000000000'] // 0.1 ERC20
+          })
         }
       ]
       const multiSendTx = await safeSdk.createTransaction({ transactions, options })
@@ -450,7 +455,7 @@ describe('Transactions creation', () => {
       'should fail to create a transaction if the Safe with version <v1.3.0 is using predicted config',
       async () => {
         const { safe, predictedSafe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,

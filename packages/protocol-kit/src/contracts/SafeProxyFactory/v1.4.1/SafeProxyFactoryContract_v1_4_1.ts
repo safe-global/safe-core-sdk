@@ -1,4 +1,3 @@
-import { ContractRunner } from 'ethers'
 import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import {
   SafeVersion,
@@ -8,6 +7,7 @@ import {
   safeProxyFactory_1_4_1_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeProxyFactoryContract_v1_4_1  is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -36,7 +36,7 @@ class SafeProxyFactoryContract_v1_4_1
     safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = safeProxyFactory_1_4_1_ContractArtifacts.abi
@@ -59,7 +59,7 @@ class SafeProxyFactoryContract_v1_4_1
    * @returns Array[chainId]
    */
   getChainId: SafeProxyFactoryContract_v1_4_1_Function<'getChainId'> = async () => {
-    return [await this.contract.getChainId()]
+    return [await this.read('getChainId')]
   }
 
   /**
@@ -67,17 +67,17 @@ class SafeProxyFactoryContract_v1_4_1
    * @returns Array[creationCode]
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_4_1_Function<'proxyCreationCode'> = async () => {
-    return [await this.contract.proxyCreationCode()]
+    return [await this.read('proxyCreationCode')]
   }
 
   /**
    * Deploys a new chain-specific proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
-   * @param args - Array[singleton, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonceBigInt]
    * @returns Array[proxy]
    */
   createChainSpecificProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createChainSpecificProxyWithNonce'> =
     async (args) => {
-      return [await this.contract.createChainSpecificProxyWithNonce(...args)]
+      return [await this.write('createChainSpecificProxyWithNonce', args)]
     }
 
   /**
@@ -88,18 +88,18 @@ class SafeProxyFactoryContract_v1_4_1
    */
   createProxyWithCallback: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithCallback'> =
     async (args) => {
-      return [await this.contract.createProxyWithCallback(...args)]
+      return [await this.write('createProxyWithCallback', args)]
     }
 
   /**
    * Deploys a new proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
-   * @param args - Array[singleton, initializer, saltNonce]
+   * @param args - Array[singleton, initializer, saltNonceBigInt]
    * @returns Array[proxy]
    */
   createProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.createProxyWithNonce(...args)]
+    return [await this.write('createProxyWithNonce', args)]
   }
 }
 

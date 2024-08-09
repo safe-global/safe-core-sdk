@@ -64,7 +64,7 @@ describe('MoneriumPack', () => {
 
     it('should throw an exception if no instance of the protocol kit is passed as parameter', async () => {
       // @ts-expect-error - Throw and exception
-      await expect(moneriumPack.init()).rejects.toThrowError(
+      await expect(moneriumPack.init()).rejects.toThrow(
         'You need to provide an instance of the protocol kit'
       )
     })

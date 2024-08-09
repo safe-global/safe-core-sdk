@@ -28,10 +28,18 @@ const playgroundRelayKitPaths = {
     'relay-kit/usdc-transfer-4337-sponsored-counterfactual'
 }
 
+const playgroundSafeKitPaths = {
+  'send-transactions': 'safe-kit/send-transactions',
+  'send-on-chain-message': 'safe-kit/send-on-chain-message',
+  'send-off-chain-message': 'safe-kit/send-off-chain-message',
+  'send-safe-operation': 'safe-kit/send-safe-operation'
+}
+
 const path =
   playgroundProtocolKitPaths[playInput] ||
   playgroundApiKitPaths[playInput] ||
-  playgroundRelayKitPaths[playInput]
+  playgroundRelayKitPaths[playInput] ||
+  playgroundSafeKitPaths[playInput]
 
 function printPlaygrounds(playgroundPaths: Record<string, string>) {
   const playgroundKits = Object.keys(playgroundPaths)
@@ -52,6 +60,9 @@ if (!path) {
 
   console.log('RELAY KIT')
   printPlaygrounds(playgroundRelayKitPaths)
+
+  console.log('SAFE KIT')
+  printPlaygrounds(playgroundSafeKitPaths)
 
   process.exit()
 }

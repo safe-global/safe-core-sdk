@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -33,7 +33,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && yarn safe-deployments && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
+    "build": "yarn unbuild && hardhat compile && yarn safe-deployments && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -50,7 +50,7 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
-    "@nomicfoundation/hardhat-ethers": "^3.0.6",
+    "@nomicfoundation/hardhat-viem": "^2.0.2",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
     "@types/chai": "^4.3.16",
@@ -61,23 +61,20 @@
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^16.4.5",
+    "ethers": "^6.13.1",
     "hardhat": "^2.19.3",
     "hardhat-deploy": "^0.11.45",
-    "hardhat-deploy-ethers": "^0.4.2",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "tsconfig-paths": "^4.2.0",
-    "viem": "^2.15.1",
     "web3": "^4.7.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@noble/hashes": "^1.3.3",
-    "@safe-global/safe-core-sdk-types": "^5.0.2",
-    "@safe-global/safe-deployments": "^1.37.0",
+    "@safe-global/safe-core-sdk-types": "^5.0.3",
+    "@safe-global/safe-deployments": "^1.37.1",
     "abitype": "^1.0.2",
-    "ethereumjs-util": "^7.1.5",
-    "ethers": "^6.13.1",
-    "semver": "^7.6.2"
+    "semver": "^7.6.2",
+    "viem": "^2.19.0"
   }
 }

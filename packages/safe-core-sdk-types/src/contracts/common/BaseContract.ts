@@ -40,7 +40,7 @@ export type ContractWriteFunctionNames<ContractAbi extends Abi> = ExtractAbiFunc
  * @template ArgType - The type of arguments to extract, either 'inputs' or 'outputs'. (default: 'inputs')
  * @type {ExtractFunctionArgs}
  */
-type ExtractFunctionArgs<
+export type ExtractFunctionArgs<
   ContractAbi extends Abi,
   ContractFunctionName extends
     ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>,
@@ -81,7 +81,7 @@ export type EstimateGasFunction<
   options?: TransactionOptions
 ) => Promise<bigint>
 
-export type GetAddressFunction = () => Promise<string>
+export type GetAddressFunction = () => string
 
 /**
  * Defines a function type for a contract, derived by the given function name from a given contract ABI.

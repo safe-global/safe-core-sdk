@@ -1,9 +1,9 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class SafeProxyFactoryBaseContract extends BaseContract to specifically integrate with the SafeProxyFactory contract.
@@ -22,7 +22,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - SafeProxyFactoryContract_v1_0_0  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_0_0_Abi>
  */
 abstract class SafeProxyFactoryBaseContract<
-  SafeProxyFactoryContractAbiType extends InterfaceAbi & Abi
+  SafeProxyFactoryContractAbiType extends Abi
 > extends BaseContract<SafeProxyFactoryContractAbiType> {
   contractName: contractName
 
@@ -44,7 +44,7 @@ abstract class SafeProxyFactoryBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContractAbiType,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const contractName = 'safeProxyFactoryVersion'
 

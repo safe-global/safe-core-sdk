@@ -113,32 +113,59 @@ describe('Passkey', () => {
   })
 
   describe('isOwner', async () => {
-    itif(safeVersionDeployed < '1.3.0')(
-      'should fail for Safe versions lower than 1.3.0',
-      async () => {
-        const {
-          contractNetworks,
-          provider,
-          accounts: [account1],
-          passkeys: [passkey1]
-        } = await setupTests()
-        const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+    describe('getPasskeyOwnerAddress', async () => {
+      itif(safeVersionDeployed < '1.3.0')(
+        'should fail for Safe versions lower than 1.3.0',
+        async () => {
+          const {
+            contractNetworks,
+            provider,
+            accounts: [account1],
+            passkeys: [passkey1]
+          } = await setupTests()
+          const safe = await getSafeWithOwners([account1.address])
+          const safeAddress = await safe.getAddress()
 
-        // Create a Safe instance with an EOA signer
-        const safeSdk = await Safe.init({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
+          // Create a Safe instance with an EOA signer
+          const safeSdk = await Safe.init({
+            provider,
+            safeAddress,
+            contractNetworks
+          })
 
-        chai
-          .expect(safeSdk.isOwner(await getPasskeyOwnerAddress(safeSdk, passkey1)))
-          .to.be.rejectedWith(
-            'Current version of the Safe does not support the Passkey signer functionality'
-          )
-      }
-    )
+          chai
+            .expect(getPasskeyOwnerAddress(safeSdk, passkey1))
+            .to.be.rejectedWith(
+              'Current version of the Safe does not support the Passkey signer functionality'
+            )
+        }
+      )
+
+      itif(safeVersionDeployed >= '1.3.0')(
+        'should return the address of the passkey signer',
+        async () => {
+          const {
+            contractNetworks,
+            provider,
+            passkeys: [passkey1],
+            passkeySigners: [passkeySigner1]
+          } = await setupTests()
+          const passkeySigner1Address = await passkeySigner1.getAddress()
+          const safe = await getSafeWithOwners([passkeySigner1Address])
+
+          const safeSdk = await Safe.init({
+            provider,
+            safeAddress: await safe.getAddress(),
+            contractNetworks,
+            signer: passkey1
+          })
+
+          const passkeyAddress = await getPasskeyOwnerAddress(safeSdk, passkey1)
+
+          chai.expect(passkeyAddress).to.equals('0xa6C62e7AbA6d09F65739FB00eec777B7bF525A01')
+        }
+      )
+    })
 
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is not deployed', async () => {
       const {

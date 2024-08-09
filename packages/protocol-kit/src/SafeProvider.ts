@@ -120,8 +120,8 @@ class SafeProvider {
           safeWebAuthnSignerFactoryContract,
           safeWebAuthnSharedSignerContract,
           safeProvider.getExternalProvider(),
-          safeAddress!,
-          owners!,
+          safeAddress || '',
+          owners || [],
           chainId.toString()
         )
       } else {

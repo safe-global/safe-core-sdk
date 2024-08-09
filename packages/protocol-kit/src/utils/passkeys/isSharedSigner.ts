@@ -16,7 +16,7 @@ async function isSharedSigner(
   const sharedSignerContractAddress = await safeWebAuthnSharedSignerContract.getAddress()
 
   // is a shared signer if the shared signer contract address is present in the owners and its configured in the Safe slot
-  if (owners.includes(sharedSignerContractAddress)) {
+  if (safeAddress && owners.includes(sharedSignerContractAddress)) {
     const [sharedSignerSlot] = await safeWebAuthnSharedSignerContract.getConfiguration([
       safeAddress
     ])

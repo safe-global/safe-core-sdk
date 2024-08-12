@@ -13,7 +13,10 @@ import {
   validateEip3770Address
 } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
-import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
+import {
+  getSafeWebAuthnSharedSignerContract,
+  getSafeWebAuthnSignerFactoryContract
+} from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
 
 import {
@@ -76,7 +79,9 @@ class SafeProvider {
     provider: SafeConfig['provider'],
     signer?: SafeConfig['signer'],
     safeVersion: SafeVersion = DEFAULT_SAFE_VERSION,
-    contractNetworks?: ContractNetworksConfig
+    contractNetworks?: ContractNetworksConfig,
+    safeAddress?: string,
+    owners?: string[]
   ): Promise<SafeProvider> {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
@@ -111,10 +116,19 @@ class SafeProvider {
           customContracts
         })
 
-        passkeySigner = new PasskeySigner(
+        const safeWebAuthnSharedSignerContract = await getSafeWebAuthnSharedSignerContract({
+          safeProvider,
+          safeVersion,
+          customContracts
+        })
+
+        passkeySigner = await PasskeySigner.init(
           signer,
           safeWebAuthnSignerFactoryContract,
+          safeWebAuthnSharedSignerContract,
           safeProvider.getExternalProvider(),
+          safeAddress || '',
+          owners || [],
           chainId.toString()
         )
       } else {

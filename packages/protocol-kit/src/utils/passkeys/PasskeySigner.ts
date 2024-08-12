@@ -1,9 +1,12 @@
 import { ethers, AbstractSigner, Provider } from 'ethers'
 
 import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
-import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
-import { EMPTY_DATA } from '../constants'
+import {
+  SafeWebAuthnSharedSignerContractImplementationType,
+  SafeWebAuthnSignerFactoryContractImplementationType
+} from '../../types/contracts'
 import { getDefaultFCLP256VerifierAddress, hexStringToUint8Array } from './extractPasskeyData'
+import isSharedSigner from './isSharedSigner'
 
 /**
  * Represents a Signer that is created using a passkey.
@@ -24,11 +27,6 @@ class PasskeySigner extends AbstractSigner {
   coordinates: PasskeyCoordinates
 
   /**
-   * Safe WebAuthn signer factory Contract.
-   */
-  safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType
-
-  /**
    * P256 Verifier Contract address.
    */
   verifierAddress: string
@@ -38,21 +36,82 @@ class PasskeySigner extends AbstractSigner {
    */
   chainId: string
 
+  /**
+   * signerAddress
+   */
+  signerAddress: string
+
+  /**
+   * Safe WebAuthn signer factory Contract.
+   */
+  safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType
+
+  /**
+   * Safe WebAuthn shared signer Contract.
+   */
+  safeWebAuthnSharedSignerContract: SafeWebAuthnSharedSignerContractImplementationType
+
   constructor(
     passkey: PasskeyArgType,
     safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
+    safeWebAuthnSharedSignerContract: SafeWebAuthnSharedSignerContractImplementationType,
     provider: Provider,
-    chainId: string
+    chainId: string,
+    signerAddress: string
   ) {
     super(provider)
 
     const { rawId, coordinates, customVerifierAddress } = passkey
 
+    this.chainId = chainId
     this.passkeyRawId = hexStringToUint8Array(rawId)
     this.coordinates = coordinates
+    this.signerAddress = signerAddress
     this.safeWebAuthnSignerFactoryContract = safeWebAuthnSignerFactoryContract
-    this.chainId = chainId
+    this.safeWebAuthnSharedSignerContract = safeWebAuthnSharedSignerContract
     this.verifierAddress = customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
+  }
+
+  static async init(
+    passkey: PasskeyArgType,
+    safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
+    safeWebAuthnSharedSignerContract: SafeWebAuthnSharedSignerContractImplementationType,
+    provider: Provider,
+    safeAddress: string,
+    owners: string[],
+    chainId: string
+  ): Promise<PasskeySigner> {
+    const { coordinates, customVerifierAddress } = passkey
+    const verifierAddress = customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
+
+    let signerAddress: string
+
+    const isPasskeySharedSigner = await isSharedSigner(
+      passkey,
+      safeWebAuthnSharedSignerContract,
+      safeAddress,
+      owners,
+      chainId
+    )
+
+    if (isPasskeySharedSigner) {
+      signerAddress = await safeWebAuthnSharedSignerContract.getAddress()
+    } else {
+      ;[signerAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
+        BigInt(coordinates.x),
+        BigInt(coordinates.y),
+        BigInt(verifierAddress)
+      ])
+    }
+
+    return new PasskeySigner(
+      passkey,
+      safeWebAuthnSignerFactoryContract,
+      safeWebAuthnSharedSignerContract,
+      provider,
+      chainId,
+      signerAddress
+    )
   }
 
   /**
@@ -60,13 +119,7 @@ class PasskeySigner extends AbstractSigner {
    * @returns {Promise<string>} A promise that resolves to the signer's address.
    */
   async getAddress(): Promise<string> {
-    const [signerAddress] = await this.safeWebAuthnSignerFactoryContract.getSigner([
-      BigInt(this.coordinates.x),
-      BigInt(this.coordinates.y),
-      BigInt(this.verifierAddress)
-    ])
-
-    return signerAddress
+    return this.signerAddress
   }
 
   /**
@@ -79,27 +132,6 @@ class PasskeySigner extends AbstractSigner {
       BigInt(this.coordinates.y),
       BigInt(this.verifierAddress)
     ])
-  }
-
-  /**
-   * Creates the deployment transaction to create a passkey signer.
-   * @returns {string} The deployment transaction to create a passkey signer.
-   */
-  async createPasskeyDeploymentTransaction() {
-    const passkeyAddress = await this.getAddress()
-    const isPasskeyDeployed = (await this.provider?.getCode(passkeyAddress)) !== EMPTY_DATA
-
-    if (isPasskeyDeployed) {
-      throw new Error('Passkey Signer contract already deployed')
-    }
-
-    const passkeySignerDeploymentTransaction = {
-      to: await this.safeWebAuthnSignerFactoryContract.getAddress(),
-      value: '0',
-      data: this.encodeCreateSigner()
-    }
-
-    return passkeySignerDeploymentTransaction
   }
 
   /**
@@ -142,8 +174,10 @@ class PasskeySigner extends AbstractSigner {
     return new PasskeySigner(
       passkey,
       this.safeWebAuthnSignerFactoryContract,
+      this.safeWebAuthnSharedSignerContract,
       provider,
-      this.chainId
+      this.chainId,
+      this.signerAddress
     )
   }
 

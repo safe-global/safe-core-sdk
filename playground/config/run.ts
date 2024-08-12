@@ -29,7 +29,7 @@ const playgroundRelayKitPaths = {
 }
 
 const playgroundStarterKitPaths = {
-  'send-transactions': 'sdks-starter-kit/send-transactions',
+  'send-transactions': 'sdk-starter-kit/send-transactions',
   'send-on-chain-message': 'sdk-starter-kit/send-on-chain-message',
   'send-off-chain-message': 'sdk-starter-kit/send-off-chain-message',
   'send-safe-operation': 'sdk-starter-kit/send-safe-operation'

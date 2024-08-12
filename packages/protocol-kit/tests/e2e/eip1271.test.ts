@@ -7,6 +7,7 @@ import Safe, {
   EthSafeSignature
 } from '@safe-global/protocol-kit/index'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import SafeMessage from '@safe-global/protocol-kit/utils/messages/SafeMessage'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import chai from 'chai'
@@ -18,7 +19,6 @@ import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 import { itif } from './utils/helpers'
-import SafeMessage from '../../src/utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 
 chai.use(chaiAsPromised)

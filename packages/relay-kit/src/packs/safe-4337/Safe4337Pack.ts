@@ -31,7 +31,8 @@ import {
   Safe4337Options,
   UserOperationReceipt,
   UserOperationWithPayload,
-  PaymasterOptions
+  PaymasterOptions,
+  ERC20PaymasterOption
 } from './types'
 import {
   DEFAULT_SAFE_VERSION,
@@ -220,17 +221,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       const setupTransactions = [enable4337ModuleTransaction]
 
-      const { isSponsored, paymasterTokenAddress } = paymasterOptions || {}
-
       const isApproveTransactionRequired =
-        !!paymasterOptions && !isSponsored && !!paymasterTokenAddress
+        !!paymasterOptions &&
+        !paymasterOptions.isSponsored &&
+        !!paymasterOptions.paymasterTokenAddress
 
       if (isApproveTransactionRequired) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
 
         // second transaction: approve ERC-20 paymaster token
         const approveToPaymasterTransaction = {
-          to: paymasterTokenAddress,
+          to: paymasterOptions.paymasterTokenAddress,
           data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
           value: '0',
           operation: OperationType.Call // Call for approve
@@ -450,20 +451,21 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
     const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
-
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
     if (amountToApprove) {
-      if (!this.#paymasterOptions || !this.#paymasterOptions.paymasterTokenAddress) {
+      const paymasterOptions = this.#paymasterOptions as ERC20PaymasterOption
+
+      if (!paymasterOptions.paymasterTokenAddress) {
         throw new Error('Paymaster must be initialized')
       }
 
-      const paymasterAddress = this.#paymasterOptions.paymasterAddress
-      const paymasterTokenAddress = this.#paymasterOptions.paymasterTokenAddress
-
       const approveToPaymasterTransaction = {
-        to: paymasterTokenAddress,
-        data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+        to: paymasterOptions.paymasterTokenAddress,
+        data: INTERFACES.encodeFunctionData('approve', [
+          paymasterOptions.paymasterAddress,
+          amountToApprove
+        ]),
         value: '0',
         operation: OperationType.Call // Call for approve
       }
@@ -483,7 +485,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
         })
       : this.#encodeExecuteUserOpCallData(transactions[0])
 
-    const paymasterAndData = this.#paymasterOptions?.paymasterAddress || '0x'
+    const paymasterAndData =
+      this.#paymasterOptions && 'paymasterAddress' in this.#paymasterOptions
+        ? this.#paymasterOptions.paymasterAddress
+        : '0x'
 
     const userOperation: UserOperation = {
       sender: safeAddress,
@@ -539,15 +544,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: userOperation?.paymasterData || '0x',
-        signature: userOperation?.signature || '0x'
+        paymasterAndData: ethers.hexlify(
+          ethers.concat([userOperation?.paymaster || '0x', userOperation?.paymasterData || '0x'])
+        ),
+        signature: safeOperationResponse.preparedSignature || '0x'
       },
       {
         chainId: this.#chainId,
         moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
         entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
-        validAfter: validAfter ? new Date(validAfter).getTime() : undefined,
-        validUntil: validUntil ? new Date(validUntil).getTime() : undefined
+        validAfter: this.#timestamp(validAfter),
+        validUntil: this.#timestamp(validUntil)
       }
     )
 
@@ -558,6 +565,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     return safeOperation
+  }
+
+  /**
+   *
+   * @param date An ISO string date
+   * @returns The timestamp in seconds to send to the bundler
+   */
+  #timestamp(date: string | null) {
+    return date ? new Date(date).getTime() / 1000 : undefined
   }
 
   /**

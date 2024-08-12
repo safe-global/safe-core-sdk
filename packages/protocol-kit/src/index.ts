@@ -41,6 +41,8 @@ import {
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
+import EthSafeTransaction from './utils/transactions/SafeTransaction'
+import EthSafeMessage from './utils/messages/SafeMessage'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
 import {
@@ -119,6 +121,8 @@ export {
   hashSafeMessage,
   generateTypedData,
   SafeProvider,
+  EthSafeTransaction,
+  EthSafeMessage,
   PasskeySigner,
   getPasskeyOwnerAddress
 }

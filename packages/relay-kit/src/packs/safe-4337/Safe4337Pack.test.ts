@@ -370,7 +370,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 400000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -398,7 +398,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 400000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -429,8 +429,7 @@ describe('Safe4337Pack', () => {
         },
         paymasterOptions: {
           isSponsored: true,
-          paymasterUrl: fixtures.PAYMASTER_URL,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          paymasterUrl: fixtures.PAYMASTER_URL
         }
       })
 
@@ -443,7 +442,7 @@ describe('Safe4337Pack', () => {
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
-        paymasterAndData: '0x0000000000325602a77416A16136FDafd04b299f',
+        paymasterAndData: '0x',
         callData: constants.INTERFACES.encodeFunctionData('executeUserOp', [
           transferUSDC.to,
           transferUSDC.value,
@@ -457,7 +456,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 400000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
 
@@ -466,9 +465,9 @@ describe('Safe4337Pack', () => {
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
         },
+        // @ts-expect-error - An error will be thrown
         paymasterOptions: {
-          isSponsored: true,
-          paymasterAddress: fixtures.PAYMASTER_ADDRESS
+          isSponsored: true
         }
       })
 
@@ -532,7 +531,7 @@ describe('Safe4337Pack', () => {
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
         verificationGasLimit: 400000n,
-        preVerificationGas: 100000n
+        preVerificationGas: 105000n
       })
     })
   })
@@ -734,7 +733,7 @@ describe('Safe4337Pack', () => {
         fixtures.OWNER_1.toLowerCase(),
         new protocolKit.EthSafeSignature(
           fixtures.OWNER_1,
-          '0x40f892ea70b4981af8a4bfcedaf084033f3a6ba9baa79783c3ead7f40d2f042145e735d4c16162a0ee22b5c21631c82bbda9fd63454c496baf59159ab42c98d01f',
+          '0xda808d1e84e6aac5eb50fda331469a108bfdce442fd41501fefaa5b5d648ade406d08a1ca2ca9a5f0ba1a079da001dbee6990189a2cdb054e6c388d5afbd2d9b20',
           false
         )
       )

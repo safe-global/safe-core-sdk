@@ -2,9 +2,9 @@ import Safe from '@safe-global/protocol-kit'
 import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
 import {
   SafeTransaction,
-  TransactionBase,
   TransactionOptions,
-  TransactionResult
+  TransactionResult,
+  Transaction
 } from '@safe-global/safe-core-sdk-types'
 
 import {
@@ -14,7 +14,11 @@ import {
   waitSafeTxReceipt
 } from '@safe-global/safe-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
-import { SafeClientResult } from '@safe-global/safe-kit/types'
+import {
+  ConfirmTransactionProps,
+  SafeClientResult,
+  SendTransactionProps
+} from '@safe-global/safe-kit/types'
 
 /**
  * @class
@@ -38,15 +42,25 @@ export class SafeClient {
 
   /**
    * Sends transactions through the Safe protocol.
+   * You can send an array to transactions { to, value, data} that we will convert to a transaction batch
    *
-   * @param {TransactionBase[]} transactions An array of transactions to be sent.
-   * @param {TransactionOptions} [options] Optional transaction options.
+   * @param {SendTransactionProps} props The SendTransactionProps object.
+   * @param {TransactionBase[]} props.transactions An array of transactions to be sent.
+   * @param {string} props.transactions[].to The recipient address of the transaction.
+   * @param {string} props.transactions[].value The value of the transaction.
+   * @param {string} props.transactions[].data The data of the transaction.
+   * @param {string} props.from The sender address of the transaction.
+   * @param {number | string} props.gasLimit The gas limit of the transaction.
+   * @param {number | string} props.gasPrice The gas price of the transaction.
+   * @param {number | string} props.maxFeePerGas The max fee per gas of the transaction.
+   * @param {number | string} props.maxPriorityFeePerGas The max priority fee per gas of the transaction.
+   * @param {number} props.nonce The nonce of the transaction.
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
    */
-  async send(
-    transactions: TransactionBase[],
-    options?: TransactionOptions
-  ): Promise<SafeClientResult> {
+  async send({
+    transactions,
+    ...transactionOptions
+  }: SendTransactionProps): Promise<SafeClientResult> {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 
@@ -55,20 +69,20 @@ export class SafeClient {
     if (isSafeDeployed) {
       if (isMultisigSafe) {
         // If the threshold is greater than 1, we need to propose the transaction first
-        return this.#proposeTransaction(safeTransaction)
+        return this.#proposeTransaction({ safeTransaction })
       } else {
         // If the threshold is 1, we can execute the transaction
-        return this.#executeTransaction(safeTransaction, options)
+        return this.#executeTransaction({ safeTransaction, ...transactionOptions })
       }
     } else {
       if (isMultisigSafe) {
         // If the threshold is greater than 1, we need to deploy the Safe account first and
         // afterwards propose the transaction
         // The transaction should be confirmed with other owners until the threshold is reached
-        return this.#deployAndProposeTransaction(safeTransaction, options)
+        return this.#deployAndProposeTransaction({ safeTransaction, ...transactionOptions })
       } else {
         // If the threshold is 1, we can deploy the Safe account and execute the transaction in one step
-        return this.#deployAndExecuteTransaction(safeTransaction, options)
+        return this.#deployAndExecuteTransaction({ safeTransaction, ...transactionOptions })
       }
     }
   }
@@ -76,11 +90,12 @@ export class SafeClient {
   /**
    * Confirms a transaction by its safe transaction hash.
    *
-   * @param {string} safeTxHash  The hash of the safe transaction to confirm.
+   * @param {ConfirmTransactionProps} props The ConfirmTransactionProps object.
+   * @param {string} props.safeTxHash  The hash of the safe transaction to confirm.
    * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the confirmed transaction.
    * @throws {Error} If the transaction confirmation fails.
    */
-  async confirm(safeTxHash: string): Promise<SafeClientResult> {
+  async confirm({ safeTxHash }: ConfirmTransactionProps): Promise<SafeClientResult> {
     let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
     const safeAddress = await this.protocolKit.getAddress()
     const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
@@ -154,15 +169,21 @@ export class SafeClient {
    * @param {TransactionOptions} options  Optional transaction options
    * @returns  A promise that resolves to the result of the transaction
    */
-  async #deployAndExecuteTransaction(
-    safeTransaction: SafeTransaction,
-    options?: TransactionOptions
-  ): Promise<SafeClientResult> {
+  async #deployAndExecuteTransaction({
+    safeTransaction,
+    ...transactionOptions
+  }: { safeTransaction: SafeTransaction } & TransactionOptions): Promise<SafeClientResult> {
     safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
 
     const transactionBatchWithDeployment =
-      await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(safeTransaction, options)
-    const hash = await sendTransaction(transactionBatchWithDeployment, {}, this.protocolKit)
+      await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(
+        safeTransaction,
+        transactionOptions
+      )
+    const hash = await sendTransaction({
+      transaction: transactionBatchWithDeployment,
+      protocolKit: this.protocolKit
+    })
 
     await this.#reconnectSafe()
 
@@ -177,24 +198,31 @@ export class SafeClient {
   /**
    * Deploys and proposes a transaction in one step.
    *
-   * @param safeTransaction The safe transaction to be proposed
-   * @param options  Optional transaction options
+   * @param {SafeTransaction} safeTransaction The safe transaction to be proposed
+   * @param {TransactionOptions} transactionOptions  Optional transaction options
    * @returns  A promise that resolves to the result of the transaction
    */
-  async #deployAndProposeTransaction(
-    safeTransaction: SafeTransaction,
-    options?: TransactionOptions
-  ): Promise<SafeClientResult> {
-    const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction(
-      undefined,
-      options
-    )
-    const hash = await sendTransaction(safeDeploymentTransaction, options || {}, this.protocolKit)
+  async #deployAndProposeTransaction({
+    safeTransaction,
+    ...transactionOptions
+  }: {
+    safeTransaction: SafeTransaction
+  } & TransactionOptions): Promise<SafeClientResult> {
+    const safeDeploymentTransaction: Transaction =
+      await this.protocolKit.createSafeDeploymentTransaction(undefined, transactionOptions)
+    const hash = await sendTransaction({
+      transaction: { ...safeDeploymentTransaction },
+      protocolKit: this.protocolKit
+    })
 
     await this.#reconnectSafe()
 
     safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
-    const safeTxHash = await proposeTransaction(safeTransaction, this.protocolKit, this.apiKit)
+    const safeTxHash = await proposeTransaction({
+      safeTransaction,
+      protocolKit: this.protocolKit,
+      apiKit: this.apiKit
+    })
 
     return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),
@@ -208,13 +236,16 @@ export class SafeClient {
    * Executes a transaction.
    *
    * @param {SafeTransaction} safeTransaction The safe transaction to be executed
-   * @param {TransactionOptions} options Optional transaction options
+   * @param {TransactionOptions} transactionOptions Optional transaction options
    * @returns A promise that resolves to the result of the transaction
    */
-  async #executeTransaction(safeTransaction: SafeTransaction, options?: TransactionOptions) {
+  async #executeTransaction({
+    safeTransaction,
+    ...transactionOptions
+  }: { safeTransaction: SafeTransaction } & TransactionOptions): Promise<SafeClientResult> {
     safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
 
-    const { hash } = await this.protocolKit.executeTransaction(safeTransaction, options)
+    const { hash } = await this.protocolKit.executeTransaction(safeTransaction, transactionOptions)
 
     return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),
@@ -223,8 +254,17 @@ export class SafeClient {
     })
   }
 
-  async #proposeTransaction(safeTransaction: SafeTransaction) {
-    const safeTxHash = await proposeTransaction(safeTransaction, this.protocolKit, this.apiKit)
+  /**
+   *  Proposes a transaction to the Safe.
+   * @param { SafeTransaction } safeTransaction The safe transaction to propose
+   * @returns The SafeClientResult
+   */
+  async #proposeTransaction({ safeTransaction }: { safeTransaction: SafeTransaction }) {
+    const safeTxHash = await proposeTransaction({
+      safeTransaction,
+      protocolKit: this.protocolKit,
+      apiKit: this.apiKit
+    })
 
     return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),

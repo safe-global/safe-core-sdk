@@ -57,7 +57,8 @@ import {
   generatePreValidatedSignature,
   generateSignature,
   preimageSafeMessageHash,
-  preimageSafeTransactionHash
+  preimageSafeTransactionHash,
+  toTransactionRequest
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -76,7 +77,8 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
-import { Hash, Hex } from 'viem'
+import { Hash, Hex, WalletClient, Transport, Chain, Account } from 'viem'
+import { convertTransactionOptions } from '@safe-global/protocol-kit/utils'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -1316,7 +1318,11 @@ class Safe {
       throw new Error('Predict Safe should be present')
     }
 
-    const signer = await this.#safeProvider.getExternalSigner()
+    const signer = (await this.#safeProvider.getExternalSigner()) as WalletClient<
+      Transport,
+      Chain,
+      Account
+    >
 
     if (!signer) {
       throw new Error('signer should be present')
@@ -1344,24 +1350,26 @@ class Safe {
         options
       )
 
-      // await for the deployment
-      const hash = await signer.sendTransaction({
+      const tx = convertTransactionOptions({
+        from: signerAddress,
         ...deploymentBatch,
         ...options
       })
+
+      // await for the deployment
+      const hash = await signer.sendTransaction(tx)
 
       txReceipt = await this.getSafeProvider()
         .getExternalProvider()
         .waitForTransactionReceipt({ hash })
     } else {
       // we create the deployment transaction
-      const safeDeploymentTransaction = await this.createSafeDeploymentTransaction()
-
-      const hash = await signer.sendTransaction({
-        from: signerAddress,
-        ...safeDeploymentTransaction,
-        ...options
+      const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(undefined, {
+        ...options,
+        from: signerAddress
       })
+
+      const hash = await signer.sendTransaction(toTransactionRequest(safeDeploymentTransaction))
 
       txReceipt = await this.getSafeProvider()
         .getExternalProvider()

@@ -65,7 +65,7 @@ import {
 } from 'viem/actions'
 import {
   toEstimateGasParameters,
-  toCallGasParameters,
+  toTransactionRequest,
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { isEip1193Provider, isPrivateKey } from './utils/provider'
@@ -367,7 +367,7 @@ class SafeProvider {
   }
 
   async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
-    const converted = toCallGasParameters(transaction)
+    const converted = toTransactionRequest(transaction)
     const { data } = await call(this.#externalProvider, {
       ...converted,
       ...asBlockId(blockTag)

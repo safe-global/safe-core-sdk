@@ -6,7 +6,11 @@ import {
   keccak256,
   pad,
   toHex,
-  WalletClient
+  WalletClient,
+  FormattedTransactionReceipt,
+  decodeEventLog,
+  parseAbi,
+  toEventHash
 } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -352,17 +356,18 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
  */
 
 function getProxyCreationEvent(safeVersion: SafeVersion): string {
+  // Events inputs here are left unnamed to deal with the decoding as a list: https://github.com/wevm/viem/blob/632d4b9fa074f4da722e26b28607947d2c14ad2d/src/utils/abi/decodeEventLog.ts#L128
   const isLegacyProxyCreationEvent = semverSatisfies(safeVersion, '<1.3.0')
 
   if (isLegacyProxyCreationEvent) {
-    return 'event ProxyCreation(address proxy)' // v1.0.0, 1.1.1 & v1.2.0
+    return 'event ProxyCreation(address)' // v1.0.0, 1.1.1 & v1.2.0
   }
 
   if (semverSatisfies(safeVersion, '=1.3.0')) {
-    return 'event ProxyCreation(address proxy, address singleton)' // v1.3.0
+    return 'event ProxyCreation(address, address)' // v1.3.0
   }
 
-  return 'event ProxyCreation(address indexed proxy, address singleton)' // >= v1.4.1
+  return 'event ProxyCreation(address, address)' // >= v1.4.1
 }
 
 /**
@@ -370,36 +375,37 @@ function getProxyCreationEvent(safeVersion: SafeVersion): string {
  *
  * This function looks for a ProxyCreation event in the transaction receipt logs to get address of the deployed SafeProxy.
  *
- * @param {TransactionReceipt} txReceipt - The transaction receipt containing logs.
+ * @param {FormattedTransactionReceipt} txReceipt - The transaction receipt containing logs.
  * @param {safeVersion} safeVersion - The Safe Version.
  * @returns {string} - The address of the deployed SafeProxy.
  * @throws {Error} - Throws an error if the SafeProxy was not deployed correctly.
  */
 
 export function getSafeAddressFromDeploymentTx(
-  txReceipt: TransactionReceipt,
+  txReceipt: FormattedTransactionReceipt,
   safeVersion: SafeVersion
 ): string {
-  const proxyCreationEventInterface = new Interface([getProxyCreationEvent(safeVersion)])
-  const proxyCreationEventFragment = proxyCreationEventInterface.getEvent('ProxyCreation')
+  const eventHash = toEventHash(getProxyCreationEvent(safeVersion))
+  const proxyCreationEvent = txReceipt?.logs.find((event) => event.topics[0] === eventHash)
 
-  const proxyCreationEvent = txReceipt?.logs.find(
-    (event) => event.topics[0] === proxyCreationEventFragment?.topicHash
-  )
-
-  if (!proxyCreationEvent || !proxyCreationEventFragment) {
+  if (!proxyCreationEvent) {
     throw new Error('SafeProxy was not deployed correctly')
   }
 
   const { data, topics } = proxyCreationEvent
 
-  const [proxyAddress] = proxyCreationEventInterface.decodeEventLog(
-    proxyCreationEventFragment,
+  const { args } = decodeEventLog({
+    abi: parseAbi([getProxyCreationEvent(safeVersion)]),
+    eventName: 'ProxyCreation',
     data,
     topics
-  )
+  })
 
-  return proxyAddress
+  if (!args || !args.length) {
+    throw new Error('SafeProxy was not deployed correctly')
+  }
+
+  return args[0] as string
 }
 
 /**

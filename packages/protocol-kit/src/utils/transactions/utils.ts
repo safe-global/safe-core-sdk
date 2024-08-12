@@ -15,7 +15,8 @@ import {
   SafeTransactionData,
   SafeTransactionDataPartial,
   SafeVersion,
-  TransactionOptions
+  TransactionOptions,
+  Transaction
 } from '@safe-global/safe-core-sdk-types'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
@@ -210,8 +211,8 @@ export function toEstimateGasParameters(tx: SafeProviderTransaction): EstimateGa
   return params
 }
 
-export function toCallGasParameters(
-  tx: SafeProviderTransaction
+export function toTransactionRequest(
+  tx: SafeProviderTransaction | Transaction
 ): UnionOmit<TransactionRequest, 'from'> {
   const params: UnionOmit<TransactionRequest, 'from'> = isLegacyTransaction(tx)
     ? createLegacyTxOptions(tx)

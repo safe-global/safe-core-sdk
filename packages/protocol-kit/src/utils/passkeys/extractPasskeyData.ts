@@ -60,6 +60,7 @@ export async function extractPasskeyCoordinates(
   }
 }
 
+// FIXME use Viem `hexToBytes`
 export function hexStringToUint8Array(hexString: string): Uint8Array {
   const arr = []
   for (let i = 0; i < hexString.length; i += 2) {

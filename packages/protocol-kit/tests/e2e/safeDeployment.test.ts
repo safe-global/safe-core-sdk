@@ -206,9 +206,8 @@ describe('Safe Deployment', () => {
         const safeSDKDeployed = await safeSDK.deploy()
 
         chai.expect(counterfactualSafeAddress).to.be.eq(await safeSDKDeployed.getAddress())
-        const compatibilityFallbackHandler = await (
-          await getCompatibilityFallbackHandler()
-        ).contract.getAddress()
+        const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
+          .address
         chai
           .expect(compatibilityFallbackHandler)
           .to.be.eq(await safeSDKDeployed.getFallbackHandler())
@@ -226,7 +225,7 @@ describe('Safe Deployment', () => {
         const safeAccountConfig: SafeAccountConfig = {
           owners,
           threshold,
-          fallbackHandler: await defaultCallbackHandler.getAddress()
+          fallbackHandler: defaultCallbackHandler.address
         }
         const saltNonce = '12345'
         const predictedSafe: PredictedSafeProps = {
@@ -245,7 +244,7 @@ describe('Safe Deployment', () => {
 
         chai.expect(counterfactualSafeAddress).to.be.eq(await safeSDKDeployed.getAddress())
         chai
-          .expect(await defaultCallbackHandler.getAddress())
+          .expect(defaultCallbackHandler.address)
           .to.be.eq(await safeSDKDeployed.getFallbackHandler())
       }
     )
@@ -449,9 +448,8 @@ describe('Safe Deployment', () => {
 
         const safeSDKDeployed = await safeSDK.deploy()
 
-        const defaultCompatibilityFallbackHandler = await (
-          await getCompatibilityFallbackHandler()
-        ).contract.getAddress()
+        const defaultCompatibilityFallbackHandler = (await getCompatibilityFallbackHandler())
+          .contract.address
 
         chai
           .expect(defaultCompatibilityFallbackHandler)

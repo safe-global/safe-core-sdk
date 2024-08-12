@@ -367,7 +367,7 @@ function getProxyCreationEvent(safeVersion: SafeVersion): string {
     return 'event ProxyCreation(address, address)' // v1.3.0
   }
 
-  return 'event ProxyCreation(address, address)' // >= v1.4.1
+  return 'event ProxyCreation(address indexed, address)' // >= v1.4.1
 }
 
 /**

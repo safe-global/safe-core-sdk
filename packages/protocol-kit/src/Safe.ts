@@ -78,7 +78,6 @@ import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
 import { Hash, Hex, WalletClient, Transport, Chain, Account } from 'viem'
-import { convertTransactionOptions } from '@safe-global/protocol-kit/utils'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -1350,7 +1349,7 @@ class Safe {
         options
       )
 
-      const tx = convertTransactionOptions({
+      const tx = toTransactionRequest({
         from: signerAddress,
         ...deploymentBatch,
         ...options

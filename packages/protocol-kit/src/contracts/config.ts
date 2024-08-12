@@ -139,7 +139,14 @@ const contractFunctions: Record<
     version: '1.4.1',
     contractName: 'safeWebAuthnSignerFactoryVersion',
     networkAddresses: {},
-    released: true
+    released: true,
+    // There was a major upgrade in safe-deployments, this property was added.
+    deployments: {
+      canonical: {
+        address: WEBAUTHN_SIGNER_FACTORY_ADDRESS,
+        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000'
+      }
+    }
   }),
   /*
     safeWebAuthnSharedSigner contract is still experimental, and not included in
@@ -151,7 +158,14 @@ const contractFunctions: Record<
     version: '1.4.1',
     contractName: 'safeWebAuthnSharedSignerVersion',
     networkAddresses: {},
-    released: true
+    released: true,
+    // There was a major upgrade in safe-deployments, this property was added.
+    deployments: {
+      canonical: {
+        address: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000'
+      }
+    }
   })
 }
 

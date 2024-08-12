@@ -1,4 +1,4 @@
-# Safe Kit
+# SDK Starter Kit
 
 [![npm Version](https://badge.fury.io/js/%40safe-global%2Fsdk-starter-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fsdk-starter-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)

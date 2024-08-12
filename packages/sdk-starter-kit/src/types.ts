@@ -46,22 +46,23 @@ export type SafeConfig = {
   saltNonce?: string
 }
 
-export type ExistingSafeKitConfig = {
+export type ExistingSdkStarterKitConfig = {
   safeAddress?: string
   safeOptions?: never
 }
 
-export type PredictedSafeKitConfig = {
+export type PredictedSdkStarterKitConfig = {
   safeAddress?: never
   safeOptions?: SafeConfig
 }
 
-export type SafeKitRootConfig = {
+export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer: SafeProvider['signer']
 }
 
-export type SafeKitConfig = SafeKitRootConfig & (ExistingSafeKitConfig | PredictedSafeKitConfig)
+export type SdkStarterKitConfig = SdkStarterKitRootConfig &
+  (ExistingSdkStarterKitConfig | PredictedSdkStarterKitConfig)
 
 export type SafeClientResult = {
   safeAddress: string

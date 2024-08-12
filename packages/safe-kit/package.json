@@ -34,9 +34,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@safe-global/api-kit": "^2.4.3",
-    "@safe-global/protocol-kit": "^4.0.3",
-    "@safe-global/relay-kit": "^3.0.3",
+    "@safe-global/api-kit": "^2.4.4",
+    "@safe-global/protocol-kit": "^4.0.4",
+    "@safe-global/relay-kit": "^3.0.4",
     "@safe-global/safe-core-sdk-types": "^5.0.3",
     "ethers": "^6.13.1"
   }

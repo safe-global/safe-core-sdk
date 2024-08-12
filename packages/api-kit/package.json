@@ -59,8 +59,8 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^4.1.0-alpha.1",
-    "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.1",
+    "@safe-global/protocol-kit": "^4.1.0-alpha.2",
+    "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.2",
     "ethers": "^6.13.1",
     "node-fetch": "^2.7.0"
   }

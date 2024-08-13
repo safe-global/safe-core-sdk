@@ -21,7 +21,7 @@ import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
-import { Hash, encodeFunctionData, zeroAddress, Hex, concat, fromHex } from 'viem'
+import { Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
 import EthSafeOperation from './SafeOperation'
 import {
   EstimateFeeProps,
@@ -263,21 +263,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
           options.owners.push(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)
         }
 
-        const passkey = passkeySigner.getPasskey()
-        const passkeyOwnerConfiguration = {
-          x: BigInt(passkey.coordinates.x),
-          y: BigInt(passkey.coordinates.y),
-          verifiers: fromHex(passkey.verifierAddress as Address, 'bigint')
-        }
-
         const sharedSignerTransaction = {
           to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
           value: '0',
-          data: encodeFunctionData({
-            abi: ABI,
-            functionName: 'configure',
-            args: [passkeyOwnerConfiguration]
-          }),
+          data: passkeySigner.encodeCreateSigner(),
           operation: OperationType.DelegateCall // DelegateCall required into the SafeWebAuthnSharedSigner instance in order for it to set its configuration.
         }
 

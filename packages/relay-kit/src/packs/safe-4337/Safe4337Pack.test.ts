@@ -623,14 +623,9 @@ describe('Safe4337Pack', () => {
         }
       })
 
-      const provider = safe4337Pack.protocolKit.getSafeProvider().provider
-      const safeProvider = await protocolKit.SafeProvider.init(provider, passkey)
-      const signer = (await safeProvider.getExternalSigner()) as protocolKit.PasskeyClient
-      const passkeySigner = signer.getPasskey()
-
       const passkeyOwnerConfiguration = {
-        x: BigInt(passkeySigner.coordinates.x),
-        y: BigInt(passkeySigner.coordinates.y),
+        x: BigInt(passkey.coordinates.x),
+        y: BigInt(passkey.coordinates.y),
         verifiers: viem.fromHex(CUSTOM_P256_VERIFIER_ADDRESS, 'bigint')
       }
 

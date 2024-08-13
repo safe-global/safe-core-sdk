@@ -1261,7 +1261,7 @@
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.3.2.tgz"
   integrity sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==
 
-"@noble/hashes@1.4.0", "@noble/hashes@^1.3.3", "@noble/hashes@~1.4.0":
+"@noble/hashes@1.4.0", "@noble/hashes@^1.3.3", "@noble/hashes@^1.4.0", "@noble/hashes@~1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
   integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
@@ -1877,7 +1877,7 @@
   dependencies:
     semver "^7.6.2"
 
-"@safe-global/safe-modules-deployments@^2.2.0":
+"@safe-global/safe-modules-deployments@^2.1.1", "@safe-global/safe-modules-deployments@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.0.tgz#bb42c8010bbde65892fe438aaf8959e17c8654d6"
   integrity sha512-ZzNhMf8Xxods3TrY7kSrescnicHQRFH7eYx7TMKqVhxFScEiuYmivQMdV94ziF+Hot0xCcrrFeed657U/oXrJw==
@@ -1890,7 +1890,7 @@
     "@safe-global/safe-contracts" "^1.4.1-build.0"
     cbor "^9.0.2"
 
-"@scure/base@^1.1.1", "@scure/base@^1.1.3", "@scure/base@~1.1.0", "@scure/base@~1.1.2":
+"@scure/base@^1.1.1", "@scure/base@^1.1.3", "@scure/base@~1.1.0":
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.6.tgz#8ce5d304b436e4c84f896e0550c83e4d88cb917d"
   integrity sha512-ok9AWwhcgYuGG3Zfhyqg+zwl+Wn5uE+dwC0NV/2qQkx4dABbb/bx96vWu8NSj+BNjjSjno+JRYRjle1jV08k3g==

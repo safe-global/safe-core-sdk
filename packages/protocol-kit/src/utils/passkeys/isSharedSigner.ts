@@ -1,7 +1,6 @@
 import { PasskeyArgType } from '../../types/passkeys'
 import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { SafeWebAuthnSharedSignerContractImplementationType } from '../../types/contracts'
-import { asAddress } from '../types'
 
 /**
  * Returns true if the passkey signer is a shared signer
@@ -19,7 +18,7 @@ async function isSharedSigner(
   // is a shared signer if the shared signer contract address is present in the owners and its configured in the Safe slot
   if (safeAddress && owners.includes(sharedSignerContractAddress)) {
     const [sharedSignerSlot] = await safeWebAuthnSharedSignerContract.getConfiguration([
-      asAddress(safeAddress)
+      safeAddress
     ])
 
     const { x, y, verifiers } = sharedSignerSlot

@@ -186,10 +186,10 @@ export const getSafeWebAuthnSignerFactory = async (): Promise<{
   const safeWebAuthnSignerFactoryDeployment = await deployments.get(
     safeWebAuthnSignerFactoryDeployed.name
   )
-  const safeWebAuthnSignerFactoryAddress = asAddress(safeWebAuthnSignerFactoryDeployment.address)
+  const safeWebAuthnSignerFactoryAddress = safeWebAuthnSignerFactoryDeployment.address
   const contract = await viem.getContractAt(
     proxyFactoryDeployed.name,
-    asAddress(safeWebAuthnSignerFactoryAddress),
+    safeWebAuthnSignerFactoryAddress,
     {
       client: { wallet: await getDeployer() }
     }
@@ -219,7 +219,7 @@ export const getSafeWebAuthnSharedSigner = async (): Promise<{
 
 export const getWebAuthnContract = async (): Promise<GetContractReturnType<Abi>> => {
   const webAuthnContractDeployment = await deployments.get('WebAuthnContract')
-  const dailyLimitModuleAddress = asAddress(webAuthnContractDeployment.address)
+  const dailyLimitModuleAddress = webAuthnContractDeployment.address
   return await viem.getContractAt('WebAuthnContract', dailyLimitModuleAddress)
 }
 

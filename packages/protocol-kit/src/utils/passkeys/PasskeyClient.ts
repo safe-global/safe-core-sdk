@@ -15,8 +15,9 @@ import {
   maxUint256,
   Client,
   fromHex,
-  Address,
-  parseAbiParameters
+  parseAbiParameters,
+  encodeFunctionData,
+  parseAbi
 } from 'viem'
 import { PasskeyClient } from '@safe-global/protocol-kit/types'
 import { asHex } from '../types'
@@ -67,7 +68,7 @@ export const createPasskeyClient = async (
   const [signerAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
     BigInt(coordinates.x),
     BigInt(coordinates.y),
-    fromHex(verifierAddress as Address, 'bigint')
+    fromHex(asHex(verifierAddress), 'bigint')
   ])
 
   return createClient({
@@ -87,6 +88,19 @@ export const createPasskeyClient = async (
       },
       signTransaction,
       signTypedData,
+      encodeConfigureOwner() {
+        return encodeFunctionData({
+          abi: parseAbi(['function configure((uint256 x, uint256 y, uint176 verifiers) signer)']),
+          functionName: 'configure',
+          args: [
+            {
+              x: BigInt(passkey.coordinates.x),
+              y: BigInt(passkey.coordinates.y),
+              verifiers: fromHex(verifierAddress as Hex, 'bigint')
+            }
+          ]
+        })
+      },
       encodeCreateSigner() {
         return asHex(
           safeWebAuthnSignerFactoryContract.encode('createSigner', [

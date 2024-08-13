@@ -18,7 +18,8 @@ import {
   Address,
   parseAbiParameters
 } from 'viem'
-import { PasskeyClient, GetPasskeyType } from '@safe-global/protocol-kit/types'
+import { PasskeyClient } from '@safe-global/protocol-kit/types'
+import { asHex } from '../types'
 
 export const PASSKEY_CLIENT_KEY = 'passkeyWallet'
 export const PASSKEY_CLIENT_NAME = 'Passkey Wallet Client'
@@ -86,13 +87,23 @@ export const createPasskeyClient = async (
       },
       signTransaction,
       signTypedData,
-      getPasskey(): GetPasskeyType {
-        return {
-          address: signerAddress,
-          coordinates,
-          verifierAddress,
-          rawId
+      encodeCreateSigner() {
+        return asHex(
+          safeWebAuthnSignerFactoryContract.encode('createSigner', [
+            BigInt(coordinates.x),
+            BigInt(coordinates.y),
+            BigInt(verifierAddress)
+          ])
+        )
+      },
+      createDeployTxRequest() {
+        const passkeySignerDeploymentTransaction = {
+          to: safeWebAuthnSignerFactoryContract.getAddress(),
+          value: '0',
+          data: this.encodeCreateSigner()
         }
+
+        return passkeySignerDeploymentTransaction
       }
     })) as PasskeyClient
 }

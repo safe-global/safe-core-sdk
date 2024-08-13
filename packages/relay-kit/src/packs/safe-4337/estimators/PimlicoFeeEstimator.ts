@@ -22,7 +22,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     return {
       callGasLimit: userOperation.callGasLimit + userOperation.callGasLimit / 2n, // +50%
       verificationGasLimit: userOperation.verificationGasLimit * 4n, // +300%
-      preVerificationGas: userOperation.preVerificationGas + userOperation.preVerificationGas / 20n
+      preVerificationGas: userOperation.preVerificationGas + userOperation.preVerificationGas / 20n // +5%
     }
   }
 

@@ -6,6 +6,7 @@ import {
 } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import { getSafeWebAuthnSignerFactoryContract } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
+
 import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,

@@ -7,7 +7,8 @@ import {
   WalletClient,
   WalletRpcSchema,
   Client,
-  WalletActions
+  WalletActions,
+  Hex
 } from 'viem'
 
 export type RequestArguments = {
@@ -27,7 +28,8 @@ export type GetPasskeyType = {
 }
 
 export type PasskeyActions = {
-  getPasskey: () => GetPasskeyType
+  createDeployTxRequest: () => { to: string; value: string; data: Hex }
+  encodeCreateSigner: () => Hex
 }
 
 export type PasskeyClient = Client<

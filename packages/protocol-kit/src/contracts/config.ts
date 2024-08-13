@@ -155,7 +155,14 @@ const contractFunctions: Record<
       '11155111': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
       '11155420': SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS
     },
-    released: true
+    released: true,
+    // There was a major upgrade in safe-deployments, this property was added.
+    deployments: {
+      canonical: {
+        address: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000'
+      }
+    }
   })
 }
 

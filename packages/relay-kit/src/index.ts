@@ -10,3 +10,9 @@ export * from './packs/safe-4337/estimators'
 export * from './packs/safe-4337/types'
 
 export * from './RelayKitBasePack'
+
+declare module 'viem/node_modules/abitype' {
+  export interface Register {
+    AddressType: string
+  }
+}

@@ -1,5 +1,4 @@
 import {
-  Address,
   Hex,
   createPublicClient,
   encodeFunctionData,
@@ -64,7 +63,7 @@ export async function signSafeOp(
   const signature = await signer.signTypedData({
     domain: {
       chainId: Number(chainId),
-      verifyingContract: safe4337ModuleAddress as Address
+      verifyingContract: safe4337ModuleAddress
     },
     types: EIP712_SAFE_OPERATION_TYPE,
     message: {
@@ -115,7 +114,7 @@ export function calculateSafeUserOperationHash(
   return hashTypedData({
     domain: {
       chainId: Number(chainId),
-      verifyingContract: safe4337ModuleAddress as Address
+      verifyingContract: safe4337ModuleAddress
     },
     types: EIP712_SAFE_OPERATION_TYPE,
     primaryType: 'SafeOp',

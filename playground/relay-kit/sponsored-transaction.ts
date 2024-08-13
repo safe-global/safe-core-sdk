@@ -1,4 +1,4 @@
-import { Address, Chain, createWalletClient, custom, formatEther, Hex } from 'viem'
+import { Chain, createWalletClient, custom, formatEther, Hex } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { getBalance, waitForTransactionReceipt } from 'viem/actions'
 import { sepolia } from 'viem/chains'
@@ -78,7 +78,7 @@ async function main() {
 
   // Calculate Safe address
 
-  const predictedSafeAddress = (await gelatoSafeClient.protocolKit.getAddress()) as Address
+  const predictedSafeAddress = await gelatoSafeClient.protocolKit.getAddress()
   console.log({ predictedSafeAddress })
 
   const isSafeDeployed = await gelatoSafeClient.protocolKit.isSafeDeployed()

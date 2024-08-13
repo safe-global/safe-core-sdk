@@ -11,7 +11,7 @@ import {
   safeProxyFactory_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
-import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
+import { asHex } from '@safe-global/protocol-kit/utils/types'
 import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
@@ -135,7 +135,7 @@ class SafeProxyFactoryContract_v1_3_0
       options.gasLimit = (
         await this.estimateGas(
           'createProxyWithNonce',
-          [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
+          [safeSingletonAddress, asHex(initializer), saltNonceBigInt],
           { ...options }
         )
       ).toString()
@@ -144,10 +144,10 @@ class SafeProxyFactoryContract_v1_3_0
     const coverted = await this.convertOptions(options)
     const proxyAddress = await this.getWallet()
       .writeContract({
-        address: asAddress(this.contractAddress),
+        address: this.contractAddress,
         abi: this.contractAbi,
         functionName: 'createProxyWithNonce',
-        args: [asAddress(safeSingletonAddress), asHex(initializer), saltNonceBigInt],
+        args: [safeSingletonAddress, asHex(initializer), saltNonceBigInt],
         ...coverted
       })
       .then(async (hash) => {

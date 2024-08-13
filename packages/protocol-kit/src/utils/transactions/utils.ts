@@ -12,7 +12,7 @@ import {
 } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { asAddress, asHex } from '../types'
+import { asHex } from '../types'
 import {
   MetaTransactionData,
   OperationType,
@@ -142,7 +142,7 @@ function encodeMetaTransaction(tx: MetaTransactionData): string {
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
     [
       tx.operation ?? OperationType.Call,
-      asAddress(tx.to),
+      tx.to,
       BigInt(tx.value),
       BigInt(data.length),
       bytesToHex(data)
@@ -230,7 +230,7 @@ export function toEstimateGasParameters(tx: SafeProviderTransaction): EstimateGa
   }
 
   if (tx.to) {
-    params.to = asAddress(tx.to)
+    params.to = tx.to
   }
 
   if (tx.data) {
@@ -248,7 +248,7 @@ export function toCallGasParameters(
     : createTxOptions(tx)
 
   if (tx.to) {
-    params.to = asAddress(tx.to)
+    params.to = tx.to
   }
 
   if (tx.data) {
@@ -273,7 +273,7 @@ export function createLegacyTxOptions(
 ): Partial<WalletLegacyTransactionOptions> {
   const converted: Partial<WalletLegacyTransactionOptions> = {}
   if (options?.from) {
-    converted.account = asAddress(options.from)
+    converted.account = options.from
   }
 
   if (options?.gasLimit) {
@@ -294,7 +294,7 @@ export function createLegacyTxOptions(
 export function createTxOptions(options?: TransactionOptions): Partial<WalletTransactionOptions> {
   const converted: Partial<WalletTransactionOptions> = {}
   if (options?.from) {
-    converted.account = asAddress(options.from)
+    converted.account = options.from
   }
 
   if (options?.gasLimit) {

@@ -1,5 +1,3 @@
-import { Chain } from 'viem'
-import { sepolia } from 'viem/chains'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
@@ -7,13 +5,15 @@ import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-cor
 // This file can be used to play around with the Safe Core SDK
 
 interface Config {
-  CHAIN: Chain
+  CHAIN_ID: bigint
+  RPC_URL: string
   SIGNER_ADDRESS_PRIVATE_KEY: string
   SAFE_ADDRESS: string
 }
 
 const config: Config = {
-  CHAIN: sepolia,
+  CHAIN_ID: 11155111n,
+  RPC_URL: 'https://sepolia.gateway.tenderly.co',
   SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
   SAFE_ADDRESS: '<SAFE_ADDRESS>'
 }
@@ -21,14 +21,14 @@ const config: Config = {
 async function main() {
   // Create Safe instance
   const protocolKit = await Safe.init({
-    provider: config.CHAIN.rpcUrls.default.http[0],
+    provider: config.RPC_URL,
     signer: config.SIGNER_ADDRESS_PRIVATE_KEY,
     safeAddress: config.SAFE_ADDRESS
   })
 
   // Create Safe API Kit instance
   const apiKit = new SafeApiKit({
-    chainId: BigInt(config.CHAIN.id)
+    chainId: config.CHAIN_ID
   })
 
   // Create transaction

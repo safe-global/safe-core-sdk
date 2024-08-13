@@ -1,4 +1,3 @@
-import { Address } from 'viem'
 import { getBlock } from 'viem/actions'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData, waitForOperationToFinish } from '../utils'
@@ -39,7 +38,7 @@ async function main() {
   console.log('Chain Id', await safe4337Pack.getChainId())
 
   // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as Address
+  const senderAddress = await safe4337Pack.protocolKit.getAddress()
 
   const usdcAmount = 100_000n // 0.1 USDC
 

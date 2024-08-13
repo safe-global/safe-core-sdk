@@ -1,4 +1,3 @@
-import { Address, Hash, encodeFunctionData, zeroAddress, Hex, concat, fromHex } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
@@ -22,6 +21,7 @@ import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
+import { Hash, encodeFunctionData, zeroAddress, Hex, concat, fromHex } from 'viem'
 import EthSafeOperation from './SafeOperation'
 import {
   EstimateFeeProps,
@@ -150,7 +150,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      addModulesLibAddress = addModulesDeployment?.networkAddresses[network] as Address | undefined
+      addModulesLibAddress = addModulesDeployment?.networkAddresses[network] as string | undefined
     }
 
     let safe4337ModuleAddress = customContracts?.safe4337ModuleAddress
@@ -220,7 +220,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         data: encodeFunctionData({
           abi: ABI,
           functionName: 'enableModules',
-          args: [[safe4337ModuleAddress as Address]]
+          args: [[safe4337ModuleAddress]]
         }),
         operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
       }
@@ -241,7 +241,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           data: encodeFunctionData({
             abi: ABI,
             functionName: 'approve',
-            args: [paymasterAddress as Address, amountToApprove]
+            args: [paymasterAddress, amountToApprove]
           }),
           value: '0',
           operation: OperationType.Call // Call for approve
@@ -333,9 +333,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     let selectedEntryPoint
 
     if (customContracts?.entryPointAddress) {
-      const requiredSafeModulesVersion = entryPointToSafeModules(
-        customContracts?.entryPointAddress as Address
-      )
+      const requiredSafeModulesVersion = entryPointToSafeModules(customContracts?.entryPointAddress)
       if (!semverSatisfies(safeModulesVersion, requiredSafeModulesVersion))
         throw new Error(
           `The selected entrypoint ${customContracts?.entryPointAddress} is not compatible with version ${safeModulesVersion} of Safe modules`
@@ -468,7 +466,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
-    const safeAddress = (await this.protocolKit.getAddress()) as Address
+    const safeAddress = await this.protocolKit.getAddress()
     const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
@@ -484,7 +482,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         data: encodeFunctionData({
           abi: ABI,
           functionName: 'approve',
-          args: [paymasterOptions.paymasterAddress as Address, amountToApprove]
+          args: [paymasterOptions.paymasterAddress, amountToApprove]
         }),
         value: '0',
         operation: OperationType.Call // Call for approve
@@ -553,8 +551,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #toSafeOperation(safeOperationResponse: SafeOperationResponse): EthSafeOperation {
     const { validUntil, validAfter, userOperation } = safeOperationResponse
 
-    const paymaster = userOperation?.paymaster || '0x'
-    const paymasterData = userOperation?.paymasterData || '0x'
+    const paymaster = (userOperation?.paymaster as Hex) || '0x'
+    const paymasterData = (userOperation?.paymasterData as Hex) || '0x'
     const safeOperation = new EthSafeOperation(
       {
         sender: userOperation?.sender || '0x',
@@ -566,7 +564,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: concat([paymaster as Address, paymasterData as Hex]),
+        paymasterAndData: concat([paymaster, paymasterData]),
         signature: safeOperationResponse.preparedSignature || '0x'
       },
       {
@@ -770,10 +768,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeProvider = this.protocolKit.getSafeProvider()
 
     const newNonce = await safeProvider.readContract({
-      address: (this.#ENTRYPOINT_ADDRESS as Address) || '0x',
+      address: this.#ENTRYPOINT_ADDRESS || '0x',
       abi: ENTRYPOINT_ABI,
       functionName: 'getNonce',
-      args: [safeAddress as Address, 0n]
+      args: [safeAddress, 0n]
     })
 
     return newNonce.toString()
@@ -790,7 +788,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       abi: ABI,
       functionName: 'executeUserOp',
       args: [
-        transaction.to as Address,
+        transaction.to,
         BigInt(transaction.value),
         transaction.data as Hex,
         transaction.operation || OperationType.Call

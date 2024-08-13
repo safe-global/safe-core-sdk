@@ -2,7 +2,6 @@ import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '../types'
 import SafeProvider from '../SafeProvider'
-import { asAddress } from '../utils/types'
 
 class OwnerManager {
   #safeProvider: SafeProvider
@@ -77,7 +76,7 @@ class OwnerManager {
       throw new Error('Safe is not deployed')
     }
 
-    const [isOwner] = await this.#safeContract.isOwner([asAddress(ownerAddress)])
+    const [isOwner] = await this.#safeContract.isOwner([ownerAddress])
     return isOwner
   }
 

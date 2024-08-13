@@ -10,7 +10,7 @@ import {
   SafeVersion,
   TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
-import { asAddress, getChainById } from '../utils/types'
+import { getChainById } from '../utils/types'
 import {
   WalletTransactionOptions,
   WalletLegacyTransactionOptions,
@@ -117,7 +117,7 @@ class BaseContract<ContractAbiType extends Abi> {
     const signer = this.wallet?.account
     if (!signer || !signerAddress) throw new Error('Invalid signer')
 
-    const account = signer || asAddress(signerAddress)
+    const account = signer || signerAddress
     const txOptions = await convertTransactionOptions(options)
     return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
   }
@@ -152,7 +152,7 @@ class BaseContract<ContractAbiType extends Abi> {
     return estimateContractGas(this.runner, {
       abi,
       functionName: functionToEstimate,
-      address: asAddress(this.getAddress()),
+      address: this.getAddress(),
       args: params,
       ...contractOptions
     })
@@ -174,7 +174,7 @@ class BaseContract<ContractAbiType extends Abi> {
     const converted = (await this.convertOptions(options)) as any
 
     return await this.getWallet().writeContract({
-      address: asAddress(this.contractAddress),
+      address: this.contractAddress,
       abi: this.contractAbi,
       functionName,
       args: args,
@@ -189,7 +189,7 @@ class BaseContract<ContractAbiType extends Abi> {
     return await this.runner.readContract({
       functionName,
       abi: this.contractAbi,
-      address: asAddress(this.contractAddress),
+      address: this.contractAddress,
       args
     })
   }

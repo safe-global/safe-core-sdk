@@ -38,6 +38,6 @@
     "@safe-global/protocol-kit": "^4.1.0-alpha.2",
     "@safe-global/relay-kit": "^3.1.0-alpha.2",
     "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.2",
-    "viem": "^2.15.1"
+    "viem": "^2.19.0"
   }
 }

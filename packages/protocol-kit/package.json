@@ -80,6 +80,6 @@
     "@safe-global/safe-modules-deployments": "^2.2.0",
     "abitype": "^1.0.2",
     "semver": "^7.6.2",
-    "viem": "^2.15.1"
+    "viem": "^2.19.0"
   }
 }

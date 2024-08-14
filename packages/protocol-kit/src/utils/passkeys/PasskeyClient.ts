@@ -1,5 +1,8 @@
 import { PasskeyArgType } from '../../types/passkeys'
-import { SafeWebAuthnSignerFactoryContractImplementationType } from '../../types/contracts'
+import {
+  SafeWebAuthnSignerFactoryContractImplementationType,
+  SafeWebAuthnSharedSignerContractImplementationType
+} from '../../types/contracts'
 import { getDefaultFCLP256VerifierAddress, hexStringToUint8Array } from './extractPasskeyData'
 import {
   Hex,
@@ -21,6 +24,7 @@ import {
 } from 'viem'
 import { PasskeyClient } from '@safe-global/protocol-kit/types'
 import { asHex } from '../types'
+import isSharedSigner from './isSharedSigner'
 
 export const PASSKEY_CLIENT_KEY = 'passkeyWallet'
 export const PASSKEY_CLIENT_NAME = 'Passkey Wallet Client'
@@ -58,18 +62,35 @@ const signTypedData = () => {
 export const createPasskeyClient = async (
   passkey: PasskeyArgType,
   safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
+  safeWebAuthnSharedSignerContract: SafeWebAuthnSharedSignerContractImplementationType,
   provider: Client,
+  safeAddress: string,
+  owners: string[],
   chainId: string
 ) => {
   const { rawId, coordinates, customVerifierAddress } = passkey
   const passkeyRawId = hexStringToUint8Array(rawId)
   const verifierAddress = customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
 
-  const [signerAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
-    BigInt(coordinates.x),
-    BigInt(coordinates.y),
-    fromHex(asHex(verifierAddress), 'bigint')
-  ])
+  const isPasskeySharedSigner = await isSharedSigner(
+    passkey,
+    safeWebAuthnSharedSignerContract,
+    safeAddress,
+    owners,
+    chainId
+  )
+
+  let signerAddress
+
+  if (isPasskeySharedSigner) {
+    signerAddress = await safeWebAuthnSharedSignerContract.getAddress()
+  } else {
+    ;[signerAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
+      BigInt(coordinates.x),
+      BigInt(coordinates.y),
+      fromHex(asHex(verifierAddress), 'bigint')
+    ])
+  }
 
   return createClient({
     account: signerAddress,

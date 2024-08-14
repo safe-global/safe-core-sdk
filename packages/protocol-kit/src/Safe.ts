@@ -167,7 +167,16 @@ class Safe {
 
     const isPasskeySigner = signer && typeof signer !== 'string'
     if (isPasskeySigner) {
-      this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
+      const safeAddress = await this.getAddress()
+      const owners = await this.getOwners()
+      this.#safeProvider = await SafeProvider.init(
+        provider,
+        signer,
+        safeVersion,
+        contractNetworks,
+        safeAddress,
+        owners
+      )
     }
   }
 

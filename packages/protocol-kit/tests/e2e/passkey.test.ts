@@ -71,11 +71,9 @@ describe('Passkey', () => {
     })
 
     const safeProvider1 = await SafeProvider.init(provider, passkey1, '1.4.1', contractNetworks)
-
     const safeProvider2 = await SafeProvider.init(provider, passkey2, '1.4.1', contractNetworks)
 
     const passkeySigner1 = await safeProvider1.getExternalSigner()
-
     const passkeySigner2 = await safeProvider2.getExternalSigner()
 
     const predictedSafe: PredictedSafeProps = {
@@ -160,62 +158,68 @@ describe('Passkey', () => {
       }
     )
 
-    it('should return the shared signer address of the passkey signer', async () => {
-      const {
-        accounts: [EOAaccount1],
-        contractNetworks,
-        provider,
-        passkeys: [passkey1],
-        safeWebAuthnSharedSignerContract
-      } = await setupTests()
+    itif(safeVersionDeployed >= '1.3.0')(
+      'should return the shared signer address of the passkey signer',
+      async () => {
+        const {
+          accounts: [EOAaccount1],
+          contractNetworks,
+          provider,
+          passkeys: [passkey1],
+          safeWebAuthnSharedSignerContract
+        } = await setupTests()
 
-      const sharedSignerContractAddress = safeWebAuthnSharedSignerContract.contractAddress
+        const sharedSignerContractAddress = safeWebAuthnSharedSignerContract.contractAddress
 
-      const safe = await getSafeWithOwners([EOAaccount1.address])
+        const safe = await getSafeWithOwners([EOAaccount1.address])
 
-      // configure the shared Signer passkey in the Safe Slot
-      const safeSdk = await Safe.init({
-        provider,
-        safeAddress: safe.address,
-        contractNetworks
-      })
+        // configure the shared Signer passkey in the Safe Slot
+        const safeSdk = await Safe.init({
+          provider,
+          safeAddress: safe.address,
+          contractNetworks
+        })
 
-      const passkeyOwnerConfiguration = {
-        ...passkey1.coordinates,
-        verifiers: passkey1.customVerifierAddress
+        const passkeyOwnerConfiguration = {
+          ...passkey1.coordinates,
+          verifiers: passkey1.customVerifierAddress
+        }
+
+        const { data: addSharedSignerAddressOwner } = await safeSdk.createAddOwnerTx({
+          ownerAddress: sharedSignerContractAddress
+        })
+
+        const configureSharedSignerTransaction = {
+          to: sharedSignerContractAddress,
+          value: '0',
+          data: safeWebAuthnSharedSignerContract.encode('configure', [passkeyOwnerConfiguration]),
+          operation: OperationType.DelegateCall // DelegateCall required into the SafeWebAuthnSharedSigner instance in order for it to set its configuration.
+        }
+
+        const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
+
+        const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
+          transactions
+        })
+
+        // Sign the configure the shared Signer transaction with the EOA signer
+        const signedConfigureSharedSignerSafeTransaction = await safeSdk.signTransaction(
+          configureSharedSignerSafeTransaction
+        )
+
+        chai.expect(await safeSdk.isOwner(await getPasskeyOwnerAddress(safeSdk, passkey1))).to.be
+          .false
+
+        const response = await safeSdk.executeTransaction(
+          signedConfigureSharedSignerSafeTransaction
+        )
+        await waitSafeTxReceipt(response)
+
+        const passkeyAddress = await getPasskeyOwnerAddress(safeSdk, passkey1)
+
+        chai.expect(passkeyAddress).to.equals(sharedSignerContractAddress)
       }
-
-      const { data: addSharedSignerAddressOwner } = await safeSdk.createAddOwnerTx({
-        ownerAddress: sharedSignerContractAddress
-      })
-
-      const configureSharedSignerTransaction = {
-        to: sharedSignerContractAddress,
-        value: '0',
-        data: safeWebAuthnSharedSignerContract.encode('configure', [passkeyOwnerConfiguration]),
-        operation: OperationType.DelegateCall // DelegateCall required into the SafeWebAuthnSharedSigner instance in order for it to set its configuration.
-      }
-
-      const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
-
-      const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
-        transactions
-      })
-
-      // Sign the configure the shared Signer transaction with the EOA signer
-      const signedConfigureSharedSignerSafeTransaction = await safeSdk.signTransaction(
-        configureSharedSignerSafeTransaction
-      )
-
-      chai.expect(await safeSdk.isOwner(await getPasskeyOwnerAddress(safeSdk, passkey1))).to.be
-        .false
-
-      await safeSdk.executeTransaction(signedConfigureSharedSignerSafeTransaction)
-
-      const passkeyAddress = await getPasskeyOwnerAddress(safeSdk, passkey1)
-
-      chai.expect(passkeyAddress).to.equals(sharedSignerContractAddress)
-    })
+    ).timeout(1000000)
 
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is not deployed', async () => {
       const {

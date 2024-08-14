@@ -16,12 +16,16 @@ async function createPasskeyDeploymentTransaction(
   passkey: PasskeyArgType
 ): Promise<{ to: string; value: string; data: Hex }> {
   const safeVersion = await safe.getContractVersion()
+  const safeAddress = await safe.getAddress()
+  const owners = await safe.getOwners()
 
   const safePasskeyProvider = await SafeProvider.init(
     safe.getSafeProvider().provider,
     passkey,
     safeVersion,
-    safe.getContractManager().contractNetworks
+    safe.getContractManager().contractNetworks,
+    safeAddress,
+    owners
   )
 
   const passkeySigner = (await safePasskeyProvider.getExternalSigner()) as PasskeyClient

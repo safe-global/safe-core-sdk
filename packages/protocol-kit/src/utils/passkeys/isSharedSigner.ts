@@ -13,7 +13,7 @@ async function isSharedSigner(
   owners: string[],
   chainId: string
 ): Promise<boolean> {
-  const sharedSignerContractAddress = await safeWebAuthnSharedSignerContract.getAddress()
+  const sharedSignerContractAddress = safeWebAuthnSharedSignerContract.contractAddress
 
   // is a shared signer if the shared signer contract address is present in the owners and its configured in the Safe slot
   if (safeAddress && owners.includes(sharedSignerContractAddress)) {

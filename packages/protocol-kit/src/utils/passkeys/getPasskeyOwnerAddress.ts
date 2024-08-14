@@ -11,12 +11,16 @@ import { PasskeyArgType } from '../../types'
  */
 async function getPasskeyOwnerAddress(safe: Safe, passkey: PasskeyArgType): Promise<string> {
   const safeVersion = await safe.getContractVersion()
+  const safeAddress = await safe.getAddress()
+  const owners = await safe.getOwners()
 
   const safePasskeyProvider = await SafeProvider.init(
     safe.getSafeProvider().provider,
     passkey,
     safeVersion,
-    safe.getContractManager().contractNetworks
+    safe.getContractManager().contractNetworks,
+    safeAddress,
+    owners
   )
 
   const passkeySigner = await safePasskeyProvider.getExternalSigner()

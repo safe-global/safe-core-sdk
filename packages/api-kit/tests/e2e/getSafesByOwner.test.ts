@@ -21,7 +21,7 @@ describe('getSafesByOwner', () => {
   })
 
   it('should fail if owner address is not checksummed', async () => {
-    const ownerAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'.toLowerCase()
+    const ownerAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
     await chai
       .expect(safeApiKit.getSafesByOwner(ownerAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -35,14 +35,14 @@ describe('getSafesByOwner', () => {
   })
 
   it('should return the array of owned Safes', async () => {
-    const ownerAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+    const ownerAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const ownerResponse = await safeApiKit.getSafesByOwner(ownerAddress)
     const { safes } = ownerResponse
     chai.expect(safes.length).to.be.greaterThan(1)
   })
 
   it('should return the array of owned Safes EIP-3770', async () => {
-    const ownerAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+    const ownerAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770OwnerAddress = `${config.EIP_3770_PREFIX}:${ownerAddress}`
     const ownerResponse = await safeApiKit.getSafesByOwner(eip3770OwnerAddress)
     const { safes } = ownerResponse

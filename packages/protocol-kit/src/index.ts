@@ -35,9 +35,9 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyCoordinates,
   extractPasskeyData,
   getDefaultFCLP256VerifierAddress,
-  extractPasskeyCoordinates,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -67,6 +67,7 @@ import {
   generateTypedData
 } from './utils/eip-712'
 import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
+import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 
 export {
   estimateTxBaseGas,
@@ -80,6 +81,7 @@ export {
   createERC20TokenTransferTransaction,
   DEFAULT_SAFE_VERSION,
   EthSafeSignature,
+  getPasskeyOwnerAddress,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,

@@ -160,7 +160,7 @@ describe('Passkey', () => {
       }
     )
 
-    it.only('should return the shared signer address of the passkey signer', async () => {
+    it('should return the shared signer address of the passkey signer', async () => {
       const {
         accounts: [EOAaccount1],
         contractNetworks,

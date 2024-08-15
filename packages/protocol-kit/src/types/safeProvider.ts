@@ -30,7 +30,7 @@ export type GetPasskeyType = {
 export type PasskeyActions = {
   createDeployTxRequest: () => { to: string; value: string; data: Hex }
   encodeCreateSigner: () => Hex
-  encodeConfigureOwner: () => Hex
+  encodeConfigure: () => Hex
 }
 
 export type PasskeyClient = Client<

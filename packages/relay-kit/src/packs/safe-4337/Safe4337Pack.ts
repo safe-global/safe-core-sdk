@@ -266,7 +266,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         const sharedSignerTransaction = {
           to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
           value: '0',
-          data: passkeySigner.encodeCreateSigner(),
+          data: passkeySigner.encodeConfigure(),
           operation: OperationType.DelegateCall // DelegateCall required into the SafeWebAuthnSharedSigner instance in order for it to set its configuration.
         }
 

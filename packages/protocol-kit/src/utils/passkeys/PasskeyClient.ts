@@ -109,7 +109,7 @@ export const createPasskeyClient = async (
       },
       signTransaction,
       signTypedData,
-      encodeConfigureOwner() {
+      encodeConfigure() {
         return encodeFunctionData({
           abi: parseAbi(['function configure((uint256 x, uint256 y, uint176 verifiers) signer)']),
           functionName: 'configure',

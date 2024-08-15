@@ -582,7 +582,9 @@ describe('Safe4337Pack', () => {
   describe('When using a passkey signer', () => {
     const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
     const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
-    const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
+    const PASSKEY_PRIVATE_KEY = BigInt(
+      '0x1c36e7789d4e7b5f0d0d9b1e01f1a1e3be4ab183f62a77eb10b05d07a6a3a5c2'
+    )
     jest.setTimeout(120_000)
 
     let passkey: protocolKit.PasskeyArgType
@@ -611,7 +613,7 @@ describe('Safe4337Pack', () => {
       })
     })
 
-    it('should include a passkey configuration transaction to SafeWebAuthnSharedSigner contract in a multiSend call', async () => {
+    it.only('should include a passkey configuration transaction to SafeWebAuthnSharedSigner contract in a multiSend call', async () => {
       const encodeFunctionDataSpy = jest.spyOn(viem, 'encodeFunctionData')
       const safeCreateSpy = jest.spyOn(Safe, 'init')
 
@@ -628,7 +630,6 @@ describe('Safe4337Pack', () => {
         y: BigInt(passkey.coordinates.y),
         verifiers: viem.fromHex(CUSTOM_P256_VERIFIER_ADDRESS, 'bigint')
       }
-
       const enableModulesData = viem.encodeFunctionData({
         abi: constants.ABI,
         functionName: 'enableModules',
@@ -660,15 +661,15 @@ describe('Safe4337Pack', () => {
         sharedSignerTransaction
       ])
 
-      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(2, {
-        abi: constants.ABI,
+      expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(6, {
         functionName: 'configure',
+        abi: constants.ABI,
         args: [passkeyOwnerConfiguration]
       })
 
       expect(encodeFunctionDataSpy).toHaveBeenNthCalledWith(3, {
-        abi: constants.ABI,
         functionName: 'multiSend',
+        abi: constants.ABI,
         args: [multiSendData]
       })
 

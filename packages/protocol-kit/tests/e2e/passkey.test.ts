@@ -219,7 +219,7 @@ describe('Passkey', () => {
 
         chai.expect(passkeyAddress).to.equals(sharedSignerContractAddress)
       }
-    ).timeout(1000000)
+    )
 
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is not deployed', async () => {
       const {

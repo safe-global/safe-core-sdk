@@ -1,9 +1,9 @@
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 
-import { SafeClient } from '@safe-global/safe-kit/SafeClient'
-import { isValidAddress, isValidSafeConfig } from '@safe-global/safe-kit/utils'
-import { SafeKitConfig } from '@safe-global/safe-kit/types'
+import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
+import { isValidAddress, isValidSafeConfig } from '@safe-global/sdk-starter-kit/utils'
+import { SdkStarterKitConfig } from '@safe-global/sdk-starter-kit/types'
 
 /**
  * Initializes a Safe client with the given configuration options.
@@ -11,7 +11,7 @@ import { SafeKitConfig } from '@safe-global/safe-kit/types'
  * @param config - The Safe client configuration options.
  * @returns A Safe client instance.
  */
-export async function createSafeClient(config: SafeKitConfig): Promise<SafeClient> {
+export async function createSafeClient(config: SdkStarterKitConfig): Promise<SafeClient> {
   const protocolKit = await getProtocolKitInstance(config)
   const apiKit = await getApiKitInstance(protocolKit)
 
@@ -23,10 +23,10 @@ export async function createSafeClient(config: SafeKitConfig): Promise<SafeClien
 /**
  * Get the Safe protocol kit instance.
  *
- * @param config - The Safe kit configuration options.
+ * @param config - The SDK Starter kit configuration options.
  * @returns A protocolKit instance.
  */
-async function getProtocolKitInstance(config: SafeKitConfig): Promise<Safe> {
+async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe> {
   if (config.safeAddress && isValidAddress(config.safeAddress)) {
     // If the safe already exist
     return Safe.init({

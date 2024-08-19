@@ -1,12 +1,12 @@
 import { ListOptions, SafeMessageListResponse } from '@safe-global/api-kit'
 
-import { SafeClient } from '@safe-global/safe-kit/SafeClient'
-import { SafeMessageClient } from '@safe-global/safe-kit/extensions/messages/SafeMessageClient'
+import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
+import { SafeMessageClient } from '@safe-global/sdk-starter-kit/extensions/messages/SafeMessageClient'
 import {
   ConfirmOffChainMessageProps,
   SafeClientResult,
   SendOffChainMessageProps
-} from '@safe-global/safe-kit/types'
+} from '@safe-global/sdk-starter-kit/types'
 
 /**
  * Extend the SafeClient with the ability to use off-chain messages

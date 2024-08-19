@@ -6,7 +6,7 @@ import {
   MetaTransactionData
 } from '@safe-global/safe-core-sdk-types'
 import { IFeeEstimator } from '@safe-global/relay-kit'
-import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 
 export type SendTransactionProps = {
   transactions: TransactionBase[]
@@ -46,22 +46,23 @@ export type SafeConfig = {
   saltNonce?: string
 }
 
-export type ExistingSafeKitConfig = {
+export type ExistingSafeConfig = {
   safeAddress?: string
   safeOptions?: never
 }
 
-export type PredictedSafeKitConfig = {
+export type PredictedSafeConfig = {
   safeAddress?: never
   safeOptions?: SafeConfig
 }
 
-export type SafeKitRootConfig = {
+export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer: SafeProvider['signer']
 }
 
-export type SafeKitConfig = SafeKitRootConfig & (ExistingSafeKitConfig | PredictedSafeKitConfig)
+export type SdkStarterKitConfig = SdkStarterKitRootConfig &
+  (ExistingSafeConfig | PredictedSafeConfig)
 
 export type SafeClientResult = {
   safeAddress: string

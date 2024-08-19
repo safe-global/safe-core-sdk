@@ -5,6 +5,8 @@ export * from './contracts/Safe'
 export * from './contracts/SafeProxyFactory'
 export * from './contracts/SignMessageLib'
 export * from './contracts/SimulateTxAccessor'
+export * from './contracts/SafeWebAuthnSignerFactory'
+export * from './contracts/SafeWebAuthnSharedSigner'
 export * from './contracts/common/BaseContract'
 export * from './contracts/assets'
 export * from './types'
@@ -17,12 +19,6 @@ declare module 'abitype' {
     //   inputs: `0x${string}` | Uint8Array
     //   outputs: `0x${string}`
     // }
-    AddressType: string
-  }
-}
-
-declare module 'viem/node_modules/abitype' {
-  export interface Register {
     AddressType: string
   }
 }

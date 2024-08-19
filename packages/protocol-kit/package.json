@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "4.0.3",
+  "version": "4.1.0-alpha.2",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -12,7 +12,9 @@
     "SDK"
   ],
   "scripts": {
-    "safe-deployments": "ts-node scripts/checkSafeDeployments.ts",
+    "check-safe-deployments": "ts-node scripts/safe-deployments/checkSafeDeployments.ts",
+    "update-safe-deployments": "ts-node scripts/safe-deployments/updateLocalNetworks.ts",
+    "check-short-name-integrity": "ts-node scripts/safe-deployments/checkShortNameIntegrity.ts",
     "test": "mocha -r ts-node/register -r tsconfig-paths/register tests/unit/**/*.ts",
     "test:hardhat:web3:v1.0.0": "export TEST_NETWORK=hardhat && export ETH_LIB=web3 && export SAFE_VERSION=1.0.0 && hardhat deploy && nyc hardhat test",
     "test:hardhat:web3:v1.1.1": "export TEST_NETWORK=hardhat && export ETH_LIB=web3 && export SAFE_VERSION=1.1.1 && hardhat deploy && nyc hardhat test",
@@ -33,7 +35,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && yarn safe-deployments && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
+    "build": "yarn unbuild && hardhat compile && yarn check-safe-deployments && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -53,6 +55,7 @@
     "@nomicfoundation/hardhat-viem": "^2.0.2",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
+    "@safe-global/safe-passkey": "0.2.0-alpha.1",
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
@@ -71,8 +74,10 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@safe-global/safe-core-sdk-types": "^5.0.3",
-    "@safe-global/safe-deployments": "^1.37.1",
+    "@noble/hashes": "^1.3.3",
+    "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.1",
+    "@safe-global/safe-deployments": "^1.37.2",
+    "@safe-global/safe-modules-deployments": "^2.2.0",
     "abitype": "^1.0.2",
     "semver": "^7.6.2",
     "viem": "^2.19.0"

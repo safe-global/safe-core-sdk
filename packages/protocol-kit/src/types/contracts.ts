@@ -22,6 +22,8 @@ import SimulateTxAccessorContract_v1_3_0 from '@safe-global/protocol-kit/contrac
 import SimulateTxAccessorContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 import CreateCallContract_v1_3_0 from '@safe-global/protocol-kit/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from '@safe-global/protocol-kit/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import SafeWebAuthnSignerFactoryContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSignerFactory/v1.4.1/SafeWebAuthnSignerFactoryContract_v1_4_1'
+import SafeWebAuthnSharedSignerContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSharedSigner/v1.4.1/SafeWebAuthnSharedSignerContract_v1_4_1'
 
 // Safe contract implementation types
 export type SafeContractImplementationType =
@@ -69,6 +71,13 @@ export type CreateCallContractImplementationType =
   | CreateCallContract_v1_3_0
   | CreateCallContract_v1_4_1
 
+// SafeWebAuthnSignerFactory contract implementation types
+export type SafeWebAuthnSignerFactoryContractImplementationType =
+  SafeWebAuthnSignerFactoryContract_v1_4_1
+
+export type SafeWebAuthnSharedSignerContractImplementationType =
+  SafeWebAuthnSharedSignerContract_v1_4_1
+
 export type GetContractProps = {
   safeVersion: SafeVersion
   customContractAddress?: string
@@ -109,6 +118,14 @@ export type ContractNetworkConfig = {
   simulateTxAccessorAddress: string
   /** simulateTxAccessorAbi - Abi of the SimulateTxAccessor contract deployed on a specific network */
   simulateTxAccessorAbi?: Abi
+  /** safeWebAuthnSignerFactoryAddress - Address of the SafeWebAuthnSignerFactory contract deployed on a specific network */
+  safeWebAuthnSignerFactoryAddress: string
+  /** safeWebAuthnSignerFactoryAbi - Abi of the SafeWebAuthnSignerFactory contract deployed on a specific network */
+  safeWebAuthnSignerFactoryAbi?: Abi
+  /** safeWebAuthnSharedSignerAddress - Address of the SafeWebAuthnSharedSigner contract deployed on a specific network */
+  safeWebAuthnSharedSignerAddress: string
+  /** safeWebAuthnSharedSignerAbi - Abi of the SafeWebAuthnSharedSigner contract deployed on a specific network */
+  safeWebAuthnSharedSignerAbi?: Abi
 }
 
 export type ContractNetworksConfig = {

@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -40,7 +40,7 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-viem": "^2.0.2",
-    "@safe-global/relay-kit": "^3.0.2",
+    "@safe-global/relay-kit": "^3.1.0-alpha.1",
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
@@ -50,7 +50,7 @@
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "ethers": "^6.13.1",
-    "hardhat": "^2.19.3",
+    "hardhat": "2.20.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "semver": "^7.6.1",
@@ -61,8 +61,9 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^4.0.3",
-    "@safe-global/safe-core-sdk-types": "^5.0.3",
+    "@safe-global/protocol-kit": "^4.1.0-alpha.2",
+    "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.2",
+    "ethers": "^6.13.1",
     "node-fetch": "^2.7.0",
     "viem": "^2.19.0"
   }

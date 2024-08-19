@@ -1,8 +1,14 @@
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
-  ExternalClient,
-  StandardizeSafeTransactionDataProps
+  AddOwnerTxParams,
+  AddPasskeyOwnerTxParams,
+  PasskeyArgType,
+  RemoveOwnerTxParams,
+  RemovePasskeyOwnerTxParams,
+  StandardizeSafeTransactionDataProps,
+  SwapOwnerTxParams,
+  ExternalClient
 } from '@safe-global/protocol-kit/types'
 import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -190,6 +196,30 @@ export function isSafeMultisigTransactionResponse(
   safeTransaction: SafeTransaction | SafeMultisigTransactionResponse
 ): safeTransaction is SafeMultisigTransactionResponse {
   return (safeTransaction as SafeMultisigTransactionResponse).isExecuted !== undefined
+}
+
+type PasskeyParam = { passkey: PasskeyArgType }
+
+export function isPasskeyParam(
+  params:
+    | AddOwnerTxParams
+    | AddPasskeyOwnerTxParams
+    | RemoveOwnerTxParams
+    | RemovePasskeyOwnerTxParams
+): params is PasskeyParam {
+  return (params as PasskeyParam).passkey !== undefined
+}
+
+export function isOldOwnerPasskey(
+  params: SwapOwnerTxParams
+): params is SwapOwnerTxParams & { oldOwnerPasskey: PasskeyArgType } {
+  return (params as { oldOwnerPasskey: PasskeyArgType }).oldOwnerPasskey !== undefined
+}
+
+export function isNewOwnerPasskey(
+  params: SwapOwnerTxParams
+): params is SwapOwnerTxParams & { newOwnerPasskey: PasskeyArgType } {
+  return (params as { newOwnerPasskey: PasskeyArgType }).newOwnerPasskey !== undefined
 }
 
 export function toEstimateGasParameters(tx: SafeProviderTransaction): EstimateGasParameters {

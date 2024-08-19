@@ -8,6 +8,8 @@ import {
   proxyFactoryDeployed,
   safeDeployed,
   safeVersionDeployed,
+  safeWebAuthnSharedSignerDeployed,
+  safeWebAuthnSignerFactoryDeployed,
   signMessageLibDeployed,
   simulateTxAccessorDeployed
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
@@ -15,7 +17,6 @@ import { deployments, viem } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { getDeployer, waitTransactionReceipt } from './transactions'
 
-// TODO: changue contract por abitype objts
 export const getSafeSingleton = async (): Promise<{
   contract: GetContractReturnType
   abi: Abi
@@ -176,6 +177,50 @@ export const getSimulateTxAccessor = async (): Promise<{
     contract,
     abi: simulateTxAccessorDeployment.abi
   }
+}
+
+export const getSafeWebAuthnSignerFactory = async (): Promise<{
+  contract: GetContractReturnType
+  abi: Abi
+}> => {
+  const safeWebAuthnSignerFactoryDeployment = await deployments.get(
+    safeWebAuthnSignerFactoryDeployed.name
+  )
+  const safeWebAuthnSignerFactoryAddress = safeWebAuthnSignerFactoryDeployment.address
+  const contract = await viem.getContractAt(
+    proxyFactoryDeployed.name,
+    safeWebAuthnSignerFactoryAddress,
+    {
+      client: { wallet: await getDeployer() }
+    }
+  )
+  return {
+    contract,
+    abi: safeWebAuthnSignerFactoryDeployment.abi
+  }
+}
+
+export const getSafeWebAuthnSharedSigner = async (): Promise<{
+  contract: GetContractReturnType
+  abi: Abi
+}> => {
+  const safeWebAuthnSharedSignerDeployment = await deployments.get(
+    safeWebAuthnSharedSignerDeployed.name
+  )
+
+  return {
+    contract: await viem.getContractAt(
+      safeWebAuthnSharedSignerDeployed.name,
+      safeWebAuthnSharedSignerDeployment.address
+    ),
+    abi: safeWebAuthnSharedSignerDeployment.abi
+  }
+}
+
+export const getWebAuthnContract = async (): Promise<GetContractReturnType<Abi>> => {
+  const webAuthnContractDeployment = await deployments.get('WebAuthnContract')
+  const dailyLimitModuleAddress = webAuthnContractDeployment.address
+  return await viem.getContractAt('WebAuthnContract', dailyLimitModuleAddress)
 }
 
 export const getDailyLimitModule = async (): Promise<GetContractReturnType<Abi>> => {

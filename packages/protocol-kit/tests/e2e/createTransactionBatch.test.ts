@@ -4,11 +4,11 @@ import { deployments } from 'hardhat'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { getContractNetworks } from './utils/setupContractNetworks'
-import { getERC20Mintable, getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
+import { getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
-import { encodeFunctionData } from 'viem'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
 chai.use(chaiAsPromised)
 
@@ -32,7 +32,6 @@ describe('createTransactionBatch', () => {
     }
 
     return {
-      erc20Mintable: await getERC20Mintable(),
       accounts,
       contractNetworks,
       predictedSafe,
@@ -41,8 +40,8 @@ describe('createTransactionBatch', () => {
   })
 
   it('should return a batch of the provided transactions', async () => {
-    const { accounts, contractNetworks, erc20Mintable } = await setupTests()
-    const [account1, account2] = accounts
+    const { accounts, contractNetworks } = await setupTests()
+    const [account1] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
     const provider = getEip1193Provider()
@@ -55,13 +54,9 @@ describe('createTransactionBatch', () => {
     })
 
     const dumpTransfer = {
-      to: erc20Mintable.address,
-      value: '0',
-      data: encodeFunctionData({
-        abi: erc20Mintable.abi,
-        functionName: 'transfer',
-        args: [account2.address, AMOUNT_TO_TRANSFER] // 0.1 ERC20
-      }),
+      to: ZERO_ADDRESS,
+      value: AMOUNT_TO_TRANSFER,
+      data: '0x',
       operation: OperationType.Call
     }
 
@@ -74,7 +69,7 @@ describe('createTransactionBatch', () => {
     chai.expect(batchTransaction).to.be.deep.equal({
       to: multiSendContractAddress,
       value: '0',
-      data: '0x8d80ff0a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000001320067b5656d60a809915323bf2c40a8bef15a152e3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000ffcf8fdee72ac11b5c542428b35eef5769c409f000000000000000000000000000000000000000000000000006f05b59d3b200000067b5656d60a809915323bf2c40a8bef15a152e3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000ffcf8fdee72ac11b5c542428b35eef5769c409f000000000000000000000000000000000000000000000000006f05b59d3b200000000000000000000000000000000'
+      data: '0x8d80ff0a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000aa00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006f05b59d3b20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006f05b59d3b20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
     })
   })
 })

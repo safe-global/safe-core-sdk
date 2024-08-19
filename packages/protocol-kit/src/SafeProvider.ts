@@ -1,10 +1,20 @@
-import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
+import {
+  SAFE_FEATURES,
+  generateTypedData,
+  hasSafeFeature,
+  validateEip3770Address
+} from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
+import {
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract
+} from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args
+  SafeEIP712Args,
+  SafeVersion
 } from '@safe-global/safe-core-sdk-types'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -13,6 +23,8 @@ import {
   getMultiSendContractInstance,
   getSafeContractInstance,
   getSafeProxyFactoryContractInstance,
+  getSafeWebAuthnSharedSignerContractInstance,
+  getSafeWebAuthnSignerFactoryContractInstance,
   getSignMessageLibContractInstance,
   getSimulateTxAccessorContractInstance
 } from './contracts/contractInstances'
@@ -24,8 +36,14 @@ import {
   ExternalSigner,
   Eip1193Provider,
   HttpTransport,
-  SocketTransport
+  SocketTransport,
+  SafeSigner,
+  SafeConfig,
+  ContractNetworksConfig,
+  PasskeyArgType,
+  PasskeyClient
 } from '@safe-global/protocol-kit/types'
+import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import { asHash, asHex, getChainById } from './utils/types'
 import { asBlockId } from './utils/block'
 import {
@@ -68,15 +86,22 @@ import {
   toTransactionRequest,
   sameString
 } from '@safe-global/protocol-kit/utils'
-import { isEip1193Provider, isPrivateKey } from './utils/provider'
+import { isEip1193Provider, isPrivateKey, isSignerPasskeyClient } from './utils/provider'
+import { createPasskeyClient, PASSKEY_CLIENT_KEY } from '@safe-global/protocol-kit/utils'
 
 class SafeProvider {
   #chain?: Chain
   #externalProvider: ExternalClient
-  signer?: string
+  signer?: SafeSigner
   provider: Eip1193Provider | HttpTransport | SocketTransport
 
-  constructor({ provider, signer }: SafeProviderConfig) {
+  constructor({
+    provider,
+    signer
+  }: {
+    provider: SafeProviderConfig['provider']
+    signer?: SafeSigner
+  }) {
     this.#externalProvider = createPublicClient({
       transport: isEip1193Provider(provider)
         ? custom(provider as Eip1193Provider)
@@ -84,19 +109,95 @@ class SafeProvider {
     })
 
     this.provider = provider
-    this.signer = signer ? asHex(signer) : signer
+    this.signer = signer
   }
 
   getExternalProvider(): ExternalClient {
     return this.#externalProvider
   }
 
+  static async init(
+    provider: SafeConfig['provider'],
+    signer?: SafeConfig['signer'],
+    safeVersion: SafeVersion = DEFAULT_SAFE_VERSION,
+    contractNetworks?: ContractNetworksConfig,
+    safeAddress?: string,
+    owners?: string[]
+  ): Promise<SafeProvider> {
+    const isPasskeySigner = signer && typeof signer !== 'string'
+
+    if (isPasskeySigner) {
+      if (!hasSafeFeature(SAFE_FEATURES.PASSKEY_SIGNER, safeVersion)) {
+        throw new Error(
+          'Current version of the Safe does not support the Passkey signer functionality'
+        )
+      }
+
+      const safeProvider = new SafeProvider({
+        provider
+      })
+      const chainId = await safeProvider.getChainId()
+      const customContracts = contractNetworks?.[chainId.toString()]
+
+      // FIXME: Passkeys is an experimental feature and is currently only available on the Sepolia chain.
+      if (chainId !== 11155111n && process.env.TEST_NETWORK !== 'hardhat') {
+        throw new Error(
+          'Passkeys is an experimental feature and is currently only available on the Sepolia chain.'
+        )
+      }
+
+      let passkeySigner: PasskeyClient
+
+      if (!isSignerPasskeyClient(signer)) {
+        // signer is type PasskeyArgType {rawId, coordinates, customVerifierAddress? }
+        const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
+          safeProvider,
+          safeVersion,
+          customContracts
+        })
+
+        const safeWebAuthnSharedSignerContract = await getSafeWebAuthnSharedSignerContract({
+          safeProvider,
+          safeVersion,
+          customContracts
+        })
+
+        passkeySigner = await createPasskeyClient(
+          signer as PasskeyArgType,
+          safeWebAuthnSignerFactoryContract,
+          safeWebAuthnSharedSignerContract,
+          safeProvider.getExternalProvider(),
+          safeAddress || '',
+          owners || [],
+          chainId.toString()
+        )
+      } else {
+        // signer was already initialized and we pass a PasskeySigner instance (reconnecting)
+        passkeySigner = signer as PasskeyClient
+      }
+
+      return new SafeProvider({
+        provider,
+        signer: passkeySigner
+      })
+    } else {
+      return new SafeProvider({
+        provider,
+        signer
+      })
+    }
+  }
+
   async getExternalSigner(): Promise<ExternalSigner | undefined> {
     const { transport, chain = await this.#getChain() } = this.getExternalProvider()
 
+    if (isSignerPasskeyClient(this.signer)) {
+      return this.signer as PasskeyClient
+    }
+
     if (isPrivateKey(this.signer)) {
       // This is a client with a local account, the account needs to be of type Accound as viem consider strings as 'json-rpc' (on parseAccount)
-      const account = privateKeyToAccount(asHex(this.signer))
+      const account = privateKeyToAccount(asHex(this.signer as string))
       return createWalletClient({
         account,
         chain,
@@ -105,7 +206,7 @@ class SafeProvider {
     }
 
     // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
-    if (this.signer && isAddress(this.signer)) {
+    if (this.signer && typeof this.signer === 'string') {
       return createWalletClient({
         account: this.signer,
         chain,
@@ -136,6 +237,11 @@ class SafeProvider {
     } catch {}
 
     return undefined
+  }
+
+  async isPasskeySigner(): Promise<boolean> {
+    const signer = await this.getExternalSigner()
+    return !!signer && signer.key === PASSKEY_CLIENT_KEY
   }
 
   isAddress(address: string): boolean {
@@ -266,6 +372,32 @@ class SafeProvider {
     customContractAbi
   }: GetContractProps) {
     return getSimulateTxAccessorContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
+  }
+
+  async getSafeWebAuthnSignerFactoryContract({
+    safeVersion,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps) {
+    return getSafeWebAuthnSignerFactoryContractInstance(
+      safeVersion,
+      this,
+      customContractAddress,
+      customContractAbi
+    )
+  }
+
+  async getSafeWebAuthnSharedSignerContract({
+    safeVersion,
+    customContractAddress,
+    customContractAbi
+  }: GetContractProps) {
+    return getSafeWebAuthnSharedSignerContractInstance(
       safeVersion,
       this,
       customContractAddress,

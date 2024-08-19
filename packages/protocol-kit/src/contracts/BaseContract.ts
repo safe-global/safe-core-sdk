@@ -69,9 +69,7 @@ class BaseContract<ContractAbiType extends Abi> {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
     const contractAddress =
-      customContractAddress ||
-      deployment?.networkAddresses[chainId.toString()] ||
-      deployment?.defaultAddress
+      customContractAddress || deployment?.networkAddresses[chainId.toString()]
 
     if (!contractAddress) {
       throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
@@ -80,7 +78,10 @@ class BaseContract<ContractAbiType extends Abi> {
     this.chainId = chainId
     this.contractName = contractName
     this.safeVersion = safeVersion
-    this.contractAddress = contractAddress
+    this.contractAddress =
+      Array.isArray(contractAddress) && contractAddress.length
+        ? contractAddress[0]
+        : contractAddress.toString()
     this.contractAbi =
       customContractAbi ||
       (deployment?.abi as unknown as ContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments

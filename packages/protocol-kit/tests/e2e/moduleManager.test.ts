@@ -149,18 +149,21 @@ describe('Safe modules manager', () => {
         .expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).modules.length)
         .to.be.eq(0)
 
-      const moduleDeployment = [
-        dailyLimitsAddress,
-        socialRecoveryAddress,
-        stateChannelAddress,
-        whiteListAddress
-      ].map(async (moduleAddress) => {
-        const txModule = await safeSdk.createEnableModuleTx(moduleAddress)
-        const moduleResponse = await safeSdk.executeTransaction(txModule)
-        await waitSafeTxReceipt(moduleResponse)
-      })
+      const dailyLimitsModuleTx = await safeSdk.createEnableModuleTx(dailyLimitsAddress)
+      const dailyLimitsResponse = await safeSdk.executeTransaction(dailyLimitsModuleTx)
+      await waitSafeTxReceipt(dailyLimitsResponse)
 
-      await Promise.all(moduleDeployment)
+      const socialRecoveryModuleTx = await safeSdk.createEnableModuleTx(socialRecoveryAddress)
+      const socialRecoveryResponse = await safeSdk.executeTransaction(socialRecoveryModuleTx)
+      await waitSafeTxReceipt(socialRecoveryResponse)
+
+      const stateChannelModuleTx = await safeSdk.createEnableModuleTx(stateChannelAddress)
+      const stateChannelResponse = await safeSdk.executeTransaction(stateChannelModuleTx)
+      await waitSafeTxReceipt(stateChannelResponse)
+
+      const whiteListModuleTx = await safeSdk.createEnableModuleTx(whiteListAddress)
+      const whiteListResponse = await safeSdk.executeTransaction(whiteListModuleTx)
+      await waitSafeTxReceipt(whiteListResponse)
 
       const modules1 = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)
       const modules2 = await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 1)

@@ -16,7 +16,9 @@ import {
   getMultiSendContract,
   getProxyFactoryContract,
   getSafeContract,
-  getSignMessageLibContract
+  getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract
 } from './contracts/safeDeploymentContracts'
 import {
   PREDETERMINED_SALT_NONCE,
@@ -32,6 +34,9 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyCoordinates,
+  extractPasskeyData,
+  getDefaultFCLP256VerifierAddress,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -60,17 +65,22 @@ import {
   hashSafeMessage,
   generateTypedData
 } from './utils/eip-712'
+import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
+import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 
 export {
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyData,
+  extractPasskeyCoordinates,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
   DEFAULT_SAFE_VERSION,
   EthSafeSignature,
+  getPasskeyOwnerAddress,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
@@ -89,6 +99,9 @@ export {
   getProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract,
+  getDefaultFCLP256VerifierAddress,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   getPredictedSafeAddressInitCode,
@@ -106,6 +119,7 @@ export {
   hashSafeMessage,
   generateTypedData,
   SafeProvider,
+  createPasskeyClient,
   EthSafeTransaction,
   EthSafeMessage
 }
@@ -113,3 +127,9 @@ export {
 export * from './types'
 
 export default Safe
+
+declare module 'viem/node_modules/abitype' {
+  export interface Register {
+    AddressType: string
+  }
+}

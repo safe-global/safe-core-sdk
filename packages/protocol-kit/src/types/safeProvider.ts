@@ -1,4 +1,15 @@
-import { Account, Chain, PublicClient, Transport, WalletClient } from 'viem'
+import { PasskeyArgType, PasskeyCoordinates } from './passkeys'
+import {
+  Account,
+  Chain,
+  PublicClient,
+  Transport,
+  WalletClient,
+  WalletRpcSchema,
+  Client,
+  WalletActions,
+  Hex
+} from 'viem'
 
 export type RequestArguments = {
   readonly method: string
@@ -9,19 +20,40 @@ export type Eip1193Provider = {
   request: (args: RequestArguments) => Promise<unknown>
 }
 
-export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account>
+export type GetPasskeyType = {
+  address: string
+  rawId: string
+  coordinates: PasskeyCoordinates
+  verifierAddress: string
+}
+
+export type PasskeyActions = {
+  createDeployTxRequest: () => { to: string; value: string; data: Hex }
+  encodeCreateSigner: () => Hex
+  encodeConfigure: () => Hex
+}
+
+export type PasskeyClient = Client<
+  Transport,
+  Chain | undefined,
+  Account,
+  WalletRpcSchema,
+  WalletActions<Chain | undefined, Account> & PasskeyActions
+>
+
+export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account> | PasskeyClient
 export type ExternalClient = PublicClient | (ExternalSigner & PublicClient)
 
 export type HexAddress = string
 export type PrivateKey = string
 export type HttpTransport = string
 export type SocketTransport = string
-export type SafeSigner = HexAddress | PrivateKey
+export type SafeSigner = HexAddress | PrivateKey | PasskeyClient
 
 export type SafeProviderConfig = {
   /** signerOrProvider - Ethers signer or provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
-  signer?: HexAddress | PrivateKey
+  signer?: HexAddress | PrivateKey | PasskeyArgType | PasskeyClient
 }
 
 export type SafeProviderTransaction = {

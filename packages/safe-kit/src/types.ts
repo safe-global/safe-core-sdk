@@ -1,4 +1,4 @@
-import { SafeProvider } from '@safe-global/protocol-kit'
+import { SafeProviderConfig } from '@safe-global/protocol-kit'
 import {
   TransactionBase,
   TransactionOptions,
@@ -57,8 +57,8 @@ export type PredictedSafeKitConfig = {
 }
 
 export type SafeKitRootConfig = {
-  provider: SafeProvider['provider']
-  signer: SafeProvider['signer']
+  provider: SafeProviderConfig['provider']
+  signer: SafeProviderConfig['signer']
 }
 
 export type SafeKitConfig = SafeKitRootConfig & (ExistingSafeKitConfig | PredictedSafeKitConfig)

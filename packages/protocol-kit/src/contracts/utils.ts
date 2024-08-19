@@ -6,11 +6,8 @@ import {
   keccak256,
   pad,
   toHex,
-  WalletClient,
-  FormattedTransactionReceipt,
-  decodeEventLog,
-  parseAbi,
-  toEventHash
+  Client,
+  WalletClient
 } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -449,6 +446,22 @@ export function toTxResult(
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is WalletClient {
-  return (signer as unknown as WalletClient).signTypedData !== undefined
+export function isTypedDataSigner(signer: any): signer is Client {
+  const isPasskeySigner = !!signer?.passkeyRawId
+  return (signer as unknown as WalletClient).signTypedData !== undefined || !isPasskeySigner
+}
+
+/**
+ * Check if the signerOrProvider is compatible with `Signer`
+ * @param signerOrProvider - Signer or provider
+ * @returns true if the parameter is compatible with `Signer`
+ */
+export function isSignerCompatible(signerOrProvider: Client | WalletClient): boolean {
+  const candidate = signerOrProvider as WalletClient
+
+  const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
+  const isSignMessageCompatible = typeof candidate.signMessage === 'function'
+  const isGetAddressCompatible = typeof candidate.getAddresses === 'function'
+
+  return isSigntransactionCompatible && isSignMessageCompatible && isGetAddressCompatible
 }

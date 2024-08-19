@@ -32,6 +32,7 @@ import ModuleManager from './managers/moduleManager'
 import OwnerManager from './managers/ownerManager'
 import {
   AddOwnerTxParams,
+  AddPasskeyOwnerTxParams,
   ConnectSafeConfig,
   CreateTransactionProps,
   PredictedSafeProps,
@@ -41,7 +42,8 @@ import {
   SigningMethod,
   SigningMethodType,
   SwapOwnerTxParams,
-  SafeModulesPaginated
+  SafeModulesPaginated,
+  RemovePasskeyOwnerTxParams
 } from './types'
 import {
   EthSafeSignature,
@@ -58,12 +60,16 @@ import {
   generateSignature,
   preimageSafeMessageHash,
   preimageSafeTransactionHash,
-  toTransactionRequest
+  toTransactionRequest,
+  adjustVInSignature
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
   encodeMultiSendData,
+  isNewOwnerPasskey,
+  isOldOwnerPasskey,
+  isPasskeyParam,
   standardizeMetaTransactionData,
   standardizeSafeTransactionData
 } from './utils/transactions/utils'
@@ -78,6 +84,8 @@ import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
 import { Hash, Hex, WalletClient, Transport, Chain, Account } from 'viem'
+import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
+import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -120,10 +128,13 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    this.#safeProvider = new SafeProvider({
+    this.#safeProvider = await SafeProvider.init(
       provider,
-      signer
-    })
+      signer,
+      DEFAULT_SAFE_VERSION,
+      contractNetworks
+    )
+
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
       this.#contractManager = await ContractManager.init(
@@ -147,6 +158,9 @@ class Safe {
       )
     }
 
+    const safeVersion = await this.getContractVersion()
+    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
+
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#guardManager = new GuardManager(this.#safeProvider, this.#contractManager.safeContract)
@@ -154,6 +168,20 @@ class Safe {
       this.#safeProvider,
       this.#contractManager.safeContract
     )
+
+    const isPasskeySigner = signer && typeof signer !== 'string'
+    if (isPasskeySigner) {
+      const safeAddress = await this.getAddress()
+      const owners = await this.getOwners()
+      this.#safeProvider = await SafeProvider.init(
+        provider,
+        signer,
+        safeVersion,
+        contractNetworks,
+        safeAddress,
+        owners
+      )
+    }
   }
 
   /**
@@ -578,6 +606,19 @@ class Safe {
    * @returns The Safe signature
    */
   async signHash(hash: string): Promise<SafeSignature> {
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
+
+    if (isPasskeySigner && signerAddress) {
+      let signature = await this.#safeProvider.signMessage(hash)
+
+      signature = await adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
+
+      const safeSignature = new EthSafeSignature(signerAddress, signature, true)
+
+      return safeSignature
+    }
+
     const signature = await generateSignature(this.#safeProvider, hash)
 
     return signature
@@ -745,7 +786,13 @@ class Safe {
 
     let signature: SafeSignature
 
-    if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+    const isPasskeySigner = await this.#safeProvider.isPasskeySigner()
+
+    if (isPasskeySigner) {
+      const txHash = await this.getTransactionHash(transaction)
+
+      signature = await this.signHash(txHash)
+    } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
       signature = await this.signTypedData(transaction, 'v4')
     } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3) {
       signature = await this.signTypedData(transaction, 'v3')
@@ -1022,16 +1069,38 @@ class Safe {
    * @throws "Threshold cannot exceed owner count"
    */
   async createAddOwnerTx(
-    { ownerAddress, threshold }: AddOwnerTxParams,
+    params: AddOwnerTxParams | AddPasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData = {
+    const isPasskey = isPasskeyParam(params)
+
+    const ownerAddress = isPasskey
+      ? await getPasskeyOwnerAddress(this, params.passkey)
+      : params.ownerAddress
+
+    const { threshold } = params
+
+    const addOwnerTransaction = {
       to: await this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
     }
+
+    const transactions = [addOwnerTransaction]
+
+    // The passkey Signer is a contract compliant with EIP-1271 standards, we need to check if it has been deployed.
+    if (isPasskey && !(await this.#safeProvider.isContractDeployed(ownerAddress))) {
+      // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
+      const passkeyDeploymentTransaction = await createPasskeyDeploymentTransaction(
+        this,
+        params.passkey
+      )
+
+      transactions.push(passkeyDeploymentTransaction)
+    }
+
     const safeTransaction = await this.createTransaction({
-      transactions: [safeTransactionData],
+      transactions,
       options
     })
     return safeTransaction
@@ -1049,9 +1118,17 @@ class Safe {
    * @throws "Threshold cannot exceed owner count"
    */
   async createRemoveOwnerTx(
-    { ownerAddress, threshold }: RemoveOwnerTxParams,
+    params: RemoveOwnerTxParams | RemovePasskeyOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const { threshold } = params
+
+    const isPasskey = isPasskeyParam(params)
+
+    const ownerAddress = isPasskey
+      ? await getPasskeyOwnerAddress(this, params.passkey)
+      : params.ownerAddress
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -1076,18 +1153,44 @@ class Safe {
    * @throws "Old address provided is not an owner"
    */
   async createSwapOwnerTx(
-    { oldOwnerAddress, newOwnerAddress }: SwapOwnerTxParams,
+    params: SwapOwnerTxParams,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
-    const safeTransactionData = {
+    const oldOwnerAddress = isOldOwnerPasskey(params)
+      ? await getPasskeyOwnerAddress(this, params.oldOwnerPasskey)
+      : params.oldOwnerAddress
+
+    const newOwnerAddress = isNewOwnerPasskey(params)
+      ? await getPasskeyOwnerAddress(this, params.newOwnerPasskey)
+      : params.newOwnerAddress
+
+    const swapOwnerTransaction = {
       to: await this.getAddress(),
       value: '0',
       data: await this.#ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
     }
+
+    const transactions = [swapOwnerTransaction]
+
+    // The passkey Signer is a contract compliant with EIP-1271 standards, we need to check if it has been deployed.
+    if (
+      isNewOwnerPasskey(params) &&
+      !(await this.#safeProvider.isContractDeployed(newOwnerAddress))
+    ) {
+      // If it has not been deployed, we need to create a batch that includes both the Signer contract deployment and the addOwner transaction
+      const passkeyDeploymentTransaction = await createPasskeyDeploymentTransaction(
+        this,
+        params.newOwnerPasskey
+      )
+
+      transactions.push(passkeyDeploymentTransaction)
+    }
+
     const safeTransaction = await this.createTransaction({
-      transactions: [safeTransactionData],
+      transactions,
       options
     })
+
     return safeTransaction
   }
 
@@ -1626,7 +1729,6 @@ class Safe {
 
     return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)
   }
-
   /**
    * Call the CompatibilityFallbackHandler isValidSignature method
    *

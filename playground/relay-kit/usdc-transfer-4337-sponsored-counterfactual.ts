@@ -1,4 +1,3 @@
-import { Address } from 'viem'
 import { getBlock } from 'viem/actions'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish, transfer, generateTransferCallData } from '../utils'
@@ -28,10 +27,6 @@ const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLIC
 // Paymaster URL
 const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
-// PAYMASTER ADDRESS
-const paymasterAddress = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
-// const paymasterAddress = '0x000000000034B78bfe02Be30AE4D324c8702803d' // GNOSIS
-
 // USDC CONTRACT ADDRESS IN SEPOLIA
 // faucet: https://faucet.circle.com/
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
@@ -46,7 +41,6 @@ async function main() {
     paymasterOptions: {
       isSponsored: true,
       sponsorshipPolicyId: POLICY_ID,
-      paymasterAddress,
       paymasterUrl: PAYMASTER_URL
     },
     options: {
@@ -61,7 +55,7 @@ async function main() {
   console.log('Chain Id', await safe4337Pack.getChainId())
 
   // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress())
+  const senderAddress = await safe4337Pack.protocolKit.getAddress()
 
   console.log('senderAddress: ', senderAddress)
 

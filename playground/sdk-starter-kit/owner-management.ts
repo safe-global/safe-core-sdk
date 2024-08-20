@@ -14,7 +14,7 @@ async function addOwner() {
     safeAddress: SAFE_ADDRESS
   })
 
-  const transaction = await safeClient.createAddOwnerTx({
+  const transaction = await safeClient.createAddOwnerTransaction({
     ownerAddress: OWNER_2_ADDRESS,
     threshold: 2
   })
@@ -37,7 +37,7 @@ async function removeOwner() {
     safeAddress: SAFE_ADDRESS
   })
 
-  const transaction = await safeClient1.createRemoveOwnerTx({
+  const transaction = await safeClient1.createRemoveOwnerTransaction({
     ownerAddress: OWNER_2_ADDRESS,
     threshold: 1
   })

@@ -1,137 +1,142 @@
-import Safe, {
-  AddOwnerTxParams,
-  RemoveOwnerTxParams,
-  SwapOwnerTxParams
-} from '@safe-global/protocol-kit'
-import { BaseClient } from './BaseClient'
-import SafeApiKit from 'packages/api-kit/dist/src'
-import { ChangeThresholdTxParams } from './types'
-import { TransactionBase } from 'packages/safe-core-sdk-types/dist/src'
+import Safe from '@safe-global/protocol-kit'
+import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
+import {
+  SafeTransaction,
+  TransactionOptions,
+  TransactionResult,
+  Transaction
+} from '@safe-global/safe-core-sdk-types'
 
+import {
+  createSafeClientResult,
+  sendTransaction,
+  proposeTransaction,
+  waitSafeTxReceipt
+} from '@safe-global/sdk-starter-kit/utils'
+import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
+import {
+  ConfirmTransactionProps,
+  SafeClientResult,
+  SendTransactionProps
+} from '@safe-global/sdk-starter-kit/types'
+
+import { BaseClient } from './BaseClient'
+
+/**
+ * @class
+ * This class provides the core functionality to create, sign and execute transactions.
+ * It also provides the ability to be extended with features through the extend function.
+ *
+ * @example
+ * const safeClient = await createSafeClient({ ... })
+ *
+ * const { transactions } = await safeClient.send(...)
+ * await safeClient.confirm(transactions?.safeTxHash)
+ */
 export class SafeClient extends BaseClient {
   constructor(protocolKit: Safe, apiKit: SafeApiKit) {
     super(protocolKit, apiKit)
   }
 
   /**
-   * Checks if a specific address is an owner of the current Safe.
+   * Sends transactions through the Safe protocol.
+   * You can send an array to transactions { to, value, data} that we will convert to a transaction batch
    *
-   * @param {string} ownerAddress - The account address
-   * @returns {boolean} TRUE if the account is an owner
+   * @param {SendTransactionProps} props The SendTransactionProps object.
+   * @param {TransactionBase[]} props.transactions An array of transactions to be sent.
+   * @param {string} props.transactions[].to The recipient address of the transaction.
+   * @param {string} props.transactions[].value The value of the transaction.
+   * @param {string} props.transactions[].data The data of the transaction.
+   * @param {string} props.from The sender address of the transaction.
+   * @param {number | string} props.gasLimit The gas limit of the transaction.
+   * @param {number | string} props.gasPrice The gas price of the transaction.
+   * @param {number | string} props.maxFeePerGas The max fee per gas of the transaction.
+   * @param {number | string} props.maxPriorityFeePerGas The max priority fee per gas of the transaction.
+   * @param {number} props.nonce The nonce of the transaction.
+   * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the transaction.
    */
-  async isOwner(ownerAddress: string): Promise<boolean> {
-    return this.protocolKit.isOwner(ownerAddress)
-  }
+  async send({
+    transactions,
+    ...transactionOptions
+  }: SendTransactionProps): Promise<SafeClientResult> {
+    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
+    const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 
-  /**
-   * Returns the list of Safe owner accounts.
-   *
-   * @returns The list of owners
-   */
-  async getOwners(): Promise<string[]> {
-    return this.protocolKit.getOwners()
-  }
+    const safeTransaction = await this.protocolKit.createTransaction({ transactions })
 
-  /**
-   * Returns the Safe threshold.
-   *
-   * @returns {number} The Safe threshold
-   */
-  async getThreshold(): Promise<number> {
-    return this.protocolKit.getThreshold()
-  }
-
-  /**
-   * Returns the Safe nonce.
-   *
-   * @returns {number} The Safe nonce
-   */
-  async getNonce(): Promise<number> {
-    return this.protocolKit.getNonce()
-  }
-
-  /**
-   * Returns a list of owners who have approved a specific Safe transaction.
-   *
-   * @param {string} txHash - The Safe transaction hash
-   * @returns {string[]} The list of owners
-   */
-  async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
-    return this.protocolKit.getOwnersWhoApprovedTx(txHash)
-  }
-
-  /**
-   * Encodes the data for adding a new owner to the Safe.
-   *
-   * @param {AddOwnerTxParams} params - The parameters for adding a new owner
-   * @param {string} params.ownerAddress - The address of the owner to add
-   * @param {number} params.threshold - The threshold of the Safe
-   * @returns {TransactionBase} The encoded data
-   */
-  async createAddOwnerTx({ ownerAddress, threshold }: AddOwnerTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
-
-    return {
-      to: await this.protocolKit.getAddress(),
-      value: '0',
-      data: await ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
+    if (isSafeDeployed) {
+      if (isMultisigSafe) {
+        // If the threshold is greater than 1, we need to propose the transaction first
+        return this.#proposeTransaction({ safeTransaction })
+      } else {
+        // If the threshold is 1, we can execute the transaction
+        return this.#executeTransaction({ safeTransaction, ...transactionOptions })
+      }
+    } else {
+      if (isMultisigSafe) {
+        // If the threshold is greater than 1, we need to deploy the Safe account first and
+        // afterwards propose the transaction
+        // The transaction should be confirmed with other owners until the threshold is reached
+        return this.#deployAndProposeTransaction({ safeTransaction, ...transactionOptions })
+      } else {
+        // If the threshold is 1, we can deploy the Safe account and execute the transaction in one step
+        return this.#deployAndExecuteTransaction({ safeTransaction, ...transactionOptions })
+      }
     }
   }
 
   /**
-   * Encodes the data for removing an owner from the Safe.
-   * @param {RemoveOwnerTxParams} params - The parameters for removing an owner
-   * @param {string} params.ownerAddress - The address of the owner to remove
-   * @param {number} params.threshold - The threshold of the Safe
-   * @returns {TransactionBase} The encoded data
+   * Confirms a transaction by its safe transaction hash.
+   *
+   * @param {ConfirmTransactionProps} props The ConfirmTransactionProps object.
+   * @param {string} props.safeTxHash  The hash of the safe transaction to confirm.
+   * @returns {Promise<SafeClientResult>} A promise that resolves to the result of the confirmed transaction.
+   * @throws {Error} If the transaction confirmation fails.
    */
-  async createRemoveOwnerTx({
-    ownerAddress,
-    threshold
-  }: RemoveOwnerTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
-    return {
-      to: await this.protocolKit.getAddress(),
-      value: '0',
-      data: await ownerManager.encodeRemoveOwnerData(ownerAddress, threshold)
+  async confirm({ safeTxHash }: ConfirmTransactionProps): Promise<SafeClientResult> {
+    let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+    const safeAddress = await this.protocolKit.getAddress()
+    const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
+
+    await this.apiKit.confirmTransaction(safeTxHash, signedTransaction.encodedSignatures())
+
+    transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+
+    if (
+      transactionResponse.confirmations &&
+      transactionResponse.confirmationsRequired === transactionResponse.confirmations.length
+    ) {
+      const executedTransactionResponse: TransactionResult =
+        await this.protocolKit.executeTransaction(transactionResponse)
+
+      await waitSafeTxReceipt(executedTransactionResponse)
+
+      return createSafeClientResult({
+        status: SafeClientTxStatus.EXECUTED,
+        safeAddress,
+        txHash: executedTransactionResponse.hash,
+        safeTxHash
+      })
     }
+
+    return createSafeClientResult({
+      status: SafeClientTxStatus.PENDING_SIGNATURES,
+      safeAddress,
+      safeTxHash
+    })
   }
 
   /**
-   * Encodes the data for swapping an owner in the Safe.
+   * Retrieves the pending transactions for the current safe address.
    *
-   * @param {SwapOwnerTxParams} params - The parameters for swapping an owner
-   * @param {string} params.oldOwnerAddress - The address of the old owner
-   * @param {string} params.newOwnerAddress - The address of the new owner
-   * @returns {TransactionBase} The encoded data
+   * @async
+   * @returns {Promise<SafeMultisigTransactionListResponse>} A promise that resolves to an array of pending transactions.
+   * @throws {Error} If there is an issue retrieving the safe address or pending transactions.
    */
-  async createSwapOwnerTx({
-    oldOwnerAddress,
-    newOwnerAddress
-  }: SwapOwnerTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
+  async getPendingTransactions(): Promise<SafeMultisigTransactionListResponse> {
+    const safeAddress = await this.protocolKit.getAddress()
 
-    return {
-      to: await this.protocolKit.getAddress(),
-      value: '0',
-      data: await ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
-    }
-  }
-
-  /**
-   *
-   * @param {ChangeThresholdTxParams} params - The parameters for changing the Safe threshold
-   * @param {number} params.threshold - The new threshold
-   * @returns {TransactionBase} The encoded data
-   */
-  async createChangeThresholdTx({ threshold }: ChangeThresholdTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
-
-    return {
-      to: await this.protocolKit.getAddress(),
-      value: '0',
-      data: await ownerManager.encodeChangeThresholdData(threshold)
-    }
+    return this.apiKit.getPendingTransactions(safeAddress)
   }
 
   /**
@@ -141,7 +146,7 @@ export class SafeClient extends BaseClient {
    * @returns
    */
   extend<T>(extendFunc: (client: SafeClient) => Promise<T>): Promise<SafeClient & T>
-  extend<T>(extendFunc: (client: SafeClient) => T): BaseClient & T
+  extend<T>(extendFunc: (client: SafeClient) => T): SafeClient & T
 
   extend<T>(
     extendFunc: (client: SafeClient) => T | Promise<T>
@@ -153,5 +158,124 @@ export class SafeClient extends BaseClient {
     } else {
       return Object.assign(this, result) as SafeClient & T
     }
+  }
+
+  /**
+   * Deploys and executes a transaction in one step.
+   *
+   * @param {SafeTransaction} safeTransaction  The safe transaction to be executed
+   * @param {TransactionOptions} options  Optional transaction options
+   * @returns  A promise that resolves to the result of the transaction
+   */
+  async #deployAndExecuteTransaction({
+    safeTransaction,
+    ...transactionOptions
+  }: { safeTransaction: SafeTransaction } & TransactionOptions): Promise<SafeClientResult> {
+    safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+
+    const transactionBatchWithDeployment =
+      await this.protocolKit.wrapSafeTransactionIntoDeploymentBatch(
+        safeTransaction,
+        transactionOptions
+      )
+    const hash = await sendTransaction({
+      transaction: transactionBatchWithDeployment,
+      protocolKit: this.protocolKit
+    })
+
+    await this.#reconnectSafe()
+
+    return createSafeClientResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.DEPLOYED_AND_EXECUTED,
+      deploymentTxHash: hash,
+      txHash: hash
+    })
+  }
+
+  /**
+   * Deploys and proposes a transaction in one step.
+   *
+   * @param {SafeTransaction} safeTransaction The safe transaction to be proposed
+   * @param {TransactionOptions} transactionOptions  Optional transaction options
+   * @returns  A promise that resolves to the result of the transaction
+   */
+  async #deployAndProposeTransaction({
+    safeTransaction,
+    ...transactionOptions
+  }: {
+    safeTransaction: SafeTransaction
+  } & TransactionOptions): Promise<SafeClientResult> {
+    const safeDeploymentTransaction: Transaction =
+      await this.protocolKit.createSafeDeploymentTransaction(undefined, transactionOptions)
+    const hash = await sendTransaction({
+      transaction: { ...safeDeploymentTransaction },
+      protocolKit: this.protocolKit
+    })
+
+    await this.#reconnectSafe()
+
+    safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+    const safeTxHash = await proposeTransaction({
+      safeTransaction,
+      protocolKit: this.protocolKit,
+      apiKit: this.apiKit
+    })
+
+    return createSafeClientResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.DEPLOYED_AND_PENDING_SIGNATURES,
+      deploymentTxHash: hash,
+      safeTxHash
+    })
+  }
+
+  /**
+   * Executes a transaction.
+   *
+   * @param {SafeTransaction} safeTransaction The safe transaction to be executed
+   * @param {TransactionOptions} transactionOptions Optional transaction options
+   * @returns A promise that resolves to the result of the transaction
+   */
+  async #executeTransaction({
+    safeTransaction,
+    ...transactionOptions
+  }: { safeTransaction: SafeTransaction } & TransactionOptions): Promise<SafeClientResult> {
+    safeTransaction = await this.protocolKit.signTransaction(safeTransaction)
+
+    const { hash } = await this.protocolKit.executeTransaction(safeTransaction, transactionOptions)
+
+    return createSafeClientResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.EXECUTED,
+      txHash: hash
+    })
+  }
+
+  /**
+   *  Proposes a transaction to the Safe.
+   * @param { SafeTransaction } safeTransaction The safe transaction to propose
+   * @returns The SafeClientResult
+   */
+  async #proposeTransaction({ safeTransaction }: { safeTransaction: SafeTransaction }) {
+    const safeTxHash = await proposeTransaction({
+      safeTransaction,
+      protocolKit: this.protocolKit,
+      apiKit: this.apiKit
+    })
+
+    return createSafeClientResult({
+      safeAddress: await this.protocolKit.getAddress(),
+      status: SafeClientTxStatus.PENDING_SIGNATURES,
+      safeTxHash
+    })
+  }
+
+  async #reconnectSafe(): Promise<void> {
+    this.protocolKit = await this.protocolKit.connect({
+      provider: this.protocolKit.getSafeProvider().provider,
+      signer: this.protocolKit.getSafeProvider().signer,
+      safeAddress: await this.protocolKit.getAddress()
+    })
   }
 }

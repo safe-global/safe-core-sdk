@@ -19,6 +19,7 @@ export class BaseClient {
 
   /**
    * Returns the Safe address.
+   *
    * @returns {string} The Safe address
    */
   async getAddress(): Promise<string> {
@@ -102,6 +103,7 @@ export class BaseClient {
 
   /**
    * Encodes the data for removing an owner from the Safe.
+   *
    * @param {RemoveOwnerTxParams} params - The parameters for removing an owner
    * @param {string} params.ownerAddress - The address of the owner to remove
    * @param {number} params.threshold - The threshold of the Safe
@@ -136,6 +138,7 @@ export class BaseClient {
   }
 
   /**
+   * Encodes the data for changing the Safe threshold.
    *
    * @param {ChangeThresholdTxParams} params - The parameters for changing the Safe threshold
    * @param {number} params.threshold - The new threshold

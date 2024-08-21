@@ -577,6 +577,9 @@ describe('Safe4337Pack', () => {
         options: {
           owners: [fixtures.OWNER_1],
           threshold: 1
+        },
+        customContracts: {
+          safeWebAuthnSharedSignerAddress: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS
         }
       })
 
@@ -654,6 +657,9 @@ describe('Safe4337Pack', () => {
         options: {
           owners: [],
           threshold: 1
+        },
+        customContracts: {
+          safeWebAuthnSharedSignerAddress: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS
         }
       })
 

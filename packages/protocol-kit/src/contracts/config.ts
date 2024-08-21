@@ -12,10 +12,11 @@ import {
   getSimulateTxAccessorDeployment
 } from '@safe-global/safe-deployments'
 import {
-  SafeVersion,
-  SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts,
-  SafeWebAuthnSharedSigner_1_4_1_ContractArtifacts
-} from '@safe-global/safe-core-sdk-types'
+  Deployment,
+  getSafeWebAuthnSignerFactoryDeployment,
+  getSafeWebAuthnShareSignerDeployment
+} from '@safe-global/safe-modules-deployments'
+import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
 export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
@@ -49,8 +50,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     signMessageLibVersion: '1.4.1',
     createCallVersion: '1.4.1',
     simulateTxAccessorVersion: '1.4.1',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.3.0': {
     safeSingletonVersion: '1.3.0',
@@ -62,8 +63,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
     simulateTxAccessorVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.2.0': {
     safeSingletonVersion: '1.2.0',
@@ -74,8 +75,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.1.1': {
     safeSingletonVersion: '1.1.1',
@@ -86,8 +87,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.0.0': {
     safeSingletonVersion: '1.0.0',
@@ -98,8 +99,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '1.4.1',
-    safeWebAuthnSharedSignerVersion: '1.4.1'
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   }
 }
 
@@ -107,18 +108,9 @@ export const safeDeploymentsL1ChainIds = [
   1n // Ethereum Mainnet
 ]
 
-/*
-  Some of the contracts used in the PoC app are still experimental, and not included in
-  the production deployment packages, thus we need to hardcode their addresses here.
-  Deployment commit: https://github.com/safe-global/safe-modules/commit/3853f34f31837e0a0aee47a4452564278f8c62ba
-*/
-// FIXME: use the production deployment packages instead of a hardcoded addresses
-const WEBAUTHN_SIGNER_FACTORY_ADDRESS = '0xc40156AbFEE908E2e3269DA84fa9609bcCDDec60'
-const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
-
 const contractFunctions: Record<
   contractName,
-  (filter?: DeploymentFilter) => SingletonDeployment | undefined
+  (filter?: DeploymentFilter) => SingletonDeployment | undefined | Deployment
 > = {
   safeSingletonVersion: getSafeSingletonDeployment,
   safeSingletonL2Version: getSafeL2SingletonDeployment,
@@ -129,44 +121,8 @@ const contractFunctions: Record<
   signMessageLibVersion: getSignMessageLibDeployment,
   createCallVersion: getCreateCallDeployment,
   simulateTxAccessorVersion: getSimulateTxAccessorDeployment,
-  /*
-    safeWebAuthnSignerFactory contract is still experimental, and not included in
-    the production deployment packages, thus we need to hardcode the addresses here
-  */
-  safeWebAuthnSignerFactoryVersion: () => ({
-    abi: SafeWebAuthnSignerFactory_1_4_1_ContractArtifacts.abi as unknown as any[],
-    defaultAddress: WEBAUTHN_SIGNER_FACTORY_ADDRESS,
-    version: '1.4.1',
-    contractName: 'safeWebAuthnSignerFactoryVersion',
-    networkAddresses: {},
-    released: true,
-    // There was a major upgrade in safe-deployments, this property was added.
-    deployments: {
-      canonical: {
-        address: WEBAUTHN_SIGNER_FACTORY_ADDRESS,
-        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000'
-      }
-    }
-  }),
-  /*
-    safeWebAuthnSharedSigner contract is still experimental, and not included in
-    the production deployment packages, thus we need to hardcode the addresses here
-  */
-  safeWebAuthnSharedSignerVersion: () => ({
-    abi: SafeWebAuthnSharedSigner_1_4_1_ContractArtifacts.abi as unknown as any[],
-    defaultAddress: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-    version: '1.4.1',
-    contractName: 'safeWebAuthnSharedSignerVersion',
-    networkAddresses: {},
-    released: true,
-    // There was a major upgrade in safe-deployments, this property was added.
-    deployments: {
-      canonical: {
-        address: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-        codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000'
-      }
-    }
-  })
+  safeWebAuthnSignerFactoryVersion: getSafeWebAuthnSignerFactoryDeployment,
+  safeWebAuthnSharedSignerVersion: getSafeWebAuthnShareSignerDeployment
 }
 
 export function getContractDeployment(
@@ -182,7 +138,7 @@ export function getContractDeployment(
     released: true
   }
 
-  const deployment = contractFunctions[contractName](filters)
+  const deployment = contractFunctions[contractName](filters) as SingletonDeployment
 
   return deployment
 }

@@ -44,6 +44,7 @@ export type Safe4337InitOptions = {
     entryPointAddress?: string
     safe4337ModuleAddress?: string
     addModulesLibAddress?: string
+    safeWebAuthnSharedSignerAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
@@ -57,6 +58,7 @@ export type Safe4337Options = {
   bundlerClient: ethers.JsonRpcProvider
   entryPointAddress: string
   safe4337ModuleAddress: string
+  safeWebAuthnSharedSignerAddress?: string
 }
 
 export type Safe4337CreateTransactionProps = {

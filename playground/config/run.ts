@@ -32,7 +32,8 @@ const playgroundStarterKitPaths = {
   'send-transactions': 'sdk-starter-kit/send-transactions',
   'send-on-chain-message': 'sdk-starter-kit/send-on-chain-message',
   'send-off-chain-message': 'sdk-starter-kit/send-off-chain-message',
-  'send-safe-operation': 'sdk-starter-kit/send-safe-operation'
+  'send-safe-operation': 'sdk-starter-kit/send-safe-operation',
+  'owner-management': 'sdk-starter-kit/owner-management'
 }
 
 const path =

@@ -20,6 +20,8 @@ import {
   SendTransactionProps
 } from '@safe-global/sdk-starter-kit/types'
 
+import { BaseClient } from './BaseClient'
+
 /**
  * @class
  * This class provides the core functionality to create, sign and execute transactions.
@@ -31,13 +33,9 @@ import {
  * const { transactions } = await safeClient.send(...)
  * await safeClient.confirm(transactions?.safeTxHash)
  */
-export class SafeClient {
-  protocolKit: Safe
-  apiKit: SafeApiKit
-
+export class SafeClient extends BaseClient {
   constructor(protocolKit: Safe, apiKit: SafeApiKit) {
-    this.protocolKit = protocolKit
-    this.apiKit = apiKit
+    super(protocolKit, apiKit)
   }
 
   /**

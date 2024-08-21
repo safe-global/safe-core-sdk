@@ -276,6 +276,14 @@ class Safe {
   }
 
   /**
+   * Returns the OwnerManager
+   * @returns {OwnerManager} The current OwnerManager
+   */
+  getOwnerManager(): OwnerManager {
+    return this.#ownerManager
+  }
+
+  /**
    * Returns the address of the MultiSend contract.
    *
    * @returns The address of the MultiSend contract

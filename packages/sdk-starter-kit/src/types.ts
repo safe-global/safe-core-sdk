@@ -83,3 +83,7 @@ export type SafeClientResult = {
     ethereumTxHash?: string
   }
 }
+
+export type ChangeThresholdTxParams = {
+  threshold: number
+}

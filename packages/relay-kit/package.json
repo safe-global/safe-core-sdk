@@ -41,7 +41,7 @@
     "@gelatonetwork/relay-sdk": "^5.5.0",
     "@safe-global/protocol-kit": "^4.1.0-alpha.2",
     "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.2",
-    "@safe-global/safe-modules-deployments": "^2.1.1",
+    "@safe-global/safe-modules-deployments": "^2.2.1",
     "ethers": "^6.13.1"
   }
 }

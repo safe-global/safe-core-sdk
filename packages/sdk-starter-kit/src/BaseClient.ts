@@ -4,7 +4,7 @@ import Safe, {
   SwapOwnerTxParams
 } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { TransactionBase } from '@safe-global/safe-core-sdk-types'
+import { SafeTransaction, TransactionBase } from '@safe-global/safe-core-sdk-types'
 
 import { ChangeThresholdTxParams } from './types'
 
@@ -85,78 +85,62 @@ export class BaseClient {
   /**
    * Encodes the data for adding a new owner to the Safe.
    *
-   * @param {AddOwnerTxParams} params - The parameters for adding a new owner
-   * @param {string} params.ownerAddress - The address of the owner to add
-   * @param {number} params.threshold - The threshold of the Safe
+   * @param {AddOwnerTxParams} addOwnerParams - The parameters for adding a new owner
    * @returns {TransactionBase} The encoded data
    */
-  async createAddOwnerTransaction({
-    ownerAddress,
-    threshold
-  }: AddOwnerTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
+  async createAddOwnerTransaction(addOwnerParams: AddOwnerTxParams): Promise<TransactionBase> {
+    const addOwnerTransaction = await this.protocolKit.createAddOwnerTx(addOwnerParams)
 
-    return this.#buildTransaction(
-      await ownerManager.encodeAddOwnerWithThresholdData(ownerAddress, threshold)
-    )
+    return this.#buildTransaction(addOwnerTransaction)
   }
 
   /**
    * Encodes the data for removing an owner from the Safe.
    *
-   * @param {RemoveOwnerTxParams} params - The parameters for removing an owner
-   * @param {string} params.ownerAddress - The address of the owner to remove
-   * @param {number} params.threshold - The threshold of the Safe
+   * @param {RemoveOwnerTxParams} removeOwnerParams - The parameters for removing an owner
    * @returns {TransactionBase} The encoded data
    */
-  async createRemoveOwnerTransaction({
-    ownerAddress,
-    threshold
-  }: RemoveOwnerTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
+  async createRemoveOwnerTransaction(
+    removeOwnerParams: RemoveOwnerTxParams
+  ): Promise<TransactionBase> {
+    const removeOwnerTransaction = await this.protocolKit.createRemoveOwnerTx(removeOwnerParams)
 
-    return this.#buildTransaction(await ownerManager.encodeRemoveOwnerData(ownerAddress, threshold))
+    return this.#buildTransaction(removeOwnerTransaction)
   }
 
   /**
    * Encodes the data for swapping an owner in the Safe.
    *
-   * @param {SwapOwnerTxParams} params - The parameters for swapping an owner
-   * @param {string} params.oldOwnerAddress - The address of the old owner
-   * @param {string} params.newOwnerAddress - The address of the new owner
+   * @param {SwapOwnerTxParams} swapParams - The parameters for swapping an owner
    * @returns {TransactionBase} The encoded data
    */
-  async createSwapOwnerTransaction({
-    oldOwnerAddress,
-    newOwnerAddress
-  }: SwapOwnerTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
+  async createSwapOwnerTransaction(swapParams: SwapOwnerTxParams): Promise<TransactionBase> {
+    const swapOwnerTransaction = await this.protocolKit.createSwapOwnerTx(swapParams)
 
-    return this.#buildTransaction(
-      await ownerManager.encodeSwapOwnerData(oldOwnerAddress, newOwnerAddress)
-    )
+    return this.#buildTransaction(swapOwnerTransaction)
   }
 
   /**
    * Encodes the data for changing the Safe threshold.
    *
-   * @param {ChangeThresholdTxParams} params - The parameters for changing the Safe threshold
-   * @param {number} params.threshold - The new threshold
+   * @param {ChangeThresholdTxParams} changeThresholdParams - The parameters for changing the Safe threshold
    * @returns {TransactionBase} The encoded data
    */
-  async createChangeThresholdTransaction({
-    threshold
-  }: ChangeThresholdTxParams): Promise<TransactionBase> {
-    const ownerManager = this.protocolKit.getOwnerManager()
+  async createChangeThresholdTransaction(
+    changeThresholdParams: ChangeThresholdTxParams
+  ): Promise<TransactionBase> {
+    const changeThresholdTransaction = await this.protocolKit.createChangeThresholdTx(
+      changeThresholdParams.threshold
+    )
 
-    return this.#buildTransaction(await ownerManager.encodeChangeThresholdData(threshold))
+    return this.#buildTransaction(changeThresholdTransaction)
   }
 
-  async #buildTransaction(encodedData: string): Promise<TransactionBase> {
+  async #buildTransaction(safeTransaction: SafeTransaction): Promise<TransactionBase> {
     return {
-      to: await this.protocolKit.getAddress(),
-      value: '0',
-      data: encodedData
+      to: safeTransaction.data.to,
+      value: safeTransaction.data.value,
+      data: safeTransaction.data.data
     }
   }
 }

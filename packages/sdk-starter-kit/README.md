@@ -1,6 +1,6 @@
-# Safe Kit
+# SDK Starter Kit
 
-[![npm Version](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction-kit-poc.svg)](https://badge.fury.io/js/%40safe-global%2Faccount-abstraction-kit-poc)
+[![npm Version](https://badge.fury.io/js/%40safe-global%2Fsdk-starter-kit.svg)](https://badge.fury.io/js/%40safe-global%2Fsdk-starter-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
@@ -18,8 +18,8 @@ Description TBD
 Install the package with yarn or npm:
 
 ```bash
-yarn add @safe-global/safe-kit
-npm install @safe-global/safe-kit
+yarn add @safe-global/sdk-starter-kit
+npm install @safe-global/sdk-starter-kit
 ```
 
 ## Need Help or Have Questions?

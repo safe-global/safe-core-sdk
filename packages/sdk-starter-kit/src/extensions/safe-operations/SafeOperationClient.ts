@@ -135,7 +135,7 @@ export class SafeOperationClient {
   async getPendingSafeOperations(options?: ListOptions): Promise<GetSafeOperationListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    return this.apiKit.getSafeOperationsByAddress({ safeAddress, ...options })
+    return this.apiKit.getSafeOperationsByAddress(safeAddress, { ...options })
   }
 
   /**

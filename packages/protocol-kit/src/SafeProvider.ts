@@ -6,6 +6,7 @@ import {
   BrowserProvider,
   JsonRpcProvider
 } from 'ethers'
+import { StaticJsonRpcProvider } from '@ethersproject/providers'
 import { generateTypedData, validateEip3770Address } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
@@ -42,7 +43,8 @@ class SafeProvider {
 
   constructor({ provider, signer }: SafeProviderConfig) {
     if (typeof provider === 'string') {
-      this.#externalProvider = new JsonRpcProvider(provider)
+      // StaticJsonRpcProvider implements JsonRpcProvider but it's not polling getNetwork
+      this.#externalProvider = new StaticJsonRpcProvider(provider) as unknown as JsonRpcProvider
     } else {
       this.#externalProvider = new BrowserProvider(provider)
     }

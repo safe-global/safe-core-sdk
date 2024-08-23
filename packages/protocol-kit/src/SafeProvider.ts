@@ -42,7 +42,7 @@ class SafeProvider {
 
   constructor({ provider, signer }: SafeProviderConfig) {
     if (typeof provider === 'string') {
-      this.#externalProvider = new JsonRpcProvider(provider)
+      this.#externalProvider = new JsonRpcProvider(provider, undefined, { staticNetwork: true })
     } else {
       this.#externalProvider = new BrowserProvider(provider)
     }

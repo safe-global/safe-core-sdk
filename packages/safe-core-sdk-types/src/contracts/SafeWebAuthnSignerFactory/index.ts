@@ -1,6 +1,6 @@
-import { SafeWebAuthnSignerFactoryContract_v1_4_1_Contract } from './v1.4.1/SafeWebAuthnSignerFactory_v1_4_1'
+import { SafeWebAuthnSignerFactoryContract_v0_2_1_Contract } from './v0.2.1/SafeWebAuthnSignerFactory_v0_2_1'
 
-export * from './v1.4.1/SafeWebAuthnSignerFactory_v1_4_1'
+export * from './v0.2.1/SafeWebAuthnSignerFactory_v0_2_1'
 
 export type SafeWebAuthnSignerFactoryContractType =
-  SafeWebAuthnSignerFactoryContract_v1_4_1_Contract
+  SafeWebAuthnSignerFactoryContract_v0_2_1_Contract

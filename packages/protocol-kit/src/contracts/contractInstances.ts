@@ -23,8 +23,8 @@ import {
   CreateCallContract_v1_3_0_Abi,
   SimulateTxAccessorContract_v1_4_1_Abi,
   SimulateTxAccessorContract_v1_3_0_Abi,
-  SafeWebAuthnSignerFactoryContract_v1_4_1_Abi,
-  SafeWebAuthnSharedSignerContract_v1_4_1_Abi
+  SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
+  SafeWebAuthnSharedSignerContract_v0_2_1_Abi
 } from '@safe-global/safe-core-sdk-types'
 import CreateCallContract_v1_3_0 from './CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from './CreateCall/v1.4.1/CreateCallContract_v1_4_1'
@@ -48,8 +48,8 @@ import SimulateTxAccessorContract_v1_3_0 from './SimulateTxAccessor/v1.3.0/Simul
 import SimulateTxAccessorContract_v1_4_1 from './SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
 import CompatibilityFallbackHandlerContract_v1_3_0 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
 import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
-import SafeWebAuthnSignerFactoryContract_v1_4_1 from './SafeWebAuthnSignerFactory/v1.4.1/SafeWebAuthnSignerFactoryContract_v1_4_1'
-import SafeWebAuthnSharedSignerContract_v1_4_1 from './SafeWebAuthnSharedSigner/v1.4.1/SafeWebAuthnSharedSignerContract_v1_4_1'
+import SafeWebAuthnSignerFactoryContract_v0_2_1 from './SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
+import SafeWebAuthnSharedSignerContract_v0_2_1 from './SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
 import SafeProvider from '../SafeProvider'
 
 export async function getSafeContractInstance(
@@ -420,18 +420,19 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
   safeProvider: SafeProvider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
-): Promise<SafeWebAuthnSignerFactoryContract_v1_4_1> {
+): Promise<SafeWebAuthnSignerFactoryContract_v0_2_1> {
   const chainId = await safeProvider.getChainId()
 
   switch (safeVersion) {
     case '1.4.1':
     case '1.3.0':
       const safeWebAuthnSignerFactoryContractInstance =
-        new SafeWebAuthnSignerFactoryContract_v1_4_1(
+        new SafeWebAuthnSignerFactoryContract_v0_2_1(
           chainId,
           safeProvider,
+          safeVersion,
           contractAddress,
-          customContractAbi as SafeWebAuthnSignerFactoryContract_v1_4_1_Abi
+          customContractAbi as SafeWebAuthnSignerFactoryContract_v0_2_1_Abi
         )
 
       await safeWebAuthnSignerFactoryContractInstance.init()
@@ -448,17 +449,18 @@ export async function getSafeWebAuthnSharedSignerContractInstance(
   safeProvider: SafeProvider,
   contractAddress?: string,
   customContractAbi?: JsonFragment | JsonFragment[] | undefined
-): Promise<SafeWebAuthnSharedSignerContract_v1_4_1> {
+): Promise<SafeWebAuthnSharedSignerContract_v0_2_1> {
   const chainId = await safeProvider.getChainId()
 
   switch (safeVersion) {
     case '1.4.1':
     case '1.3.0':
-      const safeWebAuthnSharedSignerContractInstance = new SafeWebAuthnSharedSignerContract_v1_4_1(
+      const safeWebAuthnSharedSignerContractInstance = new SafeWebAuthnSharedSignerContract_v0_2_1(
         chainId,
         safeProvider,
+        safeVersion,
         contractAddress,
-        customContractAbi as SafeWebAuthnSharedSignerContract_v1_4_1_Abi
+        customContractAbi as SafeWebAuthnSharedSignerContract_v0_2_1_Abi
       )
 
       await safeWebAuthnSharedSignerContractInstance.init()

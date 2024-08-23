@@ -1,3 +1,4 @@
+import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -16,8 +17,29 @@ import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupPro
 import { getAccounts } from './utils/setupTestNetwork'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
 import { AbstractSigner, BrowserProvider, JsonRpcProvider } from 'ethers'
+import { itif } from './utils/helpers'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
+import { createMockPasskey, getWebAuthnCredentials } from './utils/passkeys'
 
 chai.use(chaiAsPromised)
+chai.use(sinonChai)
+
+const webAuthnCredentials = getWebAuthnCredentials()
+
+if (!global.crypto) {
+  global.crypto = crypto as unknown as Crypto
+}
+
+Object.defineProperty(global, 'navigator', {
+  value: {
+    credentials: {
+      create: sinon.stub().callsFake(webAuthnCredentials.create.bind(webAuthnCredentials)),
+      get: sinon.stub().callsFake(webAuthnCredentials.get.bind(webAuthnCredentials))
+    }
+  },
+  writable: true
+})
 
 describe('Safe contracts', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
@@ -33,6 +55,22 @@ describe('Safe contracts', () => {
       chainId,
       provider
     }
+  })
+
+  describe('init', async () => {
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail for a passkey signer and Safe <v1.3.0',
+      async () => {
+        const { provider } = await setupTests()
+        const passKeySigner = await createMockPasskey('aName')
+
+        chai
+          .expect(SafeProvider.init(provider, passKeySigner, safeVersionDeployed))
+          .to.be.rejectedWith(
+            'Current version of the Safe does not support the Passkey signer functionality'
+          )
+      }
+    )
   })
 
   describe('getSafeContract', async () => {

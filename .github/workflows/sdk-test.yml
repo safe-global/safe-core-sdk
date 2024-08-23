@@ -28,6 +28,7 @@ jobs:
       - name: Test
         env:
           PRIVATE_KEY: ${{ secrets.TESTING_PRIVATE_KEY }}
+          PASSKEY_PRIVATE_KEY: ${{ secrets.TESTING_PASSKEY_PRIVATE_KEY }}
         run: yarn test
 
       - name: Upload coverage report

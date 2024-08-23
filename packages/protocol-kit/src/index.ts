@@ -16,7 +16,9 @@ import {
   getMultiSendContract,
   getProxyFactoryContract,
   getSafeContract,
-  getSignMessageLibContract
+  getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract
 } from './contracts/safeDeploymentContracts'
 import {
   PREDETERMINED_SALT_NONCE,
@@ -33,6 +35,9 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyData,
+  getDefaultFCLP256VerifierAddress,
+  extractPasskeyCoordinates,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -62,11 +67,16 @@ import {
   generateTypedData
 } from './utils/eip-712'
 
+import PasskeySigner from './utils/passkeys/PasskeySigner'
+import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
+
 export {
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyData,
+  extractPasskeyCoordinates,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
@@ -91,6 +101,9 @@ export {
   getProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract,
+  getDefaultFCLP256VerifierAddress,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   getPredictedSafeAddressInitCode,
@@ -109,7 +122,9 @@ export {
   generateTypedData,
   SafeProvider,
   EthSafeTransaction,
-  EthSafeMessage
+  EthSafeMessage,
+  PasskeySigner,
+  getPasskeyOwnerAddress
 }
 
 export * from './types'

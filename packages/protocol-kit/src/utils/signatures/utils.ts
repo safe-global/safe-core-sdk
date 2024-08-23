@@ -110,6 +110,7 @@ export async function generateSignature(
   hash: string
 ): Promise<SafeSignature> {
   const signerAddress = await safeProvider.getSignerAddress()
+
   if (!signerAddress) {
     throw new Error('SafeProvider must be initialized with a signer to use this method')
   }

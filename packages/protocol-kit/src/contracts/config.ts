@@ -11,6 +11,11 @@ import {
   getSignMessageLibDeployment,
   getSimulateTxAccessorDeployment
 } from '@safe-global/safe-deployments'
+import {
+  Deployment,
+  getSafeWebAuthnSignerFactoryDeployment,
+  getSafeWebAuthnShareSignerDeployment
+} from '@safe-global/safe-modules-deployments'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
@@ -26,6 +31,8 @@ type contractNames = {
   signMessageLibVersion?: string
   createCallVersion?: string
   simulateTxAccessorVersion?: string
+  safeWebAuthnSignerFactoryVersion?: string
+  safeWebAuthnSharedSignerVersion?: string
 }
 
 type SafeDeploymentsVersions = Record<SafeVersion, contractNames>
@@ -42,7 +49,9 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.4.1',
     signMessageLibVersion: '1.4.1',
     createCallVersion: '1.4.1',
-    simulateTxAccessorVersion: '1.4.1'
+    simulateTxAccessorVersion: '1.4.1',
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.3.0': {
     safeSingletonVersion: '1.3.0',
@@ -53,7 +62,9 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    simulateTxAccessorVersion: '1.3.0'
+    simulateTxAccessorVersion: '1.3.0',
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.2.0': {
     safeSingletonVersion: '1.2.0',
@@ -63,7 +74,9 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendVersion: '1.1.1',
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
-    createCallVersion: '1.3.0'
+    createCallVersion: '1.3.0',
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.1.1': {
     safeSingletonVersion: '1.1.1',
@@ -73,7 +86,9 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendVersion: '1.1.1',
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
-    createCallVersion: '1.3.0'
+    createCallVersion: '1.3.0',
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   },
   '1.0.0': {
     safeSingletonVersion: '1.0.0',
@@ -83,7 +98,9 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendVersion: '1.1.1',
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
-    createCallVersion: '1.3.0'
+    createCallVersion: '1.3.0',
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
   }
 }
 
@@ -93,7 +110,7 @@ export const safeDeploymentsL1ChainIds = [
 
 const contractFunctions: Record<
   contractName,
-  (filter?: DeploymentFilter) => SingletonDeployment | undefined
+  (filter?: DeploymentFilter) => SingletonDeployment | undefined | Deployment
 > = {
   safeSingletonVersion: getSafeSingletonDeployment,
   safeSingletonL2Version: getSafeL2SingletonDeployment,
@@ -103,7 +120,9 @@ const contractFunctions: Record<
   multiSendCallOnlyVersion: getMultiSendCallOnlyDeployment,
   signMessageLibVersion: getSignMessageLibDeployment,
   createCallVersion: getCreateCallDeployment,
-  simulateTxAccessorVersion: getSimulateTxAccessorDeployment
+  simulateTxAccessorVersion: getSimulateTxAccessorDeployment,
+  safeWebAuthnSignerFactoryVersion: getSafeWebAuthnSignerFactoryDeployment,
+  safeWebAuthnSharedSignerVersion: getSafeWebAuthnShareSignerDeployment
 }
 
 export function getContractDeployment(
@@ -119,7 +138,7 @@ export function getContractDeployment(
     released: true
   }
 
-  const deployment = contractFunctions[contractName](filters)
+  const deployment = contractFunctions[contractName](filters) as SingletonDeployment
 
   return deployment
 }

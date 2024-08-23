@@ -1,3 +1,6 @@
+import PasskeySigner from '../utils/passkeys/PasskeySigner'
+import { PasskeyArgType } from './passkeys'
+
 export type RequestArguments = {
   readonly method: string
   readonly params?: readonly unknown[] | object
@@ -11,12 +14,12 @@ export type HexAddress = string
 export type PrivateKey = string
 export type HttpTransport = string
 export type SocketTransport = string
-export type SafeSigner = HexAddress | PrivateKey
+export type SafeSigner = HexAddress | PrivateKey | PasskeySigner
 
 export type SafeProviderConfig = {
   /** signerOrProvider - Ethers signer or provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
-  signer?: HexAddress | PrivateKey
+  signer?: HexAddress | PrivateKey | PasskeySigner | PasskeyArgType
 }
 
 export type SafeProviderTransaction = {

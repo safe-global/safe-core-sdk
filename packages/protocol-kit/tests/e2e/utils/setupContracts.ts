@@ -7,13 +7,13 @@ import {
   proxyFactoryDeployed,
   safeDeployed,
   safeVersionDeployed,
+  safeWebAuthnSharedSignerDeployed,
+  safeWebAuthnSignerFactoryDeployed,
   signMessageLibDeployed,
   simulateTxAccessorDeployed
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
 import { deployments, ethers } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
-
-// TODO: changue contract por abitype objts
 
 export const getSafeSingleton = async (): Promise<{
   contract: Contract
@@ -161,6 +161,44 @@ export const getSimulateTxAccessor = async (): Promise<{
     contract: SimulateTxAccessor.attach(SimulateTxAccessorDeployment.address),
     abi: SimulateTxAccessorDeployment.abi
   }
+}
+
+export const getSafeWebAuthnSignerFactory = async (): Promise<{
+  contract: Contract
+  abi: JsonFragment | JsonFragment[]
+}> => {
+  const SafeWebAuthnSignerFactoryDeployment = await deployments.get(
+    safeWebAuthnSignerFactoryDeployed.name
+  )
+  const SafeWebAuthnSignerFactory = await ethers.getContractFactory(
+    safeWebAuthnSignerFactoryDeployed.name
+  )
+  return {
+    contract: SafeWebAuthnSignerFactory.attach(SafeWebAuthnSignerFactoryDeployment.address),
+    abi: SafeWebAuthnSignerFactoryDeployment.abi
+  }
+}
+
+export const getSafeWebAuthnSharedSigner = async (): Promise<{
+  contract: Contract
+  abi: JsonFragment | JsonFragment[]
+}> => {
+  const SafeWebAuthnSharedSignerDeployment = await deployments.get(
+    safeWebAuthnSharedSignerDeployed.name
+  )
+  const SafeWebAuthnSharedSigner = await ethers.getContractFactory(
+    safeWebAuthnSharedSignerDeployed.name
+  )
+  return {
+    contract: SafeWebAuthnSharedSigner.attach(SafeWebAuthnSharedSignerDeployment.address),
+    abi: SafeWebAuthnSharedSignerDeployment.abi
+  }
+}
+
+export const getWebAuthnContract = async (): Promise<Contract> => {
+  const WebAuthnContractDeployment = await deployments.get('WebAuthnContract')
+  const WebAuthn = await ethers.getContractFactory('WebAuthnContract')
+  return WebAuthn.attach(WebAuthnContractDeployment.address)
 }
 
 export const getDailyLimitModule = async (): Promise<Contract> => {

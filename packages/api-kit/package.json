@@ -48,7 +48,7 @@
     "@types/yargs": "^17.0.32",
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
-    "hardhat": "^2.19.3",
+    "hardhat": "2.20.1",
     "mocha": "^10.2.0",
     "semver": "^7.6.1",
     "sinon": "^14.0.2",
@@ -59,8 +59,8 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^4.0.4",
-    "@safe-global/safe-core-sdk-types": "^5.0.3",
+    "@safe-global/protocol-kit": "^4.1.0-alpha.2",
+    "@safe-global/safe-core-sdk-types": "^5.1.0-alpha.2",
     "ethers": "^6.13.1",
     "node-fetch": "^2.7.0"
   }

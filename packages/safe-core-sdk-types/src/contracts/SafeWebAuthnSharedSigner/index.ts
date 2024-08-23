@@ -1,5 +1,5 @@
-import { SafeWebAuthnSharedSignerContract_v1_4_1_Contract } from './v1.4.1/SafeWebAuthnSharedSigner_v1_4_1'
+import { SafeWebAuthnSharedSignerContract_v0_2_1_Contract } from './v0.2.1/SafeWebAuthnSharedSigner_v0_2_1'
 
-export * from './v1.4.1/SafeWebAuthnSharedSigner_v1_4_1'
+export * from './v0.2.1/SafeWebAuthnSharedSigner_v0_2_1'
 
-export type SafeWebAuthnSharedSignerContractType = SafeWebAuthnSharedSignerContract_v1_4_1_Contract
+export type SafeWebAuthnSharedSignerContractType = SafeWebAuthnSharedSignerContract_v0_2_1_Contract

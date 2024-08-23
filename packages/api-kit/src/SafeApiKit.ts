@@ -6,7 +6,8 @@ import {
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
   GetSafeDelegateProps,
-  SortableListProps,
+  GetSafeMessageListProps,
+  GetSafeOperationListProps,
   GetSafeOperationListResponse,
   ListOptions,
   ModulesResponse,
@@ -656,15 +657,12 @@ class SafeApiKit {
   /**
    * Get the list of messages associated to a Safe account
    * @param safeAddress The safe address
-   * @param options Options to sort and paginate the list of operations
-   * @param options.ordering Field used for sorting. It can be: `created`, `modified` (default: `-created`)
-   * @param options.limit Maximum number of results to return per page
-   * @param options.offset Initial index from which to return the result
+   * @param options The options to filter the list of messages
    * @returns The paginated list of messages
    */
   async getMessages(
     safeAddress: string,
-    { ordering, limit, offset }: SortableListProps = {}
+    { ordering, limit, offset }: GetSafeMessageListProps = {}
   ): Promise<SafeMessageListResponse> {
     if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
@@ -729,19 +727,17 @@ class SafeApiKit {
 
   /**
    * Get the SafeOperations that were sent from a particular address.
-   * @param safeAddress The Safe address
-   * @param options Options to sort and paginate the list of operations
-   * @param options.ordering Field used for sorting. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`)
-   * @param options.limit Maximum number of results to return per page
-   * @param options.offset Initial index from which to return the result
+   * @param getSafeOperationsProps - The parameters to filter the list of SafeOperations
    * @throws "Safe address must not be empty"
    * @throws "Invalid Ethereum address {safeAddress}"
    * @returns The SafeOperations sent from the given Safe's address
    */
-  async getSafeOperationsByAddress(
-    safeAddress: string,
-    { ordering, limit, offset }: SortableListProps = {}
-  ): Promise<GetSafeOperationListResponse> {
+  async getSafeOperationsByAddress({
+    safeAddress,
+    ordering,
+    limit,
+    offset
+  }: GetSafeOperationListProps): Promise<GetSafeOperationListResponse> {
     if (!safeAddress) {
       throw new Error('Safe address must not be empty')
     }

@@ -151,12 +151,16 @@ describe('addSafeOperation', () => {
     const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
     // Get the number of SafeOperations before adding a new one
-    const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
     const initialNumSafeOperations = safeOperationsBefore.count
 
     await chai.expect(safeApiKit.addSafeOperation(addSafeOperationProps)).to.be.fulfilled
 
-    const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
     chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 
@@ -167,12 +171,16 @@ describe('addSafeOperation', () => {
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
     // Get the number of SafeOperations before adding a new one
-    const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
     const initialNumSafeOperations = safeOperationsBefore.count
 
     await chai.expect(safeApiKit.addSafeOperation(signedSafeOperation)).to.be.fulfilled
 
-    const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsAfter = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
     chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 })

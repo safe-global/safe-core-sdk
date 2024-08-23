@@ -247,8 +247,8 @@ export type AddMessageProps = {
   signature: string
 }
 
-export type SortableListProps = {
-  /** Field to use to sort the results */
+export type GetSafeMessageListProps = {
+  /** Which field to use when ordering the results. It can be: `created`, `modified` (default: `-created`) */
   ordering?: string
 } & ListOptions
 
@@ -257,6 +257,13 @@ export type EIP712TypedData = {
   types: TypedDataField
   message: Record<string, unknown>
 }
+
+export type GetSafeOperationListProps = {
+  /** Address of the Safe to get SafeOperations for */
+  safeAddress: string
+  /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
+  ordering?: string
+} & ListOptions
 
 export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 

@@ -21,19 +21,21 @@ describe('getSafeOperationsByAddress', () => {
   describe('should fail', () => {
     it('should fail if safeAddress is empty', async () => {
       await chai
-        .expect(safeApiKit.getSafeOperationsByAddress(''))
+        .expect(safeApiKit.getSafeOperationsByAddress({ safeAddress: '' }))
         .to.be.rejectedWith('Safe address must not be empty')
     })
 
     it('should fail if safeAddress is invalid', async () => {
       await chai
-        .expect(safeApiKit.getSafeOperationsByAddress('0x123'))
+        .expect(safeApiKit.getSafeOperationsByAddress({ safeAddress: '0x123' }))
         .to.be.rejectedWith('Invalid Ethereum address 0x123')
     })
   })
 
   it('should get the SafeOperation list', async () => {
-    const response = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const response = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
 
     safeOperations = response.results
 
@@ -70,7 +72,8 @@ describe('getSafeOperationsByAddress', () => {
   })
 
   it('should get a maximum of 3 SafeOperations with limit = 3', async () => {
-    const response = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS, {
+    const response = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
       limit: 3
     })
 
@@ -81,7 +84,8 @@ describe('getSafeOperationsByAddress', () => {
   })
 
   it('should get all SafeOperations excluding the first one with offset = 1', async () => {
-    const response = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS, {
+    const response = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
       offset: 1
     })
 

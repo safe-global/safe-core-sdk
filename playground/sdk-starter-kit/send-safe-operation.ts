@@ -1,7 +1,7 @@
 import { privateKeyToAddress } from 'viem/accounts'
 import { createPublicClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
-import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/safe-kit'
+import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/sdk-starter-kit'
 import { generateTransferCallData } from '../utils'
 
 const OWNER_1_PRIVATE_KEY = '0x'

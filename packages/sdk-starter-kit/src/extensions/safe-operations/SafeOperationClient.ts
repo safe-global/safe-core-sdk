@@ -2,13 +2,13 @@ import Safe, { buildSignatureBytes } from '@safe-global/protocol-kit'
 import SafeApiKit, { ListOptions, GetSafeOperationListResponse } from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 
-import { createSafeClientResult } from '@safe-global/safe-kit/utils'
-import { SafeClientTxStatus } from '@safe-global/safe-kit/constants'
+import { createSafeClientResult } from '@safe-global/sdk-starter-kit/utils'
+import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 import {
   ConfirmSafeOperationProps,
   SafeClientResult,
   SendSafeOperationProps
-} from '@safe-global/safe-kit/types'
+} from '@safe-global/sdk-starter-kit/types'
 
 /**
  * @class

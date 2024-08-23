@@ -1,5 +1,5 @@
 import { privateKeyToAddress } from 'viem/accounts'
-import { SafeClientResult, createSafeClient, offChainMessages } from '@safe-global/safe-kit'
+import { SafeClientResult, createSafeClient, offChainMessages } from '@safe-global/sdk-starter-kit'
 
 const OWNER_1_PRIVATE_KEY = '0x'
 const OWNER_2_PRIVATE_KEY = '0x'

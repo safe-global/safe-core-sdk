@@ -19,7 +19,8 @@ import {
 } from '@safe-global/safe-core-sdk-types'
 import {
   getAddModulesLibDeployment,
-  getSafe4337ModuleDeployment
+  getSafe4337ModuleDeployment,
+  getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
 import { Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
 import EthSafeOperation from './SafeOperation'
@@ -58,14 +59,6 @@ const MAX_ERC20_AMOUNT_TO_APPROVE =
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 
 /**
-  Some of the contracts used in the PoC app are still experimental, and not included in
-  the production deployment packages, thus we need to hardcode their addresses here.
-  Deployment commit: https://github.com/safe-global/safe-modules/commit/3853f34f31837e0a0aee47a4452564278f8c62ba
-*/
-// FIXME: use the production deployment packages instead of a hardcoded address
-const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x608Cf2e3412c6BDA14E6D8A0a7D27c4240FeD6F1'
-
-/**
  * Safe4337Pack class that extends RelayKitBasePack.
  * This class provides an implementation of the ERC-4337 that enables Safe accounts to wrk with UserOperations.
  * It allows to create, sign and execute transactions using the Safe 4337 Module.
@@ -86,6 +79,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   #ENTRYPOINT_ADDRESS: string
   #SAFE_4337_MODULE_ADDRESS: string = '0x'
+  #SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS: string = '0x'
 
   #bundlerClient: BundlerClient
 
@@ -105,7 +99,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     chainId,
     paymasterOptions,
     entryPointAddress,
-    safe4337ModuleAddress
+    safe4337ModuleAddress,
+    safeWebAuthnSharedSignerAddress
   }: Safe4337Options) {
     super(protocolKit)
 
@@ -115,6 +110,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#paymasterOptions = paymasterOptions
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
+    this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
   }
 
   /**
@@ -168,6 +164,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
         `Safe4337Module and/or AddModulesLib not available for chain ${network} and modules version ${safeModulesVersion}`
       )
     }
+
+    let safeWebAuthnSharedSignerAddress = customContracts?.safeWebAuthnSharedSignerAddress
 
     // Existing Safe
     if ('safeAddress' in options) {
@@ -257,14 +255,28 @@ export class Safe4337Pack extends RelayKitBasePack<{
       const isPasskeySigner = await safeProvider.isPasskeySigner()
 
       if (isPasskeySigner) {
+        if (!safeWebAuthnSharedSignerAddress) {
+          const safeWebAuthnSharedSignerDeployment = getSafeWebAuthnShareSignerDeployment({
+            released: true,
+            version: '0.2.1',
+            network
+          })
+          safeWebAuthnSharedSignerAddress =
+            safeWebAuthnSharedSignerDeployment?.networkAddresses[network]
+        }
+
+        if (!safeWebAuthnSharedSignerAddress) {
+          throw new Error(`safeWebAuthnSharedSignerAddress not available for chain ${network}`)
+        }
+
         const passkeySigner = (await safeProvider.getExternalSigner()) as PasskeyClient
 
-        if (!options.owners.includes(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)) {
-          options.owners.push(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)
+        if (!options.owners.includes(safeWebAuthnSharedSignerAddress)) {
+          options.owners.push(safeWebAuthnSharedSignerAddress)
         }
 
         const sharedSignerTransaction = {
-          to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          to: safeWebAuthnSharedSignerAddress,
           value: '0',
           data: passkeySigner.encodeConfigure(),
           operation: OperationType.DelegateCall // DelegateCall required into the SafeWebAuthnSharedSigner instance in order for it to set its configuration.
@@ -357,7 +369,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       paymasterOptions,
       bundlerUrl,
       entryPointAddress: selectedEntryPoint!,
-      safe4337ModuleAddress
+      safe4337ModuleAddress,
+      safeWebAuthnSharedSignerAddress
     })
   }
 
@@ -391,7 +404,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         userOperationToHexValues(
           addDummySignature(
             safeOperation.toUserOperation(),
-            SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+            this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
             threshold
           )
         ),
@@ -425,7 +438,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
         userOperation: addDummySignature(
           safeOperation.toUserOperation(),
-          SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
           threshold
         ),
         paymasterUrl: this.#paymasterOptions.paymasterUrl,
@@ -629,7 +642,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         const passkeySignature = await this.protocolKit.signHash(safeOpHash)
         // SafeWebAuthnSharedSigner signature
         signature = new EthSafeSignature(
-          SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
           passkeySignature.data,
           true // passkeys are contract signatures
         )

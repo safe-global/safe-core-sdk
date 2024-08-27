@@ -22,7 +22,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: yarn
       - run: |
-          yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --force
           yarn build
       - name: Verify testing-kit installation
         run: |
@@ -31,12 +31,9 @@ jobs:
         run: |
           echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
           ls -la $(pwd)/node_modules/.bin
-          cd packages/testing-kit
-          echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
-          echo "$(pwd)/dist/bin" >> $GITHUB_PATH
           ls -la $(pwd)/node_modules/.bin
           ls -la $(pwd)/dist/bin
-          cd ../protocol-kit
+          cd packages/protocol-kit
           echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
           ls -la $(pwd)/node_modules/.bin          
           yarn test:hardhat:${{ matrix.provider }}:${{ matrix.contract-version }}

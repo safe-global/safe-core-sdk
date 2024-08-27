@@ -22,7 +22,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: yarn
       - run: |
-          yarn install --frozen-lockfile
+          yarn install
           yarn build
       - name: Verify testing-kit installation
         run: |

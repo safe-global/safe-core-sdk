@@ -24,11 +24,12 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
-      - name: Manually add testing-kit to PATH
-        run: |
-          echo "packages/testing-kit/dist/bin/testing-kit.js" >> $GITHUB_PATH
-          ls -la $(pwd)/packages/testing-kit/dist/bin
-
+      - name: Make testing-kit.js executable
+        run: chmod +x packages/testing-kit/bin/testing-kit.js
+      - name: Add script directory to PATH
+        run: echo "$(pwd)/packages/testing-kit/bin" >> $GITHUB_PATH
+      - name: Debug PATH
+        run: echo $PATH
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/protocol-kit

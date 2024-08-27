@@ -24,9 +24,11 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
-      - name: Verify testing-kit installation
+      - name: Manually add testing-kit to PATH
         run: |
-          yarn list @safe-global/testing-kit
+          echo "packages/testing-kit/dist/bin" >> $GITHUB_PATH
+          ls -la $(pwd)/packages/testing-kit/dist/bin
+
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/protocol-kit

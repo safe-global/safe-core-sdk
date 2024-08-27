@@ -26,7 +26,7 @@ jobs:
           yarn build
       - name: Manually add testing-kit to PATH
         run: |
-          echo "packages/testing-kit/dist/bin" >> $GITHUB_PATH
+          echo "packages/testing-kit/dist/bin/testing-kit.js" >> $GITHUB_PATH
           ls -la $(pwd)/packages/testing-kit/dist/bin
 
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}

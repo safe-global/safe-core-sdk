@@ -31,9 +31,12 @@ jobs:
         run: |
           echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
           ls -la $(pwd)/node_modules/.bin
-          cd packages/protocol-kit
+          cd packages/testing-kit
           echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
+          echo "$(pwd)/dist/bin" >> $GITHUB_PATH
           ls -la $(pwd)/node_modules/.bin
-          printenv
-          find $(pwd)/node_modules -name testing-kit -type f
+          ls -la $(pwd)/dist/bin
+          cd ../protocol-kit
+          echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
+          ls -la $(pwd)/node_modules/.bin          
           yarn test:hardhat:${{ matrix.provider }}:${{ matrix.contract-version }}

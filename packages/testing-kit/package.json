@@ -1,0 +1,48 @@
+{
+  "name": "@safe-global/testing-kit",
+  "version": "1.0.0",
+  "description": "Helper package providing testing utilities",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "keywords": [
+    "Ethereum",
+    "Wallet",
+    "Safe",
+    "Smart Account",
+    "SDK",
+    "Testing"
+  ],
+  "scripts": {
+    "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
+    "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
+    "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
+    "build": "yarn unbuild && hardhat compile && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && yarn copy-files",
+    "copy-files": "cpx 'artifacts/**/*' dist/artifacts",
+    "deploy": "hardhat deploy",
+    "compile": "hardhat compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/safe-global/safe-core-sdk.git"
+  },
+  "author": "Safe (https://safe.global)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/safe-global/safe-core-sdk/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
+  "devDependencies": {
+    "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
+    "@nomicfoundation/hardhat-viem": "^2.0.2",
+    "@openzeppelin/contracts": "^2.5.1",
+    "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
+    "@safe-global/safe-core-sdk-types": "^5.0.3",
+    "cpx": "^1.5.0",
+    "hardhat": "^2.19.3",
+    "hardhat-deploy": "^0.12.4",
+    "tsconfig-paths": "^4.2.0"
+  }
+}

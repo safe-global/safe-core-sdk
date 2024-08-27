@@ -66,7 +66,7 @@
     "dotenv": "^16.4.5",
     "ethers": "^6.13.1",
     "hardhat": "^2.19.3",
-    "hardhat-deploy": "^0.11.45",
+    "hardhat-deploy": "^0.12.4",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "tsconfig-paths": "^4.2.0",

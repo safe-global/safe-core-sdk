@@ -29,6 +29,8 @@ jobs:
           yarn list @safe-global/testing-kit
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
+          echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
+          ls -la $(pwd)/node_modules/.bin
           cd packages/protocol-kit
           echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
           ls -la $(pwd)/node_modules/.bin

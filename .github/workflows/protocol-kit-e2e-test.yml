@@ -24,9 +24,15 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
+      - name: Verify testing-kit installation
+        run: |
+          yarn list @safe-global/testing-kit
       - name: Add node_modules/.bin to the PATH
         run: |
           echo "$(yarn bin)" >> $GITHUB_PATH
+      - name: Debug node_modules/.bin
+        run: |
+          ls -la $(yarn bin)
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/protocol-kit

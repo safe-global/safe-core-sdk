@@ -4,15 +4,6 @@ import 'tsconfig-paths/register'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
 import path from 'path'
-import yargs from 'yargs'
-
-yargs
-  .option('network', {
-    type: 'string',
-    default: 'hardhat'
-  })
-  .help(false)
-  .version(false).argv
 
 dotenv.config()
 const { MNEMONIC, PK } = process.env

@@ -24,6 +24,9 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
+      - name: Add node_modules/.bin to PATH
+        run: |
+          echo '::add-path::$(yarn bin)' # Add node_modules/.bin to the PATH
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/protocol-kit

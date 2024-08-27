@@ -34,4 +34,6 @@ jobs:
           cd packages/protocol-kit
           echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
           ls -la $(pwd)/node_modules/.bin
+          printenv
+          find $(pwd)/node_modules -name testing-kit -type f
           yarn test:hardhat:${{ matrix.provider }}:${{ matrix.contract-version }}

@@ -1890,9 +1890,6 @@
     "@safe-global/safe-contracts" "^1.4.1-build.0"
     cbor "^9.0.2"
 
-"@safe-global/testing-kit@file:packages/testing-kit":
-  version "1.0.0"
-
 "@scure/base@^1.1.1", "@scure/base@^1.1.3", "@scure/base@~1.1.0":
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.6.tgz#8ce5d304b436e4c84f896e0550c83e4d88cb917d"

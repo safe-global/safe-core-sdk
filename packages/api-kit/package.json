@@ -59,7 +59,7 @@
     "tsconfig-paths": "^4.2.0",
     "web3": "^4.7.0",
     "yargs": "^17.7.2",
-    "@safe-global/testing-kit": "file:../testing-kit"
+    "@safe-global/testing-kit": "^1.0.0"
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^4.1.0",

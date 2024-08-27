@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/safe-core-sdk-types",
-  "version": "5.1.0-alpha.2",
+  "version": "5.1.0",
   "description": "Safe Core SDK types",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

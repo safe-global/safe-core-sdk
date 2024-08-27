@@ -1,1 +1,0 @@
-export { getHardHatConfig } from './config'

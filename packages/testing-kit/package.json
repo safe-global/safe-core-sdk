@@ -2,8 +2,8 @@
   "name": "@safe-global/testing-kit",
   "version": "1.0.0",
   "description": "Helper package providing testing utilities",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "keywords": [
     "Ethereum",
     "Wallet",
@@ -16,7 +16,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && yarn copy-files",
+    "build": "yarn unbuild && hardhat compile && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && yarn copy-files && chmod +x dist/bin/testing-kit.js",
     "copy-files": "cpx 'artifacts/**/*' dist/artifacts",
     "deploy": "hardhat deploy",
     "compile": "hardhat compile"
@@ -44,5 +44,8 @@
     "hardhat": "^2.19.3",
     "hardhat-deploy": "^0.12.4",
     "tsconfig-paths": "^4.2.0"
+  },
+  "bin": {
+    "testing-kit": "./dist/bin/testing-kit.js"
   }
 }

@@ -24,7 +24,7 @@ jobs:
       - run: |
           yarn install --frozen-lockfile
           yarn build
-      - name: Add node_modules/.bin to PATH
+      - name: Add node_modules/.bin to the PATH
         run: |
           echo "$(yarn bin)" >> $GITHUB_PATH
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}

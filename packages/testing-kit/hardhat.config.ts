@@ -3,6 +3,7 @@ import 'hardhat-deploy'
 import 'tsconfig-paths/register'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
+import path from 'path'
 import yargs from 'yargs'
 
 yargs
@@ -53,10 +54,9 @@ const config: HardhatUserConfig = {
     }
   },
   paths: {
-    artifacts: 'artifacts',
-    deploy: 'hardhat/deploy',
-    sources: 'contracts',
-    tests: 'tests/e2e'
+    artifacts: path.resolve(__dirname, './artifacts'),
+    deploy: path.resolve(__dirname, './hardhat/deploy'),
+    sources: path.resolve(__dirname, './contracts')
   },
   networks: {
     localhost: {

@@ -1,5 +1,5 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from '@safe-global/testing-kit'
 import {
   ContractNetworksConfig,
   DeploySafeProps,

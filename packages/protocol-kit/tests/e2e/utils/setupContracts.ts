@@ -12,7 +12,7 @@ import {
   safeWebAuthnSignerFactoryDeployed,
   signMessageLibDeployed,
   simulateTxAccessorDeployed
-} from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+} from '@safe-global/testing-kit'
 import { deployments, viem } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { getDeployer, waitTransactionReceipt } from './transactions'

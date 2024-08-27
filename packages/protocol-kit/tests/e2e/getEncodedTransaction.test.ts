@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit/index'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from '@safe-global/testing-kit'
 import chai from 'chai'
 import { deployments } from 'hardhat'
 import { getContractNetworks } from './utils/setupContractNetworks'

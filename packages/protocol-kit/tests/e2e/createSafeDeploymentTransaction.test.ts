@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { deployments } from 'hardhat'
 import { keccak256, toHex } from 'viem'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from '@safe-global/testing-kit'
 import Safe, {
   PREDETERMINED_SALT_NONCE,
   PredictedSafeProps,

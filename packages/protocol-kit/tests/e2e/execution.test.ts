@@ -1,4 +1,4 @@
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from '@safe-global/testing-kit'
 import Safe, { SigningMethod } from '@safe-global/protocol-kit/index'
 import { TransactionOptions, MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'

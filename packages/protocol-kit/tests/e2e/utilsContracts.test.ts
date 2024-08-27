@@ -8,7 +8,7 @@ import {
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
 } from '@safe-global/protocol-kit/contracts/utils'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import { safeVersionDeployed } from '@safe-global/testing-kit'
 import {
   SafeDeploymentConfig,
   SafeAccountConfig,

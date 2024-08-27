@@ -26,7 +26,7 @@ jobs:
           yarn build
       - name: Add node_modules/.bin to PATH
         run: |
-          echo '::add-path::$(yarn bin)' # Add node_modules/.bin to the PATH
+          echo "$(yarn bin)" >> $GITHUB_PATH
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/protocol-kit

@@ -35,7 +35,8 @@
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.8",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "@safe-global/testing-kit": "^1.0.0"
   },
   "lint-staged": {
     "./packages/**/*.{js,jsx,ts,tsx}": [

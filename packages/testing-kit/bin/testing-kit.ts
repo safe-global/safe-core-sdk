@@ -6,17 +6,19 @@ import fs from 'fs'
 
 // Resolve the root directory of the package
 const packageRoot = path.resolve(__dirname, '../../')
+const projectRoot = process.cwd()
 
 // Capture the command and arguments
 const args = process.argv.slice(2)
 const command = args[0]
+const directory = args[1]
 
 if (!command) {
   console.error('No command specified')
   process.exit(1)
 }
 
-const validCommands = ['compile', 'deploy']
+const validCommands = ['compile', 'deploy', 'test']
 
 if (!validCommands.includes(command)) {
   console.error(`Invalid command: ${command}`)
@@ -34,7 +36,11 @@ if (!fs.existsSync(hardhatConfigPath)) {
 }
 
 try {
-  execSync(`yarn ${command}`, { stdio: 'inherit' })
+  if (command === 'test' && directory) {
+    execSync(`yarn ${command} ${path.join(projectRoot, directory)}`, { stdio: 'inherit' })
+  } else {
+    execSync(`yarn ${command}`, { stdio: 'inherit' })
+  }
 } catch (error) {
   console.error(`Failed to execute Hardhat command: ${(error as Error).message}`)
   process.exit(1)

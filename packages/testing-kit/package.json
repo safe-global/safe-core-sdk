@@ -19,7 +19,8 @@
     "build": "yarn unbuild && hardhat compile && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && yarn copy-files && chmod +x dist/bin/testing-kit.js",
     "copy-files": "cpx 'artifacts/**/*' dist/artifacts",
     "deploy": "hardhat deploy",
-    "compile": "hardhat compile"
+    "compile": "hardhat compile",
+    "test": "hardhat test"
   },
   "repository": {
     "type": "git",

@@ -101,6 +101,7 @@ export const safeWebAuthnSharedSignerDeployed =
   safeWebAuthnSharedSignerContracts[safeVersionDeployed]
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
+  //@ts-expect-error - Property 'deployments' does not exist on type 'HardhatRuntimeEnvironment'
   const { deployments, getNamedAccounts } = hre
 
   const { deployer } = await getNamedAccounts()

@@ -28,8 +28,6 @@ jobs:
         run: chmod +x packages/testing-kit/dist/bin/testing-kit.js
       - name: Add script directory to PATH
         run: echo "$(pwd)/packages/testing-kit/dist/bin" >> $GITHUB_PATH
-      - name: Debug PATH
-        run: echo $PATH
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/protocol-kit

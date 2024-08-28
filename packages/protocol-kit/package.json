@@ -64,7 +64,6 @@
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "tsconfig-paths": "^4.2.0",
-    "hardhat": "^2.19.3",
     "web3": "^4.7.0",
     "yargs": "^17.7.2",
     "@safe-global/testing-kit": "^1.0.0"

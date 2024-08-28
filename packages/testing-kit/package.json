@@ -48,5 +48,8 @@
   },
   "bin": {
     "testing-kit": "./dist/bin/testing-kit.js"
+  },
+  "peerDependencies": {
+    "hardhat": "^2.19.3"
   }
 }

@@ -105,10 +105,6 @@ const config: HardhatUserConfig = {
       url: 'https://sepolia.gateway.tenderly.co'
     }
   },
-  //@ts-expect-error Type not found
-  compilerOptions: {
-    paths: { '^@safe-global/protocol-kit/(.*)$': ['../protocol-kit/src/*'] }
-  },
   namedAccounts: {
     deployer: {
       default: 0

@@ -4,18 +4,12 @@ import Safe, {
   getERC20Decimals,
   isGasTokenCompatibleWithHandlePayment
 } from '@safe-global/protocol-kit/index'
-import { safeVersionDeployed } from '@safe-global/testing-kit'
+import { safeVersionDeployed, setupTests, itif } from '@safe-global/testing-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import { deployments } from 'hardhat'
-
-import { itif } from './utils/helpers'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
-import { getAccounts } from './utils/setupTestNetwork'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
 chai.use(sinonChai)
@@ -30,26 +24,13 @@ describe('ERC-20 utils', () => {
     callStub.restore()
   })
 
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const provider = getEip1193Provider()
-
-    return {
-      safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
-      contractNetworks,
-      accounts,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   describe('getERC20Decimals', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the correct decimals for a standard ERC20 token',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
 
         const safeAddress = safe.address
 
@@ -71,7 +52,7 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the correct decimals for a non-standard ERC20 token',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = safe.address
 
         // mock decimals() call
@@ -92,7 +73,7 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should throw an error if decimals() fn is not defined',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = safe.address
 
         // mock decimals() call
@@ -115,7 +96,7 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return true if it is the Native token',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = safe.address
 
         const safeSdk = await Safe.init({
@@ -136,7 +117,7 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return true if it is an standard ERC20 token',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = safe.address
 
         // mock decimals() call
@@ -160,7 +141,7 @@ describe('ERC-20 utils', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return false for a non-standard ERC20 token',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = safe.address
 
         // mock decimals() call

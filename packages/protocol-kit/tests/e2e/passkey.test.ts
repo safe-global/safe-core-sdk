@@ -1,4 +1,11 @@
-import { safeVersionDeployed } from '@safe-global/testing-kit'
+import {
+  safeVersionDeployed,
+  setupTests as testingKitSetupTests,
+  itif,
+  describeif,
+  getWebAuthnContract,
+  getSafeWithOwners
+} from '@safe-global/testing-kit'
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 import Safe, {
   getPasskeyOwnerAddress,
@@ -9,18 +16,13 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
-import { deployments } from 'hardhat'
 import crypto from 'crypto'
 import {
   getSafeWebAuthnSignerFactoryContract,
   getSafeWebAuthnSharedSignerContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners, getWebAuthnContract } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
-import { getAccounts } from './utils/setupTestNetwork'
-import { itif, describeif } from './utils/helpers'
 import { createMockPasskey, getWebAuthnCredentials, deployPasskeysContract } from './utils/passkeys'
 
 chai.use(chaiAsPromised)
@@ -43,8 +45,8 @@ Object.defineProperty(global, 'navigator', {
 })
 
 describe('Passkey', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
+  const setupTests = async () => {
+    const { accounts, chainId, contractNetworks } = await testingKitSetupTests()
 
     const webAuthnContract = await getWebAuthnContract()
     const customVerifierAddress = webAuthnContract.address
@@ -52,8 +54,6 @@ describe('Passkey', () => {
     const passkey1 = { ...(await createMockPasskey('chucknorris')), customVerifierAddress }
     const passkey2 = { ...(await createMockPasskey('brucelee')), customVerifierAddress }
 
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
     const provider = getEip1193Provider()
     const safeProvider = await SafeProvider.init(provider)
     const customContracts = contractNetworks?.[chainId.toString()]
@@ -88,7 +88,7 @@ describe('Passkey', () => {
 
     return {
       safeProvider,
-      accounts: await getAccounts(),
+      accounts,
       contractNetworks,
       predictedSafe,
       provider,
@@ -97,7 +97,7 @@ describe('Passkey', () => {
       safeWebAuthnSignerFactoryContract,
       safeWebAuthnSharedSignerContract
     }
-  })
+  }
 
   describe('isOwner', async () => {
     itif(safeVersionDeployed < '1.3.0')(

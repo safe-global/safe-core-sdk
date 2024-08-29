@@ -1,45 +1,19 @@
-import { safeVersionDeployed } from '@safe-global/testing-kit'
-import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
+import { setupTests } from '@safe-global/testing-kit'
+import Safe from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
 describe('On-chain signatures', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [accounts[0].address],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        safeVersion: safeVersionDeployed
-      }
-    }
-    const provider = getEip1193Provider()
-
-    return {
-      safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
-      accounts,
-      contractNetworks,
-      predictedSafe,
-      provider
-    }
-  })
-
+  const provider = getEip1193Provider()
   describe('approveTransactionHash', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 2, threshold: 2 }
+      })
       const safeSdk1 = await Safe.init({
         provider,
         predictedSafe,
@@ -52,7 +26,9 @@ describe('On-chain signatures', () => {
     })
 
     it('should fail if a transaction hash is approved by an account that is not an owner', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 2, threshold: 2 }
+      })
       const account3 = accounts[2]
       const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
@@ -74,7 +50,9 @@ describe('On-chain signatures', () => {
     })
 
     it('should approve the transaction hash', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 2, threshold: 2 }
+      })
       const [account1] = accounts
       const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
@@ -95,7 +73,9 @@ describe('On-chain signatures', () => {
     })
 
     it('should ignore a duplicated signatures', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 2, threshold: 2 }
+      })
       const [account1] = accounts
       const safeAddress = safe.address
       const safeSdk1 = await Safe.init({
@@ -122,7 +102,9 @@ describe('On-chain signatures', () => {
 
   describe('getOwnersWhoApprovedTx', async () => {
     it('should fail if Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 2, threshold: 2 }
+      })
       const safeSdk1 = await Safe.init({
         provider,
         predictedSafe,
@@ -134,7 +116,9 @@ describe('On-chain signatures', () => {
     })
 
     it('should return the list of owners who approved a transaction hash', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 2, threshold: 2 }
+      })
       const [, account2] = accounts
       const safeAddress = safe.address
       const safeSdk1 = await Safe.init({

@@ -36,6 +36,8 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
+    "@types/semver": "^7.5.8",
+    "@types/mocha": "^10.0.6",
     "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
     "@nomicfoundation/hardhat-viem": "^2.0.2",
     "@openzeppelin/contracts": "^2.5.1",
@@ -45,6 +47,9 @@
     "hardhat": "^2.19.3",
     "hardhat-deploy": "^0.12.4",
     "tsconfig-paths": "^4.2.0"
+  },
+  "dependencies": {
+    "semver": "^7.6.2"
   },
   "bin": {
     "testing-kit": "./dist/bin/testing-kit.js"

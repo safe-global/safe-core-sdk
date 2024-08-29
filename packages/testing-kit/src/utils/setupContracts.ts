@@ -1,5 +1,4 @@
-import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { GetContractReturnType, Abi, WalletClient } from 'viem'
+import { GetContractReturnType, Abi, WalletClient, Address, zeroAddress } from 'viem'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -12,17 +11,18 @@ import {
   safeWebAuthnSignerFactoryDeployed,
   signMessageLibDeployed,
   simulateTxAccessorDeployed
-} from '@safe-global/testing-kit'
+} from '../hardhat/deploy/deploy-contracts'
 import { deployments, viem } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
 import { getDeployer, waitTransactionReceipt } from './transactions'
 
+const ZERO_ADDRESS: Address = zeroAddress
 export const getSafeSingleton = async (): Promise<{
   contract: GetContractReturnType
   abi: Abi
 }> => {
   const safeDeployment = await deployments.get(safeDeployed.name)
-  const contract = await viem.getContractAt(safeDeployed.name, safeDeployment.address)
+  const contract = await viem.getContractAt(safeDeployed.name, safeDeployment.address as Address)
   return {
     contract,
     abi: safeDeployment.abi
@@ -35,7 +35,7 @@ export const getFactory = async (): Promise<{
 }> => {
   const factoryDeployment = await deployments.get(proxyFactoryDeployed.name)
   const factoryAddress = factoryDeployment.address
-  const contract = await viem.getContractAt(proxyFactoryDeployed.name, factoryAddress, {
+  const contract = await viem.getContractAt(proxyFactoryDeployed.name, factoryAddress as Address, {
     client: { wallet: await getDeployer() }
   })
   return {
@@ -103,7 +103,7 @@ export const getCompatibilityFallbackHandler = async (): Promise<{
 
   const contract = await viem.getContractAt(
     compatibilityFallbackHandlerDeployed.name,
-    compatibilityFallbackHandlerDeploymentAddress
+    compatibilityFallbackHandlerDeploymentAddress as Address
   )
   return {
     contract,
@@ -117,7 +117,7 @@ export const getMultiSend = async (): Promise<{
 }> => {
   const multiSendDeployment = await deployments.get(multiSendDeployed.name)
   const multiSendAddress = multiSendDeployment.address
-  const contract = await viem.getContractAt(multiSendDeployed.name, multiSendAddress)
+  const contract = await viem.getContractAt(multiSendDeployed.name, multiSendAddress as Address)
   return {
     contract,
     abi: multiSendDeployment.abi
@@ -130,7 +130,10 @@ export const getMultiSendCallOnly = async (): Promise<{
 }> => {
   const multiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
   const multiSendAddress = multiSendCallOnlyDeployment.address
-  const contract = await viem.getContractAt(multiSendCallOnlyDeployed.name, multiSendAddress)
+  const contract = await viem.getContractAt(
+    multiSendCallOnlyDeployed.name,
+    multiSendAddress as Address
+  )
   return {
     contract,
     abi: multiSendCallOnlyDeployment.abi
@@ -143,7 +146,10 @@ export const getSignMessageLib = async (): Promise<{
 }> => {
   const signMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
   const signMessageLibAddress = signMessageLibDeployment.address
-  const contract = await viem.getContractAt(signMessageLibDeployed.name, signMessageLibAddress)
+  const contract = await viem.getContractAt(
+    signMessageLibDeployed.name,
+    signMessageLibAddress as Address
+  )
   return {
     contract,
     abi: signMessageLibDeployment.abi
@@ -156,7 +162,7 @@ export const getCreateCall = async (): Promise<{
 }> => {
   const createCallDeployment = await deployments.get(createCallDeployed.name)
   const createCallAddress = createCallDeployment.address
-  const contract = await viem.getContractAt(createCallDeployed.name, createCallAddress)
+  const contract = await viem.getContractAt(createCallDeployed.name, createCallAddress as Address)
   return {
     contract,
     abi: createCallDeployment.abi
@@ -171,7 +177,7 @@ export const getSimulateTxAccessor = async (): Promise<{
   const simulateTxAccessorAddress = simulateTxAccessorDeployment.address
   const contract = await viem.getContractAt(
     simulateTxAccessorDeployed.name,
-    simulateTxAccessorAddress
+    simulateTxAccessorAddress as Address
   )
   return {
     contract,
@@ -189,7 +195,7 @@ export const getSafeWebAuthnSignerFactory = async (): Promise<{
   const safeWebAuthnSignerFactoryAddress = safeWebAuthnSignerFactoryDeployment.address
   const contract = await viem.getContractAt(
     proxyFactoryDeployed.name,
-    safeWebAuthnSignerFactoryAddress,
+    safeWebAuthnSignerFactoryAddress as Address,
     {
       client: { wallet: await getDeployer() }
     }
@@ -211,7 +217,7 @@ export const getSafeWebAuthnSharedSigner = async (): Promise<{
   return {
     contract: await viem.getContractAt(
       safeWebAuthnSharedSignerDeployed.name,
-      safeWebAuthnSharedSignerDeployment.address
+      safeWebAuthnSharedSignerDeployment.address as Address
     ),
     abi: safeWebAuthnSharedSignerDeployment.abi
   }
@@ -220,37 +226,37 @@ export const getSafeWebAuthnSharedSigner = async (): Promise<{
 export const getWebAuthnContract = async (): Promise<GetContractReturnType<Abi>> => {
   const webAuthnContractDeployment = await deployments.get('WebAuthnContract')
   const dailyLimitModuleAddress = webAuthnContractDeployment.address
-  return await viem.getContractAt('WebAuthnContract', dailyLimitModuleAddress)
+  return await viem.getContractAt('WebAuthnContract', dailyLimitModuleAddress as Address)
 }
 
 export const getDailyLimitModule = async (): Promise<GetContractReturnType<Abi>> => {
   const dailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
   const dailyLimitModuleAddress = dailyLimitModuleDeployment.address
-  return await viem.getContractAt('DailyLimitModule', dailyLimitModuleAddress)
+  return await viem.getContractAt('DailyLimitModule', dailyLimitModuleAddress as Address)
 }
 
 export const getSocialRecoveryModule = async (): Promise<GetContractReturnType<Abi>> => {
   const socialRecoveryModuleDeployment = await deployments.get('SocialRecoveryModule')
   const socialRecoveryModuleAddress = socialRecoveryModuleDeployment.address
-  return await viem.getContractAt('SocialRecoveryModule', socialRecoveryModuleAddress)
+  return await viem.getContractAt('SocialRecoveryModule', socialRecoveryModuleAddress as Address)
 }
 
 export const getStateChannelModule = async (): Promise<GetContractReturnType<Abi>> => {
   const stateChannelModuleDeployment = await deployments.get('StateChannelModule')
   const stateChannelModuleAddress = stateChannelModuleDeployment.address
-  return await viem.getContractAt('StateChannelModule', stateChannelModuleAddress)
+  return await viem.getContractAt('StateChannelModule', stateChannelModuleAddress as Address)
 }
 
 export const getWhiteListModule = async (): Promise<GetContractReturnType<Abi>> => {
   const whiteListModuleDeployment = await deployments.get('WhitelistModule')
   const whiteListModuleAddress = whiteListModuleDeployment.address
-  return await viem.getContractAt('WhitelistModule', whiteListModuleAddress)
+  return await viem.getContractAt('WhitelistModule', whiteListModuleAddress as Address)
 }
 
 export const getERC20Mintable = async (): Promise<GetContractReturnType<Abi, WalletClient>> => {
   const eRC20MintableDeployment = await deployments.get('ERC20Mintable')
   const eRC20MintableAddress = eRC20MintableDeployment.address
-  return await viem.getContractAt('ERC20Mintable', eRC20MintableAddress, {
+  return await viem.getContractAt('ERC20Mintable', eRC20MintableAddress as Address, {
     client: { wallet: await getDeployer() }
   })
 }
@@ -261,7 +267,7 @@ export const getDebugTransactionGuard = async (): Promise<GetContractReturnType<
     : 'DebugTransactionGuard_SV1_4_1'
   const debugTransactionGuardDeployment = await deployments.get(contractName)
   const debugTransactionGuardAddress = debugTransactionGuardDeployment.address
-  return await viem.getContractAt(contractName, debugTransactionGuardAddress)
+  return await viem.getContractAt(contractName, debugTransactionGuardAddress as Address)
 }
 
 export const getDefaultCallbackHandler = async (): Promise<GetContractReturnType<Abi>> => {
@@ -270,5 +276,5 @@ export const getDefaultCallbackHandler = async (): Promise<GetContractReturnType
     : 'TokenCallbackHandler_SV1_4_1'
   const defaultCallbackHandlerDeployment = await deployments.get(contractName)
   const defaultCallbackHandlerAddress = defaultCallbackHandlerDeployment.address
-  return await viem.getContractAt(contractName, defaultCallbackHandlerAddress)
+  return await viem.getContractAt(contractName, defaultCallbackHandlerAddress as Address)
 }

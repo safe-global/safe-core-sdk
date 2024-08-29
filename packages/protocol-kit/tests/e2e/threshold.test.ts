@@ -1,48 +1,18 @@
-import { safeVersionDeployed } from '@safe-global/testing-kit'
-import Safe, {
-  PredictedSafeProps,
-  SafeTransactionOptionalProps
-} from '@safe-global/protocol-kit/index'
+import { setupTests, getSafeWithOwners } from '@safe-global/testing-kit'
+import Safe, { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
 describe('Safe Threshold', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [accounts[0].address],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        safeVersion: safeVersionDeployed
-      }
-    }
-    const provider = getEip1193Provider()
-
-    return {
-      safe: await getSafeWithOwners([accounts[0].address]),
-      accounts,
-      contractNetworks,
-      predictedSafe,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   describe('getThreshold', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         predictedSafe,
@@ -52,7 +22,7 @@ describe('Safe Threshold', () => {
     })
 
     it('should return the Safe threshold', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         safeAddress: safe.address,
@@ -64,7 +34,7 @@ describe('Safe Threshold', () => {
 
   describe('createChangeThresholdTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         predictedSafe,
@@ -77,7 +47,7 @@ describe('Safe Threshold', () => {
     })
 
     it('should fail if the threshold is bigger than the number of owners', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         safeAddress: safe.address,
@@ -92,7 +62,7 @@ describe('Safe Threshold', () => {
     })
 
     it('should fail if the threshold is not bigger than 0', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         safeAddress: safe.address,
@@ -105,7 +75,7 @@ describe('Safe Threshold', () => {
     })
 
     it('should build the transaction with the optional props', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
       const safeSdk = await Safe.init({
@@ -133,7 +103,7 @@ describe('Safe Threshold', () => {
     })
 
     it('should change the threshold', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address, account2.address], 1)
       const safeSdk = await Safe.init({

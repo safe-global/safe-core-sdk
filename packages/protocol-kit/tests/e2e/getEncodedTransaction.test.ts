@@ -1,33 +1,15 @@
 import Safe from '@safe-global/protocol-kit/index'
-import { safeVersionDeployed } from '@safe-global/testing-kit'
+import { safeVersionDeployed, setupTests, itif } from '@safe-global/testing-kit'
 import chai from 'chai'
-import { deployments } from 'hardhat'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
-import { itif } from './utils/helpers'
 
 describe('getEncodedTransaction', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const provider = getEip1193Provider()
-
-    return {
-      accounts,
-      contractNetworks,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   itif(safeVersionDeployed >= '1.3.0')('should return a transaction encoded', async () => {
-    const { accounts, contractNetworks, provider } = await setupTests()
-    const [account1, account2] = accounts
+    const { safe, accounts, contractNetworks } = await setupTests()
+    const [, account2] = accounts
 
-    const safe = await getSafeWithOwners([account1.address])
     const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
@@ -54,10 +36,8 @@ describe('getEncodedTransaction', () => {
   })
 
   itif(safeVersionDeployed <= '1.2.0')('should return a transaction encoded', async () => {
-    const { accounts, contractNetworks, provider } = await setupTests()
-    const [account1, account2] = accounts
-
-    const safe = await getSafeWithOwners([account1.address])
+    const { safe, accounts, contractNetworks } = await setupTests()
+    const [, account2] = accounts
     const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
@@ -84,10 +64,8 @@ describe('getEncodedTransaction', () => {
   })
 
   it('should return a signed transaction with the signatures encoded', async () => {
-    const { accounts, contractNetworks, provider } = await setupTests()
-    const [account1, account2] = accounts
-
-    const safe = await getSafeWithOwners([account1.address])
+    const { safe, accounts, contractNetworks } = await setupTests()
+    const [, account2] = accounts
     const safeAddress = safe.address
 
     const safeSdk = await Safe.init({

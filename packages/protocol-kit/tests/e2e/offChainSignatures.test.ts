@@ -1,46 +1,18 @@
-import { safeVersionDeployed } from '@safe-global/testing-kit'
-import Safe, { PredictedSafeProps, SigningMethod } from '@safe-global/protocol-kit/index'
+import { safeVersionDeployed, setupTests, itif } from '@safe-global/testing-kit'
+import Safe, { SigningMethod } from '@safe-global/protocol-kit/index'
 import { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { itif } from './utils/helpers'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 
 describe('Off-chain signatures', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [accounts[0].address],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        safeVersion: safeVersionDeployed
-      }
-    }
-    const provider = getEip1193Provider()
-
-    return {
-      safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
-      accounts,
-      contractNetworks,
-      predictedSafe,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   describe('signHash', async () => {
     it('should sign a transaction hash with the current signer if the Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         predictedSafe,
@@ -52,7 +24,7 @@ describe('Off-chain signatures', () => {
     })
 
     it('should sign a transaction hash with the current signer', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
@@ -75,7 +47,7 @@ describe('Off-chain signatures', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail to sign a transaction if the Safe with version <v1.3.0 is using predicted config',
       async () => {
-        const { safe, predictedSafe, contractNetworks, provider } = await setupTests()
+        const { safe, predictedSafe, contractNetworks } = await setupTests()
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,
@@ -107,7 +79,7 @@ describe('Off-chain signatures', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should sign a transaction with the current signer if the Safe with version >=v1.3.0 is using predicted config',
       async () => {
-        const { safe, predictedSafe, contractNetworks, provider } = await setupTests()
+        const { safe, predictedSafe, contractNetworks } = await setupTests()
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,
@@ -128,7 +100,7 @@ describe('Off-chain signatures', () => {
     )
 
     it('should fail if the signature is added by an account that is not an owner', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const account3 = accounts[2]
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
@@ -149,7 +121,7 @@ describe('Off-chain signatures', () => {
     })
 
     it('should ignore duplicated signatures', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
@@ -173,7 +145,7 @@ describe('Off-chain signatures', () => {
     itif(safeVersionDeployed === '1.0.0')(
       'should fail if the signature of the current signer is added using eth_sign and safeVersion===1.0.0',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
@@ -195,7 +167,7 @@ describe('Off-chain signatures', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'should add the signature of the current signer using eth_sign if safeVersion>1.0.0',
       async () => {
-        const { safe, contractNetworks, provider } = await setupTests()
+        const { safe, contractNetworks } = await setupTests()
         const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
@@ -216,7 +188,7 @@ describe('Off-chain signatures', () => {
     )
 
     it('should add the signature of the current signer using eth_signTypedData', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
@@ -236,7 +208,7 @@ describe('Off-chain signatures', () => {
     })
 
     it('should add the signature of the current signer using eth_signTypedData_v3', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
@@ -256,7 +228,7 @@ describe('Off-chain signatures', () => {
     })
 
     it('should add the signature of the current signer using eth_signTypedData_v4', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
@@ -276,7 +248,7 @@ describe('Off-chain signatures', () => {
     })
 
     it('should add the signature of the current signer using eth_signTypedData_v4 by default', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
@@ -296,7 +268,7 @@ describe('Off-chain signatures', () => {
     })
 
     it('should sign a transaction received from the Safe Transaction Service', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safeAddress = safe.address
       const safeSdk = await Safe.init({
@@ -304,7 +276,7 @@ describe('Off-chain signatures', () => {
         safeAddress,
         contractNetworks
       })
-      const safeServiceTransaction: SafeMultisigTransactionResponse = {
+      const safeServiceTransaction = {
         safe: '',
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
@@ -352,7 +324,9 @@ describe('Off-chain signatures', () => {
         trusted: true,
         signatures: '0x111111222222'
       }
-      const signedTx = await safeSdk.signTransaction(safeServiceTransaction)
+      const signedTx = await safeSdk.signTransaction(
+        safeServiceTransaction as SafeMultisigTransactionResponse
+      )
       chai.expect(safeServiceTransaction.confirmations?.length).to.be.eq(2)
       chai.expect(signedTx.signatures.size).to.be.eq(3)
       const signerAddress = account1.address

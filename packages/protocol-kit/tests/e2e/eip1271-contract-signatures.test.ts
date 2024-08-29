@@ -1,27 +1,24 @@
 import Safe, { buildContractSignature, hashSafeMessage } from '@safe-global/protocol-kit/index'
-import { safeVersionDeployed } from '@safe-global/testing-kit'
+import {
+  safeVersionDeployed,
+  setupTests as testingKitSetupTests,
+  getSafeWithOwners,
+  itif
+} from '@safe-global/testing-kit'
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
-import { itif } from './utils/helpers'
 
 chai.use(chaiAsPromised)
 
 describe('The EIP1271 implementation', () => {
   describe('In the context of a 3/3 Safe account with a 4/4 signer Safe account owner', async () => {
-    const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-      await deployments.fixture()
-      const accounts = await getAccounts()
-      const chainId = await getChainId()
-      const contractNetworks = await getContractNetworks(BigInt(chainId))
-      const fallbackHandlerAddress = contractNetworks[chainId].fallbackHandlerAddress
+    const setupTests = async () => {
+      const { chainId, accounts, contractNetworks } = await testingKitSetupTests()
+      const fallbackHandlerAddress = contractNetworks[Number(chainId)].fallbackHandlerAddress
       const [account1, account2, account3, account4, account5] = accounts
       const provider = getEip1193Provider()
 
@@ -63,7 +60,7 @@ describe('The EIP1271 implementation', () => {
         fallbackHandlerAddress,
         provider
       }
-    })
+    }
 
     itif(safeVersionDeployed >= '1.3.0')(
       'should allow to sign and execute transactions',

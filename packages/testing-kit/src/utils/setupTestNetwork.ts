@@ -1,6 +1,7 @@
 import { viem } from 'hardhat'
 import { WalletClient, Chain, Transport, getAddress, Account as ViemAccount } from 'viem'
-interface Account {
+
+export interface Account {
   signer: WalletClient<Transport, Chain, ViemAccount>
   address: string
 }

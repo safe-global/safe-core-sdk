@@ -30,7 +30,7 @@
     "test:hardhat:viem:v1.1.1": "export TEST_NETWORK=hardhat && export ETH_LIB=viem && export SAFE_VERSION=1.1.1 && testing-kit.js deploy && nyc testing-kit.js test 'tests/e2e/*.test.*'",
     "test:hardhat:viem:v1.2.0": "export TEST_NETWORK=hardhat && export ETH_LIB=viem && export SAFE_VERSION=1.2.0 && testing-kit.js deploy && nyc testing-kit.js test 'tests/e2e/*.test.*'",
     "test:hardhat:viem:v1.3.0": "export TEST_NETWORK=hardhat && export ETH_LIB=viem && export SAFE_VERSION=1.3.0 && testing-kit.js deploy && nyc testing-kit.js test 'tests/e2e/*.test.*'",
-    "test:hardhat:viem:v1.4.1": "export TEST_NETWORK=hardhat && export ETH_LIB=viem && export SAFE_VERSION=1.4.1 && testing-kit.js deploy && nyc testing-kit.js test 'tests/e2e/*.test.*'",
+    "test:hardhat:viem:v1.4.1": "export TEST_NETWORK=hardhat && export ETH_LIB=viem && export SAFE_VERSION=1.4.1 && testing-kit deploy && nyc testing-kit test 'tests/e2e/*.test.*'",
     "coverage": "nyc report --reporter=lcov",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",

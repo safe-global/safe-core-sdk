@@ -4,5 +4,5 @@
     "composite": true,
     "outDir": "dist"
   },
-  "include": ["bin/**/*", "src/**/*"]
+  "include": ["bin/**/*", "hardhat/**/*", "./index.ts"]
 }

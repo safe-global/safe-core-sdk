@@ -2,8 +2,8 @@
   "name": "@safe-global/testing-kit",
   "version": "1.0.0",
   "description": "Helper package providing testing utilities",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "keywords": [
     "Ethereum",
     "Wallet",

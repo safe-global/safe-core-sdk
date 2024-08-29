@@ -46,7 +46,7 @@ const config: HardhatUserConfig = {
   },
   paths: {
     artifacts: path.resolve(__dirname, './artifacts'),
-    deploy: path.resolve(__dirname, './hardhat/deploy'),
+    deploy: path.resolve(__dirname, './src/hardhat/deploy'),
     sources: path.resolve(__dirname, './contracts')
   },
   networks: {

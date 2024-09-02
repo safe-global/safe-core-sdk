@@ -227,6 +227,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 622277n, shortName: 'rth' },
   { chainId: 713715n, shortName: 'sei-devnet' },
   { chainId: 764984n, shortName: 'lamina1test' },
+  { chainId: 808813n, shortName: 'bob-sepolia' },
   { chainId: 810180n, shortName: 'zklink-nova' },
   { chainId: 7225878n, shortName: 'saakuru' },
   { chainId: 7777777n, shortName: 'zora' },

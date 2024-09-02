@@ -202,6 +202,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 47763n, shortName: 'neox-mainnet' },
   { chainId: 47805n, shortName: 'rei' },
   { chainId: 48899n, shortName: 'zircuit-testnet' },
+  { chainId: 48900n, shortName: 'zircuit-mainnet' },
   { chainId: 53457n, shortName: 'dodochain' },
   { chainId: 54211n, shortName: 'islmt' },
   { chainId: 56288n, shortName: 'boba-bnb' },

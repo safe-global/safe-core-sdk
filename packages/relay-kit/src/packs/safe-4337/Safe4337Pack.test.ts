@@ -582,9 +582,7 @@ describe('Safe4337Pack', () => {
   describe('When using a passkey signer', () => {
     const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x94a4F6affBd8975951142c3999aEAB7ecee555c2'
     const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
-    const PASSKEY_PRIVATE_KEY = BigInt(
-      '0x1c36e7789d4e7b5f0d0d9b1e01f1a1e3be4ab183f62a77eb10b05d07a6a3a5c2'
-    )
+    const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
     jest.setTimeout(120_000)
 
     let passkey: protocolKit.PasskeyArgType

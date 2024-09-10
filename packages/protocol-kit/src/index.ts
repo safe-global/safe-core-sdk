@@ -81,7 +81,6 @@ export {
   createERC20TokenTransferTransaction,
   DEFAULT_SAFE_VERSION,
   EthSafeSignature,
-  getPasskeyOwnerAddress,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
@@ -123,7 +122,8 @@ export {
   SafeProvider,
   createPasskeyClient,
   EthSafeTransaction,
-  EthSafeMessage
+  EthSafeMessage,
+  getPasskeyOwnerAddress
 }
 
 export * from './types'

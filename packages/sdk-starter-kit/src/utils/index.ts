@@ -24,8 +24,8 @@ export const waitSafeTxReceipt = async (
   txResult: TransactionResult
 ): Promise<GetTransactionReceiptReturnType | null | undefined> => {
   const receipt = txResult.transactionResponse
-    ? (
-        (await txResult.transactionResponse) as {
+    ? await (
+        txResult.transactionResponse as {
           wait: () => Promise<GetTransactionReceiptReturnType>
         }
       ).wait()

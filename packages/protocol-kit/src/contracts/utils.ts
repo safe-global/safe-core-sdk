@@ -53,7 +53,7 @@ const ZKSYNC_TESTNET = 280n
 // 4. Use ethers to convert the array into hex
 //    const deployedBytecodeHash = ethers.hexlify(bytecodeHash)
 const ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE: {
-  [version: string]: { deployedBytecodeHash: string }
+  [version: string]: { deployedBytecodeHash: Hash }
 } = {
   '1.3.0': {
     deployedBytecodeHash: '0x0100004124426fb9ebb25e27d670c068e52f9ba631bd383279a188be47e3f86d'
@@ -86,8 +86,9 @@ export function encodeCreateProxyWithNonce(
   initializer: string,
   salt?: string
 ) {
+  console.log(`safeSingletonAddress`, safeSingletonAddress)
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
-    asHex(safeSingletonAddress),
+    safeSingletonAddress,
     asHex(initializer),
     BigInt(salt || PREDETERMINED_SALT_NONCE)
   ])
@@ -324,7 +325,7 @@ export async function predictSafeAddress({
 
   const proxyAddress = getContractAddress({
     from,
-    bytecode: asHex(initCode),
+    bytecode: initCode,
     opcode: 'CREATE2',
     salt
   })
@@ -361,7 +362,7 @@ export function zkSyncEraCreate2Address(
   salt: Hex,
   input: Hex
 ): string {
-  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash as Hash
+  const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
   const inputHash = keccak256(input)
 
   const addressBytes = keccak256(

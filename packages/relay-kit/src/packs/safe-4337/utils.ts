@@ -59,7 +59,7 @@ export async function signSafeOp(
   }
 
   const chainId = await safeProvider.getChainId()
-  const signerAddress = await signer.account.address
+  const signerAddress = signer.account.address
   const signature = await signer.signTypedData({
     domain: {
       chainId: Number(chainId),

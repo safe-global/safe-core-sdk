@@ -11,7 +11,6 @@ import {
   getSignMessageLibDeployment,
   getSimulateTxAccessorDeployment
 } from '@safe-global/safe-deployments'
-
 import {
   Deployment,
   getSafeWebAuthnSignerFactoryDeployment,

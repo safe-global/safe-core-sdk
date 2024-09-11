@@ -1,10 +1,10 @@
 import { Abi } from 'abitype'
-import { PublicClient } from 'viem'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class  CompatibilityFallbackHandlerBaseContract extends BaseContract to specifically integrate with the CompatibilityFallbackHandler contract.
@@ -42,7 +42,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
-    runner?: PublicClient
+    runner?: ExternalClient
   ) {
     const contractName = 'compatibilityFallbackHandler'
 

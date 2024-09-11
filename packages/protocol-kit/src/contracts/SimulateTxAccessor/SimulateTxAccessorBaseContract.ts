@@ -1,10 +1,10 @@
 import { Abi } from 'abitype'
-import { PublicClient } from 'viem'
 
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class SimulateTxAccessorBaseContract extends BaseContract to specifically integrate with the SimulateTxAccessor contract.
@@ -42,7 +42,7 @@ abstract class SimulateTxAccessorBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SimulateTxAccessorContractAbiType,
-    runner?: PublicClient
+    runner?: ExternalClient
   ) {
     const contractName = 'simulateTxAccessorVersion'
 

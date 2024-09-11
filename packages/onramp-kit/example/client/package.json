@@ -17,10 +17,10 @@
     "@safe-global/onramp-kit": "file:../../",
     "@safe-global/protocol-kit": "file:../../../protocol-kit",
     "@safe-global/safe-react-components": "^2.0.6",
-    "ethers": "^6.11.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.18.0"
+    "react-router-dom": "^6.18.0",
+    "viem": "^2.19.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",

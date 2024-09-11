@@ -1,3 +1,4 @@
+import { Account, Address, Chain, Hash, Hex, PublicClient, PublicRpcSchema, Transport } from 'viem'
 import Safe, { SafeProviderConfig } from '@safe-global/protocol-kit'
 import {
   EstimateGasData,
@@ -6,8 +7,8 @@ import {
   SafeVersion,
   UserOperation
 } from '@safe-global/safe-core-sdk-types'
-import { ethers } from 'ethers'
 import EthSafeOperation from './SafeOperation'
+import { RPC_4337_CALLS } from './constants'
 
 type ExistingSafeOptions = {
   safeAddress: string
@@ -55,7 +56,7 @@ export type Safe4337Options = {
   protocolKit: Safe
   bundlerUrl: string
   paymasterOptions?: PaymasterOptions
-  bundlerClient: ethers.JsonRpcProvider
+  bundlerClient: BundlerClient
   entryPointAddress: string
   safe4337ModuleAddress: string
   safeWebAuthnSharedSignerAddress?: string
@@ -160,3 +161,78 @@ export type EstimateFeeProps = {
   safeOperation: EthSafeOperation
   feeEstimator?: IFeeEstimator
 }
+
+type UserOperationStringValues = Omit<
+  UserOperation,
+  | 'callGasLimit'
+  | 'verificationGasLimit'
+  | 'preVerificationGas'
+  | 'maxFeePerGas'
+  | 'maxPriorityFeePerGas'
+> & {
+  callGasLimit: string
+  verificationGasLimit: string
+  preVerificationGas: string
+  maxFeePerGas: string
+  maxPriorityFeePerGas: string
+}
+
+export type PimlicoCustomRpcSchema = [
+  {
+    Method: 'pimlico_getUserOperationGasPrice'
+    Parameters: never
+    ReturnType: {
+      slow: { maxFeePerGas: string; maxPriorityFeePerGas: string }
+      standard: { maxFeePerGas: string; maxPriorityFeePerGas: string }
+      fast: { maxFeePerGas: string; maxPriorityFeePerGas: string }
+    }
+  },
+  {
+    Method: 'pm_sponsorUserOperation'
+    Parameters: [UserOperationStringValues, string, { sponsorshipPolicyId?: string }?]
+    ReturnType: {
+      paymasterAndData: string
+      callGasLimit: string
+      verificationGasLimit: string
+      preVerificationGas: string
+    }
+  },
+  {
+    Method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS
+    Parameters: never
+    ReturnType: Hex[]
+  },
+  {
+    Method: RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS
+    Parameters: [UserOperationStringValues, string]
+    ReturnType: { callGasLimit: string; verificationGasLimit: string; preVerificationGas: string }
+  },
+  {
+    Method: RPC_4337_CALLS.SEND_USER_OPERATION
+    Parameters: [UserOperationStringValues, string]
+    ReturnType: Hex
+  },
+  {
+    Method: RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH
+    Parameters: [Hash]
+    ReturnType: {
+      userOperation: UserOperation
+      entryPoint: Address
+      transactionHash: Hash
+      blockHash: Hash
+      blockNumber: string
+    }
+  },
+  {
+    Method: RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT
+    Parameters: [Hash]
+    ReturnType: UserOperationReceipt
+  }
+]
+
+export type BundlerClient = PublicClient<
+  Transport,
+  Chain | undefined,
+  Account | undefined,
+  [...PimlicoCustomRpcSchema, ...PublicRpcSchema]
+>

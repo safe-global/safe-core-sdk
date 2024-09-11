@@ -1,4 +1,4 @@
-import { JsonFragment, AbstractSigner, Provider } from 'ethers'
+import { Abi } from 'viem'
 import {
   SafeVersion,
   SafeContract_v1_3_0_Abi,
@@ -51,12 +51,13 @@ import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallback
 import SafeWebAuthnSignerFactoryContract_v0_2_1 from './SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
 import SafeWebAuthnSharedSignerContract_v0_2_1 from './SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
 import SafeProvider from '../SafeProvider'
+import { ExternalClient } from '../types'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined,
+  customContractAbi?: Abi,
   isL1SafeSingleton?: boolean
 ): Promise<
   | SafeContract_v1_4_1
@@ -127,7 +128,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<
   CompatibilityFallbackHandlerContract_v1_4_1 | CompatibilityFallbackHandlerContract_v1_3_0
 > {
@@ -166,7 +167,7 @@ export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<MultiSendContract_v1_4_1 | MultiSendContract_v1_3_0 | MultiSendContract_v1_1_1> {
   const chainId = await safeProvider.getChainId()
   let multiSendContractInstance
@@ -211,7 +212,7 @@ export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<MultiSendCallOnlyContract_v1_4_1 | MultiSendCallOnlyContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let multiSendCallOnlyContractInstance
@@ -248,9 +249,9 @@ export async function getMultiSendCallOnlyContractInstance(
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  signerOrProvider: AbstractSigner | Provider,
+  signerOrProvider: ExternalClient,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<
   | SafeProxyFactoryContract_v1_4_1
   | SafeProxyFactoryContract_v1_3_0
@@ -311,7 +312,7 @@ export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<SignMessageLibContract_v1_4_1 | SignMessageLibContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let signMessageLibContractInstance
@@ -346,7 +347,7 @@ export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<CreateCallContract_v1_4_1 | CreateCallContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let createCallContractInstance
@@ -384,7 +385,7 @@ export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<SimulateTxAccessorContract_v1_4_1 | SimulateTxAccessorContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
   let simulateTxAccessorContractInstance
@@ -419,7 +420,7 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<SafeWebAuthnSignerFactoryContract_v0_2_1> {
   const chainId = await safeProvider.getChainId()
 
@@ -448,7 +449,7 @@ export async function getSafeWebAuthnSharedSignerContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: JsonFragment | JsonFragment[] | undefined
+  customContractAbi?: Abi
 ): Promise<SafeWebAuthnSharedSignerContract_v0_2_1> {
   const chainId = await safeProvider.getChainId()
 

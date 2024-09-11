@@ -12,14 +12,14 @@
     "API"
   ],
   "scripts": {
-    "test:web3": "export TESTS_PATH=tests/endpoint && export ETH_LIB=web3 && nyc hardhat test",
-    "test:ethers": "export TESTS_PATH=tests/endpoint && export ETH_LIB=ethers && nyc --reporter=lcov  hardhat test",
-    "test:viem": "export TESTS_PATH=tests/endpoint && export ETH_LIB=viem && nyc hardhat test",
-    "test": "yarn test:ethers",
-    "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc hardhat test",
+    "test:web3": "export TESTS_PATH=tests/endpoint && export ETH_LIB=web3 && nyc --reporter=lcov hardhat test",
+    "test:ethers": "export TESTS_PATH=tests/endpoint && export ETH_LIB=ethers && nyc --reporter=lcov hardhat test",
+    "test:viem": "export TESTS_PATH=tests/endpoint && export ETH_LIB=viem && nyc --reporter=lcov hardhat test",
+    "test": "yarn test:viem",
+    "test:ci:web3": "export TESTS_PATH=tests/e2e && export ETH_LIB=web3 && nyc --reporter=lcov hardhat test",
     "test:ci:ethers": "export TESTS_PATH=tests/e2e && export ETH_LIB=ethers && nyc --reporter=lcov hardhat test",
     "test:ci:viem": "export TESTS_PATH=tests/e2e && export ETH_LIB=viem && nyc --reporter=lcov hardhat test",
-    "test:ci": "yarn test:ci:ethers",
+    "test:ci": "yarn test:ci:viem",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist .nyc_output cache",
@@ -39,7 +39,8 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@nomicfoundation/hardhat-ethers": "^3.0.6",
+    "@nomicfoundation/hardhat-viem": "^2.0.2",
+    "@safe-global/relay-kit": "^3.1.0",
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
@@ -48,20 +49,21 @@
     "@types/yargs": "^17.0.32",
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
+    "ethers": "^6.13.1",
     "hardhat": "2.20.1",
     "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
     "semver": "^7.6.1",
     "sinon": "^14.0.2",
     "sinon-chai": "^3.7.0",
     "tsconfig-paths": "^4.2.0",
-    "viem": "^2.15.1",
     "web3": "^4.7.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^4.1.0",
     "@safe-global/safe-core-sdk-types": "^5.1.0",
-    "ethers": "^6.13.1",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "viem": "^2.19.0"
   }
 }

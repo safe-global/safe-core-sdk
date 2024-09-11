@@ -45,7 +45,7 @@ describe('createTransactionBatch', () => {
 
     const safe = await getSafeWithOwners([account1.address])
     const provider = getEip1193Provider()
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,
@@ -64,7 +64,7 @@ describe('createTransactionBatch', () => {
 
     const batchTransaction = await safeSdk.createTransactionBatch(transactions)
 
-    const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+    const multiSendContractAddress = (await getMultiSendCallOnly()).contract.address
 
     chai.expect(batchTransaction).to.be.deep.equal({
       to: multiSendContractAddress,

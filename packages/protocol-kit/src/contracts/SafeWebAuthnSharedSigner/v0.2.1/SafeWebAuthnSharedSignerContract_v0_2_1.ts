@@ -53,7 +53,7 @@ class SafeWebAuthnSharedSignerContract_v0_2_1
   getConfiguration: SafeWebAuthnSharedSignerContract_v0_2_1_Function<'getConfiguration'> = async (
     args
   ) => {
-    return [await this.contract.getConfiguration(...args)]
+    return [await this.read('getConfiguration', args)]
   }
 
   /**
@@ -62,21 +62,22 @@ class SafeWebAuthnSharedSignerContract_v0_2_1
    * @returns Array[]
    */
   configure: SafeWebAuthnSharedSignerContract_v0_2_1_Function<'configure'> = async (args) => {
-    await this.contract.configure(...args)
+    await this.write('configure', args)
+
     return []
   }
 
   isValidSignature: SafeWebAuthnSharedSignerContract_v0_2_1_Function<'isValidSignature'> = async (
     args
   ) => {
-    return [await this.contract.isValidSignature(...args)]
+    return [await this.read('isValidSignature', args)]
   }
 
   /**
    * @returns The starting storage slot on the account containing the signer data.
    */
   SIGNER_SLOT: SafeWebAuthnSharedSignerContract_v0_2_1_Function<'SIGNER_SLOT'> = async () => {
-    return [await this.contract.SIGNER_SLOT()]
+    return [await this.read('SIGNER_SLOT')]
   }
 }
 

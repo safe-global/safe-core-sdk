@@ -1,14 +1,23 @@
 import { Abi } from 'abitype'
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers'
-
+import { Transport, encodeFunctionData, WalletClient, Hash, Chain } from 'viem'
+import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction,
-  SafeVersion
+  SafeVersion,
+  TransactionOptions
 } from '@safe-global/safe-core-sdk-types'
+import { getChainById } from '../utils/types'
+import {
+  WalletTransactionOptions,
+  WalletLegacyTransactionOptions,
+  convertTransactionOptions
+} from '@safe-global/protocol-kit/utils'
+import { ExternalClient } from '../types'
+import { ContractFunctionName, ContractFunctionArgs } from 'viem'
 
 /**
  * Abstract class BaseContract
@@ -25,14 +34,15 @@ import {
  * - CreateCallBaseContract<CreateCallContractAbiType> extends BaseContract<CreateCallContractAbiType>
  * - SafeProxyFactoryBaseContract<SafeProxyFactoryContractAbiType> extends BaseContract<SafeProxyFactoryContractAbiType>
  */
-class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
+class BaseContract<ContractAbiType extends Abi> {
   contractAbi: ContractAbiType
   contractAddress: string
   contractName: contractName
   safeVersion: SafeVersion
   safeProvider: SafeProvider
-  contract!: Contract
-  runner?: ContractRunner | null
+  chainId: bigint
+  runner: ExternalClient
+  wallet?: WalletClient<Transport, Chain | undefined>
 
   /**
    * @constructor
@@ -54,22 +64,24 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: ContractAbiType,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
     const contractAddress =
-      customContractAddress ||
-      deployment?.networkAddresses[chainId.toString()] ||
-      deployment?.defaultAddress
+      customContractAddress || deployment?.networkAddresses[chainId.toString()]
 
     if (!contractAddress) {
       throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
     }
 
+    this.chainId = chainId
     this.contractName = contractName
     this.safeVersion = safeVersion
-    this.contractAddress = contractAddress
+    this.contractAddress =
+      Array.isArray(contractAddress) && contractAddress.length
+        ? contractAddress[0]
+        : contractAddress.toString()
     this.contractAbi =
       customContractAbi ||
       (deployment?.abi as unknown as ContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
@@ -80,24 +92,106 @@ class BaseContract<ContractAbiType extends InterfaceAbi & Abi> {
   }
 
   async init() {
-    this.contract = new Contract(
-      this.contractAddress,
-      this.contractAbi,
-      (await this.safeProvider.getExternalSigner()) || this.runner
-    )
+    this.wallet = await this.safeProvider.getExternalSigner()
+  }
+
+  async getTransactionReceipt(hash: Hash) {
+    return getTransactionReceipt(this.runner, { hash })
+  }
+
+  /**
+   * Converts a type of TransactionOptions to a viem transaction type. The viem transaction type creates a clear distinction between the multiple transaction objects (e.g., post-London hard fork) and doesn't allow a union of fields.
+   * See: https://github.com/wevm/viem/blob/viem%402.18.0/src/types/fee.ts and https://github.com/wevm/viem/blob/603227e2588366914fb79a902d23fd9afc353cc6/src/types/transaction.ts#L200
+   *
+   * @param options - Transaction options as expected throughout safe sdk and propagated on the results.
+   *
+   * @returns Options object compatible with viem
+   */
+  async convertOptions(
+    options?: TransactionOptions
+  ): Promise<WalletTransactionOptions | WalletLegacyTransactionOptions> {
+    const chain = this.getChain()
+    if (!chain) throw new Error('Invalid chainId')
+
+    const signerAddress = await this.safeProvider.getSignerAddress()
+    const signer = this.wallet?.account
+    if (!signer || !signerAddress) throw new Error('Invalid signer')
+
+    const account = signer || signerAddress
+    const txOptions = await convertTransactionOptions(options)
+    return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
+  }
+
+  getChain(): Chain | undefined {
+    return getChainById(this.chainId)
   }
 
   getAddress: GetAddressFunction = () => {
-    return this.contract.getAddress()
+    return this.contractAddress
   }
 
   encode: EncodeFunction<ContractAbiType> = (functionToEncode, args) => {
-    return this.contract.interface.encodeFunctionData(functionToEncode, args as ReadonlyArray<[]>)
+    const abi = this.contractAbi as Abi
+    const functionName = functionToEncode as string
+    const params = args as unknown[]
+    return encodeFunctionData({
+      abi,
+      functionName,
+      args: params
+    })
   }
 
-  estimateGas: EstimateGasFunction<ContractAbiType> = (functionToEstimate, args, options = {}) => {
-    const contractMethodToEstimate = this.contract.getFunction(functionToEstimate)
-    return contractMethodToEstimate.estimateGas(...(args as ReadonlyArray<[]>), options)
+  estimateGas: EstimateGasFunction<ContractAbiType> = async (
+    functionToEstimate,
+    args,
+    options = {}
+  ) => {
+    const contractOptions = await this.convertOptions(options)
+    const abi = this.contractAbi as Abi
+    const params = args as unknown[]
+    return estimateContractGas(this.runner, {
+      abi,
+      functionName: functionToEstimate,
+      address: this.getAddress(),
+      args: params,
+      ...contractOptions
+    })
+  }
+
+  getWallet(): WalletClient<Transport, Chain | undefined> {
+    if (!this.wallet) throw new Error('A signer must be set')
+    return this.wallet
+  }
+
+  async write<
+    functionName extends ContractFunctionName<ContractAbiType, 'payable' | 'nonpayable'>,
+    functionArgs extends ContractFunctionArgs<
+      ContractAbiType,
+      'payable' | 'nonpayable',
+      functionName
+    >
+  >(functionName: functionName, args: functionArgs, options?: TransactionOptions) {
+    const converted = (await this.convertOptions(options)) as any
+
+    return await this.getWallet().writeContract({
+      address: this.contractAddress,
+      abi: this.contractAbi,
+      functionName,
+      args: args,
+      ...converted
+    })
+  }
+
+  async read<
+    functionName extends ContractFunctionName<ContractAbiType, 'pure' | 'view'>,
+    functionArgs extends ContractFunctionArgs<ContractAbiType, 'pure' | 'view', functionName>
+  >(functionName: functionName, args?: functionArgs) {
+    return await this.runner.readContract({
+      functionName,
+      abi: this.contractAbi,
+      address: this.contractAddress,
+      args
+    })
   }
 }
 

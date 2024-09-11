@@ -1,6 +1,6 @@
-import SafeProvider from '../../SafeProvider'
-import Safe from '../../Safe'
-import { PasskeyArgType } from '../../types'
+import Safe from '@safe-global/protocol-kit/Safe'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { PasskeyArgType } from '@safe-global/protocol-kit/types'
 
 /**
  * Returns the owner address associated with the specific passkey.
@@ -25,7 +25,7 @@ async function getPasskeyOwnerAddress(safe: Safe, passkey: PasskeyArgType): Prom
 
   const passkeySigner = await safePasskeyProvider.getExternalSigner()
 
-  const passkeyOwnerAddress = await passkeySigner!.getAddress()
+  const passkeyOwnerAddress = passkeySigner!.account.address
 
   return passkeyOwnerAddress
 }

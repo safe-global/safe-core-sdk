@@ -45,7 +45,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,
@@ -92,7 +92,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
-      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+      const multiSendContractAddress = (await getMultiSendCallOnly()).contract.address
 
       chai.expect(batchTransaction).to.be.deep.equal({
         to: multiSendContractAddress,
@@ -126,7 +126,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
-      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+      const multiSendContractAddress = (await getMultiSendCallOnly()).contract.address
 
       chai.expect(batchTransaction).to.be.deep.equal({
         to: multiSendContractAddress,
@@ -168,7 +168,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const customSaltNonceEncoded = safeSdk
         .getSafeProvider()
-        .encodeParameters(['uint256'], [customSaltNonce])
+        .encodeParameters('uint256', [customSaltNonce])
 
       // custom salt nonce included in the deployment data
       chai.expect(batchTransaction.data).to.contains(customSaltNonceEncoded.replace('0x', ''))

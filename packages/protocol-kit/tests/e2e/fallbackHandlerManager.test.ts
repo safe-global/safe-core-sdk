@@ -52,7 +52,7 @@ describe('Fallback handler manager', () => {
       'should fail if getting the enabled fallback handler is not supported',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -79,24 +79,19 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should return the enabled fallback handler', async () => {
       const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
-      const compatibilityFallbackHandler = await (
-        await getCompatibilityFallbackHandler()
-      ).contract.getAddress()
+      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
+        .address
       chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(compatibilityFallbackHandler)
-      const tx = await safeSdk.createEnableFallbackHandlerTx(
-        await defaultCallbackHandler.getAddress()
-      )
+      const tx = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai
-        .expect(await safeSdk.getFallbackHandler())
-        .to.be.eq(await defaultCallbackHandler.getAddress())
+      chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
     })
   })
 
@@ -111,7 +106,7 @@ describe('Fallback handler manager', () => {
           predictedSafe,
           contractNetworks
         })
-        const tx = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
+        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
         await chai
           .expect(tx)
           .to.be.rejectedWith(
@@ -130,7 +125,7 @@ describe('Fallback handler manager', () => {
           predictedSafe,
           contractNetworks
         })
-        const tx = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
+        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
         await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
       }
     )
@@ -139,13 +134,13 @@ describe('Fallback handler manager', () => {
       'should fail if enabling a fallback handler is not supported',
       async () => {
         const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
         })
-        const tx = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
+        const tx = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
         await chai
           .expect(tx)
           .to.be.rejectedWith(
@@ -156,7 +151,7 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is invalid', async () => {
       const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -170,7 +165,7 @@ describe('Fallback handler manager', () => {
       'should fail if address is equal to 0x address',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -183,18 +178,16 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should fail if address is already enabled', async () => {
       const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
-      const tx1 = await safeSdk.createEnableFallbackHandlerTx(
-        await defaultCallbackHandler.getAddress()
-      )
+      const tx1 = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
       const txResponse = await safeSdk.executeTransaction(tx1)
       await waitSafeTxReceipt(txResponse)
-      const tx2 = safeSdk.createEnableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
+      const tx2 = safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
       await chai.expect(tx2).to.be.rejectedWith('Fallback handler provided is already enabled')
     })
 
@@ -202,7 +195,7 @@ describe('Fallback handler manager', () => {
       'should build the transaction with the optional props',
       async () => {
         const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -217,7 +210,7 @@ describe('Fallback handler manager', () => {
           safeTxGas: '666'
         }
         const tx = await safeSdk.createEnableFallbackHandlerTx(
-          await defaultCallbackHandler.getAddress(),
+          defaultCallbackHandler.address,
           options
         )
         chai.expect(tx.data.baseGas).to.be.eq('111')
@@ -231,24 +224,19 @@ describe('Fallback handler manager', () => {
 
     itif(safeVersionDeployed >= '1.1.1')('should enable a fallback handler', async () => {
       const { safe, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
-      const compatibilityFallbackHandler = await (
-        await getCompatibilityFallbackHandler()
-      ).contract.getAddress()
+      const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
+        .address
       chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(compatibilityFallbackHandler)
-      const tx = await safeSdk.createEnableFallbackHandlerTx(
-        await defaultCallbackHandler.getAddress()
-      )
+      const tx = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
-      chai
-        .expect(await safeSdk.getFallbackHandler())
-        .to.be.eq(await defaultCallbackHandler.getAddress())
+      chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
     })
   })
 
@@ -281,7 +269,7 @@ describe('Fallback handler manager', () => {
           predictedSafe,
           contractNetworks
         })
-        const tx = safeSdk.createDisableFallbackHandlerTx(await defaultCallbackHandler.getAddress())
+        const tx = safeSdk.createDisableFallbackHandlerTx(defaultCallbackHandler.address)
         await chai.expect(tx).to.be.rejectedWith('Safe is not deployed')
       }
     )
@@ -292,7 +280,7 @@ describe('Fallback handler manager', () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -311,7 +299,7 @@ describe('Fallback handler manager', () => {
       'should fail if no fallback handler is enabled',
       async () => {
         const { safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -334,21 +322,17 @@ describe('Fallback handler manager', () => {
         const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
         const [account1] = accounts
         const safe = await getSafeWithOwners([account1.address])
-        const safeAddress = await safe.getAddress()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
           contractNetworks
         })
 
-        const tx1 = await safeSdk.createEnableFallbackHandlerTx(
-          await defaultCallbackHandler.getAddress()
-        )
+        const tx1 = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
         const txResponse1 = await safeSdk.executeTransaction(tx1)
         await waitSafeTxReceipt(txResponse1)
-        chai
-          .expect(await safeSdk.getFallbackHandler())
-          .to.be.eq(await defaultCallbackHandler.getAddress())
+        chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
         const options: SafeTransactionOptionalProps = {
           baseGas: '111',
           gasPrice: '222',
@@ -371,22 +355,18 @@ describe('Fallback handler manager', () => {
       const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
       const [account1] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
 
-      const tx = await safeSdk.createEnableFallbackHandlerTx(
-        await defaultCallbackHandler.getAddress()
-      )
+      const tx = await safeSdk.createEnableFallbackHandlerTx(defaultCallbackHandler.address)
       const txResponse = await safeSdk.executeTransaction(tx)
       await waitSafeTxReceipt(txResponse)
       await new Promise((resolve) => setTimeout(resolve, 500))
-      chai
-        .expect(await safeSdk.getFallbackHandler())
-        .to.be.eq(await defaultCallbackHandler.getAddress())
+      chai.expect(await safeSdk.getFallbackHandler()).to.be.eq(defaultCallbackHandler.address)
 
       const tx1 = await safeSdk.createDisableFallbackHandlerTx()
       const txResponse1 = await safeSdk.executeTransaction(tx1)

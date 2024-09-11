@@ -1,19 +1,17 @@
-import { ethers } from 'ethers'
+import { privateKeyToAddress } from 'viem/accounts'
+import { createPublicClient, http } from 'viem'
+import { sepolia } from 'viem/chains'
 import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/sdk-starter-kit'
 import { generateTransferCallData } from '../utils'
 
-const OWNER_1_PRIVATE_KEY = ''
-const OWNER_2_PRIVATE_KEY = ''
-const OWNER_3_PRIVATE_KEY = ''
-
-const OWNER_1_ADDRESS = ''
-const OWNER_2_ADDRESS = ''
-const OWNER_3_ADDRESS = ''
+const OWNER_1_PRIVATE_KEY = '0x'
+const OWNER_2_PRIVATE_KEY = '0x'
+const OWNER_3_PRIVATE_KEY = '0x'
 
 const THRESHOLD = 3
 const SALT_NONCE = ''
 
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+const RPC_URL = 'https://rpc.sepolia.org'
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 const usdcAmount = 10_000n // 0.01 USDC
 
@@ -23,11 +21,15 @@ const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_AP
 const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}`
 
 async function send(): Promise<SafeClientResult> {
+  const owner1 = privateKeyToAddress(OWNER_1_PRIVATE_KEY)
+  const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY)
+  const owner3 = privateKeyToAddress(OWNER_3_PRIVATE_KEY)
+
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
     safeOptions: {
-      owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
+      owners: [owner1, owner2, owner3],
       threshold: THRESHOLD,
       saltNonce: SALT_NONCE
     }
@@ -54,13 +56,17 @@ async function send(): Promise<SafeClientResult> {
   }
   const transactions = [transferUSDC, transferUSDC]
 
-  const ethersProvider = new ethers.JsonRpcProvider(RPC_URL)
-  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+  const publicClient = createPublicClient({
+    chain: sepolia,
+    transport: http(RPC_URL)
+  })
+
+  const timestamp = (await publicClient.getBlock())?.timestamp || 0n
 
   const safeOperationResult = await safeClientWithSafeOperation.sendSafeOperation({
     transactions,
-    validAfter: timestamp - 60_000,
-    validUntil: timestamp + 60_000
+    validAfter: Number(timestamp - 60_000n),
+    validUntil: Number(timestamp + 60_000n)
   })
 
   console.log('-Send result: ', safeOperationResult)
@@ -73,11 +79,15 @@ async function confirm(safeClientResult: SafeClientResult, pk: string) {
     return
   }
 
+  const owner1 = privateKeyToAddress(OWNER_1_PRIVATE_KEY)
+  const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY)
+  const owner3 = privateKeyToAddress(OWNER_3_PRIVATE_KEY)
+
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: pk,
     safeOptions: {
-      owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
+      owners: [owner1, owner2, owner3],
       threshold: THRESHOLD,
       saltNonce: SALT_NONCE
     }

@@ -1,5 +1,4 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import {
@@ -8,6 +7,7 @@ import {
   CreateProxyProps as CreateProxyPropsGeneral
 } from '@safe-global/safe-core-sdk-types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 export interface CreateProxyProps extends CreateProxyPropsGeneral {
   options?: TransactionOptions
@@ -26,7 +26,7 @@ export interface CreateProxyProps extends CreateProxyPropsGeneral {
  * - SafeWebAuthnSignerFactoryContract_v0_2_1  extends SafeWebAuthnSignerFactoryBaseContract<SafeWebAuthnSignerFactoryContract_v0_2_1_Abi>
  */
 abstract class SafeWebAuthnSignerFactoryBaseContract<
-  SafeWebAuthnSignerFactoryContractAbiType extends InterfaceAbi & Abi
+  SafeWebAuthnSignerFactoryContractAbiType extends Abi
 > extends BaseContract<SafeWebAuthnSignerFactoryContractAbiType> {
   contractName: contractName
 
@@ -48,7 +48,7 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const contractName = 'safeWebAuthnSignerFactoryVersion'
 

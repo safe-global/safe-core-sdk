@@ -6,6 +6,7 @@ import {
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { asHex } from '@safe-global/protocol-kit/utils/types'
 import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '../SafeProvider'
 
@@ -59,7 +60,7 @@ class FallbackHandlerManager {
   async getFallbackHandler(): Promise<string> {
     const safeContract = await this.isFallbackHandlerCompatible()
 
-    return this.#safeProvider.getStorageAt(await safeContract.getAddress(), this.#slot)
+    return this.#safeProvider.getStorageAt(safeContract.getAddress(), this.#slot)
   }
 
   async encodeEnableFallbackHandlerData(fallbackHandlerAddress: string): Promise<string> {
@@ -69,7 +70,7 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
 
-    return safeContract.encode('setFallbackHandler', [fallbackHandlerAddress])
+    return safeContract.encode('setFallbackHandler', [asHex(fallbackHandlerAddress)])
   }
 
   async encodeDisableFallbackHandlerData(): Promise<string> {
@@ -78,7 +79,7 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsEnabled(currentFallbackHandler)
 
-    return safeContract.encode('setFallbackHandler', [ZERO_ADDRESS])
+    return safeContract.encode('setFallbackHandler', [asHex(ZERO_ADDRESS)])
   }
 }
 

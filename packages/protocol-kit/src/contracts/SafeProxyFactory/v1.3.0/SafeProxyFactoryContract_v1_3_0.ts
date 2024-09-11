@@ -1,4 +1,4 @@
-import { ContractRunner, EventLog } from 'ethers'
+import { parseEventLogs } from 'viem'
 import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
@@ -10,6 +10,9 @@ import {
   SafeProxyFactoryContract_v1_3_0_Function,
   safeProxyFactory_1_3_0_ContractArtifacts
 } from '@safe-global/safe-core-sdk-types'
+import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
+import { asHex } from '@safe-global/protocol-kit/utils/types'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeProxyFactoryContract_v1_3_0  is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
@@ -38,7 +41,7 @@ class SafeProxyFactoryContract_v1_3_0
     safeProvider: SafeProvider,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = safeProxyFactory_1_3_0_ContractArtifacts.abi
@@ -61,7 +64,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[creationCode]
    */
   proxyCreationCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyCreationCode'> = async () => {
-    return [await this.contract.proxyCreationCode()]
+    return [await this.read('proxyCreationCode')]
   }
 
   /**
@@ -69,7 +72,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[runtimeCode]
    */
   proxyRuntimeCode: SafeProxyFactoryContract_v1_3_0_Function<'proxyRuntimeCode'> = async () => {
-    return [await this.contract.proxyRuntimeCode()]
+    return [await this.read('proxyRuntimeCode')]
   }
 
   /**
@@ -79,7 +82,7 @@ class SafeProxyFactoryContract_v1_3_0
    */
   calculateCreateProxyWithNonceAddress: SafeProxyFactoryContract_v1_3_0_Function<'calculateCreateProxyWithNonceAddress'> =
     async (args) => {
-      return [await this.contract.calculateCreateProxyWithNonceAddress(...args)]
+      return [await this.write('calculateCreateProxyWithNonceAddress', args)]
     }
 
   /**
@@ -88,7 +91,7 @@ class SafeProxyFactoryContract_v1_3_0
    * @returns Array[proxyAddress]
    */
   createProxy: SafeProxyFactoryContract_v1_3_0_Function<'createProxy'> = async (args) => {
-    return [await this.contract.createProxy(...args)]
+    return [await this.write('createProxy', args)]
   }
 
   /**
@@ -98,7 +101,7 @@ class SafeProxyFactoryContract_v1_3_0
    */
   createProxyWithCallback: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithCallback'> =
     async (args) => {
-      return [await this.contract.createProxyWithCallback(...args)]
+      return [await this.write('createProxyWithCallback', args)]
     }
 
   /**
@@ -109,7 +112,7 @@ class SafeProxyFactoryContract_v1_3_0
   createProxyWithNonce: SafeProxyFactoryContract_v1_3_0_Function<'createProxyWithNonce'> = async (
     args
   ) => {
-    return [await this.contract.createProxyWithNonce(...args)]
+    return [await this.write('createProxyWithNonce', args)]
   }
 
   /**
@@ -132,27 +135,34 @@ class SafeProxyFactoryContract_v1_3_0
       options.gasLimit = (
         await this.estimateGas(
           'createProxyWithNonce',
-          [safeSingletonAddress, initializer, saltNonceBigInt],
+          [safeSingletonAddress, asHex(initializer), saltNonceBigInt],
           { ...options }
         )
       ).toString()
     }
 
-    const proxyAddress = this.contract
-      .createProxyWithNonce(safeSingletonAddress, initializer, saltNonce, { ...options })
-      .then(async (txResponse) => {
+    const coverted = await this.convertOptions(options)
+    const proxyAddress = await this.getWallet()
+      .writeContract({
+        address: this.contractAddress,
+        abi: this.contractAbi,
+        functionName: 'createProxyWithNonce',
+        args: [safeSingletonAddress, asHex(initializer), saltNonceBigInt],
+        ...coverted
+      })
+      .then(async (hash) => {
         if (callback) {
-          callback(txResponse.hash)
+          callback(hash)
         }
-        const txReceipt = await txResponse.wait()
-        const events = txReceipt?.logs as EventLog[]
+        const { logs } = await waitForTransactionReceipt(this.runner, hash)
+        const events = parseEventLogs({ logs, abi: this.contractAbi })
         const proxyCreationEvent = events.find((event) => event?.eventName === 'ProxyCreation')
         if (!proxyCreationEvent || !proxyCreationEvent.args) {
           throw new Error('SafeProxy was not deployed correctly')
         }
-        const proxyAddress: string = proxyCreationEvent.args[0]
-        return proxyAddress
+        return proxyCreationEvent.args.proxy
       })
+
     return proxyAddress
   }
 }

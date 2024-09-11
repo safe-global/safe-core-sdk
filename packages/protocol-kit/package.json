@@ -35,7 +35,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && yarn check-safe-deployments && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
+    "build": "yarn unbuild && hardhat compile && yarn check-safe-deployments && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -52,7 +52,7 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
-    "@nomicfoundation/hardhat-ethers": "^3.0.6",
+    "@nomicfoundation/hardhat-viem": "^2.0.2",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
     "@safe-global/safe-passkey": "0.2.0-alpha.1",
@@ -64,24 +64,22 @@
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^16.4.5",
-    "hardhat": "2.20.1",
-    "hardhat-deploy": "^0.12.4",
-    "hardhat-deploy-ethers": "^0.4.2",
+    "ethers": "^6.13.1",
+    "hardhat": "^2.19.3",
+    "hardhat-deploy": "^0.11.45",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "tsconfig-paths": "^4.2.0",
-    "viem": "^2.15.1",
     "web3": "^4.7.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
     "@noble/hashes": "^1.3.3",
     "@safe-global/safe-core-sdk-types": "^5.1.0",
-    "@safe-global/safe-deployments": "^1.37.3",
+    "@safe-global/safe-deployments": "^1.37.5",
     "@safe-global/safe-modules-deployments": "^2.2.1",
     "abitype": "^1.0.2",
-    "ethereumjs-util": "^7.1.5",
-    "ethers": "^6.13.1",
-    "semver": "^7.6.2"
+    "semver": "^7.6.2",
+    "viem": "^2.19.0"
   }
 }

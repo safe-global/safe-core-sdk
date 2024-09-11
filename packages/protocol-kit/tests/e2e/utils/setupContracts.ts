@@ -1,4 +1,5 @@
-import { Contract, ZeroAddress, JsonFragment } from 'ethers'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { GetContractReturnType, Abi, WalletClient } from 'viem'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
@@ -12,239 +13,262 @@ import {
   signMessageLibDeployed,
   simulateTxAccessorDeployed
 } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import { deployments, ethers } from 'hardhat'
+import { deployments, viem } from 'hardhat'
 import semverSatisfies from 'semver/functions/satisfies'
+import { getDeployer, waitTransactionReceipt } from './transactions'
 
 export const getSafeSingleton = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const SafeDeployment = await deployments.get(safeDeployed.name)
-  const Safe = await ethers.getContractFactory(safeDeployed.name)
+  const safeDeployment = await deployments.get(safeDeployed.name)
+  const contract = await viem.getContractAt(safeDeployed.name, safeDeployment.address)
   return {
-    contract: Safe.attach(SafeDeployment.address),
-    abi: SafeDeployment.abi
+    contract,
+    abi: safeDeployment.abi
   }
 }
 
 export const getFactory = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType<Abi, WalletClient>
+  abi: Abi
 }> => {
-  const FactoryDeployment = await deployments.get(proxyFactoryDeployed.name)
-  const Factory = await ethers.getContractFactory(proxyFactoryDeployed.name)
+  const factoryDeployment = await deployments.get(proxyFactoryDeployed.name)
+  const factoryAddress = factoryDeployment.address
+  const contract = await viem.getContractAt(proxyFactoryDeployed.name, factoryAddress, {
+    client: { wallet: await getDeployer() }
+  })
   return {
-    contract: Factory.attach(FactoryDeployment.address),
-    abi: FactoryDeployment.abi
+    contract,
+    abi: factoryDeployment.abi
   }
 }
 
-export const getSafeTemplate = async (): Promise<Contract> => {
+export const getSafeTemplate = async (): Promise<GetContractReturnType<Abi, WalletClient>> => {
   const randomSaltNonce = Math.floor(Math.random() * 1000000000) + 1
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
-  const singletonAddress = await singleton.getAddress()
-  const template = await factory.createProxyWithNonce.staticCall(
+  const singletonAddress = singleton.address
+
+  const { result } = await factory.simulate.createProxyWithNonce([
     singletonAddress,
     '0x',
     randomSaltNonce
-  )
-  await factory
-    .createProxyWithNonce(singletonAddress, '0x', randomSaltNonce)
-    .then((tx: any) => tx.wait())
-  const Safe = await ethers.getContractFactory(safeDeployed.name)
-  return Safe.attach(template)
+  ])
+  const hash = await factory.write.createProxyWithNonce([singletonAddress, '0x', randomSaltNonce])
+  await waitTransactionReceipt(hash)
+  return viem.getContractAt(safeDeployed.name, result)
 }
 
 export const getSafeWithOwners = async (
   owners: string[],
   threshold?: number,
   fallbackHandler?: string
-): Promise<Contract> => {
+): Promise<GetContractReturnType<Abi, WalletClient>> => {
   const template = await getSafeTemplate()
   if (semverSatisfies(safeVersionDeployed, '<=1.0.0')) {
-    await template.setup(
+    await template.write.setup([
       owners,
       threshold || owners.length,
-      ZeroAddress,
+      ZERO_ADDRESS,
       '0x',
-      ZeroAddress,
+      ZERO_ADDRESS,
       0,
-      ZeroAddress
-    )
+      ZERO_ADDRESS
+    ])
   } else {
-    await template.setup(
+    await template.write.setup([
       owners,
       threshold || owners.length,
-      ZeroAddress,
+      ZERO_ADDRESS,
       '0x',
-      fallbackHandler || (await (await getCompatibilityFallbackHandler()).contract.getAddress()),
-      ZeroAddress,
+      fallbackHandler || (await getCompatibilityFallbackHandler()).contract.address,
+      ZERO_ADDRESS,
       0,
-      ZeroAddress
-    )
+      ZERO_ADDRESS
+    ])
   }
   return template
 }
 
 export const getCompatibilityFallbackHandler = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const CompatibilityFallbackHandlerDeployment = await deployments.get(
+  const compatibilityFallbackHandlerDeployment = await deployments.get(
     compatibilityFallbackHandlerDeployed.name
   )
-  const CompatibilityFallbackHandler = await ethers.getContractFactory(
-    compatibilityFallbackHandlerDeployed.name
+  const compatibilityFallbackHandlerDeploymentAddress =
+    compatibilityFallbackHandlerDeployment.address
+
+  const contract = await viem.getContractAt(
+    compatibilityFallbackHandlerDeployed.name,
+    compatibilityFallbackHandlerDeploymentAddress
   )
   return {
-    contract: CompatibilityFallbackHandler.attach(CompatibilityFallbackHandlerDeployment.address),
-    abi: CompatibilityFallbackHandlerDeployment.abi
+    contract,
+    abi: compatibilityFallbackHandlerDeployment.abi
   }
 }
 
 export const getMultiSend = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const MultiSendDeployment = await deployments.get(multiSendDeployed.name)
-  const MultiSend = await ethers.getContractFactory(multiSendDeployed.name)
+  const multiSendDeployment = await deployments.get(multiSendDeployed.name)
+  const multiSendAddress = multiSendDeployment.address
+  const contract = await viem.getContractAt(multiSendDeployed.name, multiSendAddress)
   return {
-    contract: MultiSend.attach(MultiSendDeployment.address),
-    abi: MultiSendDeployment.abi
+    contract,
+    abi: multiSendDeployment.abi
   }
 }
 
 export const getMultiSendCallOnly = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const MultiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
-  const MultiSendCallOnly = await ethers.getContractFactory(multiSendCallOnlyDeployed.name)
+  const multiSendCallOnlyDeployment = await deployments.get(multiSendCallOnlyDeployed.name)
+  const multiSendAddress = multiSendCallOnlyDeployment.address
+  const contract = await viem.getContractAt(multiSendCallOnlyDeployed.name, multiSendAddress)
   return {
-    contract: MultiSendCallOnly.attach(MultiSendCallOnlyDeployment.address),
-    abi: MultiSendCallOnlyDeployment.abi
+    contract,
+    abi: multiSendCallOnlyDeployment.abi
   }
 }
 
 export const getSignMessageLib = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const SignMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
-  const SignMessageLib = await ethers.getContractFactory(signMessageLibDeployed.name)
+  const signMessageLibDeployment = await deployments.get(signMessageLibDeployed.name)
+  const signMessageLibAddress = signMessageLibDeployment.address
+  const contract = await viem.getContractAt(signMessageLibDeployed.name, signMessageLibAddress)
   return {
-    contract: SignMessageLib.attach(SignMessageLibDeployment.address),
-    abi: SignMessageLibDeployment.abi
+    contract,
+    abi: signMessageLibDeployment.abi
   }
 }
 
 export const getCreateCall = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const CreateCallDeployment = await deployments.get(createCallDeployed.name)
-  const CreateCall = await ethers.getContractFactory(createCallDeployed.name)
+  const createCallDeployment = await deployments.get(createCallDeployed.name)
+  const createCallAddress = createCallDeployment.address
+  const contract = await viem.getContractAt(createCallDeployed.name, createCallAddress)
   return {
-    contract: CreateCall.attach(CreateCallDeployment.address),
-    abi: CreateCallDeployment.abi
+    contract,
+    abi: createCallDeployment.abi
   }
 }
 
 export const getSimulateTxAccessor = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const SimulateTxAccessorDeployment = await deployments.get(simulateTxAccessorDeployed.name)
-  const SimulateTxAccessor = await ethers.getContractFactory(simulateTxAccessorDeployed.name)
+  const simulateTxAccessorDeployment = await deployments.get(simulateTxAccessorDeployed.name)
+  const simulateTxAccessorAddress = simulateTxAccessorDeployment.address
+  const contract = await viem.getContractAt(
+    simulateTxAccessorDeployed.name,
+    simulateTxAccessorAddress
+  )
   return {
-    contract: SimulateTxAccessor.attach(SimulateTxAccessorDeployment.address),
-    abi: SimulateTxAccessorDeployment.abi
+    contract,
+    abi: simulateTxAccessorDeployment.abi
   }
 }
 
 export const getSafeWebAuthnSignerFactory = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const SafeWebAuthnSignerFactoryDeployment = await deployments.get(
+  const safeWebAuthnSignerFactoryDeployment = await deployments.get(
     safeWebAuthnSignerFactoryDeployed.name
   )
-  const SafeWebAuthnSignerFactory = await ethers.getContractFactory(
-    safeWebAuthnSignerFactoryDeployed.name
+  const safeWebAuthnSignerFactoryAddress = safeWebAuthnSignerFactoryDeployment.address
+  const contract = await viem.getContractAt(
+    proxyFactoryDeployed.name,
+    safeWebAuthnSignerFactoryAddress,
+    {
+      client: { wallet: await getDeployer() }
+    }
   )
   return {
-    contract: SafeWebAuthnSignerFactory.attach(SafeWebAuthnSignerFactoryDeployment.address),
-    abi: SafeWebAuthnSignerFactoryDeployment.abi
+    contract,
+    abi: safeWebAuthnSignerFactoryDeployment.abi
   }
 }
 
 export const getSafeWebAuthnSharedSigner = async (): Promise<{
-  contract: Contract
-  abi: JsonFragment | JsonFragment[]
+  contract: GetContractReturnType
+  abi: Abi
 }> => {
-  const SafeWebAuthnSharedSignerDeployment = await deployments.get(
+  const safeWebAuthnSharedSignerDeployment = await deployments.get(
     safeWebAuthnSharedSignerDeployed.name
   )
-  const SafeWebAuthnSharedSigner = await ethers.getContractFactory(
-    safeWebAuthnSharedSignerDeployed.name
-  )
+
   return {
-    contract: SafeWebAuthnSharedSigner.attach(SafeWebAuthnSharedSignerDeployment.address),
-    abi: SafeWebAuthnSharedSignerDeployment.abi
+    contract: await viem.getContractAt(
+      safeWebAuthnSharedSignerDeployed.name,
+      safeWebAuthnSharedSignerDeployment.address
+    ),
+    abi: safeWebAuthnSharedSignerDeployment.abi
   }
 }
 
-export const getWebAuthnContract = async (): Promise<Contract> => {
-  const WebAuthnContractDeployment = await deployments.get('WebAuthnContract')
-  const WebAuthn = await ethers.getContractFactory('WebAuthnContract')
-  return WebAuthn.attach(WebAuthnContractDeployment.address)
+export const getWebAuthnContract = async (): Promise<GetContractReturnType<Abi>> => {
+  const webAuthnContractDeployment = await deployments.get('WebAuthnContract')
+  const dailyLimitModuleAddress = webAuthnContractDeployment.address
+  return await viem.getContractAt('WebAuthnContract', dailyLimitModuleAddress)
 }
 
-export const getDailyLimitModule = async (): Promise<Contract> => {
-  const DailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
-  const DailyLimitModule = await ethers.getContractFactory('DailyLimitModule')
-  return DailyLimitModule.attach(DailyLimitModuleDeployment.address)
+export const getDailyLimitModule = async (): Promise<GetContractReturnType<Abi>> => {
+  const dailyLimitModuleDeployment = await deployments.get('DailyLimitModule')
+  const dailyLimitModuleAddress = dailyLimitModuleDeployment.address
+  return await viem.getContractAt('DailyLimitModule', dailyLimitModuleAddress)
 }
 
-export const getSocialRecoveryModule = async (): Promise<Contract> => {
-  const SocialRecoveryModuleDeployment = await deployments.get('SocialRecoveryModule')
-  const SocialRecoveryModule = await ethers.getContractFactory('SocialRecoveryModule')
-  return SocialRecoveryModule.attach(SocialRecoveryModuleDeployment.address)
+export const getSocialRecoveryModule = async (): Promise<GetContractReturnType<Abi>> => {
+  const socialRecoveryModuleDeployment = await deployments.get('SocialRecoveryModule')
+  const socialRecoveryModuleAddress = socialRecoveryModuleDeployment.address
+  return await viem.getContractAt('SocialRecoveryModule', socialRecoveryModuleAddress)
 }
 
-export const getStateChannelModule = async (): Promise<Contract> => {
-  const StateChannelModuleDeployment = await deployments.get('StateChannelModule')
-  const StateChannelModule = await ethers.getContractFactory('StateChannelModule')
-  return StateChannelModule.attach(StateChannelModuleDeployment.address)
+export const getStateChannelModule = async (): Promise<GetContractReturnType<Abi>> => {
+  const stateChannelModuleDeployment = await deployments.get('StateChannelModule')
+  const stateChannelModuleAddress = stateChannelModuleDeployment.address
+  return await viem.getContractAt('StateChannelModule', stateChannelModuleAddress)
 }
 
-export const getWhiteListModule = async (): Promise<Contract> => {
-  const WhiteListModuleDeployment = await deployments.get('WhitelistModule')
-  const WhiteListModule = await ethers.getContractFactory('WhitelistModule')
-  return WhiteListModule.attach(WhiteListModuleDeployment.address)
+export const getWhiteListModule = async (): Promise<GetContractReturnType<Abi>> => {
+  const whiteListModuleDeployment = await deployments.get('WhitelistModule')
+  const whiteListModuleAddress = whiteListModuleDeployment.address
+  return await viem.getContractAt('WhitelistModule', whiteListModuleAddress)
 }
 
-export const getERC20Mintable = async (): Promise<Contract> => {
-  const ERC20MintableDeployment = await deployments.get('ERC20Mintable')
-  const ERC20Mintable = await ethers.getContractFactory('ERC20Mintable')
-  return ERC20Mintable.attach(ERC20MintableDeployment.address)
+export const getERC20Mintable = async (): Promise<GetContractReturnType<Abi, WalletClient>> => {
+  const eRC20MintableDeployment = await deployments.get('ERC20Mintable')
+  const eRC20MintableAddress = eRC20MintableDeployment.address
+  return await viem.getContractAt('ERC20Mintable', eRC20MintableAddress, {
+    client: { wallet: await getDeployer() }
+  })
 }
 
-export const getDebugTransactionGuard = async (): Promise<Contract> => {
+export const getDebugTransactionGuard = async (): Promise<GetContractReturnType<Abi>> => {
   const contractName = semverSatisfies(safeVersionDeployed, '<=1.3.0')
     ? 'DebugTransactionGuard_SV1_3_0'
     : 'DebugTransactionGuard_SV1_4_1'
-  const DebugTransactionGuardDeployment = await deployments.get(contractName)
-  const DebugTransactionGuard = await ethers.getContractFactory(contractName)
-  return DebugTransactionGuard.attach(DebugTransactionGuardDeployment.address)
+  const debugTransactionGuardDeployment = await deployments.get(contractName)
+  const debugTransactionGuardAddress = debugTransactionGuardDeployment.address
+  return await viem.getContractAt(contractName, debugTransactionGuardAddress)
 }
 
-export const getDefaultCallbackHandler = async (): Promise<Contract> => {
+export const getDefaultCallbackHandler = async (): Promise<GetContractReturnType<Abi>> => {
   const contractName = semverSatisfies(safeVersionDeployed, '<=1.3.0')
     ? 'DefaultCallbackHandler_SV1_3_0'
     : 'TokenCallbackHandler_SV1_4_1'
-  const DefaultCallbackHandlerDeployment = await deployments.get(contractName)
-  const DefaultCallbackHandler = await ethers.getContractFactory(contractName)
-  return DefaultCallbackHandler.attach(DefaultCallbackHandlerDeployment.address)
+  const defaultCallbackHandlerDeployment = await deployments.get(contractName)
+  const defaultCallbackHandlerAddress = defaultCallbackHandlerDeployment.address
+  return await viem.getContractAt(contractName, defaultCallbackHandlerAddress)
 }

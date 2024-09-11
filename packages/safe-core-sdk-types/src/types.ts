@@ -1,3 +1,5 @@
+export { type Hex } from 'viem'
+
 export type SafeVersion = '1.4.1' | '1.3.0' | '1.2.0' | '1.1.1' | '1.0.0'
 
 export enum OperationType {
@@ -83,7 +85,7 @@ export interface TransactionBase {
 
 export interface TransactionOptions {
   from?: string
-  gasLimit?: number | string
+  gasLimit?: number | string | bigint
   gasPrice?: number | string
   maxFeePerGas?: number | string
   maxPriorityFeePerGas?: number | string
@@ -170,20 +172,20 @@ export interface EIP712TypedDataMessage {
   }
 }
 
-interface TypedDataDomain {
+export interface TypedDataDomain {
   name?: string
   version?: string
-  chainId?: unknown
+  chainId?: number
   verifyingContract?: string
   salt?: ArrayLike<number> | string
 }
 
-interface TypedDataTypes {
+export interface TypedDataTypes {
   name: string
   type: string
 }
 
-type TypedMessageTypes = {
+export type TypedMessageTypes = {
   [key: string]: TypedDataTypes[]
 }
 

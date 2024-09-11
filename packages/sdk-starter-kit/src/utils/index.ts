@@ -1,6 +1,6 @@
 import { validateEthereumAddress } from '@safe-global/protocol-kit'
 import { TransactionResult } from '@safe-global/safe-core-sdk-types'
-import { ContractTransactionReceipt, TransactionResponse } from 'ethers'
+import { GetTransactionReceiptReturnType } from 'viem'
 
 import { MESSAGES, SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 import { SafeClientResult, SafeConfig } from '@safe-global/sdk-starter-kit/types'
@@ -22,12 +22,15 @@ export const isValidSafeConfig = (config: SafeConfig): boolean => {
 
 export const waitSafeTxReceipt = async (
   txResult: TransactionResult
-): Promise<ContractTransactionReceipt | null | undefined> => {
-  const receipt =
-    txResult.transactionResponse &&
-    (await (txResult.transactionResponse as TransactionResponse).wait())
-
-  return receipt as ContractTransactionReceipt
+): Promise<GetTransactionReceiptReturnType | null | undefined> => {
+  const receipt = txResult.transactionResponse
+    ? await (
+        txResult.transactionResponse as {
+          wait: () => Promise<GetTransactionReceiptReturnType>
+        }
+      ).wait()
+    : undefined
+  return receipt
 }
 
 export const createSafeClientResult = ({

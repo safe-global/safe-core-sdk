@@ -1,17 +1,14 @@
+import { privateKeyToAddress } from 'viem/accounts'
 import { SafeClientResult, createSafeClient, onChainMessages } from '@safe-global/sdk-starter-kit'
 
-const OWNER_1_PRIVATE_KEY = ''
-const OWNER_2_PRIVATE_KEY = ''
-const OWNER_3_PRIVATE_KEY = ''
-
-const OWNER_1_ADDRESS = ''
-const OWNER_2_ADDRESS = ''
-const OWNER_3_ADDRESS = ''
+const OWNER_1_PRIVATE_KEY = '0x'
+const OWNER_2_PRIVATE_KEY = '0x'
+const OWNER_3_PRIVATE_KEY = '0x'
 
 const THRESHOLD = 3
 const SALT_NONCE = ''
 
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
+const RPC_URL = 'https://rpc.sepolia.org'
 const MESSAGE = "I'm the owner of this Safe"
 // const MESSAGE = {
 //   types: {
@@ -61,11 +58,15 @@ const MESSAGE = "I'm the owner of this Safe"
 // }
 
 async function send(): Promise<SafeClientResult> {
+  const owner1 = privateKeyToAddress(OWNER_1_PRIVATE_KEY)
+  const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY)
+  const owner3 = privateKeyToAddress(OWNER_3_PRIVATE_KEY)
+
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
     safeOptions: {
-      owners: [OWNER_1_ADDRESS, OWNER_2_ADDRESS, OWNER_3_ADDRESS],
+      owners: [owner1, owner2, owner3],
       threshold: THRESHOLD,
       saltNonce: SALT_NONCE
     }

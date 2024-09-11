@@ -54,7 +54,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -75,7 +75,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -96,7 +96,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -117,7 +117,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,
@@ -138,7 +138,7 @@ describe('createSafeDeploymentTransaction', () => {
 
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const safeFactoryAddress = await (await getFactory()).contract.address
+    const safeFactoryAddress = (await getFactory()).contract.address
 
     chai.expect(deploymentTransaction).to.be.deep.equal({
       to: safeFactoryAddress,

@@ -1,5 +1,6 @@
 import { OperationType } from '@safe-global/safe-core-sdk-types'
 import chai from 'chai'
+
 import { decodeMultiSendData } from '@safe-global/protocol-kit/utils/transactions/utils'
 
 describe('Transaction utils', () => {

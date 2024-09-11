@@ -30,7 +30,7 @@ const EXPECTED_SAFE_OPERATION_CONFIRMATIONS = [
 ]
 
 describe('getSafeOperationConfirmations', () => {
-  before(async () => {
+  before(() => {
     safeApiKit = getApiKit(TX_SERVICE_URL)
   })
 

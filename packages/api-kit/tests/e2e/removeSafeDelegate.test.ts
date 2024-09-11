@@ -16,7 +16,7 @@ let signer: DeleteSafeDelegateProps['signer']
 let delegatorAddress: Address
 
 describe('removeSafeDelegate', () => {
-  before(async () => {
+  before(() => {
     safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
     signer = createWalletClient({
       chain: sepolia,

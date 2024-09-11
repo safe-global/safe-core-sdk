@@ -139,14 +139,7 @@ class SafeProvider {
       const chainId = await safeProvider.getChainId()
       const customContracts = contractNetworks?.[chainId.toString()]
 
-      // FIXME: Passkeys is an experimental feature and is currently only available on the Sepolia chain.
-      if (chainId !== 11155111n && process.env.TEST_NETWORK !== 'hardhat') {
-        throw new Error(
-          'Passkeys is an experimental feature and is currently only available on the Sepolia chain.'
-        )
-      }
-
-      let passkeySigner: PasskeyClient
+      let passkeySigner
 
       if (!isSignerPasskeyClient(signer)) {
         // signer is type PasskeyArgType {rawId, coordinates, customVerifierAddress? }
@@ -172,7 +165,7 @@ class SafeProvider {
           chainId.toString()
         )
       } else {
-        // signer was already initialized and we pass a PasskeySigner instance (reconnecting)
+        // signer was already initialized and we pass a PasskeyClient instance (reconnecting)
         passkeySigner = signer as PasskeyClient
       }
 

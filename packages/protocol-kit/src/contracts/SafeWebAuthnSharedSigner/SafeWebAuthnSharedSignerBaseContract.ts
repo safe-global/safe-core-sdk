@@ -15,7 +15,7 @@ import { ExternalClient } from '@safe-global/protocol-kit/types'
  * @extends BaseContract<SafeWebAuthnSharedSignerContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
- * - SafeWebAuthnSharedSignerContract_v1_4_1  extends SafeWebAuthnSharedSignerBaseContract<SafeWebAuthnSharedSignerContract_v1_4_1_Abi>
+ * - SafeWebAuthnSharedSignerContract_v0_2_1  extends SafeWebAuthnSharedSignerBaseContract<SafeWebAuthnSharedSignerContract_v0_2_1_Abi>
  */
 abstract class SafeWebAuthnSharedSignerBaseContract<
   SafeWebAuthnSharedSignerContractAbiType extends Abi

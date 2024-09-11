@@ -122,9 +122,7 @@ describe('Safe contracts', () => {
         customContractAddress: customContract?.safeSingletonAddress,
         customContractAbi: customContract?.safeSingletonAbi
       })
-      chai
-        .expect(safeContract.getAddress())
-        .to.be.eq(await (await getSafeSingleton()).contract.address)
+      chai.expect(safeContract.getAddress()).to.be.eq((await getSafeSingleton()).contract.address)
     })
   })
 
@@ -150,9 +148,7 @@ describe('Safe contracts', () => {
         customContractAddress: customContract.multiSendAddress,
         customContractAbi: customContract.multiSendAbi
       })
-      chai
-        .expect(await multiSendContract.getAddress())
-        .to.be.eq(await (await getMultiSend()).contract.address)
+      chai.expect(multiSendContract.getAddress()).to.be.eq((await getMultiSend()).contract.address)
     })
   })
 
@@ -164,7 +160,7 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await multiSendCallOnlyContract.getAddress())
+        .expect(multiSendCallOnlyContract.getAddress())
         .to.be.eq('0x40A2aCCbd92BCA938b02010E17A5b8929b49130D')
     })
 
@@ -179,8 +175,8 @@ describe('Safe contracts', () => {
         customContractAbi: customContract.multiSendCallOnlyAbi
       })
       chai
-        .expect(await multiSendCallOnlyContract.getAddress())
-        .to.be.eq(await (await getMultiSendCallOnly()).contract.address)
+        .expect(multiSendCallOnlyContract.getAddress())
+        .to.be.eq((await getMultiSendCallOnly()).contract.address)
     })
   })
 
@@ -193,7 +189,7 @@ describe('Safe contracts', () => {
           safeVersion
         })
       chai
-        .expect(await compatibilityFallbackHandlerContract.getAddress())
+        .expect(compatibilityFallbackHandlerContract.getAddress())
         .to.be.eq('0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4')
     })
 
@@ -209,8 +205,8 @@ describe('Safe contracts', () => {
           customContractAbi: customContract.fallbackHandlerAbi
         })
       chai
-        .expect(await compatibilityFallbackHandlerContract.getAddress())
-        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.address)
+        .expect(compatibilityFallbackHandlerContract.getAddress())
+        .to.be.eq((await getCompatibilityFallbackHandler()).contract.address)
     })
   })
 
@@ -222,7 +218,7 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await factoryContract.getAddress())
+        .expect(factoryContract.getAddress())
         .to.be.eq('0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2')
     })
 
@@ -236,9 +232,7 @@ describe('Safe contracts', () => {
         customContractAddress: customContract.safeProxyFactoryAddress,
         customContractAbi: customContract.safeProxyFactoryAbi
       })
-      chai
-        .expect(await factoryContract.getAddress())
-        .to.be.eq(await (await getFactory()).contract.address)
+      chai.expect(factoryContract.getAddress()).to.be.eq((await getFactory()).contract.address)
     })
   })
 
@@ -250,7 +244,7 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await signMessageLibContract.getAddress())
+        .expect(signMessageLibContract.getAddress())
         .to.be.eq('0xA65387F16B013cf2Af4605Ad8aA5ec25a2cbA3a2')
     })
 
@@ -265,8 +259,8 @@ describe('Safe contracts', () => {
         customContractAbi: customContract.signMessageLibAbi
       })
       chai
-        .expect(await signMessageLibContract.getAddress())
-        .to.be.eq(await (await getSignMessageLib()).contract.address)
+        .expect(signMessageLibContract.getAddress())
+        .to.be.eq((await getSignMessageLib()).contract.address)
     })
   })
 
@@ -278,7 +272,7 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await createCallContract.getAddress())
+        .expect(createCallContract.getAddress())
         .to.be.eq('0x7cbB62EaA69F79e6873cD1ecB2392971036cFAa4')
     })
 
@@ -293,8 +287,8 @@ describe('Safe contracts', () => {
         customContractAbi: customContract.createCallAbi
       })
       chai
-        .expect(await createCallContract.getAddress())
-        .to.be.eq(await (await getCreateCall()).contract.address)
+        .expect(createCallContract.getAddress())
+        .to.be.eq((await getCreateCall()).contract.address)
     })
 
     it('should return an external provider (PublicClient) and signer (WalletClient) when using an EIP1193 provider', async () => {

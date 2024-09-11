@@ -101,7 +101,7 @@ class SafeProxyFactoryContract_v1_1_1
 
   /**
    * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
-   * @param args - Array[masterCopy, initializer, saltNonceBigInt]
+   * @param args - Array[masterCopy, initializer, saltNonce]
    * @returns Array[proxyAddress]
    */
   createProxyWithNonce: SafeProxyFactoryContract_v1_1_1_Function<'createProxyWithNonce'> = async (

@@ -72,7 +72,7 @@ class SafeProxyFactoryContract_v1_4_1
 
   /**
    * Deploys a new chain-specific proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
-   * @param args - Array[singleton, initializer, saltNonceBigInt]
+   * @param args - Array[singleton, initializer, saltNonce]
    * @returns Array[proxy]
    */
   createChainSpecificProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createChainSpecificProxyWithNonce'> =
@@ -93,7 +93,7 @@ class SafeProxyFactoryContract_v1_4_1
 
   /**
    * Deploys a new proxy with singleton and salt. Optionally executes an initializer call to a new proxy.
-   * @param args - Array[singleton, initializer, saltNonceBigInt]
+   * @param args - Array[singleton, initializer, saltNonce]
    * @returns Array[proxy]
    */
   createProxyWithNonce: SafeProxyFactoryContract_v1_4_1_Function<'createProxyWithNonce'> = async (

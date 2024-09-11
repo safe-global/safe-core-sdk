@@ -386,7 +386,7 @@ function isGnosisChainEstimationError(error: EstimationError): error is GnosisCh
  * @returns {string} The SafeTxGas value.
  * @throws It Will throw an error if the SafeTxGas cannot be parsed.
  */
-function parseSafeTxGasErrorResponse(error: EstimationError) {
+function parseSafeTxGasErrorResponse(error: EstimationError): string {
   // Ethers v6
   if (isEthersError(error)) {
     return decodeSafeTxGas(error.data)

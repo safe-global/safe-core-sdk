@@ -885,7 +885,7 @@ class Safe {
     const ownersWhoApproved: string[] = []
     for (const owner of owners) {
       const [approved] = await this.#contractManager.safeContract.approvedHashes([
-        owner,
+        asHex(owner),
         asHash(txHash)
       ])
       if (approved > 0) {
@@ -1644,7 +1644,7 @@ class Safe {
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
       data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        safeSingletonContract.getAddress(),
+        asHex(safeSingletonContract.getAddress()),
         asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
         BigInt(saltNonce)
       ])
@@ -1729,6 +1729,7 @@ class Safe {
 
     return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)
   }
+
   /**
    * Call the CompatibilityFallbackHandler isValidSignature method
    *

@@ -1,8 +1,8 @@
-import Safe from '../../Safe'
-import { PasskeyArgType } from '../../types'
 import { Hex } from 'viem'
-import SafeProvider from '../../SafeProvider'
-import { PasskeyClient } from '@safe-global/protocol-kit/types'
+
+import Safe from '@safe-global/protocol-kit/Safe'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { PasskeyArgType, PasskeyClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Creates the deployment transaction to create a passkey signer.
@@ -29,7 +29,7 @@ async function createPasskeyDeploymentTransaction(
   )
 
   const passkeySigner = (await safePasskeyProvider.getExternalSigner()) as PasskeyClient
-  const passkeyAddress = await passkeySigner!.account.address
+  const passkeyAddress = passkeySigner!.account.address
 
   const isPasskeyDeployed = await safe.getSafeProvider().isContractDeployed(passkeyAddress)
 

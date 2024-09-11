@@ -21,7 +21,7 @@ let delegatorAddress: Address
 describe('getSafeDelegates', () => {
   const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
 
-  before(async () => {
+  before(() => {
     safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
     signer = createWalletClient({
       chain: sepolia,

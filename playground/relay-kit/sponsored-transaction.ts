@@ -2,7 +2,7 @@ import { Chain, createWalletClient, custom, formatEther, Hex } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { getBalance, waitForTransactionReceipt } from 'viem/actions'
 import { sepolia } from 'viem/chains'
-import { createSafeClient, SafeClient } from '@safe-global/safe-kit'
+import { createSafeClient, SafeClient } from '@safe-global/sdk-starter-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
   MetaTransactionData,

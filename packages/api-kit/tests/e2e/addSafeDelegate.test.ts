@@ -17,7 +17,7 @@ let signer: AddSafeDelegateProps['signer']
 let delegatorAddress: Address
 
 describe('addSafeDelegate', () => {
-  before(async () => {
+  before(() => {
     safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
     signer = createWalletClient({
       chain: sepolia,
@@ -136,7 +136,7 @@ describe('addSafeDelegate', () => {
       transport: http(),
       account: privateKeyToAccount(PRIVATE_KEY_2)
     })
-    const delegatorAddress = (await nonOwnerSigner.getAddresses())[0]
+    const delegatorAddress = nonOwnerSigner.account.address
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,

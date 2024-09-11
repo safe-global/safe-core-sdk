@@ -302,7 +302,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           args: [encodeMultiSendData(setupTransactions) as Hex]
         })
 
-        deploymentTo = await multiSendContract.getAddress()
+        deploymentTo = multiSendContract.getAddress()
         deploymentData = batchData
       } else {
         deploymentTo = enable4337ModuleTransaction.to
@@ -494,7 +494,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const isBatch = transactions.length > 1
-    const multiSendAddress = await this.protocolKit.getMultiSendAddress()
+    const multiSendAddress = this.protocolKit.getMultiSendAddress()
 
     const callData = isBatch
       ? this.#encodeExecuteUserOpCallData({

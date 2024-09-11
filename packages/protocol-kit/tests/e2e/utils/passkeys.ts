@@ -1,6 +1,7 @@
 import { PasskeyArgType, PasskeyClient, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
 import { WebAuthnCredentials } from './webauthnShim'
 import { WalletClient, keccak256, toBytes, Transport, Chain, Account } from 'viem'
+import { asHex } from '@safe-global/protocol-kit/utils/types'
 
 let singleInstance: WebAuthnCredentials
 
@@ -33,7 +34,7 @@ export async function deployPasskeysContract(
     const createPasskeySignerTransaction = {
       to,
       value: BigInt(value),
-      data: data
+      data: asHex(data)
     }
     // Deploy the passkey signer
     return await signer.sendTransaction(createPasskeySignerTransaction)

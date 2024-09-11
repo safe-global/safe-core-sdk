@@ -48,7 +48,7 @@ export const getSafeTemplate = async (): Promise<GetContractReturnType<Abi, Wall
   const randomSaltNonce = Math.floor(Math.random() * 1000000000) + 1
   const singleton = (await getSafeSingleton()).contract
   const factory = (await getFactory()).contract
-  const singletonAddress = await singleton.address
+  const singletonAddress = singleton.address
 
   const { result } = await factory.simulate.createProxyWithNonce([
     singletonAddress,

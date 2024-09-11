@@ -266,7 +266,7 @@ class SafeProvider {
   }
 
   getChecksummedAddress(address: string): string {
-    return getAddress(asHex(address))
+    return getAddress(address)
   }
 
   async getSafeContract({

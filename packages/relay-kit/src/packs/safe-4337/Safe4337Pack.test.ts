@@ -381,7 +381,7 @@ describe('Safe4337Pack', () => {
           abi: constants.ABI,
           functionName: 'executeUserOp',
           args: [
-            (await safe4337Pack.protocolKit.getMultiSendAddress()) as viem.Address,
+            safe4337Pack.protocolKit.getMultiSendAddress(),
             0n,
             viem.encodeFunctionData({
               abi: constants.ABI,
@@ -417,7 +417,7 @@ describe('Safe4337Pack', () => {
           abi: constants.ABI,
           functionName: 'executeUserOp',
           args: [
-            transferUSDC.to as viem.Address,
+            transferUSDC.to,
             BigInt(transferUSDC.value),
             transferUSDC.data as viem.Hex,
             OperationType.Call
@@ -479,7 +479,7 @@ describe('Safe4337Pack', () => {
           abi: constants.ABI,
           functionName: 'executeUserOp',
           args: [
-            transferUSDC.to as viem.Address,
+            transferUSDC.to,
             BigInt(transferUSDC.value),
             transferUSDC.data as viem.Hex,
             OperationType.Call
@@ -557,7 +557,7 @@ describe('Safe4337Pack', () => {
           abi: constants.ABI,
           functionName: 'executeUserOp',
           args: [
-            (await safe4337Pack.protocolKit.getMultiSendAddress()) as viem.Address,
+            safe4337Pack.protocolKit.getMultiSendAddress(),
             0n,
             viem.encodeFunctionData({
               abi: constants.ABI,
@@ -684,7 +684,7 @@ describe('Safe4337Pack', () => {
           safeAccountConfig: {
             owners: [fixtures.OWNER_1, SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS],
             threshold: 1,
-            to: await safe4337Pack.protocolKit.getMultiSendAddress(),
+            to: safe4337Pack.protocolKit.getMultiSendAddress(),
             data: viem.encodeFunctionData({
               abi: constants.ABI,
               functionName: 'multiSend',

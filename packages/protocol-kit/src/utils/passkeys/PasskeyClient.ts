@@ -83,7 +83,7 @@ export const createPasskeyClient = async (
   let signerAddress
 
   if (isPasskeySharedSigner) {
-    signerAddress = await safeWebAuthnSharedSignerContract.getAddress()
+    signerAddress = safeWebAuthnSharedSignerContract.getAddress()
   } else {
     ;[signerAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
       BigInt(coordinates.x),

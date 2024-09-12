@@ -56,7 +56,6 @@
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
     "@types/semver": "^7.5.8",
-    "@types/yargs": "^17.0.32",
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^16.4.5",
@@ -65,7 +64,6 @@
     "nyc": "^15.1.0",
     "tsconfig-paths": "^4.2.0",
     "web3": "^4.7.0",
-    "yargs": "^17.7.2",
     "@safe-global/testing-kit": "^1.0.0"
   },
   "dependencies": {

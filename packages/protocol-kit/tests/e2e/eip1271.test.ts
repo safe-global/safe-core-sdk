@@ -24,7 +24,7 @@ import { asHash } from '@safe-global/protocol-kit/utils/types'
 
 chai.use(chaiAsPromised)
 
-export const calculateSafeMessageHash = (
+const calculateSafeMessageHash = (
   safeAddress: string,
   message: string,
   chainId: number
@@ -105,9 +105,8 @@ describe('The EIP1271 implementation', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should validate on-chain messages (Approved hashes)',
       async () => {
-        const { contractNetworks, safeSdk1, safeSdk2 } = await setupTests()
+        const { chainId, contractNetworks, safeSdk1, safeSdk2 } = await setupTests()
 
-        const chainId = await safeSdk1.getChainId()
         const safeVersion = await safeSdk1.getContractVersion()
 
         const customContract = contractNetworks[chainId.toString()]
@@ -209,7 +208,7 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should validate Smart contracts as signers (threshold = 1)',
         async () => {
-          const { safeSdk1, safeSdk2, safeSdk3, safeAddress, signerSafeAddress } =
+          const { chainId, safeSdk1, safeSdk2, safeSdk3, safeAddress, signerSafeAddress } =
             await setupTests()
           // Hash the message
           const messageHash = hashSafeMessage(MESSAGE)
@@ -228,7 +227,7 @@ describe('The EIP1271 implementation', () => {
             safeAddress,
             messageHash,
             await safeSdk1.getContractVersion(),
-            await safeSdk1.getChainId()
+            chainId
           )
           const safeSignerMessageHash = await safeSdk3.getSafeMessageHash(
             shouldPreimageMessage ? messageHashData : messageHash
@@ -252,7 +251,7 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should allow to validate transaction hashes using smart contracts as signers',
         async () => {
-          const { accounts, safeSdk1, safeSdk3, safeAddress, signerSafeAddress } =
+          const { accounts, chainId, safeSdk1, safeSdk3, safeAddress, signerSafeAddress } =
             await setupTests()
 
           const [account1] = accounts
@@ -276,7 +275,7 @@ describe('The EIP1271 implementation', () => {
             safeAddress,
             txHash,
             await safeSdk1.getContractVersion(),
-            await safeSdk1.getChainId()
+            chainId
           )
 
           const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(
@@ -296,9 +295,8 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should generate the correct safeMessageHash',
         async () => {
-          const { safeAddress, safeSdk1 } = await setupTests()
+          const { chainId, safeAddress, safeSdk1 } = await setupTests()
 
-          const chainId = await safeSdk1.getChainId()
           const messageHash = hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 
@@ -406,9 +404,8 @@ describe('The EIP1271 implementation', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should generate the correct safeMessageHash',
         async () => {
-          const { safeAddress, safeSdk1 } = await setupTests()
+          const { chainId, safeAddress, safeSdk1 } = await setupTests()
 
-          const chainId = await safeSdk1.getChainId()
           const messageHash = hashSafeMessage(MESSAGE)
           const safeMessageHash = await safeSdk1.getSafeMessageHash(messageHash)
 

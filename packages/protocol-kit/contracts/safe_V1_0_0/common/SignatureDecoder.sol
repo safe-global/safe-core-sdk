@@ -27,7 +27,7 @@ contract SignatureDecoder {
     }
 
     /// @dev divides bytes signature into `uint8 v, bytes32 r, bytes32 s`. 
-    /// @notice Make sure to peform a bounds check for @param pos, to avoid out of bounds access on @param signatures
+    /// @notice Make sure to perform a bounds check for @param pos, to avoid out of bounds access on @param signatures
     /// @param pos which signature to read. A prior bounds check of this parameter should be performed, to avoid out of bounds access
     /// @param signatures concatenated rsv signatures
     function signatureSplit(bytes memory signatures, uint256 pos)

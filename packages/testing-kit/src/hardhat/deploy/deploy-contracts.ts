@@ -102,7 +102,6 @@ export const safeWebAuthnSharedSignerDeployed =
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<void> => {
   const { deployments, getNamedAccounts } = hre
-
   const { deployer } = await getNamedAccounts()
   const { deploy } = deployments
 

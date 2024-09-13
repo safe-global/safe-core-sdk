@@ -63,27 +63,25 @@ export type ContractNetworksConfig = {
 export async function getContractNetworks(chainId: bigint): Promise<ContractNetworksConfig> {
   return {
     [chainId.toString()]: {
-      safeSingletonAddress: await (await getSafeSingleton()).contract.address,
+      safeSingletonAddress: (await getSafeSingleton()).contract.address,
       safeSingletonAbi: (await getSafeSingleton()).abi,
-      safeProxyFactoryAddress: await (await getFactory()).contract.address,
+      safeProxyFactoryAddress: (await getFactory()).contract.address,
       safeProxyFactoryAbi: (await getFactory()).abi,
-      multiSendAddress: await (await getMultiSend()).contract.address,
+      multiSendAddress: (await getMultiSend()).contract.address,
       multiSendAbi: (await getMultiSend()).abi,
-      multiSendCallOnlyAddress: await (await getMultiSendCallOnly()).contract.address,
+      multiSendCallOnlyAddress: (await getMultiSendCallOnly()).contract.address,
       multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
-      fallbackHandlerAddress: await (await getCompatibilityFallbackHandler()).contract.address,
+      fallbackHandlerAddress: (await getCompatibilityFallbackHandler()).contract.address,
       fallbackHandlerAbi: (await getCompatibilityFallbackHandler()).abi,
-      signMessageLibAddress: await (await getSignMessageLib()).contract.address,
+      signMessageLibAddress: (await getSignMessageLib()).contract.address,
       signMessageLibAbi: (await getSignMessageLib()).abi,
-      createCallAddress: await (await getCreateCall()).contract.address,
+      createCallAddress: (await getCreateCall()).contract.address,
       createCallAbi: (await getCreateCall()).abi,
-      simulateTxAccessorAddress: await (await getSimulateTxAccessor()).contract.address,
+      simulateTxAccessorAddress: (await getSimulateTxAccessor()).contract.address,
       simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi,
-      safeWebAuthnSignerFactoryAddress: await (
-        await getSafeWebAuthnSignerFactory()
-      ).contract.address,
+      safeWebAuthnSignerFactoryAddress: (await getSafeWebAuthnSignerFactory()).contract.address,
       safeWebAuthnSignerFactoryAbi: (await getSafeWebAuthnSignerFactory()).abi,
-      safeWebAuthnSharedSignerAddress: await (await getSafeWebAuthnSharedSigner()).contract.address,
+      safeWebAuthnSharedSignerAddress: (await getSafeWebAuthnSharedSigner()).contract.address,
       safeWebAuthnSharedSignerAbi: (await getSafeWebAuthnSharedSigner()).abi
     }
   }

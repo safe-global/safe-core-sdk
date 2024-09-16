@@ -1,4 +1,4 @@
-import { EIP712TypedData, TypedDataTypes, TypedMessageTypes } from 'packages/safe-core-sdk-types'
+import { EIP712TypedData, TypedDataTypes, TypedMessageTypes } from 'packages/types-kit/dist/src'
 import {
   keccak256,
   concat,

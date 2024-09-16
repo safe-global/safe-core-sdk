@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { setupTests, getMultiSendCallOnly } from '@safe-global/testing-kit'
 import Safe from '@safe-global/protocol-kit/index'
 import { getEip1193Provider } from './utils/setupProvider'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { OperationType } from '@safe-global/types-kit'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
 chai.use(chaiAsPromised)

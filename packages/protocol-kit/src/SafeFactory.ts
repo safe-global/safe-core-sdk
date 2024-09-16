@@ -22,7 +22,7 @@ import {
   SafeFactoryInitConfig,
   DeploySafeProps
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 
 class SafeFactory {

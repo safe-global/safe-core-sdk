@@ -19,7 +19,7 @@ import {
   SafeVersion,
   TransactionOptions,
   TransactionResult
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import { asHex } from '../utils/types'
 import {

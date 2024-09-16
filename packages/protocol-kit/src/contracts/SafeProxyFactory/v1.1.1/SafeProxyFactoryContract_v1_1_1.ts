@@ -9,7 +9,7 @@ import {
   SafeProxyFactoryContract_v1_1_1_Contract,
   SafeProxyFactoryContract_v1_1_1_Function,
   safeProxyFactory_1_1_1_ContractArtifacts
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
 import { asHex } from '@safe-global/protocol-kit/utils/types'
 import { ExternalClient } from '@safe-global/protocol-kit/types'

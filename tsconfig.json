@@ -5,7 +5,7 @@
     { "path": "packages/api-kit" },
     { "path": "packages/protocol-kit" },
     { "path": "packages/relay-kit" },
-    { "path": "packages/safe-core-sdk-types" },
+    { "path": "packages/types-kit" },
     { "path": "packages/sdk-starter-kit" }
   ]
 }

@@ -5,7 +5,7 @@ import {
   SafeSignature,
   SafeUserOperation,
   UserOperation
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
 import { calculateSafeUserOperationHash } from './utils'
 

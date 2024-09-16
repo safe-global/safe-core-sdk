@@ -16,7 +16,7 @@ import {
   SafeOperationResponse,
   SafeSignature,
   UserOperation
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment,

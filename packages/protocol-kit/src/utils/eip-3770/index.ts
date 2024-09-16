@@ -1,5 +1,5 @@
 import { isAddress } from 'viem'
-import { Eip3770Address } from '@safe-global/safe-core-sdk-types'
+import { Eip3770Address } from '@safe-global/types-kit'
 import { networks } from './config'
 
 export function parseEip3770Address(fullAddress: string): Eip3770Address {

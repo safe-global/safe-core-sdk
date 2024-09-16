@@ -40,7 +40,7 @@
     "@nomicfoundation/hardhat-viem": "^2.0.2",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
-    "@safe-global/safe-core-sdk-types": "^5.0.3",
+    "@safe-global/types-kit": "^5.0.3",
     "hardhat": "^2.19.3",
     "hardhat-deploy": "^0.12.4",
     "tsconfig-paths": "^4.2.0"

@@ -9,7 +9,7 @@ import {
   GetAddressFunction,
   SafeVersion,
   TransactionOptions
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { getChainById } from '../utils/types'
 import {
   WalletTransactionOptions,

@@ -5,7 +5,7 @@ import {
   SafeWebAuthnSharedSignerContract_v0_2_1_Contract,
   SafeWebAuthnSharedSignerContract_v0_2_1_Function,
   SafeWebAuthnSharedSigner_0_2_1_ContractArtifacts
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 
 /**

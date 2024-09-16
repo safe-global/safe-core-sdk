@@ -5,7 +5,7 @@ import {
   TransactionOptions,
   TransactionResult,
   Transaction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 import {
   createSafeClientResult,

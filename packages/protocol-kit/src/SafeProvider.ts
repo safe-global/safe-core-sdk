@@ -15,7 +15,7 @@ import {
   Eip3770Address,
   SafeEIP712Args,
   SafeVersion
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,

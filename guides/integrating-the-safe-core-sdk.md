@@ -17,7 +17,7 @@
 To integrate the [Safe Core SDK](https://github.com/safe-global/safe-core-sdk) into your Dapp or script you will need to install these dependencies:
 
 ```
-@safe-global/safe-core-sdk-types
+@safe-global/types-kit
 @safe-global/protocol-kit
 @safe-global/api-kit
 ```
@@ -143,7 +143,7 @@ When the array contains only one transaction, it is not wrapped in the MultiSend
 
 ```js
 import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'
-import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData } from '@safe-global/types-kit'
 
 const transactions: MetaTransactionData[] = [
   {

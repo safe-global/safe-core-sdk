@@ -14,7 +14,7 @@ import {
   EIP712TypedData,
   SafeTransactionData,
   CompatibilityFallbackHandlerContractType
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,

@@ -12,7 +12,7 @@ import {
   safe_1_3_0_ContractArtifacts,
   TransactionOptions,
   TransactionResult
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { asHash, asHex } from '@safe-global/protocol-kit/utils/types'
 import { ContractFunctionArgs } from 'viem'
 

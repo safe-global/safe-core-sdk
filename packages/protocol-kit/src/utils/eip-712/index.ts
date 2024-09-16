@@ -7,7 +7,7 @@ import {
   SafeTransactionData,
   EIP712TypedDataMessage,
   EIP712TypedDataTx
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import { hashTypedData as hashTypedStructuredData } from './encode'
 

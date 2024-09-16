@@ -6,7 +6,7 @@ import { BundlerClient, Safe4337InitOptions, Safe4337Pack } from '@safe-global/r
 import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
-import { SafeOperation } from '@safe-global/safe-core-sdk-types'
+import { SafeOperation } from '@safe-global/types-kit'
 // Needs to be imported from dist folder in order to mock the getEip4337BundlerProvider function
 import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getApiKit, getEip1193Provider } from '../utils/setupKits'

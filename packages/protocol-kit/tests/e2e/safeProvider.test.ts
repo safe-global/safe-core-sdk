@@ -10,7 +10,7 @@ import {
   getSafeSingleton,
   getSignMessageLib
 } from '@safe-global/testing-kit'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'

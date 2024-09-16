@@ -1,5 +1,5 @@
 import { GetTransactionReceiptReturnType } from 'viem'
-import { TransactionResult } from '@safe-global/safe-core-sdk-types'
+import { TransactionResult } from '@safe-global/types-kit'
 
 export async function waitSafeTxReceipt(
   txResult: TransactionResult

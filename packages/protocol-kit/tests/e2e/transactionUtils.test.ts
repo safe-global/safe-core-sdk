@@ -1,4 +1,4 @@
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { OperationType } from '@safe-global/types-kit'
 import chai from 'chai'
 
 import { decodeMultiSendData } from '@safe-global/protocol-kit/utils/transactions/utils'

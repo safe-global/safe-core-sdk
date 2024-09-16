@@ -4,7 +4,7 @@ import {
   TransactionOptions,
   EIP712TypedData,
   MetaTransactionData
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { IFeeEstimator } from '@safe-global/relay-kit'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 

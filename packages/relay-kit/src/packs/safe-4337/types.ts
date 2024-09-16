@@ -6,7 +6,7 @@ import {
   SafeOperationResponse,
   SafeVersion,
   UserOperation
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import EthSafeOperation from './SafeOperation'
 import { RPC_4337_CALLS } from './constants'
 

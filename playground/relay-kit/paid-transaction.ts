@@ -9,7 +9,7 @@ import {
   MetaTransactionOptions,
   OperationType,
   SafeTransaction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 // Check the status of a transaction after it is relayed:
 // https://relay.gelato.digital/tasks/status/<TASK_ID>

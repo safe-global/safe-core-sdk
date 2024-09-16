@@ -9,7 +9,7 @@ import {
   MetaTransactionOptions,
   OperationType,
   SafeTransaction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 // Fund the 1Balance account that will sponsor the transaction and get the API key:
 // https://relay.gelato.network/

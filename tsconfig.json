@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
+    { "path": "packages/testing-kit" },
     { "path": "packages/api-kit" },
     { "path": "packages/protocol-kit" },
     { "path": "packages/relay-kit" },

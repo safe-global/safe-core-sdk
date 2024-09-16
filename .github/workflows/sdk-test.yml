@@ -25,6 +25,12 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Make testing-kit.js executable
+        run: chmod +x packages/testing-kit/dist/bin/testing-kit.js
+
+      - name: Add script directory to PATH
+        run: echo "$(pwd)/packages/testing-kit/dist/bin" >> $GITHUB_PATH
+
       - name: Test
         env:
           PRIVATE_KEY: ${{ secrets.TESTING_PRIVATE_KEY }}

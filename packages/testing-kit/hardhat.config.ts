@@ -3,15 +3,7 @@ import 'hardhat-deploy'
 import 'tsconfig-paths/register'
 import dotenv from 'dotenv'
 import { HardhatUserConfig, HttpNetworkUserConfig } from 'hardhat/types'
-import yargs from 'yargs'
-
-yargs
-  .option('network', {
-    type: 'string',
-    default: 'hardhat'
-  })
-  .help(false)
-  .version(false).argv
+import path from 'path'
 
 dotenv.config()
 const { MNEMONIC, PK } = process.env
@@ -53,10 +45,9 @@ const config: HardhatUserConfig = {
     }
   },
   paths: {
-    artifacts: 'artifacts',
-    deploy: 'hardhat/deploy',
-    sources: 'contracts',
-    tests: 'tests/e2e'
+    artifacts: path.resolve(__dirname, './artifacts'),
+    deploy: path.resolve(__dirname, './src/hardhat/deploy'),
+    sources: path.resolve(__dirname, './contracts')
   },
   networks: {
     localhost: {
@@ -113,10 +104,6 @@ const config: HardhatUserConfig = {
       ...sharedNetworkConfig,
       url: 'https://sepolia.gateway.tenderly.co'
     }
-  },
-  //@ts-expect-error Type not found
-  compilerOptions: {
-    paths: { '^@safe-global/protocol-kit/(.*)$': ['../protocol-kit/src/*'] }
   },
   namedAccounts: {
     deployer: {

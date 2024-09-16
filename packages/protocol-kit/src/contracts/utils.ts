@@ -86,7 +86,6 @@ export function encodeCreateProxyWithNonce(
   initializer: string,
   salt?: string
 ) {
-  console.log(`safeSingletonAddress`, safeSingletonAddress)
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
     safeSingletonAddress,
     asHex(initializer),

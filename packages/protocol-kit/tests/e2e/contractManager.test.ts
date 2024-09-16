@@ -8,7 +8,9 @@ import {
   getMultiSendCallOnly,
   getSafeSingleton,
   getSignMessageLib,
-  getSimulateTxAccessor
+  getSimulateTxAccessor,
+  getSafeWebAuthnSharedSigner,
+  getSafeWebAuthnSignerFactory
 } from '@safe-global/testing-kit'
 import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -70,7 +72,7 @@ describe('Safe contracts manager', () => {
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
       const { safe, chainId } = await setupTests()
-      const customContractNetworks = {
+      const customContractNetworks: ContractNetworksConfig = {
         [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
           safeSingletonAbi: (await getSafeSingleton()).abi,
@@ -87,7 +89,11 @@ describe('Safe contracts manager', () => {
           createCallAddress: ZERO_ADDRESS,
           createCallAbi: (await getCreateCall()).abi,
           simulateTxAccessorAddress: ZERO_ADDRESS,
-          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi
+          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi,
+          safeWebAuthnSignerFactoryAddress: ZERO_ADDRESS,
+          safeWebAuthnSignerFactoryAbi: (await getSafeWebAuthnSignerFactory()).abi,
+          safeWebAuthnSharedSignerAddress: ZERO_ADDRESS,
+          safeWebAuthnSharedSignerAbi: (await getSafeWebAuthnSharedSigner()).abi
         }
       }
 
@@ -97,7 +103,7 @@ describe('Safe contracts manager', () => {
           Safe.init({
             provider,
             safeAddress,
-            contractNetworks: customContractNetworks as ContractNetworksConfig
+            contractNetworks: customContractNetworks
           })
         )
         .to.be.rejectedWith('MultiSend contract is not deployed on the current network')

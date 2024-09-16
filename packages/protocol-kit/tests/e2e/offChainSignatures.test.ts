@@ -276,7 +276,7 @@ describe('Off-chain signatures', () => {
         safeAddress,
         contractNetworks
       })
-      const safeServiceTransaction = {
+      const safeServiceTransaction: SafeMultisigTransactionResponse = {
         safe: '',
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
@@ -303,6 +303,7 @@ describe('Off-chain signatures', () => {
         origin: '',
         dataDecoded: '',
         confirmationsRequired: 2,
+        proposer: '0x',
         confirmations: [
           {
             owner: '0x1111111111111111111111111111111111111111',
@@ -324,9 +325,7 @@ describe('Off-chain signatures', () => {
         trusted: true,
         signatures: '0x111111222222'
       }
-      const signedTx = await safeSdk.signTransaction(
-        safeServiceTransaction as SafeMultisigTransactionResponse
-      )
+      const signedTx = await safeSdk.signTransaction(safeServiceTransaction)
       chai.expect(safeServiceTransaction.confirmations?.length).to.be.eq(2)
       chai.expect(signedTx.signatures.size).to.be.eq(3)
       const signerAddress = account1.address

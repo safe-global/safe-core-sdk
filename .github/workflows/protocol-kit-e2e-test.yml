@@ -22,9 +22,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: yarn
       - run: |
-          yarn install --force --verbose --frozen-lockfile
+          yarn install --frozen-lockfile
           yarn build
           ls ./packages/protocol-kit/node_modules/.bin
+          ls ./node_modules/.bin
       - name: Test ${{ matrix.provider }} - Safe ${{ matrix.contract-version }}
         run: |
           cd packages/protocol-kit

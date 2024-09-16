@@ -19,11 +19,10 @@ Please describe concisely the bug you have found.
 - Safe Core SDK versions:
   <!-- Please leave empty or delete those that you don't use. -->
   - api-kit:
-  - auth-kit:
-  - onramp-kit
   - protocol-kit:
   - relay-kit:
   - safe-core-sdk-types:
+  - sdk-starter-kit:
 - Safe contract version: 
 - Environment:
   - browser

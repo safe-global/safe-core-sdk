@@ -36,7 +36,5 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           files: packages/api-kit/coverage/lcov.info
-            packages/auth-kit/coverage/lcov.info
-            packages/onramp-kit/coverage/lcov.info
             packages/relay-kit/coverage/lcov.info
             packages/sdk-starter-kit/coverage/lcov.info

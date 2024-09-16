@@ -130,7 +130,7 @@ export * from './types'
 
 export default Safe
 
-declare module 'viem/node_modules/abitype' {
+declare module 'abitype' {
   export interface Register {
     AddressType: string
   }

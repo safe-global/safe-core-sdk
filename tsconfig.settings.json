@@ -22,8 +22,6 @@
     "baseUrl": "./",
     "paths": {
       "@safe-global/api-kit/*": ["./packages/api-kit/src/*"],
-      "@safe-global/auth-kit/*": ["./packages/auth-kit/src/*"],
-      "@safe-global/onramp-kit/*": ["./packages/onramp-kit/src/*"],
       "@safe-global/protocol-kit/*": ["./packages/protocol-kit/src/*"],
       "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"],
       "@safe-global/relay-kit/*": ["./packages/relay-kit/src/*"],

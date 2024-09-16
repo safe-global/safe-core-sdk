@@ -248,6 +248,7 @@ export type AddMessageProps = {
 }
 
 export type GetSafeMessageListProps = {
+  /** Which field to use when ordering the results. It can be: `created`, `modified` (default: `-created`) */
   ordering?: string
 } & ListOptions
 
@@ -260,7 +261,7 @@ export type EIP712TypedData = {
 export type GetSafeOperationListProps = {
   /** Address of the Safe to get SafeOperations for */
   safeAddress: string
-  /** Which field to use when ordering the results */
+  /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
 } & ListOptions
 

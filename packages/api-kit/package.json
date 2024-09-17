@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^4.1.0",
-    "@safe-global/types-kit": "^5.1.0",
+    "@safe-global/types-kit": "^1.0.0",
     "node-fetch": "^2.7.0",
     "viem": "^2.19.0"
   }

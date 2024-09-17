@@ -6,8 +6,7 @@ import Safe, {
   estimateSafeDeploymentGas,
   createERC20TokenTransferTransaction
 } from '@safe-global/protocol-kit'
-import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
-import { SafeTransaction } from '@safe-global/types-kit'
+import { MetaTransactionData, OperationType, SafeTransaction } from '@safe-global/types-kit'
 
 import {
   GELATO_FEE_COLLECTOR,

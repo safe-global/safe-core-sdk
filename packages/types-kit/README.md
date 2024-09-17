@@ -1,4 +1,4 @@
-# Safe Core SDK Types
+# Types Kit
 
 [![npm Version](https://badge.fury.io/js/@safe-global%2Ftypes-kit.svg)](https://badge.fury.io/js/@safe-global%2Ftypes-kit)
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)

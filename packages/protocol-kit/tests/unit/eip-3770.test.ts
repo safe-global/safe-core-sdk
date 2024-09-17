@@ -8,7 +8,7 @@ import {
   validateEthereumAddress
 } from '@safe-global/protocol-kit/utils'
 
-declare module 'viem/node_modules/abitype' {
+declare module 'abitype' {
   export interface Register {
     AddressType: string
   }

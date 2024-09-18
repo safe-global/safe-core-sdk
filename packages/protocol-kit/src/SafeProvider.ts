@@ -1,8 +1,12 @@
 import {
+  createPasskeyClient,
   SAFE_FEATURES,
   generateTypedData,
   hasSafeFeature,
-  validateEip3770Address
+  validateEip3770Address,
+  toEstimateGasParameters,
+  toCallGasParameters,
+  sameString
 } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import {
@@ -81,13 +85,7 @@ import {
   getStorageAt,
   readContract
 } from 'viem/actions'
-import {
-  toEstimateGasParameters,
-  toCallGasParameters,
-  sameString
-} from '@safe-global/protocol-kit/utils'
 import { isEip1193Provider, isPrivateKey, isSignerPasskeyClient } from './utils/provider'
-import { createPasskeyClient, PASSKEY_CLIENT_KEY } from '@safe-global/protocol-kit/utils'
 
 class SafeProvider {
   #chain?: Chain
@@ -234,8 +232,7 @@ class SafeProvider {
   }
 
   async isPasskeySigner(): Promise<boolean> {
-    const signer = await this.getExternalSigner()
-    return !!signer && signer.key === PASSKEY_CLIENT_KEY
+    return isSignerPasskeyClient(this.signer)
   }
 
   isAddress(address: string): boolean {

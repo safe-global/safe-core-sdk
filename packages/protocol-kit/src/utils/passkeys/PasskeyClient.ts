@@ -1,11 +1,6 @@
-import { PasskeyArgType } from '../../types/passkeys'
-import {
-  SafeWebAuthnSignerFactoryContractImplementationType,
-  SafeWebAuthnSharedSignerContractImplementationType
-} from '../../types/contracts'
-import { getDefaultFCLP256VerifierAddress, hexStringToUint8Array } from './extractPasskeyData'
 import {
   Hex,
+  hexToBytes,
   encodeAbiParameters,
   toHex,
   toBytes,
@@ -22,7 +17,13 @@ import {
   encodeFunctionData,
   parseAbi
 } from 'viem'
-import { PasskeyClient } from '@safe-global/protocol-kit/types'
+import {
+  PasskeyArgType,
+  PasskeyClient,
+  SafeWebAuthnSignerFactoryContractImplementationType,
+  SafeWebAuthnSharedSignerContractImplementationType
+} from '@safe-global/protocol-kit/types'
+import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { asHex } from '../types'
 import isSharedSigner from './isSharedSigner'
 
@@ -69,7 +70,7 @@ export const createPasskeyClient = async (
   chainId: string
 ) => {
   const { rawId, coordinates, customVerifierAddress } = passkey
-  const passkeyRawId = hexStringToUint8Array(rawId)
+  const passkeyRawId = hexToBytes(asHex(rawId))
   const verifierAddress = customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
 
   const isPasskeySharedSigner = await isSharedSigner(

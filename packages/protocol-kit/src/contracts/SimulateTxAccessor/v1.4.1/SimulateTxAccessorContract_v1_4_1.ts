@@ -6,7 +6,7 @@ import {
   SimulateTxAccessorContract_v1_4_1_Abi,
   SimulateTxAccessorContract_v1_4_1_Contract,
   SimulateTxAccessorContract_v1_4_1_Function
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { asHex } from '@safe-global/protocol-kit/utils/types'
 /**
  * SimulateTxAccessorContract_v1_4_1  is the implementation specific to the SimulateTxAccessor contract version 1.4.1.

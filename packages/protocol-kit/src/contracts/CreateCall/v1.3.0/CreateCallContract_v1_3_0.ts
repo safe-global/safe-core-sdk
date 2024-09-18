@@ -5,7 +5,7 @@ import {
   CreateCallContract_v1_3_0_Contract,
   createCall_1_3_0_ContractArtifacts,
   SafeContractFunction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 

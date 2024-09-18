@@ -4,7 +4,7 @@ import Safe, {
   standardizeSafeTransactionData,
   SafeContractImplementationType as SafeContract
 } from '@safe-global/protocol-kit/index'
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'

@@ -1,5 +1,5 @@
 import { hashSafeMessage } from '@safe-global/protocol-kit'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { OperationType } from '@safe-global/types-kit'
 
 import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
 import { SafeClientResult, SendOnChainMessageProps } from '@safe-global/sdk-starter-kit/types'

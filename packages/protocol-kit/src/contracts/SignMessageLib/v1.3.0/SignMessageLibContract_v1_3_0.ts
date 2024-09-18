@@ -8,7 +8,7 @@ import {
   SignMessageLibContract_v1_3_0_Contract,
   SignMessageLibContract_v1_3_0_Function,
   signMessageLib_1_3_0_ContractArtifacts
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 /**
  * SignMessageLibContract_v1_3_0  is the implementation specific to the SignMessageLib contract version 1.3.0.

@@ -1,7 +1,7 @@
 import { WalletClient, Transport, Chain, Hex, Account } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import Safe from '@safe-global/protocol-kit'
-import { Transaction } from '@safe-global/safe-core-sdk-types'
+import { Transaction } from '@safe-global/types-kit'
 
 /**
  * Sends a transaction using the signer (owner)

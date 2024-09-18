@@ -6,7 +6,7 @@ import {
   SimulateTxAccessorContract_v1_3_0_Abi,
   SimulateTxAccessorContract_v1_3_0_Contract,
   SimulateTxAccessorContract_v1_3_0_Function
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 import { asHex } from '@safe-global/protocol-kit/utils/types'
 

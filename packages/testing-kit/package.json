@@ -39,7 +39,7 @@
     "@nomicfoundation/hardhat-viem": "^2.0.4",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
-    "@safe-global/safe-core-sdk-types": "^5.0.3",
+    "@safe-global/types-kit": "^1.0.0",
     "@types/semver": "^7.5.8",
     "hardhat": "^2.19.3",
     "hardhat-deploy": "^0.12.4",

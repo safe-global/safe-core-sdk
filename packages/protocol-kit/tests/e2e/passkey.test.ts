@@ -6,7 +6,7 @@ import {
   getWebAuthnContract,
   getSafeWithOwners
 } from '@safe-global/testing-kit'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { OperationType } from '@safe-global/types-kit'
 import Safe, {
   getPasskeyOwnerAddress,
   PredictedSafeProps,

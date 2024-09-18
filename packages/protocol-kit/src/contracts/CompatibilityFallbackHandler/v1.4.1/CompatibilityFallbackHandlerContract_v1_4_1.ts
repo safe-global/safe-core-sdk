@@ -5,7 +5,7 @@ import {
   CompatibilityFallbackHandlerContract_v1_4_1_Abi,
   CompatibilityFallbackHandlerContract_v1_4_1_Contract,
   SafeVersion
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 /**
  * CompatibilityFallbackHandlerContract_v1_4_1  is the implementation specific to the CompatibilityFallbackHandler contract version 1.4.1.

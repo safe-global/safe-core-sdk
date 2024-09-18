@@ -22,7 +22,7 @@ import {
   SafeTransactionDataPartial,
   SafeVersion,
   TransactionOptions
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
 import {

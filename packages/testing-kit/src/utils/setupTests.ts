@@ -5,7 +5,7 @@ import { Account, getAccounts } from './setupTestNetwork'
 import { ContractNetworksConfig, getContractNetworks } from './setupContractNetworks'
 import { getSafeWithOwners } from './setupContracts'
 import { safeVersionDeployed } from '../hardhat/deploy/deploy-contracts'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 
 type SetupTestsOptions = {
   safeConfig?: {

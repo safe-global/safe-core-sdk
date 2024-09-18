@@ -25,7 +25,7 @@
       "@safe-global/protocol-kit/*": ["./packages/protocol-kit/src/*"],
       "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"],
       "@safe-global/relay-kit/*": ["./packages/relay-kit/src/*"],
-      "@safe-global/safe-core-sdk-types/*": ["./packages/safe-core-sdk-types/src/*"],
+      "@safe-global/types-kit/*": ["./packages/types-kit/src/*"],
       "@safe-global/sdk-starter-kit/*": ["./packages/sdk-starter-kit/src/*"]
     }
   },

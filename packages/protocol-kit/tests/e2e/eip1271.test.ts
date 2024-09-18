@@ -13,7 +13,7 @@ import {
   itif
 } from '@safe-global/testing-kit'
 import SafeMessage from '@safe-global/protocol-kit/utils/messages/SafeMessage'
-import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/types-kit'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'

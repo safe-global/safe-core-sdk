@@ -41,7 +41,7 @@ import {
   SafeOperation,
   SafeOperationConfirmationListResponse,
   SafeOperationResponse
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
 import { getAddSafeOperationProps } from './utils/safeOperation'

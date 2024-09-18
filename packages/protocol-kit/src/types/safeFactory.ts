@@ -1,4 +1,4 @@
-import { SafeVersion, TransactionOptions } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion, TransactionOptions } from '@safe-global/types-kit'
 
 import { SafeProviderConfig } from './safeProvider'
 import { SafeAccountConfig } from './safeConfig'

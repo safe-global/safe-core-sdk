@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@noble/hashes": "^1.3.3",
-    "@safe-global/safe-core-sdk-types": "^5.1.0",
+    "@safe-global/types-kit": "^1.0.0",
     "@safe-global/safe-deployments": "^1.37.5",
     "@safe-global/safe-modules-deployments": "^2.2.1",
     "abitype": "^1.0.2",

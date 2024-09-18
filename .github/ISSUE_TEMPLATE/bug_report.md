@@ -21,7 +21,7 @@ Please describe concisely the bug you have found.
   - api-kit:
   - protocol-kit:
   - relay-kit:
-  - safe-core-sdk-types:
+  - types-kit:
   - sdk-starter-kit:
 - Safe contract version: 
 - Environment:

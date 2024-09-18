@@ -12,7 +12,7 @@ import {
   SignMessageLibContractImplementationType,
   SimulateTxAccessorContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 
 export interface GetContractInstanceProps {
   safeProvider: SafeProvider

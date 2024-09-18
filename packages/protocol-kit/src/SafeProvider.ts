@@ -110,6 +110,7 @@ class SafeProvider {
 
     this.provider = provider
     this.signer = signer
+    this.#chain = undefined
   }
 
   getExternalProvider(): ExternalClient {
@@ -189,7 +190,7 @@ class SafeProvider {
     }
 
     if (isPrivateKey(this.signer)) {
-      // This is a client with a local account, the account needs to be of type Accound as viem consider strings as 'json-rpc' (on parseAccount)
+      // This is a client with a local account, the account needs to be of type Account as Viem consider strings as 'json-rpc' (on parseAccount)
       const account = privateKeyToAccount(asHex(this.signer as string))
       return createWalletClient({
         account,
@@ -198,7 +199,7 @@ class SafeProvider {
       })
     }
 
-    // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
+    // If we have a signer and its not a PK, it might be a delegate on the rpc levels and this should work with eth_requestAcc
     if (this.signer && typeof this.signer === 'string') {
       return createWalletClient({
         account: this.signer,
@@ -261,7 +262,7 @@ class SafeProvider {
   }
 
   async getChainId(): Promise<bigint> {
-    const res = await this.#externalProvider.getChainId()
+    const res = (await this.#getChain()).id
     return BigInt(res)
   }
 
@@ -428,7 +429,7 @@ class SafeProvider {
   async getTransaction(transactionHash: string): Promise<Transaction> {
     return getTransaction(this.#externalProvider, {
       hash: asHash(transactionHash)
-    }) // as Promise<Transaction>
+    })
   }
 
   async getSignerAddress(): Promise<string | undefined> {
@@ -519,7 +520,7 @@ class SafeProvider {
 
   async #getChain(): Promise<Chain> {
     if (this.#chain) return this.#chain
-    const chain = getChainById(await this.getChainId())
+    const chain = getChainById(BigInt(await this.#externalProvider.getChainId()))
     if (!chain) throw new Error('Invalid chainId')
     this.#chain = chain
     return this.#chain

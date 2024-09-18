@@ -21,7 +21,7 @@ import {
   getPredictedSafeAddressInitCode,
   predictSafeAddress
 } from './contracts/utils'
-import { DEFAULT_SAFE_VERSION } from './contracts/config'
+import { ContractInfo, DEFAULT_SAFE_VERSION, getContractInfo } from './contracts/config'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -1650,6 +1650,14 @@ class Safe {
     } catch (error) {
       return false
     }
+  }
+
+  getContractInfo = ({
+    contractAddress
+  }: {
+    contractAddress: string
+  }): ContractInfo | undefined => {
+    return getContractInfo(contractAddress)
   }
 }
 

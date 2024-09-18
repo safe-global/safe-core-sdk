@@ -142,3 +142,48 @@ export function getContractDeployment(
 
   return deployment
 }
+
+export type ContractInfo = {
+  version: string
+  type: 'canonical' | 'eip155' | 'zksync'
+  contractName: contractName
+}
+
+export function getContractInfo(contractAddress: string): ContractInfo | undefined {
+  for (const [safeVersion, contracts] of Object.entries(safeDeploymentsVersions)) {
+    for (const [contractName, contractVersion] of Object.entries(contracts)) {
+      const filters: DeploymentFilter = {
+        version: contractVersion,
+        released: true
+      }
+
+      const deployment = contractFunctions[contractName as contractName](
+        filters
+      ) as SingletonDeployment
+      if (deployment && deployment.networkAddresses) {
+        for (const [, address] of Object.entries(deployment.networkAddresses)) {
+          if (address.toLowerCase() === contractAddress.toLowerCase()) {
+            const types = Object.keys(deployment.deployments) as (
+              | 'canonical'
+              | 'eip155'
+              | 'zksync'
+            )[]
+            const type = types.find(
+              (t) =>
+                deployment.deployments[t]?.address.toLowerCase() === contractAddress.toLowerCase()
+            )
+            if (type) {
+              return {
+                version: safeVersion,
+                type,
+                contractName: contractName as contractName
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return undefined
+}

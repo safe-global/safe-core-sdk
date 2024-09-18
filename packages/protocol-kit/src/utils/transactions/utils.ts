@@ -6,6 +6,7 @@ import {
   PasskeyArgType,
   RemoveOwnerTxParams,
   RemovePasskeyOwnerTxParams,
+  SafeProviderTransaction,
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams,
   ExternalClient
@@ -38,7 +39,6 @@ import {
   parseAbi
 } from 'viem'
 import { waitForTransactionReceipt as waitForTransactionReceiptViem } from 'viem/actions'
-import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
 import { WalletLegacyTransactionOptions, WalletTransactionOptions } from './types'
 
 export function standardizeMetaTransactionData(

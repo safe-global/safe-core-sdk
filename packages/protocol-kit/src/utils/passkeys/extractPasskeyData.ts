@@ -1,6 +1,6 @@
 import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
 import { Buffer } from 'buffer'
-import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
+import { PasskeyCoordinates, PasskeyArgType } from '@safe-global/protocol-kit/types'
 
 /**
  * Extracts and returns the passkey data (coordinates and rawId) from a given passkey Credential.

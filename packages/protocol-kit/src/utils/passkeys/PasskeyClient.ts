@@ -12,6 +12,7 @@ import {
   walletActions,
   maxUint256,
   Client,
+  fromBytes,
   fromHex,
   parseAbiParameters,
   encodeFunctionData,
@@ -118,7 +119,7 @@ export const createPasskeyClient = async (
             {
               x: BigInt(passkey.coordinates.x),
               y: BigInt(passkey.coordinates.y),
-              verifiers: fromHex(verifierAddress as Hex, 'bigint')
+              verifiers: fromHex(asHex(verifierAddress), 'bigint')
             }
           ]
         })
@@ -199,7 +200,7 @@ function extractSignature(signature: ArrayBuffer): [bigint, bigint] {
     const len = view.getUint8(offset + 1)
     const start = offset + 2
     const end = start + len
-    const n = fromHex(toHex(new Uint8Array(view.buffer.slice(start, end))), 'bigint')
+    const n = fromBytes(new Uint8Array(view.buffer.slice(start, end)), 'bigint')
     check(n < maxUint256)
     return [n, end] as const
   }

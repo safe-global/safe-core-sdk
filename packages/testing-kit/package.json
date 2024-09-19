@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/testing-kit",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.1-alpha.1",
   "description": "Helper package providing testing utilities",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -16,7 +16,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && chmod +x dist/bin/testing-kit.js",
+    "build": "yarn unbuild && hardhat compile && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "deploy": "hardhat deploy",
     "compile": "hardhat compile",
     "test": "hardhat test"
@@ -49,7 +49,7 @@
     "semver": "^7.6.3"
   },
   "bin": {
-    "testing-kit": "./dist/bin/testing-kit.js"
+    "testing-kit": "./bin/testing-kit.js"
   },
   "peerDependencies": {
     "hardhat": "^2.19.3"

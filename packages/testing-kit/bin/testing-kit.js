@@ -1,11 +1,12 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-var-requires */
 
-import { execSync } from 'child_process'
-import path from 'path'
-import fs from 'fs'
+const { execSync } = require('child_process')
+const path = require('path')
+const fs = require('fs')
 
 // Resolve the root directory of the package
-const packageRoot = path.resolve(__dirname, '../../')
+const packageRoot = path.resolve(__dirname, '../')
 const projectRoot = process.cwd()
 
 // Capture the command and arguments
@@ -42,6 +43,6 @@ try {
     execSync(`yarn ${command}`, { stdio: 'inherit' })
   }
 } catch (error) {
-  console.error(`Failed to execute Hardhat command: ${(error as Error).message}`)
+  console.error(`Failed to execute Hardhat command: ${error.message}`)
   process.exit(1)
 }

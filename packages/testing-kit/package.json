@@ -16,7 +16,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && chmod +x ./bin/testing-kit.js",
+    "build": "yarn unbuild && hardhat compile && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "deploy": "hardhat deploy",
     "compile": "hardhat compile",
     "test": "hardhat test"

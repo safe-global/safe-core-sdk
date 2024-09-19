@@ -653,15 +653,12 @@ class Safe {
     signingMethod: SigningMethodType = SigningMethod.ETH_SIGN_TYPED_DATA_V4,
     preimageSafeAddress?: string
   ): Promise<SafeMessage> {
-    const owners = await this.getOwners()
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
 
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
+    const addressIsOwner = await this.isOwner(signerAddress)
     if (!addressIsOwner) {
       throw new Error('Messages can only be signed by Safe owners')
     }
@@ -764,16 +761,12 @@ class Safe {
       ? await this.toSafeTransactionType(safeTransaction)
       : safeTransaction
 
-    const owners = await this.getOwners()
     const signerAddress = await this.#safeProvider.getSignerAddress()
-
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
 
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
+    const addressIsOwner = await this.isOwner(signerAddress)
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
@@ -855,14 +848,12 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    const owners = await this.getOwners()
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
+
+    const addressIsOwner = await this.isOwner(signerAddress)
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
@@ -1269,12 +1260,14 @@ class Safe {
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
-    const owners = await this.getOwners()
+
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
-    if (owners.includes(signerAddress)) {
+
+    const addressIsOwner = await this.isOwner(signerAddress)
+    if (addressIsOwner) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
@@ -1316,14 +1309,13 @@ class Safe {
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
-    const owners = await this.getOwners()
     const threshold = await this.getThreshold()
     const signerAddress = await this.#safeProvider.getSignerAddress()
-    if (
-      threshold > signedSafeTransaction.signatures.size &&
-      signerAddress &&
-      owners.includes(signerAddress)
-    ) {
+    if (!signerAddress) {
+      throw new Error('The protocol-kit requires a signer to use this method')
+    }
+    const addressIsOwner = await this.isOwner(signerAddress)
+    if (threshold > signedSafeTransaction.signatures.size && addressIsOwner) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 

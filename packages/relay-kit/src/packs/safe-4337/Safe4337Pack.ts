@@ -146,7 +146,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      addModulesLibAddress = addModulesDeployment?.networkAddresses[network] as string | undefined
+      addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
     }
 
     let safe4337ModuleAddress = customContracts?.safe4337ModuleAddress

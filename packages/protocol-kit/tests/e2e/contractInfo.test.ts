@@ -53,6 +53,18 @@ describe('Contract Info', () => {
           type: 'canonical',
           version: '1.0.0'
         })
+
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0xB00ce5CCcdEf57e539ddcEd01DF43a13855d9910'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'safeSingletonVersion',
+          type: 'zksync',
+          version: '1.3.0'
+        })
     })
 
     it('should return the contract info for a CompatibilityFallbackHandler contracts', async () => {

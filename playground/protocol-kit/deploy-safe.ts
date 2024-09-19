@@ -1,6 +1,10 @@
 import Safe, { SafeAccountConfig } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
+import { createWalletClient, http } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { sepolia } from 'viem/chains'
+
 // This file can be used to play around with the Safe Core SDK
 
 interface Config {
@@ -61,13 +65,26 @@ async function main() {
 
   console.log('Deploying Safe Account...')
 
-  // Deploy Safe
-  const deployedSafeSDK = await safeSDK.deploy()
+  // Deploy the Safe account
+  const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
 
-  console.log('Deployed Safe address:', await deployedSafeSDK.getAddress())
+  console.log('deploymentTransaction: ', deploymentTransaction)
 
-  // check if its deployed
-  console.log('Safe Account deployed: ', await deployedSafeSDK.isSafeDeployed())
+  const account = privateKeyToAccount(`0x${config.DEPLOYER_ADDRESS_PRIVATE_KEY}`)
+
+  const client = createWalletClient({
+    account,
+    chain: sepolia,
+    transport: http(config.RPC_URL)
+  })
+
+  const txHash = await client.sendTransaction({
+    to: deploymentTransaction.to,
+    value: BigInt(deploymentTransaction.value),
+    data: deploymentTransaction.data as `0x${string}`
+  })
+
+  console.log('Transaction hash:', txHash)
 }
 
 main()

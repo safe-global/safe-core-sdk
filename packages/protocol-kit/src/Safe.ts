@@ -19,7 +19,6 @@ import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
   getPredictedSafeAddressInitCode,
-  getSafeAddressFromDeploymentTx,
   predictSafeAddress,
   validateSafeAccountConfig,
   validateSafeDeploymentConfig
@@ -60,7 +59,6 @@ import {
   generateSignature,
   preimageSafeMessageHash,
   preimageSafeTransactionHash,
-  toTransactionRequest,
   adjustVInSignature
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
@@ -83,7 +81,7 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
-import { Hash, Hex, WalletClient, Transport, Chain, Account } from 'viem'
+import { Hash, Hex } from 'viem'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
 
@@ -268,6 +266,13 @@ class Safe {
    */
   async getAddress(): Promise<string> {
     if (this.#predictedSafe) {
+      const safeVersion = await this.getContractVersion()
+      if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+        throw new Error(
+          'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+        )
+      }
+
       const chainId = await this.#safeProvider.getChainId()
       return predictSafeAddress({
         safeProvider: this.#safeProvider,
@@ -1397,101 +1402,6 @@ class Safe {
   }
 
   /**
-   * Deploys a Safe and optionally executes a transaction in a batch
-   *
-   * @param safeTransaction - The Safe transaction to execute
-   * @param options - The Safe transaction execution options. Optional
-   * @throws "No signer provided"
-   * @throws "There are X signatures missing"
-   * @returns The new instance of the SDK with the Safe deployed
-   */
-  async deploy(
-    safeTransaction?: SafeTransaction | SafeMultisigTransactionResponse,
-    options: TransactionOptions = {}
-  ): Promise<Safe> {
-    const isSafeDeployed = await this.isSafeDeployed()
-
-    // if the safe is already deployed throws an error
-    if (isSafeDeployed) {
-      throw new Error('Safe already deployed')
-    }
-
-    if (!this.#predictedSafe) {
-      throw new Error('Predict Safe should be present')
-    }
-
-    const signer = (await this.#safeProvider.getExternalSigner()) as WalletClient<
-      Transport,
-      Chain,
-      Account
-    >
-
-    if (!signer) {
-      throw new Error('signer should be present')
-    }
-
-    validateSafeAccountConfig(this.#predictedSafe.safeAccountConfig)
-    validateSafeDeploymentConfig(this.#predictedSafe?.safeDeploymentConfig || {})
-
-    const signerAddress = (await this.#safeProvider.getSignerAddress()) || '0x'
-
-    let txReceipt
-
-    if (safeTransaction) {
-      const transaction = isSafeMultisigTransactionResponse(safeTransaction)
-        ? await this.toSafeTransactionType(safeTransaction)
-        : safeTransaction
-
-      const signedSafeTransaction = await this.#addPreValidatedSignature(transaction)
-
-      await this.#isReadyToExecute(signedSafeTransaction)
-
-      // we add the Safe deployment to the batch
-      const deploymentBatch = await this.wrapSafeTransactionIntoDeploymentBatch(
-        signedSafeTransaction,
-        options
-      )
-
-      const tx = toTransactionRequest({
-        from: signerAddress,
-        ...deploymentBatch,
-        ...options
-      })
-
-      // await for the deployment
-      const hash = await signer.sendTransaction(tx)
-
-      txReceipt = await this.getSafeProvider()
-        .getExternalProvider()
-        .waitForTransactionReceipt({ hash })
-    } else {
-      // we create the deployment transaction
-      const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(undefined, {
-        ...options,
-        from: signerAddress
-      })
-
-      const hash = await signer.sendTransaction(toTransactionRequest(safeDeploymentTransaction))
-
-      txReceipt = await this.getSafeProvider()
-        .getExternalProvider()
-        .waitForTransactionReceipt({ hash })
-    }
-
-    const safeVersion = await this.getContractVersion()
-    const safeAddress = getSafeAddressFromDeploymentTx(txReceipt!, safeVersion)
-
-    const isSafeProxyContractDeployed = await this.#safeProvider.isContractDeployed(safeAddress)
-
-    if (!isSafeProxyContractDeployed) {
-      throw new Error('SafeProxy contract is not deployed on the current network')
-    }
-
-    // return a new instance of the SDK with the safe deployed
-    return this.connect({ signer: this.#safeProvider.signer, safeAddress })
-  }
-
-  /**
    * Returns the Safe Transaction encoded
    *
    * @async
@@ -1537,15 +1447,13 @@ class Safe {
    * @async
    * @param {SafeTransaction} safeTransaction - The Safe transaction to be wrapped into the deployment batch.
    * @param {TransactionOptions} [transactionOptions] - Optional. Options for the transaction, such as from, gas price, gas limit, etc.
-   * @param {string} [customSaltNonce] - Optional. a Custom salt nonce to be used for the deployment of the Safe. If not provided, a default value is used.
    * @returns {Promise<Transaction>} A promise that resolves to a Transaction object representing the prepared batch of transactions.
    * @throws Will throw an error if the safe is already deployed.
    *
    */
   async wrapSafeTransactionIntoDeploymentBatch(
     safeTransaction: SafeTransaction,
-    transactionOptions?: TransactionOptions,
-    customSaltNonce?: string
+    transactionOptions?: TransactionOptions
   ): Promise<Transaction> {
     const isSafeDeployed = await this.isSafeDeployed()
 
@@ -1555,7 +1463,7 @@ class Safe {
     }
 
     // we create the deployment transaction
-    const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(customSaltNonce)
+    const safeDeploymentTransaction = await this.createSafeDeploymentTransaction()
 
     // First transaction of the batch: The Safe deployment Transaction
     const safeDeploymentBatchTransaction = {
@@ -1583,31 +1491,25 @@ class Safe {
   }
 
   /**
-   * Creates a Safe deployment transaction.
+   * Creates a transaction to deploy a Safe Account.
    *
-   * This function prepares a transaction for the deployment of a Safe.
-   * Both the saltNonce and options parameters are optional, and if not
-   * provided, default values will be used.
-   *
-   * @async
-   * @param {string} [customSaltNonce] - Optional. a Custom salt nonce to be used for the deployment of the Safe. If not provided, a default value is used.
-   * @param {TransactionOptions} [options] - Optional. Options for the transaction, such as gas price, gas limit, etc.
-   * @returns {Promise<Transaction>} A promise that resolves to a Transaction object representing the prepared Safe deployment transaction.
-   *
+   * @returns {Promise<Transaction>} Returns a promise that resolves to an Ethereum transaction with the fields `to`, `value`, and `data`, which can be used to deploy the Safe Account.
    */
-  async createSafeDeploymentTransaction(
-    customSaltNonce?: string,
-    transactionOptions?: TransactionOptions
-  ): Promise<Transaction> {
+  async createSafeDeploymentTransaction(): Promise<Transaction> {
     if (!this.#predictedSafe) {
-      throw new Error('Predict Safe should be present')
+      throw new Error('Predict Safe should be present to build the Safe deployement transaction')
     }
 
     const { safeAccountConfig, safeDeploymentConfig } = this.#predictedSafe
 
-    const safeVersion = await this.getContractVersion()
+    validateSafeAccountConfig(safeAccountConfig)
+    validateSafeDeploymentConfig(safeDeploymentConfig || {})
+
     const safeProvider = this.#safeProvider
     const chainId = await safeProvider.getChainId()
+    const safeVersion = safeDeploymentConfig?.safeVersion || DEFAULT_SAFE_VERSION
+    const saltNonce = safeDeploymentConfig?.saltNonce || getChainSpecificDefaultSaltNonce(chainId)
+
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
@@ -1633,13 +1535,7 @@ class Safe {
       customContracts
     })
 
-    const saltNonce =
-      customSaltNonce ||
-      safeDeploymentConfig?.saltNonce ||
-      getChainSpecificDefaultSaltNonce(chainId)
-
     const safeDeployTransactionData = {
-      ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
       to: safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52

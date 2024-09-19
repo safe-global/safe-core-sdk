@@ -105,8 +105,7 @@ export class SafeMessageClient {
   }): Promise<SafeClientResult> {
     let deploymentTxHash
     const threshold = await this.protocolKit.getThreshold()
-    const safeDeploymentTransaction =
-      await this.protocolKit.createSafeDeploymentTransaction(undefined)
+    const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction()
 
     try {
       deploymentTxHash = await sendTransaction({

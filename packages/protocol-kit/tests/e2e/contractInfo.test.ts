@@ -29,7 +29,7 @@ describe('Contract Info', () => {
       ).to.be.undefined
     })
 
-    it('should return the contract info for a Safe Singleton contract', async () => {
+    it('should return the contract info for SafeSingleton contracts', async () => {
       chai
         .expect(
           protocolKit.getContractInfo({
@@ -40,6 +40,46 @@ describe('Contract Info', () => {
           contractName: 'safeSingletonVersion',
           type: 'eip155',
           version: '1.3.0'
+        })
+
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0xb6029EA3B2c51D09a50B53CA8012FeEB05bDa35A'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'safeSingletonVersion',
+          type: 'canonical',
+          version: '1.0.0'
+        })
+    })
+
+    it('should return the contract info for a CompatibilityFallbackHandler contracts', async () => {
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'compatibilityFallbackHandler',
+          type: 'canonical',
+          version: '1.4.1'
+        })
+    })
+
+    it('should return the contract info for a SignMessageLib contracts', async () => {
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'signMessageLibVersion',
+          type: 'canonical',
+          version: '1.4.1'
         })
     })
   })

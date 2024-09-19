@@ -1,4 +1,4 @@
-import { EIP712TypedData, TypedDataTypes, TypedMessageTypes } from 'packages/types-kit/dist/src'
+import { EIP712TypedData, TypedDataTypes, TypedMessageTypes } from '@safe-global/types-kit'
 import {
   keccak256,
   concat,

@@ -12,13 +12,13 @@
     "API"
   ],
   "scripts": {
-    "test:web3": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=web3 && nyc --reporter=lcov testing-kit.js test 'tests/endpoint/*.test.*'",
-    "test:ethers": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=ethers && nyc --reporter=lcov testing-kit.js test 'tests/endpoint/*.test.*'",
-    "test:viem": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && nyc --reporter=lcov testing-kit.js test 'tests/endpoint/*.test.*'",
+    "test:web3": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=web3 && nyc --reporter=lcov testing-kit test 'tests/endpoint/*.test.*'",
+    "test:ethers": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=ethers && nyc --reporter=lcov testing-kit test 'tests/endpoint/*.test.*'",
+    "test:viem": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && nyc --reporter=lcov testing-kit test 'tests/endpoint/*.test.*'",
     "test": "yarn test:viem",
-    "test:ci:web3": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=web3 && nyc --reporter=lcov testing-kit.js test 'tests/e2e/*.test.*'",
-    "test:ci:ethers": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=ethers && nyc --reporter=lcov testing-kit.js test 'tests/e2e/*.test.*'",
-    "test:ci:viem": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && nyc --reporter=lcov testing-kit.js test 'tests/e2e/*.test.*'",
+    "test:ci:web3": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=web3 && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
+    "test:ci:ethers": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=ethers && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
+    "test:ci:viem": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
     "test:ci": "yarn test:ci:viem",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
@@ -40,7 +40,7 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@safe-global/relay-kit": "^3.1.0",
-    "@safe-global/testing-kit": "^0.0.1-alpha.0",
+    "@safe-global/testing-kit": "^0.0.1-alpha.1",
     "@types/chai": "^4.3.19",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.8",

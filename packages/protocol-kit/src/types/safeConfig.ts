@@ -17,6 +17,7 @@ export type SafeAccountConfig = {
 export type SafeDeploymentConfig = {
   saltNonce?: string
   safeVersion?: SafeVersion
+  deploymentType?: 'canonical' | 'eip155' | 'zksync'
 }
 
 export type PredictedSafeProps = {

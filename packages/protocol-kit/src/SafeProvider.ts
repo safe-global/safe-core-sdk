@@ -94,6 +94,7 @@ class SafeProvider {
   #externalProvider: ExternalClient
   signer?: SafeSigner
   provider: Eip1193Provider | HttpTransport | SocketTransport
+  #deploymentType?: 'canonical' | 'eip155' | 'zksync'
 
   constructor({
     provider,
@@ -179,6 +180,14 @@ class SafeProvider {
         signer
       })
     }
+  }
+
+  get deploymentType(): 'canonical' | 'eip155' | 'zksync' | undefined {
+    return this.#deploymentType
+  }
+
+  set deploymentType(deploymentType: 'canonical' | 'eip155' | 'zksync' | undefined) {
+    this.#deploymentType = deploymentType
   }
 
   async getExternalSigner(): Promise<ExternalSigner | undefined> {

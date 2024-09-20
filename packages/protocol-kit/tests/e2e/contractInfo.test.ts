@@ -20,7 +20,7 @@ describe('Contract Info', () => {
     })
   })
 
-  describe.only('create', async () => {
+  describe('create', async () => {
     it('should return undefined for a contract address not related to Safe', async () => {
       chai.expect(
         protocolKit.getContractInfo({

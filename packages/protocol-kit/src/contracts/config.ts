@@ -160,6 +160,7 @@ export function getContractInfo(contractAddress: string): ContractInfo | undefin
       const deployment = contractFunctions[contractName as contractName](
         filters
       ) as SingletonDeployment
+
       if (deployment && deployment.networkAddresses) {
         for (const [, address] of Object.entries(deployment.networkAddresses)) {
           if (address.toLowerCase() === contractAddress.toLowerCase()) {
@@ -168,10 +169,12 @@ export function getContractInfo(contractAddress: string): ContractInfo | undefin
               | 'eip155'
               | 'zksync'
             )[]
+
             const type = types.find(
               (t) =>
                 deployment.deployments[t]?.address.toLowerCase() === contractAddress.toLowerCase()
             )
+
             if (type) {
               return {
                 version: safeVersion,

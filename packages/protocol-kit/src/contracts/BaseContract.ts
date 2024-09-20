@@ -75,12 +75,16 @@ class BaseContract<ContractAbiType extends Abi> {
       throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
     }
 
+    const customDeploymentTypeAddress = safeProvider.deploymentType
+      ? deployment?.deployments[safeProvider.deploymentType]?.address
+      : undefined
+
     this.chainId = chainId
     this.contractName = contractName
     this.safeVersion = safeVersion
     this.contractAddress =
       Array.isArray(contractAddress) && contractAddress.length
-        ? contractAddress[0]
+        ? contractAddress.find((a) => a === customDeploymentTypeAddress) || contractAddress[0]
         : contractAddress.toString()
     this.contractAbi =
       customContractAbi ||

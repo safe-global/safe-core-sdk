@@ -128,7 +128,10 @@ class Safe {
       provider,
       signer,
       DEFAULT_SAFE_VERSION,
-      contractNetworks
+      contractNetworks,
+      undefined,
+      undefined,
+      predictedSafe?.safeDeploymentConfig?.deploymentType
     )
 
     if (isSafeConfigWithPredictedSafe(config)) {
@@ -155,8 +158,15 @@ class Safe {
     }
 
     const safeVersion = await this.getContractVersion()
-    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
-    this.#safeProvider.deploymentType = predictedSafe?.safeDeploymentConfig?.deploymentType
+    this.#safeProvider = await SafeProvider.init(
+      provider,
+      signer,
+      safeVersion,
+      contractNetworks,
+      undefined,
+      undefined,
+      this.#safeProvider.deploymentType
+    )
 
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
@@ -176,7 +186,8 @@ class Safe {
         safeVersion,
         contractNetworks,
         safeAddress,
-        owners
+        owners,
+        this.#safeProvider.deploymentType
       )
     }
   }

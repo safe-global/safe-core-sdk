@@ -98,10 +98,12 @@ class SafeProvider {
 
   constructor({
     provider,
-    signer
+    signer,
+    deploymentType
   }: {
     provider: SafeProviderConfig['provider']
     signer?: SafeSigner
+    deploymentType?: 'canonical' | 'eip155' | 'zksync'
   }) {
     this.#externalProvider = createPublicClient({
       transport: isEip1193Provider(provider)
@@ -111,6 +113,7 @@ class SafeProvider {
 
     this.provider = provider
     this.signer = signer
+    this.deploymentType = deploymentType
   }
 
   getExternalProvider(): ExternalClient {
@@ -123,7 +126,8 @@ class SafeProvider {
     safeVersion: SafeVersion = DEFAULT_SAFE_VERSION,
     contractNetworks?: ContractNetworksConfig,
     safeAddress?: string,
-    owners?: string[]
+    owners?: string[],
+    deploymentType?: 'canonical' | 'eip155' | 'zksync'
   ): Promise<SafeProvider> {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
@@ -172,12 +176,14 @@ class SafeProvider {
 
       return new SafeProvider({
         provider,
-        signer: passkeySigner
+        signer: passkeySigner,
+        deploymentType
       })
     } else {
       return new SafeProvider({
         provider,
-        signer
+        signer,
+        deploymentType
       })
     }
   }

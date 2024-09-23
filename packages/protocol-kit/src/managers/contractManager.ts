@@ -43,11 +43,16 @@ class ContractManager {
       safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
     } else {
       // We check the correct version of the Safe from the blockchain
-      safeVersion = (await safeProvider.getExternalProvider().readContract({
-        address: safeAddress as string,
-        abi: parseAbi(['function VERSION() view returns (string)']),
-        functionName: 'VERSION'
-      })) as SafeVersion
+      try {
+        safeVersion = (await safeProvider.getExternalProvider().readContract({
+          address: safeAddress as string,
+          abi: parseAbi(['function VERSION() view returns (string)']),
+          functionName: 'VERSION'
+        })) as SafeVersion
+      } catch (e) {
+        // if contract is not deployed we use the default version
+        safeVersion = DEFAULT_SAFE_VERSION
+      }
 
       this.#safeContract = await getSafeContract({
         safeProvider,

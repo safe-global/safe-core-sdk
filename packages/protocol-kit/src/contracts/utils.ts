@@ -6,6 +6,7 @@ import {
   isAddress,
   keccak256,
   pad,
+  parseAbi,
   toHex,
   Client,
   WalletClient
@@ -189,6 +190,17 @@ const memoizedGetSafeContract = createMemoizedFunction(
   }: MemoizedGetSafeContractInstanceProps) =>
     getSafeContract({ safeProvider, safeVersion, isL1SafeSingleton, customContracts })
 )
+
+export async function getSafeContractVersion(
+  safeProvider: SafeProvider,
+  safeAddress: string
+): Promise<SafeVersion> {
+  return (await safeProvider.readContract({
+    address: safeAddress,
+    abi: parseAbi(['function VERSION() view returns (string)']),
+    functionName: 'VERSION'
+  })) as SafeVersion
+}
 
 /**
  * Provides a chain-specific default salt nonce for generating unique addresses

@@ -14,7 +14,7 @@ import {
 import { SafeVersion } from '@safe-global/types-kit'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 import SafeProvider from '../SafeProvider'
-import { parseAbi } from 'viem'
+import { getSafeContractVersion } from '@safe-global/protocol-kit/contracts/utils'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
@@ -42,13 +42,9 @@ class ContractManager {
     if (isSafeConfigWithPredictedSafe(config)) {
       safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
     } else {
-      // We check the correct version of the Safe from the blockchain
       try {
-        safeVersion = (await safeProvider.getExternalProvider().readContract({
-          address: safeAddress as string,
-          abi: parseAbi(['function VERSION() view returns (string)']),
-          functionName: 'VERSION'
-        })) as SafeVersion
+        // We try to fetch the version of the Safe from the blockchain
+        safeVersion = await getSafeContractVersion(safeProvider, safeAddress as string)
       } catch (e) {
         // if contract is not deployed we use the default version
         safeVersion = DEFAULT_SAFE_VERSION

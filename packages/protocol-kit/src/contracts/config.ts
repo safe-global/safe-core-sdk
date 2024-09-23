@@ -18,6 +18,7 @@ import {
   getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
 import { SafeVersion } from '@safe-global/types-kit'
+import { DeploymentType } from '../types'
 
 export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
 export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
@@ -148,7 +149,7 @@ export function getContractDeployment(
 
 export type ContractInfo = {
   version: string
-  type: 'canonical' | 'eip155' | 'zksync'
+  type: DeploymentType
   contractName: contractName
 }
 

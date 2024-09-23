@@ -14,10 +14,12 @@ export type SafeAccountConfig = {
   paymentReceiver?: string
 }
 
+export type DeploymentType = 'canonical' | 'eip155' | 'zksync'
+
 export type SafeDeploymentConfig = {
   saltNonce?: string
   safeVersion?: SafeVersion
-  deploymentType?: 'canonical' | 'eip155' | 'zksync'
+  deploymentType?: DeploymentType
 }
 
 export type PredictedSafeProps = {

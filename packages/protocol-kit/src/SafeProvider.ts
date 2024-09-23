@@ -41,7 +41,8 @@ import {
   SafeConfig,
   ContractNetworksConfig,
   PasskeyArgType,
-  PasskeyClient
+  PasskeyClient,
+  DeploymentType
 } from '@safe-global/protocol-kit/types'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import { asHash, asHex, getChainById } from './utils/types'
@@ -94,7 +95,7 @@ class SafeProvider {
   #externalProvider: ExternalClient
   signer?: SafeSigner
   provider: Eip1193Provider | HttpTransport | SocketTransport
-  #deploymentType?: 'canonical' | 'eip155' | 'zksync'
+  #deploymentType?: DeploymentType
 
   constructor({
     provider,
@@ -103,7 +104,7 @@ class SafeProvider {
   }: {
     provider: SafeProviderConfig['provider']
     signer?: SafeSigner
-    deploymentType?: 'canonical' | 'eip155' | 'zksync'
+    deploymentType?: DeploymentType
   }) {
     this.#externalProvider = createPublicClient({
       transport: isEip1193Provider(provider)
@@ -127,7 +128,7 @@ class SafeProvider {
     contractNetworks?: ContractNetworksConfig,
     safeAddress?: string,
     owners?: string[],
-    deploymentType?: 'canonical' | 'eip155' | 'zksync'
+    deploymentType?: DeploymentType
   ): Promise<SafeProvider> {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
@@ -186,14 +187,6 @@ class SafeProvider {
         deploymentType
       })
     }
-  }
-
-  get deploymentType(): 'canonical' | 'eip155' | 'zksync' | undefined {
-    return this.#deploymentType
-  }
-
-  set deploymentType(deploymentType: 'canonical' | 'eip155' | 'zksync' | undefined) {
-    this.#deploymentType = deploymentType
   }
 
   async getExternalSigner(): Promise<ExternalSigner | undefined> {

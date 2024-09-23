@@ -651,5 +651,71 @@ describe('Contract utils', () => {
         chai.expect(mainnetPredictedSafeAddress).to.be.equal(expectedMainnetSafeAddress)
       }
     )
+
+    itif(safeVersionDeployed === '1.3.0')(
+      'returns the same predicted address based on the deploymentType for different chains',
+      async () => {
+        const { accounts } = await setupTests()
+        const [owner] = accounts
+        const safeVersion = safeVersionDeployed
+
+        const safeAccountConfig: SafeAccountConfig = {
+          owners: [owner.address],
+          threshold: 1
+        }
+
+        const safeDeploymentConfig: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: PREDETERMINED_SALT_NONCE
+        }
+
+        const protocolKitPolygonMainnet = await Safe.init({
+          provider: 'https://polygon-bor-rpc.publicnode.com',
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitGnosis = await Safe.init({
+          provider: 'https://rpc.gnosischain.com',
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitBNB = await Safe.init({
+          provider: 'https://bsc.meowrpc.com',
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig: {
+              ...safeDeploymentConfig,
+              deploymentType: 'canonical'
+            }
+          }
+        })
+
+        const protocolKitSepolia = await Safe.init({
+          provider: 'https://sepolia.gateway.tenderly.co',
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig: {
+              ...safeDeploymentConfig,
+              deploymentType: 'canonical'
+            }
+          }
+        })
+
+        const gnosisChainPredictedAddress = await protocolKitGnosis.getAddress()
+        const polygonChainPredictedAddress = await protocolKitPolygonMainnet.getAddress()
+        const bnbChainPredictedAddress = await protocolKitBNB.getAddress()
+        const sepoliaChainPredictedAddress = await protocolKitSepolia.getAddress()
+
+        chai.expect(gnosisChainPredictedAddress).to.be.equal(polygonChainPredictedAddress)
+        chai.expect(polygonChainPredictedAddress).to.be.equal(bnbChainPredictedAddress)
+        chai.expect(bnbChainPredictedAddress).to.be.equal(sepoliaChainPredictedAddress)
+      }
+    )
   })
 })

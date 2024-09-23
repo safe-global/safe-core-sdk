@@ -1,15 +1,16 @@
 import {
   DeploymentFilter,
   SingletonDeployment,
-  getCompatibilityFallbackHandlerDeployment,
-  getCreateCallDeployment,
-  getMultiSendCallOnlyDeployment,
-  getMultiSendDeployment,
-  getProxyFactoryDeployment,
-  getSafeL2SingletonDeployment,
-  getSafeSingletonDeployment,
-  getSignMessageLibDeployment,
-  getSimulateTxAccessorDeployment
+  SingletonDeploymentV2,
+  getCompatibilityFallbackHandlerDeployments,
+  getCreateCallDeployments,
+  getMultiSendCallOnlyDeployments,
+  getMultiSendDeployments,
+  getProxyFactoryDeployments,
+  getSafeL2SingletonDeployments,
+  getSafeSingletonDeployments,
+  getSignMessageLibDeployments,
+  getSimulateTxAccessorDeployments
 } from '@safe-global/safe-deployments'
 import {
   Deployment,
@@ -110,17 +111,19 @@ export const safeDeploymentsL1ChainIds = [
 
 const contractFunctions: Record<
   contractName,
-  (filter?: DeploymentFilter) => SingletonDeployment | undefined | Deployment
+  (
+    filter?: DeploymentFilter
+  ) => SingletonDeployment | SingletonDeploymentV2 | undefined | Deployment
 > = {
-  safeSingletonVersion: getSafeSingletonDeployment,
-  safeSingletonL2Version: getSafeL2SingletonDeployment,
-  safeProxyFactoryVersion: getProxyFactoryDeployment,
-  compatibilityFallbackHandler: getCompatibilityFallbackHandlerDeployment,
-  multiSendVersion: getMultiSendDeployment,
-  multiSendCallOnlyVersion: getMultiSendCallOnlyDeployment,
-  signMessageLibVersion: getSignMessageLibDeployment,
-  createCallVersion: getCreateCallDeployment,
-  simulateTxAccessorVersion: getSimulateTxAccessorDeployment,
+  safeSingletonVersion: getSafeSingletonDeployments,
+  safeSingletonL2Version: getSafeL2SingletonDeployments,
+  safeProxyFactoryVersion: getProxyFactoryDeployments,
+  compatibilityFallbackHandler: getCompatibilityFallbackHandlerDeployments,
+  multiSendVersion: getMultiSendDeployments,
+  multiSendCallOnlyVersion: getMultiSendCallOnlyDeployments,
+  signMessageLibVersion: getSignMessageLibDeployments,
+  createCallVersion: getCreateCallDeployments,
+  simulateTxAccessorVersion: getSimulateTxAccessorDeployments,
   safeWebAuthnSignerFactoryVersion: getSafeWebAuthnSignerFactoryDeployment,
   safeWebAuthnSharedSignerVersion: getSafeWebAuthnShareSignerDeployment
 }

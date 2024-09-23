@@ -131,8 +131,6 @@ class Safe {
       contractNetworks
     )
 
-    this.#safeProvider.deploymentType = predictedSafe?.safeDeploymentConfig?.deploymentType
-
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
       this.#contractManager = await ContractManager.init(
@@ -158,6 +156,7 @@ class Safe {
 
     const safeVersion = await this.getContractVersion()
     this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
+    this.#safeProvider.deploymentType = predictedSafe?.safeDeploymentConfig?.deploymentType
 
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)

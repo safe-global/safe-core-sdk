@@ -1,5 +1,13 @@
 import { Abi } from 'abitype'
-import { Transport, encodeFunctionData, WalletClient, Hash, Chain } from 'viem'
+import {
+  ContractFunctionName,
+  ContractFunctionArgs,
+  Transport,
+  encodeFunctionData,
+  WalletClient,
+  Hash,
+  Chain
+} from 'viem'
 import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -17,7 +25,6 @@ import {
   convertTransactionOptions
 } from '@safe-global/protocol-kit/utils'
 import { ExternalClient } from '../types'
-import { ContractFunctionName, ContractFunctionArgs } from 'viem'
 
 /**
  * Abstract class BaseContract
@@ -118,7 +125,7 @@ class BaseContract<ContractAbiType extends Abi> {
     if (!signer || !signerAddress) throw new Error('Invalid signer')
 
     const account = signer || signerAddress
-    const txOptions = await convertTransactionOptions(options)
+    const txOptions = convertTransactionOptions(options)
     return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
   }
 

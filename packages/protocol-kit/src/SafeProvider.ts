@@ -442,8 +442,8 @@ class SafeProvider {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
-    // The address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
-    // For viem, in this context a typeof account === 'string' to singMessage is assumed to be a json-rpc account (returned by parseAccount function)
+    // The address on the `WalletClient` is the one we are passing so we let Viem make assertions about that account
+    // For Viem, in this context a typeof account === 'string' to signMessage is assumed to be a json-rpc account (returned by parseAccount function)
     if (sameString(signer.account.address, account)) {
       return await signer?.signMessage!({
         message: { raw: toBytes(message) }

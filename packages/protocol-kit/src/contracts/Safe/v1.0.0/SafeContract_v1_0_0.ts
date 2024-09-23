@@ -29,8 +29,6 @@ class SafeContract_v1_0_0
   extends SafeBaseContract<SafeContract_v1_0_0_Abi>
   implements SafeContract_v1_0_0_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SafeContract_v1_0_0
    *
@@ -59,8 +57,6 @@ class SafeContract_v1_0_0
       customContractAddress,
       customContractAbi
     )
-
-    this.safeVersion = safeVersion
   }
 
   /* ----- Specific v1.0.0 properties -----  */

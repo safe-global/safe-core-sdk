@@ -72,7 +72,6 @@ import {
 import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
-  getMultiSendCallOnlyContract,
   getProxyFactoryContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
@@ -1523,14 +1522,8 @@ class Safe {
     transactions: MetaTransactionData[],
     transactionOptions?: TransactionOptions
   ): Promise<Transaction> {
-    const chainId = await this.#safeProvider.getChainId()
-
     // we use the MultiSend contract to create the batch, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/libraries/MultiSendCallOnly.sol
-    const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
-      safeProvider: this.#safeProvider,
-      safeVersion: await this.getContractVersion(),
-      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
-    })
+    const multiSendCallOnlyContract = this.#contractManager.multiSendCallOnlyContract
 
     // multiSend method with the transactions encoded
     const batchData = multiSendCallOnlyContract.encode('multiSend', [

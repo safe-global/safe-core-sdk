@@ -28,8 +28,6 @@ class SafeContract_v1_4_1
   extends SafeBaseContract<SafeContract_v1_4_1_Abi>
   implements SafeContract_v1_4_1_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SafeContract_v1_4_1
    *
@@ -58,8 +56,6 @@ class SafeContract_v1_4_1
       customContractAddress,
       customContractAbi
     )
-
-    this.safeVersion = safeVersion
   }
 
   /**
@@ -325,7 +321,7 @@ class SafeContract_v1_4_1
    * @returns Array[chainId]
    */
   async getChainId(): Promise<[bigint]> {
-    return [await this.read('getChainId')]
+    return [await Promise.resolve(this.chainId)]
   }
 
   /**

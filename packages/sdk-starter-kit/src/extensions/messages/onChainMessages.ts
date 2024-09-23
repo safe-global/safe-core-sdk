@@ -36,7 +36,7 @@ export function onChainMessages() {
       const signMessageLibContract = await client.protocolKit
         .getSafeProvider()
         .getSignMessageLibContract({
-          safeVersion: await client.protocolKit.getContractVersion()
+          safeVersion: client.protocolKit.getContractVersion()
         })
 
       const transaction = {

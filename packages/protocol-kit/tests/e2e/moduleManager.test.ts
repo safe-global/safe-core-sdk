@@ -108,7 +108,7 @@ describe('Safe modules manager', () => {
         safeAddress,
         contractNetworks
       })
-      const currentPageNext = semverSatisfies(await safeSdk.getContractVersion(), '>=1.4.1')
+      const currentPageNext = semverSatisfies(safeSdk.getContractVersion(), '>=1.4.1')
 
       chai
         .expect((await safeSdk.getModulesPaginated(SENTINEL_ADDRESS, 10)).modules.length)
@@ -169,7 +169,7 @@ describe('Safe modules manager', () => {
         safeAddress,
         contractNetworks
       })
-      const currentPageNext = semverSatisfies(await safeSdk.getContractVersion(), '>=1.4.1')
+      const currentPageNext = semverSatisfies(safeSdk.getContractVersion(), '>=1.4.1')
 
       const moduleDeployment = [
         dailyLimitModule.address,

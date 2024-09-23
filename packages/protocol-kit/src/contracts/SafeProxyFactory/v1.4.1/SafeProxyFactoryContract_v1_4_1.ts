@@ -3,7 +3,6 @@ import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import {
-  SafeVersion,
   SafeProxyFactoryContract_v1_4_1_Abi,
   SafeProxyFactoryContract_v1_4_1_Contract,
   SafeProxyFactoryContract_v1_4_1_Function,
@@ -26,8 +25,6 @@ class SafeProxyFactoryContract_v1_4_1
   extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_4_1_Abi>
   implements SafeProxyFactoryContract_v1_4_1_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SafeProxyFactoryContract_v1_4_1
    *
@@ -55,8 +52,6 @@ class SafeProxyFactoryContract_v1_4_1
       customContractAbi,
       runner
     )
-
-    this.safeVersion = safeVersion
   }
 
   /**

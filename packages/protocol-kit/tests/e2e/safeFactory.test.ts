@@ -400,7 +400,7 @@ describe('SafeProxyFactory', () => {
       chai.expect(callbackResult).to.be.empty
       const safe = await safeFactory.deploySafe(deploySafeProps)
       chai.expect(callbackResult).to.be.not.empty
-      const safeInstanceVersion = await safe.getContractVersion()
+      const safeInstanceVersion = safe.getContractVersion()
       chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
     })
 
@@ -415,7 +415,7 @@ describe('SafeProxyFactory', () => {
         const safeAccountConfig: SafeAccountConfig = { owners, threshold }
         const deploySafeProps: DeploySafeProps = { safeAccountConfig }
         const safe = await safeFactory.deploySafe(deploySafeProps)
-        const safeInstanceVersion = await safe.getContractVersion()
+        const safeInstanceVersion = safe.getContractVersion()
         chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
       }
     )
@@ -433,7 +433,7 @@ describe('SafeProxyFactory', () => {
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
       const deploySafeProps: DeploySafeProps = { safeAccountConfig }
       const safe = await safeFactory.deploySafe(deploySafeProps)
-      const safeInstanceVersion = await safe.getContractVersion()
+      const safeInstanceVersion = safe.getContractVersion()
       chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
     })
   })

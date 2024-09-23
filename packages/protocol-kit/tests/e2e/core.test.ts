@@ -113,7 +113,7 @@ describe('Safe Info', () => {
         predictedSafe,
         contractNetworks
       })
-      const contractVersion = await safeSdk.getContractVersion()
+      const contractVersion = safeSdk.getContractVersion()
       chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
     })
 
@@ -128,7 +128,7 @@ describe('Safe Info', () => {
         predictedSafe: safeConfig,
         contractNetworks
       })
-      const contractVersion = await safeSdk.getContractVersion()
+      const contractVersion = safeSdk.getContractVersion()
       chai.expect(contractVersion).to.be.eq(DEFAULT_SAFE_VERSION)
     })
 
@@ -140,7 +140,7 @@ describe('Safe Info', () => {
         safeAddress,
         contractNetworks
       })
-      const contractVersion = await safeSdk.getContractVersion()
+      const contractVersion = safeSdk.getContractVersion()
       chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
     })
   })

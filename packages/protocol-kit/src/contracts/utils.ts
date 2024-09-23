@@ -116,7 +116,7 @@ export async function encodeSetupCallData({
     paymentReceiver = ZERO_ADDRESS
   } = safeAccountConfig
 
-  const safeVersion = customSafeVersion || (await safeContract.getVersion())
+  const safeVersion = customSafeVersion || safeContract.safeVersion
 
   if (semverSatisfies(safeVersion, '<=1.0.0')) {
     return safeContract.encode('setup', [
@@ -191,6 +191,15 @@ const memoizedGetSafeContract = createMemoizedFunction(
     getSafeContract({ safeProvider, safeVersion, isL1SafeSingleton, customContracts })
 )
 
+/**
+ * Retrieves the version of the Safe contract associated with the given Safe address from the blockchain.
+ *
+ * @param {SafeProvider} safeProvider The provider to use when reading the contract.
+ * @param {string} safeAddress The address of the Safe contract for which to retrieve the version.
+ *
+ * @returns {Promise<SafeVersion>} A promise resolving to the version of the Safe contract.
+ * @throws when fetching an address which doesn't have a Safe deployed in it.
+ */
 export async function getSafeContractVersion(
   safeProvider: SafeProvider,
   safeAddress: string

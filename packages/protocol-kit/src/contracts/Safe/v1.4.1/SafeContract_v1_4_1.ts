@@ -4,7 +4,6 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
-  SafeVersion,
   SafeContract_v1_4_1_Abi,
   SafeContract_v1_4_1_Contract,
   SafeContract_v1_4_1_Function,
@@ -322,15 +321,6 @@ class SafeContract_v1_4_1
    */
   async getChainId(): Promise<[bigint]> {
     return [await Promise.resolve(this.chainId)]
-  }
-
-  /**
-   * returns the version of the Safe contract.
-   *
-   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
-   */
-  async getVersion(): Promise<SafeVersion> {
-    return Promise.resolve(this.safeVersion)
   }
 
   /**

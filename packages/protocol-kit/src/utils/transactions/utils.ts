@@ -88,7 +88,7 @@ export async function standardizeSafeTransactionData({
     if (!safeContract) {
       throw new Error('Safe is not deployed')
     }
-    safeVersion = await safeContract.getVersion()
+    safeVersion = safeContract.safeVersion
   }
 
   const hasSafeTxGasOptional = hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)

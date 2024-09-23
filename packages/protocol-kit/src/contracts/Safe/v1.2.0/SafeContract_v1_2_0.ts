@@ -3,7 +3,6 @@ import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseC
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import {
-  SafeVersion,
   SafeContract_v1_2_0_Abi,
   SafeContract_v1_2_0_Contract,
   SafeContract_v1_2_0_Function,
@@ -307,15 +306,6 @@ class SafeContract_v1_2_0
     } catch (error) {
       return false
     }
-  }
-
-  /**
-   * returns the version of the Safe contract.
-   *
-   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
-   */
-  async getVersion(): Promise<SafeVersion> {
-    return Promise.resolve(this.safeVersion)
   }
 
   /**

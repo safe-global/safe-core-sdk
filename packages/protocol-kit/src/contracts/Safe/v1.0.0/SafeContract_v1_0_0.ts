@@ -351,8 +351,7 @@ class SafeContract_v1_0_0
    * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
    */
   async getVersion(): Promise<SafeVersion> {
-    const [safeVersion] = await this.VERSION()
-    return safeVersion as SafeVersion
+    return Promise.resolve(this.safeVersion)
   }
 
   /**

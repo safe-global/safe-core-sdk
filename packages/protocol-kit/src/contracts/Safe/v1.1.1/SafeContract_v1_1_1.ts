@@ -281,7 +281,7 @@ class SafeContract_v1_1_1
           options
         ))
 
-      const converted = await this.convertOptions({ ...options, gasLimit })
+      const converted = this.convertOptions({ ...options, gasLimit })
       const txResult = await simulateContract(this.runner, {
         address: this.contractAddress,
         functionName: 'execTransaction',

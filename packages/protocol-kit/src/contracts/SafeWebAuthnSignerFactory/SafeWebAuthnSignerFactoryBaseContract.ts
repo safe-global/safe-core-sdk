@@ -7,7 +7,6 @@ import {
   CreateProxyProps as CreateProxyPropsGeneral
 } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 export interface CreateProxyProps extends CreateProxyPropsGeneral {
   options?: TransactionOptions
@@ -47,8 +46,7 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
     defaultAbi: SafeWebAuthnSignerFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType,
-    runner?: ExternalClient
+    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType
   ) {
     const contractName = 'safeWebAuthnSignerFactoryVersion'
 
@@ -59,8 +57,7 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi,
-      runner
+      customContractAbi
     )
 
     this.contractName = contractName

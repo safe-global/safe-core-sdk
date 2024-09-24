@@ -11,7 +11,6 @@ import {
 } from '@safe-global/types-kit'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
 import { asHex } from '@safe-global/protocol-kit/utils/types'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeProxyFactoryContract_v1_0_0  is the implementation specific to the Safe Proxy Factory contract version 1.0.0.
@@ -37,21 +36,12 @@ class SafeProxyFactoryContract_v1_0_0
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi,
-    runner?: ExternalClient
+    customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi
   ) {
     const safeVersion = '1.0.0'
     const defaultAbi = safeProxyFactory_1_0_0_ContractArtifacts.abi
 
-    super(
-      chainId,
-      safeProvider,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi,
-      runner
-    )
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
   }
 
   /**

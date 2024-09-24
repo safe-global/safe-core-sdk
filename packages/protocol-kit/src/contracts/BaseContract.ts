@@ -70,8 +70,7 @@ class BaseContract<ContractAbiType extends Abi> {
     defaultAbi: ContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: ContractAbiType,
-    runner?: ExternalClient
+    customContractAbi?: ContractAbiType
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
@@ -94,7 +93,7 @@ class BaseContract<ContractAbiType extends Abi> {
       (deployment?.abi as unknown as ContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
       defaultAbi // if no customAbi and no abi is present in the safe-deployments we use our hardcoded abi
 
-    this.runner = runner || safeProvider.getExternalProvider()
+    this.runner = safeProvider.getExternalProvider()
     this.safeProvider = safeProvider
   }
 

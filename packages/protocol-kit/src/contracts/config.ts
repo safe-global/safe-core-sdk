@@ -167,7 +167,6 @@ export function getContractInfo(contractAddress: string): ContractInfo | undefin
 
       if (deployment && deployment.networkAddresses) {
         for (const [, addresses] of Object.entries(deployment.networkAddresses)) {
-          console.log(addresses, contractAddress)
           if (
             (Array.isArray(addresses) &&
               addresses.find((a) => a.toLowerCase() === contractAddress.toLowerCase())) ||

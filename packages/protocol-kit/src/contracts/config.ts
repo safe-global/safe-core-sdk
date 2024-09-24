@@ -41,6 +41,12 @@ type SafeDeploymentsVersions = Record<SafeVersion, contractNames>
 
 export type contractName = keyof contractNames
 
+export type ContractInfo = {
+  version: string
+  type: DeploymentType
+  contractName: contractName
+}
+
 export const safeDeploymentsVersions: SafeDeploymentsVersions = {
   '1.4.1': {
     safeSingletonVersion: '1.4.1',
@@ -147,12 +153,6 @@ export function getContractDeployment(
   return deployment
 }
 
-export type ContractInfo = {
-  version: string
-  type: DeploymentType
-  contractName: contractName
-}
-
 export function getContractInfo(contractAddress: string): ContractInfo | undefined {
   for (const [safeVersion, contracts] of Object.entries(safeDeploymentsVersions)) {
     for (const [contractName, contractVersion] of Object.entries(contracts)) {
@@ -168,11 +168,7 @@ export function getContractInfo(contractAddress: string): ContractInfo | undefin
       if (deployment && deployment.networkAddresses) {
         for (const [, address] of Object.entries(deployment.networkAddresses)) {
           if (address.toLowerCase() === contractAddress.toLowerCase()) {
-            const types = Object.keys(deployment.deployments) as (
-              | 'canonical'
-              | 'eip155'
-              | 'zksync'
-            )[]
+            const types = Object.keys(deployment.deployments) as DeploymentType[]
 
             const type = types.find(
               (t) =>

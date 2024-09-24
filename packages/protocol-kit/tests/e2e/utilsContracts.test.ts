@@ -666,7 +666,8 @@ describe('Contract utils', () => {
 
         const safeDeploymentConfig: SafeDeploymentConfig = {
           safeVersion,
-          saltNonce: PREDETERMINED_SALT_NONCE
+          saltNonce: PREDETERMINED_SALT_NONCE,
+          deploymentType: 'canonical'
         }
 
         const protocolKitPolygonMainnet = await Safe.init({
@@ -689,37 +690,31 @@ describe('Contract utils', () => {
           provider: 'https://bsc.meowrpc.com',
           predictedSafe: {
             safeAccountConfig,
-            safeDeploymentConfig: {
-              ...safeDeploymentConfig,
-              deploymentType: 'canonical'
-            }
+            safeDeploymentConfig
           }
         })
 
-        const protocolKitSepolia = await Safe.init({
-          provider: 'https://sepolia.gateway.tenderly.co',
+        const protocolKitOptimism = await Safe.init({
+          provider: 'https://optimism.drpc.org',
           predictedSafe: {
             safeAccountConfig,
-            safeDeploymentConfig: {
-              ...safeDeploymentConfig,
-              deploymentType: 'canonical'
-            }
+            safeDeploymentConfig
           }
         })
 
         const gnosisChainPredictedAddress = await protocolKitGnosis.getAddress()
         const polygonChainPredictedAddress = await protocolKitPolygonMainnet.getAddress()
         const bnbChainPredictedAddress = await protocolKitBNB.getAddress()
-        const sepoliaChainPredictedAddress = await protocolKitSepolia.getAddress()
+        const optimismChainPredictedAddress = await protocolKitOptimism.getAddress()
 
         console.log('gnosisChainPredictedAddress', gnosisChainPredictedAddress)
         console.log('polygonChainPredictedAddress', polygonChainPredictedAddress)
         console.log('bnbChainPredictedAddress', bnbChainPredictedAddress)
-        console.log('sepoliaChainPredictedAddress', sepoliaChainPredictedAddress)
+        console.log('optimismChainPredictedAddress', optimismChainPredictedAddress)
 
         chai.expect(gnosisChainPredictedAddress).to.be.equal(polygonChainPredictedAddress)
         chai.expect(polygonChainPredictedAddress).to.be.equal(bnbChainPredictedAddress)
-        chai.expect(bnbChainPredictedAddress).to.be.equal(sepoliaChainPredictedAddress)
+        chai.expect(bnbChainPredictedAddress).to.be.equal(optimismChainPredictedAddress)
       }
     )
   })

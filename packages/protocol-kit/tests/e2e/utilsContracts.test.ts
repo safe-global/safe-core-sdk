@@ -712,6 +712,11 @@ describe('Contract utils', () => {
         const bnbChainPredictedAddress = await protocolKitBNB.getAddress()
         const sepoliaChainPredictedAddress = await protocolKitSepolia.getAddress()
 
+        console.log('gnosisChainPredictedAddress', gnosisChainPredictedAddress)
+        console.log('polygonChainPredictedAddress', polygonChainPredictedAddress)
+        console.log('bnbChainPredictedAddress', bnbChainPredictedAddress)
+        console.log('sepoliaChainPredictedAddress', sepoliaChainPredictedAddress)
+
         chai.expect(gnosisChainPredictedAddress).to.be.equal(polygonChainPredictedAddress)
         chai.expect(polygonChainPredictedAddress).to.be.equal(bnbChainPredictedAddress)
         chai.expect(bnbChainPredictedAddress).to.be.equal(sepoliaChainPredictedAddress)

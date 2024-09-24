@@ -389,7 +389,7 @@ export function zkSyncEraCreate2Address(
     concat([ZKSYNC_CREATE2_PREFIX, pad(asHex(from)), salt, bytecodeHash, inputHash])
   ).slice(26)
 
-  return addressBytes
+  return `0x${addressBytes}`
 }
 
 export function toTxResult(

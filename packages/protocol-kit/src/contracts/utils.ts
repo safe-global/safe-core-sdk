@@ -27,7 +27,7 @@ import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
   getCompatibilityFallbackHandlerContract,
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
 import {
@@ -160,7 +160,7 @@ type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & { cha
 
 const memoizedGetProxyFactoryContract = createMemoizedFunction(
   ({ safeProvider, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
-    getProxyFactoryContract({ safeProvider, safeVersion, customContracts })
+    getSafeProxyFactoryContract({ safeProvider, safeVersion, customContracts })
 )
 
 const memoizedGetProxyCreationCode = createMemoizedFunction(

@@ -21,20 +21,7 @@ import {
   SafeVersion
 } from '@safe-global/types-kit'
 import {
-  getCompatibilityFallbackHandlerContractInstance,
-  getCreateCallContractInstance,
-  getMultiSendCallOnlyContractInstance,
-  getMultiSendContractInstance,
-  getSafeContractInstance,
-  getSafeProxyFactoryContractInstance,
-  getSafeWebAuthnSharedSignerContractInstance,
-  getSafeWebAuthnSignerFactoryContractInstance,
-  getSignMessageLibContractInstance,
-  getSimulateTxAccessorContractInstance
-} from './contracts/contractInstances'
-import {
   SafeProviderTransaction,
-  GetContractProps,
   SafeProviderConfig,
   ExternalClient,
   ExternalSigner,
@@ -264,136 +251,7 @@ class SafeProvider {
   }
 
   getChecksummedAddress(address: string): string {
-    return getAddress(asHex(address))
-  }
-
-  async getSafeContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi,
-    isL1SafeSingleton
-  }: GetContractProps) {
-    return getSafeContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi,
-      isL1SafeSingleton
-    )
-  }
-
-  async getSafeProxyFactoryContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    const signerOrProvider = this.#externalProvider
-    return getSafeProxyFactoryContractInstance(
-      safeVersion,
-      this,
-      signerOrProvider,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getMultiSendContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getMultiSendContractInstance(safeVersion, this, customContractAddress, customContractAbi)
-  }
-
-  async getMultiSendCallOnlyContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getMultiSendCallOnlyContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getCompatibilityFallbackHandlerContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getCompatibilityFallbackHandlerContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSignMessageLibContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSignMessageLibContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getCreateCallContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getCreateCallContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSimulateTxAccessorContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSimulateTxAccessorContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSafeWebAuthnSignerFactoryContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSafeWebAuthnSignerFactoryContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSafeWebAuthnSharedSignerContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSafeWebAuthnSharedSignerContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
+    return getAddress(address)
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {

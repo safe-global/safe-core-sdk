@@ -72,7 +72,8 @@ import {
 import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
-  getProxyFactoryContract
+  getSafeProxyFactoryContract,
+  getSafeContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
@@ -1359,11 +1360,11 @@ class Safe {
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
-    const safeSingletonContract = await this.#safeProvider.getSafeContract({
+    const safeSingletonContract = await getSafeContract({
+      safeProvider: this.#safeProvider,
       safeVersion,
       isL1SafeSingleton,
-      customContractAbi: customContracts?.safeSingletonAbi,
-      customContractAddress: customContracts?.safeSingletonAddress
+      customContracts
     })
 
     const encodedTransaction = safeSingletonContract.encode('execTransaction', [
@@ -1465,15 +1466,15 @@ class Safe {
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
-    const safeSingletonContract = await safeProvider.getSafeContract({
+    const safeSingletonContract = await getSafeContract({
+      safeProvider,
       safeVersion,
       isL1SafeSingleton,
-      customContractAddress: customContracts?.safeSingletonAddress,
-      customContractAbi: customContracts?.safeSingletonAbi
+      customContracts
     })
 
     // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol
-    const safeProxyFactoryContract = await getProxyFactoryContract({
+    const safeProxyFactoryContract = await getSafeProxyFactoryContract({
       safeProvider,
       safeVersion,
       customContracts

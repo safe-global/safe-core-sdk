@@ -136,7 +136,7 @@ class SafeProxyFactoryContract_v1_1_1
       ).toString()
     }
 
-    const coverted = await this.convertOptions(options)
+    const coverted = this.convertOptions(options)
     const proxyAddress = await this.getWallet()
       .writeContract({
         address: this.contractAddress,

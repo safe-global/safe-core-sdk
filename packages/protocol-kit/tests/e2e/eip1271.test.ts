@@ -4,7 +4,8 @@ import Safe, {
   buildSignatureBytes,
   preimageSafeMessageHash,
   buildContractSignature,
-  EthSafeSignature
+  EthSafeSignature,
+  getSignMessageLibContract
 } from '@safe-global/protocol-kit/index'
 import {
   safeVersionDeployed,
@@ -109,12 +110,12 @@ describe('The EIP1271 implementation', () => {
 
         const safeVersion = safeSdk1.getContractVersion()
 
-        const customContract = contractNetworks[chainId.toString()]
+        const customContracts = contractNetworks[chainId.toString()]
 
-        const signMessageLibContract = await safeSdk1.getSafeProvider().getSignMessageLibContract({
+        const signMessageLibContract = await getSignMessageLibContract({
+          safeProvider: safeSdk1.getSafeProvider(),
           safeVersion,
-          customContractAddress: customContract.signMessageLibAddress,
-          customContractAbi: customContract.signMessageLibAbi
+          customContracts
         })
 
         const messageHash = hashSafeMessage(MESSAGE)
@@ -122,7 +123,7 @@ describe('The EIP1271 implementation', () => {
         const txData = signMessageLibContract.encode('signMessage', [asHash(messageHash)])
 
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: customContract.signMessageLibAddress,
+          to: customContracts.signMessageLibAddress,
           value: '0',
           data: txData,
           operation: OperationType.DelegateCall

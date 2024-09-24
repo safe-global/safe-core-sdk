@@ -193,7 +193,6 @@ class SafeContract_v1_0_0
    * @returns Transaction result.
    */
   async approveHash(hash: string, options?: TransactionOptions): Promise<TransactionResult> {
-    if (!this.wallet) throw new Error()
     const gasLimit =
       options?.gasLimit || (await this.estimateGas('approveHash', [asHash(hash)], options))
 

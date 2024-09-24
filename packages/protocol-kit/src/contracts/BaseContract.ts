@@ -112,19 +112,17 @@ class BaseContract<ContractAbiType extends Abi> {
    *
    * @param options - Transaction options as expected throughout safe sdk and propagated on the results.
    *
-   * @returns Options object compatible with viem
+   * @returns Options object compatible with Viem
    */
-  async convertOptions(
+  convertOptions(
     options?: TransactionOptions
-  ): Promise<WalletTransactionOptions | WalletLegacyTransactionOptions> {
+  ): WalletTransactionOptions | WalletLegacyTransactionOptions {
     const chain = this.getChain()
     if (!chain) throw new Error('Invalid chainId')
 
-    const signerAddress = await this.safeProvider.getSignerAddress()
-    const signer = this.wallet?.account
-    if (!signer || !signerAddress) throw new Error('Invalid signer')
+    const account = this.getWallet().account
+    if (!account) throw new Error('Invalid signer')
 
-    const account = signer || signerAddress
     const txOptions = convertTransactionOptions(options)
     return { chain, ...txOptions, account } // Needs to be in this order to override the `account` if necessary
   }
@@ -153,7 +151,7 @@ class BaseContract<ContractAbiType extends Abi> {
     args,
     options = {}
   ) => {
-    const contractOptions = await this.convertOptions(options)
+    const contractOptions = this.convertOptions(options)
     const abi = this.contractAbi as Abi
     const params = args as unknown[]
     return estimateContractGas(this.runner, {
@@ -178,13 +176,13 @@ class BaseContract<ContractAbiType extends Abi> {
       functionName
     >
   >(functionName: functionName, args: functionArgs, options?: TransactionOptions) {
-    const converted = (await this.convertOptions(options)) as any
+    const converted = this.convertOptions(options) as any
 
     return await this.getWallet().writeContract({
       address: this.contractAddress,
       abi: this.contractAbi,
       functionName,
-      args: args,
+      args,
       ...converted
     })
   }

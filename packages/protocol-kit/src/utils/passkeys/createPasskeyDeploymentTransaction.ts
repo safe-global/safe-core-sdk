@@ -19,15 +19,15 @@ async function createPasskeyDeploymentTransaction(
   const safeAddress = await safe.getAddress()
   const owners = await safe.getOwners()
 
-  const safePasskeyProvider = await SafeProvider.init(
-    safe.getSafeProvider().provider,
-    passkey,
+  const safePasskeyProvider = await SafeProvider.init({
+    provider: safe.getSafeProvider().provider,
+    signer: passkey,
     safeVersion,
-    safe.getContractManager().contractNetworks,
+    contractNetworks: safe.getContractManager().contractNetworks,
     safeAddress,
     owners,
-    safe.getSafeProvider().deploymentType
-  )
+    deploymentType: safe.getSafeProvider().deploymentType
+  })
 
   const passkeySigner = (await safePasskeyProvider.getExternalSigner()) as PasskeyClient
   const passkeyAddress = passkeySigner!.account.address

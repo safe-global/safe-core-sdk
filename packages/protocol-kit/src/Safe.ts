@@ -124,15 +124,13 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks, predictedSafe } = config
 
-    this.#safeProvider = await SafeProvider.init(
+    this.#safeProvider = await SafeProvider.init({
       provider,
       signer,
-      DEFAULT_SAFE_VERSION,
+      safeVersion: DEFAULT_SAFE_VERSION,
       contractNetworks,
-      undefined,
-      undefined,
-      predictedSafe?.safeDeploymentConfig?.deploymentType
-    )
+      deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
+    })
 
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
@@ -158,15 +156,13 @@ class Safe {
     }
 
     const safeVersion = await this.getContractVersion()
-    this.#safeProvider = await SafeProvider.init(
+    this.#safeProvider = await SafeProvider.init({
       provider,
       signer,
       safeVersion,
       contractNetworks,
-      undefined,
-      undefined,
-      this.#safeProvider.deploymentType
-    )
+      deploymentType: this.#safeProvider.deploymentType
+    })
 
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
@@ -180,15 +176,15 @@ class Safe {
     if (isPasskeySigner) {
       const safeAddress = await this.getAddress()
       const owners = await this.getOwners()
-      this.#safeProvider = await SafeProvider.init(
+      this.#safeProvider = await SafeProvider.init({
         provider,
         signer,
         safeVersion,
         contractNetworks,
         safeAddress,
         owners,
-        this.#safeProvider.deploymentType
-      )
+        deploymentType: this.#safeProvider.deploymentType
+      })
     }
   }
 

@@ -55,7 +55,7 @@ describe('Passkey', () => {
     const passkey2 = { ...(await createMockPasskey('brucelee')), customVerifierAddress }
 
     const provider = getEip1193Provider()
-    const safeProvider = await SafeProvider.init(provider)
+    const safeProvider = await SafeProvider.init({ provider })
     const customContracts = contractNetworks?.[chainId.toString()]
 
     const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
@@ -70,8 +70,18 @@ describe('Passkey', () => {
       customContracts
     })
 
-    const safeProvider1 = await SafeProvider.init(provider, passkey1, '1.4.1', contractNetworks)
-    const safeProvider2 = await SafeProvider.init(provider, passkey2, '1.4.1', contractNetworks)
+    const safeProvider1 = await SafeProvider.init({
+      provider,
+      signer: passkey1,
+      safeVersion: '1.4.1',
+      contractNetworks
+    })
+    const safeProvider2 = await SafeProvider.init({
+      provider,
+      signer: passkey2,
+      safeVersion: '1.4.1',
+      contractNetworks
+    })
 
     const passkeySigner1 = await safeProvider1.getExternalSigner()
     const passkeySigner2 = await safeProvider2.getExternalSigner()

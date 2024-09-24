@@ -13,8 +13,7 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args,
-  SafeVersion
+  SafeEIP712Args
 } from '@safe-global/types-kit'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -32,14 +31,13 @@ import {
   SafeProviderTransaction,
   GetContractProps,
   SafeProviderConfig,
+  SafeProviderInitOptions,
   ExternalClient,
   ExternalSigner,
   Eip1193Provider,
   HttpTransport,
   SocketTransport,
   SafeSigner,
-  SafeConfig,
-  ContractNetworksConfig,
   PasskeyArgType,
   PasskeyClient,
   DeploymentType
@@ -114,22 +112,26 @@ class SafeProvider {
 
     this.provider = provider
     this.signer = signer
-    this.deploymentType = deploymentType
+    this.#deploymentType = deploymentType
+  }
+
+  get deploymentType(): DeploymentType | undefined {
+    return this.#deploymentType
   }
 
   getExternalProvider(): ExternalClient {
     return this.#externalProvider
   }
 
-  static async init(
-    provider: SafeConfig['provider'],
-    signer?: SafeConfig['signer'],
-    safeVersion: SafeVersion = DEFAULT_SAFE_VERSION,
-    contractNetworks?: ContractNetworksConfig,
-    safeAddress?: string,
-    owners?: string[],
-    deploymentType?: DeploymentType
-  ): Promise<SafeProvider> {
+  static async init({
+    provider,
+    signer,
+    safeVersion = DEFAULT_SAFE_VERSION,
+    contractNetworks,
+    safeAddress,
+    owners,
+    deploymentType
+  }: SafeProviderInitOptions): Promise<SafeProvider> {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
     if (isPasskeySigner) {

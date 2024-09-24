@@ -49,7 +49,9 @@ describe('Safe contracts', () => {
         const passKeySigner = await createMockPasskey('aName')
 
         chai
-          .expect(SafeProvider.init(provider, passKeySigner, safeVersionDeployed))
+          .expect(
+            SafeProvider.init({ provider, signer: passKeySigner, safeVersion: safeVersionDeployed })
+          )
           .to.be.rejectedWith(
             'Current version of the Safe does not support the Passkey signer functionality'
           )

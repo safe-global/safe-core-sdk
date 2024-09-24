@@ -189,7 +189,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the address of a Safe >=v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, contractNetworks, provider } = await setupTests()
+        const { predictedSafe, contractNetworks, provider, accounts } = await setupTests()
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,
@@ -199,13 +199,16 @@ describe('Safe Info', () => {
 
         chai.expect(await safeSdk.isSafeDeployed()).to.be.false
 
-        const deployedSdk = await safeSdk.deploy()
+        const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-        const expectedSafeAddress = await deployedSdk.getAddress()
+        const signer = accounts[0].signer
+        await signer.sendTransaction(deploymentTransaction)
+
+        const expectedSafeAddress = await safeSdk.getAddress()
 
         chai.expect(safeAddress).to.be.eq(expectedSafeAddress)
 
-        chai.expect(await deployedSdk.isSafeDeployed()).to.be.true
+        chai.expect(await safeSdk.isSafeDeployed()).to.be.true
       }
     )
 

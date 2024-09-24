@@ -1,6 +1,10 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps, SafeAccountConfig } from '@safe-global/protocol-kit/index'
+import Safe, {
+  getSafeAddressFromDeploymentTx,
+  PredictedSafeProps,
+  SafeAccountConfig
+} from '@safe-global/protocol-kit/index'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -14,6 +18,7 @@ import {
 } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { getAccounts } from './utils/setupTestNetwork'
+import { waitTransactionReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
@@ -63,7 +68,7 @@ describe('Safe Deployment', () => {
       })
 
       await chai
-        .expect(safeSDK.deploy())
+        .expect(safeSDK.createSafeDeploymentTransaction())
         .rejectedWith('SafeProxyFactory contract is not deployed on the current network')
     })
   })
@@ -85,7 +90,9 @@ describe('Safe Deployment', () => {
 
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
-      await chai.expect(safeSDK.deploy()).rejectedWith('Owner list must have at least one owner')
+      await chai
+        .expect(safeSDK.createSafeDeploymentTransaction())
+        .rejectedWith('Owner list must have at least one owner')
     })
 
     it('should fail if the threshold is lower than 0', async () => {
@@ -106,7 +113,7 @@ describe('Safe Deployment', () => {
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
       await chai
-        .expect(safeSDK.deploy())
+        .expect(safeSDK.createSafeDeploymentTransaction())
         .rejectedWith('Threshold must be greater than or equal to 1')
     })
 
@@ -128,7 +135,7 @@ describe('Safe Deployment', () => {
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
       await chai
-        .expect(safeSDK.deploy())
+        .expect(safeSDK.createSafeDeploymentTransaction())
         .rejectedWith('Threshold must be lower than or equal to owners length')
     })
 
@@ -150,11 +157,38 @@ describe('Safe Deployment', () => {
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
       await chai
-        .expect(safeSDK.deploy())
+        .expect(safeSDK.createSafeDeploymentTransaction())
         .rejectedWith('saltNonce must be greater than or equal to 0')
     })
 
-    it('should predict a new Safe with saltNonce', async () => {
+    itif(safeVersionDeployed < '1.3.0')(
+      'should fail if the safe Version is lower than 1.3.0',
+      async () => {
+        const { accounts, contractNetworks, provider } = await setupTests()
+        const [account1, account2] = accounts
+        const owners = [account1.address, account2.address]
+        const threshold = 2
+        const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+        const saltNonce = '12345'
+        const predictedSafe: PredictedSafeProps = {
+          safeAccountConfig,
+          safeDeploymentConfig: {
+            safeVersion: safeVersionDeployed,
+            saltNonce
+          }
+        }
+
+        const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
+
+        await chai
+          .expect(safeSDK.getAddress())
+          .rejectedWith(
+            'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+          )
+      }
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')('should predict a new Safe with saltNonce', async () => {
       const { accounts, contractNetworks, provider } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
@@ -172,14 +206,16 @@ describe('Safe Deployment', () => {
       const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
       const counterfactualSafeAddress = await safeSDK.getAddress()
+      const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
 
-      const safeSDKDeployed = await safeSDK.deploy()
+      const signer = account1.signer
+      await signer.sendTransaction(deploymentTransaction)
 
-      chai.expect(counterfactualSafeAddress).to.be.eq(await safeSDKDeployed.getAddress())
-      chai.expect(threshold).to.be.eq(await safeSDKDeployed.getThreshold())
-      const deployedSafeOwners = await safeSDKDeployed.getOwners()
+      chai.expect(counterfactualSafeAddress).to.be.eq(await safeSDK.getAddress())
+      chai.expect(threshold).to.be.eq(await safeSDK.getThreshold())
+      const deployedSafeOwners = await safeSDK.getOwners()
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
-      chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+      chai.expect(await safeSDK.getContractVersion()).to.be.eq(safeVersionDeployed)
     })
 
     itif(safeVersionDeployed > '1.0.0')(
@@ -201,11 +237,22 @@ describe('Safe Deployment', () => {
 
         const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
-        const counterfactualSafeAddress = await safeSDK.getAddress()
+        const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
 
-        const safeSDKDeployed = await safeSDK.deploy()
+        const signer = accounts[0].signer
 
-        chai.expect(counterfactualSafeAddress).to.be.eq(await safeSDKDeployed.getAddress())
+        const txHash = await signer.sendTransaction(deploymentTransaction)
+
+        const txReceipt = await waitTransactionReceipt(txHash)
+
+        const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+        const safeSDKDeployed = await Safe.init({
+          provider,
+          contractNetworks,
+          safeAddress
+        })
+
         const compatibilityFallbackHandler = (await getCompatibilityFallbackHandler()).contract
           .address
         chai
@@ -238,11 +285,22 @@ describe('Safe Deployment', () => {
 
         const safeSDK = await Safe.init({ provider, contractNetworks, predictedSafe })
 
-        const counterfactualSafeAddress = await safeSDK.getAddress()
+        const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
 
-        const safeSDKDeployed = await safeSDK.deploy()
+        const signer = accounts[0].signer
 
-        chai.expect(counterfactualSafeAddress).to.be.eq(await safeSDKDeployed.getAddress())
+        const txHash = await signer.sendTransaction(deploymentTransaction)
+
+        const txReceipt = await waitTransactionReceipt(txHash)
+
+        const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+        const safeSDKDeployed = await Safe.init({
+          provider,
+          contractNetworks,
+          safeAddress
+        })
+
         chai
           .expect(defaultCallbackHandler.address)
           .to.be.eq(await safeSDKDeployed.getFallbackHandler())
@@ -251,7 +309,7 @@ describe('Safe Deployment', () => {
   })
 
   describe('deploySafe', async () => {
-    it('should fail if the Safe is deployed', async () => {
+    itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is deployed', async () => {
       const { contractNetworks, provider, accounts } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
@@ -272,10 +330,16 @@ describe('Safe Deployment', () => {
 
       chai.expect(await safeSDK.isSafeDeployed()).to.be.false
 
-      const safeSDKDeployed = await safeSDK.deploy()
+      const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
 
-      await chai.expect(safeSDK.deploy()).rejectedWith('Safe already deployed')
-      chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+      const signer = accounts[0].signer
+      await signer.sendTransaction(deploymentTransaction)
+
+      await chai
+        .expect(safeSDK.createSafeDeploymentTransaction())
+        .rejectedWith('Safe already deployed')
+
+      chai.expect(await safeSDK.isSafeDeployed()).to.be.true
     })
 
     it('should fail if there are no owners', async () => {
@@ -296,7 +360,9 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
-      await chai.expect(safeSDK.deploy()).rejectedWith('Owner list must have at least one owner')
+      await chai
+        .expect(safeSDK.createSafeDeploymentTransaction())
+        .rejectedWith('Owner list must have at least one owner')
     })
 
     it('should fail if the threshold is lower than 0', async () => {
@@ -319,7 +385,7 @@ describe('Safe Deployment', () => {
       })
 
       await chai
-        .expect(safeSDK.deploy())
+        .expect(safeSDK.createSafeDeploymentTransaction())
         .rejectedWith('Threshold must be greater than or equal to 1')
     })
 
@@ -344,7 +410,7 @@ describe('Safe Deployment', () => {
       })
 
       await chai
-        .expect(safeSDK.deploy())
+        .expect(safeSDK.createSafeDeploymentTransaction())
         .rejectedWith('Threshold must be lower than or equal to owners length')
     })
 
@@ -371,7 +437,7 @@ describe('Safe Deployment', () => {
       })
 
       await chai
-        .expect(safeSDK.deploy())
+        .expect(safeSDK.createSafeDeploymentTransaction())
         .rejectedWith('saltNonce must be greater than or equal to 0')
     })
 
@@ -402,9 +468,24 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
-        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+        if (safeVersionDeployed >= '1.3.0') {
+          chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+        }
 
-        const safeSDKDeployed = await safeSDK.deploy()
+        const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+        const signer = accounts[0].signer
+        const txHash = await signer.sendTransaction(deploymentTransaction)
+
+        const txReceipt = await waitTransactionReceipt(txHash)
+
+        const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+        const safeSDKDeployed = await Safe.init({
+          provider,
+          contractNetworks,
+          safeAddress
+        })
 
         const deployedSafeOwners = await safeSDKDeployed.getOwners()
         const deployedSafeThreshold = await safeSDKDeployed.getThreshold()
@@ -444,9 +525,24 @@ describe('Safe Deployment', () => {
           predictedSafe
         })
 
-        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+        if (safeVersionDeployed >= '1.3.0') {
+          chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+        }
 
-        const safeSDKDeployed = await safeSDK.deploy()
+        const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+        const signer = accounts[0].signer
+        const txHash = await signer.sendTransaction(deploymentTransaction)
+
+        const txReceipt = await waitTransactionReceipt(txHash)
+
+        const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+        const safeSDKDeployed = await Safe.init({
+          provider,
+          contractNetworks,
+          safeAddress
+        })
 
         const defaultCompatibilityFallbackHandler = (await getCompatibilityFallbackHandler())
           .contract.address
@@ -481,9 +577,24 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+      if (safeVersionDeployed >= '1.3.0') {
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+      }
 
-      const safeSDKDeployed = await safeSDK.deploy()
+      const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+      const signer = accounts[0].signer
+      const txHash = await signer.sendTransaction(deploymentTransaction)
+
+      const txReceipt = await waitTransactionReceipt(txHash)
+
+      const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+      const safeSDKDeployed = await Safe.init({
+        provider,
+        contractNetworks,
+        safeAddress
+      })
 
       const deployedSafeOwners = await safeSDKDeployed.getOwners()
       const deployedSafeThreshold = await safeSDKDeployed.getThreshold()
@@ -517,9 +628,24 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+      if (safeVersionDeployed >= '1.3.0') {
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+      }
 
-      const safeSDKDeployed = await safeSDK.deploy()
+      const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+      const signer = accounts[0].signer
+      const txHash = await signer.sendTransaction(deploymentTransaction)
+
+      const txReceipt = await waitTransactionReceipt(txHash)
+
+      const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+      const safeSDKDeployed = await Safe.init({
+        provider,
+        contractNetworks,
+        safeAddress
+      })
 
       const deployedSafeOwners = await safeSDKDeployed.getOwners()
       const deployedSafeThreshold = await safeSDKDeployed.getThreshold()
@@ -531,8 +657,8 @@ describe('Safe Deployment', () => {
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
-    itif(safeVersionDeployed === DEFAULT_SAFE_VERSION)(
-      'should deploy last Safe version by default',
+    itif(safeVersionDeployed == '1.3.0')(
+      'should deploy the v1.3.0 Safe version by default',
       async () => {
         const { accounts, contractNetworks, provider } = await setupTests()
         const [account1, account2] = accounts
@@ -541,10 +667,7 @@ describe('Safe Deployment', () => {
         const safeAccountConfig: SafeAccountConfig = { owners, threshold }
 
         const predictedSafe: PredictedSafeProps = {
-          safeAccountConfig,
-          safeDeploymentConfig: {
-            safeVersion: DEFAULT_SAFE_VERSION
-          }
+          safeAccountConfig
         }
 
         const safeSDK = await Safe.init({
@@ -555,13 +678,26 @@ describe('Safe Deployment', () => {
 
         chai.expect(await safeSDK.isSafeDeployed()).to.be.false
 
-        const safeSDKDeployed = await safeSDK.deploy()
+        const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+        const signer = accounts[0].signer
+        const txHash = await signer.sendTransaction(deploymentTransaction)
+
+        const txReceipt = await waitTransactionReceipt(txHash)
+
+        const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, DEFAULT_SAFE_VERSION)
+
+        const safeSDKDeployed = await Safe.init({
+          provider,
+          contractNetworks,
+          safeAddress
+        })
 
         const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
 
         chai.expect(safeInstanceVersion).to.be.eq(DEFAULT_SAFE_VERSION)
         chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(DEFAULT_SAFE_VERSION)
         chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
       }
     )
@@ -586,9 +722,24 @@ describe('Safe Deployment', () => {
         predictedSafe
       })
 
-      chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+      if (safeVersionDeployed >= '1.3.0') {
+        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+      }
 
-      const safeSDKDeployed = await safeSDK.deploy()
+      const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+      const signer = accounts[0].signer
+      const txHash = await signer.sendTransaction(deploymentTransaction)
+
+      const txReceipt = await waitTransactionReceipt(txHash)
+
+      const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+      const safeSDKDeployed = await Safe.init({
+        provider,
+        contractNetworks,
+        safeAddress
+      })
 
       const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
 
@@ -598,103 +749,177 @@ describe('Safe Deployment', () => {
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
-    itif(safeVersionDeployed >= '1.3.0')(
-      'should deploy the Safe Account and execute a transaction',
-      async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
-        const [account1, account2] = accounts
-        const owners = [account1.address, account2.address]
-        const threshold = 1
-        const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+    describe('counterfactual deployment via wrapSafeTransactionIntoDeploymentBatch', () => {
+      itif(safeVersionDeployed >= '1.3.0')(
+        'should deploy the Safe Account and execute one transaction',
+        async () => {
+          const { accounts, contractNetworks, provider } = await setupTests()
+          const [account1, account2] = accounts
+          const owners = [account1.address, account2.address]
+          const threshold = 1
+          const safeAccountConfig: SafeAccountConfig = { owners, threshold }
 
-        const predictedSafe: PredictedSafeProps = {
-          safeAccountConfig,
-          safeDeploymentConfig: {
-            safeVersion: safeVersionDeployed
+          const predictedSafe: PredictedSafeProps = {
+            safeAccountConfig,
+            safeDeploymentConfig: {
+              safeVersion: safeVersionDeployed
+            }
           }
-        }
 
-        const safeSDK = await Safe.init({
-          provider,
-          contractNetworks,
-          predictedSafe
-        })
+          const safeSDK = await Safe.init({
+            provider,
+            contractNetworks,
+            predictedSafe
+          })
 
-        const transaction = {
-          to: account2.address,
-          value: '0',
-          data: '0x'
-        }
-
-        const safeTransaction = await safeSDK.createTransaction({ transactions: [transaction] })
-
-        const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
-
-        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
-        const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
-
-        const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-        chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
-        chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
-        chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
-      }
-    )
-
-    itif(safeVersionDeployed >= '1.3.0')(
-      'should deploy the Safe Account and execute a batch of transactions',
-      async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
-        const [account1, account2] = accounts
-        const owners = [account1.address, account2.address]
-        const threshold = 1
-        const safeAccountConfig: SafeAccountConfig = { owners, threshold }
-
-        const predictedSafe: PredictedSafeProps = {
-          safeAccountConfig,
-          safeDeploymentConfig: {
-            safeVersion: safeVersionDeployed
+          const transaction = {
+            to: account2.address,
+            value: '0',
+            data: '0x'
           }
+
+          const safeTransaction = await safeSDK.createTransaction({ transactions: [transaction] })
+
+          const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
+
+          const deploymentTransaction =
+            await safeSDK.wrapSafeTransactionIntoDeploymentBatch(signedSafeTransaction)
+
+          chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+
+          const signer = accounts[0].signer
+          const txHash = await signer.sendTransaction(deploymentTransaction)
+
+          const txReceipt = await waitTransactionReceipt(txHash)
+
+          const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+          const safeSDKDeployed = await Safe.init({
+            provider,
+            contractNetworks,
+            safeAddress
+          })
+
+          const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
+
+          chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
+          chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+          chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+          chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
         }
+      )
+      itif(safeVersionDeployed >= '1.3.0')(
+        'should deploy the Safe Account and execute a batch of transactions',
+        async () => {
+          const { accounts, contractNetworks, provider } = await setupTests()
+          const [account1, account2] = accounts
+          const owners = [account1.address, account2.address]
+          const threshold = 1
+          const safeAccountConfig: SafeAccountConfig = { owners, threshold }
 
-        const safeSDK = await Safe.init({
-          provider,
-          contractNetworks,
-          predictedSafe
-        })
+          const predictedSafe: PredictedSafeProps = {
+            safeAccountConfig,
+            safeDeploymentConfig: {
+              safeVersion: safeVersionDeployed
+            }
+          }
 
-        const firstTransaction = {
-          to: account1.address,
-          value: '0',
-          data: '0x'
+          const safeSDK = await Safe.init({
+            provider,
+            contractNetworks,
+            predictedSafe
+          })
+
+          const firstTransaction = {
+            to: account1.address,
+            value: '0',
+            data: '0x'
+          }
+
+          const secondTransaction = {
+            to: account2.address,
+            value: '0',
+            data: '0x'
+          }
+
+          // batch to execute after the deployment
+          const transactions = [firstTransaction, secondTransaction]
+
+          const safeTransaction = await safeSDK.createTransaction({ transactions })
+
+          const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
+
+          chai.expect(await safeSDK.isSafeDeployed()).to.be.false
+
+          const deploymentTransaction =
+            await safeSDK.wrapSafeTransactionIntoDeploymentBatch(signedSafeTransaction)
+
+          const signer = accounts[0].signer
+          const txHash = await signer.sendTransaction(deploymentTransaction)
+
+          const txReceipt = await waitTransactionReceipt(txHash)
+
+          const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+          const safeSDKDeployed = await Safe.init({
+            provider,
+            contractNetworks,
+            safeAddress
+          })
+
+          const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
+
+          chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
+          chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
+          chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+          chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
         }
+      )
 
-        const secondTransaction = {
-          to: account2.address,
-          value: '0',
-          data: '0x'
+      itif(safeVersionDeployed < '1.3.0')(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0',
+        async () => {
+          const { accounts, contractNetworks, provider } = await setupTests()
+          const [account1, account2] = accounts
+          const owners = [account1.address, account2.address]
+          const threshold = 1
+          const safeAccountConfig: SafeAccountConfig = { owners, threshold }
+
+          const predictedSafe: PredictedSafeProps = {
+            safeAccountConfig,
+            safeDeploymentConfig: {
+              safeVersion: safeVersionDeployed
+            }
+          }
+
+          const safeSDK = await Safe.init({
+            provider,
+            contractNetworks,
+            predictedSafe
+          })
+
+          const firstTransaction = {
+            to: account1.address,
+            value: '0',
+            data: '0x'
+          }
+
+          const secondTransaction = {
+            to: account2.address,
+            value: '0',
+            data: '0x'
+          }
+
+          // batch to execute after the deployment
+          const transactions = [firstTransaction, secondTransaction]
+
+          await chai
+            .expect(safeSDK.createTransaction({ transactions }))
+            .rejectedWith(
+              'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+            )
         }
-
-        // batch to execute after the deployment
-        const transactions = [firstTransaction, secondTransaction]
-
-        const safeTransaction = await safeSDK.createTransaction({ transactions })
-
-        const signedSafeTransaction = await safeSDK.signTransaction(safeTransaction)
-
-        chai.expect(await safeSDK.isSafeDeployed()).to.be.false
-
-        const safeSDKDeployed = await safeSDK.deploy(signedSafeTransaction)
-
-        const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-        chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
-        chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
-        chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
-      }
-    )
+      )
+    })
   })
 })

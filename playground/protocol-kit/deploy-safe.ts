@@ -1,9 +1,11 @@
-import Safe, { SafeAccountConfig } from '@safe-global/protocol-kit'
+import Safe, { SafeAccountConfig, getSafeAddressFromDeploymentTx } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/safe-core-sdk-types'
 
 import { createWalletClient, http } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
+import { waitForTransactionReceipt } from 'viem/actions'
+import semverSatisfies from 'semver/functions/satisfies'
 
 // This file can be used to play around with the Safe Core SDK
 
@@ -19,7 +21,7 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: 'https://rpc.sepolia.org',
+  RPC_URL: sepolia.rpcUrls.default.http[0],
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
     OWNERS: ['OWNER_ADDRESS'],
@@ -30,9 +32,7 @@ const config: Config = {
 }
 
 async function main() {
-  const safeVersion = config.DEPLOY_SAFE.SAFE_VERSION as SafeVersion
-
-  console.log('safe config: ', config.DEPLOY_SAFE)
+  console.log('Safe Account config: ', config.DEPLOY_SAFE)
 
   // Config of the deployed Safe
   const safeAccountConfig: SafeAccountConfig = {
@@ -40,10 +40,11 @@ async function main() {
     threshold: config.DEPLOY_SAFE.THRESHOLD
   }
 
+  const safeVersion = config.DEPLOY_SAFE.SAFE_VERSION as SafeVersion
   const saltNonce = config.DEPLOY_SAFE.SALT_NONCE
 
-  // Create SDK instance
-  const safeSDK = await Safe.init({
+  // protocol-kit instance creation
+  const protocolKit = await Safe.init({
     provider: config.RPC_URL,
     signer: config.DEPLOYER_ADDRESS_PRIVATE_KEY,
     predictedSafe: {
@@ -55,18 +56,20 @@ async function main() {
     }
   })
 
-  // check if its deployed
-  console.log('Safe Account deployed: ', await safeSDK.isSafeDeployed())
+  // The Account Abstraction feature is only available for Safes version 1.3.0 and above.
+  if (semverSatisfies(safeVersion, '>=1.3.0')) {
+    // check if its deployed
+    console.log('Safe Account deployed: ', await protocolKit.isSafeDeployed())
 
-  // Predict deployed address
-  const predictedSafeAddress = await safeSDK.getAddress()
-
-  console.log('Predicted Safe address:', predictedSafeAddress)
+    // Predict deployed address
+    const predictedSafeAddress = await protocolKit.getAddress()
+    console.log('Predicted Safe address:', predictedSafeAddress)
+  }
 
   console.log('Deploying Safe Account...')
 
   // Deploy the Safe account
-  const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+  const deploymentTransaction = await protocolKit.createSafeDeploymentTransaction()
 
   console.log('deploymentTransaction: ', deploymentTransaction)
 
@@ -85,6 +88,12 @@ async function main() {
   })
 
   console.log('Transaction hash:', txHash)
+
+  const txReceipt = await waitForTransactionReceipt(client, { hash: txHash })
+
+  const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersion)
+
+  console.log('safeAddress:', safeAddress)
 }
 
 main()

@@ -1500,15 +1500,25 @@ class Safe {
       throw new Error('Predict Safe should be present to build the Safe deployement transaction')
     }
 
-    const { safeAccountConfig, safeDeploymentConfig } = this.#predictedSafe
+    const { safeAccountConfig, safeDeploymentConfig = {} } = this.#predictedSafe
 
     validateSafeAccountConfig(safeAccountConfig)
-    validateSafeDeploymentConfig(safeDeploymentConfig || {})
+    validateSafeDeploymentConfig(safeDeploymentConfig)
 
     const safeProvider = this.#safeProvider
     const chainId = await safeProvider.getChainId()
     const safeVersion = safeDeploymentConfig?.safeVersion || DEFAULT_SAFE_VERSION
     const saltNonce = safeDeploymentConfig?.saltNonce || getChainSpecificDefaultSaltNonce(chainId)
+
+    // we only check if the safe is deployed if safeVersion >= 1.3.0
+    if (hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      const isSafeDeployed = await this.isSafeDeployed()
+
+      // if the safe is already deployed throws an error
+      if (isSafeDeployed) {
+        throw new Error('Safe already deployed')
+      }
+    }
 
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]

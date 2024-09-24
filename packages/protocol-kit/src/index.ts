@@ -25,7 +25,8 @@ import {
   encodeCreateProxyWithNonce,
   encodeSetupCallData,
   predictSafeAddress,
-  getPredictedSafeAddressInitCode
+  getPredictedSafeAddressInitCode,
+  getSafeAddressFromDeploymentTx
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
 import {
@@ -115,6 +116,7 @@ export {
   preimageSafeMessageHash,
   getEip712TxTypes,
   getEip712MessageTypes,
+  getSafeAddressFromDeploymentTx,
   hashSafeMessage,
   generateTypedData,
   SafeProvider,

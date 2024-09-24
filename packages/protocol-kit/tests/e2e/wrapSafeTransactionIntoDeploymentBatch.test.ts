@@ -142,9 +142,17 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
       const [, account2] = accounts
 
+      const customSaltNonce = '123456789'
+
       const safeSdk = await Safe.init({
         provider,
-        predictedSafe,
+        predictedSafe: {
+          ...predictedSafe,
+          safeDeploymentConfig: {
+            ...predictedSafe.safeDeploymentConfig,
+            saltNonce: customSaltNonce
+          }
+        },
         contractNetworks
       })
 
@@ -158,13 +166,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
         transactions: [safeTransactionData]
       })
 
-      const customSaltNonce = '123456789'
-
-      const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(
-        safeTransaction,
-        {}, // transaction options
-        customSaltNonce
-      )
+      const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
       const customSaltNonceEncoded = safeSdk
         .getSafeProvider()

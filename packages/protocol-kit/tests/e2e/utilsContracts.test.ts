@@ -5,6 +5,7 @@ import { getContractNetworks } from './utils/setupContractNetworks'
 import { getDefaultCallbackHandler } from './utils/setupContracts'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
+  getSafeAddressFromDeploymentTx,
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
 } from '@safe-global/protocol-kit/contracts/utils'
@@ -19,12 +20,14 @@ import {
 import Safe from '@safe-global/protocol-kit/index'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { itif } from './utils/helpers'
+import { waitTransactionReceipt } from './utils/transactions'
 
 // test util funcion to deploy a safe (needed to check the expected Safe Address)
 async function deploySafe(
   predictedSafeProps: PredictedSafeProps,
   provider: Eip1193Provider,
   contractNetworks: ContractNetworksConfig,
+  signer,
   signerAddress?: string
 ): Promise<Safe> {
   const safeSDK = await Safe.init({
@@ -40,13 +43,28 @@ async function deploySafe(
     contractNetworks
   })
 
-  return await safeSDK.deploy()
+  const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+  const txHash = await signer.sendTransaction(deploymentTransaction)
+
+  const txReceipt = await waitTransactionReceipt(txHash)
+
+  const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+  const safeSDKDeployed = await Safe.init({
+    provider,
+    contractNetworks,
+    safeAddress
+  })
+
+  return safeSDKDeployed
 }
 
 describe('Contract utils', () => {
   const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
     await deployments.fixture()
     const accounts = await getAccounts()
+    const signer = accounts[0].signer
     const chainId = BigInt(await getChainId())
     const contractNetworks = await getContractNetworks(chainId)
     const provider = getEip1193Provider()
@@ -56,13 +74,14 @@ describe('Contract utils', () => {
       chainId,
       accounts,
       contractNetworks,
-      provider
+      provider,
+      signer
     }
   })
 
   describe('predictSafeAddress', () => {
     it('returns the predicted address of a 1/1 Safe', async () => {
-      const { accounts, contractNetworks, chainId, provider } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider, signer } = await setupTests()
 
       // 1/1 Safe
       const [owner1] = accounts
@@ -95,6 +114,7 @@ describe('Contract utils', () => {
         { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -107,7 +127,7 @@ describe('Contract utils', () => {
     })
 
     it('returns the predicted address of a 1/2 Safe', async () => {
-      const { accounts, contractNetworks, chainId, provider } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider, signer } = await setupTests()
 
       // 1/2 Safe
       const [owner1, owner2] = accounts
@@ -140,6 +160,7 @@ describe('Contract utils', () => {
         { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -152,7 +173,7 @@ describe('Contract utils', () => {
     })
 
     it('returns the predicted address of a 2/2 Safe', async () => {
-      const { accounts, contractNetworks, chainId, provider } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider, signer } = await setupTests()
 
       // 2/2 Safe
       const [owner1, owner2] = accounts
@@ -185,6 +206,7 @@ describe('Contract utils', () => {
         { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -332,7 +354,7 @@ describe('Contract utils', () => {
     })
 
     it('returns different addresses with different saltNonce value but same Safe config (threshold & owners)', async () => {
-      const { accounts, contractNetworks, chainId, provider } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider, signer } = await setupTests()
 
       // 1/2 Safe
       const [owner1, owner2] = accounts
@@ -367,6 +389,7 @@ describe('Contract utils', () => {
         { safeAccountConfig, safeDeploymentConfig: { saltNonce: firstSaltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -391,6 +414,7 @@ describe('Contract utils', () => {
         { safeAccountConfig, safeDeploymentConfig: { saltNonce: secondSaltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -415,6 +439,7 @@ describe('Contract utils', () => {
         { safeAccountConfig, safeDeploymentConfig: { saltNonce: thirdSaltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -425,7 +450,7 @@ describe('Contract utils', () => {
     })
 
     it('returns the same predicted address for multiple calls to predictedSafeAddress with the same config (owners, threshold & saltNonce)', async () => {
-      const { accounts, contractNetworks, chainId, provider } = await setupTests()
+      const { accounts, contractNetworks, chainId, provider, signer } = await setupTests()
 
       // 2/2 Safe
       const [owner1, owner2] = accounts
@@ -450,6 +475,7 @@ describe('Contract utils', () => {
         { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -490,7 +516,7 @@ describe('Contract utils', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'safeDeploymentConfig is an optional parameter',
       async () => {
-        const { accounts, contractNetworks, chainId, provider } = await setupTests()
+        const { accounts, contractNetworks, chainId, provider, signer } = await setupTests()
 
         // 1/1 Safe
         const [owner1] = accounts
@@ -517,6 +543,7 @@ describe('Contract utils', () => {
           { safeAccountConfig },
           provider,
           contractNetworks,
+          signer,
           owner1.address
         )
 

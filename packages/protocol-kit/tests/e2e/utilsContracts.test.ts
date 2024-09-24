@@ -652,7 +652,7 @@ describe('Contract utils', () => {
       }
     )
 
-    itif(safeVersionDeployed === '1.3.0')(
+    itif(safeVersionDeployed >= '1.3.0')(
       'returns the same predicted address based on the deploymentType for different chains',
       async () => {
         const { accounts } = await setupTests()

@@ -166,8 +166,14 @@ export function getContractInfo(contractAddress: string): ContractInfo | undefin
       ) as SingletonDeployment
 
       if (deployment && deployment.networkAddresses) {
-        for (const [, address] of Object.entries(deployment.networkAddresses)) {
-          if (address.toLowerCase() === contractAddress.toLowerCase()) {
+        for (const [, addresses] of Object.entries(deployment.networkAddresses)) {
+          console.log(addresses, contractAddress)
+          if (
+            (Array.isArray(addresses) &&
+              addresses.find((a) => a.toLowerCase() === contractAddress.toLowerCase())) ||
+            (typeof addresses === 'string' &&
+              addresses.toLowerCase() === contractAddress.toLowerCase())
+          ) {
             const types = Object.keys(deployment.deployments) as DeploymentType[]
 
             const type = types.find(

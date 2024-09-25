@@ -1,5 +1,13 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
-import { safeVersionDeployed } from '@safe-global/testing-kit'
+import {
+  getCompatibilityFallbackHandler,
+  getDefaultCallbackHandler,
+  getFactory,
+  itif,
+  safeVersionDeployed,
+  setupTests,
+  waitTransactionReceipt
+} from '@safe-global/testing-kit'
 import Safe, {
   getSafeAddressFromDeploymentTx,
   PredictedSafeProps,
@@ -8,40 +16,17 @@ import Safe, {
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { itif } from './utils/helpers'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import {
-  getCompatibilityFallbackHandler,
-  getDefaultCallbackHandler,
-  getFactory
-} from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
-import { waitTransactionReceipt } from './utils/transactions'
+// import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 
 describe('Safe Deployment', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const provider = getEip1193Provider()
-
-    return {
-      defaultCallbackHandler: await getDefaultCallbackHandler(),
-      chainId,
-      accounts,
-      contractNetworks,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   describe('init', async () => {
     it('should fail if the SafeProxyFactory contract provided is not deployed', async () => {
-      const { chainId, provider, accounts, contractNetworks } = await setupTests()
+      const { chainId, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -75,7 +60,7 @@ describe('Safe Deployment', () => {
 
   describe('predictSafeAddress', async () => {
     it('should fail if there are no owners', async () => {
-      const { contractNetworks, provider } = await setupTests()
+      const { contractNetworks } = await setupTests()
       const owners: string[] = []
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
@@ -96,7 +81,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should fail if the threshold is lower than 0', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const invalidThreshold = 0
@@ -118,7 +103,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should fail if the threshold is higher than the number of owners', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const invalidThreshold = 3
@@ -140,7 +125,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should fail if the saltNonce is lower than 0', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -164,7 +149,7 @@ describe('Safe Deployment', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail if the safe Version is lower than 1.3.0',
       async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
+        const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const owners = [account1.address, account2.address]
         const threshold = 2
@@ -189,7 +174,7 @@ describe('Safe Deployment', () => {
     )
 
     itif(safeVersionDeployed >= '1.3.0')('should predict a new Safe with saltNonce', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -215,13 +200,13 @@ describe('Safe Deployment', () => {
       chai.expect(threshold).to.be.eq(await safeSDK.getThreshold())
       const deployedSafeOwners = await safeSDK.getOwners()
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
-      chai.expect(await safeSDK.getContractVersion()).to.be.eq(safeVersionDeployed)
+      chai.expect(safeSDK.getContractVersion()).to.be.eq(safeVersionDeployed)
     })
 
     itif(safeVersionDeployed > '1.0.0')(
       'should predict a new Safe with the default CompatibilityFallbackHandler',
       async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
+        const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const owners = [account1.address, account2.address]
         const threshold = 2
@@ -258,17 +243,18 @@ describe('Safe Deployment', () => {
         chai
           .expect(compatibilityFallbackHandler)
           .to.be.eq(await safeSDKDeployed.getFallbackHandler())
-        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+        chai.expect(safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
       }
     )
 
     itif(safeVersionDeployed > '1.3.0')(
       'should predict a new Safe with a custom fallback handler',
       async () => {
-        const { accounts, contractNetworks, defaultCallbackHandler, provider } = await setupTests()
+        const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const owners = [account1.address, account2.address]
         const threshold = 2
+        const defaultCallbackHandler = await getDefaultCallbackHandler()
         const safeAccountConfig: SafeAccountConfig = {
           owners,
           threshold,
@@ -310,7 +296,7 @@ describe('Safe Deployment', () => {
 
   describe('deploySafe', async () => {
     itif(safeVersionDeployed >= '1.3.0')('should fail if the Safe is deployed', async () => {
-      const { contractNetworks, provider, accounts } = await setupTests()
+      const { contractNetworks, accounts } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -343,7 +329,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should fail if there are no owners', async () => {
-      const { contractNetworks, provider } = await setupTests()
+      const { contractNetworks } = await setupTests()
       const owners: string[] = []
       const threshold = 2
       const safeAccountConfig: SafeAccountConfig = { owners, threshold }
@@ -366,7 +352,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should fail if the threshold is lower than 0', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 0
@@ -390,7 +376,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should fail if the threshold is higher than the number of owners', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 3
@@ -415,7 +401,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should fail if the saltNonce is lower than 0', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -444,7 +430,7 @@ describe('Safe Deployment', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'should deploy a new Safe with custom fallback handler',
       async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
+        const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const owners = [account1.address, account2.address]
         const threshold = 2
@@ -503,7 +489,7 @@ describe('Safe Deployment', () => {
     itif(safeVersionDeployed > '1.0.0')(
       'should deploy a new Safe with the default CompatibilityFallbackHandler',
       async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
+        const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const owners = [account1.address, account2.address]
         const threshold = 2
@@ -558,7 +544,7 @@ describe('Safe Deployment', () => {
     )
 
     it('should deploy a new Safe without saltNonce', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -607,7 +593,7 @@ describe('Safe Deployment', () => {
     })
 
     it('should deploy a new Safe with saltNonce', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -653,14 +639,14 @@ describe('Safe Deployment', () => {
       chai.expect(deployedSafeOwners.toString()).to.be.eq(owners.toString())
       chai.expect(deployedSafeThreshold).to.be.eq(threshold)
       chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-      chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+      chai.expect(safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
     itif(safeVersionDeployed == '1.3.0')(
       'should deploy the v1.3.0 Safe version by default',
       async () => {
-        const { accounts, contractNetworks, provider } = await setupTests()
+        const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts
         const owners = [account1.address, account2.address]
         const threshold = 2
@@ -693,17 +679,14 @@ describe('Safe Deployment', () => {
           safeAddress
         })
 
-        const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-        chai.expect(safeInstanceVersion).to.be.eq(DEFAULT_SAFE_VERSION)
         chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-        chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(DEFAULT_SAFE_VERSION)
+        chai.expect(safeSDKDeployed.getContractVersion()).to.be.eq(DEFAULT_SAFE_VERSION)
         chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
       }
     )
 
     it('should deploy a specific Safe version', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const owners = [account1.address, account2.address]
       const threshold = 2
@@ -741,11 +724,8 @@ describe('Safe Deployment', () => {
         safeAddress
       })
 
-      const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-      chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
       chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-      chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+      chai.expect(safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
@@ -753,7 +733,7 @@ describe('Safe Deployment', () => {
       itif(safeVersionDeployed >= '1.3.0')(
         'should deploy the Safe Account and execute one transaction',
         async () => {
-          const { accounts, contractNetworks, provider } = await setupTests()
+          const { accounts, contractNetworks } = await setupTests()
           const [account1, account2] = accounts
           const owners = [account1.address, account2.address]
           const threshold = 1
@@ -800,18 +780,15 @@ describe('Safe Deployment', () => {
             safeAddress
           })
 
-          const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-          chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
           chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-          chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+          chai.expect(safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
           chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
         }
       )
       itif(safeVersionDeployed >= '1.3.0')(
         'should deploy the Safe Account and execute a batch of transactions',
         async () => {
-          const { accounts, contractNetworks, provider } = await setupTests()
+          const { accounts, contractNetworks } = await setupTests()
           const [account1, account2] = accounts
           const owners = [account1.address, account2.address]
           const threshold = 1
@@ -867,11 +844,8 @@ describe('Safe Deployment', () => {
             safeAddress
           })
 
-          const safeInstanceVersion = await safeSDKDeployed.getContractVersion()
-
-          chai.expect(safeInstanceVersion).to.be.eq(safeVersionDeployed)
           chai.expect(await safeSDKDeployed.isSafeDeployed()).to.be.true
-          chai.expect(await safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
+          chai.expect(safeSDKDeployed.getContractVersion()).to.be.eq(safeVersionDeployed)
           chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(1)
         }
       )
@@ -879,7 +853,7 @@ describe('Safe Deployment', () => {
       itif(safeVersionDeployed < '1.3.0')(
         'Account Abstraction functionality is not available for Safes with version lower than v1.3.0',
         async () => {
-          const { accounts, contractNetworks, provider } = await setupTests()
+          const { accounts, contractNetworks } = await setupTests()
           const [account1, account2] = accounts
           const owners = [account1.address, account2.address]
           const threshold = 1

@@ -10,6 +10,7 @@ import {
 } from 'viem'
 import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   EncodeFunction,
@@ -70,7 +71,8 @@ class BaseContract<ContractAbiType extends Abi> {
     defaultAbi: ContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: ContractAbiType
+    customContractAbi?: ContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
@@ -81,8 +83,8 @@ class BaseContract<ContractAbiType extends Abi> {
       throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
     }
 
-    const customDeploymentTypeAddress = safeProvider.deploymentType
-      ? deployment?.deployments[safeProvider.deploymentType]?.address
+    const customDeploymentTypeAddress = deploymentType
+      ? deployment?.deployments[deploymentType]?.address
       : undefined
 
     this.chainId = chainId

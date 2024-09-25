@@ -30,8 +30,7 @@ import {
   SocketTransport,
   SafeSigner,
   PasskeyArgType,
-  PasskeyClient,
-  DeploymentType
+  PasskeyClient
 } from '@safe-global/protocol-kit/types'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import { asHash, asHex, getChainById } from './utils/types'
@@ -78,7 +77,6 @@ class SafeProvider {
   #externalProvider: ExternalClient
   signer?: SafeSigner
   provider: Eip1193Provider | HttpTransport | SocketTransport
-  #deploymentType?: DeploymentType
 
   constructor({
     provider,
@@ -86,7 +84,6 @@ class SafeProvider {
   }: {
     provider: SafeProviderConfig['provider']
     signer?: SafeSigner
-    deploymentType?: DeploymentType
   }) {
     this.#externalProvider = createPublicClient({
       transport: isEip1193Provider(provider)
@@ -109,8 +106,7 @@ class SafeProvider {
     safeVersion = DEFAULT_SAFE_VERSION,
     contractNetworks,
     safeAddress,
-    owners,
-    deploymentType
+    owners
   }: SafeProviderInitOptions): Promise<SafeProvider> {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
@@ -159,14 +155,12 @@ class SafeProvider {
 
       return new SafeProvider({
         provider,
-        signer: passkeySigner,
-        deploymentType
+        signer: passkeySigner
       })
     } else {
       return new SafeProvider({
         provider,
-        signer,
-        deploymentType
+        signer
       })
     }
   }

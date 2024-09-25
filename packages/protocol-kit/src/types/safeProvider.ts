@@ -11,7 +11,7 @@ import {
   Hex
 } from 'viem'
 import { SafeVersion } from '@safe-global/types-kit'
-import { DeploymentType, ContractNetworksConfig } from '@safe-global/protocol-kit/types'
+import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 
 export type RequestArguments = {
   readonly method: string
@@ -65,7 +65,6 @@ export type SafeProviderInitOptions = {
   contractNetworks?: ContractNetworksConfig
   safeAddress?: string
   owners?: string[]
-  deploymentType?: DeploymentType
 }
 
 export type SafeProviderTransaction = {

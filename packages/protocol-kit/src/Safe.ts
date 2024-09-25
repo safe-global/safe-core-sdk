@@ -122,14 +122,13 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async #initializeProtocolKit(config: SafeConfig) {
-    const { provider, signer, isL1SafeSingleton, contractNetworks, predictedSafe } = config
+    const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
     this.#safeProvider = await SafeProvider.init({
       provider,
       signer,
       safeVersion: DEFAULT_SAFE_VERSION,
-      contractNetworks,
-      deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
+      contractNetworks
     })
 
     if (isSafeConfigWithPredictedSafe(config)) {
@@ -176,8 +175,7 @@ class Safe {
         safeVersion,
         contractNetworks,
         safeAddress,
-        owners,
-        deploymentType: this.#safeProvider.deploymentType
+        owners
       })
     }
   }

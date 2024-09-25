@@ -4,7 +4,6 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class  CompatibilityFallbackHandlerBaseContract extends BaseContract to specifically integrate with the CompatibilityFallbackHandler contract.
@@ -41,8 +40,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     defaultAbi: CompatibilityFallbackHandlerContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
-    runner?: ExternalClient
+    customContractAbi?: CompatibilityFallbackHandlerContractAbiType
   ) {
     const contractName = 'compatibilityFallbackHandler'
 
@@ -53,8 +51,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi,
-      runner
+      customContractAbi
     )
 
     this.contractName = contractName

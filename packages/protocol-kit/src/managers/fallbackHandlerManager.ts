@@ -47,7 +47,7 @@ class FallbackHandlerManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    const safeVersion = await this.#safeContract.getVersion()
+    const safeVersion = this.#safeContract.safeVersion
     if (!hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
       throw new Error(
         'Current version of the Safe does not support the fallback handler functionality'

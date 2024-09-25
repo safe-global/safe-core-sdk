@@ -72,8 +72,8 @@ import {
 import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
-  getMultiSendCallOnlyContract,
-  getProxyFactoryContract
+  getSafeProxyFactoryContract,
+  getSafeContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
@@ -155,14 +155,8 @@ class Safe {
       )
     }
 
-    const safeVersion = await this.getContractVersion()
-    this.#safeProvider = await SafeProvider.init({
-      provider,
-      signer,
-      safeVersion,
-      contractNetworks,
-      deploymentType: this.#safeProvider.deploymentType
-    })
+    const safeVersion = this.getContractVersion()
+    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
 
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
@@ -272,7 +266,7 @@ class Safe {
    */
   async getAddress(): Promise<string> {
     if (this.#predictedSafe) {
-      const safeVersion = await this.getContractVersion()
+      const safeVersion = this.getContractVersion()
       if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
         throw new Error(
           'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
@@ -347,16 +341,16 @@ class Safe {
    *
    * @returns The Safe Singleton contract version
    */
-  async getContractVersion(): Promise<SafeVersion> {
+  getContractVersion(): SafeVersion {
     if (this.#contractManager.safeContract) {
-      return this.#contractManager.safeContract.getVersion()
+      return this.#contractManager.safeContract.safeVersion
     }
 
     if (this.#predictedSafe?.safeDeploymentConfig?.safeVersion) {
-      return Promise.resolve(this.#predictedSafe.safeDeploymentConfig.safeVersion)
+      return this.#predictedSafe.safeDeploymentConfig.safeVersion
     }
 
-    return Promise.resolve(DEFAULT_SAFE_VERSION)
+    return DEFAULT_SAFE_VERSION
   }
 
   /**
@@ -497,7 +491,7 @@ class Safe {
     onlyCalls = false,
     options
   }: CreateTransactionProps): Promise<SafeTransaction> {
-    const safeVersion = await this.getContractVersion()
+    const safeVersion = this.getContractVersion()
     if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
       throw new Error(
         'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
@@ -604,7 +598,7 @@ class Safe {
    */
   async getTransactionHash(safeTransaction: SafeTransaction): Promise<string> {
     const safeAddress = await this.getAddress()
-    const safeVersion = await this.getContractVersion()
+    const safeVersion = this.getContractVersion()
     const chainId = await this.getChainId()
 
     return calculateSafeTransactionHash(safeAddress, safeTransaction.data, safeVersion, chainId)
@@ -661,20 +655,17 @@ class Safe {
     signingMethod: SigningMethodType = SigningMethod.ETH_SIGN_TYPED_DATA_V4,
     preimageSafeAddress?: string
   ): Promise<SafeMessage> {
-    const owners = await this.getOwners()
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
 
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
+    const addressIsOwner = await this.isOwner(signerAddress)
     if (!addressIsOwner) {
       throw new Error('Messages can only be signed by Safe owners')
     }
 
-    const safeVersion = await this.getContractVersion()
+    const safeVersion = this.getContractVersion()
     if (
       signingMethod === SigningMethod.SAFE_SIGNATURE &&
       semverSatisfies(safeVersion, EQ_OR_GT_1_4_1) &&
@@ -743,7 +734,7 @@ class Safe {
   ): Promise<SafeSignature> {
     const safeEIP712Args: SafeEIP712Args = {
       safeAddress: await this.getAddress(),
-      safeVersion: await this.getContractVersion(),
+      safeVersion: this.getContractVersion(),
       chainId: await this.#safeProvider.getChainId(),
       data: eip712Data.data
     }
@@ -772,21 +763,17 @@ class Safe {
       ? await this.toSafeTransactionType(safeTransaction)
       : safeTransaction
 
-    const owners = await this.getOwners()
     const signerAddress = await this.#safeProvider.getSignerAddress()
-
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
 
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
+    const addressIsOwner = await this.isOwner(signerAddress)
     if (!addressIsOwner) {
       throw new Error('Transactions can only be signed by Safe owners')
     }
 
-    const safeVersion = await this.getContractVersion()
+    const safeVersion = this.getContractVersion()
     if (
       signingMethod === SigningMethod.SAFE_SIGNATURE &&
       semverSatisfies(safeVersion, EQ_OR_GT_1_3_0) &&
@@ -810,7 +797,7 @@ class Safe {
     } else if (signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA) {
       signature = await this.signTypedData(transaction, undefined)
     } else {
-      const safeVersion = await this.getContractVersion()
+      const safeVersion = this.getContractVersion()
       const chainId = await this.getChainId()
       if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
@@ -863,14 +850,12 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    const owners = await this.getOwners()
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && sameString(owner, signerAddress)
-    )
+
+    const addressIsOwner = await this.isOwner(signerAddress)
     if (!addressIsOwner) {
       throw new Error('Transaction hashes can only be approved by Safe owners')
     }
@@ -1277,12 +1262,14 @@ class Safe {
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
-    const owners = await this.getOwners()
+
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
-      throw new Error('SafeProvider must be initialized with a signer to use this method')
+      throw new Error('The protocol-kit requires a signer to use this method')
     }
-    if (owners.includes(signerAddress)) {
+
+    const addressIsOwner = await this.isOwner(signerAddress)
+    if (addressIsOwner) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
@@ -1324,14 +1311,13 @@ class Safe {
     for (const owner of ownersWhoApprovedTx) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
     }
-    const owners = await this.getOwners()
     const threshold = await this.getThreshold()
     const signerAddress = await this.#safeProvider.getSignerAddress()
-    if (
-      threshold > signedSafeTransaction.signatures.size &&
-      signerAddress &&
-      owners.includes(signerAddress)
-    ) {
+    if (!signerAddress) {
+      throw new Error('The protocol-kit requires a signer to use this method')
+    }
+    const addressIsOwner = await this.isOwner(signerAddress)
+    if (threshold > signedSafeTransaction.signatures.size && addressIsOwner) {
       signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
     }
 
@@ -1371,16 +1357,16 @@ class Safe {
    *
    */
   async getEncodedTransaction(safeTransaction: SafeTransaction): Promise<string> {
-    const safeVersion = await this.getContractVersion()
+    const safeVersion = this.getContractVersion()
     const chainId = await this.getChainId()
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
 
-    const safeSingletonContract = await this.#safeProvider.getSafeContract({
+    const safeSingletonContract = await getSafeContract({
+      safeProvider: this.#safeProvider,
       safeVersion,
       isL1SafeSingleton,
-      customContractAbi: customContracts?.safeSingletonAbi,
-      customContractAddress: customContracts?.safeSingletonAddress
+      customContracts
     })
 
     const encodedTransaction = safeSingletonContract.encode('execTransaction', [
@@ -1476,21 +1462,21 @@ class Safe {
 
     const { safeAccountConfig, safeDeploymentConfig } = this.#predictedSafe
 
-    const safeVersion = await this.getContractVersion()
+    const safeVersion = this.getContractVersion()
     const safeProvider = this.#safeProvider
     const chainId = await safeProvider.getChainId()
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
-    const safeSingletonContract = await safeProvider.getSafeContract({
+    const safeSingletonContract = await getSafeContract({
+      safeProvider,
       safeVersion,
       isL1SafeSingleton,
-      customContractAddress: customContracts?.safeSingletonAddress,
-      customContractAbi: customContracts?.safeSingletonAbi
+      customContracts
     })
 
     // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol
-    const safeProxyFactoryContract = await getProxyFactoryContract({
+    const safeProxyFactoryContract = await getSafeProxyFactoryContract({
       safeProvider,
       safeVersion,
       customContracts
@@ -1539,14 +1525,8 @@ class Safe {
     transactions: MetaTransactionData[],
     transactionOptions?: TransactionOptions
   ): Promise<Transaction> {
-    const chainId = await this.#safeProvider.getChainId()
-
     // we use the MultiSend contract to create the batch, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/libraries/MultiSendCallOnly.sol
-    const multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
-      safeProvider: this.#safeProvider,
-      safeVersion: await this.getContractVersion(),
-      customContracts: this.#contractManager.contractNetworks?.[chainId.toString()]
-    })
+    const multiSendCallOnlyContract = this.#contractManager.multiSendCallOnlyContract
 
     // multiSend method with the transactions encoded
     const batchData = multiSendCallOnlyContract.encode('multiSend', [
@@ -1573,8 +1553,7 @@ class Safe {
       throw new Error('Safe is not deployed')
     }
 
-    const safeVersion =
-      (await this.#contractManager.safeContract.getVersion()) ?? DEFAULT_SAFE_VERSION
+    const safeVersion = this.#contractManager.safeContract.safeVersion ?? DEFAULT_SAFE_VERSION
     const chainId = await this.#safeProvider.getChainId()
 
     const compatibilityFallbackHandlerContract = await getCompatibilityFallbackHandlerContract({
@@ -1595,7 +1574,7 @@ class Safe {
    */
   getSafeMessageHash = async (messageHash: string): Promise<string> => {
     const safeAddress = await this.getAddress()
-    const safeVersion = await this.getContractVersion()
+    const safeVersion = this.getContractVersion()
     const chainId = await this.getChainId()
 
     return calculateSafeMessageHash(safeAddress, messageHash, safeVersion, chainId)

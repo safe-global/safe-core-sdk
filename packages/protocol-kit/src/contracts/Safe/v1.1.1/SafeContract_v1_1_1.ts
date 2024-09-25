@@ -4,7 +4,6 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import { sameString } from '@safe-global/protocol-kit/utils'
 import {
-  SafeVersion,
   SafeContract_v1_1_1_Abi,
   SafeContract_v1_1_1_Contract,
   SafeContract_v1_1_1_Function,
@@ -28,8 +27,6 @@ class SafeContract_v1_1_1
   extends SafeBaseContract<SafeContract_v1_1_1_Abi>
   implements SafeContract_v1_1_1_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SafeContract_v1_1_1
    *
@@ -58,8 +55,6 @@ class SafeContract_v1_1_1
       customContractAddress,
       customContractAbi
     )
-
-    this.safeVersion = safeVersion
   }
 
   /**
@@ -286,7 +281,7 @@ class SafeContract_v1_1_1
           options
         ))
 
-      const converted = await this.convertOptions({ ...options, gasLimit })
+      const converted = this.convertOptions({ ...options, gasLimit })
       const txResult = await simulateContract(this.runner, {
         address: this.contractAddress,
         functionName: 'execTransaction',
@@ -310,16 +305,6 @@ class SafeContract_v1_1_1
     } catch (error) {
       return false
     }
-  }
-
-  /**
-   * returns the version of the Safe contract.
-   *
-   * @returns {Promise<SafeVersion>} A promise that resolves to the version of the Safe contract as string.
-   */
-  async getVersion(): Promise<SafeVersion> {
-    const [safeVersion] = await this.VERSION()
-    return safeVersion as SafeVersion
   }
 
   /**

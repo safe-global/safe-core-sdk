@@ -4,7 +4,8 @@ import Safe, {
   buildSignatureBytes,
   preimageSafeMessageHash,
   buildContractSignature,
-  EthSafeSignature
+  EthSafeSignature,
+  getSignMessageLibContract
 } from '@safe-global/protocol-kit/index'
 import {
   safeVersionDeployed,
@@ -107,14 +108,14 @@ describe('The EIP1271 implementation', () => {
       async () => {
         const { chainId, contractNetworks, safeSdk1, safeSdk2 } = await setupTests()
 
-        const safeVersion = await safeSdk1.getContractVersion()
+        const safeVersion = safeSdk1.getContractVersion()
 
-        const customContract = contractNetworks[chainId.toString()]
+        const customContracts = contractNetworks[chainId.toString()]
 
-        const signMessageLibContract = await safeSdk1.getSafeProvider().getSignMessageLibContract({
+        const signMessageLibContract = await getSignMessageLibContract({
+          safeProvider: safeSdk1.getSafeProvider(),
           safeVersion,
-          customContractAddress: customContract.signMessageLibAddress,
-          customContractAbi: customContract.signMessageLibAbi
+          customContracts
         })
 
         const messageHash = hashSafeMessage(MESSAGE)
@@ -122,7 +123,7 @@ describe('The EIP1271 implementation', () => {
         const txData = signMessageLibContract.encode('signMessage', [asHash(messageHash)])
 
         const safeTransactionData: SafeTransactionDataPartial = {
-          to: customContract.signMessageLibAddress,
+          to: customContracts.signMessageLibAddress,
           value: '0',
           data: txData,
           operation: OperationType.DelegateCall
@@ -219,14 +220,11 @@ describe('The EIP1271 implementation', () => {
           const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE), 'v4')
 
           // Sign with the Smart contract
-          const shouldPreimageMessage = semverSatisfies(
-            await safeSdk1.getContractVersion(),
-            '>=1.4.1'
-          )
+          const shouldPreimageMessage = semverSatisfies(safeSdk1.getContractVersion(), '>=1.4.1')
           const messageHashData = preimageSafeMessageHash(
             safeAddress,
             messageHash,
-            await safeSdk1.getContractVersion(),
+            safeSdk1.getContractVersion(),
             chainId
           )
           const safeSignerMessageHash = await safeSdk3.getSafeMessageHash(
@@ -267,14 +265,11 @@ describe('The EIP1271 implementation', () => {
           const safeMessageHash = await safeSdk1.getSafeMessageHash(txHash)
           const signature1 = await safeSdk1.signHash(safeMessageHash)
 
-          const shouldPreimageTxHash = semverSatisfies(
-            await safeSdk1.getContractVersion(),
-            '>=1.4.1'
-          )
+          const shouldPreimageTxHash = semverSatisfies(safeSdk1.getContractVersion(), '>=1.4.1')
           const txHashData = preimageSafeMessageHash(
             safeAddress,
             txHash,
-            await safeSdk1.getContractVersion(),
+            safeSdk1.getContractVersion(),
             chainId
           )
 

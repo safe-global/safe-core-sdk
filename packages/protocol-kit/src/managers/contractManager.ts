@@ -14,6 +14,7 @@ import {
 import { SafeVersion } from '@safe-global/types-kit'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 import SafeProvider from '../SafeProvider'
+import { getSafeContractVersion } from '@safe-global/protocol-kit/contracts/utils'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
@@ -41,30 +42,21 @@ class ContractManager {
     if (isSafeConfigWithPredictedSafe(config)) {
       safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
     } else {
-      // We use the default version of the Safe contract to get the correct version of this Safe
-      const defaultSafeContractInstance = await getSafeContract({
+      try {
+        // We try to fetch the version of the Safe from the blockchain
+        safeVersion = await getSafeContractVersion(safeProvider, safeAddress as string)
+      } catch (e) {
+        // if contract is not deployed we use the default version
+        safeVersion = DEFAULT_SAFE_VERSION
+      }
+
+      this.#safeContract = await getSafeContract({
         safeProvider,
-        safeVersion: DEFAULT_SAFE_VERSION,
+        safeVersion,
         isL1SafeSingleton,
         customSafeAddress: safeAddress,
         customContracts
       })
-
-      // We check the correct version of the Safe from the blockchain
-      safeVersion = await defaultSafeContractInstance.getVersion()
-
-      // We get the correct Safe Contract if the real Safe version is not the lastest
-      const isTheDefaultSafeVersion = safeVersion === DEFAULT_SAFE_VERSION
-
-      this.#safeContract = isTheDefaultSafeVersion
-        ? defaultSafeContractInstance
-        : await getSafeContract({
-            safeProvider,
-            safeVersion,
-            isL1SafeSingleton,
-            customSafeAddress: safeAddress,
-            customContracts
-          })
     }
 
     this.#multiSendContract = await getMultiSendContract({

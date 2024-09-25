@@ -1,11 +1,6 @@
-import { PasskeyArgType } from '../../types/passkeys'
-import {
-  SafeWebAuthnSignerFactoryContractImplementationType,
-  SafeWebAuthnSharedSignerContractImplementationType
-} from '../../types/contracts'
-import { getDefaultFCLP256VerifierAddress, hexStringToUint8Array } from './extractPasskeyData'
 import {
   Hex,
+  hexToBytes,
   encodeAbiParameters,
   toHex,
   toBytes,
@@ -17,12 +12,19 @@ import {
   walletActions,
   maxUint256,
   Client,
+  fromBytes,
   fromHex,
   parseAbiParameters,
   encodeFunctionData,
   parseAbi
 } from 'viem'
-import { PasskeyClient } from '@safe-global/protocol-kit/types'
+import {
+  PasskeyArgType,
+  PasskeyClient,
+  SafeWebAuthnSignerFactoryContractImplementationType,
+  SafeWebAuthnSharedSignerContractImplementationType
+} from '@safe-global/protocol-kit/types'
+import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { asHex } from '../types'
 import isSharedSigner from './isSharedSigner'
 
@@ -69,7 +71,7 @@ export const createPasskeyClient = async (
   chainId: string
 ) => {
   const { rawId, coordinates, customVerifierAddress } = passkey
-  const passkeyRawId = hexStringToUint8Array(rawId)
+  const passkeyRawId = hexToBytes(asHex(rawId))
   const verifierAddress = customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
 
   const isPasskeySharedSigner = await isSharedSigner(
@@ -117,7 +119,7 @@ export const createPasskeyClient = async (
             {
               x: BigInt(passkey.coordinates.x),
               y: BigInt(passkey.coordinates.y),
-              verifiers: fromHex(verifierAddress as Hex, 'bigint')
+              verifiers: fromHex(asHex(verifierAddress), 'bigint')
             }
           ]
         })
@@ -198,7 +200,7 @@ function extractSignature(signature: ArrayBuffer): [bigint, bigint] {
     const len = view.getUint8(offset + 1)
     const start = offset + 2
     const end = start + len
-    const n = fromHex(toHex(new Uint8Array(view.buffer.slice(start, end))), 'bigint')
+    const n = fromBytes(new Uint8Array(view.buffer.slice(start, end)), 'bigint')
     check(n < maxUint256)
     return [n, end] as const
   }

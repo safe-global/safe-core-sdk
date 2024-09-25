@@ -6,6 +6,7 @@ import {
   isAddress,
   keccak256,
   pad,
+  parseAbi,
   toHex,
   Client,
   WalletClient
@@ -26,7 +27,7 @@ import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
   getCompatibilityFallbackHandlerContract,
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
 import {
@@ -115,7 +116,7 @@ export async function encodeSetupCallData({
     paymentReceiver = ZERO_ADDRESS
   } = safeAccountConfig
 
-  const safeVersion = customSafeVersion || (await safeContract.getVersion())
+  const safeVersion = customSafeVersion || safeContract.safeVersion
 
   if (semverSatisfies(safeVersion, '<=1.0.0')) {
     return safeContract.encode('setup', [
@@ -159,7 +160,7 @@ type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & { cha
 
 const memoizedGetProxyFactoryContract = createMemoizedFunction(
   ({ safeProvider, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
-    getProxyFactoryContract({ safeProvider, safeVersion, customContracts })
+    getSafeProxyFactoryContract({ safeProvider, safeVersion, customContracts })
 )
 
 const memoizedGetProxyCreationCode = createMemoizedFunction(
@@ -189,6 +190,26 @@ const memoizedGetSafeContract = createMemoizedFunction(
   }: MemoizedGetSafeContractInstanceProps) =>
     getSafeContract({ safeProvider, safeVersion, isL1SafeSingleton, customContracts })
 )
+
+/**
+ * Retrieves the version of the Safe contract associated with the given Safe address from the blockchain.
+ *
+ * @param {SafeProvider} safeProvider The provider to use when reading the contract.
+ * @param {string} safeAddress The address of the Safe contract for which to retrieve the version.
+ *
+ * @returns {Promise<SafeVersion>} A promise resolving to the version of the Safe contract.
+ * @throws when fetching an address which doesn't have a Safe deployed in it.
+ */
+export async function getSafeContractVersion(
+  safeProvider: SafeProvider,
+  safeAddress: string
+): Promise<SafeVersion> {
+  return (await safeProvider.readContract({
+    address: safeAddress,
+    abi: parseAbi(['function VERSION() view returns (string)']),
+    functionName: 'VERSION'
+  })) as SafeVersion
+}
 
 /**
  * Provides a chain-specific default salt nonce for generating unique addresses
@@ -368,7 +389,7 @@ export function zkSyncEraCreate2Address(
     concat([ZKSYNC_CREATE2_PREFIX, pad(asHex(from)), salt, bytecodeHash, inputHash])
   ).slice(26)
 
-  return addressBytes
+  return `0x${addressBytes}`
 }
 
 export function toTxResult(

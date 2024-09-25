@@ -10,7 +10,7 @@ import { PasskeyArgType } from '@safe-global/protocol-kit/types'
  * @returns {Promise<string>} Returns the passkey owner address associated with the passkey
  */
 async function getPasskeyOwnerAddress(safe: Safe, passkey: PasskeyArgType): Promise<string> {
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeAddress = await safe.getAddress()
   const owners = await safe.getOwners()
 

@@ -1,6 +1,5 @@
 import CreateCallBaseContract from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContract'
 import {
-  SafeVersion,
   CreateCallContract_v1_3_0_Abi,
   CreateCallContract_v1_3_0_Contract,
   createCall_1_3_0_ContractArtifacts,
@@ -21,8 +20,6 @@ class CreateCallContract_v1_3_0
   extends CreateCallBaseContract<CreateCallContract_v1_3_0_Abi>
   implements CreateCallContract_v1_3_0_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of CreateCallContract_v1_3_0
    *
@@ -41,8 +38,6 @@ class CreateCallContract_v1_3_0
     const defaultAbi = createCall_1_3_0_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
 
   /**

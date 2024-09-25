@@ -171,7 +171,7 @@ export async function estimateTxBaseGas(
   const encodeRefundReceiver = refundReceiver || ZERO_ADDRESS
   const signatures = '0x'
 
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
@@ -238,7 +238,7 @@ export async function estimateSafeTxGas(
   safe: Safe,
   safeTransaction: SafeTransaction
 ): Promise<string> {
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
 
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     const safeTxGas = await estimateSafeTxGasWithSimulate(safe, safeTransaction)
@@ -283,7 +283,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
 ): Promise<string> {
   const isSafeDeployed = await safe.isSafeDeployed()
   const safeAddress = await safe.getAddress()
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
@@ -436,7 +436,7 @@ async function estimateSafeTxGasWithSimulate(
 ): Promise<string> {
   const isSafeDeployed = await safe.isSafeDeployed()
   const safeAddress = await safe.getAddress()
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
   const chainId = await safe.getChainId()
   const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]

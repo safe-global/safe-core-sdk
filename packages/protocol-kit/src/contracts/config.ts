@@ -83,8 +83,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '0.2.1',
-    safeWebAuthnSharedSignerVersion: '0.2.1'
+    safeWebAuthnSignerFactoryVersion: undefined,
+    safeWebAuthnSharedSignerVersion: undefined
   },
   '1.1.1': {
     safeSingletonVersion: '1.1.1',
@@ -95,8 +95,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '0.2.1',
-    safeWebAuthnSharedSignerVersion: '0.2.1'
+    safeWebAuthnSignerFactoryVersion: undefined,
+    safeWebAuthnSharedSignerVersion: undefined
   },
   '1.0.0': {
     safeSingletonVersion: '1.0.0',
@@ -107,8 +107,8 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     multiSendCallOnlyVersion: '1.3.0',
     signMessageLibVersion: '1.3.0',
     createCallVersion: '1.3.0',
-    safeWebAuthnSignerFactoryVersion: '0.2.1',
-    safeWebAuthnSharedSignerVersion: '0.2.1'
+    safeWebAuthnSignerFactoryVersion: undefined,
+    safeWebAuthnSharedSignerVersion: undefined
   }
 }
 

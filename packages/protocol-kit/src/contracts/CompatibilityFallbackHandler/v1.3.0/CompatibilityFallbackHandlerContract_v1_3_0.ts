@@ -1,7 +1,6 @@
 import CompatibilityFallbackHandlerBaseContract from '@safe-global/protocol-kit/contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
-  SafeVersion,
   CompatibilityFallbackHandlerContract_v1_3_0_Abi,
   CompatibilityFallbackHandlerContract_v1_3_0_Contract,
   compatibilityFallbackHandler_1_3_0_ContractArtifacts
@@ -19,8 +18,6 @@ class CompatibilityFallbackHandlerContract_v1_3_0
   extends CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
   implements CompatibilityFallbackHandlerContract_v1_3_0_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of CompatibilityFallbackHandlerContract_v1_3_0
    *
@@ -39,8 +36,6 @@ class CompatibilityFallbackHandlerContract_v1_3_0
     const defaultAbi = compatibilityFallbackHandler_1_3_0_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
 }
 

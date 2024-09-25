@@ -1,4 +1,16 @@
-import SafeProvider from '../SafeProvider'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import {
+  getCompatibilityFallbackHandlerContractInstance,
+  getCreateCallContractInstance,
+  getMultiSendCallOnlyContractInstance,
+  getMultiSendContractInstance,
+  getSafeContractInstance,
+  getSafeProxyFactoryContractInstance,
+  getSafeWebAuthnSharedSignerContractInstance,
+  getSafeWebAuthnSignerFactoryContractInstance,
+  getSignMessageLibContractInstance,
+  getSimulateTxAccessorContractInstance
+} from '@safe-global/protocol-kit/contracts/contractInstances'
 import {
   CompatibilityFallbackHandlerContractImplementationType,
   ContractNetworkConfig,
@@ -32,12 +44,14 @@ export async function getSafeContract({
   isL1SafeSingleton,
   customContracts
 }: GetSafeContractInstanceProps): Promise<SafeContractImplementationType> {
-  const safeContract = await safeProvider.getSafeContract({
+  const safeContract = await getSafeContractInstance(
     safeVersion,
-    customContractAddress: customSafeAddress ?? customContracts?.safeSingletonAddress,
-    customContractAbi: customContracts?.safeSingletonAbi,
+    safeProvider,
+    customSafeAddress ?? customContracts?.safeSingletonAddress,
+    customContracts?.safeSingletonAbi,
     isL1SafeSingleton
-  })
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(safeContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('SafeProxy contract is not deployed on the current network')
@@ -45,16 +59,18 @@ export async function getSafeContract({
   return safeContract
 }
 
-export async function getProxyFactoryContract({
+export async function getSafeProxyFactoryContract({
   safeProvider,
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SafeProxyFactoryContractImplementationType> {
-  const safeProxyFactoryContract = await safeProvider.getSafeProxyFactoryContract({
+  const safeProxyFactoryContract = await getSafeProxyFactoryContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.safeProxyFactoryAddress,
-    customContractAbi: customContracts?.safeProxyFactoryAbi
-  })
+    safeProvider,
+    customContracts?.safeProxyFactoryAddress,
+    customContracts?.safeProxyFactoryAbi
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(
     safeProxyFactoryContract.getAddress()
   )
@@ -69,11 +85,13 @@ export async function getCompatibilityFallbackHandlerContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<CompatibilityFallbackHandlerContractImplementationType> {
-  const fallbackHandlerContract = await safeProvider.getCompatibilityFallbackHandlerContract({
+  const fallbackHandlerContract = await getCompatibilityFallbackHandlerContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.fallbackHandlerAddress,
-    customContractAbi: customContracts?.fallbackHandlerAbi
-  })
+    safeProvider,
+    customContracts?.fallbackHandlerAddress,
+    customContracts?.fallbackHandlerAbi
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(
     fallbackHandlerContract.getAddress()
   )
@@ -88,11 +106,13 @@ export async function getMultiSendContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<MultiSendContractImplementationType> {
-  const multiSendContract = await safeProvider.getMultiSendContract({
+  const multiSendContract = await getMultiSendContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.multiSendAddress,
-    customContractAbi: customContracts?.multiSendAbi
-  })
+    safeProvider,
+    customContracts?.multiSendAddress,
+    customContracts?.multiSendAbi
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(multiSendContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('MultiSend contract is not deployed on the current network')
@@ -105,11 +125,13 @@ export async function getMultiSendCallOnlyContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<MultiSendCallOnlyContractImplementationType> {
-  const multiSendCallOnlyContract = await safeProvider.getMultiSendCallOnlyContract({
+  const multiSendCallOnlyContract = await getMultiSendCallOnlyContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.multiSendCallOnlyAddress,
-    customContractAbi: customContracts?.multiSendCallOnlyAbi
-  })
+    safeProvider,
+    customContracts?.multiSendCallOnlyAddress,
+    customContracts?.multiSendCallOnlyAbi
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(
     multiSendCallOnlyContract.getAddress()
   )
@@ -124,11 +146,13 @@ export async function getSignMessageLibContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SignMessageLibContractImplementationType> {
-  const signMessageLibContract = await safeProvider.getSignMessageLibContract({
+  const signMessageLibContract = await getSignMessageLibContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.signMessageLibAddress,
-    customContractAbi: customContracts?.signMessageLibAbi
-  })
+    safeProvider,
+    customContracts?.signMessageLibAddress,
+    customContracts?.signMessageLibAbi
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(
     signMessageLibContract.getAddress()
   )
@@ -143,11 +167,13 @@ export async function getCreateCallContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<CreateCallContractImplementationType> {
-  const createCallContract = await safeProvider.getCreateCallContract({
+  const createCallContract = await getCreateCallContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.createCallAddress,
-    customContractAbi: customContracts?.createCallAbi
-  })
+    safeProvider,
+    customContracts?.createCallAddress,
+    customContracts?.createCallAbi
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(createCallContract.getAddress())
   if (!isContractDeployed) {
     throw new Error('CreateCall contract is not deployed on the current network')
@@ -160,11 +186,13 @@ export async function getSimulateTxAccessorContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SimulateTxAccessorContractImplementationType> {
-  const simulateTxAccessorContract = await safeProvider.getSimulateTxAccessorContract({
+  const simulateTxAccessorContract = await getSimulateTxAccessorContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.simulateTxAccessorAddress,
-    customContractAbi: customContracts?.simulateTxAccessorAbi
-  })
+    safeProvider,
+    customContracts?.simulateTxAccessorAddress,
+    customContracts?.simulateTxAccessorAbi
+  )
+
   const isContractDeployed = await safeProvider.isContractDeployed(
     simulateTxAccessorContract.getAddress()
   )
@@ -179,12 +207,11 @@ export async function getSafeWebAuthnSignerFactoryContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SafeWebAuthnSignerFactoryContractImplementationType> {
-  const safeWebAuthnSignerFactoryContract = await safeProvider.getSafeWebAuthnSignerFactoryContract(
-    {
-      safeVersion,
-      customContractAddress: customContracts?.safeWebAuthnSignerFactoryAddress,
-      customContractAbi: customContracts?.safeWebAuthnSignerFactoryAbi
-    }
+  const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContractInstance(
+    safeVersion,
+    safeProvider,
+    customContracts?.safeWebAuthnSignerFactoryAddress,
+    customContracts?.safeWebAuthnSignerFactoryAbi
   )
 
   const isContractDeployed = await safeProvider.isContractDeployed(
@@ -201,11 +228,12 @@ export async function getSafeWebAuthnSharedSignerContract({
   safeVersion,
   customContracts
 }: GetContractInstanceProps): Promise<SafeWebAuthnSharedSignerContractImplementationType> {
-  const safeWebAuthnSharedSignerContract = await safeProvider.getSafeWebAuthnSharedSignerContract({
+  const safeWebAuthnSharedSignerContract = await getSafeWebAuthnSharedSignerContractInstance(
     safeVersion,
-    customContractAddress: customContracts?.safeWebAuthnSharedSignerAddress,
-    customContractAbi: customContracts?.safeWebAuthnSharedSignerAbi
-  })
+    safeProvider,
+    customContracts?.safeWebAuthnSharedSignerAddress,
+    customContracts?.safeWebAuthnSharedSignerAbi
+  )
 
   const isContractDeployed = await safeProvider.isContractDeployed(
     safeWebAuthnSharedSignerContract.getAddress()

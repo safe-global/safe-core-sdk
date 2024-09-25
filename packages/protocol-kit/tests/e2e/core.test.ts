@@ -52,7 +52,7 @@ describe('Safe Info', () => {
       chai.expect(
         sameString(
           await safeSdk2.getSafeProvider().getSignerAddress(),
-          await account1.signer.account?.address
+          account1.signer.account?.address
         )
       ).to.be.true
     })
@@ -71,7 +71,7 @@ describe('Safe Info', () => {
       chai.expect(
         sameString(
           await safeSdk.getSafeProvider().getSignerAddress(),
-          await account1.signer.account?.address
+          account1.signer.account?.address
         )
       ).to.be.true
 
@@ -85,7 +85,7 @@ describe('Safe Info', () => {
       chai.expect(
         sameString(
           await safeSdk2.getSafeProvider().getSignerAddress(),
-          await account2.signer.account?.address
+          account2.signer.account?.address
         )
       ).to.be.true
 
@@ -99,7 +99,7 @@ describe('Safe Info', () => {
       chai.expect(
         sameString(
           await safeSdk3.getSafeProvider().getSignerAddress(),
-          await account3.signer.account?.address
+          account3.signer.account?.address
         )
       ).to.be.true
     })
@@ -113,7 +113,7 @@ describe('Safe Info', () => {
         predictedSafe,
         contractNetworks
       })
-      const contractVersion = await safeSdk.getContractVersion()
+      const contractVersion = safeSdk.getContractVersion()
       chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
     })
 
@@ -128,7 +128,7 @@ describe('Safe Info', () => {
         predictedSafe: safeConfig,
         contractNetworks
       })
-      const contractVersion = await safeSdk.getContractVersion()
+      const contractVersion = safeSdk.getContractVersion()
       chai.expect(contractVersion).to.be.eq(DEFAULT_SAFE_VERSION)
     })
 
@@ -140,7 +140,7 @@ describe('Safe Info', () => {
         safeAddress,
         contractNetworks
       })
-      const contractVersion = await safeSdk.getContractVersion()
+      const contractVersion = safeSdk.getContractVersion()
       chai.expect(contractVersion).to.be.eq(safeVersionDeployed)
     })
   })
@@ -213,7 +213,7 @@ describe('Safe Info', () => {
       chai.expect(
         sameString(
           await safeSdk.getSafeProvider().getSignerAddress(),
-          await account1.signer.account?.address
+          account1.signer.account?.address
         )
       ).to.be.true
     })

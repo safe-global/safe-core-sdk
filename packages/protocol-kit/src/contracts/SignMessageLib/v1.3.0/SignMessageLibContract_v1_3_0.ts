@@ -2,7 +2,6 @@ import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import SignMessageLibBaseContract from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
-  SafeVersion,
   SafeContractFunction,
   SignMessageLibContract_v1_3_0_Abi,
   SignMessageLibContract_v1_3_0_Contract,
@@ -22,8 +21,6 @@ class SignMessageLibContract_v1_3_0
   extends SignMessageLibBaseContract<SignMessageLibContract_v1_3_0_Abi>
   implements SignMessageLibContract_v1_3_0_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SignMessageLibContract_v1_3_0
    *
@@ -42,8 +39,6 @@ class SignMessageLibContract_v1_3_0
     const defaultAbi = signMessageLib_1_3_0_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
   /**
    * @param args - Array[message]

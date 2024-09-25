@@ -15,7 +15,7 @@ async function createPasskeyDeploymentTransaction(
   safe: Safe,
   passkey: PasskeyArgType
 ): Promise<{ to: string; value: string; data: Hex }> {
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeAddress = await safe.getAddress()
   const owners = await safe.getOwners()
 

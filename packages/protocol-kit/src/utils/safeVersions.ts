@@ -58,7 +58,7 @@ export type SafeContractCompatibleWithSimulateAndRevert = SafeContract_v1_3_0 | 
 export async function isSafeContractCompatibleWithRequiredTxGas(
   safeContract: SafeContractImplementationType
 ): Promise<SafeContractCompatibleWithRequiredTxGas> {
-  const safeVersion = await safeContract.getVersion()
+  const safeVersion = safeContract.safeVersion
 
   if (!hasSafeFeature(SAFE_FEATURES.REQUIRED_TXGAS, safeVersion)) {
     throw new Error('Current version of the Safe does not support the requiredTxGas functionality')
@@ -70,7 +70,7 @@ export async function isSafeContractCompatibleWithRequiredTxGas(
 export async function isSafeContractCompatibleWithSimulateAndRevert(
   safeContract: SafeContractImplementationType
 ): Promise<SafeContractCompatibleWithSimulateAndRevert> {
-  const safeVersion = await safeContract.getVersion()
+  const safeVersion = safeContract.safeVersion
 
   if (!hasSafeFeature(SAFE_FEATURES.SIMULATE_AND_REVERT, safeVersion)) {
     throw new Error(

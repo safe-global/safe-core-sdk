@@ -1,8 +1,9 @@
 import { hashSafeMessage } from '@safe-global/protocol-kit'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { OperationType } from '@safe-global/types-kit'
 
 import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
 import { SafeClientResult, SendOnChainMessageProps } from '@safe-global/sdk-starter-kit/types'
+import { Hash } from 'viem'
 
 /**
  * Extend the SafeClient with the ability to use on-chain messages
@@ -39,9 +40,9 @@ export function onChainMessages() {
         })
 
       const transaction = {
-        to: await signMessageLibContract.getAddress(),
+        to: signMessageLibContract.getAddress(),
         value: '0',
-        data: signMessageLibContract.encode('signMessage', [hashSafeMessage(message)]),
+        data: signMessageLibContract.encode('signMessage', [hashSafeMessage(message) as Hash]),
         operation: OperationType.DelegateCall
       }
 

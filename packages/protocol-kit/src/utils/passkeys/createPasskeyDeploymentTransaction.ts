@@ -1,8 +1,8 @@
-import Safe from '../../Safe'
-import { PasskeyArgType } from '../../types'
-import { EMPTY_DATA } from '../constants'
-import SafeProvider from '../../SafeProvider'
-import PasskeySigner from './PasskeySigner'
+import { Hex } from 'viem'
+
+import Safe from '@safe-global/protocol-kit/Safe'
+import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { PasskeyArgType, PasskeyClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Creates the deployment transaction to create a passkey signer.
@@ -14,7 +14,7 @@ import PasskeySigner from './PasskeySigner'
 async function createPasskeyDeploymentTransaction(
   safe: Safe,
   passkey: PasskeyArgType
-): Promise<{ to: string; value: string; data: string }> {
+): Promise<{ to: string; value: string; data: Hex }> {
   const safeVersion = await safe.getContractVersion()
   const safeAddress = await safe.getAddress()
   const owners = await safe.getOwners()
@@ -28,23 +28,16 @@ async function createPasskeyDeploymentTransaction(
     owners
   )
 
-  const passkeySigner = (await safePasskeyProvider.getExternalSigner()) as PasskeySigner
-  const passkeyAddress = await passkeySigner!.getAddress()
-  const provider = safe.getSafeProvider().getExternalProvider()
+  const passkeySigner = (await safePasskeyProvider.getExternalSigner()) as PasskeyClient
+  const passkeyAddress = passkeySigner!.account.address
 
-  const isPasskeyDeployed = (await provider.getCode(passkeyAddress)) !== EMPTY_DATA
+  const isPasskeyDeployed = await safe.getSafeProvider().isContractDeployed(passkeyAddress)
 
   if (isPasskeyDeployed) {
     throw new Error('Passkey Signer contract already deployed')
   }
 
-  const passkeySignerDeploymentTransaction = {
-    to: await passkeySigner.safeWebAuthnSignerFactoryContract.getAddress(),
-    value: '0',
-    data: passkeySigner.encodeCreateSigner()
-  }
-
-  return passkeySignerDeploymentTransaction
+  return passkeySigner.createDeployTxRequest()
 }
 
 export default createPasskeyDeploymentTransaction

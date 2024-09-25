@@ -1,6 +1,6 @@
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/types-kit'
 
 // This file can be used to play around with the Safe Core SDK
 

@@ -1,8 +1,7 @@
 import { Abi } from 'abitype'
-import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
@@ -20,7 +19,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - MultiSendContract_v1_3_0  extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
  */
 abstract class MultiSendBaseContract<
-  MultiSendContractAbiType extends InterfaceAbi & Abi
+  MultiSendContractAbiType extends Abi
 > extends BaseContract<MultiSendContractAbiType> {
   contractName: contractName
 

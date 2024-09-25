@@ -1,12 +1,11 @@
 {
   "files": [],
   "references": [
+    { "path": "packages/testing-kit" },
     { "path": "packages/api-kit" },
     { "path": "packages/protocol-kit" },
     { "path": "packages/relay-kit" },
-    { "path": "packages/auth-kit" },
-    { "path": "packages/onramp-kit" },
-    { "path": "packages/safe-core-sdk-types" },
+    { "path": "packages/types-kit" },
     { "path": "packages/sdk-starter-kit" }
   ]
 }

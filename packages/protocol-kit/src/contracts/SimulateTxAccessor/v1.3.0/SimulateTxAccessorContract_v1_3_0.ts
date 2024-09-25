@@ -6,7 +6,9 @@ import {
   SimulateTxAccessorContract_v1_3_0_Abi,
   SimulateTxAccessorContract_v1_3_0_Contract,
   SimulateTxAccessorContract_v1_3_0_Function
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
+
+import { asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SimulateTxAccessorContract_v1_3_0  is the implementation specific to the SimulateTxAccessor contract version 1.3.0.
@@ -48,8 +50,9 @@ class SimulateTxAccessorContract_v1_3_0
    * @param args - Array[to, value, data, operation]
    * @returns Array[estimate, success, returnData]
    */
-  simulate: SimulateTxAccessorContract_v1_3_0_Function<'simulate'> = (args) => {
-    return this.contract.simulate(...args)
+  simulate: SimulateTxAccessorContract_v1_3_0_Function<'simulate'> = async (args) => {
+    const [estimate, success, returnData] = await this.write('simulate', args)
+    return [BigInt(estimate), !!success, asHex(returnData)]
   }
 }
 

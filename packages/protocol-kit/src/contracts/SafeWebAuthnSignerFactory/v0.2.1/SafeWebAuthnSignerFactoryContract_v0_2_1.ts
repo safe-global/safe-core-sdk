@@ -5,7 +5,7 @@ import {
   SafeWebAuthnSignerFactoryContract_v0_2_1_Contract,
   SafeWebAuthnSignerFactoryContract_v0_2_1_Function,
   SafeWebAuthnSignerFactory_0_2_1_ContractArtifacts
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 
 /**
@@ -51,7 +51,7 @@ class SafeWebAuthnSignerFactoryContract_v0_2_1
    * @returns Array[signer]
    */
   getSigner: SafeWebAuthnSignerFactoryContract_v0_2_1_Function<'getSigner'> = async (args) => {
-    return [await this.contract.getSigner(...args)]
+    return [await this.read('getSigner', args)]
   }
 
   /**
@@ -62,12 +62,12 @@ class SafeWebAuthnSignerFactoryContract_v0_2_1
   createSigner: SafeWebAuthnSignerFactoryContract_v0_2_1_Function<'createSigner'> = async (
     args
   ) => {
-    return [await this.contract.createSigner(...args)]
+    return [await this.write('createSigner', args)]
   }
 
   isValidSignatureForSigner: SafeWebAuthnSignerFactoryContract_v0_2_1_Function<'isValidSignatureForSigner'> =
     async (args) => {
-      return [await this.contract.isValidSignatureForSigner(...args)]
+      return [await this.read('isValidSignatureForSigner', args)]
     }
 }
 

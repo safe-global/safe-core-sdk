@@ -1,50 +1,30 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
+import {
+  safeVersionDeployed,
+  setupTests,
+  itif,
+  getSafeWithOwners,
+  waitTransactionReceipt
+} from '@safe-global/testing-kit'
 import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { itif } from './utils/helpers'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
+
 import { waitSafeTxReceipt } from './utils/transactions'
+import { sameString } from '@safe-global/protocol-kit/utils'
 
 chai.use(chaiAsPromised)
 
 describe('Safe Info', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [accounts[0].address],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        safeVersion: safeVersionDeployed
-      }
-    }
-    const provider = getEip1193Provider()
-    return {
-      chainId,
-      safe: await getSafeWithOwners([accounts[0].address, accounts[1].address]),
-      provider,
-      predictedSafe,
-      accounts,
-      contractNetworks
-    }
-  })
+  const provider = getEip1193Provider()
 
   describe('connect', async () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail to connect a Safe <v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, safe, contractNetworks, provider } = await setupTests()
-        const safeAddress = await safe.getAddress()
+        const { predictedSafe, safe, contractNetworks } = await setupTests()
+        const safeAddress = safe.address
         const safeSdk = await Safe.init({
           provider,
           safeAddress,
@@ -59,63 +39,75 @@ describe('Safe Info', () => {
       }
     )
 
-    itif(safeVersionDeployed >= '1.3.0')(
-      'should connect a Safe >=v1.3.0 that is not deployed',
-      async () => {
-        const { predictedSafe, safe, accounts, contractNetworks, provider } = await setupTests()
-        const [account1] = accounts
-        const safeAddress = await safe.getAddress()
-        const safeSdk = await Safe.init({
-          provider,
-          safeAddress,
-          contractNetworks
-        })
-        const safeSdk2 = await safeSdk.connect({ predictedSafe })
-        chai
-          .expect(await safeSdk2.getSafeProvider().getSignerAddress())
-          .to.be.eq(await account1.signer.getAddress())
-      }
-    )
+    it('should connect a Safe >=v1.3.0 that is not deployed', async () => {
+      const { predictedSafe, safe, accounts, contractNetworks } = await setupTests()
+      const [account1] = accounts
+      const safeAddress = safe.address
+      const safeSdk = await Safe.init({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const safeSdk2 = await safeSdk.connect({ predictedSafe })
+      chai.expect(
+        sameString(
+          await safeSdk2.getSafeProvider().getSignerAddress(),
+          await account1.signer.account?.address
+        )
+      ).to.be.true
+    })
 
     it('should connect a deployed Safe', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2, account3] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
         contractNetworks
       })
       chai.expect(await safeSdk.getAddress()).to.be.eq(safeAddress)
-      chai
-        .expect(await safeSdk.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account1.signer.getAddress())
+
+      chai.expect(
+        sameString(
+          await safeSdk.getSafeProvider().getSignerAddress(),
+          await account1.signer.account?.address
+        )
+      ).to.be.true
 
       const safeSdk2 = await safeSdk.connect({
         signer: account2.address,
         contractNetworks
       })
+      const signer = await safeSdk2.getSafeProvider().getExternalSigner()
+      chai.expect(signer)
       chai.expect(await safeSdk2.getAddress()).to.be.eq(safeAddress)
-      chai
-        .expect(await safeSdk2.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account2.signer.getAddress())
+      chai.expect(
+        sameString(
+          await safeSdk2.getSafeProvider().getSignerAddress(),
+          await account2.signer.account?.address
+        )
+      ).to.be.true
 
       const safe2 = await getSafeWithOwners([account3.address])
-      const safe2Address = await safe2.getAddress()
+      const safe2Address = safe2.address
       const safeSdk3 = await safeSdk2.connect({
         safeAddress: safe2Address,
         signer: account3.address
       })
       chai.expect(await safeSdk3.getAddress()).to.be.eq(safe2Address)
-      chai
-        .expect(await safeSdk3.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account3.signer.getAddress())
+      chai.expect(
+        sameString(
+          await safeSdk3.getSafeProvider().getSignerAddress(),
+          await account3.signer.account?.address
+        )
+      ).to.be.true
     })
   })
 
   describe('getContractVersion', async () => {
     it('should return the contract version of a Safe that is not deployed with a custom version configuration', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         predictedSafe,
@@ -126,7 +118,7 @@ describe('Safe Info', () => {
     })
 
     it('should return the contract version of a Safe that is not deployed with a default version configuration', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests()
       const safeConfig: PredictedSafeProps = {
         ...predictedSafe,
         safeDeploymentConfig: {}
@@ -141,8 +133,8 @@ describe('Safe Info', () => {
     })
 
     it('should return the Safe contract version', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const { safe, contractNetworks } = await setupTests()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -157,7 +149,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail to return the address of a Safe <v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, contractNetworks, provider } = await setupTests()
+        const { predictedSafe, contractNetworks } = await setupTests()
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,
@@ -175,7 +167,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the address of a Safe >=v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, contractNetworks, provider } = await setupTests()
+        const { predictedSafe, contractNetworks } = await setupTests()
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,
@@ -196,8 +188,8 @@ describe('Safe Info', () => {
     )
 
     it('should return the address of a deployed Safe', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const { safe, contractNetworks } = await setupTests()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,
@@ -209,23 +201,27 @@ describe('Safe Info', () => {
 
   describe('getEip1193Provider', async () => {
     it('should return the connected SafeProvider', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress: safeAddress,
         contractNetworks
       })
-      chai
-        .expect(await safeSdk.getSafeProvider().getSignerAddress())
-        .to.be.eq(await account1.signer.getAddress())
+
+      chai.expect(
+        sameString(
+          await safeSdk.getSafeProvider().getSignerAddress(),
+          await account1.signer.account?.address
+        )
+      ).to.be.true
     })
   })
 
   describe('getNonce', async () => {
     it('should return the nonce of a Safe that is not deployed', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         predictedSafe,
@@ -235,10 +231,10 @@ describe('Safe Info', () => {
     })
 
     it('should return the Safe nonce', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
       const safe = await getSafeWithOwners([account1.address])
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress: safeAddress,
@@ -260,7 +256,7 @@ describe('Safe Info', () => {
 
   describe('getChainId', async () => {
     it('should return the chainId of a Safe that is not deployed', async () => {
-      const { predictedSafe, chainId, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, chainId, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
         predictedSafe,
@@ -270,8 +266,8 @@ describe('Safe Info', () => {
     })
 
     it('should return the chainId of the current network', async () => {
-      const { safe, chainId, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const { safe, chainId, contractNetworks } = await setupTests()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress: safeAddress,
@@ -285,7 +281,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail to return the balance of a Safe <v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, contractNetworks, provider } = await setupTests()
+        const { predictedSafe, contractNetworks } = await setupTests()
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,
@@ -302,7 +298,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the balance of a Safe >=v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
+        const { predictedSafe, accounts, contractNetworks } = await setupTests()
         const [account1] = accounts
         const safeSdk = await Safe.init({
           provider,
@@ -311,23 +307,23 @@ describe('Safe Info', () => {
         })
         chai.expect(await safeSdk.getBalance()).to.be.eq(0n)
 
-        const txResponse = await account1.signer.sendTransaction({
+        const hash = await account1.signer.sendTransaction({
           to: await safeSdk.getAddress(),
           value: BigInt(`${1e18}`)
         })
-        await txResponse.wait(1)
+        await waitTransactionReceipt(hash)
 
         // TODO: Not working without this delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        // await new Promise((resolve) => setTimeout(resolve, 500))
 
         chai.expect(await safeSdk.getBalance()).to.be.eq(BigInt(`${1e18}`))
       }
     )
 
     it('should return the balance of a deployed Safe', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         signer: account1.address,
@@ -336,11 +332,11 @@ describe('Safe Info', () => {
       })
       chai.expect(await safeSdk.getBalance()).to.be.eq(0n)
 
-      const txResponse = await account1.signer.sendTransaction({
+      const txHash = await account1.signer.sendTransaction({
         to: safeAddress,
         value: BigInt(`${1e18}`)
       })
-      await txResponse.wait(1)
+      await waitTransactionReceipt(txHash)
 
       // TODO: Not working without this delay
       await new Promise((resolve) => setTimeout(resolve, 500))

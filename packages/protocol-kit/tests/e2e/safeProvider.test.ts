@@ -1,10 +1,7 @@
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { getContractNetworks } from './utils/setupContractNetworks'
 import {
+  safeVersionDeployed,
+  setupTests,
+  itif,
   getCompatibilityFallbackHandler,
   getCreateCall,
   getFactory,
@@ -12,15 +9,16 @@ import {
   getMultiSendCallOnly,
   getSafeSingleton,
   getSignMessageLib
-} from './utils/setupContracts'
+} from '@safe-global/testing-kit'
+import { SafeVersion } from '@safe-global/types-kit'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
-import { AbstractSigner, BrowserProvider, JsonRpcProvider } from 'ethers'
-import { itif } from './utils/helpers'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import { createMockPasskey, getWebAuthnCredentials } from './utils/passkeys'
+import { publicActions, walletActions } from 'viem'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -42,26 +40,12 @@ Object.defineProperty(global, 'navigator', {
 })
 
 describe('Safe contracts', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const provider = getEip1193Provider()
-
-    return {
-      accounts,
-      contractNetworks,
-      chainId,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   describe('init', async () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail for a passkey signer and Safe <v1.3.0',
       async () => {
-        const { provider } = await setupTests()
         const passKeySigner = await createMockPasskey('aName')
 
         chai
@@ -80,9 +64,7 @@ describe('Safe contracts', () => {
       const safeContract = await safeProvider.getSafeContract({
         safeVersion
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
+      chai.expect(safeContract.getAddress()).to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
     })
 
     it('should return an L2 Safe contract from safe-deployments', async () => {
@@ -91,9 +73,7 @@ describe('Safe contracts', () => {
       const safeContract = await safeProvider.getSafeContract({
         safeVersion
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0x3E5c63644E683549055b9Be8653de26E0B4CD36E')
+      chai.expect(safeContract.getAddress()).to.be.eq('0x3E5c63644E683549055b9Be8653de26E0B4CD36E')
     })
 
     it('should return an L1 Safe contract from safe-deployments using the L1 flag', async () => {
@@ -104,9 +84,7 @@ describe('Safe contracts', () => {
         safeVersion,
         isL1SafeSingleton
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
+      chai.expect(safeContract.getAddress()).to.be.eq('0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552')
     })
 
     it('should return an L1 Safe contract from safe-deployments when the safeVersion is < 1.3.0', async () => {
@@ -115,13 +93,11 @@ describe('Safe contracts', () => {
       const safeContract = await safeProvider.getSafeContract({
         safeVersion
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq('0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F')
+      chai.expect(safeContract.getAddress()).to.be.eq('0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F')
     })
 
     it('should return a Safe contract from the custom addresses', async () => {
-      const { contractNetworks, chainId, provider } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -130,9 +106,7 @@ describe('Safe contracts', () => {
         customContractAddress: customContract?.safeSingletonAddress,
         customContractAbi: customContract?.safeSingletonAbi
       })
-      chai
-        .expect(await safeContract.getAddress())
-        .to.be.eq(await (await getSafeSingleton()).contract.getAddress())
+      chai.expect(safeContract.getAddress()).to.be.eq((await getSafeSingleton()).contract.address)
     })
   })
 
@@ -149,7 +123,7 @@ describe('Safe contracts', () => {
     })
 
     it('should return a MultiSend contract from the custom addresses', async () => {
-      const { contractNetworks, chainId, provider } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -158,9 +132,7 @@ describe('Safe contracts', () => {
         customContractAddress: customContract.multiSendAddress,
         customContractAbi: customContract.multiSendAbi
       })
-      chai
-        .expect(await multiSendContract.getAddress())
-        .to.be.eq(await (await getMultiSend()).contract.getAddress())
+      chai.expect(multiSendContract.getAddress()).to.be.eq((await getMultiSend()).contract.address)
     })
   })
 
@@ -172,12 +144,12 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await multiSendCallOnlyContract.getAddress())
+        .expect(multiSendCallOnlyContract.getAddress())
         .to.be.eq('0x40A2aCCbd92BCA938b02010E17A5b8929b49130D')
     })
 
     it('should return a MultiSendCallOnly contract from the custom addresses', async () => {
-      const { contractNetworks, chainId, provider } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -187,8 +159,8 @@ describe('Safe contracts', () => {
         customContractAbi: customContract.multiSendCallOnlyAbi
       })
       chai
-        .expect(await multiSendCallOnlyContract.getAddress())
-        .to.be.eq(await (await getMultiSendCallOnly()).contract.getAddress())
+        .expect(multiSendCallOnlyContract.getAddress())
+        .to.be.eq((await getMultiSendCallOnly()).contract.address)
     })
   })
 
@@ -201,12 +173,12 @@ describe('Safe contracts', () => {
           safeVersion
         })
       chai
-        .expect(await compatibilityFallbackHandlerContract.getAddress())
+        .expect(compatibilityFallbackHandlerContract.getAddress())
         .to.be.eq('0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4')
     })
 
     it('should return a CompatibilityFallbackHandler contract from the custom addresses', async () => {
-      const { contractNetworks, chainId, provider } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -217,8 +189,8 @@ describe('Safe contracts', () => {
           customContractAbi: customContract.fallbackHandlerAbi
         })
       chai
-        .expect(await compatibilityFallbackHandlerContract.getAddress())
-        .to.be.eq(await (await getCompatibilityFallbackHandler()).contract.getAddress())
+        .expect(compatibilityFallbackHandlerContract.getAddress())
+        .to.be.eq((await getCompatibilityFallbackHandler()).contract.address)
     })
   })
 
@@ -230,12 +202,12 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await factoryContract.getAddress())
+        .expect(factoryContract.getAddress())
         .to.be.eq('0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2')
     })
 
     it('should return a SafeProxyFactory contract from the custom addresses', async () => {
-      const { contractNetworks, chainId, provider } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -244,9 +216,7 @@ describe('Safe contracts', () => {
         customContractAddress: customContract.safeProxyFactoryAddress,
         customContractAbi: customContract.safeProxyFactoryAbi
       })
-      chai
-        .expect(await factoryContract.getAddress())
-        .to.be.eq(await (await getFactory()).contract.getAddress())
+      chai.expect(factoryContract.getAddress()).to.be.eq((await getFactory()).contract.address)
     })
   })
 
@@ -258,12 +228,12 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await signMessageLibContract.getAddress())
+        .expect(signMessageLibContract.getAddress())
         .to.be.eq('0xA65387F16B013cf2Af4605Ad8aA5ec25a2cbA3a2')
     })
 
     it('should return a SignMessageLib contract from the custom addresses', async () => {
-      const { contractNetworks, chainId, provider } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -273,8 +243,8 @@ describe('Safe contracts', () => {
         customContractAbi: customContract.signMessageLibAbi
       })
       chai
-        .expect(await signMessageLibContract.getAddress())
-        .to.be.eq(await (await getSignMessageLib()).contract.getAddress())
+        .expect(signMessageLibContract.getAddress())
+        .to.be.eq((await getSignMessageLib()).contract.address)
     })
   })
 
@@ -286,12 +256,12 @@ describe('Safe contracts', () => {
         safeVersion
       })
       chai
-        .expect(await createCallContract.getAddress())
+        .expect(createCallContract.getAddress())
         .to.be.eq('0x7cbB62EaA69F79e6873cD1ecB2392971036cFAa4')
     })
 
     it('should return a SafeProxyFactory contract from the custom addresses', async () => {
-      const { contractNetworks, chainId, provider } = await setupTests()
+      const { contractNetworks, chainId } = await setupTests()
       const safeProvider = new SafeProvider({ provider })
       const safeVersion: SafeVersion = '1.3.0'
       const customContract = contractNetworks[chainId.toString()]
@@ -301,27 +271,25 @@ describe('Safe contracts', () => {
         customContractAbi: customContract.createCallAbi
       })
       chai
-        .expect(await createCallContract.getAddress())
-        .to.be.eq(await (await getCreateCall()).contract.getAddress())
+        .expect(createCallContract.getAddress())
+        .to.be.eq((await getCreateCall()).contract.address)
     })
 
-    it('should return an external provider (BrowserProvider) and signer (AbstractSigner) when using an EIP1193 provider', async () => {
-      const { provider } = await setupTests()
-
+    it('should return an external provider (PublicClient) and signer (WalletClient) when using an EIP1193 provider', async () => {
       const safeProvider = new SafeProvider({ provider })
 
-      chai.expect(safeProvider.getExternalProvider()).to.be.instanceOf(BrowserProvider)
-      chai.expect(await safeProvider.getExternalSigner()).to.be.instanceOf(AbstractSigner)
+      chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
+      chai.expect(await safeProvider.getExternalSigner()).to.deep.include(walletActions)
     })
 
-    it('should return an external provider (JsonRpcProvider) and signer (AbstractSigner) when using a private key', async () => {
+    it('should return an external provider (PublicClient) and signer (WalletClient) when using a private key', async () => {
       const safeProvider = new SafeProvider({
         provider: 'https://sepolia.gateway.tenderly.co',
         signer: '4ff03ace1395691975678c93449d552dc83df6b773a8024d4c368b39042a7610'
       })
 
-      chai.expect(safeProvider.getExternalProvider()).to.be.instanceOf(JsonRpcProvider)
-      chai.expect(await safeProvider.getExternalSigner()).to.be.instanceOf(AbstractSigner)
+      chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
+      chai.expect(await safeProvider.getExternalSigner()).to.deep.include(walletActions)
     })
 
     it('should return an undefined signer when using an RPC without signer', async () => {
@@ -329,7 +297,7 @@ describe('Safe contracts', () => {
         provider: 'https://sepolia.gateway.tenderly.co'
       })
 
-      chai.expect(safeProvider.getExternalProvider()).to.be.instanceOf(JsonRpcProvider)
+      chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
       chai.expect(await safeProvider.getExternalSigner()).to.be.undefined
     })
   })

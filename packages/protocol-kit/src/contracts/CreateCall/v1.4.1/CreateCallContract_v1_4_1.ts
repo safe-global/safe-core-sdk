@@ -6,7 +6,7 @@ import {
   CreateCallContract_v1_4_1_Contract,
   createCall_1_4_1_ContractArtifacts,
   SafeContractFunction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 
 /**
@@ -57,8 +57,8 @@ class CreateCallContract_v1_4_1
     if (options && !options.gasLimit) {
       options.gasLimit = (await this.estimateGas('performCreate', args, options)).toString()
     }
-    const txResponse = await this.contract.performCreate(...args, options)
-    return toTxResult(txResponse, options)
+
+    return toTxResult(this.runner!, await this.write('performCreate', args, options), options)
   }
 
   /**
@@ -75,8 +75,8 @@ class CreateCallContract_v1_4_1
         await this.estimateGas('performCreate2', [...args], { ...options })
       ).toString()
     }
-    const txResponse = await this.contract.performCreate2(...args)
-    return toTxResult(txResponse, options)
+
+    return toTxResult(this.runner!, await this.write('performCreate2', args, options), options)
   }
 }
 

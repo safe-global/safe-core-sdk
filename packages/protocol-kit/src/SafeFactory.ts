@@ -22,7 +22,7 @@ import {
   SafeFactoryInitConfig,
   DeploySafeProps
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 
 class SafeFactory {
@@ -89,7 +89,7 @@ class SafeFactory {
     return this.#safeVersion
   }
 
-  getAddress(): Promise<string> {
+  getAddress(): string {
     return this.#safeProxyFactoryContract.getAddress()
   }
 
@@ -144,7 +144,7 @@ class SafeFactory {
     })
 
     const safeAddress = await this.#safeProxyFactoryContract.createProxyWithOptions({
-      safeSingletonAddress: await this.#safeContract.getAddress(),
+      safeSingletonAddress: this.#safeContract.getAddress(),
       initializer,
       saltNonce: saltNonce || getChainSpecificDefaultSaltNonce(chainId),
       options: {

@@ -1,13 +1,9 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
+import { setupTests, getMultiSendCallOnly } from '@safe-global/testing-kit'
+import Safe from '@safe-global/protocol-kit/index'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
-import { OperationType } from '@safe-global/safe-core-sdk-types'
+import { OperationType } from '@safe-global/types-kit'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
 chai.use(chaiAsPromised)
@@ -15,37 +11,11 @@ chai.use(chaiAsPromised)
 const AMOUNT_TO_TRANSFER = '500000000000000000' // 0.5 ETH
 
 describe('createTransactionBatch', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [accounts[0].address],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        safeVersion: safeVersionDeployed
-      }
-    }
-
-    return {
-      accounts,
-      contractNetworks,
-      predictedSafe,
-      chainId
-    }
-  })
-
   it('should return a batch of the provided transactions', async () => {
-    const { accounts, contractNetworks } = await setupTests()
-    const [account1] = accounts
+    const { safe, contractNetworks } = await setupTests()
 
-    const safe = await getSafeWithOwners([account1.address])
     const provider = getEip1193Provider()
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,
@@ -64,7 +34,7 @@ describe('createTransactionBatch', () => {
 
     const batchTransaction = await safeSdk.createTransactionBatch(transactions)
 
-    const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+    const multiSendContractAddress = (await getMultiSendCallOnly()).contract.address
 
     chai.expect(batchTransaction).to.be.deep.equal({
       to: multiSendContractAddress,

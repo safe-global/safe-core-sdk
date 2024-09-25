@@ -4,7 +4,7 @@ import SafeApiKit, {
   ListOptions,
   SafeMessageListResponse
 } from '@safe-global/api-kit'
-import { SafeMessage } from '@safe-global/safe-core-sdk-types'
+import { SafeMessage } from '@safe-global/types-kit'
 import { createSafeClientResult, sendTransaction } from '@safe-global/sdk-starter-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 import {

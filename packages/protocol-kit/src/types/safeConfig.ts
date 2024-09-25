@@ -1,4 +1,4 @@
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 
 import { SafeProviderConfig } from './safeProvider'
 import { ContractNetworksConfig } from './contracts'

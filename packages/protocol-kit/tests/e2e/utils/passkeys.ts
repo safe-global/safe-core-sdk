@@ -1,7 +1,7 @@
-import { ethers } from 'ethers'
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
-import { PasskeyArgType, PasskeySigner, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
+import { PasskeyArgType, PasskeyClient, extractPasskeyCoordinates } from '@safe-global/protocol-kit'
 import { WebAuthnCredentials } from './webauthnShim'
+import { WalletClient, keccak256, toBytes, Transport, Chain, Account } from 'viem'
+import { asHex } from '@safe-global/protocol-kit/utils/types'
 
 let singleInstance: WebAuthnCredentials
 
@@ -21,19 +21,20 @@ export function getWebAuthnCredentials() {
 
 /**
  * Deploys the passkey contract for each of the signers.
- * @param passkeys An array of PasskeySigner representing the passkeys to deploy.
+ * @param passkeys An array of PasskeyClient representing the passkeys to deploy.
  * @param signer A signer to deploy the passkey contracts.
  * @returns Passkey deployment transactions
  */
 export async function deployPasskeysContract(
-  passkeys: PasskeySigner[],
-  signer: HardhatEthersSigner
+  passkeys: PasskeyClient[],
+  signer: WalletClient<Transport, Chain, Account>
 ) {
-  const toDeploy = passkeys.map(async (passkey) => {
+  const toDeploy = passkeys.map(async (client) => {
+    const { data, to, value } = client.createDeployTxRequest()
     const createPasskeySignerTransaction = {
-      to: await passkey.safeWebAuthnSignerFactoryContract.getAddress(),
-      value: '0',
-      data: passkey.encodeCreateSigner()
+      to,
+      value: BigInt(value),
+      data: asHex(data)
     }
     // Deploy the passkey signer
     return await signer.sendTransaction(createPasskeySignerTransaction)
@@ -60,11 +61,11 @@ export async function createMockPasskey(
         id: 'safe.global'
       },
       user: {
-        id: ethers.getBytes(ethers.id(name)),
+        id: toBytes(keccak256(toBytes(name))),
         name: name,
         displayName: name
       },
-      challenge: ethers.toBeArray(Date.now()),
+      challenge: toBytes(Date.now()),
       pubKeyCredParams: [{ type: 'public-key', alg: -7 }]
     }
   })

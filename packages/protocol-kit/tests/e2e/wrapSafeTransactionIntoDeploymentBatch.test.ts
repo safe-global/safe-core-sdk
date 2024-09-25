@@ -1,51 +1,28 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { itif } from './utils/helpers'
-import { getSafeWithOwners, getMultiSendCallOnly } from './utils/setupContracts'
+import {
+  safeVersionDeployed,
+  setupTests,
+  itif,
+  getSafeWithOwners,
+  getMultiSendCallOnly
+} from '@safe-global/testing-kit'
+import Safe from '@safe-global/protocol-kit/index'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 
 const AMOUNT_TO_TRANSFER = '500000000000000000' // 0.5 ETH
 
 describe('wrapSafeTransactionIntoDeploymentBatch', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [accounts[0].address],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        safeVersion: safeVersionDeployed
-      }
-    }
-    const provider = getEip1193Provider()
-
-    return {
-      accounts,
-      contractNetworks,
-      predictedSafe,
-      chainId,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   it('should throw an error if the Safe is already deployed', async () => {
-    const { accounts, contractNetworks, provider } = await setupTests()
+    const { accounts, contractNetworks } = await setupTests()
     const [account1, account2] = accounts
 
     const safe = await getSafeWithOwners([account1.address])
-    const safeAddress = await safe.getAddress()
+    const safeAddress = safe.address
 
     const safeSdk = await Safe.init({
       provider,
@@ -71,7 +48,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed == '1.4.1')(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
-      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
+      const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [, account2] = accounts
 
       const safeSdk = await Safe.init({
@@ -92,7 +69,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
-      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+      const multiSendContractAddress = (await getMultiSendCallOnly()).contract.address
 
       chai.expect(batchTransaction).to.be.deep.equal({
         to: multiSendContractAddress,
@@ -105,7 +82,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed == '1.3.0')(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
-      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
+      const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [, account2] = accounts
 
       const safeSdk = await Safe.init({
@@ -126,7 +103,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const batchTransaction = await safeSdk.wrapSafeTransactionIntoDeploymentBatch(safeTransaction)
 
-      const multiSendContractAddress = await (await getMultiSendCallOnly()).contract.getAddress()
+      const multiSendContractAddress = (await getMultiSendCallOnly()).contract.address
 
       chai.expect(batchTransaction).to.be.deep.equal({
         to: multiSendContractAddress,
@@ -139,7 +116,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
   itif(safeVersionDeployed >= '1.3.0')(
     'should include the custom salt nonce in the Safe deployment data',
     async () => {
-      const { accounts, contractNetworks, predictedSafe, provider } = await setupTests()
+      const { accounts, contractNetworks, predictedSafe } = await setupTests()
       const [, account2] = accounts
 
       const safeSdk = await Safe.init({
@@ -168,7 +145,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
 
       const customSaltNonceEncoded = safeSdk
         .getSafeProvider()
-        .encodeParameters(['uint256'], [customSaltNonce])
+        .encodeParameters('uint256', [customSaltNonce])
 
       // custom salt nonce included in the deployment data
       chai.expect(batchTransaction.data).to.contains(customSaltNonceEncoded.replace('0x', ''))

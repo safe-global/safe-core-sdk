@@ -1,16 +1,15 @@
-import { ethers } from 'ethers'
+import { recoverAddress } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import {
-  SafeSignature,
-  SafeEIP712Args,
-  SafeTransactionData
-} from '@safe-global/safe-core-sdk-types'
-import { bufferToHex, ecrecover, pubToAddress } from 'ethereumjs-util'
+import { SafeSignature, SafeEIP712Args, SafeTransactionData } from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
 import { SigningMethod } from '@safe-global/protocol-kit/types'
+import { hashTypedData } from '../eip-712'
+import { encodeTypedData } from '../eip-712/encode'
+import { asHash, asHex } from '../types'
+import { EMPTY_DATA } from '../constants'
 
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
@@ -22,25 +21,18 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
   return new EthSafeSignature(ownerAddress, signature)
 }
 
-export function isTxHashSignedWithPrefix(
+export async function isTxHashSignedWithPrefix(
   txHash: string,
   signature: string,
   ownerAddress: string
-): boolean {
+): Promise<boolean> {
   let hasPrefix
   try {
-    const rsvSig = {
-      r: Buffer.from(signature.slice(2, 66), 'hex'),
-      s: Buffer.from(signature.slice(66, 130), 'hex'),
-      v: parseInt(signature.slice(130, 132), 16)
-    }
-    const recoveredData = ecrecover(
-      Buffer.from(txHash.slice(2), 'hex'),
-      rsvSig.v,
-      rsvSig.r,
-      rsvSig.s
-    )
-    const recoveredAddress = bufferToHex(pubToAddress(recoveredData))
+    const recoveredAddress = await recoverAddress({
+      hash: asHash(txHash),
+      signature: asHex(signature)
+    })
+
     hasPrefix = !sameString(recoveredAddress, ownerAddress)
   } catch (e) {
     hasPrefix = true
@@ -49,21 +41,21 @@ export function isTxHashSignedWithPrefix(
 }
 
 type AdjustVOverload = {
-  (signingMethod: SigningMethod.ETH_SIGN_TYPED_DATA, signature: string): string
+  (signingMethod: SigningMethod.ETH_SIGN_TYPED_DATA, signature: string): Promise<string>
   (
     signingMethod: SigningMethod.ETH_SIGN,
     signature: string,
     safeTxHash: string,
     sender: string
-  ): string
+  ): Promise<string>
 }
 
-export const adjustVInSignature: AdjustVOverload = (
+export const adjustVInSignature: AdjustVOverload = async (
   signingMethod: SigningMethod.ETH_SIGN | SigningMethod.ETH_SIGN_TYPED_DATA,
   signature: string,
   safeTxHash?: string,
   signerAddress?: string
-): string => {
+): Promise<string> => {
   const ETHEREUM_V_VALUES = [0, 1, 27, 28]
   const MIN_VALID_V_VALUE_FOR_SAFE_ECDSA = 27
   let signatureV = parseInt(signature.slice(-2), 16)
@@ -86,7 +78,7 @@ export const adjustVInSignature: AdjustVOverload = (
       signatureV += MIN_VALID_V_VALUE_FOR_SAFE_ECDSA
     }
     const adjustedSignature = signature.slice(0, -2) + signatureV.toString(16)
-    const signatureHasPrefix = isTxHashSignedWithPrefix(
+    const signatureHasPrefix = await isTxHashSignedWithPrefix(
       safeTxHash as string,
       adjustedSignature,
       signerAddress as string
@@ -117,7 +109,7 @@ export async function generateSignature(
 
   let signature = await safeProvider.signMessage(hash)
 
-  signature = adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
+  signature = await adjustVInSignature(SigningMethod.ETH_SIGN, signature, hash, signerAddress)
   return new EthSafeSignature(signerAddress, signature)
 }
 
@@ -134,7 +126,7 @@ export async function generateEIP712Signature(
   //@ts-expect-error: Evaluate removal of methodVersion and use v4
   let signature = await safeProvider.signTypedData(safeEIP712Args, methodVersion)
 
-  signature = adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
+  signature = await adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
   return new EthSafeSignature(signerAddress, signature)
 }
 
@@ -158,7 +150,7 @@ export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
     left.signer.toLowerCase().localeCompare(right.signer.toLowerCase())
   )
 
-  let signatureBytes = '0x'
+  let signatureBytes = EMPTY_DATA
   let dynamicBytes = ''
 
   for (const signature of signatures) {
@@ -198,11 +190,12 @@ export const preimageSafeTransactionHash = (
 ): string => {
   const safeTxTypes = getEip712TxTypes(safeVersion)
 
-  return ethers.TypedDataEncoder.encode(
-    { verifyingContract: safeAddress, chainId },
-    { SafeTx: safeTxTypes.SafeTx },
-    safeTx
-  )
+  const message = safeTx as unknown as Record<string, unknown>
+  return encodeTypedData({
+    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    types: { SafeTx: safeTxTypes.SafeTx },
+    message
+  })
 }
 
 export const preimageSafeMessageHash = (
@@ -213,11 +206,11 @@ export const preimageSafeMessageHash = (
 ): string => {
   const safeMessageTypes = getEip712MessageTypes(safeVersion)
 
-  return ethers.TypedDataEncoder.encode(
-    { verifyingContract: safeAddress, chainId },
-    { SafeMessage: safeMessageTypes.SafeMessage },
-    { message }
-  )
+  return encodeTypedData({
+    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    types: { SafeMessage: safeMessageTypes.SafeMessage },
+    message: { message }
+  })
 }
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -230,15 +223,17 @@ export const calculateSafeTransactionHash = (
 ): string => {
   const safeTxTypes = getEip712TxTypes(safeVersion)
   const domain: {
-    chainId?: bigint
+    chainId?: number
     verifyingContract: string
   } = { verifyingContract: safeAddress }
 
   if (semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)) {
-    domain.chainId = chainId
+    domain.chainId = Number(chainId)
   }
 
-  return ethers.TypedDataEncoder.hash(domain, { SafeTx: safeTxTypes.SafeTx }, safeTx)
+  const message = safeTx as unknown as Record<string, unknown>
+
+  return hashTypedData({ domain, types: { SafeTx: safeTxTypes.SafeTx }, message })
 }
 
 export const calculateSafeMessageHash = (
@@ -249,9 +244,9 @@ export const calculateSafeMessageHash = (
 ): string => {
   const safeMessageTypes = getEip712MessageTypes(safeVersion)
 
-  return ethers.TypedDataEncoder.hash(
-    { verifyingContract: safeAddress, chainId },
-    { SafeMessage: safeMessageTypes.SafeMessage },
-    { message }
-  )
+  return hashTypedData({
+    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    types: { SafeMessage: safeMessageTypes.SafeMessage },
+    message: { message }
+  })
 }

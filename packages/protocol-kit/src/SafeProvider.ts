@@ -1,12 +1,4 @@
 import {
-  ethers,
-  TransactionResponse,
-  AbstractSigner,
-  Provider,
-  BrowserProvider,
-  JsonRpcProvider
-} from 'ethers'
-import {
   SAFE_FEATURES,
   generateTypedData,
   hasSafeFeature,
@@ -14,18 +6,16 @@ import {
 } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import {
-  getSafeWebAuthnSharedSignerContract,
-  getSafeWebAuthnSignerFactoryContract
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
-import { EMPTY_DATA } from '@safe-global/protocol-kit/utils/constants'
-
 import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
   SafeEIP712Args,
   SafeVersion
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
@@ -42,17 +32,68 @@ import {
   SafeProviderTransaction,
   GetContractProps,
   SafeProviderConfig,
+  ExternalClient,
+  ExternalSigner,
+  Eip1193Provider,
+  HttpTransport,
+  SocketTransport,
   SafeSigner,
   SafeConfig,
-  ContractNetworksConfig
+  ContractNetworksConfig,
+  PasskeyArgType,
+  PasskeyClient
 } from '@safe-global/protocol-kit/types'
-import PasskeySigner from './utils/passkeys/PasskeySigner'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
+import { asHash, asHex, getChainById } from './utils/types'
+import { asBlockId } from './utils/block'
+import {
+  createPublicClient,
+  createWalletClient,
+  custom,
+  http,
+  getAddress,
+  isAddress,
+  Transaction,
+  decodeAbiParameters,
+  encodeAbiParameters,
+  parseAbiParameters,
+  toBytes,
+  Chain,
+  Abi,
+  ReadContractParameters,
+  ContractFunctionName,
+  ContractFunctionArgs,
+  walletActions,
+  publicActions,
+  createClient,
+  PublicRpcSchema,
+  WalletRpcSchema,
+  rpcSchema
+} from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import {
+  call,
+  estimateGas,
+  getBalance,
+  getCode,
+  getTransaction,
+  getTransactionCount,
+  getStorageAt,
+  readContract
+} from 'viem/actions'
+import {
+  toEstimateGasParameters,
+  toCallGasParameters,
+  sameString
+} from '@safe-global/protocol-kit/utils'
+import { isEip1193Provider, isPrivateKey, isSignerPasskeyClient } from './utils/provider'
+import { createPasskeyClient, PASSKEY_CLIENT_KEY } from '@safe-global/protocol-kit/utils'
 
 class SafeProvider {
-  #externalProvider: BrowserProvider | JsonRpcProvider
-  provider: SafeProviderConfig['provider']
+  #chain?: Chain
+  #externalProvider: ExternalClient
   signer?: SafeSigner
+  provider: Eip1193Provider | HttpTransport | SocketTransport
 
   constructor({
     provider,
@@ -61,17 +102,17 @@ class SafeProvider {
     provider: SafeProviderConfig['provider']
     signer?: SafeSigner
   }) {
-    if (typeof provider === 'string') {
-      this.#externalProvider = new JsonRpcProvider(provider, undefined, { staticNetwork: true })
-    } else {
-      this.#externalProvider = new BrowserProvider(provider)
-    }
+    this.#externalProvider = createPublicClient({
+      transport: isEip1193Provider(provider)
+        ? custom(provider as Eip1193Provider)
+        : http(provider as string)
+    })
 
     this.provider = provider
     this.signer = signer
   }
 
-  getExternalProvider(): Provider {
+  getExternalProvider(): ExternalClient {
     return this.#externalProvider
   }
 
@@ -99,9 +140,8 @@ class SafeProvider {
       const customContracts = contractNetworks?.[chainId.toString()]
 
       let passkeySigner
-      const isPasskeySignerConfig = !(signer instanceof PasskeySigner)
 
-      if (isPasskeySignerConfig) {
+      if (!isSignerPasskeyClient(signer)) {
         // signer is type PasskeyArgType {rawId, coordinates, customVerifierAddress? }
         const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
           safeProvider,
@@ -115,8 +155,8 @@ class SafeProvider {
           customContracts
         })
 
-        passkeySigner = await PasskeySigner.init(
-          signer,
+        passkeySigner = await createPasskeyClient(
+          signer as PasskeyArgType,
           safeWebAuthnSignerFactoryContract,
           safeWebAuthnSharedSignerContract,
           safeProvider.getExternalProvider(),
@@ -125,8 +165,8 @@ class SafeProvider {
           chainId.toString()
         )
       } else {
-        // signer was already initialized and we pass a PasskeySigner instance (reconnecting)
-        passkeySigner = signer
+        // signer was already initialized and we pass a PasskeyClient instance (reconnecting)
+        passkeySigner = signer as PasskeyClient
       }
 
       return new SafeProvider({
@@ -141,36 +181,64 @@ class SafeProvider {
     }
   }
 
-  async getExternalSigner(): Promise<AbstractSigner | undefined> {
-    if (typeof this.signer === 'string') {
-      // If the signer is not an Ethereum address, it should be a private key
-      if (!ethers.isAddress(this.signer)) {
-        const privateKeySigner = new ethers.Wallet(this.signer, this.#externalProvider)
-        return privateKeySigner
-      }
+  async getExternalSigner(): Promise<ExternalSigner | undefined> {
+    const { transport, chain = await this.#getChain() } = this.getExternalProvider()
 
-      return this.#externalProvider.getSigner(this.signer)
-    } else {
-      if (this.signer) {
-        return this.signer
-      }
+    if (isSignerPasskeyClient(this.signer)) {
+      return this.signer as PasskeyClient
     }
 
-    if (this.#externalProvider instanceof BrowserProvider) {
-      return this.#externalProvider.getSigner()
+    if (isPrivateKey(this.signer)) {
+      // This is a client with a local account, the account needs to be of type Accound as viem consider strings as 'json-rpc' (on parseAccount)
+      const account = privateKeyToAccount(asHex(this.signer as string))
+      return createWalletClient({
+        account,
+        chain,
+        transport: custom(transport)
+      })
     }
+
+    // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
+    if (this.signer && typeof this.signer === 'string') {
+      return createWalletClient({
+        account: this.signer,
+        chain,
+        transport: custom(transport)
+      })
+    }
+
+    try {
+      // This behavior is a reproduction of JsonRpcApiProvider#getSigner (which is super of BrowserProvider).
+      // it dispatches and eth_accounts and picks the index 0. https://github.com/ethers-io/ethers.js/blob/a4b1d1f43fca14f2e826e3c60e0d45f5b6ef3ec4/src.ts/providers/provider-jsonrpc.ts#L1119C24-L1119C37
+      const wallet = createWalletClient({
+        chain,
+        transport: custom(transport)
+      })
+
+      const [address] = await wallet.getAddresses()
+      if (address) {
+        const client = createClient({
+          account: address,
+          transport: custom(transport),
+          chain: wallet.chain,
+          rpcSchema: rpcSchema<WalletRpcSchema & PublicRpcSchema>()
+        })
+          .extend(walletActions)
+          .extend(publicActions)
+        return client
+      }
+    } catch {}
 
     return undefined
   }
 
   async isPasskeySigner(): Promise<boolean> {
-    const signer = (await this.getExternalSigner()) as PasskeySigner
-
-    return signer && !!signer.passkeyRawId
+    const signer = await this.getExternalSigner()
+    return !!signer && signer.key === PASSKEY_CLIENT_KEY
   }
 
   isAddress(address: string): boolean {
-    return ethers.isAddress(address)
+    return isAddress(address)
   }
 
   async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
@@ -179,19 +247,26 @@ class SafeProvider {
   }
 
   async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
-    return this.#externalProvider.getBalance(address, blockTag)
+    return getBalance(this.#externalProvider, {
+      address,
+      ...asBlockId(blockTag)
+    })
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {
-    return this.#externalProvider.getTransactionCount(address, blockTag)
+    return getTransactionCount(this.#externalProvider, {
+      address,
+      ...asBlockId(blockTag)
+    })
   }
 
   async getChainId(): Promise<bigint> {
-    return (await this.#externalProvider.getNetwork()).chainId
+    const res = await this.#externalProvider.getChainId()
+    return BigInt(res)
   }
 
   getChecksummedAddress(address: string): string {
-    return ethers.getAddress(address)
+    return getAddress(asHex(address))
   }
 
   async getSafeContract({
@@ -214,7 +289,7 @@ class SafeProvider {
     customContractAddress,
     customContractAbi
   }: GetContractProps) {
-    const signerOrProvider = (await this.getExternalSigner()) || this.#externalProvider
+    const signerOrProvider = this.#externalProvider
     return getSafeProxyFactoryContractInstance(
       safeVersion,
       this,
@@ -324,39 +399,63 @@ class SafeProvider {
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
-    return this.#externalProvider.getCode(address, blockTag)
+    const res = await getCode(this.#externalProvider, {
+      address,
+      ...asBlockId(blockTag)
+    })
+
+    return res ?? '0x'
   }
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
-    const contractCode = await this.#externalProvider.getCode(address, blockTag)
-    return contractCode !== EMPTY_DATA
+    const contractCode = await getCode(this.#externalProvider, {
+      address,
+      ...asBlockId(blockTag)
+    })
+    // https://github.com/wevm/viem/blob/963877cd43083260a4399d6f0bbf142ccede53b4/src/actions/public/getCode.ts#L71
+    return !!contractCode
   }
 
   async getStorageAt(address: string, position: string): Promise<string> {
-    const content = await this.#externalProvider.getStorage(address, position)
-    const decodedContent = this.decodeParameters(['address'], content)
+    const content = await getStorageAt(this.#externalProvider, {
+      address,
+      slot: asHex(position)
+    })
+    const decodedContent = this.decodeParameters('address', asHex(content))
     return decodedContent[0]
   }
 
-  async getTransaction(transactionHash: string): Promise<TransactionResponse> {
-    return this.#externalProvider.getTransaction(transactionHash) as Promise<TransactionResponse>
+  async getTransaction(transactionHash: string): Promise<Transaction> {
+    return getTransaction(this.#externalProvider, {
+      hash: asHash(transactionHash)
+    }) // as Promise<Transaction>
   }
 
   async getSignerAddress(): Promise<string | undefined> {
-    const signer = await this.getExternalSigner()
-
-    return signer?.getAddress()
+    const externalSigner = await this.getExternalSigner()
+    return externalSigner ? getAddress(externalSigner.account.address) : undefined
   }
 
   async signMessage(message: string): Promise<string> {
     const signer = await this.getExternalSigner()
+    const account = await this.getSignerAddress()
 
-    if (!signer) {
+    if (!signer || !account) {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
-    const messageArray = ethers.getBytes(message)
 
-    return signer.signMessage(messageArray)
+    // The address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
+    // For viem, in this context a typeof account === 'string' to singMessage is assumed to be a json-rpc account (returned by parseAccount function)
+    if (sameString(signer.account.address, account)) {
+      return await signer?.signMessage!({
+        message: { raw: toBytes(message) }
+      })
+    } else {
+      return await signer?.signMessage!({
+        account: account,
+        message: { raw: toBytes(message) }
+      })
+    }
   }
 
   async signTypedData(safeEIP712Args: SafeEIP712Args): Promise<string> {
@@ -368,13 +467,19 @@ class SafeProvider {
 
     if (isTypedDataSigner(signer)) {
       const typedData = generateTypedData(safeEIP712Args)
-      const signature = await signer.signTypedData(
-        typedData.domain,
-        typedData.primaryType === 'SafeMessage'
-          ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
-          : { SafeTx: (typedData as EIP712TypedDataTx).types.SafeTx },
-        typedData.message
-      )
+      const { chainId, verifyingContract } = typedData.domain
+      const chain = chainId ? Number(chainId) : undefined // ensure empty string becomes undefined
+      const domain = { verifyingContract: verifyingContract, chainId: chain }
+
+      const signature = await signer.signTypedData({
+        domain,
+        types:
+          typedData.primaryType === 'SafeMessage'
+            ? { SafeMessage: (typedData as EIP712TypedDataMessage).types.SafeMessage }
+            : { SafeTx: (typedData as EIP712TypedDataTx).types.SafeTx },
+        primaryType: typedData.primaryType,
+        message: typedData.message
+      })
       return signature
     }
 
@@ -382,20 +487,42 @@ class SafeProvider {
   }
 
   async estimateGas(transaction: SafeProviderTransaction): Promise<string> {
-    return (await this.#externalProvider.estimateGas(transaction)).toString()
+    const converted = toEstimateGasParameters(transaction)
+    return (await estimateGas(this.#externalProvider, converted)).toString()
   }
 
-  call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
-    return this.#externalProvider.call({ ...transaction, blockTag })
+  async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
+    const converted = toCallGasParameters(transaction)
+    const { data } = await call(this.#externalProvider, {
+      ...converted,
+      ...asBlockId(blockTag)
+    })
+    return data ?? '0x'
+  }
+
+  async readContract<
+    const abi extends Abi | readonly unknown[],
+    functionName extends ContractFunctionName<abi, 'pure' | 'view'>,
+    const args extends ContractFunctionArgs<abi, 'pure' | 'view', functionName>
+  >(args: ReadContractParameters<abi, functionName, args>) {
+    return readContract(this.#externalProvider, args)
   }
 
   // TODO: fix anys
-  encodeParameters(types: string[], values: any[]): string {
-    return new ethers.AbiCoder().encode(types, values)
+  encodeParameters(types: string, values: any[]): string {
+    return encodeAbiParameters(parseAbiParameters(types), values)
   }
 
-  decodeParameters(types: string[], values: string): { [key: string]: any } {
-    return new ethers.AbiCoder().decode(types, values)
+  decodeParameters(types: string, values: string): { [key: string]: any } {
+    return decodeAbiParameters(parseAbiParameters(types), asHex(values))
+  }
+
+  async #getChain(): Promise<Chain> {
+    if (this.#chain) return this.#chain
+    const chain = getChainById(await this.getChainId())
+    if (!chain) throw new Error('Invalid chainId')
+    this.#chain = chain
+    return this.#chain
   }
 }
 

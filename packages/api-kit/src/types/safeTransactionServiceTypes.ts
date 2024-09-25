@@ -1,11 +1,11 @@
-import { Signer, TypedDataDomain, TypedDataField } from 'ethers'
+import { Account, Chain, Transport, TypedDataDomain, TypedDataParameter, WalletClient } from 'viem'
 import {
   SafeMultisigTransactionResponse,
   SafeTransactionData,
   UserOperation,
   SafeOperationResponse,
   ListResponse
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 export type ListOptions = {
   /** Maximum number of results to return per page */
@@ -77,14 +77,14 @@ export type AddSafeDelegateProps = {
   safeAddress?: string
   delegateAddress: string
   delegatorAddress: string
-  signer: Signer
+  signer: WalletClient<Transport, Chain, Account>
   label: string
 }
 
 export type DeleteSafeDelegateProps = {
   delegateAddress: string
   delegatorAddress: string
-  signer: Signer
+  signer: WalletClient<Transport, Chain, Account>
 }
 
 export type SafeDelegateResponse = {
@@ -248,19 +248,20 @@ export type AddMessageProps = {
 }
 
 export type GetSafeMessageListProps = {
+  /** Which field to use when ordering the results. It can be: `created`, `modified` (default: `-created`) */
   ordering?: string
 } & ListOptions
 
 export type EIP712TypedData = {
   domain: TypedDataDomain
-  types: TypedDataField
+  types: TypedDataParameter
   message: Record<string, unknown>
 }
 
 export type GetSafeOperationListProps = {
   /** Address of the Safe to get SafeOperations for */
   safeAddress: string
-  /** Which field to use when ordering the results */
+  /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
 } & ListOptions
 

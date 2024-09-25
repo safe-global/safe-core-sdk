@@ -1,8 +1,7 @@
 import { Abi } from 'abitype'
-import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
 import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
@@ -24,7 +23,7 @@ import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
  * - SafeContract_v1_0_0  extends SafeBaseContract<SafeContract_v1_0_0_Abi>
  */
 abstract class SafeBaseContract<
-  SafeContractAbiType extends InterfaceAbi & Abi
+  SafeContractAbiType extends Abi
 > extends BaseContract<SafeContractAbiType> {
   contractName: contractName
 

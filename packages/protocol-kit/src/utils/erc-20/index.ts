@@ -1,7 +1,6 @@
-import { Interface } from 'ethers'
 import Safe from '@safe-global/protocol-kit/Safe'
-import { Transaction } from '@safe-global/safe-core-sdk-types'
-
+import { Transaction } from '@safe-global/types-kit'
+import { encodeFunctionData, parseAbi } from 'viem'
 import { ZERO_ADDRESS } from '../constants'
 
 const ERC20_ABI = [
@@ -20,13 +19,16 @@ const ERC20_ABI = [
  */
 export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promise<number> {
   const safeProvider = safe.getSafeProvider()
-  const erc20Interface = new Interface(ERC20_ABI)
+  const data = encodeFunctionData({
+    abi: parseAbi(ERC20_ABI),
+    functionName: 'decimals'
+  })
 
   const getTokenDecimalsTransaction = {
     to: tokenAddress,
     from: tokenAddress,
     value: '0',
-    data: erc20Interface.encodeFunctionData('decimals')
+    data
   }
 
   const response = await safeProvider.call(getTokenDecimalsTransaction)
@@ -83,12 +85,16 @@ export function createERC20TokenTransferTransaction(
   toAddress: string,
   amount: string
 ): Transaction {
-  const erc20Interface = new Interface(ERC20_ABI)
+  const data = encodeFunctionData({
+    abi: parseAbi(ERC20_ABI),
+    functionName: 'transfer',
+    args: [toAddress, amount]
+  })
 
   const transferTransaction = {
     to: tokenAddress,
     value: '0',
-    data: erc20Interface.encodeFunctionData('transfer', [toAddress, amount])
+    data
   }
 
   return transferTransaction

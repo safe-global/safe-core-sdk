@@ -35,9 +35,9 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyCoordinates,
   extractPasskeyData,
   getDefaultFCLP256VerifierAddress,
-  extractPasskeyCoordinates,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -66,8 +66,7 @@ import {
   hashSafeMessage,
   generateTypedData
 } from './utils/eip-712'
-
-import PasskeySigner from './utils/passkeys/PasskeySigner'
+import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 
 export {
@@ -121,12 +120,18 @@ export {
   hashSafeMessage,
   generateTypedData,
   SafeProvider,
+  createPasskeyClient,
   EthSafeTransaction,
   EthSafeMessage,
-  PasskeySigner,
   getPasskeyOwnerAddress
 }
 
 export * from './types'
 
 export default Safe
+
+declare module 'abitype' {
+  export interface Register {
+    AddressType: string
+  }
+}

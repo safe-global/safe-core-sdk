@@ -8,7 +8,7 @@ import {
   SignMessageLibContract_v1_3_0_Contract,
   SignMessageLibContract_v1_3_0_Function,
   signMessageLib_1_3_0_ContractArtifacts
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 /**
  * SignMessageLibContract_v1_3_0  is the implementation specific to the SignMessageLib contract version 1.3.0.
@@ -49,7 +49,7 @@ class SignMessageLibContract_v1_3_0
    * @param args - Array[message]
    */
   getMessageHash: SignMessageLibContract_v1_3_0_Function<'getMessageHash'> = async (args) => {
-    return [await this.contract.getMessageHash(...args)]
+    return [await this.read('getMessageHash', args)]
   }
 
   /**
@@ -63,9 +63,7 @@ class SignMessageLibContract_v1_3_0
       options.gasLimit = Number(await this.estimateGas('signMessage', data, { ...options }))
     }
 
-    const txResponse = await this.contract.signMessage(data, { ...options })
-
-    return toTxResult(txResponse, options)
+    return toTxResult(this.runner!, await this.write('signMessage', data, options), options)
   }
 }
 

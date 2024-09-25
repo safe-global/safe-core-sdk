@@ -1,10 +1,10 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class SimulateTxAccessorBaseContract extends BaseContract to specifically integrate with the SimulateTxAccessor contract.
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - SimulateTxAccessorContract_v1_3_0  extends SimulateTxAccessorBaseContract<SimulateTxAccessorContract_v1_3_0_Abi>
  */
 abstract class SimulateTxAccessorBaseContract<
-  SimulateTxAccessorContractAbiType extends InterfaceAbi & Abi
+  SimulateTxAccessorContractAbiType extends Abi
 > extends BaseContract<SimulateTxAccessorContractAbiType> {
   contractName: contractName
 
@@ -42,7 +42,7 @@ abstract class SimulateTxAccessorBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SimulateTxAccessorContractAbiType,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const contractName = 'simulateTxAccessorVersion'
 

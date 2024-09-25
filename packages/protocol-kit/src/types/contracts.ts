@@ -1,6 +1,5 @@
-import { JsonFragment } from 'ethers'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
-
+import { Abi } from 'viem'
+import { SafeVersion } from '@safe-global/types-kit'
 import SafeContract_v1_0_0 from '@safe-global/protocol-kit/contracts/Safe/v1.0.0/SafeContract_v1_0_0'
 import SafeContract_v1_1_1 from '@safe-global/protocol-kit/contracts/Safe/v1.1.1/SafeContract_v1_1_1'
 import SafeContract_v1_2_0 from '@safe-global/protocol-kit/contracts/Safe/v1.2.0/SafeContract_v1_2_0'
@@ -82,7 +81,7 @@ export type SafeWebAuthnSharedSignerContractImplementationType =
 export type GetContractProps = {
   safeVersion: SafeVersion
   customContractAddress?: string
-  customContractAbi?: JsonFragment | JsonFragment[]
+  customContractAbi?: Abi
   isL1SafeSingleton?: boolean
 }
 
@@ -90,43 +89,43 @@ export type ContractNetworkConfig = {
   /** safeSingletonAddress - Address of the Safe Singleton contract deployed on a specific network */
   safeSingletonAddress: string
   /** safeSingletonAbi - Abi of the Safe Singleton contract deployed on a specific network */
-  safeSingletonAbi?: JsonFragment | JsonFragment[]
+  safeSingletonAbi?: Abi
   /** safeProxyFactoryAddress - Address of the SafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAddress: string
   /** safeProxyFactoryAbi - Abi of the SafeProxyFactory contract deployed on a specific network */
-  safeProxyFactoryAbi?: JsonFragment | JsonFragment[]
+  safeProxyFactoryAbi?: Abi
   /** multiSendAddress - Address of the MultiSend contract deployed on a specific network */
   multiSendAddress: string
   /** multiSendAbi - Abi of the MultiSend contract deployed on a specific network */
-  multiSendAbi?: JsonFragment | JsonFragment[]
+  multiSendAbi?: Abi
   /** multiSendCallOnlyAddress - Address of the MultiSendCallOnly contract deployed on a specific network */
   multiSendCallOnlyAddress: string
   /** multiSendCallOnlyAbi - Abi of the MultiSendCallOnly contract deployed on a specific network */
-  multiSendCallOnlyAbi?: JsonFragment | JsonFragment[]
+  multiSendCallOnlyAbi?: Abi
   /** fallbackHandlerAddress - Address of the Fallback Handler contract deployed on a specific network */
   fallbackHandlerAddress: string
   /** fallbackHandlerAbi - Abi of the Fallback Handler contract deployed on a specific network */
-  fallbackHandlerAbi?: JsonFragment | JsonFragment[]
+  fallbackHandlerAbi?: Abi
   /** signMessageLibAddress - Address of the SignMessageLib contract deployed on a specific network */
   signMessageLibAddress: string
   /** signMessageLibAbi - Abi of the SignMessageLib contract deployed on a specific network */
-  signMessageLibAbi?: JsonFragment | JsonFragment[]
+  signMessageLibAbi?: Abi
   /** createCallAddress - Address of the CreateCall contract deployed on a specific network */
   createCallAddress: string
   /** createCallAbi - Abi of the CreateCall contract deployed on a specific network */
-  createCallAbi?: JsonFragment | JsonFragment[]
+  createCallAbi?: Abi
   /** simulateTxAccessorAddress - Address of the SimulateTxAccessor contract deployed on a specific network */
   simulateTxAccessorAddress: string
   /** simulateTxAccessorAbi - Abi of the SimulateTxAccessor contract deployed on a specific network */
-  simulateTxAccessorAbi?: JsonFragment | JsonFragment[]
+  simulateTxAccessorAbi?: Abi
   /** safeWebAuthnSignerFactoryAddress - Address of the SafeWebAuthnSignerFactory contract deployed on a specific network */
   safeWebAuthnSignerFactoryAddress: string
   /** safeWebAuthnSignerFactoryAbi - Abi of the SafeWebAuthnSignerFactory contract deployed on a specific network */
-  safeWebAuthnSignerFactoryAbi?: JsonFragment | JsonFragment[]
+  safeWebAuthnSignerFactoryAbi?: Abi
   /** safeWebAuthnSharedSignerAddress - Address of the SafeWebAuthnSharedSigner contract deployed on a specific network */
   safeWebAuthnSharedSignerAddress: string
   /** safeWebAuthnSharedSignerAbi - Abi of the SafeWebAuthnSharedSigner contract deployed on a specific network */
-  safeWebAuthnSharedSignerAbi?: JsonFragment | JsonFragment[]
+  safeWebAuthnSharedSignerAbi?: Abi
 }
 
 export type ContractNetworksConfig = {

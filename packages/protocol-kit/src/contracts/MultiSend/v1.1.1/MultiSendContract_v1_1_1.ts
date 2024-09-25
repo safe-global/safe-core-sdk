@@ -5,7 +5,7 @@ import {
   multisend_1_1_1_ContractArtifacts,
   MultiSendContract_v1_1_1_Abi,
   MultiSendContract_v1_1_1_Contract
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 /**
  * MultiSendContract_v1_1_1  is the implementation specific to the MultiSend contract version 1.1.1.

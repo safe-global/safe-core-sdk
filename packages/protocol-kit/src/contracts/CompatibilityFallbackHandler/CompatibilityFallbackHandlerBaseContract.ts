@@ -1,10 +1,10 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
+import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class  CompatibilityFallbackHandlerBaseContract extends BaseContract to specifically integrate with the CompatibilityFallbackHandler contract.
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - CompatibilityFallbackHandlerContract_v1_3_0  extends  CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
  */
 abstract class CompatibilityFallbackHandlerBaseContract<
-  CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi & Abi
+  CompatibilityFallbackHandlerContractAbiType extends Abi
 > extends BaseContract<CompatibilityFallbackHandlerContractAbiType> {
   contractName: contractName
 
@@ -42,7 +42,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
-    runner?: ContractRunner | null
+    runner?: ExternalClient
   ) {
     const contractName = 'compatibilityFallbackHandler'
 

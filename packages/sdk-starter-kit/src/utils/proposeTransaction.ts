@@ -1,6 +1,6 @@
 import Safe, { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { SafeTransaction } from '@safe-global/safe-core-sdk-types'
+import { SafeTransaction } from '@safe-global/types-kit'
 
 /**
  *  Propose a transaction to the Safe

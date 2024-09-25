@@ -5,7 +5,7 @@ import {
   multiSendCallOnly_1_4_1_ContractArtifacts,
   MultiSendCallOnlyContract_v1_4_1_Abi,
   MultiSendCallOnlyContract_v1_4_1_Contract
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 /**
  * MultiSendCallOnlyContract_v1_4_1  is the implementation specific to the MultiSend contract version 1.4.1.

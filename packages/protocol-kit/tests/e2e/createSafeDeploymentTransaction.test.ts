@@ -11,7 +11,8 @@ import {
 import Safe, {
   PREDETERMINED_SALT_NONCE,
   SafeProvider,
-  encodeSetupCallData
+  encodeSetupCallData,
+  getSafeContract
 } from '@safe-global/protocol-kit/index'
 import { getEip1193Provider } from './utils/setupProvider'
 
@@ -136,11 +137,11 @@ describe('createSafeDeploymentTransaction', () => {
     const safeProvider = safeSdk.getSafeProvider()
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
-    const customContract = contractNetworks[chainId.toString()]
-    const safeContract = await safeProvider.getSafeContract({
+    const customContracts = contractNetworks[chainId.toString()]
+    const safeContract = await getSafeContract({
+      safeProvider,
       safeVersion: safeVersionDeployed,
-      customContractAddress: customContract?.safeSingletonAddress,
-      customContractAbi: customContract?.safeSingletonAbi
+      customContracts
     })
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe

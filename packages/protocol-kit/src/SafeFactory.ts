@@ -1,7 +1,7 @@
 import Safe from '@safe-global/protocol-kit/Safe'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import {
@@ -68,7 +68,7 @@ class SafeFactory {
     this.#contractNetworks = contractNetworks
     const chainId = await this.#safeProvider.getChainId()
     const customContracts = contractNetworks?.[chainId.toString()]
-    this.#safeProxyFactoryContract = await getProxyFactoryContract({
+    this.#safeProxyFactoryContract = await getSafeProxyFactoryContract({
       safeProvider: this.#safeProvider,
       safeVersion,
       customContracts

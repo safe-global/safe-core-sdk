@@ -1,7 +1,6 @@
 import MultiSendCallOnlyBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendCallOnlyBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
-  SafeVersion,
   MultiSendCallOnlyContract_v1_3_0_Abi,
   MultiSendCallOnlyContract_v1_3_0_Contract,
   multiSendCallOnly_1_3_0_ContractArtifacts
@@ -19,8 +18,6 @@ class MultiSendCallOnlyContract_v1_3_0
   extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContract_v1_3_0_Abi>
   implements MultiSendCallOnlyContract_v1_3_0_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of MultiSendCallOnlyContract_v1_3_0
    *
@@ -39,8 +36,6 @@ class MultiSendCallOnlyContract_v1_3_0
     const defaultAbi = multiSendCallOnly_1_3_0_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
 }
 

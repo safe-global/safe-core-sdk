@@ -3,7 +3,6 @@ import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import {
-  SafeVersion,
   SafeProxyFactoryContract_v1_4_1_Abi,
   SafeProxyFactoryContract_v1_4_1_Contract,
   SafeProxyFactoryContract_v1_4_1_Function,
@@ -12,7 +11,6 @@ import {
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
 import { asHex } from '@safe-global/protocol-kit/utils/types'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeProxyFactoryContract_v1_4_1  is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -26,8 +24,6 @@ class SafeProxyFactoryContract_v1_4_1
   extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_4_1_Abi>
   implements SafeProxyFactoryContract_v1_4_1_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SafeProxyFactoryContract_v1_4_1
    *
@@ -40,23 +36,12 @@ class SafeProxyFactoryContract_v1_4_1
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi,
-    runner?: ExternalClient
+    customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = safeProxyFactory_1_4_1_ContractArtifacts.abi
 
-    super(
-      chainId,
-      safeProvider,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi,
-      runner
-    )
-
-    this.safeVersion = safeVersion
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
   }
 
   /**
@@ -133,7 +118,7 @@ class SafeProxyFactoryContract_v1_4_1
       ).toString()
     }
 
-    const coverted = await this.convertOptions(options)
+    const coverted = this.convertOptions(options)
     const proxyAddress = await this.getWallet()
       .writeContract({
         address: this.contractAddress,

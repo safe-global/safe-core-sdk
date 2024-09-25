@@ -1,4 +1,4 @@
-import { hashSafeMessage } from '@safe-global/protocol-kit'
+import { getSignMessageLibContract, hashSafeMessage } from '@safe-global/protocol-kit'
 import { OperationType } from '@safe-global/types-kit'
 
 import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
@@ -33,11 +33,10 @@ export function onChainMessages() {
     async sendOnChainMessage(props: SendOnChainMessageProps): Promise<SafeClientResult> {
       const { message, ...transactionOptions } = props
 
-      const signMessageLibContract = await client.protocolKit
-        .getSafeProvider()
-        .getSignMessageLibContract({
-          safeVersion: await client.protocolKit.getContractVersion()
-        })
+      const signMessageLibContract = await getSignMessageLibContract({
+        safeProvider: client.protocolKit.getSafeProvider(),
+        safeVersion: client.protocolKit.getContractVersion()
+      })
 
       const transaction = {
         to: signMessageLibContract.getAddress(),

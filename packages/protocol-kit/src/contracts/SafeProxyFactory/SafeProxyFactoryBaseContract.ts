@@ -7,7 +7,6 @@ import {
   CreateProxyProps as CreateProxyPropsGeneral
 } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 export interface CreateProxyProps extends CreateProxyPropsGeneral {
   options?: TransactionOptions
@@ -51,8 +50,7 @@ abstract class SafeProxyFactoryBaseContract<
     defaultAbi: SafeProxyFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContractAbiType,
-    runner?: ExternalClient
+    customContractAbi?: SafeProxyFactoryContractAbiType
   ) {
     const contractName = 'safeProxyFactoryVersion'
 
@@ -63,8 +61,7 @@ abstract class SafeProxyFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi,
-      runner
+      customContractAbi
     )
 
     this.contractName = contractName

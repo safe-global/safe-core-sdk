@@ -20,8 +20,6 @@ class SafeWebAuthnSharedSignerContract_v0_2_1
   extends SafeWebAuthnSharedSignerBaseContract<SafeWebAuthnSharedSignerContract_v0_2_1_Abi>
   implements SafeWebAuthnSharedSignerContract_v0_2_1_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SafeWebAuthnSharedSignerContract_v0_2_1
    *
@@ -41,8 +39,6 @@ class SafeWebAuthnSharedSignerContract_v0_2_1
     const defaultAbi = SafeWebAuthnSharedSigner_0_2_1_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
 
   /**

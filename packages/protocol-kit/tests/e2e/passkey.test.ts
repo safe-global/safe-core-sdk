@@ -11,7 +11,7 @@ import Safe, {
   getPasskeyOwnerAddress,
   PredictedSafeProps,
   SafeProvider
-} from '@safe-global/protocol-kit'
+} from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'

@@ -1,8 +1,12 @@
 import {
+  createPasskeyClient,
   SAFE_FEATURES,
   generateTypedData,
   hasSafeFeature,
-  validateEip3770Address
+  validateEip3770Address,
+  toEstimateGasParameters,
+  toCallGasParameters,
+  sameString
 } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
 import {
@@ -17,20 +21,7 @@ import {
   SafeVersion
 } from '@safe-global/types-kit'
 import {
-  getCompatibilityFallbackHandlerContractInstance,
-  getCreateCallContractInstance,
-  getMultiSendCallOnlyContractInstance,
-  getMultiSendContractInstance,
-  getSafeContractInstance,
-  getSafeProxyFactoryContractInstance,
-  getSafeWebAuthnSharedSignerContractInstance,
-  getSafeWebAuthnSignerFactoryContractInstance,
-  getSignMessageLibContractInstance,
-  getSimulateTxAccessorContractInstance
-} from './contracts/contractInstances'
-import {
   SafeProviderTransaction,
-  GetContractProps,
   SafeProviderConfig,
   ExternalClient,
   ExternalSigner,
@@ -81,13 +72,7 @@ import {
   getStorageAt,
   readContract
 } from 'viem/actions'
-import {
-  toEstimateGasParameters,
-  toCallGasParameters,
-  sameString
-} from '@safe-global/protocol-kit/utils'
 import { isEip1193Provider, isPrivateKey, isSignerPasskeyClient } from './utils/provider'
-import { createPasskeyClient, PASSKEY_CLIENT_KEY } from '@safe-global/protocol-kit/utils'
 
 class SafeProvider {
   #chain?: Chain
@@ -110,6 +95,7 @@ class SafeProvider {
 
     this.provider = provider
     this.signer = signer
+    this.#chain = undefined
   }
 
   getExternalProvider(): ExternalClient {
@@ -189,7 +175,7 @@ class SafeProvider {
     }
 
     if (isPrivateKey(this.signer)) {
-      // This is a client with a local account, the account needs to be of type Accound as viem consider strings as 'json-rpc' (on parseAccount)
+      // This is a client with a local account, the account needs to be of type Account as Viem consider strings as 'json-rpc' (on parseAccount)
       const account = privateKeyToAccount(asHex(this.signer as string))
       return createWalletClient({
         account,
@@ -198,7 +184,7 @@ class SafeProvider {
       })
     }
 
-    // If we have a signer and its not a pk, it might be a delegate on the rpc levels and this should work with eth_requestAcc
+    // If we have a signer and its not a PK, it might be a delegate on the rpc levels and this should work with eth_requestAcc
     if (this.signer && typeof this.signer === 'string') {
       return createWalletClient({
         account: this.signer,
@@ -233,8 +219,7 @@ class SafeProvider {
   }
 
   async isPasskeySigner(): Promise<boolean> {
-    const signer = await this.getExternalSigner()
-    return !!signer && signer.key === PASSKEY_CLIENT_KEY
+    return isSignerPasskeyClient(this.signer)
   }
 
   isAddress(address: string): boolean {
@@ -261,141 +246,12 @@ class SafeProvider {
   }
 
   async getChainId(): Promise<bigint> {
-    const res = await this.#externalProvider.getChainId()
+    const res = (await this.#getChain()).id
     return BigInt(res)
   }
 
   getChecksummedAddress(address: string): string {
-    return getAddress(asHex(address))
-  }
-
-  async getSafeContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi,
-    isL1SafeSingleton
-  }: GetContractProps) {
-    return getSafeContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi,
-      isL1SafeSingleton
-    )
-  }
-
-  async getSafeProxyFactoryContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    const signerOrProvider = this.#externalProvider
-    return getSafeProxyFactoryContractInstance(
-      safeVersion,
-      this,
-      signerOrProvider,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getMultiSendContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getMultiSendContractInstance(safeVersion, this, customContractAddress, customContractAbi)
-  }
-
-  async getMultiSendCallOnlyContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getMultiSendCallOnlyContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getCompatibilityFallbackHandlerContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getCompatibilityFallbackHandlerContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSignMessageLibContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSignMessageLibContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getCreateCallContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getCreateCallContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSimulateTxAccessorContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSimulateTxAccessorContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSafeWebAuthnSignerFactoryContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSafeWebAuthnSignerFactoryContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
-  }
-
-  async getSafeWebAuthnSharedSignerContract({
-    safeVersion,
-    customContractAddress,
-    customContractAbi
-  }: GetContractProps) {
-    return getSafeWebAuthnSharedSignerContractInstance(
-      safeVersion,
-      this,
-      customContractAddress,
-      customContractAbi
-    )
+    return getAddress(address)
   }
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
@@ -428,7 +284,7 @@ class SafeProvider {
   async getTransaction(transactionHash: string): Promise<Transaction> {
     return getTransaction(this.#externalProvider, {
       hash: asHash(transactionHash)
-    }) // as Promise<Transaction>
+    })
   }
 
   async getSignerAddress(): Promise<string | undefined> {
@@ -444,8 +300,8 @@ class SafeProvider {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
-    // The address on the `WalletClient` is the one we are passing so we let viem make assertions about that account
-    // For viem, in this context a typeof account === 'string' to singMessage is assumed to be a json-rpc account (returned by parseAccount function)
+    // The address on the `WalletClient` is the one we are passing so we let Viem make assertions about that account
+    // For Viem, in this context a typeof account === 'string' to signMessage is assumed to be a json-rpc account (returned by parseAccount function)
     if (sameString(signer.account.address, account)) {
       return await signer?.signMessage!({
         message: { raw: toBytes(message) }
@@ -519,7 +375,7 @@ class SafeProvider {
 
   async #getChain(): Promise<Chain> {
     if (this.#chain) return this.#chain
-    const chain = getChainById(await this.getChainId())
+    const chain = getChainById(BigInt(await this.#externalProvider.getChainId()))
     if (!chain) throw new Error('Invalid chainId')
     this.#chain = chain
     return this.#chain

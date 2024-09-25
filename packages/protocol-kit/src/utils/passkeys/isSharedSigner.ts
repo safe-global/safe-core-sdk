@@ -7,7 +7,7 @@ import { asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * Returns true if the passkey signer is a shared signer
- * @returns {Promise<string>} A promise that resolves to the signer's address.
+ * @returns {Promise<boolean>} A promise that resolves to the signer's address.
  */
 async function isSharedSigner(
   passkey: PasskeyArgType,
@@ -26,13 +26,13 @@ async function isSharedSigner(
 
     const { x, y, verifiers } = sharedSignerSlot
 
-    const passkeyVerifierAddress =
-      passkey.customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId.toString())
+    const verifierAddress =
+      passkey.customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
 
     const isSharedSigner =
       BigInt(passkey.coordinates.x) === x &&
       BigInt(passkey.coordinates.y) === y &&
-      BigInt(passkeyVerifierAddress) === verifiers
+      BigInt(verifierAddress) === verifiers
 
     return isSharedSigner
   }

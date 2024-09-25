@@ -4,7 +4,6 @@ import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class SimulateTxAccessorBaseContract extends BaseContract to specifically integrate with the SimulateTxAccessor contract.
@@ -41,8 +40,7 @@ abstract class SimulateTxAccessorBaseContract<
     defaultAbi: SimulateTxAccessorContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SimulateTxAccessorContractAbiType,
-    runner?: ExternalClient
+    customContractAbi?: SimulateTxAccessorContractAbiType
   ) {
     const contractName = 'simulateTxAccessorVersion'
 
@@ -53,8 +51,7 @@ abstract class SimulateTxAccessorBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi,
-      runner
+      customContractAbi
     )
 
     this.contractName = contractName

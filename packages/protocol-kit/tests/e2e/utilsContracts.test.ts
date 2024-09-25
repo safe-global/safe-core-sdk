@@ -1,4 +1,5 @@
 import chai from 'chai'
+import { polygon, optimism, bsc, gnosis } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   PREDETERMINED_SALT_NONCE,
@@ -671,7 +672,7 @@ describe('Contract utils', () => {
         }
 
         const protocolKitPolygonMainnet = await Safe.init({
-          provider: 'https://polygon-bor-rpc.publicnode.com',
+          provider: polygon.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig
@@ -679,7 +680,7 @@ describe('Contract utils', () => {
         })
 
         const protocolKitGnosis = await Safe.init({
-          provider: 'https://rpc.gnosischain.com',
+          provider: gnosis.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig
@@ -687,7 +688,7 @@ describe('Contract utils', () => {
         })
 
         const protocolKitBNB = await Safe.init({
-          provider: 'https://bsc.meowrpc.com',
+          provider: bsc.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig
@@ -695,7 +696,7 @@ describe('Contract utils', () => {
         })
 
         const protocolKitOptimism = await Safe.init({
-          provider: 'https://optimism.drpc.org',
+          provider: optimism.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig

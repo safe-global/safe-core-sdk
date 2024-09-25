@@ -7,6 +7,7 @@ import {
   SafeWebAuthnSharedSigner_0_2_1_ContractArtifacts
 } from '@safe-global/types-kit'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeWebAuthnSharedSignerContract_v0_2_1 is the implementation specific to the SafeWebAuthnSharedSigner contract version 0.2.1.
@@ -34,11 +35,20 @@ class SafeWebAuthnSharedSignerContract_v0_2_1
     safeProvider: SafeProvider,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeWebAuthnSharedSignerContract_v0_2_1_Abi
+    customContractAbi?: SafeWebAuthnSharedSignerContract_v0_2_1_Abi,
+    deploymentType?: DeploymentType
   ) {
     const defaultAbi = SafeWebAuthnSharedSigner_0_2_1_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 
   /**

@@ -1,6 +1,7 @@
 import { Abi } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
@@ -40,7 +41,8 @@ abstract class MultiSendBaseContract<
     defaultAbi: MultiSendContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: MultiSendContractAbiType
+    customContractAbi?: MultiSendContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'multiSendVersion'
 
@@ -51,7 +53,8 @@ abstract class MultiSendBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

@@ -1,5 +1,6 @@
 import MultiSendBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   multisend_1_3_0_ContractArtifacts,
   MultiSendContract_v1_3_0_Abi,
@@ -30,12 +31,21 @@ class MultiSendContract_v1_3_0
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: MultiSendContract_v1_3_0_Abi
+    customContractAbi?: MultiSendContract_v1_3_0_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = multisend_1_3_0_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 }
 

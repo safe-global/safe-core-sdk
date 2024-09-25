@@ -1,5 +1,6 @@
 import { Abi } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import {
   SafeVersion,
@@ -46,7 +47,8 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
     defaultAbi: SafeWebAuthnSignerFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType
+    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'safeWebAuthnSignerFactoryVersion'
 
@@ -57,7 +59,8 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

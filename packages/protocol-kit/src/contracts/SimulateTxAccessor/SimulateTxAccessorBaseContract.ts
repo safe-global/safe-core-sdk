@@ -2,6 +2,7 @@ import { Abi } from 'abitype'
 
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
@@ -40,7 +41,8 @@ abstract class SimulateTxAccessorBaseContract<
     defaultAbi: SimulateTxAccessorContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SimulateTxAccessorContractAbiType
+    customContractAbi?: SimulateTxAccessorContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'simulateTxAccessorVersion'
 
@@ -51,7 +53,8 @@ abstract class SimulateTxAccessorBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

@@ -1,5 +1,6 @@
 import CreateCallBaseContract from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   CreateCallContract_v1_4_1_Abi,
   CreateCallContract_v1_4_1_Contract,
@@ -32,12 +33,21 @@ class CreateCallContract_v1_4_1
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: CreateCallContract_v1_4_1_Abi
+    customContractAbi?: CreateCallContract_v1_4_1_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = createCall_1_4_1_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 
   /**

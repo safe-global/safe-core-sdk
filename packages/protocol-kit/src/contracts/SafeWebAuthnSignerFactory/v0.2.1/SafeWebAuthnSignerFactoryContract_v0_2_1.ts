@@ -7,6 +7,7 @@ import {
   SafeWebAuthnSignerFactory_0_2_1_ContractArtifacts
 } from '@safe-global/types-kit'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 
 /**
  * SafeWebAuthnSignerFactoryContract_v0_2_1  is the implementation specific to the SafeWebAuthnSigner Factory contract version 0.2.1.
@@ -34,11 +35,20 @@ class SafeWebAuthnSignerFactoryContract_v0_2_1
     safeProvider: SafeProvider,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeWebAuthnSignerFactoryContract_v0_2_1_Abi
+    customContractAbi?: SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
+    deploymentType?: DeploymentType
   ) {
     const defaultAbi = SafeWebAuthnSignerFactory_0_2_1_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 
   /**

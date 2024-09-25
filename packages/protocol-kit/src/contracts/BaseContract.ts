@@ -26,6 +26,7 @@ import {
   convertTransactionOptions
 } from '@safe-global/protocol-kit/utils'
 import { ExternalClient } from '../types'
+import { SingletonDeployment } from '@safe-global/safe-deployments'
 
 /**
  * Abstract class BaseContract
@@ -77,24 +78,26 @@ class BaseContract<ContractAbiType extends Abi> {
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
-    const contractAddress =
-      customContractAddress || deployment?.networkAddresses[chainId.toString()]
-
-    if (!contractAddress) {
-      throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
+    if (!deployment) {
+      throw new Error(`Deployment details not found for ${contractName} on chain ID ${chainId}`)
     }
 
-    const customDeploymentTypeAddress = deploymentType
-      ? deployment?.deployments[deploymentType]?.address
-      : undefined
+    const resolvedAddress =
+      customContractAddress ??
+      this.#resolveAddress(
+        deployment.networkAddresses[chainId.toString()],
+        deployment,
+        deploymentType
+      )
+
+    if (!resolvedAddress) {
+      throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
+    }
 
     this.chainId = chainId
     this.contractName = contractName
     this.safeVersion = safeVersion
-    this.contractAddress =
-      Array.isArray(contractAddress) && contractAddress.length
-        ? contractAddress.find((a) => a === customDeploymentTypeAddress) || contractAddress[0]
-        : contractAddress.toString()
+    this.contractAddress = resolvedAddress
     this.contractAbi =
       customContractAbi ||
       (deployment?.abi as unknown as ContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
@@ -102,6 +105,31 @@ class BaseContract<ContractAbiType extends Abi> {
 
     this.runner = safeProvider.getExternalProvider()
     this.safeProvider = safeProvider
+  }
+
+  #resolveAddress(
+    networkAddresses: string | string[] | undefined,
+    deployment: SingletonDeployment,
+    deploymentType?: DeploymentType
+  ): string | undefined {
+    if (!networkAddresses) {
+      return undefined
+    }
+
+    if (typeof networkAddresses === 'string') {
+      return networkAddresses
+    }
+
+    if (deploymentType) {
+      const customDeploymentTypeAddress = deployment.deployments[deploymentType]?.address
+
+      return (
+        networkAddresses.find((address) => address === customDeploymentTypeAddress) ??
+        networkAddresses[0]
+      )
+    }
+
+    return networkAddresses[0]
   }
 
   async init() {

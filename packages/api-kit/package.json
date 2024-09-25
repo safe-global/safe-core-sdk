@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -58,7 +58,7 @@
     "web3": "^4.12.1"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^4.1.0",
+    "@safe-global/protocol-kit": "^4.1.1",
     "@safe-global/types-kit": "^1.0.0",
     "node-fetch": "^2.7.0",
     "viem": "^2.21.8"

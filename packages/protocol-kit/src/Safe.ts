@@ -155,7 +155,12 @@ class Safe {
     }
 
     const safeVersion = this.getContractVersion()
-    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
+    this.#safeProvider = await SafeProvider.init({
+      provider,
+      signer,
+      safeVersion,
+      contractNetworks
+    })
 
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)

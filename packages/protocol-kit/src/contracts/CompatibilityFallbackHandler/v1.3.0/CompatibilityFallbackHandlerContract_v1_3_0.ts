@@ -1,5 +1,6 @@
 import CompatibilityFallbackHandlerBaseContract from '@safe-global/protocol-kit/contracts/CompatibilityFallbackHandler/CompatibilityFallbackHandlerBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   CompatibilityFallbackHandlerContract_v1_3_0_Abi,
   CompatibilityFallbackHandlerContract_v1_3_0_Contract,
@@ -30,12 +31,21 @@ class CompatibilityFallbackHandlerContract_v1_3_0
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: CompatibilityFallbackHandlerContract_v1_3_0_Abi
+    customContractAbi?: CompatibilityFallbackHandlerContract_v1_3_0_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = compatibilityFallbackHandler_1_3_0_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 }
 

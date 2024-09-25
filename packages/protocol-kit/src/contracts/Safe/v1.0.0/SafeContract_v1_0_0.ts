@@ -4,6 +4,7 @@ import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseC
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import { sameString, isSentinelAddress } from '@safe-global/protocol-kit/utils'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeContract_v1_0_0_Abi,
   SafeContract_v1_0_0_Function,
@@ -42,7 +43,8 @@ class SafeContract_v1_0_0
     safeProvider: SafeProvider,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContract_v1_0_0_Abi
+    customContractAbi?: SafeContract_v1_0_0_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.0.0'
     const defaultAbi = safe_1_0_0_ContractArtifacts.abi
@@ -54,7 +56,8 @@ class SafeContract_v1_0_0
       safeVersion,
       isL1SafeSingleton,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
   }
 

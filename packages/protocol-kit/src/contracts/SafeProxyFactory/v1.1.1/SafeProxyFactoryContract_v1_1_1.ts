@@ -3,6 +3,7 @@ import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeProxyFactoryContract_v1_1_1_Abi,
   SafeProxyFactoryContract_v1_1_1_Contract,
@@ -36,12 +37,21 @@ class SafeProxyFactoryContract_v1_1_1
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_1_1_Abi
+    customContractAbi?: SafeProxyFactoryContract_v1_1_1_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.1.1'
     const defaultAbi = safeProxyFactory_1_1_1_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 
   /**

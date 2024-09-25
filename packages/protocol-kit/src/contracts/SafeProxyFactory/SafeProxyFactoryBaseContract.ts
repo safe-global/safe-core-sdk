@@ -1,6 +1,7 @@
 import { Abi } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeVersion,
   TransactionOptions,
@@ -50,7 +51,8 @@ abstract class SafeProxyFactoryBaseContract<
     defaultAbi: SafeProxyFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContractAbiType
+    customContractAbi?: SafeProxyFactoryContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'safeProxyFactoryVersion'
 
@@ -61,7 +63,8 @@ abstract class SafeProxyFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

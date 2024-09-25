@@ -2,6 +2,7 @@ import { Abi } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
@@ -40,7 +41,8 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     defaultAbi: CompatibilityFallbackHandlerContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: CompatibilityFallbackHandlerContractAbiType
+    customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'compatibilityFallbackHandler'
 
@@ -51,7 +53,8 @@ abstract class CompatibilityFallbackHandlerBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

@@ -2,6 +2,7 @@ import { simulateContract } from 'viem/actions'
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeContract_v1_2_0_Abi,
   SafeContract_v1_2_0_Contract,
@@ -40,7 +41,8 @@ class SafeContract_v1_2_0
     safeProvider: SafeProvider,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContract_v1_2_0_Abi
+    customContractAbi?: SafeContract_v1_2_0_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.2.0'
     const defaultAbi = safe_1_2_0_ContractArtifacts.abi
@@ -52,7 +54,8 @@ class SafeContract_v1_2_0
       safeVersion,
       isL1SafeSingleton,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
   }
 

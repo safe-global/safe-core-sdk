@@ -33,7 +33,7 @@ import {
 
 chai.use(chaiAsPromised)
 
-describe.only('Safe contracts', () => {
+describe('Safe contracts', () => {
   const provider = getEip1193Provider()
 
   describe('getSafeContract', async () => {

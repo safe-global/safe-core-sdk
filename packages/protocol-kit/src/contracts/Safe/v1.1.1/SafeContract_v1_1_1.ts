@@ -3,6 +3,7 @@ import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseC
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import { sameString } from '@safe-global/protocol-kit/utils'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeContract_v1_1_1_Abi,
   SafeContract_v1_1_1_Contract,
@@ -41,7 +42,8 @@ class SafeContract_v1_1_1
     safeProvider: SafeProvider,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContract_v1_1_1_Abi
+    customContractAbi?: SafeContract_v1_1_1_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.1.1'
     const defaultAbi = safe_1_1_1_ContractArtifacts.abi
@@ -53,7 +55,8 @@ class SafeContract_v1_1_1
       safeVersion,
       isL1SafeSingleton,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
   }
 

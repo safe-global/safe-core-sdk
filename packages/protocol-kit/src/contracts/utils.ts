@@ -259,14 +259,16 @@ export async function getPredictedSafeAddressInitCode({
 
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
-    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId),
+    deploymentType
   } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     safeProvider,
     safeVersion,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const safeContract = await memoizedGetSafeContract({
@@ -274,7 +276,8 @@ export async function getPredictedSafeAddressInitCode({
     safeVersion,
     isL1SafeSingleton,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const initializer = await encodeSetupCallData({
@@ -282,7 +285,8 @@ export async function getPredictedSafeAddressInitCode({
     safeAccountConfig,
     safeContract,
     customContracts,
-    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+    customSafeVersion: safeVersion, // it is more efficient if we provide the safeVersion manually
+    deploymentType
   })
 
   const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce])

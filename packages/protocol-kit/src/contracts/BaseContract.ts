@@ -9,6 +9,7 @@ import {
   Chain
 } from 'viem'
 import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
+import { SingletonDeployment } from '@safe-global/safe-deployments'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -26,7 +27,6 @@ import {
   convertTransactionOptions
 } from '@safe-global/protocol-kit/utils'
 import { ExternalClient } from '../types'
-import { SingletonDeployment } from '@safe-global/safe-deployments'
 
 /**
  * Abstract class BaseContract

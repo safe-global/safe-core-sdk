@@ -78,14 +78,10 @@ class BaseContract<ContractAbiType extends Abi> {
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
-    if (!deployment) {
-      throw new Error(`Deployment details not found for ${contractName} on chain ID ${chainId}`)
-    }
-
     const resolvedAddress =
       customContractAddress ??
       this.#resolveAddress(
-        deployment.networkAddresses[chainId.toString()],
+        deployment?.networkAddresses[chainId.toString()],
         deployment,
         deploymentType
       )

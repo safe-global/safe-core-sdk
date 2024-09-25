@@ -1,5 +1,5 @@
 import { validateEthereumAddress } from '@safe-global/protocol-kit'
-import { TransactionResult } from '@safe-global/safe-core-sdk-types'
+import { TransactionResult } from '@safe-global/types-kit'
 import { GetTransactionReceiptReturnType } from 'viem'
 
 import { MESSAGES, SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'

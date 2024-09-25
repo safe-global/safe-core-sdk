@@ -1,4 +1,4 @@
-import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionDataPartial } from '@safe-global/types-kit'
 import { Chain, Address, Account } from 'viem'
 
 export type SafeTransactionOptionalProps = Pick<

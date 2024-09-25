@@ -14,7 +14,7 @@ import {
   getCreateCallContract,
   getMultiSendCallOnlyContract,
   getMultiSendContract,
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
   getSafeWebAuthnSignerFactoryContract,
@@ -37,7 +37,6 @@ import {
   estimateSafeDeploymentGas,
   extractPasskeyCoordinates,
   extractPasskeyData,
-  getDefaultFCLP256VerifierAddress,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -96,12 +95,11 @@ export {
   getERC20Decimals,
   getMultiSendCallOnlyContract,
   getMultiSendContract,
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
   getSafeWebAuthnSignerFactoryContract,
   getSafeWebAuthnSharedSignerContract,
-  getDefaultFCLP256VerifierAddress,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   getPredictedSafeAddressInitCode,
@@ -130,7 +128,7 @@ export * from './types'
 
 export default Safe
 
-declare module 'viem/node_modules/abitype' {
+declare module 'abitype' {
   export interface Register {
     AddressType: string
   }

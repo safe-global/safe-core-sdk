@@ -6,6 +6,7 @@ import {
   PasskeyArgType,
   RemoveOwnerTxParams,
   RemovePasskeyOwnerTxParams,
+  SafeProviderTransaction,
   StandardizeSafeTransactionDataProps,
   SwapOwnerTxParams,
   ExternalClient
@@ -23,7 +24,7 @@ import {
   SafeVersion,
   TransactionOptions,
   Transaction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import { estimateGas, estimateTxGas } from './gas'
 import {
@@ -39,7 +40,6 @@ import {
   parseAbi
 } from 'viem'
 import { waitForTransactionReceipt as waitForTransactionReceiptViem } from 'viem/actions'
-import { SafeProviderTransaction } from '@safe-global/protocol-kit/types'
 import { WalletLegacyTransactionOptions, WalletTransactionOptions } from './types'
 
 export function standardizeMetaTransactionData(
@@ -89,7 +89,7 @@ export async function standardizeSafeTransactionData({
     if (!safeContract) {
       throw new Error('Safe is not deployed')
     }
-    safeVersion = await safeContract.getVersion()
+    safeVersion = safeContract.safeVersion
   }
 
   const hasSafeTxGasOptional = hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)

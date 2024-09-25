@@ -25,7 +25,7 @@ import {
   SimulateTxAccessorContract_v1_3_0_Abi,
   SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
   SafeWebAuthnSharedSignerContract_v0_2_1_Abi
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import CreateCallContract_v1_3_0 from './CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from './CreateCall/v1.4.1/CreateCallContract_v1_4_1'
 import MultiSendContract_v1_1_1 from './MultiSend/v1.1.1/MultiSendContract_v1_1_1'
@@ -51,7 +51,6 @@ import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallback
 import SafeWebAuthnSignerFactoryContract_v0_2_1 from './SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
 import SafeWebAuthnSharedSignerContract_v0_2_1 from './SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
 import SafeProvider from '../SafeProvider'
-import { ExternalClient } from '../types'
 
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
@@ -249,7 +248,6 @@ export async function getMultiSendCallOnlyContractInstance(
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  signerOrProvider: ExternalClient,
   contractAddress?: string,
   customContractAbi?: Abi
 ): Promise<
@@ -267,8 +265,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_4_1_Abi,
-        signerOrProvider
+        customContractAbi as SafeProxyFactoryContract_v1_4_1_Abi
       )
       break
     case '1.3.0':
@@ -276,8 +273,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_3_0_Abi,
-        signerOrProvider
+        customContractAbi as SafeProxyFactoryContract_v1_3_0_Abi
       )
       break
     case '1.2.0':
@@ -286,8 +282,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_1_1_Abi,
-        signerOrProvider
+        customContractAbi as SafeProxyFactoryContract_v1_1_1_Abi
       )
       break
     case '1.0.0':
@@ -295,8 +290,7 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_0_0_Abi,
-        signerOrProvider
+        customContractAbi as SafeProxyFactoryContract_v1_0_0_Abi
       )
       break
     default:

@@ -1,9 +1,8 @@
 import { Abi } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class SafeProxyFactoryBaseContract extends BaseContract to specifically integrate with the SafeProxyFactory contract.
@@ -43,8 +42,7 @@ abstract class SafeProxyFactoryBaseContract<
     defaultAbi: SafeProxyFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContractAbiType,
-    runner?: ExternalClient
+    customContractAbi?: SafeProxyFactoryContractAbiType
   ) {
     const contractName = 'safeProxyFactoryVersion'
 
@@ -55,8 +53,7 @@ abstract class SafeProxyFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi,
-      runner
+      customContractAbi
     )
 
     this.contractName = contractName

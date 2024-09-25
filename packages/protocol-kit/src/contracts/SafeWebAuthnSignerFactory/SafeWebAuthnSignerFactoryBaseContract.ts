@@ -1,9 +1,8 @@
 import { Abi } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
 
 /**
  * Abstract class SafeWebAuthnSignerFactoryBaseContract extends BaseContract to specifically integrate with the SafeWebAuthnSignerFactory contract.
@@ -39,8 +38,7 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
     defaultAbi: SafeWebAuthnSignerFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType,
-    runner?: ExternalClient
+    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType
   ) {
     const contractName = 'safeWebAuthnSignerFactoryVersion'
 
@@ -51,8 +49,7 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi,
-      runner
+      customContractAbi
     )
 
     this.contractName = contractName

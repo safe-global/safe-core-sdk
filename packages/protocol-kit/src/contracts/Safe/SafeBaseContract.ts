@@ -1,7 +1,7 @@
 import { Abi } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
 import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'

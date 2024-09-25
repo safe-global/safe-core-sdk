@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 import Safe, { SigningMethod } from '@safe-global/protocol-kit'
-import { OperationType, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/types-kit'
 
 dotenv.config()
 

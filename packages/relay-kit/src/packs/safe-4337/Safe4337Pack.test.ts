@@ -8,7 +8,7 @@ import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
-import { MetaTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
+import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
 import { Safe4337Pack } from './Safe4337Pack'
 import EthSafeOperation from './SafeOperation'
 import * as constants from './constants'

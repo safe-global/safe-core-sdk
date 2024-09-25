@@ -16,7 +16,7 @@ import {
   SafeOperationResponse,
   SafeSignature,
   UserOperation
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import {
   getAddModulesLibDeployment,
   getSafe4337ModuleDeployment,
@@ -146,7 +146,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      addModulesLibAddress = addModulesDeployment?.networkAddresses[network] as string | undefined
+      addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
     }
 
     let safe4337ModuleAddress = customContracts?.safe4337ModuleAddress
@@ -175,7 +175,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         safeAddress: options.safeAddress
       })
 
-      const safeVersion = await protocolKit.getContractVersion()
+      const safeVersion = protocolKit.getContractVersion()
       const isSafeVersion4337Compatible = semverSatisfies(safeVersion, EQ_OR_GT_1_4_1)
 
       if (!isSafeVersion4337Compatible) {

@@ -1,4 +1,4 @@
-import { EIP712TypedData, SafeMessage, SafeSignature } from '@safe-global/safe-core-sdk-types'
+import { EIP712TypedData, SafeMessage, SafeSignature } from '@safe-global/types-kit'
 import { buildSignatureBytes } from '../signatures'
 
 class EthSafeMessage implements SafeMessage {

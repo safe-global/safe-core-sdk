@@ -1,13 +1,11 @@
 import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
-  SafeVersion,
   SafeProxyFactoryContract_v1_3_0_Abi,
   SafeProxyFactoryContract_v1_3_0_Contract,
   SafeProxyFactoryContract_v1_3_0_Function,
   safeProxyFactory_1_3_0_ContractArtifacts
-} from '@safe-global/safe-core-sdk-types'
-import { ExternalClient } from '@safe-global/protocol-kit/types'
+} from '@safe-global/types-kit'
 
 /**
  * SafeProxyFactoryContract_v1_3_0  is the implementation specific to the Safe Proxy Factory contract version 1.3.0.
@@ -21,8 +19,6 @@ class SafeProxyFactoryContract_v1_3_0
   extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_3_0_Abi>
   implements SafeProxyFactoryContract_v1_3_0_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SafeProxyFactoryContract_v1_3_0
    *
@@ -35,23 +31,12 @@ class SafeProxyFactoryContract_v1_3_0
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi,
-    runner?: ExternalClient
+    customContractAbi?: SafeProxyFactoryContract_v1_3_0_Abi
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = safeProxyFactory_1_3_0_ContractArtifacts.abi
 
-    super(
-      chainId,
-      safeProvider,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi,
-      runner
-    )
-
-    this.safeVersion = safeVersion
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
   }
 
   /**

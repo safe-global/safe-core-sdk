@@ -7,7 +7,7 @@ import Safe, {
 import {
   SafeMultisigConfirmationResponse,
   SafeTransactionDataPartial
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'

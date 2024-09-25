@@ -4,7 +4,7 @@ import Safe, {
   SwapOwnerTxParams
 } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { SafeTransaction, TransactionBase } from '@safe-global/safe-core-sdk-types'
+import { SafeTransaction, TransactionBase } from '@safe-global/types-kit'
 
 import { ChangeThresholdTxParams } from './types'
 

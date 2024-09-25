@@ -1,5 +1,5 @@
 import Safe, { SafeAccountConfig, getSafeAddressFromDeploymentTx } from '@safe-global/protocol-kit'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 
 import { createWalletClient, http } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'

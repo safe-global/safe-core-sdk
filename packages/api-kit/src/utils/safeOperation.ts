@@ -1,4 +1,4 @@
-import { SafeOperation } from '@safe-global/safe-core-sdk-types'
+import { SafeOperation } from '@safe-global/types-kit'
 
 export const getAddSafeOperationProps = async (safeOperation: SafeOperation) => {
   const userOperation = safeOperation.toUserOperation()

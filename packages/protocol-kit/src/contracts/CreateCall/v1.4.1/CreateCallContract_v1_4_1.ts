@@ -1,12 +1,11 @@
 import CreateCallBaseContract from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
-  SafeVersion,
   CreateCallContract_v1_4_1_Abi,
   CreateCallContract_v1_4_1_Contract,
   createCall_1_4_1_ContractArtifacts,
   SafeContractFunction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 
 /**
@@ -21,8 +20,6 @@ class CreateCallContract_v1_4_1
   extends CreateCallBaseContract<CreateCallContract_v1_4_1_Abi>
   implements CreateCallContract_v1_4_1_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of CreateCallContract_v1_4_1
    *
@@ -41,8 +38,6 @@ class CreateCallContract_v1_4_1
     const defaultAbi = createCall_1_4_1_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
 
   /**

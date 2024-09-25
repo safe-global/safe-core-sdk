@@ -1,4 +1,4 @@
-import { SafeTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionData, OperationType, EIP712TypedData } from '@safe-global/types-kit'
 import chai from 'chai'
 import {
   EIP712_DOMAIN,
@@ -6,7 +6,6 @@ import {
   generateTypedData,
   getEip712TxTypes
 } from '@safe-global/protocol-kit/utils'
-import { EIP712TypedData } from '@safe-global/safe-core-sdk-types'
 
 const safeAddress = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
 const safeTransactionData: SafeTransactionData = {

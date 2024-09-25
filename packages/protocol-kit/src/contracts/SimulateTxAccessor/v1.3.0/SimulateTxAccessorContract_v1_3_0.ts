@@ -1,12 +1,11 @@
 import SimulateTxAccessorBaseContract from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/SimulateTxAccessorBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
-  SafeVersion,
   simulateTxAccessor_1_3_0_ContractArtifacts,
   SimulateTxAccessorContract_v1_3_0_Abi,
   SimulateTxAccessorContract_v1_3_0_Contract,
   SimulateTxAccessorContract_v1_3_0_Function
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 import { asHex } from '@safe-global/protocol-kit/utils/types'
 
@@ -22,8 +21,6 @@ class SimulateTxAccessorContract_v1_3_0
   extends SimulateTxAccessorBaseContract<SimulateTxAccessorContract_v1_3_0_Abi>
   implements SimulateTxAccessorContract_v1_3_0_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of SimulateTxAccessorContract_v1_3_0
    *
@@ -42,8 +39,6 @@ class SimulateTxAccessorContract_v1_3_0
     const defaultAbi = simulateTxAccessor_1_3_0_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
 
   /**

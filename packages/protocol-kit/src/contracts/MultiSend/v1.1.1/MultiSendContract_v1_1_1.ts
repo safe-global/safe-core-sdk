@@ -1,11 +1,10 @@
 import MultiSendBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
-  SafeVersion,
   multisend_1_1_1_ContractArtifacts,
   MultiSendContract_v1_1_1_Abi,
   MultiSendContract_v1_1_1_Contract
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 /**
  * MultiSendContract_v1_1_1  is the implementation specific to the MultiSend contract version 1.1.1.
@@ -19,8 +18,6 @@ class MultiSendContract_v1_1_1
   extends MultiSendBaseContract<MultiSendContract_v1_1_1_Abi>
   implements MultiSendContract_v1_1_1_Contract
 {
-  safeVersion: SafeVersion
-
   /**
    * Constructs an instance of MultiSendContract_v1_1_1
    *
@@ -39,8 +36,6 @@ class MultiSendContract_v1_1_1
     const defaultAbi = multisend_1_1_1_ContractArtifacts.abi
 
     super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
-
-    this.safeVersion = safeVersion
   }
 }
 

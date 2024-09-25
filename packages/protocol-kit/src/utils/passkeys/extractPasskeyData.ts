@@ -1,6 +1,6 @@
 import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
 import { Buffer } from 'buffer'
-import { PasskeyCoordinates, PasskeyArgType } from '../../types/passkeys'
+import { PasskeyCoordinates, PasskeyArgType } from '@safe-global/protocol-kit/types'
 
 /**
  * Extracts and returns the passkey data (coordinates and rawId) from a given passkey Credential.
@@ -60,28 +60,21 @@ export async function extractPasskeyCoordinates(
   }
 }
 
-// FIXME use Viem `hexToBytes`
-export function hexStringToUint8Array(hexString: string): Uint8Array {
-  const arr = []
-  for (let i = 0; i < hexString.length; i += 2) {
-    arr.push(parseInt(hexString.substr(i, 2), 16))
-  }
-  return new Uint8Array(arr)
-}
-
 export function getDefaultFCLP256VerifierAddress(chainId: string): string {
-  const network = BigInt(chainId).toString()
-
   const FCLP256VerifierDeployment = getFCLP256VerifierDeployment({
-    version: '0.2.0',
+    version: '0.2.1',
     released: true,
-    network
+    network: chainId
   })
 
-  const verifierAddress = FCLP256VerifierDeployment?.networkAddresses[network]
+  if (!FCLP256VerifierDeployment) {
+    throw new Error(`Failed to load FCLP256Verifier deployment for chain ID ${chainId}`)
+  }
+
+  const verifierAddress = FCLP256VerifierDeployment.networkAddresses[chainId]
 
   if (!verifierAddress) {
-    throw new Error('FCLP256Verifier address not found')
+    throw new Error(`FCLP256Verifier address not found for chain ID ${chainId}`)
   }
 
   return verifierAddress

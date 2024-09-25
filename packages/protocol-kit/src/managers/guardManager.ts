@@ -44,7 +44,7 @@ class GuardManager {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
-    const safeVersion = await this.#safeContract.getVersion()
+    const safeVersion = this.#safeContract.safeVersion
     if (!hasSafeFeature(SAFE_FEATURES.SAFE_TX_GUARDS, safeVersion)) {
       throw new Error(
         'Current version of the Safe does not support Safe transaction guards functionality'

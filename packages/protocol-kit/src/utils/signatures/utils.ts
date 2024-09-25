@@ -1,10 +1,6 @@
 import { recoverAddress } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import {
-  SafeSignature,
-  SafeEIP712Args,
-  SafeTransactionData
-} from '@safe-global/safe-core-sdk-types'
+import { SafeSignature, SafeEIP712Args, SafeTransactionData } from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'

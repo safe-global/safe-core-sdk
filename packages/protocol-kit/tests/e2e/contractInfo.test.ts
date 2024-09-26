@@ -6,13 +6,14 @@ import { getEip1193Provider } from './utils/setupProvider'
 
 chai.use(chaiAsPromised)
 
-describe('Contract Info', () => {
+describe.only('Contract Info', () => {
   const provider = getEip1193Provider()
   let protocolKit: Safe
 
-  beforeEach(async () => {
+  before(async () => {
     const { safe, contractNetworks } = await setupTests()
     const safeAddress = safe.address
+
     protocolKit = await Safe.init({
       provider,
       safeAddress,

@@ -37,7 +37,6 @@ export interface GetContractInstanceProps {
 export interface GetSafeContractInstanceProps extends GetContractInstanceProps {
   isL1SafeSingleton?: boolean
   customSafeAddress?: string
-  deploymentType?: DeploymentType
 }
 
 export async function getSafeContract({

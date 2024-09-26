@@ -1,5 +1,6 @@
 import { Abi } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import {
   SafeVersion,
@@ -39,6 +40,7 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -46,7 +48,8 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
     defaultAbi: SafeWebAuthnSignerFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType
+    customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'safeWebAuthnSignerFactoryVersion'
 
@@ -57,7 +60,8 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

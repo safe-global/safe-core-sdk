@@ -37,7 +37,9 @@ describe('Safe provider', () => {
         const passKeySigner = await createMockPasskey('aName')
 
         chai
-          .expect(SafeProvider.init(provider, passKeySigner, safeVersionDeployed))
+          .expect(
+            SafeProvider.init({ provider, signer: passKeySigner, safeVersion: safeVersionDeployed })
+          )
           .to.be.rejectedWith(
             'Current version of the Safe does not support the Passkey signer functionality'
           )
@@ -45,24 +47,26 @@ describe('Safe provider', () => {
     )
 
     it('should return an external provider (PublicClient) and signer (WalletClient) when using an EIP1193 provider', async () => {
-      const safeProvider = await SafeProvider.init(provider)
+      const safeProvider = await SafeProvider.init({ provider })
 
       chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
       chai.expect(await safeProvider.getExternalSigner()).to.deep.include(walletActions)
     })
 
     it('should return an external provider (PublicClient) and signer (WalletClient) when using a private key', async () => {
-      const safeProvider = await SafeProvider.init(
-        'https://sepolia.gateway.tenderly.co',
-        '4ff03ace1395691975678c93449d552dc83df6b773a8024d4c368b39042a7610'
-      )
+      const safeProvider = await SafeProvider.init({
+        provider: 'https://sepolia.gateway.tenderly.co',
+        signer: '4ff03ace1395691975678c93449d552dc83df6b773a8024d4c368b39042a7610'
+      })
 
       chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
       chai.expect(await safeProvider.getExternalSigner()).to.deep.include(walletActions)
     })
 
     it('should return an undefined signer when using an RPC without signer', async () => {
-      const safeProvider = await SafeProvider.init('https://sepolia.gateway.tenderly.co')
+      const safeProvider = await SafeProvider.init({
+        provider: 'https://sepolia.gateway.tenderly.co'
+      })
 
       chai.expect(safeProvider.getExternalProvider()).to.deep.include(publicActions)
       chai.expect(await safeProvider.getExternalSigner()).to.be.undefined

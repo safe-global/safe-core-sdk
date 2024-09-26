@@ -3,6 +3,7 @@ import SafeProxyFactoryBaseContract, {
   CreateProxyProps
 } from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeProxyFactoryContract_v1_1_1_Abi,
   SafeProxyFactoryContract_v1_1_1_Contract,
@@ -31,17 +32,27 @@ class SafeProxyFactoryContract_v1_1_1
    * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.1.1 is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_1_1_Abi
+    customContractAbi?: SafeProxyFactoryContract_v1_1_1_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.1.1'
     const defaultAbi = safeProxyFactory_1_1_1_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 
   /**

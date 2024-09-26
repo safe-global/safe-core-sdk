@@ -1,5 +1,6 @@
 import MultiSendBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   MultiSendContract_v1_4_1_Abi,
   MultiSendContract_v1_4_1_Contract,
@@ -25,17 +26,27 @@ class MultiSendContract_v1_4_1
    * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.4.1 is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: MultiSendContract_v1_4_1_Abi
+    customContractAbi?: MultiSendContract_v1_4_1_Abi,
+    deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.4.1'
     const defaultAbi = multisend_1_4_1_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, customContractAbi)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 }
 

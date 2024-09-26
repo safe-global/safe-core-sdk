@@ -15,6 +15,7 @@ import {
   CompatibilityFallbackHandlerContractImplementationType,
   ContractNetworkConfig,
   CreateCallContractImplementationType,
+  DeploymentType,
   MultiSendCallOnlyContractImplementationType,
   MultiSendContractImplementationType,
   SafeContractImplementationType,
@@ -30,6 +31,7 @@ export interface GetContractInstanceProps {
   safeProvider: SafeProvider
   safeVersion: SafeVersion
   customContracts?: ContractNetworkConfig
+  deploymentType?: DeploymentType
 }
 
 export interface GetSafeContractInstanceProps extends GetContractInstanceProps {
@@ -42,14 +44,16 @@ export async function getSafeContract({
   safeVersion,
   customSafeAddress,
   isL1SafeSingleton,
-  customContracts
+  customContracts,
+  deploymentType
 }: GetSafeContractInstanceProps): Promise<SafeContractImplementationType> {
   const safeContract = await getSafeContractInstance(
     safeVersion,
     safeProvider,
     customSafeAddress ?? customContracts?.safeSingletonAddress,
     customContracts?.safeSingletonAbi,
-    isL1SafeSingleton
+    isL1SafeSingleton,
+    deploymentType
   )
 
   const isContractDeployed = await safeProvider.isContractDeployed(safeContract.getAddress())
@@ -62,13 +66,15 @@ export async function getSafeContract({
 export async function getSafeProxyFactoryContract({
   safeProvider,
   safeVersion,
-  customContracts
+  customContracts,
+  deploymentType
 }: GetContractInstanceProps): Promise<SafeProxyFactoryContractImplementationType> {
   const safeProxyFactoryContract = await getSafeProxyFactoryContractInstance(
     safeVersion,
     safeProvider,
     customContracts?.safeProxyFactoryAddress,
-    customContracts?.safeProxyFactoryAbi
+    customContracts?.safeProxyFactoryAbi,
+    deploymentType
   )
 
   const isContractDeployed = await safeProvider.isContractDeployed(
@@ -83,13 +89,15 @@ export async function getSafeProxyFactoryContract({
 export async function getCompatibilityFallbackHandlerContract({
   safeProvider,
   safeVersion,
-  customContracts
+  customContracts,
+  deploymentType
 }: GetContractInstanceProps): Promise<CompatibilityFallbackHandlerContractImplementationType> {
   const fallbackHandlerContract = await getCompatibilityFallbackHandlerContractInstance(
     safeVersion,
     safeProvider,
     customContracts?.fallbackHandlerAddress,
-    customContracts?.fallbackHandlerAbi
+    customContracts?.fallbackHandlerAbi,
+    deploymentType
   )
 
   const isContractDeployed = await safeProvider.isContractDeployed(

@@ -21,7 +21,7 @@ import {
   getPredictedSafeAddressInitCode,
   predictSafeAddress
 } from './contracts/utils'
-import { DEFAULT_SAFE_VERSION } from './contracts/config'
+import { ContractInfo, DEFAULT_SAFE_VERSION, getContractInfo } from './contracts/config'
 import ContractManager from './managers/contractManager'
 import FallbackHandlerManager from './managers/fallbackHandlerManager'
 import GuardManager from './managers/guardManager'
@@ -124,12 +124,12 @@ class Safe {
   async #initializeProtocolKit(config: SafeConfig) {
     const { provider, signer, isL1SafeSingleton, contractNetworks } = config
 
-    this.#safeProvider = await SafeProvider.init(
+    this.#safeProvider = await SafeProvider.init({
       provider,
       signer,
-      DEFAULT_SAFE_VERSION,
+      safeVersion: DEFAULT_SAFE_VERSION,
       contractNetworks
-    )
+    })
 
     if (isSafeConfigWithPredictedSafe(config)) {
       this.#predictedSafe = config.predictedSafe
@@ -155,7 +155,12 @@ class Safe {
     }
 
     const safeVersion = this.getContractVersion()
-    this.#safeProvider = await SafeProvider.init(provider, signer, safeVersion, contractNetworks)
+    this.#safeProvider = await SafeProvider.init({
+      provider,
+      signer,
+      safeVersion,
+      contractNetworks
+    })
 
     this.#ownerManager = new OwnerManager(this.#safeProvider, this.#contractManager.safeContract)
     this.#moduleManager = new ModuleManager(this.#safeProvider, this.#contractManager.safeContract)
@@ -169,14 +174,14 @@ class Safe {
     if (isPasskeySigner) {
       const safeAddress = await this.getAddress()
       const owners = await this.getOwners()
-      this.#safeProvider = await SafeProvider.init(
+      this.#safeProvider = await SafeProvider.init({
         provider,
         signer,
         safeVersion,
         contractNetworks,
         safeAddress,
         owners
-      )
+      })
     }
   }
 
@@ -1635,6 +1640,14 @@ class Safe {
     } catch (error) {
       return false
     }
+  }
+
+  getContractInfo = ({
+    contractAddress
+  }: {
+    contractAddress: string
+  }): ContractInfo | undefined => {
+    return getContractInfo(contractAddress)
   }
 }
 

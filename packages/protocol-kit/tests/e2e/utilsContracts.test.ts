@@ -1,4 +1,5 @@
 import chai from 'chai'
+import { polygon, optimism, bsc, gnosis, base, avalanche } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   PREDETERMINED_SALT_NONCE,
@@ -649,6 +650,87 @@ describe('Contract utils', () => {
         chai.expect(zkSyncPredictedSafeAddress).to.be.equal(expectedSkSyncSafeAddress)
         chai.expect(sepoliaPredictedSafeAddress).to.be.equal(expectedSepoliaSafeAddress)
         chai.expect(mainnetPredictedSafeAddress).to.be.equal(expectedMainnetSafeAddress)
+      }
+    )
+
+    itif(safeVersionDeployed >= '1.3.0')(
+      'returns the same predicted address based on the deploymentType for different chains',
+      async () => {
+        const { accounts } = await setupTests()
+        const [owner] = accounts
+        const safeVersion = safeVersionDeployed
+
+        const safeAccountConfig: SafeAccountConfig = {
+          owners: [owner.address],
+          threshold: 1
+        }
+
+        const safeDeploymentConfig: SafeDeploymentConfig = {
+          safeVersion,
+          saltNonce: PREDETERMINED_SALT_NONCE,
+          deploymentType: 'canonical'
+        }
+
+        const protocolKitPolygonMainnet = await Safe.init({
+          provider: polygon.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitGnosis = await Safe.init({
+          provider: gnosis.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitBNB = await Safe.init({
+          provider: bsc.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitOptimism = await Safe.init({
+          provider: optimism.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitBase = await Safe.init({
+          provider: base.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitAvalanche = await Safe.init({
+          provider: avalanche.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const gnosisChainPredictedAddress = await protocolKitGnosis.getAddress()
+        const polygonChainPredictedAddress = await protocolKitPolygonMainnet.getAddress()
+        const bnbChainPredictedAddress = await protocolKitBNB.getAddress()
+        const optimismChainPredictedAddress = await protocolKitOptimism.getAddress()
+        const baseChainPredictedAddress = await protocolKitBase.getAddress()
+        const avalancheChainPredictedAddress = await protocolKitAvalanche.getAddress()
+
+        chai.expect(gnosisChainPredictedAddress).to.be.equal(polygonChainPredictedAddress)
+        chai.expect(polygonChainPredictedAddress).to.be.equal(bnbChainPredictedAddress)
+        chai.expect(bnbChainPredictedAddress).to.be.equal(optimismChainPredictedAddress)
+        chai.expect(optimismChainPredictedAddress).to.be.equal(baseChainPredictedAddress)
+        chai.expect(baseChainPredictedAddress).to.be.equal(avalancheChainPredictedAddress)
       }
     )
   })

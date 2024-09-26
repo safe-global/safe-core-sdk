@@ -6,7 +6,7 @@ import { getEip1193Provider } from './utils/setupProvider'
 
 chai.use(chaiAsPromised)
 
-describe.only('Contract Info', () => {
+describe('Contract Info', () => {
   const provider = getEip1193Provider()
   let protocolKit: Safe
 

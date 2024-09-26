@@ -1,5 +1,5 @@
 import chai from 'chai'
-import { polygon, optimism, bsc, gnosis } from 'viem/chains'
+import { polygon, optimism, bsc, gnosis, base, avalanche } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   PREDETERMINED_SALT_NONCE,
@@ -703,19 +703,34 @@ describe('Contract utils', () => {
           }
         })
 
+        const protocolKitBase = await Safe.init({
+          provider: base.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
+        const protocolKitAvalanche = await Safe.init({
+          provider: avalanche.rpcUrls.default.http[0],
+          predictedSafe: {
+            safeAccountConfig,
+            safeDeploymentConfig
+          }
+        })
+
         const gnosisChainPredictedAddress = await protocolKitGnosis.getAddress()
         const polygonChainPredictedAddress = await protocolKitPolygonMainnet.getAddress()
         const bnbChainPredictedAddress = await protocolKitBNB.getAddress()
         const optimismChainPredictedAddress = await protocolKitOptimism.getAddress()
-
-        console.log('gnosisChainPredictedAddress', gnosisChainPredictedAddress)
-        console.log('polygonChainPredictedAddress', polygonChainPredictedAddress)
-        console.log('bnbChainPredictedAddress', bnbChainPredictedAddress)
-        console.log('optimismChainPredictedAddress', optimismChainPredictedAddress)
+        const baseChainPredictedAddress = await protocolKitBase.getAddress()
+        const avalancheChainPredictedAddress = await protocolKitAvalanche.getAddress()
 
         chai.expect(gnosisChainPredictedAddress).to.be.equal(polygonChainPredictedAddress)
         chai.expect(polygonChainPredictedAddress).to.be.equal(bnbChainPredictedAddress)
         chai.expect(bnbChainPredictedAddress).to.be.equal(optimismChainPredictedAddress)
+        chai.expect(optimismChainPredictedAddress).to.be.equal(baseChainPredictedAddress)
+        chai.expect(baseChainPredictedAddress).to.be.equal(avalancheChainPredictedAddress)
       }
     )
   })

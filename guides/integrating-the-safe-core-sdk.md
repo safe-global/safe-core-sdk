@@ -104,25 +104,69 @@ const protocolKit = await Safe.init({ provider, signer, safeAddress, contractNet
 
 ## <a name="deploy-safe">3. Deploy a new Safe</a>
 
-The Protocol Kit library allows the deployment of new Safes using the `deploy` method.
+The Protocol Kit library now simplifies the creation of new Safes by providing the `createSafeDeploymentTransaction` method. This method returns an Ethereum transaction object ready for execution, which includes the deployment of a Safe.
 
-Here, for example, we can create a new Safe account with 3 owners and 2 required signatures.
+Here is an example of how to create a new Safe account with 3 owners and 2 required signatures:
 
 ```js
 import { SafeAccountConfig } from '@safe-global/protocol-kit'
 
 const safeAccountConfig: SafeAccountConfig = {
-  owners: ['0x...', '0x...', '0x...']
-  threshold: 2,
-  // ... (optional params)
+  owners: ['0x...', '0x...', '0x...'],
+  threshold: 2
+  // Additional optional parameters can be included here
 }
 
-const predictedSafe = await Safe.init({ provider, signer, predictSafe, contractNetworks })
+const predictSafe = {
+  safeAccountConfig,
+  safeDeploymentConfig: {
+    saltNonce, // optional parameter
+    safeVersion // optional parameter
+  }
+}
 
-const protocolKit = await predictedSafe.deploy()
+const protocolKit = await Safe.init({ provider, signer, predictSafe })
+
+const deploymentTransaction = await protocolKit.createSafeDeploymentTransaction()
+
+// Execute this transaction using the Ethereum client of your choice
+const txHash = await client.sendTransaction({
+  to: deploymentTransaction.to,
+  value: BigInt(deploymentTransaction.value),
+  data: `0x${deploymentTransaction.data}`
+})
+
 ```
 
-Calling the method `deploy` will deploy the desired Safe and return a Protocol Kit initialized instance ready to be used. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit#deploysafe) for more details on additional configuration parameters and callbacks.
+Once you obtain the `deploymentTransaction` object, you will have an Ethereum transaction object containing the `to`, `value`, and `data` fields. You can execute this transaction using the Ethereum client of your choice. Check the [API Reference](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit#deploysafe) for more details on additional configuration parameters.
+
+After successfully executing the transaction and confirming that the Safe has been deployed, you will need to reconnect to the new Safe address. Use the `connect` method to reinitialize the protocol-kit instance with the deployed Safe address:
+
+```js
+// Execute this transaction using the Ethereum client of your choice
+const txHash = await client.sendTransaction({
+  to: deploymentTransaction.to,
+  value: BigInt(deploymentTransaction.value),
+  data: `0x${deploymentTransaction.data}`
+})
+
+console.log('Transaction hash:', txHash)
+
+const txReceipt = await waitForTransactionReceipt(client, { hash: txHash })
+
+// Extract the Safe address from the deployment transaction receipt
+const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersion)
+
+console.log('safeAddress:', safeAddress)
+
+// Reinitialize the instance of protocol-kit using the obtained Safe address
+protocolKit.connect({ safeAddress })
+
+console.log('is Safe deployed:', await protocolKit.isSafeDeployed())
+console.log('Safe Address:', await protocolKit.getAddress())
+console.log('Safe Owners:', await protocolKit.getOwners())
+console.log('Safe Threshold:', await protocolKit.getThreshold())
+```
 
 ## <a name="create-transaction">4. Create a transaction</a>
 

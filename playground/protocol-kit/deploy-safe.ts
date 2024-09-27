@@ -94,6 +94,14 @@ async function main() {
   const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersion)
 
   console.log('safeAddress:', safeAddress)
+
+  // now you can use the Safe address in the instance of the protocol-kit
+  protocolKit.connect({ safeAddress })
+
+  console.log('is Safe deployed:', await protocolKit.isSafeDeployed())
+  console.log('Safe Address:', await protocolKit.getAddress())
+  console.log('Safe Owners:', await protocolKit.getOwners())
+  console.log('Safe Threshold:', await protocolKit.getThreshold())
 }
 
 main()

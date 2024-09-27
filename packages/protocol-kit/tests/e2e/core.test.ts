@@ -6,7 +6,7 @@ import {
   getSafeWithOwners,
   waitTransactionReceipt
 } from '@safe-global/testing-kit'
-import Safe, { PredictedSafeProps, SafeFactory } from '@safe-global/protocol-kit/index'
+import Safe, { PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
@@ -167,7 +167,7 @@ describe('Safe Info', () => {
     itif(safeVersionDeployed >= '1.3.0')(
       'should return the address of a Safe >=v1.3.0 that is not deployed',
       async () => {
-        const { predictedSafe, contractNetworks } = await setupTests()
+        const { predictedSafe, contractNetworks, accounts } = await setupTests()
         const safeSdk = await Safe.init({
           provider,
           predictedSafe,
@@ -175,15 +175,18 @@ describe('Safe Info', () => {
         })
         const safeAddress = await safeSdk.getAddress()
 
-        const safeFactory = await SafeFactory.init({
-          provider,
-          safeVersion: safeVersionDeployed,
-          contractNetworks
-        })
-        const deployedSdk = await safeFactory.deploySafe(predictedSafe)
-        const expectedSafeAddress = await deployedSdk.getAddress()
+        chai.expect(await safeSdk.isSafeDeployed()).to.be.false
+
+        const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
+
+        const signer = accounts[0].signer
+        await signer.sendTransaction(deploymentTransaction)
+
+        const expectedSafeAddress = await safeSdk.getAddress()
 
         chai.expect(safeAddress).to.be.eq(expectedSafeAddress)
+
+        chai.expect(await safeSdk.isSafeDeployed()).to.be.true
       }
     )
 

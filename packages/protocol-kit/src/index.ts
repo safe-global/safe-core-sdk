@@ -25,10 +25,10 @@ import {
   encodeCreateProxyWithNonce,
   encodeSetupCallData,
   predictSafeAddress,
-  getPredictedSafeAddressInitCode
+  getPredictedSafeAddressInitCode,
+  getSafeAddressFromDeploymentTx
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
-import SafeFactory from './SafeFactory'
 import {
   EthSafeSignature,
   estimateTxBaseGas,
@@ -84,7 +84,6 @@ export {
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
   SafeBaseContract,
-  SafeFactory,
   SafeProxyFactoryBaseContract,
   SafeTransactionOptionalProps,
   SignMessageLibBaseContract,
@@ -115,6 +114,7 @@ export {
   preimageSafeMessageHash,
   getEip712TxTypes,
   getEip712MessageTypes,
+  getSafeAddressFromDeploymentTx,
   hashSafeMessage,
   generateTypedData,
   SafeProvider,

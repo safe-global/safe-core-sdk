@@ -1,11 +1,6 @@
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
-import {
-  SafeTransaction,
-  TransactionOptions,
-  TransactionResult,
-  Transaction
-} from '@safe-global/types-kit'
+import { SafeTransaction, TransactionOptions, TransactionResult } from '@safe-global/types-kit'
 
 import {
   createSafeClientResult,
@@ -204,10 +199,9 @@ export class SafeClient extends BaseClient {
   }: {
     safeTransaction: SafeTransaction
   } & TransactionOptions): Promise<SafeClientResult> {
-    const safeDeploymentTransaction: Transaction =
-      await this.protocolKit.createSafeDeploymentTransaction(undefined, transactionOptions)
+    const safeDeploymentTransaction = await this.protocolKit.createSafeDeploymentTransaction()
     const hash = await sendTransaction({
-      transaction: { ...safeDeploymentTransaction },
+      transaction: { ...safeDeploymentTransaction, ...transactionOptions },
       protocolKit: this.protocolKit
     })
 

@@ -5,7 +5,7 @@ import {
   hasSafeFeature,
   validateEip3770Address,
   toEstimateGasParameters,
-  toCallGasParameters,
+  toTransactionRequest,
   sameString
 } from '@safe-global/protocol-kit/utils'
 import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
@@ -346,7 +346,7 @@ class SafeProvider {
   }
 
   async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
-    const converted = toCallGasParameters(transaction)
+    const converted = toTransactionRequest(transaction)
     const { data } = await call(this.#externalProvider, {
       ...converted,
       ...asBlockId(blockTag)

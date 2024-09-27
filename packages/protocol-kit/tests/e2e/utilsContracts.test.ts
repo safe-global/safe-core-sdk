@@ -2,34 +2,62 @@ import chai from 'chai'
 import { polygon, optimism, bsc, gnosis, base, avalanche } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
+  getSafeAddressFromDeploymentTx,
   PREDETERMINED_SALT_NONCE,
   predictSafeAddress
 } from '@safe-global/protocol-kit/contracts/utils'
-import { safeVersionDeployed, setupTests, itif } from '@safe-global/testing-kit'
+import {
+  safeVersionDeployed,
+  setupTests,
+  itif,
+  waitTransactionReceipt
+} from '@safe-global/testing-kit'
 import {
   SafeDeploymentConfig,
   SafeAccountConfig,
   ContractNetworksConfig,
-  Eip1193Provider
+  Eip1193Provider,
+  PredictedSafeProps
 } from '@safe-global/protocol-kit/types'
-import Safe, { SafeFactory, DeploySafeProps } from '@safe-global/protocol-kit/index'
+import Safe from '@safe-global/protocol-kit/index'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 
 // test util funcion to deploy a safe (needed to check the expected Safe Address)
 async function deploySafe(
-  deploySafeProps: DeploySafeProps,
+  predictedSafeProps: PredictedSafeProps,
   provider: Eip1193Provider,
   contractNetworks: ContractNetworksConfig,
+  signer,
   signerAddress?: string
 ): Promise<Safe> {
-  const safeFactory = await SafeFactory.init({
+  const safeSDK = await Safe.init({
     provider,
     signer: signerAddress,
-    safeVersion: safeVersionDeployed,
+    predictedSafe: {
+      ...predictedSafeProps,
+      safeDeploymentConfig: {
+        saltNonce: predictedSafeProps.safeDeploymentConfig?.saltNonce,
+        safeVersion: safeVersionDeployed
+      }
+    },
     contractNetworks
   })
 
-  return await safeFactory.deploySafe(deploySafeProps)
+  const deploymentTransaction = await safeSDK.createSafeDeploymentTransaction()
+
+  const txHash = await signer.sendTransaction(deploymentTransaction)
+
+  const txReceipt = await waitTransactionReceipt(txHash)
+
+  const safeAddress = getSafeAddressFromDeploymentTx(txReceipt, safeVersionDeployed)
+
+  const safeSDKDeployed = await Safe.init({
+    provider,
+    contractNetworks,
+    safeAddress
+  })
+
+  return safeSDKDeployed
 }
 
 describe('Contract utils', () => {
@@ -42,6 +70,7 @@ describe('Contract utils', () => {
       // 1/1 Safe
       const [owner1] = accounts
       const owners = [owner1.address]
+      const signer = accounts[0].signer
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const safeProvider = new SafeProvider({ provider })
@@ -67,9 +96,10 @@ describe('Contract utils', () => {
 
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
-        { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
+        { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -87,6 +117,7 @@ describe('Contract utils', () => {
       // 1/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
+      const signer = accounts[0].signer
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const safeProvider = new SafeProvider({ provider })
@@ -112,9 +143,10 @@ describe('Contract utils', () => {
 
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
-        { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
+        { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -132,6 +164,7 @@ describe('Contract utils', () => {
       // 2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
+      const signer = accounts[0].signer
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const safeProvider = new SafeProvider({ provider })
@@ -157,9 +190,10 @@ describe('Contract utils', () => {
 
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
-        { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
+        { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -312,6 +346,7 @@ describe('Contract utils', () => {
       // 1/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
+      const signer = accounts[0].signer
       const threshold = 1
       const safeVersion = safeVersionDeployed
       const safeProvider = new SafeProvider({ provider })
@@ -339,9 +374,10 @@ describe('Contract utils', () => {
 
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const firstDeployedSafe = await deploySafe(
-        { safeAccountConfig, saltNonce: firstSaltNonce },
+        { safeAccountConfig, safeDeploymentConfig: { saltNonce: firstSaltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -363,9 +399,10 @@ describe('Contract utils', () => {
 
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const secondDeployedSafe = await deploySafe(
-        { safeAccountConfig, saltNonce: secondSaltNonce },
+        { safeAccountConfig, safeDeploymentConfig: { saltNonce: secondSaltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -387,9 +424,10 @@ describe('Contract utils', () => {
 
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const thirdDeployedSafe = await deploySafe(
-        { safeAccountConfig, saltNonce: thirdSaltNonce },
+        { safeAccountConfig, safeDeploymentConfig: { saltNonce: thirdSaltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
 
@@ -405,6 +443,7 @@ describe('Contract utils', () => {
       // 2/2 Safe
       const [owner1, owner2] = accounts
       const owners = [owner1.address, owner2.address]
+      const signer = accounts[0].signer
       const threshold = 2
       const safeVersion = safeVersionDeployed
       const safeProvider = new SafeProvider({ provider })
@@ -422,9 +461,10 @@ describe('Contract utils', () => {
 
       // we deploy the Safe with the given configuration and the deployed Safe address should be equal to the predicted one
       const deployedSafe = await deploySafe(
-        { safeAccountConfig, saltNonce: safeDeploymentConfig.saltNonce },
+        { safeAccountConfig, safeDeploymentConfig: { saltNonce: safeDeploymentConfig.saltNonce } },
         provider,
         contractNetworks,
+        signer,
         owner1.address
       )
       // We ensure the Safe is deployed, as getAddress() function is able to return an address for a predictedSafe
@@ -470,6 +510,7 @@ describe('Contract utils', () => {
         // 1/1 Safe
         const [owner1] = accounts
         const owners = [owner1.address]
+        const signer = accounts[0].signer
         const threshold = 1
         const customContracts = contractNetworks[chainId.toString()]
 
@@ -492,6 +533,7 @@ describe('Contract utils', () => {
           { safeAccountConfig },
           provider,
           contractNetworks,
+          signer,
           owner1.address
         )
 

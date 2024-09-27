@@ -7,14 +7,6 @@ export enum OperationType {
   DelegateCall // 1
 }
 
-export interface CreateProxyProps {
-  safeSingletonAddress: string
-  initializer: string
-  saltNonce: string
-  options?: TransactionOptions
-  callback?: (txHash: string) => void
-}
-
 export interface SafeSetupConfig {
   owners: string[]
   threshold: number

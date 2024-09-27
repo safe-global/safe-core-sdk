@@ -179,26 +179,6 @@ describe('createSafeDeploymentTransaction', () => {
         .to.contains(predeterminedSaltNonceEncoded.replace('0x', ''))
     })
 
-    it('should include the custom salt nonce in the Safe deployment data', async () => {
-      const { contractNetworks, predictedSafe } = await setupTests()
-
-      const safeProvider = new SafeProvider({ provider })
-      const safeSdk = await Safe.init({
-        provider,
-        predictedSafe,
-        contractNetworks
-      })
-
-      const customSaltNonce = '123456789'
-
-      const customSaltNonceEncoded = safeProvider.encodeParameters('uint256', [customSaltNonce])
-
-      const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
-
-      // custom salt nonce included in the deployment data
-      chai.expect(deploymentTransaction.data).to.contains(customSaltNonceEncoded.replace('0x', ''))
-    })
-
     it('should include the salt nonce included in the safeDeploymentConfig in the Safe deployment data', async () => {
       const { contractNetworks, predictedSafe } = await setupTests()
 
@@ -220,7 +200,7 @@ describe('createSafeDeploymentTransaction', () => {
         .getSafeProvider()
         .encodeParameters('uint256', [customSaltNonce])
 
-      const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction(customSaltNonce)
+      const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction()
 
       // custom salt nonce included in the deployment data
       chai.expect(deploymentTransaction.data).to.contains(saltNonceEncoded.replace('0x', ''))

@@ -1,7 +1,4 @@
-import { parseEventLogs } from 'viem'
-import SafeProxyFactoryBaseContract, {
-  CreateProxyProps
-} from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
+import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeProxyFactoryContract_v1_4_1_Abi,
@@ -10,8 +7,6 @@ import {
   safeProxyFactory_1_4_1_ContractArtifacts
 } from '@safe-global/types-kit'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { waitForTransactionReceipt } from '@safe-global/protocol-kit/utils'
-import { asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
  * SafeProxyFactoryContract_v1_4_1  is the implementation specific to the Safe Proxy Factory contract version 1.4.1.
@@ -101,57 +96,6 @@ class SafeProxyFactoryContract_v1_4_1
     args
   ) => {
     return [await this.write('createProxyWithNonce', args)]
-  }
-
-  /**
-   * Allows to create new proxy contract and execute a message call to the new proxy within one transaction.
-   * @param {CreateProxyProps} props - Properties for the new proxy contract.
-   * @returns The address of the new proxy contract.
-   */
-  async createProxyWithOptions({
-    safeSingletonAddress,
-    initializer,
-    saltNonce,
-    options,
-    callback
-  }: CreateProxyProps): Promise<string> {
-    const saltNonceBigInt = BigInt(saltNonce)
-
-    if (saltNonceBigInt < 0) throw new Error('saltNonce must be greater than or equal to 0')
-
-    if (options && !options.gasLimit) {
-      options.gasLimit = (
-        await this.estimateGas(
-          'createProxyWithNonce',
-          [safeSingletonAddress, asHex(initializer), saltNonceBigInt],
-          { ...options }
-        )
-      ).toString()
-    }
-
-    const coverted = this.convertOptions(options)
-    const proxyAddress = await this.getWallet()
-      .writeContract({
-        address: this.contractAddress,
-        abi: this.contractAbi,
-        functionName: 'createProxyWithNonce',
-        args: [safeSingletonAddress, asHex(initializer), saltNonceBigInt],
-        ...coverted
-      })
-      .then(async (hash) => {
-        if (callback) {
-          callback(hash)
-        }
-        const { logs } = await waitForTransactionReceipt(this.runner, hash)
-        const events = parseEventLogs({ logs, abi: this.contractAbi })
-        const proxyCreationEvent = events.find((event) => event?.eventName === 'ProxyCreation')
-        if (!proxyCreationEvent || !proxyCreationEvent.args) {
-          throw new Error('SafeProxy was not deployed correctly')
-        }
-        return proxyCreationEvent.args.proxy
-      })
-
-    return proxyAddress
   }
 }
 

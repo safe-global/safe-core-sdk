@@ -19,7 +19,9 @@ import {
   encodeSetupCallData,
   getChainSpecificDefaultSaltNonce,
   getPredictedSafeAddressInitCode,
-  predictSafeAddress
+  predictSafeAddress,
+  validateSafeAccountConfig,
+  validateSafeDeploymentConfig
 } from './contracts/utils'
 import { ContractInfo, DEFAULT_SAFE_VERSION, getContractInfo } from './contracts/config'
 import ContractManager from './managers/contractManager'
@@ -877,7 +879,7 @@ class Safe {
    */
   async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
     if (!this.#contractManager.safeContract) {
-      throw new Error('Safe is not deployed')
+      return []
     }
 
     const owners = await this.getOwners()
@@ -908,6 +910,13 @@ class Safe {
     fallbackHandlerAddress: string,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const safeVersion = await this.getContractVersion()
+    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      throw new Error(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+      )
+    }
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -933,6 +942,13 @@ class Safe {
   async createDisableFallbackHandlerTx(
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
+    const safeVersion = await this.getContractVersion()
+    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      throw new Error(
+        'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
+      )
+    }
+
     const safeTransactionData = {
       to: await this.getAddress(),
       value: '0',
@@ -1307,31 +1323,9 @@ class Safe {
       ? await this.toSafeTransactionType(safeTransaction)
       : safeTransaction
 
-    const signedSafeTransaction = await this.copyTransaction(transaction)
+    const signedSafeTransaction = await this.#addPreValidatedSignature(transaction)
 
-    const txHash = await this.getTransactionHash(signedSafeTransaction)
-    const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
-    for (const owner of ownersWhoApprovedTx) {
-      signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
-    }
-    const threshold = await this.getThreshold()
-    const signerAddress = await this.#safeProvider.getSignerAddress()
-    if (!signerAddress) {
-      throw new Error('The protocol-kit requires a signer to use this method')
-    }
-    const addressIsOwner = await this.isOwner(signerAddress)
-    if (threshold > signedSafeTransaction.signatures.size && addressIsOwner) {
-      signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
-    }
-
-    if (threshold > signedSafeTransaction.signatures.size) {
-      const signaturesMissing = threshold - signedSafeTransaction.signatures.size
-      throw new Error(
-        `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
-          signaturesMissing > 1 ? 's' : ''
-        } missing`
-      )
-    }
+    await this.#isReadyToExecute(signedSafeTransaction)
 
     const value = BigInt(signedSafeTransaction.data.value)
     if (value !== 0n) {
@@ -1341,6 +1335,8 @@ class Safe {
       }
     }
 
+    const signerAddress = await this.#safeProvider.getSignerAddress()
+
     const txResponse = await this.#contractManager.safeContract.execTransaction(
       signedSafeTransaction,
       {
@@ -1349,6 +1345,58 @@ class Safe {
       }
     )
     return txResponse
+  }
+
+  /**
+   * Adds a PreValidatedSignature to the transaction if the threshold is not reached.
+   *
+   * @async
+   * @param {SafeTransaction} transaction - The transaction to add a signature to.
+   * @returns {Promise<SafeTransaction>} A promise that resolves to the signed transaction.
+   */
+  async #addPreValidatedSignature(transaction: SafeTransaction): Promise<SafeTransaction> {
+    const signedSafeTransaction = await this.copyTransaction(transaction)
+
+    const txHash = await this.getTransactionHash(signedSafeTransaction)
+    const ownersWhoApprovedTx = await this.getOwnersWhoApprovedTx(txHash)
+
+    for (const owner of ownersWhoApprovedTx) {
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
+    }
+
+    const owners = await this.getOwners()
+    const threshold = await this.getThreshold()
+    const signerAddress = await this.#safeProvider.getSignerAddress()
+
+    if (
+      threshold > signedSafeTransaction.signatures.size &&
+      signerAddress &&
+      owners.includes(signerAddress)
+    ) {
+      signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
+    }
+
+    return signedSafeTransaction
+  }
+
+  /**
+   * Checks if the transaction has enough signatures to be executed.
+   *
+   * @async
+   * @param {SafeTransaction} transaction - The Safe transaction to check.
+   * @throws Will throw an error if the required number of signatures is not met.
+   */
+  async #isReadyToExecute(transaction: SafeTransaction) {
+    const threshold = await this.getThreshold()
+
+    if (threshold > transaction.signatures.size) {
+      const signaturesMissing = threshold - transaction.signatures.size
+      throw new Error(
+        `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${
+          signaturesMissing > 1 ? 's' : ''
+        } missing`
+      )
+    }
   }
 
   /**
@@ -1397,15 +1445,13 @@ class Safe {
    * @async
    * @param {SafeTransaction} safeTransaction - The Safe transaction to be wrapped into the deployment batch.
    * @param {TransactionOptions} [transactionOptions] - Optional. Options for the transaction, such as from, gas price, gas limit, etc.
-   * @param {string} [customSaltNonce] - Optional. a Custom salt nonce to be used for the deployment of the Safe. If not provided, a default value is used.
    * @returns {Promise<Transaction>} A promise that resolves to a Transaction object representing the prepared batch of transactions.
    * @throws Will throw an error if the safe is already deployed.
    *
    */
   async wrapSafeTransactionIntoDeploymentBatch(
     safeTransaction: SafeTransaction,
-    transactionOptions?: TransactionOptions,
-    customSaltNonce?: string
+    transactionOptions?: TransactionOptions
   ): Promise<Transaction> {
     const isSafeDeployed = await this.isSafeDeployed()
 
@@ -1415,7 +1461,7 @@ class Safe {
     }
 
     // we create the deployment transaction
-    const safeDeploymentTransaction = await this.createSafeDeploymentTransaction(customSaltNonce)
+    const safeDeploymentTransaction = await this.createSafeDeploymentTransaction()
 
     // First transaction of the batch: The Safe deployment Transaction
     const safeDeploymentBatchTransaction = {
@@ -1443,31 +1489,35 @@ class Safe {
   }
 
   /**
-   * Creates a Safe deployment transaction.
+   * Creates a transaction to deploy a Safe Account.
    *
-   * This function prepares a transaction for the deployment of a Safe.
-   * Both the saltNonce and options parameters are optional, and if not
-   * provided, default values will be used.
-   *
-   * @async
-   * @param {string} [customSaltNonce] - Optional. a Custom salt nonce to be used for the deployment of the Safe. If not provided, a default value is used.
-   * @param {TransactionOptions} [options] - Optional. Options for the transaction, such as gas price, gas limit, etc.
-   * @returns {Promise<Transaction>} A promise that resolves to a Transaction object representing the prepared Safe deployment transaction.
-   *
+   * @returns {Promise<Transaction>} Returns a promise that resolves to an Ethereum transaction with the fields `to`, `value`, and `data`, which can be used to deploy the Safe Account.
    */
-  async createSafeDeploymentTransaction(
-    customSaltNonce?: string,
-    transactionOptions?: TransactionOptions
-  ): Promise<Transaction> {
+  async createSafeDeploymentTransaction(): Promise<Transaction> {
     if (!this.#predictedSafe) {
-      throw new Error('Predict Safe should be present')
+      throw new Error('Predict Safe should be present to build the Safe deployement transaction')
     }
 
-    const { safeAccountConfig, safeDeploymentConfig } = this.#predictedSafe
+    const { safeAccountConfig, safeDeploymentConfig = {} } = this.#predictedSafe
 
-    const safeVersion = this.getContractVersion()
+    validateSafeAccountConfig(safeAccountConfig)
+    validateSafeDeploymentConfig(safeDeploymentConfig)
+
     const safeProvider = this.#safeProvider
     const chainId = await safeProvider.getChainId()
+    const safeVersion = safeDeploymentConfig?.safeVersion || DEFAULT_SAFE_VERSION
+    const saltNonce = safeDeploymentConfig?.saltNonce || getChainSpecificDefaultSaltNonce(chainId)
+
+    // we only check if the safe is deployed if safeVersion >= 1.3.0
+    if (hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      const isSafeDeployed = await this.isSafeDeployed()
+
+      // if the safe is already deployed throws an error
+      if (isSafeDeployed) {
+        throw new Error('Safe already deployed')
+      }
+    }
+
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
 
@@ -1493,13 +1543,7 @@ class Safe {
       customContracts
     })
 
-    const saltNonce =
-      customSaltNonce ||
-      safeDeploymentConfig?.saltNonce ||
-      getChainSpecificDefaultSaltNonce(chainId)
-
     const safeDeployTransactionData = {
-      ...transactionOptions, // optional transaction options like from, gasLimit, gasPrice...
       to: safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52

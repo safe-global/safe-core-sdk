@@ -2,16 +2,8 @@ import { Abi } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import {
-  SafeVersion,
-  TransactionOptions,
-  CreateProxyProps as CreateProxyPropsGeneral
-} from '@safe-global/types-kit'
+import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-
-export interface CreateProxyProps extends CreateProxyPropsGeneral {
-  options?: TransactionOptions
-}
 
 /**
  * Abstract class SafeWebAuthnSharedSignerBaseContract extends BaseContract to specifically integrate with the SafeWebAuthnSharedSigner contract.

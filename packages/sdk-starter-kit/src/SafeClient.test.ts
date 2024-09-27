@@ -131,7 +131,7 @@ describe('SafeClient', () => {
 
       const result = await safeClient.send({ transactions: TRANSACTION_BATCH })
 
-      expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith(undefined, {})
+      expect(protocolKit.createSafeDeploymentTransaction).toHaveBeenCalledWith()
       expect(utils.sendTransaction).toHaveBeenCalledWith({
         transaction: DEPLOYMENT_TRANSACTION,
         protocolKit

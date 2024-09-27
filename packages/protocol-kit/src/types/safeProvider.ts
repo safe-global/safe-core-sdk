@@ -10,6 +10,8 @@ import {
   WalletActions,
   Hex
 } from 'viem'
+import { SafeVersion } from '@safe-global/types-kit'
+import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 
 export type RequestArguments = {
   readonly method: string
@@ -54,6 +56,15 @@ export type SafeProviderConfig = {
   /** signerOrProvider - Ethers signer or provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
   signer?: HexAddress | PrivateKey | PasskeyArgType | PasskeyClient
+}
+
+export type SafeProviderInitOptions = {
+  provider: SafeProviderConfig['provider']
+  signer?: SafeProviderConfig['signer']
+  safeVersion?: SafeVersion
+  contractNetworks?: ContractNetworksConfig
+  safeAddress?: string
+  owners?: string[]
 }
 
 export type SafeProviderTransaction = {

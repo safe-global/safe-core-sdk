@@ -18,6 +18,7 @@ import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeProxyFactoryContractType,
   SafeVersion,
@@ -82,6 +83,7 @@ export interface encodeSetupCallDataProps {
   safeContract: SafeContractImplementationType
   customContracts?: ContractNetworkConfig
   customSafeVersion?: SafeVersion
+  deploymentType?: DeploymentType
 }
 
 export function encodeCreateProxyWithNonce(
@@ -106,7 +108,8 @@ export async function encodeSetupCallData({
   safeAccountConfig,
   safeContract,
   customContracts,
-  customSafeVersion
+  customSafeVersion,
+  deploymentType
 }: encodeSetupCallDataProps): Promise<string> {
   const {
     owners,
@@ -139,7 +142,8 @@ export async function encodeSetupCallData({
     const fallbackHandlerContract = await memoizedGetCompatibilityFallbackHandlerContract({
       safeProvider,
       safeVersion,
-      customContracts
+      customContracts,
+      deploymentType
     })
 
     fallbackHandlerAddress = fallbackHandlerContract.getAddress()
@@ -158,12 +162,23 @@ export async function encodeSetupCallData({
 }
 
 // we need to include the chainId as string to prevent memoization issues see: https://github.com/safe-global/safe-core-sdk/issues/598
-type MemoizedGetProxyFactoryContractProps = GetContractInstanceProps & { chainId: string }
-type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & { chainId: string }
+type MemoizedGetProxyFactoryContractProps = GetContractInstanceProps & {
+  chainId: string
+  deploymentType?: DeploymentType
+}
+type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & {
+  chainId: string
+  deploymentType?: DeploymentType
+}
 
 const memoizedGetProxyFactoryContract = createMemoizedFunction(
-  ({ safeProvider, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
-    getSafeProxyFactoryContract({ safeProvider, safeVersion, customContracts })
+  ({
+    safeProvider,
+    safeVersion,
+    customContracts,
+    deploymentType
+  }: MemoizedGetProxyFactoryContractProps) =>
+    getSafeProxyFactoryContract({ safeProvider, safeVersion, customContracts, deploymentType })
 )
 
 const memoizedGetProxyCreationCode = createMemoizedFunction(
@@ -171,13 +186,15 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
     safeProvider,
     safeVersion,
     customContracts,
-    chainId
+    chainId,
+    deploymentType
   }: MemoizedGetProxyFactoryContractProps) => {
     const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
       safeProvider,
       safeVersion,
       customContracts,
-      chainId
+      chainId,
+      deploymentType
     })
 
     return safeProxyFactoryContract.proxyCreationCode()
@@ -189,9 +206,16 @@ const memoizedGetSafeContract = createMemoizedFunction(
     safeProvider,
     safeVersion,
     isL1SafeSingleton,
-    customContracts
+    customContracts,
+    deploymentType
   }: MemoizedGetSafeContractInstanceProps) =>
-    getSafeContract({ safeProvider, safeVersion, isL1SafeSingleton, customContracts })
+    getSafeContract({
+      safeProvider,
+      safeVersion,
+      isL1SafeSingleton,
+      customContracts,
+      deploymentType
+    })
 )
 
 /**
@@ -238,14 +262,16 @@ export async function getPredictedSafeAddressInitCode({
 
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
-    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId),
+    deploymentType
   } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     safeProvider,
     safeVersion,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const safeContract = await memoizedGetSafeContract({
@@ -253,7 +279,8 @@ export async function getPredictedSafeAddressInitCode({
     safeVersion,
     isL1SafeSingleton,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const initializer = await encodeSetupCallData({
@@ -261,7 +288,8 @@ export async function getPredictedSafeAddressInitCode({
     safeAccountConfig,
     safeContract,
     customContracts,
-    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+    customSafeVersion: safeVersion, // it is more efficient if we provide the safeVersion manually
+    deploymentType
   })
 
   const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce])
@@ -294,21 +322,24 @@ export async function predictSafeAddress({
 
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
-    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId),
+    deploymentType
   } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     safeProvider,
     safeVersion,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const [proxyCreationCode] = await memoizedGetProxyCreationCode({
     safeProvider,
     safeVersion,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const safeContract = await memoizedGetSafeContract({
@@ -316,7 +347,8 @@ export async function predictSafeAddress({
     safeVersion,
     isL1SafeSingleton,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const initializer = await encodeSetupCallData({
@@ -324,7 +356,8 @@ export async function predictSafeAddress({
     safeAccountConfig,
     safeContract,
     customContracts,
-    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+    customSafeVersion: safeVersion, // it is more efficient if we provide the safeVersion manuall
+    deploymentType
   })
   const initializerHash = keccak256(asHex(initializer))
 

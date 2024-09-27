@@ -2,6 +2,7 @@ import { Abi } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
@@ -33,6 +34,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -40,7 +42,8 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     defaultAbi: CompatibilityFallbackHandlerContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: CompatibilityFallbackHandlerContractAbiType
+    customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'compatibilityFallbackHandler'
 
@@ -51,7 +54,8 @@ abstract class CompatibilityFallbackHandlerBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

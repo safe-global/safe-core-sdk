@@ -9,7 +9,9 @@ import {
   Chain
 } from 'viem'
 import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
+import { SingletonDeployment } from '@safe-global/safe-deployments'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   EncodeFunction,
@@ -62,6 +64,7 @@ class BaseContract<ContractAbiType extends Abi> {
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     contractName: contractName,
@@ -70,24 +73,27 @@ class BaseContract<ContractAbiType extends Abi> {
     defaultAbi: ContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: ContractAbiType
+    customContractAbi?: ContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
 
-    const contractAddress =
-      customContractAddress || deployment?.networkAddresses[chainId.toString()]
+    const resolvedAddress =
+      customContractAddress ??
+      this.#resolveAddress(
+        deployment?.networkAddresses[chainId.toString()],
+        deployment,
+        deploymentType
+      )
 
-    if (!contractAddress) {
+    if (!resolvedAddress) {
       throw new Error(`Invalid ${contractName.replace('Version', '')} contract address`)
     }
 
     this.chainId = chainId
     this.contractName = contractName
     this.safeVersion = safeVersion
-    this.contractAddress =
-      Array.isArray(contractAddress) && contractAddress.length
-        ? contractAddress[0]
-        : contractAddress.toString()
+    this.contractAddress = resolvedAddress
     this.contractAbi =
       customContractAbi ||
       (deployment?.abi as unknown as ContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
@@ -95,6 +101,31 @@ class BaseContract<ContractAbiType extends Abi> {
 
     this.runner = safeProvider.getExternalProvider()
     this.safeProvider = safeProvider
+  }
+
+  #resolveAddress(
+    networkAddresses: string | string[] | undefined,
+    deployment: SingletonDeployment,
+    deploymentType?: DeploymentType
+  ): string | undefined {
+    if (!networkAddresses) {
+      return undefined
+    }
+
+    if (typeof networkAddresses === 'string') {
+      return networkAddresses
+    }
+
+    if (deploymentType) {
+      const customDeploymentTypeAddress = deployment.deployments[deploymentType]?.address
+
+      return (
+        networkAddresses.find((address) => address === customDeploymentTypeAddress) ??
+        networkAddresses[0]
+      )
+    }
+
+    return networkAddresses[0]
   }
 
   async init() {

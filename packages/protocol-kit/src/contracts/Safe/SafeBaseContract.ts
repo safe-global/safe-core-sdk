@@ -4,6 +4,7 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
 
 /**
@@ -38,6 +39,7 @@ abstract class SafeBaseContract<
    * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -46,7 +48,8 @@ abstract class SafeBaseContract<
     safeVersion: SafeVersion,
     isL1SafeSingleton = false,
     customContractAddress?: string,
-    customContractAbi?: SafeContractAbiType
+    customContractAbi?: SafeContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const isL1Contract =
       safeDeploymentsL1ChainIds.includes(chainId) ||
@@ -62,7 +65,8 @@ abstract class SafeBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

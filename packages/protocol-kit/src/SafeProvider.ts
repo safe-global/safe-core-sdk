@@ -17,20 +17,18 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
   Eip3770Address,
-  SafeEIP712Args,
-  SafeVersion
+  SafeEIP712Args
 } from '@safe-global/types-kit'
 import {
   SafeProviderTransaction,
   SafeProviderConfig,
+  SafeProviderInitOptions,
   ExternalClient,
   ExternalSigner,
   Eip1193Provider,
   HttpTransport,
   SocketTransport,
   SafeSigner,
-  SafeConfig,
-  ContractNetworksConfig,
   PasskeyArgType,
   PasskeyClient
 } from '@safe-global/protocol-kit/types'
@@ -102,14 +100,14 @@ class SafeProvider {
     return this.#externalProvider
   }
 
-  static async init(
-    provider: SafeConfig['provider'],
-    signer?: SafeConfig['signer'],
-    safeVersion: SafeVersion = DEFAULT_SAFE_VERSION,
-    contractNetworks?: ContractNetworksConfig,
-    safeAddress?: string,
-    owners?: string[]
-  ): Promise<SafeProvider> {
+  static async init({
+    provider,
+    signer,
+    safeVersion = DEFAULT_SAFE_VERSION,
+    contractNetworks,
+    safeAddress,
+    owners
+  }: SafeProviderInitOptions): Promise<SafeProvider> {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
     if (isPasskeySigner) {

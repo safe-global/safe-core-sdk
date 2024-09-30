@@ -4,6 +4,6 @@
     "composite": true,
     "outDir": "dist"
   },
-  "include": ["bin/**/*", "src/**/*"],
+  "include": ["src/**/*"],
   "files": ["./hardhat.config.ts"]
 }

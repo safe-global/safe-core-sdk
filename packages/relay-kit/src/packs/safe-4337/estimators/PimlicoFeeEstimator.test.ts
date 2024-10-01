@@ -35,7 +35,6 @@ describe('PimlicoFeeEstimator', () => {
     expect(sponsoredGasEstimation).toEqual({ maxFeePerGas: 100000n, maxPriorityFeePerGas: 200000n })
   })
 
-  // TODO: This tests breaks because of the BigInt serialization and requires further investigation
   it('should enable to adjust the gas estimation', async () => {
     const sponsoredGasEstimation = await estimator.adjustEstimation({
       bundlerUrl: fixtures.BUNDLER_URL,

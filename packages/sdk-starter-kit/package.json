@@ -36,9 +36,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@safe-global/api-kit": "^2.4.6",
-    "@safe-global/protocol-kit": "^4.1.1",
-    "@safe-global/relay-kit": "^3.1.1",
+    "@safe-global/api-kit": "^2.5.0",
+    "@safe-global/protocol-kit": "^5.0.0",
+    "@safe-global/relay-kit": "^3.2.0",
     "@safe-global/types-kit": "^1.0.0",
     "viem": "^2.21.8"
   }

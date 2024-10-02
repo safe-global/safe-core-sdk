@@ -78,7 +78,7 @@ export class BaseClient {
    * @param {string} txHash - The Safe transaction hash
    * @returns {string[]} The list of owners
    */
-  async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
+  async getOwnersWhoApprovedTransaction(txHash: string): Promise<string[]> {
     return this.protocolKit.getOwnersWhoApprovedTx(txHash)
   }
 

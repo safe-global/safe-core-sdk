@@ -70,7 +70,7 @@ class SafeApiKit {
         )
       }
 
-      this.#txServiceBaseUrl = `${url}/api`
+      this.#txServiceBaseUrl = url
     }
   }
 

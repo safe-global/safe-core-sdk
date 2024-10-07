@@ -155,6 +155,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 6102n, shortName: 'cascadia' },
   { chainId: 6321n, shortName: 'eaura' },
   { chainId: 6322n, shortName: 'aura' },
+  { chainId: 6398n, shortName: 'connext-sepolia' },
   { chainId: 6688n, shortName: 'iris' },
   { chainId: 7000n, shortName: 'zetachain-mainnet' },
   { chainId: 7001n, shortName: 'zetachain-testnet' },

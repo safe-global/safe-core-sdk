@@ -201,6 +201,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 22776n, shortName: 'mapo' },
   { chainId: 23294n, shortName: 'sapphire' },
   { chainId: 23295n, shortName: 'sapphire-testnet' },
+  { chainId: 25327n, shortName: 'Everclear' },
   { chainId: 28979n, shortName: 'kimbonet-testnet' },
   { chainId: 32769n, shortName: 'zil' },
   { chainId: 33101n, shortName: 'zil-testnet' },

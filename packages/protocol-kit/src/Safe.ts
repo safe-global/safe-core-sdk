@@ -282,6 +282,7 @@ class Safe {
       return predictSafeAddress({
         safeProvider: this.#safeProvider,
         chainId,
+        isL1SafeSingleton: this.#contractManager.isL1SafeSingleton,
         customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
         ...this.#predictedSafe
       })

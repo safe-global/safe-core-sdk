@@ -46,15 +46,13 @@ abstract class SafeBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: SafeContractAbiType,
     safeVersion: SafeVersion,
-    isL1SafeSingleton = false,
+    isL1SafeSingleton = safeDeploymentsL1ChainIds.includes(chainId),
     customContractAddress?: string,
     customContractAbi?: SafeContractAbiType,
     deploymentType?: DeploymentType
   ) {
     const isL1Contract =
-      safeDeploymentsL1ChainIds.includes(chainId) ||
-      isL1SafeSingleton ||
-      !hasSafeFeature(SAFE_FEATURES.SAFE_L2_CONTRACTS, safeVersion)
+      isL1SafeSingleton || !hasSafeFeature(SAFE_FEATURES.SAFE_L2_CONTRACTS, safeVersion)
 
     const contractName = isL1Contract ? 'safeSingletonVersion' : 'safeSingletonL2Version'
 

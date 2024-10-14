@@ -112,17 +112,20 @@ class BaseContract<ContractAbiType extends Abi> {
       return undefined
     }
 
-    if (typeof networkAddresses === 'string') {
-      return networkAddresses
-    }
-
     if (deploymentType) {
       const customDeploymentTypeAddress = deployment.deployments[deploymentType]?.address
 
-      return (
-        networkAddresses.find((address) => address === customDeploymentTypeAddress) ??
-        networkAddresses[0]
-      )
+      if (typeof networkAddresses === 'string') {
+        return networkAddresses === customDeploymentTypeAddress
+          ? customDeploymentTypeAddress
+          : undefined
+      }
+
+      return networkAddresses.find((address) => address === customDeploymentTypeAddress)
+    }
+
+    if (typeof networkAddresses === 'string') {
+      return networkAddresses
     }
 
     return networkAddresses[0]

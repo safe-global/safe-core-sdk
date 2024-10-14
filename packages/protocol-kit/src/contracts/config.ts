@@ -118,9 +118,7 @@ export const safeDeploymentsL1ChainIds = [
 
 const contractFunctions: Record<
   contractName,
-  (
-    filter?: DeploymentFilter
-  ) => SingletonDeployment | SingletonDeploymentV2 | undefined | Deployment
+  (filter?: DeploymentFilter) => SingletonDeploymentV2 | undefined | Deployment
 > = {
   safeSingletonVersion: getSafeSingletonDeployments,
   safeSingletonL2Version: getSafeL2SingletonDeployments,
@@ -148,7 +146,7 @@ export function getContractDeployment(
     released: true
   }
 
-  const deployment = contractFunctions[contractName](filters) as SingletonDeployment
+  const deployment = contractFunctions[contractName](filters)
 
   return deployment
 }

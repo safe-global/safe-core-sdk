@@ -43,7 +43,7 @@ export type PasskeyClient = Client<
   WalletActions<Chain | undefined, Account> & PasskeyActions
 >
 
-export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account>
+export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account> | PasskeyClient
 export type ExternalClient = PublicClient | (ExternalSigner & PublicClient)
 
 export type HexAddress = string

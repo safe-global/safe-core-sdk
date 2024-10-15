@@ -512,7 +512,7 @@ describe('Endpoint tests', () => {
     it('getPendingTransactions', async () => {
       const currentNonce = 1
       await chai
-        .expect(safeApiKit.getPendingTransactions(safeAddress, currentNonce))
+        .expect(safeApiKit.getPendingTransactions(safeAddress, { currentNonce }))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,
@@ -523,7 +523,7 @@ describe('Endpoint tests', () => {
     it('getPendingTransactions EIP-3770', async () => {
       const currentNonce = 1
       await chai
-        .expect(safeApiKit.getPendingTransactions(eip3770SafeAddress, currentNonce))
+        .expect(safeApiKit.getPendingTransactions(eip3770SafeAddress, { currentNonce }))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/multisig-transactions/?executed=false&nonce__gte=${currentNonce}`,

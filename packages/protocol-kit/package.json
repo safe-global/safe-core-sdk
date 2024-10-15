@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -51,7 +51,7 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/testing-kit": "^0.1.0",
+    "@safe-global/testing-kit": "^0.1.1",
     "@types/chai": "^4.3.19",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.8",

@@ -1544,7 +1544,8 @@ class Safe {
       safeProvider,
       safeContract: safeSingletonContract,
       safeAccountConfig: safeAccountConfig,
-      customContracts
+      customContracts,
+      deploymentType
     })
 
     const safeDeployTransactionData = {

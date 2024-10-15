@@ -9,7 +9,8 @@ import {
   Chain
 } from 'viem'
 import { estimateContractGas, getTransactionReceipt } from 'viem/actions'
-import { SingletonDeployment } from '@safe-global/safe-deployments'
+import { SingletonDeploymentV2 } from '@safe-global/safe-deployments'
+import { Deployment } from '@safe-global/safe-modules-deployments'
 import { contractName, getContractDeployment } from '@safe-global/protocol-kit/contracts/config'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -105,26 +106,35 @@ class BaseContract<ContractAbiType extends Abi> {
 
   #resolveAddress(
     networkAddresses: string | string[] | undefined,
-    deployment: SingletonDeployment,
+    deployment: SingletonDeploymentV2 | Deployment | undefined,
     deploymentType?: DeploymentType
   ): string | undefined {
+    // If there are no addresses for the given chainId we return undefined
     if (!networkAddresses) {
       return undefined
     }
 
+    // If a custom deployment type is selected, we check that type is available in the given chain
+    // We ensure that we receive a SingletonDeploymentV2 object for this check,
+    // otherwise we continue with the next logic (`@safe-global/safe-module-deployments` is not having this property.)
+    if (deploymentType && deployment && 'deployments' in deployment) {
+      const customDeploymentTypeAddress = deployment.deployments[deploymentType]?.address
+
+      if (typeof networkAddresses === 'string') {
+        return networkAddresses === customDeploymentTypeAddress
+          ? customDeploymentTypeAddress
+          : undefined
+      }
+
+      return networkAddresses.find((address) => address === customDeploymentTypeAddress)
+    }
+
+    // Deployment type is not selected and there is only one address for this contract in the given chain, we return it
     if (typeof networkAddresses === 'string') {
       return networkAddresses
     }
 
-    if (deploymentType) {
-      const customDeploymentTypeAddress = deployment.deployments[deploymentType]?.address
-
-      return (
-        networkAddresses.find((address) => address === customDeploymentTypeAddress) ??
-        networkAddresses[0]
-      )
-    }
-
+    // If there are multiple addresses available for this contract, we return the first one.
     return networkAddresses[0]
   }
 

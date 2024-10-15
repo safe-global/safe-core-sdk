@@ -282,6 +282,7 @@ class Safe {
       return predictSafeAddress({
         safeProvider: this.#safeProvider,
         chainId,
+        isL1SafeSingleton: this.#contractManager.isL1SafeSingleton,
         customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
         ...this.#predictedSafe
       })
@@ -1520,19 +1521,22 @@ class Safe {
 
     const isL1SafeSingleton = this.#contractManager.isL1SafeSingleton
     const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+    const deploymentType = this.#predictedSafe.safeDeploymentConfig?.deploymentType
 
     const safeSingletonContract = await getSafeContract({
       safeProvider,
       safeVersion,
       isL1SafeSingleton,
-      customContracts
+      customContracts,
+      deploymentType
     })
 
     // we use the SafeProxyFactory.sol contract, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol
     const safeProxyFactoryContract = await getSafeProxyFactoryContract({
       safeProvider,
       safeVersion,
-      customContracts
+      customContracts,
+      deploymentType
     })
 
     // this is the call to the setup method that sets the threshold & owners of the new Safe, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/Safe.sol#L95

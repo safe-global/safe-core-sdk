@@ -254,7 +254,7 @@ export async function getPredictedSafeAddressInitCode({
   chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
-  isL1SafeSingleton = false,
+  isL1SafeSingleton,
   customContracts
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
@@ -314,7 +314,7 @@ export async function predictSafeAddress({
   chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
-  isL1SafeSingleton = false,
+  isL1SafeSingleton,
   customContracts
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)

@@ -7,4 +7,5 @@ export type PasskeyArgType = {
   rawId: string // required to sign data
   coordinates: PasskeyCoordinates // required to sign data
   customVerifierAddress?: string // optional
+  getFn?: (options?: CredentialRequestOptions) => Promise<Credential | null>
 }

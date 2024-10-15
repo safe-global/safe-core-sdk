@@ -31,8 +31,15 @@ import isSharedSigner from './isSharedSigner'
 export const PASSKEY_CLIENT_KEY = 'passkeyWallet'
 export const PASSKEY_CLIENT_NAME = 'Passkey Wallet Client'
 
-const sign = async (passkeyRawId: Uint8Array, data: Uint8Array): Promise<Hex> => {
-  const assertion = (await navigator.credentials.get({
+const sign = async (
+  passkeyRawId: Uint8Array,
+  data: Uint8Array,
+  getFn?: (options?: CredentialRequestOptions) => Promise<Credential | null>
+): Promise<Hex> => {
+  // Avoid loosing the context for navigator.credentials.get function that leads to an error
+  const getCredentials = getFn || navigator.credentials.get.bind(navigator.credentials)
+
+  const assertion = (await getCredentials({
     publicKey: {
       challenge: data,
       allowCredentials: [{ type: 'public-key', id: passkeyRawId }],
@@ -45,7 +52,9 @@ const sign = async (passkeyRawId: Uint8Array, data: Uint8Array): Promise<Hex> =>
   }
 
   const { authenticatorData, signature, clientDataJSON } = assertion.response
-
+  console.log('sign (authenticatorData)', authenticatorData)
+  console.log('sign (signature)', signature)
+  console.log('sign (clientDataJSON)', clientDataJSON)
   return encodeAbiParameters(parseAbiParameters('bytes, bytes, uint256[2]'), [
     toHex(new Uint8Array(authenticatorData)),
     extractClientDataFields(clientDataJSON),
@@ -104,10 +113,14 @@ export const createPasskeyClient = async (
     .extend(() => ({
       signMessage({ message }: { message: SignableMessage }) {
         if (typeof message === 'string') {
-          return sign(passkeyRawId, toBytes(message))
+          return sign(passkeyRawId, toBytes(message), passkey.getFn)
         }
 
-        return sign(passkeyRawId, isHex(message.raw) ? toBytes(message.raw) : message.raw)
+        return sign(
+          passkeyRawId,
+          isHex(message.raw) ? toBytes(message.raw) : message.raw,
+          passkey.getFn
+        )
       },
       signTransaction,
       signTypedData,
@@ -145,6 +158,19 @@ export const createPasskeyClient = async (
     })) as PasskeyClient
 }
 
+function decodeClientDataJSON(clientDataJSON: ArrayBuffer): string {
+  const uint8Array = new Uint8Array(clientDataJSON)
+
+  let result = ''
+  for (let i = 0; i < uint8Array.length; i++) {
+    result += String.fromCharCode(uint8Array[i])
+  }
+
+  console.log('decodeClientDataJSON', clientDataJSON, result)
+
+  return result
+}
+
 /**
  * Compute the additional client data JSON fields. This is the fields other than `type` and
  * `challenge` (including `origin` and any other additional client data fields that may be
@@ -157,7 +183,9 @@ export const createPasskeyClient = async (
  * @throws {Error} Throws an error if the client data JSON does not contain the expected 'challenge' field pattern.
  */
 function extractClientDataFields(clientDataJSON: ArrayBuffer): Hex {
-  const decodedClientDataJSON = new TextDecoder('utf-8').decode(clientDataJSON)
+  const decodedClientDataJSON = decodeClientDataJSON(clientDataJSON)
+  console.log('extractClientDataFields (decodedClientDataJSON)', decodedClientDataJSON)
+
   const match = decodedClientDataJSON.match(
     /^\{"type":"webauthn.get","challenge":"[A-Za-z0-9\-_]{43}",(.*)\}$/
   )

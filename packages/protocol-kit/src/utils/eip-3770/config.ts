@@ -180,6 +180,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 10242n, shortName: 'aa' },
   { chainId: 10243n, shortName: 'aat' },
   { chainId: 10849n, shortName: 'lamina1' },
+  { chainId: 11011n, shortName: 'shapesep' },
   { chainId: 11111n, shortName: 'WAGMI' },
   { chainId: 11235n, shortName: 'islm' },
   { chainId: 11437n, shortName: 'shyftt' },

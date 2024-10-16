@@ -150,6 +150,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 5000n, shortName: 'mantle' },
   { chainId: 5001n, shortName: 'mantle-testnet' },
   { chainId: 5003n, shortName: 'mnt-sep' },
+  { chainId: 5165n, shortName: 'ftn' },
   { chainId: 5700n, shortName: 'tsys' },
   { chainId: 6001n, shortName: 'bouncebit-mainnet' },
   { chainId: 6102n, shortName: 'cascadia' },

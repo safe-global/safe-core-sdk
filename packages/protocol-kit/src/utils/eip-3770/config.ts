@@ -88,6 +88,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 787n, shortName: 'aca' },
   { chainId: 919n, shortName: 'modesep' },
   { chainId: 943n, shortName: 't4pls' },
+  { chainId: 970n, shortName: 'oortmainnet' },
   { chainId: 1001n, shortName: 'baobab' },
   { chainId: 1008n, shortName: 'eun' },
   { chainId: 1030n, shortName: 'cfx' },

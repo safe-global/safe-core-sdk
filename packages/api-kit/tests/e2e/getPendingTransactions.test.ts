@@ -48,4 +48,26 @@ describe('getPendingTransactions', () => {
     chai.expect(transactionList.count).to.be.equal(10)
     chai.expect(transactionList.results.length).to.be.equal(10)
   })
+
+  it('should return a maximum of 2 transactions with limit = 2', async () => {
+    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with pending transaction
+    const transactionList = await safeApiKit.getPendingTransactions(safeAddress, {
+      limit: 2
+    })
+
+    chai.expect(transactionList).to.have.property('count').greaterThan(1)
+    chai.expect(transactionList).to.have.property('results').to.be.an('array')
+    chai.expect(transactionList.results.length).to.be.equal(2)
+  })
+
+  it('should return all pending transactions excluding the first one with offset = 1', async () => {
+    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with pending transaction
+    const transactionList = await safeApiKit.getPendingTransactions(safeAddress, {
+      offset: 1
+    })
+
+    chai.expect(transactionList).to.have.property('count').greaterThan(1)
+    chai.expect(transactionList).to.have.property('results').to.be.an('array')
+    chai.expect(transactionList.results.length).to.be.lessThanOrEqual(transactionList.count - 1)
+  })
 })

@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -39,8 +39,8 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/relay-kit": "^3.2.1",
-    "@safe-global/testing-kit": "^0.1.0",
+    "@safe-global/relay-kit": "^3.2.2",
+    "@safe-global/testing-kit": "^0.1.1",
     "@types/chai": "^4.3.19",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.8",
@@ -58,7 +58,7 @@
     "web3": "^4.12.1"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^5.0.1",
+    "@safe-global/protocol-kit": "^5.0.2",
     "@safe-global/types-kit": "^1.0.0",
     "node-fetch": "^2.7.0",
     "viem": "^2.21.8"

@@ -2,8 +2,14 @@
   "name": "@safe-global/protocol-kit",
   "version": "5.0.3",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
-  "main": "dist/src/index.js",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
   "types": "dist/src/index.d.ts",
+  "exports": {
+    "types": "./dist/src/index.d.ts",
+    "require": "./dist/cjs/index.cjs",
+    "import": "./dist/esm/index.mjs"
+  },
   "keywords": [
     "Ethereum",
     "Wallet",
@@ -35,7 +41,10 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && yarn check-safe-deployments && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
+    "build": "yarn unbuild && yarn check-safe-deployments &&  yarn build:esm && yarn build:cjs && yarn build:types",
+    "build:esm": "esbuild ./src/index --format=esm --bundle --packages=external --outdir=dist/esm --out-extension:.js=.mjs",
+    "build:cjs": "esbuild ./src/index --format=cjs --bundle --packages=external --outdir=dist/cjs --out-extension:.js=.cjs",
+    "build:types": "NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json --declaration"
   },
   "repository": {
     "type": "git",
@@ -59,6 +68,7 @@
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^16.4.5",
+    "esbuild": "^0.24.0",
     "ethers": "^6.13.2",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",

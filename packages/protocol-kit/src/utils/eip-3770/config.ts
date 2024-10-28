@@ -38,7 +38,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 81n, shortName: 'joc' },
   { chainId: 82n, shortName: 'meter' },
   { chainId: 83n, shortName: 'meter-test' },
-  { chainId: 88n, shortName: 'tomo' },
+  { chainId: 88n, shortName: 'vic' },
   { chainId: 97n, shortName: 'bnbt' },
   { chainId: 100n, shortName: 'gno' },
   { chainId: 106n, shortName: 'vlx' },

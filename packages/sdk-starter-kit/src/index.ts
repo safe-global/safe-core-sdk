@@ -45,7 +45,9 @@ async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe
           threshold: config.safeOptions.threshold
         },
         safeDeploymentConfig: {
-          saltNonce: config.safeOptions.saltNonce
+          safeVersion: config.safeOptions.safeVersion,
+          saltNonce: config.safeOptions.saltNonce,
+          deploymentType: config.safeOptions.deploymentType
         }
       }
     })

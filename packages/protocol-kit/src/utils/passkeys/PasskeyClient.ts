@@ -52,9 +52,7 @@ const sign = async (
   }
 
   const { authenticatorData, signature, clientDataJSON } = assertion.response
-  console.log('sign (authenticatorData)', authenticatorData)
-  console.log('sign (signature)', signature)
-  console.log('sign (clientDataJSON)', clientDataJSON)
+
   return encodeAbiParameters(parseAbiParameters('bytes, bytes, uint256[2]'), [
     toHex(new Uint8Array(authenticatorData)),
     extractClientDataFields(clientDataJSON),
@@ -166,8 +164,6 @@ function decodeClientDataJSON(clientDataJSON: ArrayBuffer): string {
     result += String.fromCharCode(uint8Array[i])
   }
 
-  console.log('decodeClientDataJSON', clientDataJSON, result)
-
   return result
 }
 
@@ -184,7 +180,6 @@ function decodeClientDataJSON(clientDataJSON: ArrayBuffer): string {
  */
 function extractClientDataFields(clientDataJSON: ArrayBuffer): Hex {
   const decodedClientDataJSON = decodeClientDataJSON(clientDataJSON)
-  console.log('extractClientDataFields (decodedClientDataJSON)', decodedClientDataJSON)
 
   const match = decodedClientDataJSON.match(
     /^\{"type":"webauthn.get","challenge":"[A-Za-z0-9\-_]{43}",(.*)\}$/

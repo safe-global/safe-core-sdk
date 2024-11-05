@@ -538,10 +538,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
       validAfter
     })
 
-    return await this.getEstimateFee({
-      safeOperation,
-      feeEstimator
-    })
+    try {
+      const estimateFee = await this.getEstimateFee({
+        safeOperation,
+        feeEstimator
+      })
+
+      return estimateFee
+    } catch (error) {
+      console.error(error)
+      throw new Error('Error estimating gas fees')
+    }
   }
 
   /**

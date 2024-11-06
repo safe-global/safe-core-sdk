@@ -547,7 +547,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       return estimateFee
     } catch (error) {
       console.error(error)
-      throw new Error('Error estimating gas fees')
+      throw error
     }
   }
 

@@ -124,6 +124,13 @@ export type ProposeTransactionProps = {
   origin?: string
 }
 
+export type PendingTransactionsOptions = {
+  currentNonce?: number
+  hasConfirmations?: boolean
+  /** Which field to use when ordering the results. It can be: `nonce`, `created`, `modified` (default: `-created`) */
+  ordering?: string
+} & ListOptions
+
 export type SafeMultisigTransactionListResponse = ListResponse<SafeMultisigTransactionResponse>
 
 export type TransferResponse = {

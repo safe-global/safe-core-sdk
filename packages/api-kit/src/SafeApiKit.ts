@@ -12,6 +12,7 @@ import {
   ListOptions,
   ModulesResponse,
   OwnerResponse,
+  PendingTransactionsOptions,
   ProposeTransactionProps,
   SafeCreationInfoResponse,
   SafeDelegateListResponse,
@@ -528,7 +529,7 @@ class SafeApiKit {
    * Returns the list of multi-signature transactions that are waiting for the confirmation of the Safe owners.
    *
    * @param safeAddress - The Safe address
-   * @param currentNonce - Current nonce of the Safe
+   * @param currentNonce - Deprecated, use inside object property: Current nonce of the Safe.
    * @returns The list of transactions waiting for the confirmation of the Safe owners
    * @throws "Invalid Safe address"
    * @throws "Invalid data"
@@ -537,15 +538,70 @@ class SafeApiKit {
   async getPendingTransactions(
     safeAddress: string,
     currentNonce?: number
+  ): Promise<SafeMultisigTransactionListResponse>
+  /**
+   * Returns the list of multi-signature transactions that are waiting for the confirmation of the Safe owners.
+   *
+   * @param safeAddress - The Safe address
+   * @param {PendingTransactionsOptions} options The options to filter the list of transactions
+   * @returns The list of transactions waiting for the confirmation of the Safe owners
+   * @throws "Invalid Safe address"
+   * @throws "Invalid data"
+   * @throws "Invalid ethereum address"
+   */
+  async getPendingTransactions(
+    safeAddress: string,
+    { currentNonce, hasConfirmations, ordering, limit, offset }: PendingTransactionsOptions
+  ): Promise<SafeMultisigTransactionListResponse>
+  async getPendingTransactions(
+    safeAddress: string,
+    propsOrCurrentNonce: PendingTransactionsOptions | number = {}
   ): Promise<SafeMultisigTransactionListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
+
+    // TODO: Remove @deprecated migration code
+    let currentNonce: number | undefined
+    let hasConfirmations: boolean | undefined
+    let ordering: string | undefined
+    let limit: number | undefined
+    let offset: number | undefined
+    if (typeof propsOrCurrentNonce === 'object') {
+      ;({ currentNonce, hasConfirmations, ordering, limit, offset } = propsOrCurrentNonce)
+    } else {
+      console.warn(
+        'Deprecated: Use `currentNonce` inside an object instead. See `PendingTransactionsOptions`.'
+      )
+      currentNonce = propsOrCurrentNonce
+    }
+    // END of @deprecated migration code
+
     const { address } = this.#getEip3770Address(safeAddress)
     const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
 
+    const url = new URL(
+      `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`
+    )
+
+    if (hasConfirmations) {
+      url.searchParams.set('has_confirmations', hasConfirmations.toString())
+    }
+
+    if (ordering) {
+      url.searchParams.set('ordering', ordering)
+    }
+
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
+    }
+
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
+    }
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`,
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }

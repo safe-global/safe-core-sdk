@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/testing-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Helper package providing testing utilities",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -39,6 +39,7 @@
     "@nomicfoundation/hardhat-viem": "^2.0.4",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
+    "@safe-global/safe-passkey": "0.2.0-alpha.1",
     "@safe-global/types-kit": "^1.0.0",
     "@types/semver": "^7.5.8",
     "hardhat": "^2.19.3",

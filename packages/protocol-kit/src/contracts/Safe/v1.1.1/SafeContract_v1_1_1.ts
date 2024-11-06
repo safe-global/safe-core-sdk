@@ -41,7 +41,7 @@ class SafeContract_v1_1_1
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    isL1SafeSingleton = false,
+    isL1SafeSingleton?: boolean,
     customContractAddress?: string,
     customContractAbi?: SafeContract_v1_1_1_Abi,
     deploymentType?: DeploymentType

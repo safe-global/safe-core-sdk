@@ -55,20 +55,23 @@ class ContractManager {
         safeVersion,
         isL1SafeSingleton,
         customSafeAddress: safeAddress,
-        customContracts
+        customContracts,
+        deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
       })
     }
 
     this.#multiSendContract = await getMultiSendContract({
       safeProvider,
       safeVersion,
-      customContracts
+      customContracts,
+      deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
     })
 
     this.#multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
       safeProvider,
       safeVersion,
-      customContracts
+      customContracts,
+      deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
     })
   }
 

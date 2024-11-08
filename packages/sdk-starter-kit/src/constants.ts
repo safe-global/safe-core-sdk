@@ -1,3 +1,7 @@
+import { DeploymentType } from '@safe-global/protocol-kit'
+
+export const DEFAULT_DEPLOYMENT_TYPE: DeploymentType = 'canonical'
+
 export enum SafeClientTxStatus {
   DEPLOYED_AND_EXECUTED = 'DEPLOYED_AND_EXECUTED',
   DEPLOYED_AND_PENDING_SIGNATURES = 'DEPLOYED_AND_PENDING_SIGNATURES',

@@ -3,8 +3,7 @@ import {
   TransactionBase,
   TransactionOptions,
   EIP712TypedData,
-  MetaTransactionData,
-  SafeVersion
+  MetaTransactionData
 } from '@safe-global/types-kit'
 import { IFeeEstimator } from '@safe-global/relay-kit'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
@@ -45,7 +44,6 @@ export type SafeConfig = {
   owners: string[]
   threshold: number
   saltNonce?: string
-  safeVersion?: SafeVersion
   deploymentType?: DeploymentType
 }
 
@@ -62,6 +60,7 @@ export type PredictedSafeConfig = {
 export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer?: SafeProvider['signer']
+  txServiceUrl?: string
 }
 
 export type SdkStarterKitConfig = SdkStarterKitRootConfig &

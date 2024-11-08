@@ -62,13 +62,15 @@ class ContractManager {
     this.#multiSendContract = await getMultiSendContract({
       safeProvider,
       safeVersion,
-      customContracts
+      customContracts,
+      deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
     })
 
     this.#multiSendCallOnlyContract = await getMultiSendCallOnlyContract({
       safeProvider,
       safeVersion,
-      customContracts
+      customContracts,
+      deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
     })
   }
 

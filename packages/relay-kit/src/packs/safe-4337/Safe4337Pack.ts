@@ -293,7 +293,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       if (isBatch) {
         const multiSendContract = await getMultiSendContract({
           safeProvider,
-          safeVersion
+          safeVersion,
+          deploymentType: options.deploymentType || undefined
         })
 
         const batchData = encodeFunctionData({
@@ -315,7 +316,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
         predictedSafe: {
           safeDeploymentConfig: {
             safeVersion,
-            saltNonce: options.saltNonce || undefined
+            saltNonce: options.saltNonce || undefined,
+            deploymentType: options.deploymentType || undefined
           },
           safeAccountConfig: {
             owners: options.owners,

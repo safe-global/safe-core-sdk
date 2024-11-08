@@ -55,8 +55,7 @@ class ContractManager {
         safeVersion,
         isL1SafeSingleton,
         customSafeAddress: safeAddress,
-        customContracts,
-        deploymentType: predictedSafe?.safeDeploymentConfig?.deploymentType
+        customContracts
       })
     }
 

@@ -1,4 +1,4 @@
-import { DeploymentType, SafeProvider } from '@safe-global/protocol-kit'
+import { SafeProvider } from '@safe-global/protocol-kit'
 import {
   TransactionBase,
   TransactionOptions,
@@ -44,7 +44,6 @@ export type SafeConfig = {
   owners: string[]
   threshold: number
   saltNonce?: string
-  deploymentType?: DeploymentType
 }
 
 export type ExistingSafeConfig = {

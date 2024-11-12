@@ -3,7 +3,6 @@
     "target": "ES2020" /* Specify ECMAScript target version: 'ES5' (default), 'ES2019', 'ES2020', 'ES2021', 'ES2022', 'ES2023' or 'ESNEXT'. */,
     "module": "CommonJS" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */,
     "allowJs": false /* Allow javascript files to be compiled. */,
-    "declaration": true /* Generates corresponding '.d.ts' file. */,
     "sourceMap": true /* Generates corresponding '.map' file. */,
     "strict": true /* Enable all strict type-checking options. */,
     "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
@@ -22,7 +21,6 @@
     "baseUrl": "./",
     "paths": {
       "@safe-global/api-kit/*": ["./packages/api-kit/src/*"],
-      "@safe-global/protocol-kit/*": ["./packages/protocol-kit/src/*"],
       "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"],
       "@safe-global/relay-kit/*": ["./packages/relay-kit/src/*"],
       "@safe-global/types-kit/*": ["./packages/types-kit/src/*"],

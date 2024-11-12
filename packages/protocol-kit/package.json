@@ -2,9 +2,9 @@
   "name": "@safe-global/protocol-kit",
   "version": "5.0.4",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
+  "types": "dist/src/index.d.ts",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.mjs",
-  "types": "dist/src/index.d.ts",
   "exports": {
     "types": "./dist/src/index.d.ts",
     "require": "./dist/cjs/index.cjs",

@@ -1,5 +1,5 @@
 import { PimlicoFeeEstimator } from './PimlicoFeeEstimator'
-import * as fixtures from '../testing-utils/fixtures'
+import { fixtures } from '@safe-global/relay-kit/test-utils'
 import * as constants from '../constants'
 
 jest.mock('../utils', () => ({

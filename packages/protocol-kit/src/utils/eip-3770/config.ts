@@ -144,6 +144,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 3737n, shortName: 'csb' },
   { chainId: 3776n, shortName: 'astrzk' },
   { chainId: 4002n, shortName: 'tftm' },
+  { chainId: 4061n, shortName: 'Nahmii3Mainnet' },
   { chainId: 4062n, shortName: 'Nahmii3Testnet' },
   { chainId: 4078n, shortName: 'muster' },
   { chainId: 4157n, shortName: 'crossfi-testnet' },

@@ -21,8 +21,7 @@
     "baseUrl": "./",
     "paths": {
       "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"],
-      "@safe-global/types-kit/*": ["./packages/types-kit/src/*"],
-      "@safe-global/sdk-starter-kit/*": ["./packages/sdk-starter-kit/src/*"]
+      "@safe-global/types-kit/*": ["./packages/types-kit/src/*"]
     }
   },
   "exclude": ["**/dist", "**/node_modules"]

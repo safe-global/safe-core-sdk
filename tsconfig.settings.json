@@ -20,8 +20,7 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"],
-      "@safe-global/types-kit/*": ["./packages/types-kit/src/*"]
+      "@safe-global/protocol-kit/hardhat/*": ["./packages/protocol-kit/hardhat/*"]
     }
   },
   "exclude": ["**/dist", "**/node_modules"]

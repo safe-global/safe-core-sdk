@@ -1,32 +1,42 @@
 import {
-  ContractTransactionResponse,
-  Provider,
-  AbstractSigner,
+  concat,
+  getContractAddress,
+  Hash,
+  Hex,
   isAddress,
-  zeroPadValue
-} from 'ethers'
-import { keccak_256 } from '@noble/hashes/sha3'
+  keccak256,
+  pad,
+  parseAbi,
+  toHex,
+  Client,
+  WalletClient,
+  toEventHash,
+  FormattedTransactionReceipt,
+  decodeEventLog
+} from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeProxyFactoryContractType,
   SafeVersion,
   TransactionOptions,
   TransactionResult
-} from '@safe-global/safe-core-sdk-types'
-import { generateAddress2, keccak256, toBuffer } from 'ethereumjs-util'
+} from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
-
+import { asHex } from '../utils/types'
 import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
   getCompatibilityFallbackHandlerContract,
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract
 } from '../contracts/safeDeploymentContracts'
 import {
   ContractNetworkConfig,
+  ExternalClient,
   SafeAccountConfig,
   SafeContractImplementationType,
   SafeDeploymentConfig
@@ -48,7 +58,7 @@ const ZKSYNC_TESTNET = 280n
 // 4. Use ethers to convert the array into hex
 //    const deployedBytecodeHash = ethers.hexlify(bytecodeHash)
 const ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE: {
-  [version: string]: { deployedBytecodeHash: string }
+  [version: string]: { deployedBytecodeHash: Hash }
 } = {
   '1.3.0': {
     deployedBytecodeHash: '0x0100004124426fb9ebb25e27d670c068e52f9ba631bd383279a188be47e3f86d'
@@ -73,6 +83,7 @@ export interface encodeSetupCallDataProps {
   safeContract: SafeContractImplementationType
   customContracts?: ContractNetworkConfig
   customSafeVersion?: SafeVersion
+  deploymentType?: DeploymentType
 }
 
 export function encodeCreateProxyWithNonce(
@@ -83,7 +94,7 @@ export function encodeCreateProxyWithNonce(
 ) {
   return safeProxyFactoryContract.encode('createProxyWithNonce', [
     safeSingletonAddress,
-    initializer,
+    asHex(initializer),
     BigInt(salt || PREDETERMINED_SALT_NONCE)
   ])
 }
@@ -97,7 +108,8 @@ export async function encodeSetupCallData({
   safeAccountConfig,
   safeContract,
   customContracts,
-  customSafeVersion
+  customSafeVersion,
+  deploymentType
 }: encodeSetupCallDataProps): Promise<string> {
   const {
     owners,
@@ -110,14 +122,14 @@ export async function encodeSetupCallData({
     paymentReceiver = ZERO_ADDRESS
   } = safeAccountConfig
 
-  const safeVersion = customSafeVersion || (await safeContract.getVersion())
+  const safeVersion = customSafeVersion || safeContract.safeVersion
 
   if (semverSatisfies(safeVersion, '<=1.0.0')) {
     return safeContract.encode('setup', [
       owners,
       threshold,
       to,
-      data,
+      asHex(data),
       paymentToken,
       payment,
       paymentReceiver
@@ -130,10 +142,11 @@ export async function encodeSetupCallData({
     const fallbackHandlerContract = await memoizedGetCompatibilityFallbackHandlerContract({
       safeProvider,
       safeVersion,
-      customContracts
+      customContracts,
+      deploymentType
     })
 
-    fallbackHandlerAddress = await fallbackHandlerContract.getAddress()
+    fallbackHandlerAddress = fallbackHandlerContract.getAddress()
   }
 
   return safeContract.encode('setup', [
@@ -149,12 +162,23 @@ export async function encodeSetupCallData({
 }
 
 // we need to include the chainId as string to prevent memoization issues see: https://github.com/safe-global/safe-core-sdk/issues/598
-type MemoizedGetProxyFactoryContractProps = GetContractInstanceProps & { chainId: string }
-type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & { chainId: string }
+type MemoizedGetProxyFactoryContractProps = GetContractInstanceProps & {
+  chainId: string
+  deploymentType?: DeploymentType
+}
+type MemoizedGetSafeContractInstanceProps = GetSafeContractInstanceProps & {
+  chainId: string
+  deploymentType?: DeploymentType
+}
 
 const memoizedGetProxyFactoryContract = createMemoizedFunction(
-  ({ safeProvider, safeVersion, customContracts }: MemoizedGetProxyFactoryContractProps) =>
-    getProxyFactoryContract({ safeProvider, safeVersion, customContracts })
+  ({
+    safeProvider,
+    safeVersion,
+    customContracts,
+    deploymentType
+  }: MemoizedGetProxyFactoryContractProps) =>
+    getSafeProxyFactoryContract({ safeProvider, safeVersion, customContracts, deploymentType })
 )
 
 const memoizedGetProxyCreationCode = createMemoizedFunction(
@@ -162,13 +186,15 @@ const memoizedGetProxyCreationCode = createMemoizedFunction(
     safeProvider,
     safeVersion,
     customContracts,
-    chainId
+    chainId,
+    deploymentType
   }: MemoizedGetProxyFactoryContractProps) => {
     const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
       safeProvider,
       safeVersion,
       customContracts,
-      chainId
+      chainId,
+      deploymentType
     })
 
     return safeProxyFactoryContract.proxyCreationCode()
@@ -180,10 +206,37 @@ const memoizedGetSafeContract = createMemoizedFunction(
     safeProvider,
     safeVersion,
     isL1SafeSingleton,
-    customContracts
+    customContracts,
+    deploymentType
   }: MemoizedGetSafeContractInstanceProps) =>
-    getSafeContract({ safeProvider, safeVersion, isL1SafeSingleton, customContracts })
+    getSafeContract({
+      safeProvider,
+      safeVersion,
+      isL1SafeSingleton,
+      customContracts,
+      deploymentType
+    })
 )
+
+/**
+ * Retrieves the version of the Safe contract associated with the given Safe address from the blockchain.
+ *
+ * @param {SafeProvider} safeProvider The provider to use when reading the contract.
+ * @param {string} safeAddress The address of the Safe contract for which to retrieve the version.
+ *
+ * @returns {Promise<SafeVersion>} A promise resolving to the version of the Safe contract.
+ * @throws when fetching an address which doesn't have a Safe deployed in it.
+ */
+export async function getSafeContractVersion(
+  safeProvider: SafeProvider,
+  safeAddress: string
+): Promise<SafeVersion> {
+  return (await safeProvider.readContract({
+    address: safeAddress,
+    abi: parseAbi(['function VERSION() view returns (string)']),
+    functionName: 'VERSION'
+  })) as SafeVersion
+}
 
 /**
  * Provides a chain-specific default salt nonce for generating unique addresses
@@ -193,7 +246,7 @@ const memoizedGetSafeContract = createMemoizedFunction(
  * @returns {string} The chain-specific salt nonce in hexadecimal format.
  */
 export function getChainSpecificDefaultSaltNonce(chainId: bigint): string {
-  return `0x${Buffer.from(keccak_256(PREDETERMINED_SALT_NONCE + chainId)).toString('hex')}`
+  return keccak256(toHex(PREDETERMINED_SALT_NONCE + chainId))
 }
 
 export async function getPredictedSafeAddressInitCode({
@@ -201,7 +254,7 @@ export async function getPredictedSafeAddressInitCode({
   chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
-  isL1SafeSingleton = false,
+  isL1SafeSingleton,
   customContracts
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
@@ -209,14 +262,16 @@ export async function getPredictedSafeAddressInitCode({
 
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
-    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId),
+    deploymentType
   } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     safeProvider,
     safeVersion,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const safeContract = await memoizedGetSafeContract({
@@ -224,7 +279,8 @@ export async function getPredictedSafeAddressInitCode({
     safeVersion,
     isL1SafeSingleton,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const initializer = await encodeSetupCallData({
@@ -232,20 +288,19 @@ export async function getPredictedSafeAddressInitCode({
     safeAccountConfig,
     safeContract,
     customContracts,
-    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+    customSafeVersion: safeVersion, // it is more efficient if we provide the safeVersion manually
+    deploymentType
   })
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
-    'hex'
-  )
-  const safeSingletonAddress = await safeContract.getAddress()
+  const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce])
+  const safeSingletonAddress = safeContract.getAddress()
   const initCodeCallData = encodeCreateProxyWithNonce(
     safeProxyFactoryContract,
     safeSingletonAddress,
     initializer,
-    '0x' + encodedNonce
+    encodedNonce
   )
-  const safeProxyFactoryAddress = await safeProxyFactoryContract.getAddress()
+  const safeProxyFactoryAddress = safeProxyFactoryContract.getAddress()
   const initCode = `0x${[safeProxyFactoryAddress, initCodeCallData].reduce(
     (acc, x) => acc + x.replace('0x', ''),
     ''
@@ -259,7 +314,7 @@ export async function predictSafeAddress({
   chainId,
   safeAccountConfig,
   safeDeploymentConfig = {},
-  isL1SafeSingleton = false,
+  isL1SafeSingleton,
   customContracts
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
@@ -267,21 +322,24 @@ export async function predictSafeAddress({
 
   const {
     safeVersion = DEFAULT_SAFE_VERSION,
-    saltNonce = getChainSpecificDefaultSaltNonce(chainId)
+    saltNonce = getChainSpecificDefaultSaltNonce(chainId),
+    deploymentType
   } = safeDeploymentConfig
 
   const safeProxyFactoryContract = await memoizedGetProxyFactoryContract({
     safeProvider,
     safeVersion,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
-  const proxyCreationCode = await memoizedGetProxyCreationCode({
+  const [proxyCreationCode] = await memoizedGetProxyCreationCode({
     safeProvider,
     safeVersion,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const safeContract = await memoizedGetSafeContract({
@@ -289,7 +347,8 @@ export async function predictSafeAddress({
     safeVersion,
     isL1SafeSingleton,
     customContracts,
-    chainId: chainId.toString()
+    chainId: chainId.toString(),
+    deploymentType
   })
 
   const initializer = await encodeSetupCallData({
@@ -297,32 +356,35 @@ export async function predictSafeAddress({
     safeAccountConfig,
     safeContract,
     customContracts,
-    customSafeVersion: safeVersion // it is more efficient if we provide the safeVersion manually
+    customSafeVersion: safeVersion, // it is more efficient if we provide the safeVersion manuall
+    deploymentType
   })
+  const initializerHash = keccak256(asHex(initializer))
 
-  const encodedNonce = toBuffer(safeProvider.encodeParameters(['uint256'], [saltNonce])).toString(
-    'hex'
-  )
-  const salt = keccak256(
-    toBuffer('0x' + keccak256(toBuffer(initializer)).toString('hex') + encodedNonce)
-  )
+  const encodedNonce = asHex(safeProvider.encodeParameters('uint256', [saltNonce]))
 
-  const input = safeProvider.encodeParameters(['address'], [await safeContract.getAddress()])
+  const salt = keccak256(concat([initializerHash, encodedNonce]))
 
-  const from = await safeProxyFactoryContract.getAddress()
+  const input = safeProvider.encodeParameters('address', [safeContract.getAddress()])
+
+  const from = safeProxyFactoryContract.getAddress()
 
   // On the zkSync Era chain, the counterfactual deployment address is calculated differently
   const isZkSyncEraChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET].includes(chainId)
   if (isZkSyncEraChain) {
-    const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, input)
+    const proxyAddress = zkSyncEraCreate2Address(from, safeVersion, salt, asHex(input))
 
     return safeProvider.getChecksummedAddress(proxyAddress)
   }
 
-  const constructorData = toBuffer(input).toString('hex')
-  const initCode = proxyCreationCode + constructorData
-  const proxyAddress =
-    '0x' + generateAddress2(toBuffer(from), toBuffer(salt), toBuffer(initCode)).toString('hex')
+  const initCode = concat([proxyCreationCode, asHex(input)])
+
+  const proxyAddress = getContractAddress({
+    from,
+    bytecode: initCode,
+    opcode: 'CREATE2',
+    salt
+  })
 
   return safeProvider.getChecksummedAddress(proxyAddress)
 }
@@ -340,53 +402,111 @@ export const validateSafeDeploymentConfig = ({ saltNonce }: SafeDeploymentConfig
 }
 
 /**
- * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
- * see: https://era.zksync.io/docs/reference/architecture/differences-with-ethereum.html#address-derivation
+ * Returns the ProxyCreation Event based on the Safe version
  *
- * @param {string} from - The sender's address.
+ * based on the Safe Version, we have different proxyCreation events
+ *
+ * @param {safeVersion} safeVersion - The Safe Version.
+ * @returns {string} - The ProxyCreation event.
+ */
+
+function getProxyCreationEvent(safeVersion: SafeVersion): string {
+  // Events inputs here are left unnamed to deal with the decoding as a list: https://github.com/wevm/viem/blob/632d4b9fa074f4da722e26b28607947d2c14ad2d/src/utils/abi/decodeEventLog.ts#L128
+  const isLegacyProxyCreationEvent = semverSatisfies(safeVersion, '<1.3.0')
+
+  if (isLegacyProxyCreationEvent) {
+    return 'event ProxyCreation(address)' // v1.0.0, 1.1.1 & v1.2.0
+  }
+
+  if (semverSatisfies(safeVersion, '=1.3.0')) {
+    return 'event ProxyCreation(address, address)' // v1.3.0
+  }
+
+  return 'event ProxyCreation(address indexed, address)' // >= v1.4.1
+}
+
+/**
+ * Returns the address of a SafeProxy Address from the transaction receipt.
+ *
+ * This function looks for a ProxyCreation event in the transaction receipt logs to get address of the deployed SafeProxy.
+ *
+ * @param {FormattedTransactionReceipt} txReceipt - The transaction receipt containing logs.
+ * @param {safeVersion} safeVersion - The Safe Version.
+ * @returns {string} - The address of the deployed SafeProxy.
+ * @throws {Error} - Throws an error if the SafeProxy was not deployed correctly.
+ */
+
+export function getSafeAddressFromDeploymentTx(
+  txReceipt: FormattedTransactionReceipt,
+  safeVersion: SafeVersion
+): string {
+  const eventHash = toEventHash(getProxyCreationEvent(safeVersion))
+  const proxyCreationEvent = txReceipt?.logs.find((event) => event.topics[0] === eventHash)
+
+  if (!proxyCreationEvent) {
+    throw new Error('SafeProxy was not deployed correctly')
+  }
+
+  const { data, topics } = proxyCreationEvent
+
+  const { args } = decodeEventLog({
+    abi: parseAbi([getProxyCreationEvent(safeVersion)]),
+    eventName: 'ProxyCreation',
+    data,
+    topics
+  })
+
+  if (!args || !args.length) {
+    throw new Error('SafeProxy was not deployed correctly')
+  }
+
+  return args[0] as string
+}
+
+/**
+ * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
+ * see: https://docs.zksync.io/build/developer-reference/ethereum-differences/evm-instructions/#address-derivation
+ *
+ * @param {`string`} from - The sender's address.
  * @param {SafeVersion} safeVersion - The version of the safe.
- * @param {Buffer} salt - The salt used for address derivation.
- * @param {string} input - Additional input data for the derivation.
+ * @param {`0x${string}`} salt - The salt used for address derivation.
+ * @param {`0x${string}`} input - Additional input data for the derivation.
  *
  * @returns {string} The derived zkSync Era address.
  */
 export function zkSyncEraCreate2Address(
   from: string,
   safeVersion: SafeVersion,
-  salt: Buffer,
-  input: string
+  salt: Hex,
+  input: Hex
 ): string {
   const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
-  const inputHash = keccak256(toBuffer(input))
+  const inputHash = keccak256(input)
 
   const addressBytes = keccak256(
-    toBuffer(
-      ZKSYNC_CREATE2_PREFIX +
-        zeroPadValue(from, 32).slice(2) +
-        salt.toString('hex') +
-        bytecodeHash.slice(2) +
-        inputHash.toString('hex')
-    )
-  )
-    .toString('hex')
-    .slice(24)
+    concat([ZKSYNC_CREATE2_PREFIX, pad(asHex(from)), salt, bytecodeHash, inputHash])
+  ).slice(26)
 
-  return addressBytes
+  return `0x${addressBytes}`
 }
 
 export function toTxResult(
-  transactionResponse: ContractTransactionResponse,
+  runner: ExternalClient,
+  hash: Hash,
   options?: TransactionOptions
 ): TransactionResult {
   return {
-    hash: transactionResponse.hash,
+    hash,
     options,
-    transactionResponse
+    transactionResponse: {
+      wait: async () => waitForTransactionReceipt(runner, { hash })
+    }
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is AbstractSigner {
-  return (signer as unknown as AbstractSigner).signTypedData !== undefined
+export function isTypedDataSigner(signer: any): signer is Client {
+  const isPasskeySigner = !!signer?.passkeyRawId
+  return (signer as unknown as WalletClient).signTypedData !== undefined || !isPasskeySigner
 }
 
 /**
@@ -394,12 +514,12 @@ export function isTypedDataSigner(signer: any): signer is AbstractSigner {
  * @param signerOrProvider - Signer or provider
  * @returns true if the parameter is compatible with `Signer`
  */
-export function isSignerCompatible(signerOrProvider: AbstractSigner | Provider): boolean {
-  const candidate = signerOrProvider as AbstractSigner
+export function isSignerCompatible(signerOrProvider: Client | WalletClient): boolean {
+  const candidate = signerOrProvider as WalletClient
 
   const isSigntransactionCompatible = typeof candidate.signTransaction === 'function'
   const isSignMessageCompatible = typeof candidate.signMessage === 'function'
-  const isGetAddressCompatible = typeof candidate.getAddress === 'function'
+  const isGetAddressCompatible = typeof candidate.getAddresses === 'function'
 
   return isSigntransactionCompatible && isSignMessageCompatible && isGetAddressCompatible
 }

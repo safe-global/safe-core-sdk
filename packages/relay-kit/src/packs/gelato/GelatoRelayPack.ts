@@ -26,7 +26,7 @@ import {
   RelayTransaction,
   SafeTransaction,
   Transaction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 import {
   GelatoCreateTransactionProps,

@@ -1,52 +1,20 @@
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, {
-  PredictedSafeProps,
-  SafeTransactionOptionalProps
-} from '@safe-global/protocol-kit/index'
+import { setupTests } from '@safe-global/testing-kit'
+import Safe, { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/index'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { getContractNetworks } from './utils/setupContractNetworks'
-import { getSafeWithOwners } from './utils/setupContracts'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 import { waitSafeTxReceipt } from './utils/transactions'
 
 chai.use(chaiAsPromised)
 
 describe('Safe owners manager', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const provider = getEip1193Provider()
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig: {
-        owners: [accounts[0].address],
-        threshold: 1
-      },
-      safeDeploymentConfig: {
-        safeVersion: safeVersionDeployed
-      }
-    }
-    return {
-      safe: await getSafeWithOwners([
-        accounts[0].address,
-        accounts[1].address,
-        accounts[2].address
-      ]),
-      accounts,
-      contractNetworks,
-      predictedSafe,
-      provider
-    }
-  })
-
+  const provider = getEip1193Provider()
   describe('getOwners', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const safeSdk = await Safe.init({
         provider,
         predictedSafe,
@@ -56,12 +24,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should return the list of Safe owners', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 2, threshold: 2 }
+      })
       const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address, account2.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const owners = await safeSdk.getOwners()
@@ -73,7 +42,9 @@ describe('Safe owners manager', () => {
 
   describe('isOwner', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1] = accounts
       const safeSdk = await Safe.init({
         provider,
@@ -84,12 +55,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should return true if an account is an owner of the connected Safe', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const isOwner = await safeSdk.isOwner(account1.address)
@@ -97,12 +67,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should return false if an account is not an owner of the connected Safe', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const isOwner = await safeSdk.isOwner(account2.address)
@@ -112,7 +81,9 @@ describe('Safe owners manager', () => {
 
   describe('createAddOwnerTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
@@ -124,12 +95,10 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is invalid', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: '0x123' })
@@ -137,12 +106,10 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: SENTINEL_ADDRESS })
@@ -150,12 +117,10 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, contractNetworks } = await setupTests()
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: ZERO_ADDRESS })
@@ -163,12 +128,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is already an owner', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: account1.address })
@@ -176,12 +140,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if the threshold is bigger than the number of owners', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 3
@@ -195,12 +158,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if the threshold is not bigger than 0', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createAddOwnerTx({ ownerAddress: account2.address, threshold: 0 })
@@ -208,12 +170,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should build the transaction with the optional props', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const options: SafeTransactionOptionalProps = {
@@ -234,12 +195,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should add an owner and keep the same threshold', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const initialThreshold = await safeSdk.getThreshold()
@@ -258,12 +218,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should add an owner and update the threshold', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 2
@@ -286,7 +245,7 @@ describe('Safe owners manager', () => {
 
   describe('createRemoveOwnerTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
@@ -298,10 +257,12 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is invalid', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: '0x123' })
@@ -309,10 +270,12 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is equal to sentinel', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: SENTINEL_ADDRESS })
@@ -320,10 +283,12 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is equal to 0x address', async () => {
-      const { safe, contractNetworks, provider } = await setupTests()
+      const { safe, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: ZERO_ADDRESS })
@@ -331,11 +296,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if address is not an owner', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [, , , account4] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: account4.address })
@@ -343,11 +310,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if the threshold is bigger than the number of owners', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const newThreshold = 3
@@ -361,11 +330,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if the threshold is not bigger than 0', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createRemoveOwnerTx({ ownerAddress: account1.address, threshold: 0 })
@@ -373,11 +344,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should build the transaction with the optional props', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const options: SafeTransactionOptionalProps = {
@@ -398,11 +371,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should remove the first owner of a Safe and decrease the threshold', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1, account2, account3] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({
@@ -431,11 +406,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should remove any owner of a Safe and decrease the threshold', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1, account2, account3] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({
@@ -465,11 +442,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should remove an owner and update the threshold', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1, account2, account3] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({
@@ -502,7 +481,7 @@ describe('Safe owners manager', () => {
 
   describe('createSwapOwnerTx', async () => {
     it('should fail if the Safe is not deployed', async () => {
-      const { predictedSafe, accounts, contractNetworks, provider } = await setupTests()
+      const { predictedSafe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
       const safeSdk = await Safe.init({
         provider,
@@ -517,12 +496,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if old address is invalid', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -533,12 +511,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if new address is invalid', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -549,12 +526,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if old address is equal to sentinel', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -565,12 +541,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if new address is equal to sentinel', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -581,12 +556,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if old address is equal to 0x address', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -597,12 +571,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if new address is equal to 0x address', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -613,12 +586,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if old address is not an owner', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
-      const [account1, account2, , account4] = accounts
-      const safe = await getSafeWithOwners([account1.address])
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [, account2, , account4] = accounts
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -629,12 +601,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should fail if new address is already an owner', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const tx = safeSdk.createSwapOwnerTx({
@@ -645,12 +616,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should build the transaction with the optional props', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const options: SafeTransactionOptionalProps = {
@@ -674,12 +644,11 @@ describe('Safe owners manager', () => {
     })
 
     it('should replace the first owner of a Safe', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests()
       const [account1, account2] = accounts
-      const safe = await getSafeWithOwners([account1.address])
       const safeSdk = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const initialOwners = await safeSdk.getOwners()
@@ -697,11 +666,13 @@ describe('Safe owners manager', () => {
     })
 
     it('should replace any owner of a Safe', async () => {
-      const { safe, accounts, contractNetworks, provider } = await setupTests()
+      const { safe, accounts, contractNetworks } = await setupTests({
+        safeConfig: { numberOfOwners: 3, threshold: 3 }
+      })
       const [account1, account2, account3, account4] = accounts
       const safeSdk1 = await Safe.init({
         provider,
-        safeAddress: await safe.getAddress(),
+        safeAddress: safe.address,
         contractNetworks
       })
       const safeSdk2 = await safeSdk1.connect({

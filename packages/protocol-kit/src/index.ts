@@ -14,25 +14,29 @@ import {
   getCreateCallContract,
   getMultiSendCallOnlyContract,
   getMultiSendContract,
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract,
-  getSignMessageLibContract
+  getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract
 } from './contracts/safeDeploymentContracts'
 import {
   PREDETERMINED_SALT_NONCE,
   encodeCreateProxyWithNonce,
   encodeSetupCallData,
   predictSafeAddress,
-  getPredictedSafeAddressInitCode
+  getPredictedSafeAddressInitCode,
+  getSafeAddressFromDeploymentTx
 } from './contracts/utils'
 import ContractManager from './managers/contractManager'
-import SafeFactory from './SafeFactory'
 import {
   EthSafeSignature,
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyCoordinates,
+  extractPasskeyData,
   validateEthereumAddress,
   validateEip3770Address
 } from './utils'
@@ -61,12 +65,16 @@ import {
   hashSafeMessage,
   generateTypedData
 } from './utils/eip-712'
+import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
+import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 
 export {
   estimateTxBaseGas,
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
+  extractPasskeyData,
+  extractPasskeyCoordinates,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
@@ -76,7 +84,6 @@ export {
   MultiSendBaseContract,
   PREDETERMINED_SALT_NONCE,
   SafeBaseContract,
-  SafeFactory,
   SafeProxyFactoryBaseContract,
   SafeTransactionOptionalProps,
   SignMessageLibBaseContract,
@@ -88,9 +95,11 @@ export {
   getERC20Decimals,
   getMultiSendCallOnlyContract,
   getMultiSendContract,
-  getProxyFactoryContract,
+  getSafeProxyFactoryContract,
   getSafeContract,
   getSignMessageLibContract,
+  getSafeWebAuthnSignerFactoryContract,
+  getSafeWebAuthnSharedSignerContract,
   isGasTokenCompatibleWithHandlePayment,
   predictSafeAddress,
   getPredictedSafeAddressInitCode,
@@ -105,13 +114,22 @@ export {
   preimageSafeMessageHash,
   getEip712TxTypes,
   getEip712MessageTypes,
+  getSafeAddressFromDeploymentTx,
   hashSafeMessage,
   generateTypedData,
   SafeProvider,
+  createPasskeyClient,
   EthSafeTransaction,
-  EthSafeMessage
+  EthSafeMessage,
+  getPasskeyOwnerAddress
 }
 
 export * from './types'
 
 export default Safe
+
+declare module 'abitype' {
+  export interface Register {
+    AddressType: string
+  }
+}

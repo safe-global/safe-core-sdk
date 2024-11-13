@@ -1,4 +1,4 @@
-import { ethers, TypedDataDomain } from 'ethers'
+import { hashMessage as performMessageHash } from 'viem'
 import {
   EIP712MessageTypes,
   EIP712TxTypes,
@@ -7,8 +7,9 @@ import {
   SafeTransactionData,
   EIP712TypedDataMessage,
   EIP712TypedDataTx
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
+import { hashTypedData as hashTypedStructuredData } from './encode'
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
@@ -59,14 +60,11 @@ export function getEip712MessageTypes(safeVersion: string): EIP712MessageTypes {
 }
 
 export const hashTypedData = (typedData: EIP712TypedData): string => {
-  // `ethers` doesn't require `EIP712Domain` and otherwise throws
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { EIP712Domain: _, ...types } = typedData.types
-  return ethers.TypedDataEncoder.hash(typedData.domain as TypedDataDomain, types, typedData.message)
+  return hashTypedStructuredData(typedData)
 }
 
 const hashMessage = (message: string): string => {
-  return ethers.hashMessage(message)
+  return performMessageHash(message)
 }
 
 export const hashSafeMessage = (message: string | EIP712TypedData): string => {
@@ -117,7 +115,7 @@ export function generateTypedData({
   }
 
   if (eip712WithChainId) {
-    typedData.domain.chainId = chainId.toString()
+    typedData.domain.chainId = Number(chainId)
   }
 
   return typedData

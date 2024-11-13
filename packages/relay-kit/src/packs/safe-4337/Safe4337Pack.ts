@@ -1,11 +1,11 @@
-import { ethers } from 'ethers'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
-  SafeProvider,
   SigningMethod,
   encodeMultiSendData,
-  getMultiSendContract
+  getMultiSendContract,
+  PasskeyClient,
+  SafeProvider
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
@@ -16,11 +16,13 @@ import {
   SafeOperationResponse,
   SafeSignature,
   UserOperation
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 import {
   getAddModulesLibDeployment,
-  getSafe4337ModuleDeployment
+  getSafe4337ModuleDeployment,
+  getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
+import { Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
 import EthSafeOperation from './SafeOperation'
 import {
   EstimateFeeProps,
@@ -31,13 +33,15 @@ import {
   UserOperationReceipt,
   UserOperationWithPayload,
   PaymasterOptions,
-  ERC20PaymasterOption
+  ERC20PaymasterOption,
+  BundlerClient
 } from './types'
 import {
+  ABI,
   DEFAULT_SAFE_VERSION,
   DEFAULT_SAFE_MODULES_VERSION,
-  INTERFACES,
-  RPC_4337_CALLS
+  RPC_4337_CALLS,
+  ENTRYPOINT_ABI
 } from './constants'
 import {
   addDummySignature,
@@ -75,8 +79,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   #ENTRYPOINT_ADDRESS: string
   #SAFE_4337_MODULE_ADDRESS: string = '0x'
+  #SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS: string = '0x'
 
-  #bundlerClient: ethers.JsonRpcProvider
+  #bundlerClient: BundlerClient
 
   #chainId: bigint
 
@@ -94,7 +99,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     chainId,
     paymasterOptions,
     entryPointAddress,
-    safe4337ModuleAddress
+    safe4337ModuleAddress,
+    safeWebAuthnSharedSignerAddress
   }: Safe4337Options) {
     super(protocolKit)
 
@@ -104,6 +110,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#paymasterOptions = paymasterOptions
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
+    this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
   }
 
   /**
@@ -120,7 +127,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const { provider, signer, options, bundlerUrl, customContracts, paymasterOptions } = initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
-    const chainId = await bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
+    const chainId = await bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
 
     let addModulesLibAddress = customContracts?.addModulesLibAddress
     const network = parseInt(chainId, 16).toString()
@@ -158,6 +165,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       )
     }
 
+    let safeWebAuthnSharedSignerAddress = customContracts?.safeWebAuthnSharedSignerAddress
+
     // Existing Safe
     if ('safeAddress' in options) {
       protocolKit = await Safe.init({
@@ -166,7 +175,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         safeAddress: options.safeAddress
       })
 
-      const safeVersion = await protocolKit.getContractVersion()
+      const safeVersion = protocolKit.getContractVersion()
       const isSafeVersion4337Compatible = semverSatisfies(safeVersion, EQ_OR_GT_1_4_1)
 
       if (!isSafeVersion4337Compatible) {
@@ -198,8 +207,23 @@ export class Safe4337Pack extends RelayKitBasePack<{
         throw new Error('Owners and threshold are required to deploy a new Safe')
       }
 
-      let deploymentTo = addModulesLibAddress
-      let deploymentData = INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]])
+      const safeVersion = options.safeVersion || DEFAULT_SAFE_VERSION
+
+      // we need to create a batch to setup the 4337 Safe Account
+
+      // first setup transaction: Enable 4337 module
+      const enable4337ModuleTransaction = {
+        to: addModulesLibAddress,
+        value: '0',
+        data: encodeFunctionData({
+          abi: ABI,
+          functionName: 'enableModules',
+          args: [[safe4337ModuleAddress]]
+        }),
+        operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
+      }
+
+      const setupTransactions = [enable4337ModuleTransaction]
 
       const isApproveTransactionRequired =
         !!paymasterOptions &&
@@ -209,33 +233,80 @@ export class Safe4337Pack extends RelayKitBasePack<{
       if (isApproveTransactionRequired) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
 
-        const enable4337ModulesTransaction = {
-          to: addModulesLibAddress,
-          value: '0',
-          data: INTERFACES.encodeFunctionData('enableModules', [[safe4337ModuleAddress]]),
-          operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
-        }
-
+        // second transaction: approve ERC-20 paymaster token
         const approveToPaymasterTransaction = {
           to: paymasterOptions.paymasterTokenAddress,
-          data: INTERFACES.encodeFunctionData('approve', [paymasterAddress, amountToApprove]),
+          data: encodeFunctionData({
+            abi: ABI,
+            functionName: 'approve',
+            args: [paymasterAddress, amountToApprove]
+          }),
           value: '0',
           operation: OperationType.Call // Call for approve
         }
 
-        const setupBatch = [enable4337ModulesTransaction, approveToPaymasterTransaction]
+        setupTransactions.push(approveToPaymasterTransaction)
+      }
 
-        const batchData = INTERFACES.encodeFunctionData('multiSend', [
-          encodeMultiSendData(setupBatch)
-        ])
+      const safeProvider = await SafeProvider.init({ provider, signer, safeVersion })
 
+      // third transaction: passkey support via shared signer SafeWebAuthnSharedSigner
+      // see: https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/4337/experimental/README.md
+      const isPasskeySigner = await safeProvider.isPasskeySigner()
+
+      if (isPasskeySigner) {
+        if (!safeWebAuthnSharedSignerAddress) {
+          const safeWebAuthnSharedSignerDeployment = getSafeWebAuthnShareSignerDeployment({
+            released: true,
+            version: '0.2.1',
+            network
+          })
+          safeWebAuthnSharedSignerAddress =
+            safeWebAuthnSharedSignerDeployment?.networkAddresses[network]
+        }
+
+        if (!safeWebAuthnSharedSignerAddress) {
+          throw new Error(`safeWebAuthnSharedSignerAddress not available for chain ${network}`)
+        }
+
+        const passkeySigner = (await safeProvider.getExternalSigner()) as PasskeyClient
+
+        if (!options.owners.includes(safeWebAuthnSharedSignerAddress)) {
+          options.owners.push(safeWebAuthnSharedSignerAddress)
+        }
+
+        const sharedSignerTransaction = {
+          to: safeWebAuthnSharedSignerAddress,
+          value: '0',
+          data: passkeySigner.encodeConfigure(),
+          operation: OperationType.DelegateCall // DelegateCall required into the SafeWebAuthnSharedSigner instance in order for it to set its configuration.
+        }
+
+        setupTransactions.push(sharedSignerTransaction)
+      }
+
+      let deploymentTo
+      let deploymentData
+
+      const isBatch = setupTransactions.length > 1
+
+      if (isBatch) {
         const multiSendContract = await getMultiSendContract({
-          safeProvider: new SafeProvider({ provider, signer }),
-          safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION
+          safeProvider,
+          safeVersion
         })
 
-        deploymentTo = await multiSendContract.getAddress()
+        const batchData = encodeFunctionData({
+          abi: ABI,
+          functionName: 'multiSend',
+          args: [encodeMultiSendData(setupTransactions) as Hex]
+        })
+
+        deploymentTo = multiSendContract.getAddress()
         deploymentData = batchData
+      } else {
+        deploymentTo = enable4337ModuleTransaction.to
+        deploymentData = enable4337ModuleTransaction.data
       }
 
       protocolKit = await Safe.init({
@@ -243,7 +314,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         signer,
         predictedSafe: {
           safeDeploymentConfig: {
-            safeVersion: options.safeVersion || DEFAULT_SAFE_VERSION,
+            safeVersion,
             saltNonce: options.saltNonce || undefined
           },
           safeAccountConfig: {
@@ -252,9 +323,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
             to: deploymentTo,
             data: deploymentData,
             fallbackHandler: safe4337ModuleAddress,
-            paymentToken: ethers.ZeroAddress,
+            paymentToken: zeroAddress,
             payment: 0,
-            paymentReceiver: ethers.ZeroAddress
+            paymentReceiver: zeroAddress
           }
         }
       })
@@ -271,16 +342,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       selectedEntryPoint = customContracts?.entryPointAddress
     } else {
-      const supportedEntryPoints = await bundlerClient.send(
-        RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS,
-        []
-      )
+      const supportedEntryPoints = await bundlerClient.request({
+        method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS
+      })
 
       if (!supportedEntryPoints.length) {
         throw new Error('No entrypoint provided or available through the bundler')
       }
 
-      selectedEntryPoint = supportedEntryPoints.find((entryPoint: string) => {
+      selectedEntryPoint = supportedEntryPoints.find((entryPoint) => {
         const requiredSafeModulesVersion = entryPointToSafeModules(entryPoint)
         return semverSatisfies(safeModulesVersion, requiredSafeModulesVersion)
       })
@@ -299,7 +369,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       paymasterOptions,
       bundlerUrl,
       entryPointAddress: selectedEntryPoint!,
-      safe4337ModuleAddress
+      safe4337ModuleAddress,
+      safeWebAuthnSharedSignerAddress
     })
   }
 
@@ -316,6 +387,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<EthSafeOperation> {
+    const threshold = await this.protocolKit.getThreshold()
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
@@ -326,15 +398,19 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOperation.addEstimations(setupEstimationData)
     }
 
-    const estimateUserOperationGas = await this.#bundlerClient.send(
-      RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
-      [
+    const estimateUserOperationGas = await this.#bundlerClient.request({
+      method: RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
+      params: [
         userOperationToHexValues(
-          addDummySignature(safeOperation.toUserOperation(), await this.protocolKit.getOwners())
+          addDummySignature(
+            safeOperation.toUserOperation(),
+            this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+            threshold
+          )
         ),
         this.#ENTRYPOINT_ADDRESS
       ]
-    )
+    })
 
     if (estimateUserOperationGas) {
       safeOperation.addEstimations({
@@ -360,7 +436,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
-        userOperation: safeOperation.toUserOperation(),
+        userOperation: addDummySignature(
+          safeOperation.toUserOperation(),
+          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          threshold
+        ),
         paymasterUrl: this.#paymasterOptions.paymasterUrl,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
         sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId
@@ -401,10 +481,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       const approveToPaymasterTransaction = {
         to: paymasterOptions.paymasterTokenAddress,
-        data: INTERFACES.encodeFunctionData('approve', [
-          paymasterOptions.paymasterAddress,
-          amountToApprove
-        ]),
+        data: encodeFunctionData({
+          abi: ABI,
+          functionName: 'approve',
+          args: [paymasterOptions.paymasterAddress, amountToApprove]
+        }),
         value: '0',
         operation: OperationType.Call // Call for approve
       }
@@ -413,7 +494,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     }
 
     const isBatch = transactions.length > 1
-    const multiSendAddress = await this.protocolKit.getMultiSendAddress()
+    const multiSendAddress = this.protocolKit.getMultiSendAddress()
 
     const callData = isBatch
       ? this.#encodeExecuteUserOpCallData({
@@ -472,6 +553,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
   #toSafeOperation(safeOperationResponse: SafeOperationResponse): EthSafeOperation {
     const { validUntil, validAfter, userOperation } = safeOperationResponse
 
+    const paymaster = (userOperation?.paymaster as Hex) || '0x'
+    const paymasterData = (userOperation?.paymasterData as Hex) || '0x'
     const safeOperation = new EthSafeOperation(
       {
         sender: userOperation?.sender || '0x',
@@ -483,9 +566,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         preVerificationGas: BigInt(userOperation?.preVerificationGas || 0),
         maxFeePerGas: BigInt(userOperation?.maxFeePerGas || 0),
         maxPriorityFeePerGas: BigInt(userOperation?.maxPriorityFeePerGas || 0),
-        paymasterAndData: ethers.hexlify(
-          ethers.concat([userOperation?.paymaster || '0x', userOperation?.paymasterData || '0x'])
-        ),
+        paymasterAndData: concat([paymaster, paymasterData]),
         signature: safeOperationResponse.preparedSignature || '0x'
       },
       {
@@ -536,35 +617,57 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOp = safeOperation
     }
 
-    const owners = await this.protocolKit.getOwners()
-    const signerAddress = await this.protocolKit.getSafeProvider().getSignerAddress()
+    const safeProvider = this.protocolKit.getSafeProvider()
+    const signerAddress = await safeProvider.getSignerAddress()
+    const isPasskeySigner = await safeProvider.isPasskeySigner()
+
     if (!signerAddress) {
       throw new Error('There is no signer address available to sign the SafeOperation')
     }
 
-    const addressIsOwner = owners.some(
-      (owner: string) => signerAddress && owner.toLowerCase() === signerAddress.toLowerCase()
-    )
+    const isOwner = await this.protocolKit.isOwner(signerAddress)
+    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
 
-    if (!addressIsOwner) {
+    if ((!isOwner && isSafeDeployed) || (!isSafeDeployed && !isPasskeySigner && !isOwner)) {
       throw new Error('UserOperations can only be signed by Safe owners')
     }
 
     let signature: SafeSignature
-    if (
-      signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V4 ||
-      signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA_V3 ||
-      signingMethod === SigningMethod.ETH_SIGN_TYPED_DATA
-    ) {
-      signature = await signSafeOp(
-        safeOp.data,
-        this.protocolKit.getSafeProvider(),
-        this.#SAFE_4337_MODULE_ADDRESS
-      )
-    } else {
+
+    if (isPasskeySigner) {
       const safeOpHash = safeOp.getHash()
 
-      signature = await this.protocolKit.signHash(safeOpHash)
+      // if the Safe is not deployed we force the Shared Signer signature
+      if (!isSafeDeployed) {
+        const passkeySignature = await this.protocolKit.signHash(safeOpHash)
+        // SafeWebAuthnSharedSigner signature
+        signature = new EthSafeSignature(
+          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          passkeySignature.data,
+          true // passkeys are contract signatures
+        )
+      } else {
+        signature = await this.protocolKit.signHash(safeOpHash)
+      }
+    } else {
+      if (
+        signingMethod in
+        [
+          SigningMethod.ETH_SIGN_TYPED_DATA_V4,
+          SigningMethod.ETH_SIGN_TYPED_DATA_V3,
+          SigningMethod.ETH_SIGN_TYPED_DATA
+        ]
+      ) {
+        signature = await signSafeOp(
+          safeOp.data,
+          this.protocolKit.getSafeProvider(),
+          this.#SAFE_4337_MODULE_ADDRESS
+        )
+      } else {
+        const safeOpHash = safeOp.getHash()
+
+        signature = await this.protocolKit.signHash(safeOpHash)
+      }
     }
 
     const signedSafeOperation = new EthSafeOperation(safeOp.toUserOperation(), {
@@ -604,10 +707,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const userOperation = safeOperation.toUserOperation()
 
-    return this.#bundlerClient.send(RPC_4337_CALLS.SEND_USER_OPERATION, [
-      userOperationToHexValues(userOperation),
-      this.#ENTRYPOINT_ADDRESS
-    ])
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.SEND_USER_OPERATION,
+      params: [userOperationToHexValues(userOperation), this.#ENTRYPOINT_ADDRESS]
+    })
   }
 
   /**
@@ -617,7 +720,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {UserOperation} - null in case the UserOperation is not yet included in a block, or a full UserOperation, with the addition of entryPoint, blockNumber, blockHash and transactionHash
    */
   async getUserOperationByHash(userOpHash: string): Promise<UserOperationWithPayload> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH, [userOpHash])
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.GET_USER_OPERATION_BY_HASH,
+      params: [userOpHash as Hash]
+    })
   }
 
   /**
@@ -627,7 +733,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {UserOperationReceipt} - null in case the UserOperation is not yet included in a block, or UserOperationReceipt object
    */
   async getUserOperationReceipt(userOpHash: string): Promise<UserOperationReceipt | null> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT, [userOpHash])
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT,
+      params: [userOpHash as Hash]
+    })
   }
 
   /**
@@ -637,7 +746,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {string[]} - The supported entry points.
    */
   async getSupportedEntryPoints(): Promise<string[]> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS, [])
+    return this.#bundlerClient.request({
+      method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS
+    })
   }
 
   /**
@@ -646,7 +757,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {string} - The chain id.
    */
   async getChainId(): Promise<string> {
-    return this.#bundlerClient.send(RPC_4337_CALLS.CHAIN_ID, [])
+    return this.#bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
   }
 
   /**
@@ -656,26 +767,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @returns {Promise<string>} The Promise object will resolve to the account nonce.
    */
   async #getSafeNonceFromEntrypoint(safeAddress: string): Promise<string> {
-    const abi = [
-      {
-        inputs: [
-          { name: 'sender', type: 'address' },
-          { name: 'key', type: 'uint192' }
-        ],
-        name: 'getNonce',
-        outputs: [{ name: 'nonce', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function'
-      }
-    ]
+    const safeProvider = this.protocolKit.getSafeProvider()
 
-    const contract = new ethers.Contract(
-      this.#ENTRYPOINT_ADDRESS || '0x',
-      abi,
-      this.protocolKit.getSafeProvider().getExternalProvider()
-    )
-
-    const newNonce = await contract.getNonce(safeAddress, BigInt(0))
+    const newNonce = await safeProvider.readContract({
+      address: this.#ENTRYPOINT_ADDRESS || '0x',
+      abi: ENTRYPOINT_ABI,
+      functionName: 'getNonce',
+      args: [safeAddress, 0n]
+    })
 
     return newNonce.toString()
   }
@@ -687,11 +786,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {string} The encoded call data string.
    */
   #encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
-    return INTERFACES.encodeFunctionData('executeUserOp', [
-      transaction.to,
-      transaction.value,
-      transaction.data,
-      transaction.operation || OperationType.Call
-    ])
+    return encodeFunctionData({
+      abi: ABI,
+      functionName: 'executeUserOp',
+      args: [
+        transaction.to,
+        BigInt(transaction.value),
+        transaction.data as Hex,
+        transaction.operation || OperationType.Call
+      ]
+    })
   }
 }

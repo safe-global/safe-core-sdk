@@ -1,4 +1,4 @@
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 
 import { SafeProviderConfig } from './safeProvider'
 import { ContractNetworksConfig } from './contracts'
@@ -14,9 +14,12 @@ export type SafeAccountConfig = {
   paymentReceiver?: string
 }
 
+export type DeploymentType = 'canonical' | 'eip155' | 'zksync'
+
 export type SafeDeploymentConfig = {
   saltNonce?: string
   safeVersion?: SafeVersion
+  deploymentType?: DeploymentType
 }
 
 export type PredictedSafeProps = {

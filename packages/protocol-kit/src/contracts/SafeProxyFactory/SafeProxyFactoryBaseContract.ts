@@ -1,17 +1,9 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import {
-  SafeVersion,
-  TransactionOptions,
-  CreateProxyProps as CreateProxyPropsGeneral
-} from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
-
-export interface CreateProxyProps extends CreateProxyPropsGeneral {
-  options?: TransactionOptions
-}
 
 /**
  * Abstract class SafeProxyFactoryBaseContract extends BaseContract to specifically integrate with the SafeProxyFactory contract.
@@ -30,7 +22,7 @@ export interface CreateProxyProps extends CreateProxyPropsGeneral {
  * - SafeProxyFactoryContract_v1_0_0  extends SafeProxyFactoryBaseContract<SafeProxyFactoryContract_v1_0_0_Abi>
  */
 abstract class SafeProxyFactoryBaseContract<
-  SafeProxyFactoryContractAbiType extends InterfaceAbi & Abi
+  SafeProxyFactoryContractAbiType extends Abi
 > extends BaseContract<SafeProxyFactoryContractAbiType> {
   contractName: contractName
 
@@ -44,6 +36,7 @@ abstract class SafeProxyFactoryBaseContract<
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -52,7 +45,7 @@ abstract class SafeProxyFactoryBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: SafeProxyFactoryContractAbiType,
-    runner?: ContractRunner | null
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'safeProxyFactoryVersion'
 
@@ -64,7 +57,7 @@ abstract class SafeProxyFactoryBaseContract<
       safeVersion,
       customContractAddress,
       customContractAbi,
-      runner
+      deploymentType
     )
 
     this.contractName = contractName

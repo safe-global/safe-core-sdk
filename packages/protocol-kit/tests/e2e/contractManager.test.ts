@@ -1,45 +1,31 @@
-import { safeVersionDeployed } from '@safe-global/protocol-kit/hardhat/deploy/deploy-contracts'
-import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/protocol-kit/index'
-import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import { deployments } from 'hardhat'
-import { getContractNetworks } from './utils/setupContractNetworks'
 import {
+  safeVersionDeployed,
+  setupTests,
   getCompatibilityFallbackHandler,
   getCreateCall,
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
   getSafeSingleton,
-  getSafeWithOwners,
   getSignMessageLib,
-  getSimulateTxAccessor
-} from './utils/setupContracts'
+  getSimulateTxAccessor,
+  getSafeWebAuthnSharedSigner,
+  getSafeWebAuthnSignerFactory
+} from '@safe-global/testing-kit'
+import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/protocol-kit/index'
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
-import { getAccounts } from './utils/setupTestNetwork'
 
 chai.use(chaiAsPromised)
 
 describe('Safe contracts manager', () => {
-  const setupTests = deployments.createFixture(async ({ deployments, getChainId }) => {
-    await deployments.fixture()
-    const accounts = await getAccounts()
-    const chainId = BigInt(await getChainId())
-    const contractNetworks = await getContractNetworks(chainId)
-    const provider = getEip1193Provider()
-    return {
-      safe: await getSafeWithOwners([accounts[0].address]),
-      accounts,
-      contractNetworks,
-      chainId,
-      provider
-    }
-  })
+  const provider = getEip1193Provider()
 
   describe('create', async () => {
     it('should initialize the SDK with a Safe that is not deployed', async () => {
-      const { accounts, contractNetworks, provider } = await setupTests()
+      const { accounts, contractNetworks } = await setupTests()
       const predictedSafe: PredictedSafeProps = {
         safeAccountConfig: {
           owners: [accounts[0].address],
@@ -59,8 +45,8 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if the current network is not a default network and no contractNetworks is provided', async () => {
-      const { safe, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const { safe } = await setupTests()
+      const safeAddress = safe.address
       await chai
         .expect(
           Safe.init({
@@ -72,7 +58,7 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if SafeProxy contract is not deployed on the current network', async () => {
-      const { contractNetworks, provider } = await setupTests()
+      const { contractNetworks } = await setupTests()
       await chai
         .expect(
           Safe.init({
@@ -85,7 +71,7 @@ describe('Safe contracts manager', () => {
     })
 
     it('should fail if MultiSend contract is specified in contractNetworks but not deployed', async () => {
-      const { safe, chainId, provider } = await setupTests()
+      const { safe, chainId } = await setupTests()
       const customContractNetworks: ContractNetworksConfig = {
         [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
@@ -103,11 +89,15 @@ describe('Safe contracts manager', () => {
           createCallAddress: ZERO_ADDRESS,
           createCallAbi: (await getCreateCall()).abi,
           simulateTxAccessorAddress: ZERO_ADDRESS,
-          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi
+          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi,
+          safeWebAuthnSignerFactoryAddress: ZERO_ADDRESS,
+          safeWebAuthnSignerFactoryAbi: (await getSafeWebAuthnSignerFactory()).abi,
+          safeWebAuthnSharedSignerAddress: ZERO_ADDRESS,
+          safeWebAuthnSharedSignerAbi: (await getSafeWebAuthnSharedSigner()).abi
         }
       }
 
-      const safeAddress = await safe.getAddress()
+      const safeAddress = safe.address
       await chai
         .expect(
           Safe.init({
@@ -120,8 +110,8 @@ describe('Safe contracts manager', () => {
     })
 
     it('should set the MultiSend contract available on the current network', async () => {
-      const { safe, chainId, contractNetworks, provider } = await setupTests()
-      const safeAddress = await safe.getAddress()
+      const { safe, chainId, contractNetworks } = await setupTests()
+      const safeAddress = safe.address
       const safeSdk = await Safe.init({
         provider,
         safeAddress,

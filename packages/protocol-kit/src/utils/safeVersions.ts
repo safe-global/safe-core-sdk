@@ -14,6 +14,7 @@ export enum SAFE_FEATURES {
   ACCOUNT_ABSTRACTION = 'ACCOUNT_ABSTRACTION',
   REQUIRED_TXGAS = 'REQUIRED_TXGAS',
   SIMULATE_AND_REVERT = 'SIMULATE_AND_REVERT',
+  PASSKEY_SIGNER = 'PASSKEY_SIGNER',
   SAFE_L2_CONTRACTS = 'SAFE_L2_CONTRACTS'
 }
 
@@ -25,6 +26,7 @@ const SAFE_FEATURES_BY_VERSION: Record<SAFE_FEATURES, string> = {
   [SAFE_FEATURES.ACCOUNT_ABSTRACTION]: '>=1.3.0',
   [SAFE_FEATURES.REQUIRED_TXGAS]: '<=1.2.0',
   [SAFE_FEATURES.SIMULATE_AND_REVERT]: '>=1.3.0',
+  [SAFE_FEATURES.PASSKEY_SIGNER]: '>=1.3.0',
   [SAFE_FEATURES.SAFE_L2_CONTRACTS]: '>=1.3.0'
 }
 
@@ -56,7 +58,7 @@ export type SafeContractCompatibleWithSimulateAndRevert = SafeContract_v1_3_0 | 
 export async function isSafeContractCompatibleWithRequiredTxGas(
   safeContract: SafeContractImplementationType
 ): Promise<SafeContractCompatibleWithRequiredTxGas> {
-  const safeVersion = await safeContract.getVersion()
+  const safeVersion = safeContract.safeVersion
 
   if (!hasSafeFeature(SAFE_FEATURES.REQUIRED_TXGAS, safeVersion)) {
     throw new Error('Current version of the Safe does not support the requiredTxGas functionality')
@@ -68,7 +70,7 @@ export async function isSafeContractCompatibleWithRequiredTxGas(
 export async function isSafeContractCompatibleWithSimulateAndRevert(
   safeContract: SafeContractImplementationType
 ): Promise<SafeContractCompatibleWithSimulateAndRevert> {
-  const safeVersion = await safeContract.getVersion()
+  const safeVersion = safeContract.safeVersion
 
   if (!hasSafeFeature(SAFE_FEATURES.SIMULATE_AND_REVERT, safeVersion)) {
     throw new Error(

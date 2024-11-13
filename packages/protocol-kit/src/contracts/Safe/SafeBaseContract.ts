@@ -1,10 +1,10 @@
 import { Abi } from 'abitype'
-import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
 
 /**
@@ -24,7 +24,7 @@ import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
  * - SafeContract_v1_0_0  extends SafeBaseContract<SafeContract_v1_0_0_Abi>
  */
 abstract class SafeBaseContract<
-  SafeContractAbiType extends InterfaceAbi & Abi
+  SafeContractAbiType extends Abi
 > extends BaseContract<SafeContractAbiType> {
   contractName: contractName
 
@@ -39,20 +39,20 @@ abstract class SafeBaseContract<
    * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
     defaultAbi: SafeContractAbiType,
     safeVersion: SafeVersion,
-    isL1SafeSingleton = false,
+    isL1SafeSingleton = safeDeploymentsL1ChainIds.includes(chainId),
     customContractAddress?: string,
-    customContractAbi?: SafeContractAbiType
+    customContractAbi?: SafeContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const isL1Contract =
-      safeDeploymentsL1ChainIds.includes(chainId) ||
-      isL1SafeSingleton ||
-      !hasSafeFeature(SAFE_FEATURES.SAFE_L2_CONTRACTS, safeVersion)
+      isL1SafeSingleton || !hasSafeFeature(SAFE_FEATURES.SAFE_L2_CONTRACTS, safeVersion)
 
     const contractName = isL1Contract ? 'safeSingletonVersion' : 'safeSingletonL2Version'
 
@@ -63,7 +63,8 @@ abstract class SafeBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

@@ -1,9 +1,9 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - CreateCallContract_v1_3_0  extends CreateCallBaseContract<CreateCallContract_v1_3_0_Abi>
  */
 abstract class CreateCallBaseContract<
-  CreateCallContractAbiType extends InterfaceAbi & Abi
+  CreateCallContractAbiType extends Abi
 > extends BaseContract<CreateCallContractAbiType> {
   contractName: contractName
 
@@ -34,6 +34,7 @@ abstract class CreateCallBaseContract<
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -42,7 +43,7 @@ abstract class CreateCallBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CreateCallContractAbiType,
-    runner?: ContractRunner | null
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'createCallVersion'
 
@@ -54,7 +55,7 @@ abstract class CreateCallBaseContract<
       safeVersion,
       customContractAddress,
       customContractAbi,
-      runner
+      deploymentType
     )
 
     this.contractName = contractName

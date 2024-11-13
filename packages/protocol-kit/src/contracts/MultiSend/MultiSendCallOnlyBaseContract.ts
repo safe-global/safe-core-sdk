@@ -1,8 +1,8 @@
 import { Abi } from 'abitype'
-import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
+import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - MultiSendCallOnlyContract_v1_3_0  extends MultiSendCallOnlyBaseContract<MultiSendCallOnlyContract_v1_3_0_Abi>
  */
 abstract class MultiSendCallOnlyBaseContract<
-  MultiSendCallOnlyContractAbiType extends InterfaceAbi & Abi
+  MultiSendCallOnlyContractAbiType extends Abi
 > extends BaseContract<MultiSendCallOnlyContractAbiType> {
   contractName: contractName
 
@@ -34,6 +34,7 @@ abstract class MultiSendCallOnlyBaseContract<
    * @param safeVersion - The version of the MultiSendCallOnly contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSendCallOnly deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the MultiSendCallOnly deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -41,7 +42,8 @@ abstract class MultiSendCallOnlyBaseContract<
     defaultAbi: MultiSendCallOnlyContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: MultiSendCallOnlyContractAbiType
+    customContractAbi?: MultiSendCallOnlyContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'multiSendCallOnlyVersion'
 
@@ -52,7 +54,8 @@ abstract class MultiSendCallOnlyBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

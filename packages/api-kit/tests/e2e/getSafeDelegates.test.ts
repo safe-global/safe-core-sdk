@@ -1,4 +1,6 @@
-import { ethers, Signer } from 'ethers'
+import { Address, createWalletClient, http } from 'viem'
+import { sepolia } from 'viem/chains'
+import { privateKeyToAccount } from 'viem/accounts'
 import SafeApiKit, {
   DeleteSafeDelegateProps,
   SafeDelegateResponse
@@ -13,14 +15,20 @@ chai.use(chaiAsPromised)
 const PRIVATE_KEY = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 
 let safeApiKit: SafeApiKit
-let signer: Signer
+let signer: DeleteSafeDelegateProps['signer']
+let delegatorAddress: Address
 
 describe('getSafeDelegates', () => {
   const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
 
-  before(async () => {
+  before(() => {
     safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
-    signer = new ethers.Wallet(PRIVATE_KEY)
+    signer = createWalletClient({
+      chain: sepolia,
+      transport: http(),
+      account: privateKeyToAccount(PRIVATE_KEY)
+    })
+    delegatorAddress = signer.account.address
   })
 
   it('should fail if Safe address is empty', async () => {
@@ -44,13 +52,11 @@ describe('getSafeDelegates', () => {
   })
 
   describe('for valid parameters', () => {
-    let delegatorAddress: string
     let delegateConfig1: DeleteSafeDelegateProps
     let delegateConfig2: DeleteSafeDelegateProps
     let delegatesResponse: SafeDelegateResponse[]
 
     before(async () => {
-      delegatorAddress = await signer.getAddress()
       delegateConfig1 = {
         delegateAddress: '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
         delegatorAddress,
@@ -97,11 +103,11 @@ describe('getSafeDelegates', () => {
       chai.expect(results.length).to.be.eq(2)
       chai.expect(results[0].safe).to.be.eq(safeAddress)
       chai.expect(results[0].delegate).to.be.eq(delegateConfig1.delegateAddress)
-      chai.expect(results[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
+      chai.expect(results[0].delegator).to.be.eq(delegateConfig1.signer.account!.address)
       chai.expect(results[0].label).to.be.eq('Label1')
       chai.expect(results[1].safe).to.be.eq(safeAddress)
       chai.expect(results[1].delegate).to.be.eq(delegateConfig2.delegateAddress)
-      chai.expect(results[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
+      chai.expect(results[1].delegator).to.be.eq(delegateConfig2.signer.account!.address)
       chai.expect(results[1].label).to.be.eq('Label2')
     })
 
@@ -123,7 +129,6 @@ describe('getSafeDelegates', () => {
   it('should return an array of delegates EIP-3770', async () => {
     const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const delegatorAddress = await signer.getAddress()
     const delegateConfig1: DeleteSafeDelegateProps = {
       delegateAddress: `${config.EIP_3770_PREFIX}:0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B`,
       delegatorAddress,
@@ -153,10 +158,10 @@ describe('getSafeDelegates', () => {
     )
     chai.expect(results.length).to.be.eq(2)
     chai.expect(results[0].delegate).to.be.eq('0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B')
-    chai.expect(results[0].delegator).to.be.eq(await delegateConfig1.signer.getAddress())
+    chai.expect(results[0].delegator).to.be.eq(delegateConfig1.signer.account!.address)
     chai.expect(results[0].label).to.be.eq('Label1')
     chai.expect(results[1].delegate).to.be.eq('0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b')
-    chai.expect(results[1].delegator).to.be.eq(await delegateConfig2.signer.getAddress())
+    chai.expect(results[1].delegator).to.be.eq(delegateConfig2.signer.account!.address)
     chai.expect(results[1].label).to.be.eq('Label2')
     await safeApiKit.removeSafeDelegate({
       delegateAddress: delegateConfig1.delegateAddress,

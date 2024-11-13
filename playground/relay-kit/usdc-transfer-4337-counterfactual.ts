@@ -1,4 +1,6 @@
-import { ethers } from 'ethers'
+import { parseEther } from 'viem'
+import { getBlock, waitForTransactionReceipt } from 'viem/actions'
+import { sepolia } from 'viem/chains'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish, transfer, generateTransferCallData } from '../utils'
 
@@ -11,7 +13,7 @@ const PIMLICO_API_KEY = ''
 const OWNER_ADDRESS = ''
 
 // RPC URL
-const RPC_URL = 'https://sepolia.gateway.tenderly.co' // SEPOLIA
+const RPC_URL = 'https://rpc.sepolia.org' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // CHAIN
@@ -43,7 +45,7 @@ async function main() {
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
   console.log('Chain Id', await safe4337Pack.getChainId())
 
-  const senderAddress = (await safe4337Pack.protocolKit.getAddress()) as `0x${string}`
+  const senderAddress = await safe4337Pack.protocolKit.getAddress()
 
   console.log('senderAddress: ', senderAddress)
 
@@ -55,22 +57,23 @@ async function main() {
 
   const fundingSafe = {
     to: senderAddress,
-    value: ethers.parseEther(nativeTokenAmount)
+    value: parseEther(nativeTokenAmount),
+    chain: sepolia
   }
 
   console.log(`sending ${nativeTokenAmount} ETH...`)
 
-  const ethersSigner = await safe4337Pack.protocolKit.getSafeProvider().getExternalSigner()
+  const externalSigner = await safe4337Pack.protocolKit.getSafeProvider().getExternalSigner()
   const signerAddress = await safe4337Pack.protocolKit.getSafeProvider().getSignerAddress()
-  const ethersProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+  const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
 
-  if (!ethersSigner || !signerAddress) {
+  if (!externalSigner || !signerAddress) {
     throw new Error('No signer found!')
   }
 
-  const transactionFundingResponse = await ethersSigner?.sendTransaction(fundingSafe)
+  const hash = await externalSigner?.sendTransaction(fundingSafe)
 
-  await transactionFundingResponse?.wait()
+  await waitForTransactionReceipt(externalProvider, { hash })
 
   // Create transaction batch with two 0.1 USDC transfers
 
@@ -79,7 +82,7 @@ async function main() {
   console.log(`sending USDC...`)
 
   // send 0.2 USDC to the Safe
-  await transfer(ethersSigner, usdcTokenAddress, senderAddress, usdcAmount * 2n)
+  await transfer(externalSigner, usdcTokenAddress, senderAddress, usdcAmount * 2n)
 
   console.log(`creating the Safe batch...`)
 
@@ -90,14 +93,14 @@ async function main() {
   }
 
   const transactions = [transferUSDC, transferUSDC]
-  const timestamp = (await ethersProvider.getBlock('latest'))?.timestamp || 0
+  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
-      validAfter: timestamp - 60_000,
-      validUntil: timestamp + 60_000
+      validAfter: Number(timestamp - 60_000n),
+      validUntil: Number(timestamp + 60_000n)
     }
   })
 

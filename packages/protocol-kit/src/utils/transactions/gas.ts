@@ -1,4 +1,5 @@
-import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/safe-core-sdk-types'
+import { BaseError, CallExecutionErrorType, RawContractErrorType } from 'viem'
+import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe from '@safe-global/protocol-kit/Safe'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -15,6 +16,7 @@ import {
   isSafeContractCompatibleWithRequiredTxGas,
   isSafeContractCompatibleWithSimulateAndRevert
 } from '../safeVersions'
+import { asHex } from '../types'
 
 // Every byte == 00 -> 4  Gas cost
 const CALL_DATA_ZERO_BYTE_GAS_COST = 4
@@ -80,7 +82,7 @@ export async function estimateGas(
   const transactionDataToEstimate = simulateTxAccessorContract.encode('simulate', [
     to,
     BigInt(valueInWei),
-    data,
+    asHex(data),
     operation
   ])
 
@@ -89,9 +91,9 @@ export async function estimateGas(
 
   const safeFunctionToEstimate = safeContractContractCompatibleWithSimulateAndRevert.encode(
     'simulateAndRevert',
-    [await simulateTxAccessorContract.getAddress(), transactionDataToEstimate]
+    [simulateTxAccessorContract.getAddress(), asHex(transactionDataToEstimate)]
   )
-  const safeAddress = await safeContract.getAddress()
+  const safeAddress = safeContract.getAddress()
   const transactionToEstimateGas = {
     to: safeAddress,
     value: '0',
@@ -116,50 +118,7 @@ export async function estimateTxGas(
   data: string,
   operation: OperationType
 ): Promise<string> {
-  let txGasEstimation = 0
-  const safeAddress = await safeContract.getAddress()
-
-  const safeContractCompatibleWithRequiredTxGas =
-    await isSafeContractCompatibleWithRequiredTxGas(safeContract)
-
-  const estimateData = safeContractCompatibleWithRequiredTxGas.encode('requiredTxGas', [
-    to,
-    BigInt(valueInWei),
-    data,
-    operation
-  ])
-
-  try {
-    const estimateResponse = await safeProvider.estimateGas({
-      to: safeAddress,
-      from: safeAddress,
-      data: estimateData
-    })
-    txGasEstimation = Number('0x' + estimateResponse.substring(138)) + 10000
-  } catch (error) {}
-
-  if (txGasEstimation > 0) {
-    const dataGasEstimation = estimateDataGasCosts(estimateData)
-    let additionalGas = 10000
-    for (let i = 0; i < 10; i++) {
-      try {
-        const estimateResponse = await safeProvider.call({
-          to: safeAddress,
-          from: safeAddress,
-          data: estimateData,
-          gasPrice: '0',
-          gasLimit: (txGasEstimation + dataGasEstimation + additionalGas).toString()
-        })
-        if (estimateResponse !== '0x') {
-          break
-        }
-      } catch (error) {}
-      txGasEstimation = txGasEstimation + additionalGas
-      additionalGas *= 2
-    }
-    return (txGasEstimation + additionalGas).toString()
-  }
-
+  const safeAddress = safeContract.getAddress()
   try {
     const estimateGas = await safeProvider.estimateGas({
       to,
@@ -212,7 +171,7 @@ export async function estimateTxBaseGas(
   const encodeRefundReceiver = refundReceiver || ZERO_ADDRESS
   const signatures = '0x'
 
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
@@ -225,8 +184,8 @@ export async function estimateTxBaseGas(
     customContracts
   })
 
-  //@ts-expect-error: Type too complex to represent.
   //TODO: We should explore contract versions and map to the correct types
+  //@ts-expect-error: Type too complex to represent.
   const execTransactionData = safeSingletonContract.encode('execTransaction', [
     to,
     BigInt(value),
@@ -279,7 +238,7 @@ export async function estimateSafeTxGas(
   safe: Safe,
   safeTransaction: SafeTransaction
 ): Promise<string> {
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
 
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
     const safeTxGas = await estimateSafeTxGasWithSimulate(safe, safeTransaction)
@@ -324,7 +283,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
 ): Promise<string> {
   const isSafeDeployed = await safe.isSafeDeployed()
   const safeAddress = await safe.getAddress()
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
   const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
   const chainId = await safe.getChainId()
@@ -345,12 +304,12 @@ async function estimateSafeTxGasWithRequiredTxGas(
     [
       safeTransaction.data.to,
       BigInt(safeTransaction.data.value),
-      safeTransaction.data.data,
+      asHex(safeTransaction.data.data),
       safeTransaction.data.operation
     ]
   )
 
-  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
 
   const transactionToEstimateGas = {
     to,
@@ -400,11 +359,24 @@ function decodeSafeTxGas(encodedDataResponse: string): string {
 
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }
 type EthersEstimationError = { data: string }
-type ViemEstimationError = { info: { error: { message: string } } }
-type EstimationError = Error &
-  EthersEstimationError &
-  GnosisChainEstimationError &
-  ViemEstimationError
+type ViemEstimationError = BaseError | CallExecutionErrorType
+type EstimationError =
+  | Error
+  | EthersEstimationError
+  | GnosisChainEstimationError
+  | ViemEstimationError
+
+function isEthersError(error: EstimationError): error is EthersEstimationError {
+  return (error as EthersEstimationError).data != null
+}
+
+function isViemError(error: EstimationError): error is ViemEstimationError {
+  return error instanceof BaseError
+}
+
+function isGnosisChainEstimationError(error: EstimationError): error is GnosisChainEstimationError {
+  return (error as GnosisChainEstimationError).info.error.data != null
+}
 
 /**
  * Parses the SafeTxGas estimation response from different providers.
@@ -414,23 +386,23 @@ type EstimationError = Error &
  * @returns {string} The SafeTxGas value.
  * @throws It Will throw an error if the SafeTxGas cannot be parsed.
  */
-function parseSafeTxGasErrorResponse(error: EstimationError) {
+function parseSafeTxGasErrorResponse(error: EstimationError): string {
   // Ethers v6
-  const ethersData = error?.data
-  if (ethersData) {
-    return decodeSafeTxGas(ethersData)
+  if (isEthersError(error)) {
+    return decodeSafeTxGas(error.data)
   }
 
   // viem
-  const viemError = error?.info?.error?.message
-  if (viemError) {
-    return decodeSafeTxGas(viemError)
+  if (isViemError(error)) {
+    const cause = error.walk() as RawContractErrorType
+    if (typeof cause?.data === 'string') {
+      return decodeSafeTxGas(cause?.data)
+    }
   }
 
   // gnosis-chain
-  const gnosisChainProviderData = error?.info?.error?.data
-
-  if (gnosisChainProviderData) {
+  if (isGnosisChainEstimationError(error)) {
+    const gnosisChainProviderData = error.info.error.data
     const isString = typeof gnosisChainProviderData === 'string'
 
     const encodedDataResponse = isString ? gnosisChainProviderData : gnosisChainProviderData.data
@@ -438,10 +410,10 @@ function parseSafeTxGasErrorResponse(error: EstimationError) {
   }
 
   // Error message
-  const isEncodedDataPresent = error?.message?.includes('0x')
+  const isEncodedDataPresent = error.message.includes('0x')
 
   if (isEncodedDataPresent) {
-    return decodeSafeTxGas(error?.message)
+    return decodeSafeTxGas(error.message)
   }
 
   throw new Error('Could not parse SafeTxGas from Estimation response, Details: ' + error?.message)
@@ -464,7 +436,7 @@ async function estimateSafeTxGasWithSimulate(
 ): Promise<string> {
   const isSafeDeployed = await safe.isSafeDeployed()
   const safeAddress = await safe.getAddress()
-  const safeVersion = await safe.getContractVersion()
+  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
   const chainId = await safe.getChainId()
   const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
@@ -487,19 +459,19 @@ async function estimateSafeTxGasWithSimulate(
   const transactionDataToEstimate: string = simulateTxAccessorContract.encode('simulate', [
     safeTransaction.data.to,
     BigInt(safeTransaction.data.value),
-    safeTransaction.data.data,
+    asHex(safeTransaction.data.data),
     safeTransaction.data.operation
   ])
 
   // if the Safe is not deployed we can use the singleton address to simulate
-  const to = isSafeDeployed ? safeAddress : await safeSingletonContract.getAddress()
+  const to = isSafeDeployed ? safeAddress : safeSingletonContract.getAddress()
 
   const SafeContractCompatibleWithSimulateAndRevert =
     await isSafeContractCompatibleWithSimulateAndRevert(safeSingletonContract)
 
   const safeFunctionToEstimate: string = SafeContractCompatibleWithSimulateAndRevert.encode(
     'simulateAndRevert',
-    [await simulateTxAccessorContract.getAddress(), transactionDataToEstimate]
+    [simulateTxAccessorContract.getAddress(), asHex(transactionDataToEstimate)]
   )
 
   const transactionToEstimateGas = {

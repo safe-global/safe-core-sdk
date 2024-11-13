@@ -1,5 +1,5 @@
 import SafeApiKit from '@safe-global/api-kit/index'
-import { SafeOperationResponse } from '@safe-global/safe-core-sdk-types'
+import { SafeOperationResponse } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getApiKit } from '../utils/setupKits'

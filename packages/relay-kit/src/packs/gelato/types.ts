@@ -3,7 +3,7 @@ import {
   MetaTransactionData,
   MetaTransactionOptions,
   SafeTransaction
-} from '@safe-global/safe-core-sdk-types'
+} from '@safe-global/types-kit'
 
 export type GelatoOptions = {
   apiKey?: string

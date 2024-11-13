@@ -1,5 +1,5 @@
-import { ethers } from 'ethers'
-import { Eip3770Address } from '@safe-global/safe-core-sdk-types'
+import { isAddress } from 'viem'
+import { Eip3770Address } from '@safe-global/types-kit'
 import { networks } from './config'
 
 export function parseEip3770Address(fullAddress: string): Eip3770Address {
@@ -29,8 +29,7 @@ export function validateEip3770NetworkPrefix(prefix: string, currentChainId: big
 }
 
 export function validateEthereumAddress(address: string): void {
-  const isValidAddress = ethers.isHexString(address) && ethers.isAddress(address)
-  if (!isValidAddress) {
+  if (!isAddress(address)) {
     throw new Error(`Invalid Ethereum address ${address}`)
   }
 }

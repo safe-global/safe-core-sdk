@@ -1,4 +1,4 @@
-import { SafeTransactionData, OperationType } from '@safe-global/safe-core-sdk-types'
+import { SafeTransactionData, OperationType, EIP712TypedData } from '@safe-global/types-kit'
 import chai from 'chai'
 import {
   EIP712_DOMAIN,
@@ -87,7 +87,7 @@ describe('EIP-712 sign typed data', () => {
         data: safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
-      chai.expect(domain.chainId).to.be.eq(chainId.toString())
+      chai.expect(domain.chainId).to.be.eq(Number(chainId))
     })
 
     it('should generate the correct types for a EIP-191 message for >= 1.3.0 Safes', () => {
@@ -115,7 +115,7 @@ describe('EIP-712 sign typed data', () => {
           SafeMessage: [{ name: 'message', type: 'bytes' }]
         },
         domain: {
-          chainId: '1',
+          chainId: 1,
           verifyingContract: safeAddress
         },
         primaryType: 'SafeMessage',
@@ -156,9 +156,9 @@ describe('EIP-712 sign typed data', () => {
     })
 
     it('should generate the correct types for an EIP-712 message for >=1.3.0 Safes', () => {
-      const message = {
+      const message: EIP712TypedData = {
         domain: {
-          chainId: '1',
+          chainId: 1,
           name: 'Ether Mail',
           verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
           version: '1'
@@ -225,7 +225,7 @@ describe('EIP-712 sign typed data', () => {
           SafeMessage: [{ name: 'message', type: 'bytes' }]
         },
         domain: {
-          chainId: '1',
+          chainId: 1,
           verifyingContract: safeAddress
         },
         primaryType: 'SafeMessage',
@@ -238,7 +238,7 @@ describe('EIP-712 sign typed data', () => {
     it('should generate the correct types for an EIP-712 message for <1.3.0 Safes', () => {
       const message = {
         domain: {
-          chainId: 1n,
+          chainId: 1,
           name: 'Ether Mail',
           verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
           version: '1'

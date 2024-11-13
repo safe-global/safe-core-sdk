@@ -1,9 +1,9 @@
 import { Abi } from 'abitype'
-import { ContractRunner, InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
+import { SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - CompatibilityFallbackHandlerContract_v1_3_0  extends  CompatibilityFallbackHandlerBaseContract<CompatibilityFallbackHandlerContract_v1_3_0_Abi>
  */
 abstract class CompatibilityFallbackHandlerBaseContract<
-  CompatibilityFallbackHandlerContractAbiType extends InterfaceAbi & Abi
+  CompatibilityFallbackHandlerContractAbiType extends Abi
 > extends BaseContract<CompatibilityFallbackHandlerContractAbiType> {
   contractName: contractName
 
@@ -34,6 +34,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -42,7 +43,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     safeVersion: SafeVersion,
     customContractAddress?: string,
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
-    runner?: ContractRunner | null
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'compatibilityFallbackHandler'
 
@@ -54,7 +55,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
       safeVersion,
       customContractAddress,
       customContractAbi,
-      runner
+      deploymentType
     )
 
     this.contractName = contractName

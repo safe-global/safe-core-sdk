@@ -1,8 +1,8 @@
 import { Abi } from 'abitype'
-import { InterfaceAbi } from 'ethers'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { DeploymentType } from '@safe-global/protocol-kit/types'
+import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
@@ -20,7 +20,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * - MultiSendContract_v1_3_0  extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
  */
 abstract class MultiSendBaseContract<
-  MultiSendContractAbiType extends InterfaceAbi & Abi
+  MultiSendContractAbiType extends Abi
 > extends BaseContract<MultiSendContractAbiType> {
   contractName: contractName
 
@@ -34,6 +34,7 @@ abstract class MultiSendBaseContract<
    * @param safeVersion - The version of the MultiSend contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSend deployments based on the chainId and safeVersion.
    * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the MultiSend deployments or the defaultAbi is used.
+   * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
@@ -41,7 +42,8 @@ abstract class MultiSendBaseContract<
     defaultAbi: MultiSendContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
-    customContractAbi?: MultiSendContractAbiType
+    customContractAbi?: MultiSendContractAbiType,
+    deploymentType?: DeploymentType
   ) {
     const contractName = 'multiSendVersion'
 
@@ -52,7 +54,8 @@ abstract class MultiSendBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
-      customContractAbi
+      customContractAbi,
+      deploymentType
     )
 
     this.contractName = contractName

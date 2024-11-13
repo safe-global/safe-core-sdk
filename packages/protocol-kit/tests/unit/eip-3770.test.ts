@@ -8,6 +8,12 @@ import {
   validateEthereumAddress
 } from '@safe-global/protocol-kit/utils'
 
+declare module 'abitype' {
+  export interface Register {
+    AddressType: string
+  }
+}
+
 describe('EIP-3770 chain-specific addresses', () => {
   describe('parseEip3770Address', async () => {
     it('should parse an empty full address', async () => {

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { SafeVersion } from '@safe-global/safe-core-sdk-types'
+import { SafeVersion } from '@safe-global/types-kit'
 import { DeploymentFilter, getSafeSingletonDeployment } from '@safe-global/safe-deployments'
 import { networks } from '../../src/utils/eip-3770/config'
 

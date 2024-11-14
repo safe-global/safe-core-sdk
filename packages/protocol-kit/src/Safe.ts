@@ -42,7 +42,8 @@ import {
   SigningMethodType,
   SwapOwnerTxParams,
   SafeModulesPaginated,
-  RemovePasskeyOwnerTxParams
+  RemovePasskeyOwnerTxParams,
+  PasskeyCoordinates
 } from './types'
 import {
   EthSafeSignature,
@@ -59,7 +60,8 @@ import {
   generateSignature,
   preimageSafeMessageHash,
   preimageSafeTransactionHash,
-  adjustVInSignature
+  adjustVInSignature,
+  extractPasskeyData
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -1697,6 +1699,12 @@ class Safe {
     contractAddress: string
   }): ContractInfo | undefined => {
     return getContractInfo(contractAddress)
+  }
+
+  static createPasskeySigner = async (
+    credentials: Credential
+  ): Promise<{ rawId: string; coordinates: PasskeyCoordinates }> => {
+    return extractPasskeyData(credentials)
   }
 }
 

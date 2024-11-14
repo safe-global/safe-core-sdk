@@ -1,6 +1,26 @@
-import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
+import { p256 } from '@noble/curves/p256'
+import { AsnProp, AsnPropTypes, AsnType, AsnTypeTypes, AsnParser } from '@peculiar/asn1-schema'
 import { Buffer } from 'buffer'
-import { PasskeyCoordinates, PasskeyArgType } from '@safe-global/protocol-kit/types'
+import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
+import { PasskeyArgType, PasskeyCoordinates } from '@safe-global/protocol-kit/types'
+
+@AsnType({ type: AsnTypeTypes.Sequence })
+class AlgorithmIdentifier {
+  @AsnProp({ type: AsnPropTypes.ObjectIdentifier })
+  public id: string = ''
+
+  @AsnProp({ type: AsnPropTypes.ObjectIdentifier, optional: true })
+  public curve: string = ''
+}
+
+@AsnType({ type: AsnTypeTypes.Sequence })
+class ECPublicKey {
+  @AsnProp({ type: AlgorithmIdentifier })
+  public algorithm = new AlgorithmIdentifier()
+
+  @AsnProp({ type: AsnPropTypes.BitString })
+  public publicKey: ArrayBuffer = new ArrayBuffer(0)
+}
 
 /**
  * Extracts and returns the passkey data (coordinates and rawId) from a given passkey Credential.
@@ -13,13 +33,7 @@ export async function extractPasskeyData(passkeyCredential: Credential): Promise
   const passkey = passkeyCredential as PublicKeyCredential
   const attestationResponse = passkey.response as AuthenticatorAttestationResponse
 
-  const publicKey = attestationResponse.getPublicKey()
-
-  if (!publicKey) {
-    throw new Error('Failed to generate passkey Coordinates. getPublicKey() failed')
-  }
-
-  const coordinates = await extractPasskeyCoordinates(publicKey)
+  const coordinates = decodePublicKey(attestationResponse)
   const rawId = Buffer.from(passkey.rawId).toString('hex')
 
   return {
@@ -28,35 +42,74 @@ export async function extractPasskeyData(passkeyCredential: Credential): Promise
   }
 }
 
+function isBase64String(str: string): boolean {
+  const base64Regex = /^(?:[A-Za-z0-9+\/]{4})*?(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
+  return base64Regex.test(str)
+}
+
+function decodeBase64(base64: string): Uint8Array {
+  const binaryString = atob(base64.replace(/-/g, '+').replace(/_/g, '/'))
+  return Uint8Array.from(binaryString, (c) => c.charCodeAt(0))
+}
+
 /**
- * Extracts and returns coordinates from a given passkey public key.
+ * Decodes the x and y coordinates of the public key from a created public key credential response.
+ * Inspired from <https://webauthn.guide/#registration>.
  *
- * @param {ArrayBuffer} publicKey - The public key of the passkey from which coordinates will be extracted.
- * @returns {Promise<PasskeyCoordinates>} A promise that resolves to an object containing the coordinates derived from the public key of the passkey.
- * @throws {Error} Throws an error if the coordinates could not be extracted via `crypto.subtle.exportKey()`
+ * @param {Pick<AuthenticatorAttestationResponse, 'attestationObject'>} response
+ * @returns {PasskeyCoordinates} Object containing the coordinates derived from the public key of the passkey.
+ * @throws {Error} Throws an error if the coordinates could not be extracted via `p256.ProjectivePoint.fromHex`
  */
-export async function extractPasskeyCoordinates(
-  publicKey: ArrayBuffer
-): Promise<PasskeyCoordinates> {
-  const algorithm = {
-    name: 'ECDSA',
-    namedCurve: 'P-256',
-    hash: { name: 'SHA-256' }
+export function decodePublicKey(response: AuthenticatorAttestationResponse): PasskeyCoordinates {
+  const publicKey = response.getPublicKey()
+
+  if (!publicKey) {
+    throw new Error('Failed to generate passkey coordinates. getPublicKey() failed')
   }
 
-  const key = await crypto.subtle.importKey('spki', publicKey, algorithm, true, ['verify'])
+  console.log('Public Key:', publicKey)
 
-  const { x, y } = await crypto.subtle.exportKey('jwk', key)
+  try {
+    let publicKeyUint8Array: Uint8Array
 
-  const isValidCoordinates = !!x && !!y
+    if (typeof publicKey === 'string') {
+      console.log('Public Key is Base64')
+      publicKeyUint8Array = decodeBase64(publicKey)
+    } else if (publicKey instanceof ArrayBuffer) {
+      console.log('Public Key is ArrayBuffer')
+      publicKeyUint8Array = new Uint8Array(publicKey)
+    } else {
+      throw new Error('Unsupported public key format.')
+    }
 
-  if (!isValidCoordinates) {
-    throw new Error('Failed to generate passkey Coordinates. crypto.subtle.exportKey() failed')
-  }
+    console.log('Decoded Public Key Uint8Array:', publicKeyUint8Array)
 
-  return {
-    x: '0x' + Buffer.from(x, 'base64').toString('hex'),
-    y: '0x' + Buffer.from(y, 'base64').toString('hex')
+    if (publicKeyUint8Array.length === 0) {
+      throw new Error('Decoded public key is empty.')
+    }
+
+    // Parse the DER-encoded public key using the ASN.1 schema
+    const decodedKey = AsnParser.parse(publicKeyUint8Array.buffer, ECPublicKey)
+
+    // Extract the actual public key bytes
+    const keyData = new Uint8Array(decodedKey.publicKey)
+
+    // Parse the public key bytes into a point on the curve
+    const point = p256.ProjectivePoint.fromHex(keyData)
+
+    console.log('Elliptic Curve Point:', point)
+
+    // Extract x and y coordinates
+    const x = point.x.toString(16).padStart(64, '0')
+    const y = point.y.toString(16).padStart(64, '0')
+
+    return {
+      x: '0x' + x,
+      y: '0x' + y
+    }
+  } catch (error) {
+    console.error('Error decoding public key:', error)
+    throw error
   }
 }
 

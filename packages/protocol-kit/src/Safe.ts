@@ -43,7 +43,7 @@ import {
   SwapOwnerTxParams,
   SafeModulesPaginated,
   RemovePasskeyOwnerTxParams,
-  PasskeyCoordinates
+  PasskeyArgType
 } from './types'
 import {
   EthSafeSignature,
@@ -1701,9 +1701,12 @@ class Safe {
     return getContractInfo(contractAddress)
   }
 
-  static createPasskeySigner = async (
-    credentials: Credential
-  ): Promise<{ rawId: string; coordinates: PasskeyCoordinates }> => {
+  /**
+   * This method creates a signer to be used with the init method
+   * @param {Credential} credentials - The credentials to be used to create the signer. Can be generated in the web with navigator.credentials.create
+   * @returns {PasskeyArgType} - The signer to be used with the init method
+   */
+  static createPasskeySigner = async (credentials: Credential): Promise<PasskeyArgType> => {
     return extractPasskeyData(credentials)
   }
 }

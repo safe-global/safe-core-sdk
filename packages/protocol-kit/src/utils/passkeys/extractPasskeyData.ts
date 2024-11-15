@@ -42,14 +42,30 @@ export async function extractPasskeyData(passkeyCredential: Credential): Promise
   }
 }
 
-function isBase64String(str: string): boolean {
-  const base64Regex = /^(?:[A-Za-z0-9+\/]{4})*?(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
-  return base64Regex.test(str)
+// function decodeBase64(base64: string): Uint8Array {
+//   const base64Fixed = base64.replace(/-/g, '+').replace(/_/g, '/')
+//   const binaryString = Buffer.from(base64Fixed, 'base64')
+//   return new Uint8Array(binaryString)
+// }
+
+function base64ToUint8Array(base64: string): Uint8Array {
+  const base64Fixed = base64.replace(/-/g, '+').replace(/_/g, '/')
+  const binaryString = atob(base64Fixed)
+  const bytes = new Uint8Array(binaryString.length)
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i)
+  }
+  return bytes
 }
 
-function decodeBase64(base64: string): Uint8Array {
-  const binaryString = atob(base64.replace(/-/g, '+').replace(/_/g, '/'))
-  return Uint8Array.from(binaryString, (c) => c.charCodeAt(0))
+function ensureCorrectFormat(publicKey: Uint8Array): Uint8Array {
+  if (publicKey.length === 64) {
+    const uncompressedKey = new Uint8Array(65)
+    uncompressedKey[0] = 0x04
+    uncompressedKey.set(publicKey, 1)
+    return uncompressedKey
+  }
+  return publicKey
 }
 
 /**
@@ -74,10 +90,15 @@ export function decodePublicKey(response: AuthenticatorAttestationResponse): Pas
 
     if (typeof publicKey === 'string') {
       console.log('Public Key is Base64')
-      publicKeyUint8Array = decodeBase64(publicKey)
+      publicKeyUint8Array = base64ToUint8Array(publicKey)
     } else if (publicKey instanceof ArrayBuffer) {
       console.log('Public Key is ArrayBuffer')
       publicKeyUint8Array = new Uint8Array(publicKey)
+      // Parse the DER-encoded public key using the ASN.1 schema
+      const decodedKey = AsnParser.parse(publicKeyUint8Array.buffer, ECPublicKey)
+
+      // Extract the actual public key bytes
+      publicKeyUint8Array = new Uint8Array(decodedKey.publicKey)
     } else {
       throw new Error('Unsupported public key format.')
     }
@@ -88,14 +109,10 @@ export function decodePublicKey(response: AuthenticatorAttestationResponse): Pas
       throw new Error('Decoded public key is empty.')
     }
 
-    // Parse the DER-encoded public key using the ASN.1 schema
-    const decodedKey = AsnParser.parse(publicKeyUint8Array.buffer, ECPublicKey)
-
-    // Extract the actual public key bytes
-    const keyData = new Uint8Array(decodedKey.publicKey)
+    const formattedKey = ensureCorrectFormat(publicKeyUint8Array)
 
     // Parse the public key bytes into a point on the curve
-    const point = p256.ProjectivePoint.fromHex(keyData)
+    const point = p256.ProjectivePoint.fromHex(formattedKey)
 
     console.log('Elliptic Curve Point:', point)
 

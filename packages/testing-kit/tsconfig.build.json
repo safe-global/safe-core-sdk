@@ -1,9 +1,12 @@
 {
-  "extends": "../../tsconfig.settings.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "outDir": "dist"
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "outDir": "dist/src"
   },
   "include": ["src/**/*"],
+  "exclude": ["dist"],
   "files": ["./hardhat.config.ts"]
 }

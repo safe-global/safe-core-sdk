@@ -3,17 +3,17 @@ import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import { BundlerClient, Safe4337InitOptions, Safe4337Pack } from '@safe-global/relay-kit'
-import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
+import {
+  generateTransferCallData,
+  ENTRYPOINT_ADDRESS_V06,
+  RPC_4337_CALLS
+} from '@safe-global/relay-kit/test-utils'
+// @ts-expect-error crazy hack to get test working
+import * as utils from '@safe-global/relay-kit/dist/cjs/src/packs/safe-4337/utils'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { SafeOperation } from '@safe-global/types-kit'
-// Needs to be imported from dist folder in order to mock the getEip4337BundlerProvider function
-import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getApiKit, getEip1193Provider } from '../utils/setupKits'
-import {
-  ENTRYPOINT_ADDRESS_V06,
-  RPC_4337_CALLS
-} from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
@@ -73,7 +73,7 @@ describe('confirmSafeOperation', () => {
   const requestStub = sinon.stub()
 
   before(async () => {
-    sinon.stub(safe4337Utils, 'getEip4337BundlerProvider').returns({
+    sinon.stub(utils, 'getEip4337BundlerProvider').returns({
       request: requestStub
     } as unknown as BundlerClient)
 

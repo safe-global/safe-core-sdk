@@ -1,4 +1,4 @@
-import { ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07 } from '../constants'
+import { ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07 } from '../src/packs/safe-4337/constants'
 
 export const OWNER_1 = '0xFfAC5578BE8AC1B2B9D13b34cAf4A074B96B8A1b'
 export const OWNER_2 = '0x3059EfD1BCe33be41eeEfd5fb6D520d7fEd54E43'

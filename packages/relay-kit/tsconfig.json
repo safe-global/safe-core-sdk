@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.settings.json",
   "compilerOptions": {
-    "composite": true,
-    "outDir": "dist"
+    "baseUrl": "./",
+    "paths": {
+      "@safe-global/relay-kit/*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["dist"]
 }

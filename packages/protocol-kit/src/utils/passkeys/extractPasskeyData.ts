@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import { p256 } from '@noble/curves/p256'
 import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
 import { PasskeyArgType, PasskeyCoordinates } from '@safe-global/protocol-kit/types'

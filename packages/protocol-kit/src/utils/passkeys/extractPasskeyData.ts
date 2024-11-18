@@ -2,6 +2,25 @@ import { Buffer } from 'buffer'
 import { p256 } from '@noble/curves/p256'
 import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
 import { PasskeyArgType, PasskeyCoordinates } from '@safe-global/protocol-kit/types'
+import { AsnParser, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } from '@peculiar/asn1-schema'
+
+@AsnType({ type: AsnTypeTypes.Sequence })
+class AlgorithmIdentifier {
+  @AsnProp({ type: AsnPropTypes.ObjectIdentifier })
+  public id: string = ''
+
+  @AsnProp({ type: AsnPropTypes.ObjectIdentifier, optional: true })
+  public curve: string = ''
+}
+
+@AsnType({ type: AsnTypeTypes.Sequence })
+class ECPublicKey {
+  @AsnProp({ type: AlgorithmIdentifier })
+  public algorithm = new AlgorithmIdentifier()
+
+  @AsnProp({ type: AsnPropTypes.BitString })
+  public publicKey: ArrayBuffer = new ArrayBuffer(0)
+}
 
 /**
  * Converts a Base64 URL-encoded string to a Uint8Array.
@@ -21,48 +40,58 @@ function base64ToUint8Array(base64: string): Uint8Array {
 }
 
 /**
- * Ensures the elliptic curve public key is in the correct uncompressed format.
+ * Formats the public key to ensure it is in the correct uncompressed format.
  *
- * Elliptic curve operations often require the public key to be in an uncompressed format,
- * which starts with a `0x04` byte, followed by the x and y coordinates. This function
- * checks the key length and prepends `0x04` if necessary.
+ * If the public key is in ASN.1 DER format, it extracts the key. If the key is 64 bytes,
+ * it prepends 0x04 to indicate it's uncompressed. This is necessary for compatibility
+ * with elliptic curve operations.
  *
- * @param {Uint8Array} publicKey - The public key to format.
+ * @param {Uint8Array} publicKeyBytes - The public key bytes to format.
  * @returns {Uint8Array} The formatted public key in uncompressed format.
  */
-function ensureCorrectFormat(publicKey: Uint8Array): Uint8Array {
-  if (publicKey.length === 64) {
+function formatPublicKey(publicKeyBytes: Uint8Array): Uint8Array {
+  // ASN.1 DER encoding of an EC public key
+  // Android Keystore returns the public key in ASN.1 DER format
+  // https://developer.android.com/privacy-and-security/keystore#ImportingEncryptedKeys
+  if (publicKeyBytes.length > 65) {
+    const decodedPublicKey = AsnParser.parse(publicKeyBytes.buffer, ECPublicKey)
+
+    return new Uint8Array(decodedPublicKey.publicKey)
+  }
+
+  // Missing prefix
+  if (publicKeyBytes.length === 64) {
     const uncompressedKey = new Uint8Array(65)
     uncompressedKey[0] = 0x04
-    uncompressedKey.set(publicKey, 1)
+    uncompressedKey.set(publicKeyBytes, 1)
 
     return uncompressedKey
   }
 
-  return publicKey
+  return publicKeyBytes
 }
 
 /**
  * Decodes a Base64-encoded ECDSA public key for React Native and extracts the x and y coordinates.
  *
- * This function decodes a Base64-encoded public key, ensures it is in the correct uncompressed format,
- * and extracts the x and y coordinates using the `@noble/curves` library. The coordinates are returned
- * as hexadecimal strings prefixed with '0x'.
+ * This function decodes a Base64-encoded public key, formats it to ensure compatibility with
+ * elliptic curve operations, and extracts the x and y coordinates using the `@noble/curves` library.
+ * The coordinates are returned as hexadecimal strings prefixed with '0x'.
  *
  * @param {string} publicKey - The Base64-encoded public key to decode.
  * @returns {PasskeyCoordinates} An object containing the x and y coordinates of the public key.
  * @throws {Error} Throws an error if the key coordinates cannot be extracted.
  */
 function decodePublicKeyForReactNative(publicKey: string): PasskeyCoordinates {
-  const publicKeyUint8Array = base64ToUint8Array(publicKey)
-
-  if (publicKeyUint8Array.length === 0) {
+  const publicKeyBytes = base64ToUint8Array(publicKey)
+  console.log('publicKey', publicKey, publicKeyBytes)
+  if (publicKeyBytes.length === 0) {
     throw new Error('Decoded public key is empty.')
   }
 
-  const formattedKey = ensureCorrectFormat(publicKeyUint8Array)
+  const formattedPublicKeyBytes = formatPublicKey(publicKeyBytes)
 
-  const point = p256.ProjectivePoint.fromHex(formattedKey)
+  const point = p256.ProjectivePoint.fromHex(formattedPublicKeyBytes)
 
   const x = point.x.toString(16).padStart(64, '0')
   const y = point.y.toString(16).padStart(64, '0')

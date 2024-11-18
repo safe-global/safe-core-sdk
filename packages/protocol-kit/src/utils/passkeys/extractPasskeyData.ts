@@ -45,6 +45,48 @@ function ensureCorrectFormat(publicKey: Uint8Array): Uint8Array {
   return publicKey
 }
 
+function decodePublicKeyForReactNative(publicKey: string): PasskeyCoordinates {
+  const publicKeyUint8Array = base64ToUint8Array(publicKey)
+
+  if (publicKeyUint8Array.length === 0) {
+    throw new Error('Decoded public key is empty.')
+  }
+
+  const formattedKey = ensureCorrectFormat(publicKeyUint8Array)
+  const point = p256.ProjectivePoint.fromHex(formattedKey)
+
+  const x = point.x.toString(16).padStart(64, '0')
+  const y = point.y.toString(16).padStart(64, '0')
+
+  return {
+    x: '0x' + x,
+    y: '0x' + y
+  }
+}
+
+async function decodePublicKeyForWeb(publicKey: ArrayBuffer): Promise<PasskeyCoordinates> {
+  const algorithm = {
+    name: 'ECDSA',
+    namedCurve: 'P-256',
+    hash: { name: 'SHA-256' }
+  }
+
+  const key = await crypto.subtle.importKey('spki', publicKey, algorithm, true, ['verify'])
+
+  const { x, y } = await crypto.subtle.exportKey('jwk', key)
+
+  const isValidCoordinates = !!x && !!y
+
+  if (!isValidCoordinates) {
+    throw new Error('Failed to generate passkey Coordinates. crypto.subtle.exportKey() failed')
+  }
+
+  return {
+    x: '0x' + Buffer.from(x, 'base64').toString('hex'),
+    y: '0x' + Buffer.from(y, 'base64').toString('hex')
+  }
+}
+
 /**
  * Decodes the x and y coordinates of the public key from a created public key credential response.
  *
@@ -62,55 +104,14 @@ export async function decodePublicKey(
   }
 
   try {
-    let publicKeyUint8Array: Uint8Array
-
     if (typeof publicKey === 'string') {
       // Public key is base64 encoded
       // React Native platform uses base64 encoded strings
-      publicKeyUint8Array = base64ToUint8Array(publicKey)
-
-      if (publicKeyUint8Array.length === 0) {
-        throw new Error('Decoded public key is empty.')
-      }
-
-      const formattedKey = ensureCorrectFormat(publicKeyUint8Array)
-
-      // Parse the public key bytes into a point on the curve
-      const point = p256.ProjectivePoint.fromHex(formattedKey)
-
-      console.log('Elliptic Curve Point:', point)
-
-      // Extract x and y coordinates
-      const x = point.x.toString(16).padStart(64, '0')
-      const y = point.y.toString(16).padStart(64, '0')
-
-      return {
-        x: '0x' + x,
-        y: '0x' + y
-      }
+      return decodePublicKeyForReactNative(publicKey)
     } else if (publicKey instanceof ArrayBuffer) {
       // Public key is an ArrayBuffer
       // Web platform uses ArrayBuffer
-      const algorithm = {
-        name: 'ECDSA',
-        namedCurve: 'P-256',
-        hash: { name: 'SHA-256' }
-      }
-
-      const key = await crypto.subtle.importKey('spki', publicKey, algorithm, true, ['verify'])
-
-      const { x, y } = await crypto.subtle.exportKey('jwk', key)
-
-      const isValidCoordinates = !!x && !!y
-
-      if (!isValidCoordinates) {
-        throw new Error('Failed to generate passkey Coordinates. crypto.subtle.exportKey() failed')
-      }
-
-      return {
-        x: '0x' + Buffer.from(x, 'base64').toString('hex'),
-        y: '0x' + Buffer.from(y, 'base64').toString('hex')
-      }
+      return await decodePublicKeyForWeb(publicKey)
     } else {
       throw new Error('Unsupported public key format.')
     }

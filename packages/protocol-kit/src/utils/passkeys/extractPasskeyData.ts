@@ -40,58 +40,41 @@ function base64ToUint8Array(base64: string): Uint8Array {
 }
 
 /**
- * Formats the public key to ensure it is in the correct uncompressed format.
- *
- * If the public key is in ASN.1 DER format, it extracts the key. If the key is 64 bytes,
- * it prepends 0x04 to indicate it's uncompressed. This is necessary for compatibility
- * with elliptic curve operations.
- *
- * @param {Uint8Array} publicKeyBytes - The public key bytes to format.
- * @returns {Uint8Array} The formatted public key in uncompressed format.
- */
-function formatPublicKey(publicKeyBytes: Uint8Array): Uint8Array {
-  // ASN.1 DER encoding of an EC public key
-  // Android Keystore returns the public key in ASN.1 DER format
-  // https://developer.android.com/privacy-and-security/keystore#ImportingEncryptedKeys
-  if (publicKeyBytes.length > 65) {
-    const decodedPublicKey = AsnParser.parse(publicKeyBytes.buffer, ECPublicKey)
-
-    return new Uint8Array(decodedPublicKey.publicKey)
-  }
-
-  // Missing prefix
-  if (publicKeyBytes.length === 64) {
-    const uncompressedKey = new Uint8Array(65)
-    uncompressedKey[0] = 0x04
-    uncompressedKey.set(publicKeyBytes, 1)
-
-    return uncompressedKey
-  }
-
-  return publicKeyBytes
-}
-
-/**
  * Decodes a Base64-encoded ECDSA public key for React Native and extracts the x and y coordinates.
  *
- * This function decodes a Base64-encoded public key, formats it to ensure compatibility with
- * elliptic curve operations, and extracts the x and y coordinates using the `@noble/curves` library.
+ * This function handles both ASN.1 DER-encoded keys and uncompressed keys. It decodes a Base64-encoded
+ * public key, checks its format, and extracts the x and y coordinates using the `@noble/curves` library.
  * The coordinates are returned as hexadecimal strings prefixed with '0x'.
  *
  * @param {string} publicKey - The Base64-encoded public key to decode.
  * @returns {PasskeyCoordinates} An object containing the x and y coordinates of the public key.
- * @throws {Error} Throws an error if the key coordinates cannot be extracted.
+ * @throws {Error} Throws an error if the key is empty or if the coordinates cannot be extracted.
  */
 function decodePublicKeyForReactNative(publicKey: string): PasskeyCoordinates {
-  const publicKeyBytes = base64ToUint8Array(publicKey)
+  let publicKeyBytes = base64ToUint8Array(publicKey)
+
   console.log('publicKey', publicKey, publicKeyBytes)
+
   if (publicKeyBytes.length === 0) {
     throw new Error('Decoded public key is empty.')
   }
 
-  const formattedPublicKeyBytes = formatPublicKey(publicKeyBytes)
+  const isAsn1Encoded = publicKeyBytes[0] === 0x30
+  const isUncompressedKey = publicKeyBytes.length === 64
 
-  const point = p256.ProjectivePoint.fromHex(formattedPublicKeyBytes)
+  if (isAsn1Encoded) {
+    const asn1ParsedKey = AsnParser.parse(publicKeyBytes.buffer, ECPublicKey)
+
+    publicKeyBytes = new Uint8Array(asn1ParsedKey.publicKey)
+  } else if (isUncompressedKey) {
+    const uncompressedKey = new Uint8Array(65)
+    uncompressedKey[0] = 0x04
+    uncompressedKey.set(publicKeyBytes, 1)
+
+    publicKeyBytes = uncompressedKey
+  }
+
+  const point = p256.ProjectivePoint.fromHex(publicKeyBytes)
 
   const x = point.x.toString(16).padStart(64, '0')
   const y = point.y.toString(16).padStart(64, '0')

@@ -61,7 +61,8 @@ export async function standardizeSafeTransactionData({
   predictedSafe,
   provider,
   tx,
-  contractNetworks
+  contractNetworks,
+  trackId
 }: StandardizeSafeTransactionDataProps): Promise<SafeTransactionData> {
   const standardizedTxs = {
     to: tx.to,
@@ -71,7 +72,7 @@ export async function standardizeSafeTransactionData({
     baseGas: tx.baseGas ?? '0',
     gasPrice: tx.gasPrice ?? '0',
     gasToken: tx.gasToken || ZERO_ADDRESS,
-    refundReceiver: tx.refundReceiver || ZERO_ADDRESS,
+    refundReceiver: tx.refundReceiver || trackId || ZERO_ADDRESS,
     nonce: tx.nonce ?? (safeContract ? Number(await safeContract.getNonce()) : 0)
   }
 

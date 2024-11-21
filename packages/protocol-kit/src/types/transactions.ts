@@ -37,6 +37,7 @@ type StandardizeSafeTransactionData = {
   tx: SafeTransactionDataPartial
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
+  trackId: string
 }
 
 export type StandardizeSafeTxDataWithSafeContract = StandardizeSafeTransactionData &

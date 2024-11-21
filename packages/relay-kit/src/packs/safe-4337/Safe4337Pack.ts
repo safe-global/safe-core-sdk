@@ -124,7 +124,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { provider, signer, options, bundlerUrl, customContracts, paymasterOptions } = initOptions
+    const { provider, signer, options, bundlerUrl, customContracts, paymasterOptions, trackId } =
+      initOptions
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
     const chainId = await bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
@@ -172,7 +173,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       protocolKit = await Safe.init({
         provider,
         signer,
-        safeAddress: options.safeAddress
+        safeAddress: options.safeAddress,
+        trackId
       })
 
       const safeVersion = protocolKit.getContractVersion()
@@ -329,7 +331,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
             payment: 0,
             paymentReceiver: zeroAddress
           }
-        }
+        },
+        trackId
       })
     }
 

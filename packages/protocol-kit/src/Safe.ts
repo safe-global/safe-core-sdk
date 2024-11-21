@@ -84,6 +84,7 @@ import { asHash, asHex } from './utils/types'
 import { Hash, Hex } from 'viem'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
+import formatTrackId from './utils/on-chain-tracking/formatTrackId'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -99,6 +100,9 @@ class Safe {
 
   #MAGIC_VALUE = '0x1626ba7e'
   #MAGIC_VALUE_BYTES = '0x20c13b0b'
+
+  // On-chain Analitics
+  #trackId: string = ''
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -124,7 +128,11 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async #initializeProtocolKit(config: SafeConfig) {
-    const { provider, signer, isL1SafeSingleton, contractNetworks } = config
+    const { provider, signer, isL1SafeSingleton, contractNetworks, trackId } = config
+
+    if (trackId) {
+      this.#trackId = formatTrackId(trackId)
+    }
 
     this.#safeProvider = await SafeProvider.init({
       provider,
@@ -252,6 +260,7 @@ class Safe {
       safeProvider: this.#safeProvider,
       chainId,
       customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
+      trackId: this.#trackId,
       ...this.#predictedSafe
     })
   }
@@ -284,6 +293,7 @@ class Safe {
         chainId,
         isL1SafeSingleton: this.#contractManager.isL1SafeSingleton,
         customContracts: this.#contractManager.contractNetworks?.[chainId.toString()],
+        trackId: this.#trackId,
         ...this.#predictedSafe
       })
     }
@@ -534,7 +544,8 @@ class Safe {
           predictedSafe: this.#predictedSafe,
           provider: this.#safeProvider.provider,
           tx: newTransaction,
-          contractNetworks: this.#contractManager.contractNetworks
+          contractNetworks: this.#contractManager.contractNetworks,
+          trackId: this.#trackId
         })
       )
     }
@@ -547,7 +558,8 @@ class Safe {
         safeContract: this.#contractManager.safeContract,
         provider: this.#safeProvider.provider,
         tx: newTransaction,
-        contractNetworks: this.#contractManager.contractNetworks
+        contractNetworks: this.#contractManager.contractNetworks,
+        trackId: this.#trackId
       })
     )
   }
@@ -1545,7 +1557,8 @@ class Safe {
       safeContract: safeSingletonContract,
       safeAccountConfig: safeAccountConfig,
       customContracts,
-      deploymentType
+      deploymentType,
+      trackId: this.#trackId
     })
 
     const safeDeployTransactionData = {
@@ -1697,6 +1710,10 @@ class Safe {
     contractAddress: string
   }): ContractInfo | undefined => {
     return getContractInfo(contractAddress)
+  }
+
+  getTrackId(): string {
+    return this.#trackId
   }
 }
 

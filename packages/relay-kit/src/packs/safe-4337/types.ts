@@ -50,6 +50,7 @@ export type Safe4337InitOptions = {
   }
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
+  trackId?: string
 }
 
 export type Safe4337Options = {

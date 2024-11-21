@@ -75,6 +75,7 @@ export interface PredictSafeAddressProps {
   safeDeploymentConfig?: SafeDeploymentConfig
   isL1SafeSingleton?: boolean
   customContracts?: ContractNetworkConfig
+  trackId?: string
 }
 
 export interface encodeSetupCallDataProps {
@@ -84,6 +85,7 @@ export interface encodeSetupCallDataProps {
   customContracts?: ContractNetworkConfig
   customSafeVersion?: SafeVersion
   deploymentType?: DeploymentType
+  trackId: string
 }
 
 export function encodeCreateProxyWithNonce(
@@ -109,7 +111,8 @@ export async function encodeSetupCallData({
   safeContract,
   customContracts,
   customSafeVersion,
-  deploymentType
+  deploymentType,
+  trackId
 }: encodeSetupCallDataProps): Promise<string> {
   const {
     owners,
@@ -119,7 +122,7 @@ export async function encodeSetupCallData({
     fallbackHandler,
     paymentToken = ZERO_ADDRESS,
     payment = 0,
-    paymentReceiver = ZERO_ADDRESS
+    paymentReceiver = trackId || ZERO_ADDRESS
   } = safeAccountConfig
 
   const safeVersion = customSafeVersion || safeContract.safeVersion
@@ -255,7 +258,8 @@ export async function getPredictedSafeAddressInitCode({
   safeAccountConfig,
   safeDeploymentConfig = {},
   isL1SafeSingleton,
-  customContracts
+  customContracts,
+  trackId = ''
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
@@ -289,7 +293,8 @@ export async function getPredictedSafeAddressInitCode({
     safeContract,
     customContracts,
     customSafeVersion: safeVersion, // it is more efficient if we provide the safeVersion manually
-    deploymentType
+    deploymentType,
+    trackId
   })
 
   const encodedNonce = safeProvider.encodeParameters('uint256', [saltNonce])
@@ -315,7 +320,8 @@ export async function predictSafeAddress({
   safeAccountConfig,
   safeDeploymentConfig = {},
   isL1SafeSingleton,
-  customContracts
+  customContracts,
+  trackId = ''
 }: PredictSafeAddressProps): Promise<string> {
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
@@ -357,7 +363,8 @@ export async function predictSafeAddress({
     safeContract,
     customContracts,
     customSafeVersion: safeVersion, // it is more efficient if we provide the safeVersion manuall
-    deploymentType
+    deploymentType,
+    trackId
   })
   const initializerHash = keccak256(asHex(initializer))
 

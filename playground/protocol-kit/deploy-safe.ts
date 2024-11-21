@@ -18,6 +18,7 @@ interface Config {
     SALT_NONCE: string
     SAFE_VERSION: string
   }
+  trackId: string
 }
 
 const config: Config = {
@@ -27,8 +28,9 @@ const config: Config = {
     OWNERS: ['OWNER_ADDRESS'],
     THRESHOLD: 1, // <SAFE_THRESHOLD>
     SALT_NONCE: '150000',
-    SAFE_VERSION: '1.3.0'
-  }
+    SAFE_VERSION: '1.0.0'
+  },
+  trackId: '' // On chain analitic
 }
 
 async function main() {
@@ -53,8 +55,14 @@ async function main() {
         saltNonce,
         safeVersion
       }
-    }
+    },
+    trackId: config.trackId
   })
+
+  if (config.trackId) {
+    console.log('trackId: ', config.trackId)
+    console.log('on-chain trackId: ', protocolKit.getTrackId())
+  }
 
   // The Account Abstraction feature is only available for Safes version 1.3.0 and above.
   if (semverSatisfies(safeVersion, '>=1.3.0')) {
@@ -96,7 +104,7 @@ async function main() {
   console.log('safeAddress:', safeAddress)
 
   // now you can use the Safe address in the instance of the protocol-kit
-  protocolKit.connect({ safeAddress })
+  await protocolKit.connect({ safeAddress })
 
   console.log('is Safe deployed:', await protocolKit.isSafeDeployed())
   console.log('Safe Address:', await protocolKit.getAddress())

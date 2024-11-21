@@ -69,7 +69,9 @@ async function importLibs() {
  * @returns {PasskeyCoordinates} An object containing the x and y coordinates of the public key.
  * @throws {Error} Throws an error if the key is empty or if the coordinates cannot be extracted.
  */
-async function decodePublicKeyForReactNative(publicKey: string): Promise<PasskeyCoordinates> {
+export async function decodePublicKeyForReactNative(
+  publicKey: string
+): Promise<PasskeyCoordinates> {
   const { p256, AsnParser, ECPublicKey } = await importLibs()
 
   let publicKeyBytes = base64ToUint8Array(publicKey)
@@ -116,7 +118,7 @@ async function decodePublicKeyForReactNative(publicKey: string): Promise<Passkey
  * the x and y coordinates of the public key.
  * @throws {Error} Throws an error if the key coordinates cannot be extracted.
  */
-async function decodePublicKeyForWeb(publicKey: ArrayBuffer): Promise<PasskeyCoordinates> {
+export async function decodePublicKeyForWeb(publicKey: ArrayBuffer): Promise<PasskeyCoordinates> {
   const algorithm = {
     name: 'ECDSA',
     namedCurve: 'P-256',
@@ -146,7 +148,7 @@ async function decodePublicKeyForWeb(publicKey: ArrayBuffer): Promise<PasskeyCoo
  * @returns {PasskeyCoordinates} Object containing the coordinates derived from the public key of the passkey.
  * @throws {Error} Throws an error if the coordinates could not be extracted via `p256.ProjectivePoint.fromHex`
  */
-async function decodePublicKey(
+export async function decodePublicKey(
   response: PasskeyAuthenticatorAttestationResponse
 ): Promise<PasskeyCoordinates> {
   const publicKey = response.getPublicKey()

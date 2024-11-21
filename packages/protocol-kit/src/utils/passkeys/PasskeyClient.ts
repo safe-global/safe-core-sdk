@@ -22,7 +22,10 @@ import {
   PasskeyArgType,
   PasskeyClient,
   SafeWebAuthnSignerFactoryContractImplementationType,
-  SafeWebAuthnSharedSignerContractImplementationType
+  SafeWebAuthnSharedSignerContractImplementationType,
+  GetPasskeyCredentialFn,
+  PasskeyCredential,
+  PasskeyAuthenticatorAssertionResponse
 } from '@safe-global/protocol-kit/types'
 import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { asHex } from '../types'
@@ -34,7 +37,7 @@ export const PASSKEY_CLIENT_NAME = 'Passkey Wallet Client'
 const sign = async (
   passkeyRawId: Uint8Array,
   data: Uint8Array,
-  getFn?: (options?: CredentialRequestOptions) => Promise<Credential | null>
+  getFn?: GetPasskeyCredentialFn
 ): Promise<Hex> => {
   // Avoid loosing the context for navigator.credentials.get function that leads to an error
   const getCredentials = getFn || navigator.credentials.get.bind(navigator.credentials)
@@ -45,7 +48,7 @@ const sign = async (
       allowCredentials: [{ type: 'public-key', id: passkeyRawId }],
       userVerification: 'required'
     }
-  })) as PublicKeyCredential & { response: AuthenticatorAssertionResponse }
+  })) as PasskeyCredential<PasskeyAuthenticatorAssertionResponse>
 
   if (!assertion?.response?.authenticatorData) {
     throw new Error('Failed to sign data with passkey Signer')

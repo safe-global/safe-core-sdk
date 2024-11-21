@@ -1,7 +1,12 @@
 import { Buffer } from 'buffer'
 import { p256 } from '@noble/curves/p256'
 import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
-import { PasskeyArgType, PasskeyCoordinates } from '@safe-global/protocol-kit/types'
+import {
+  PasskeyArgType,
+  PasskeyAuthenticatorAttestationResponse,
+  PasskeyCoordinates,
+  PasskeyCredential
+} from '@safe-global/protocol-kit/types'
 import { AsnParser, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } from '@peculiar/asn1-schema'
 
 @AsnType({ type: AsnTypeTypes.Sequence })
@@ -20,6 +25,20 @@ class ECPublicKey {
 
   @AsnProp({ type: AsnPropTypes.BitString })
   public publicKey: ArrayBuffer = new ArrayBuffer(0)
+}
+
+/**
+ * Checks if a given string is Base64 encoded.
+ *
+ * This function uses a regular expression to verify if the string
+ * conforms to the Base64 encoding pattern, including optional padding.
+ *
+ * @param {string} str - The string to check.
+ * @returns {boolean} Returns true if the string is Base64 encoded, otherwise false.
+ */
+function isBase64Encoded(str: string): boolean {
+  const base64Regex = /^(?:[A-Za-z0-9+\/]{4})*?(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
+  return base64Regex.test(str)
 }
 
 /**
@@ -52,8 +71,6 @@ function base64ToUint8Array(base64: string): Uint8Array {
  */
 function decodePublicKeyForReactNative(publicKey: string): PasskeyCoordinates {
   let publicKeyBytes = base64ToUint8Array(publicKey)
-
-  console.log('publicKey', publicKey, publicKeyBytes)
 
   if (publicKeyBytes.length === 0) {
     throw new Error('Decoded public key is empty.')
@@ -128,7 +145,7 @@ async function decodePublicKeyForWeb(publicKey: ArrayBuffer): Promise<PasskeyCoo
  * @throws {Error} Throws an error if the coordinates could not be extracted via `p256.ProjectivePoint.fromHex`
  */
 async function decodePublicKey(
-  response: AuthenticatorAttestationResponse
+  response: PasskeyAuthenticatorAttestationResponse
 ): Promise<PasskeyCoordinates> {
   const publicKey = response.getPublicKey()
 
@@ -136,7 +153,7 @@ async function decodePublicKey(
     throw new Error('Failed to generate passkey coordinates. getPublicKey() failed')
   }
 
-  if (typeof publicKey === 'string') {
+  if (typeof publicKey === 'string' && isBase64Encoded(publicKey)) {
     // Public key is base64 encoded
     // - React Native platform uses base64 encoded strings
     return decodePublicKeyForReactNative(publicKey)
@@ -154,18 +171,17 @@ async function decodePublicKey(
 /**
  * Extracts and returns the passkey data (coordinates and rawId) from a given passkey Credential.
  *
- * @param {Credential} passkeyCredential - The passkey credential generated via `navigator.credentials.create()` or other method in another platforms.
+ * @param {PasskeyCredential<PasskeyAuthenticatorAttestationResponse>} passkeyCredential - The passkey credential generated via `navigator.credentials.create()` or other method in another platforms.
  * @returns {Promise<PasskeyArgType>} A promise that resolves to an object containing the coordinates and the rawId derived from the passkey.
  * This is the important information in the Safe account context and should be stored securely as it is used to verify the passkey and to instantiate the SDK
  * as a signer (`Safe.init())
  * @throws {Error} Throws an error if the coordinates could not be extracted
  */
-export async function extractPasskeyData(passkeyCredential: Credential): Promise<PasskeyArgType> {
-  const passkey = passkeyCredential as PublicKeyCredential
-  const attestationResponse = passkey.response as AuthenticatorAttestationResponse
-
-  const rawId = Buffer.from(passkey.rawId).toString('hex')
-  const coordinates = await decodePublicKey(attestationResponse)
+export async function extractPasskeyData(
+  passkeyCredential: PasskeyCredential<PasskeyAuthenticatorAttestationResponse>
+): Promise<PasskeyArgType> {
+  const rawId = Buffer.from(passkeyCredential.rawId).toString('hex')
+  const coordinates = await decodePublicKey(passkeyCredential.response)
 
   return {
     rawId,

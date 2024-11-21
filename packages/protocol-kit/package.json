@@ -66,13 +66,15 @@
     "web3": "^4.12.1"
   },
   "dependencies": {
-    "@noble/curves": "^1.6.0",
-    "@peculiar/asn1-schema": "^2.3.13",
     "@safe-global/safe-deployments": "^1.37.14",
     "@safe-global/safe-modules-deployments": "^2.2.4",
     "@safe-global/types-kit": "^1.0.0",
     "abitype": "^1.0.2",
     "semver": "^7.6.3",
     "viem": "^2.21.8"
+  },
+  "optionalDependencies": {
+    "@noble/curves": "^1.6.0",
+    "@peculiar/asn1-schema": "^2.3.13"
   }
 }

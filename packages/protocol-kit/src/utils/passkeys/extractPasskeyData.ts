@@ -1,5 +1,4 @@
 import { Buffer } from 'buffer'
-import { p256 } from '@noble/curves/p256'
 import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
 import {
   PasskeyArgType,
@@ -7,39 +6,6 @@ import {
   PasskeyCoordinates,
   PasskeyCredential
 } from '@safe-global/protocol-kit/types'
-import { AsnParser, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } from '@peculiar/asn1-schema'
-
-@AsnType({ type: AsnTypeTypes.Sequence })
-class AlgorithmIdentifier {
-  @AsnProp({ type: AsnPropTypes.ObjectIdentifier })
-  public id: string = ''
-
-  @AsnProp({ type: AsnPropTypes.ObjectIdentifier, optional: true })
-  public curve: string = ''
-}
-
-@AsnType({ type: AsnTypeTypes.Sequence })
-class ECPublicKey {
-  @AsnProp({ type: AlgorithmIdentifier })
-  public algorithm = new AlgorithmIdentifier()
-
-  @AsnProp({ type: AsnPropTypes.BitString })
-  public publicKey: ArrayBuffer = new ArrayBuffer(0)
-}
-
-/**
- * Checks if a given string is Base64 encoded.
- *
- * This function uses a regular expression to verify if the string
- * conforms to the Base64 encoding pattern, including optional padding.
- *
- * @param {string} str - The string to check.
- * @returns {boolean} Returns true if the string is Base64 encoded, otherwise false.
- */
-function isBase64Encoded(str: string): boolean {
-  const base64Regex = /^(?:[A-Za-z0-9+\/]{4})*?(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
-  return base64Regex.test(str)
-}
 
 /**
  * Converts a Base64 URL-encoded string to a Uint8Array.
@@ -59,6 +25,40 @@ function base64ToUint8Array(base64: string): Uint8Array {
 }
 
 /**
+ * Dynamic import libraries required for decoding public keys.
+ */
+async function importLibs() {
+  const { p256 } = await import('@noble/curves/p256')
+
+  const { AsnParser, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } = await import(
+    '@peculiar/asn1-schema'
+  )
+
+  @AsnType({ type: AsnTypeTypes.Sequence })
+  class AlgorithmIdentifier {
+    @AsnProp({ type: AsnPropTypes.ObjectIdentifier })
+    public id: string = ''
+
+    @AsnProp({ type: AsnPropTypes.ObjectIdentifier, optional: true })
+    public curve: string = ''
+  }
+
+  @AsnType({ type: AsnTypeTypes.Sequence })
+  class ECPublicKey {
+    @AsnProp({ type: AlgorithmIdentifier })
+    public algorithm = new AlgorithmIdentifier()
+
+    @AsnProp({ type: AsnPropTypes.BitString })
+    public publicKey: ArrayBuffer = new ArrayBuffer(0)
+  }
+
+  return {
+    p256,
+    AsnParser,
+    ECPublicKey
+  }
+}
+/**
  * Decodes a Base64-encoded ECDSA public key for React Native and extracts the x and y coordinates.
  *
  * This function handles both ASN.1 DER-encoded keys and uncompressed keys. It decodes a Base64-encoded
@@ -69,7 +69,9 @@ function base64ToUint8Array(base64: string): Uint8Array {
  * @returns {PasskeyCoordinates} An object containing the x and y coordinates of the public key.
  * @throws {Error} Throws an error if the key is empty or if the coordinates cannot be extracted.
  */
-function decodePublicKeyForReactNative(publicKey: string): PasskeyCoordinates {
+async function decodePublicKeyForReactNative(publicKey: string): Promise<PasskeyCoordinates> {
+  const { p256, AsnParser, ECPublicKey } = await importLibs()
+
   let publicKeyBytes = base64ToUint8Array(publicKey)
 
   if (publicKeyBytes.length === 0) {
@@ -153,7 +155,7 @@ async function decodePublicKey(
     throw new Error('Failed to generate passkey coordinates. getPublicKey() failed')
   }
 
-  if (typeof publicKey === 'string' && isBase64Encoded(publicKey)) {
+  if (typeof publicKey === 'string') {
     // Public key is base64 encoded
     // - React Native platform uses base64 encoded strings
     return decodePublicKeyForReactNative(publicKey)

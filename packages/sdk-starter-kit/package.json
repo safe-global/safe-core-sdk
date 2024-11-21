@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@safe-global/api-kit": "^2.5.4",
-    "@safe-global/protocol-kit": "^5.0.4",
+    "@safe-global/protocol-kit": "file:.yalc/@safe-global/protocol-kit",
     "@safe-global/relay-kit": "^3.2.4",
     "@safe-global/types-kit": "^1.0.0",
     "viem": "^2.21.8"

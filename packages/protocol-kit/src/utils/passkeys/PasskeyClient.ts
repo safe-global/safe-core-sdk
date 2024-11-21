@@ -23,9 +23,7 @@ import {
   PasskeyClient,
   SafeWebAuthnSignerFactoryContractImplementationType,
   SafeWebAuthnSharedSignerContractImplementationType,
-  GetPasskeyCredentialFn,
-  PasskeyCredential,
-  PasskeyAuthenticatorAssertionResponse
+  GetPasskeyCredentialFn
 } from '@safe-global/protocol-kit/types'
 import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { asHex } from '../types'
@@ -48,13 +46,15 @@ const sign = async (
       allowCredentials: [{ type: 'public-key', id: passkeyRawId }],
       userVerification: 'required'
     }
-  })) as PasskeyCredential<PasskeyAuthenticatorAssertionResponse>
+  })) as PublicKeyCredential
 
-  if (!assertion?.response?.authenticatorData) {
+  const assertionResponse = assertion.response as AuthenticatorAssertionResponse
+
+  if (!assertionResponse?.authenticatorData) {
     throw new Error('Failed to sign data with passkey Signer')
   }
 
-  const { authenticatorData, signature, clientDataJSON } = assertion.response
+  const { authenticatorData, signature, clientDataJSON } = assertionResponse
 
   return encodeAbiParameters(parseAbiParameters('bytes, bytes, uint256[2]'), [
     toHex(new Uint8Array(authenticatorData)),

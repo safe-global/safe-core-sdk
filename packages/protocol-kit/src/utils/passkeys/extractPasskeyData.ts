@@ -1,11 +1,6 @@
 import { Buffer } from 'buffer'
 import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
-import {
-  PasskeyArgType,
-  PasskeyAuthenticatorAttestationResponse,
-  PasskeyCoordinates,
-  PasskeyCredential
-} from '@safe-global/protocol-kit/types'
+import { PasskeyArgType, PasskeyCoordinates } from '@safe-global/protocol-kit/types'
 
 /**
  * Converts a Base64 URL-encoded string to a Uint8Array.
@@ -144,14 +139,15 @@ export async function decodePublicKeyForWeb(publicKey: ArrayBuffer): Promise<Pas
 /**
  * Decodes the x and y coordinates of the public key from a created public key credential response.
  *
- * @param {Pick<AuthenticatorAttestationResponse, 'attestationObject'>} response
+ * @param {AuthenticatorResponse} response
  * @returns {PasskeyCoordinates} Object containing the coordinates derived from the public key of the passkey.
  * @throws {Error} Throws an error if the coordinates could not be extracted via `p256.ProjectivePoint.fromHex`
  */
 export async function decodePublicKey(
-  response: PasskeyAuthenticatorAttestationResponse
+  response: AuthenticatorResponse
 ): Promise<PasskeyCoordinates> {
-  const publicKey = response.getPublicKey()
+  const publicKeyAuthenticatorResponse = response as AuthenticatorAttestationResponse
+  const publicKey = publicKeyAuthenticatorResponse.getPublicKey()
 
   if (!publicKey) {
     throw new Error('Failed to generate passkey coordinates. getPublicKey() failed')
@@ -175,17 +171,17 @@ export async function decodePublicKey(
 /**
  * Extracts and returns the passkey data (coordinates and rawId) from a given passkey Credential.
  *
- * @param {PasskeyCredential<PasskeyAuthenticatorAttestationResponse>} passkeyCredential - The passkey credential generated via `navigator.credentials.create()` or other method in another platforms.
+ * @param {Credential} passkeyCredential - The passkey credential generated via `navigator.credentials.create()` or other method in another platforms.
  * @returns {Promise<PasskeyArgType>} A promise that resolves to an object containing the coordinates and the rawId derived from the passkey.
  * This is the important information in the Safe account context and should be stored securely as it is used to verify the passkey and to instantiate the SDK
  * as a signer (`Safe.init())
  * @throws {Error} Throws an error if the coordinates could not be extracted
  */
-export async function extractPasskeyData(
-  passkeyCredential: PasskeyCredential<PasskeyAuthenticatorAttestationResponse>
-): Promise<PasskeyArgType> {
-  const rawId = Buffer.from(passkeyCredential.rawId).toString('hex')
-  const coordinates = await decodePublicKey(passkeyCredential.response)
+export async function extractPasskeyData(passkeyCredential: Credential): Promise<PasskeyArgType> {
+  const passkeyPublicKeyCredential = passkeyCredential as PublicKeyCredential
+
+  const rawId = Buffer.from(passkeyPublicKeyCredential.rawId).toString('hex')
+  const coordinates = await decodePublicKey(passkeyPublicKeyCredential.response)
 
   return {
     rawId,

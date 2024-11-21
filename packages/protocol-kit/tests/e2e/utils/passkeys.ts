@@ -2,6 +2,7 @@ import { PasskeyArgType, PasskeyClient } from '@safe-global/protocol-kit'
 import { WebAuthnCredentials } from './webauthnShim'
 import { WalletClient, keccak256, toBytes, Transport, Chain, Account } from 'viem'
 import { asHex } from '@safe-global/protocol-kit/utils/types'
+import { PasskeyCoordinates } from '@safe-global/protocol-kit/types'
 
 let singleInstance: WebAuthnCredentials
 
@@ -17,6 +18,29 @@ export function getWebAuthnCredentials() {
   }
 
   return singleInstance
+}
+
+async function extractPasskeyCoordinates(publicKey: ArrayBuffer): Promise<PasskeyCoordinates> {
+  const algorithm = {
+    name: 'ECDSA',
+    namedCurve: 'P-256',
+    hash: { name: 'SHA-256' }
+  }
+
+  const key = await crypto.subtle.importKey('spki', publicKey, algorithm, true, ['verify'])
+
+  const { x, y } = await crypto.subtle.exportKey('jwk', key)
+
+  const isValidCoordinates = !!x && !!y
+
+  if (!isValidCoordinates) {
+    throw new Error('Failed to generate passkey Coordinates. crypto.subtle.exportKey() failed')
+  }
+
+  return {
+    x: '0x' + Buffer.from(x, 'base64').toString('hex'),
+    y: '0x' + Buffer.from(y, 'base64').toString('hex')
+  }
 }
 
 /**
@@ -54,7 +78,7 @@ export async function createMockPasskey(
   webAuthnCredentials?: WebAuthnCredentials
 ): Promise<PasskeyArgType> {
   const credentialsInstance = webAuthnCredentials ?? getWebAuthnCredentials()
-  const passkeyCredential = await credentialsInstance.create({
+  const passkeyCredential = credentialsInstance.create({
     publicKey: {
       rp: {
         name: 'Safe',
@@ -85,6 +109,7 @@ export async function createMockPasskey(
   const exportedPublicKey = await crypto.subtle.exportKey('spki', key)
 
   const rawId = Buffer.from(passkeyCredential.rawId).toString('hex')
+
   const coordinates = await extractPasskeyCoordinates(exportedPublicKey)
 
   const passkey: PasskeyArgType = {

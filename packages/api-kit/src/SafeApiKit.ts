@@ -122,14 +122,21 @@ class SafeApiKit {
    * @throws "Not Found"
    * @throws "Ensure this field has at least 1 hexadecimal chars (not counting 0x)."
    */
-  async decodeData(data: string, to: string = ''): Promise<any> {
+  async decodeData(data: string, to?: string): Promise<any> {
     if (data === '') {
       throw new Error('Invalid data')
     }
+
+    const dataDecoderRequest: { data: string; to?: string } = { data }
+
+    if (to) {
+      dataDecoderRequest.to = to
+    }
+
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/data-decoder/`,
       method: HttpMethod.Post,
-      body: { data, to }
+      body: dataDecoderRequest
     })
   }
 

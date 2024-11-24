@@ -48,6 +48,8 @@ export type SafeConfigProps = {
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
+  // on-chain analitics
+  trackId?: string
 }
 
 export type SafeConfigWithSafeAddress = SafeConfigProps & SafeConfigWithSafeAddressProps
@@ -75,6 +77,8 @@ type ConnectSafeConfigProps = {
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
+  // on-chain analitics
+  trackId?: string
 }
 
 export type ConnectSafeConfigWithSafeAddress = ConnectSafeConfigProps &

@@ -20,6 +20,7 @@ import {
   getChainSpecificDefaultSaltNonce,
   getPredictedSafeAddressInitCode,
   predictSafeAddress,
+  toTxResult,
   validateSafeAccountConfig,
   validateSafeDeploymentConfig
 } from './contracts/utils'
@@ -81,9 +82,10 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
-import { Hash, Hex } from 'viem'
+import { Hash, Hex, SendTransactionParameters } from 'viem'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
+import formatTrackId from './utils/on-chain-tracking/formatTrackId'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -99,6 +101,9 @@ class Safe {
 
   #MAGIC_VALUE = '0x1626ba7e'
   #MAGIC_VALUE_BYTES = '0x20c13b0b'
+
+  // On-chain Analitics
+  #trackId: string = ''
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -124,7 +129,11 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async #initializeProtocolKit(config: SafeConfig) {
-    const { provider, signer, isL1SafeSingleton, contractNetworks } = config
+    const { provider, signer, isL1SafeSingleton, contractNetworks, trackId } = config
+
+    if (trackId) {
+      this.#trackId = formatTrackId(trackId)
+    }
 
     this.#safeProvider = await SafeProvider.init({
       provider,
@@ -1338,6 +1347,32 @@ class Safe {
 
     const signerAddress = await this.#safeProvider.getSignerAddress()
 
+    if (this.#trackId) {
+      const encodedTransaction = await this.getEncodedTransaction(signedSafeTransaction)
+
+      const transaction = {
+        to: await this.getAddress(),
+        value: 0n,
+        data: encodedTransaction + this.#trackId
+      }
+
+      const signer = await this.#safeProvider.getExternalSigner()
+
+      if (!signer) {
+        throw new Error('A signer must be set')
+      }
+
+      const hash = await signer.sendTransaction({
+        ...transaction,
+        account: signerAddress,
+        ...options
+      } as SendTransactionParameters)
+
+      const provider = this.#safeProvider.getExternalProvider()
+
+      return toTxResult(provider, hash, options)
+    }
+
     const txResponse = await this.#contractManager.safeContract.execTransaction(
       signedSafeTransaction,
       {
@@ -1552,11 +1587,12 @@ class Safe {
       to: safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
-      data: safeProxyFactoryContract.encode('createProxyWithNonce', [
-        asHex(safeSingletonContract.getAddress()),
-        asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
-        BigInt(saltNonce)
-      ])
+      data:
+        safeProxyFactoryContract.encode('createProxyWithNonce', [
+          asHex(safeSingletonContract.getAddress()),
+          asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
+          BigInt(saltNonce)
+        ]) + this.#trackId
     }
 
     return safeDeployTransactionData
@@ -1697,6 +1733,10 @@ class Safe {
     contractAddress: string
   }): ContractInfo | undefined => {
     return getContractInfo(contractAddress)
+  }
+
+  getTrackId(): string {
+    return this.#trackId
   }
 }
 

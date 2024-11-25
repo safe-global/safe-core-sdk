@@ -67,6 +67,7 @@ import {
 } from './utils/eip-712'
 import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
+import formatTrackId from './utils/on-chain-tracking/formatTrackId'
 
 export {
   estimateTxBaseGas,
@@ -75,6 +76,7 @@ export {
   estimateSafeDeploymentGas,
   extractPasskeyData,
   extractPasskeyCoordinates,
+  formatTrackId,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,

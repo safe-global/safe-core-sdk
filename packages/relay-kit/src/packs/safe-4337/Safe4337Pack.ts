@@ -5,7 +5,8 @@ import Safe, {
   encodeMultiSendData,
   getMultiSendContract,
   PasskeyClient,
-  SafeProvider
+  SafeProvider,
+  formatTrackId
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
@@ -329,7 +330,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
             fallbackHandler: safe4337ModuleAddress,
             paymentToken: zeroAddress,
             payment: 0,
-            paymentReceiver: zeroAddress
+            paymentReceiver: trackId ? formatTrackId(trackId) : zeroAddress
           }
         },
         trackId

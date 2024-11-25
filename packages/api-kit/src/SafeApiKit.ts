@@ -115,20 +115,28 @@ class SafeApiKit {
   /**
    * Decodes the specified Safe transaction data.
    *
-   * @param data - The Safe transaction data
+   * @param data - The Safe transaction data. '0x' prefixed hexadecimal string.
+   * @param to - The address of the receiving contract. If provided, the decoded data will be more accurate, as in case of an ABI collision the Safe Transaction Service would know which ABI to use
    * @returns The transaction data decoded
    * @throws "Invalid data"
    * @throws "Not Found"
    * @throws "Ensure this field has at least 1 hexadecimal chars (not counting 0x)."
    */
-  async decodeData(data: string): Promise<any> {
+  async decodeData(data: string, to?: string): Promise<any> {
     if (data === '') {
       throw new Error('Invalid data')
     }
+
+    const dataDecoderRequest: { data: string; to?: string } = { data }
+
+    if (to) {
+      dataDecoderRequest.to = to
+    }
+
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/data-decoder/`,
       method: HttpMethod.Post,
-      body: { data }
+      body: dataDecoderRequest
     })
   }
 

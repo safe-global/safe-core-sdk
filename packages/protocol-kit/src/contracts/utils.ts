@@ -85,7 +85,7 @@ export interface encodeSetupCallDataProps {
   customContracts?: ContractNetworkConfig
   customSafeVersion?: SafeVersion
   deploymentType?: DeploymentType
-  trackId: string
+  trackId?: string
 }
 
 export function encodeCreateProxyWithNonce(

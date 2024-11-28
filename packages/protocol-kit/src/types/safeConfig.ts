@@ -85,7 +85,7 @@ type ConnectSafeConfigProps = {
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
   // on-chain analitics
-  trackId?: string
+  onchainAnalitics?: OnchainAnaliticsProps
 }
 
 export type ConnectSafeConfigWithSafeAddress = ConnectSafeConfigProps &

@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv'
 import Safe, { SafeAccountConfig, getSafeAddressFromDeploymentTx } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/types-kit'
 
@@ -6,6 +7,10 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { waitForTransactionReceipt } from 'viem/actions'
 import semverSatisfies from 'semver/functions/satisfies'
+
+dotenv.config()
+
+const { SIGNER_ADDRESS_PRIVATE_KEY } = process.env
 
 // This file can be used to play around with the Safe Core SDK
 
@@ -21,12 +26,12 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: sepolia.rpcUrls.default.http[0],
-  DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
+  RPC_URL: 'https://sepolia.infura.io/v3/ab83b04f41414799a57129cb165be0dd', // SEPOLIA
+  DEPLOYER_ADDRESS_PRIVATE_KEY: SIGNER_ADDRESS_PRIVATE_KEY!,
   DEPLOY_SAFE: {
-    OWNERS: ['OWNER_ADDRESS'],
+    OWNERS: ['0x0Ee26C4481485AC64BfFf2bdCaA21EdAeCEcdCa9'],
     THRESHOLD: 1, // <SAFE_THRESHOLD>
-    SALT_NONCE: '150000',
+    SALT_NONCE: '1500002332234342345',
     SAFE_VERSION: '1.3.0'
   }
 }
@@ -53,8 +58,11 @@ async function main() {
         saltNonce,
         safeVersion
       }
-    }
+    },
+    onchainAnalitics: { project: 'Test Dapp SDK', platform: 'Web' }
   })
+
+  console.log('On Chain identifier: ', protocolKit.getTrackId())
 
   // The Account Abstraction feature is only available for Safes version 1.3.0 and above.
   if (semverSatisfies(safeVersion, '>=1.3.0')) {

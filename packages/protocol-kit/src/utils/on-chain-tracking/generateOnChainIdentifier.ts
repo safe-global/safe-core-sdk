@@ -28,14 +28,14 @@ function generateOnChainIdentifier(
   tool: string,
   toolVersion: string
 ): string {
-  const indentifierPrefix = '5afe'
-  const indentifierVersion = '00' // first version
+  const identifierPrefix = '5afe'
+  const identifierVersion = '00' // first version
   const projectHash = generateHash(project, 20) // Take the last 20 bytes
   const platformHash = generateHash(platform, 3) // Take the last 3 bytes
   const toolHash = generateHash(tool, 3) // Take the last 3 bytes
   const toolVersionHash = generateHash(toolVersion, 3) // Take the last 3 bytes
 
-  return `${indentifierPrefix}${indentifierVersion}${projectHash}${platformHash}${toolHash}${toolVersionHash}`
+  return `${identifierPrefix}${identifierVersion}${projectHash}${platformHash}${toolHash}${toolVersionHash}`
 }
 
 export default generateOnChainIdentifier

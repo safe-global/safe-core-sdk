@@ -1761,7 +1761,7 @@ class Safe {
     return getContractInfo(contractAddress)
   }
 
-  getTrackId(): string {
+  getOnchainIdentifier(): string {
     return this.#onchainIdentifier
   }
 }

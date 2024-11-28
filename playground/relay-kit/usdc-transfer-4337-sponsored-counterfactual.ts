@@ -3,12 +3,12 @@ import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish, transfer, generateTransferCallData } from '../utils'
 
 // Safe owner PK
-const PRIVATE_KEY = '77ad1d85be4115ab08f3f31ce08fd9473896e9ba008115f5f49c6c7e9183a501'
+const PRIVATE_KEY = ''
 
 const PIMLICO_API_KEY = 'f8492c09-7cad-43ed-83d3-548a3692583d'
 
 // Safe owner address
-const OWNER_ADDRESS = '0x0Ee26C4481485AC64BfFf2bdCaA21EdAeCEcdCa9'
+const OWNER_ADDRESS = ''
 
 //  PolicyId is an optional parameter, you can create one here: https://dashboard.pimlico.io/sponsorship-policies
 const POLICY_ID = ''
@@ -18,8 +18,7 @@ const CHAIN_NAME = 'sepolia'
 // const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://sepolia.infura.io/v3/ab83b04f41414799a57129cb165be0dd' // SEPOLIA
-// const RPC_URL = 'https://rpc.sepolia.org' // SEPOLIA
+const RPC_URL = 'https://rpc.sepolia.org' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL
@@ -48,15 +47,12 @@ async function main() {
       owners: [OWNER_ADDRESS],
       threshold: 1,
       saltNonce: '4337' + '222334434432432' // to update the address
-    },
-    onchainAnalitics: { project: 'Test Dapp SDK', platform: 'Web' }
+    }
   })
 
   // Log supported entry points and chain id
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
   console.log('Chain Id', await safe4337Pack.getChainId())
-
-  console.log('onchain Identifier: ', safe4337Pack.getOnchainIdentifier())
 
   // Create transaction batch with two 0.1 USDC transfers
   const senderAddress = await safe4337Pack.protocolKit.getAddress()
@@ -70,7 +66,7 @@ async function main() {
   console.log(`sending USDC...`)
 
   const externalSigner = await safe4337Pack.protocolKit.getSafeProvider().getExternalSigner()
-  // const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
+  const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
 
   if (!externalSigner) {
     throw new Error('No signer found!')
@@ -88,21 +84,15 @@ async function main() {
   }
   const transactions = [transferUSDC, transferUSDC]
 
-  // const rejectTransaction = {
-  //   to: senderAddress,
-  //   data: '0x',
-  //   value: '0'
-  // }
-  // const transactions = [rejectTransaction, rejectTransaction]
-  // const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
+  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({
-    transactions
-    // options: {
-    //   validAfter: Number(timestamp - 60_000n),
-    //   validUntil: Number(timestamp + 60_000n)
-    // }
+    transactions,
+    options: {
+      validAfter: Number(timestamp - 60_000n),
+      validUntil: Number(timestamp + 60_000n)
+    }
   })
 
   // 3) Sign SafeOperation

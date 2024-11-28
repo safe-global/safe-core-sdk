@@ -4,7 +4,8 @@ import {
   SafeTransactionData,
   UserOperation,
   SafeOperationResponse,
-  ListResponse
+  ListResponse,
+  SignatureType
 } from '@safe-global/types-kit'
 
 export type ListOptions = {
@@ -231,7 +232,7 @@ export type SafeMessageConfirmation = {
   readonly modified: string
   readonly owner: string
   readonly signature: string
-  readonly signatureType: string
+  readonly signatureType: SignatureType
 }
 
 export type SafeMessage = {

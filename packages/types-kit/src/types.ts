@@ -188,13 +188,22 @@ export interface EIP712TypedData {
   primaryType?: string
 }
 
+export const SignatureTypes = {
+  CONTRACT_SIGNATURE: 'CONTRACT_SIGNATURE',
+  EOA: 'EOA',
+  APPROVED_HASH: 'APPROVED_HASH',
+  ETH_SIGN: 'ETH_SIGN'
+} as const
+
+export type SignatureType = (typeof SignatureTypes)[keyof typeof SignatureTypes]
+
 export type SafeMultisigConfirmationResponse = {
   readonly owner: string
   readonly submissionDate: string
   readonly transactionHash?: string
   readonly confirmationType?: string
   readonly signature: string
-  readonly signatureType?: string
+  readonly signatureType: SignatureType
 }
 
 export type ListResponse<T> = {
@@ -313,7 +322,7 @@ export type SafeOperationConfirmation = {
   readonly modified: string
   readonly owner: string
   readonly signature: string
-  readonly signatureType: string
+  readonly signatureType: SignatureType
 }
 
 export type UserOperationResponse = {

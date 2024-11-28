@@ -5,7 +5,7 @@ import { waitForOperationToFinish, transfer, generateTransferCallData } from '..
 // Safe owner PK
 const PRIVATE_KEY = ''
 
-const PIMLICO_API_KEY = 'f8492c09-7cad-43ed-83d3-548a3692583d'
+const PIMLICO_API_KEY = ''
 
 // Safe owner address
 const OWNER_ADDRESS = ''

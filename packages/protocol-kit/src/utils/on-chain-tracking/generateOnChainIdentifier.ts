@@ -8,7 +8,7 @@ import { keccak256, toHex } from 'viem'
  * @returns {string} A hexadecimal string representation of the truncated hash, without the `0x` prefix.
  */
 export function generateHash(input: string, size: number): string {
-  const fullHash = keccak256(Buffer.from(input))
+  const fullHash = keccak256(toHex(input))
   return toHex(fullHash.slice(-size)).replace('0x', '') // Take the last X bytes
 }
 

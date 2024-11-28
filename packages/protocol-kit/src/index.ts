@@ -67,6 +67,7 @@ import {
 } from './utils/eip-712'
 import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
+import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
 
 export {
   estimateTxBaseGas,
@@ -82,6 +83,7 @@ export {
   EthSafeSignature,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
+  generateOnChainIdentifier,
   PREDETERMINED_SALT_NONCE,
   SafeBaseContract,
   SafeProxyFactoryBaseContract,

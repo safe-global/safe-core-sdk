@@ -5,7 +5,8 @@ import Safe, {
   encodeMultiSendData,
   getMultiSendContract,
   PasskeyClient,
-  SafeProvider
+  SafeProvider,
+  generateOnChainIdentifier
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
@@ -87,6 +88,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   #paymasterOptions?: PaymasterOptions
 
+  #onchainIdentifier: string = ''
+
   /**
    * Creates an instance of the Safe4337Pack.
    *
@@ -100,7 +103,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     paymasterOptions,
     entryPointAddress,
     safe4337ModuleAddress,
-    safeWebAuthnSharedSignerAddress
+    safeWebAuthnSharedSignerAddress,
+    onchainAnalitics
   }: Safe4337Options) {
     super(protocolKit)
 
@@ -111,6 +115,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
     this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
+
+    if (onchainAnalitics?.project) {
+      this.#onchainIdentifier = generateOnChainIdentifier(
+        onchainAnalitics.project,
+        onchainAnalitics.platform,
+        'relay-kit',
+        '3.2.4'
+      )
+    }
   }
 
   /**
@@ -124,7 +137,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { provider, signer, options, bundlerUrl, customContracts, paymasterOptions } = initOptions
+    const {
+      provider,
+      signer,
+      options,
+      bundlerUrl,
+      customContracts,
+      paymasterOptions,
+      onchainAnalitics
+    } = initOptions
+
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
     const chainId = await bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
@@ -329,7 +351,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
             payment: 0,
             paymentReceiver: zeroAddress
           }
-        }
+        },
+        onchainAnalitics
       })
     }
 
@@ -372,7 +395,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl,
       entryPointAddress: selectedEntryPoint!,
       safe4337ModuleAddress,
-      safeWebAuthnSharedSignerAddress
+      safeWebAuthnSharedSignerAddress,
+      onchainAnalitics
     })
   }
 
@@ -524,6 +548,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
       maxPriorityFeePerGas: 1n,
       paymasterAndData,
       signature: '0x'
+    }
+
+    if (this.#onchainIdentifier) {
+      userOperation.callData += this.#onchainIdentifier
     }
 
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
@@ -798,5 +826,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
         transaction.operation || OperationType.Call
       ]
     })
+  }
+
+  getOnchainIdentifier(): string {
+    return this.#onchainIdentifier
   }
 }

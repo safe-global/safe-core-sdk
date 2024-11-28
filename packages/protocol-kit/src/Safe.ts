@@ -85,7 +85,7 @@ import { asHash, asHex } from './utils/types'
 import { Hash, Hex, SendTransactionParameters } from 'viem'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
-import formatTrackId from './utils/on-chain-tracking/formatTrackId'
+import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -102,8 +102,8 @@ class Safe {
   #MAGIC_VALUE = '0x1626ba7e'
   #MAGIC_VALUE_BYTES = '0x20c13b0b'
 
-  // On-chain Analitics
-  #trackId: string = ''
+  // on-chain Analitics
+  #onchainIdentifier: string = ''
 
   /**
    * Creates an instance of the Safe Core SDK.
@@ -129,10 +129,15 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async #initializeProtocolKit(config: SafeConfig) {
-    const { provider, signer, isL1SafeSingleton, contractNetworks, trackId } = config
+    const { provider, signer, isL1SafeSingleton, contractNetworks, onchainAnalitics } = config
 
-    if (trackId) {
-      this.#trackId = formatTrackId(trackId)
+    if (onchainAnalitics?.project) {
+      this.#onchainIdentifier = generateOnChainIdentifier(
+        onchainAnalitics.project,
+        onchainAnalitics.platform,
+        'protocol-kit',
+        '5.0.4'
+      )
     }
 
     this.#safeProvider = await SafeProvider.init({
@@ -1347,13 +1352,13 @@ class Safe {
 
     const signerAddress = await this.#safeProvider.getSignerAddress()
 
-    if (this.#trackId) {
+    if (this.#onchainIdentifier) {
       const encodedTransaction = await this.getEncodedTransaction(signedSafeTransaction)
 
       const transaction = {
         to: await this.getAddress(),
         value: 0n,
-        data: encodedTransaction + this.#trackId
+        data: encodedTransaction + this.#onchainIdentifier
       }
 
       const signer = await this.#safeProvider.getExternalSigner()
@@ -1364,7 +1369,7 @@ class Safe {
 
       const hash = await signer.sendTransaction({
         ...transaction,
-        account: signerAddress,
+        account: signer.account,
         ...options
       } as SendTransactionParameters)
 
@@ -1499,6 +1504,14 @@ class Safe {
     // we create the deployment transaction
     const safeDeploymentTransaction = await this.createSafeDeploymentTransaction()
 
+    // remove the onchain idendifier if it is included
+    if (safeDeploymentTransaction.data.endsWith(this.#onchainIdentifier)) {
+      safeDeploymentTransaction.data = safeDeploymentTransaction.data.replace(
+        this.#onchainIdentifier,
+        ''
+      )
+    }
+
     // First transaction of the batch: The Safe deployment Transaction
     const safeDeploymentBatchTransaction = {
       to: safeDeploymentTransaction.to,
@@ -1519,7 +1532,11 @@ class Safe {
     const transactions = [safeDeploymentBatchTransaction, safeBatchTransaction]
 
     // this is the transaction with the batch
-    const safeDeploymentBatch = await this.createTransactionBatch(transactions, transactionOptions)
+    const safeDeploymentBatch = await this.createTransactionBatch(
+      transactions,
+      transactionOptions,
+      true // include the on chain identifier
+    )
 
     return safeDeploymentBatch
   }
@@ -1587,12 +1604,15 @@ class Safe {
       to: safeProxyFactoryContract.getAddress(),
       value: '0',
       // we use the createProxyWithNonce method to create the Safe in a deterministic address, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/proxies/SafeProxyFactory.sol#L52
-      data:
-        safeProxyFactoryContract.encode('createProxyWithNonce', [
-          asHex(safeSingletonContract.getAddress()),
-          asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
-          BigInt(saltNonce)
-        ]) + this.#trackId
+      data: safeProxyFactoryContract.encode('createProxyWithNonce', [
+        asHex(safeSingletonContract.getAddress()),
+        asHex(initializer), // call to the setup method to set the threshold & owners of the new Safe
+        BigInt(saltNonce)
+      ])
+    }
+
+    if (this.#onchainIdentifier) {
+      safeDeployTransactionData.data += this.#onchainIdentifier
     }
 
     return safeDeployTransactionData
@@ -1606,12 +1626,14 @@ class Safe {
    * @function createTransactionBatch
    * @param {MetaTransactionData[]} transactions - An array of MetaTransactionData objects to be batched together.
    * @param {TransactionOption} [transactionOptions] - Optional TransactionOption object to specify additional options for the transaction batch.
+   * @param {boolean} [includeOnchainIdentifier=false] - A flag indicating whether to append the onchain identifier to the data field of the resulting transaction.
    * @returns {Promise<Transaction>} A Promise that resolves with the created transaction batch.
    *
    */
   async createTransactionBatch(
     transactions: MetaTransactionData[],
-    transactionOptions?: TransactionOptions
+    transactionOptions?: TransactionOptions,
+    includeOnchainIdentifier: boolean = false
   ): Promise<Transaction> {
     // we use the MultiSend contract to create the batch, see: https://github.com/safe-global/safe-contracts/blob/main/contracts/libraries/MultiSendCallOnly.sol
     const multiSendCallOnlyContract = this.#contractManager.multiSendCallOnlyContract
@@ -1626,6 +1648,10 @@ class Safe {
       to: multiSendCallOnlyContract.getAddress(),
       value: '0',
       data: batchData
+    }
+
+    if (includeOnchainIdentifier) {
+      transactionBatch.data += this.#onchainIdentifier
     }
 
     return transactionBatch
@@ -1736,7 +1762,7 @@ class Safe {
   }
 
   getTrackId(): string {
-    return this.#trackId
+    return this.#onchainIdentifier
   }
 }
 

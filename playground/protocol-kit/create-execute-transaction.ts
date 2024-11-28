@@ -18,11 +18,9 @@ interface Config {
 }
 
 const config: Config = {
-  // RPC_URL: 'https://sepolia.gateway.tenderly.co',
-  RPC_URL: 'https://sepolia.infura.io/v3/ab83b04f41414799a57129cb165be0dd',
-  // RPC_URL: 'https://eth-sepolia.public.blastapi.io',
+  RPC_URL: 'https://sepolia.gateway.tenderly.co',
   SIGNER_ADDRESS_PRIVATE_KEY: SIGNER_ADDRESS_PRIVATE_KEY!,
-  SAFE_ADDRESS: '0x096B2222AE1600D0074d35a8A6BC58FF04AB2384'
+  SAFE_ADDRESS: '<SAFE_ADDRESS>'
 }
 
 async function main() {
@@ -30,8 +28,7 @@ async function main() {
   const safe = await Safe.init({
     provider: config.RPC_URL,
     signer: config.SIGNER_ADDRESS_PRIVATE_KEY,
-    safeAddress: config.SAFE_ADDRESS,
-    onchainAnalitics: { project: 'Test Dapp SDK', platform: 'Web' }
+    safeAddress: config.SAFE_ADDRESS
   })
 
   console.log('Creating transaction with Safe:')
@@ -40,12 +37,10 @@ async function main() {
   console.log(' - Version: ', await safe.getContractVersion())
   console.log(' - Threshold: ', await safe.getThreshold(), '\n')
 
-  console.log('On Chain identifier: ', safe.getTrackId())
-
   // Create rejection transaction
   const safeTransactionData: SafeTransactionDataPartial = {
     to: config.SAFE_ADDRESS,
-    value: '0', // 0.001 ether
+    value: '1000000000000000', // 0.001 ether
     data: '0x',
     operation: OperationType.Call
   }

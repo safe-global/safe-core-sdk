@@ -46,7 +46,7 @@ async function main() {
     options: {
       owners: [OWNER_ADDRESS],
       threshold: 1,
-      saltNonce: '4337' + '222334434432432' // to update the address
+      saltNonce: '4337' + '1' // to update the address
     }
   })
 
@@ -61,7 +61,7 @@ async function main() {
 
   console.log('is Safe Account deployed: ', await safe4337Pack.protocolKit.isSafeDeployed())
 
-  const usdcAmount = 10_000n // 0.01 USDC
+  const usdcAmount = 100_000n // 0.1 USDC
 
   console.log(`sending USDC...`)
 
@@ -83,7 +83,6 @@ async function main() {
     value: '0'
   }
   const transactions = [transferUSDC, transferUSDC]
-
   const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
 
   // 2) Create transaction batch

@@ -26,12 +26,12 @@ interface Config {
 }
 
 const config: Config = {
-  RPC_URL: 'https://sepolia.infura.io/v3/ab83b04f41414799a57129cb165be0dd', // SEPOLIA
+  RPC_URL: sepolia.rpcUrls.default.http[0],
   DEPLOYER_ADDRESS_PRIVATE_KEY: SIGNER_ADDRESS_PRIVATE_KEY!,
   DEPLOY_SAFE: {
-    OWNERS: ['0x0Ee26C4481485AC64BfFf2bdCaA21EdAeCEcdCa9'],
+    OWNERS: ['OWNER_ADDRESS'],
     THRESHOLD: 1, // <SAFE_THRESHOLD>
-    SALT_NONCE: '1500002332234342345',
+    SALT_NONCE: '150000',
     SAFE_VERSION: '1.3.0'
   }
 }
@@ -58,11 +58,8 @@ async function main() {
         saltNonce,
         safeVersion
       }
-    },
-    onchainAnalitics: { project: 'Test Dapp SDK', platform: 'Web' }
+    }
   })
-
-  console.log('On Chain identifier: ', protocolKit.getTrackId())
 
   // The Account Abstraction feature is only available for Safes version 1.3.0 and above.
   if (semverSatisfies(safeVersion, '>=1.3.0')) {

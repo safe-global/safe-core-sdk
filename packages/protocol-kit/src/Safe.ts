@@ -43,7 +43,8 @@ import {
   SigningMethodType,
   SwapOwnerTxParams,
   SafeModulesPaginated,
-  RemovePasskeyOwnerTxParams
+  RemovePasskeyOwnerTxParams,
+  PasskeyArgType
 } from './types'
 import {
   EthSafeSignature,
@@ -60,7 +61,8 @@ import {
   generateSignature,
   preimageSafeMessageHash,
   preimageSafeTransactionHash,
-  adjustVInSignature
+  adjustVInSignature,
+  extractPasskeyData
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -1763,6 +1765,15 @@ class Safe {
 
   getOnchainIdentifier(): string {
     return this.#onchainIdentifier
+  }
+
+  /**
+   * This method creates a signer to be used with the init method
+   * @param {Credential} credential - The credential to be used to create the signer. Can be generated in the web with navigator.credentials.create
+   * @returns {PasskeyArgType} - The signer to be used with the init method
+   */
+  static createPasskeySigner = async (credential: Credential): Promise<PasskeyArgType> => {
+    return extractPasskeyData(credential)
   }
 }
 

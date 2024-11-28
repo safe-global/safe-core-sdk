@@ -22,7 +22,8 @@ import {
   PasskeyArgType,
   PasskeyClient,
   SafeWebAuthnSignerFactoryContractImplementationType,
-  SafeWebAuthnSharedSignerContractImplementationType
+  SafeWebAuthnSharedSignerContractImplementationType,
+  GetPasskeyCredentialFn
 } from '@safe-global/protocol-kit/types'
 import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { asHex } from '../types'
@@ -31,20 +32,29 @@ import isSharedSigner from './isSharedSigner'
 export const PASSKEY_CLIENT_KEY = 'passkeyWallet'
 export const PASSKEY_CLIENT_NAME = 'Passkey Wallet Client'
 
-const sign = async (passkeyRawId: Uint8Array, data: Uint8Array): Promise<Hex> => {
-  const assertion = (await navigator.credentials.get({
+const sign = async (
+  passkeyRawId: Uint8Array,
+  data: Uint8Array,
+  getFn?: GetPasskeyCredentialFn
+): Promise<Hex> => {
+  // Avoid loosing the context for navigator.credentials.get function that leads to an error
+  const getCredentials = getFn || navigator.credentials.get.bind(navigator.credentials)
+
+  const assertion = (await getCredentials({
     publicKey: {
       challenge: data,
       allowCredentials: [{ type: 'public-key', id: passkeyRawId }],
       userVerification: 'required'
     }
-  })) as PublicKeyCredential & { response: AuthenticatorAssertionResponse }
+  })) as PublicKeyCredential
 
-  if (!assertion?.response?.authenticatorData) {
+  const assertionResponse = assertion.response as AuthenticatorAssertionResponse
+
+  if (!assertionResponse?.authenticatorData) {
     throw new Error('Failed to sign data with passkey Signer')
   }
 
-  const { authenticatorData, signature, clientDataJSON } = assertion.response
+  const { authenticatorData, signature, clientDataJSON } = assertionResponse
 
   return encodeAbiParameters(parseAbiParameters('bytes, bytes, uint256[2]'), [
     toHex(new Uint8Array(authenticatorData)),
@@ -104,10 +114,14 @@ export const createPasskeyClient = async (
     .extend(() => ({
       signMessage({ message }: { message: SignableMessage }) {
         if (typeof message === 'string') {
-          return sign(passkeyRawId, toBytes(message))
+          return sign(passkeyRawId, toBytes(message), passkey.getFn)
         }
 
-        return sign(passkeyRawId, isHex(message.raw) ? toBytes(message.raw) : message.raw)
+        return sign(
+          passkeyRawId,
+          isHex(message.raw) ? toBytes(message.raw) : message.raw,
+          passkey.getFn
+        )
       },
       signTransaction,
       signTypedData,
@@ -145,6 +159,17 @@ export const createPasskeyClient = async (
     })) as PasskeyClient
 }
 
+function decodeClientDataJSON(clientDataJSON: ArrayBuffer): string {
+  const uint8Array = new Uint8Array(clientDataJSON)
+
+  let result = ''
+  for (let i = 0; i < uint8Array.length; i++) {
+    result += String.fromCharCode(uint8Array[i])
+  }
+
+  return result
+}
+
 /**
  * Compute the additional client data JSON fields. This is the fields other than `type` and
  * `challenge` (including `origin` and any other additional client data fields that may be
@@ -157,7 +182,8 @@ export const createPasskeyClient = async (
  * @throws {Error} Throws an error if the client data JSON does not contain the expected 'challenge' field pattern.
  */
 function extractClientDataFields(clientDataJSON: ArrayBuffer): Hex {
-  const decodedClientDataJSON = new TextDecoder('utf-8').decode(clientDataJSON)
+  const decodedClientDataJSON = decodeClientDataJSON(clientDataJSON)
+
   const match = decodedClientDataJSON.match(
     /^\{"type":"webauthn.get","challenge":"[A-Za-z0-9\-_]{43}",(.*)\}$/
   )

@@ -45,4 +45,22 @@ describe('decodeData', () => {
       })
     )
   })
+
+  it('should decode the data and allow to specify the receiving contract', async () => {
+    const data = '0x610b592500000000000000000000000090F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+    const to = '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+    const decodedData = await safeApiKit.decodeData(data, to)
+    chai.expect(JSON.stringify(decodedData)).to.be.equal(
+      JSON.stringify({
+        method: 'enableModule',
+        parameters: [
+          {
+            name: 'module',
+            type: 'address',
+            value: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
+          }
+        ]
+      })
+    )
+  })
 })

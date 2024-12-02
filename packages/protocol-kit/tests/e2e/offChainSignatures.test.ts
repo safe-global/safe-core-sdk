@@ -311,7 +311,7 @@ describe('Off-chain signatures', () => {
             transactionHash: '',
             confirmationType: '',
             signature: '0x111111',
-            signatureType: ''
+            signatureType: 'EOA'
           },
           {
             owner: '0x2222222222222222222222222222222222222222',
@@ -319,7 +319,7 @@ describe('Off-chain signatures', () => {
             transactionHash: '',
             confirmationType: '',
             signature: '0x222222',
-            signatureType: ''
+            signatureType: 'EOA'
           }
         ],
         trusted: true,

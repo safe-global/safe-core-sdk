@@ -1741,17 +1741,6 @@
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.1.1.tgz#1ec17e2edbec25c8306d424ecfbf13c7de1aaa31"
   integrity sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==
 
-"@safe-global/protocol-kit@file:packages/sdk-starter-kit/.yalc/@safe-global/protocol-kit":
-  version "5.0.4"
-  dependencies:
-    "@noble/curves" "^1.6.0"
-    "@safe-global/safe-deployments" "^1.37.14"
-    "@safe-global/safe-modules-deployments" "^2.2.4"
-    "@safe-global/types-kit" "^1.0.0"
-    abitype "^1.0.2"
-    semver "^7.6.3"
-    viem "^2.21.8"
-
 "@safe-global/safe-contracts-v1.4.1@npm:@safe-global/safe-contracts@1.4.1":
   version "1.4.1"
   resolved "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz"
@@ -1762,10 +1751,10 @@
   resolved "https://registry.yarnpkg.com/@safe-global/safe-contracts/-/safe-contracts-1.4.1-build.0.tgz#5d82e2f3fd8430b4589df992b9ee2c71386082fe"
   integrity sha512-TIpoKJtMqLcLFoid0cvpxo8YTcnRUj95MHvxzwgPbJPRONOckNS6ebgGyBBRDmnpxFh34IBpPUZ7JD+z2Cfbbg==
 
-"@safe-global/safe-deployments@^1.37.14":
-  version "1.37.14"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.14.tgz#31c1d1ff924d94ce639c136bef154de3adf5f75e"
-  integrity sha512-uHpYizq52j1arwWRxHbEbrZsECD5tG87NwLo/xDViRVw/GIrkRC6HerkzfZwiHVjVrC8gN8o3ApLsknYbxrF4w==
+"@safe-global/safe-deployments@^1.37.20":
+  version "1.37.20"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.20.tgz#368c172b19cd34fa77ec5c0df6a16d52d64abdee"
+  integrity sha512-2T2cYtgpLGzxM0GUPXd5mqZiQ193fgWXB2Yg0Azd/EBpBsAfUEWVmjdux+5D2aNNyVv++16Hq5GqiOv5sU07Tg==
   dependencies:
     semver "^7.6.2"
 

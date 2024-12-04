@@ -1,5 +1,9 @@
 import { Account, Address, Chain, Hash, Hex, PublicClient, PublicRpcSchema, Transport } from 'viem'
-import Safe, { DeploymentType, SafeProviderConfig } from '@safe-global/protocol-kit'
+import Safe, {
+  DeploymentType,
+  SafeProviderConfig,
+  OnchainAnaliticsProps
+} from '@safe-global/protocol-kit'
 import {
   EstimateGasData,
   MetaTransactionData,
@@ -50,6 +54,8 @@ export type Safe4337InitOptions = {
   }
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
+  // on-chain analitics
+  onchainAnalitics?: OnchainAnaliticsProps
 }
 
 export type Safe4337Options = {
@@ -61,6 +67,8 @@ export type Safe4337Options = {
   entryPointAddress: string
   safe4337ModuleAddress: string
   safeWebAuthnSharedSignerAddress?: string
+  // on-chain analitics
+  onchainAnalitics?: OnchainAnaliticsProps
 }
 
 export type Safe4337CreateTransactionProps = {

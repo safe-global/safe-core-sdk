@@ -3,8 +3,11 @@ export type PasskeyCoordinates = {
   y: string
 }
 
+export type GetPasskeyCredentialFn = (options?: CredentialRequestOptions) => Promise<Credential>
+
 export type PasskeyArgType = {
   rawId: string // required to sign data
   coordinates: PasskeyCoordinates // required to sign data
-  customVerifierAddress?: string // optional
+  customVerifierAddress?: string
+  getFn?: GetPasskeyCredentialFn
 }

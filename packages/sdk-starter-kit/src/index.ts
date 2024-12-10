@@ -1,9 +1,10 @@
-import Safe from '@safe-global/protocol-kit'
+import Safe, { SafeConfig } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 
 import { SafeClient } from '@safe-global/sdk-starter-kit/SafeClient'
 import { isValidAddress, isValidSafeConfig } from '@safe-global/sdk-starter-kit/utils'
 import { SdkStarterKitConfig } from '@safe-global/sdk-starter-kit/types'
+import { DEFAULT_DEPLOYMENT_TYPE } from './constants'
 
 /**
  * Initializes a Safe client with the given configuration options.
@@ -13,7 +14,7 @@ import { SdkStarterKitConfig } from '@safe-global/sdk-starter-kit/types'
  */
 export async function createSafeClient(config: SdkStarterKitConfig): Promise<SafeClient> {
   const protocolKit = await getProtocolKitInstance(config)
-  const apiKit = await getApiKitInstance(protocolKit)
+  const apiKit = await getApiKitInstance(protocolKit, config)
 
   if (!protocolKit || !apiKit) throw new Error('Failed to create a kit instances')
 
@@ -36,7 +37,8 @@ async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe
     })
   } else if (config.safeOptions && isValidSafeConfig(config.safeOptions)) {
     // If the safe does not exist and the configuration is provided
-    const protocolKit = await Safe.init({
+    let protocolKit: Safe
+    const initConfig: SafeConfig = {
       provider: config.provider,
       signer: config.signer,
       predictedSafe: {
@@ -45,10 +47,30 @@ async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe
           threshold: config.safeOptions.threshold
         },
         safeDeploymentConfig: {
-          saltNonce: config.safeOptions.saltNonce
+          saltNonce: config.safeOptions.saltNonce,
+          deploymentType: DEFAULT_DEPLOYMENT_TYPE
         }
       }
-    })
+    }
+
+    try {
+      protocolKit = await Safe.init(initConfig)
+    } catch (error) {
+      const isDeploymentTypeUnresolvedError =
+        error instanceof Error &&
+        error.message &&
+        error.message.startsWith('Invalid') &&
+        error.message.includes('contract address')
+      if (
+        isDeploymentTypeUnresolvedError &&
+        initConfig.predictedSafe.safeDeploymentConfig?.deploymentType
+      ) {
+        delete initConfig.predictedSafe.safeDeploymentConfig.deploymentType
+        protocolKit = await Safe.init(initConfig)
+      } else {
+        throw error
+      }
+    }
 
     const isSafeDeployed = await protocolKit.isSafeDeployed()
 
@@ -70,10 +92,13 @@ async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe
   }
 }
 
-async function getApiKitInstance(protocolKit: Safe): Promise<SafeApiKit> {
+async function getApiKitInstance(
+  protocolKit: Safe,
+  config: SdkStarterKitConfig
+): Promise<SafeApiKit> {
   const chainId = await protocolKit.getChainId()
 
-  return new SafeApiKit({ chainId })
+  return new SafeApiKit({ chainId, txServiceUrl: config.txServiceUrl })
 }
 
 export * from './types'

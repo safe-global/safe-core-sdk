@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv'
 import Safe, { SafeAccountConfig, getSafeAddressFromDeploymentTx } from '@safe-global/protocol-kit'
 import { SafeVersion } from '@safe-global/types-kit'
 
@@ -7,10 +6,6 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { waitForTransactionReceipt } from 'viem/actions'
 import semverSatisfies from 'semver/functions/satisfies'
-
-dotenv.config()
-
-const { SIGNER_ADDRESS_PRIVATE_KEY } = process.env
 
 // This file can be used to play around with the Safe Core SDK
 
@@ -27,7 +22,7 @@ interface Config {
 
 const config: Config = {
   RPC_URL: sepolia.rpcUrls.default.http[0],
-  DEPLOYER_ADDRESS_PRIVATE_KEY: SIGNER_ADDRESS_PRIVATE_KEY!,
+  DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
     OWNERS: ['OWNER_ADDRESS'],
     THRESHOLD: 1, // <SAFE_THRESHOLD>

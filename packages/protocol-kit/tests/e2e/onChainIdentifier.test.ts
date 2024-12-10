@@ -24,7 +24,7 @@ describe('On-chain analytics', () => {
       const tool = 'protocol-kit'
       const toolVersion = '1.0.0'
 
-      const onChainIdentifier = generateOnChainIdentifier(project, platform, tool, toolVersion)
+      const onChainIdentifier = generateOnChainIdentifier({ project, platform, tool, toolVersion })
 
       const identifierPrefix = '5afe'
       const identifierVersion = '00'

@@ -54,7 +54,6 @@ export type Safe4337InitOptions = {
   }
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
-  // on-chain analitics
   onchainAnalitics?: OnchainAnaliticsProps
 }
 
@@ -67,7 +66,6 @@ export type Safe4337Options = {
   entryPointAddress: string
   safe4337ModuleAddress: string
   safeWebAuthnSharedSignerAddress?: string
-  // on-chain analitics
   onchainAnalitics?: OnchainAnaliticsProps
 }
 

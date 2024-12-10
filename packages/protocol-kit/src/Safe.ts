@@ -88,6 +88,7 @@ import { Hash, Hex, SendTransactionParameters } from 'viem'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
+import getProtocolKitVersion from './utils/getProtocolKitVersion'
 
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
@@ -134,12 +135,13 @@ class Safe {
     const { provider, signer, isL1SafeSingleton, contractNetworks, onchainAnalitics } = config
 
     if (onchainAnalitics?.project) {
-      this.#onchainIdentifier = generateOnChainIdentifier(
-        onchainAnalitics.project,
-        onchainAnalitics.platform,
-        'protocol-kit',
-        '5.0.4'
-      )
+      const { project, platform } = onchainAnalitics
+      this.#onchainIdentifier = generateOnChainIdentifier({
+        project,
+        platform,
+        tool: 'protocol-kit',
+        toolVersion: getProtocolKitVersion()
+      })
     }
 
     this.#safeProvider = await SafeProvider.init({

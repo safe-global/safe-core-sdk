@@ -53,6 +53,7 @@ import {
 } from './utils'
 import { entryPointToSafeModules, EQ_OR_GT_0_3_0 } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
+import getRelayKitVersion from './utils/getRelayKitVersion'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
@@ -117,12 +118,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
 
     if (onchainAnalitics?.project) {
-      this.#onchainIdentifier = generateOnChainIdentifier(
-        onchainAnalitics.project,
-        onchainAnalitics.platform,
-        'relay-kit',
-        '3.2.4'
-      )
+      const { project, platform } = onchainAnalitics
+      this.#onchainIdentifier = generateOnChainIdentifier({
+        project,
+        platform,
+        tool: 'relay-kit',
+        toolVersion: getRelayKitVersion()
+      })
     }
   }
 

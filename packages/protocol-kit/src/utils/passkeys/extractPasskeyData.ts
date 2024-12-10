@@ -172,12 +172,14 @@ export async function decodePublicKey(
  * Extracts and returns the passkey data (coordinates and rawId) from a given passkey Credential.
  *
  * @param {Credential} passkeyCredential - The passkey credential generated via `navigator.credentials.create()` or other method in another platforms.
- * @returns {Promise<PasskeyArgType>} A promise that resolves to an object containing the coordinates and the rawId derived from the passkey.
+ * @returns {Promise<Pick<PasskeyArgType, 'rawId' | 'coordinates'>>} A promise that resolves to an object containing the coordinates and the rawId derived from the passkey.
  * This is the important information in the Safe account context and should be stored securely as it is used to verify the passkey and to instantiate the SDK
  * as a signer (`Safe.init())
  * @throws {Error} Throws an error if the coordinates could not be extracted
  */
-export async function extractPasskeyData(passkeyCredential: Credential): Promise<PasskeyArgType> {
+export async function extractPasskeyData(
+  passkeyCredential: Credential
+): Promise<Pick<PasskeyArgType, 'rawId' | 'coordinates'>> {
   const passkeyPublicKeyCredential = passkeyCredential as PublicKeyCredential
 
   const rawId = Buffer.from(passkeyPublicKeyCredential.rawId).toString('hex')

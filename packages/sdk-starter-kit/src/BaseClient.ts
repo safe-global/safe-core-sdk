@@ -1,6 +1,8 @@
 import Safe, {
   AddOwnerTxParams,
+  AddPasskeyOwnerTxParams,
   RemoveOwnerTxParams,
+  RemovePasskeyOwnerTxParams,
   SwapOwnerTxParams
 } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
@@ -85,10 +87,12 @@ export class BaseClient {
   /**
    * Encodes the data for adding a new owner to the Safe.
    *
-   * @param {AddOwnerTxParams} addOwnerParams - The parameters for adding a new owner
+   * @param {AddOwnerTxParams | AddPasskeyOwnerTxParams} addOwnerParams - The parameters for adding a new owner
    * @returns {TransactionBase} The encoded data
    */
-  async createAddOwnerTransaction(addOwnerParams: AddOwnerTxParams): Promise<TransactionBase> {
+  async createAddOwnerTransaction(
+    addOwnerParams: AddOwnerTxParams | AddPasskeyOwnerTxParams
+  ): Promise<TransactionBase> {
     const addOwnerTransaction = await this.protocolKit.createAddOwnerTx(addOwnerParams)
 
     return this.#buildTransaction(addOwnerTransaction)
@@ -97,11 +101,11 @@ export class BaseClient {
   /**
    * Encodes the data for removing an owner from the Safe.
    *
-   * @param {RemoveOwnerTxParams} removeOwnerParams - The parameters for removing an owner
+   * @param {RemoveOwnerTxParams | RemovePasskeyOwnerTxParams} removeOwnerParams - The parameters for removing an owner
    * @returns {TransactionBase} The encoded data
    */
   async createRemoveOwnerTransaction(
-    removeOwnerParams: RemoveOwnerTxParams
+    removeOwnerParams: RemoveOwnerTxParams | RemovePasskeyOwnerTxParams
   ): Promise<TransactionBase> {
     const removeOwnerTransaction = await this.protocolKit.createRemoveOwnerTx(removeOwnerParams)
 

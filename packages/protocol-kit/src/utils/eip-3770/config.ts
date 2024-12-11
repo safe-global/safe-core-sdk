@@ -48,6 +48,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 114n, shortName: 'c2flr' },
   { chainId: 122n, shortName: 'fuse' },
   { chainId: 123n, shortName: 'spark' },
+  { chainId: 133n, shortName: 'hsk'},
   { chainId: 137n, shortName: 'matic' },
   { chainId: 148n, shortName: 'shimmerevm' },
   { chainId: 155n, shortName: 'tenet-testnet' },

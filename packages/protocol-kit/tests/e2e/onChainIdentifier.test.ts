@@ -6,11 +6,13 @@ import Safe, {
   SafeAccountConfig
 } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
+import Sinon from 'sinon'
 import chaiAsPromised from 'chai-as-promised'
 
+import { generateHash } from '@safe-global/protocol-kit/utils/on-chain-tracking/generateOnChainIdentifier'
+import getProtocolKitVersion, * as getProtocolKitVersionModule from '@safe-global/protocol-kit/utils/getProtocolKitVersion'
 import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
-import { generateHash } from '@safe-global/protocol-kit/utils/on-chain-tracking/generateOnChainIdentifier'
 
 chai.use(chaiAsPromised)
 
@@ -38,12 +40,14 @@ describe('On-chain analytics', () => {
     })
   })
 
-  describe.only('getOnchainIdentifier method', () => {
+  describe('getOnchainIdentifier method', () => {
     it('should return the on-chain identifier when provided', async () => {
       const onchainAnalytics: OnchainAnalyticsProps = {
         project: 'Test e2e Project',
         platform: 'Web'
       }
+
+      const stub = Sinon.stub(getProtocolKitVersionModule, 'default').returns('5.0.4')
 
       const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address
@@ -58,6 +62,7 @@ describe('On-chain analytics', () => {
       const onChainIdentifier = '5afe003861653435366632366138366164643038373864646561393238653366'
 
       chai.expect(onChainIdentifier).to.equals(protocolKit.getOnchainIdentifier())
+      stub.restore()
     })
 
     it('should return an empty string when no onchain Analiticts is provided', async () => {
@@ -102,7 +107,12 @@ describe('On-chain analytics', () => {
 
       const deploymentTransaction = await protocolKit.createSafeDeploymentTransaction()
 
-      const onChainIdentifier = '5afe003861653435366632366138366164643038373864646561393238653366'
+      // toolVersion is dynamic (currrent protocol-kit version)
+      const toolVersion = getProtocolKitVersion()
+      const toolHash = generateHash(toolVersion, 3)
+
+      const onChainIdentifier =
+        '5afe003861653435366632366138366164643038373864646561393238' + toolHash
 
       chai.expect(onChainIdentifier).to.equals(protocolKit.getOnchainIdentifier())
       chai.expect(deploymentTransaction.data.endsWith(onChainIdentifier)).to.be.true
@@ -147,7 +157,12 @@ describe('On-chain analytics', () => {
         .getSafeProvider()
         .getTransaction(transactionResponse.hash)
 
-      const onChainIdentifier = '5afe003861653435366632366138366164643038373864646561393238653366'
+      // toolVersion is dynamic (currrent protocol-kit version)
+      const toolVersion = getProtocolKitVersion()
+      const toolHash = generateHash(toolVersion, 3)
+
+      const onChainIdentifier =
+        '5afe003861653435366632366138366164643038373864646561393238' + toolHash
 
       chai.expect(onChainIdentifier).to.equals(protocolKit.getOnchainIdentifier())
       chai.expect(transaction.input.endsWith(onChainIdentifier)).to.be.true

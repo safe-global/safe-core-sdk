@@ -44,8 +44,6 @@ function generateOnChainIdentifier({
   tool,
   toolVersion
 }: OnChainIdentifierParamsType): string {
-  console.log('@@@ toolVersion: ', toolVersion)
-
   const identifierPrefix = '5afe'
   const identifierVersion = '00' // first version
   const projectHash = generateHash(project, 20) // Take the last 20 bytes

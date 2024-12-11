@@ -105,7 +105,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     entryPointAddress,
     safe4337ModuleAddress,
     safeWebAuthnSharedSignerAddress,
-    onchainAnalitics
+    onchainAnalytics
   }: Safe4337Options) {
     super(protocolKit)
 
@@ -117,8 +117,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
     this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
 
-    if (onchainAnalitics?.project) {
-      const { project, platform } = onchainAnalitics
+    if (onchainAnalytics?.project) {
+      const { project, platform } = onchainAnalytics
       this.#onchainIdentifier = generateOnChainIdentifier({
         project,
         platform,
@@ -146,7 +146,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl,
       customContracts,
       paymasterOptions,
-      onchainAnalitics
+      onchainAnalytics
     } = initOptions
 
     let protocolKit: Safe
@@ -354,7 +354,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
             paymentReceiver: zeroAddress
           }
         },
-        onchainAnalitics
+        onchainAnalytics
       })
     }
 
@@ -398,7 +398,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       entryPointAddress: selectedEntryPoint!,
       safe4337ModuleAddress,
       safeWebAuthnSharedSignerAddress,
-      onchainAnalitics
+      onchainAnalytics
     })
   }
 

@@ -1,7 +1,7 @@
 import { setupTests, safeVersionDeployed } from '@safe-global/testing-kit'
 import Safe, {
   generateOnChainIdentifier,
-  OnchainAnaliticsProps,
+  OnchainAnalyticsProps,
   PredictedSafeProps,
   SafeAccountConfig
 } from '@safe-global/protocol-kit/index'
@@ -40,7 +40,7 @@ describe('On-chain analytics', () => {
 
   describe('getOnchainIdentifier method', () => {
     it('should return the on-chain identifier when provided', async () => {
-      const onchainAnalitics: OnchainAnaliticsProps = {
+      const onchainAnalytics: OnchainAnalyticsProps = {
         project: 'Test e2e Project',
         platform: 'Web'
       }
@@ -52,7 +52,7 @@ describe('On-chain analytics', () => {
         provider,
         safeAddress,
         contractNetworks,
-        onchainAnalitics
+        onchainAnalytics
       })
 
       const onChainIdentifier = '5afe003861653435366632366138366164643038373864646561393238653366'
@@ -76,7 +76,7 @@ describe('On-chain analytics', () => {
 
   describe('Tracking Safe Deployment on-chain via the transaction data field', () => {
     it('should append the on-chain identifier to the deployment transaction data field', async () => {
-      const onchainAnalitics: OnchainAnaliticsProps = {
+      const onchainAnalytics: OnchainAnalyticsProps = {
         project: 'Test e2e Project',
         platform: 'Web'
       }
@@ -97,7 +97,7 @@ describe('On-chain analytics', () => {
         provider,
         predictedSafe,
         contractNetworks,
-        onchainAnalitics
+        onchainAnalytics
       })
 
       const deploymentTransaction = await protocolKit.createSafeDeploymentTransaction()
@@ -111,7 +111,7 @@ describe('On-chain analytics', () => {
 
   describe('Tracking Safe transactions on-chain via the transaction data field', () => {
     it('should append the on-chain identifier to the execTransaction data field', async () => {
-      const onchainAnalitics: OnchainAnaliticsProps = {
+      const onchainAnalytics: OnchainAnalyticsProps = {
         project: 'Test e2e Project',
         platform: 'Web'
       }
@@ -123,7 +123,7 @@ describe('On-chain analytics', () => {
         provider,
         safeAddress,
         contractNetworks,
-        onchainAnalitics
+        onchainAnalytics
       })
 
       const testTransaction = {

@@ -2,7 +2,7 @@ import { Account, Address, Chain, Hash, Hex, PublicClient, PublicRpcSchema, Tran
 import Safe, {
   DeploymentType,
   SafeProviderConfig,
-  OnchainAnaliticsProps
+  OnchainAnalyticsProps
 } from '@safe-global/protocol-kit'
 import {
   EstimateGasData,
@@ -54,7 +54,7 @@ export type Safe4337InitOptions = {
   }
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
-  onchainAnalitics?: OnchainAnaliticsProps
+  onchainAnalytics?: OnchainAnalyticsProps
 }
 
 export type Safe4337Options = {
@@ -66,7 +66,7 @@ export type Safe4337Options = {
   entryPointAddress: string
   safe4337ModuleAddress: string
   safeWebAuthnSharedSignerAddress?: string
-  onchainAnalitics?: OnchainAnaliticsProps
+  onchainAnalytics?: OnchainAnalyticsProps
 }
 
 export type Safe4337CreateTransactionProps = {

@@ -105,7 +105,7 @@ class Safe {
   #MAGIC_VALUE = '0x1626ba7e'
   #MAGIC_VALUE_BYTES = '0x20c13b0b'
 
-  // on-chain Analitics
+  // on-chain Analytics
   #onchainIdentifier: string = ''
 
   /**
@@ -132,10 +132,10 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async #initializeProtocolKit(config: SafeConfig) {
-    const { provider, signer, isL1SafeSingleton, contractNetworks, onchainAnalitics } = config
+    const { provider, signer, isL1SafeSingleton, contractNetworks, onchainAnalytics } = config
 
-    if (onchainAnalitics?.project) {
-      const { project, platform } = onchainAnalitics
+    if (onchainAnalytics?.project) {
+      const { project, platform } = onchainAnalytics
       this.#onchainIdentifier = generateOnChainIdentifier({
         project,
         platform,
@@ -1539,7 +1539,7 @@ class Safe {
     const safeDeploymentBatch = await this.createTransactionBatch(
       transactions,
       transactionOptions,
-      true // include the on chain identifier
+      !!this.#onchainIdentifier // include the on chain identifier
     )
 
     return safeDeploymentBatch

@@ -38,7 +38,7 @@ describe('On-chain analytics', () => {
     })
   })
 
-  describe('getOnchainIdentifier method', () => {
+  describe.only('getOnchainIdentifier method', () => {
     it('should return the on-chain identifier when provided', async () => {
       const onchainAnalytics: OnchainAnalyticsProps = {
         project: 'Test e2e Project',

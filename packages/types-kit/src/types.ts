@@ -7,6 +7,15 @@ export enum OperationType {
   DelegateCall // 1
 }
 
+export const SignatureTypes = {
+  CONTRACT_SIGNATURE: 'CONTRACT_SIGNATURE',
+  EOA: 'EOA',
+  APPROVED_HASH: 'APPROVED_HASH',
+  ETH_SIGN: 'ETH_SIGN'
+} as const
+
+export type SignatureType = (typeof SignatureTypes)[keyof typeof SignatureTypes]
+
 export interface SafeSetupConfig {
   owners: string[]
   threshold: number

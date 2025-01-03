@@ -44,7 +44,7 @@ yarn -v
 
 #### Installing dependencies    
 
-The Safe{Core} SDK uses a mono-repository structure managed by [Yarn Workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) and [Lerna](https://lerna.js.org). From the root of the repository you will need to install the whole dependency stack and do the project build. Some packages depend on each other, so even when modifiying only one package it's better to run the full build.
+The Safe{Core} SDK uses a mono-repository structure managed by [Yarn Workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) and [Lerna](https://lerna.js.org). From the root of the repository you will need to install the whole dependency stack and do the project build. Some packages depend on each other, so even when modifying only one package it's better to run the full build.
 
 Install all dependencies and build the whole project by using the following commands at the project root.
 

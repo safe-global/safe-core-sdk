@@ -55,7 +55,7 @@ In case you want to execute the transaction via a transaction relay, this script
 yarn play relay-sponsored-transaction
 ```
 
-#### Generate a custon Safe address
+#### Generate a custom Safe address
 
 This script allows to find the right `saltNonce` to generate a vanity Safe address with any given configuration:
 

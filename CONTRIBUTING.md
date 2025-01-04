@@ -17,7 +17,7 @@ You will need to agree to [our CLA](https://safe.global/cla) in order to be poss
 
 ### Starting Guide
 
-By following the steps bellow you will understand the development process and worflow.
+By following the steps bellow you will understand the development process and workflow.
 1. [Forking the repository](#forking-the-repository)
 2. [Installing Node and Yarn](#installing-node-and-yarn)
 3. [Installing dependencies](#installing-dependencies)

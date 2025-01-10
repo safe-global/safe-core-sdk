@@ -11,15 +11,13 @@ import Safe, {
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
   isSafeOperationResponse,
-  MetaTransactionData,
   OperationType,
   SafeOperationConfirmation,
   SafeOperationResponse,
-  SafeSignature,
-  UserOperation
+  SafeSignature
 } from '@safe-global/types-kit'
 import {
-  getAddModulesLibDeployment,
+  getSafeModuleSetupDeployment,
   getSafe4337ModuleDeployment,
   getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
@@ -34,26 +32,24 @@ import {
   UserOperationReceipt,
   UserOperationWithPayload,
   PaymasterOptions,
-  ERC20PaymasterOption,
   BundlerClient
 } from './types'
 import {
   ABI,
   DEFAULT_SAFE_VERSION,
   DEFAULT_SAFE_MODULES_VERSION,
-  RPC_4337_CALLS,
-  ENTRYPOINT_ABI
+  RPC_4337_CALLS
 } from './constants'
 import {
   addDummySignature,
-  encodeMultiSendCallData,
   getEip4337BundlerProvider,
   signSafeOp,
   userOperationToHexValues
 } from './utils'
-import { entryPointToSafeModules, EQ_OR_GT_0_3_0 } from './utils/entrypoint'
+import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 import getRelayKitVersion from './utils/getRelayKitVersion'
+import { createUserOperation } from './utils/userOperations'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
@@ -153,24 +149,18 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
     const chainId = await bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
 
-    let addModulesLibAddress = customContracts?.addModulesLibAddress
+    let safeModulesSetupAddress = customContracts?.safeModulesSetupAddress
     const network = parseInt(chainId, 16).toString()
 
     const safeModulesVersion = initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION
 
-    if (semverSatisfies(safeModulesVersion, EQ_OR_GT_0_3_0)) {
-      throw new Error(
-        `Incompatibility detected: Safe modules version ${safeModulesVersion} is not supported. The SDK can use 0.2.0 only.`
-      )
-    }
-
-    if (!addModulesLibAddress) {
-      const addModulesDeployment = getAddModulesLibDeployment({
+    if (!safeModulesSetupAddress) {
+      const safeModuleSetupDeployment = getSafeModuleSetupDeployment({
         released: true,
         version: safeModulesVersion,
         network
       })
-      addModulesLibAddress = addModulesDeployment?.networkAddresses[network]
+      safeModulesSetupAddress = safeModuleSetupDeployment?.networkAddresses[network]
     }
 
     let safe4337ModuleAddress = customContracts?.safe4337ModuleAddress
@@ -183,9 +173,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
     }
 
-    if (!addModulesLibAddress || !safe4337ModuleAddress) {
+    if (!safeModulesSetupAddress || !safe4337ModuleAddress) {
       throw new Error(
-        `Safe4337Module and/or AddModulesLib not available for chain ${network} and modules version ${safeModulesVersion}`
+        `Safe4337Module and/or SafeModuleSetup not available for chain ${network} and modules version ${safeModulesVersion}`
       )
     }
 
@@ -237,7 +227,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       // first setup transaction: Enable 4337 module
       const enable4337ModuleTransaction = {
-        to: addModulesLibAddress,
+        to: safeModulesSetupAddress,
         value: '0',
         data: encodeFunctionData({
           abi: ABI,
@@ -496,70 +486,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
-    const safeAddress = await this.protocolKit.getAddress()
-    const nonce = await this.#getSafeNonceFromEntrypoint(safeAddress)
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
-    if (amountToApprove) {
-      const paymasterOptions = this.#paymasterOptions as ERC20PaymasterOption
-
-      if (!paymasterOptions.paymasterTokenAddress) {
-        throw new Error('Paymaster must be initialized')
-      }
-
-      const approveToPaymasterTransaction = {
-        to: paymasterOptions.paymasterTokenAddress,
-        data: encodeFunctionData({
-          abi: ABI,
-          functionName: 'approve',
-          args: [paymasterOptions.paymasterAddress, amountToApprove]
-        }),
-        value: '0',
-        operation: OperationType.Call // Call for approve
-      }
-
-      transactions.push(approveToPaymasterTransaction)
-    }
-
-    const isBatch = transactions.length > 1
-    const multiSendAddress = this.protocolKit.getMultiSendAddress()
-
-    const callData = isBatch
-      ? this.#encodeExecuteUserOpCallData({
-          to: multiSendAddress,
-          value: '0',
-          data: encodeMultiSendCallData(transactions),
-          operation: OperationType.DelegateCall
-        })
-      : this.#encodeExecuteUserOpCallData(transactions[0])
-
-    const paymasterAndData =
-      this.#paymasterOptions && 'paymasterAddress' in this.#paymasterOptions
-        ? this.#paymasterOptions.paymasterAddress
-        : '0x'
-
-    const userOperation: UserOperation = {
-      sender: safeAddress,
-      nonce: nonce,
-      initCode: '0x',
-      callData,
-      callGasLimit: 1n,
-      verificationGasLimit: 1n,
-      preVerificationGas: 1n,
-      maxFeePerGas: 1n,
-      maxPriorityFeePerGas: 1n,
-      paymasterAndData,
-      signature: '0x'
-    }
-
+    const userOperation = await createUserOperation(this.protocolKit, transactions, {
+      entryPoint: this.#ENTRYPOINT_ADDRESS,
+      paymasterOptions: this.#paymasterOptions,
+      amountToApprove
+    })
+    console.log('userOperation', userOperation)
     if (this.#onchainIdentifier) {
       userOperation.callData += this.#onchainIdentifier
-    }
-
-    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
-
-    if (!isSafeDeployed) {
-      userOperation.initCode = await this.protocolKit.getInitCode()
     }
 
     const safeOperation = new EthSafeOperation(userOperation, {
@@ -790,44 +726,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
    */
   async getChainId(): Promise<string> {
     return this.#bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
-  }
-
-  /**
-   * Gets account nonce from the bundler.
-   *
-   * @param {string} safeAddress - Account address for which the nonce is to be fetched.
-   * @returns {Promise<string>} The Promise object will resolve to the account nonce.
-   */
-  async #getSafeNonceFromEntrypoint(safeAddress: string): Promise<string> {
-    const safeProvider = this.protocolKit.getSafeProvider()
-
-    const newNonce = await safeProvider.readContract({
-      address: this.#ENTRYPOINT_ADDRESS || '0x',
-      abi: ENTRYPOINT_ABI,
-      functionName: 'getNonce',
-      args: [safeAddress, 0n]
-    })
-
-    return newNonce.toString()
-  }
-
-  /**
-   * Encode the UserOperation execution from a transaction.
-   *
-   * @param {MetaTransactionData} transaction - The transaction data to encode.
-   * @return {string} The encoded call data string.
-   */
-  #encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
-    return encodeFunctionData({
-      abi: ABI,
-      functionName: 'executeUserOp',
-      args: [
-        transaction.to,
-        BigInt(transaction.value),
-        transaction.data as Hex,
-        transaction.operation || OperationType.Call
-      ]
-    })
   }
 
   getOnchainIdentifier(): string {

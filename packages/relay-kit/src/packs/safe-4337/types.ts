@@ -49,7 +49,7 @@ export type Safe4337InitOptions = {
   customContracts?: {
     entryPointAddress?: string
     safe4337ModuleAddress?: string
-    addModulesLibAddress?: string
+    safeModulesSetupAddress?: string
     safeWebAuthnSharedSignerAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions

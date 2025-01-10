@@ -260,7 +260,7 @@ export interface MetaTransactionOptions {
   isSponsored?: boolean
 }
 
-export type UserOperation = {
+export type UserOperationV06 = {
   sender: string
   nonce: string
   initCode: string
@@ -273,6 +273,26 @@ export type UserOperation = {
   paymasterAndData: string
   signature: string
 }
+
+export type UserOperationV07 = {
+  sender: string
+  nonce: string
+  factory?: string
+  factoryData?: string
+  callData: string
+  callGasLimit: bigint
+  verificationGasLimit: bigint
+  preVerificationGas: bigint
+  maxFeePerGas: bigint
+  maxPriorityFeePerGas: bigint
+  paymaster?: string
+  paymasterData?: string
+  paymasterVerificationGasLimit?: bigint
+  paymasterPostOpGasLimit?: bigint
+  signature: string
+}
+
+export type UserOperation = UserOperationV06 | UserOperationV07
 
 export type SafeUserOperation = {
   safe: string

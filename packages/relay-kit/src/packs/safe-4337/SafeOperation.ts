@@ -4,7 +4,8 @@ import {
   SafeOperation,
   SafeSignature,
   SafeUserOperation,
-  UserOperation
+  UserOperation,
+  UserOperationV06
 } from '@safe-global/types-kit'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
 import { calculateSafeUserOperationHash } from './utils'
@@ -32,14 +33,14 @@ class EthSafeOperation implements SafeOperation {
     this.data = {
       safe: userOperation.sender,
       nonce: BigInt(userOperation.nonce),
-      initCode: userOperation.initCode,
+      initCode: (userOperation as UserOperationV06).initCode,
       callData: userOperation.callData,
       callGasLimit: userOperation.callGasLimit,
       verificationGasLimit: userOperation.verificationGasLimit,
       preVerificationGas: userOperation.preVerificationGas,
       maxFeePerGas: userOperation.maxFeePerGas,
       maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas,
-      paymasterAndData: userOperation.paymasterAndData,
+      paymasterAndData: (userOperation as UserOperationV06).paymasterAndData,
       validAfter: validAfter || 0,
       validUntil: validUntil || 0,
       entryPoint

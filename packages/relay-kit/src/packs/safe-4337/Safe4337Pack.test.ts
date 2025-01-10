@@ -5,7 +5,7 @@ import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { WebAuthnCredentials } from '@safe-global/protocol-kit/tests/e2e/utils/webauthnShim'
 import { createMockPasskey } from '@safe-global/protocol-kit/tests/e2e/utils/passkeys'
 import {
-  getAddModulesLibDeployment,
+  getSafeModuleSetupDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
@@ -38,7 +38,7 @@ jest.mock('./utils', () => ({
 }))
 
 let safe4337ModuleAddress: viem.Hash
-let addModulesLibAddress: string
+let safeModulesSetupAddress: string
 
 describe('Safe4337Pack', () => {
   beforeAll(async () => {
@@ -48,7 +48,7 @@ describe('Safe4337Pack', () => {
       version: '0.2.0',
       network
     })?.networkAddresses[network] as viem.Hash
-    addModulesLibAddress = getAddModulesLibDeployment({
+    safeModulesSetupAddress = getSafeModuleSetupDeployment({
       released: true,
       version: '0.2.0',
       network
@@ -250,7 +250,7 @@ describe('Safe4337Pack', () => {
           safeAccountConfig: {
             owners: [fixtures.OWNER_1, fixtures.OWNER_2],
             threshold: 1,
-            to: addModulesLibAddress,
+            to: safeModulesSetupAddress,
             data: viem.encodeFunctionData({
               abi: constants.ABI,
               functionName: 'enableModules',
@@ -295,7 +295,7 @@ describe('Safe4337Pack', () => {
       })
 
       const enable4337ModuleTransaction = {
-        to: addModulesLibAddress,
+        to: safeModulesSetupAddress,
         value: '0',
         data: enableModulesData,
         operation: OperationType.DelegateCall
@@ -641,7 +641,7 @@ describe('Safe4337Pack', () => {
       })
 
       const enable4337ModuleTransaction = {
-        to: addModulesLibAddress,
+        to: safeModulesSetupAddress,
         value: '0',
         data: enableModulesData,
         operation: OperationType.DelegateCall

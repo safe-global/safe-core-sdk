@@ -1,4 +1,5 @@
-import { ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07 } from '../constants'
+import Safe from '@safe-global/protocol-kit'
+import { ENTRYPOINT_ABI, ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07 } from '../constants'
 
 const EQ_0_2_0 = '0.2.0'
 
@@ -19,4 +20,31 @@ export function entryPointToSafeModules(entryPoint: string) {
 
 export function isEntryPointV6(address: string): boolean {
   return sameString(address, ENTRYPOINT_ADDRESS_V06)
+}
+
+export function isEntryPointV7(address: string): boolean {
+  return sameString(address, ENTRYPOINT_ADDRESS_V07)
+}
+
+/**
+ * Gets account nonce from the bundler.
+ *
+ * @param {string} safeAddress - Account address for which the nonce is to be fetched.
+ * @returns {Promise<string>} The Promise object will resolve to the account nonce.
+ */
+export async function getSafeNonceFromEntrypoint(
+  protocolKit: Safe,
+  safeAddress: string,
+  entryPointAddress: string
+): Promise<string> {
+  const safeProvider = protocolKit.getSafeProvider()
+
+  const newNonce = await safeProvider.readContract({
+    address: entryPointAddress || '0x',
+    abi: ENTRYPOINT_ABI,
+    functionName: 'getNonce',
+    args: [safeAddress, 0n]
+  })
+
+  return newNonce.toString()
 }

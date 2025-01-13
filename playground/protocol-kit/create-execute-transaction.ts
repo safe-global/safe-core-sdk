@@ -37,7 +37,7 @@ async function main() {
   console.log(' - Version: ', await safe.getContractVersion())
   console.log(' - Threshold: ', await safe.getThreshold(), '\n')
 
-  // Create transaction
+  // Create rejection transaction
   const safeTransactionData: SafeTransactionDataPartial = {
     to: config.SAFE_ADDRESS,
     value: '1000000000000000', // 0.001 ether

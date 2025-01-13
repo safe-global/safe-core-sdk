@@ -1,7 +1,12 @@
-import Safe, { getSafeProxyFactoryContract } from '@safe-global/protocol-kit'
-import { MetaTransactionData, OperationType, UserOperation } from '@safe-global/types-kit'
+import Safe from '@safe-global/protocol-kit'
+import {
+  MetaTransactionData,
+  OperationType,
+  UserOperation,
+  UserOperationV07
+} from '@safe-global/types-kit'
 import { getSafeNonceFromEntrypoint, isEntryPointV6 } from './entrypoint'
-import { encodeFunctionData, Hex } from 'viem'
+import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex } from 'viem'
 import { ABI } from '../constants'
 import { ERC20PaymasterOption, PaymasterOptions } from '../types'
 import { encodeMultiSendCallData } from '../utils'
@@ -61,6 +66,43 @@ export async function getCallData(
   return callData
 }
 
+export function unpackPaymasterAndData(
+  paymasterAndData: string
+): Pick<
+  UserOperationV07,
+  'paymaster' | 'paymasterVerificationGasLimit' | 'paymasterPostOpGasLimit' | 'paymasterData'
+> {
+  const paymasterAndDataBytes = hexToBytes(paymasterAndData as Hex)
+  const isZero = paymasterAndDataBytes.every((byte) => byte === 0)
+
+  return paymasterAndDataBytes.length > 0 && !isZero
+    ? {
+        paymaster: getAddress(sliceHex(paymasterAndData as Hex, 0, 20)),
+        paymasterVerificationGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 20, 36)),
+        paymasterPostOpGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 36, 52)),
+        paymasterData: sliceHex(paymasterAndData as Hex, 52)
+      }
+    : {
+        paymaster: '0x',
+        paymasterData: '0x',
+        paymasterVerificationGasLimit: undefined,
+        paymasterPostOpGasLimit: undefined
+      }
+}
+
+export function unpackInitCode(
+  initCode: string
+): Pick<UserOperationV07, 'factory' | 'factoryData'> {
+  const initCodeBytes = hexToBytes(initCode as Hex)
+
+  return initCodeBytes.length > 0
+    ? {
+        factory: getAddress(sliceHex(initCode as Hex, 0, 20)),
+        factoryData: sliceHex(initCode as Hex, 20)
+      }
+    : {}
+}
+
 export async function createUserOperation(
   protocolKit: Safe,
   transactions: MetaTransactionData[],
@@ -101,19 +143,10 @@ export async function createUserOperation(
     }
   }
 
-  const factoryContract = isSafeDeployed
-    ? undefined
-    : await getSafeProxyFactoryContract({
-        safeProvider: protocolKit.getSafeProvider(),
-        safeVersion: protocolKit.getContractVersion()
-      })
-  const factory = factoryContract?.contractAddress
-
   return {
     sender: safeAddress,
     nonce,
-    factory,
-    factoryData: initCode,
+    ...unpackInitCode(initCode),
     callData,
     callGasLimit: 1n,
     verificationGasLimit: 1n,

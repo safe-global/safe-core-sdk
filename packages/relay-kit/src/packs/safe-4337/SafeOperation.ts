@@ -1,4 +1,4 @@
-import { Hex, concat, encodePacked, pad, toHex, hexToBytes, sliceHex, getAddress } from 'viem'
+import { Hex, concat, encodePacked, pad, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -11,6 +11,7 @@ import {
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
 import { calculateSafeUserOperationHash } from './utils'
 import { isEntryPointV6, isEntryPointV7 } from './utils/entrypoint'
+import { unpackInitCode, unpackPaymasterAndData } from './utils/userOperations'
 
 type SafeOperationOptions = {
   moduleAddress: string
@@ -128,8 +129,8 @@ class EthSafeOperation implements SafeOperation {
       }
     }
 
-    const factoryData = this.unpackInitCode(this.data.initCode)
-    const paymasterData = this.unpackPaymasterAndData(this.data.paymasterAndData)
+    const factoryData = unpackInitCode(this.data.initCode)
+    const paymasterData = unpackPaymasterAndData(this.data.paymasterAndData)
 
     return {
       sender: this.data.safe,
@@ -151,41 +152,6 @@ class EthSafeOperation implements SafeOperation {
 
   getHash(): string {
     return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress)
-  }
-
-  unpackPaymasterAndData(
-    paymasterAndData: string
-  ): Pick<
-    UserOperationV07,
-    'paymaster' | 'paymasterVerificationGasLimit' | 'paymasterPostOpGasLimit' | 'paymasterData'
-  > {
-    const paymasterAndDataBytes = hexToBytes(paymasterAndData as Hex)
-    const isZero = paymasterAndDataBytes.every((byte) => byte === 0)
-
-    return paymasterAndDataBytes.length > 0 && !isZero
-      ? {
-          paymaster: getAddress(sliceHex(paymasterAndData as Hex, 0, 20)),
-          paymasterVerificationGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 20, 36)),
-          paymasterPostOpGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 36, 52)),
-          paymasterData: sliceHex(paymasterAndData as Hex, 52)
-        }
-      : {
-          paymaster: '0x',
-          paymasterData: '0x',
-          paymasterVerificationGasLimit: undefined,
-          paymasterPostOpGasLimit: undefined
-        }
-  }
-
-  unpackInitCode(initCode: string): Pick<UserOperationV07, 'factory' | 'factoryData'> {
-    const initCodeBytes = hexToBytes(initCode as Hex)
-
-    return initCodeBytes.length > 0
-      ? {
-          factory: getAddress(sliceHex(initCode as Hex, 0, 20)),
-          factoryData: sliceHex(initCode as Hex, 20)
-        }
-      : {}
   }
 }
 

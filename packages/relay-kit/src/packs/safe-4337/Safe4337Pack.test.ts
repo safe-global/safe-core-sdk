@@ -764,7 +764,7 @@ describe('Safe4337Pack', () => {
       expect(requestMock).toHaveBeenCalledWith({
         method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
         params: [
-          utils.userOperationToHexValues(safeOperation.toUserOperation()),
+          utils.userOperationToHexValues(safeOperation.toUserOperation(), fixtures.ENTRYPOINTS[0]),
           fixtures.ENTRYPOINTS[0]
         ]
       })
@@ -861,7 +861,7 @@ describe('Safe4337Pack', () => {
     expect(requestMock).toHaveBeenCalledWith({
       method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
       params: [
-        utils.userOperationToHexValues(safeOperation.toUserOperation()),
+        utils.userOperationToHexValues(safeOperation.toUserOperation(), fixtures.ENTRYPOINTS[0]),
         fixtures.ENTRYPOINTS[0]
       ]
     })

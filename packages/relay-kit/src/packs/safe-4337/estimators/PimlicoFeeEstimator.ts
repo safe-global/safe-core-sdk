@@ -37,21 +37,26 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     const gasEstimate = await paymasterClient.request({
       method: RPC_4337_CALLS.SPONSOR_USER_OPERATION,
       params: sponsorshipPolicyId
-        ? [userOperationToHexValues(userOperation), entryPoint, { sponsorshipPolicyId }]
-        : [userOperationToHexValues(userOperation), entryPoint]
+        ? [userOperationToHexValues(userOperation, entryPoint), entryPoint, { sponsorshipPolicyId }]
+        : [userOperationToHexValues(userOperation, entryPoint), entryPoint]
     })
 
+    console.log('getPaymasterEstimation', gasEstimate)
     return gasEstimate
   }
 
   async #getFeeData(
     bundlerClient: BundlerClient
   ): Promise<Pick<EstimateGasData, 'maxFeePerGas' | 'maxPriorityFeePerGas'>> {
-    const {
-      fast: { maxFeePerGas, maxPriorityFeePerGas }
-    } = await bundlerClient.request({
+    const feeData = await bundlerClient.request({
       method: 'pimlico_getUserOperationGasPrice'
     })
+
+    console.log('getFeeData', feeData)
+
+    const {
+      fast: { maxFeePerGas, maxPriorityFeePerGas }
+    } = feeData
 
     return {
       maxFeePerGas: BigInt(maxFeePerGas),

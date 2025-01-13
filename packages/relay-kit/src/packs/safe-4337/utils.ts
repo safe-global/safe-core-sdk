@@ -23,6 +23,7 @@ import {
 } from '@safe-global/protocol-kit'
 import { ABI, EIP712_SAFE_OPERATION_TYPE } from './constants'
 import { BundlerClient, PimlicoCustomRpcSchema } from './types'
+import { isEntryPointV7 } from './utils/entrypoint'
 
 /**
  * Gets the EIP-4337 bundler provider.
@@ -128,7 +129,7 @@ export function calculateSafeUserOperationHash(
  * @param {UserOperation} userOperation - The UserOperation object whose values are to be converted.
  * @returns {UserOperation} A new UserOperation object with the values converted to hexadecimal.
  */
-export function userOperationToHexValues(userOperation: UserOperation) {
+export function userOperationToHexValues(userOperation: UserOperation, entryPointAddress: string) {
   const userOperationWithHexValues = {
     ...userOperation,
     nonce: toHex(BigInt(userOperation.nonce)),
@@ -136,7 +137,15 @@ export function userOperationToHexValues(userOperation: UserOperation) {
     verificationGasLimit: toHex(userOperation.verificationGasLimit),
     preVerificationGas: toHex(userOperation.preVerificationGas),
     maxFeePerGas: toHex(userOperation.maxFeePerGas),
-    maxPriorityFeePerGas: toHex(userOperation.maxPriorityFeePerGas)
+    maxPriorityFeePerGas: toHex(userOperation.maxPriorityFeePerGas),
+    ...(isEntryPointV7(entryPointAddress)
+      ? {
+          paymaster: null,
+          paymasterData: null,
+          paymasterVerificationGasLimit: null,
+          paymasterPostOpGasLimit: null
+        }
+      : {})
   }
 
   return userOperationWithHexValues

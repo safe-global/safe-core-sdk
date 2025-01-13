@@ -424,7 +424,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
             safeOperation.toUserOperation(),
             this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
             threshold
-          )
+          ),
+          this.#ENTRYPOINT_ADDRESS
         ),
         this.#ENTRYPOINT_ADDRESS
       ]
@@ -493,7 +494,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       paymasterOptions: this.#paymasterOptions,
       amountToApprove
     })
-    console.log('userOperation', userOperation)
+
     if (this.#onchainIdentifier) {
       userOperation.callData += this.#onchainIdentifier
     }
@@ -505,6 +506,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       validUntil,
       validAfter
     })
+
+    console.log('safeOperation', safeOperation)
 
     return await this.getEstimateFee({
       safeOperation,
@@ -677,7 +680,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     return this.#bundlerClient.request({
       method: RPC_4337_CALLS.SEND_USER_OPERATION,
-      params: [userOperationToHexValues(userOperation), this.#ENTRYPOINT_ADDRESS]
+      params: [
+        userOperationToHexValues(userOperation, this.#ENTRYPOINT_ADDRESS),
+        this.#ENTRYPOINT_ADDRESS
+      ]
     })
   }
 

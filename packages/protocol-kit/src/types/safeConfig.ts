@@ -41,6 +41,13 @@ type SafeConfigWithPredictedSafeProps = {
   predictedSafe: PredictedSafeProps
 }
 
+export type OnchainAnalyticsProps = {
+  /** project - The project that is using the SDK */
+  project?: string
+  /** platform - The platform that is using the SDK */
+  platform?: string
+}
+
 export type SafeConfigProps = {
   provider: SafeProviderConfig['provider']
   signer?: SafeProviderConfig['signer']
@@ -48,6 +55,8 @@ export type SafeConfigProps = {
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
+  // on-chain analytics
+  onchainAnalytics?: OnchainAnalyticsProps
 }
 
 export type SafeConfigWithSafeAddress = SafeConfigProps & SafeConfigWithSafeAddressProps
@@ -75,6 +84,8 @@ type ConnectSafeConfigProps = {
   isL1SafeSingleton?: boolean
   /** contractNetworks - Contract network configuration */
   contractNetworks?: ContractNetworksConfig
+  // on-chain analytics
+  onchainAnalytics?: OnchainAnalyticsProps
 }
 
 export type ConnectSafeConfigWithSafeAddress = ConnectSafeConfigProps &

@@ -75,19 +75,22 @@ export function unpackPaymasterAndData(
   const paymasterAndDataBytes = hexToBytes(paymasterAndData as Hex)
   const isZero = paymasterAndDataBytes.every((byte) => byte === 0)
 
-  return paymasterAndDataBytes.length > 0 && !isZero
-    ? {
-        paymaster: getAddress(sliceHex(paymasterAndData as Hex, 0, 20)),
-        paymasterVerificationGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 20, 36)),
-        paymasterPostOpGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 36, 52)),
-        paymasterData: sliceHex(paymasterAndData as Hex, 52)
-      }
-    : {
-        paymaster: '0x',
-        paymasterData: '0x',
-        paymasterVerificationGasLimit: undefined,
-        paymasterPostOpGasLimit: undefined
-      }
+  const unpackedData =
+    paymasterAndDataBytes.length > 0 && !isZero
+      ? {
+          paymaster: getAddress(sliceHex(paymasterAndData as Hex, 0, 20)),
+          paymasterVerificationGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 20, 36)),
+          paymasterPostOpGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 36, 52)),
+          paymasterData: sliceHex(paymasterAndData as Hex, 52)
+        }
+      : {
+          paymaster: '0x',
+          paymasterData: '0x',
+          paymasterVerificationGasLimit: undefined,
+          paymasterPostOpGasLimit: undefined
+        }
+
+  return unpackedData
 }
 
 export function unpackInitCode(

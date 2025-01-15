@@ -13,7 +13,8 @@ import {
   OperationType,
   MetaTransactionData,
   SafeSignature,
-  UserOperation
+  UserOperation,
+  UserOperationV07
 } from '@safe-global/types-kit'
 import {
   EthSafeSignature,
@@ -21,7 +22,7 @@ import {
   encodeMultiSendData,
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
-import { ABI, EIP712_SAFE_OPERATION_TYPE } from './constants'
+import { ABI, EIP712_SAFE_OPERATION_TYPE_V06, EIP712_SAFE_OPERATION_TYPE_V07 } from './constants'
 import { BundlerClient, PimlicoCustomRpcSchema } from './types'
 import { isEntryPointV7 } from './utils/entrypoint'
 
@@ -51,7 +52,8 @@ export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
 export async function signSafeOp(
   safeUserOperation: SafeUserOperation,
   safeProvider: SafeProvider,
-  safe4337ModuleAddress: string
+  safe4337ModuleAddress: string,
+  entryPoint: string
 ): Promise<SafeSignature> {
   const signer = await safeProvider.getExternalSigner()
 
@@ -66,7 +68,9 @@ export async function signSafeOp(
       chainId: Number(chainId),
       verifyingContract: safe4337ModuleAddress
     },
-    types: EIP712_SAFE_OPERATION_TYPE,
+    types: isEntryPointV7(entryPoint)
+      ? EIP712_SAFE_OPERATION_TYPE_V07
+      : EIP712_SAFE_OPERATION_TYPE_V06,
     message: {
       ...safeUserOperation,
       nonce: toHex(safeUserOperation.nonce),
@@ -110,14 +114,17 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): st
 export function calculateSafeUserOperationHash(
   safeUserOperation: SafeUserOperation,
   chainId: bigint,
-  safe4337ModuleAddress: string
+  safe4337ModuleAddress: string,
+  entryPoint: string
 ): string {
   return hashTypedData({
     domain: {
       chainId: Number(chainId),
       verifyingContract: safe4337ModuleAddress
     },
-    types: EIP712_SAFE_OPERATION_TYPE,
+    types: isEntryPointV7(entryPoint)
+      ? EIP712_SAFE_OPERATION_TYPE_V07
+      : EIP712_SAFE_OPERATION_TYPE_V06,
     primaryType: 'SafeOp',
     message: safeUserOperation
   })
@@ -130,6 +137,8 @@ export function calculateSafeUserOperationHash(
  * @returns {UserOperation} A new UserOperation object with the values converted to hexadecimal.
  */
 export function userOperationToHexValues(userOperation: UserOperation, entryPointAddress: string) {
+  const userOpV07 = userOperation as UserOperationV07
+
   const userOperationWithHexValues = {
     ...userOperation,
     nonce: toHex(BigInt(userOperation.nonce)),
@@ -140,10 +149,14 @@ export function userOperationToHexValues(userOperation: UserOperation, entryPoin
     maxPriorityFeePerGas: toHex(userOperation.maxPriorityFeePerGas),
     ...(isEntryPointV7(entryPointAddress)
       ? {
-          paymaster: null,
-          paymasterData: null,
-          paymasterVerificationGasLimit: null,
-          paymasterPostOpGasLimit: null
+          paymaster: userOpV07.paymaster !== '0x' ? userOpV07.paymaster : null,
+          paymasterData: userOpV07.paymasterData !== '0x' ? userOpV07.paymasterData : null,
+          paymasterVerificationGasLimit: userOpV07.paymasterVerificationGasLimit
+            ? toHex(userOpV07.paymasterVerificationGasLimit)
+            : null,
+          paymasterPostOpGasLimit: userOpV07.paymasterPostOpGasLimit
+            ? toHex(userOpV07.paymasterPostOpGasLimit)
+            : null
         }
       : {})
   }

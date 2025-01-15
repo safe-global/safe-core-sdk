@@ -311,11 +311,16 @@ export type SafeUserOperation = {
 }
 
 export type EstimateGasData = {
+  paymasterAndData?: string
+  paymaster?: string
+  paymasterData?: string
   maxFeePerGas?: bigint
   maxPriorityFeePerGas?: bigint
   preVerificationGas?: bigint
   verificationGasLimit?: bigint
   callGasLimit?: bigint
+  paymasterVerificationGasLimit?: bigint
+  paymasterPostOpGasLimit?: bigint
 }
 
 export interface SafeOperation {

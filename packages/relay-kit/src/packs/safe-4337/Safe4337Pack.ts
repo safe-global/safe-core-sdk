@@ -431,6 +431,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       ]
     })
 
+    console.log('estimateUserOperationGas', estimateUserOperationGas)
+
     if (estimateUserOperationGas) {
       safeOperation.addEstimations({
         preVerificationGas: BigInt(estimateUserOperationGas.preVerificationGas),
@@ -464,9 +466,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
         entryPoint: this.#ENTRYPOINT_ADDRESS,
         sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId
       })
-
-      safeOperation.data.paymasterAndData =
-        paymasterEstimation?.paymasterAndData || safeOperation.data.paymasterAndData
 
       if (paymasterEstimation) {
         safeOperation.addEstimations(paymasterEstimation)
@@ -632,7 +631,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
         signature = await signSafeOp(
           safeOp.data,
           this.protocolKit.getSafeProvider(),
-          this.#SAFE_4337_MODULE_ADDRESS
+          this.#SAFE_4337_MODULE_ADDRESS,
+          this.#ENTRYPOINT_ADDRESS
         )
       } else {
         const safeOpHash = safeOp.getHash()

@@ -23,6 +23,7 @@ type SafeOperationOptions = {
 
 class EthSafeOperation implements SafeOperation {
   data: SafeUserOperation
+  userOperation: UserOperation
   signatures: Map<string, SafeSignature> = new Map()
   moduleAddress: string
   chainId: bigint
@@ -35,6 +36,7 @@ class EthSafeOperation implements SafeOperation {
     this.chainId = chainId
     this.moduleAddress = moduleAddress
     this.entryPoint = entryPoint
+    this.userOperation = userOperation
 
     let initCode
     let paymasterAndData
@@ -96,16 +98,43 @@ class EthSafeOperation implements SafeOperation {
   }
 
   addEstimations(estimations: EstimateGasData): void {
-    const keys: (keyof EstimateGasData)[] = [
-      'maxFeePerGas',
-      'maxPriorityFeePerGas',
-      'verificationGasLimit',
-      'preVerificationGas',
-      'callGasLimit'
-    ]
+    this.data.maxFeePerGas = BigInt(estimations.maxFeePerGas || this.data.maxFeePerGas)
+    this.data.maxPriorityFeePerGas = BigInt(
+      estimations.maxPriorityFeePerGas || this.data.maxPriorityFeePerGas
+    )
+    this.data.verificationGasLimit = BigInt(
+      estimations.verificationGasLimit || this.data.verificationGasLimit
+    )
+    this.data.preVerificationGas = BigInt(
+      estimations.preVerificationGas || this.data.preVerificationGas
+    )
+    this.data.callGasLimit = BigInt(estimations.callGasLimit || this.data.callGasLimit)
 
-    for (const key of keys) {
-      this.data[key] = BigInt(estimations[key] || this.data[key])
+    if (isEntryPointV7(this.entryPoint)) {
+      console.log('estimations', estimations)
+      const paymaster = estimations.paymaster || (this.userOperation as UserOperationV07).paymaster
+      const paymasterData =
+        estimations.paymasterData || (this.userOperation as UserOperationV07).paymasterData
+
+      if (estimations.paymasterPostOpGasLimit || estimations.paymasterVerificationGasLimit) {
+        this.data['paymasterAndData'] =
+          'paymaster' in estimations
+            ? concat([
+                paymaster as Hex,
+                pad(toHex(estimations.paymasterVerificationGasLimit || 0n), {
+                  size: 16
+                }),
+                pad(toHex(estimations.paymasterPostOpGasLimit || 0n), {
+                  size: 16
+                }),
+                (paymasterData as Hex) || ('0x' as Hex)
+              ])
+            : '0x'
+        console.log("this.data['paymasterAndData']", this.data['paymasterAndData'])
+      }
+    } else {
+      this.data['paymasterAndData'] =
+        estimations.paymasterAndData || (this.userOperation as UserOperationV06).paymasterAndData
     }
   }
 
@@ -151,7 +180,12 @@ class EthSafeOperation implements SafeOperation {
   }
 
   getHash(): string {
-    return calculateSafeUserOperationHash(this.data, this.chainId, this.moduleAddress)
+    return calculateSafeUserOperationHash(
+      this.data,
+      this.chainId,
+      this.moduleAddress,
+      this.entryPoint
+    )
   }
 }
 

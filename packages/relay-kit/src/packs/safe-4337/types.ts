@@ -83,9 +83,13 @@ export type Safe4337ExecutableProps = {
   executable: EthSafeOperation | SafeOperationResponse
 }
 
-export type EstimateSponsoredGasData = {
-  paymasterAndData: string
-} & EstimateGasData
+export type EstimateSponsoredGasData = (
+  | {
+      paymasterAndData: string
+    }
+  | { paymaster: string; paymasterData: string }
+) &
+  EstimateGasData
 
 type Log = {
   logIndex: string

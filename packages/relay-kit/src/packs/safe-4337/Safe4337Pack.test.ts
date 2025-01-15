@@ -722,7 +722,8 @@ describe('Safe4337Pack', () => {
       const safeOpHash = utils.calculateSafeUserOperationHash(
         safeOperation.data,
         BigInt(fixtures.CHAIN_ID),
-        fixtures.MODULE_ADDRESS
+        fixtures.MODULE_ADDRESS,
+        fixtures.ENTRYPOINTS[0]
       )
 
       const passkeySignature = await safe4337Pack.protocolKit.signHash(safeOpHash)

@@ -17,7 +17,7 @@ You will need to agree to [our CLA](https://safe.global/cla) in order to be poss
 
 ### Starting Guide
 
-By following the steps bellow you will understand the development process and worflow.
+By following the steps below you will understand the development process and workflow.
 1. [Forking the repository](#forking-the-repository)
 2. [Installing Node and Yarn](#installing-node-and-yarn)
 3. [Installing dependencies](#installing-dependencies)
@@ -44,7 +44,7 @@ yarn -v
 
 #### Installing dependencies    
 
-The Safe{Core} SDK uses a mono-repository structure managed by [Yarn Workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) and [Lerna](https://lerna.js.org). From the root of the repository you will need to install the whole dependency stack and do the project build. Some packages depend on each other, so even when modifiying only one package it's better to run the full build.
+The Safe{Core} SDK uses a mono-repository structure managed by [Yarn Workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) and [Lerna](https://lerna.js.org). From the root of the repository you will need to install the whole dependency stack and do the project build. Some packages depend on each other, so even when modifying only one package it's better to run the full build.
 
 Install all dependencies and build the whole project by using the following commands at the project root.
 

@@ -4,8 +4,10 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationMap": true,
+    "resolveJsonModule": true,
+    "composite": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "test-utils/**/*"],
+  "include": ["src/**/*", "test-utils/**/*", "package.json"],
   "exclude": ["dist", "test"]
 }

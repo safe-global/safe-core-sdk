@@ -35,7 +35,6 @@ import {
   estimateTxGas,
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
-  extractPasskeyCoordinates,
   extractPasskeyData,
   validateEthereumAddress,
   validateEip3770Address
@@ -67,6 +66,7 @@ import {
 } from './utils/eip-712'
 import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
+import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
 
 export {
   estimateTxBaseGas,
@@ -74,7 +74,6 @@ export {
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
   extractPasskeyData,
-  extractPasskeyCoordinates,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,
@@ -82,6 +81,7 @@ export {
   EthSafeSignature,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
+  generateOnChainIdentifier,
   PREDETERMINED_SALT_NONCE,
   SafeBaseContract,
   SafeProxyFactoryBaseContract,

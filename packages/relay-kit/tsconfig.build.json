@@ -1,8 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "resolveJsonModule": true,
+    "composite": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "test-utils/**/*"],
+  "include": ["src/**/*", "test-utils/**/*", "package.json"],
   "exclude": ["dist", "src/**/*.test.ts", "src/**/*.test-d.ts"]
 }

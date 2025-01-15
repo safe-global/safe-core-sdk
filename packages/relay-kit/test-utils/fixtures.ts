@@ -1,4 +1,5 @@
 import { ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07 } from '../src/packs/safe-4337/constants'
+import { SignatureTypes } from '@safe-global/types-kit'
 
 export const OWNER_1 = '0xFfAC5578BE8AC1B2B9D13b34cAf4A074B96B8A1b'
 export const OWNER_2 = '0x3059EfD1BCe33be41eeEfd5fb6D520d7fEd54E43'
@@ -109,7 +110,7 @@ export const SAFE_OPERATION_RESPONSE = {
       owner: '0x3059EfD1BCe33be41eeEfd5fb6D520d7fEd54E43',
       signature:
         '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d',
-      signatureType: 'EOA'
+      signatureType: SignatureTypes.EOA
     }
   ],
   preparedSignature:

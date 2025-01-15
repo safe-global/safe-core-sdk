@@ -291,7 +291,7 @@ type SafeMultisigTransactionResponse = {
       transactionHash?: string
       confirmationType?: string
       signature: string
-      signatureType?: string
+      signatureType?: SignatureType
     },
     // ...
   ]

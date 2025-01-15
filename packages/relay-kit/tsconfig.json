@@ -4,8 +4,11 @@
     "baseUrl": "./",
     "paths": {
       "@safe-global/relay-kit/*": ["./src/*"]
-    }
+    },
+    "resolveJsonModule": true,
+    "composite": true,
+    "outDir": "dist"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "package.json"],
   "exclude": ["dist"]
 }

@@ -4,8 +4,11 @@
     "baseUrl": "./",
     "paths": {
       "@safe-global/protocol-kit/*": ["./src/*"]
-    }
+    },
+    "resolveJsonModule": true,
+    "composite": true,
+    "outDir": "dist"
   },
-  "include": ["src/**/*", "tests/**/*", "hardhat/**/*", "hardhat.config.ts"],
+  "include": ["src/**/*", "tests/**/*", "hardhat/**/*", "hardhat.config.ts", "package.json"],
   "exclude": ["dist"]
 }

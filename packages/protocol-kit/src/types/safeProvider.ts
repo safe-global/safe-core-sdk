@@ -50,7 +50,7 @@ export type HexAddress = string
 export type PrivateKey = string
 export type HttpTransport = string
 export type SocketTransport = string
-export type SafeSigner = HexAddress | PrivateKey | PasskeyClient
+export type SafeSigner = HexAddress | PrivateKey | PasskeyArgType | PasskeyClient
 
 export type SafeProviderConfig = {
   /** signerOrProvider - Ethers signer or provider */

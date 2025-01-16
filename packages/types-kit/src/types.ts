@@ -214,6 +214,17 @@ export type ListResponse<T> = {
 }
 export type SafeMultisigConfirmationListResponse = ListResponse<SafeMultisigConfirmationResponse>
 
+export type DataDecoded = {
+  readonly method: string
+  readonly parameters: DecodedParameters[]
+}
+
+export type DecodedParameters = {
+  readonly name: string
+  readonly type: string
+  readonly value: string
+}
+
 export type SafeMultisigTransactionResponse = {
   readonly safe: string
   readonly to: string
@@ -233,14 +244,17 @@ export type SafeMultisigTransactionResponse = {
   readonly transactionHash: string
   readonly safeTxHash: string
   readonly executor?: string
-  readonly proposer: string
+  readonly proposer?: string
+  readonly proposedByDelegate?: string
   readonly isExecuted: boolean
   readonly isSuccessful?: boolean
   readonly ethGasPrice?: string
+  readonly maxFeePerGas?: string
+  readonly maxPriorityFeePerGas?: string
   readonly gasUsed?: number
   readonly fee?: string
   readonly origin: string
-  readonly dataDecoded?: string
+  readonly dataDecoded?: DataDecoded
   readonly confirmationsRequired: number
   readonly confirmations?: SafeMultisigConfirmationResponse[]
   readonly trusted: boolean

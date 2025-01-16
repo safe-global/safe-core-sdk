@@ -2,11 +2,12 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getApiKit } from '../utils/setupKits'
+import { API_TESTING_SAFE } from '../helpers/safe'
 
 chai.use(chaiAsPromised)
 
 let safeApiKit: SafeApiKit
-const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+const safeAddress = API_TESTING_SAFE.address
 
 describe('getMessages', () => {
   before(async () => {

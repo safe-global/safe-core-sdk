@@ -35,6 +35,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
+    "prebuild": "node -p \"'export const getProtocolKitVersion = () => \\'' + require('./package.json').version.split('-')[0] + '\\''\" > src/utils/getProtocolKitVersion.ts",
     "build": "yarn unbuild && yarn check-safe-deployments && NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {

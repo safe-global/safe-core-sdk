@@ -53,7 +53,7 @@ import {
 } from './utils'
 import { entryPointToSafeModules, EQ_OR_GT_0_3_0 } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
-import getRelayKitVersion from './utils/getRelayKitVersion'
+import { getRelayKitVersion } from './utils/getRelayKitVersion'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn

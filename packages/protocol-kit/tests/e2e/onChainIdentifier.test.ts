@@ -10,7 +10,8 @@ import Sinon from 'sinon'
 import chaiAsPromised from 'chai-as-promised'
 
 import { generateHash } from '@safe-global/protocol-kit/utils/on-chain-tracking/generateOnChainIdentifier'
-import getProtocolKitVersion, * as getProtocolKitVersionModule from '@safe-global/protocol-kit/utils/getProtocolKitVersion'
+import * as getProtocolKitVersionModule from '@safe-global/protocol-kit/utils/getProtocolKitVersion'
+import { getProtocolKitVersion } from '@safe-global/protocol-kit/utils/getProtocolKitVersion'
 import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
 
@@ -47,7 +48,7 @@ describe('On-chain analytics', () => {
         platform: 'Web'
       }
 
-      const stub = Sinon.stub(getProtocolKitVersionModule, 'default').returns('5.0.4')
+      const stub = Sinon.stub(getProtocolKitVersionModule, 'getProtocolKitVersion').returns('5.0.4')
 
       const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address

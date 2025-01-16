@@ -1,7 +1,1 @@
-import packageJson from '../../package.json'
-
-function getProtocolKitVersion(): string {
-  return packageJson.version
-}
-
-export default getProtocolKitVersion
+export const getProtocolKitVersion = () => '5.1.1'

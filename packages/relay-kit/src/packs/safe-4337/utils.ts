@@ -226,7 +226,7 @@ export function getSignatureBytes({
   // Helper functions
   // Convert a number to a 64-byte hex string with padded upto Hex string with 32 bytes
   const encodeUint256 = (x: bigint | number) => x.toString(16).padStart(64, '0')
-  // Calculate the byte size of the dynamic data along with the length parameter alligned to 32 bytes
+  // Calculate the byte size of the dynamic data along with the length parameter aligned to 32 bytes
   const byteSize = (data: Uint8Array) => 32 * (Math.ceil(data.length / 32) + 1) // +1 is for the length parameter
   // Encode dynamic data padded with zeros if necessary in 32 bytes chunks
   const encodeBytes = (data: Uint8Array) =>

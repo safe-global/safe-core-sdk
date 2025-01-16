@@ -23,7 +23,7 @@ contract DailyLimitModule is Module {
 
     /// @dev Setup function sets initial storage of contract.
     /// @param tokens List of token addresses. Ether is represented with address 0x0.
-    /// @param _dailyLimits List of daily limits in smalles units (e.g. Wei for Ether).
+    /// @param _dailyLimits List of daily limits in smallest units (e.g. Wei for Ether).
     function setup(address[] memory tokens, uint256[] memory _dailyLimits)
         public
     {
@@ -43,9 +43,9 @@ contract DailyLimitModule is Module {
     }
 
     /// @dev Returns if Safe transaction is a valid daily limit transaction.
-    /// @param token Address of the token that should be transfered (0 for Ether)
-    /// @param to Address to which the tokens should be transfered
-    /// @param amount Amount of tokens (or Ether) that should be transfered
+    /// @param token Address of the token that should be transferred (0 for Ether)
+    /// @param to Address to which the tokens should be transferred
+    /// @param amount Amount of tokens (or Ether) that should be transferred
     /// @return Returns if transaction can be executed.
     function executeDailyLimit(address token, address to, uint256 amount)
         public

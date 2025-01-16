@@ -17,7 +17,7 @@ contract CreateAndAddModules {
 
     /// @dev Allows to create and add multiple module in one transaction.
     /// @param proxyFactory Module proxy factory contract.
-    /// @param data Modules constructor payload. This is the data for each proxy factory call concatinated. (e.g. <byte_array_len_1><byte_array_data_1><byte_array_len_2><byte_array_data_2>)
+    /// @param data Modules constructor payload. This is the data for each proxy factory call contaminated. (e.g. <byte_array_len_1><byte_array_data_1><byte_array_len_2><byte_array_data_2>)
     function createAndAddModules(address proxyFactory, bytes memory data)
         public
     {

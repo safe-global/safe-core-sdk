@@ -4,7 +4,7 @@ import "./ModuleManager.sol";
 import "./OwnerManager.sol";
 
 
-/// @title Base Safe - A multisignature wallet with support for modules and owners. This contract needs to be extented to add functionality to execute transactions.
+/// @title Base Safe - A multisignature wallet with support for modules and owners. This contract needs to be extended to add functionality to execute transactions.
 /// @author Stefan George - <stefan@gnosis.pm>
 /// @author Richard Meissner - <richard@gnosis.pm>
 contract BaseSafe is ModuleManager, OwnerManager {

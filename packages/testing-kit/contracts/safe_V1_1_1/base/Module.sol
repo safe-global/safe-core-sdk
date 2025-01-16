@@ -18,7 +18,7 @@ contract Module is MasterCopy {
     function setManager()
         internal
     {
-        // manager can only be 0 at initalization of contract.
+        // manager can only be 0 at initialization of contract.
         // Check ensures that setup function can only be called once.
         require(address(manager) == address(0), "Manager has already been set");
         manager = ModuleManager(msg.sender);

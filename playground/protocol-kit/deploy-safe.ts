@@ -5,7 +5,7 @@ import { createWalletClient, http } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { waitForTransactionReceipt } from 'viem/actions'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 
 // This file can be used to play around with the Safe Core SDK
 

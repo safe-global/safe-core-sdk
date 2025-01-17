@@ -5,10 +5,9 @@
     "paths": {
       "@safe-global/relay-kit/*": ["./src/*"]
     },
-    "resolveJsonModule": true,
     "composite": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "package.json"],
+  "include": ["src/**/*"],
   "exclude": ["dist"]
 }

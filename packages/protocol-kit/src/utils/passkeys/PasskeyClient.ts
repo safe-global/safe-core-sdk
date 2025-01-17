@@ -200,11 +200,11 @@ function extractClientDataFields(clientDataJSON: ArrayBuffer): Hex {
  * Extracts the numeric values r and s from a DER-encoded ECDSA signature.
  * This function decodes the signature based on a specific format and validates the encoding at each step.
  *
- * @param {ArrayBuffer} signature - The DER-encoded signature to be decoded.
+ * @param {ArrayBuffer | Uint8Array | Array<number>} signature - The DER-encoded signature to be decoded. The WebAuthn standard expects the signature to be an ArrayBuffer, but some password managers (including Bitwarden) provide a Uint8Array or an array of numbers instead.
  * @returns {[bigint, bigint]} A tuple containing two BigInt values, r and s, which are the numeric values extracted from the signature.
  * @throws {Error} Throws an error if the signature encoding is invalid or does not meet expected conditions.
  */
-function extractSignature(signature: ArrayBuffer): [bigint, bigint] {
+function extractSignature(signature: ArrayBuffer | Uint8Array | Array<number>): [bigint, bigint] {
   const check = (x: boolean) => {
     if (!x) {
       throw new Error('invalid signature encoding')
@@ -214,7 +214,13 @@ function extractSignature(signature: ArrayBuffer): [bigint, bigint] {
   // Decode the DER signature. Note that we assume that all lengths fit into 8-bit integers,
   // which is true for the kinds of signatures we are decoding but generally false. I.e. this
   // code should not be used in any serious application.
-  const view = new DataView(signature)
+  const view = new DataView(
+    signature instanceof ArrayBuffer
+      ? signature
+      : signature instanceof Uint8Array
+        ? signature.buffer
+        : new Uint8Array(signature).buffer
+  )
 
   // check that the sequence header is valid
   check(view.getUint8(0) === 0x30)

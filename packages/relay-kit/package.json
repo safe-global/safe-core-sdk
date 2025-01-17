@@ -37,6 +37,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist .nyc_output cache",
+    "prebuild": "node -p \"'export const getRelayKitVersion = () => \\'' + require('./package.json').version.split('-')[0] + '\\''\" > src/packs/safe-4337/utils/getRelayKitVersion.ts",
     "build": "yarn unbuild && yarn build:esm && yarn build:cjs && yarn build:types",
     "build:esm": "tsc -p tsconfig.build.json --module esnext --outDir dist/esm && tsc-alias -p tsconfig.build.json --outDir dist/esm",
     "build:cjs": "tsc -p tsconfig.build.json --outDir dist/cjs && tsc-alias -p tsconfig.build.json --outDir dist/cjs",

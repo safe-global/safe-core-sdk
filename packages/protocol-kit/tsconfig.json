@@ -5,10 +5,9 @@
     "paths": {
       "@safe-global/protocol-kit/*": ["./src/*"]
     },
-    "resolveJsonModule": true,
     "composite": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "tests/**/*", "hardhat/**/*", "hardhat.config.ts", "package.json"],
+  "include": ["src/**/*", "tests/**/*", "hardhat/**/*", "hardhat.config.ts"],
   "exclude": ["dist"]
 }

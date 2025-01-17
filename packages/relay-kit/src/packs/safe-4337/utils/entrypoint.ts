@@ -36,7 +36,7 @@ export async function getSafeNonceFromEntrypoint(
   protocolKit: Safe,
   safeAddress: string,
   entryPointAddress: string
-): Promise<string> {
+): Promise<bigint> {
   const safeProvider = protocolKit.getSafeProvider()
 
   const newNonce = await safeProvider.readContract({
@@ -46,5 +46,5 @@ export async function getSafeNonceFromEntrypoint(
     args: [safeAddress, 0n]
   })
 
-  return newNonce.toString()
+  return newNonce
 }

@@ -6,7 +6,7 @@ import {
   UserOperationV07
 } from '@safe-global/types-kit'
 import { getSafeNonceFromEntrypoint, isEntryPointV6 } from './entrypoint'
-import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex } from 'viem'
+import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
 import { ABI } from '../constants'
 import { ERC20PaymasterOption, PaymasterOptions } from '../types'
 import { encodeMultiSendCallData } from '../utils'
@@ -133,7 +133,7 @@ export async function createUserOperation(
   if (isEntryPointV6(entryPoint)) {
     return {
       sender: safeAddress,
-      nonce,
+      nonce: toHex(nonce),
       initCode,
       callData,
       callGasLimit: 1n,
@@ -148,7 +148,7 @@ export async function createUserOperation(
 
   return {
     sender: safeAddress,
-    nonce,
+    nonce: toHex(nonce),
     ...unpackInitCode(initCode),
     callData,
     callGasLimit: 1n,

@@ -409,7 +409,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      userOperation: safeOperation.toUserOperation()
+      userOperation: safeOperation.getUserOperation()
     })
 
     if (setupEstimationData) {
@@ -421,7 +421,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       params: [
         userOperationToHexValues(
           addDummySignature(
-            safeOperation.toUserOperation(),
+            safeOperation.getUserOperation(),
             this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
             threshold
           ),
@@ -430,8 +430,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
         this.#ENTRYPOINT_ADDRESS
       ]
     })
-
-    console.log('estimateUserOperationGas', estimateUserOperationGas)
 
     if (estimateUserOperationGas) {
       safeOperation.addEstimations({
@@ -444,7 +442,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      userOperation: safeOperation.toUserOperation()
+      userOperation: safeOperation.getUserOperation()
     })
 
     if (adjustEstimationData) {
@@ -458,7 +456,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
         userOperation: addDummySignature(
-          safeOperation.toUserOperation(),
+          safeOperation.getUserOperation(),
           this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
           threshold
         ),
@@ -505,8 +503,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       validUntil,
       validAfter
     })
-
-    console.log('safeOperation', safeOperation)
 
     return await this.getEstimateFee({
       safeOperation,
@@ -629,7 +625,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ]
       ) {
         signature = await signSafeOp(
-          safeOp.data,
+          safeOp.getSafeOperation(),
           this.protocolKit.getSafeProvider(),
           this.#SAFE_4337_MODULE_ADDRESS,
           this.#ENTRYPOINT_ADDRESS
@@ -641,12 +637,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     }
 
-    const signedSafeOperation = new EthSafeOperation(safeOp.toUserOperation(), {
+    const signedSafeOperation = new EthSafeOperation(safeOp.getUserOperation(), {
       chainId: this.#chainId,
       moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      validUntil: safeOp.data.validUntil,
-      validAfter: safeOp.data.validAfter
+      validUntil: safeOp.options.validUntil,
+      validAfter: safeOp.options.validAfter
     })
 
     safeOp.signatures.forEach((signature: SafeSignature) => {
@@ -676,7 +672,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOperation = executable
     }
 
-    const userOperation = safeOperation.toUserOperation()
+    const userOperation = safeOperation.getUserOperation()
 
     return this.#bundlerClient.request({
       method: RPC_4337_CALLS.SEND_USER_OPERATION,

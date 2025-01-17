@@ -2,6 +2,7 @@ import { Hex, concat, encodePacked, pad, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
+  SafeOperationOptions,
   SafeSignature,
   SafeUserOperation,
   UserOperation,
@@ -10,79 +11,16 @@ import {
 } from '@safe-global/types-kit'
 import { buildSignatureBytes } from '@safe-global/protocol-kit'
 import { calculateSafeUserOperationHash } from './utils'
-import { isEntryPointV6, isEntryPointV7 } from './utils/entrypoint'
-import { unpackInitCode, unpackPaymasterAndData } from './utils/userOperations'
-
-type SafeOperationOptions = {
-  moduleAddress: string
-  entryPoint: string
-  chainId: bigint
-  validAfter?: number
-  validUntil?: number
-}
+import { isEntryPointV7 } from './utils/entrypoint'
 
 class EthSafeOperation implements SafeOperation {
-  data: SafeUserOperation
+  options: SafeOperationOptions
   userOperation: UserOperation
   signatures: Map<string, SafeSignature> = new Map()
-  moduleAddress: string
-  chainId: bigint
-  entryPoint: string
 
-  constructor(
-    userOperation: UserOperation,
-    { chainId, entryPoint, validAfter, validUntil, moduleAddress }: SafeOperationOptions
-  ) {
-    this.chainId = chainId
-    this.moduleAddress = moduleAddress
-    this.entryPoint = entryPoint
+  constructor(userOperation: UserOperation, options: SafeOperationOptions) {
     this.userOperation = userOperation
-
-    let initCode
-    let paymasterAndData
-
-    console.log('userOperation', userOperation)
-
-    if (isEntryPointV7(entryPoint)) {
-      const userOpV07 = userOperation as UserOperationV07
-
-      initCode = userOpV07.factory
-        ? concat([userOpV07.factory as Hex, (userOpV07.factoryData as Hex) || ('0x' as Hex)])
-        : '0x'
-      paymasterAndData = userOpV07.paymaster
-        ? concat([
-            userOpV07.paymaster as Hex,
-            pad(toHex(userOpV07.paymasterVerificationGasLimit || 0n), {
-              size: 16
-            }),
-            pad(toHex(userOpV07.paymasterPostOpGasLimit || 0n), {
-              size: 16
-            }),
-            (userOpV07.paymasterData as Hex) || ('0x' as Hex)
-          ])
-        : '0x'
-    } else {
-      const userOpV06 = userOperation as UserOperationV06
-
-      initCode = userOpV06.initCode
-      paymasterAndData = userOpV06.paymasterAndData
-    }
-
-    this.data = {
-      safe: userOperation.sender,
-      nonce: BigInt(userOperation.nonce),
-      initCode,
-      callData: userOperation.callData,
-      callGasLimit: userOperation.callGasLimit,
-      verificationGasLimit: userOperation.verificationGasLimit,
-      preVerificationGas: userOperation.preVerificationGas,
-      maxFeePerGas: userOperation.maxFeePerGas,
-      maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas,
-      paymasterAndData,
-      validAfter: validAfter || 0,
-      validUntil: validUntil || 0,
-      entryPoint
-    }
+    this.options = options
   }
 
   getSignature(signer: string): SafeSignature | undefined {
@@ -98,93 +36,101 @@ class EthSafeOperation implements SafeOperation {
   }
 
   addEstimations(estimations: EstimateGasData): void {
-    this.data.maxFeePerGas = BigInt(estimations.maxFeePerGas || this.data.maxFeePerGas)
-    this.data.maxPriorityFeePerGas = BigInt(
-      estimations.maxPriorityFeePerGas || this.data.maxPriorityFeePerGas
+    const userOpV06 = this.userOperation as UserOperationV06
+    userOpV06.maxFeePerGas = BigInt(estimations.maxFeePerGas || userOpV06.maxFeePerGas)
+    userOpV06.maxPriorityFeePerGas = BigInt(
+      estimations.maxPriorityFeePerGas || userOpV06.maxPriorityFeePerGas
     )
-    this.data.verificationGasLimit = BigInt(
-      estimations.verificationGasLimit || this.data.verificationGasLimit
+    userOpV06.verificationGasLimit = BigInt(
+      estimations.verificationGasLimit || userOpV06.verificationGasLimit
     )
-    this.data.preVerificationGas = BigInt(
-      estimations.preVerificationGas || this.data.preVerificationGas
+    userOpV06.preVerificationGas = BigInt(
+      estimations.preVerificationGas || userOpV06.preVerificationGas
     )
-    this.data.callGasLimit = BigInt(estimations.callGasLimit || this.data.callGasLimit)
+    userOpV06.callGasLimit = BigInt(estimations.callGasLimit || userOpV06.callGasLimit)
 
-    if (isEntryPointV7(this.entryPoint)) {
-      console.log('estimations', estimations)
-      const paymaster = estimations.paymaster || (this.userOperation as UserOperationV07).paymaster
-      const paymasterData =
-        estimations.paymasterData || (this.userOperation as UserOperationV07).paymasterData
+    userOpV06.paymasterAndData = estimations.paymasterAndData || userOpV06.paymasterAndData
 
-      if (estimations.paymasterPostOpGasLimit || estimations.paymasterVerificationGasLimit) {
-        this.data['paymasterAndData'] =
-          'paymaster' in estimations
-            ? concat([
-                paymaster as Hex,
-                pad(toHex(estimations.paymasterVerificationGasLimit || 0n), {
-                  size: 16
-                }),
-                pad(toHex(estimations.paymasterPostOpGasLimit || 0n), {
-                  size: 16
-                }),
-                (paymasterData as Hex) || ('0x' as Hex)
-              ])
-            : '0x'
-        console.log("this.data['paymasterAndData']", this.data['paymasterAndData'])
-      }
-    } else {
-      this.data['paymasterAndData'] =
-        estimations.paymasterAndData || (this.userOperation as UserOperationV06).paymasterAndData
+    if (isEntryPointV7(this.options.entryPoint)) {
+      const userOp = this.userOperation as UserOperationV07
+      userOp.paymasterPostOpGasLimit = estimations.paymasterPostOpGasLimit
+        ? BigInt(estimations.paymasterPostOpGasLimit) || userOp.paymasterPostOpGasLimit
+        : undefined
+      userOp.paymasterVerificationGasLimit = estimations.paymasterVerificationGasLimit
+        ? BigInt(estimations.paymasterVerificationGasLimit) || userOp.paymasterVerificationGasLimit
+        : undefined
+      userOp.paymaster = estimations.paymaster || userOp.paymaster
+      userOp.paymasterData = estimations.paymasterData || userOp.paymasterData
     }
   }
 
-  toUserOperation(): UserOperation {
-    if (isEntryPointV6(this.entryPoint)) {
-      return {
-        sender: this.data.safe,
-        nonce: toHex(this.data.nonce),
-        initCode: this.data.initCode,
-        callData: this.data.callData,
-        callGasLimit: this.data.callGasLimit,
-        verificationGasLimit: this.data.verificationGasLimit,
-        preVerificationGas: this.data.preVerificationGas,
-        maxFeePerGas: this.data.maxFeePerGas,
-        maxPriorityFeePerGas: this.data.maxPriorityFeePerGas,
-        paymasterAndData: this.data.paymasterAndData,
-        signature: encodePacked(
-          ['uint48', 'uint48', 'bytes'],
-          [this.data.validAfter, this.data.validUntil, this.encodedSignatures() as Hex]
-        )
-      }
+  getSafeOperation(): SafeUserOperation {
+    let initCode
+    let paymasterAndData
+
+    if (isEntryPointV7(this.options.entryPoint)) {
+      const userOpV07 = this.userOperation as UserOperationV07
+
+      initCode = userOpV07.factory
+        ? concat([userOpV07.factory as Hex, (userOpV07.factoryData as Hex) || ('0x' as Hex)])
+        : '0x'
+
+      paymasterAndData = userOpV07.paymaster
+        ? concat([
+            userOpV07.paymaster as Hex,
+            pad(toHex(userOpV07.paymasterVerificationGasLimit || 0n), {
+              size: 16
+            }),
+            pad(toHex(userOpV07.paymasterPostOpGasLimit || 0n), {
+              size: 16
+            }),
+            (userOpV07.paymasterData as Hex) || ('0x' as Hex)
+          ])
+        : '0x'
+    } else {
+      const userOpV06 = this.userOperation as UserOperationV06
+
+      initCode = userOpV06.initCode
+      paymasterAndData = userOpV06.paymasterAndData
     }
 
-    const factoryData = unpackInitCode(this.data.initCode)
-    const paymasterData = unpackPaymasterAndData(this.data.paymasterAndData)
-
     return {
-      sender: this.data.safe,
-      nonce: toHex(this.data.nonce),
-      ...factoryData,
-      callData: this.data.callData,
-      callGasLimit: this.data.callGasLimit,
-      verificationGasLimit: this.data.verificationGasLimit,
-      preVerificationGas: this.data.preVerificationGas,
-      maxFeePerGas: this.data.maxFeePerGas,
-      maxPriorityFeePerGas: this.data.maxPriorityFeePerGas,
-      ...paymasterData,
+      safe: this.userOperation.sender,
+      nonce: BigInt(this.userOperation.nonce),
+      initCode,
+      callData: this.userOperation.callData,
+      callGasLimit: this.userOperation.callGasLimit,
+      verificationGasLimit: this.userOperation.verificationGasLimit,
+      preVerificationGas: this.userOperation.preVerificationGas,
+      maxFeePerGas: this.userOperation.maxFeePerGas,
+      maxPriorityFeePerGas: this.userOperation.maxPriorityFeePerGas,
+      paymasterAndData,
+      validAfter: this.options.validAfter || 0,
+      validUntil: this.options.validUntil || 0,
+      entryPoint: this.options.entryPoint
+    }
+  }
+
+  getUserOperation(): UserOperation {
+    return {
+      ...this.userOperation,
       signature: encodePacked(
         ['uint48', 'uint48', 'bytes'],
-        [this.data.validAfter, this.data.validUntil, this.encodedSignatures() as Hex]
+        [
+          this.options.validAfter || 0,
+          this.options.validUntil || 0,
+          this.encodedSignatures() as Hex
+        ]
       )
     }
   }
 
   getHash(): string {
     return calculateSafeUserOperationHash(
-      this.data,
-      this.chainId,
-      this.moduleAddress,
-      this.entryPoint
+      this.getSafeOperation(),
+      this.options.chainId,
+      this.options.moduleAddress,
+      this.options.entryPoint
     )
   }
 }

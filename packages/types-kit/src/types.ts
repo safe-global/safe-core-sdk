@@ -323,16 +323,25 @@ export type EstimateGasData = {
   paymasterPostOpGasLimit?: bigint
 }
 
+export type SafeOperationOptions = {
+  moduleAddress: string
+  entryPoint: string
+  chainId: bigint
+  validAfter?: number
+  validUntil?: number
+}
+
 export interface SafeOperation {
-  readonly chainId: bigint
-  readonly moduleAddress: string
-  readonly data: SafeUserOperation
+  userOperation: UserOperation
+  options: SafeOperationOptions
+
   readonly signatures: Map<string, SafeSignature>
   getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
   addEstimations(estimations: EstimateGasData): void
-  toUserOperation(): UserOperation
+  getUserOperation(): UserOperation
+  getSafeOperation(): SafeUserOperation
   getHash(): string
 }
 

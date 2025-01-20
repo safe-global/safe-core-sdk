@@ -1,4 +1,4 @@
-import { Hex, concat, encodePacked, pad, toHex } from 'viem'
+import { Hex, concat, encodePacked, isAddress, pad, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -75,7 +75,7 @@ class EthSafeOperation implements SafeOperation {
         ? concat([userOpV07.factory as Hex, (userOpV07.factoryData as Hex) || ('0x' as Hex)])
         : '0x'
 
-      paymasterAndData = userOpV07.paymaster
+      paymasterAndData = isAddress(userOpV07.paymaster || '')
         ? concat([
             userOpV07.paymaster as Hex,
             pad(toHex(userOpV07.paymasterVerificationGasLimit || 0n), {

@@ -617,12 +617,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     } else {
       if (
-        signingMethod in
         [
           SigningMethod.ETH_SIGN_TYPED_DATA_V4,
           SigningMethod.ETH_SIGN_TYPED_DATA_V3,
           SigningMethod.ETH_SIGN_TYPED_DATA
-        ]
+        ].includes(signingMethod)
       ) {
         signature = await signSafeOp(
           safeOp.getSafeOperation(),

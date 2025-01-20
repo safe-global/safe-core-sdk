@@ -14,11 +14,11 @@ const OWNER_ADDRESS = ''
 const POLICY_ID = ''
 
 // CHAIN
-const CHAIN_NAME = 'sepolia'
+const CHAIN_NAME = '11155111'
 // const CHAIN_NAME = 'gnosis'
 
 // RPC URL
-const RPC_URL = 'https://rpc.sepolia.org' // SEPOLIA
+const RPC_URL = 'https://ethereum-sepolia-rpc.publicnode.com' // SEPOLIA
 // const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL

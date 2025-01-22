@@ -70,5 +70,7 @@ export enum RPC_4337_CALLS {
   GET_USER_OPERATION_RECEIPT = 'eth_getUserOperationReceipt',
   SUPPORTED_ENTRY_POINTS = 'eth_supportedEntryPoints',
   CHAIN_ID = 'eth_chainId',
-  SPONSOR_USER_OPERATION = 'pm_sponsorUserOperation'
+  SPONSOR_USER_OPERATION = 'pm_sponsorUserOperation',
+  GET_PAYMASTER_STUB_DATA = 'pm_getPaymasterStubData',
+  GET_PAYMASTER_DATA = 'pm_getPaymasterData'
 }

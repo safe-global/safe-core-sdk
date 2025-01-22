@@ -1,21 +1,45 @@
 import { EstimateGasData } from '@safe-global/types-kit'
 import {
   BundlerClient,
+  ERC20PaymasterOption,
   EstimateFeeFunctionProps,
-  EstimateSponsoredFeeFunctionProps,
-  EstimateSponsoredGasData,
-  IFeeEstimator
+  IFeeEstimator,
+  SponsoredPaymasterOption
 } from '../types'
 import { getEip4337BundlerProvider, userOperationToHexValues } from '../utils'
 import { RPC_4337_CALLS } from '../constants'
 
 export class PimlicoFeeEstimator implements IFeeEstimator {
-  async setupEstimation({ bundlerUrl }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
+  async setupEstimation({
+    bundlerUrl,
+    userOperation,
+    entryPoint,
+    paymasterOptions
+  }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
-
     const feeData = await this.#getFeeData(bundlerClient)
+    const chainId = await bundlerClient.request({ method: 'eth_chainId' })
 
-    return feeData
+    let paymasterStubData = {}
+    if (paymasterOptions) {
+      const paymasterClient = getEip4337BundlerProvider(paymasterOptions.paymasterUrl)
+      const context = (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress
+        ? {
+            token: (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress
+          }
+        : {}
+      paymasterStubData = await paymasterClient.request({
+        method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA,
+        params: (paymasterOptions as SponsoredPaymasterOption).sponsorshipPolicyId
+          ? [userOperationToHexValues(userOperation, entryPoint), entryPoint, chainId, context]
+          : [userOperationToHexValues(userOperation, entryPoint), entryPoint, chainId, context]
+      })
+    }
+
+    return {
+      ...feeData,
+      ...paymasterStubData
+    }
   }
 
   async adjustEstimation({ userOperation }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
@@ -28,20 +52,33 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
 
   async getPaymasterEstimation({
     userOperation,
-    paymasterUrl,
     entryPoint,
-    sponsorshipPolicyId
-  }: EstimateSponsoredFeeFunctionProps): Promise<EstimateSponsoredGasData> {
-    const paymasterClient = getEip4337BundlerProvider(paymasterUrl)
+    paymasterOptions
+  }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
+    if (!paymasterOptions) throw new Error("Paymaster options can't be empty")
 
-    const gasEstimate = await paymasterClient.request({
-      method: RPC_4337_CALLS.SPONSOR_USER_OPERATION,
-      params: sponsorshipPolicyId
-        ? [userOperationToHexValues(userOperation, entryPoint), entryPoint, { sponsorshipPolicyId }]
-        : [userOperationToHexValues(userOperation, entryPoint), entryPoint]
-    })
+    const paymasterClient = getEip4337BundlerProvider(paymasterOptions.paymasterUrl)
 
-    console.log('getPaymasterEstimation', gasEstimate)
+    let gasEstimate: EstimateGasData
+
+    if (paymasterOptions?.isSponsored) {
+      gasEstimate = await paymasterClient.request({
+        method: RPC_4337_CALLS.SPONSOR_USER_OPERATION,
+        params: [userOperationToHexValues(userOperation, entryPoint), entryPoint]
+      })
+    } else {
+      const chainId = await paymasterClient.request({ method: 'eth_chainId' })
+      gasEstimate = await paymasterClient.request({
+        method: RPC_4337_CALLS.GET_PAYMASTER_DATA,
+        params: [
+          userOperationToHexValues(userOperation, entryPoint),
+          entryPoint,
+          chainId,
+          { token: (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress }
+        ]
+      })
+    }
+
     return gasEstimate
   }
 
@@ -52,15 +89,13 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       method: 'pimlico_getUserOperationGasPrice'
     })
 
-    console.log('getFeeData', feeData)
-
     const {
       fast: { maxFeePerGas, maxPriorityFeePerGas }
     } = feeData
 
     return {
-      maxFeePerGas: BigInt(maxFeePerGas),
-      maxPriorityFeePerGas: BigInt(maxPriorityFeePerGas)
+      maxFeePerGas: maxFeePerGas,
+      maxPriorityFeePerGas: maxPriorityFeePerGas
     }
   }
 }

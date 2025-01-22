@@ -409,8 +409,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      userOperation: safeOperation.getUserOperation()
+      userOperation: safeOperation.getUserOperation(),
+      paymasterOptions: this.#paymasterOptions
     })
+
+    console.log('1.setupEstimationData', setupEstimationData)
 
     if (setupEstimationData) {
       safeOperation.addEstimations(setupEstimationData)
@@ -431,12 +434,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
       ]
     })
 
+    console.log('2.estimateUserOperationGas', estimateUserOperationGas)
+
     if (estimateUserOperationGas) {
-      safeOperation.addEstimations({
-        preVerificationGas: BigInt(estimateUserOperationGas.preVerificationGas),
-        verificationGasLimit: BigInt(estimateUserOperationGas.verificationGasLimit),
-        callGasLimit: BigInt(estimateUserOperationGas.callGasLimit)
-      })
+      safeOperation.addEstimations(estimateUserOperationGas)
     }
 
     const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
@@ -445,25 +446,25 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation: safeOperation.getUserOperation()
     })
 
+    console.log('3.adjustEstimationData', adjustEstimationData)
+
     if (adjustEstimationData) {
       safeOperation.addEstimations(adjustEstimationData)
     }
 
-    if (this.#paymasterOptions?.isSponsored) {
-      if (!this.#paymasterOptions.paymasterUrl) {
-        throw new Error('No paymaster url provided for a sponsored transaction')
-      }
-
+    if (this.#paymasterOptions) {
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
         userOperation: addDummySignature(
           safeOperation.getUserOperation(),
           this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
           threshold
         ),
-        paymasterUrl: this.#paymasterOptions.paymasterUrl,
+        bundlerUrl: this.#BUNDLER_URL,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
-        sponsorshipPolicyId: this.#paymasterOptions.sponsorshipPolicyId
+        paymasterOptions: this.#paymasterOptions
       })
+
+      console.log('4.paymasterEstimation', paymasterEstimation)
 
       if (paymasterEstimation) {
         safeOperation.addEstimations(paymasterEstimation)

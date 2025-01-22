@@ -33,6 +33,7 @@ export type SponsoredPaymasterOption = {
 }
 
 export type ERC20PaymasterOption = {
+  paymasterUrl: string
   isSponsored?: false
   paymasterAddress: string
   paymasterTokenAddress: string
@@ -141,31 +142,20 @@ export type EstimateFeeFunctionProps = {
   userOperation: UserOperation
   bundlerUrl: string
   entryPoint: string
+  paymasterOptions?: PaymasterOptions
 }
 
 export type EstimateFeeFunction = ({
   userOperation,
   bundlerUrl,
-  entryPoint
+  entryPoint,
+  paymasterOptions
 }: EstimateFeeFunctionProps) => Promise<EstimateGasData>
-
-export type EstimateSponsoredFeeFunctionProps = {
-  userOperation: UserOperation
-  paymasterUrl: string
-  entryPoint: string
-  sponsorshipPolicyId?: string
-}
-
-export type EstimateSponsoredFeeFunction = ({
-  userOperation,
-  paymasterUrl,
-  entryPoint
-}: EstimateSponsoredFeeFunctionProps) => Promise<EstimateSponsoredGasData>
 
 export interface IFeeEstimator {
   setupEstimation?: EstimateFeeFunction
   adjustEstimation?: EstimateFeeFunction
-  getPaymasterEstimation?: EstimateSponsoredFeeFunction
+  getPaymasterEstimation?: EstimateFeeFunction
 }
 
 export type EstimateFeeProps = {
@@ -199,14 +189,55 @@ export type PimlicoCustomRpcSchema = [
     }
   },
   {
-    Method: 'pm_sponsorUserOperation'
-    Parameters: [UserOperationStringValues, string, { sponsorshipPolicyId?: string }?]
-    ReturnType: {
-      paymasterAndData: string
-      callGasLimit: string
-      verificationGasLimit: string
-      preVerificationGas: string
-    }
+    Method: RPC_4337_CALLS.SPONSOR_USER_OPERATION
+    Parameters: [UserOperationStringValues, string, { token?: string }?]
+    ReturnType:
+      | {
+          paymasterAndData: string
+          callGasLimit: string
+          verificationGasLimit: string
+          verificationGas: string
+          preVerificationGas: string
+        }
+      | {
+          paymaster: string
+          paymasterData: string
+          callGasLimit: string
+          verificationGasLimit: string
+          verificationGas: string
+          preVerificationGas: string
+          paymasterVerificationGasLimit: string
+          paymasterPostOpGasLimit: string
+        }
+  },
+  {
+    Method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA
+    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
+    ReturnType:
+      | {
+          paymasterAndData: string
+        }
+      | {
+          paymaster: string
+          paymasterData: string
+          paymasterVerificationGasLimit?: string
+          paymasterPostOpGasLimit?: string
+        }
+  },
+  {
+    Method: RPC_4337_CALLS.GET_PAYMASTER_DATA
+    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
+    ReturnType:
+      | {
+          paymasterAndData: string
+          preVerificationGas: string
+          verificationGasLimit: string
+          callGasLimit: string
+        }
+      | {
+          paymaster: string
+          paymasterData: string
+        }
   },
   {
     Method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS
@@ -216,7 +247,13 @@ export type PimlicoCustomRpcSchema = [
   {
     Method: RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS
     Parameters: [UserOperationStringValues, string]
-    ReturnType: { callGasLimit: string; verificationGasLimit: string; preVerificationGas: string }
+    ReturnType: {
+      callGasLimit: string
+      verificationGasLimit: string
+      preVerificationGas: string
+      paymasterPostOpGasLimit?: string
+      paymasterVerificationGasLimit?: string
+    }
   },
   {
     Method: RPC_4337_CALLS.SEND_USER_OPERATION

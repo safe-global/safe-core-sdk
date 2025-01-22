@@ -54,11 +54,11 @@ class EthSafeOperation implements SafeOperation {
     if (isEntryPointV7(this.options.entryPoint)) {
       const userOp = this.userOperation as UserOperationV07
       userOp.paymasterPostOpGasLimit = estimations.paymasterPostOpGasLimit
-        ? BigInt(estimations.paymasterPostOpGasLimit) || userOp.paymasterPostOpGasLimit
-        : undefined
+        ? BigInt(estimations.paymasterPostOpGasLimit)
+        : userOp.paymasterPostOpGasLimit
       userOp.paymasterVerificationGasLimit = estimations.paymasterVerificationGasLimit
-        ? BigInt(estimations.paymasterVerificationGasLimit) || userOp.paymasterVerificationGasLimit
-        : undefined
+        ? BigInt(estimations.paymasterVerificationGasLimit)
+        : userOp.paymasterVerificationGasLimit
       userOp.paymaster = estimations.paymaster || userOp.paymaster
       userOp.paymasterData = estimations.paymasterData || userOp.paymasterData
     }

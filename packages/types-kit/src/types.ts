@@ -314,13 +314,13 @@ export type EstimateGasData = {
   paymasterAndData?: string
   paymaster?: string
   paymasterData?: string
-  maxFeePerGas?: bigint
-  maxPriorityFeePerGas?: bigint
-  preVerificationGas?: bigint
-  verificationGasLimit?: bigint
-  callGasLimit?: bigint
-  paymasterVerificationGasLimit?: bigint
-  paymasterPostOpGasLimit?: bigint
+  maxFeePerGas?: bigint | number | string
+  maxPriorityFeePerGas?: bigint | number | string
+  preVerificationGas?: bigint | number | string
+  verificationGasLimit?: bigint | number | string
+  callGasLimit?: bigint | number | string
+  paymasterVerificationGasLimit?: bigint | number | string
+  paymasterPostOpGasLimit?: bigint | number | string
 }
 
 export type SafeOperationOptions = {

@@ -8,18 +8,18 @@
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
-      "require": "./dist/cjs/src/index.js",
-      "import": "./dist/esm/src/index.js"
+      "require": "./dist/cjs/src/index.cjs",
+      "import": "./dist/esm/src/index.mjs"
     },
     "./test-utils": {
       "types": "./dist/test-utils/index.d.ts",
-      "require": "./dist/cjs/test-utils/index.js",
-      "import": "./dist/esm/test-utils/index.js"
+      "require": "./dist/cjs/test-utils/index.cjs",
+      "import": "./dist/esm/test-utils/index.mjs"
     },
     "./dist/src/packs/safe-4337/utils": {
       "types": "./dist/src/packs/safe-4337/utils.d.ts",
-      "require": "./dist/cjs/src/packs/safe-4337/utils.js",
-      "import": "./dist/esm/src/packs/safe-4337/utils.js"
+      "require": "./dist/utils/src/packs/safe-4337/utils.js",
+      "import": "./dist/utils/src/packs/safe-4337/utils.js"
     }
   },
   "keywords": [
@@ -38,9 +38,10 @@
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist .nyc_output cache",
     "prebuild": "node -p \"'export const getRelayKitVersion = () => \\'' + require('./package.json').version.split('-')[0] + '\\''\" > src/packs/safe-4337/utils/getRelayKitVersion.ts",
-    "build": "yarn unbuild && yarn build:esm && yarn build:cjs && yarn build:types",
-    "build:esm": "tsc -p tsconfig.build.json --module esnext --outDir dist/esm && tsc-alias -p tsconfig.build.json --outDir dist/esm",
-    "build:cjs": "tsc -p tsconfig.build.json --outDir dist/cjs && tsc-alias -p tsconfig.build.json --outDir dist/cjs",
+    "build": "yarn unbuild && yarn build:esm && yarn build:cjs && yarn build:types && yarn build:utils",
+    "build:utils": "tsc -p tsconfig.build.json --outDir dist/utils && tsc-alias -p tsconfig.build.json --outDir dist/utils",
+    "build:esm": "esbuild ./src/index ./test-utils/index --format=esm --bundle --metafile=meta-esm.json --packages=external --outdir=dist/esm --out-extension:.js=.mjs",
+    "build:cjs": "esbuild ./src/index ./test-utils/index --format=cjs --bundle --metafile=meta-cjs.json --packages=external --outdir=dist/cjs --out-extension:.js=.cjs",
     "build:types": "NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json --declaration --declarationMap --emitDeclarationOnly && tsc-alias -p tsconfig.build.json"
   },
   "repository": {

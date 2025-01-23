@@ -8,8 +8,7 @@ import {
   ENTRYPOINT_ADDRESS_V06,
   RPC_4337_CALLS
 } from '@safe-global/relay-kit/test-utils'
-// @ts-expect-error crazy hack to get test working
-import * as utils from '@safe-global/relay-kit/dist/cjs/src/packs/safe-4337/utils'
+import * as utils from '@safe-global/relay-kit/src/packs/safe-4337/utils'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { SafeOperation } from '@safe-global/types-kit'

@@ -6,8 +6,7 @@ import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { BundlerClient, Safe4337Pack } from '@safe-global/relay-kit'
-// @ts-expect-error crazy hack to get test working
-import * as utils from '@safe-global/relay-kit/dist/cjs/src/packs/safe-4337/utils'
+import * as utils from '@safe-global/relay-kit/src/packs/safe-4337/utils'
 import {
   generateTransferCallData,
   ENTRYPOINT_ABI,

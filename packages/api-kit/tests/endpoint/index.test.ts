@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { createWalletClient, http } from 'viem'
@@ -18,6 +19,7 @@ import config from '../utils/config'
 import { getApiKit, getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
+chai.use(sinonChai)
 
 const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 

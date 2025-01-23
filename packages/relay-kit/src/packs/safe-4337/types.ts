@@ -28,19 +28,19 @@ type PredictedSafeOptions = {
 
 export type SponsoredPaymasterOption = {
   isSponsored: true
-  paymasterUrl: string
   sponsorshipPolicyId?: string
 }
 
 export type ERC20PaymasterOption = {
-  paymasterUrl: string
   isSponsored?: false
   paymasterAddress: string
   paymasterTokenAddress: string
   amountToApprove?: bigint
 }
 
-export type PaymasterOptions = SponsoredPaymasterOption | ERC20PaymasterOption | undefined
+export type PaymasterOptions =
+  | ({ paymasterUrl: string } & (SponsoredPaymasterOption | ERC20PaymasterOption))
+  | undefined
 
 export type Safe4337InitOptions = {
   provider: SafeProviderConfig['provider']
@@ -163,7 +163,7 @@ export type EstimateFeeProps = {
   feeEstimator?: IFeeEstimator
 }
 
-type UserOperationStringValues = Omit<
+export type UserOperationStringValues = Omit<
   UserOperation,
   | 'callGasLimit'
   | 'verificationGasLimit'
@@ -190,7 +190,7 @@ export type PimlicoCustomRpcSchema = [
   },
   {
     Method: RPC_4337_CALLS.SPONSOR_USER_OPERATION
-    Parameters: [UserOperationStringValues, string, { token?: string }?]
+    Parameters: [UserOperationStringValues, string, { sponsorshipPolicyId: string }?]
     ReturnType:
       | {
           paymasterAndData: string
@@ -212,7 +212,7 @@ export type PimlicoCustomRpcSchema = [
   },
   {
     Method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA
-    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
+    Parameters: [UserOperationStringValues, string, string, { token: string }?]
     ReturnType:
       | {
           paymasterAndData: string
@@ -226,7 +226,7 @@ export type PimlicoCustomRpcSchema = [
   },
   {
     Method: RPC_4337_CALLS.GET_PAYMASTER_DATA
-    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
+    Parameters: [UserOperationStringValues, string, string, { token: string }?]
     ReturnType:
       | {
           paymasterAndData: string

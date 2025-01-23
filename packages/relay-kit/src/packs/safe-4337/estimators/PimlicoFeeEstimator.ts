@@ -4,7 +4,8 @@ import {
   ERC20PaymasterOption,
   EstimateFeeFunctionProps,
   IFeeEstimator,
-  SponsoredPaymasterOption
+  SponsoredPaymasterOption,
+  UserOperationStringValues
 } from '../types'
 import { getEip4337BundlerProvider, userOperationToHexValues } from '../utils'
 import { RPC_4337_CALLS } from '../constants'
@@ -27,7 +28,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
         ? {
             token: (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress
           }
-        : {}
+        : undefined
       paymasterStubData = await paymasterClient.request({
         method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA,
         params: (paymasterOptions as SponsoredPaymasterOption).sponsorshipPolicyId
@@ -42,13 +43,13 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     }
   }
 
-  async adjustEstimation({ userOperation }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    return {
-      callGasLimit: userOperation.callGasLimit + userOperation.callGasLimit / 2n, // +50%
-      verificationGasLimit: userOperation.verificationGasLimit * 4n, // +300%
-      preVerificationGas: userOperation.preVerificationGas + userOperation.preVerificationGas / 20n // +5%
-    }
-  }
+  // async adjustEstimation({ userOperation }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
+  //   return {
+  //     callGasLimit: userOperation.callGasLimit + userOperation.callGasLimit / 2n, // +50%
+  //     verificationGasLimit: userOperation.verificationGasLimit * 4n, // +300%
+  //     preVerificationGas: userOperation.preVerificationGas + userOperation.preVerificationGas / 20n // +5%
+  //   }
+  // }
 
   async getPaymasterEstimation({
     userOperation,
@@ -61,10 +62,19 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
 
     let gasEstimate: EstimateGasData
 
-    if (paymasterOptions?.isSponsored) {
+    if (paymasterOptions.isSponsored) {
+      const params: [UserOperationStringValues, string, { sponsorshipPolicyId: string }?] = [
+        userOperationToHexValues(userOperation, entryPoint),
+        entryPoint
+      ]
+      if (paymasterOptions.sponsorshipPolicyId) {
+        params.push({
+          sponsorshipPolicyId: paymasterOptions.sponsorshipPolicyId
+        })
+      }
       gasEstimate = await paymasterClient.request({
         method: RPC_4337_CALLS.SPONSOR_USER_OPERATION,
-        params: [userOperationToHexValues(userOperation, entryPoint), entryPoint]
+        params
       })
     } else {
       const chainId = await paymasterClient.request({ method: 'eth_chainId' })
@@ -74,7 +84,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
           userOperationToHexValues(userOperation, entryPoint),
           entryPoint,
           chainId,
-          { token: (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress }
+          { token: paymasterOptions.paymasterTokenAddress }
         ]
       })
     }

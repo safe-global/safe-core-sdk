@@ -46,13 +46,13 @@ async function main() {
     }
   })
 
-  // 1) Setup Playground
+  // 2) Setup Playground
   const { transactions, timestamp } = await setup4337Playground(safe4337Pack, {
     erc20TokenAmount: 200_000n,
     erc20TokenContractAddress: pimlicoTokenAddress
   })
 
-  // 2) Create transaction batch
+  // 3) Create SafeOperation
   const safeOperation = await safe4337Pack.createTransaction({
     transactions,
     options: {
@@ -61,12 +61,12 @@ async function main() {
     }
   })
 
-  // 3) Sign SafeOperation
+  // 4) Sign SafeOperation
   const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
 
   console.log('SafeOperation', signedSafeOperation)
 
-  // 4) Execute SafeOperation
+  // 5) Execute SafeOperation
   const userOperationHash = await safe4337Pack.executeTransaction({
     executable: signedSafeOperation
   })

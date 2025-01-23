@@ -1,25 +1,22 @@
-import { getBlock } from 'viem/actions'
 import { Safe4337Pack } from '@safe-global/relay-kit'
-import { generateTransferCallData, waitForOperationToFinish } from '../utils'
+import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
 // Safe owner PK
 const PRIVATE_KEY = ''
 
 const PIMLICO_API_KEY = ''
 
-// Safe 4337 compatible
-const SAFE_ADDRESS = ''
+// Safe owner address
+const OWNER_ADDRESS = ''
 
 //  PolicyId is an optional parameter, you can create one here: https://dashboard.pimlico.io/sponsorship-policies
 const POLICY_ID = ''
 
 // CHAIN
 const CHAIN_NAME = '11155111'
-// const CHAIN_NAME = 'gnosis'
 
 // RPC URL
 const RPC_URL = 'https://ethereum-sepolia-rpc.publicnode.com' // SEPOLIA
-// const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
 
 // Bundler URL
 const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
@@ -27,10 +24,9 @@ const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLIC
 // Paymaster URL
 const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
 
-// USDC CONTRACT ADDRESS IN SEPOLIA
-// faucet: https://faucet.circle.com/
-const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
-// const usdcTokenAddress = '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83' // GNOSIS
+// PIM test token contract address
+// faucet: https://dashboard.pimlico.io/test-erc20-faucet
+const pimlicoTokenAddress = '0xFC3e86566895Fb007c6A0d3809eb2827DF94F751'
 
 async function main() {
   // 1) Initialize pack with the paymaster data
@@ -40,31 +36,21 @@ async function main() {
     bundlerUrl: BUNDLER_URL,
     paymasterOptions: {
       isSponsored: true,
-      paymasterUrl: PAYMASTER_URL,
-      sponsorshipPolicyId: POLICY_ID
+      sponsorshipPolicyId: POLICY_ID,
+      paymasterUrl: PAYMASTER_URL
     },
     options: {
-      safeAddress: SAFE_ADDRESS
+      owners: [OWNER_ADDRESS],
+      threshold: 1,
+      saltNonce: '4337' + '1'
     }
   })
 
-  // Log supported entry points and chain id
-  console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
-  console.log('Chain Id', await safe4337Pack.getChainId())
-
-  // Create transaction batch with two 0.1 USDC transfers
-  const senderAddress = await safe4337Pack.protocolKit.getAddress()
-
-  const usdcAmount = 100_000n // 0.1 USDC
-
-  const transferUSDC = {
-    to: usdcTokenAddress,
-    data: generateTransferCallData(senderAddress, usdcAmount),
-    value: '0'
-  }
-  const transactions = [transferUSDC, transferUSDC]
-  const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()
-  const timestamp = (await getBlock(externalProvider))?.timestamp || 0n
+  // 1) Setup Playground
+  const { transactions, timestamp } = await setup4337Playground(safe4337Pack, {
+    erc20TokenAmount: 200_000n,
+    erc20TokenContractAddress: pimlicoTokenAddress
+  })
 
   // 2) Create transaction batch
   const safeOperation = await safe4337Pack.createTransaction({

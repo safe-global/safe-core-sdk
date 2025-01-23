@@ -6,7 +6,7 @@ import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { BundlerClient, Safe4337Pack } from '@safe-global/relay-kit'
-import * as utils from '@safe-global/relay-kit/src/packs/safe-4337/utils'
+import * as relayKit from '@safe-global/relay-kit'
 import {
   generateTransferCallData,
   ENTRYPOINT_ABI,
@@ -40,7 +40,7 @@ describe('addSafeOperation', () => {
   const requestStub = sinon.stub()
   // Setup mocks for the bundler client
   before(async () => {
-    sinon.stub(utils, 'getEip4337BundlerProvider').returns({
+    sinon.stub(relayKit, 'getEip4337BundlerProvider').returns({
       request: requestStub,
       readContract: sinon
         .stub()

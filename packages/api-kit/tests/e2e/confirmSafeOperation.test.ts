@@ -8,7 +8,7 @@ import {
   ENTRYPOINT_ADDRESS_V06,
   RPC_4337_CALLS
 } from '@safe-global/relay-kit/test-utils'
-import * as utils from '@safe-global/relay-kit/src/packs/safe-4337/utils'
+import * as relayKit from '@safe-global/relay-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { SafeOperation } from '@safe-global/types-kit'
@@ -72,7 +72,7 @@ describe('confirmSafeOperation', () => {
   const requestStub = sinon.stub()
 
   before(async () => {
-    sinon.stub(utils, 'getEip4337BundlerProvider').returns({
+    sinon.stub(relayKit, 'getEip4337BundlerProvider').returns({
       request: requestStub
     } as unknown as BundlerClient)
 

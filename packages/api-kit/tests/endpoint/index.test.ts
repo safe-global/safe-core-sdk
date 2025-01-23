@@ -170,7 +170,9 @@ describe('Endpoint tests', () => {
     it('getSafeInfo', async () => {
       await chai
         .expect(safeApiKit.getSafeInfo(safeAddress))
-        .to.be.eventually.deep.equals({ data: { success: true } })
+        // FIXME the singleton hack makes that the property is always added by SafeApiKit.
+        // Remove when is correctly returned by the service.
+        .to.be.eventually.deep.equals({ data: { success: true }, singleton: undefined })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/`,
         method: 'get'
@@ -180,7 +182,9 @@ describe('Endpoint tests', () => {
     it('getSafeInfo EIP-3770', async () => {
       await chai
         .expect(safeApiKit.getSafeInfo(eip3770SafeAddress))
-        .to.be.eventually.deep.equals({ data: { success: true } })
+        // FIXME the singleton hack makes that the property is always added by SafeApiKit.
+        // Remove when is correctly returned by the service.
+        .to.be.eventually.deep.equals({ data: { success: true }, singleton: undefined })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/`,
         method: 'get'

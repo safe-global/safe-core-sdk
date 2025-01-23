@@ -3,13 +3,13 @@
   "version": "3.4.0",
   "description": "SDK for Safe Smart Accounts with support for ERC-4337 and Relay",
   "types": "dist/src/index.d.ts",
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
+  "main": "dist/cjs/src/src/index.js",
+  "module": "dist/esm/src/src/index.js",
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
-      "require": "./dist/cjs/index.cjs",
-      "import": "./dist/esm/index.mjs"
+      "require": "./dist/cjs/src/index.cjs",
+      "import": "./dist/esm/src/index.mjs"
     },
     "./test-utils": {
       "types": "./dist/test-utils/index.d.ts",

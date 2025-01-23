@@ -1,4 +1,4 @@
-import * as chai from 'chai'
+import chai from 'chai'
 import {
   getEip3770NetworkPrefixFromChainId,
   isValidEip3770NetworkPrefix,

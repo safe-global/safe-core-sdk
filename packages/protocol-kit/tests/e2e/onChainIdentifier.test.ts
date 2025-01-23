@@ -6,7 +6,7 @@ import Safe, {
   SafeAccountConfig
 } from '@safe-global/protocol-kit/index'
 import chai from 'chai'
-import Sinon from 'sinon'
+import sinon from 'sinon'
 import chaiAsPromised from 'chai-as-promised'
 
 import { generateHash } from '@safe-global/protocol-kit/utils/on-chain-tracking/generateOnChainIdentifier'
@@ -48,7 +48,7 @@ describe('On-chain analytics', () => {
         platform: 'Web'
       }
 
-      const stub = Sinon.stub(getProtocolKitVersionModule, 'getProtocolKitVersion').returns('5.0.4')
+      const stub = sinon.stub(getProtocolKitVersionModule, 'getProtocolKitVersion').returns('5.0.4')
 
       const { safe, contractNetworks } = await setupTests()
       const safeAddress = safe.address

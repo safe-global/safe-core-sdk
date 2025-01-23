@@ -15,7 +15,6 @@ import Safe, {
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
 import crypto from 'crypto'
 import {
   getSafeWebAuthnSignerFactoryContract,
@@ -26,7 +25,6 @@ import { waitSafeTxReceipt } from './utils/transactions'
 import { createMockPasskey, getWebAuthnCredentials, deployPasskeysContract } from './utils/passkeys'
 
 chai.use(chaiAsPromised)
-chai.use(sinonChai)
 
 const webAuthnCredentials = getWebAuthnCredentials()
 

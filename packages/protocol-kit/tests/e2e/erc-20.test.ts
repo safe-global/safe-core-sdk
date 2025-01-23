@@ -8,11 +8,9 @@ import { safeVersionDeployed, setupTests, itif } from '@safe-global/testing-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
 import { getEip1193Provider } from './utils/setupProvider'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 
-chai.use(sinonChai)
 chai.use(chaiAsPromised)
 
 const ERC20_TOKEN_ADDRESS = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'

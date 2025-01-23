@@ -9,6 +9,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
+import { API_TESTING_SAFE } from '../helpers/safe'
 
 chai.use(chaiAsPromised)
 
@@ -19,7 +20,7 @@ let signer: DeleteSafeDelegateProps['signer']
 let delegatorAddress: Address
 
 describe('getSafeDelegates', () => {
-  const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+  const safeAddress = API_TESTING_SAFE.address
 
   before(() => {
     safeApiKit = getApiKit('https://safe-transaction-sepolia.staging.5afe.dev/api')
@@ -127,7 +128,6 @@ describe('getSafeDelegates', () => {
   })
 
   it('should return an array of delegates EIP-3770', async () => {
-    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateConfig1: DeleteSafeDelegateProps = {
       delegateAddress: `${config.EIP_3770_PREFIX}:0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B`,

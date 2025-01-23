@@ -7,7 +7,7 @@ import { getApiKit } from '../utils/setupKits'
 chai.use(chaiAsPromised)
 
 let safeApiKit: SafeApiKit
-const goerliSpendingLimitModule = '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
+const allowanceModule = '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
 
 describe('getSafesByModule', () => {
   before(async () => {
@@ -36,14 +36,14 @@ describe('getSafesByModule', () => {
   })
 
   it('should return the array Safes with the module enabled', async () => {
-    const moduleAddress = goerliSpendingLimitModule
+    const moduleAddress = allowanceModule
     const moduleResponse = await safeApiKit.getSafesByModule(moduleAddress)
     const { safes } = moduleResponse
     chai.expect(safes.length).to.be.greaterThan(10)
   })
 
   it('should return the array of Safes with the module enabled when using EIP-3770 module address', async () => {
-    const moduleAddress = goerliSpendingLimitModule
+    const moduleAddress = allowanceModule
     const eip3770ModuleAddress = `${config.EIP_3770_PREFIX}:${moduleAddress}`
     const moduleResponse = await safeApiKit.getSafesByModule(eip3770ModuleAddress)
     const { safes } = moduleResponse

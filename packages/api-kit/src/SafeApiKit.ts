@@ -258,6 +258,14 @@ class SafeApiKit {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/`,
       method: HttpMethod.Get
+    }).then((response: any) => {
+      // FIXME remove when the transaction service returns the singleton property instead of masterCopy
+      if (!response?.singleton) {
+        const { masterCopy, ...rest } = response
+        return { ...rest, singleton: masterCopy } as SafeInfoResponse
+      }
+
+      return response as SafeInfoResponse
     })
   }
 

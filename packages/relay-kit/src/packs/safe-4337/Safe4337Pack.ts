@@ -13,8 +13,7 @@ import {
   isSafeOperationResponse,
   OperationType,
   SafeOperationConfirmation,
-  SafeOperationResponse,
-  SafeSignature
+  SafeOperationResponse
 } from '@safe-global/types-kit'
 import {
   getSafeModuleSetupDeployment,
@@ -40,12 +39,7 @@ import {
   DEFAULT_SAFE_MODULES_VERSION,
   RPC_4337_CALLS
 } from './constants'
-import {
-  addDummySignature,
-  getEip4337BundlerProvider,
-  signSafeOp,
-  userOperationToHexValues
-} from './utils'
+import { addDummySignature, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
 import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 import getRelayKitVersion from './utils/getRelayKitVersion'
@@ -497,10 +491,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation.callData += this.#onchainIdentifier
     }
 
-    const safeOperation = new EthSafeOperation(userOperation, {
+    const safeOperation = new EthSafeOperation(userOperation, this.protocolKit, {
       chainId: this.#chainId,
       moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
+      sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
       validUntil,
       validAfter
     })
@@ -536,9 +531,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
         paymasterAndData: concat([paymaster, paymasterData]),
         signature: safeOperationResponse.preparedSignature || '0x'
       },
+      this.protocolKit,
       {
         chainId: this.#chainId,
         moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
+        sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
         entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
         validAfter: this.#timestamp(validAfter),
         validUntil: this.#timestamp(validUntil)
@@ -584,74 +581,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOp = safeOperation
     }
 
-    const safeProvider = this.protocolKit.getSafeProvider()
-    const signerAddress = await safeProvider.getSignerAddress()
-    const isPasskeySigner = await safeProvider.isPasskeySigner()
+    await safeOp.sign(signingMethod)
 
-    if (!signerAddress) {
-      throw new Error('There is no signer address available to sign the SafeOperation')
-    }
-
-    const isOwner = await this.protocolKit.isOwner(signerAddress)
-    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
-
-    if ((!isOwner && isSafeDeployed) || (!isSafeDeployed && !isPasskeySigner && !isOwner)) {
-      throw new Error('UserOperations can only be signed by Safe owners')
-    }
-
-    let signature: SafeSignature
-
-    if (isPasskeySigner) {
-      const safeOpHash = safeOp.getHash()
-
-      // if the Safe is not deployed we force the Shared Signer signature
-      if (!isSafeDeployed) {
-        const passkeySignature = await this.protocolKit.signHash(safeOpHash)
-        // SafeWebAuthnSharedSigner signature
-        signature = new EthSafeSignature(
-          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-          passkeySignature.data,
-          true // passkeys are contract signatures
-        )
-      } else {
-        signature = await this.protocolKit.signHash(safeOpHash)
-      }
-    } else {
-      if (
-        [
-          SigningMethod.ETH_SIGN_TYPED_DATA_V4,
-          SigningMethod.ETH_SIGN_TYPED_DATA_V3,
-          SigningMethod.ETH_SIGN_TYPED_DATA
-        ].includes(signingMethod)
-      ) {
-        signature = await signSafeOp(
-          safeOp.getSafeOperation(),
-          this.protocolKit.getSafeProvider(),
-          this.#SAFE_4337_MODULE_ADDRESS,
-          this.#ENTRYPOINT_ADDRESS
-        )
-      } else {
-        const safeOpHash = safeOp.getHash()
-
-        signature = await this.protocolKit.signHash(safeOpHash)
-      }
-    }
-
-    const signedSafeOperation = new EthSafeOperation(safeOp.getUserOperation(), {
-      chainId: this.#chainId,
-      moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
-      entryPoint: this.#ENTRYPOINT_ADDRESS,
-      validUntil: safeOp.options.validUntil,
-      validAfter: safeOp.options.validAfter
-    })
-
-    safeOp.signatures.forEach((signature: SafeSignature) => {
-      signedSafeOperation.addSignature(signature)
-    })
-
-    signedSafeOperation.addSignature(signature)
-
-    return signedSafeOperation
+    return safeOp
   }
 
   /**

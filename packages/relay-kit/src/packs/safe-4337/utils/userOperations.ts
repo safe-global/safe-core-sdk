@@ -17,7 +17,7 @@ import { encodeMultiSendCallData } from '../utils'
  * @param {MetaTransactionData} transaction - The transaction data to encode.
  * @return {string} The encoded call data string.
  */
-export function encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
+function encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
   return encodeFunctionData({
     abi: ABI,
     functionName: 'executeUserOp',
@@ -30,7 +30,7 @@ export function encodeExecuteUserOpCallData(transaction: MetaTransactionData): s
   })
 }
 
-export async function getCallData(
+async function getCallData(
   protocolKit: Safe,
   transactions: MetaTransactionData[],
   paymasterOptions: ERC20PaymasterOption,
@@ -66,36 +66,7 @@ export async function getCallData(
   return callData
 }
 
-export function unpackPaymasterAndData(
-  paymasterAndData: string
-): Pick<
-  UserOperationV07,
-  'paymaster' | 'paymasterVerificationGasLimit' | 'paymasterPostOpGasLimit' | 'paymasterData'
-> {
-  const paymasterAndDataBytes = hexToBytes(paymasterAndData as Hex)
-  const isZero = paymasterAndDataBytes.every((byte) => byte === 0)
-
-  const unpackedData =
-    paymasterAndDataBytes.length > 0 && !isZero
-      ? {
-          paymaster: getAddress(sliceHex(paymasterAndData as Hex, 0, 20)),
-          paymasterVerificationGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 20, 36)),
-          paymasterPostOpGasLimit: BigInt(sliceHex(paymasterAndData as Hex, 36, 52)),
-          paymasterData: sliceHex(paymasterAndData as Hex, 52)
-        }
-      : {
-          paymaster: '0x',
-          paymasterData: '0x',
-          paymasterVerificationGasLimit: undefined,
-          paymasterPostOpGasLimit: undefined
-        }
-
-  return unpackedData
-}
-
-export function unpackInitCode(
-  initCode: string
-): Pick<UserOperationV07, 'factory' | 'factoryData'> {
+function unpackInitCode(initCode: string): Pick<UserOperationV07, 'factory' | 'factoryData'> {
   const initCodeBytes = hexToBytes(initCode as Hex)
 
   return initCodeBytes.length > 0

@@ -12,13 +12,11 @@ import {
   SafeUserOperation,
   OperationType,
   MetaTransactionData,
-  SafeSignature,
   UserOperation,
   UserOperationV07
 } from '@safe-global/types-kit'
 import {
   EthSafeSignature,
-  SafeProvider,
   encodeMultiSendData,
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
@@ -39,50 +37,6 @@ export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
   })
 
   return provider
-}
-
-/**
- * Signs typed data.
- *
- * @param {SafeUserOperation} safeUserOperation - Safe user operation to sign.
- * @param {SafeProvider} safeProvider - Safe provider.
- * @param {string} safe4337ModuleAddress - Safe 4337 module address.
- * @return {Promise<SafeSignature>} The SafeSignature object containing the data and the signatures.
- */
-export async function signSafeOp(
-  safeUserOperation: SafeUserOperation,
-  safeProvider: SafeProvider,
-  safe4337ModuleAddress: string,
-  entryPoint: string
-): Promise<SafeSignature> {
-  const signer = await safeProvider.getExternalSigner()
-
-  if (!signer) {
-    throw new Error('No signer found')
-  }
-
-  const chainId = await safeProvider.getChainId()
-  const signerAddress = signer.account.address
-  const signature = await signer.signTypedData({
-    domain: {
-      chainId: Number(chainId),
-      verifyingContract: safe4337ModuleAddress
-    },
-    types: isEntryPointV7(entryPoint)
-      ? EIP712_SAFE_OPERATION_TYPE_V07
-      : EIP712_SAFE_OPERATION_TYPE_V06,
-    message: {
-      ...safeUserOperation,
-      nonce: toHex(safeUserOperation.nonce),
-      validAfter: toHex(safeUserOperation.validAfter),
-      validUntil: toHex(safeUserOperation.validUntil),
-      maxFeePerGas: toHex(safeUserOperation.maxFeePerGas),
-      maxPriorityFeePerGas: toHex(safeUserOperation.maxPriorityFeePerGas)
-    },
-    primaryType: 'SafeOp'
-  })
-
-  return new EthSafeSignature(signerAddress, signature)
 }
 
 /**

@@ -327,6 +327,7 @@ export type SafeOperationOptions = {
   moduleAddress: string
   entryPoint: string
   chainId: bigint
+  sharedSigner: string
   validAfter?: number
   validUntil?: number
 }
@@ -336,6 +337,7 @@ export interface SafeOperation {
   options: SafeOperationOptions
 
   readonly signatures: Map<string, SafeSignature>
+  sign(signingMethod: string): void
   getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string

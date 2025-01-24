@@ -1,7 +1,6 @@
 import semverSatisfies from 'semver/functions/satisfies'
 import Safe, {
   EthSafeSignature,
-  SigningMethod,
   encodeMultiSendData,
   getMultiSendContract,
   PasskeyClient,
@@ -13,7 +12,8 @@ import {
   isSafeOperationResponse,
   OperationType,
   SafeOperationConfirmation,
-  SafeOperationResponse
+  SafeOperationResponse,
+  SigningMethod
 } from '@safe-global/types-kit'
 import {
   getSafeModuleSetupDeployment,

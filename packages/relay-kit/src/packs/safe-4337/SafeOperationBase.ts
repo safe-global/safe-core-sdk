@@ -5,13 +5,10 @@ import {
   SafeOperationOptions,
   SafeSignature,
   SafeUserOperation,
-  UserOperation
-} from '@safe-global/types-kit'
-import Safe, {
-  buildSignatureBytes,
-  EthSafeSignature,
+  UserOperation,
   SigningMethod
-} from '@safe-global/protocol-kit'
+} from '@safe-global/types-kit'
+import Safe, { buildSignatureBytes, EthSafeSignature } from '@safe-global/protocol-kit'
 import { EIP712_SAFE_OPERATION_TYPE_V06, EIP712_SAFE_OPERATION_TYPE_V07 } from './constants'
 
 abstract class SafeOperationBase implements SafeOperation {
@@ -42,7 +39,7 @@ abstract class SafeOperationBase implements SafeOperation {
 
   abstract getSafeOperation(): SafeUserOperation
 
-  async sign(signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+  async sign(signingMethod: string = SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
     const safeProvider = this.protocolKit.getSafeProvider()
     const signerAddress = await safeProvider.getSignerAddress()
     const isPasskeySigner = await safeProvider.isPasskeySigner()
@@ -71,11 +68,12 @@ abstract class SafeOperationBase implements SafeOperation {
       }
     } else {
       if (
+        signingMethod in
         [
           SigningMethod.ETH_SIGN_TYPED_DATA_V4,
           SigningMethod.ETH_SIGN_TYPED_DATA_V3,
           SigningMethod.ETH_SIGN_TYPED_DATA
-        ].includes(signingMethod)
+        ]
       ) {
         const signer = await safeProvider.getExternalSigner()
 

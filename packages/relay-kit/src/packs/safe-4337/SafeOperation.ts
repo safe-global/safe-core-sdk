@@ -1,4 +1,4 @@
-import { Hex, concat, encodePacked, isAddress, pad, toHex } from 'viem'
+import { Hex, concat, encodePacked, hashTypedData, isAddress, pad, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -14,7 +14,6 @@ import Safe, {
   EthSafeSignature,
   SigningMethod
 } from '@safe-global/protocol-kit'
-import { calculateSafeUserOperationHash } from './utils'
 import { isEntryPointV7 } from './utils/entrypoint'
 import { EIP712_SAFE_OPERATION_TYPE_V06, EIP712_SAFE_OPERATION_TYPE_V07 } from './constants'
 
@@ -165,12 +164,11 @@ class EthSafeOperation implements SafeOperation {
           throw new Error('No signer found')
         }
 
-        const chainId = await safeProvider.getChainId()
         const signerAddress = signer.account.address
         const safeOperation = this.getSafeOperation()
         const signature = await signer.signTypedData({
           domain: {
-            chainId: Number(chainId),
+            chainId: Number(this.options.chainId),
             verifyingContract: this.options.moduleAddress
           },
           types: isEntryPointV7(this.options.entryPoint)
@@ -213,12 +211,17 @@ class EthSafeOperation implements SafeOperation {
   }
 
   getHash(): string {
-    return calculateSafeUserOperationHash(
-      this.getSafeOperation(),
-      this.options.chainId,
-      this.options.moduleAddress,
-      this.options.entryPoint
-    )
+    return hashTypedData({
+      domain: {
+        chainId: Number(this.options.chainId),
+        verifyingContract: this.options.moduleAddress
+      },
+      types: isEntryPointV7(this.options.entryPoint)
+        ? EIP712_SAFE_OPERATION_TYPE_V07
+        : EIP712_SAFE_OPERATION_TYPE_V06,
+      primaryType: 'SafeOp',
+      message: this.getSafeOperation()
+    })
   }
 }
 

@@ -3,13 +3,11 @@ import {
   createPublicClient,
   encodeFunctionData,
   encodePacked,
-  hashTypedData,
   http,
   rpcSchema,
   toHex
 } from 'viem'
 import {
-  SafeUserOperation,
   OperationType,
   MetaTransactionData,
   UserOperation,
@@ -20,7 +18,7 @@ import {
   encodeMultiSendData,
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
-import { ABI, EIP712_SAFE_OPERATION_TYPE_V06, EIP712_SAFE_OPERATION_TYPE_V07 } from './constants'
+import { ABI } from './constants'
 import { BundlerClient, PimlicoCustomRpcSchema } from './types'
 import { isEntryPointV7 } from './utils/entrypoint'
 
@@ -54,33 +52,6 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): st
         transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
       ) as Hex
     ]
-  })
-}
-
-/**
- * Gets the safe user operation hash.
- *
- * @param {SafeUserOperation} safeUserOperation - The SafeUserOperation.
- * @param {bigint} chainId - The chain id.
- * @param {string} safe4337ModuleAddress - The Safe 4337 module address.
- * @return {string} The hash of the safe operation.
- */
-export function calculateSafeUserOperationHash(
-  safeUserOperation: SafeUserOperation,
-  chainId: bigint,
-  safe4337ModuleAddress: string,
-  entryPoint: string
-): string {
-  return hashTypedData({
-    domain: {
-      chainId: Number(chainId),
-      verifyingContract: safe4337ModuleAddress
-    },
-    types: isEntryPointV7(entryPoint)
-      ? EIP712_SAFE_OPERATION_TYPE_V07
-      : EIP712_SAFE_OPERATION_TYPE_V06,
-    primaryType: 'SafeOp',
-    message: safeUserOperation
   })
 }
 

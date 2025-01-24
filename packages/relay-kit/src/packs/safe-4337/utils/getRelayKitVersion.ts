@@ -1,7 +1,1 @@
-import packageJson from '../../../../package.json'
-
-function getRelayKitVersion(): string {
-  return packageJson.version
-}
-
-export default getRelayKitVersion
+export const getRelayKitVersion = () => '3.4.0'

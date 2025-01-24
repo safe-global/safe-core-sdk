@@ -42,7 +42,7 @@ import {
 import { getDummySignature, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
 import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
-import getRelayKitVersion from './utils/getRelayKitVersion'
+import { getRelayKitVersion } from './utils/getRelayKitVersion'
 import { createUserOperation } from './utils/userOperations'
 import SafeOperationFactory from './SafeOperationFactory'
 

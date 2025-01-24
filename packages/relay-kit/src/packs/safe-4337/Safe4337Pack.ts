@@ -39,7 +39,7 @@ import {
   DEFAULT_SAFE_MODULES_VERSION,
   RPC_4337_CALLS
 } from './constants'
-import { addDummySignature, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
+import { getDummySignature, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
 import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 import getRelayKitVersion from './utils/getRelayKitVersion'
@@ -416,14 +416,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const estimateUserOperationGas = await this.#bundlerClient.request({
       method: RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS,
       params: [
-        userOperationToHexValues(
-          addDummySignature(
-            safeOperation.getUserOperation(),
-            this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-            threshold
-          ),
-          this.#ENTRYPOINT_ADDRESS
-        ),
+        {
+          ...userOperationToHexValues(safeOperation.getUserOperation(), this.#ENTRYPOINT_ADDRESS),
+          signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
+        },
         this.#ENTRYPOINT_ADDRESS
       ]
     })
@@ -448,11 +444,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     if (this.#paymasterOptions) {
       const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
-        userOperation: addDummySignature(
-          safeOperation.getUserOperation(),
-          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-          threshold
-        ),
+        userOperation: {
+          ...safeOperation.getUserOperation(),
+          signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
+        },
         bundlerUrl: this.#BUNDLER_URL,
         entryPoint: this.#ENTRYPOINT_ADDRESS,
         paymasterOptions: this.#paymasterOptions
@@ -604,12 +599,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOperation = executable
     }
 
-    const userOperation = safeOperation.getUserOperation()
-
     return this.#bundlerClient.request({
       method: RPC_4337_CALLS.SEND_USER_OPERATION,
       params: [
-        userOperationToHexValues(userOperation, this.#ENTRYPOINT_ADDRESS),
+        userOperationToHexValues(safeOperation.getUserOperation(), this.#ENTRYPOINT_ADDRESS),
         this.#ENTRYPOINT_ADDRESS
       ]
     })

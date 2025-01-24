@@ -19,7 +19,7 @@ import {
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
 import { ABI } from './constants'
-import { BundlerClient, PimlicoCustomRpcSchema } from './types'
+import { BundlerClient, PimlicoCustomRpcSchema, UserOperationStringValues } from './types'
 import { isEntryPointV7 } from './utils/entrypoint'
 
 /**
@@ -61,7 +61,10 @@ export function encodeMultiSendCallData(transactions: MetaTransactionData[]): st
  * @param {UserOperation} userOperation - The UserOperation object whose values are to be converted.
  * @returns {UserOperation} A new UserOperation object with the values converted to hexadecimal.
  */
-export function userOperationToHexValues(userOperation: UserOperation, entryPointAddress: string) {
+export function userOperationToHexValues(
+  userOperation: UserOperation,
+  entryPointAddress: string
+): UserOperationStringValues {
   const userOpV07 = userOperation as UserOperationV07
 
   const userOperationWithHexValues = {
@@ -114,16 +117,11 @@ DUMMY_AUTHENTICATOR_DATA[32] = 0x04
 /**
  * This method creates a dummy signature for the SafeOperation based on the Safe threshold. We assume that all owners are passkeys
  * This is useful for gas estimations
- * @param userOperation - The user operation
  * @param signer - The signer
  * @param threshold - The Safe threshold
  * @returns The user operation with the dummy passkey signature
  */
-export function addDummySignature(
-  userOperation: UserOperation,
-  signer: string,
-  threshold: number
-): UserOperation {
+export function getDummySignature(signer: string, threshold: number): string {
   const signatures = []
 
   for (let i = 0; i < threshold; i++) {
@@ -138,13 +136,7 @@ export function addDummySignature(
     signatures.push(new EthSafeSignature(signer, passkeySignature, isContractSignature))
   }
 
-  return {
-    ...userOperation,
-    signature: encodePacked(
-      ['uint48', 'uint48', 'bytes'],
-      [0, 0, buildSignatureBytes(signatures) as Hex]
-    )
-  }
+  return encodePacked(['uint48', 'uint48', 'bytes'], [0, 0, buildSignatureBytes(signatures) as Hex])
 }
 
 /**

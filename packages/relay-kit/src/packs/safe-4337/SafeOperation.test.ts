@@ -1,6 +1,6 @@
 import { Hex, encodePacked } from 'viem'
 import { EthSafeSignature } from '@safe-global/protocol-kit'
-import EthSafeOperation from './SafeOperation'
+import EthSafeOperation from './SafeOperationBase'
 import * as fixtures from './testing-utils/fixtures'
 
 describe('SafeOperation', () => {

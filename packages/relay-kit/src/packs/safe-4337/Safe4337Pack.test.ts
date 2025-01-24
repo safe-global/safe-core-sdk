@@ -10,7 +10,7 @@ import {
 } from '@safe-global/safe-modules-deployments'
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
 import { Safe4337Pack } from './Safe4337Pack'
-import EthSafeOperation from './SafeOperation'
+import EthSafeOperation from './SafeOperationBase'
 import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'

@@ -1,23 +1,20 @@
-import { Hex, concat, encodePacked, hashTypedData, isAddress, pad, toHex } from 'viem'
+import { Hex, encodePacked, hashTypedData, toHex } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
   SafeOperationOptions,
   SafeSignature,
   SafeUserOperation,
-  UserOperation,
-  UserOperationV06,
-  UserOperationV07
+  UserOperation
 } from '@safe-global/types-kit'
 import Safe, {
   buildSignatureBytes,
   EthSafeSignature,
   SigningMethod
 } from '@safe-global/protocol-kit'
-import { isEntryPointV7 } from './utils/entrypoint'
 import { EIP712_SAFE_OPERATION_TYPE_V06, EIP712_SAFE_OPERATION_TYPE_V07 } from './constants'
 
-class EthSafeOperation implements SafeOperation {
+abstract class SafeOperationBase implements SafeOperation {
   userOperation: UserOperation
   protocolKit: Safe
   options: SafeOperationOptions
@@ -41,81 +38,9 @@ class EthSafeOperation implements SafeOperation {
     return buildSignatureBytes(Array.from(this.signatures.values()))
   }
 
-  addEstimations(estimations: EstimateGasData): void {
-    const userOpV06 = this.userOperation as UserOperationV06
-    userOpV06.maxFeePerGas = BigInt(estimations.maxFeePerGas || userOpV06.maxFeePerGas)
-    userOpV06.maxPriorityFeePerGas = BigInt(
-      estimations.maxPriorityFeePerGas || userOpV06.maxPriorityFeePerGas
-    )
-    userOpV06.verificationGasLimit = BigInt(
-      estimations.verificationGasLimit || userOpV06.verificationGasLimit
-    )
-    userOpV06.preVerificationGas = BigInt(
-      estimations.preVerificationGas || userOpV06.preVerificationGas
-    )
-    userOpV06.callGasLimit = BigInt(estimations.callGasLimit || userOpV06.callGasLimit)
+  abstract addEstimations(estimations: EstimateGasData): void
 
-    userOpV06.paymasterAndData = estimations.paymasterAndData || userOpV06.paymasterAndData
-
-    if (isEntryPointV7(this.options.entryPoint)) {
-      const userOp = this.userOperation as UserOperationV07
-      userOp.paymasterPostOpGasLimit = estimations.paymasterPostOpGasLimit
-        ? BigInt(estimations.paymasterPostOpGasLimit)
-        : userOp.paymasterPostOpGasLimit
-      userOp.paymasterVerificationGasLimit = estimations.paymasterVerificationGasLimit
-        ? BigInt(estimations.paymasterVerificationGasLimit)
-        : userOp.paymasterVerificationGasLimit
-      userOp.paymaster = estimations.paymaster || userOp.paymaster
-      userOp.paymasterData = estimations.paymasterData || userOp.paymasterData
-    }
-  }
-
-  getSafeOperation(): SafeUserOperation {
-    let initCode
-    let paymasterAndData
-
-    if (isEntryPointV7(this.options.entryPoint)) {
-      const userOpV07 = this.userOperation as UserOperationV07
-
-      initCode = userOpV07.factory
-        ? concat([userOpV07.factory as Hex, (userOpV07.factoryData as Hex) || ('0x' as Hex)])
-        : '0x'
-
-      paymasterAndData = isAddress(userOpV07.paymaster || '')
-        ? concat([
-            userOpV07.paymaster as Hex,
-            pad(toHex(userOpV07.paymasterVerificationGasLimit || 0n), {
-              size: 16
-            }),
-            pad(toHex(userOpV07.paymasterPostOpGasLimit || 0n), {
-              size: 16
-            }),
-            (userOpV07.paymasterData as Hex) || ('0x' as Hex)
-          ])
-        : '0x'
-    } else {
-      const userOpV06 = this.userOperation as UserOperationV06
-
-      initCode = userOpV06.initCode
-      paymasterAndData = userOpV06.paymasterAndData
-    }
-
-    return {
-      safe: this.userOperation.sender,
-      nonce: BigInt(this.userOperation.nonce),
-      initCode,
-      callData: this.userOperation.callData,
-      callGasLimit: this.userOperation.callGasLimit,
-      verificationGasLimit: this.userOperation.verificationGasLimit,
-      preVerificationGas: this.userOperation.preVerificationGas,
-      maxFeePerGas: this.userOperation.maxFeePerGas,
-      maxPriorityFeePerGas: this.userOperation.maxPriorityFeePerGas,
-      paymasterAndData,
-      validAfter: this.options.validAfter || 0,
-      validUntil: this.options.validUntil || 0,
-      entryPoint: this.options.entryPoint
-    }
-  }
+  abstract getSafeOperation(): SafeUserOperation
 
   async sign(signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
     const safeProvider = this.protocolKit.getSafeProvider()
@@ -138,15 +63,9 @@ class EthSafeOperation implements SafeOperation {
     if (isPasskeySigner) {
       const safeOpHash = this.getHash()
 
-      // if the Safe is not deployed we force the Shared Signer signature
       if (!isSafeDeployed) {
         const passkeySignature = await this.protocolKit.signHash(safeOpHash)
-        // SafeWebAuthnSharedSigner signature
-        safeSignature = new EthSafeSignature(
-          this.options.sharedSigner,
-          passkeySignature.data,
-          true // passkeys are contract signatures
-        )
+        safeSignature = new EthSafeSignature(this.options.sharedSigner, passkeySignature.data, true)
       } else {
         safeSignature = await this.protocolKit.signHash(safeOpHash)
       }
@@ -171,9 +90,7 @@ class EthSafeOperation implements SafeOperation {
             chainId: Number(this.options.chainId),
             verifyingContract: this.options.moduleAddress
           },
-          types: isEntryPointV7(this.options.entryPoint)
-            ? EIP712_SAFE_OPERATION_TYPE_V07
-            : EIP712_SAFE_OPERATION_TYPE_V06,
+          types: this.getEIP712Type(),
           message: {
             ...safeOperation,
             nonce: toHex(safeOperation.nonce),
@@ -216,13 +133,15 @@ class EthSafeOperation implements SafeOperation {
         chainId: Number(this.options.chainId),
         verifyingContract: this.options.moduleAddress
       },
-      types: isEntryPointV7(this.options.entryPoint)
-        ? EIP712_SAFE_OPERATION_TYPE_V07
-        : EIP712_SAFE_OPERATION_TYPE_V06,
+      types: this.getEIP712Type(),
       primaryType: 'SafeOp',
       message: this.getSafeOperation()
     })
   }
+
+  protected abstract getEIP712Type():
+    | typeof EIP712_SAFE_OPERATION_TYPE_V06
+    | typeof EIP712_SAFE_OPERATION_TYPE_V07
 }
 
-export default EthSafeOperation
+export default SafeOperationBase

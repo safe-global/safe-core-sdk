@@ -21,7 +21,7 @@ import {
   getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
 import { Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
-import EthSafeOperation from './SafeOperation'
+import SafeOperationBase from './SafeOperationBase'
 import {
   EstimateFeeProps,
   Safe4337CreateTransactionProps,
@@ -44,6 +44,7 @@ import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 import getRelayKitVersion from './utils/getRelayKitVersion'
 import { createUserOperation } from './utils/userOperations'
+import SafeOperationFactory from './SafeOperationFactory'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
@@ -61,9 +62,9 @@ const EQ_OR_GT_1_4_1 = '>=1.4.1'
  */
 export class Safe4337Pack extends RelayKitBasePack<{
   EstimateFeeProps: EstimateFeeProps
-  EstimateFeeResult: EthSafeOperation
+  EstimateFeeResult: SafeOperationBase
   CreateTransactionProps: Safe4337CreateTransactionProps
-  CreateTransactionResult: EthSafeOperation
+  CreateTransactionResult: SafeOperationBase
   ExecuteTransactionProps: Safe4337ExecutableProps
   ExecuteTransactionResult: string
 }> {
@@ -390,15 +391,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * Estimates gas for the SafeOperation.
    *
    * @param {EstimateFeeProps} props - The parameters for the gas estimation.
-   * @param {EthSafeOperation} props.safeOperation - The SafeOperation to estimate the gas.
+   * @param {SafeOperationBase} props.safeOperation - The SafeOperation to estimate the gas.
    * @param {IFeeEstimator} props.feeEstimator - The function to estimate the gas.
-   * @return {Promise<EthSafeOperation>} The Promise object that will be resolved into the gas estimation.
+   * @return {Promise<SafeOperationBase>} The Promise object that will be resolved into the gas estimation.
    */
 
   async getEstimateFee({
     safeOperation,
     feeEstimator = new PimlicoFeeEstimator()
-  }: EstimateFeeProps): Promise<EthSafeOperation> {
+  }: EstimateFeeProps): Promise<SafeOperationBase> {
     const threshold = await this.protocolKit.getThreshold()
     const setupEstimationData = await feeEstimator?.setupEstimation?.({
       bundlerUrl: this.#BUNDLER_URL,
@@ -468,12 +469,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
    *
    * @param {MetaTransactionData[]} transactions - The transactions to batch in a SafeOperation.
    * @param options - Optional configuration options for the transaction creation.
-   * @return {Promise<EthSafeOperation>} The Promise object will resolve a SafeOperation.
+   * @return {Promise<SafeOperationBase>} The Promise object will resolve a SafeOperation.
    */
   async createTransaction({
     transactions,
     options = {}
-  }: Safe4337CreateTransactionProps): Promise<EthSafeOperation> {
+  }: Safe4337CreateTransactionProps): Promise<SafeOperationBase> {
     const { amountToApprove, validUntil, validAfter, feeEstimator } = options
 
     const userOperation = await createUserOperation(this.protocolKit, transactions, {
@@ -486,14 +487,18 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation.callData += this.#onchainIdentifier
     }
 
-    const safeOperation = new EthSafeOperation(userOperation, this.protocolKit, {
-      chainId: this.#chainId,
-      moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
-      entryPoint: this.#ENTRYPOINT_ADDRESS,
-      sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-      validUntil,
-      validAfter
-    })
+    const safeOperation = SafeOperationFactory.createSafeOperation(
+      userOperation,
+      this.protocolKit,
+      {
+        chainId: this.#chainId,
+        moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
+        entryPoint: this.#ENTRYPOINT_ADDRESS,
+        sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+        validUntil,
+        validAfter
+      }
+    )
 
     return await this.getEstimateFee({
       safeOperation,
@@ -502,17 +507,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
   }
 
   /**
-   * Converts a SafeOperationResponse to an EthSafeOperation.
+   * Converts a SafeOperationResponse to an SafeOperationBase.
    *
-   * @param {SafeOperationResponse} safeOperationResponse - The SafeOperationResponse to convert to EthSafeOperation
-   * @returns {EthSafeOperation} - The EthSafeOperation object
+   * @param {SafeOperationResponse} safeOperationResponse - The SafeOperationResponse to convert to SafeOperationBase
+   * @returns {SafeOperationBase} - The SafeOperationBase object
    */
-  #toSafeOperation(safeOperationResponse: SafeOperationResponse): EthSafeOperation {
+  #toSafeOperation(safeOperationResponse: SafeOperationResponse): SafeOperationBase {
     const { validUntil, validAfter, userOperation } = safeOperationResponse
 
     const paymaster = (userOperation?.paymaster as Hex) || '0x'
     const paymasterData = (userOperation?.paymasterData as Hex) || '0x'
-    const safeOperation = new EthSafeOperation(
+    const safeOperation = SafeOperationFactory.createSafeOperation(
       {
         sender: userOperation?.sender || '0x',
         nonce: userOperation?.nonce?.toString() || '0',
@@ -558,17 +563,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
   /**
    * Signs a safe operation.
    *
-   * @param {EthSafeOperation | SafeOperationResponse} safeOperation - The SafeOperation to sign. It can be:
+   * @param {SafeOperationBase | SafeOperationResponse} safeOperation - The SafeOperation to sign. It can be:
    * - A response from the API (Tx Service)
-   * - An instance of EthSafeOperation
+   * - An instance of SafeOperationBase
    * @param {SigningMethod} signingMethod - The signing method to use.
-   * @return {Promise<EthSafeOperation>} The Promise object will resolve to the signed SafeOperation.
+   * @return {Promise<SafeOperationBase>} The Promise object will resolve to the signed SafeOperation.
    */
   async signSafeOperation(
-    safeOperation: EthSafeOperation | SafeOperationResponse,
+    safeOperation: SafeOperationBase | SafeOperationResponse,
     signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4
-  ): Promise<EthSafeOperation> {
-    let safeOp: EthSafeOperation
+  ): Promise<SafeOperationBase> {
+    let safeOp: SafeOperationBase
 
     if (isSafeOperationResponse(safeOperation)) {
       safeOp = this.#toSafeOperation(safeOperation)
@@ -585,13 +590,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * Executes the relay transaction.
    *
    * @param {Safe4337ExecutableProps} props - The parameters for the transaction execution.
-   * @param {EthSafeOperation | SafeOperationResponse} props.executable - The SafeOperation to execute. It can be:
+   * @param {SafeOperationBase | SafeOperationResponse} props.executable - The SafeOperation to execute. It can be:
    * - A response from the API (Tx Service)
-   * - An instance of EthSafeOperation
+   * - An instance of SafeOperationBase
    * @return {Promise<string>} The user operation hash.
    */
   async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {
-    let safeOperation: EthSafeOperation
+    let safeOperation: SafeOperationBase
 
     if (isSafeOperationResponse(executable)) {
       safeOperation = this.#toSafeOperation(executable)

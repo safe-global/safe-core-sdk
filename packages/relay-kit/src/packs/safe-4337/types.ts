@@ -11,7 +11,7 @@ import {
   SafeVersion,
   UserOperation
 } from '@safe-global/types-kit'
-import EthSafeOperation from './SafeOperation'
+import SafeOperationBase from './SafeOperationBase'
 import { RPC_4337_CALLS } from './constants'
 
 type ExistingSafeOptions = {
@@ -81,7 +81,7 @@ export type Safe4337CreateTransactionProps = {
 }
 
 export type Safe4337ExecutableProps = {
-  executable: EthSafeOperation | SafeOperationResponse
+  executable: SafeOperationBase | SafeOperationResponse
 }
 
 export type EstimateSponsoredGasData = (
@@ -159,7 +159,7 @@ export interface IFeeEstimator {
 }
 
 export type EstimateFeeProps = {
-  safeOperation: EthSafeOperation
+  safeOperation: SafeOperationBase
   feeEstimator?: IFeeEstimator
 }
 

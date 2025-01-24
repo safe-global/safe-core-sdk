@@ -59,6 +59,7 @@
     "@safe-global/protocol-kit": "^5.2.0",
     "@safe-global/safe-modules-deployments": "^2.2.4",
     "@safe-global/types-kit": "^1.0.1",
+    "semver": "^7.6.3",
     "viem": "^2.21.8"
   }
 }

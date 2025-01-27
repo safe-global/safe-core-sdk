@@ -1,21 +1,16 @@
+import dotenv from 'dotenv'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
-// Safe owner PK
-const PRIVATE_KEY = ''
+dotenv.config({ path: './playground/relay-kit/.env' })
 
-const PIMLICO_API_KEY = ''
-
-// Safe 4337 compatible
-const SAFE_ADDRESS = ''
-
-// RPC URL
-const RPC_URL = 'https://ethereum-sepolia-rpc.publicnode.com' // SEPOLIA
-
-const CHAIN_NAME = '11155111'
-
-// Bundler URL
-const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+const {
+  PRIVATE_KEY,
+  SAFE_ADDRESS = '0x',
+  RPC_URL = '',
+  CHAIN_ID = '',
+  BUNDLER_URL = ''
+} = process.env
 
 // PIM test token contract address
 // faucet: https://dashboard.pimlico.io/test-erc20-faucet
@@ -58,7 +53,7 @@ async function main() {
     executable: signedSafeOperation
   })
 
-  await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)
+  await waitForOperationToFinish(userOperationHash, CHAIN_ID, safe4337Pack)
 }
 
 main()

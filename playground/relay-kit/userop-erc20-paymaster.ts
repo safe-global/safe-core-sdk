@@ -1,23 +1,16 @@
+import * as dotenv from 'dotenv'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish, setup4337Playground } from '../utils'
 
-// Safe owner PK
-const PRIVATE_KEY = ''
+dotenv.config({ path: './playground/relay-kit/.env' })
 
-const PIMLICO_API_KEY = ''
-
-// Safe 4337 compatible
-const SAFE_ADDRESS = ''
-
-// CHAIN
-const CHAIN_NAME = '11155111'
-
-// RPC URL
-const RPC_URL = 'https://ethereum-sepolia-rpc.publicnode.com' // SEPOLIA
-// const RPC_URL = 'https://rpc.gnosischain.com/' // GNOSIS
-
-// Bundler URL
-const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+const {
+  PRIVATE_KEY,
+  SAFE_ADDRESS = '0x',
+  RPC_URL = '',
+  CHAIN_ID = '',
+  BUNDLER_URL = ''
+} = process.env
 
 // PAYMASTER ADDRESSES
 const paymasterAddress_v07 = '0x0000000000000039cd5e8ae05257ce51c473ddd1'
@@ -69,7 +62,7 @@ async function main() {
     executable: signedSafeOperation
   })
 
-  await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)
+  await waitForOperationToFinish(userOperationHash, CHAIN_ID, safe4337Pack)
 }
 
 main()

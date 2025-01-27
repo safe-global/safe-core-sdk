@@ -1,28 +1,18 @@
+import * as dotenv from 'dotenv'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
-// Safe owner PK
-const PRIVATE_KEY = ''
+dotenv.config({ path: './playground/relay-kit/.env' })
 
-const PIMLICO_API_KEY = ''
-
-// Safe owner address
-const OWNER_ADDRESS = ''
-
-//  PolicyId is an optional parameter, you can create one here: https://dashboard.pimlico.io/sponsorship-policies
-const POLICY_ID = ''
-
-// CHAIN
-const CHAIN_NAME = '11155111'
-
-// RPC URL
-const RPC_URL = 'https://ethereum-sepolia-rpc.publicnode.com' // SEPOLIA
-
-// Bundler URL
-const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
-
-// Paymaster URL
-const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
+const {
+  PRIVATE_KEY,
+  OWNER_ADDRESS = '0x',
+  RPC_URL = '',
+  CHAIN_ID = '',
+  BUNDLER_URL = '',
+  PAYMASTER_URL = '',
+  POLICY_ID
+} = process.env
 
 // PIM test token contract address
 // faucet: https://dashboard.pimlico.io/test-erc20-faucet
@@ -42,7 +32,7 @@ async function main() {
     options: {
       owners: [OWNER_ADDRESS],
       threshold: 1,
-      saltNonce: '4337' + '1'
+      saltNonce: '4337' + '112'
     }
   })
 
@@ -71,7 +61,7 @@ async function main() {
     executable: signedSafeOperation
   })
 
-  await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)
+  await waitForOperationToFinish(userOperationHash, CHAIN_ID, safe4337Pack)
 }
 
 main()

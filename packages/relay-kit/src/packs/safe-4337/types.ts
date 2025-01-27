@@ -178,38 +178,7 @@ export type UserOperationStringValues = Omit<
   maxPriorityFeePerGas: string
 }
 
-export type PimlicoCustomRpcSchema = [
-  {
-    Method: 'pimlico_getUserOperationGasPrice'
-    Parameters: never
-    ReturnType: {
-      slow: { maxFeePerGas: string; maxPriorityFeePerGas: string }
-      standard: { maxFeePerGas: string; maxPriorityFeePerGas: string }
-      fast: { maxFeePerGas: string; maxPriorityFeePerGas: string }
-    }
-  },
-  {
-    Method: RPC_4337_CALLS.SPONSOR_USER_OPERATION
-    Parameters: [UserOperationStringValues, string, { sponsorshipPolicyId: string }?]
-    ReturnType:
-      | {
-          paymasterAndData: string
-          callGasLimit: string
-          verificationGasLimit: string
-          verificationGas: string
-          preVerificationGas: string
-        }
-      | {
-          paymaster: string
-          paymasterData: string
-          callGasLimit: string
-          verificationGasLimit: string
-          verificationGas: string
-          preVerificationGas: string
-          paymasterVerificationGasLimit: string
-          paymasterPostOpGasLimit: string
-        }
-  },
+export type Safe4337RpcSchema = [
   {
     Method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA
     Parameters: [UserOperationStringValues, string, string, { token: string }?]
@@ -278,9 +247,15 @@ export type PimlicoCustomRpcSchema = [
   }
 ]
 
-export type BundlerClient = PublicClient<
+export type RpcSchemaEntry = {
+  Method: string
+  Parameters: unknown[]
+  ReturnType: unknown
+}
+
+export type BundlerClient<ProviderCustomRpcSchema extends RpcSchemaEntry[] = []> = PublicClient<
   Transport,
   Chain | undefined,
   Account | undefined,
-  [...PimlicoCustomRpcSchema, ...PublicRpcSchema]
+  [...PublicRpcSchema, ...Safe4337RpcSchema, ...ProviderCustomRpcSchema]
 >

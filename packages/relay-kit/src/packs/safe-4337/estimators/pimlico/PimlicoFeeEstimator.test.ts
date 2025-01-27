@@ -1,6 +1,6 @@
 import { PimlicoFeeEstimator } from './PimlicoFeeEstimator'
-import * as fixtures from '../testing-utils/fixtures'
-import * as constants from '../constants'
+import * as fixtures from '../../testing-utils/fixtures'
+import * as constants from '../../constants'
 
 jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),

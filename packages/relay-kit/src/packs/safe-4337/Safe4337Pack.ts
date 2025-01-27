@@ -41,7 +41,7 @@ import {
 } from './constants'
 import { getDummySignature, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
 import { entryPointToSafeModules } from './utils/entrypoint'
-import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
+import { PimlicoFeeEstimator } from './estimators/pimlico/PimlicoFeeEstimator'
 import { getRelayKitVersion } from './utils/getRelayKitVersion'
 import { createUserOperation } from './utils/userOperations'
 import SafeOperationFactory from './SafeOperationFactory'
@@ -362,7 +362,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         throw new Error('No entrypoint provided or available through the bundler')
       }
 
-      selectedEntryPoint = supportedEntryPoints.find((entryPoint) => {
+      selectedEntryPoint = supportedEntryPoints.find((entryPoint: string) => {
         const requiredSafeModulesVersion = entryPointToSafeModules(entryPoint)
         return semverSatisfies(safeModulesVersion, requiredSafeModulesVersion)
       })

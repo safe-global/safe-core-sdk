@@ -1,5 +1,6 @@
 import {
   Hex,
+  PublicRpcSchema,
   createPublicClient,
   encodeFunctionData,
   encodePacked,
@@ -19,7 +20,12 @@ import {
   buildSignatureBytes
 } from '@safe-global/protocol-kit'
 import { ABI } from './constants'
-import { BundlerClient, PimlicoCustomRpcSchema, UserOperationStringValues } from './types'
+import {
+  BundlerClient,
+  RpcSchemaEntry,
+  Safe4337RpcSchema,
+  UserOperationStringValues
+} from './types'
 import { isEntryPointV7 } from './utils/entrypoint'
 
 /**
@@ -28,10 +34,12 @@ import { isEntryPointV7 } from './utils/entrypoint'
  * @param {string} bundlerUrl The EIP-4337 bundler URL.
  * @return {BundlerClient} The EIP-4337 bundler provider.
  */
-export function getEip4337BundlerProvider(bundlerUrl: string): BundlerClient {
+export function getEip4337BundlerProvider<ProviderCustomRpcSchema extends RpcSchemaEntry[] = []>(
+  bundlerUrl: string
+): BundlerClient<ProviderCustomRpcSchema> {
   const provider = createPublicClient({
     transport: http(bundlerUrl),
-    rpcSchema: rpcSchema<[...PimlicoCustomRpcSchema]>()
+    rpcSchema: rpcSchema<[...PublicRpcSchema, ...Safe4337RpcSchema, ...ProviderCustomRpcSchema]>()
   })
 
   return provider

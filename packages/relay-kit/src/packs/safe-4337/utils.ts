@@ -34,7 +34,7 @@ import { isEntryPointV7 } from './utils/entrypoint'
  * @param {string} bundlerUrl The EIP-4337 bundler URL.
  * @return {BundlerClient} The EIP-4337 bundler provider.
  */
-export function getEip4337BundlerProvider<ProviderCustomRpcSchema extends RpcSchemaEntry[] = []>(
+export function createBundlerClient<ProviderCustomRpcSchema extends RpcSchemaEntry[] = []>(
   bundlerUrl: string
 ): BundlerClient<ProviderCustomRpcSchema> {
   const provider = createPublicClient({

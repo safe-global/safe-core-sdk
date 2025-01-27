@@ -30,6 +30,14 @@ function encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
   })
 }
 
+/**
+ *
+ * @param {Safe} protocolKit - The Safe instance
+ * @param {MetaTransactionData[]} transactions - The transactions to batch
+ * @param {ERC20PaymasterOption} paymasterOptions - The options for the paymaster
+ * @param {bigint} amountToApprove - The amount to approve. Useful for ERC20 paymasters to include an approve transaction for the ERC20 token ruling the paymaster
+ * @returns {string} - An hexadecimal string with the call data
+ */
 async function getCallData(
   protocolKit: Safe,
   transactions: MetaTransactionData[],
@@ -66,6 +74,11 @@ async function getCallData(
   return callData
 }
 
+/**
+ * Unpack initCode into factory and factoryData fields for an V07 UserOperation
+ * @param {string} initCode - The initializer code for the Safe deployment
+ * @returns {Pick<UserOperationV07, 'factory' | 'factoryData'>} The factory and factoryData fields for an V07 UserOperation
+ */
 function unpackInitCode(initCode: string): Pick<UserOperationV07, 'factory' | 'factoryData'> {
   const initCodeBytes = hexToBytes(initCode as Hex)
 
@@ -77,6 +90,16 @@ function unpackInitCode(initCode: string): Pick<UserOperationV07, 'factory' | 'f
     : {}
 }
 
+/**
+ * Creates an initial UserOperation before adding all the estimation values
+ * @param {Safe} protocolKit - The Safe instance
+ * @param {MetaTransactionData[]} transactions - The transactions to batch
+ * @param {{ entryPoint: string; amountToApprove?: bigint; paymasterOptions: PaymasterOptions }} options
+ * @param {bigint} options.amountToApprove - The amount to approve. Useful for ERC20 paymasters to include an approve transaction for the ERC20 token ruling the paymaster
+ * @param {string} options.entryPoint - The entry point for the UserOperation
+ * @param {PaymasterOptions} options.paymasterOptions - The options for the paymaster
+ * @returns {Promise<UserOperation>} The initialized UserOperation
+ */
 export async function createUserOperation(
   protocolKit: Safe,
   transactions: MetaTransactionData[],

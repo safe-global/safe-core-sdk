@@ -8,12 +8,18 @@ import {
   UserOperationStringValues
 } from '@safe-global/relay-kit/packs/safe-4337/types'
 import {
-  getEip4337BundlerProvider,
+  createBundlerClient,
   userOperationToHexValues
 } from '@safe-global/relay-kit/packs/safe-4337/utils'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 import { PIMLICO_CUSTOM_RPC_4337_CALLS, PimlicoCustomRpcSchema } from './types'
 
+/**
+ * PimlicoFeeEstimator is a class that implements the IFeeEstimator interface. You can implement three optional methods that will be called during the estimation process:
+ * - setupEstimation: Setup the userOperation before calling the eth_estimateUserOperation gas method.
+ * - adjustEstimation: Adjust the userOperation values returned after calling the eth_adjustUserOperation method.
+ * - getPaymasterEstimation: Obtain the paymaster data and the paymaster gas values.
+ */
 export class PimlicoFeeEstimator implements IFeeEstimator {
   async setupEstimation({
     bundlerUrl,
@@ -21,13 +27,14 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     entryPoint,
     paymasterOptions
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    const bundlerClient = getEip4337BundlerProvider<PimlicoCustomRpcSchema>(bundlerUrl)
-    const feeData = await this.#getFeeData(bundlerClient)
-    const chainId = await bundlerClient.request({ method: 'eth_chainId' })
+    const bundlerClient = createBundlerClient<PimlicoCustomRpcSchema>(bundlerUrl)
+    const feeData = await this.#getUserOperationGasPrices(bundlerClient)
+    const chainId = await this.#getChainId(bundlerClient)
 
     let paymasterStubData = {}
+
     if (paymasterOptions) {
-      const paymasterClient = getEip4337BundlerProvider<PimlicoCustomRpcSchema>(
+      const paymasterClient = createBundlerClient<PimlicoCustomRpcSchema>(
         paymasterOptions.paymasterUrl
       )
       const context = (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress
@@ -54,48 +61,55 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     entryPoint,
     paymasterOptions
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    if (!paymasterOptions) throw new Error("Paymaster options can't be empty")
+    if (!paymasterOptions)
+      throw new Error(
+        "Paymaster options can't be empty when trying to get the paymaster data and gas estimation"
+      )
 
-    const paymasterClient = getEip4337BundlerProvider<PimlicoCustomRpcSchema>(
+    const paymasterClient = createBundlerClient<PimlicoCustomRpcSchema>(
       paymasterOptions.paymasterUrl
     )
 
-    let gasEstimate: EstimateGasData
     if (paymasterOptions.isSponsored) {
       const params: [UserOperationStringValues, string, { sponsorshipPolicyId: string }?] = [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint
       ]
+
       if (paymasterOptions.sponsorshipPolicyId) {
         params.push({
           sponsorshipPolicyId: paymasterOptions.sponsorshipPolicyId
         })
       }
-      gasEstimate = await paymasterClient.request({
+
+      const sponsoredData = await paymasterClient.request({
         method: PIMLICO_CUSTOM_RPC_4337_CALLS.SPONSOR_USER_OPERATION,
         params
       })
-    } else {
-      const chainId = await paymasterClient.request({ method: 'eth_chainId' })
-      gasEstimate = await paymasterClient.request({
-        method: RPC_4337_CALLS.GET_PAYMASTER_DATA,
-        params: [
-          userOperationToHexValues(userOperation, entryPoint),
-          entryPoint,
-          chainId,
-          { token: paymasterOptions.paymasterTokenAddress }
-        ]
-      })
+
+      return sponsoredData
     }
 
-    return gasEstimate
+    const chainId = await this.#getChainId(paymasterClient)
+
+    const erc20PaymasterData = await paymasterClient.request({
+      method: RPC_4337_CALLS.GET_PAYMASTER_DATA,
+      params: [
+        userOperationToHexValues(userOperation, entryPoint),
+        entryPoint,
+        chainId,
+        { token: paymasterOptions.paymasterTokenAddress }
+      ]
+    })
+
+    return erc20PaymasterData
   }
 
-  async #getFeeData(
+  async #getUserOperationGasPrices(
     bundlerClient: BundlerClient<PimlicoCustomRpcSchema>
   ): Promise<Pick<EstimateGasData, 'maxFeePerGas' | 'maxPriorityFeePerGas'>> {
     const feeData = await bundlerClient.request({
-      method: PIMLICO_CUSTOM_RPC_4337_CALLS.GET_USEROPERATION_GAS_PRICE
+      method: PIMLICO_CUSTOM_RPC_4337_CALLS.GET_USER_OPERATION_GAS_PRICE
     })
 
     const {
@@ -106,5 +120,11 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       maxFeePerGas: maxFeePerGas,
       maxPriorityFeePerGas: maxPriorityFeePerGas
     }
+  }
+
+  async #getChainId(client: BundlerClient<PimlicoCustomRpcSchema>): Promise<string> {
+    const chainId = await client.request({ method: 'eth_chainId' })
+
+    return chainId
   }
 }

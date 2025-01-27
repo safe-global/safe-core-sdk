@@ -81,7 +81,7 @@ class SafeOperationV07 extends SafeOperationBase {
     }
   }
 
-  protected getEIP712Type() {
+  getEIP712Type() {
     return EIP712_SAFE_OPERATION_TYPE_V07
   }
 }

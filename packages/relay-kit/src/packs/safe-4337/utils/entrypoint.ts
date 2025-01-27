@@ -26,12 +26,6 @@ export function isEntryPointV7(address: string): boolean {
   return sameString(address, ENTRYPOINT_ADDRESS_V07)
 }
 
-/**
- * Gets account nonce from the bundler.
- *
- * @param {string} safeAddress - Account address for which the nonce is to be fetched.
- * @returns {Promise<string>} The Promise object will resolve to the account nonce.
- */
 export async function getSafeNonceFromEntrypoint(
   protocolKit: Safe,
   safeAddress: string,

@@ -23,18 +23,6 @@ abstract class SafeOperationBase implements SafeOperation {
     this.options = options
   }
 
-  getSignature(signer: string): SafeSignature | undefined {
-    return this.signatures.get(signer.toLowerCase())
-  }
-
-  addSignature(signature: SafeSignature): void {
-    this.signatures.set(signature.signer.toLowerCase(), signature)
-  }
-
-  encodedSignatures(): string {
-    return buildSignatureBytes(Array.from(this.signatures.values()))
-  }
-
   abstract addEstimations(estimations: EstimateGasData): void
 
   abstract getSafeOperation(): SafeUserOperation
@@ -111,6 +99,18 @@ abstract class SafeOperationBase implements SafeOperation {
     this.addSignature(safeSignature)
   }
 
+  getSignature(signer: string): SafeSignature | undefined {
+    return this.signatures.get(signer.toLowerCase())
+  }
+
+  addSignature(signature: SafeSignature): void {
+    this.signatures.set(signature.signer.toLowerCase(), signature)
+  }
+
+  encodedSignatures(): string {
+    return buildSignatureBytes(Array.from(this.signatures.values()))
+  }
+
   getUserOperation(): UserOperation {
     return {
       ...this.userOperation,
@@ -137,7 +137,7 @@ abstract class SafeOperationBase implements SafeOperation {
     })
   }
 
-  protected abstract getEIP712Type():
+  abstract getEIP712Type():
     | typeof EIP712_SAFE_OPERATION_TYPE_V06
     | typeof EIP712_SAFE_OPERATION_TYPE_V07
 }

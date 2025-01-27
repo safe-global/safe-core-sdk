@@ -20,7 +20,7 @@ const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLIC
 
 // Paymaster addresses
 const paymasterAddress_v07 = '0x0000000000000039cd5e8ae05257ce51c473ddd1'
-const paymasterAddress_v06 = '0x00000000000000fb866daaa79352cc568a005d96'
+// const paymasterAddress_v06 = '0x00000000000000fb866daaa79352cc568a005d96' // Use this with the 0.2.0 safeModulesVersion that is currently compatible with the v0.6 entrypoint
 
 // PIM test token contract address
 // faucet: https://dashboard.pimlico.io/test-erc20-faucet

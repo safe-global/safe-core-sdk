@@ -16,9 +16,6 @@ class SafeOperationV06 extends SafeOperationBase {
   }
 
   addEstimations(estimations: EstimateGasData): void {
-    this.userOperation.maxFeePerGas = BigInt(
-      estimations.maxFeePerGas || this.userOperation.maxFeePerGas
-    )
     this.userOperation.maxPriorityFeePerGas = BigInt(
       estimations.maxPriorityFeePerGas || this.userOperation.maxPriorityFeePerGas
     )
@@ -54,7 +51,7 @@ class SafeOperationV06 extends SafeOperationBase {
     }
   }
 
-  protected getEIP712Type() {
+  getEIP712Type() {
     return EIP712_SAFE_OPERATION_TYPE_V06
   }
 }

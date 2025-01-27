@@ -39,7 +39,7 @@ import {
   DEFAULT_SAFE_MODULES_VERSION,
   RPC_4337_CALLS
 } from './constants'
-import { getDummySignature, getEip4337BundlerProvider, userOperationToHexValues } from './utils'
+import { getDummySignature, createBundlerClient, userOperationToHexValues } from './utils'
 import { entryPointToSafeModules } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/pimlico/PimlicoFeeEstimator'
 import { getRelayKitVersion } from './utils/getRelayKitVersion'
@@ -141,7 +141,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     } = initOptions
 
     let protocolKit: Safe
-    const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
+    const bundlerClient = createBundlerClient(bundlerUrl)
     const chainId = await bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
 
     let safeModulesSetupAddress = customContracts?.safeModulesSetupAddress

@@ -1,7 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
 import { Safe4337InitOptions, Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import SafeApiKit from '@safe-global/api-kit/index'
@@ -10,7 +9,6 @@ import { SafeOperation } from '@safe-global/types-kit'
 import { getApiKit, getEip1193Provider } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
-chai.use(sinonChai)
 
 const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'

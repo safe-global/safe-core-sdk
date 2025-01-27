@@ -45,7 +45,7 @@
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
     "@gnosis.pm/safe-contracts-v1.3.0": "npm:@gnosis.pm/safe-contracts@1.3.0",
-    "@nomicfoundation/hardhat-viem": "^2.0.4",
+    "@nomicfoundation/hardhat-viem": "^2.0.6",
     "@openzeppelin/contracts": "^2.5.1",
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
     "@safe-global/safe-passkey": "0.2.0-alpha.1",

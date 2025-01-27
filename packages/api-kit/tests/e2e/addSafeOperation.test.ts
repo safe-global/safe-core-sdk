@@ -1,7 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
@@ -10,7 +9,6 @@ import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import { getKits } from '../utils/setupKits'
 
 chai.use(chaiAsPromised)
-chai.use(sinonChai)
 
 const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/2 Safe (v1.4.1) with signer above being an owner + 4337 module enabled

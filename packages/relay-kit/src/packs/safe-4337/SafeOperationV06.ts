@@ -16,6 +16,9 @@ class SafeOperationV06 extends SafeOperationBase {
   }
 
   addEstimations(estimations: EstimateGasData): void {
+    this.userOperation.maxFeePerGas = BigInt(
+      estimations.maxFeePerGas || this.userOperation.maxFeePerGas
+    )
     this.userOperation.maxPriorityFeePerGas = BigInt(
       estimations.maxPriorityFeePerGas || this.userOperation.maxPriorityFeePerGas
     )
@@ -28,7 +31,6 @@ class SafeOperationV06 extends SafeOperationBase {
     this.userOperation.callGasLimit = BigInt(
       estimations.callGasLimit || this.userOperation.callGasLimit
     )
-
     this.userOperation.paymasterAndData =
       estimations.paymasterAndData || this.userOperation.paymasterAndData
   }

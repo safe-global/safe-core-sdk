@@ -31,7 +31,7 @@ async function main() {
 
   // 2) Setup Playground
   const { transactions, timestamp } = await setup4337Playground(safe4337Pack, {
-    // nativeTokenAmount: parseEther('0.01'), // Increase this value when is not enough to cover the gas fees
+    nativeTokenAmount: parseEther('0.01'), // Increase this value when is not enough to cover the gas fees
     erc20TokenAmount: 200_000n,
     erc20TokenContractAddress: pimlicoTokenAddress
   })

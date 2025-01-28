@@ -9,7 +9,10 @@ import {
   SigningMethod
 } from '@safe-global/types-kit'
 import Safe, { buildSignatureBytes, EthSafeSignature } from '@safe-global/protocol-kit'
-import { EIP712_SAFE_OPERATION_TYPE_V06, EIP712_SAFE_OPERATION_TYPE_V07 } from './constants'
+import {
+  EIP712_SAFE_OPERATION_TYPE_V06,
+  EIP712_SAFE_OPERATION_TYPE_V07
+} from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 abstract class SafeOperationBase implements SafeOperation {
   userOperation: UserOperation

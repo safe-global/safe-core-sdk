@@ -5,10 +5,10 @@ import {
   UserOperationV07,
   SafeOperationOptions
 } from '@safe-global/types-kit'
-import SafeOperationV06 from './SafeOperationV06'
-import SafeOperationV07 from './SafeOperationV07'
-import SafeOperationBase from './SafeOperationBase'
-import { isEntryPointV7 } from './utils/entrypoint'
+import SafeOperationV06 from '@safe-global/relay-kit/packs/safe-4337/SafeOperationV06'
+import SafeOperationV07 from '@safe-global/relay-kit/packs/safe-4337/SafeOperationV07'
+import SafeOperationBase from '@safe-global/relay-kit/packs/safe-4337/SafeOperationBase'
+import { isEntryPointV7 } from '@safe-global/relay-kit/packs/safe-4337/utils'
 
 class SafeOperationFactory {
   static createSafeOperation(

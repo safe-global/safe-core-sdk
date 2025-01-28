@@ -21,7 +21,8 @@ import {
   getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
 import { Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
-import SafeOperationBase from './SafeOperationBase'
+import SafeOperationBase from '@safe-global/relay-kit/packs/safe-4337/SafeOperationBase'
+import SafeOperationFactory from '@safe-global/relay-kit/packs/safe-4337/SafeOperationFactory'
 import {
   EstimateFeeProps,
   Safe4337CreateTransactionProps,
@@ -32,19 +33,22 @@ import {
   UserOperationWithPayload,
   PaymasterOptions,
   BundlerClient
-} from './types'
+} from '@safe-global/relay-kit/packs/safe-4337/types'
 import {
   ABI,
   DEFAULT_SAFE_VERSION,
   DEFAULT_SAFE_MODULES_VERSION,
   RPC_4337_CALLS
-} from './constants'
-import { getDummySignature, createBundlerClient, userOperationToHexValues } from './utils'
-import { entryPointToSafeModules } from './utils/entrypoint'
-import { PimlicoFeeEstimator } from './estimators/pimlico/PimlicoFeeEstimator'
-import { getRelayKitVersion } from './utils/getRelayKitVersion'
-import { createUserOperation } from './utils/userOperations'
-import SafeOperationFactory from './SafeOperationFactory'
+} from '@safe-global/relay-kit/packs/safe-4337/constants'
+import {
+  entryPointToSafeModules,
+  getDummySignature,
+  createBundlerClient,
+  userOperationToHexValues,
+  getRelayKitVersion,
+  createUserOperation
+} from '@safe-global/relay-kit/packs/safe-4337/utils'
+import { PimlicoFeeEstimator } from '@safe-global/relay-kit/packs/safe-4337/estimators/pimlico/PimlicoFeeEstimator'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn

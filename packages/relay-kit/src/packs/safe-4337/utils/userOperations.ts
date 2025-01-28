@@ -1,3 +1,4 @@
+import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
 import Safe from '@safe-global/protocol-kit'
 import {
   MetaTransactionData,
@@ -5,11 +6,18 @@ import {
   UserOperation,
   UserOperationV07
 } from '@safe-global/types-kit'
-import { getSafeNonceFromEntrypoint, isEntryPointV6 } from './entrypoint'
-import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
-import { ABI } from '../constants'
-import { ERC20PaymasterOption, PaymasterOptions } from '../types'
-import { encodeMultiSendCallData } from '../utils'
+import {
+  getSafeNonceFromEntrypoint,
+  isEntryPointV6,
+  isEntryPointV7,
+  encodeMultiSendCallData
+} from '@safe-global/relay-kit/packs/safe-4337/utils'
+import { ABI } from '@safe-global/relay-kit/packs/safe-4337/constants'
+import {
+  ERC20PaymasterOption,
+  PaymasterOptions,
+  UserOperationStringValues
+} from '@safe-global/relay-kit/packs/safe-4337/types'
 
 /**
  * Encode the UserOperation execution from a transaction.
@@ -156,4 +164,41 @@ export async function createUserOperation(
     paymasterPostOpGasLimit: undefined,
     signature: '0x'
   }
+}
+
+/**
+ * Converts various bigint values from a UserOperation to their hexadecimal representation.
+ *
+ * @param {UserOperation} userOperation - The UserOperation object whose values are to be converted.
+ * @returns {UserOperation} A new UserOperation object with the values converted to hexadecimal.
+ */
+export function userOperationToHexValues(
+  userOperation: UserOperation,
+  entryPointAddress: string
+): UserOperationStringValues {
+  const userOpV07 = userOperation as UserOperationV07
+
+  const userOperationWithHexValues = {
+    ...userOperation,
+    nonce: toHex(BigInt(userOperation.nonce)),
+    callGasLimit: toHex(userOperation.callGasLimit),
+    verificationGasLimit: toHex(userOperation.verificationGasLimit),
+    preVerificationGas: toHex(userOperation.preVerificationGas),
+    maxFeePerGas: toHex(userOperation.maxFeePerGas),
+    maxPriorityFeePerGas: toHex(userOperation.maxPriorityFeePerGas),
+    ...(isEntryPointV7(entryPointAddress)
+      ? {
+          paymaster: userOpV07.paymaster !== '0x' ? userOpV07.paymaster : null,
+          paymasterData: userOpV07.paymasterData !== '0x' ? userOpV07.paymasterData : null,
+          paymasterVerificationGasLimit: userOpV07.paymasterVerificationGasLimit
+            ? toHex(userOpV07.paymasterVerificationGasLimit)
+            : null,
+          paymasterPostOpGasLimit: userOpV07.paymasterPostOpGasLimit
+            ? toHex(userOpV07.paymasterPostOpGasLimit)
+            : null
+        }
+      : {})
+  }
+
+  return userOperationWithHexValues
 }

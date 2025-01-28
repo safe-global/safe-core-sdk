@@ -1,5 +1,9 @@
 import Safe from '@safe-global/protocol-kit'
-import { ENTRYPOINT_ABI, ENTRYPOINT_ADDRESS_V06, ENTRYPOINT_ADDRESS_V07 } from '../constants'
+import {
+  ENTRYPOINT_ABI,
+  ENTRYPOINT_ADDRESS_V06,
+  ENTRYPOINT_ADDRESS_V07
+} from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 const EQ_0_2_0 = '0.2.0'
 

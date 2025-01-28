@@ -11,8 +11,8 @@ import {
   SafeVersion,
   UserOperation
 } from '@safe-global/types-kit'
-import SafeOperationBase from './SafeOperationBase'
-import { RPC_4337_CALLS } from './constants'
+import SafeOperationBase from '@safe-global/relay-kit/packs/safe-4337/SafeOperationBase'
+import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 type ExistingSafeOptions = {
   safeAddress: string

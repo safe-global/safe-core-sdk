@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import { parseEther } from 'viem'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
@@ -21,6 +22,7 @@ async function main() {
   const safe4337Pack = await Safe4337Pack.init({
     provider: RPC_URL,
     signer: PRIVATE_KEY,
+    safeModulesVersion: '0.3.0', // Blank or 0.3.0 for Entrypoint v0.7, 0.2.0 for Entrypoint v0.6
     bundlerUrl: BUNDLER_URL,
     options: {
       safeAddress: SAFE_ADDRESS
@@ -29,7 +31,7 @@ async function main() {
 
   // 2) Setup Playground
   const { transactions, timestamp } = await setup4337Playground(safe4337Pack, {
-    // nativeTokenAmount: parseEther('0.1'),
+    // nativeTokenAmount: parseEther('0.01'), // Increase this value when is not enough to cover the gas fees
     erc20TokenAmount: 200_000n,
     erc20TokenContractAddress: pimlicoTokenAddress
   })

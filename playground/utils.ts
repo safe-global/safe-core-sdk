@@ -86,8 +86,9 @@ export async function setup4337Playground(
 
   // Log supported entry points and Safe state
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
-  console.log('Chain Id', await safe4337Pack.getChainId())
-  console.log('senderAddress: ', senderAddress)
+  console.log('Chain id', await safe4337Pack.getChainId())
+  console.log('Safe Address: ', senderAddress)
+  console.log('Safe Owners:', await safe4337Pack.protocolKit.getOwners())
   console.log('is Safe Account deployed: ', await safe4337Pack.protocolKit.isSafeDeployed())
 
   const externalProvider = safe4337Pack.protocolKit.getSafeProvider().getExternalProvider()

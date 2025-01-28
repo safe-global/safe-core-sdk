@@ -23,6 +23,7 @@ async function main() {
   const safe4337Pack = await Safe4337Pack.init({
     provider: RPC_URL,
     signer: PRIVATE_KEY,
+    safeModulesVersion: '0.3.0', // Blank or 0.3.0 for Entrypoint v0.7, 0.2.0 for Entrypoint v0.6
     bundlerUrl: BUNDLER_URL,
     paymasterOptions: {
       isSponsored: true,

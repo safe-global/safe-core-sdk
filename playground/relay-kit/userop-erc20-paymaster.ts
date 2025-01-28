@@ -14,7 +14,7 @@ const {
 
 // PAYMASTER ADDRESSES
 const paymasterAddress_v07 = '0x0000000000000039cd5e8ae05257ce51c473ddd1'
-// const paymasterAddress_v06 = '0x00000000000000fb866daaa79352cc568a005d96' // Use this with the 0.2.0 safeModulesVersion that is currently compatible with the v0.6 entrypoint
+const paymasterAddress_v06 = '0x00000000000000fb866daaa79352cc568a005d96' // Use this with the 0.2.0 safeModulesVersion that is currently compatible with the v0.6 entrypoint
 
 // PIM test token contract address
 // faucet: https://dashboard.pimlico.io/test-erc20-faucet
@@ -26,7 +26,7 @@ async function main() {
     provider: RPC_URL,
     signer: PRIVATE_KEY,
     bundlerUrl: BUNDLER_URL,
-    safeModulesVersion: '0.3.0',
+    safeModulesVersion: '0.3.0', // Blank or 0.3.0 for Entrypoint v0.7, 0.2.0 for Entrypoint v0.6
     paymasterOptions: {
       paymasterUrl: BUNDLER_URL,
       paymasterTokenAddress: pimlicoTokenAddress,
@@ -39,7 +39,7 @@ async function main() {
 
   // 2) Setup Playground
   const { transactions, timestamp } = await setup4337Playground(safe4337Pack, {
-    erc20TokenAmount: 200_000n,
+    // erc20TokenAmount: 100_000_000n,
     erc20TokenContractAddress: pimlicoTokenAddress
   })
 

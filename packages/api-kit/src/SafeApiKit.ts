@@ -262,10 +262,10 @@ class SafeApiKit {
       // FIXME remove when the transaction service returns the singleton property instead of masterCopy
       if (!response?.singleton) {
         const { masterCopy, ...rest } = response
-        return { ...rest, singleton: masterCopy } as SafeInfoResponse
+        return { ...rest, singleton: masterCopy, nonce: Number(response.nonce) } as SafeInfoResponse
       }
 
-      return response as SafeInfoResponse
+      return { ...response, nonce: Number(response.nonce) } as SafeInfoResponse
     })
   }
 
@@ -851,6 +851,18 @@ class SafeApiKit {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/`,
       method: HttpMethod.Get
+    }).then((response: any) => {
+      // FIXME values are returned as strings by API because they can have precision issues
+      // string is the best type to return by API, but we should plan a migration to BigInt type in TypeScript
+      return {
+        ...response,
+        nonce: Number(response.nonce),
+        callGasLimit: Number(response.callGasLimit),
+        verificationGasLimit: Number(response.verificationcallGasLimit),
+        preVerificationGas: Number(response.preVerificationGas),
+        maxFeePerGas: Number(response.maxFeePerGas),
+        maxPriorityFeePerGas: Number(response.maxPriorityFeePerGas)
+      } as SafeOperationResponse
     })
   }
 

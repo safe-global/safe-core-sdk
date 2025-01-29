@@ -94,6 +94,7 @@ export type SafeDelegateResponse = {
   readonly delegate: string
   readonly delegator: string
   readonly label: string
+  readonly expiryDate: string
 }
 
 export type SignedSafeDelegateResponse = SafeDelegateResponse & {
@@ -238,6 +239,7 @@ export type SafeMessage = {
   readonly safeAppId: null | string
   readonly confirmations: Array<SafeMessageConfirmation>
   readonly preparedSignature: string
+  readonly origin?: string
 }
 
 export type SafeMessageListResponse = ListResponse<SafeMessage>

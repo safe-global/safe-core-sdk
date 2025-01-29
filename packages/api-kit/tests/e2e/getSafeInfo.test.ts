@@ -32,7 +32,7 @@ describe('getSafeInfo', () => {
     const safeAddress = API_TESTING_SAFE.address
     const safeInfoResponse = await safeApiKit.getSafeInfo(safeAddress)
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
-    chai.expect(safeInfoResponse.nonce).to.be.a('number')
+    chai.expect(safeInfoResponse.nonce).to.be.a('string')
     chai.expect(safeInfoResponse.threshold).to.be.equal(API_TESTING_SAFE.threshold)
     chai.expect(safeInfoResponse).to.have.property('owners').to.be.an('array')
     chai.expect(safeInfoResponse).to.have.property('modules').to.be.an('array')
@@ -51,7 +51,7 @@ describe('getSafeInfo', () => {
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeInfoResponse = await safeApiKit.getSafeInfo(eip3770SafeAddress)
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
-    chai.expect(safeInfoResponse.nonce).to.be.a('number')
+    chai.expect(safeInfoResponse.nonce).to.be.a('string')
     chai.expect(safeInfoResponse.threshold).to.be.equal(API_TESTING_SAFE.threshold)
     chai.expect(safeInfoResponse).to.have.property('owners').to.be.an('array')
     chai.expect(safeInfoResponse).to.have.property('modules').to.be.an('array')

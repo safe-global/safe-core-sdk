@@ -717,7 +717,7 @@ describe('Endpoint tests', () => {
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
         method: 'post',
         body: {
-          nonce: Number(userOperation.nonce),
+          nonce: userOperation.nonce,
           initCode: userOperation.initCode,
           callData: userOperation.callData,
           callGasLimit: userOperation.callGasLimit.toString(),

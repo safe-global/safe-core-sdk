@@ -343,14 +343,14 @@ export type UserOperationResponse = {
   readonly ethereumTxHash: null | string
   readonly sender: string
   readonly userOperationHash: string
-  readonly nonce: number
+  readonly nonce: string
   readonly initCode: null | string
   readonly callData: null | string
-  readonly callGasLimit: number
-  readonly verificationGasLimit: number
-  readonly preVerificationGas: number
-  readonly maxFeePerGas: number
-  readonly maxPriorityFeePerGas: number
+  readonly callGasLimit: string
+  readonly verificationGasLimit: string
+  readonly preVerificationGas: string
+  readonly maxFeePerGas: string
+  readonly maxPriorityFeePerGas: string
   readonly paymaster: null | string
   readonly paymasterData: null | string
   readonly signature: string

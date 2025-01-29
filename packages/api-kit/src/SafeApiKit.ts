@@ -265,7 +265,7 @@ class SafeApiKit {
         return { ...rest, singleton: masterCopy } as SafeInfoResponse
       }
 
-      return { ...response } as SafeInfoResponse
+      return response as SafeInfoResponse
     })
   }
 
@@ -914,7 +914,7 @@ class SafeApiKit {
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
       method: HttpMethod.Post,
       body: {
-        nonce: Number(userOperation.nonce),
+        nonce: userOperation.nonce,
         initCode: isEmptyData(userOperation.initCode) ? null : userOperation.initCode,
         callData: userOperation.callData,
         callGasLimit: userOperation.callGasLimit.toString(),

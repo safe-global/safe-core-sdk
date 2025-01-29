@@ -131,7 +131,7 @@ export function calculateSafeUserOperationHash(
 export function userOperationToHexValues(userOperation: UserOperation) {
   const userOperationWithHexValues = {
     ...userOperation,
-    nonce: toHex(BigInt(userOperation.nonce)),
+    nonce: toHex(userOperation.nonce),
     callGasLimit: toHex(userOperation.callGasLimit),
     verificationGasLimit: toHex(userOperation.verificationGasLimit),
     preVerificationGas: toHex(userOperation.preVerificationGas),

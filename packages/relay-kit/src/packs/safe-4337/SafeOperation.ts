@@ -1,4 +1,4 @@
-import { Hex, encodePacked, toHex } from 'viem'
+import { Hex, encodePacked } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -31,7 +31,7 @@ class EthSafeOperation implements SafeOperation {
     this.moduleAddress = moduleAddress
     this.data = {
       safe: userOperation.sender,
-      nonce: BigInt(userOperation.nonce),
+      nonce: userOperation.nonce,
       initCode: userOperation.initCode,
       callData: userOperation.callData,
       callGasLimit: userOperation.callGasLimit,
@@ -75,7 +75,7 @@ class EthSafeOperation implements SafeOperation {
   toUserOperation(): UserOperation {
     return {
       sender: this.data.safe,
-      nonce: toHex(this.data.nonce),
+      nonce: this.data.nonce,
       initCode: this.data.initCode,
       callData: this.data.callData,
       callGasLimit: this.data.callGasLimit,

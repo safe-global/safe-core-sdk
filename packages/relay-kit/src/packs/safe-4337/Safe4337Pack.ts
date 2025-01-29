@@ -540,7 +540,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const userOperation: UserOperation = {
       sender: safeAddress,
-      nonce: nonce,
+      nonce,
       initCode: '0x',
       callData,
       callGasLimit: 1n,
@@ -590,7 +590,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeOperation = new EthSafeOperation(
       {
         sender: userOperation?.sender || '0x',
-        nonce: userOperation?.nonce?.toString() || '0',
+        nonce: userOperation?.nonce || '0',
         initCode: userOperation?.initCode || '',
         callData: userOperation?.callData || '',
         callGasLimit: BigInt(userOperation?.callGasLimit || 0n),

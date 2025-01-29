@@ -290,7 +290,7 @@ export type UserOperation = {
 
 export type SafeUserOperation = {
   safe: string
-  nonce: bigint
+  nonce: string
   initCode: string
   callData: string
   callGasLimit: bigint

@@ -39,6 +39,7 @@ export type SafeSingletonResponse = {
   deployer: string
   deployedBlockNumber: number
   lastIndexedBlockNumber: number
+  l2: boolean
 }
 
 export type SafeInfoResponse = {

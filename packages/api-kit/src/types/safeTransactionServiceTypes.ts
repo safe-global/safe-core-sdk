@@ -43,7 +43,7 @@ export type SafeSingletonResponse = {
 
 export type SafeInfoResponse = {
   readonly address: string
-  readonly nonce: number
+  readonly nonce: string
   readonly threshold: number
   readonly owners: string[]
   readonly singleton: string

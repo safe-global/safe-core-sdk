@@ -262,10 +262,10 @@ class SafeApiKit {
       // FIXME remove when the transaction service returns the singleton property instead of masterCopy
       if (!response?.singleton) {
         const { masterCopy, ...rest } = response
-        return { ...rest, singleton: masterCopy, nonce: Number(response.nonce) } as SafeInfoResponse
+        return { ...rest, singleton: masterCopy } as SafeInfoResponse
       }
 
-      return { ...response, nonce: Number(response.nonce) } as SafeInfoResponse
+      return { ...response } as SafeInfoResponse
     })
   }
 
@@ -664,16 +664,19 @@ class SafeApiKit {
    * @throws "Invalid data"
    * @throws "Invalid ethereum address"
    */
-  async getNextNonce(safeAddress: string): Promise<number> {
+  async getNextNonce(safeAddress: string): Promise<string> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
     const pendingTransactions = await this.getPendingTransactions(address)
     if (pendingTransactions.results.length > 0) {
-      const nonces = pendingTransactions.results.map((tx) => tx.nonce)
-      const lastNonce = Math.max(...nonces)
-      return lastNonce + 1
+      const maxNonce = pendingTransactions.results.reduce((acc, tx) => {
+        const curr = BigInt(tx.nonce)
+        return curr > acc ? curr : acc
+      }, 0n)
+
+      return (maxNonce + 1n).toString()
     }
     const safeInfo = await this.getSafeInfo(address)
     return safeInfo.nonce

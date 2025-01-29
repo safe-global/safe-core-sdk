@@ -412,8 +412,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       paymasterOptions: this.#paymasterOptions
     })
 
-    console.log('1.setupEstimationData', setupEstimationData)
-
     if (setupEstimationData) {
       safeOperation.addEstimations(setupEstimationData)
     }
@@ -429,8 +427,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       ]
     })
 
-    console.log('2.estimateUserOperationGas', estimateUserOperationGas)
-
     if (estimateUserOperationGas) {
       safeOperation.addEstimations(estimateUserOperationGas)
     }
@@ -440,8 +436,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation()
     })
-
-    console.log('3.adjustEstimationData', adjustEstimationData)
 
     if (adjustEstimationData) {
       safeOperation.addEstimations(adjustEstimationData)
@@ -457,8 +451,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
         entryPoint: this.#ENTRYPOINT_ADDRESS,
         paymasterOptions: this.#paymasterOptions
       })
-
-      console.log('4.paymasterEstimation', paymasterEstimation)
 
       if (paymasterEstimation) {
         safeOperation.addEstimations(paymasterEstimation)

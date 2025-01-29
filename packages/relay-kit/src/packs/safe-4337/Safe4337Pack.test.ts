@@ -34,7 +34,7 @@ const requestMock = jest.fn(async ({ method }: { method: keyof typeof requestRes
 
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
-  getEip4337BundlerProvider: jest.fn(() => ({ request: requestMock }))
+  createBundlerClient: jest.fn(() => ({ request: requestMock }))
 }))
 
 let safe4337ModuleAddress: viem.Hash
@@ -87,16 +87,6 @@ describe('Safe4337Pack', () => {
         'Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: 0xa581c4A4DB7175302464fF3C06380BC3270b4037) to ensure compatibility.'
       )
     })
-
-    it('should throw an error if the Safe Modules do not match the supported version', async () => {
-      await expect(
-        createSafe4337Pack({
-          safeModulesVersion: fixtures.SAFE_MODULES_V0_3_0
-        })
-      ).rejects.toThrow(
-        'Incompatibility detected: Safe modules version 0.3.0 is not supported. The SDK can use 0.2.0 only.'
-      )
-    })
   })
 
   describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {
@@ -117,7 +107,7 @@ describe('Safe4337Pack', () => {
       })
 
       const mockedUtils = jest.requireMock('./utils')
-      mockedUtils.getEip4337BundlerProvider.mockImplementationOnce(() => ({
+      mockedUtils.createBundlerClient.mockImplementationOnce(() => ({
         request: jest.fn(
           async ({ method }: { method: keyof typeof overridenMap }) => overridenMap[method]
         )
@@ -275,6 +265,7 @@ describe('Safe4337Pack', () => {
           threshold: 1
         },
         paymasterOptions: {
+          paymasterUrl: fixtures.PAYMASTER_URL,
           paymasterAddress: fixtures.PAYMASTER_ADDRESS,
           paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS
         }
@@ -372,7 +363,7 @@ describe('Safe4337Pack', () => {
       })
 
       expect(safeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(safeOperation.data).toMatchObject({
+      expect(safeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
@@ -392,13 +383,13 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: 1n,
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
     })
 
@@ -408,7 +399,7 @@ describe('Safe4337Pack', () => {
       })
 
       expect(safeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(safeOperation.data).toMatchObject({
+      expect(safeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
@@ -424,13 +415,13 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: 1n,
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
     })
 
@@ -449,7 +440,7 @@ describe('Safe4337Pack', () => {
       })
 
       expect(getInitCodeSpy).toHaveBeenCalled()
-      expect(safeOperation.data.initCode).toBe(
+      expect(safeOperation.getSafeOperation().initCode).toBe(
         '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec671688f0b900000000000000000000000029fcb43b46531bca003ddc8fcb67ffe91900c7620000000000000000000000000000000000000000000000000000000000000060ad27de2a410652abce96ea0fdfc30c2f0fd35952b78f554667111999a28ff33800000000000000000000000000000000000000000000000000000000000001e4b63e800d000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000010000000000000000000000008ecd4ec46d4d2a6b64fe960b3d64e8b94b2234eb0000000000000000000000000000000000000000000000000000000000000140000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ffac5578be8ac1b2b9d13b34caf4a074b96b8a1b00000000000000000000000000000000000000000000000000000000000000648d0dc49f00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
       )
     })
@@ -470,7 +461,7 @@ describe('Safe4337Pack', () => {
       })
 
       expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(sponsoredSafeOperation.data).toMatchObject({
+      expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
@@ -486,32 +477,14 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: 1n,
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
-    })
-
-    it('createTransaction should throw an error if paymasterUrl is not present in sponsored transactions', async () => {
-      const safe4337Pack = await createSafe4337Pack({
-        options: {
-          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
-        },
-        // @ts-expect-error - An error will be thrown
-        paymasterOptions: {
-          isSponsored: true
-        }
-      })
-
-      await expect(
-        safe4337Pack.createTransaction({
-          transactions: [transferUSDC]
-        })
-      ).rejects.toThrow('No paymaster url provided for a sponsored transaction')
     })
 
     it('should add the approve transaction to the batch when amountToApprove is provided', async () => {
@@ -520,6 +493,7 @@ describe('Safe4337Pack', () => {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
         },
         paymasterOptions: {
+          paymasterUrl: fixtures.PAYMASTER_URL,
           paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS,
           paymasterAddress: fixtures.PAYMASTER_ADDRESS
         }
@@ -548,7 +522,7 @@ describe('Safe4337Pack', () => {
       const batch = [transferUSDC, approveTransaction]
 
       expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(sponsoredSafeOperation.data).toMatchObject({
+      expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
         initCode: '0x',
@@ -568,13 +542,13 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: 1n,
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
     })
   })
@@ -719,12 +693,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      const safeOpHash = utils.calculateSafeUserOperationHash(
-        safeOperation.data,
-        BigInt(fixtures.CHAIN_ID),
-        fixtures.MODULE_ADDRESS,
-        fixtures.ENTRYPOINTS[0]
-      )
+      const safeOpHash = safeOperation.getHash()
 
       const passkeySignature = await safe4337Pack.protocolKit.signHash(safeOpHash)
 
@@ -765,7 +734,7 @@ describe('Safe4337Pack', () => {
       expect(requestMock).toHaveBeenCalledWith({
         method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
         params: [
-          utils.userOperationToHexValues(safeOperation.toUserOperation(), fixtures.ENTRYPOINTS[0]),
+          utils.userOperationToHexValues(safeOperation.getUserOperation(), fixtures.ENTRYPOINTS[0]),
           fixtures.ENTRYPOINTS[0]
         ]
       })
@@ -862,7 +831,7 @@ describe('Safe4337Pack', () => {
     expect(requestMock).toHaveBeenCalledWith({
       method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
       params: [
-        utils.userOperationToHexValues(safeOperation.toUserOperation(), fixtures.ENTRYPOINTS[0]),
+        utils.userOperationToHexValues(safeOperation.getUserOperation(), fixtures.ENTRYPOINTS[0]),
         fixtures.ENTRYPOINTS[0]
       ]
     })
@@ -880,21 +849,24 @@ describe('Safe4337Pack', () => {
     expect(requestMock).toHaveBeenCalledWith({
       method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
       params: [
-        utils.userOperationToHexValues({
-          sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
-          nonce: '3',
-          initCode: '0x',
-          callData:
-            '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-          callGasLimit: 122497n,
-          verificationGasLimit: 123498n,
-          preVerificationGas: 50705n,
-          maxFeePerGas: 105183831060n,
-          maxPriorityFeePerGas: 1380000000n,
-          paymasterAndData: '0x',
-          signature:
-            '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
-        }),
+        utils.userOperationToHexValues(
+          {
+            sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
+            nonce: '3',
+            initCode: '0x',
+            callData:
+              '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+            callGasLimit: 122497n,
+            verificationGasLimit: 123498n,
+            preVerificationGas: 50705n,
+            maxFeePerGas: 105183831060n,
+            maxPriorityFeePerGas: 1380000000n,
+            paymasterAndData: '0x',
+            signature:
+              '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
+          },
+          fixtures.ENTRYPOINTS[0]
+        ),
         fixtures.ENTRYPOINTS[0]
       ]
     })

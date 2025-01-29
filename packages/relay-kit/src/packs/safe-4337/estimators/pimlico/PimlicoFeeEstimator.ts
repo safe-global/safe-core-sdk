@@ -56,6 +56,11 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async adjustEstimation(_: EstimateFeeFunctionProps): Promise<EstimateGasData> {
+    return {}
+  }
+
   async getPaymasterEstimation({
     userOperation,
     entryPoint,

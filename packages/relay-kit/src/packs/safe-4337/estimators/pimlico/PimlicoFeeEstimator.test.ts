@@ -1,15 +1,15 @@
 import { PimlicoFeeEstimator } from './PimlicoFeeEstimator'
 import * as fixtures from '../../testing-utils/fixtures'
-import * as constants from '../../constants'
+import { PIMLICO_CUSTOM_RPC_4337_CALLS } from './types'
 
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  getEip4337BundlerProvider: () => ({
+jest.mock('../../utils', () => ({
+  ...jest.requireActual('../../utils'),
+  createBundlerClient: () => ({
     request: async ({ method }: { method: string }) => {
       switch (method) {
-        case constants.RPC_4337_CALLS.SPONSOR_USER_OPERATION:
+        case PIMLICO_CUSTOM_RPC_4337_CALLS.SPONSOR_USER_OPERATION:
           return fixtures.SPONSORED_GAS_ESTIMATION
-        case 'pimlico_getUserOperationGasPrice':
+        case PIMLICO_CUSTOM_RPC_4337_CALLS.GET_USER_OPERATION_GAS_PRICE:
           return fixtures.USER_OPERATION_GAS_PRICE
         default:
           return undefined
@@ -52,7 +52,12 @@ describe('PimlicoFeeEstimator', () => {
   it('should get the paymaster estimation', async () => {
     const paymasterGasEstimation = await estimator.getPaymasterEstimation({
       userOperation: fixtures.USER_OPERATION,
-      paymasterUrl: fixtures.PAYMASTER_URL,
+      bundlerUrl: fixtures.BUNDLER_URL,
+      paymasterOptions: {
+        paymasterUrl: fixtures.PAYMASTER_URL,
+        paymasterAddress: fixtures.PAYMASTER_ADDRESS,
+        paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS
+      },
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
 

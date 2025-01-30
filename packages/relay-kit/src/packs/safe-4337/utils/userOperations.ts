@@ -135,7 +135,7 @@ export async function createUserOperation(
   if (isEntryPointV6(entryPoint)) {
     return {
       sender: safeAddress,
-      nonce: toHex(nonce),
+      nonce: nonce.toString(),
       initCode,
       callData,
       callGasLimit: 1n,
@@ -150,7 +150,7 @@ export async function createUserOperation(
 
   return {
     sender: safeAddress,
-    nonce: toHex(nonce),
+    nonce: nonce.toString(),
     ...unpackInitCode(initCode),
     callData,
     callGasLimit: 1n,

@@ -81,7 +81,7 @@ abstract class SafeOperationBase implements SafeOperation {
           types: this.getEIP712Type(),
           message: {
             ...safeOperation,
-            nonce: toHex(safeOperation.nonce),
+            nonce: BigInt(safeOperation.nonce),
             validAfter: toHex(safeOperation.validAfter),
             validUntil: toHex(safeOperation.validUntil),
             maxFeePerGas: toHex(safeOperation.maxFeePerGas),

@@ -66,7 +66,7 @@ class SafeOperationV07 extends SafeOperationBase {
 
     return {
       safe: this.userOperation.sender,
-      nonce: BigInt(this.userOperation.nonce),
+      nonce: this.userOperation.nonce,
       initCode,
       callData: this.userOperation.callData,
       callGasLimit: this.userOperation.callGasLimit,

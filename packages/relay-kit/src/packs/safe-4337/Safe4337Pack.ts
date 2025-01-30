@@ -516,7 +516,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeOperation = SafeOperationFactory.createSafeOperation(
       {
         sender: userOperation?.sender || '0x',
-        nonce: userOperation?.nonce?.toString() || '0',
+        nonce: userOperation?.nonce || '0',
         initCode: userOperation?.initCode || '',
         callData: userOperation?.callData || '',
         callGasLimit: BigInt(userOperation?.callGasLimit || 0n),

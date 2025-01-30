@@ -14,7 +14,7 @@ describe('SafeOperation', () => {
 
     expect(safeOperation.getSafeOperation()).toMatchObject({
       safe: fixtures.USER_OPERATION.sender,
-      nonce: BigInt(fixtures.USER_OPERATION.nonce),
+      nonce: fixtures.USER_OPERATION.nonce,
       initCode: fixtures.USER_OPERATION.initCode,
       callData: fixtures.USER_OPERATION.callData,
       callGasLimit: fixtures.USER_OPERATION.callGasLimit,
@@ -79,7 +79,7 @@ describe('SafeOperation', () => {
 
     expect(safeOperation.getSafeOperation()).toMatchObject({
       safe: fixtures.USER_OPERATION.sender,
-      nonce: BigInt(fixtures.USER_OPERATION.nonce),
+      nonce: fixtures.USER_OPERATION.nonce,
       initCode: fixtures.USER_OPERATION.initCode,
       callData: fixtures.USER_OPERATION.callData,
       callGasLimit: BigInt(fixtures.GAS_ESTIMATION.callGasLimit),

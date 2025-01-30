@@ -1,6 +1,6 @@
 export const API_TESTING_SAFE = {
   address: '0xF8ef84392f7542576F6b9d1b140334144930Ac78',
-  nonce: 11,
+  nonce: '11',
   threshold: 2,
   owners: [
     '0x56e2C102c664De6DfD7315d12c0178b61D16F171',

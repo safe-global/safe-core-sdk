@@ -382,7 +382,7 @@ describe('Safe4337Pack', () => {
             OperationType.DelegateCall
           ]
         }),
-        nonce: 1n,
+        nonce: '1',
         callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
@@ -414,7 +414,7 @@ describe('Safe4337Pack', () => {
             OperationType.Call
           ]
         }),
-        nonce: 1n,
+        nonce: '1',
         callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
@@ -476,7 +476,7 @@ describe('Safe4337Pack', () => {
             OperationType.Call
           ]
         }),
-        nonce: 1n,
+        nonce: '1',
         callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
@@ -541,7 +541,7 @@ describe('Safe4337Pack', () => {
             OperationType.DelegateCall
           ]
         }),
-        nonce: 1n,
+        nonce: '1',
         callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,

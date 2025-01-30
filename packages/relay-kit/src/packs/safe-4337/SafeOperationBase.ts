@@ -30,7 +30,7 @@ abstract class SafeOperationBase implements SafeOperation {
 
   abstract getSafeOperation(): SafeUserOperation
 
-  async sign(signingMethod: string = SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
+  async sign(signingMethod: SigningMethod = SigningMethod.ETH_SIGN_TYPED_DATA_V4) {
     const safeProvider = this.protocolKit.getSafeProvider()
     const signerAddress = await safeProvider.getSignerAddress()
     const isPasskeySigner = await safeProvider.isPasskeySigner()
@@ -59,12 +59,11 @@ abstract class SafeOperationBase implements SafeOperation {
       }
     } else {
       if (
-        signingMethod in
         [
           SigningMethod.ETH_SIGN_TYPED_DATA_V4,
           SigningMethod.ETH_SIGN_TYPED_DATA_V3,
           SigningMethod.ETH_SIGN_TYPED_DATA
-        ]
+        ].includes(signingMethod)
       ) {
         const signer = await safeProvider.getExternalSigner()
 

@@ -11,7 +11,7 @@ import {
   ENTRYPOINT_ADDRESS_V06,
   RPC_4337_CALLS
 } from '@safe-global/relay-kit/packs/safe-4337/constants'
-// Needs to be imported from dist folder in order to mock the getEip4337BundlerProvider function
+// Needs to be imported from dist folder in order to mock the createBundlerClient function
 import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getKits } from '../utils/setupKits'
 
@@ -39,7 +39,7 @@ describe('addSafeOperation', () => {
   const requestStub = sinon.stub()
   // Setup mocks for the bundler client
   before(async () => {
-    sinon.stub(safe4337Utils, 'getEip4337BundlerProvider').returns({
+    sinon.stub(safe4337Utils, 'createBundlerClient').returns({
       request: requestStub,
       readContract: sinon
         .stub()

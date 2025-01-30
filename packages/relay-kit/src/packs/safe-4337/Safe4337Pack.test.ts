@@ -10,7 +10,7 @@ import {
 } from '@safe-global/safe-modules-deployments'
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
 import { Safe4337Pack } from './Safe4337Pack'
-import EthSafeOperation from './SafeOperationBase'
+import SafeOperationBase from './SafeOperationBase'
 import * as constants from './constants'
 import * as fixtures from './testing-utils/fixtures'
 import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
@@ -362,7 +362,7 @@ describe('Safe4337Pack', () => {
         transactions
       })
 
-      expect(safeOperation).toBeInstanceOf(EthSafeOperation)
+      expect(safeOperation).toBeInstanceOf(SafeOperationBase)
       expect(safeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
@@ -398,7 +398,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(safeOperation).toBeInstanceOf(EthSafeOperation)
+      expect(safeOperation).toBeInstanceOf(SafeOperationBase)
       expect(safeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
@@ -460,7 +460,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
+      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperationBase)
       expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
@@ -521,7 +521,7 @@ describe('Safe4337Pack', () => {
 
       const batch = [transferUSDC, approveTransaction]
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
+      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperationBase)
       expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1,
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',

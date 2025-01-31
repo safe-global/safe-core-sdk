@@ -2,7 +2,8 @@ import { Account, Address, Chain, Hash, Hex, PublicClient, PublicRpcSchema, Tran
 import Safe, {
   DeploymentType,
   SafeProviderConfig,
-  OnchainAnalyticsProps
+  OnchainAnalyticsProps,
+  ContractNetworksConfig
 } from '@safe-global/protocol-kit'
 import {
   EstimateGasData,
@@ -55,6 +56,7 @@ export type Safe4337InitOptions = {
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
   onchainAnalytics?: OnchainAnalyticsProps
+  contractNetworks?: ContractNetworksConfig
 }
 
 export type Safe4337Options = {

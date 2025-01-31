@@ -374,7 +374,12 @@ export interface SafeOperation {
 export const isSafeOperation = (response: unknown): response is SafeOperation => {
   const safeOperation = response as SafeOperation
 
-  return 'data' in safeOperation && 'signatures' in safeOperation
+  return (
+    'userOperation' in safeOperation &&
+    'options' in safeOperation &&
+    'signatures' in safeOperation &&
+    'protocolKit' in safeOperation
+  )
 }
 
 export type SafeOperationConfirmation = {

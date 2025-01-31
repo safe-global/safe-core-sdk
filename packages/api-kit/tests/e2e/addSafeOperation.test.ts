@@ -79,6 +79,7 @@ describe('addSafeOperation', () => {
       bundlerUrl: BUNDLER_URL,
       safeModulesVersion: '0.2.0',
       paymasterOptions: {
+        paymasterUrl: 'https://paymaster.url',
         paymasterTokenAddress: PAYMASTER_TOKEN_ADDRESS,
         paymasterAddress: PAYMASTER_ADDRESS
       }

@@ -39,11 +39,12 @@ export type SafeSingletonResponse = {
   deployer: string
   deployedBlockNumber: number
   lastIndexedBlockNumber: number
+  l2: boolean
 }
 
 export type SafeInfoResponse = {
   readonly address: string
-  readonly nonce: number
+  readonly nonce: string
   readonly threshold: number
   readonly owners: string[]
   readonly singleton: string
@@ -93,6 +94,7 @@ export type SafeDelegateResponse = {
   readonly delegate: string
   readonly delegator: string
   readonly label: string
+  readonly expiryDate: string
 }
 
 export type SignedSafeDelegateResponse = SafeDelegateResponse & {
@@ -237,6 +239,7 @@ export type SafeMessage = {
   readonly safeAppId: null | string
   readonly confirmations: Array<SafeMessageConfirmation>
   readonly preparedSignature: string
+  readonly origin?: string
 }
 
 export type SafeMessageListResponse = ListResponse<SafeMessage>

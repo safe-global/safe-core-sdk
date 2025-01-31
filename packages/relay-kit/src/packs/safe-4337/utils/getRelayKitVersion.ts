@@ -1,1 +1,1 @@
-export const getRelayKitVersion = () => '3.4.0'
+export const getRelayKitVersion = () => '3.4.1'

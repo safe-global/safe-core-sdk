@@ -23,6 +23,7 @@
     "@types/node": "^22.10.9",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
+    "esbuild": "^0.24.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.3",
@@ -35,7 +36,7 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.8",
-    "typescript": "^5.3.3"
+    "typescript": "^5.6.3"
   },
   "lint-staged": {
     "./packages/**/*.{js,jsx,ts,tsx}": [

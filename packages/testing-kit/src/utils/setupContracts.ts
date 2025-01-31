@@ -13,7 +13,7 @@ import {
   simulateTxAccessorDeployed
 } from '../hardhat/deploy/deploy-contracts'
 import { deployments, viem } from 'hardhat'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { getDeployer, waitTransactionReceipt } from './transactions'
 
 const ZERO_ADDRESS: Address = zeroAddress

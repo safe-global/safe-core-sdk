@@ -1,4 +1,4 @@
-import { PasskeyArgType, PasskeyClient } from '@safe-global/protocol-kit'
+import { PasskeyArgType, PasskeyClient } from '../src'
 import { WebAuthnCredentials } from './webauthnShim'
 import { WalletClient, keccak256, toBytes, Transport, Chain, Account } from 'viem'
 import { asHex } from '@safe-global/protocol-kit/utils/types'

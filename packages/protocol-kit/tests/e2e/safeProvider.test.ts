@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
 import sinon from 'sinon'
-import { createMockPasskey, getWebAuthnCredentials } from './utils/passkeys'
+import { createMockPasskey, getWebAuthnCredentials } from '@safe-global/protocol-kit/test-utils'
 import { publicActions, walletActions } from 'viem'
 
 chai.use(chaiAsPromised)

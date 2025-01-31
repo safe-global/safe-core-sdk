@@ -1,4 +1,4 @@
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { SafeContractImplementationType } from '@safe-global/protocol-kit/types'
 import SafeContract_v1_0_0 from '@safe-global/protocol-kit/contracts/Safe/v1.0.0/SafeContract_v1_0_0'
 import SafeContract_v1_1_1 from '@safe-global/protocol-kit/contracts/Safe/v1.1.1/SafeContract_v1_1_1'

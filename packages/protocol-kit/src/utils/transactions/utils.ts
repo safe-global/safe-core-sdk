@@ -25,7 +25,7 @@ import {
   TransactionOptions,
   Transaction
 } from '@safe-global/types-kit'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { estimateGas, estimateTxGas } from './gas'
 import {
   Hash,

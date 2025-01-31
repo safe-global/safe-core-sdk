@@ -11,6 +11,9 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 coverage
 *.lcov
 
+#esbuild report
+meta-*.json
+
 # nyc test coverage
 .nyc_output
 

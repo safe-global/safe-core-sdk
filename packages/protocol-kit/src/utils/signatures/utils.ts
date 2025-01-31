@@ -1,11 +1,15 @@
 import { recoverAddress } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
-import { SafeSignature, SafeEIP712Args, SafeTransactionData } from '@safe-global/types-kit'
+import {
+  SafeSignature,
+  SafeEIP712Args,
+  SafeTransactionData,
+  SigningMethod
+} from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
-import { SigningMethod } from '@safe-global/protocol-kit/types'
 import { hashTypedData } from '../eip-712'
 import { encodeTypedData } from '../eip-712/encode'
 import { asHash, asHex } from '../types'

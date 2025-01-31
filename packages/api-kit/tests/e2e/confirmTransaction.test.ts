@@ -1,12 +1,12 @@
 import Safe, {
   EthSafeSignature,
   buildSignatureBytes,
-  SigningMethod,
   buildContractSignature
 } from '@safe-global/protocol-kit'
 import {
   SafeMultisigConfirmationResponse,
-  SafeTransactionDataPartial
+  SafeTransactionDataPartial,
+  SigningMethod
 } from '@safe-global/types-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'

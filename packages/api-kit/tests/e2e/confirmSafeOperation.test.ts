@@ -1,12 +1,17 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import { BundlerClient, Safe4337InitOptions, Safe4337Pack } from '@safe-global/relay-kit'
+import {
+  BundlerClient,
+  Safe4337InitOptions,
+  Safe4337Pack,
+  SafeOperationBase
+} from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { SafeOperation } from '@safe-global/types-kit'
-// Needs to be imported from dist folder in order to mock the getEip4337BundlerProvider function
+// Needs to be imported from dist folder in order to mock the createBundlerClient function
 import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getApiKit, getEip1193Provider } from '../utils/setupKits'
 import {
@@ -16,8 +21,8 @@ import {
 
 chai.use(chaiAsPromised)
 
-const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'
+const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676' // 0x56e2C102c664De6DfD7315d12c0178b61D16F171
+const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44' // 0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 4337 enabled 1/2 Safe (v1.4.1) owned by PRIVATE_KEY_1 + PRIVATE_KEY_2
 const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 const BUNDLER_URL = `https://bundler.url`
@@ -41,12 +46,15 @@ describe('confirmSafeOperation', () => {
       provider: options.provider || getEip1193Provider(),
       signer: options.signer || PRIVATE_KEY_1,
       options: { safeAddress: SAFE_ADDRESS },
-      bundlerUrl: BUNDLER_URL
+      bundlerUrl: BUNDLER_URL,
+      safeModulesVersion: '0.2.0'
     })
 
   const createSignature = async (safeOperation: SafeOperation, signer: string) => {
     const safe4337Pack = await getSafe4337Pack({ signer })
-    const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+    const signedSafeOperation = await safe4337Pack.signSafeOperation(
+      safeOperation as SafeOperationBase
+    )
     const signerAddress = await safe4337Pack.protocolKit.getSafeProvider().getSignerAddress()
     return signedSafeOperation.getSignature(signerAddress!)
   }
@@ -71,7 +79,7 @@ describe('confirmSafeOperation', () => {
   const requestStub = sinon.stub()
 
   before(async () => {
-    sinon.stub(safe4337Utils, 'getEip4337BundlerProvider').returns({
+    sinon.stub(safe4337Utils, 'createBundlerClient').returns({
       request: requestStub
     } as unknown as BundlerClient)
 

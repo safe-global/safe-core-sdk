@@ -1,3 +1,3 @@
-import { PimlicoFeeEstimator } from './PimlicoFeeEstimator'
+import { PimlicoFeeEstimator } from './pimlico/PimlicoFeeEstimator'
 
 export { PimlicoFeeEstimator }

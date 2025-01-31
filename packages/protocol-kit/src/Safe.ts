@@ -13,7 +13,9 @@ import {
   Transaction,
   EIP712TypedData,
   SafeTransactionData,
-  CompatibilityFallbackHandlerContractType
+  CompatibilityFallbackHandlerContractType,
+  SigningMethod,
+  SigningMethodType
 } from '@safe-global/types-kit'
 import {
   encodeSetupCallData,
@@ -39,8 +41,6 @@ import {
   RemoveOwnerTxParams,
   SafeConfig,
   SafeConfigProps,
-  SigningMethod,
-  SigningMethodType,
   SwapOwnerTxParams,
   SafeModulesPaginated,
   RemovePasskeyOwnerTxParams,

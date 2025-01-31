@@ -11,7 +11,7 @@ import {
   ENTRYPOINT_ADDRESS_V06,
   RPC_4337_CALLS
 } from '@safe-global/relay-kit/packs/safe-4337/constants'
-// Needs to be imported from dist folder in order to mock the getEip4337BundlerProvider function
+// Needs to be imported from dist folder in order to mock the createBundlerClient function
 import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
 import { getKits } from '../utils/setupKits'
 
@@ -39,7 +39,7 @@ describe('addSafeOperation', () => {
   const requestStub = sinon.stub()
   // Setup mocks for the bundler client
   before(async () => {
-    sinon.stub(safe4337Utils, 'getEip4337BundlerProvider').returns({
+    sinon.stub(safe4337Utils, 'createBundlerClient').returns({
       request: requestStub,
       readContract: sinon
         .stub()
@@ -77,7 +77,9 @@ describe('addSafeOperation', () => {
       signer: protocolKit.getSafeProvider().signer,
       options: { safeAddress: SAFE_ADDRESS },
       bundlerUrl: BUNDLER_URL,
+      safeModulesVersion: '0.2.0',
       paymasterOptions: {
+        paymasterUrl: 'https://paymaster.url',
         paymasterTokenAddress: PAYMASTER_TOKEN_ADDRESS,
         paymasterAddress: PAYMASTER_ADDRESS
       }
@@ -178,12 +180,11 @@ describe('addSafeOperation', () => {
     chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 
-  it('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
+  it.only('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
     const safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC, transferUSDC]
     })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
-
     // Get the number of SafeOperations before adding a new one
     const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS

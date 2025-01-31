@@ -77,6 +77,7 @@ describe('addSafeOperation', () => {
       signer: protocolKit.getSafeProvider().signer,
       options: { safeAddress: SAFE_ADDRESS },
       bundlerUrl: BUNDLER_URL,
+      safeModulesVersion: '0.2.0',
       paymasterOptions: {
         paymasterTokenAddress: PAYMASTER_TOKEN_ADDRESS,
         paymasterAddress: PAYMASTER_ADDRESS

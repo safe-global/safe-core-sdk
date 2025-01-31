@@ -247,28 +247,28 @@ export type SafeMultisigTransactionResponse = {
   readonly gasPrice: string
   readonly refundReceiver?: string
   readonly nonce: number
-  readonly executionDate: string
+  readonly executionDate: string | null
   readonly submissionDate: string
   readonly modified: string
-  readonly blockNumber?: number
-  readonly transactionHash: string
+  readonly blockNumber: number | null
+  readonly transactionHash: string | null
   readonly safeTxHash: string
-  readonly executor?: string
-  readonly proposer?: string
-  readonly proposedByDelegate?: string
+  readonly executor: string | null
+  readonly proposer: string | null
+  readonly proposedByDelegate: string | null
   readonly isExecuted: boolean
-  readonly isSuccessful?: boolean
-  readonly ethGasPrice?: string
-  readonly maxFeePerGas?: string
-  readonly maxPriorityFeePerGas?: string
-  readonly gasUsed?: number
-  readonly fee?: string
+  readonly isSuccessful: boolean | null
+  readonly ethGasPrice: string | null
+  readonly maxFeePerGas: string | null
+  readonly maxPriorityFeePerGas: string | null
+  readonly gasUsed: number | null
+  readonly fee: string | null
   readonly origin: string
   readonly dataDecoded?: DataDecoded
   readonly confirmationsRequired: number
   readonly confirmations?: SafeMultisigConfirmationResponse[]
   readonly trusted: boolean
-  readonly signatures?: string
+  readonly signatures: string | null
 }
 
 export interface RelayTransaction {

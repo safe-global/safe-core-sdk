@@ -48,7 +48,7 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/relay-kit": "^3.4.1",
+    "@safe-global/relay-kit": "^3.4.2",
     "@safe-global/testing-kit": "^0.1.2",
     "@types/chai": "^4.3.20",
     "@types/chai-as-promised": "^7.1.8",

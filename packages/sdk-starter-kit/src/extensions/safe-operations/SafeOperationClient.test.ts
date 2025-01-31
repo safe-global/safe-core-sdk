@@ -47,7 +47,6 @@ const SAFE_OPERATION = new SafeOperationV06(
     paymasterAndData: '0xPaymasterAndData',
     signature: '0xSignature'
   },
-  new Safe(),
   {
     chainId: 1n,
     entryPoint: '0xEntryPoint',

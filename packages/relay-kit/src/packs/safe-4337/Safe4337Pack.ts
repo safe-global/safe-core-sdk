@@ -489,7 +489,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       chainId: this.#chainId,
       moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
       validUntil,
       validAfter
     })
@@ -528,7 +527,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       {
         chainId: this.#chainId,
         moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
-        sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
         entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
         validAfter: this.#timestamp(validAfter),
         validUntil: this.#timestamp(validUntil)

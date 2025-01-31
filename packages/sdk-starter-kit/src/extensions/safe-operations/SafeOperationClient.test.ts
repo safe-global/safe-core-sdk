@@ -50,8 +50,7 @@ const SAFE_OPERATION = new SafeOperationV06(
   {
     chainId: 1n,
     entryPoint: '0xEntryPoint',
-    moduleAddress: '0xModuleAddress',
-    sharedSigner: '0xSharedSigner'
+    moduleAddress: '0xModuleAddress'
   }
 )
 

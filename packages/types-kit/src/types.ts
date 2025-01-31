@@ -351,7 +351,6 @@ export type SafeOperationOptions = {
   moduleAddress: string
   entryPoint: string
   chainId: bigint
-  sharedSigner: string
   validAfter?: number
   validUntil?: number
 }

@@ -8,8 +8,7 @@ describe('SafeOperation', () => {
     const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[0],
-      sharedSigner: fixtures.SHARED_SIGNER
+      entryPoint: fixtures.ENTRYPOINTS[0]
     })
 
     expect(safeOperation.getSafeOperation()).toMatchObject({
@@ -35,8 +34,7 @@ describe('SafeOperation', () => {
     const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[0],
-      sharedSigner: fixtures.SHARED_SIGNER
+      entryPoint: fixtures.ENTRYPOINTS[0]
     })
 
     safeOperation.addSignature(new EthSafeSignature('0xSigner', '0xSignature'))
@@ -53,8 +51,7 @@ describe('SafeOperation', () => {
     const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[0],
-      sharedSigner: fixtures.SHARED_SIGNER
+      entryPoint: fixtures.ENTRYPOINTS[0]
     })
 
     safeOperation.addSignature(new EthSafeSignature('0xSigner1', '0xSignature1'))
@@ -67,8 +64,7 @@ describe('SafeOperation', () => {
     const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[0],
-      sharedSigner: fixtures.SHARED_SIGNER
+      entryPoint: fixtures.ENTRYPOINTS[0]
     })
 
     safeOperation.addEstimations({
@@ -98,8 +94,7 @@ describe('SafeOperation', () => {
     const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[0],
-      sharedSigner: fixtures.SHARED_SIGNER
+      entryPoint: fixtures.ENTRYPOINTS[0]
     })
 
     safeOperation.addSignature(

@@ -1,4 +1,5 @@
 import semverSatisfies from 'semver/functions/satisfies'
+import { toHex } from 'viem'
 import Safe, {
   EthSafeSignature,
   encodeMultiSendData,
@@ -13,6 +14,7 @@ import {
   OperationType,
   SafeOperationConfirmation,
   SafeOperationResponse,
+  SafeSignature,
   SigningMethod
 } from '@safe-global/types-kit'
 import {
@@ -483,18 +485,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
       userOperation.callData += this.#onchainIdentifier
     }
 
-    const safeOperation = SafeOperationFactory.createSafeOperation(
-      userOperation,
-      this.protocolKit,
-      {
-        chainId: this.#chainId,
-        moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
-        entryPoint: this.#ENTRYPOINT_ADDRESS,
-        sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-        validUntil,
-        validAfter
-      }
-    )
+    const safeOperation = SafeOperationFactory.createSafeOperation(userOperation, {
+      chainId: this.#chainId,
+      moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
+      entryPoint: this.#ENTRYPOINT_ADDRESS,
+      sharedSigner: this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+      validUntil,
+      validAfter
+    })
 
     return await this.getEstimateFee({
       safeOperation,
@@ -527,7 +525,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
         paymasterAndData: concat([paymaster, paymasterData]),
         signature: safeOperationResponse.preparedSignature || '0x'
       },
-      this.protocolKit,
       {
         chainId: this.#chainId,
         moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
@@ -577,7 +574,78 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOp = safeOperation
     }
 
-    await safeOp.sign(signingMethod)
+    const safeProvider = this.protocolKit.getSafeProvider()
+    const signerAddress = await safeProvider.getSignerAddress()
+    const isPasskeySigner = await safeProvider.isPasskeySigner()
+
+    if (!signerAddress) {
+      throw new Error('There is no signer address available to sign the SafeOperation')
+    }
+
+    const isOwner = await this.protocolKit.isOwner(signerAddress)
+    const isSafeDeployed = await this.protocolKit.isSafeDeployed()
+
+    if ((!isOwner && isSafeDeployed) || (!isSafeDeployed && !isPasskeySigner && !isOwner)) {
+      throw new Error('UserOperations can only be signed by Safe owners')
+    }
+
+    let safeSignature: SafeSignature
+
+    if (isPasskeySigner) {
+      const safeOpHash = safeOp.getHash()
+
+      if (!isSafeDeployed) {
+        const passkeySignature = await this.protocolKit.signHash(safeOpHash)
+        safeSignature = new EthSafeSignature(
+          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+          passkeySignature.data,
+          true
+        )
+      } else {
+        safeSignature = await this.protocolKit.signHash(safeOpHash)
+      }
+    } else {
+      if (
+        [
+          SigningMethod.ETH_SIGN_TYPED_DATA_V4,
+          SigningMethod.ETH_SIGN_TYPED_DATA_V3,
+          SigningMethod.ETH_SIGN_TYPED_DATA
+        ].includes(signingMethod)
+      ) {
+        const signer = await safeProvider.getExternalSigner()
+
+        if (!signer) {
+          throw new Error('No signer found')
+        }
+
+        const signerAddress = signer.account.address
+        const safeOperation = safeOp.getSafeOperation()
+        const signature = await signer.signTypedData({
+          domain: {
+            chainId: Number(this.#chainId),
+            verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
+          },
+          types: safeOp.getEIP712Type(),
+          message: {
+            ...safeOperation,
+            nonce: BigInt(safeOperation.nonce),
+            validAfter: toHex(safeOperation.validAfter),
+            validUntil: toHex(safeOperation.validUntil),
+            maxFeePerGas: toHex(safeOperation.maxFeePerGas),
+            maxPriorityFeePerGas: toHex(safeOperation.maxPriorityFeePerGas)
+          },
+          primaryType: 'SafeOp'
+        })
+
+        safeSignature = new EthSafeSignature(signerAddress, signature)
+      } else {
+        const safeOpHash = safeOp.getHash()
+
+        safeSignature = await this.protocolKit.signHash(safeOpHash)
+      }
+    }
+
+    safeOp.addSignature(safeSignature)
 
     return safeOp
   }

@@ -7,13 +7,12 @@ import {
 import { concat, Hex, isAddress, pad, toHex } from 'viem'
 import SafeOperationBase from '@safe-global/relay-kit/packs/safe-4337/SafeOperationBase'
 import { EIP712_SAFE_OPERATION_TYPE_V07 } from '@safe-global/relay-kit/packs/safe-4337/constants'
-import Safe from '@safe-global/protocol-kit'
 
 class SafeOperationV07 extends SafeOperationBase {
   userOperation!: UserOperationV07
 
-  constructor(userOperation: UserOperationV07, protocolKit: Safe, options: SafeOperationOptions) {
-    super(userOperation, protocolKit, options)
+  constructor(userOperation: UserOperationV07, options: SafeOperationOptions) {
+    super(userOperation, options)
   }
 
   addEstimations(estimations: EstimateGasData): void {

@@ -1,11 +1,11 @@
 import { Hex, encodePacked } from 'viem'
-import Safe, { EthSafeSignature } from '@safe-global/protocol-kit'
+import { EthSafeSignature } from '@safe-global/protocol-kit'
 import SafeOperationV06 from './SafeOperationV06'
 import * as fixtures from './testing-utils/fixtures'
 
 describe('SafeOperation', () => {
   it('should create a SafeOperation from an UserOperation', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, new Safe(), {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0],
@@ -32,7 +32,7 @@ describe('SafeOperation', () => {
   })
 
   it('should add and retrieve signatures', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, new Safe(), {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0],
@@ -50,7 +50,7 @@ describe('SafeOperation', () => {
   })
 
   it('should encode the signatures', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, new Safe(), {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0],
@@ -64,7 +64,7 @@ describe('SafeOperation', () => {
   })
 
   it('should add estimations', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, new Safe(), {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0],
@@ -95,7 +95,7 @@ describe('SafeOperation', () => {
   })
 
   it('should retrieve the UserOperation', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, new Safe(), {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0],

@@ -1,4 +1,3 @@
-import Safe from '@safe-global/protocol-kit'
 import {
   UserOperationV06,
   EstimateGasData,
@@ -11,8 +10,8 @@ import { EIP712_SAFE_OPERATION_TYPE_V06 } from '@safe-global/relay-kit/packs/saf
 class SafeOperationV06 extends SafeOperationBase {
   userOperation!: UserOperationV06
 
-  constructor(userOperation: UserOperationV06, protocolKit: Safe, options: SafeOperationOptions) {
-    super(userOperation, protocolKit, options)
+  constructor(userOperation: UserOperationV06, options: SafeOperationOptions) {
+    super(userOperation, options)
   }
 
   addEstimations(estimations: EstimateGasData): void {

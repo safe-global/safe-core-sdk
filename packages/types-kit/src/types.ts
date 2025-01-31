@@ -366,7 +366,6 @@ export interface SafeOperation {
   encodedSignatures(): string
   addEstimations(estimations: EstimateGasData): void
   getSafeOperation(): SafeUserOperation
-  sign(signingMethod: SigningMethod): void
   getUserOperation(): UserOperation
   getHash(): string
 }
@@ -375,10 +374,7 @@ export const isSafeOperation = (response: unknown): response is SafeOperation =>
   const safeOperation = response as SafeOperation
 
   return (
-    'userOperation' in safeOperation &&
-    'options' in safeOperation &&
-    'signatures' in safeOperation &&
-    'protocolKit' in safeOperation
+    'userOperation' in safeOperation && 'options' in safeOperation && 'signatures' in safeOperation
   )
 }
 

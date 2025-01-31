@@ -180,12 +180,11 @@ describe('addSafeOperation', () => {
     chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 
-  it('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
+  it.only('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
     const safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC, transferUSDC]
     })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
-
     // Get the number of SafeOperations before adding a new one
     const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS

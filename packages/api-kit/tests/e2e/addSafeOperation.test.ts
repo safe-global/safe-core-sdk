@@ -180,7 +180,7 @@ describe('addSafeOperation', () => {
     chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 
-  it.only('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
+  it('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
     const safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC, transferUSDC]
     })

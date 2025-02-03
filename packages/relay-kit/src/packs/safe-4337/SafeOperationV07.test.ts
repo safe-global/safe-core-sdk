@@ -7,8 +7,8 @@ describe('SafeOperationV07', () => {
   it('should create a SafeOperation from an UserOperation', () => {
     const safeOperation = new SafeOperationV07(fixtures.USER_OPERATION_V07, {
       chainId: BigInt(fixtures.CHAIN_ID),
-      moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[1]
+      moduleAddress: fixtures.SAFE_4337_MODULE_ADDRESS_V0_3_0,
+      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
     })
 
     expect(safeOperation.getSafeOperation()).toMatchObject({
@@ -27,7 +27,7 @@ describe('SafeOperationV07', () => {
       paymasterAndData: '0x',
       validAfter: 0,
       validUntil: 0,
-      entryPoint: fixtures.ENTRYPOINTS[1]
+      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
     })
 
     expect(safeOperation.signatures.size).toBe(0)
@@ -36,8 +36,8 @@ describe('SafeOperationV07', () => {
   it('should add estimations', () => {
     const safeOperation = new SafeOperationV07(fixtures.USER_OPERATION_V07, {
       chainId: BigInt(fixtures.CHAIN_ID),
-      moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[1]
+      moduleAddress: fixtures.SAFE_4337_MODULE_ADDRESS_V0_3_0,
+      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
     })
 
     safeOperation.addEstimations({
@@ -62,15 +62,15 @@ describe('SafeOperationV07', () => {
       paymasterAndData: '0x',
       validAfter: 0,
       validUntil: 0,
-      entryPoint: fixtures.ENTRYPOINTS[1]
+      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
     })
   })
 
   it('should retrieve the UserOperation', () => {
     const safeOperation = new SafeOperationV07(fixtures.USER_OPERATION_V07, {
       chainId: BigInt(fixtures.CHAIN_ID),
-      moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[1]
+      moduleAddress: fixtures.SAFE_4337_MODULE_ADDRESS_V0_3_0,
+      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
     })
 
     safeOperation.addSignature(

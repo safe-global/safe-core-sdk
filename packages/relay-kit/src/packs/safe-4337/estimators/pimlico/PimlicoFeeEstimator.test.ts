@@ -30,8 +30,8 @@ describe('PimlicoFeeEstimator', () => {
   it('should enable to setup the gas estimation', async () => {
     const sponsoredGasEstimation = await estimator.setupEstimation({
       bundlerUrl: fixtures.BUNDLER_URL,
-      userOperation: fixtures.USER_OPERATION,
-      entryPoint: fixtures.ENTRYPOINTS[0]
+      userOperation: fixtures.USER_OPERATION_V07,
+      entryPoint: fixtures.ENTRYPOINTS[1]
     })
 
     expect(sponsoredGasEstimation).toEqual({
@@ -43,8 +43,8 @@ describe('PimlicoFeeEstimator', () => {
   it('should enable to adjust the gas estimation', async () => {
     const sponsoredGasEstimation = await estimator.adjustEstimation({
       bundlerUrl: fixtures.BUNDLER_URL,
-      userOperation: fixtures.USER_OPERATION,
-      entryPoint: fixtures.ENTRYPOINTS[0]
+      userOperation: fixtures.USER_OPERATION_V07,
+      entryPoint: fixtures.ENTRYPOINTS[1]
     })
 
     expect(sponsoredGasEstimation).toEqual({})
@@ -52,14 +52,14 @@ describe('PimlicoFeeEstimator', () => {
 
   it('should get the paymaster estimation', async () => {
     const paymasterGasEstimation = await estimator.getPaymasterEstimation({
-      userOperation: fixtures.USER_OPERATION,
+      userOperation: fixtures.USER_OPERATION_V07,
       bundlerUrl: fixtures.BUNDLER_URL,
       paymasterOptions: {
         paymasterUrl: fixtures.PAYMASTER_URL,
         paymasterAddress: fixtures.PAYMASTER_ADDRESS,
         paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS
       },
-      entryPoint: fixtures.ENTRYPOINTS[0]
+      entryPoint: fixtures.ENTRYPOINTS[1]
     })
 
     expect(paymasterGasEstimation).toEqual(fixtures.SPONSORED_GAS_ESTIMATION)

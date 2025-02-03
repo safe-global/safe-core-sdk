@@ -3,25 +3,25 @@ import { EthSafeSignature } from '@safe-global/protocol-kit'
 import SafeOperationV06 from './SafeOperationV06'
 import * as fixtures from './testing-utils/fixtures'
 
-describe('SafeOperation', () => {
+describe('SafeOperationV06', () => {
   it('should create a SafeOperation from an UserOperation', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION_V06, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
     })
 
     expect(safeOperation.getSafeOperation()).toMatchObject({
-      safe: fixtures.USER_OPERATION.sender,
-      nonce: fixtures.USER_OPERATION.nonce,
-      initCode: fixtures.USER_OPERATION.initCode,
-      callData: fixtures.USER_OPERATION.callData,
-      callGasLimit: fixtures.USER_OPERATION.callGasLimit,
-      verificationGasLimit: fixtures.USER_OPERATION.verificationGasLimit,
-      preVerificationGas: fixtures.USER_OPERATION.preVerificationGas,
-      maxFeePerGas: fixtures.USER_OPERATION.maxFeePerGas,
-      maxPriorityFeePerGas: fixtures.USER_OPERATION.maxPriorityFeePerGas,
-      paymasterAndData: fixtures.USER_OPERATION.paymasterAndData,
+      safe: fixtures.USER_OPERATION_V06.sender,
+      nonce: fixtures.USER_OPERATION_V06.nonce,
+      initCode: fixtures.USER_OPERATION_V06.initCode,
+      callData: fixtures.USER_OPERATION_V06.callData,
+      callGasLimit: fixtures.USER_OPERATION_V06.callGasLimit,
+      verificationGasLimit: fixtures.USER_OPERATION_V06.verificationGasLimit,
+      preVerificationGas: fixtures.USER_OPERATION_V06.preVerificationGas,
+      maxFeePerGas: fixtures.USER_OPERATION_V06.maxFeePerGas,
+      maxPriorityFeePerGas: fixtures.USER_OPERATION_V06.maxPriorityFeePerGas,
+      paymasterAndData: fixtures.USER_OPERATION_V06.paymasterAndData,
       validAfter: 0,
       validUntil: 0,
       entryPoint: fixtures.ENTRYPOINTS[0]
@@ -30,38 +30,8 @@ describe('SafeOperation', () => {
     expect(safeOperation.signatures.size).toBe(0)
   })
 
-  it('should add and retrieve signatures', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
-      chainId: BigInt(fixtures.CHAIN_ID),
-      moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[0]
-    })
-
-    safeOperation.addSignature(new EthSafeSignature('0xSigner', '0xSignature'))
-
-    expect(safeOperation.signatures.size).toBe(1)
-    expect(safeOperation.getSignature('0xSigner')).toMatchObject({
-      signer: '0xSigner',
-      data: '0xSignature',
-      isContractSignature: false
-    })
-  })
-
-  it('should encode the signatures', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
-      chainId: BigInt(fixtures.CHAIN_ID),
-      moduleAddress: fixtures.MODULE_ADDRESS,
-      entryPoint: fixtures.ENTRYPOINTS[0]
-    })
-
-    safeOperation.addSignature(new EthSafeSignature('0xSigner1', '0xSignature1'))
-    safeOperation.addSignature(new EthSafeSignature('0xSigner2', '0xSignature2'))
-
-    expect(safeOperation.encodedSignatures()).toBe('0xSignature1Signature2')
-  })
-
   it('should add estimations', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION_V06, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
@@ -74,16 +44,16 @@ describe('SafeOperation', () => {
     })
 
     expect(safeOperation.getSafeOperation()).toMatchObject({
-      safe: fixtures.USER_OPERATION.sender,
-      nonce: fixtures.USER_OPERATION.nonce,
-      initCode: fixtures.USER_OPERATION.initCode,
-      callData: fixtures.USER_OPERATION.callData,
+      safe: fixtures.USER_OPERATION_V06.sender,
+      nonce: fixtures.USER_OPERATION_V06.nonce,
+      initCode: fixtures.USER_OPERATION_V06.initCode,
+      callData: fixtures.USER_OPERATION_V06.callData,
       callGasLimit: BigInt(fixtures.GAS_ESTIMATION.callGasLimit),
       verificationGasLimit: BigInt(fixtures.GAS_ESTIMATION.verificationGasLimit),
       preVerificationGas: BigInt(fixtures.GAS_ESTIMATION.preVerificationGas),
-      maxFeePerGas: fixtures.USER_OPERATION.maxFeePerGas,
-      maxPriorityFeePerGas: fixtures.USER_OPERATION.maxPriorityFeePerGas,
-      paymasterAndData: fixtures.USER_OPERATION.paymasterAndData,
+      maxFeePerGas: fixtures.USER_OPERATION_V06.maxFeePerGas,
+      maxPriorityFeePerGas: fixtures.USER_OPERATION_V06.maxPriorityFeePerGas,
+      paymasterAndData: fixtures.USER_OPERATION_V06.paymasterAndData,
       validAfter: 0,
       validUntil: 0,
       entryPoint: fixtures.ENTRYPOINTS[0]
@@ -91,7 +61,7 @@ describe('SafeOperation', () => {
   })
 
   it('should retrieve the UserOperation', () => {
-    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION, {
+    const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION_V06, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.MODULE_ADDRESS,
       entryPoint: fixtures.ENTRYPOINTS[0]
@@ -106,7 +76,7 @@ describe('SafeOperation', () => {
 
     expect(safeOperation.getUserOperation()).toMatchObject({
       sender: safeOperation.userOperation.sender,
-      nonce: fixtures.USER_OPERATION.nonce,
+      nonce: fixtures.USER_OPERATION_V06.nonce,
       initCode: safeOperation.userOperation.initCode,
       callData: safeOperation.userOperation.callData,
       callGasLimit: safeOperation.userOperation.callGasLimit,
